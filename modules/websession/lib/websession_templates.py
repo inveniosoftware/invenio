@@ -27,7 +27,7 @@ import locale
 from invenio.config import *
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
-from invenio.websession_config import cfg_websession_group_join_policy,cfg_websession_usergroup_status
+from invenio.websession_config import cfg_websession_group_join_policy
 class Template:
     def tmpl_lost_password_message(self, ln, supportemail):
         """
@@ -939,7 +939,7 @@ class Template:
         </a>""" 
         
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text="Groups you are administrator of")        
+                                          text="Your are administrator of the following groups:")        
 
         out += self.tmpl_infobox(infos)
 
@@ -961,14 +961,14 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" %(_("Name"), _("Description"))
+  <tbody class="mailboxbody">""" %(_("Group"), _("Description"))
         if len(groups) == 0:
             out += """
     <tr class="mailboxrecord" style="height: 100px;">
       <td colspan="4" style="text-align: center;">
-        %s
+        <small>%s</small>
       </td>
-    </tr>""" %(_("No Group you are the administrator"),)
+    </tr>""" %(_("You are not administrator of any group."),)
         for group_data in groups:
             (grpID, name, description) = group_data
             edit_link = img_link % {'weburl' : weburl,
@@ -1011,7 +1011,7 @@ class Template:
 
     def tmpl_display_member_group(self, groups, infos, ln=cdslang):
         _ = gettext_set_language(ln)
-        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text="Groups you are member of")
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text="You are member of the following groups: ")
         group_text += self.tmpl_infobox(infos)
         group_text += """
 <table class="mailbox">
@@ -1027,14 +1027,14 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" % (_("Name"), _("Description"))
+  <tbody class="mailboxbody">""" % (_("Group"), _("Description"))
         if len(groups) == 0:
             group_text += """
     <tr class="mailboxrecord" style="height: 100px;">
       <td colspan="2" style="text-align: center;">
         <small>%s</small>
       </td>
-    </tr>""" %(_("No Group you are member of"),)
+    </tr>""" %(_("You are not member of any group."),)
         for group_data in groups:
             (id, name, description) = group_data
             group_text += """
@@ -1043,11 +1043,9 @@ class Template:
       <td>%s</td>
     </tr>""" %(name, description)
         group_text += """
+    <tr>
     <tr class="mailboxfooter">
       <td>
-      <table>
-       <tr>
-        <td>
           <form name="newGroup" action="join?ln=%(ln)s" method="post">
            <input type="submit" name="join_group" value="%(join_label)s" class="formbutton" />
           </form>
@@ -1058,11 +1056,7 @@ class Template:
          </form>
         </td>
        </tr>
-       </table>
-       </td>
-      <td>&nbsp;</td>
-     </tr> 
-  </tbody>
+     </tbody>
 </table>
  """ % {'ln': ln,
                'join_label': _("Join new group"),
@@ -1083,7 +1077,7 @@ class Template:
         hidden_id =""
         form_name = "create_group"
         action = weburl + '/yourgroups/create'
-        button_label = _("Create a new group")
+        button_label = _("Create new group")
         button_name = "create_button"
         label = _("Create New Group")
         delete_text = ""
@@ -1093,7 +1087,7 @@ class Template:
             action = weburl + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
-            label = _("Edit Group")
+            label = _('Edit group: ' + group_name)
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
             delete_text %= (_("Delete group"),"delete")
             if grpID != "":
@@ -1165,10 +1159,10 @@ class Template:
                 'logo': weburl + '/img/webbasket_create.png',
                 'label': label,
                 'form_name' : form_name,
-                'name_label': _("Group's name"),
+                'name_label': _("Group name: "),
                 'delete_text': delete_text,
-                'description_label': _("Group's description"),
-                'join_policy_label': _("Group's join policy"),
+                'description_label': _("Group description: "),
+                'join_policy_label': _("Group join policy: "),
                 'group_name': group_name,
                 'group_description': group_description,
                 'button_label': button_label,
@@ -1197,7 +1191,7 @@ class Template:
             if group_from_search != []:
                 search_content += self.__create_select_menu('grpID', group_from_search, _("Please select:"))
             else:
-                search_content += _("No matching Group")
+                search_content += _("No matching group")
         
             search_content += """</td><td>&nbsp;</td></tr>"""
             
@@ -1261,10 +1255,10 @@ class Template:
                 'logo': weburl + '/img/webbasket_create.png',
                 'label': _("Join group"),
                 'group_name': group_name,
-                'label2':_("Or find it:"),
-                'list_label':_("Group list"),
+                'label2':_("or find it: "),
+                'list_label':_("Choose group:"),
                 'ln': ln,
-                'find_label': _("Find a group"),
+                'find_label': _("Find group"),
                 'cancel_label':_("Cancel"),
                 'group_list' :self.__create_select_menu("grpID",group_list, _("Please Select:")),
                 'search_content' : search_content
@@ -1284,61 +1278,156 @@ class Template:
         out = self.tmpl_warning(warnings)
         out += """
 <form name="member" action="%(action)s" method="POST">
+ <p>%(title)s</p>
+ <input type="hidden" name="ln" value="%(ln)s" />
  <input type="hidden" name="grpID" value="%(grpID)s"/>
  <table>
-  <tr>
-   <td>
-    %(header1)s
-    <table>
-    <tr>
-     <td>"""
-        if infos[0]:
-            out += self.tmpl_infobox(infos[0])
-        out += """
-        %(member_list)s
-     </td>
-     <td>
-      <input type="submit" name="remove_member" value="%(label_remove)s" class="nonsubmitbutton"/>
-     </td>
-    </tr>
-   </table>
-   </td>
-  </tr>
-  <tr>
-   <td>
-    %(header2)s
-    <table>
-     <tr>
-      <td>"""
-        if infos[1]:
-            out += self.tmpl_infobox(infos[1])
-        out += """
-        %(pending_list)s
-      </td>
-      <td>
-       <input type="submit" name="add_member" value="%(label_add)s" class="nonsubmitbutton"/>
-      </td>
-     </tr>
-    </table>
-   </td>
-  </tr>
- </table>
-</form>
  """
-        member_list =   self.__create_select_menu("member_id", members, _("Please Select:"))
-        pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please Select:"))
+        if infos[0]:
+            out += "<tr><td>"
+            out += self.tmpl_infobox(infos[0])
+            out += "</td></tr>"
+        out += """
+  <tr>
+   <td>
+    <table class="bskbasket">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup.png" alt="Members" />
+        </td>
+
+        <td class="bsktitle">
+          <b>%(header1)s</b><br />
+          &nbsp;
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>          
+            <tr>
+            %(member_text)s
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+ </td>    
+ </tr>"""
+        if infos[1]:
+            out += "<tr><td>"
+            out += self.tmpl_infobox(infos[1])
+            out += "</td></tr>"
+        out += """
+ <tr>
+  <td>
+   <table class="bskbasket">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup_gray.png" alt="PendingMembers" />
+        </td>
+
+        <td class="bsktitle">
+          <b>%(header2)s</b><br />
+          &nbsp;
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>          
+            <tr>
+             %(pending_text)s
+            </tr>
+          </table>
+          </td>
+      </tr>
+    </tbody>
+  </table>
+ </td>    
+ </tr>
+ <tr>
+  <td>
+  <table class="bskbasket" style="width: 400px">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="http://pcusrent01.cern.ch/img/iconpen.gif" alt="Invite" />
+        </td>
+
+        <td class="bsktitle">
+          <b>%(header3)s</b><br />
+          &nbsp;
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>          
+            <tr>
+             <td collspan="2" style="padding: 0 5 10 5;">%(invite_text)s</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+ </td>
+</tr>
+<tr>
+ <td>
+  <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+ </td>
+</tr>
+</table>
+</form>
+      """
+        
+        
+        if members :
+            member_list =   self.__create_select_menu("member_id", members, _("Please Select:"))
+            member_text = """
+            <td style="padding: 0 5 10 5;">%s</td>
+            <td style="padding: 0 5 10 5;">
+            <input type="submit" name="remove_member" value="%s" class="nonsubmitbutton"/>
+            </td>""" %  (member_list,_("Remove member"))
+        else :
+            member_text = """<td style="padding: 0 5 10 5;" collspan="2">No member</td>"""
+        if pending_members :
+            pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please Select:"))
+            pending_text = """
+            <td style="padding: 0 5 10 5;">%s</td>
+            <td style="padding: 0 5 10 5;">
+            <input type="submit" name="add_member" value="%s" class="nonsubmitbutton"/>
+            </td>""" %  (pending_list,_("Add member"))
+        else :
+            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">No pending member</td>""" 
+        
         header1 = self.tmpl_group_table_title(text="Current members")
         header2 = self.tmpl_group_table_title(text="Waiting members")
+        header3 = _("Invite new members")
+        url_write = '<a href="' + weburl + '/yourmessages/write?ln=%s' + '">web message</a>'
+        url_write %= ln
+        invite_text = _("If you want to invite new members to join your group, please use the %s system." % url_write)
         action = weburl + '/yourgroups/members?ln=%s'
         action %= (ln)
-        out %= {'member_list' : member_list,
-                'pending_list' : pending_list,
+        out %= {'title':_('Group: <b>%s</b>' % group_name),
+                'member_text' : member_text,
+                'pending_text' :pending_text,
                 'action':action,
                 'grpID':grpID,
-                'label_remove' : _("Remove member"),
-                'label_add' : _("Add Member"),
                 'header1': header1,
-                'header2': header2
+                'header2': header2,
+                'header3': header3,
+                'invite_text': invite_text,
+                'cancel_label':_("Cancel"),
+                'ln':ln
                 }
         return out
     
@@ -1350,24 +1439,68 @@ class Template:
         out = self.tmpl_warning(warnings)
         out += """
 <form name="leave" action="%(action)s" method="POST">
- <table>
+ <input type="hidden" name="ln" value="%(ln)s" />
+  <div style="padding:10px;">
+  <table class="bskbasket">
+    <thead class="bskbasketheader">
+      <tr>
+        <td class="bskactions">
+          <img src="%(logo)s" alt="%(label)s" />
+        </td>
+        <td class="bsktitle">
+          <b>%(label)s</b><br />
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="2">
+          <table>
+            <tr>
+              <td>%(list_label)s</td>
+              <td>
+               %(groups)s
+               </td>
+              <td>
+               &nbsp;
+              </td>
+            </tr>
+           </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <table>
   <tr>
    <td>
-    %(groups)s
+    %(submit)s
    </td>
    <td>
-    <input type="submit" name="leave_button" value="%(label)s" class="formbutton"/>
+    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
    </td>
-  </tr>
- </table>
+   </tr>
+  </table>
+ </div>
 </form>
  """
-        groups =   self.__create_select_menu("grpID", groups, _("Please Select:"))
+        if groups:
+            groups =   self.__create_select_menu("grpID", groups, _("Please Select:"))
+            list_label = _("Group list: ")
+            submit = """<input type="submit" name="leave_button" value="%s" class="formbutton"/>""" % _("Leave group")
+        else :
+            groups = _("You are not member of any group.")
+            list_label = ""
+            submit = ""
         action = weburl + '/yourgroups/leave?ln=%s'
         action %= (ln)
         out %= {'groups' : groups,
+                'list_label' : list_label,
                 'action':action,
-                'label' : _("Leave Group"),
+                'logo': weburl + '/img/webbasket_create.png',
+                'label' : _("Leave group"),
+                'cancel_label':_("Cancel"),
+                'ln' :ln,
+                'submit' : submit
                 }
         return out
         
@@ -1459,11 +1592,7 @@ class Template:
         elements = [(cfg_websession_group_join_policy['VISIBLEOPEN'],
                      _("Visible and open for new member")),
                     (cfg_websession_group_join_policy['VISIBLEMAIL'],
-                     _("Visible but need approval for new member")),
-                    (cfg_websession_group_join_policy['INVISIBLEOPEN'],
-                     _("Not visible and open for new member")),
-                    (cfg_websession_group_join_policy['INVISIBLEMAIL'],
-                     _("Not Visible and need approval for new member")),
+                     _("Visible but need approval for new member"))
                     ]
         select_text = _("Please select")
         return self.__create_select_menu(name, elements, select_text, selected_key=current_join_policy)
@@ -1545,11 +1674,12 @@ class Template:
                             ln=cdslang):
         
         _ = gettext_set_language(ln)
-        sujet = "%s : New user is pending" % group_name
+        sujet = "%s : New user request" % group_name
         url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
-        body = """A new user wants to join %s .<br/>
-                  <br/>You can add him by clicking on:<br/>
-                  <a href="%s">%s</a>"""
-        body %= (group_name, url, _("Edit Members"))
+        link = """<a href="%s">%s</a>""" % (url, _("here"))
+        body = """A new user wants to join group %s .<br/>
+                  Click %s to accept the new member<br/>
+                  """
+        body %= (group_name, link)
         return sujet, body

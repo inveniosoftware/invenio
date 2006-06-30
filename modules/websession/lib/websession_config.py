@@ -45,7 +45,7 @@ cfg_websession_info_messages = {1:'You have successfully created a new group.',
                                 4:'You have successfully deleted a group.',
                                 5:'You have successfully deleted a member.',
                                 6:'You have successfully added a new member.',
-                                7:'The administrator has been notified of your request for joining.<br/>You will be noticed when accepted.',
+                                7:'The group administrator has been notified of your request.',
                                 8:'You have successfully left a group.'
                                
 }

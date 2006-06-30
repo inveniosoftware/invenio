@@ -29,38 +29,24 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
 from invenio.config import *
 
-def get_is_admin_of_group(uid):
-    """Select all the groups the user is admin of"""
+def get_groups_by_user_status(uid, user_status):
+    """Select all the groups the user is admin of
+    @param uid: user id
+    @return ((id_usergroup,
+              group_name,
+              group_description, ))
+    """
     query = """SELECT g.id,
                       g.name,
                       g.description
-               FROM usergroup g, user_usergroup ug               WHERE ug.id_user=%i AND
-                     ug.id_usergroup=g.id AND
-                     ug.user_status="A"
-               
-               ORDER BY g.name"""
-    uid = int(uid)
-    res = run_sql(query % uid)
-    return res  
-
-def get_is_member_of_group(uid,desc=0):
-    """Select all the groups the user is member of"""
-    if desc:
-        select = """SELECT g.id,
-                      g.name,
-                      g.description"""
-    else:
-        select = """SELECT g.id,
-                      g.name"""
-    query = select + """
                FROM usergroup g, user_usergroup ug
                WHERE ug.id_user=%i AND
                      ug.id_usergroup=g.id AND
-                     ug.user_status="M"
+                     ug.user_status="%s"
                
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query % uid)
+    res = run_sql(query % (uid, escape_string(user_status)))
     return res  
 
 def get_visible_group_list(uid, pattern=""):
@@ -85,7 +71,7 @@ def get_visible_group_list(uid, pattern=""):
         query2 += """ WHERE id NOT IN %s""" % str(tuple(grpID))
 
     if pattern:
-        pattern_query = """ AND name RLIKE '%s'""" % pattern
+        pattern_query = """ AND name RLIKE '%s'""" % escape_string(pattern)
         query2 += pattern_query
     query2 += """ ORDER BY name"""
     res2 = run_sql(query2)
@@ -109,14 +95,14 @@ def get_groupnames_like(uid, pattern=""):
                 FROM usergroup g, user_usergroup ug 
                 WHERE g.id=ug.id_usergroup AND ug.id_user=%i"""
     if pattern :
-        pattern_query = """ AND g.name RLIKE '%s'""" % pattern
+        pattern_query = """ AND g.name RLIKE '%s'""" % escape_string(pattern)
         query2 += pattern_query
     res = run_sql(query2 % uid)
     map(lambda x: groups.setdefault(x[0], x[1]), res)
     return groups
 
 
-def  insert_new_group(uid,
+def insert_new_group(uid,
                       new_group_name,
                       new_group_description,
                       join_policy):
@@ -125,7 +111,9 @@ def  insert_new_group(uid,
                 VALUES
                 (NULL,'%s','%s','%s')
                 """
-    params1 = (new_group_name, new_group_description, join_policy)
+    params1 = (escape_string(new_group_name),
+               escape_string(new_group_description),
+               escape_string(join_policy))
     res1 = run_sql(query1 % params1)
 
     date = convert_datestruct_to_datetext(localtime())
@@ -149,7 +137,7 @@ def insert_new_member(uid,
     date = convert_datestruct_to_datetext(localtime())
     uid = int(uid)
     grpID = int(grpID)
-    query %= (uid, grpID, status, date)
+    query %= (uid, grpID, escape_string(status), date)
     res = run_sql(query)
     return res
 
@@ -170,7 +158,9 @@ def update_group_infos(grpID,
                SET name="%s", description="%s", join_policy="%s"
                WHERE id = %i"""
     grpID = int(grpID)
-    res = run_sql(query% (group_name, group_description, join_policy, grpID))
+    res = run_sql(query% (escape_string(group_name),
+                          escape_string(group_description),
+                          escape_string(join_policy), grpID))
     return res
 
 def get_user_status(uid, grpID):
@@ -193,7 +183,7 @@ def get_users_by_status(grpID, status, ln=cdslang):
                AND ug.id_user=u.id
                AND user_status = '%s'"""
     grpID = int(grpID)
-    res = run_sql(query% (grpID, status))
+    res = run_sql(query% (grpID, escape_string(status)))
     users = []
     if res:
         for (mid, nickname) in res:
@@ -213,12 +203,26 @@ def delete_member(grpID, member_id):
     res = run_sql(query% (grpID, member_id))
     return res
 
+
 def delete_group(grpID):
     """Delete member"""
     query = """DELETE FROM usergroup
                WHERE id = %i
                """
     grpID = int(grpID)
+    res = run_sql(query% grpID)
+    return res
+
+def delete_group_and_members(grpID):
+    """Delete the group and its members"""
+    query = """DELETE FROM usergroup
+               WHERE id = %i
+               """
+    grpID = int(grpID)
+    res = run_sql(query% grpID)
+    query = """DELETE FROM user_usergroup
+               WHERE id_usergroup = %i
+               """
     res = run_sql(query% grpID)
     return res
 
@@ -231,11 +235,11 @@ def add_pending_member(grpID, member_id, user_status):
     date = convert_datestruct_to_datetext(localtime())
     grpID = int(grpID)
     member_id = int(member_id)
-    res = run_sql(query% (user_status, date, grpID, member_id))
+    res = run_sql(query% (escape_string(user_status), date, grpID, member_id))
     return res
 
 
-def leave_group(grpID,uid):
+def leave_group(grpID, uid):
     query = """DELETE FROM user_usergroup
                WHERE id_usergroup=%i
                AND id_user=%i"""
@@ -243,7 +247,14 @@ def leave_group(grpID,uid):
     uid = int(uid)
     res = run_sql(query% (grpID, uid))
     return res
-    
+
+def group_name_exist(group_name):
+    query = """SELECT id
+               FROM usergroup
+               WHERE name='%s'"""
+    res = run_sql(query % escape_string(group_name))
+    return res
+
 ########################## helpful functions ##################################
 
 def __wash_count(res):
