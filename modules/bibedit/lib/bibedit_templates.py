@@ -440,7 +440,7 @@ class Template:
                                %(message1)s
                              </b>
                           </span><br/><br/>
-                      """ % {'message1' : _("Cannot edit deleted Record.")}
+                      """ % {'message1' : _("Cannot edit deleted record.")}
                 
         else:
             result = ''
