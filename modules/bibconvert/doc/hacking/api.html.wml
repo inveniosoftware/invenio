@@ -30,7 +30,7 @@
 CDS Invenio BibConvert can be called from within your Python 
 programs via a high-level API.
 
-BibConvert High-level API
+BibConvert High-level API (subject to change)
 
    Description:
 
