@@ -15,16 +15,39 @@ records, including 400,000 fulltext documents, covering preprints,
 articles, books, journals, photographs, videos, and more.  Please
 consult <http://cdsweb.cern.ch/> for details.
 
-We aim at user friendliness and speed.  Among the features of CDS are:
+We aim at user friendliness and speed.  Among the features are:
 
-  - Configurable portal-like interfaces for hosting various kind of
-    collections.
+  - Navigable collection tree
 
-  - Powerful search engine with Google-like syntax and integrated
-    metadata, reference and fulltext searching.
+    . Documents organised in collections
+    . Regular and virtual collection trees
+    . Customizable portalboxes for each collection
+    . At CERN, over 800,000 documents in 500 collections
 
-  - User personalization, including document baskets and email
-    notification alerts.
+  - Powerful search engine
+
+    . Specially designed indexes to provide Google-like search speeds
+      for repositories of up to 1,500,000 records
+    . Customizable simple and advanced search interfaces
+    . Combined metadata, fulltext and citation search in one go
+    . Results clustering by collection
+
+  - Flexible metadata
+
+    . Standard metadata format (MARC)
+    . Handling articles, books, theses, photos, videos, museum objects
+      and more
+    . Customizable batch imports and web submission lines
+    . Customizable output display and linking rules
+
+  - Collaborative features and personalization
+
+    . User-defined document baskets
+    . User-defined automated email notification alerts
+    . Basket-sharing within user groups
+    . Messaging between users
+    . Open peer commentin and reviewing of repository documents and in
+      group-shared baskets
 
 The CDS Invenio is free software licenced under terms of GNU General
 Public Licence (GPL).  It is provided on an "as is" basis.  However,
