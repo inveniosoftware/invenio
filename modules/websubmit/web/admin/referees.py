@@ -25,7 +25,7 @@ import time
 import types
 import re
 import shutil
-from invenio.config import cdsname,cdslang
+from invenio.config import cdsname,cdslang,weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
@@ -125,10 +125,8 @@ def displayRefereesPage(doctype,warningText):
     t+= """
     </TD></TR></TABLE>
 <!-- End submissionuser rule -->
-    <SMALL>
-    <INPUT class=\"adminbutton\" TYPE=submit VALUE='FINISHED' onclick="document.forms[0].action='documentEDS.php';document.forms[0].submit();">
-    </SMALL>
-    </FORM>"""
+    <a href="%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s">Finished</a>
+    </FORM>""" % (weburl, doctype)
     return t
     
 def displayUserTable(doctype):
