@@ -155,100 +155,118 @@ def save_update_to_file(filepath, filecontent, notruncate=0, appendmode=0):
             raise InvenioWebSubmitAdminWarningIOError(msg)
     return
 
-## def wash_form_var(var, test_type, force_convert=0, minlen=None, maxlen=None):
-##     """Intended to be used to test values submitted to a form, to see whether they
-##        meet some criteria, as defined by the "test_type" argument
-##        @param svar: the string value to test
-##        @param typematch: the type that we want to test our string against - may take
-##          a value of:
-##          'alphanum' : the value may only contain alphanumeric values and the underscore
-##                       (the set [a-zA-Z0-9_])
-##          'alpha'    : the value may only contain alphabetical values (the set [a-zA-Z])
-##          'digit'    : the value may only contain the integer digits [0-9]
-##        @param forcematch: 
-##     """
-##     out = None
-##     var_ok = 1 ## Assume that var is correct type (will reset flag if not)
+def string_is_alphanumeric_including_underscore(txtstring):
+    p_txtstring = re.compile(r'^\w*$')
+    m_txtstring = p_txtstring.search(txtstring)
+    if m_txtstring is not None:
+        return 1
+    else:
+        return 0
 
-##     if test_type == 'alphanum':
-##         ## Test to see whether
-##         pass
-##     elif test_type == 'alpha':
-##         pass
-##     elif test_type == 'digit':
-##         pass
-##     elif test_type == 'str':
-##         pass
-##     elif test_type == 'int':
-##         pass
-##     elif test_type == 'list':
-##         pass
-##     elif test_type == 'tuple':
-##         pass
-##     elif test_type == 'dict':
-##         pass
+def function_name_is_valid(fname):
+    p_fname = re.compile(r'^(_|[a-zA-Z])\w*$')
+    m_fname = p_fname.search(fname)
+    if m_fname is not None:
+        return 1
+    else:
+        return 0
 
+def wash_single_urlarg(urlarg, argreqdtype, argdefault, maxstrlen=None, minstrlen=None, truncatestr=0):
+    """Wash a single argument according to some specifications.
+       @param urlarg: the argument to be tested, as passed from the form/url, etc
+       @param argreqdtype: (a python type) the type that the argument should conform to (argument required
+        type)
+       @argdefault: the default value that should be returned for the argument in the case that it
+        doesn't comply with the washing specifications
+       @param maxstrlen: (integer) the maximum length for a string argument; defaults to None, which means
+        that no maximum length is forced upon the string
+       @param minstrlen: (integer) the minimum length for a string argument; defaults to None, which means
+        that no minimum length is forced upon the string
+       @truncatestr: (integer) should be 1 or 0 (ZERO). A flag used to determine whether or not a string
+        argument that overstretches the maximum length (if one if provided) should be truncated, or reset
+        to the default for the argument. 0, means don't truncate and reset the argument; 1 means truncate
+        the string.
+       @return: the washed argument
+       @exceptions raised:
+            - ValueError: when it is not possible to cast an argument to the type passed as argreqdtype
+    """
+    ## sanity checking:
+    if maxstrlen is not None and type(maxstrlen) is not int:
+        maxstrlen = None
+    elif maxstrlen is int and maxstrlen < 1:
+        maxstrlen = None
+    if minstrlen is not None and type(minstrlen) is not int:
+        minstrlen = None
+    elif minstrlen is int and minstrlen < 1:
+        minstrlen = None
 
-    
-##     testtypes = ('alphanum', 'alpha', 'digit')
-##     if typematch not in testtypes:
-##         raise TypeError("Unknown value for typematch")
-##     (re.compile(r'\W',re.U)).search
-        
-## def wash_url_argument(var, new_type):
-##     """
-##     Wash argument into 'new_type', that can be 'list', 'str', 'int', 'tuple' or 'dict'.
-##     If needed, the check 'type(var) is not None' should be done before calling this function
-##     @param var: variable value
-##     @param new_type: variable type, 'list', 'str', 'int', 'tuple' or 'dict'
-##     @return as much as possible, value var as type new_type
-##             If var is a list, will change first element into new_type.
-##             If int check unsuccessful, returns 0
-##     """
-##     out = []
-##     if new_type == 'list':  # return lst
-##         if type(var) is list:
-##             out = var
-##         else:
-##             out = [var]
-##     elif new_type == 'str':  # return str
-##         if type(var) is list:
-##             try:
-##                 out = "%s" % var[0]
-##             except:
-##                 out = ""
-##         elif type(var) is str:
-##             out = var
-##         else:
-##             out = "%s" % var
-##     elif new_type == 'int': # return int
-##         if type(var) is list:
-##             try:
-##                 out = int(var[0])
-##             except:
-##                 out = 0
-##         elif type(var) is int:
-##             out = var
-##         elif type(var) is str:
-##             try:
-##                 out = int(var)
-##             except:
-##                 out = 0
-##         else:
-##             out = 0
-##     elif new_type == 'tuple': # return tuple
-##         if type(var) is tuple:
-##             out = var
-##         else:
-##             out = (var,)
-##     elif new_type == 'dict': # return dictionary
-##         if type(var) is dict:
-##             out = var
-##         else:
-##             out = {0:var}
-##     return out
+    result = ""
+    arg_dst_type = argreqdtype
 
+    ## if no urlarg, return the default for that argument:
+    if urlarg is None:
+        result = argdefault
+        return result
 
+    ## get the type of the argument passed:
+    arg_src_type = type(urlarg)
+    value = urlarg
+
+    # First, handle the case where we want all the results. In
+    # this case, we need to ensure all the elements are strings,
+    # and not Field instances.
+    if arg_src_type in (list, tuple):
+        if arg_dst_type is list:
+            result = [str(x) for x in value]
+            return result
+
+        if arg_dst_type is tuple:
+            result = tuple([str(x) for x in value])
+            return result
+
+        # in all the other cases, we are only interested in the
+        # first value.
+        value = value[0]
+
+    # Maybe we already have what is expected? Then don't change
+    # anything.
+    if arg_src_type is arg_dst_type:
+        result = value
+        if arg_dst_type is str and maxstrlen is not None and len(result) > maxstrlen:
+            if truncatestr != 0:
+                result = result[0:maxstrlen]
+            else:
+                result = argdefault
+        elif arg_dst_type is str and minstrlen is not None and len(result) < minstrlen:
+            result = argdefault
+        return result
+
+    if arg_dst_type in (str, int):
+        try:
+            result = arg_dst_type(value)
+
+            if arg_dst_type is str and maxstrlen is not None and len(result) > maxstrlen:
+                if truncatestr != 0:
+                    result = result[0:maxstrlen]
+                else:
+                    result = argdefault
+            elif arg_dst_type is str and minstrlen is not None and len(result) < minstrlen:
+                result = argdefault
+        except:
+            result = argdefault
+    elif arg_dst_type is tuple:
+        result = (value,)
+
+    elif arg_dst_type is list:
+        result = [value]
+
+    elif arg_dst_type is dict:
+        result = {0: str(value)}
+
+    else:
+        raise ValueError('cannot cast form argument into type %r' % (arg_dst_type,))
+
+    return result
 
 
 ## Internal Business-Logic functions
@@ -266,37 +284,71 @@ def _add_new_action(actid,actname,working_dir,status_text):
     err_code = insert_action_details(actid,actname,working_dir,status_text)
     return err_code
 
-def perform_request_add_function(funcname="", funcdescr="", funcaddcommit=""):
+def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""):
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Create New WebSubmit Function"
+    commit_error=0
 
+    ## wash args:
+    if funcname != None:
+        try:
+            funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="", maxstrlen=40, minstrlen=1)
+            if function_name_is_valid(fname=funcname) == 0:
+                funcname = ""
+        except ValueError, e:
+            funcname = ""
+    else:
+        funcname = ""
+    if funcdescr != None:
+        try:
+            funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            funcdescr = ""
+    else:
+        funcdescr = ""
+
+    ## process request:
     if funcaddcommit != "" and funcaddcommit != None:
+        if funcname == "":
+            funcname = ""
+            user_msg.append("""Function name is mandatory and must be a string with no more than 40 characters""")
+            user_msg.append("""It must contain only alpha-numeric and underscore characters, beginning with a """\
+                            """letter or underscore""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            body = websubmitadmin_templates.tmpl_display_addfunctionform(funcdescr=funcdescr, user_msg=user_msg)
+            return (title, body, errors, warnings)
+
         ## Add a new function definition - IF it is not already present
         err_code = insert_function_details(funcname, funcdescr)
 
         ## Handle error code - redisplay form with warning about no DB commit, or display with options
         ## to edit function:
         if err_code == 0:
-            user_msg = """'%s' Function Added to WebSubmit""" % (funcname,)
+            user_msg.append("""'%s' Function Added to WebSubmit""" % (funcname,))
+            all_function_parameters = get_distinct_paramname_all_websubmit_function_parameters()
             body = websubmitadmin_templates.tmpl_display_addfunctionform(funcname=funcname,
                                                                          funcdescr=funcdescr,
+                                                                         all_websubmit_func_parameters=all_function_parameters,
                                                                          perform_act="functionedit",
-                                                                         user_msg=user_msg
-                                                                        )
+                                                                         user_msg=user_msg)
         else:
             ## Could not commit function to WebSubmit DB - redisplay form with function description:
-            user_msg = """Could Not Add '%s' Function to WebSubmit""" % (funcname,)
+            user_msg.append("""Could Not Add '%s' Function to WebSubmit""" % (funcname,))
             body = websubmitadmin_templates.tmpl_display_addfunctionform(funcdescr=funcdescr, user_msg=user_msg)
 
     else:
         ## Display Web form for new function addition:
-        body = websubmitadmin_templates.tmpl_display_addfunctionform(funcdescr=funcdescr)
+        body = websubmitadmin_templates.tmpl_display_addfunctionform()
 
     return (title, body, errors, warnings)
 
-def perform_request_add_action(actid="",actname="",working_dir="",status_text="", actcommit=""):
+def perform_request_add_action(actid=None, actname=None, working_dir=None, status_text=None, actcommit=""):
     """An interface for the addition of a new WebSubmit action.
        If form fields filled, will insert new action into WebSubmit database, else will display
        web form prompting for action details.
@@ -307,12 +359,62 @@ def perform_request_add_action(actid="",actname="",working_dir="",status_text=""
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Create New WebSubmit Action"
+    commit_error=0
 
+    ## wash args:
+    if actid != None:
+        try:
+            actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
+            if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
+                actid = ""
+        except ValueError, e:
+            actid = ""
+    else:
+        actid = ""
+    if actname != None:
+        try:
+            actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            actname = ""
+    else:
+        actname = ""
+    if working_dir != None:
+        try:
+            working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            working_dir = ""
+    else:
+        working_dir = ""
+    if status_text != None:
+        try:
+            status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            status_text = ""
+    else:
+        status_text = ""
+
+    ## process request:
     if actcommit != "" and actcommit != None:
+        if actid in ("", None):
+            actid = ""
+            user_msg.append("""Action ID is mandatory and must be a 3 letter string""")
+            commit_error = 1
+        if actname in ("", None):
+            actname = ""
+            user_msg.append("""Action description is mandatory""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            body = websubmitadmin_templates.tmpl_display_addactionform(actid=actid, actname=actname, working_dir=working_dir,\
+                                                                       status_text=status_text, user_msg=user_msg)
+            return (title, body, errors, warnings)
+
         ## Commit new action to WebSubmit DB:
         err_code = _add_new_action(actid,actname,working_dir,status_text)
 
@@ -328,17 +430,14 @@ def perform_request_add_action(actid="",actname="",working_dir="",status_text=""
             ## Could not commit action to WebSubmit DB redisplay form with completed details and error message
             ## warnings.append(('ERR_WEBSUBMIT_ADMIN_ADDACTIONFAILDUPLICATE',actid) ## TODO
             user_msg = """Could Not Add '%s' Action to WebSubmit""" % (actid,)
-            body = websubmitadmin_templates.tmpl_display_addactionform(actid=actid, actname=actname, working_dir=working_dir, status_text=status_text, user_msg=user_msg)
+            body = websubmitadmin_templates.tmpl_display_addactionform(actid=actid, actname=actname, working_dir=working_dir, \
+                                                                       status_text=status_text, user_msg=user_msg)
     else:
         ## Display Web form for new action details:
-        user_msg = ""
-## FIXME - ERROR CHECKING
-##         if actname != "":
-##             user_msg = """The field "Action Description" is Mandatory"""
-        body = websubmitadmin_templates.tmpl_display_addactionform(actid=actid, actname=actname, working_dir=working_dir, status_text=status_text, user_msg=user_msg)
+        body = websubmitadmin_templates.tmpl_display_addactionform()
     return (title, body, errors, warnings)
 
-def perform_request_add_jscheck(chname="", chdesc="", chcommit=""):
+def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
     """An interface for the addition of a new WebSubmit JavaScript Check, as used on form elements.
        If form fields filled, will insert new Check into WebSubmit database, else will display
        Web form prompting for Check details.
@@ -347,12 +446,45 @@ def perform_request_add_jscheck(chname="", chdesc="", chcommit=""):
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Create New WebSubmit Checking Function"
+    commit_error=0
 
+    ## wash args:
+    if chname != None:
+        try:
+            chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if function_name_is_valid(fname=chname) == 0:
+                chname = ""
+        except ValueError, e:
+            chname = ""
+    else:
+        chname = ""
+    if chdesc != None:
+        try:
+            chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            chdesc = ""
+    else:
+        chdesc = ""
+
+    ## process request:
     if chcommit != "" and chcommit != None:
+        if chname in ("", None):
+            chname = ""
+            user_msg.append("""Check name is mandatory and must be a string with no more than 15 characters""")
+            user_msg.append("""It must contain only alpha-numeric and underscore characters, beginning with a """\
+                            """letter or underscore""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=chname, chdesc=chdesc, user_msg=user_msg)
+            return (title, body, errors, warnings)
+
         ## Commit new check to WebSubmit DB:
         err_code = insert_jscheck_details(chname, chdesc)
 
@@ -360,48 +492,156 @@ def perform_request_add_jscheck(chname="", chdesc="", chcommit=""):
         ## of checks
         if err_code == 0:
             ## Check added: show page listing WebSubmit JS Checks
-            user_msg = """'%s' Checking Function Added to WebSubmit""" % (chname,)
+            user_msg.append("""'%s' Checking Function Added to WebSubmit""" % (chname,))
             all_jschecks = get_chname_alljschecks()
             body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
             title = "Available WebSubmit Checking Functions"
         else:
             ## Could not commit Check to WebSubmit DB: redisplay form with completed details and error message
             ## TODO : Warning Message
-            user_msg = """Could Not Add '%s' Checking Function to WebSubmit""" % (chname,)
+            user_msg.append("""Could Not Add '%s' Checking Function to WebSubmit""" % (chname,))
             body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=chname, chdesc=chdesc, user_msg=user_msg)
     else:
         ## Display Web form for new check details:
-        user_msg = ""
-## FIXME - ERROR CHECKING
-##         if chdesc != "":
-##             user_msg = """The field "Check Name" is Mandatory"""
-        body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=chname, chdesc=chdesc, user_msg=user_msg)
+        body = websubmitadmin_templates.tmpl_display_addjscheckform()
     return (title, body, errors, warnings)
 
-def perform_request_add_element(elname="", elmarccode="", eltype="", elsize="", elrows="", \
-                                elcols="", elmaxlength="", elval="", elfidesc="", \
-                                elmodifytext="", elcookie="", elcommit=""):
+def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsize=None, elrows=None, \
+                                elcols=None, elmaxlength=None, elval=None, elfidesc=None, \
+                                elmodifytext=None, elcookie=None, elcommit=""):
     """An interface for adding a new ELEMENT to the WebSubmit DB.
-       @param elname: element name.
-       @param elmarccode: element's MARC code.
-       @param eltype: element type.
-       @param elsize: element size.
-       @param elrows: number of rows in element.
-       @param elcols: number of columns in element.
-       @param elmaxlength: maximum length of element
-       @param elval: default value of element
-       @param elfidesc: description of element
-       @param elmodifytext: modification text of element
-       @param elcookie: does the element set a cookie?
-       @param elcommit: If this value is not empty, attempt to commit element details to WebSubmit DB
+       @param elname: (string) element name.
+       @param elmarccode: (string) element's MARC code.
+       @param eltype: (character) element type.
+       @param elsize: (integer) element size.
+       @param elrows: (integer) number of rows in element.
+       @param elcols: (integer) number of columns in element.
+       @param elmaxlength: (integer) maximum length of element
+       @param elval: (string) default value of element
+       @param elfidesc: (string) description of element
+       @param elmodifytext: (string) modification text of element
+       @param elcookie: (integer) does the element set a cookie?
+       @param elcommit: (string) If this value is not empty, attempt to commit element details to WebSubmit DB
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Create New WebSubmit Element"
+    commit_error=0
+
+    ## wash args:
+    if elname != None:
+        try:
+            elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
+                elname = ""
+        except ValueError, e:
+            elname = ""
+    else:
+        elname = ""
+    if elmarccode != None:
+        try:
+            elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elmarccode = ""
+    else:
+        elmarccode = ""
+    if eltype != None:
+        try:
+            eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
+        except ValueError, e:
+            eltype = ""
+    else:
+        eltype = ""
+    if elsize != None:
+        try:
+            elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elsize = ""
+    else:
+        elsize = ""
+    if elrows != None:
+        try:
+            elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elrows = ""
+    else:
+        elrows = ""
+    if elcols != None:
+        try:
+            elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elcols = ""
+    else:
+        elcols = ""
+    if elmaxlength != None:
+        try:
+            elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elmaxlength = ""
+    else:
+        elmaxlength = ""
+    if elval != None:
+        try:
+            elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elval = ""
+    else:
+        elval = ""
+    if elfidesc != None:
+        try:
+            elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elfidesc = ""
+    else:
+        elfidesc = ""
+    if elmodifytext != None:
+        try:
+            elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elmodifytext = ""
+    else:
+        elmodifytext = ""
+    if elcookie != None:
+        try:
+            elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
+        except ValueError, e:
+            elcookie = 0
+    else:
+        elcookie = 0
+
+    ## process request:
     if elcommit != "" and elcommit != None:
+        if elname == "":
+            elname = ""
+            user_msg.append("""The element name is mandatory and must be a string with no more than 15 characters""")
+            user_msg.append("""It must contain only alpha-numeric and underscore characters""")
+            commit_error = 1
+        if eltype == "" or eltype not in ("D", "F", "H", "I", "R", "S", "T"):
+            eltype = ""
+            user_msg.append("""The element type is mandatory and must be selected from the list""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            body = websubmitadmin_templates.tmpl_display_addelementform(elname=elname,
+                                                                        elmarccode=elmarccode,
+                                                                        eltype=eltype,
+                                                                        elsize=str(elsize),
+                                                                        elrows=str(elrows),
+                                                                        elcols=str(elcols),
+                                                                        elmaxlength=str(elmaxlength),
+                                                                        elval=elval,
+                                                                        elfidesc=elfidesc,
+                                                                        elmodifytext=elmodifytext,
+                                                                        elcookie=str(elcookie),
+                                                                        user_msg=user_msg,
+                                                                       )
+            return (title, body, errors, warnings)
+
         ## Commit new element description to WebSubmit DB:
         ## First, wash and check arguments:
         
@@ -411,48 +651,35 @@ def perform_request_add_element(elname="", elmarccode="", eltype="", elsize="", 
                                           elmodifytext=elmodifytext, elcookie=elcookie)
         if err_code == 0:
             ## Element added: show page listing WebSubmit elements
-            user_msg = """'%s' Element Added to WebSubmit""" % (elname,)
+            user_msg.append("""'%s' Element Added to WebSubmit""" % (elname,))
             title = "Available WebSubmit Elements"
             all_elements = get_elename_allelements()
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
         else:
             ## Could not commit element to WebSubmit DB: redisplay form with completed details and error message
             ## TODO : Warning Message
-            user_msg = """Could Not Add '%s' Element to WebSubmit""" % (elname,)
+            user_msg.append("""Could Not Add '%s' Element to WebSubmit""" % (elname,))
             body = websubmitadmin_templates.tmpl_display_addelementform(elname=elname,
                                                                         elmarccode=elmarccode,
                                                                         eltype=eltype,
-                                                                        elsize=elsize,
-                                                                        elrows=elrows,
-                                                                        elcols=elcols,
-                                                                        elmaxlength=elmaxlength,
+                                                                        elsize=str(elsize),
+                                                                        elrows=str(elrows),
+                                                                        elcols=str(elcols),
+                                                                        elmaxlength=str(elmaxlength),
                                                                         elval=elval,
                                                                         elfidesc=elfidesc,
                                                                         elmodifytext=elmodifytext,
-                                                                        elcookie=elcookie,
+                                                                        elcookie=str(elcookie),
                                                                         user_msg=user_msg,
                                                                        )
     else:
         ## Display Web form for new element details:
-        user_msg = ""
-        body = websubmitadmin_templates.tmpl_display_addelementform(elname=elname,
-                                                                    elmarccode=elmarccode,
-                                                                    eltype=eltype,
-                                                                    elsize=elsize,
-                                                                    elrows=elrows,
-                                                                    elcols=elcols,
-                                                                    elmaxlength=elmaxlength,
-                                                                    elval=elval,
-                                                                    elfidesc=elfidesc,
-                                                                    elmodifytext=elmodifytext,
-                                                                    elcookie=elcookie,
-                                                                    user_msg=user_msg,
-                                                                   )
+        body = websubmitadmin_templates.tmpl_display_addelementform()
     return (title, body, errors, warnings)
 
-def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
-                                 elrows="", elcols="", elmaxlength="", elval="", \
-                                 elfidesc="", elmodifytext="", elcookie="", elcommit=""):
+def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=None, \
+                                 elrows=None, elcols=None, elmaxlength=None, elval=None, \
+                                 elfidesc=None, elmodifytext=None, elcookie=None, elcommit=""):
     """An interface for the editing and updating the details of a WebSubmit ELEMENT.
        @param elname: element name.
        @param elmarccode: element's MARC code.
@@ -469,11 +696,115 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Edit WebSubmit Element"
+    commit_error=0
+
+    ## wash args:
+    if elname != None:
+        try:
+            elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
+                elname = ""
+        except ValueError, e:
+            elname = ""
+    else:
+        elname = ""
+    if elmarccode != None:
+        try:
+            elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elmarccode = ""
+    else:
+        elmarccode = ""
+    if eltype != None:
+        try:
+            eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
+        except ValueError, e:
+            eltype = ""
+    else:
+        eltype = ""
+    if elsize != None:
+        try:
+            elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elsize = ""
+    else:
+        elsize = ""
+    if elrows != None:
+        try:
+            elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elrows = ""
+    else:
+        elrows = ""
+    if elcols != None:
+        try:
+            elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elcols = ""
+    else:
+        elcols = ""
+    if elmaxlength != None:
+        try:
+            elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            elmaxlength = ""
+    else:
+        elmaxlength = ""
+    if elval != None:
+        try:
+            elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elval = ""
+    else:
+        elval = ""
+    if elfidesc != None:
+        try:
+            elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elfidesc = ""
+    else:
+        elfidesc = ""
+    if elmodifytext != None:
+        try:
+            elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            elmodifytext = ""
+    else:
+        elmodifytext = ""
+    if elcookie != None:
+        try:
+            elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
+        except ValueError, e:
+            elcookie = 0
+    else:
+        elcookie = 0
+
+    ## process request:
     if elcommit != "" and elcommit != None:
+        if elname == "":
+            elname = ""
+            user_msg.append("""Invalid Element Name!""")
+            commit_error = 1
+        if eltype == "" or eltype not in ("D", "F", "H", "I", "R", "S", "T"):
+            eltype = ""
+            user_msg.append("""Invalid Element Type!""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            all_elements = get_elename_allelements()
+            user_msg.append("""Could Not Update Element""")
+            title = "Available WebSubmit Elements"
+            body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
+            return (title, body, errors, warnings)
+
+
+
         ## Commit updated element description to WebSubmit DB:
         err_code = update_element_details(elname=elname, elmarccode=elmarccode, eltype=eltype, \
                                           elsize=elsize, elrows=elrows, elcols=elcols, \
@@ -481,7 +812,7 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
                                           elmodifytext=elmodifytext, elcookie=elcookie)
         if err_code == 0:
             ## Element Updated: Show All Element Details Again
-            user_msg = """'%s' Element Updated""" % (elname,)
+            user_msg.append("""'%s' Element Updated""" % (elname,))
             ## Get submission page usage of element:
             el_use = get_doctype_action_pagenb_for_submissions_using_element(elname)
             element_dets = get_element_details(elname)
@@ -511,10 +842,10 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
                                                                         el_use_tuple=el_use
                                                                        )
         else:
-            ## Could Not Update Element: Maybe Key Violation, or Invalid elname? Redisplay all Checks.
+            ## Could Not Update Element: Maybe Key Violation, or Invalid elname? Redisplay all elements.
             ## TODO : LOGGING
             all_elements = get_elename_allelements()
-            user_msg = """Could Not Update Element '%s'""" % (elname,)
+            user_msg.append("""Could Not Update Element '%s'""" % (elname,))
             title = "Available WebSubmit Elements"
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
     else:
@@ -556,16 +887,47 @@ def perform_request_edit_element(elname, elmarccode="", eltype="", elsize="", \
             all_elements = get_elename_allelements()
             if num_rows_ret > 1:
                 ## Key Error - duplicated elname
-                user_msg = """Found Several Rows for Element with Name '%s' - Inform Administrator""" % (elname,)
+                user_msg.append("""Found Several Rows for Element with Name '%s' - Inform Administrator""" % (elname,))
                 ## LOG MESSAGE
             else:
                 ## No rows for ELEMENT
-                user_msg = """Could Not Find Any Rows for Element with Name '%s'""" % (elname,)
+                user_msg.append("""Could Not Find Any Rows for Element with Name '%s'""" % (elname,))
                 ## LOG MESSAGE
             body = websubmitadmin_templates.tmpl_display_allelements(all_elements, user_msg=user_msg)
     return (title, body, errors, warnings)
 
-def perform_request_edit_jscheck(chname, chdesc="", chcommit=""):
+def _display_edit_check_form(errors, warnings, chname, user_msg=""):
+    title = "Edit WebSubmit Checking Function"
+    if user_msg == "":
+        user_msg = []
+    jscheck_dets = get_jscheck_details(chname)
+    num_rows_ret = len(jscheck_dets)
+    if num_rows_ret == 1:
+        ## Display Check details
+        body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=jscheck_dets[0][0],
+                                                                    chdesc=jscheck_dets[0][1],
+                                                                    perform_act="jscheckedit",
+                                                                    cd=jscheck_dets[0][2],
+                                                                    md=jscheck_dets[0][3],
+                                                                    user_msg=user_msg)
+    else:
+        ## Either no rows, or more than one row for Check: log error, and display all Checks
+        ## TODO : LOGGING
+        title = "Available WebSubmit Checking Functions"
+        all_jschecks = get_chname_alljschecks()
+        if num_rows_ret > 1:
+            ## Key Error - duplicated chname
+            user_msg.append("""Found Several Rows for Checking Function with Name '%s' - Inform Administrator""" % (chname,))
+            ## LOG MESSAGE
+        else:
+            ## No rows for action
+            user_msg.append("""Could Not Find Any Rows for Checking Function with Name '%s'""" % (chname,))
+            ## LOG MESSAGE
+        body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
+    return (title, body)
+
+
+def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
     """Interface for editing and updating the details of a WebSubmit Check.
        If only "chname" provided, will display the details of a Check in a Web form.
        If "chdesc" not empty, will assume that this is a call to commit update to Check details.
@@ -574,19 +936,53 @@ def perform_request_edit_jscheck(chname, chdesc="", chcommit=""):
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Edit WebSubmit Checking Function"
+    commit_error=0
+
+    ## wash args:
+    if chname != None:
+        try:
+            chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if function_name_is_valid(fname=chname) == 0:
+                chname = ""
+        except ValueError, e:
+            chname = ""
+    else:
+        chname = ""
+    if chdesc != None:
+        try:
+            chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            chdesc = ""
+    else:
+        chdesc = ""
     (chname, chdesc) = (str(chname), str(chdesc))
 
-## FIXME - ERROR CHECKING
     if chcommit != "" and chcommit != None:
+        if chname in ("", None):
+            chname = ""
+            user_msg.append("""Check name is mandatory and must be a string with no more than 15 characters""")
+            user_msg.append("""It must contain only alpha-numeric and underscore characters, beginning with a """\
+                            """letter or underscore""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            all_jschecks = get_chname_alljschecks()
+            user_msg.append("""Could Not Update Checking Function""")
+            body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
+            title = "Available WebSubmit Checking Functions"
+            return (title, body, errors, warnings)
+
         ## Commit updated Check details to WebSubmit DB:
         err_code = update_jscheck_details(chname, chdesc)
         if err_code == 0:
             ## Check Updated: Show All Check Details Again
-            user_msg = """'%s' Check Updated""" % (chname,)
+            user_msg.append("""'%s' Check Updated""" % (chname,))
             jscheck_dets = get_jscheck_details(chname)
             body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=jscheck_dets[0][0],
                                                                         chdesc=jscheck_dets[0][1],
@@ -599,38 +995,47 @@ def perform_request_edit_jscheck(chname, chdesc="", chcommit=""):
             ## Could Not Update Check: Maybe Key Violation, or Invalid chname? Redisplay all Checks.
             ## TODO : LOGGING
             all_jschecks = get_chname_alljschecks()
-            user_msg = """Could Not Update Checking Function '%s'""" % (chname,)
+            user_msg.append("""Could Not Update Checking Function '%s'""" % (chname,))
             body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
             title = "Available WebSubmit Checking Functions"
     else:
         ## Display Web form containing existing details of Check:
-        jscheck_dets = get_jscheck_details(chname)
-        num_rows_ret = len(jscheck_dets)
-        if num_rows_ret == 1:
-            ## Display Check details
-            body = websubmitadmin_templates.tmpl_display_addjscheckform(chname=jscheck_dets[0][0],
-                                                                        chdesc=jscheck_dets[0][1],
-                                                                        perform_act="jscheckedit",
-                                                                        cd=jscheck_dets[0][2],
-                                                                        md=jscheck_dets[0][3]
-                                                                       )
-        else:
-            ## Either no rows, or more than one row for Check: log error, and display all Checks
-            ## TODO : LOGGING
-            title = "Available WebSubmit Checking Functions"
-            all_jschecks = get_chname_alljschecks()
-            if num_rows_ret > 1:
-                ## Key Error - duplicated chname
-                user_msg = """Found Several Rows for Checking Function with Name '%s' - Inform Administrator""" % (chname,)
-                ## LOG MESSAGE
-            else:
-                ## No rows for action
-                user_msg = """Could Not Find Any Rows for Checking Function with Name '%s'""" % (chname,)
-                ## LOG MESSAGE
-            body = websubmitadmin_templates.tmpl_display_alljschecks(all_jschecks, user_msg=user_msg)
+        (title, body) = _display_edit_check_form(errors, warnings, chname=chname)
     return (title, body, errors, warnings)
 
-def perform_request_edit_action(actid, actname="", working_dir="", status_text="", actcommit=""):
+def _display_edit_action_form(errors, warnings, actid, user_msg=""):
+    title = "Edit WebSubmit Action"
+    if user_msg == "":
+        user_msg = []
+    action_dets = get_action_details(actid)
+    num_rows_ret = len(action_dets)
+    if num_rows_ret == 1:
+        ## Display action details
+        body = websubmitadmin_templates.tmpl_display_addactionform(actid=action_dets[0][0],
+                                                                   actname=action_dets[0][1],
+                                                                   working_dir=action_dets[0][2],
+                                                                   status_text=action_dets[0][3],
+                                                                   perform_act="actionedit",
+                                                                   cd=action_dets[0][4],
+                                                                   md=action_dets[0][5],
+                                                                   user_msg=user_msg)
+    else:
+        ## Either no rows, or more than one row for action: log error, and display all actions
+        ## TODO : LOGGING
+        title = "Available WebSubmit Actions"
+        all_actions = get_actid_actname_allactions()
+        if num_rows_ret > 1:
+            ## Key Error - duplicated actid
+            user_msg.append("""Found Several Rows for Action with ID '%s' - Inform Administrator""" % (actid,))
+            ## LOG MESSAGE
+        else:
+            ## No rows for action
+            user_msg.append("""Could Not Find Any Rows for Action with ID '%s'""" % (actid,))
+            ## LOG MESSAGE
+        body = websubmitadmin_templates.tmpl_display_allactions(all_actions, user_msg=user_msg)
+    return (title, body)
+
+def perform_request_edit_action(actid, actname=None, working_dir=None, status_text=None, actcommit=""):
     """Interface for editing and updating the details of a WebSubmit action.
        If only "actid" provided, will display the details of an action in a Web form.
        If "actname" not empty, will assume that this is a call to commit update to action details.
@@ -641,19 +1046,63 @@ def perform_request_edit_action(actid, actname="", working_dir="", status_text="
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
     """
+    user_msg = []
     errors = []
     warnings = []
     body = ""
     title = "Edit WebSubmit Action"
-    (actid, actname, working_dir, status_text) = (str(actid).upper(), str(actname), str(working_dir), str(status_text))
+    commit_error = 0
 
-## FIXME - ERROR CHECKING
+    ## wash args:
+    if actid != None:
+        try:
+            actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
+            if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
+                actid = ""
+        except ValueError, e:
+            actid = ""
+        actid = actid.upper()
+    else:
+        actid = ""
+    if actname != None:
+        try:
+            actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            actname = ""
+    else:
+        actname = ""
+    if working_dir != None:
+        try:
+            working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            working_dir = ""
+    else:
+        working_dir = ""
+    if status_text != None:
+        try:
+            status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            status_text = ""
+    else:
+        status_text = ""
+
+    ## process request:
     if actcommit != "" and actcommit != None:
+        if actname in ("", None):
+            actname = ""
+            user_msg.append("""Action description is mandatory""")
+            commit_error = 1
+
+        if commit_error != 0:
+            ## don't commit - just re-display page with message to user
+            (title, body) = _display_edit_action_form(errors=errors, warnings=warnings, actid=actid, user_msg=user_msg)
+            return (title, body, errors, warnings)
+
         ## Commit updated action details to WebSubmit DB:
         err_code = update_action_details(actid, actname, working_dir, status_text)
         if err_code == 0:
             ## Action Updated: Show Action Details Again
-            user_msg = """'%s' Action Updated""" % (actid,)
+            user_msg.append("""'%s' Action Updated""" % (actid,))
             action_dets = get_action_details(actid)
             body = websubmitadmin_templates.tmpl_display_addactionform(actid=action_dets[0][0],
                                                                        actname=action_dets[0][1],
@@ -668,37 +1117,12 @@ def perform_request_edit_action(actid, actname="", working_dir="", status_text="
             ## Could Not Update Action: Maybe Key Violation, or Invalid actid? Redisplay all actions.
             ## TODO : LOGGING
             all_actions = get_actid_actname_allactions()
-            user_msg = """Could Not Update Action '%s'""" % (actid,)
+            user_msg.append("""Could Not Update Action '%s'""" % (actid,))
             body = websubmitadmin_templates.tmpl_display_allactions(all_actions, user_msg=user_msg)
             title = "Available WebSubmit Actions"
     else:
         ## Display Web form containing existing details of action:
-        action_dets = get_action_details(actid)
-        num_rows_ret = len(action_dets)
-        if num_rows_ret == 1:
-            ## Display action details
-            body = websubmitadmin_templates.tmpl_display_addactionform(actid=action_dets[0][0],
-                                                                       actname=action_dets[0][1],
-                                                                       working_dir=action_dets[0][2],
-                                                                       status_text=action_dets[0][3],
-                                                                       perform_act="actionedit",
-                                                                       cd=action_dets[0][4],
-                                                                       md=action_dets[0][5]
-                                                                       )
-        else:
-            ## Either no rows, or more than one row for action: log error, and display all actions
-            ## TODO : LOGGING
-            title = "Available WebSubmit Actions"
-            all_actions = get_actid_actname_allactions()
-            if num_rows_ret > 1:
-                ## Key Error - duplicated actid
-                user_msg = """Found Several Rows for Action with ID '%s' - Inform Administrator""" % (actid,)
-                ## LOG MESSAGE
-            else:
-                ## No rows for action
-                user_msg = """Could Not Find Any Rows for Action with ID '%s'""" % (actid,)
-                ## LOG MESSAGE
-            body = websubmitadmin_templates.tmpl_display_allactions(all_actions, user_msg=user_msg)
+        (title, body) = _display_edit_action_form(errors=errors, warnings=warnings, actid=actid)
     return (title, body, errors, warnings)
 
 def _functionedit_display_function_details(errors, warnings, funcname, user_msg=""):
@@ -709,6 +1133,8 @@ def _functionedit_display_function_details(errors, warnings, funcname, user_msg=
        @param user_msg: Any message to the user that is to be displayed on the page.
        @return: tuple containing (page title, HTML page body).
     """
+    if user_msg == "":
+        user_msg = []
     title = "Edit WebSubmit Function"
     func_descr_res = get_function_description(function=funcname)
     num_rows_ret = len(func_descr_res)
@@ -731,18 +1157,15 @@ def _functionedit_display_function_details(errors, warnings, funcname, user_msg=
     else:
         ## Either no rows, or more than one row for function: log error, and display all functions
         ## TODO : LOGGING
-        if user_msg != "":
-            ## display the intended message, followed by the new error message
-            user_msg += """<br />\n"""
         title = "Available WebSubmit Functions"
         all_functions = get_funcname_funcdesc_allfunctions()
         if num_rows_ret > 1:
             ## Key Error - duplicated function name
-            user_msg += """Found Several Rows for Function with Name '%s' - Inform Administrator""" % (funcname,)
+            user_msg.append("""Found Several Rows for Function with Name '%s' - Inform Administrator""" % (funcname,))
             ## LOG MESSAGE
         else:
             ## No rows for function
-            user_msg += """Could Not Find Any Rows for Function with Name '%s'""" % (funcname,)
+            user_msg.append("""Could Not Find Any Rows for Function with Name '%s'""" % (funcname,))
             ## LOG MESSAGE
         body = websubmitadmin_templates.tmpl_display_allfunctions(all_functions, user_msg=user_msg)
     return (title, body)
@@ -755,14 +1178,15 @@ def _functionedit_update_description(errors, warnings, funcname, funcdescr):
        @param funcdescr: description to be updated for funcname
        @return: a tuple containing (page title, HTML body content)
     """
+    user_msg = []
     err_code = update_function_description(funcname, funcdescr)
     if err_code == 0:
         ## Function updated - redisplay
-        user_msg = """'%s' Function Description Updated""" % (funcname,)
+        user_msg.append("""'%s' Function Description Updated""" % (funcname,))
     else:
         ## Could not update function description
 ## TODO : ERROR LIBS
-        user_msg = """Could Not Update Description for Function '%s'""" % (funcname,)
+        user_msg.append("""Could Not Update Description for Function '%s'""" % (funcname,))
     ## Display function details
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
@@ -779,15 +1203,16 @@ def _functionedit_delete_parameter(errors, warnings, funcname, deleteparam):
        @param deleteparam: the name of the parameter to be deleted from the function.
        @return: tuple containing (title, HTML body content)
     """
+    user_msg = []
     err_code = delete_function_parameter(function=funcname, parameter_name=deleteparam)
     if err_code == 0:
         ## Parameter deleted - redisplay function details
-        user_msg = """'%s' Parameter Deleted from '%s' Function""" % (deleteparam, funcname)
+        user_msg.append("""'%s' Parameter Deleted from '%s' Function""" % (deleteparam, funcname))
     else:
         ## could not delete param - it does not exist for this function
 ## TODO : ERROR LIBS
-        user_msg = """'%s' Parameter Does not Seem to Exist for Function '%s' - Could not Delete""" \
-                   % (deleteparam, funcname)
+        user_msg.append("""'%s' Parameter Does not Seem to Exist for Function '%s' - Could not Delete""" \
+                   % (deleteparam, funcname))
     ## Display function details
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
@@ -808,10 +1233,11 @@ def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="",
         list value.
        @return: tuple containing (title, HTML body content)
     """
+    user_msg = []
     if funceditaddparam in ("", None, "NO_VALUE") and funceditaddparamfree in ("", None):
         ## no parameter chosen
 ## TODO : ERROR LIBS
-        user_msg = """Unable to Find the Parameter to be Added to Function '%s' - Could not Add""" % (funcname,)
+        user_msg.append("""Unable to Find the Parameter to be Added to Function '%s' - Could not Add""" % (funcname,))
     else:
         add_parameter = ""
         if funceditaddparam not in ("", None) and funceditaddparamfree not in ("", None):
@@ -827,18 +1253,18 @@ def _functionedit_add_parameter(errors, warnings, funcname, funceditaddparam="",
         err_code = add_function_parameter(function=funcname, parameter_name=add_parameter)
         if err_code == 0:
             ## Parameter added - redisplay function details
-            user_msg = """'%s' Parameter Added to '%s' Function""" % (add_parameter, funcname)
+            user_msg.append("""'%s' Parameter Added to '%s' Function""" % (add_parameter, funcname))
         else:
             ## could not add param - perhaps it already exists for this function
 ## TODO : ERROR LIBS
-            user_msg = """Could not Add '%s' Parameter to Function '%s' - It Already Exists for this Function""" \
-                       % (add_parameter, funcname)
+            user_msg.append("""Could not Add '%s' Parameter to Function '%s' - It Already Exists for this Function""" \
+                       % (add_parameter, funcname))
     ## Display function details
     (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname, user_msg=user_msg)
     return (title, body)
 
-def perform_request_edit_function(funcname, funcdescr="", funceditaddparam="", funceditaddparamfree="",
-                                  funceditdelparam="", funcdescreditcommit="", funcparamdelcommit="",
+def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=None, funceditaddparamfree=None,
+                                  funceditdelparam=None, funcdescreditcommit="", funcparamdelcommit="",
                                   funcparamaddcommit=""):
     """Edit a WebSubmit function. 3 possibilities: edit the function description; delete a parameter from the
         function; add a new parameter to the function.
@@ -856,6 +1282,55 @@ def perform_request_edit_function(funcname, funcdescr="", funceditaddparam="", f
     warnings = []
     body = ""
     title = "Edit WebSubmit Function"
+    commit_error = 0
+
+    ## wash args:
+    if funcname != None:
+        try:
+            funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="")
+            if string_is_alphanumeric_including_underscore(txtstring=funcname) == 0:
+                funcname = ""
+        except ValueError, e:
+            funcname = ""
+    else:
+        funcname = ""
+    if funcdescr != None:
+        try:
+            funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            funcdescr = ""
+    else:
+        funcdescr = ""
+    if funceditaddparam != None:
+        try:
+            funceditaddparam = wash_single_urlarg(urlarg=funceditaddparam, argreqdtype=str, argdefault="")
+            if string_is_alphanumeric_including_underscore(txtstring=funceditaddparam) == 0:
+                funceditaddparam = ""
+        except ValueError, e:
+            funceditaddparam = ""
+    else:
+        funceditaddparam = ""
+    if funceditaddparamfree != None:
+        try:
+            funceditaddparamfree = wash_single_urlarg(urlarg=funceditaddparamfree, argreqdtype=str, argdefault="")
+            if string_is_alphanumeric_including_underscore(txtstring=funceditaddparamfree) == 0:
+                funceditaddparamfree = ""
+        except ValueError, e:
+            funceditaddparamfree = ""
+    else:
+        funceditaddparamfree = ""
+    if funceditdelparam != None:
+        try:
+            funceditdelparam = wash_single_urlarg(urlarg=funceditdelparam, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            funceditdelparam = ""
+    else:
+        funceditdelparam = ""
+
+    if funcname == "":
+        (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname)
+        return (title, body, errors, warnings)
+
     if funcdescreditcommit != "" and funcdescreditcommit != None:
         ## Update the definition of a function:
         (title, body) = _functionedit_update_description(errors=errors, warnings=warnings, funcname=funcname, funcdescr=funcdescr)
@@ -1149,6 +1624,17 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
     title = ""
     body = ""
     user_msg = []
+    commit_error = 0
+    if doctype == "":
+        user_msg.append("""The Document Type ID is mandatory and must be a string with no more than 10 alpha-numeric characters""")
+        commit_error = 1
+
+    if commit_error != 0:
+        ## don't commit - just re-display page with message to user
+        (title, body) = _create_add_doctype_form(doctypename=doctypename, doctypedescr=doctypedescr, clonefrom=clonefrom, user_msg=user_msg)
+        return (title, body)
+
+
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 0:
         ## this document type already exists - do not add
@@ -1192,15 +1678,48 @@ def _add_doctype(errors, warnings, doctype, doctypename, doctypedescr, clonefrom
 
     return (title, body)
 
-def perform_request_add_doctype(doctype="", doctypename="", doctypedescr="", clonefrom="", doctypedetailscommit=""):
+def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=None, clonefrom=None, doctypedetailscommit=""):
     errors = []
     warnings = []
     body = ""
-    if doctypedetailscommit not in ("", None) and doctype not in ("", None):
+
+    ## wash args:
+    if doctype != None:
+        try:
+            doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
+                doctype = ""
+        except ValueError, e:
+            doctype = ""
+    else:
+        doctype = ""
+    if doctypename != None:
+        try:
+            doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            doctypename = ""
+    else:
+        doctypename = ""
+    if doctypedescr != None:
+        try:
+            doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            doctypedescr = ""
+    else:
+        doctypedescr = ""
+    if clonefrom != None:
+        try:
+            clonefrom = wash_single_urlarg(urlarg=clonefrom, argreqdtype=str, argdefault="None")
+        except ValueError, e:
+            doctype = "None"
+    else:
+        doctype = "None"
+
+    if doctypedetailscommit not in ("", None):
         (title, body) = _add_doctype(errors=errors, warnings=warnings, doctype=doctype,
                                      doctypename=doctypename, doctypedescr=doctypedescr, clonefrom=clonefrom)
     else:
-        (title, body) = _create_add_doctype_form(doctype=doctype, doctypename=doctypename, doctypedescr=doctypedescr, clonefrom=clonefrom)
+        (title, body) = _create_add_doctype_form()
     return (title, body, errors, warnings)
 
 def _delete_referee_doctype(errors, warnings, doctype, categid, refereeid):
@@ -1286,7 +1805,12 @@ def _create_add_submission_choose_clonefrom_form(errors, warnings, doctype, acti
         user_msg = []
     elif type(user_msg) in (str, unicode):
         user_msg = [user_msg]
-    
+
+    if action in ("", None):
+        user_msg.append("""Unknown Submission""")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     ## does this doctype already have this action?
     numrows_doctype_action = get_number_submissions_doctype_action(doctype=doctype, action=action)
     if numrows_doctype_action < 1:
@@ -1315,6 +1839,12 @@ def _create_add_submission_form(errors, warnings, doctype, action, displayed="",
         user_msg = []
     elif type(user_msg) in (str, unicode):
         user_msg = [user_msg]
+
+    if action in ("", None):
+        user_msg.append("""Unknown Submission""")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     title = "Add Submission '%s' to Document Type '%s'" % (action, doctype)
     body = websubmitadmin_templates.tmpl_display_submissiondetails_form(doctype=doctype,
                                                                         action=action,
@@ -1445,6 +1975,13 @@ def _delete_category_from_doctype(errors, warnings, doctype, categid):
        @return: a tuple containing 2 strings: (page title, page body)
     """
     user_msg = []
+
+    if categid in ("", None):
+        ## cannot delete unknown category!
+        user_msg.append("Category ID is mandatory")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     error_code = delete_category_doctype(doctype=doctype, categ=categid)
     if error_code == 0:
         ## successful delete
@@ -1501,6 +2038,13 @@ def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctyp
 
 def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefrom):
     user_msg = []
+
+    if action in ("", None) or clonefrom in ("", None):
+        user_msg.append("Unknown action or document type to clone from - cannot add submission")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
+
     ## does action exist?
     numrows_action = get_number_actions_with_actid(actid=action)
     if numrows_action > 0:
@@ -1529,6 +2073,7 @@ def _add_submission_to_doctype_clone(errors, warnings, doctype, action, clonefro
 def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, buttonorder,
                                statustext, level, score, stpage, endtxt):
     user_msg = []
+
     ## does "action" exist?
     numrows_action = get_number_actions_with_actid(actid=action)
     if numrows_action < 1:
@@ -1561,7 +2106,12 @@ def _delete_submission_from_doctype(errors, warnings, doctype, action):
        @return: a tuple containing 2 strings: (page title, page body)
     """
     user_msg = []
-    ##numrows_doctypesubmission = get_number_submissions_doctype_action(doctype=doctype, action=action)
+
+    if action in ("", None):
+        user_msg.append("Unknown action - cannot delete submission")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     ## delete fields for this submission:
     error_code = delete_all_submissionfields_submission("""%s%s""" % (action, doctype) )
     if error_code != 0:
@@ -1612,6 +2162,12 @@ def _edit_submission_for_doctype(errors, warnings, doctype, action, displayed, b
        @return: a tuple of 2 strings: (page title, page body)
     """
     user_msg = []
+    commit_error = 0
+    if action in ("", None):
+        user_msg.append("Unknown Action - cannot update submission")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     error_code = update_submissiondetails_doctype_action(doctype=doctype, action=action, displayed=displayed,
                                                          buttonorder=buttonorder, statustext=statustext, level=level,
                                                          score=score, stpage=stpage, endtxt=endtxt)
@@ -1657,6 +2213,13 @@ def _edit_category_for_doctype(errors, warnings, doctype, categid, categdescr):
        @return: at tuple containing 2 strings: (page title, page body)
     """
     user_msg = []
+
+    if categid in ("", None) or categdescr in ("", None):
+        ## cannot edit unknown category!
+        user_msg.append("Category ID and Description are both mandatory")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     error_code = update_category_description_doctype_categ(doctype=doctype, categ=categid, categdescr=categdescr)
     if error_code == 0:
         ## successful update
@@ -1679,6 +2242,13 @@ def _add_category_to_doctype(errors, warnings, doctype, categid, categdescr):
        @return: at tuple containing 2 strings: (page title, page body)
     """
     user_msg = []
+
+    if categid in ("", None) or categdescr in ("", None):
+        ## cannot add unknown category!
+        user_msg.append("Category ID and Description are both mandatory")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
     error_code = insert_category_doctype(doctype=doctype, categ=categid, categdescr=categdescr)
     if error_code == 0:
         ## successful insert
@@ -1691,8 +2261,8 @@ def _add_category_to_doctype(errors, warnings, doctype, categid, categdescr):
     return (title, body)
 
 def perform_request_configure_doctype(doctype,
-                                      doctypename="",
-                                      doctypedescr="",
+                                      doctypename=None,
+                                      doctypedescr=None,
                                       doctypedetailsedit="",
                                       doctypedetailscommit="",
                                       doctypecategoryadd="",
@@ -1706,22 +2276,128 @@ def perform_request_configure_doctype(doctype,
                                       doctypesubmissionaddclonechosen="",
                                       doctypesubmissionadddetailscommit="",
                                       doctypesubmissioneditdetailscommit="",
-                                      categid="",
-                                      categdescr="",
-                                      action="",
-                                      doctype_cloneactionfrom="",
-                                      displayed="",
-                                      buttonorder="",
-                                      statustext="",
-                                      level="",
-                                      score="",
-                                      stpage="",
-                                      endtxt="",
-                                      doctyperefereedelete=""
+                                      categid=None,
+                                      categdescr=None,
+                                      action=None,
+                                      doctype_cloneactionfrom=None,
+                                      displayed=None,
+                                      buttonorder=None,
+                                      statustext=None,
+                                      level=None,
+                                      score=None,
+                                      stpage=None,
+                                      endtxt=None
                                      ):
+    user_msg = []
     errors = []
     warnings = []
     body = ""
+
+    if doctype != None:
+        try:
+            doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
+                doctype = ""
+        except ValueError, e:
+            doctype = ""
+    else:
+        doctype = ""
+    if action != None:
+        try:
+            action = wash_single_urlarg(urlarg=action, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=action) == 0:
+                action = ""
+        except ValueError, e:
+            action = ""
+    else:
+        action = ""
+    if doctypename != None:
+        try:
+            doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            doctypename = ""
+    else:
+        doctypename = ""
+    if doctypedescr != None:
+        try:
+            doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            doctypedescr = ""
+    else:
+        doctypedescr = ""
+    if categid != None:
+        try:
+            categid = wash_single_urlarg(urlarg=categid, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            categid = ""
+    else:
+        categid = ""
+    if categdescr != None:
+        try:
+            categdescr = wash_single_urlarg(urlarg=categdescr, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            categdescr = ""
+    else:
+        categdescr = ""
+    if doctype_cloneactionfrom != None:
+        try:
+            doctype_cloneactionfrom = wash_single_urlarg(urlarg=doctype_cloneactionfrom, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=doctype_cloneactionfrom) == 0:
+                doctype_cloneactionfrom = ""
+        except ValueError, e:
+            doctype_cloneactionfrom = ""
+    else:
+        doctype_cloneactionfrom = ""
+    if displayed != None:
+        try:
+            displayed = wash_single_urlarg(urlarg=displayed, argreqdtype=str, argdefault="Y", maxstrlen=1, minstrlen=1)
+        except ValueError, e:
+            displayed = "Y"
+    else:
+        displayed = "Y"
+    if buttonorder != None:
+        try:
+            buttonorder = wash_single_urlarg(urlarg=buttonorder, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            buttonorder = ""
+    else:
+        buttonorder = ""
+    if level != None:
+        try:
+            level = wash_single_urlarg(urlarg=level, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
+        except ValueError, e:
+            level = ""
+    else:
+        level = ""
+    if score != None:
+        try:
+            score = wash_single_urlarg(urlarg=score, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            score = ""
+    else:
+        score = ""
+    if stpage != None:
+        try:
+            stpage = wash_single_urlarg(urlarg=stpage, argreqdtype=int, argdefault="")
+        except ValueError, e:
+            stpage = ""
+    else:
+        stpage = ""
+    if statustext != None:
+        try:
+            statustext = wash_single_urlarg(urlarg=statustext, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            statustext = ""
+    else:
+        statustext = ""
+    if endtxt != None:
+        try:
+            endtxt = wash_single_urlarg(urlarg=endtxt, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            endtxt = ""
+    else:
+        endtxt = ""
+
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
     numrows_doctype = get_number_doctypes_docid(docid=doctype)
     if numrows_doctype > 1:
@@ -2131,6 +2807,59 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
     warnings = []
     body = ""
     user_msg = []
+
+    if addfunctionstep != "":
+        try:
+            addfunctionstep = str(wash_single_urlarg(urlarg=addfunctionstep, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            addfunctionstep = ""
+    if addfunctionscore != "":
+        try:
+            addfunctionscore = str(wash_single_urlarg(urlarg=addfunctionscore, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            addfunctionscore = ""
+    if deletefunctionstep != "":
+        try:
+            deletefunctionstep = str(wash_single_urlarg(urlarg=deletefunctionstep, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            deletefunctionstep = ""
+    if deletefunctionscore != "":
+        try:
+            deletefunctionscore = str(wash_single_urlarg(urlarg=deletefunctionscore, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            deletefunctionscore = ""
+    if movetofunctionstep != "":
+        try:
+            movetofunctionstep = str(wash_single_urlarg(urlarg=movetofunctionstep, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movetofunctionstep = ""
+    if movetofunctionscore != "":
+        try:
+            movetofunctionscore = str(wash_single_urlarg(urlarg=movetofunctionscore, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movetofunctionscore = ""
+    if moveupfunctionstep != "":
+        try:
+            moveupfunctionstep = str(wash_single_urlarg(urlarg=moveupfunctionstep, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            moveupfunctionstep = ""
+    if moveupfunctionscore != "":
+        try:
+            moveupfunctionscore = str(wash_single_urlarg(urlarg=moveupfunctionscore, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            moveupfunctionscore = ""
+    if movedownfunctionstep != "":
+        try:
+            movedownfunctionstep = str(wash_single_urlarg(urlarg=movedownfunctionstep, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movedownfunctionstep = ""
+    if movedownfunctionscore != "":
+        try:
+            movedownfunctionscore = str(wash_single_urlarg(urlarg=movedownfunctionscore, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movedownfunctionscore = ""
+
+    
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
     if doctype in ("", None):
         user_msg.append("""Unknown Document Type""")
@@ -2266,6 +2995,27 @@ def _add_function_to_submission(doctype, action, addfunctionname, addfunctionste
        @return: a tuple containing 2 strings: (page-title, page-body)
     """
     user_msg = []
+    if addfunctionname == "" or  addfunctionstep == "" or addfunctionscore == "":
+        ## invalid details!
+        user_msg.append("""Invalid function coordinates supplied!""")
+        (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
+                                                                                         action=action,
+                                                                                         user_msg=user_msg)
+        return (title, body)
+    try:
+        if int(addfunctionstep) < 1 or int(addfunctionscore) < 1:
+            ## invalid details!
+            user_msg.append("""Invalid function step and/or score!""")
+            (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
+                                                                                             action=action,
+                                                                                             user_msg=user_msg)
+            return (title, body)
+    except ValueError:
+        user_msg.append("""Invalid function step and/or score!""")
+        (title, body) = _create_configure_doctype_submission_functions_add_function_form(doctype=doctype,
+                                                                                         action=action,
+                                                                                         user_msg=user_msg)
+
     try:
         insert_function_into_submission_at_step_and_score_then_regulate_scores_of_functions_in_step(doctype=doctype,
                                                                                                     action=action,
@@ -2362,6 +3112,30 @@ def perform_request_configure_doctype_submissionpage_preview(doctype, action, pa
     warnings = []
     body = ""
     user_msg = []
+
+    try:
+        pagenum = str(pagenum)
+    except ValueError:
+        pagenum = ""
+
+    if pagenum != "":
+        try:
+            pagenum = str(wash_single_urlarg(urlarg=pagenum, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            pagenum = ""
+    ## ensure that the page number for this submission is valid:
+    num_pages_submission = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
+    try:
+        if not (int(pagenum) > 0 and int(pagenum) <= num_pages_submission):
+            user_msg.append("Invalid page number - out of range")
+            (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
+            return (title, body, errors, warnings)
+    except ValueError:
+        ## invalid page number
+        user_msg.append("Invalid page number - must be an integer value!")
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body, errors, warnings)
+
     ## get details of all fields on submission page:
     fields = get_details_and_description_of_all_fields_on_submissionpage(doctype=doctype, action=action, pagenum=pagenum)
     ## ensure all values for each field are strings:
@@ -2388,6 +3162,66 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         pagenum = str(pagenum)
     except ValueError:
         pagenum = ""
+
+    if pagenum != "":
+        try:
+            pagenum = str(wash_single_urlarg(urlarg=pagenum, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            pagenum = ""
+    if fieldname != "":
+        try:
+            fieldname = wash_single_urlarg(urlarg=fieldname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=fieldname) == 0:
+                fieldname = ""
+        except ValueError, e:
+            fieldname = ""
+    if fieldtext != "":
+        try:
+            fieldtext = wash_single_urlarg(urlarg=fieldtext, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            fieldtext = ""
+    if fieldlevel != "":
+        try:
+            fieldlevel = wash_single_urlarg(urlarg=fieldlevel, argreqdtype=str, argdefault="O", maxstrlen=1, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=fieldlevel) == 0:
+                fieldlevel = "O"
+            if fieldlevel not in ("m", "M", "o", "O"):
+                fieldlevel = "O"
+            fieldlevel = fieldlevel.upper()
+        except ValueError, e:
+            fieldlevel = "O"
+    if fieldshortdesc != "":
+        try:
+            fieldshortdesc = wash_single_urlarg(urlarg=fieldshortdesc, argreqdtype=str, argdefault="")
+        except ValueError, e:
+            fieldshortdesc = ""
+    if fieldcheck != "":
+        try:
+            fieldcheck = wash_single_urlarg(urlarg=fieldcheck, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
+            if string_is_alphanumeric_including_underscore(txtstring=fieldcheck) == 0:
+                fieldcheck = ""
+        except ValueError, e:
+            fieldcheck = ""
+    if editfieldposn != "":
+        try:
+            editfieldposn = str(wash_single_urlarg(urlarg=editfieldposn, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            editfieldposn = ""
+    if deletefieldposn != "":
+        try:
+            deletefieldposn = str(wash_single_urlarg(urlarg=deletefieldposn, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            deletefieldposn = ""
+    if movefieldfromposn != "":
+        try:
+            movefieldfromposn = str(wash_single_urlarg(urlarg=movefieldfromposn, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movefieldfromposn = ""
+    if movefieldtoposn != "":
+        try:
+            movefieldtoposn = str(wash_single_urlarg(urlarg=movefieldtoposn, argreqdtype=int, argdefault=""))
+        except ValueError, e:
+            movefieldtoposn = ""
 
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
     if doctype in ("", None):
@@ -2435,6 +3269,20 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
 
+    ## ensure that the page number for this submission is valid:
+    num_pages_submission = get_numbersubmissionpages_doctype_action(doctype=doctype, action=action)
+    try:
+        if not (int(pagenum) > 0 and int(pagenum) <= num_pages_submission):
+            user_msg.append("Invalid page number - out of range")
+            (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
+            return (title, body, errors, warnings)
+    except ValueError:
+        ## invalid page number
+        user_msg.append("Invalid page number - must be an integer value!")
+        (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
+        return (title, body, errors, warnings)
+    
+    
     ## submission valid
     if editfieldposn != "" and editfieldposncommit == "":
         ## display form for editing field
@@ -2507,12 +3355,12 @@ def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, a
                                                       fieldcheck=fieldcheck)
         user_msg.append("The details of the field at position %s have been updated successfully" % (fieldposn,))
         update_modification_date_for_submission(doctype=doctype, action=action)
-    except InvenioWebSubmitAdminTooManyRows, e:
+    except InvenioWebSubmitAdminWarningTooManyRows, e:
         ## multiple rows found at page position - not safe to edit:
         user_msg.append("Unable to update details of field at position %s on submission page %s - multiple fields found at this position" \
                         % (fieldposn, pagenum))
         ## TODO : LOG WARNING
-    except InvenioWebSubmitAdminNoRowsFound, e:
+    except InvenioWebSubmitAdminWarningNoRowsFound, e:
         ## field not found - cannot edit
         user_msg.append("Unable to update details of field at position %s on submission page %s - field doesn't seem to exist there!" \
                         % (fieldposn, pagenum))
@@ -2545,6 +3393,11 @@ def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors
         allchecks.append((check,))
     ## get the details for the field to be edited:
     fielddets = get_details_of_field_at_positionx_on_submissionpage(doctype=doctype, action=action, pagenum=pagenum, fieldposition=fieldposn)
+
+    if len(fielddets) < 1:
+        (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum)
+        return (title, body)
+
     fieldname = str(fielddets[2])
     if fieldtext is not None:
         fieldtext = str(fieldtext)
@@ -2597,6 +3450,15 @@ def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, ac
     """
     user_msg = []
     ## ensure that a field "fieldname" actually exists:
+    if fieldname == "":
+        ## the field to be added has no element description in the WebSubmit DB - cannot add
+        user_msg.append("""The field that you have chosen to add does not seem to exist in WebSubmit - cannot add""")
+        (title, body) = _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum,
+                                                                                    fieldtext=fieldtext,
+                                                                                    fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
+                                                                                    fieldcheck=fieldcheck, user_msg=user_msg)
+        return (title, body)
+
     numelements_elname = get_number_elements_with_elname(elname=fieldname)
     if numelements_elname < 1:
         ## the field to be added has no element description in the WebSubmit DB - cannot add
@@ -2625,7 +3487,7 @@ def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, ac
                         % (fieldname, pagenum, "%s%s" % (action, doctype)))
         update_modification_date_for_submission(doctype=doctype, action=action)
         (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
-    except InvenioWebSubmitAdminInsertFailed, e:
+    except InvenioWebSubmitAdminWarningInsertFailed, e:
         ## the insert of the new field failed for some reason
         ## TODO : LOG ERROR
         user_msg.append("""Couldn't add the field "%s" to page %s of submission %s - please try again""" \
