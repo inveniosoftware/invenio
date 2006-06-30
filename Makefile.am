@@ -22,7 +22,7 @@ confignice_SCRIPTS=config.nice
 
 SUBDIRS = po config modules
 
-EXTRA_DIST = UNINSTALL RELEASE-NOTES configure-tests.py config.nice.in
+EXTRA_DIST = UNINSTALL CREDITS RELEASE-NOTES configure-tests.py config.nice.in
 
 ## submit stuff for demo data link creation
 sbmdir = $(localstatedir)/www/submit/access/protected
