@@ -7,6 +7,63 @@ Here is a short summary of the most notable changes in CDSware
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDS Invenio v0.90.0 -- released 2006-06-30
+------------------------------------------
+
+ *) formerly known as CDSware; the application name change clarifies
+    the relationship with respect to the CDS Sofware Consortium
+    producing two flagship applications (CDS Indico and CDS Invenio)
+
+ *) version number increased to v0.90 in the anticipation of the
+    forthcoming v1.0 release after all the major codebase changes are
+    now over
+
+ *) new possibility to define user groups (WebGroup)
+
+ *) new personal basket organization in topics (WebBasket)
+
+ *) new basket sharing among user groups (WebBasket)
+
+ *) new open peer reviewing and commenting on documents (WebComment)
+ 
+ *) new user and group web messaging system (WebMessage)
+       
+ *) new ontology-based document classification system (BibClassify)
+
+ *) new WebSubmit Admin (WebSubmit)
+
+ *) new record editing web interface (BibEdit)
+
+ *) new record matching tool  (BibMatch)
+
+ *) new OAI repository administration tool (BibHarvest)
+
+ *) new OAI periodical harvesting tool (BibHarvest) 
+
+ *) new web layout templating system (WebStyle)
+
+ *) new clean URL schema (e.g. /collection/Theses, /record/1234)
+    (WebStyle)
+
+ *) new BibTeX output format support (BibFormat)
+
+ *) new possibility of secure HTTPS authentication while keeping the
+    rest of the site non-HTTPS (WebSession)
+
+ *) new centralized error library (MiscUtil)
+
+ *) new gettext-based international translations, with two new beta
+    translations (Japanese, Polish)
+
+ *) new regression testing suite framework (MiscUtil)
+
+ *) new all prerequisites are now apt-gettable for Debian "Sarge"
+    GNU/Linux
+
+ *) new full support for Mac OS X
+
+ *) ... plus many fixes and changes worth one year of development
+
 CDSware v0.7.1 -- released 2005-05-04
 -------------------------------------
 

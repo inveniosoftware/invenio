@@ -1,40 +1,74 @@
 --------------------------------------------------------------------
-CDSware v0.7.1 is released
-May 4, 2005
+CDS Invenio v0.90.0 is released
+June 30, 2006
 http://cdsware.cern.ch/news/
 --------------------------------------------------------------------
 
-CDSware v0.7.1 was released on May 4, 2005.  
+CDS Invenio v0.90.0 was released on June 30, 2006.
 
 What's new:
 -----------
 
- *) important bugfix for bibconvert's ``source data in a directory''
-    mode, as invoked by the web submission system (BibConvert)
+ *) formerly known as CDSware; the application name change clarifies
+    the relationship with respect to the CDS Sofware Consortium
+    producing two flagship applications (CDS Indico and CDS Invenio)
 
- *) minor bugfix in the search engine, thanks to Frédéric Gobry
-    (WebSearch)
+ *) version number increased to v0.90 in the anticipation of the
+    forthcoming v1.0 release after all the major codebase changes are
+    now over
 
- *) minor bugfix in the WebSearch Admin interface (WebSearch)
+ *) new possibility to define user groups (WebGroup)
 
- *) automatic linking to Google Print in the ``Haven't found what you
-    were looking for...'' page box (WebSearch)
+ *) new personal basket organization in topics (WebBasket)
 
- *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba   
+ *) new basket sharing among user groups (WebBasket)
 
- *) new Catalan translation, thanks to Ferran Jorba
+ *) new open peer reviewing and commenting on documents (WebComment)
+ 
+ *) new user and group web messaging system (WebMessage)
+       
+ *) new ontology-based document classification system (BibClassify)
 
- *) updated Greek and Portuguese translations, thanks to Theodoros
-    Theodoropoulos and Flávio C. Coelho
+ *) new WebSubmit Admin (WebSubmit)
 
- *) updated Spanish translation 
+ *) new record editing web interface (BibEdit)
+
+ *) new record matching tool  (BibMatch)
+
+ *) new OAI repository administration tool (BibHarvest)
+
+ *) new OAI periodical harvesting tool (BibHarvest) 
+
+ *) new web layout templating system (WebStyle)
+
+ *) new clean URL schema (e.g. /collection/Theses, /record/1234)
+    (WebStyle)
+
+ *) new BibTeX output format support (BibFormat)
+
+ *) new possibility of secure HTTPS authentication while keeping the
+    rest of the site non-HTTPS (WebSession)
+
+ *) new centralized error library (MiscUtil)
+
+ *) new gettext-based international translations, with two new beta
+    translations (Japanese, Polish)
+
+ *) new regression testing suite framework (MiscUtil)
+
+ *) new all prerequisites are now apt-gettable for Debian "Sarge"
+    GNU/Linux
+
+ *) new full support for Mac OS X
+
+ *) ... plus many fixes and changes worth one year of development
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz>
-  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cdsware-0.7.1.tar.gz.sig>
+  <http://cdsware.cern.ch/download/cds-invenio-0.90.0.tar.gz>
+  <http://cdsware.cern.ch/download/cds-invenio-0.90.0.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cds-invenio-0.90.0.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -44,98 +78,11 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDSware v0.7.0, then please follow the
-following steps:
-
-   - Launch the bibsched monitor and wait until all active bibsched
-     tasks are finished.  Then put bibsched daemon into sleeping
-     (manual) mode.
-
-   - Stop all submission procedures and other write operations: for
-     example, you may want to switch your site to read-only mode (set
-     CFG_ACCESS_CONTROL_LEVEL_SITE to 1 in access_control_config.py
-     and restart Apache) or you may want to stop Apache completely.
-
-   - Optionally you may want to backup your current MySQL database and
-     your CDSware installation directory.  (This step is not really
-     mandatory for the 0.7.0 -> 0.7.1 transition, since the changes
-     are of minor nature only.)
-
-   - Untar new sources and rerun configure with old arguments (see
-     /path/to/cdsware/lib/wml/cdsware/etc/build/config.nice).
-
-   - Merge your old config.wml with the new one. (Your old config.wml
-     can be found in /path/to/cdsware/lib/wml/cdsware/config.wml.)
-     The only novelty in the new config.wml file is the introduction
-     of the Catalan translation in the CDSNAMEINTL and CDSLANGS
-     options, so that merging should be straightforward.  Note that
-     you may directly reuse your old config.wml file in case you do
-     not plan to provide your user interface in Catalan.
-
-   - Run make.
-
-   - If you have customized your /path/to/cdsware/etc/ files since the
-     last installation (for example to edit the stopwords list or
-     configure language stemmers), then back them up now.
-
-   - Run make install.
-
-   - If you have backed up your old /path/to/cdsware/etc/ directory as
-     mentioned before, then restore your old etc files now.
-
-   - Optionally update your tables with the new Catalan and Spanish
-     field names:
-
-        $ grep "'ca'" modules/miscutil/sql/tabfill.sql | \
-               ./modules/miscutil/bin/dbexec  
-        $ echo "UPDATE fieldname SET value='materia' \
-                 WHERE value='' AND id_field=7 AND ln='es';" | \
-               ./modules/miscutil/bin/dbexec  
-        $ echo "UPDATE fieldname SET value='división' \
-                WHERE value='' AND id_field=11 AND ln='es';" | \
-               ./modules/miscutil/bin/dbexec  
-        $ echo "UPDATE fieldname SET value='experimento' \
-                WHERE value='' AND id_field=13 AND ln='es';" | \
-               ./modules/miscutil/bin/dbexec  
-        $ echo "UPDATE fieldname SET value='registro núm.' \
-                WHERE value='' AND id_field=14 AND ln='es';" | \
-               ./modules/miscutil/bin/dbexec  
-
-   - Optionally run webcoll to regenerate Catalan and Spanish search
-     interface pages.
-
-   - Re-enable write access if you have disabled it before and restart
-     your Apache server.
-
-   - Put the bibsched daemon back into the automatic mode.  You are
-     done.
-
-Known problems:
----------------
-
- *) Several modules of the this release (e.g. the mail submission
-    system, citation and download ranking) are experimental and not
-    yet activated.  You may have a peek at what is planned, but please
-    do not rely on them.
-
- *) The admin-level functionality for several modules is not fully
-    developed yet.
-
- *) Fulltext file storage management is not yet linked with the
-    metadata management.
- 
-What's next:
-------------
-
- *) Fixing the problems mentioned above.
-
- *) Developing clearer relations and dependencies between metadata
-    records and fulltext files.
-
- *) Introducing page templating to ease the customization of CDSware
-    interface.
-
- *) Introducing a new tool for matching external XML MARC records
-    against the database content.
+If you want to upgrade from CDSware v0.7.1 or earlier versions, please
+do not use this release for production environment yet.  The codebase
+has undergone very important changes during the last year.  You can
+use this release to check out the new CDS Invenio features and test it
+in your environment.  Full-scale upgrade instructions and tools will
+be provided with the forthcoming update release in July 2006.
 
 - end of file -
