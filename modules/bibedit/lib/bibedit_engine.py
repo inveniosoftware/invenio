@@ -19,18 +19,17 @@
 
 import os
 import time
-import string
 import cPickle
-from invenio.config          import bindir, tmpdir
-from invenio.bibedit_dblayer import *
-from invenio.bibedit_config  import *
-from invenio.search_engine   import print_record, record_exists
-from invenio.bibrecord       import record_xml_output, create_record, field_add_subfield, record_add_field
+from invenio.config import bindir, tmpdir
+from invenio.bibedit_dblayer import marc_to_split_tag
+from invenio.bibedit_config import *
+from invenio.search_engine import print_record, record_exists
+from invenio.bibrecord import record_xml_output, create_record, field_add_subfield, record_add_field
 import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
 
-def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
+def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):    
     """ This function return the body of main page. """
     
@@ -52,19 +51,19 @@ def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, 
             body = bibedit_templates.tmpl_deleted(ln)
 
     else:
-        if recID != 0 :
-            if record_exists(recID) > 0:
-                (record, body) = get_record(ln, recID, uid, temp)
+        if recid != 0 :
+            if record_exists(recid) > 0:
+                (record, body) = get_record(ln, recid, uid, temp)
 
                 if record != '':
                     if add == 3:
                         body = ''
 
                     if edit_tag != None and dict_value != None:
-                        record = edit_record(recID, uid, record, edit_tag, dict_value, num_field)
+                        record = edit_record(recid, uid, record, edit_tag, dict_value)
 
                     if delete_tag != None and num_field != None:
-                        record = delete_field(recID, uid, record, delete_tag, num_field)
+                        record = delete_field(recid, uid, record, delete_tag, num_field)
 
                     if add == 4:
 
@@ -75,9 +74,9 @@ def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, 
                         value   = dict_value.get("add_value"  , '')
 
                         if tag != '' and subcode != '' and value != '':
-                            record = add_field(recID, uid, record, tag, ind1, ind2, subcode, value)
+                            record = add_field(recid, uid, record, tag, ind1, ind2, subcode, value)
 
-                    body += bibedit_templates.tmpl_table_header(ln, "record", recID, temp, format_tag, add=add)
+                    body += bibedit_templates.tmpl_table_header(ln, "record", recid, temp, format_tag, add=add)
 
                     keys = record.keys()
                     keys.sort()
@@ -89,16 +88,16 @@ def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, 
                         if fields != "empty":
                             for field in fields:
                                 if tag != '001':
-                                    body += bibedit_templates.tmpl_table_value(ln, recID, temp, tag,
+                                    body += bibedit_templates.tmpl_table_value(ln, recid, temp, tag,
                                                                                field, format_tag, "record", add)
 
                     if add == 3:
-                        body += bibedit_templates.tmpl_table_value(ln, recID, temp, '', [], format_tag, "record", add, 1)
+                        body += bibedit_templates.tmpl_table_value(ln, recid, temp, '', [], format_tag, "record", add, 1)
 
                     body += bibedit_templates.tmpl_table_footer(ln, "record", add)
 
                 else:
-                   body = bibedit_templates.tmpl_record_choice_box(ln, 2)
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 2)
 
             else:
                 body = bibedit_templates.tmpl_record_choice_box(ln, 1)
@@ -109,29 +108,31 @@ def perform_request_index(ln, recID, cancel, delete, confirm_delete, uid, temp, 
     return (body, errors, warnings)
 
 
-def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
+def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
     """ This function return the body of edit page. """
     
     errors = []
     warnings = []
     body = ''
     
-    (record, junk) = get_record(ln, recID, uid, temp)
+    (record, junk) = get_record(ln, recid, uid, temp)
     
     if del_subfield != None:
-        record = delete_subfield(recID, uid, record, tag, num_field)
+        record = delete_subfield(recid, uid, record, tag, num_field)
                 
     if add == 2:
         
         subcode = dict_value.get("add_subcode", "empty")
         value   = dict_value.get("add_value"  , "empty")
-        if subcode == '': subcode = "empty"
-        if value   == '': value   = "empty"
+        if subcode == '':
+            subcode = "empty"
+        if value   == '':
+            value   = "empty"
         
         if value != "empty" and subcode != "empty":
-            record = add_subfield(recID, uid, tag, record, num_field, subcode, value)
+            record = add_subfield(recid, uid, tag, record, num_field, subcode, value)
         
-    body += bibedit_templates.tmpl_table_header(ln, "edit", recID, temp=temp,
+    body += bibedit_templates.tmpl_table_header(ln, "edit", recid, temp=temp,
                                                 tag=tag, num_field=num_field, add=add)
     
     tag = tag[:3]
@@ -140,7 +141,7 @@ def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_s
     if fields != "empty":
         for field in fields:
             if field[4] == int(num_field) :
-                body += bibedit_templates.tmpl_table_value(ln, recID, temp, tag, field, format_tag, "edit", add)
+                body += bibedit_templates.tmpl_table_value(ln, recid, temp, tag, field, format_tag, "edit", add)
                 break
             
     body += bibedit_templates.tmpl_table_footer(ln, "edit", add)
@@ -148,10 +149,10 @@ def perform_request_edit(ln, recID, uid, tag, num_field, format_tag, temp, del_s
     return (body, errors, warnings)    
     
     
-def perform_request_submit(ln, recID):    
+def perform_request_submit(ln, recid):    
     """ This function submit record on database. """
     
-    save_xml_record(recID)
+    save_xml_record(recid)
     
     errors   = []
     warnings = []
@@ -160,20 +161,20 @@ def perform_request_submit(ln, recID):
     return (body, errors, warnings)
 
 
-def get_file_path(recID):
+def get_file_path(recid):
     """ return the file path of record. """
     
-    return "%s/%s_%s" % (tmpdir, cfg_bibedit_tmpfilenameprefix, str(recID))
+    return "%s/%s_%s" % (tmpdir, cfg_bibedit_tmpfilenameprefix, str(recid))
 
 
-def save_xml_record(recID):    
+def save_xml_record(recid):    
     """ Save XML Record File in database. """
     
-    file_path = get_file_path(recID)
+    file_path = get_file_path(recid)
     
-    f = open("%s.xml" % file_path, 'w')
-    f.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
-    f.close()
+    file_temp = open("%s.xml" % file_path, 'w')
+    file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
+    file_temp.close()
     
     os.system("%s/bibupload -r %s.xml" % (bindir, file_path))
     os.system("rm %s.tmp" % file_path)
@@ -181,26 +182,26 @@ def save_xml_record(recID):
 def save_temp_record(record, uid, file_path):
     """ Save record dict in temp file. """
     
-    f = open(file_path, "w")
-    cPickle.dump([uid, record], f)
-    f.close()
+    file_temp = open(file_path, "w")
+    cPickle.dump([uid, record], file_temp)
+    file_temp.close()
 
 
 def get_temp_record(file_path):    
     """ Load record dict from a temp file. """
     
-    f = open(file_path)
-    [uid, record] = cPickle.load(f)
-    f.close()
+    file_temp = open(file_path)
+    [uid, record] = cPickle.load(file_temp)
+    file_temp.close()
     
     return (uid, record)
 
 
-def get_record(ln, recID, uid, temp):    
+def get_record(ln, recid, uid, temp):    
     """ This function return a record dict,
         and warning message in case of. """
 
-    file_path = get_file_path(recID)
+    file_path = get_file_path(recid)
     
     if temp != "false":
         warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)         
@@ -219,14 +220,14 @@ def get_record(ln, recID, uid, temp):
             if time_tmp_file < time_out_file :
                 
                 os.system("rm %s.tmp" % file_path)
-                record = create_record(print_record(recID, 'xm'))[0]
+                record = create_record(print_record(recid, 'xm'))[0]
                 save_temp_record(record, uid, "%s.tmp" % file_path)
 
             else:
                 record = ''
 
     else:
-        record = create_record(print_record(recID, 'xm'))[0]
+        record = create_record(print_record(recid, 'xm'))[0]
         save_temp_record(record, uid, "%s.tmp" % file_path)
         
     return (record, warning_temp_file)
@@ -234,10 +235,8 @@ def get_record(ln, recID, uid, temp):
 
 ######### EDIT #########
 
-def edit_record(recID, uid, record, edit_tag, dict_value, num_field):    
+def edit_record(recid, uid, record, edit_tag, dict_value):    
     """ This function edit value in record. """
-   
-    result = ''
     
     for subfield in range( len(dict_value.keys())/3 ):
         
@@ -254,7 +253,7 @@ def edit_record(recID, uid, record, edit_tag, dict_value, num_field):
                     edit_tag = edit_tag[:5]                
                     record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value)
        
-    save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
@@ -288,20 +287,20 @@ def edit_subfield(record, tag, subcode, old_subcode, value, old_value):
 
 ######### ADD ########
 
-def add_field(recID, uid, record, tag, ind1, ind2, subcode, value_subfield):
+def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
     """ This function add a new field in record. """
     
     tag = tag[:3]
 
     new_field_number = record_add_field(record, tag, ind1, ind2)
-    record  = add_subfield(recID, uid, tag, record, new_field_number, subcode, value_subfield)
+    record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value_subfield)
     
-    save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
 
-def add_subfield(recID, uid, tag, record, num_field, subcode, value):
+def add_subfield(recid, uid, tag, record, num_field, subcode, value):
     """ This function add a new subfield in a field. """
 
     tag = tag[:3]
@@ -322,17 +321,17 @@ def add_subfield(recID, uid, tag, record, num_field, subcode, value):
                 field_add_subfield(record[tag][i], subcode, value)
                 break
 
-    save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
 
 ######### DELETE ########
 
-def delete_field(recID, uid, record, tag, num_field):    
+def delete_field(recid, uid, record, tag, num_field):    
     """ This function delete field in record. """
     
-    (tag, junk1, junk2, junk3) = marc_to_split_tag(tag)
+    (tag, junk, junk, junk) = marc_to_split_tag(tag)
     tmp = []
     
     for field in record[tag]:
@@ -345,15 +344,15 @@ def delete_field(recID, uid, record, tag, num_field):
     else:
         del record[tag]
     
-    save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
 
-def delete_subfield(recID, uid, record, tag, num_field):    
+def delete_subfield(recid, uid, record, tag, num_field):    
     """ This function delete subfield in field. """
     
-    (tag, junk1, junk2, subcode) = marc_to_split_tag(tag)
+    (tag, junk, junk, subcode) = marc_to_split_tag(tag)
     tmp = []
     i = -1
     
@@ -367,7 +366,7 @@ def delete_subfield(recID, uid, record, tag, num_field):
                     
     record[tag][i] = (tmp, record[tag][i][1], record[tag][i][2], record[tag][i][3], record[tag][i][4])
     
-    save_temp_record(record, uid, "%s.tmp" % get_file_path(recID))
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 

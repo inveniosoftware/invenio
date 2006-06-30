@@ -85,7 +85,7 @@ def marc_to_split_tag(tag):
         if len_tag > 4:
             
             ind2 = tag[4]
-            if ind2 =='_':
+            if ind2 == '_':
                 ind2 = ''
                 
             if len_tag > 5:
