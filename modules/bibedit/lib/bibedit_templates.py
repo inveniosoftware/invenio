@@ -434,7 +434,14 @@ class Template:
                           </span><br/><br/>
                       """ % {'message1' : _("This record is currently being edited by somebody else."),
                              'message2' : _("Please try to come back later.")}
-            
+        elif message == 3:
+            result = """ <span class=\"errorbox\">
+                             <b>
+                               %(message1)s
+                             </b>
+                          </span><br/><br/>
+                      """ % {'message1' : _("Cannot edit deleted Record.")}
+                
         else:
             result = ''
             
@@ -554,7 +561,7 @@ class Template:
         if style     != '':
             style     = 'style="%s"'     % str(style)
         
-        return """ <input type=\"%(type)s\" %(name)s %(value)s %(size)s %(maxlength)s %(class_css)s %(style)s \>
+        return """ <input type=\"%(type)s\" %(name)s %(value)s %(size)s %(maxlength)s %(class_css)s %(style)s/>
                """ % {'type'      : type_input,
                       'value'     : value,
                       'name'      : name,

@@ -100,7 +100,10 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                     body = bibedit_templates.tmpl_record_choice_box(ln, 2)
 
             else:
-                body = bibedit_templates.tmpl_record_choice_box(ln, 1)
+                if record_exists(recid) == -1: 
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 3)
+                else:
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 1)
 
         else:
             body = bibedit_templates.tmpl_record_choice_box(ln, 0)
