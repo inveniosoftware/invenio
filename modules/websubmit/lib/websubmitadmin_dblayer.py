@@ -167,6 +167,17 @@ def get_function_description(function):
     q = """SELECT description FROM sbmALLFUNCDESCR where function=%s"""
     return run_sql(q, (function,))
 
+def get_function_parameter_vals_doctype(doctype, paramlist):
+    res = []
+    q = """SELECT name, value FROM sbmPARAMETERS WHERE doctype=%s AND name=%s"""
+    for par in paramlist:
+        r = run_sql(q, (doctype, par))
+        if len(r) > 0:
+            res.append(r[0])
+        else:
+            res.append((par, ""))
+    return res
+
 def get_function_parameters(function):
     """Get the list of paremeters for a given function
        @param function: the function name
@@ -1760,9 +1771,13 @@ def update_value_of_function_parameter_for_doctype(doctype, paramname, paramval)
         raise InvenioWebSubmitAdminWarningTooManyRows(msg)
     else:
         ## no row for parameter found
-        msg = """When trying to update the [%s] parameter for the [%s] document type, no rows were found for the parameter"""\
-              % (paramname, doctype)
-        raise InvenioWebSubmitAdminWarningNoRowsFound(msg)
+        insert_parameter_doctype(doctype=doctype, paramname=paramname, paramval=paramval)
+        numrows_param = get_numberparams_doctype_paramname(doctype=doctype, paramname=paramname)
+        if numrows_param != 1:
+            msg = """When trying to update the [%s] parameter for the [%s] document type, could not insert a new value"""\
+                  % (paramname, doctype)
+            raise InvenioWebSubmitAdminWarningNoRowsFound(msg)
+        return
 
 def get_parameters_name_and_value_for_function_of_doctype(doctype, function):
     """Get the names and values of all parameters of a given function, as they have been set for a particular document

@@ -2550,7 +2550,14 @@ def _create_configure_doctype_submission_functions_list_parameters_form(doctype,
                                                                         user_msg=""):
     title = """Parameters of the %s function, as used in the %s document type"""\
             % (functionname, doctype)
-    params = get_parameters_name_and_value_for_function_of_doctype(doctype=doctype, function=functionname)
+    funcparams = get_function_parameters(function=functionname)
+    if len(funcparams) > 0:
+        ## get the values
+        paramslist = map(lambda x: str(x[0]), funcparams)
+        params = get_function_parameter_vals_doctype(doctype=doctype, paramlist=paramslist)
+    else:
+        params = ()
+##    params = get_parameters_name_and_value_for_function_of_doctype(doctype=doctype, function=functionname)
     body = websubmitadmin_templates.tmpl_configuredoctype_list_functionparameters(doctype=doctype,
                                                                                   action=action,
                                                                                   function=functionname,
