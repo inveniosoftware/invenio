@@ -20,6 +20,9 @@
 from os import system, access, R_OK
 
 def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
+    """Call "xmlmarc2textmarc" to convert an XML MARC record to an ALEPH MARC record, saving the ALEPH record
+       in the running directory for the submission.
+    """
     ## attempt to create ALEPH record:
     call_xmlmarc2textmarc_text = """%(xmlmarc2textmarc)s --aleph-marc=r %(curdir)s/recmysql > %(curdir)s/recaleph"""\
                                  % { 'xmlmarc2textmarc' : xmlmarc2textmarc, 'curdir' : curdir }
