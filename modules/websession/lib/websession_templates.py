@@ -939,7 +939,7 @@ class Template:
         </a>""" 
         
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text="Your are administrator of the following groups:")        
+                                          text=_("You are administrator of the following groups:"))        
 
         out += self.tmpl_infobox(infos)
 
@@ -1011,7 +1011,7 @@ class Template:
 
     def tmpl_display_member_group(self, groups, infos, ln=cdslang):
         _ = gettext_set_language(ln)
-        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text="You are member of the following groups: ")
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are member of the following groups:"))
         group_text += self.tmpl_infobox(infos)
         group_text += """
 <table class="mailbox">
