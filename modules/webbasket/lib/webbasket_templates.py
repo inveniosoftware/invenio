@@ -137,7 +137,7 @@ class Template:
   </tr>
 </table>""" % out
         else:
-            out = self.tmpl_create_basket(ln=cdslang)
+            out = self.tmpl_create_basket(ln=ln)
             
         return out
 
