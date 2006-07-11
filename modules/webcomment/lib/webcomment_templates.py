@@ -471,7 +471,7 @@ class Template:
 
         ## record details
         from search_engine import print_record
-        record_details = print_record(recID=recID, format='hb')
+        record_details = print_record(recID=recID, format='hb', ln=ln)
 
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
@@ -796,7 +796,7 @@ class Template:
             note %= (link, '</a>', '<i>' + display + '</i>')
 
         from invenio.search_engine import print_record
-        record_details = print_record(recID=recID, format='hb')
+        record_details = print_record(recID=recID, format='hb', ln=ln)
 
         warnings = self.tmpl_warnings(warnings, ln)
         form = """
@@ -838,7 +838,7 @@ class Template:
         warnings = self.tmpl_warnings(warnings, ln)
 
         from search_engine import print_record
-        record_details = print_record(recID=recID, format='hb')
+        record_details = print_record(recID=recID, format='hb', ln=ln)
 
         note_label = _("Note: Your nickname, %s, will be displayed as the author of this review")
         note_label %= ('<i>' + nickname + '</i>')
