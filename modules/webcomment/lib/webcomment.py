@@ -363,8 +363,7 @@ def query_get_user_contact_info(uid):
     @return tuple (nickname, email, last_login), if none found return ()
     Note: for the moment, if no nickname, will return email address up to the '@'
     """
-    query1 = """SELECT email,
-                     nickname,
+    query1 = """SELECT nickname, email,
                      DATE_FORMAT(last_login, '%%Y-%%m-%%d %%H:%%i:%%s')
                      FROM user WHERE id=%s"""
     params1 = (uid,)
@@ -774,8 +773,8 @@ def perform_request_add_comment_or_remark(recID=0,
     user_contact_info = query_get_user_contact_info(uid)
     nickname = ''
     if user_contact_info:
-        if user_contact_info[1]:
-            nickname = user_contact_info[1]
+        if user_contact_info[0]:
+            nickname = user_contact_info[0]
     # show the form 
     if action == 'DISPLAY':
         if reviews and cfg_webcomment_allow_reviews:
