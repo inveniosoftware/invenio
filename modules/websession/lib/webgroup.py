@@ -46,8 +46,8 @@ def perform_request_group_display(uid, errors = [], warnings = [], info=0, ln=cd
     elif info in(2, 7):
         member_info.append(_(cfg_websession_info_messages[info]))
                            
-    (body_admin, errors_admin) = display_admin_group(uid, infos=admin_info)
-    (body_member, errors_member) = display_member_group(uid, infos=member_info)
+    (body_admin, errors_admin) = display_admin_group(uid, infos=admin_info, ln=ln)
+    (body_member, errors_member) = display_member_group(uid, infos=member_info, ln=ln)
             
     if errors_admin != [] :
         errors.extend(errors_admin)
