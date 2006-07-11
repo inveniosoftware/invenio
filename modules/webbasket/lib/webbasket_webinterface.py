@@ -512,7 +512,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             topic = perform_request_create_basket(uid=uid,
                                                   new_basket_name=argd['new_basket_name'],
                                                   new_topic_name=argd['new_topic_name'],
-                                                  create_in_topic=argd['create_in_topic'])
+                                                  create_in_topic=argd['create_in_topic'],
+                                                  ln=argd['ln'])
             url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
             url %= (cfg_webbasket_categories['PRIVATE'], int(topic), argd['ln'])
             redirect_to_url(req, url)
