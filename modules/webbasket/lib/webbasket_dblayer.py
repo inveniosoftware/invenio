@@ -144,14 +144,13 @@ def get_max_user_rights_on_basket(uid, bskid):
                               ON ug.id_usergroup=ub.id_usergroup
     WHERE ug.id_user=%i AND ub.id_bskBASKET=%i AND NOT(ub.share_level='NO') AND ug.user_status!='%s'
     """
-    max_rights_index = None
     params_group_baskets = (uid, bskid, cfg_websession_usergroup_status['PENDING'])
     res = run_sql(query_group_baskets % params_group_baskets)
+    group_index = None
     if res:
-        group_rights = res[0][0]
         try:
-            max_rights_index = cfg_webbasket_share_levels_ordered.index(group_rights)
-        except ValueError:
+            group_index = cfg_webbasket_share_levels_ordered.index(res[0][0])
+        except:
             return None
     # public basket ?
     query_public_baskets = """
@@ -159,18 +158,17 @@ def get_max_user_rights_on_basket(uid, bskid):
     FROM usergroup_bskBASKET
     WHERE id_usergroup=0 AND id_bskBASKET=%i
     """
+    public_index = None
     res = run_sql(query_public_baskets % bskid)
     if res:
-        public_rights = res[0][0]
         try:
-            index = cfg_webbasket_share_levels_ordered.index(public_rights)
-            if index > max_rights_index:
-                return cfg_webbasket_share_levels_ordered[index]
-            else:
-                return cfg_webbasket_share_levels_ordered[max_rights_index]
-        except ValueError:
+            public_index = cfg_webbasket_share_levels_ordered.index(res[0][0])
+        except:
             return None
-            
+    if group_index > public_index:
+        return cfg_webbasket_share_levels_ordered[group_index]
+    else:
+        return cfg_webbasket_share_levels_ordered[public_index]
             
 ########################### Personal baskets ##################################
 
