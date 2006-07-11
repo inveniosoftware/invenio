@@ -198,6 +198,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             # user logged in
             else:
                 (body, errors, warnings) = perform_request_add_comment_or_remark(recID=argd['recid'],
+                                                                                 ln=argd['ln'],
                                                                                  uid=uid,
                                                                                  action=argd['action'],
                                                                                  msg=argd['msg'],
