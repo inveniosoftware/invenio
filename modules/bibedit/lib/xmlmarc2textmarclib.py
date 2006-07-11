@@ -328,7 +328,7 @@ def create_field_lines(fieldname, field, sysno, alephmarc=0):
         subfield_value = ""
         if len(field_instance[0]) == 0 and field_instance[3] != "":
             ## this is a controlfield
-            if fieldname != "001":
+            if fieldname not in ("001", "002", "003", "004", "005", "006", "007", "008", "009"):
                 subfield_label = "$$_"
             else:
                 subfield_label = ""
