@@ -162,7 +162,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
            submissions = submissions,
          )
 
-    return page(title="Your Submissions",
+    return page(title=_("Your Submissions"),
                 navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
                              'account' : _("Your Account"),
