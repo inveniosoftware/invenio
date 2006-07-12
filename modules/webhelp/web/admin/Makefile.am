@@ -21,9 +21,9 @@ SUBDIRS = howto
 
 docdir = $(localstatedir)/www/admin
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.uk.html
+doc_DATA = index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.bg.html index.uk.html
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
+FILESWML = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
@@ -31,7 +31,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
 MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 
-%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.bg.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
@@ -47,6 +47,7 @@ MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 	       -o\(ALL-LANG_*\)+LANG_NO:$*.no.html \
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
+	       -o\(ALL-LANG_*\)+LANG_BG:$*.bg.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
 	for lang in $(LINGUAS); do \
 		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.$${lang}.html" ; \

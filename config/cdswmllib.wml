@@ -21,6 +21,7 @@
 ## language handling:
 
 #use wml::std::lang
+<lang:new id=bg short>
 <lang:new id=ca short>
 <lang:new id=de short>
 <lang:new id=en short>
@@ -61,7 +62,8 @@
                       'el' => 'Ελληνικά',
                       'uk' => 'Українська',
                       'ja' => '日本語',
-                      'pl' => 'Polski');
+                      'pl' => 'Polski',
+                      'bg' => 'Български');
         return $longnames{$ln};
     }
     

@@ -41,6 +41,7 @@
 <el>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</el>
 <uk>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</uk>
 <ja>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ja>
+<bg>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</bg>
 
 <blockquote>
 <dl>
@@ -62,6 +63,7 @@
     <el>Get help with searching <CDSNAMEINTL>.</el>
     <uk>Get help with searching <CDSNAMEINTL>.</uk>
     <ja>Get help with searching <CDSNAMEINTL>.</ja>
+    <bg>Get help with searching <CDSNAMEINTL>.</bg>
 <dt><a href="submit/<lang:star: index.*.html>">_(Submit Help)_</a>
 <dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
@@ -79,5 +81,6 @@
     <el>Get help with submitting to <CDSNAMEINTL>.</el>
     <uk>Get help with submitting to <CDSNAMEINTL>.</uk>
     <ja>Get help with submitting to <CDSNAMEINTL>.</ja>
+    <bg>Get help with submitting to <CDSNAMEINTL>.</bg>
 </dl>
 </blockquote>
