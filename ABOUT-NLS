@@ -160,7 +160,11 @@ translator sends over the following translations by email:
         year
         experiment
         record ID
+
+   - miscellaneous terms loaded from tabfill.sql.wml:
  
+        word similarity
+
    - collection names, usually loaded from democfgdata.sql.wml:
  
         Preprints
@@ -177,6 +181,10 @@ translator sends over the following translations by email:
         Books & Reports
         Multimedia & Arts
         Poetry
+ 
+   - miscellaneus terms loaded from democfgdata.sql.wml:
+
+        journal impact factor
  
    - the right-hand-side portalbox:
  
