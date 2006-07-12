@@ -34,6 +34,8 @@ from invenio.webbasket_config import cfg_webbasket_share_levels, \
                                      cfg_webbasket_warning_messages, \
                                      cfg_webbasket_error_messages, \
                                      cfg_webbasket_max_number_of_displayed_baskets
+from invenio.webuser import isGuestUser
+                            
 import invenio.webbasket_dblayer as db
 try:
     import invenio.template
@@ -496,9 +498,13 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
             groups_rights = groups_rights[1:]
         display_delete = db.check_user_owns_baskets(uid, bskid)
         display_general = display_delete
+        if isGuestUser(uid):
+            display_sharing = 0
+        else:
+            display_sharing = 1
         body = webbasket_templates.tmpl_edit(bskid=bskid, bsk_name=bsk_name, 
                                              display_general=display_general, topics=topics, topic=topic, 
-                                             display_delete=display_delete,
+                                             display_delete=display_delete, display_sharing=display_sharing,
                                              groups_rights=groups_rights, external_rights=external_rights, 
                                              ln=ln)
     else:
@@ -508,7 +514,8 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
                 (group_id, group_rights) = group.split('_')
                 out_groups[group_id] = group_rights
         out_groups['0'] = external
-        db.update_rights(bskid, out_groups)
+        if not(isGuestUser(uid)):
+            db.update_rights(bskid, out_groups)
         if new_name != bsk_name:
             db.rename_basket(bskid, new_name)
         if new_topic_name:

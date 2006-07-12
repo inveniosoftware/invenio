@@ -1186,11 +1186,12 @@ class Template:
         return out
 
     def tmpl_edit(self, bskid, bsk_name, topic, topics, groups_rights, external_rights,
-                  display_general=0, display_delete=0, ln=cdslang):
+                  display_general=0, display_sharing=0, display_delete=0, ln=cdslang):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
         @param external_rights: rights as defined in cfg_webbasket_share_levels for public access.
         @param display_general: display fields name and topic, used with personal baskets
+        @param display_sharing: display sharing possibilities
         @param display_delete: display delete basket button
         """
         _ = gettext_set_language(ln)
@@ -1219,25 +1220,34 @@ class Template:
                                              title=_("General settings"),
                                              body = general_body)
         groups_body = ''
-        for (group_id, name, rights) in groups_rights:
-            groups_body += """
+        if display_sharing:
+            for (group_id, name, rights) in groups_rights:
+                groups_body += """
 <tr>
   <td>%s</td>
   <td>%s</td>
 </tr>""" % (name, self.__create_group_rights_selection_menu(group_id, rights, ln))
-        groups_body += """
+            groups_body += """
 <tr>
   <td colspan="2">
     <input type="submit" name="add_group" class="nonsubmitbutton" value="%s"/>
   </td>
 </tr>""" % _("Add group")
+        else:
+            groups_body = '<tr><td colspan="2">%s</td></tr>'
+            groups_body %= self.tmpl_create_guest_forbidden_box(ln)
         groups_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_usergroup.png',
                                             title=_("Manage group rights"),
                                             body=groups_body)
-        external_body = """
+        if display_sharing:
+            external_body = """
 <tr>
   <td>%s</td>
 </tr>""" % self.__create_rights_selection_menu('external', external_rights, ln)
+        else:
+            external_body = '<tr><td colspan="2">%s</td></tr>'
+            external_body %= self.tmpl_create_guest_forbidden_box(ln)
+
         external_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_world.png',
                                               title=_("Manage global sharing rights"),
                                               body=external_body)
@@ -1401,6 +1411,21 @@ class Template:
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
         message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session. If you wish you can %slogin or register here%s.")
+        message %= ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), '</a>')
+        out = """
+<table class="errorbox">
+  <thead>
+    <tr>
+      <th class="errorboxheader">%s</th>
+    </tr>
+  </thead>
+</table>"""
+        return out % message
+          
+    def tmpl_create_guest_forbidden_box(self, ln=cdslang):
+        """return html warning box for non registered users"""
+        _ = gettext_set_language(ln)
+        message = _("This functionality is forbidden for guest users. If you wish you can %slogin or register here%s.")
         message %= ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), '</a>')
         out = """
 <table class="errorbox">
