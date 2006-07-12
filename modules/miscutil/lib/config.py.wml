@@ -125,6 +125,7 @@ counters = "<CFG_SUBMIT_COUNTER>"
 storage = "<CFG_SUBMIT_DIR>"
 filedir	 = "<CFG_FILE_DIR>"
 filedirsize = <CFG_FILE_DIR_SIZE>
+xmlmarc2textmarc = "<BINDIR>/xmlmarc2textmarc"
 bibupload = "<BINDIR>/bibupload"
 bibformat = "<BINDIR>/bibformat"
 bibwords = "<BINDIR>/bibwords"
