@@ -249,7 +249,7 @@ msgstr "Υποβολή"
 #: modules/webstyle/lib/webstyle_templates.py:344
 #: modules/webstyle/lib/webstyle_templates.py:415
 msgid "Personalize"
-msgstr "Προσωπικές Ρυθμίσεις"
+msgstr "Ρυθμίσεις"
 
 #: modules/webhelp/web/index.html.wml:22 modules/webhelp/web/index.html.wml:28
 #: modules/webhelp/web/index.html.wml:29 modules/webhelp/web/index.html.wml:30
@@ -962,12 +962,12 @@ msgid ""
 "Set a new alert from %(your_searches)s, the %(popular_searches)s or the "
 "input form."
 msgstr ""
-"Καθορίστε μια νέα ειδοποίση από τις %(your_searches)s, τις %(popular_searches)s ή την "
+"Καθορίστε μια νέα ειδοποίηση από τις %(your_searches)s, τις %(popular_searches)s ή την "
 "φόρμα εισαγωγής."
 
 #: modules/webalert/lib/webalert_templates.py:282
 msgid "your searches"
-msgstr "οι έρευνές σας"
+msgstr "έρευνές σας"
 
 #: modules/webalert/lib/webalert_templates.py:283
 msgid "most popular searches"
@@ -1094,7 +1094,7 @@ msgstr "Παρουσίαση ερευνών"
 #: modules/websubmit/web/yourapprovals.py:90
 #: modules/websubmit/web/yoursubmissions.py:168
 msgid "Your Account"
-msgstr "Ο Λογαριασμός σας"
+msgstr "Ο Λογαριασμός μου"
 
 #: modules/webalert/lib/webalert_webinterface.py:106
 msgid "Set a new alert"
@@ -1561,8 +1561,8 @@ msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session. If you wish you can %slogin or register here%s."
 msgstr ""
-"Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν"
-"στο τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε μπορείτε να κάνετε %slogin ή να εγγραφείτε εδώ %s."
+"Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν "
+"στο τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %slogin ή να εγγραφείτε εδώ.%s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1462
 #: modules/webcomment/lib/webcomment_templates.py:614
@@ -2124,7 +2124,7 @@ msgstr "Το μύνημά σας έχει αποσταλεί."
 #: modules/webmessage/lib/webmessage_webinterface.py:246
 #: modules/websession/lib/websession_templates.py:430
 msgid "Your Messages"
-msgstr "Τα Μυνήματά σας"
+msgstr "Τα Μυνήματά μου"
 
 #: modules/webmessage/lib/webmessage_templates.py:82
 #: modules/webmessage/lib/webmessage_templates.py:418
@@ -2324,12 +2324,12 @@ msgstr "οποιαδήποτε ημέρα"
 #: modules/websearch/lib/search_engine.py:413
 #: modules/websearch/lib/websearch_templates.py:638
 msgid "any month"
-msgstr "οποιονδήποτε μήνα"
+msgstr "οποιουδήποτε μήνα"
 
 #: modules/websearch/lib/search_engine.py:421
 #: modules/websearch/lib/websearch_templates.py:652
 msgid "any year"
-msgstr "οποιονδήποτε χρόνο"
+msgstr "οποιουδήποτε έτους"
 
 #: modules/websearch/lib/search_engine.py:495
 #: modules/websearch/lib/search_engine.py:510
@@ -2811,6 +2811,9 @@ msgid ""
 "Note that if you have been using an external login system (such as CERN "
 "NICE), then we cannot do anything and you have to ask there."
 msgstr ""
+"Σημειώστε οτι αν χρησιμοποιείτε κάποιο εξωτερικό σύστημα για login (όπως το CERN "
+"NICE), τότε δεν μπορείτε να χρησιμοποιήσετε την παρακάτω φόρμα, αλλά πρέπει να "
+"επικοινωνήσετε με τον διαχειριστή εκείνης της υπηρεσίας."
 
 #: modules/websession/lib/websession_templates.py:49
 #, python-format
@@ -2818,6 +2821,8 @@ msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
 "internal."
 msgstr ""
+"Εναλλακτικά, θα μπορούσατε να αιτηθείτε στο %s αλλαγή του τρόπου login "
+"από το εξωτερικό σύστημα, σε εσωτερικό."
 
 #: modules/websession/lib/websession_templates.py:151
 msgid ""
@@ -2914,7 +2919,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:287
 #: modules/websession/lib/websession_webinterface.py:105
 msgid "Your Settings"
-msgstr "Οι επιλογές σας"
+msgstr "Οι επιλογές μου"
 
 #: modules/websession/lib/websession_templates.py:288
 msgid ""
@@ -2925,7 +2930,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:298
 #: modules/websession/lib/websession_templates.py:433
 msgid "Your Searches"
-msgstr "Οι Αναζητήσεις σας"
+msgstr "Οι Αναζητήσεις μου"
 
 #: modules/websession/lib/websession_templates.py:299
 msgid "View all the searches you performed during the last 30 days."
@@ -2943,7 +2948,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:309
 msgid "Your Alerts"
-msgstr "Οι Ειδοποιήσεις σας"
+msgstr "Οι Ειδοποιήσεις μου"
 
 #: modules/websession/lib/websession_templates.py:310
 msgid ""
@@ -2956,7 +2961,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:319
 msgid "Your Loans"
-msgstr "Οι δανεισμοί σας"
+msgstr "Οι δανεισμοί μου"
 
 #: modules/websession/lib/websession_templates.py:320
 msgid ""
@@ -2972,6 +2977,9 @@ msgid ""
 "               <a href=\"%s/youraccount/login?ln=%s\">login or register "
 "here</a>."
 msgstr ""
+"Έχετε συνδεθεί σαν χρήστης guest, οπότε οι %s σας θα εξαφανιστούν "
+"στο τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε\n"
+"               <a href=\"%s/youraccount/login?ln=%s\">να κάνετε login ή να εγγραφείτε εδώ.</a>"
 
 #: modules/websession/lib/websession_templates.py:367
 #, python-format
@@ -2982,66 +2990,66 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:432
 msgid "Your Alert Searches"
-msgstr "Οι αναζητήσεις ειδοποιήσεων σας."
+msgstr "Οι αναζητήσεις ειδοποιήσεων μου."
 
 #: modules/websession/lib/websession_templates.py:434
 #: modules/websession/lib/websession_templates.py:1651
 #: modules/websession/lib/websession_webinterface.py:559
 msgid "Your Groups"
-msgstr "Οι ομάδες σας"
+msgstr "Οι ομάδες μου"
 
 #: modules/websession/lib/websession_templates.py:435
-#, python-format, fuzzy
+#, python-format
 msgid ""
 "You can consult the list of %(your_groups)s you are administering or are a "
 "member of."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα των ομάδων που διαχειρίζεστε ή "
+"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή "
 "των οποίων είστε μέλος."
 
 #: modules/websession/lib/websession_templates.py:440
 msgid "your groups"
-msgstr "οι ομάδες σας"
+msgstr "των ομάδων"
 
 #: modules/websession/lib/websession_templates.py:443
 msgid "Your Submissions"
-msgstr "Οι υποβολές σας"
+msgstr "Οι υποβολές μου"
 
 #: modules/websession/lib/websession_templates.py:444
-#, python-format, fuzzy
+#, python-format
 msgid ""
 "You can consult the list of %(your_submissions)s and inquire about their "
 "status."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα των υποβολών σας και να "
+"Μπορείτε να συμβουλευτείτε την λίστα %(your_submissions)s σας και να "
 "δείτε την κατάστασή τους."
 
 #: modules/websession/lib/websession_templates.py:449
 msgid "your submissions"
-msgstr "οι υποβολές σας"
+msgstr "των υποβολών"
 
 #: modules/websession/lib/websession_templates.py:452
 #: modules/websubmit/web/yourapprovals.py:87
 msgid "Your Approvals"
-msgstr "Οι εγκρίσεις σας"
+msgstr "Οι εγκρίσεις μου"
 
 #: modules/websession/lib/websession_templates.py:453
-#, python-format, fuzzy
+#, python-format
 msgid ""
 "You can consult the list of %(your_approvals)s with the documents you "
 "approved or refereed."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα με τα έγγραφα που "
+"Μπορείτε να συμβουλευτείτε την λίστα %(your_approvals)s σας, με τα έγγραφα που "
 "έχετε εγκρίνει ή εξετάσει."
 
 #: modules/websession/lib/websession_templates.py:458
 msgid "your approvals"
-msgstr "οι εγκρίσεις σας"
+msgstr "των εγκρίσεών"
 
 #: modules/websession/lib/websession_templates.py:461
 #: modules/websession/lib/websession_webinterface.py:320
 msgid "Your Administrative Activities"
-msgstr "Οι διαχειριστικές σας δραστηριότητες"
+msgstr "Οι διαχειριστικές μου δραστηριότητες"
 
 #: modules/websession/lib/websession_templates.py:488
 msgid "Try again"
@@ -3134,7 +3142,7 @@ msgstr "Ξαναεισάγετε τον κωδικό"
 #: modules/websession/lib/websession_templates.py:721
 #: modules/websession/lib/websession_webinterface.py:521
 msgid "register"
-msgstr ""
+msgstr "εγγραφή"
 
 #: modules/websession/lib/websession_templates.py:722
 #, python-format
@@ -3146,13 +3154,18 @@ msgid ""
 "automatic alert search that will look for new preprints and will notify you "
 "daily of new arrivals by email."
 msgstr ""
-
+"Παρακαλώ μην χρησιμοποιείτε κωδικούς που έχετε και σε άλλα συστήματα. "
+"Το στοιχεία του email σας θα μείνουν εμπιστευτικά και δεν θα παραχωρηθούν "
+"σε κάποιο τρίτο φορέα. Το email σας θα χρησιμοποιείται μόνο για υπηρεσίες στο %s."
+ 
 #: modules/websession/lib/websession_templates.py:751
 #, python-format
 msgid ""
 "You seem to be the guest user.  You have to <a href=\"../youraccount/login?"
 "ln=%s\">login</a> first."
 msgstr ""
+"Φαίνεται οτι είστε χρήστης guest. Θα πρέπει πρώτα να κάνετε <a href=\"../youraccount/login?"
+"ln=%s\">login.</a>"
 
 #: modules/websession/lib/websession_templates.py:755
 msgid "You are not authorized to access administrative functions."
@@ -3895,7 +3908,7 @@ msgid " document #%s"
 msgstr " έγγραφο #%s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1082
-#, fuzzy, python-format
+#, python-format
 msgid " version #%s"
 msgstr "έκδοση #%s"
 
