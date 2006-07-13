@@ -95,10 +95,21 @@ the procedure below:
        $ firefox http://your.site/?ln=ja  # check it out in context
 
     If you do not have access to a test installation, please
-    contribute your PO file (see next step) and the CDS Invenio developers
-    will install it on a test site and will contact you so that you
-    would be able to check your translations in the global context of
+    contribute your PO file to the developers team (see the next step)
+    and we shall install it on a test site and contact you so that you
+    will be able to check your translation in the global context of
     the application.
+
+    (Note to developers: note that ``make update-gmo'' command may be
+    necessary to run before ``make'' if the latter fails, even if you
+    are not touching translation business at all.  The reason being
+    that the gmo files are not stored in CVS, while they are included
+    in distribution tarball.  So, if you are building from CVS, and
+    you do not have them in your tree, you may get build errors in
+    directories like modules/webhelp/web/admin saying things like
+    ``There is no rule to build index.en.html''.  The solution is to
+    run ``make update-gmo'' to produce gmo files before running
+    ``make''. End of note to developers.)
 
   - Please contribute your translation by emailing the file to
     <cds.support@cern.ch>.  You help is greatly appreciated and will
