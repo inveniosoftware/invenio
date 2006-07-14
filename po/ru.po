@@ -19,8 +19,8 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-06-30 12:19+0200\n"
-"PO-Revision-Date: 2006-06-23 17:03+0200\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
+"PO-Revision-Date: 2006-07-14 16:40+0200\n"
+"Last-Translator: Iaroslav Gaponenko <adrahil@gmail.com>\n"
 "Language-Team: RU <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -284,9 +284,8 @@ msgstr "Центральная Помощь"
 
 #: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:154
 #: modules/webstyle/lib/webstyle_templates.py:381
-#, fuzzy
 msgid "Last updated:"
-msgstr "Последнее изменение"
+msgstr "Последнее изменение:"
 
 #: modules/webhelp/web/index.html.wml:65
 #: modules/websubmit/doc/access.html.wml:23
@@ -337,14 +336,12 @@ msgid "Guide"
 msgstr "Руководство"
 
 #: config/cdspage.wml:59
-#, fuzzy
 msgid "Library"
-msgstr "февраль"
+msgstr "Архив"
 
 #: config/cdspage.wml:56
-#, fuzzy
 msgid "Agenda"
-msgstr "Повестка"
+msgstr "Календарь событий"
 
 #: modules/websearch/doc/index.html.wml:48
 #: modules/websearch/doc/tips.html.wml:22
@@ -371,9 +368,8 @@ msgid "Maintained by"
 msgstr "Поддерживает"
 
 #: config/cdspage.wml:58
-#, fuzzy
 msgid "Bulletin"
-msgstr "наборы"
+msgstr "Бюллетень"
 
 #: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:418
 msgid "Powered by"
@@ -381,25 +377,24 @@ msgstr "Powered by"
 
 #: modules/bibedit/lib/bibedit_templates.py:50
 msgid "Add Subfield"
-msgstr ""
+msgstr "Добавить подполе"
 
 #: modules/bibedit/lib/bibedit_templates.py:61
 #: modules/webalert/lib/webalert_templates.py:75
 msgid "Field"
-msgstr ""
+msgstr "Поле"
 
 #: modules/bibedit/lib/bibedit_templates.py:87
 msgid "Add Field"
-msgstr ""
+msgstr "Добавить поле"
 
 #: modules/bibedit/lib/bibedit_templates.py:94
-#, fuzzy
 msgid "Verbose"
-msgstr "Просмотреть"
+msgstr "Детальный"
 
 #: modules/bibedit/lib/bibedit_templates.py:99
 msgid "MARC"
-msgstr ""
+msgstr "МАРК"
 
 #: modules/bibedit/lib/bibedit_templates.py:111
 #: modules/webbasket/lib/webbasket_templates.py:1185
@@ -410,42 +405,39 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1429
 #: modules/websession/lib/websession_templates.py:1501
 msgid "Cancel"
-msgstr ""
+msgstr "Отменить"
 
 #: modules/bibedit/lib/bibedit_templates.py:112
 #: modules/webmessage/lib/webmessage_templates.py:105
 msgid "Delete"
-msgstr ""
+msgstr "Удалить"
 
 #: modules/bibedit/lib/bibedit_templates.py:125
 #: modules/webalert/lib/webalert_templates.py:307
 #: modules/webalert/lib/webalert_templates.py:430
 #: modules/webmessage/lib/webmessage_templates.py:82
 #: modules/websubmit/lib/websubmit_templates.py:1398
-#, fuzzy
 msgid "Action"
-msgstr "наборы"
+msgstr "Действие"
 
 #: modules/bibedit/lib/bibedit_templates.py:126
 #: modules/bibedit/lib/bibedit_templates.py:141
 #: modules/webcomment/lib/webcomment_templates.py:613
 #: modules/webcomment/lib/webcomment_templates.py:1169
 msgid "Record"
-msgstr ""
+msgstr "Запись"
 
 #: modules/bibedit/lib/bibedit_templates.py:127
-#, fuzzy
 msgid "Display"
-msgstr "Представить результаты:"
+msgstr "Показать"
 
 #: modules/bibedit/lib/bibedit_templates.py:255
 msgid "Save"
-msgstr ""
+msgstr "Сохранить"
 
 #: modules/bibedit/lib/bibedit_templates.py:257
-#, fuzzy
 msgid "Return to Record"
-msgstr "идти к записи:"
+msgstr "Назад к записи:"
 
 #: modules/bibedit/lib/bibedit_templates.py:411
 msgid "Your changes are TEMPORARY."
@@ -457,7 +449,7 @@ msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:426
 msgid "This record doesn't exist."
-msgstr ""
+msgstr "Эта запись не существует"
 
 #: modules/bibedit/lib/bibedit_templates.py:427
 msgid "Please try another record ID."
@@ -469,7 +461,7 @@ msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:436
 msgid "Please try to come back later."
-msgstr ""
+msgstr "Пожалуйста вернитесь позже"
 
 #: modules/bibedit/lib/bibedit_templates.py:443
 msgid "Cannot edit deleted record."
@@ -480,9 +472,8 @@ msgid "Please enter"
 msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:464
-#, fuzzy
 msgid "record ID"
-msgstr "Similar records"
+msgstr "Номер записи"
 
 #: modules/bibedit/lib/bibedit_templates.py:465
 msgid "to edit"
@@ -523,7 +514,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1540
 #: modules/websession/lib/websession_templates.py:1579
 msgid "Yes"
-msgstr ""
+msgstr "Да"
 
 #: modules/bibedit/lib/bibedit_templates.py:513
 #: modules/webalert/lib/webalert_templates.py:299
@@ -535,7 +526,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1541
 #: modules/websession/lib/websession_templates.py:1580
 msgid "No"
-msgstr ""
+msgstr "Нет"
 
 #: modules/bibedit/lib/bibedit_templates.py:520
 msgid ""
@@ -545,9 +536,8 @@ msgstr ""
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
-#, fuzzy
 msgid "See Guide"
-msgstr "Руководство"
+msgstr "Посмотреть руководство"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:106
 msgid "OAI sources currently present in the database"
@@ -598,213 +588,195 @@ msgid "N/A"
 msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:139
-#, fuzzy
 msgid "Sun"
-msgstr "июнь"
+msgstr "Вос"
 
 #: modules/miscutil/lib/dateutils.py:140
-#, fuzzy
 msgid "Mon"
-msgstr "май"
+msgstr "Пон"
 
 #: modules/miscutil/lib/dateutils.py:141
 msgid "Tue"
-msgstr ""
+msgstr "Вто"
 
 #: modules/miscutil/lib/dateutils.py:142
-#, fuzzy
 msgid "Wed"
-msgstr "Повестка"
+msgstr "Сре"
 
 #: modules/miscutil/lib/dateutils.py:143
 msgid "Thu"
-msgstr ""
+msgstr "Чет"
 
 #: modules/miscutil/lib/dateutils.py:144
 msgid "Fri"
-msgstr ""
+msgstr "Пят"
 
 #: modules/miscutil/lib/dateutils.py:145
 msgid "Sat"
-msgstr ""
+msgstr "Суб"
 
 #: modules/miscutil/lib/dateutils.py:147
-#, fuzzy
 msgid "Sunday"
-msgstr "любой день"
+msgstr "Воскресенье"
 
 #: modules/miscutil/lib/dateutils.py:148
-#, fuzzy
 msgid "Monday"
-msgstr "май"
+msgstr "Понедельник"
 
 #: modules/miscutil/lib/dateutils.py:149
-#, fuzzy
 msgid "Tuesday"
-msgstr "любой день"
+msgstr "Бторник"
 
 #: modules/miscutil/lib/dateutils.py:150
 msgid "Wednesday"
-msgstr ""
+msgstr "Среда"
 
 #: modules/miscutil/lib/dateutils.py:151
 msgid "Thursday"
-msgstr ""
+msgstr "Четверг"
 
 #: modules/miscutil/lib/dateutils.py:152
 msgid "Friday"
-msgstr ""
+msgstr "Пятница"
 
 #: modules/miscutil/lib/dateutils.py:153
-#, fuzzy
 msgid "Saturday"
-msgstr "любой день"
+msgstr "Суббота"
 
 #: modules/miscutil/lib/dateutils.py:167 modules/miscutil/lib/dateutils.py:181
-#, fuzzy
 msgid "Month"
-msgstr "любой месяц"
+msgstr "Месяц"
 
 #: modules/miscutil/lib/dateutils.py:168
-#, fuzzy
 msgid "Jan"
-msgstr "январь"
+msgstr "Янв"
 
 #: modules/miscutil/lib/dateutils.py:169
 msgid "Feb"
-msgstr ""
+msgstr "Фев"
 
 #: modules/miscutil/lib/dateutils.py:170
-#, fuzzy
 msgid "Mar"
-msgstr "март"
+msgstr "Мар"
 
 #: modules/miscutil/lib/dateutils.py:171
-#, fuzzy
 msgid "Apr"
-msgstr "апрель"
+msgstr "Апр"
 
 #: modules/miscutil/lib/dateutils.py:172 modules/miscutil/lib/dateutils.py:186
 #: modules/websearch/lib/search_engine.py:415
 #: modules/websearch/lib/websearch_templates.py:642
 msgid "May"
-msgstr "май"
+msgstr "Май"
 
 #: modules/miscutil/lib/dateutils.py:173
-#, fuzzy
 msgid "Jun"
-msgstr "июнь"
+msgstr "Июнь"
 
 #: modules/miscutil/lib/dateutils.py:174
-#, fuzzy
 msgid "Jul"
-msgstr "июль"
+msgstr "Июль"
 
 #: modules/miscutil/lib/dateutils.py:175
-#, fuzzy
 msgid "Aug"
-msgstr "август"
+msgstr "Авг"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Sep"
-msgstr ""
+msgstr "Сен"
 
 #: modules/miscutil/lib/dateutils.py:177
-#, fuzzy
 msgid "Oct"
-msgstr "октябрь"
+msgstr "Окт"
 
 #: modules/miscutil/lib/dateutils.py:178
 msgid "Nov"
-msgstr ""
+msgstr "Ноя"
 
 #: modules/miscutil/lib/dateutils.py:179
 msgid "Dec"
-msgstr ""
+msgstr "Дек"
 
 #: modules/miscutil/lib/dateutils.py:182
 #: modules/websearch/lib/search_engine.py:414
 #: modules/websearch/lib/websearch_templates.py:641
 msgid "January"
-msgstr "январь"
+msgstr "Январь"
 
 #: modules/miscutil/lib/dateutils.py:183
 #: modules/websearch/lib/search_engine.py:414
 #: modules/websearch/lib/websearch_templates.py:641
 msgid "February"
-msgstr "февраль"
+msgstr "Февраль"
 
 #: modules/miscutil/lib/dateutils.py:184
 #: modules/websearch/lib/search_engine.py:414
 #: modules/websearch/lib/websearch_templates.py:641
 msgid "March"
-msgstr "март"
+msgstr "Март"
 
 #: modules/miscutil/lib/dateutils.py:185
 #: modules/websearch/lib/search_engine.py:414
 #: modules/websearch/lib/websearch_templates.py:641
 msgid "April"
-msgstr "апрель"
+msgstr "Апрель"
 
 #: modules/miscutil/lib/dateutils.py:187
 #: modules/websearch/lib/search_engine.py:415
 #: modules/websearch/lib/websearch_templates.py:642
 msgid "June"
-msgstr "июнь"
+msgstr "Июнь"
 
 #: modules/miscutil/lib/dateutils.py:188
 #: modules/websearch/lib/search_engine.py:415
 #: modules/websearch/lib/websearch_templates.py:642
 msgid "July"
-msgstr "июль"
+msgstr "Июль"
 
 #: modules/miscutil/lib/dateutils.py:189
 #: modules/websearch/lib/search_engine.py:415
 #: modules/websearch/lib/websearch_templates.py:642
 msgid "August"
-msgstr "август"
+msgstr "Август"
 
 #: modules/miscutil/lib/dateutils.py:190
 #: modules/websearch/lib/search_engine.py:416
 #: modules/websearch/lib/websearch_templates.py:643
 msgid "September"
-msgstr "сентябрь"
+msgstr "Сентябрь"
 
 #: modules/miscutil/lib/dateutils.py:191
 #: modules/websearch/lib/search_engine.py:416
 #: modules/websearch/lib/websearch_templates.py:643
 msgid "October"
-msgstr "октябрь"
+msgstr "Октябрь"
 
 #: modules/miscutil/lib/dateutils.py:192
 #: modules/websearch/lib/search_engine.py:416
 #: modules/websearch/lib/websearch_templates.py:643
 msgid "November"
-msgstr "ноябрь"
+msgstr "Ноябрь"
 
 #: modules/miscutil/lib/dateutils.py:193
 #: modules/websearch/lib/search_engine.py:416
 #: modules/websearch/lib/websearch_templates.py:643
 msgid "December"
-msgstr "декабрь"
+msgstr "Декабрь"
 
 #: modules/miscutil/lib/dateutils.py:211
-#, fuzzy
 msgid "Day"
-msgstr "май"
+msgstr "День"
 
 #: modules/miscutil/lib/dateutils.py:262
-#, fuzzy
 msgid "Year"
-msgstr "Искать"
+msgstr "Год"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:59
 #: modules/miscutil/lib/errorlib_webinterface.py:61
 #: modules/miscutil/lib/errorlib_webinterface.py:63
 #: modules/miscutil/lib/errorlib_webinterface.py:65
-#, fuzzy
 msgid "Sorry"
-msgstr "Классифицировать по:"
+msgstr "Извините"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:59
 #: modules/miscutil/lib/errorlib_webinterface.py:61
@@ -815,9 +787,8 @@ msgid "Cannot send error request, %s parameter missing."
 msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:82
-#, fuzzy
 msgid "The error report has been sent."
-msgstr "The record has been deleted."
+msgstr "Послал рапорт об ошыбке."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:83
 msgid "Many thanks for helping us make CDS Invenio better."
@@ -829,7 +800,7 @@ msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:87
 msgid "Thank you!"
-msgstr ""
+msgstr "Спасибо!"
 
 #: modules/webalert/lib/webalert.py:53
 #, python-format
@@ -838,7 +809,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert.py:110
 msgid "unknown"
-msgstr ""
+msgstr "неизвестный"
 
 #: modules/webalert/lib/webalert.py:172
 msgid "You already have an alert defined for the specified query and basket"
@@ -854,9 +825,9 @@ msgid "The alert %s has been added to your profile."
 msgstr ""
 
 #: modules/webalert/lib/webalert.py:314
-#, fuzzy, python-format
+#, python-format
 msgid "The alert %s has been successfully updated."
-msgstr "The record has been deleted."
+msgstr "Тревога %s была обновлена."
 
 #: modules/webalert/lib/webalert.py:369
 #, python-format
@@ -867,9 +838,8 @@ msgid ""
 msgstr ""
 
 #: modules/webalert/lib/webalert.py:370
-#, fuzzy
 msgid "detailed list"
-msgstr "подробный"
+msgstr "подробный список"
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
@@ -900,27 +870,24 @@ msgid "Field 3"
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:89
-#, fuzzy
 msgid "Collections"
-msgstr "наборы"
+msgstr "Наборы"
 
 #: modules/webalert/lib/webalert_templates.py:91
-#, fuzzy
 msgid "Collection"
-msgstr "наборы"
+msgstr "Набор"
 
 #: modules/webalert/lib/webalert_templates.py:112
 msgid "You own following alerts:"
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:113
-#, fuzzy
 msgid "alert name"
-msgstr "сообщения"
+msgstr "имя сообщения"
 
 #: modules/webalert/lib/webalert_templates.py:121
 msgid "SHOW"
-msgstr ""
+msgstr "ПОКАЗАТЬ"
 
 #: modules/webalert/lib/webalert_templates.py:163
 msgid ""
@@ -930,7 +897,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:164
 msgid "QUERY"
-msgstr ""
+msgstr "ВОПРОС"
 
 #: modules/webalert/lib/webalert_templates.py:195
 msgid "Alert identification name:"
@@ -942,20 +909,18 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:201
 #: modules/webalert/lib/webalert_templates.py:318
-#, fuzzy
 msgid "monthly"
-msgstr "любой месяц"
+msgstr "каждый месяц"
 
 #: modules/webalert/lib/webalert_templates.py:202
 #: modules/webalert/lib/webalert_templates.py:316
 msgid "weekly"
-msgstr ""
+msgstr "каждую неделю"
 
 #: modules/webalert/lib/webalert_templates.py:203
 #: modules/webalert/lib/webalert_templates.py:313
-#, fuzzy
 msgid "daily"
-msgstr "подробный"
+msgstr "каждый день"
 
 #: modules/webalert/lib/webalert_templates.py:204
 msgid "Send notification e-mail?"
@@ -964,12 +929,12 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:207
 #: modules/webalert/lib/webalert_templates.py:321
 msgid "yes"
-msgstr ""
+msgstr "да"
 
 #: modules/webalert/lib/webalert_templates.py:208
 #: modules/webalert/lib/webalert_templates.py:323
 msgid "no"
-msgstr ""
+msgstr "нет"
 
 #: modules/webalert/lib/webalert_templates.py:209
 msgid "if <B>no</B> you must specify a basket"
@@ -995,18 +960,16 @@ msgid ""
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:282
-#, fuzzy
 msgid "your searches"
-msgstr "Попробуйте искать с..."
+msgstr "Вашы поиски"
 
 #: modules/webalert/lib/webalert_templates.py:283
-#, fuzzy
 msgid "most popular searches"
-msgstr "Попробуйте искать с..."
+msgstr "самые популярные поиски"
 
 #: modules/webalert/lib/webalert_templates.py:300
 msgid "Name"
-msgstr ""
+msgstr "Имя"
 
 #: modules/webalert/lib/webalert_templates.py:301
 msgid "Search checking frequency"
@@ -1017,9 +980,8 @@ msgid "Notification by e-mail"
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:303
-#, fuzzy
 msgid "Result in basket"
-msgstr "корзины"
+msgstr "Результат в корзине"
 
 #: modules/webalert/lib/webalert_templates.py:304
 msgid "Date last run"
@@ -1034,14 +996,12 @@ msgid "Query"
 msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:352
-#, fuzzy
 msgid "Remove"
-msgstr "ещё"
+msgstr "Удалить"
 
 #: modules/webalert/lib/webalert_templates.py:353
-#, fuzzy
 msgid "Modify"
-msgstr "май"
+msgstr "изменить"
 
 #: modules/webalert/lib/webalert_templates.py:355
 #: modules/webalert/lib/webalert_templates.py:448
@@ -1060,7 +1020,7 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:408
 msgid "Click here"
-msgstr ""
+msgstr "Щелкните здець"
 
 #: modules/webalert/lib/webalert_templates.py:416
 #, python-format
@@ -1071,26 +1031,23 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:428
 msgid "#"
-msgstr ""
+msgstr "#"
 
 #: modules/webalert/lib/webalert_templates.py:429
-#, fuzzy
 msgid "Question"
-msgstr "сеанс"
+msgstr "Вопрос"
 
 #: modules/webalert/lib/webalert_templates.py:433
-#, fuzzy
 msgid "Last Run"
-msgstr "Последнее изменение"
+msgstr "Последнуй запуск"
 
 #: modules/webalert/lib/webalert_templates.py:449
 msgid "Set new alert"
 msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:66
-#, fuzzy
 msgid "Display searches"
-msgstr "Представить результаты:"
+msgstr "Показать поиски"
 
 #: modules/webalert/lib/webalert_webinterface.py:71
 #: modules/webalert/lib/webalert_webinterface.py:111
@@ -1128,9 +1085,8 @@ msgstr "Представить результаты:"
 #: modules/websubmit/web/publiline.py:73
 #: modules/websubmit/web/yourapprovals.py:90
 #: modules/websubmit/web/yoursubmissions.py:168
-#, fuzzy
 msgid "Your Account"
-msgstr "счёт"
+msgstr "Ваш счёт"
 
 #: modules/webalert/lib/webalert_webinterface.py:106
 msgid "Set a new alert"
@@ -1144,9 +1100,8 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:209
 #: modules/webalert/lib/webalert_webinterface.py:246
 #: modules/webalert/lib/webalert_webinterface.py:276
-#, fuzzy
 msgid "Display alerts"
-msgstr "Представить результаты:"
+msgstr "Представить результаты"
 
 #: modules/webbasket/lib/webbasket.py:342
 msgid "Your comment has been successfully posted"
@@ -1154,114 +1109,104 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket.py:710
 #: modules/webbasket/lib/webbasket_templates.py:89
-#, fuzzy
 msgid "Personal baskets"
-msgstr "Персонализовать"
+msgstr "Персональные корзины"
 
 #: modules/webbasket/lib/webbasket.py:730
 #: modules/webbasket/lib/webbasket_templates.py:96
-#, fuzzy
 msgid "Group baskets"
-msgstr "корзины"
+msgstr "Корзины группы"
 
 #: modules/webbasket/lib/webbasket.py:751
 #: modules/webbasket/lib/webbasket_templates.py:103
-#, fuzzy
 msgid "Others' baskets"
-msgstr "корзины"
+msgstr "Корзины других"
 
 #: modules/webbasket/lib/webbasket.py:772
 #, python-format
 msgid "%i personal baskets"
-msgstr ""
+msgstr "%i персональных корзин"
 
 #: modules/webbasket/lib/webbasket.py:776
-#, fuzzy, python-format
+#, python-format
 msgid "%i group baskets"
-msgstr "корзины"
+msgstr "%i группных корзин"
 
 #: modules/webbasket/lib/webbasket.py:780
-#, fuzzy, python-format
+#, python-format
 msgid "%i others' baskets"
-msgstr "корзины"
+msgstr "%i корзин других"
 
 #: modules/webbasket/lib/webbasket.py:786
 #, python-format
 msgid "You have %s and are subscribed to %s and %s."
-msgstr ""
+msgstr "У вас %s и вы подписаны на %s и %s."
 
 #: modules/webbasket/lib/webbasket_templates.py:183
-#, fuzzy, python-format
+#, python-format
 msgid "There are %i baskets"
-msgstr "корзины"
+msgstr "Существуют %i корзин"
 
 #: modules/webbasket/lib/webbasket_templates.py:190
-#, fuzzy
 msgid "updated on"
-msgstr "Последнее изменение"
+msgstr "Последнее изменение:"
 
 #: modules/webbasket/lib/webbasket_templates.py:223
 #: modules/webbasket/lib/webbasket_templates.py:415
 msgid "Basket is empty"
-msgstr ""
+msgstr "Корзина пустая"
 
 #: modules/webbasket/lib/webbasket_templates.py:234
 #, python-format
 msgid "This basket belongs to %s. You can freely %ssubscribe%s to it"
-msgstr ""
+msgstr "%s владеет этой корзиной. Вы можете свободно %sподписаться%s на эту корзину."
 
 #: modules/webbasket/lib/webbasket_templates.py:257
 #: modules/webbasket/lib/webbasket_webinterface.py:563
-#, fuzzy
 msgid "Public basket"
-msgstr "корзины"
+msgstr "Общая корзина"
 
 #: modules/webbasket/lib/webbasket_templates.py:260
 #: modules/webbasket/lib/webbasket_templates.py:486
 #: modules/webbasket/lib/webbasket_templates.py:773
-#, fuzzy
 msgid "records"
-msgstr "Similar records"
+msgstr "записи"
 
 #: modules/webbasket/lib/webbasket_templates.py:261
 #: modules/webbasket/lib/webbasket_templates.py:487
 #: modules/webbasket/lib/webbasket_templates.py:774
-#, fuzzy
 msgid "last update"
-msgstr "Последнее изменение"
+msgstr "последнее изменение"
 
 #: modules/webbasket/lib/webbasket_templates.py:266
 msgid "Subscribe to this basket"
-msgstr ""
+msgstr "Подписаться на ету корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:279
 #: modules/webbasket/lib/webbasket_templates.py:960
 #: modules/webbasket/lib/webbasket_templates.py:1203
-#, fuzzy
 msgid "Basket's name"
-msgstr "корзины"
+msgstr "Имя корзины"
 
 #: modules/webbasket/lib/webbasket_templates.py:280
 msgid "Number of views"
-msgstr ""
+msgstr "Счет просмотров"
 
 #: modules/webbasket/lib/webbasket_templates.py:281
 msgid "Owner"
-msgstr ""
+msgstr "Предприниматель"
 
 #: modules/webbasket/lib/webbasket_templates.py:311
-#, fuzzy
 msgid "View"
-msgstr "ещё"
+msgstr "Просмотр"
 
 #: modules/webbasket/lib/webbasket_templates.py:320
 msgid "Subscribe"
-msgstr ""
+msgstr "Подписаться"
 
 #: modules/webbasket/lib/webbasket_templates.py:327
-#, fuzzy
 msgid "There is currently no publicly accessible basket"
-msgstr "The record has been deleted."
+msgstr "Нет никакой публично доступной корзины."
 
 #: modules/webbasket/lib/webbasket_templates.py:335
 #, python-format
@@ -1269,33 +1214,28 @@ msgid "Displaying baskets %i-%i out of %i total baskets."
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:362
-#, fuzzy
 msgid "Actions"
-msgstr "наборы"
+msgstr "Действия"
 
 #: modules/webbasket/lib/webbasket_templates.py:393
 #: modules/webbasket/lib/webbasket_templates.py:726
-#, fuzzy
 msgid "Non-shared basket"
-msgstr "корзины"
+msgstr "Неразделенная корзина"
 
 #: modules/webbasket/lib/webbasket_templates.py:396
 #: modules/webbasket/lib/webbasket_templates.py:728
-#, fuzzy
 msgid "Shared basket"
-msgstr "корзины"
+msgstr "Разделенная корзина"
 
 #: modules/webbasket/lib/webbasket_templates.py:399
 #: modules/webbasket/lib/webbasket_templates.py:730
-#, fuzzy
 msgid "Group-shared basket"
-msgstr "корзины"
+msgstr "Группная корзина"
 
 #: modules/webbasket/lib/webbasket_templates.py:405
 #: modules/webbasket/lib/webbasket_webinterface.py:487
-#, fuzzy
 msgid "Edit basket"
-msgstr "корзины"
+msgstr "Редактировать корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:444
 msgid "You don't have sufficient rights to view this basket's content"
@@ -1309,37 +1249,35 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:462
 #: modules/webbasket/lib/webbasket_templates.py:601
 msgid "comments"
-msgstr ""
+msgstr "комментарии"
 
 #: modules/webbasket/lib/webbasket_templates.py:462
 msgid "last comment:"
-msgstr ""
+msgstr "последний комментарий:"
 
 #: modules/webbasket/lib/webbasket_templates.py:524
 msgid "Bring item up"
-msgstr ""
+msgstr "Поднять"
 
 #: modules/webbasket/lib/webbasket_templates.py:539
 msgid "Bring item down"
-msgstr ""
+msgstr "Понизить"
 
 #: modules/webbasket/lib/webbasket_templates.py:554
 msgid "Copy item"
-msgstr ""
+msgstr "Скопировать"
 
 #: modules/webbasket/lib/webbasket_templates.py:569
-#, fuzzy
 msgid "Remove item"
-msgstr "ещё"
+msgstr "Удалить"
 
 #: modules/webbasket/lib/webbasket_templates.py:572
-#, fuzzy
 msgid "External record"
-msgstr "Подробная запись"
+msgstr "Внешная запись"
 
 #: modules/webbasket/lib/webbasket_templates.py:602
 msgid "last"
-msgstr ""
+msgstr "последний"
 
 #: modules/webbasket/lib/webbasket_templates.py:603
 #: modules/webbasket/lib/webbasket_webinterface.py:120
@@ -1348,12 +1286,11 @@ msgid "Details and comments"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:627
-#, fuzzy, python-format
+#, python-format
 msgid "This basket is publicly accessible at this address: %s."
-msgstr "The record has been deleted."
+msgstr "Эта корзина публично доступна на: %s."
 
 #: modules/webbasket/lib/webbasket_templates.py:657
-#, fuzzy
 msgid "Sort by"
 msgstr "Классифицировать по:"
 
@@ -1361,19 +1298,19 @@ msgstr "Классифицировать по:"
 #: modules/webbasket/lib/webbasket_templates.py:875
 #: modules/websubmit/lib/websubmit_templates.py:1878
 msgid "Title"
-msgstr ""
+msgstr "Название"
 
 #: modules/webbasket/lib/webbasket_templates.py:659
 #: modules/webmessage/lib/webmessage_templates.py:82
 msgid "Date"
-msgstr ""
+msgstr "Дата"
 
 #: modules/webbasket/lib/webbasket_templates.py:720
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:172
 #: modules/webcomment/web/admin/webcommentadmin.py:117
 msgid "Comments"
-msgstr ""
+msgstr "Комментарии"
 
 #: modules/webbasket/lib/webbasket_templates.py:721
 #, python-format
@@ -1384,119 +1321,110 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_webinterface.py:161
 #: modules/webcomment/lib/webcomment_templates.py:93
 msgid "Write a comment"
-msgstr ""
+msgstr "Написать комментарий"
 
 #: modules/webbasket/lib/webbasket_templates.py:779
-#, fuzzy
 msgid "Back to baskets"
-msgstr "корзины"
+msgstr "Назад к корзинам"
 
 #: modules/webbasket/lib/webbasket_templates.py:804
 #: modules/webbasket/lib/webbasket_templates.py:832
 msgid "by"
-msgstr ""
+msgstr "от"
 
 #: modules/webbasket/lib/webbasket_templates.py:805
 #: modules/webbasket/lib/webbasket_templates.py:832
-#, fuzzy
 msgid "on"
-msgstr "май"
+msgstr "на"
 
 #: modules/webbasket/lib/webbasket_templates.py:817
 #: modules/webcomment/lib/webcomment_templates.py:327
 #: modules/webmessage/lib/webmessage_templates.py:102
 msgid "Reply"
-msgstr ""
+msgstr "Ответ"
 
 #: modules/webbasket/lib/webbasket_templates.py:818
-#, fuzzy
 msgid "Delete comment"
-msgstr "счёт"
+msgstr "Удалить комментарий"
 
 #: modules/webbasket/lib/webbasket_templates.py:874
 #: modules/webbasket/lib/webbasket_templates.py:879
 #: modules/webcomment/lib/webcomment_webinterface.py:212
 msgid "Add Comment"
-msgstr ""
+msgstr "Добавить комментарий"
 
 #: modules/webbasket/lib/webbasket_templates.py:876
 #: modules/webcomment/lib/webcomment_templates.py:1172
 #: modules/webcomment/lib/webcomment_templates.py:1238
 msgid "Comment"
-msgstr ""
+msgstr "Комментарий"
 
 #: modules/webbasket/lib/webbasket_templates.py:895
 #: modules/webbasket/lib/webbasket_templates.py:991
-#, fuzzy
 msgid "Create new basket"
-msgstr "корзины"
+msgstr "Создать новую корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:945
-#, fuzzy
 msgid "Select topic"
-msgstr "корзины"
+msgstr "Выбрать тему"
 
 #: modules/webbasket/lib/webbasket_templates.py:961
 #: modules/webbasket/lib/webbasket_templates.py:1205
 #: modules/webbasket/lib/webbasket_templates.py:1214
 msgid "Choose topic"
-msgstr ""
+msgstr "Выбрать тему"
 
 #: modules/webbasket/lib/webbasket_templates.py:962
 #: modules/webbasket/lib/webbasket_templates.py:1216
 msgid "or create a new one"
-msgstr ""
+msgstr "или создать новый"
 
 #: modules/webbasket/lib/webbasket_templates.py:962
-#, fuzzy
 msgid "Create new topic"
-msgstr "корзины"
+msgstr "Создать новую тему"
 
 #: modules/webbasket/lib/webbasket_templates.py:964
-#, fuzzy
 msgid "Create a new basket"
-msgstr "корзины"
+msgstr "Создать новую корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:1025
 #: modules/webbasket/lib/webbasket_templates.py:1046
 #: modules/webbasket/lib/webbasket_templates.py:1062
-#, fuzzy
 msgid "Select basket"
-msgstr "корзины"
+msgstr "Выбрать корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:1033
 msgid "Add to a personal basket"
-msgstr ""
+msgstr "Добавить в личную корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:1034
 #: modules/webbasket/lib/webbasket_templates.py:1055
 #: modules/webbasket/lib/webbasket_templates.py:1073
-#, fuzzy, python-format
+#, python-format
 msgid "%i baskets"
-msgstr "корзины"
+msgstr "%i корзин"
 
 #: modules/webbasket/lib/webbasket_templates.py:1054
 msgid "Add to a group shared basket"
-msgstr ""
+msgstr "Добавить в группную корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:1072
 msgid "Add to a public basket"
-msgstr ""
+msgstr "Добавить к общей корзине"
 
 #: modules/webbasket/lib/webbasket_templates.py:1105
 #, python-format
 msgid "Adding %i records to these baskets"
-msgstr ""
+msgstr "Добавляю %i записей к корзинам"
 
 #: modules/webbasket/lib/webbasket_templates.py:1110
-#, fuzzy
 msgid "Add to baskets"
-msgstr "корзины"
+msgstr "Добавить к корзинам"
 
 #: modules/webbasket/lib/webbasket_templates.py:1117
-#, fuzzy, python-format
+#, python-format
 msgid "The selected records have been successfully added to %i baskets"
-msgstr "The record has been deleted."
+msgstr "Выбранные записи были добавлены в %i корзин"
 
 #: modules/webbasket/lib/webbasket_templates.py:1120
 msgid "No records were added to the selected baskets."
@@ -1522,15 +1450,14 @@ msgid "You have set %i alerts on this basket"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1219
-#, fuzzy
 msgid "General settings"
-msgstr "корзины"
+msgstr "Общие настройки"
 
 #: modules/webbasket/lib/webbasket_templates.py:1233
 #: modules/webbasket/lib/webbasket_templates.py:1354
 #: modules/webbasket/lib/webbasket_templates.py:1381
 msgid "Add group"
-msgstr ""
+msgstr "Добавить группу"
 
 #: modules/webbasket/lib/webbasket_templates.py:1235
 msgid "Manage group rights"
@@ -1541,18 +1468,17 @@ msgid "Manage global sharing rights"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1247
-#, fuzzy
 msgid "Delete basket"
-msgstr "корзины"
+msgstr "Удалить корзину"
 
 #: modules/webbasket/lib/webbasket_templates.py:1271
-#, fuzzy, python-format
+#, python-format
 msgid "Editing basket \"%s\""
-msgstr "корзины"
+msgstr "Редактирование корзины \\\"%s\\\""
 
 #: modules/webbasket/lib/webbasket_templates.py:1279
 msgid "Save changes"
-msgstr ""
+msgstr "Сохранить изменения"
 
 #: modules/webbasket/lib/webbasket_templates.py:1292
 #: modules/webbasket/lib/webbasket_templates.py:1316
@@ -1561,9 +1487,8 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1294
 #: modules/webbasket/lib/webbasket_templates.py:1318
-#, fuzzy
 msgid "View records"
-msgstr "Similar records"
+msgstr "Просмотр записей"
 
 #: modules/webbasket/lib/webbasket_templates.py:1296
 #: modules/webbasket/lib/webbasket_templates.py:1298
@@ -1577,37 +1502,33 @@ msgstr "Similar records"
 #: modules/webbasket/lib/webbasket_templates.py:1326
 #: modules/webbasket/lib/webbasket_templates.py:1328
 #: modules/webbasket/lib/webbasket_templates.py:1330
-#, fuzzy
 msgid "and"
-msgstr "Повестка"
+msgstr "и"
 
 #: modules/webbasket/lib/webbasket_templates.py:1296
 #: modules/webbasket/lib/webbasket_templates.py:1320
 msgid "view comments"
-msgstr ""
+msgstr "смотреть комментарии"
 
 #: modules/webbasket/lib/webbasket_templates.py:1298
 #: modules/webbasket/lib/webbasket_templates.py:1322
 msgid "add comments"
-msgstr ""
+msgstr "добавить комментарии"
 
 #: modules/webbasket/lib/webbasket_templates.py:1300
 #: modules/webbasket/lib/webbasket_templates.py:1324
-#, fuzzy
 msgid "add records"
-msgstr "Similar records"
+msgstr "добавить записи"
 
 #: modules/webbasket/lib/webbasket_templates.py:1302
 #: modules/webbasket/lib/webbasket_templates.py:1326
-#, fuzzy
 msgid "delete comments"
-msgstr "счёт"
+msgstr "удалить комментарии"
 
 #: modules/webbasket/lib/webbasket_templates.py:1304
 #: modules/webbasket/lib/webbasket_templates.py:1328
-#, fuzzy
 msgid "remove records"
-msgstr "Подробная запись"
+msgstr "удалить записи"
 
 #: modules/webbasket/lib/webbasket_templates.py:1306
 #: modules/webbasket/lib/webbasket_templates.py:1330
@@ -1616,16 +1537,15 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1352
 msgid "You're not member of a group"
-msgstr ""
+msgstr "Вы не принадлежыте к группе"
 
 #: modules/webbasket/lib/webbasket_templates.py:1374
 msgid "Sharing basket to a new group"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1395
-#, fuzzy
 msgid "no basket"
-msgstr "корзины"
+msgstr "нет корзин"
 
 #: modules/webbasket/lib/webbasket_templates.py:1403
 #, python-format
@@ -1636,45 +1556,39 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1462
 #: modules/webcomment/lib/webcomment_templates.py:614
-#, fuzzy
 msgid "(Back to search results)"
-msgstr "Результаты поиска"
+msgstr "(Назад к результатам поиска)"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:77
-#, fuzzy
 msgid "Display baskets"
-msgstr "Представить результаты:"
+msgstr "Представить корзины"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:291
 #: modules/websession/lib/websession_templates.py:300
 #: modules/websession/lib/websession_templates.py:431
-#, fuzzy
 msgid "Your Baskets"
-msgstr "корзины"
+msgstr "Вашы корзины"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:293
 msgid "Add records to baskets"
-msgstr ""
+msgstr "Добавить записи к корзинам"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:343
-#, fuzzy
 msgid "Delete a basket"
-msgstr "корзины"
+msgstr "Удалить корзину"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:381
 msgid "Copy record to basket"
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_webinterface.py:530
-#, fuzzy
 msgid "Create basket"
-msgstr "корзины"
+msgstr "Создать корзину"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:562
 #: modules/webbasket/lib/webbasket_webinterface.py:588
-#, fuzzy
 msgid "List of public baskets"
-msgstr "корзины"
+msgstr "Лист публичных корзин"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
@@ -1692,11 +1606,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:120
 msgid "Discuss this document:"
-msgstr ""
+msgstr "Обсуждение этого документа:"
 
 #: modules/webcomment/lib/webcomment_templates.py:145
 msgid "Discuss this document"
-msgstr ""
+msgstr "Обсуждение етого документа"
 
 #: modules/webcomment/lib/webcomment_templates.py:146
 msgid "Start a discussion about any aspect of this document."
@@ -1762,14 +1676,13 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:331
 #: modules/webcomment/lib/webcomment_templates.py:371
-#, fuzzy
 msgid "Report abuse"
-msgstr "сентябрь"
+msgstr "Сообщить злоупотребление"
 
 #: modules/webcomment/lib/webcomment_templates.py:366
-#, fuzzy, python-format
+#, python-format
 msgid "Reviewed by %(nickname)s on %(date)s"
-msgstr "Cited by: %s records"
+msgstr "Рассмотрел %(nickname)s на %(date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:367
 #, python-format
@@ -1777,17 +1690,16 @@ msgid "%i out of %i people found this review useful"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:505
-#, fuzzy
 msgid "(Report abuse)"
-msgstr "сентябрь"
+msgstr "(Сообщить злоупотребление)"
 
 #: modules/webcomment/lib/webcomment_templates.py:535
 msgid "< Previous"
-msgstr ""
+msgstr "< Предыдущий"
 
 #: modules/webcomment/lib/webcomment_templates.py:551
 msgid "< Next"
-msgstr ""
+msgstr "< Следующий"
 
 #: modules/webcomment/lib/webcomment_templates.py:555
 msgid "review"
@@ -1804,12 +1716,12 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:569
 msgid "comment"
-msgstr ""
+msgstr "комментарий"
 
 #: modules/webcomment/lib/webcomment_templates.py:575
 #, python-format
 msgid "Write a %s"
-msgstr ""
+msgstr "Написать %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:578
 #, python-format
@@ -1827,7 +1739,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:671
 msgid "Page: "
-msgstr ""
+msgstr "Страница: "
 
 #: modules/webcomment/lib/webcomment_templates.py:789
 #, python-format
@@ -1846,13 +1758,12 @@ msgid "%s will temporarly be displayed as author of this comment."
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:815
-#, fuzzy
 msgid "Article:"
-msgstr "апрель"
+msgstr "Статья"
 
 #: modules/webcomment/lib/webcomment_templates.py:816
 msgid "Comment:"
-msgstr ""
+msgstr "Комментарий:"
 
 #: modules/webcomment/lib/webcomment_templates.py:843
 #, python-format
@@ -1860,18 +1771,16 @@ msgid "Note: Your nickname, %s, will be displayed as the author of this review"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:889
-#, fuzzy
 msgid "Article"
-msgstr "апрель"
+msgstr "Статья"
 
 #: modules/webcomment/lib/webcomment_templates.py:890
 msgid "Rate this article"
-msgstr ""
+msgstr "Оценить эту статью"
 
 #: modules/webcomment/lib/webcomment_templates.py:891
-#, fuzzy
 msgid "Select a score"
-msgstr "корзины"
+msgstr "Выберите очко"
 
 #: modules/webcomment/lib/webcomment_templates.py:892
 msgid "Give a title to your review"
@@ -1895,9 +1804,8 @@ msgid "Your comment was successfully added"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:922
-#, fuzzy
 msgid "Back to record"
-msgstr "идти к записи:"
+msgstr "Назад к записи"
 
 #: modules/webcomment/lib/webcomment_templates.py:1007
 msgid "View all reported comments"
@@ -1912,9 +1820,8 @@ msgid "Delete a specific comment/review (by ID)"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1010
-#, fuzzy
 msgid "View all users who have been reported"
-msgstr "The record has been deleted."
+msgstr "Вце пользователи о которых существуют рапорты"
 
 #: modules/webcomment/lib/webcomment_templates.py:1013
 msgid "Comments and reviews are disabled"
@@ -1922,7 +1829,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1016
 msgid "Menu"
-msgstr ""
+msgstr "Меню"
 
 #: modules/webcomment/lib/webcomment_templates.py:1031
 msgid ""
@@ -1936,7 +1843,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1045
 msgid "View Comment"
-msgstr ""
+msgstr "Просмотр комментария"
 
 #: modules/webcomment/lib/webcomment_templates.py:1070
 #, python-format
@@ -1959,12 +1866,11 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:153
 #: modules/websession/lib/websession_templates.py:713
 msgid "Nickname"
-msgstr ""
+msgstr "Имя"
 
 #: modules/webcomment/lib/webcomment_templates.py:1120
-#, fuzzy
 msgid "Email"
-msgstr "подробный"
+msgstr "Электронная почта"
 
 #: modules/webcomment/lib/webcomment_templates.py:1121
 #: modules/webcomment/lib/webcomment_templates.py:1150
@@ -1992,43 +1898,38 @@ msgid "View all user's reported comments/reviews"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1152
-#, fuzzy
 msgid "email"
-msgstr "подробный"
+msgstr "электронная почта"
 
 #: modules/webcomment/lib/webcomment_templates.py:1160
-#, fuzzy, python-format
+#, python-format
 msgid "This review has been reported %i times"
-msgstr "The record has been deleted."
+msgstr "Об этом обзоре сообщили %i раз"
 
 #: modules/webcomment/lib/webcomment_templates.py:1162
-#, fuzzy, python-format
+#, python-format
 msgid "This comment has been reported %i times"
-msgstr "The record has been deleted."
+msgstr "Об этом комментарии сообщили %i раз"
 
 #: modules/webcomment/lib/webcomment_templates.py:1238
-#, fuzzy
 msgid "Review"
-msgstr "ещё"
+msgstr "Обзор"
 
 #: modules/webcomment/lib/webcomment_templates.py:1239
-#, fuzzy
 msgid "Written by"
-msgstr "Cited by"
+msgstr "Автор: "
 
 #: modules/webcomment/lib/webcomment_templates.py:1240
 msgid "General informations"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1241
-#, fuzzy
 msgid "Select"
-msgstr "корзины"
+msgstr "Выбор"
 
 #: modules/webcomment/lib/webcomment_templates.py:1255
-#, fuzzy
 msgid "Delete selected reviews"
-msgstr "корзины"
+msgstr "Удалить быбранные обзоры"
 
 #: modules/webcomment/lib/webcomment_templates.py:1256
 #: modules/webcomment/lib/webcomment_templates.py:1261
@@ -2036,13 +1937,12 @@ msgid "Suppress selected abuse report"
 msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1260
-#, fuzzy
 msgid "Delete selected comments"
-msgstr "корзины"
+msgstr "Удалить выбранные комментарии"
 
 #: modules/webcomment/lib/webcomment_templates.py:1269
 msgid "Ok"
-msgstr ""
+msgstr "ОК"
 
 #: modules/webcomment/lib/webcomment_templates.py:1275
 #, python-format
@@ -2087,22 +1987,20 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:167
-#, fuzzy, python-format
+#, python-format
 msgid "Detailed record #%s"
-msgstr "Подробная запись"
+msgstr "Подробная запись #%s"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:172
 #: modules/webcomment/web/admin/webcommentadmin.py:117
-#, fuzzy
 msgid "Reviews"
-msgstr "ещё"
+msgstr "Обзоры"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:124
 #: modules/webcomment/lib/webcomment_webinterface.py:224
-#, fuzzy
 msgid "Record Not Found"
-msgstr "Набор %s не существует"
+msgstr "Запись не существует"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:183
 msgid "Before you add your comment, you need to log in first"
@@ -2111,9 +2009,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:191
 #: modules/websession/lib/websession_webinterface.py:394
 #: modules/websession/lib/websession_webinterface.py:425
-#, fuzzy
 msgid "Login"
-msgstr "записаться"
+msgstr "Логин"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:42
 #: modules/webcomment/web/admin/webcommentadmin.py:51
@@ -2125,9 +2022,8 @@ msgid "Comment Management"
 msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:81
-#, fuzzy
 msgid "Delete Comment"
-msgstr "счёт"
+msgstr "Удалить комментарий"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:117
 #, python-format
@@ -2139,18 +2035,16 @@ msgid "View all Reported Users"
 msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:185
-#, fuzzy
 msgid "Delete comments"
-msgstr "счёт"
+msgstr "Удалить комментарии"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:188
 msgid "Suppress abuse reports"
 msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:132
-#, fuzzy
 msgid "The message could not be deleted"
-msgstr "The record has been deleted."
+msgstr "Невозможно удалить сообщение"
 
 #: modules/webmessage/lib/webmessage.py:134
 msgid "Delete successful"
@@ -2180,7 +2074,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage.py:366
 #, python-format
 msgid "Group '%s' doesn't exist\n"
-msgstr ""
+msgstr "Группа '%s' не существует\n"
 
 #: modules/webmessage/lib/webmessage.py:389
 #, python-format
@@ -2191,7 +2085,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:102
 #: modules/webmessage/lib/webmessage_webinterface.py:165
 msgid "Write a message"
-msgstr ""
+msgstr "Написать сообчение"
 
 #: modules/webmessage/lib/webmessage.py:418
 msgid "Your message couldn't be sent to the following recipients\n"
@@ -2211,100 +2105,93 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:217
 #: modules/webmessage/lib/webmessage_webinterface.py:246
 #: modules/websession/lib/websession_templates.py:430
-#, fuzzy
 msgid "Your Messages"
-msgstr "Искать"
+msgstr "Вашы сообщения"
 
 #: modules/webmessage/lib/webmessage_templates.py:82
 #: modules/webmessage/lib/webmessage_templates.py:418
-#, fuzzy
 msgid "Subject"
-msgstr "Внести"
+msgstr "Предмет"
 
 #: modules/webmessage/lib/webmessage_templates.py:82
-#, fuzzy
 msgid "Sender"
-msgstr "Повестка"
+msgstr "Отправитель"
 
 #: modules/webmessage/lib/webmessage_templates.py:89
-#, fuzzy
 msgid "No messages"
-msgstr "Искать"
+msgstr "Нет сообщений"
 
 #: modules/webmessage/lib/webmessage_templates.py:92
-#, fuzzy
 msgid "[No subject]"
-msgstr "Внести"
+msgstr "[Нет предмета]"
 
 #: modules/webmessage/lib/webmessage_templates.py:133
 msgid "Write new message"
-msgstr ""
+msgstr "Написать новое сообщение"
 
 #: modules/webmessage/lib/webmessage_templates.py:134
 msgid "Delete All"
-msgstr ""
+msgstr "Удалить Все"
 
 #: modules/webmessage/lib/webmessage_templates.py:180
 msgid "Re: "
 msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:270
-#, fuzzy
 msgid "Send later?"
-msgstr "Повестка"
+msgstr "Послать позже?"
 
 #: modules/webmessage/lib/webmessage_templates.py:271
 msgid "To:"
-msgstr ""
+msgstr "Кому:"
 
 #: modules/webmessage/lib/webmessage_templates.py:272
 msgid "Users"
-msgstr ""
+msgstr "Пользователи"
 
 #: modules/webmessage/lib/webmessage_templates.py:273
 msgid "Groups"
-msgstr ""
+msgstr "Группы"
 
 #: modules/webmessage/lib/webmessage_templates.py:274
-#, fuzzy
 msgid "Subject:"
-msgstr "Внести"
+msgstr "Предмет:"
 
 #: modules/webmessage/lib/webmessage_templates.py:275
 msgid "Message:"
-msgstr ""
+msgstr "Соощение:"
 
 #: modules/webmessage/lib/webmessage_templates.py:276
 msgid "SEND"
-msgstr ""
+msgstr "ПОСЛАТЬ"
 
 #: modules/webmessage/lib/webmessage_templates.py:417
 msgid "From"
-msgstr ""
+msgstr "От"
 
 #: modules/webmessage/lib/webmessage_templates.py:419
 msgid "Sent on"
-msgstr ""
+msgstr "Послан на"
 
 #: modules/webmessage/lib/webmessage_templates.py:420
 msgid "Received on"
-msgstr ""
+msgstr "Принят на"
 
 #: modules/webmessage/lib/webmessage_templates.py:421
 msgid "Sent to"
-msgstr ""
+msgstr "Получатели"
 
 #: modules/webmessage/lib/webmessage_templates.py:422
 msgid "Sent to groups"
-msgstr ""
+msgstr "Послан группам"
 
 #: modules/webmessage/lib/webmessage_templates.py:423
 msgid "REPLY"
-msgstr ""
+msgstr "ОТВЕТ"
 
 #: modules/webmessage/lib/webmessage_templates.py:424
 msgid "DELETE"
-msgstr ""
+msgstr "УДАЛИТЬ"
 
 #: modules/webmessage/lib/webmessage_templates.py:473
 msgid "Are you sure you want to empty your whole mailbox?"
@@ -2436,9 +2323,8 @@ msgid "add another collection"
 msgstr "добавить другой набор"
 
 #: modules/websearch/lib/search_engine.py:550
-#, fuzzy
 msgid "HTML brief"
-msgstr "краткий"
+msgstr "короткий HTML"
 
 #: modules/websearch/lib/search_engine.py:650
 #: modules/websearch/lib/websearch_templates.py:602
@@ -2487,13 +2373,11 @@ msgstr ""
 "em> ..."
 
 #: modules/websearch/lib/search_engine.py:1633
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "No match found in collection %s. Other public collections gave <a class="
 "\"nearestterms\" href=\"%s\">%d hits</a>."
-msgstr ""
-"Не найден результат в наборе %s. Other public collections gave <a class="
-"\"nearestterms\" href=\"%s/search.py?%s\">%d hits</a>."
+msgstr "Не найден результат в наборе %s. В других публичных наборах <a class=\"nearestterms\" href=\"%s\">%d резултатов</a>."
 
 #: modules/websearch/lib/search_engine.py:1640
 msgid ""
@@ -2580,9 +2464,9 @@ msgid "Record #%d: %s"
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:166
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%d"
-msgstr "Набор %s не существует"
+msgstr "Запись #%d"
 
 #: modules/websearch/lib/websearch_templates.py:288
 #: modules/websearch/lib/websearch_templates.py:389
@@ -2687,9 +2571,8 @@ msgid "inside"
 msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:1019
-#, fuzzy
 msgid "in any collection are:"
-msgstr "любой набор"
+msgstr "в любом наборе есть:"
 
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "Hits"
@@ -2698,7 +2581,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1172
 #: modules/websearch/lib/websearch_templates.py:1914
 msgid "next"
-msgstr ""
+msgstr "следущий"
 
 #: modules/websearch/lib/websearch_templates.py:1265
 #: modules/websearch/lib/websearch_templates.py:1366
@@ -2711,11 +2594,11 @@ msgstr "наборы"
 
 #: modules/websearch/lib/websearch_templates.py:1467
 msgid "Limit to"
-msgstr ""
+msgstr "Ограничит на"
 
 #: modules/websearch/lib/websearch_templates.py:1585
 msgid "MARC tag"
-msgstr ""
+msgstr "Таг MARC"
 
 #: modules/websearch/lib/websearch_templates.py:1614
 #: modules/websearch/lib/websearch_templates.py:1616
@@ -2770,19 +2653,17 @@ msgid "<strong>%s</strong> records found"
 msgstr "<strong>%s</strong> найденных записей"
 
 #: modules/websearch/lib/websearch_templates.py:1901
-#, fuzzy
 msgid "begin"
-msgstr "записаться"
+msgstr "начало"
 
 #: modules/websearch/lib/websearch_templates.py:1905
 #: modules/websubmit/lib/websubmit_templates.py:1162
 msgid "previous"
-msgstr ""
+msgstr "предыдущий"
 
 #: modules/websearch/lib/websearch_templates.py:1918
-#, fuzzy
 msgid "end"
-msgstr "Повестка"
+msgstr "конец"
 
 #: modules/websearch/lib/websearch_templates.py:1938
 msgid "jump to record:"
@@ -2856,9 +2737,9 @@ msgid "Internal Error"
 msgstr "Внутренная Ошибка"
 
 #: modules/websearch/lib/websearch_webinterface.py:289
-#, fuzzy, python-format
+#, python-format
 msgid "Collection %s Not Found"
-msgstr "Набор %s не существует"
+msgstr "Набор %s не найден"
 
 #: modules/websearch/lib/websearch_webinterface.py:290
 #, python-format
@@ -2885,7 +2766,7 @@ msgstr ""
 
 #: modules/websession/lib/webaccount.py:91
 msgid "No queries found"
-msgstr ""
+msgstr "Нет вопросов"
 
 #: modules/websession/lib/websession_templates.py:46
 msgid ""
@@ -2913,15 +2794,14 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:152
-#, fuzzy
 msgid "Edit parameters"
-msgstr "корзины"
+msgstr "Изменить параметры"
 
 #: modules/websession/lib/websession_templates.py:156
 #: modules/websession/lib/websession_templates.py:159
 #: modules/websession/lib/websession_templates.py:717
 msgid "Example"
-msgstr ""
+msgstr "Пример"
 
 #: modules/websession/lib/websession_templates.py:157
 msgid "New email address"
@@ -2929,13 +2809,12 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:158
 #: modules/websession/lib/websession_templates.py:715
-#, fuzzy
 msgid "mandatory"
-msgstr "любой день"
+msgstr "обязательно"
 
 #: modules/websession/lib/websession_templates.py:160
 msgid "New password"
-msgstr ""
+msgstr "Новый пароль"
 
 #: modules/websession/lib/websession_templates.py:161
 #: modules/websession/lib/websession_templates.py:716
@@ -2972,18 +2851,17 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:202
 #: modules/websession/lib/websession_templates.py:215
-#, fuzzy
 msgid "Select method"
-msgstr "корзины"
+msgstr "Выбрать метод"
 
 #: modules/websession/lib/websession_templates.py:251
 #: modules/websession/lib/websession_templates.py:712
 msgid "Email address"
-msgstr ""
+msgstr "Email аддрес"
 
 #: modules/websession/lib/websession_templates.py:252
 msgid "Send lost password"
-msgstr ""
+msgstr "Послать потерянный пароль"
 
 #: modules/websession/lib/websession_templates.py:278
 msgid ""
@@ -2995,9 +2873,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:287
 #: modules/websession/lib/websession_webinterface.py:105
-#, fuzzy
 msgid "Your Settings"
-msgstr "корзины"
+msgstr "Вашы настройки"
 
 #: modules/websession/lib/websession_templates.py:288
 msgid ""
@@ -3007,9 +2884,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:298
 #: modules/websession/lib/websession_templates.py:433
-#, fuzzy
 msgid "Your Searches"
-msgstr "Искать"
+msgstr "Вашы поиски"
 
 #: modules/websession/lib/websession_templates.py:299
 msgid "View all the searches you performed during the last 30 days."
@@ -3022,9 +2898,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:309
-#, fuzzy
 msgid "Your Alerts"
-msgstr "корзины"
+msgstr "Вашы тревоги"
 
 #: modules/websession/lib/websession_templates.py:310
 msgid ""
@@ -3033,9 +2908,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:319
-#, fuzzy
 msgid "Your Loans"
-msgstr "подтверждения"
+msgstr "Вашы ссуды"
 
 #: modules/websession/lib/websession_templates.py:320
 msgid ""
@@ -3060,16 +2934,14 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:432
-#, fuzzy
 msgid "Your Alert Searches"
-msgstr "Искать"
+msgstr "Поиск вашых тревог"
 
 #: modules/websession/lib/websession_templates.py:434
 #: modules/websession/lib/websession_templates.py:1651
 #: modules/websession/lib/websession_webinterface.py:559
-#, fuzzy
 msgid "Your Groups"
-msgstr "подтверждения"
+msgstr "Вашы группы"
 
 #: modules/websession/lib/websession_templates.py:435
 #, python-format
@@ -3079,14 +2951,12 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:440
-#, fuzzy
 msgid "your groups"
-msgstr "подтверждения"
+msgstr "вашы группы"
 
 #: modules/websession/lib/websession_templates.py:443
-#, fuzzy
 msgid "Your Submissions"
-msgstr "записи"
+msgstr "Вашы подачи"
 
 #: modules/websession/lib/websession_templates.py:444
 #, python-format
@@ -3096,15 +2966,13 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:449
-#, fuzzy
 msgid "your submissions"
-msgstr "записи"
+msgstr "вашы подачи"
 
 #: modules/websession/lib/websession_templates.py:452
 #: modules/websubmit/web/yourapprovals.py:87
-#, fuzzy
 msgid "Your Approvals"
-msgstr "подтверждения"
+msgstr "Вашы одобрения"
 
 #: modules/websession/lib/websession_templates.py:453
 #, python-format
@@ -3114,9 +2982,8 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:458
-#, fuzzy
 msgid "your approvals"
-msgstr "подтверждения"
+msgstr "вашы одобрения"
 
 #: modules/websession/lib/websession_templates.py:461
 #: modules/websession/lib/websession_webinterface.py:320
@@ -3133,9 +3000,8 @@ msgid "Okay, password has been emailed to %s"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:522
-#, fuzzy
 msgid "Deleting your account"
-msgstr "счёт"
+msgstr "Удаляем ваш счёт"
 
 #: modules/websession/lib/websession_templates.py:538
 #, python-format
@@ -3163,26 +3029,24 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:594
-#, fuzzy
 msgid "Login via:"
-msgstr "записаться"
+msgstr "Логин через:"
 
 #: modules/websession/lib/websession_templates.py:620
-#, fuzzy
 msgid "Username"
-msgstr "сообщения"
+msgstr "Пользователь"
 
 #: modules/websession/lib/websession_templates.py:621
 #: modules/websession/lib/websession_templates.py:714
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: modules/websession/lib/websession_templates.py:622
 #: modules/websession/lib/websession_templates.py:826
 #: modules/websession/lib/websession_webinterface.py:392
 #: modules/websession/lib/websession_webinterface.py:426
 msgid "login"
-msgstr "записаться"
+msgstr "логин"
 
 #: modules/websession/lib/websession_templates.py:627
 #: modules/websession/lib/websession_webinterface.py:223
@@ -3206,7 +3070,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:721
 #: modules/websession/lib/websession_webinterface.py:521
 msgid "register"
-msgstr ""
+msgstr "регистрироватьса"
 
 #: modules/websession/lib/websession_templates.py:722
 #, python-format
@@ -3231,9 +3095,9 @@ msgid "You are not authorized to access administrative functions."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:758
-#, fuzzy, python-format
+#, python-format
 msgid "You seem to be <em>%s</em>."
-msgstr "Искомый термин <em>%s</em>"
+msgstr "Вы кажется <em>%s</em>"
 
 #: modules/websession/lib/websession_templates.py:759
 msgid "Here are some interesting web admin links for you:"
@@ -3245,37 +3109,35 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:767
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "Настройки BibFormat"
 
 #: modules/websession/lib/websession_templates.py:769
 msgid "Configure BibHarvest"
-msgstr ""
+msgstr "Настройки BibHarvest"
 
 #: modules/websession/lib/websession_templates.py:771
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "Настройки BibIndex"
 
 #: modules/websession/lib/websession_templates.py:773
 msgid "Configure BibRank"
-msgstr ""
+msgstr "Настройки BibRank"
 
 #: modules/websession/lib/websession_templates.py:775
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "Настройки WebAccess"
 
 #: modules/websession/lib/websession_templates.py:777
-#, fuzzy
 msgid "Configure WebComment"
-msgstr "Искать"
+msgstr "Настройки WebComment"
 
 #: modules/websession/lib/websession_templates.py:779
-#, fuzzy
 msgid "Configure WebSearch"
-msgstr "Искать"
+msgstr "Настройки WebSearch"
 
 #: modules/websession/lib/websession_templates.py:781
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "Настройки WebSubmit"
 
 #: modules/websession/lib/websession_templates.py:782
 #, python-format
@@ -3335,9 +3197,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:964
 #: modules/websession/lib/websession_templates.py:1030
-#, fuzzy
 msgid "Description"
-msgstr "сеанс"
+msgstr "Описание"
 
 #: modules/websession/lib/websession_templates.py:971
 msgid "You are not administrator of any group."
@@ -3353,14 +3214,13 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1008
 #: modules/websession/lib/websession_templates.py:1080
-#, fuzzy
 msgid "Create new group"
-msgstr "корзины"
+msgstr "Добавить новую группу"
 
 #: modules/websession/lib/websession_templates.py:1037
 #: modules/websession/lib/websession_templates.py:1491
 msgid "You are not member of any group."
-msgstr ""
+msgstr "Вы не принадлежыте никакой группе."
 
 #: modules/websession/lib/websession_templates.py:1062
 msgid "Join new group"
@@ -3370,32 +3230,28 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1489
 #: modules/websession/lib/websession_templates.py:1500
 msgid "Leave group"
-msgstr ""
+msgstr "Оставить группу"
 
 #: modules/websession/lib/websession_templates.py:1082
 #: modules/websession/lib/websession_webinterface.py:612
-#, fuzzy
 msgid "Create New Group"
-msgstr "корзины"
+msgstr "Добавить новую группу"
 
 #: modules/websession/lib/websession_templates.py:1088
-#, fuzzy
 msgid "Update group"
-msgstr "Последнее изменение"
+msgstr "Обновить группу"
 
 #: modules/websession/lib/websession_templates.py:1090
 msgid "Edit group: "
-msgstr ""
+msgstr "Изменить группу: "
 
 #: modules/websession/lib/websession_templates.py:1092
-#, fuzzy
 msgid "Delete group"
-msgstr "счёт"
+msgstr "Удалить группу"
 
 #: modules/websession/lib/websession_templates.py:1162
-#, fuzzy
 msgid "Group name: "
-msgstr "корзины"
+msgstr "Имя группы: "
 
 #: modules/websession/lib/websession_templates.py:1164
 msgid "Group description: "
@@ -3406,9 +3262,8 @@ msgid "Group join policy: "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1192
-#, fuzzy
 msgid "Please select:"
-msgstr "корзины"
+msgstr "Пожалуйста выберите:"
 
 #: modules/websession/lib/websession_templates.py:1256
 msgid "Join group"
@@ -3416,36 +3271,34 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1258
 msgid "or find it: "
-msgstr ""
+msgstr "или найдите: "
 
 #: modules/websession/lib/websession_templates.py:1259
 msgid "Choose group:"
-msgstr ""
+msgstr "Выберите группу:"
 
 #: modules/websession/lib/websession_templates.py:1261
 msgid "Find group"
-msgstr ""
+msgstr "Найдите группу"
 
 #: modules/websession/lib/websession_templates.py:1263
 #: modules/websession/lib/websession_templates.py:1394
 #: modules/websession/lib/websession_templates.py:1403
 #: modules/websession/lib/websession_templates.py:1487
-#, fuzzy
 msgid "Please Select:"
-msgstr "корзины"
+msgstr "Пожалуйста выберите:"
 
 #: modules/websession/lib/websession_templates.py:1399
-#, fuzzy
 msgid "Remove member"
-msgstr "ещё"
+msgstr "Удалить члена"
 
 #: modules/websession/lib/websession_templates.py:1408
 msgid "Add member"
-msgstr ""
+msgstr "Добавить члена"
 
 #: modules/websession/lib/websession_templates.py:1414
 msgid "Invite new members"
-msgstr ""
+msgstr "Пригласить нового члена"
 
 #: modules/websession/lib/websession_templates.py:1417
 #, python-format
@@ -3457,16 +3310,15 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1420
 #, python-format
 msgid "Group: <b>%s</b>"
-msgstr ""
+msgstr "Группа: <b>%s</b>"
 
 #: modules/websession/lib/websession_templates.py:1488
-#, fuzzy
 msgid "Group list: "
-msgstr "корзины"
+msgstr "Лист групп: "
 
 #: modules/websession/lib/websession_templates.py:1538
 msgid "Are your sure you want to delete this group?"
-msgstr ""
+msgstr "Вы уверены что хотите удалить эту группу?"
 
 #: modules/websession/lib/websession_templates.py:1577
 msgid "Are your sure you want to leave this group?"
@@ -3481,18 +3333,17 @@ msgid "Visible but need approval for new member"
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1597
-#, fuzzy
 msgid "Please select"
-msgstr "корзины"
+msgstr "Пожалуйста выберите"
 
 #: modules/websession/lib/websession_templates.py:1680
 msgid "here"
-msgstr ""
+msgstr "здесь"
 
 #: modules/websession/lib/webuser.py:102
 #, python-format
 msgid "Database problem: %s"
-msgstr ""
+msgstr "Проблема базы данных: %s"
 
 #: modules/websession/lib/webuser.py:198
 #, python-format
@@ -3506,9 +3357,8 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:138
 #: modules/websession/lib/websession_webinterface.py:163
-#, fuzzy
 msgid "Show account"
-msgstr "счёт"
+msgstr "Показать счёт"
 
 #: modules/websession/lib/websession_webinterface.py:142
 msgid "Login method successfully selected."
@@ -3537,7 +3387,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:496
 #: modules/websession/lib/websession_webinterface.py:507
 msgid "Please try again."
-msgstr ""
+msgstr "Пожалуйста попробуйте ещё один раз."
 
 #: modules/websession/lib/websession_webinterface.py:169
 #: modules/websession/lib/websession_webinterface.py:175
@@ -3572,7 +3422,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:180
 #: modules/websession/lib/websession_webinterface.py:502
 msgid "Or please try again."
-msgstr ""
+msgstr "Или попробуйте ещё один раз"
 
 #: modules/websession/lib/websession_webinterface.py:185
 #, python-format
@@ -3601,13 +3451,12 @@ msgid "Here are your user credentials for"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:278
-#, fuzzy
 msgid "username"
-msgstr "сообщения"
+msgstr "имя пользователя"
 
 #: modules/websession/lib/websession_webinterface.py:278
 msgid "password"
-msgstr ""
+msgstr "пароль"
 
 #: modules/websession/lib/websession_webinterface.py:279
 msgid "You can login at"
@@ -3628,14 +3477,12 @@ msgid "Lost password sent"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:341
-#, fuzzy
 msgid "Delete Account"
-msgstr "счёт"
+msgstr "Удалить счёт"
 
 #: modules/websession/lib/websession_webinterface.py:362
-#, fuzzy
 msgid "Logout"
-msgstr "выход"
+msgstr "Выход"
 
 #: modules/websession/lib/websession_webinterface.py:456
 msgid "Register"
@@ -3699,20 +3546,18 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:827
 #: modules/websession/lib/websession_webinterface.py:835
 #: modules/websession/lib/websession_webinterface.py:842
-#, fuzzy
 msgid "Edit group members"
-msgstr "корзины"
+msgstr "Редактировать членов группы"
 
 #: modules/webstyle/lib/webstyle_templates.py:495
 #: modules/webstyle/lib/webstyle_templates.py:529
 #, python-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Ошыбка: %s"
 
 #: modules/webstyle/lib/webstyle_templates.py:499
-#, fuzzy
 msgid "Browser"
-msgstr "Просмотреть"
+msgstr "Браузер"
 
 #: modules/webstyle/lib/webstyle_templates.py:520
 #, python-format
@@ -3722,7 +3567,7 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:531
 #: modules/websubmit/lib/websubmit_webinterface.py:376
 msgid "Error"
-msgstr ""
+msgstr "Ошыбка"
 
 #: modules/webstyle/lib/webstyle_templates.py:533
 #, python-format
@@ -3733,11 +3578,11 @@ msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:578
 msgid "Time"
-msgstr ""
+msgstr "Время"
 
 #: modules/webstyle/lib/webstyle_templates.py:579
 msgid "Client"
-msgstr ""
+msgstr "Клиент"
 
 #: modules/webstyle/lib/webstyle_templates.py:580
 msgid "Please send an error report to the Administrator"
@@ -3775,12 +3620,12 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:90
 msgid "unknown document type"
-msgstr ""
+msgstr "неизвестный тип документа"
 
 #: modules/websubmit/lib/websubmit_engine.py:96
 #: modules/websubmit/lib/websubmit_engine.py:612
 msgid "unknown action"
-msgstr ""
+msgstr "неизвестное действие"
 
 #: modules/websubmit/lib/websubmit_engine.py:103
 msgid "can't figure number of pages"
@@ -3794,12 +3639,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:606
 msgid "unknown type of document"
-msgstr ""
+msgstr "неизвестный тип документа"
 
 #: modules/websubmit/lib/websubmit_engine.py:619
-#, fuzzy
 msgid "this action does not apply on this type of document"
-msgstr "Этот набор не содержит пока ни одной записи."
+msgstr "это действие не применяется на этот тип документа"
 
 #: modules/websubmit/lib/websubmit_engine.py:852
 #, python-format
@@ -3807,13 +3651,12 @@ msgid "Cannot find document %s"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:1018
-#, fuzzy
 msgid "Your chosen action is not supported by the document"
-msgstr "Этот набор не содержит пока ни одной записи."
+msgstr "Вами выбранное действие не применяется на этот документ"
 
 #: modules/websubmit/lib/websubmit_engine.py:1073
 msgid "error"
-msgstr ""
+msgstr "ошыбка"
 
 #: modules/websubmit/lib/websubmit_engine.py:1084
 msgid "warning"
@@ -3856,25 +3699,24 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:345
 msgid "go"
-msgstr ""
+msgstr "вперёд"
 
 #: modules/websubmit/lib/websubmit_templates.py:470
 #: modules/websubmit/lib/websubmit_templates.py:905
 msgid "SUMMARY"
-msgstr ""
+msgstr "РЕЗЮМЕ"
 
 #: modules/websubmit/lib/websubmit_templates.py:507
 msgid "previous page"
-msgstr ""
+msgstr "предыдущая страница"
 
 #: modules/websubmit/lib/websubmit_templates.py:513
-#, fuzzy
 msgid "Submission no(1)"
-msgstr "записи"
+msgstr "Подача но(1)"
 
 #: modules/websubmit/lib/websubmit_templates.py:527
 msgid "next page"
-msgstr ""
+msgstr "следыщая страница"
 
 #: modules/websubmit/lib/websubmit_templates.py:542
 #: modules/websubmit/lib/websubmit_templates.py:944
@@ -3926,9 +3768,8 @@ msgid "end of action"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:928
-#, fuzzy
 msgid "Submission no"
-msgstr "записи"
+msgstr "Подача но"
 
 #: modules/websubmit/lib/websubmit_templates.py:994
 #, python-format
@@ -3938,14 +3779,12 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:999
-#, fuzzy
 msgid "Function"
-msgstr "сеанс"
+msgstr "функцыя"
 
 #: modules/websubmit/lib/websubmit_templates.py:1000
-#, fuzzy
 msgid "Score"
-msgstr "ещё"
+msgstr "счет"
 
 #: modules/websubmit/lib/websubmit_templates.py:1001
 msgid "Running Function"
@@ -3961,9 +3800,8 @@ msgid "You now have to"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1051
-#, fuzzy
 msgid "or"
-msgstr "ещё"
+msgstr "или"
 
 #: modules/websubmit/lib/websubmit_templates.py:1078
 #, python-format
@@ -3976,9 +3814,9 @@ msgid " document #%s"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1082
-#, fuzzy, python-format
+#, python-format
 msgid " version #%s"
-msgstr "сеанс"
+msgstr "версия #%s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1111
 msgid "file(s)"
@@ -3986,21 +3824,19 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1159
 msgid "see"
-msgstr ""
+msgstr "смотреть"
 
 #: modules/websubmit/lib/websubmit_templates.py:1173
-#, fuzzy
 msgid "version"
-msgstr "сеанс"
+msgstr "версия"
 
 #: modules/websubmit/lib/websubmit_templates.py:1345
-#, fuzzy
 msgid "For"
-msgstr "ещё"
+msgstr "Для"
 
 #: modules/websubmit/lib/websubmit_templates.py:1346
 msgid "all types of document"
-msgstr ""
+msgstr "все типы документов"
 
 #: modules/websubmit/lib/websubmit_templates.py:1399
 msgid "Status"
@@ -4067,37 +3903,32 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1635
 #: modules/websubmit/lib/websubmit_templates.py:1676
-#, fuzzy
 msgid "pending"
-msgstr "Повестка"
+msgstr "ожыдающие"
 
 #: modules/websubmit/lib/websubmit_templates.py:1641
 #: modules/websubmit/lib/websubmit_templates.py:1679
-#, fuzzy
 msgid "approved"
-msgstr "подтверждения"
+msgstr "одобрен"
 
 #: modules/websubmit/lib/websubmit_templates.py:1647
 #: modules/websubmit/lib/websubmit_templates.py:1681
 #: modules/websubmit/lib/websubmit_templates.py:1682
-#, fuzzy
 msgid "rejected"
-msgstr "ограничено"
+msgstr "отклонённые"
 
 #: modules/websubmit/lib/websubmit_templates.py:1675
 msgid "Key"
-msgstr ""
+msgstr "Ключ"
 
 #: modules/websubmit/lib/websubmit_templates.py:1678
-#, fuzzy
 msgid "waiting for approval"
-msgstr "подтверждения"
+msgstr "ждут подтверждения"
 
 #: modules/websubmit/lib/websubmit_templates.py:1680
 #: modules/websubmit/lib/websubmit_templates.py:1683
-#, fuzzy
 msgid "already approved"
-msgstr "подтверждения"
+msgstr "уже одобренные"
 
 #: modules/websubmit/lib/websubmit_templates.py:1684
 msgid "some documents are pending"
@@ -4112,24 +3943,20 @@ msgid "Click on a report number to have more information"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1741
-#, fuzzy
 msgid "Report Number"
-msgstr "сентябрь"
+msgstr "Номер рапорта"
 
 #: modules/websubmit/lib/websubmit_templates.py:1742
-#, fuzzy
 msgid "Pending"
-msgstr "Повестка"
+msgstr "Ожыдающие"
 
 #: modules/websubmit/lib/websubmit_templates.py:1743
-#, fuzzy
 msgid "Approved"
-msgstr "подтверждения"
+msgstr "Одобренные"
 
 #: modules/websubmit/lib/websubmit_templates.py:1744
-#, fuzzy
 msgid "Rejected"
-msgstr "ограничено"
+msgstr "Отклонённые"
 
 #: modules/websubmit/lib/websubmit_templates.py:1864
 msgid "Your request has been sent to the referee!"
@@ -4137,15 +3964,15 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1884
 msgid "Author"
-msgstr ""
+msgstr "Автор"
 
 #: modules/websubmit/lib/websubmit_templates.py:1892
 msgid "More information"
-msgstr ""
+msgstr "Больше информации"
 
 #: modules/websubmit/lib/websubmit_templates.py:1893
 msgid "click here"
-msgstr ""
+msgstr "щёлкните здесь"
 
 #: modules/websubmit/lib/websubmit_templates.py:1899
 msgid ""
