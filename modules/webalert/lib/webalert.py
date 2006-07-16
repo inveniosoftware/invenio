@@ -264,7 +264,7 @@ def perform_remove_alert(alert_name, id_user, id_query, id_basket, uid, ln=cdsla
     query %= (id_user, id_query, id_basket)
     run_sql(query)
     out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
-    out += perform_list_alerts(uid)
+    out += perform_list_alerts(uid, ln=ln)
     return out
 
 
@@ -311,8 +311,8 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     
     run_sql(query)
 
-    out += _("The alert %s has been successfully updated.") % "<b>" + alert_name + "</b>"
-    out += "<br /><br />\n" + perform_list_alerts(uid)
+    out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>")
+    out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
     return out
 
 def is_selected(var, fld):
@@ -367,7 +367,7 @@ def account_list_searches(uid, ln=cdslang):
     _ = gettext_set_language(ln)
 
     out += _("You have made %(number)s queries. A %(detailed_list)s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries.") % {
-              'detailed_list' : """<a href="../youralerts/display">""" + _("detailed list") + """</a>""",
+              'detailed_list' : """<a href="../youralerts/display?ln=%s">""" % ln + _("detailed list") + """</a>""",
               'number' : nb_queries_total,
             }
     return out
