@@ -216,6 +216,7 @@ class Template:
                    <TR>
                     <TD colspan="2" align="center"><BR>
                       <INPUT type="hidden" name="idq" value="%(idq)s">
+                      <INPUT type="hidden" name="ln" value="%(ln)s">
                       <CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;"></CODE>&nbsp;
                       <CODE class="blocknote"><INPUT class="formbutton" type="reset" value="%(clear_data)s"></CODE>
                      </TD>
@@ -226,6 +227,7 @@ class Template:
                 </TABLE>
                """ % {
                      'idq' : id_query,
+                     'ln' : ln,
                      'set_alert' : _("SET ALERT"),
                      'clear_data' : _("CLEAR DATA"),
                    }
@@ -279,8 +281,8 @@ class Template:
 
         out = """<P>%(set_new_alert)s</P>""" % {
                 'set_new_alert' : _("Set a new alert from %(your_searches)s, the %(popular_searches)s or the input form.") % {
-                                    'your_searches' : """<A href="display">%s</A>""" % _("your searches"),
-                                    'popular_searches' : """<A href="display?p='y'">%s</A>""" % _("most popular searches"),
+                                    'your_searches' : """<A href="display?ln=%s">%s</A>""" % (ln, _("your searches")),
+                                    'popular_searches' : """<A href="display?ln=%s&p=y">%s</A>""" % (ln, _("most popular searches")),
                                   }
               }
 
@@ -331,8 +333,8 @@ class Template:
                              <TD><NOBR>%(lastrun)s<NOBR></TD>
                              <TD><NOBR>%(created)s<NOBR></TD>
                              <TD>%(textargs)s</TD>
-                             <TD><A href="./remove?name=%(alertname)s&idu=%(userid)d&idq=%(queryid)d&idb=%(basketid)d">%(remove)s</A><BR>
-                                 <A href="./modify?idq=%(queryid)d&name=%(alertname)s&freq=%(freq)s&notif=%(notif)s&idb=%(basketid)d&old_idb=%(basketid)d">%(modify)s</A><BR>
+                             <TD><A href="./remove?ln=%(ln)s&name=%(alertname)s&idu=%(userid)d&idq=%(queryid)d&idb=%(basketid)d">%(remove)s</A><BR>
+                                 <A href="./modify?ln=%(ln)s&idq=%(queryid)d&name=%(alertname)s&freq=%(freq)s&notif=%(notif)s&idb=%(basketid)d&old_idb=%(basketid)d">%(modify)s</A><BR>
                                  <A href="%(weburl)s/search?%(queryargs)s">%(search)s</A>
                              </TD>
                             </TR>""" % {
@@ -349,6 +351,7 @@ class Template:
                     'basketid' : alert['basketid'],
                     'freq' : alert['frequency'],
                     'notif' : alert['notification'],
+                    'ln' : ln,
                     'remove' : _("Remove"),
                     'modify' : _("Modify"),
                     'weburl' : weburl,
@@ -403,8 +406,9 @@ class Template:
 
         if len(queries) == 0:
             return _("You have not executed any search yet. %(click_here)s for search.") % {
-                     'click_here' : """<a href="%(weburl)s/search">%(click)s</a>""" % {
+                     'click_here' : """<a href="%(weburl)s/search?ln=%(ln)s">%(click)s</a>""" % {
                                       'weburl' : weburl,
+                                      'ln': ln,
                                       'click' : _("Click here"),
                                     }
                    }
@@ -439,12 +443,13 @@ class Template:
             out += """<TR>
                         <TD><I>#%(index)d</I></TD>
                         <TD>%(textargs)s</TD>
-                        <TD><A href="%(weburl)s/search?%(args)s">%(execute_query)s</A><BR><A href="./input?idq=%(id)d">%(set_alert)s</A></TD>""" % {
+                        <TD><A href="%(weburl)s/search?%(args)s">%(execute_query)s</A><BR><A href="./input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></TD>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'weburl' : weburl,
                      'args' : query['args'],
                      'id' : query['id'],
+                     'ln': ln,
                      'execute_query' : _("Execute search"),
                      'set_alert' : _("Set new alert")
                    }
