@@ -317,7 +317,7 @@ class Template:
             <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">%(your_loans)s</A>
             <dd>%(explain_loans)s""" % {
               'your_loans' : _("Your Loans"),
-              'explain_loans' : _("Check out book you have on load, submit borrowing requests, etc.  Requires CERN ID."),
+              'explain_loans' : _("Check out book you have on loan, submit borrowing requests, etc.  Requires CERN ID."),
             }
 
         out += """
