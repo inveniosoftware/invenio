@@ -505,7 +505,7 @@ class Template:
                            %(input_button_no)s
                          </form>
                        </div>
-                   """ % {'message'          : _("Do you really want to delete this record ?"),
+                   """ % {'message'          : _("Do you really want to delete this record?"),
                           'weburl_bibedit'   : weburl_bibedit,
                           'recid'            : str(recid),
                           'input_ln'         : self.tmpl_input('hidden', ln, 'ln'),
@@ -517,7 +517,7 @@ class Template:
         else:    
             return """ %(message)s:
                        <a href=\"%(weburl)s/admin/bibedit/index?ln=&(ln)s\">%(link)s</a>.
-                   """ % {'message': _("The record as soon deleted when the task queue is empty.You can now go back to"),
+                   """ % {'message': _("The record will be deleted as soon as the task queue is empty.  You can now go back to"),
                           'link'   : _("BibEdit Admin Interface"),
                           'weburl' : weburl,
                           'ln'     : ln}
