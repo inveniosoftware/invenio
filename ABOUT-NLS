@@ -104,12 +104,12 @@ the procedure below:
     necessary to run before ``make'' if the latter fails, even if you
     are not touching translation business at all.  The reason being
     that the gmo files are not stored in CVS, while they are included
-    in distribution tarball.  So, if you are building from CVS, and
-    you do not have them in your tree, you may get build errors in
-    directories like modules/webhelp/web/admin saying things like
-    ``There is no rule to build index.en.html''.  The solution is to
-    run ``make update-gmo'' to produce gmo files before running
-    ``make''. End of note to developers.)
+    in the distribution tarball.  So, if you are building from CVS,
+    and you do not have them in your tree, you may get build errors in
+    directories like modules/webhelp/web/admin saying things like ``No
+    rule to make target `index.bg.html'''.  The solution is to run
+    ``make update-gmo'' to produce the gmo files before running
+    ``make''.  End of note to developers.)
 
   - Please contribute your translation by emailing the file to
     <cds.support@cern.ch>.  You help is greatly appreciated and will
