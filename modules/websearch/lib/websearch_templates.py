@@ -162,9 +162,9 @@ class Template:
         title = get_fieldvalues(recid, "245__a")
         
         if title:
-            title = _("Record #%d: %s") %(recid, title[0])
+            title = _("Record") + '#%d: %s' %(recid, title[0])
         else:
-            title = _("Record #%d") % recid
+            title = _("Record") + ' #%d' % recid
 
         keywords = ', '.join(get_fieldvalues(recid, "6531_a"))
         description = ' '.join(get_fieldvalues(recid, "520__a"))
@@ -286,8 +286,9 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for:") % \
+        header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "","")
+	header += ':'
 
         asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
         
@@ -387,9 +388,9 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for:") % \
+        header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "","")
-
+	header += ':'
         ssearchurl = self.build_search_interface_url(c=collection_id, as=0, ln=ln)
 
         out += '''
@@ -463,7 +464,7 @@ class Template:
                        </tr>
                       <tbody>
                      </table>""" % {
-                       'searchheader' : _("Search options:"),
+                       'searchheader' : _("Search options") + ':',
                        'searchoptions' : searchoptions
                      }
 
@@ -510,14 +511,14 @@ class Template:
                   <!--/create_searchfor_advanced()-->
               """ % {
 
-                    'added' : _("Added since:"),
-                    'until' : _("until:"),
+                    'added' : _("Added since") + ':',
+                    'until' : _("until") + ':',
                     'date_added' : self.tmpl_inputdate("d1", ln=ln),
                     'date_until' : self.tmpl_inputdate("d2", ln=ln),
 
-                    'msg_sort' : _("Sort by:"),
-                    'msg_display' : _("Display results:"),
-                    'msg_format' : _("Output format:"),
+                    'msg_sort' : _("Sort by") + ':',
+                    'msg_display' : _("Display results") + ':',
+                    'msg_format' : _("Output format") + ':',
                     'sortoptions' : sortoptions,
                     'rankoptions' : rankoptions,
                     'displayoptions' : displayoptions,
@@ -694,8 +695,8 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = {'r': _("Narrow by collection:"),
-                 'v': _("Focus on:")}[type]
+        title = {'r': _("Narrow by collection") + ':',
+                 'v': _("Focus on") + ':'}[type]
         
 
         if has_grandchildren:
@@ -846,7 +847,7 @@ class Template:
             <td class="narrowsearchboxbody">%(body)s</td>
             </tr>
           <tbody>
-        </table>''' % {'header' : _("Latest additions:"),
+        </table>''' % {'header' : _("Latest additions") + ':',
                        'body' : body,
                        }
 
@@ -1017,7 +1018,7 @@ class Template:
                  'inside' : _("inside"),
                      'f' : f,
               }
-        out += _("in any collection are:") + "<br>"
+        out += _("in any collection are") + ":<br />"
         out += nearest_box
         return out
 
@@ -1495,7 +1496,7 @@ class Template:
                        </tbody>
                       </table>""" % {
                         'added' : _("Added since:"),
-                        'until' : _("until:"),
+                        'until' : _("until") + ':',
                         'date1' : self.tmpl_inputdate("d1", ln, d1y, d1m, d1d),
                         'date2' : self.tmpl_inputdate("d2", ln, d2y, d2m, d2d),
                       }
@@ -1534,9 +1535,9 @@ class Template:
                   </tr>
                  </tbody>
                 </table>""" % {
-                  'sort_by' : _("Sort by:"),
-                  'display_res' : _("Display results:"),
-                  'out_format' : _("Output format:"),
+                  'sort_by' : _("Sort by") + ':',
+                  'display_res' : _("Display results") + ':',
+                  'out_format' : _("Output format") + ':',
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_formats, selected = sf, css_class = 'address'),
                   'select_so' : self.tmpl_select(fieldname = 'so', values = [{
                                     'value' : 'a',
@@ -1751,7 +1752,7 @@ class Template:
         out = ""
         if out_links:
             out += """<a name="googlebox"></a>"""
-            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers:") + prolog_end
+            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers") + ':' + prolog_end
             nb_out_links_in_one_column = len(out_links)/2
             out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
             out += column_separator
@@ -1869,12 +1870,12 @@ class Template:
         if not middle_only:
             out += """<td class="searchresultsboxheader" align="center">
                       %(recs_found)s &nbsp;""" % {
-                     'recs_found' : _("<strong>%s</strong> records found") % self.tmpl_nice_number(nb_found, ln)
+                     'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
                    }
         else:
             out += "<small>"
             if nb_found > rg:
-                out += "" + collection_name + " : " + _("<strong>%s</strong> records found") % self.tmpl_nice_number(nb_found, ln) + " &nbsp; "
+                out += "" + collection_name + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
 
         if nb_found > rg: # navig.arrows are needed, since we have many hits
 
@@ -1936,7 +1937,7 @@ class Template:
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name = fieldcode, value = val)
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
-                     'jump' : _("jump to record:"),
+                     'jump' : _("jump to record") + ':',
                      'jrec' : jrec,
                    }
 
@@ -1949,7 +1950,7 @@ class Template:
         if not middle_only:
             if cpu_time > -1:
                 out += """<td class="searchresultsboxheader" align="right"><small>%(time)s</small>&nbsp;</td>""" % {
-                         'time' : _("Search took %.2f seconds.") % cpu_time,
+                         'time' : _("Search took %s seconds.") % ('%.2f' % cpu_time),
                        }
             out += "</tr></table>"
         else:
@@ -2137,7 +2138,7 @@ class Template:
                     cs = row ['downloadsimilarity']
 
                     similar = self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who downloaded this document also downloaded:"), cs, ln)
+                        _("People who downloaded this document also downloaded") + ':', cs, ln)
 
                     out += '''
                     <tr><td>%(graph)s</td></tr>
@@ -2152,7 +2153,7 @@ class Template:
                 if row.has_key ('viewsimilarity'):
                     out += '<p>&nbsp'
                     out += self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
+                        _("People who viewed this page also viewed") + ':', row ['viewsimilarity'], ln)
 
                 if row.has_key ('reviews'):
                     out += '<p>&nbsp'
@@ -2199,7 +2200,10 @@ class Template:
         out = """<p><table class="searchresultsbox">
                 <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
                 <tbody><tr><td class="searchresultsboxbody"> """ % {
-                'founds' : _("<strong>Results overview:</strong> Found <strong>%s</strong> records in %.2f seconds.") % (self.tmpl_nice_number(results_final_nb_total, ln), cpu_time)
+                'founds' : _("%sResults overview:%s Found %s records in %s seconds.") % ('<strong>',
+											 '</strong>', 
+											 '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>', 
+											 '%.2f' % cpu_time)
               }
         # then print hits per collection:
         for coll in colls:
@@ -2208,7 +2212,7 @@ class Template:
                       <a href="#%(coll)s">%(number)s</a><br>''' % {
                         'coll' : urllib.quote(coll['code']),
                         'coll_name' : coll['name'],
-                        'number' : _("<strong>%s</strong> records found") % self.tmpl_nice_number(results_final_nb[coll['code']], ln)
+                        'number' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')
                       }
         out += "</td></tr></tbody></table>"
         return out

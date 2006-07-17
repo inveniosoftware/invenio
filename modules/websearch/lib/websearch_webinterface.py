@@ -286,10 +286,11 @@ def display_collection(req, c, as, verbose, ln):
     # deduce collection id:
     colID = get_colID(c)
     if type(colID) is not int:
+	page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
+	page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl[ln] + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % c,
-                    body=_("<p>Sorry, collection <strong>%s</strong> does not seem to exist. "
-                           "<p>You may want to start browsing from <a href=\"%s\">%s</a>.") % (c, "%s?ln=%s" % (weburl, ln), cdsnameintl[ln]),
-                    description="%s - Not found: %s " % (cdsname, c),
+                    body=page_body,
+                    description=(cdsname + ' - ' + _("Not found") + ': ' + str(c)),
                     keywords="%s, CDS Invenio" % cdsname,
                     uid=uid,
                     language=ln,
