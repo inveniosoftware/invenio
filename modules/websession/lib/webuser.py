@@ -99,7 +99,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
                         body = cfg_webaccess_warning_msgs[4] + cfg_webaccess_msgs[2]
 
         except OperationalError, e:
-            body = _("Database problem: %s") % str(e)
+            body = _("Database problem") + ': ' + str(e)
 
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
@@ -195,7 +195,7 @@ def get_user_info(uid, ln=cdslang):
                 user.append(user[1])
             else:
                 user[1] = str(user[0])
-                user.append(_("user #%i")% user[0])
+                user.append(_("user") + ' #' + str(user[0]))
             return tuple(user)
     return (uid, '', _("N/A"))
 

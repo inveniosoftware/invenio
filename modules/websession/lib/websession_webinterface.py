@@ -475,12 +475,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                mess += _(" An email has been sent to the given address with the account information.")
+                mess += _("An email has been sent to the given address with the account information.")
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
-                mess += _(" A second email will be sent when the account has been activated and can be used.")
+                mess += _("A second email will be sent when the account has been activated and can be used.")
             else:
-                mess += _(""" You can now access your <a href="%s">account</a>.""") % (
-                          "%s/youraccount/display?ln=%s" % (sweburl, args['ln']))
+                mess += _("You can now access your %saccount%s.") % ('<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">', '</a>')
         elif ruid == -2:
             mess = _("Both passwords must match.")
             mess += " " + _("Please try again.")
@@ -609,7 +608,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                                                 group_description=argd['group_description'],
                                                                                 join_policy=argd['join_policy'],
                                                                                 ln=argd['ln'])
-        title = _("Create New Group")
+        title = _("Create new group")
 
         if body == 1:
             url = weburl + '/yourgroups/display?info=1&ln=%s'
