@@ -137,7 +137,52 @@ In WML source files, the convention is _()_:
 
    _(Search Help)_
 
-Please follow the WebSearch module files for an example.
+Here are some tips for writing easily translatable phrases:  
+
+  - Do not cut phrases into several pieces, and do not reuse
+    standalone words.  If you have two similar phrases with some
+    addition in the middle, rather define two sentences.  Remember
+    that joining of sub-phrases may differ depending on what is being
+    joined (e.g. gender).
+ 
+       not: _("This") + _("record") + _("is not available.")
+       not: _("This") + _("item") + _("is not available.")
+ 
+       but: _("This record is not available.")
+       but: _("This item is not available.")
+ 
+  - Do not mix HTML presentation inside phrases. If you want to
+    reserve space for markup, please use general %s placeholders:
+ 
+       not: _("This is <b>bold</b>, isn't it?")
+       but: _("This is %sbold%s, isn't it?")
+ 
+  - Use unnamed %i or %s placeholder if you want to print variables in
+    shorter sentences:
+ 
+       not: _("There are %(x_number_of_baskets)s baskets.")
+       yes: _("There are %i baskets.")
+ 
+  - But, if you are printing more than one variable in a sentence, you
+    should better name them, because in some languagues the correct
+    grammar would be to invert the order.  Also, you may want to keep
+    the names short and start them with ``x_'' to ease the variable
+    recognition task for the translators.
+  
+       not: _("The value of %s is %s when %s.")
+       but: _("The value of %(x_foo)s is %(x_bar)s when %(x_rains)s.")
+ 
+  - Do not leave unnecessary things in messages, such as extraneous
+    spaces or colons; put them rather in the business logic:
+ 
+       not: _(" subject:")
+       but: " " + _(" subject") + ":"
+ 
+       not: _("Record #%d:")
+       but: _("Record") + "#%d" % recID
+ 
+The best is to follow existing message style as a model, as the
+translators are accustomed to it.
 
 Appendix A. Introducing a new language
 ======================================
