@@ -48,7 +48,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<div class="quicknote">%(error)s</div><br>%(rest)s""" % {
+        out = """<div class="quicknote">%(error)s</div><br />%(rest)s""" % {
                 'error' : error_msg,
                 'rest' : rest
               }
@@ -70,25 +70,25 @@ class Template:
 
         out = ""
         if args.has_key('p'):
-            out += "<strong>" + _("Pattern") + ":</strong> " + string.join(args['p'], "; ") + "<br>"
+            out += "<strong>" + _("Pattern") + ":</strong> " + string.join(args['p'], "; ") + "<br />"
         if args.has_key('f'):
-            out += "<strong>" + _("Field") + ":</strong> " + string.join(args['f'], "; ") + "<br>"
+            out += "<strong>" + _("Field") + ":</strong> " + string.join(args['f'], "; ") + "<br />"
         if args.has_key('p1'):
-            out += "<strong>" + _("Pattern 1") + ":</strong> " + string.join(args['p1'], "; ") + "<br>"
+            out += "<strong>" + _("Pattern 1") + ":</strong> " + string.join(args['p1'], "; ") + "<br />"
         if args.has_key('f1'):
-            out += "<strong>" + _("Field 1") + ":</strong> " + string.join(args['f1'], "; ") + "<br>"
+            out += "<strong>" + _("Field 1") + ":</strong> " + string.join(args['f1'], "; ") + "<br />"
         if args.has_key('p2'):
-            out += "<strong>" + _("Pattern 2") + ":</strong> " + string.join(args['p2'], "; ") + "<br>"
+            out += "<strong>" + _("Pattern 2") + ":</strong> " + string.join(args['p2'], "; ") + "<br />"
         if args.has_key('f2'):
-            out += "<strong>" + _("Field 2") + ":</strong> " + string.join(args['f2'], "; ") + "<br>"
+            out += "<strong>" + _("Field 2") + ":</strong> " + string.join(args['f2'], "; ") + "<br />"
         if args.has_key('p3'):
-            out += "<strong>" + _("Pattern 3") + ":</strong> " + string.join(args['p3'], "; ") + "<br>"
+            out += "<strong>" + _("Pattern 3") + ":</strong> " + string.join(args['p3'], "; ") + "<br />"
         if args.has_key('f3'):
-            out += "<strong>" + _("Field 3") + ":</strong> " + string.join(args['f3'], "; ") + "<br>"
+            out += "<strong>" + _("Field 3") + ":</strong> " + string.join(args['f3'], "; ") + "<br />"
         if args.has_key('c'):
-            out += "<strong>" + _("Collections") + ":</strong> " + string.join(args['c'], "; ") + "<br>"
+            out += "<strong>" + _("Collections") + ":</strong> " + string.join(args['c'], "; ") + "<br />"
         elif args.has_key('cc'):
-            out += "<strong>" + _("Collection") + ":</strong> " + string.join(args['cc'], "; ") + "<br>"
+            out += "<strong>" + _("Collection") + ":</strong> " + string.join(args['cc'], "; ") + "<br />"
         return out
 
     def tmpl_account_list_alerts(self, ln, alerts):
@@ -105,19 +105,19 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<FORM name="displayalert" action="../youralerts/list" method="post">
-                 %(you_own)s
-                <SELECT name="id_alert">
-                  <OPTION value="0">- %(alert_name)s -</OPTION>""" % {
-                 'you_own' : _("You own following alerts:"),
+        out = """<form name="displayalert" action="../youralerts/list" method="post">
+                 %(you_own)s:
+                <select name="id_alert">
+                  <option value="0">- %(alert_name)s -</option>""" % {
+                 'you_own' : _("You own following alerts"),
                  'alert_name' : _("alert name"),
                }
         for alert in alerts :
-                  out += """<OPTION value="%(id)s">%(name)s</OPTION>""" % alert
-        out += """</SELECT>
-                &nbsp;<CODE class="blocknote">
-                <INPUT class="formbutton" type="submit" name="action" value="%(show)s"></CODE>
-                </FORM>""" % {
+                  out += """<option value="%(id)s">%(name)s</option>""" % alert
+        out += """</select>
+                &nbsp;<code class="blocknote">
+                <input class="formbutton" type="submit" name="action" value="%(show)s" /></code>
+                </form>""" % {
                   'show' : _("SHOW"),
                 }
         return out
@@ -153,51 +153,59 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        out += """<TABLE border="0" cellspacing="0" cellpadding="2" width="650">
-                    <TR><TD colspan="3">%(notify_cond)s </TD></TR>
-                    <TR>
-                      <TD>&nbsp;&nbsp;</TD>
-                      <TD align="left" valign="top" width="10"><B>%(query_text)s:</B></TD>
-                      <TD align="left" valign="top" width="500">%(query)s</TD></TR>
-                  </TABLE>""" % {
+        out += """<table style="border: 0px; padding: 2px; width: 650px;">
+                    <tr><td colspan="3">%(notify_cond)s</td></tr>
+                    <tr>
+                      <td></td>
+                      <td style="text-align: left; vertical-align: top; width: 10px; font-weight: bold;">%(query_text)s:</td>
+                      <td style="text-align: left; vertical-align: top; width: 500px">%(query)s</td>
+                    </tr>
+                  </table>""" % {
                  'notify_cond' : _("This alert will notify you each time/only if a new item satisfy the following query"),
                  'query_text' : _("QUERY"),
                  'query' : query,
                }
 
-        out += """<FORM name="setalert" action="../youralerts/%(action)s" method="get">
-        <TABLE style="background-color:F1F1F1; border:thin groove grey" cellspacing="0" cellpadding="0"><TR><TD>
-                    <TABLE border="0" cellpadding="0" cellspacing ="10">
-                      <TR>
-                        <TD align="right" valign="top"><B>%(alert_name)s</B></TD>
-                        <TD><INPUT type="text" name="name" size="20" maxlength="50" value="%(alert)s"></TD>
-                      </TR>
-                      <TR><TD align="right"><B>%(freq)s</B></TD>
-                          <TD><SELECT name="freq">
-                                <OPTION value="month" %(freq_month)s>%(monthly)s</OPTION>
-                             <OPTION value="week" %(freq_week)s>%(weekly)s</OPTION>
-                             <OPTION value="day" %(freq_day)s>%(daily)s</OPTION></SELECT>
-                         </TD>
-                      </TR>
-                      <TR>
-                        <TD align="right"><B>%(send_email)s</B></TD>
-                        <TD><SELECT name="notif">
-                            <OPTION value="y" %(notif_yes)s>%(yes)s</OPTION>
-                            <OPTION value="n"%(notif_no)s>%(no)s</OPTION></SELECT>
-                            <SMALL class="quicknote"> (%(specify)s)</SMALL>&nbsp;
-                        </TD>
-                      </TR>
-                      <TR>
-                        <TD align="right" valign="top"><B>%(store_basket)s</B></TD>
-                        <TD>%(baskets)s
+        out += """<form name="setalert" action="../youralerts/%(action)s" method="get">
+        <table style="background-color:F1F1F1; border:thin groove grey; padding: 0px;">
+          <tr>
+            <td>
+              <table style="border: 0px; padding:10px;>
+                <tr>
+                   <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s:</td>
+                   <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s"></td>
+                </tr>
+                <tr>
+                  <td style="text-align: right; font-weight: bold;">%(freq)s:</td>
+                  <td>
+                    <select name="freq">
+                      <option value="month" %(freq_month)s>%(monthly)s</option>
+                      <option value="week" %(freq_week)s>%(weekly)s</option>
+                      <option value="day" %(freq_day)s>%(daily)s</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align:right; font-weight: bold">%(send_email)s</td>
+                  <td>
+                    <select name="notif">
+                      <option value="y" %(notif_yes)s>%(yes)s</option>
+                      <option value="n" %(notif_no)s>%(no)s</option>
+                    </select>
+                    <small class="quicknote"> (%(specify)s)</small>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: right; vertical-align:top; font-weight: bold;">%(store_basket)s</td>
+                  <td>%(baskets)s
                """ % {
                  'action': action,
-                 'alert_name' : _("Alert identification name:"),
+                 'alert_name' : _("Alert identification name"),
                  'alert' : alert_name,
-                 'freq' : _("Search-checking frequency:"),
-                 'freq_month' : (frequency == 'month' and "selected" or ""),
-                 'freq_week' : (frequency == 'week' and "selected" or ""),
-                 'freq_day' : (frequency == 'day' and "selected" or ""),
+                 'freq' : _("Search-checking frequency"),
+                 'freq_month' : (frequency == 'month' and 'selected="selected"' or ""),
+                 'freq_week' : (frequency == 'week' and 'selected="selected"' or ""),
+                 'freq_day' : (frequency == 'day' and 'selected="selected"' or ""),
                  'monthly' : _("monthly"),
                  'weekly' : _("weekly"),
                  'daily' : _("daily"),
@@ -206,25 +214,25 @@ class Template:
                  'notif_no' : (notification == 'n' and "selected" or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
-                 'specify' : _("if <B>no</B> you must specify a basket"),
+                 'specify' : _("if %sno%s you must specify a basket") % ('<b>','</b>'),
                  'store_basket' : _("Store results in basket?"),
                  'baskets': baskets 
                }
         
-        out += """  </TD>
-                   </TR>
-                   <TR>
-                    <TD colspan="2" align="center"><BR>
-                      <INPUT type="hidden" name="idq" value="%(idq)s">
-                      <INPUT type="hidden" name="ln" value="%(ln)s">
-                      <CODE class="blocknote"><INPUT class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;"></CODE>&nbsp;
-                      <CODE class="blocknote"><INPUT class="formbutton" type="reset" value="%(clear_data)s"></CODE>
-                     </TD>
-                    </TR>
-                   </TABLE>
-                  </TD>
-                 </TR>
-                </TABLE>
+        out += """  </td>
+                   </tr>
+                   <tr>
+                    <td colspan="2" style="text-align:center">
+                      <input type="hidden" name="idq" value="%(idq)s" />
+                      <input type="hidden" name="ln" value="%(ln)s" />
+                      <code class="blocknote"><input class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" /></code>&nbsp;
+                      <code class="blocknote"><input class="formbutton" type="reset" value="%(clear_data)s" /></code>
+                     </td>
+                    </tr>
+                   </table>
+                  </td>
+                 </tr>
+                </table>
                """ % {
                      'idq' : id_query,
                      'ln' : ln,
@@ -232,8 +240,8 @@ class Template:
                      'clear_data' : _("CLEAR DATA"),
                    }
         if action == "update":
-            out += """<INPUT type="hidden" name="old_idb" value="%s">""" % old_id_basket
-        out += "</FORM>"
+            out += '<input type="hidden" name="old_idb" value="%s" />' % old_id_basket
+        out += "</form>"
 
         return out
 
@@ -279,25 +287,21 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<P>%(set_new_alert)s</P>""" % {
-                'set_new_alert' : _("Set a new alert from %(your_searches)s, the %(popular_searches)s or the input form.") % {
-                                    'your_searches' : """<A href="display?ln=%s">%s</A>""" % (ln, _("your searches")),
-                                    'popular_searches' : """<A href="display?ln=%s&p=y">%s</A>""" % (ln, _("most popular searches")),
-                                  }
-              }
-
+        out = '<p>' + _("Set a new alert from %syour searches%s, the %spopular_searches%s or the input form.") + '</p>'
+        out %= ('<a href="display?ln=%s">' % ln, '</a>', 
+                """<a href="display?ln=%s&amp;p=y">""" % ln, '</a>')
         if len(alerts):
-              out += """<TABLE border="1" cellspacing="0" cellpadding="3" width="100%%">
-                          <TR class="pageboxlefttop" align="center">
-                            <TD><B>%(no)s</B></TD>
-                            <TD><B>%(name)s</B></TD>
-                            <TD><B>%(search_freq)s</B></TD>
-                            <TD><B>%(notification)s</B></TD>
-                            <TD><B>%(result_basket)s</B></TD>
-                            <TD><B>%(date_run)s</B></TD>
-                            <TD><B>%(date_created)s</B></TD>
-                            <TD><B>%(query)s</B></TD>
-                            <TD><B>%(action)s</B></TD></TR>""" % {
+              out += """<table class="alrtTable">
+                          <tr class="pageboxlefttop" style="text-align: center;">
+                            <td style="font-weight: bold">%(no)s</td>
+                            <td style="font-weight: bold">%(name)s</td>
+                            <td style="font-weight: bold">%(search_freq)s</td>
+                            <td style="font-weight: bold">%(notification)s</td>
+                            <td style="font-weight: bold">%(result_basket)s</td>
+                            <td style="font-weight: bold">%(date_run)s</td>
+                            <td style="font-weight: bold">%(date_created)s</td>
+                            <td style="font-weight: bold">%(query)s</td>
+                            <td style="font-weight: bold">%(action)s</td></tr>""" % {
                        'no' : _("No"),
                        'name' : _("Name"),
                        'search_freq' : _("Search checking frequency"),
@@ -324,20 +328,21 @@ class Template:
                   else:
                       notification = _("no")
 
-                  out += """<TR>
-                              <TD><I>#%(index)d</I></TD>
-                             <TD><B><NOBR>%(alertname)s<NOBR></B></TD>
-                             <TD>%(frequency)s</TD>
-                             <TD align="center">%(notification)s</TD>
-                             <TD><NOBR>%(basketname)s<NOBR></TD>
-                             <TD><NOBR>%(lastrun)s<NOBR></TD>
-                             <TD><NOBR>%(created)s<NOBR></TD>
-                             <TD>%(textargs)s</TD>
-                             <TD><A href="./remove?ln=%(ln)s&name=%(alertname)s&idu=%(userid)d&idq=%(queryid)d&idb=%(basketid)d">%(remove)s</A><BR>
-                                 <A href="./modify?ln=%(ln)s&idq=%(queryid)d&name=%(alertname)s&freq=%(freq)s&notif=%(notif)s&idb=%(basketid)d&old_idb=%(basketid)d">%(modify)s</A><BR>
-                                 <A href="%(weburl)s/search?%(queryargs)s">%(search)s</A>
-                             </TD>
-                            </TR>""" % {
+                  out += """<tr>
+                              <td style="font-style: italic">#%(index)d</td>
+                              <td style="font-weight: bold; text-wrap:none;">%(alertname)s</td>
+                              <td>%(frequency)s</td>
+                              <td style="text-align:center">%(notification)s</td>
+                              <td style="text-wrap:none;">%(basketname)s</td>
+                              <td style="text-wrap:none;">%(lastrun)s</td>
+                              <td style="text-wrap:none;">%(created)s</td>
+                              <td>%(textargs)s</td>
+                              <td>
+                                 <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idu=%(userid)d&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
+                                 <a href="./modify?ln=%(ln)s&amp;idq=%(queryid)d&amp;name=%(alertname)s&amp;freq=%(freq)s&amp;notif=%(notif)s&amp;idb=%(basketid)d&amp;old_idb=%(basketid)d">%(modify)s</a><br />
+                                 <a href="%(weburl)s/search?%(queryargs)s&amp;ln=%(ln)s">%(search)s</a>
+                             </td>
+                            </tr>""" % {
                     'index' : i,
                     'alertname' : alert['alertname'],
                     'frequency' : frequency,
@@ -359,15 +364,11 @@ class Template:
                     'queryargs' : alert['queryargs']
                   }
 
-              out += '</TABLE>'
+              out += '</table>'
               
-        out += """<P>%(defined)s</P>""" % {
-                 'defined' : _("You have defined <B>%(number)s</B> alerts.") % { 'number' : len(alerts)}
-               }
-
+        out += '<p>' + (_("You have defined %s alerts.") % ('<b>' + str(len(alerts)) + '</b>' )) + '</p>'
         if guest:
             out += guesttxt
-
         return out
 
     def tmpl_display_alerts(self, ln, weburl, permanent, nb_queries_total, nb_queries_distinct, queries, guest, guesttxt):
@@ -405,45 +406,46 @@ class Template:
         _ = gettext_set_language(ln)
 
         if len(queries) == 0:
-            return _("You have not executed any search yet. %(click_here)s for search.") % {
-                     'click_here' : """<a href="%(weburl)s/search?ln=%(ln)s">%(click)s</a>""" % {
-                                      'weburl' : weburl,
-                                      'ln': ln,
-                                      'click' : _("Click here"),
-                                    }
-                   }
+            out = _("You have not executed any search yet. %(link_open)sClick here%(link_close)s for search.") 
+            out %= {'link_open' : '<a href="%s/search?ln=%s">' % (weburl, ln),
+                    'link_close': '</a>'}
+            return out
 
         out = ''
         
         # display message: number of items in the list
         if permanent=="n":
-            out += """<P>""" + _("You have performed <B>%(number)d</B> searches (<strong>%(different)d</strong> different questions) during the last 30 days or so.""") % {
-                     'number' : nb_queries_total,
-                     'different' : nb_queries_distinct
-                   } + """</P>"""
+            msg = _("You have performed %(nb_search)s searches (%(nb_questions)s different questions) during the last 30 days or so.") 
+            msg %= {'nb_search' : nb_queries_total, 'nb_questions' : nb_queries_distinct} 
+            out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
-            out += """<P>Here are listed the <B>%s</B> most popular searches.</P>""" % len(query_result)
+            msg = _("Here are listed the %s most popular searches.") 
+            msg %= ('<b>' + str(len(query_result)) + '</b>')
+            out += '<p>' + msg + '</p>'
 
         # display the list of searches
-        out += """<TABLE border="1" cellspacing="0" cellpadding="3" width="100%%">
-                    <TR class="pageboxlefttop"><TD><B>%(no)s</B></TD><TD><B>%(question)s</B></TD>
-                    <TD><B>%(action)s</B></TD>""" % {
+        out += """<table class="alrtTable">
+                    <tr class="pageboxlefttop">
+                      <td style="font-weight: bold">%(no)s</td>
+                      <td style="font-weight: bold">%(question)s</td>
+                      <td style="font-weight: bold">%(action)s</td>""" % {
                       'no' : _("#"),
                       'question' : _("Question"),
                       'action' : _("Action")
                     }
         if permanent=="n":
-            out += """<TD><B>%s</B></TD>""" % _("Last Run")
-        out += """</TR>\n"""
+            out += '<td  style="font-weight: bold">%s</td>' % _("Last Run")
+        out += "</tr>\n"
         i = 0
         for query in queries :
             i += 1
             # id, pattern, base, search url and search set alert, date
-            out += """<TR>
-                        <TD><I>#%(index)d</I></TD>
-                        <TD>%(textargs)s</TD>
-                        <TD><A href="%(weburl)s/search?%(args)s">%(execute_query)s</A><BR><A href="./input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></TD>""" % {
+            out += """<tr>
+                        <td style="font-style: italic;">#%(index)d</TD>
+                        <td>%(textargs)s</td>
+                        <td><a href="%(weburl)s/search?%(args)s">%(execute_query)s</a><br />
+                            <a href="./input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></td>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'weburl' : weburl,
@@ -454,9 +456,9 @@ class Template:
                      'set_alert' : _("Set new alert")
                    }
             if permanent=="n":
-                out += """<TD>%(lastrun)s</TD>""" % query
-            out += """</TR>\n"""
-        out += """</TABLE><BR>\n"""
+                out += '<td>%s</td>' % query['lastrun']
+            out += """</tr>\n"""
+        out += "</table><br />\n"
         if guest :
             out += guesttxt
 
