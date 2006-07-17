@@ -50,7 +50,7 @@ def check_alert_name(alert_name, uid, ln=cdslang):
     _ = gettext_set_language(ln)
 
     if len( run_sql( sql ) ) > 0:
-        raise AlertError( _("You already have an alert which name is <b>%(name)s</b>") % {'name' : alert_name} )
+        raise AlertError( _("You already have an alert which name is %s.") % {'name' : '<b>' + alert_name + '</b>'} )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=cdslang):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
@@ -169,7 +169,7 @@ def check_alert_is_unique(id_basket, id_query, uid, ln=cdslang ):
             and id_basket= %s"""%(uid, id_query, id_basket)
     res =  run_sql(sql)
     if len(res):
-        raise AlertError(_("You already have an alert defined for the specified query and basket"))
+        raise AlertError(_("You already have an alert defined for the specified query and basket."))
 
 def perform_add_alert(alert_name, frequency, notification,
                       id_basket, id_query, uid, ln = cdslang):
@@ -188,7 +188,7 @@ def perform_add_alert(alert_name, frequency, notification,
 
     #check the alert name is not empty
     if alert_name.strip() == "":
-        raise AlertError(_("The alert name cannot be <b>empty</b>."))
+        raise AlertError(_("The alert name cannot be empty."))
 
     #check if the alert can be created
     check_alert_name(alert_name, uid, ln)
@@ -286,7 +286,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
 
     #check the alert name is not empty
     if alert_name.strip() == "":
-        raise AlertError(_("The alert name cannot be <b>empty</b>."))
+        raise AlertError(_("The alert name cannot be empty."))
 
     #check if the alert can be created
     sql = """select alert_name
