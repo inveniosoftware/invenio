@@ -57,7 +57,7 @@ install-data-local:
 	@echo "** to test your installation.                             **"
 	@echo "**                                                        **"
 	@echo "** If you are reinstalling CDS Invenio because you have   **"
-	@echo "** editing CDS Invenio sources or its WML configuration,  **"
+	@echo "** edited CDS Invenio sources or its WML configuration,   **"
 	@echo "** you may want to restart your Apache server now by      **"
 	@echo "** running 'sudo apachectl restart'.                      **"
 	@echo "************************************************************"
