@@ -221,7 +221,7 @@ def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None,
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_action(actid, actname, working_dir, status_text, actcommit)
-        return page(title       = _("%s"%(title,)),
+        return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
@@ -285,7 +285,7 @@ def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=cdslang):
         ## user is authorised to use WebSubmit Admin:
         # Generate content
         (title, body, errors, warnings) = perform_request_add_jscheck(chname, chdesc, chcommit)
-        return page(title       = _("%s"%(title,)),
+        return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,
@@ -361,7 +361,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
                                                                        elsize, elrows, elcols, elmaxlength, \
                                                                        elval, elfidesc, elmodifytext, \
                                                                        elcookie, elcommit)
-        return page(title       = _("%s"%(title,)),
+        return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
                     uid         = uid,

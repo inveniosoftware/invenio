@@ -76,31 +76,31 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         # warningMsg("""<center><font color="red"></font></center>""",req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg(_("invalid parameter"), req, c, ln)
+        return errorMsg(_("Invalid parameter"), req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg(_("cannot find submission directory"), req, c, ln)
+            return errorMsg(_("Cannot find submission directory."), req, c, ln)
         else:
             row = res[0]
             indir = row[0]
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
     if len(res) == 0:
-        return errorMsg(_("unknown document type"), req, c, ln)
+        return errorMsg(_("Unknown document type"), req, c, ln)
     else:
         docname = res[0][0]
         docname = string.replace(docname, " ", "&nbsp;")
     res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s", (act,))
     if len(res) == 0:
-        return errorMsg(_("unknown action"), req, c, ln)
+        return errorMsg(_("Unknown action"), req, c, ln)
     else:
         actname = res[0][0]
         actname = string.replace(actname, " ", "&nbsp;")
     subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
-        return errorMsg(_("can't figure number of pages"), req, c, ln)
+        return errorMsg(_("Can't figure number of pages."), req, c, ln)
     else:
         nbpages = res[0][0]
     #Get current page
@@ -126,7 +126,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("can't create submission directory"), req, c, ln)
+            return errorMsg(_("Can't create submission directory."), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")
@@ -187,7 +187,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 try:
                     os.makedirs("%s/files/%s" % (curdir, key))
                 except:
-                    return errorMsg(_("can't create submission directory"), req, c, ln)
+                    return errorMsg(_("Can't create submission directory."), req, c, ln)
             filename = formfields.filename
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
@@ -484,12 +484,12 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                          ), req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
-        return errorMsg(_("invalid parameter"), req, c, ln)
+        return errorMsg(_("Invalid parameter"), req, c, ln)
     # retrieve the action and doctype data
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg(_("cannot find submission directory"), req, c, ln)
+            return errorMsg(_("Cannot find submission directory."), req, c, ln)
         else:
             row = res[0]
             indir = row[0]
@@ -503,7 +503,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("can't create submission directory"), req, c, ln)
+            return errorMsg(_("Can't create submission directory."), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")
@@ -603,20 +603,20 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if len(res) > 0:
        docname = res[0][0]
     else:
-        return errorMsg(_("unknown type of document"), req, cdsname, ln)
+        return errorMsg(_("Unknown type of document."), req, cdsname, ln)
     # Get action name
     res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
        actname = res[0][0]
     else:
-        return errorMsg(_("unknown action"), req, cdsname, ln)
+        return errorMsg(_("Unknown action"), req, cdsname, ln)
     # Get number of pages
     subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) > 0:
        nbpages = res[0][0]
     else:
-        return errorMsg(_("this action does not apply on this type of document"), req, cdsname, ln)
+        return errorMsg(_("This action does not apply on this type of document."), req, cdsname, ln)
 
     # we specify here whether we are in the last step of the action or not
     res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act, doctype, step,))
@@ -849,7 +849,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
         docShortDesc = arr[1]
         description = arr[4]
     else:
-        return errorMsg (_("Cannot find document %s") % doctype, req)
+        return errorMsg (_("Cannot find document") + str(doctype), req)
     #then data about associated actions
     res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
     for arr2 in res2:
@@ -1015,7 +1015,7 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
             )
     else :
         if dismode == 'S':
-            t = "<br><br><b>" + _("Your chosen action is not supported by the document") + "<b>"
+            t = "<br /><br /><b>" + _("Your chosen action is not supported by the document.") + "</b>"
     return t
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir):
@@ -1070,7 +1070,7 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    return page(title = _("error"),
+    return page(title = _("Error"),
                 body = create_error_box(req, title=title, verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
@@ -1081,7 +1081,7 @@ def warningMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    return page(title = _("warning"),
+    return page(title = _("Warning"),
                 body = title,
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,

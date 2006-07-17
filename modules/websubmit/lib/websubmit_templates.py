@@ -79,7 +79,7 @@ class Template:
               </tr>
             </table>""" % {
               'document_types' : _("Document types available for submission"),
-              'please_select' : _("Please select the type of document you want to submit"),
+              'please_select' : _("Please select the type of document you want to submit."),
               'catalogues' : catalogues,
             }
 
@@ -95,7 +95,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<h3>" + _("No document types yet...") + "</h3>\n"
+        out = "<h3>" + _("No document types yet.") + "</h3>\n"
         return out
 
     def tmpl_submit_home_catalogs(self, ln, catalogs):
@@ -237,7 +237,7 @@ class Template:
               """
         if (guest):
             out += "alert(\"%(please_login_js)s\");return false;\n" % {
-                     'please_login_js' : _("please log in first.\\nUse the top right menu to log in.")
+                     'please_login_js' : _("Please log in first.") + '\\n' + _("Use the top right menu to log in.")
                    }
 
         out += """
@@ -280,7 +280,7 @@ class Template:
                         <TABLE align="center" cellpadding="0" cellspacing="0" border="0">
                         <TR valign="top">
                 """ % {
-                      'select_cat' : _("please select a category"),
+                      'select_cat' : _("Please select a category"),
                       'doctype' : doctype,
                       'now' : now,
                       'pid' : pid,
@@ -504,13 +504,13 @@ class Template:
             """ % {
               'prpage' : int(curpage) - 1,
               'images' : images,
-              'prevpage' : _("previous page"),
+              'prevpage' : _("Previous page"),
             }
         else:
             out += """ <TD class="submitHeader">&nbsp;</TD>"""
         # Display the submission number
         out += """ <TD class="submitHeader" align="center"><small>%(submission)s: %(access)s</small></TD>\n""" % {
-                'submission' : _("Submission no(1)"),
+                'submission' : _("Submission number") + '(1)',
                 'access' : access,
               }
         # Display the "next page" navigation arrow
@@ -524,7 +524,7 @@ class Template:
             """ % {
               'nxpage' : int(curpage) + 1,
               'images' : images,
-              'nextpage' : _("next page"),
+              'nextpage' : _("Next page"),
             }
         else:
             out += """ <TD class="submitHeader">&nbsp;</TD>"""
@@ -540,11 +540,11 @@ class Template:
                   <small>%(explain_summary)s</small><BR>
                """ % {
                  'surequit' : _("Are you sure you want to quit this submission?"),
-                 'back' : _("back to main menu"),
+                 'back' : _("Back to main menu"),
                  'mainmenu' : mainmenu,
                  'images' : images,
-                 'take_note' : _("(1) you should take note of this number at the beginning of the submission, it will allow you to get your information back in case your browser crashes before the end of the submission."),
-                 'explain_summary' : _("(2) mandatory fields appear in red in the 'Summary' window."),
+                 'take_note' : '(1) ' + _("You should take note of this number at the beginning of the submission, it will allow you to continue interrupted submission in case of problems."),
+                 'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
                }
         return out
 
@@ -684,7 +684,7 @@ class Template:
                                     alert("%(field_mandatory)s");
                                     return 0;
                               } """ % {
-                                'field_mandatory' : _("The field `%s` is Mandatory.\\n Please make a choice in the 'Select:' box") % txt[i]
+                                'field_mandatory' : _("The field `%s` is Mandatory.") % txt[i] + '\\n' + _("Please make a choice in the 'Select:' box")
                               }
                 elif radio[i] != 0:
                     # If the field is a radio buttonset
@@ -782,7 +782,7 @@ class Template:
                           document.forms[0].submit();
                          }
                        """ % {
-                         'msg' : _("The field '%(field)s' is mandatory.\\nGoing back to page %(page)s") % returnto,
+                         'msg' : _("The field %(field)s is mandatory.") + '\n' + _("Going back to page") + returnto['page'],
                          'page' : returnto['page']
                        }
             else:
@@ -948,7 +948,7 @@ class Template:
             out += """ <A HREF="%(mainmenu)s">
                        <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
                        <BR><BR>""" % {
-                     'back' : _("back to main menu"),
+                     'back' : _("Back to main menu"),
                      'images' : images,
                      'mainmenu' : mainmenu,
                    }
@@ -991,14 +991,14 @@ class Template:
                       <table border="1" cellpadding="15">
                         <tr><th>%(function)s</th><th>%(score)s</th><th>%(running)s</th></tr>
                    """ % {
-                     'function_list' : _("Here is the %(action)s function list for %(doctype)s documents at level %(step)s") % {
-                                         'action' : action,
-                                         'doctype' : doctype,
-                                         'step' : step,
+                     'function_list' : _("Here is the %(x_action)s function list for %(x_doctype)s documents at level %(x_step)s") % {
+                                         'x_action' : action,
+                                         'x_doctype' : doctype,
+                                         'x_step' : step,
                                        },
                      'function' : _("Function"),
                      'score' : _("Score"),
-                     'running' : _("Running Function"),
+                     'running' : _("Running function"),
                    }
             for function in functions:
                 out += """<tr><td>%(name)s</td><td>%(score)s</td><td>%(result)s</td></tr>""" % {
@@ -1075,11 +1075,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record #%s") % ("<a href=\"/record/%s\">%s</a>" % (recid,recid))
+        title = _("record") + ' #' + '<a href="%s/record/%s">%s</a>' % (weburl, recid, recid)
         if docid != "":
-            title += _(" document #%s") % docid
+            title += ' ' + _("document") + ' #' + str(docid)
         if version != "":
-            title += _(" version #%s") % version
+            title += ' ' + _("version") + ' #' + str(version)
 
         out = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Access&nbsp;to&nbsp;Fulltext&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody"><!--start file list-->
                   %s
@@ -1397,11 +1397,11 @@ class Template:
                          'docname' : submission['docname'],
                          'action' : _("Action"),
                          'status' : _("Status"),
-                         'id' : _("id"),
-                         'reference' : _("reference"),
+                         'id' : _("Id"),
+                         'reference' : _("Reference"),
                          'images' : images,
-                         'first' : _("first access"),
-                         'last' : _("last access"),
+                         'first' : _("First access"),
+                         'last' : _("Last access"),
                        }
             if submission['pending']:
                 idtext = """<a href="submit/sub/access=%(id)s@%(action)s%(doctype)s">%(id)s</a>
@@ -1412,9 +1412,9 @@ class Template:
                            'action' : submission['act'],
                            'doctype' : submission['doctype'],
                            'sure' : _("Are you sure you want to delete this submission?"),
-                           'delete' : _("delete submission %(id)s in %(docname)s") % {
-                                        'id' : submission['id'],
-                                        'docname' : submission['docname']
+                           'delete' : _("Delete submission %(x_id)s in %(x_docname)s") % {
+                                        'x_id' : str(submission['id']),
+                                        'x_docname' : str(submission['docname'])
                                       }
                          }
             else:
@@ -1428,7 +1428,7 @@ class Template:
             if submission['reference']:
                 reference = submission['reference']
             else:
-                reference = """<font color="red">%s</font>""" % _("reference not yet given")
+                reference = """<font color="red">%s</font>""" % _("Reference not yet given")
 
             cdate = str(submission['cdate']).replace(" ","&nbsp;")
             mdate= str(submission['mdate']).replace(" ","&nbsp;")
@@ -1514,10 +1514,8 @@ class Template:
             else:
                 for category in doctype['categories']:
                     out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
-                        'referee' : (_("You are referee for category: %(name)s (%(id)s)") % {
-                                       'name' : category['name'],
-                                       'id'   : category['id']}),
-                        'doctype' : doctype['doctype'],
+                        'referee' : _("You are referee for category") + ': ' + str(category['name']) + ' (' + str(category['id']) + ')',
+			'doctype' : doctype['doctype'],
                         'categ' : category['id']}
                     
             out += "</small></UL></UL>"
@@ -1550,11 +1548,11 @@ class Template:
                   </tr>
                   <tr>
                       <td class="portalboxbody">
-              %(select)s
+              %(select)s:
             </small>
             <blockquote>""" % {
               'list' : _("List of refereed types of documents"),
-              'select' : _("Select one of the following types of documents to check the documents status:"),
+              'select' : _("Select one of the following types of documents to check the documents status"),
             }
 
         for doc in docs:
@@ -1632,19 +1630,19 @@ class Template:
             if categ['waiting'] != 0:
                 out += """| %(waiting)s <IMG ALT="%(pending)s" SRC="%(images)s/waiting_or.gif" border="0">""" % {
                           'waiting' : categ['waiting'],
-                          'pending' : _("pending"),
+                          'pending' : _("Pending"),
                           'images' : images,
                         }
             if categ['approved'] != 0:
                 out += """| %(approved)s<IMG ALT="%(approved_text)s" SRC="%(images)s/smchk_gr.gif" border="0">""" % {
                           'approved' : categ['approved'],
-                          'approved_text' : _("approved"),
+                          'approved_text' : _("Approved"),
                           'images' : images,
                         }
             if categ['rejected'] != 0:
                 out += """| %(rejected)s<IMG ALT="%(rejected_text)s" SRC="%(images)s/cross_red.gif" border="0">""" % {
                           'rejected' : categ['rejected'],
-                          'rejected_text' : _("rejected"),
+                          'rejected_text' : _("Rejected"),
                           'images' : images,
                         }
             out += ")</SMALL><BR>"
@@ -1673,15 +1671,14 @@ class Template:
              </tr>
             </table>""" % {
               'key' : _("Key"),
-              'pending' : _("pending"),
+              'pending' : _("Pending"),
               'images' : images,
-              'waiting' : _("waiting for approval"),
-              'approved' : _("approved"),
-              'already_approved' : _("already approved"),
-              'rejected' : _("rejected"),
-              'rejected_text' : _("rejected"),
-              'already_approved' : _("already approved"),
-              'somepending' : _("some documents are pending"),
+              'waiting' : _("Waiting for approval"),
+              'approved' : _("Approved"),
+              'already_approved' : _("Already approved"),
+              'rejected' : _("Rejected"),
+              'rejected_text' : _("Rejected"),
+              'somepending' : _("Some documents are pending"),
             }
         return out
 
@@ -1737,7 +1734,7 @@ class Template:
                 'title' : title,
                 'categ' : categ,
                 'list' : _("List of refereed documents"),
-                'choose_report' : _("Click on a report number to have more information"),
+                'choose_report' : _("Click on a report number to have more information."),
                 'report_no' : _("Report Number"),
                 'pending' : _("Pending"),
                 'approved' : _("Approved"),
@@ -1886,50 +1883,52 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s:</strong>
-                        <A HREF="%(url)s?id=%(sysno)s">%(click)s</A>
-                        <BR><BR>
+                        <a href="%(url)s?id=%(sysno)s">%(click)s</a>
+                        <br /><br />
                    """ % {
                      'more' : _("More information"),
-                     'click' : _("click here"),
+                     'click' : _("Click here"),
                      'url' : accessurl,
                      'sysno' : sysno,
                    }
 
         if status == "waiting":
-            out += _("This Document is still <strong class=\"headline\">waiting for approval</strong>.") + "<BR><BR>" +\
-                   _("It has first been sent to approval on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+            out += _("This document is still %swaiting for approval%s.") % ('<strong class="headline">', '</strong>')
+	    out += "<br /><br />"
+	    out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dLastReq} + "<BR>"
-            out += "<BR>" + _("You can send an approval request e-mail again by clicking the following button:") + "<BR>" +\
-                   """<INPUT class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
+            out += "<br />" + _("You can send an approval request e-mail again by clicking the following button") + ": <br />" +\
+                   """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
                      'send' : _("Send Again"),
-                     'warning' : _("WARNING! An e-mail will be send to your referee if you confirm.")
+                     'warning' : _("WARNING! An e-mail will be sent to your referee if you confirm.")
                    }
             if auth_code == 0:
-                out += "<BR>" + _("As a referee for this document, you may click this button to approve or reject it:") + "<BR>" +\
-                       """<INPUT class="adminbutton" type="submit" name="approval" value="%(approve)s" onClick="window.location='approve.py?%(access)s';return false;">""" % {
+                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it") + ":<br />" +\
+                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onClick="window.location='approve.py?%(access)s';return false;">""" % {
                          'approve' : _("Approve/Reject"),
                          'access' : access
                        }
         if status == "approved":
-            out += _("This Document has been <strong class=\"headline\">approved</strong>.") + "<BR>" +\
-                   _("Its approved reference is: <strong class=\"headline\">%(rn)s</strong>") % {'rn' : newrn} + "<BR><BR>" +\
-                   _("It has first been sent to approval on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+            out += _("This document has been %sapproved%s.") % ('<strong class="headline">', '</strong>')
+            out += '<br />' + _("Its approved reference is") + ': <strong class="headline">' + str(newrn) + '</strong><br /><br />'
+            out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dLastReq} + "<BR>" +\
-                       _("It has been approved on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dAction} + "<BR>"
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />' +\
+                       _("It has been approved on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
         if status == "rejected":
-            out += _("This Document has been <strong class=\"headline\">rejected</strong>.") + "<BR><BR>" +\
-                   _("It has first been sent to approval on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+            out += _("This document has been %srejected%s.") % ('<strong class="headline">', '</strong>') 
+            out += "<br /><br />"
+            out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) +'</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dFirstReq} + "<BR>"
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dLastReq} + "<BR>"
-            out += _("It has been rejected on: <strong class=\"headline\">%(date)s</strong>") % {'date' : dAction} + "<BR>"
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dLastReq) +'</strong><br />'
+            out += _("It has been rejected on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
 
         out += """    </SMALL></FORM>
                       <BR></TD></TR></TABLE>
