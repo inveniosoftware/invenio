@@ -205,7 +205,7 @@ modules/websearch/lib/websearchadminlib.py
 modules/websearch/lib/websearch_templates.py
 modules/websearch/lib/websearch_webinterface.py
 modules/websearch/web/admin/websearchadmin.py
-modules/websession/bin/sessiongc.wml
+modules/websession/bin/sessiongc.in
 modules/websession/doc/admin/guide.html.wml
 modules/websession/doc/admin/index.html.wml
 modules/websession/lib/session.py
