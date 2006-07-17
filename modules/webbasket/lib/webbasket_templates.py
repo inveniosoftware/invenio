@@ -1425,8 +1425,9 @@ class Template:
     def tmpl_create_guest_forbidden_box(self, ln=cdslang):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
-        message = _("This functionality is forbidden for guest users. If you wish you can %slogin or register here%s.")
-        message %= ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), '</a>')
+        message = _("This functionality is forbidden to guest users. If you wish you can %(open_link)slogin or register here%(close_link)s.")
+        message %= {'open_link': '<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), 
+                    'close_link': '</a>'}
         out = """
 <table class="errorbox">
   <thead>

@@ -1279,7 +1279,7 @@ class Template:
         if comID > 0:
             header = '<br />' +_("Here is comment/review %s")% comID + '<br /><br />'
         if uid > 0 and comID > 0:
-            header = '<br />' + _("Here is comment/review %s written by user %s") % (comID, uid)
+            header = '<br />' + _("Here is comment/review %(cmtID)s written by user %(user)s") % {'cmtID': comID, 'user': uid}
             header += '<br/ ><br />'
         if uid == 0 and comID == 0:
             header = '<br />'

@@ -114,7 +114,8 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     if not auth_code:
         if reviews==0:
             raise ValueError
-        return page(title=_("View all Reported %s") % (reviews>0 and _("Reviews") or _("Comments")),
+            
+        return page(title=_("View all reported comments")),
                 body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
                 uid=auid,
                 language=ln,

@@ -776,21 +776,20 @@ def account_list_baskets(uid, ln=cdslang):
     (personal, group, external) = db.count_baskets(uid)
     link = '<a href="%s">%s</a>'
     base_url = weburl + '/yourbaskets/display?category=%s&amp;ln=' + ln
-    personal_text = _("%i personal baskets") % personal
+    personal_text = personal
     if personal:
         url = base_url % cfg_webbasket_categories['PRIVATE']
         personal_text = link % (url, personal_text)
-    group_text = _("%i group baskets") % group
+    group_text = group
     if group:
         url = base_url % cfg_webbasket_categories['GROUP']
         group_text = link % (url, group_text)
-    external_text = _("%i others' baskets") % external
+    external_text = external
     if external:
         url = base_url % cfg_webbasket_categories['EXTERNAL']
     else:
         url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text) 
-    out = _("You have %s and are subscribed to %s and %s.") % (personal_text,
-                                                               group_text,
-                                                               external_text)
+    out = _("You have %s personal baskets and are subscribed to %s group baskets and %s others' baskets.") 
+    out %= (personal_text, group_text, external_text)
     return out
