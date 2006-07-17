@@ -52,7 +52,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         """
         Redirects to display function
         """
-        redirect_to_url(req,"%s/comments/display?%s" % (weburl, req.args))
+        redirect_to_url(req, "%s/comments/display?%s" % (weburl, req.args))
 
     def display(self, req, form):
         """
@@ -336,4 +336,4 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             #Note: sent to comments display 
             referer = "%s/comments/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1"
             referer %= (weburl, argd['recid'], argd['ln'])
-            redirect_to_url(referer)
+            redirect_to_url(req, referer)
