@@ -492,7 +492,7 @@ class Template:
 
         if title == None:
             if errors: 
-                title = _("Error: %s") % errors[0][1]
+                title = _("Error") + ': %s' % errors[0][1]
             else:    
                 title = _("Internal Error")
 
@@ -517,7 +517,7 @@ class Template:
         traceback_s = ''
         if verbose >= 1:
             if sys.exc_info()[0]:
-                sys_error_s = _("System Error: %s %s\n") % (sys.exc_info()[0], sys.exc_info()[1])
+                sys_error_s = _("System Error") + ': %s %s\n' % (sys.exc_info()[0], sys.exc_info()[1])
             if errors:
                 errs = ''
                 for error_tuple in errors:
@@ -526,11 +526,11 @@ class Template:
                     except:
                         errs += "%s%s\n" % (' '*6, error_tuple)
                 errs = errs[6:-2] # get rid of trainling ','
-                error_s = _("Error: %s")% errs + "\n"
+                error_s = _("Error") + ': %s")' % errs + "\n"
             else:
                 error_s = _("Error") + ': ' + info_not_available
         if verbose >= 9:
-            traceback_s = _("Traceback: \n%s") % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
+            traceback_s = _("Traceback") + ': \n%s' % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
 
         out = """
               <table class="errorbox">
@@ -577,11 +577,11 @@ URI: http://%(host)s%(page)s
                 'title'     : title,
                 'time_label': _("Time"),
                 'client_label': _("Client"),
-                'send_error_label': _("Please send an error report to the Administrator"),
+                'send_error_label': _("Please send an error report to the Administrator."),
                 'send_label': _("Send error report"),
                 'sys1'      : sys.exc_info()[0] or '',
                 'sys2'      : sys.exc_info()[1] or '',
-                'contact'   : _("Please contact <a href=\"mailto:%s\">%s</a> quoting the following information:")  % (urllib.quote(supportemail), supportemail),
+                'contact'   : _("Please contact %s quoting the following information")  % ':<a href="mailto:' + urllib.quote(supportemail) +'">' + supportemail + '</a>',
                 'host'      : host_s,
                 'page'      : page_s,
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
