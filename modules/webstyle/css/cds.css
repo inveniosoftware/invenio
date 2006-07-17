@@ -1062,7 +1062,6 @@ input,select {
 }
 #bsktabs{
    float: left;
-   width: 100%;
    background:transparent;
    padding: 0px;
    margin: 0px;
@@ -1080,9 +1079,6 @@ input,select {
 #bsktab_selected{
    background-color: #ffc;
    font-weight: bold;
-/*   border-left: 1px solid #fc0;
-   border-top: 1px solid #fc0;
-   border-right: 1px solid #fc0;*/
    border-bottom: hidden; 
 }
 .bsktab a{
@@ -1097,6 +1093,7 @@ input,select {
 }
 #bskcontent{
    float: left;
+   width: 100%;
    border-collapse: collapse;
    background: #ffe;
    border: none;
@@ -1126,7 +1123,6 @@ input,select {
    background-color: transparent;
 }
 .bskbasket{
-   width: auto;
    margin-bottom: 20px;
    border-collapse: collapse;
    border: 1px solid #fc0;
@@ -1250,5 +1246,41 @@ input.hyperlinkformSubmitButton {
    color: blue;
 }
 /* end of WebSubmit module */
-
+/* BibEdit module */
+.bibEditTable{
+   background: #ececec;
+   border: 0px;
+   padding: 0px;
+   border-collapse: collapse;
+}
+.bibEditTable th{
+   background: #ccc;
+   text-align: left;
+   padding: 5px;
+}
+.bibEditCellRight{
+   font-size: small;
+   text-align: right;
+   padding: 0px;
+}
+.bibEditCellTag{
+   font-size: small;
+   text-align: right;
+   vertical-align: top;
+   padding: 2px 5px 2px 5px;
+   font-weight: bold; 
+}
+/* end of BibEdit module*/
+/* WebAlert module */
+.alrtTable{
+    border: 1px solid black;
+    width: 100%;
+    padding: 0px;
+    border-collapse: collapse;
+}
+.alrtTable td{
+    border: 1px solid black;
+    padding: 3px;
+}
+/* end of WebAlert module */
 /* end of cds.css */
