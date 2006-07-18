@@ -431,7 +431,7 @@ class Template:
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
-	groups_description = ("You can consult the list of %syour groups%s you are administering or are a member of.")
+	groups_description = _("You can consult the list of %syour groups%s you are administering or are a member of.")
 	groups_description %= ('<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">', '</a>')
         out += self.tmpl_account_template(_("Your Groups"), groups_description, ln)
 	submission_description = _("You can consult the list of %syour submissions%s and inquire about their status.")
