@@ -684,7 +684,7 @@ class Template:
                                     alert("%(field_mandatory)s");
                                     return 0;
                               } """ % {
-                                'field_mandatory' : _("The field `%s` is Mandatory.") % txt[i] + '\\n' + _("Please make a choice in the 'Select:' box")
+                                'field_mandatory' : _("The field %s is mandatory.") % txt[i] + '\\n' + _("Please make a choice in the select box")
                               }
                 elif radio[i] != 0:
                     # If the field is a radio buttonset
@@ -706,7 +706,7 @@ class Template:
                                alert("%(field_mandatory)s");
                                return 0;
                               }""" % {
-                                'field_mandatory' : _("The field `%s` is Mandatory. Please fill it in.") % txt[i]
+                                'field_mandatory' : _("The field %s is mandatory. Please fill it in.") % txt[i]
                               }
         out += """  return 1;
                   }
@@ -1552,7 +1552,7 @@ class Template:
             </small>
             <blockquote>""" % {
               'list' : _("List of refereed types of documents"),
-              'select' : _("Select one of the following types of documents to check the documents status"),
+              'select' : _("Select one of the following types of documents to check the documents status."),
             }
 
         for doc in docs:
@@ -1678,7 +1678,7 @@ class Template:
               'already_approved' : _("Already approved"),
               'rejected' : _("Rejected"),
               'rejected_text' : _("Rejected"),
-              'somepending' : _("Some documents are pending"),
+              'somepending' : _("Some documents are pending."),
             }
         return out
 
@@ -1899,14 +1899,14 @@ class Template:
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
-            out += "<br />" + _("You can send an approval request email again by clicking the following button") + ": <br />" +\
+                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
+            out += "<br />" + _("You can send an approval request e-mail again by clicking the following button.") + ": <br />" +\
                    """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
                      'send' : _("Send Again"),
                      'warning' : _("WARNING! An email will be sent to your referee if you confirm.")
                    }
             if auth_code == 0:
-                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it") + ":<br />" +\
+                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it.") + ":<br />" +\
                        """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onClick="window.location='approve.py?%(access)s';return false;">""" % {
                          'approve' : _("Approve/Reject"),
                          'access' : access

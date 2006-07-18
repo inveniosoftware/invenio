@@ -115,8 +115,8 @@ class Template:
     def tmpl_output_schedule(self, ln, schtime, schstatus):
         _ = gettext_set_language(ln)
         msg_next = _("Next oaiharvest task")
-        msg_sched = _("scheduled time") + ":"
-        msg_cur = _("current status") + ":"
+        msg_sched = _("scheduled time:")
+        msg_cur = _("current status:")
         msg_notask = _("No oaiharvest task currently scheduled.")
         if schtime and schstatus:
             output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong>%s<br>

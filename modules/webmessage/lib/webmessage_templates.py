@@ -271,8 +271,8 @@ class Template:
                                  'to_label': _("To:"),
                                  'users_label': _("Users"),
                                  'groups_label': _("Groups"),
-                                 'subject_label': _("Subject") + ":",
-                                 'message_label': _("Message") + ":",
+                                 'subject_label': _("Subject:"),
+                                 'message_label': _("Message:"),
                                  'send_label': _("SEND")}
         return write_box 
     

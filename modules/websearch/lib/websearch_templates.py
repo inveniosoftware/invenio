@@ -286,10 +286,8 @@ class Template:
             out += self.tmpl_input_hidden(field, value)
 
 
-        header = _("Search %s records for") % \
+        header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
-	header += ':'
-
         asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
         
         # print commentary start:
@@ -464,7 +462,7 @@ class Template:
                        </tr>
                       <tbody>
                      </table>""" % {
-                       'searchheader' : _("Search options") + ':',
+                       'searchheader' : _("Search options:"),
                        'searchoptions' : searchoptions
                      }
 
@@ -511,14 +509,14 @@ class Template:
                   <!--/create_searchfor_advanced()-->
               """ % {
 
-                    'added' : _("Added since") + ':',
-                    'until' : _("until") + ':',
+                    'added' : _("Added since:"),
+                    'until' : _("until:"),
                     'date_added' : self.tmpl_inputdate("d1", ln=ln),
                     'date_until' : self.tmpl_inputdate("d2", ln=ln),
 
-                    'msg_sort' : _("Sort by") + ':',
-                    'msg_display' : _("Display results") + ':',
-                    'msg_format' : _("Output format") + ':',
+                    'msg_sort' : _("Sort by:"),
+                    'msg_display' : _("Display results:"),
+                    'msg_format' : _("Output format:"),
                     'sortoptions' : sortoptions,
                     'rankoptions' : rankoptions,
                     'displayoptions' : displayoptions,
@@ -695,8 +693,8 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = {'r': _("Narrow by collection") + ':',
-                 'v': _("Focus on") + ':'}[type]
+        title = {'r': _("Narrow by collection:"),
+                 'v': _("Focus on:")}[type]
         
 
         if has_grandchildren:
@@ -847,7 +845,7 @@ class Template:
             <td class="narrowsearchboxbody">%(body)s</td>
             </tr>
           <tbody>
-        </table>''' % {'header' : _("Latest additions") + ':',
+        </table>''' % {'header' : _("Latest additions:"),
                        'body' : body,
                        }
 
@@ -1018,7 +1016,7 @@ class Template:
                  'inside' : _("inside"),
                      'f' : f,
               }
-        out += _("in any collection are") + ":<br />"
+        out += _("in any collection are:") + "<br />"
         out += nearest_box
         return out
 
@@ -1496,7 +1494,7 @@ class Template:
                        </tbody>
                       </table>""" % {
                         'added' : _("Added since:"),
-                        'until' : _("until") + ':',
+                        'until' : _("until:"),
                         'date1' : self.tmpl_inputdate("d1", ln, d1y, d1m, d1d),
                         'date2' : self.tmpl_inputdate("d2", ln, d2y, d2m, d2d),
                       }
@@ -1536,8 +1534,8 @@ class Template:
                  </tbody>
                 </table>""" % {
                   'sort_by' : _("Sort by") + ':',
-                  'display_res' : _("Display results") + ':',
-                  'out_format' : _("Output format") + ':',
+                  'display_res' : _("Display results:"),
+                  'out_format' : _("Output format:"),
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_formats, selected = sf, css_class = 'address'),
                   'select_so' : self.tmpl_select(fieldname = 'so', values = [{
                                     'value' : 'a',
@@ -1752,7 +1750,7 @@ class Template:
         out = ""
         if out_links:
             out += """<a name="googlebox"></a>"""
-            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers") + ':' + prolog_end
+            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers:") + prolog_end
             nb_out_links_in_one_column = len(out_links)/2
             out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
             out += column_separator
@@ -1937,7 +1935,7 @@ class Template:
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name = fieldcode, value = val)
             out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
-                     'jump' : _("jump to record") + ':',
+                     'jump' : _("jump to record:"),
                      'jrec' : jrec,
                    }
 
@@ -2138,7 +2136,7 @@ class Template:
                     cs = row ['downloadsimilarity']
 
                     similar = self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who downloaded this document also downloaded") + ':', cs, ln)
+                        _("People who downloaded this document also downloaded:"), cs, ln)
 
                     out += '''
                     <tr><td>%(graph)s</td></tr>
@@ -2153,7 +2151,7 @@ class Template:
                 if row.has_key ('viewsimilarity'):
                     out += '<p>&nbsp'
                     out += self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who viewed this page also viewed") + ':', row ['viewsimilarity'], ln)
+                        _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
 
                 if row.has_key ('reviews'):
                     out += '<p>&nbsp'

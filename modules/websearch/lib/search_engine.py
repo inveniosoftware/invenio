@@ -667,11 +667,11 @@ def create_matchtype_box(name='m', value='', ln='en'):
     <option value="r"%s>%s
     </select>
     """ % (name,
-           is_selected('a', value), _("All of the words")+":",
-           is_selected('o', value), _("Any of the words")+":",
-           is_selected('e', value), _("Exact phrase")+":",
-           is_selected('p', value), _("Partial phrase")+":",
-           is_selected('r', value), _("Regular expression")+":")
+           is_selected('a', value), _("All of the words:"),
+           is_selected('o', value), _("Any of the words:"),
+           is_selected('e', value), _("Exact phrase:"),
+           is_selected('p', value), _("Partial phrase:"),
+           is_selected('r', value), _("Regular expression:"))
     return out
 
 def is_selected(var, fld):
@@ -1631,9 +1631,10 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
-                print_warning(req, _("No match found in collection %s. Other public collections gave %shits%s.") %
+                print_warning(req, _("No match found in collection %s. Other public collections gave %s%d hits%s.") %
                               (string.join(colls, ','), 
-                               '<a class="nearestterms" href="%s">%d' % (url, results_in_Home._nbhits),
+                               '<a class="nearestterms" href="%s">' % (url),
+                               results_in_Home._nbhits,
                                '</a>'))
             results = {}
         else:

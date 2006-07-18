@@ -459,7 +459,7 @@ class Template:
         if nb_comments:
             comments_field = """
 %i %s<br/>
-%s %s""" % (nb_comments,  _("comments"), _("last comment")+":", last_comment)
+%s %s""" % (nb_comments,  _("comments"), _("last comment:"), last_comment)
         out = """       
 <table class="bskbasket">
   <thead class="bskbasketheader">

@@ -603,7 +603,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if len(res) > 0:
        docname = res[0][0]
     else:
-        return errorMsg(_("Unknown type of document."), req, cdsname, ln)
+        return errorMsg(_("Unknown type of document"), req, cdsname, ln)
     # Get action name
     res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
@@ -849,7 +849,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
         docShortDesc = arr[1]
         description = arr[4]
     else:
-        return errorMsg (_("Cannot find document") + str(doctype), req)
+        return errorMsg (_("Cannot find document.") + str(doctype), req)
     #then data about associated actions
     res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
     for arr2 in res2:

@@ -664,7 +664,7 @@ class Template:
 %(page_links)s <br />
 """ % \
         {'v_label': _("Viewing"),
-         'page_links': _("Page") + ": " + page_links ,
+         'page_links': _("Page:") + page_links ,
          'comments_or_reviews': reviews and _('review') or _('comment'),
          'results_nb_lower': len(comments)>0 and ((page-1) * nb_per_page)+1 or 0,
          'results_nb_higher': page == nb_pages and (((page-1) * nb_per_page) + len(comments)) or (page * nb_per_page)   }

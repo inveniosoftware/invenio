@@ -451,7 +451,7 @@ class Template:
                    <a href="%(weburl)s/admin/bibedit/index?ln=%(ln)s">%(link)s</a>.
                """ % {'message1': _("Your modifications have now been submitted."),
                       'message2': _("They will be processed as soon as the task queue is empty."),
-                      'message3': _("You can now go back to") + " " + link}
+                      'message3': _("You can now go back to %s.") % link}
     
     def tmpl_deleted(self, ln, message='', recid='', temp='', format_tag=''):
         """ Return a deleted message of Bibedit. """

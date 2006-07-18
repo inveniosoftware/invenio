@@ -109,7 +109,7 @@ class Template:
                  %(you_own)s:
                 <select name="id_alert">
                   <option value="0">- %(alert_name)s -</option>""" % {
-                 'you_own' : _("You own following alerts"),
+                 'you_own' : _("You own following alerts:"),
                  'alert_name' : _("alert name"),
                }
         for alert in alerts :
@@ -200,9 +200,9 @@ class Template:
                   <td>%(baskets)s
                """ % {
                  'action': action,
-                 'alert_name' : _("Alert identification name"),
+                 'alert_name' : _("Alert identification name:"),
                  'alert' : alert_name,
-                 'freq' : _("Search-checking frequency"),
+                 'freq' : _("Search-checking frequency:"),
                  'freq_month' : (frequency == 'month' and 'selected="selected"' or ""),
                  'freq_week' : (frequency == 'week' and 'selected="selected"' or ""),
                  'freq_day' : (frequency == 'day' and 'selected="selected"' or ""),

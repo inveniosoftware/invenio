@@ -86,7 +86,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,ln):
     if isGuestUser(uid):
         user = "guest"
         login = "%s/youraccount/login?ln=%s" % (sweburl, ln)
-        accBody = _("You are logged in as guest. You may want to %slogin%s as a regular user") % ('<a href="' + login + '">', '</a>')
+        accBody = _("You are logged in as guest. You may want to %slogin%s as a regular user.") % ('<a href="' + login + '">', '</a>')
 	accBody += "<br /><br />"
         bask=aler=msgs= _("The %sguest%s users need to %sregister%s first") % ('<strong class="headline">', 
 									       '</strong>',

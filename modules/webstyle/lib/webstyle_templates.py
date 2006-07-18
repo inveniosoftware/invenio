@@ -581,7 +581,7 @@ URI: http://%(host)s%(page)s
                 'send_label': _("Send error report"),
                 'sys1'      : sys.exc_info()[0] or '',
                 'sys2'      : sys.exc_info()[1] or '',
-                'contact'   : _("Please contact %s quoting the following information")  % ':<a href="mailto:' + urllib.quote(supportemail) +'">' + supportemail + '</a>',
+                'contact'   : _("Please contact %s quoting the following information:")  % '<a href="mailto:' + urllib.quote(supportemail) +'">' + supportemail + '</a>',
                 'host'      : host_s,
                 'page'      : page_s,
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),

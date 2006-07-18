@@ -571,7 +571,7 @@ class Template:
                       <td>%(login_select)s</td>
                       <td></td>
                    </tr>""" % {
-                     'login_title' : _("Login via") + ':',
+                     'login_title' : _("Login via:"),
                      'login_select' : login_select,
                    }
         else:
@@ -647,7 +647,7 @@ class Template:
 
         out = ""
         if level <= 1:
-            out += _("Please enter your email address and desired nickname and password") + ':'
+            out += _("Please enter your email address and desired nickname and password:")
             if level == 1:
                 out += _("The account will not be possible to use before it has been verified and activated.")
             out += """
@@ -736,7 +736,7 @@ class Template:
 
         # displaying form
         out += "<p>" + (_("You seem to be %s.") % ('<em>' + string.join(roles, ", ") + "</em> ")) + '</p>' 
-        out += _("Here are some interesting web admin links for you") + ':'
+        out += _("Here are some interesting web admin links for you:")
 
         # print proposed links:
         activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
@@ -759,10 +759,8 @@ class Template:
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
             if action == "cfgwebsubmit":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
-        out += "<br />" + _("For more admin-level activities, see the complete %(x_admin_area)s""") % {
-                           'x_admin_area' : """<a href="%s/admin/index.%s.html">%s</a>.""" % (weburl, ln, _("Admin Area"))
-                         }
-
+        out += "<br />" + _("For more admin-level activities, see the complete %sAdmin Area%s.""") %\
+            ('<a href="%s/admin/index.%s.html">' % (weburl, ln), '</a>')
         return out
 
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin):
