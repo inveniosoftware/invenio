@@ -92,7 +92,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     if html_content != "":
         out += """<br/><br/><table><tr><td class="blocknote">
                   %s %s</td></tr><tr><td>
-                  <table border="0" cellspacing="1" cellpadding="1">""" %  (_("Downloads history:"), users_analysis_text)
+                  <table border="0" cellspacing="1" cellpadding="1">""" %  (_("Downloads history"), users_analysis_text)
         out += html_content
         out += "</table></td></tr></table>"
     return out

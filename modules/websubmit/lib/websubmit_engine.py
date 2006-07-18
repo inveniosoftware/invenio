@@ -100,7 +100,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
-        return errorMsg(_("Can't figure number of pages."), req, c, ln)
+        return errorMsg(_("Cannot find number of pages."), req, c, ln)
     else:
         nbpages = res[0][0]
     #Get current page
@@ -126,7 +126,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("Can't create submission directory."), req, c, ln)
+            return errorMsg(_("Cannot create submission directory."), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")
@@ -187,7 +187,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 try:
                     os.makedirs("%s/files/%s" % (curdir, key))
                 except:
-                    return errorMsg(_("Can't create submission directory."), req, c, ln)
+                    return errorMsg(_("Cannot create submission directory."), req, c, ln)
             filename = formfields.filename
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
@@ -503,7 +503,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("Can't create submission directory."), req, c, ln)
+            return errorMsg(_("Cannot create submission directory."), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")

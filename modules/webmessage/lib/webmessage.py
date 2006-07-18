@@ -129,9 +129,9 @@ def perform_request_delete_msg(uid, msgid, ln=cdslang):
         errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
     else:
         if (delete_message_from_user_inbox(uid, msgid)==0):
-            warnings.append(_("The message could not be deleted"))
+            warnings.append(_("The message could not be deleted."))
         else:
-            infos.append(_("Delete successful"))
+            infos.append(_("Delete successful."))
     return perform_request_display(uid, errors, warnings, infos, ln) 
 
 def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
@@ -148,7 +148,7 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     _ = gettext_set_language(ln)
     if confirmed:
         delete_all_messages(uid)
-        infos = [_("Your mailbox has been emptied")]
+        infos = [_("Your mailbox has been emptied.")]
         return perform_request_display(uid, warnings, errors, infos, ln)
     else:
         body = webmessage_templates.tmpl_confirm_delete(ln)
@@ -338,22 +338,20 @@ def perform_request_send(uid,
     else:
         status = cfg_webmessage_status_code['REMINDER']
         if send_on_date == datetext_default:
-            warning = _("The chosen date (%(year)i/%(month)i/%(day)i) is invalid")
-            warning = warning % {'year': msg_send_year,
-                                 'month': msg_send_month,
-                                 'day': msg_send_day}
+            warning = _("The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid.")
+            warning = warning % {'x_year': msg_send_year,
+                                 'x_month': msg_send_month,
+                                 'x_day': msg_send_day}
             warnings.append(warning)
             problem = 1
             
     if not(users_to_str or groups_to_str):
         # <=> not(users_to_str) AND not(groups_to_str)
-        warnings.append(_("Please enter a user name or a group name"))
+        warnings.append(_("Please enter a user name or a group name."))
         problem = 1
         
     if len(msg_body) > cfg_webmessage_max_size_of_message:
-        warnings.append(_("""Your message is too long, please edit it.
-                             Max size allowed is %i characters
-                          """)%(cfg_webmessage_max_size_of_message,))
+        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.")%(cfg_webmessage_max_size_of_message,))
         problem = 1
 
     users_dict = get_uids_from_nicks(users_to)
@@ -363,7 +361,7 @@ def perform_request_send(uid,
     gids_to = []
     for (group_name, group_id) in groups_to:
         if not(group_id):
-            warnings.append(_("Group '%s' doesn't exist\n")% (group_name))
+            warnings.append(_("Group %s does not exist.")% (group_name))
             problem = 1
         else:
             gids_to.append(group_id)
@@ -386,7 +384,7 @@ def perform_request_send(uid,
                     uids_from_group.append(user_nick)
                     tmp_dict[user_nick] = None
             else:                    
-                warnings.append(_("User '%s' doesn't exist\n")% (user_nick))
+                warnings.append(_("User %s does not exist.")% (user_nick))
                 problem = 1
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
@@ -415,10 +413,8 @@ def perform_request_send(uid,
             def listing(name1, name2):
                 """ name1, name2 => 'name1, name2' """
                 return str(name1) + ", " + str(name2)
-            warning = _("Your message couldn't be sent to the following recipients\n")
-            warning += _("These users are overquota: ")
+            warning = _("Your message could not be sent to the following recipients due to their quota:") + " "
             warnings.append(warning + reduce(listing, usernames_problem)) 
- 
 
         if len(uids_from_group) != len(uid_problem):
             infos.append(_("Your message has been sent."))

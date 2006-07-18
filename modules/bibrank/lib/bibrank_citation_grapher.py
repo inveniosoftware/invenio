@@ -115,7 +115,7 @@ def create_citation_history_graph_and_box(recid, ln=cdslang):
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history:")
+            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history")
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)

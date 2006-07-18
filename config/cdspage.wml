@@ -141,7 +141,7 @@ $(cdspagefooteradd)
     $footer =~ s/<!--MSGHELP-->/_(Help)_/g;
     $footer =~ s/<!--MSGPERSONALIZE-->/_(Personalize)_/g;
     $footer =~ s/<!--LN-->/<lang:star: *>/g;
-    $footer =~ s/<!--LASTUPDATED-->/_(Last updated:)_ $lastupdated/g;
+    $footer =~ s/<!--LASTUPDATED-->/_(Last updated)_ $lastupdated/g;
     $footer =~ s/<!--MAINTAINEDBY-->/_(Maintained by)_/g;
     $footer =~ s/<!--POWEREDBY-->/_(Powered by)_/g;
     $footer =~ s/<!--LANGUAGESELECTIONBOX-->/&generate_language_selection_box_for_html;/ge;

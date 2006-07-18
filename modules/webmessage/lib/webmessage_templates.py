@@ -89,7 +89,7 @@ class Template:
     </tr>""" %(_("No messages"),)
         for (msgid, id_user_from, user_from_nick, subject, sent_date, status) in messages:
             if not(subject):
-                subject = _("[No subject]")
+                subject = _("No subject")
             subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
                                                                                ln,
                                                                                subject)
@@ -177,7 +177,7 @@ class Template:
                                                    results_field,
                                                    ln)
         if (msg_id != 0):
-            msg_subject = _("Re: ") + msg_subject
+            msg_subject = _("Re:") + " " + msg_subject
             msg_body = email_quote_txt(msg_body)
             msg_body = msg_body.replace('>', '&gt;')
         write_box += """
@@ -271,8 +271,8 @@ class Template:
                                  'to_label': _("To:"),
                                  'users_label': _("Users"),
                                  'groups_label': _("Groups"),
-                                 'subject_label': _("Subject:"),
-                                 'message_label': _("Message:"),
+                                 'subject_label': _("Subject") + ":",
+                                 'message_label': _("Message") + ":",
                                  'send_label': _("SEND")}
         return write_box 
     

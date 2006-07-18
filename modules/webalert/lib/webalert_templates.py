@@ -209,7 +209,7 @@ class Template:
                  'monthly' : _("monthly"),
                  'weekly' : _("weekly"),
                  'daily' : _("daily"),
-                 'send_email' : _("Send notification e-mail?"),
+                 'send_email' : _("Send notification email?"),
                  'notif_yes' : (notification == 'y' and "selected" or ""),
                  'notif_no' : (notification == 'n' and "selected" or ""),
                  'yes' : _("yes"),
@@ -305,7 +305,7 @@ class Template:
                        'no' : _("No"),
                        'name' : _("Name"),
                        'search_freq' : _("Search checking frequency"),
-                       'notification' : _("Notification by e-mail"),
+                       'notification' : _("Notification by email"),
                        'result_basket' : _("Result in basket"),
                        'date_run' : _("Date last run"),
                        'date_created' : _("Creation date"),
@@ -406,17 +406,15 @@ class Template:
         _ = gettext_set_language(ln)
 
         if len(queries) == 0:
-            out = _("You have not executed any search yet. %(link_open)sClick here%(link_close)s for search.") 
-            out %= {'link_open' : '<a href="%s/search?ln=%s">' % (weburl, ln),
-                    'link_close': '</a>'}
+            out = _("You have not executed any search yet. Please go to the %ssearch interface%s first.") % ('<a href="%s/?ln=%s">' % (weburl, ln),
+                                                                                                             '</a>')
             return out
 
         out = ''
         
         # display message: number of items in the list
         if permanent=="n":
-            msg = _("You have performed %(nb_search)s searches (%(nb_questions)s different questions) during the last 30 days or so.") 
-            msg %= {'nb_search' : nb_queries_total, 'nb_questions' : nb_queries_distinct} 
+            msg = _("You have performed %s searches (%s different questions) during the last 30 days or so.") % (nb_queries_total, nb_queries_distinct)
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
@@ -430,7 +428,7 @@ class Template:
                       <td style="font-weight: bold">%(no)s</td>
                       <td style="font-weight: bold">%(question)s</td>
                       <td style="font-weight: bold">%(action)s</td>""" % {
-                      'no' : _("#"),
+                      'no' : "#",
                       'question' : _("Question"),
                       'action' : _("Action")
                     }

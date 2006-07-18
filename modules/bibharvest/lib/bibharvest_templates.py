@@ -115,9 +115,9 @@ class Template:
     def tmpl_output_schedule(self, ln, schtime, schstatus):
         _ = gettext_set_language(ln)
         msg_next = _("Next oaiharvest task")
-        msg_sched = _("scheduled time:")
-        msg_cur = _("current status:")
-        msg_notask = _("No oaiharvest task currently scheduled")
+        msg_sched = _("scheduled time") + ":"
+        msg_cur = _("current status") + ":"
+        msg_notask = _("No oaiharvest task currently scheduled.")
         if schtime and schstatus:
             output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong>%s<br>
                          &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s <br>
@@ -218,8 +218,8 @@ class Template:
           - 'outcome' *int* - 0=success, 1=fail
           - 'base' *string* - baseurl"""
         _ = gettext_set_language(ln)
-        msg_success = _("successfully validated!")
-        msg_nosuccess = _("does not seem to be a OAI-compliant baseURL...")
+        msg_success = _("successfully validated")
+        msg_nosuccess = _("does not seem to be a OAI-compliant baseURL")
         if (outcome==0):
             output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
             return output

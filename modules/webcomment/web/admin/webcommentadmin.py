@@ -143,7 +143,7 @@ def users(req, ln=cdslang):
         return error_page(req)
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if not auth_code:
-        return page(title=_("View all Reported Users"),
+        return page(title=_("View all reported users"),
                     body=perform_request_users(ln=ln),
                     uid=uid,
                     language=ln,

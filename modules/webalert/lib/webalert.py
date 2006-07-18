@@ -366,8 +366,5 @@ def account_list_searches(uid, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    out += _("You have made %(number)s queries. A %(link_open)sdetailed list%(link_close)s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries.") % {
-              'link_open' : '<a href="../youralerts/display?ln=%s">' % ln,
-              'link_close': '</a>',
-              'number' : nb_queries_total}
+    out += _("You have made %s queries. A %sdetailed list%s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries.") % (nb_queries_total, '<a href="../youralerts/display?ln=%s">' % ln, '</a>')
     return out

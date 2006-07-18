@@ -1636,10 +1636,10 @@ class Template:
         out = "<div>"
         if img:
             out += """
-            <img src="%(logo)s"/>
-            """ % weburl + img
+            <img src="%s"/>
+            """ % (weburl + img)
         out += """
-        <b>%(text)s</b>
+        <b>%s</b>
         </div>""" % text
         return out
  

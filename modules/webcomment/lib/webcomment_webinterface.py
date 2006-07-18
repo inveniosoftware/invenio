@@ -108,7 +108,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(argd['recid']))
             navtrail += '&gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, argd['recid'], argd['ln'])
-            navtrail += _("Detailed record #%s") % argd['recid']
+            navtrail += _("Detailed record") + " #%s" % argd['recid'] 
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (argd['reviews']==1 and _("Reviews") or _("Comments"))
 
@@ -164,7 +164,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         if ok:
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(argd['recid']))
             navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, argd['recid'], argd['ln'])
-            navtrail += _("Detailed record #%s") % argd['recid']
+            navtrail += _("Detailed record") + " #%s" % argd['recid']
             navtrail += '</a>'
             navtrail += '&gt; <a class="navtrail" href="%s/comments/display?recid=%s&ln=%s">%s</a>' % (weburl,
                                                                                                        argd['recid'],

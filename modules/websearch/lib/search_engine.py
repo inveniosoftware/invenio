@@ -667,11 +667,11 @@ def create_matchtype_box(name='m', value='', ln='en'):
     <option value="r"%s>%s
     </select>
     """ % (name,
-           is_selected('a', value), _("All of the words:"),
-           is_selected('o', value), _("Any of the words:"),
-           is_selected('e', value), _("Exact phrase:"),
-           is_selected('p', value), _("Partial phrase:"),
-           is_selected('r', value), _("Regular expression:"))
+           is_selected('a', value), _("All of the words")+":",
+           is_selected('o', value), _("Any of the words")+":",
+           is_selected('e', value), _("Exact phrase")+":",
+           is_selected('p', value), _("Partial phrase")+":",
+           is_selected('r', value), _("Regular expression")+":")
     return out
 
 def is_selected(var, fld):
@@ -1392,7 +1392,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, _("No exact match found for <em>%s</em>, using <em>%s</em> instead...") % (bsu_p,bsu_pn))
+                        print_warning(req, _("No exact match found for %s, using %s instead...") % ("<em>"+bsu_p+"</em>",
+                                                                                                    "<em>"+bsu_pn+"</em>"))
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
@@ -1630,9 +1631,10 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
-                print_warning(req, _("No match found in collection %s. Other public collections gave "
-                                     "<a class=\"nearestterms\" href=\"%s\">%d hits</a>.") %
-                              (string.join(colls, ","), url, results_in_Home._nbhits))
+                print_warning(req, _("No match found in collection %s. Other public collections gave %shits%s.") %
+                              (string.join(colls, ','), 
+                               '<a class="nearestterms" href="%s">%d' % (url, results_in_Home._nbhits),
+                               '</a>'))
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
@@ -1776,10 +1778,13 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
 
     intro = ""
     if intro_text_p: # add full leading introductory text
-        intro = _("Search term <em>%s</em>") % (p.startswith("%") and p.endswith("%") and p[1:-1] or p)
         if f:
-            intro += " " + _("inside <em>%s</em> index") % get_field_i18nname(f, ln)
-        intro += " " + _("did not match any record. Nearest terms in any collection are:")
+            intro = _("Search term %s inside index %s did not match any record. Nearest terms in any collection are:") % \
+                     ("<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
+                      "<em>" + get_field_i18nname(f, ln) + "</em>")
+        else:
+            intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
+                     ("<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
 
     return websearch_templates.tmpl_nearest_term_box(p=p, ln=ln, f=f, terminfo=terminfo,
                                                      intro=intro)
@@ -2206,7 +2211,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         return recIDs
     if len(recIDs) > cfg_nb_records_to_sort:
         if of.startswith('h'):
-            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order (\"latest first\").") % cfg_nb_records_to_sort, "Warning")
+            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % cfg_nb_records_to_sort, "Warning")
         return recIDs
 
     sort_fields = string.split(sort_field, ",")
@@ -2230,7 +2235,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                     tags.append(row[0])
             else:
                 if of.startswith('h'):
-                    print_warning(req, _("Sorry, '%s' does not seem to be a valid sort option. Choosing title sort instead.") % sort_field, "Error")
+                    print_warning(req, _("Sorry, %s does not seem to be a valid sort option. Choosing title sort instead.") % sort_field, "Error")
                 tags.append("245__a")
     if verbose >= 3:
         print_warning(req, "Sorting by tags %s." % tags)

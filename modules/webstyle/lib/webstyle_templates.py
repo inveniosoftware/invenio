@@ -151,7 +151,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         if lastupdated:
-            msg_lastupdated = _("Last updated:") + " " + lastupdated
+            msg_lastupdated = _("Last updated") + ": " + lastupdated
         else:
             msg_lastupdated = ""
         out = self.tmpl_pageheader(req, 
@@ -378,7 +378,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         if lastupdated:
-            msg_lastupdated = _("Last updated:") + " " + lastupdated
+            msg_lastupdated = _("Last updated") + ": " + lastupdated
         else:
             msg_lastupdated = ""
 

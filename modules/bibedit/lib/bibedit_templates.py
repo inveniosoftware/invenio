@@ -93,7 +93,7 @@ class Template:
                                                   'format_tag' : 's',
                                                   'temp'       : temp})
             
-            link_diplay_marc    = self.tmpl_link(ln, _("MARC"), weburl_bibedit, 'index',
+            link_diplay_marc    = self.tmpl_link(ln, "MARC", weburl_bibedit, 'index',
                                                  {'recid'      : str(recid),
                                                   'format_tag' : 'marc',
                                                   'temp'       : temp})                              
@@ -451,7 +451,7 @@ class Template:
                    <a href="%(weburl)s/admin/bibedit/index?ln=%(ln)s">%(link)s</a>.
                """ % {'message1': _("Your modifications have now been submitted."),
                       'message2': _("They will be processed as soon as the task queue is empty."),
-                      'message3': _("You can now go back to %s") % link}
+                      'message3': _("You can now go back to") + " " + link}
     
     def tmpl_deleted(self, ln, message='', recid='', temp='', format_tag=''):
         """ Return a deleted message of Bibedit. """
@@ -480,8 +480,9 @@ class Template:
                           'format_tag'       : format_tag}
         
         else:    
-            out =  """%(message)s: <a href="%(weburl)s/admin/bibedit/index?ln=&(ln)s">%(link)s</a>.""" 
-            out %= {'message': _("The record will be deleted as soon as the task queue is empty. You can now go back to"),
+            out =  """%(message)s %(message_back)s <a href="%(weburl)s/admin/bibedit/index?ln=&(ln)s">%(link)s</a>.""" 
+            out %= {'message': _("The record will be deleted as soon as the task queue is empty."),
+                    'message_back': _("You can now go back to"),
                     'link'   : _("BibEdit Admin Interface"),
                     'weburl' : weburl,
                     'ln'     : ln}

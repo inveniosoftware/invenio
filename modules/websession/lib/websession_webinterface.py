@@ -260,7 +260,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         passw = webuser.givePassword(args['p_email'])
         if passw == -999:
-            eMsg = _("The entered e-mail address doesn't exist in the database")
+            eMsg = _("The entered email address doesn't exist in the database.")
             return page(title=_("Your Account"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="CDS Personalize, Main page",

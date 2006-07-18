@@ -459,7 +459,7 @@ class Template:
         if nb_comments:
             comments_field = """
 %i %s<br/>
-%s %s""" % (nb_comments,  _("comments"), _("last comment:"), last_comment)
+%s %s""" % (nb_comments,  _("comments"), _("last comment")+":", last_comment)
         out = """       
 <table class="bskbasket">
   <thead class="bskbasketheader">
@@ -624,7 +624,7 @@ class Template:
         if group_sharing_level == 0:
             public_url = weburl + '/yourbaskets/display_public?bskid=' + str(bskid)
             public_link = '<a href="%s">%s</a>' % (public_url, public_url)
-            public_infos = _("This basket is publicly accessible at this address: %s.") % public_link
+            public_infos = _("This basket is publicly accessible at the following address:") + public_link
         if content:
             content += '<br />'
         if not(content) and not(public_infos):
@@ -1114,7 +1114,7 @@ class Template:
         """Display message for addition of records to baskets"""
         _ = gettext_set_language(ln)
         if nb_baskets_modified:
-            out = _("The selected records have been successfully added to %i baskets")
+            out = _("The selected records have been successfully added to %i baskets.")
             out %= nb_baskets_modified
         else:
             out = _("No records were added to the selected baskets.")
@@ -1139,11 +1139,11 @@ class Template:
         _ = gettext_set_language(ln)
         message = _("Are you sure you want to delete this basket?")
         if nb_users:
-            message += '<p>' + _("%i users have subscribed to this basket")% nb_users + '</p>'
+            message += '<p>' + _("%i users are subscribed to this basket.")% nb_users + '</p>'
         if nb_groups:
-            message += '<p>' + _("%i usergroups have subscribed to this basket")% nb_groups + '</p>'
+            message += '<p>' + _("%i user groups are subscribed to this basket.")% nb_groups + '</p>'
         if nb_alerts:
-            message += '<p>' + _("You have set %i alerts on this basket")% nb_alerts + '</p>'
+            message += '<p>' + _("You have set %i alerts on this basket.")% nb_alerts + '</p>'
         out = """
 <table class="confirmoperation">
   <tr>
@@ -1278,7 +1278,7 @@ class Template:
     </tr>
   </table>
       
-</form>""" % {'label': _('Editing basket "%s"') % bsk_name,
+</form>""" % {'label': _('Editing basket') + ' ' + bsk_name,
               'action': weburl + '/yourbaskets/edit',
               'ln': ln,
               'topic': topic,
@@ -1425,9 +1425,8 @@ class Template:
     def tmpl_create_guest_forbidden_box(self, ln=cdslang):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
-        message = _("This functionality is forbidden to guest users. If you wish you can %(open_link)slogin or register here%(close_link)s.")
-        message %= {'open_link': '<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), 
-                    'close_link': '</a>'}
+        message = _("This functionality is forbidden to guest users. If you wish you can %slogin or register here%s.") % ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), 
+                                                                                                                          '</a>')
         out = """
 <table class="errorbox">
   <thead>
@@ -1485,7 +1484,7 @@ class Template:
         'Back to search results'
         """
         _ = gettext_set_language(ln)
-        label = _("(Back to search results)")
+        label = _("Back to search results")
         out = '<a href="%s">%s</a>' % (link, label)
         return out
        

@@ -790,6 +790,6 @@ def account_list_baskets(uid, ln=cdslang):
     else:
         url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text) 
-    out = _("You have %s personal baskets and are subscribed to %s group baskets and %s others' baskets.") 
+    out = _("You have %s personal baskets and are subscribed to %s group baskets and %s other users public baskets.") 
     out %= (personal_text, group_text, external_text)
     return out
