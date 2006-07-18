@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-18 14:01+0200\n"
-"PO-Revision-Date: 2006-07-18 14:02+0200\n"
-"Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
+"POT-Creation-Date: 2006-07-18 14:45+0200\n"
+"PO-Revision-Date: 2006-07-18 14:40+0200\n"
+"Last-Translator: Gregory Favre <gregory.favre@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2946,6 +2946,15 @@ msgstr ""
 msgid "Your Alert Searches"
 msgstr "Vos alertes"
 
+#: modules/websession/lib/websession_templates.py:434
+#, fuzzy, python-format
+msgid ""
+"You can consult the list of %syour groups%s you are administering or are a "
+"member of."
+msgstr ""
+"Vous pouvez consulter la liste de %svos approbations%s contenant les "
+"références des documents que vous avez approuvés ou relus."
+
 #: modules/websession/lib/websession_templates.py:436
 #: modules/websession/lib/websession_templates.py:1629
 #: modules/websession/lib/websession_webinterface.py:558
@@ -4003,6 +4012,7 @@ msgid "It has first been sent to approval on"
 msgstr "Il a été envoyé pour approbation pour la première fois le"
 
 #: modules/websubmit/lib/websubmit_templates.py:1900
+#: modules/websubmit/lib/websubmit_templates.py:1902
 #: modules/websubmit/lib/websubmit_templates.py:1919
 #: modules/websubmit/lib/websubmit_templates.py:1921
 #: modules/websubmit/lib/websubmit_templates.py:1928
@@ -4010,13 +4020,9 @@ msgstr "Il a été envoyé pour approbation pour la première fois le"
 msgid "Last approval email was sent on"
 msgstr "Le dernier courriel d'approbation a été envoyé le"
 
-#: modules/websubmit/lib/websubmit_templates.py:1902
-msgid "Last approval e-mail was sent on"
-msgstr "Le dernier courriel d'approbation a été envoyé le"
-
 #: modules/websubmit/lib/websubmit_templates.py:1903
 msgid ""
-"You can send an approval request e-mail again by clicking the following "
+"You can send an approval request email again by clicking the following "
 "button."
 msgstr ""
 "Vous pouvez envoyer un courriel de requête d'approbation en cliquant sur le "
@@ -4096,169 +4102,3 @@ msgid ""
 msgstr ""
 "Vous devez vous enregistrer pour accéder à cette fonction. Utilisez le menu "
 "de gauche pour vous enregistrer."
-
-#~ msgid "until"
-#~ msgstr "jusqu'à:"
-
-#~ msgid "Display results"
-#~ msgstr "Afficher:"
-
-#~ msgid "Output format"
-#~ msgstr "Format de sortie:"
-
-#, fuzzy
-#~ msgid "Added since"
-#~ msgstr "Ajouté depuis:"
-
-#, fuzzy
-#~ msgid "All of the words"
-#~ msgstr "Tous les mots:"
-
-#, fuzzy
-#~ msgid "Any of the words"
-#~ msgstr "Au moins un des mots:"
-
-#, fuzzy
-#~ msgid "Exact phrase"
-#~ msgstr "Phrase exacte:"
-
-#, fuzzy
-#~ msgid "Partial phrase"
-#~ msgstr "Phrase partielle:"
-
-#, fuzzy
-#~ msgid "Regular expression"
-#~ msgstr "Expression régulière:"
-
-#~ msgid "MARC"
-#~ msgstr "MARC"
-
-#, fuzzy
-#~ msgid ""
-#~ "The record will be deleted as soon as the task queue is empty. You can "
-#~ "now go back to"
-#~ msgstr "Elles seront traitées dès que possible."
-
-#~ msgid "#"
-#~ msgstr "#"
-
-#~ msgid "Editing basket \"%s\""
-#~ msgstr "Édition du panier \"%s\""
-
-#~ msgid "Discuss this document:"
-#~ msgstr "Discuter ce document:"
-
-#~ msgid "(Report abuse)"
-#~ msgstr "(Signaler un abus)"
-
-#~ msgid "Average review score"
-#~ msgstr "Note moyenne"
-
-#~ msgid "based on %(nb_comments_total)s reviews"
-#~ msgstr "basée sur %(nb_comments_total)s évaluations"
-
-#~ msgid "Write a %s"
-#~ msgstr "Écrire un %s"
-
-#~ msgid ""
-#~ "Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s."
-#~ msgstr ""
-#~ "Note: vous n'avez pas encore %(link_open)sdéfini de pseudonyme%"
-#~ "(link_close)s."
-
-#~ msgid "%s will temporarly be displayed as author of this comment."
-#~ msgstr "%s sera temporairement affiché comme l'auteur de ce commentaire."
-
-#~ msgid "Article:"
-#~ msgstr "Article:"
-
-#~ msgid "Comment:"
-#~ msgstr "Commentaire:"
-
-#~ msgid "email"
-#~ msgstr "courriel"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Notice détaillée #%s"
-
-#~ msgid "These users are overquota: "
-#~ msgstr "Ces utilisateurs ont dépassé leur quota: "
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "Terme de recherche <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "dans l'index <em>%s</em>"
-
-#~ msgid "record ID"
-#~ msgstr "ID notice"
-
-#~ msgid "detailed list"
-#~ msgstr "liste détaillée"
-
-#~ msgid "your searches"
-#~ msgstr "vos requêtes"
-
-#~ msgid "%i personal baskets"
-#~ msgstr "%i paniers personnels"
-
-#~ msgid "%i group baskets"
-#~ msgstr "%i paniers de groupe"
-
-#~ msgid "%i others' baskets"
-#~ msgstr "%i paniers des autres"
-
-#~ msgid "Record #%d: %s"
-#~ msgstr "Notice #%d: %s"
-
-#~ msgid "Record #%d"
-#~ msgstr "Notice #%d"
-
-#~ msgid "<strong>%s</strong> records found"
-#~ msgstr "<strong>%s</strong> notices trouvées"
-
-#~ msgid ""
-#~ "<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You "
-#~ "may want to start browsing from <a href=\"%s\">%s</a>."
-#~ msgstr ""
-#~ "<p>Désolé, la collection <strong>%s</strong> n'existe pas.</p><p>Essayez "
-#~ "de naviguer à partir de <a href=\"%s\">%s</a>.</p>"
-
-#~ msgid "your groups"
-#~ msgstr "vos groupes"
-
-#~ msgid "your submissions"
-#~ msgstr "vos soumissions"
-
-#~ msgid "your approvals"
-#~ msgstr "vos approbations"
-
-#~ msgid "Create New Group"
-#~ msgstr "Créer un nouveau groupe"
-
-#~ msgid "Edit group: "
-#~ msgstr "Éditer le groupe: "
-
-#~ msgid "Please select:"
-#~ msgstr "Veuillez choisir:"
-
-#~ msgid "Submission no(1)"
-#~ msgstr "Soumission no(1)"
-
-#~ msgid " version #%s"
-#~ msgstr "version #%s"
-
-#~ msgid "pending"
-#~ msgstr "en attente"
-
-#~ msgid "approved"
-#~ msgstr "approuvé"
-
-#~ msgid "rejected"
-#~ msgstr "rejeté"
-
-#~ msgid "view all %s reviews"
-#~ msgstr "visualiser toutes les %s évaluations"
-
-#~ msgid "write a review"
-#~ msgstr "écrire une critique"
