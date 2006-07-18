@@ -1899,8 +1899,8 @@ class Template:
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval e-mail was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
-            out += "<br />" + _("You can send an approval request e-mail again by clicking the following button.") + ": <br />" +\
+                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
+            out += "<br />" + _("You can send an approval request email again by clicking the following button.") + ": <br />" +\
                    """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
                      'send' : _("Send Again"),
                      'warning' : _("WARNING! An email will be sent to your referee if you confirm.")
