@@ -109,7 +109,7 @@ class Template:
                  %(you_own)s:
                 <select name="id_alert">
                   <option value="0">- %(alert_name)s -</option>""" % {
-                 'you_own' : _("You own following alerts:"),
+                 'you_own' : _("You own the following alerts:"),
                  'alert_name' : _("alert name"),
                }
         for alert in alerts :
@@ -161,7 +161,7 @@ class Template:
                       <td style="text-align: left; vertical-align: top; width: 500px">%(query)s</td>
                     </tr>
                   </table>""" % {
-                 'notify_cond' : _("This alert will notify you each time/only if a new item satisfy the following query"),
+                 'notify_cond' : _("This alert will notify you each time/only if a new item satisfies the following query:"),
                  'query_text' : _("QUERY"),
                  'query' : query,
                }
@@ -214,7 +214,7 @@ class Template:
                  'notif_no' : (notification == 'n' and "selected" or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
-                 'specify' : _("if %sno%s you must specify a basket") % ('<b>','</b>'),
+                 'specify' : _("if %sno%s you must specify a basket") % ('<b>', '</b>'),
                  'store_basket' : _("Store results in basket?"),
                  'baskets': baskets 
                }
@@ -287,7 +287,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<p>' + _("Set a new alert from %syour searches%s, the %spopular_searches%s or the input form.") + '</p>'
+        out = '<p>' + _("Set a new alert from %syour searches%s, the %spopular_searches%s, or the input form.") + '</p>'
         out %= ('<a href="display?ln=%s">' % ln, '</a>', 
                 """<a href="display?ln=%s&amp;p=y">""" % ln, '</a>')
         if len(alerts):
@@ -418,7 +418,7 @@ class Template:
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
-            msg = _("Here are listed the %s most popular searches.") 
+            msg = _("Here are the %s most popular searches.") 
             msg %= ('<b>' + str(len(query_result)) + '</b>')
             out += '<p>' + msg + '</p>'
 

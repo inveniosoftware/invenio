@@ -332,7 +332,7 @@ class Template:
             footer += change_page % (0, weburl + '/img/sb.gif')
         if inf_limit > 0:
             footer += change_page % (inf_limit - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sp.gif')
-        footer += ' ' + _("Displaying baskets %i-%i out of %i total baskets.") % (inf_limit+1, inf_limit + len(baskets), total_baskets) + ' '
+        footer += ' ' + _("Displaying baskets %i-%i out of %i baskets in total.") % (inf_limit+1, inf_limit + len(baskets), total_baskets) + ' '
         if inf_limit + len(baskets) < total_baskets:
             footer += change_page % (inf_limit + cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sn.gif')
         if inf_limit + len(baskets) < total_baskets - cfg_webbasket_max_number_of_displayed_baskets:
@@ -441,7 +441,7 @@ class Template:
   <td colspan="3" style="text-align:center; height:100px">
     %s
   </td>
-</tr>""" % _("You don't have sufficient rights to view this basket's content")
+</tr>""" % _("You do not have sufficient rights to view this basket's content")
         content = ''
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
             url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
@@ -521,7 +521,7 @@ class Template:
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
-                                 _("Bring item up"))
+                                 _("Move item up"))
         if downarrow:
             url = "%s/yourbaskets/modify?action=movedown&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
@@ -536,7 +536,7 @@ class Template:
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
-                                 _("Bring item down"))
+                                 _("Move item down"))
         if copy_item:
             url = "%s/yourbaskets/modify?action=copy&amp;bskid=%i&amp;recid=%i"
             url += "&amp;category=%s&amp;topic=%i&amp;group_id=%i&amp;ln=%s"
@@ -1051,7 +1051,7 @@ class Template:
                 groups_html %= (group_name,
                                 self.__create_select_menu('bskids', baskets))
             group = self.__tmpl_basket_box(weburl + '/img/webbasket_usergroup.png',
-                                           _("Add to a group shared basket"),
+                                           _("Add to a group-shared basket"),
                                            _("%i baskets") % len(group_baskets),
                                            groups_html)    
         if external_baskets:
@@ -1359,7 +1359,7 @@ class Template:
             groups_body = """
 <tr>
   <td>%s</td>
-</tr>""" % _("You're not member of a group")
+</tr>""" % _("You are not a member of a group")
         groups_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_usergroup.png',
                                             title=_("Add group"),
                                             body=groups_body)

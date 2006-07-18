@@ -131,7 +131,7 @@ def perform_request_delete_msg(uid, msgid, ln=cdslang):
         if (delete_message_from_user_inbox(uid, msgid)==0):
             warnings.append(_("The message could not be deleted."))
         else:
-            infos.append(_("Delete successful."))
+            infos.append(_("The message was successfully deleted."))
     return perform_request_display(uid, errors, warnings, infos, ln) 
 
 def perform_request_delete_all(uid, confirmed=0, ln=cdslang):

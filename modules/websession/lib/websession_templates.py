@@ -275,7 +275,7 @@ class Template:
                  <blockquote>
                  <dl>
               """ % {
-                'account_offer' : _("The CDS Search offers you a possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email."),
+                'account_offer' : _("%s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email.") % cdsnameintl[ln],
               }
 
         if not guest:
@@ -285,7 +285,7 @@ class Template:
                    <dd>%(change_account)s""" % {
                      'ln' : ln,
                      'your_settings' : _("Your Settings"),
-                     'change_account' : _("Set or change your account Email address or password. Specify your preferences about the way the interface looks like.")
+                     'change_account' : _("Set or change your account email address or password. Specify your preferences about the look and feel of the interface.")
                    }
 
         out += """
@@ -649,7 +649,7 @@ class Template:
         if level <= 1:
             out += _("Please enter your email address and desired nickname and password:")
             if level == 1:
-                out += _("The account will not be possible to use before it has been verified and activated.")
+                out += _("It will not be possible to use the account before it has been verified and activated.")
             out += """
               <form method="post" action="../youraccount/register">
               <input type="hidden" name="referer" value="%(referer)s">
@@ -728,7 +728,7 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("You seem to be the guest user. You have to %slogin%s first.") % ('<a href="../youraccount/login?ln=' + ln +'">', '<a/>')
+            return _("You seem to be a guest user. You have to %slogin%s first.") % ('<a href="../youraccount/login?ln=' + ln +'">', '<a/>')
 
         # no rights condition
         if not roles:
@@ -917,7 +917,7 @@ class Template:
         </a>""" 
         
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text=_("You are administrator of the following groups") + ':')        
+                                          text=_("You are an administrator of the following groups") + ':')        
 
         out += self.tmpl_infobox(infos)
 
@@ -946,7 +946,7 @@ class Template:
       <td colspan="4" style="text-align: center;">
         <small>%s</small>
       </td>
-    </tr>""" %(_("You are not administrator of any group."),)
+    </tr>""" %(_("You are not an administrator of any groups."),)
         for group_data in groups:
             (grpID, name, description) = group_data
             edit_link = img_link % {'weburl' : weburl,
@@ -989,7 +989,7 @@ class Template:
 
     def tmpl_display_member_group(self, groups, infos, ln=cdslang):
         _ = gettext_set_language(ln)
-        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are member of the following groups") + ':')
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are a member of the following groups") + ':')
         group_text += self.tmpl_infobox(infos)
         group_text += """
 <table class="mailbox">
@@ -1012,7 +1012,7 @@ class Template:
       <td colspan="2" style="text-align: center;">
         <small>%s</small>
       </td>
-    </tr>""" %(_("You are not member of any group."),)
+    </tr>""" %(_("You are not a member of any groups."),)
         for group_data in groups:
             (id, name, description) = group_data
             group_text += """
@@ -1568,9 +1568,9 @@ class Template:
         """
         _ = gettext_set_language(ln)
         elements = [(cfg_websession_group_join_policy['VISIBLEOPEN'],
-                     _("Visible and open for new member")),
+                     _("Visible and open for new members")),
                     (cfg_websession_group_join_policy['VISIBLEMAIL'],
-                     _("Visible but need approval for new member"))
+                     _("Visible but new members need approval"))
                     ]
         select_text = _("Please select")
         return self.__create_select_menu(name, elements, select_text, selected_key=current_join_policy)

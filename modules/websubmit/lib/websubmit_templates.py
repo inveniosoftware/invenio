@@ -95,7 +95,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<h3>" + _("No document types yet.") + "</h3>\n"
+        out = "<h3>" + _("No document types available.") + "</h3>\n"
         return out
 
     def tmpl_submit_home_catalogs(self, ln, catalogs):
@@ -237,7 +237,7 @@ class Template:
               """
         if (guest):
             out += "alert(\"%(please_login_js)s\");return false;\n" % {
-                     'please_login_js' : _("Please log in first.") + '\\n' + _("Use the top right menu to log in.")
+                     'please_login_js' : _("Please log in first.") + '\\n' + _("Use the top-right menu to log in.")
                    }
 
         out += """
@@ -319,7 +319,7 @@ class Template:
             out += """<STRONG class="headline">%(notice)s:</STRONG><BR>
                     %(select_cat)s""" % {
                      'notice' : _("Notice"),
-                     'select_cat' : _("Select a category and then click the button to perform the action you chose."),
+                     'select_cat' : _("Select a category and then click on an action button."),
                     }
         out += """
                 <BR><BR>
@@ -340,9 +340,9 @@ class Template:
                         </td>
                     </tr>
                 </table>""" % {
-                  'continue_explain' : _("To continue an interrupted submission, enter your access number directly in the input box."),
+                'continue_explain' : _("To continue with a previously interrupted submission, enter an access number into the box below:"),
                   'doctype' : doctype,
-                  'go' : _("go"),
+                  'go' : _("GO"),
                 }
 
         return out
@@ -543,7 +543,7 @@ class Template:
                  'back' : _("Back to main menu"),
                  'mainmenu' : mainmenu,
                  'images' : images,
-                 'take_note' : '(1) ' + _("You should take note of this number at the beginning of the submission, it will allow you to continue interrupted submission in case of problems."),
+                 'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
                  'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
                }
         return out
@@ -1004,7 +1004,7 @@ class Template:
                 out += """<tr><td>%(name)s</td><td>%(score)s</td><td>%(result)s</td></tr>""" % {
                           'name' : function['name'],
                           'score' : function['score'],
-                          'result' : function['error'] and (_("function %s does not exist...") % function['name'] + "<br>") or function['text']
+                          'result' : function['error'] and (_("Function %s does not exist.") % function['name'] + "<br>") or function['text']
                         }
             out += "</table>"
         else:
@@ -1043,7 +1043,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = "<BR><BR>%(haveto)s<ul>" % {
-                'haveto' : _("You now have to"),
+                'haveto' : _("You must now"),
               }
         i = 0
         for action in actions:
@@ -1509,12 +1509,12 @@ class Template:
                 out += '''<LI><A HREF="publiline.py?doctype=%(doctype)s">%(generalref)s</a><br>''' % {
                     'docname' : doctype['docname'],
                     'doctype' : doctype['doctype'],
-                    'generalref' : _("You are general referee")}
+                    'generalref' : _("You are a general referee")}
 
             else:
                 for category in doctype['categories']:
                     out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
-                        'referee' : _("You are referee for category") + ': ' + str(category['name']) + ' (' + str(category['id']) + ')',
+                        'referee' : _("You are a referee for category") + ': ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
                         'categ' : category['id']}
                     
@@ -1734,7 +1734,7 @@ class Template:
                 'title' : title,
                 'categ' : categ,
                 'list' : _("List of refereed documents"),
-                'choose_report' : _("Click on a report number to have more information."),
+                'choose_report' : _("Click on a report number for more information."),
                 'report_no' : _("Report Number"),
                 'pending' : _("Pending"),
                 'approved' : _("Approved"),
@@ -1858,7 +1858,7 @@ class Template:
                  }
         if confirm_send:
             out += """<I><strong class="headline">%(requestsent)s</strong></I><BR><BR>""" % {
-                     'requestsent' : _("Your request has been sent to the referee!"),
+                     'requestsent' : _("Your request has been sent to the referee."),
                    }
 
         out += """<FORM action="publiline.py">
@@ -1895,7 +1895,7 @@ class Template:
         if status == "waiting":
             out += _("This document is still %swaiting for approval%s.") % ('<strong class="headline">', '</strong>')
 	    out += "<br /><br />"
-	    out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+	    out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
@@ -1903,7 +1903,7 @@ class Template:
             out += "<br />" + _("You can send an approval request email again by clicking the following button.") + ": <br />" +\
                    """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
                      'send' : _("Send Again"),
-                     'warning' : _("WARNING! An email will be sent to your referee if you confirm.")
+                     'warning' : _("WARNING! Upon confirmation, an email will be sent to the referee.")
                    }
             if auth_code == 0:
                 out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it.") + ":<br />" +\
@@ -1914,21 +1914,21 @@ class Template:
         if status == "approved":
             out += _("This document has been %sapproved%s.") % ('<strong class="headline">', '</strong>')
             out += '<br />' + _("Its approved reference is") + ': <strong class="headline">' + str(newrn) + '</strong><br /><br />'
-            out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+            out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />' +\
-                       _("It has been approved on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
+                       _("It was approved on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
         if status == "rejected":
             out += _("This document has been %srejected%s.") % ('<strong class="headline">', '</strong>') 
             out += "<br /><br />"
-            out += _("It has first been sent to approval on") + ': <strong class="headline">' + str(dFirstReq) +'</strong><br />'
+            out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) +'</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
                 out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) +'</strong><br />'
-            out += _("It has been rejected on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
+            out += _("It was rejected on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
 
         out += """    </SMALL></FORM>
                       <BR></TD></TR></TABLE>

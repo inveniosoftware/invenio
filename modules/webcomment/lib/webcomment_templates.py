@@ -1022,7 +1022,7 @@ class Template:
         out = '''
         <br />
         %s<br />
-        <br />'''%_("Please enter the ID of the comment/review so that you can view it before deciding to delete it or not")
+        <br />'''%_("Please enter the ID of the comment/review so that you can view it before deciding whether to delete it or not")
         form = '''
             <table> 
                 <tr>
@@ -1102,7 +1102,7 @@ class Template:
              }
  
         out = "<br />"
-        out += _("Here is a list, sorted by total number of reports, of all users who have had at least one report to one of their comments.")
+        out += _("Here is a list, sorted by total number of reports, of all users who have had a comment reported at least once.")
         out += """
 <br />
 <br />
@@ -1260,7 +1260,7 @@ class Template:
                                                       method="POST",
                                                       action_display=action_display,
                                                       action_field_name='action',
-                                                      button_label=_("Ok"),
+                                                      button_label=_("OK"),
                                                       button_name="okbutton",
                                                       content=out)
         if uid > 0:
@@ -1278,9 +1278,9 @@ class Template:
         if uid == 0 and comID == 0:
             header = '<br />'
             if reviews:
-                header += _("Here are all reported reviews sorted by most reported")
+                header += _("Here are all reported reviews sorted by the most reported")
             else:
-                header += _("Here are all reported comments sorted by most reported")
+                header += _("Here are all reported comments sorted by the most reported")
             header += "<br /><br />"
 
         return header + form

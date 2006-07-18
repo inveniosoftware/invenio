@@ -71,7 +71,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if uid_email == "" or uid_email == "guest":
         return warningMsg(websubmit_templates.tmpl_warning_message(
                            ln = ln,
-                           msg = _("Sorry, you must log in to perform this action. Please use the top right menu to do so.")
+                           msg = _("Sorry, you must log in to perform this action.")
                          ), req, ln)
         # warningMsg("""<center><font color="red"></font></center>""",req, ln)
     # check we have minimum fields
@@ -81,7 +81,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if indir == "":
         res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
         if len(res) == 0:
-            return errorMsg(_("Cannot find submission directory."), req, c, ln)
+            return errorMsg(_("Unable to find the submission directory."), req, c, ln)
         else:
             row = res[0]
             indir = row[0]
@@ -100,7 +100,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) == 0:
-        return errorMsg(_("Cannot find number of pages."), req, c, ln)
+        return errorMsg(_("Unable to determine the number of submission pages."), req, c, ln)
     else:
         nbpages = res[0][0]
     #Get current page
@@ -126,7 +126,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         try:
             os.makedirs(curdir)
         except:
-            return errorMsg(_("Cannot create submission directory."), req, c, ln)
+            return errorMsg(_("Unable to create a directory for this submission."), req, c, ln)
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")
@@ -480,7 +480,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if uid_email == "" or uid_email == "guest":
         return warningMsg(websubmit_templates.tmpl_warning_message(
                            ln = ln,
-                           msg = _("Sorry, you must log in to perform this action. Please use the top right menu to do so.")
+                           msg = _("Sorry, you must log in to perform this action.")
                          ), req, ln)
     # check we have minimum fields
     if doctype=="" or act=="" or access=="":
@@ -616,7 +616,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     if len(res) > 0:
        nbpages = res[0][0]
     else:
-        return errorMsg(_("This action does not apply on this type of document."), req, cdsname, ln)
+        return errorMsg(_("This action does not exist for this document type."), req, cdsname, ln)
 
     # we specify here whether we are in the last step of the action or not
     res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act, doctype, step,))
@@ -849,7 +849,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
         docShortDesc = arr[1]
         description = arr[4]
     else:
-        return errorMsg (_("Cannot find document.") + str(doctype), req)
+        return errorMsg (_("Unable to find document type.") + str(doctype), req)
     #then data about associated actions
     res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
     for arr2 in res2:
@@ -1015,7 +1015,7 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
             )
     else :
         if dismode == 'S':
-            t = "<br /><br /><b>" + _("Your chosen action is not supported by the document.") + "</b>"
+            t = "<br /><br /><b>" + _("The chosen action is not supported by the document type.") + "</b>"
     return t
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir):

@@ -61,7 +61,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
     if u_email == "guest" or u_email == "":
         return warningMsg(websubmit_templates.tmpl_warning_message(
                  ln = ln,
-                 msg = _("You first have to login before using this feature. Use the left menu to log in."),
+                 msg = _("Sorry, you must log in to perform this action."),
                ),req, ln = ln)
 
 

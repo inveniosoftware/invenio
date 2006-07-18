@@ -175,12 +175,12 @@ def displayDocument(doctype,categ,RN,send, ln = cdslang):
         dAction = arr[4]
         access = arr[5]
     else:
-        return _("This document has never been requested for approval!") + "<BR>&nbsp;"
+        return _("Approval has never been requested for this document.") + "<BR>&nbsp;"
 
     try:
         (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
     except TypeError:
-        return _("Cannot display this document.")
+        return _("Unable to display document.")
 
     confirm_send = 0
     if send == _("Send Again"):

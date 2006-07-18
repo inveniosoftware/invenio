@@ -404,7 +404,7 @@ class Template:
                                %(message1)s %(message2)s
                              </b>
                          </span><br/><br/>
-                     """ % {'message1' : _("This record doesn't exist."),
+                     """ % {'message1' : _("This record does not exist."),
                             'message2' : _("Please try another record ID.")}
             
         elif message == 2:

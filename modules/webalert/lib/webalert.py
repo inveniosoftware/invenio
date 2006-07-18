@@ -50,7 +50,7 @@ def check_alert_name(alert_name, uid, ln=cdslang):
     _ = gettext_set_language(ln)
 
     if len( run_sql( sql ) ) > 0:
-        raise AlertError( _("You already have an alert which name is %s.") % {'name' : '<b>' + alert_name + '</b>'} )
+        raise AlertError( _("You already have an alert named %s.") % ('<b>' + alert_name + '</b>',) )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=cdslang):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
@@ -311,7 +311,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     
     run_sql(query)
 
-    out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>")
+    out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>",)
     out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
     return out
 
@@ -366,5 +366,5 @@ def account_list_searches(uid, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    out += _("You have made %s queries. A %sdetailed list%s is available with a posibility to (a) view search results and (b) subscribe for automatic email alerting service for these queries.") % (nb_queries_total, '<a href="../youralerts/display?ln=%s">' % ln, '</a>')
+    out += _("You have made %s queries. A %sdetailed list%s is available with a posibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries.") % (nb_queries_total, '<a href="../youralerts/display?ln=%s">' % ln, '</a>')
     return out

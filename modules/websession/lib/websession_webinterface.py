@@ -260,7 +260,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         passw = webuser.givePassword(args['p_email'])
         if passw == -999:
-            eMsg = _("The entered email address doesn't exist in the database.")
+            eMsg = _("The entered email address does not exist in the database.")
             return page(title=_("Your Account"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
                         description="CDS Personalize, Main page",
@@ -484,37 +484,37 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             mess = _("Both passwords must match.")
             mess += " " + _("Please try again.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         elif ruid == 1:
             mess = _("Supplied email address %s is invalid.") % args['p_email']
             mess += " " + _("Please try again.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         elif ruid == 2:
             mess = _("Desired nickname %s is invalid.") % args['p_nickname']
             mess += " " + _("Please try again.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         elif ruid == 3:
             mess = _("Supplied email address %s already exists in the database.") % args['p_email']
             mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
             mess += " " + _("Or please try again.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         elif ruid == 4:
             mess = _("Desired nickname %s already exists in the database.") % args['p_nickname']
             mess += " " + _("Please try again.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         elif ruid == 5:
             mess = _("Users cannot register themselves, only admin can register them.")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
         else:
             # this should never happen
             mess = _("Internal Error")
             act = "register"
-            title = _("Register failure")
+            title = _("Registration failure")
 
         return page(title=title,
                     body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), args['ln']),

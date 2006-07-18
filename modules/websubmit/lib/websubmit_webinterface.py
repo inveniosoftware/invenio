@@ -88,7 +88,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         docfile=doc.getFile(name,format,args['version'])
                         
                         if docfile is None:
-                            return warningMsg(_("Cannot find file."), req, cdsname, ln)
+                            return warningMsg(_("Unable to find file."), req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
@@ -96,7 +96,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             
                         return docfile.stream(req)
                 else:
-                    return warningMsg(_("Cannot find file."), req, cdsname, ln)
+                    return warningMsg(_("Unable to find file."), req, cdsname, ln)
 
             filelist = bibarchive.display("", args['version'], ln=ln)
 
@@ -158,7 +158,7 @@ def websubmit_legacy_getfile(req, form):
             docfile=doc.getFile(name,format,version)
             
             if docfile == None:
-                return warningMsg(_("Cannot find file."),req, c, ln)
+                return warningMsg(_("Unable to find file."),req, c, ln)
 
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
