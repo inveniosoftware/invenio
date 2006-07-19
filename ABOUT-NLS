@@ -124,7 +124,7 @@ See also the GNU gettext manual, especially the chapters 5, 6 and 11.
 CDS Invenio uses standard GNU gettext I18N and L12N philosophy.
 
 In Python programs, all output strings should be made translatable via
-_() convention:
+the _() convention:
 
    from messages import gettext_set_language
    [...]
@@ -137,52 +137,63 @@ In WML source files, the convention is _()_:
 
    _(Search Help)_
 
-Here are some tips for writing easily translatable phrases:  
+Here are some tips for writing easily translatable output messages:  
 
-  - Do not cut phrases into several pieces, and do not reuse
-    standalone words.  If you have two similar phrases with some
-    addition in the middle, rather define two sentences.  Remember
-    that joining of sub-phrases may differ depending on what is being
-    joined (e.g. gender).
+  - Do not cut big phrases into several pieces, the meaning may be
+    harder to grasp and to render properly in another language.  Leave
+    them in the context.  Do not try to economize and reuse
+    standalone-translated words as parts of bigger sentences.  The
+    translation could differ due to gender, for example.  Rather
+    define two sentences instead:
  
-       not: _("This") + _("record") + _("is not available.")
-       not: _("This") + _("item") + _("is not available.")
+       not: _("This %s is not available.") % x,
+            where x is either _("basket") or _("alert")
+
+       but: _("This basket is not available.") and 
+            _("This alert is not available.") 
+   
+  - If you print some value in a translatable phrase, you can use an
+    unnamed %i or %s string replacement placeholders:
  
-       but: _("This record is not available.")
-       but: _("This item is not available.")
- 
+       yes: _("There are %i baskets.") % nb_baskets
+
+    But, as soon as you are printing more than one value, you should
+    use named string placeholders because in some languages the parts
+    of the sentence may be reversed when translated:
+
+       not: _("There are %i baskets shared by %i groups.") % \
+               (nb_baskets, nb_groups)
+       but: _("There are %(x_nb_baskets)s baskets shared by %(x_nb_groups)s groups.") % \
+               {'x_nb_baskets': nb_baskets, 'x_nb_groups': nb_groups,}
+
+    Please use the `x_' prefix for the named placeholder variables to
+    ease the localization task of the translator.
+
   - Do not mix HTML presentation inside phrases. If you want to
-    reserve space for markup, please use general %s placeholders:
+    reserve space for HTML markup, please use generic replacement
+    placeholders as prologue and epilogue:
  
-       not: _("This is <b>bold</b>, isn't it?")
-       but: _("This is %sbold%s, isn't it?")
- 
-  - Use unnamed %i or %s placeholder if you want to print variables in
-    shorter sentences:
- 
-       not: _("There are %(x_number_of_baskets)s baskets.")
-       yes: _("There are %i baskets.")
- 
-  - But, if you are printing more than one variable in a sentence, you
-    should better name them, because in some languagues the correct
-    grammar would be to invert the order.  Also, you may want to keep
-    the names short and start them with ``x_'' to ease the variable
-    recognition task for the translators.
-  
-       not: _("The value of %s is %s when %s.")
-       but: _("The value of %(x_foo)s is %(x_bar)s when %(x_rains)s.")
+       not: _("This is <b>cold</b>.")
+       but: _("This is %(x_fmt_open)scold%(x_fmt_close)s.")
+
+    Ditto for links:
+
+       not: _("This is <a href="%s">homepage</a>.")
+       not: _("This is %(x_url_open)shomepage%(x_url_close)s.")
  
   - Do not leave unnecessary things in messages, such as extraneous
-    spaces or colons; put them rather in the business logic:
+    spaces or colons before or after the translatable expressions.
+    Rather put them in the business logic:
  
-       not: _(" subject:")
-       but: " " + _(" subject") + ":"
+       not: _(" subject")
+       but: " " + _("subject")
  
-       not: _("Record #%d:")
-       but: _("Record") + "#%d" % recID
+       not: _("Record %i:")
+       but: _("Record") + "%i:" % recID
  
-The best is to follow existing message style as a model, as the
-translators are accustomed to it.
+  - Last but not least: the best is to follow the style of existing
+    messages as a model, so that the translators are presented with a
+    homogeneous and consistently presented output phrase set.
 
 Appendix A. Introducing a new language
 ======================================
