@@ -76,7 +76,7 @@ def perform_youradminactivities(uid, ln):
            )
 
 # perform_display_account(): display a dynamic page that shows the user's account
-def perform_display_account(req,username,bask,aler,sear,msgs,ln):
+def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -108,6 +108,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,ln):
              alerts = aler,
              searches = sear,
              messages = msgs,
+             groups = grps,
              administrative = perform_youradminactivities(uid, ln)
            )
 

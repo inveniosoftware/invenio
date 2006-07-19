@@ -399,7 +399,7 @@ class Template:
                           </table>""" % (title, body)
         return out
 
-    def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, messages, administrative):
+    def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, messages, groups, administrative):
         """
         Displays the your account page
 
@@ -419,6 +419,8 @@ class Template:
 
           - 'messages' *string* - The body of the messages block
 
+          - 'groups' *string* - The body of the groups block
+
           - 'administrative' *string* - The body of the administrative block
         """
 
@@ -431,10 +433,8 @@ class Template:
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
-	groups_description = _("You can consult the list of %syour groups%s you are administering or are a member of.")
-	groups_description %= ('<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">', '</a>')
-        out += self.tmpl_account_template(_("Your Groups"), groups_description, ln)
-	submission_description = _("You can consult the list of %syour submissions%s and inquire about their status.")
+        out += self.tmpl_account_template(_("Your Groups"), groups, ln)
+        submission_description = _("You can consult the list of %syour submissions%s and inquire about their status.")
 	submission_description %= ('<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">', '</a>')
         out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln)
 	approval_description =  _("You can consult the list of %syour approvals%s with the documents you approved or refereed.")
@@ -845,7 +845,33 @@ class Template:
                    }
         return out
 
-    def tmpl_warning(self, warnings, ln=cdslang):
+    def tmpl_warning(self, warnings, ln=cdslang): 
+        """
+        Prepare the warnings list
+        @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
+        @return html string of warnings
+        """
+        from invenio.errorlib import get_msgs_for_code_list
+        span_class = 'important'
+        out = ""
+        if type(warnings) is not list:
+            warnings = [warnings]
+        if len(warnings) > 0:
+            warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
+            for (warning_code, warning_text) in warnings_parsed:
+                if not warning_code.startswith('WRN'):
+                    #display only warnings that begin with WRN to user
+                    continue
+                span_class = 'important'
+                out += '''
+                    <span class="%(span_class)s">%(warning)s</span><br>''' % \
+                    {   'span_class'    :   span_class,
+                        'warning'       :   warning_text         } 
+            return out
+        else:
+            return ""
+
+    def tmpl_warnings(self, warnings, ln=cdslang):
         """
         Display len(warnings) warning fields
         @param infos: list of strings
@@ -867,8 +893,10 @@ class Template:
         return warningbox
     
     def tmpl_display_all_groups(self,
+                                infos,
                                 admin_group_html,
                                 member_group_html,
+                                warnings=[],
                                 ln=cdslang):
         """
         Displays the 2 tables of groups: admin and member 
@@ -878,7 +906,7 @@ class Template:
           - 'ln' *string* - The language to display the interface in
           
           - 'admin_group_html' *string* - Html code for displaying all the groups
-          the user is the administrator
+          the user is the administrator of 
           
           - 'member_group_html' *string* - Html code for displaying all the groups
           the user is member of
@@ -886,8 +914,9 @@ class Template:
         """
         
         _ = gettext_set_language(ln)
-        #group_text = self.tmpl_warning(warnings, ln)
-        group_text = """
+        group_text = self.tmpl_infobox(infos)
+        group_text += self.tmpl_warning(warnings)
+        group_text += """
 <table>
   <tr>
     <td>%s</td>
@@ -898,7 +927,7 @@ class Template:
 </table>""" %(admin_group_html, member_group_html)
         return group_text
 
-    def tmpl_display_admin_group(self, groups, infos, ln=cdslang):
+    def tmpl_display_admin_group(self, groups, ln=cdslang):
         """
         Display the groups the user is admin of.
         
@@ -916,11 +945,10 @@ class Template:
         height="25"><br/><small>%(text)s</small></img>
         </a>""" 
         
+
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text=_("You are an administrator of the following groups") + ':')        
-
-        out += self.tmpl_infobox(infos)
-
+                                          text=_("You are administrator of the following groups:") )        
+        
         out += """
 <table class="mailbox">
   <thead class="mailboxheader">
@@ -987,10 +1015,18 @@ class Template:
                }
         return indent_text(out, 2)
 
-    def tmpl_display_member_group(self, groups, infos, ln=cdslang):
+    def tmpl_display_member_group(self, groups, ln=cdslang):
+        """
+        Display the groups the user is member of.
+        
+        Parameters:
+        
+        - 'ln' *string* - The language to display the interface in
+        - 'groups' *list* - All the group the user is member of
+        """ 
         _ = gettext_set_language(ln)
-        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are a member of the following groups") + ':')
-        group_text += self.tmpl_infobox(infos)
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are member of the following groups:"))
+
         group_text += """
 <table class="mailbox">
   <thead class="mailboxheader">
@@ -1043,13 +1079,26 @@ class Template:
         return indent_text(group_text, 2)
 
     def tmpl_display_input_group_info(self,
-                                        group_name,
-                                        group_description,
-                                        join_policy,
-                                        act_type="create",
-                                        grpID="",
-                                        warnings=[],
-                                        ln=cdslang):
+                                      group_name,
+                                      group_description,
+                                      join_policy,
+                                      act_type="create",
+                                      grpID="",
+                                      warnings=[],
+                                      ln=cdslang):
+        """
+        Display group data when creating or updating a group:
+        Name, description, join_policy.
+        Parameters:
+        - 'ln' *string* - The language to display the interface in
+        - 'group_name' *string* - name of the group
+        - 'group_description' *string* - description of the group
+        - 'join_policy' *string* - join policy
+        - 'act_type' *string* - info about action : create or edit(update)
+        - 'grpID' *string* - ID of the group(not null in case of group editing)
+        - 'warnings' *list* - Display warning if values are not correct
+        
+        """
         _ = gettext_set_language(ln)
         #default
         hidden_id =""
@@ -1065,7 +1114,7 @@ class Template:
             action = weburl + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
-            label = _('Edit group') + ': ' + group_name
+            label = _('Edit group: ') + group_name
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
             delete_text %= (_("Delete group"),"delete")
             if grpID != "":
@@ -1137,10 +1186,10 @@ class Template:
                 'logo': weburl + '/img/webbasket_create.png',
                 'label': label,
                 'form_name' : form_name,
-                'name_label': _("Group name") + ': ',
+                'name_label': _("Group name:"),
                 'delete_text': delete_text,
-                'description_label': _("Group description") + ': ',
-                'join_policy_label': _("Group join policy") + ': ',
+                'description_label': _("Group description:"),
+                'join_policy_label': _("Group join policy:"),
                 'group_name': group_name,
                 'group_description': group_description,
                 'button_label': button_label,
@@ -1152,7 +1201,7 @@ class Template:
                                                                         join_policy,
                                                                         ln)
                } 
-        return out
+        return indent_text(out, 2)
 
     def tmpl_display_input_join_group(self,
                                       group_list,
@@ -1161,13 +1210,27 @@ class Template:
                                       search,
                                       warnings=[],
                                       ln=cdslang):
+
+        """
+        Display the groups the user can join.
+        He can use default select list or the search box
+        
+        Parameters:
+
+        - 'ln' *string* - The language to display the interface in
+        - 'group_list' *list* - All the group the user can join
+        - 'group_name' *string* - Name of the group the user is looking for
+        - 'group_from search' *list* - List of the group the user can join matching group_name
+        - 'search' *int* - User is looking for group using group_name
+        - 'warnings' *list* - Display warning if two group are selected
+        """
         _ = gettext_set_language(ln)
         out = self.tmpl_warning(warnings)
         search_content = ""
         if search:
             search_content = """<tr><td>&nbsp;</td><td>"""
             if group_from_search != []:
-                search_content += self.__create_select_menu('grpID', group_from_search, _("Please select") + ':')
+                search_content += self.__create_select_menu('grpID', group_from_search, _("Please select:"))
             else:
                 search_content += _("No matching group")
         
@@ -1234,45 +1297,52 @@ class Template:
                 'label': _("Join group"),
                 'group_name': group_name,
                 'label2':_("or find it") + ': ',
-                'list_label':_("Choose group") + ':',
+                'list_label':_("Choose group:"),
                 'ln': ln,
                 'find_label': _("Find group"),
                 'cancel_label':_("Cancel"),
-                'group_list' :self.__create_select_menu("grpID",group_list, _("Please select") + ':'),
+                'group_list' :self.__create_select_menu("grpID",group_list, _("Please select:")),
                 'search_content' : search_content
                } 
-        return out
+        return indent_text(out, 2)
     
     def tmpl_display_manage_member(self,
                                    grpID,
                                    group_name,
                                    members,
                                    pending_members,
-                                   infos=([], []),
+                                   infos=[],
                                    warnings=[],
                                    ln=cdslang):
+        """Display current members and waiting members of a group.
+        
+        Parameters:
+
+        - 'ln' *string* - The language to display the interface in
+        - 'grpID *string* - ID of the group
+        - 'group_name' *string* - Name of the group
+        - 'members' *list* - List of the current members
+        - 'pending_members' *list* - List of the waiting members
+        - 'infos' *tuple of 2 lists* - Message to inform user about his last action
+        - 'warnings' *list* - Display warning if two group are selected
+        """
         
         _ = gettext_set_language(ln)
         out = self.tmpl_warning(warnings)
+        out += self.tmpl_infobox(infos)
         out += """
 <form name="member" action="%(action)s" method="POST">
  <p>%(title)s</p>
  <input type="hidden" name="ln" value="%(ln)s" />
  <input type="hidden" name="grpID" value="%(grpID)s"/>
  <table>
- """
-        if infos[0]:
-            out += "<tr><td>"
-            out += self.tmpl_infobox(infos[0])
-            out += "</td></tr>"
-        out += """
-  <tr>
+   <tr>
    <td>
     <table class="bskbasket">
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup.png" alt="Members" />
+          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup.png" alt="%(header1)s" />
         </td>
 
         <td class="bsktitle">
@@ -1294,19 +1364,14 @@ class Template:
     </tbody>
   </table>
  </td>    
- </tr>"""
-        if infos[1]:
-            out += "<tr><td>"
-            out += self.tmpl_infobox(infos[1])
-            out += "</td></tr>"
-        out += """
+ </tr>
  <tr>
   <td>
    <table class="bskbasket">
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup_gray.png" alt="PendingMembers" />
+          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup_gray.png" alt="%(header2)s" />
         </td>
 
         <td class="bsktitle">
@@ -1335,7 +1400,7 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/iconpen.gif" alt="Invite" />
+          <img src="http://pcusrent01.cern.ch/img/iconpen.gif" alt="%(header3)s" />
         </td>
 
         <td class="bsktitle">
@@ -1369,33 +1434,35 @@ class Template:
         
         
         if members :
-            member_list =   self.__create_select_menu("member_id", members, _("Please select") + ':')
+            member_list =   self.__create_select_menu("member_id", members, _("Please select:"))
             member_text = """
             <td style="padding: 0 5 10 5;">%s</td>
             <td style="padding: 0 5 10 5;">
             <input type="submit" name="remove_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (member_list,_("Remove member"))
         else :
-            member_text = """<td style="padding: 0 5 10 5;" collspan="2">No member</td>"""
+            member_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No member")
         if pending_members :
-            pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please Select:"))
+            pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please select:"))
             pending_text = """
             <td style="padding: 0 5 10 5;">%s</td>
             <td style="padding: 0 5 10 5;">
             <input type="submit" name="add_member" value="%s" class="nonsubmitbutton"/>
-            </td>""" %  (pending_list,_("Add member"))
+            </td>
+            <td style="padding: 0 5 10 5;">
+            <input type="submit" name="reject_member" value="%s" class="nonsubmitbutton"/>
+            </td>""" %  (pending_list,_("Accept member"), _("Reject member"))
         else :
-            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">No pending member</td>""" 
+            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No waiting member") 
         
-        header1 = self.tmpl_group_table_title(text="Current members")
-        header2 = self.tmpl_group_table_title(text="Waiting members")
+        header1 = self.tmpl_group_table_title(text=_("Current members"))
+        header2 = self.tmpl_group_table_title(text=_("Waiting members"))
         header3 = _("Invite new members")
-        url_write = '<a href="' + weburl + '/yourmessages/write?ln=%s' + '">web message</a>'
-        url_write %= ln
-        invite_text = _("If you want to invite new members to join your group, please use the %s system." % url_write)
-        action = weburl + '/yourgroups/members?ln=%s'
-        action %= (ln)
-        out %= {'title': _('Group') + (': <b>%s</b>' % group_name),
+        link_open = '<a href="%s/yourmessages/write?ln=%s">'
+        link_open %= (weburl, ln)
+        invite_text = _("If you want to invite new members to join your group, please use the %sweb message%s system.") % (link_open, '</a>')
+        action = weburl + '/yourgroups/members?ln=' + ln
+        out %= {'title':_('Group: <b>%s</b>') % group_name,
                 'member_text' : member_text,
                 'pending_text' :pending_text,
                 'action':action,
@@ -1407,12 +1474,20 @@ class Template:
                 'cancel_label':_("Cancel"),
                 'ln':ln
                 }
-        return out
+        return indent_text(out, 2)
     
     def tmpl_display_input_leave_group(self,
                                        groups,
                                        warnings=[],
                                        ln=cdslang):
+        """Display groups the user can leave.
+        
+        Parameters:
+
+        - 'ln' *string* - The language to display the interface in
+        - 'groups' *list* - List of groups the user is currently member of
+        - 'warnings' *list* - Display warning if no group is selected
+        """
         _ = gettext_set_language(ln)
         out = self.tmpl_warning(warnings)
         out += """
@@ -1462,7 +1537,7 @@ class Template:
 </form>
  """
         if groups:
-            groups =   self.__create_select_menu("grpID", groups, _("Please select") + ':')
+            groups =   self.__create_select_menu("grpID", groups, _("Please select:"))
             list_label = _("Group list")
             submit = """<input type="submit" name="leave_button" value="%s" class="formbutton"/>""" % _("Leave group")
         else :
@@ -1480,12 +1555,12 @@ class Template:
                 'ln' :ln,
                 'submit' : submit
                 }
-        return out
+        return indent_text(out, 2)
         
 
     def tmpl_confirm_delete(self, grpID, ln=cdslang):
         """
-        display a confirm message
+        display a confirm message when deleting a group
         @param ln: language
         @return html output
         """
@@ -1572,7 +1647,7 @@ class Template:
                     (cfg_websession_group_join_policy['VISIBLEMAIL'],
                      _("Visible but new members need approval"))
                     ]
-        select_text = _("Please select")
+        select_text = _("Please select:")
         return self.__create_select_menu(name, elements, select_text, selected_key=current_join_policy)
 
     def __create_select_menu(self, name, elements, select_text, multiple=0, selected_key=None):
@@ -1606,11 +1681,11 @@ class Template:
             infos = [infos]       
         infobox = ""
         for info in infos:
-            infobox += "<div class=\"infobox\">"
+            infobox += "<div><span class='info'>"
             lines = info.split("\n")
             for line in lines[0:-1]:
                 infobox += line + "<br/>\n"
-            infobox += lines[-1] + "</div>\n"
+            infobox += lines[-1] + "</span></div>\n"
         return infobox
 
     def tmpl_navtrail(self, ln=cdslang, title=""):
@@ -1631,6 +1706,12 @@ class Template:
         return  nav_h1 % (weburl, _("Your Account")) + nav_h2
 
     def tmpl_group_table_title(self, img="", text="", ln=cdslang):
+        """
+        display the title of a table:
+        - 'img' *string* - img path
+        - 'text' *string* - title
+        - 'ln' *string* - The language to display the interface in
+        """
         out = "<div>"
         if img:
             out += """
@@ -1641,16 +1722,75 @@ class Template:
         </div>""" % text
         return out
  
-    def tmpl_new_member_msg(self,
+    def tmpl_admin_msg(self,
                             group_name,
                             grpID,
                             ln=cdslang):
-        
+        """
+        return message content for joining group
+        - 'group_name' *string* - name of the group
+        - 'grpID' *string* - ID of the group
+        - 'ln' *string* - The language to display the interface in
+        """
         _ = gettext_set_language(ln)
-        subject = '%s : ' % group_name + _("New user request")
+        subject = _("Group %s: New user request") % group_name
         url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
         link = """<a href="%s">%s</a>""" % (url, _("here"))
         body = (_("A new user wants to join group %s.") % group_name) + '<br/>'
-	body += (_("Click %shere%s to accept the new member") % ('<a href="' + url + '">', '</a>')) + '<br />'
+	body += (_("You can %saccept or reject%s the new member") % ('<a href="' + url + '">', '</a>')) + '<br />'
         return subject, body
+
+    def tmpl_member_msg(self,
+                        group_name,
+                        status,
+                        ln=cdslang):
+        """
+        return message content when new member is accepted/rejected
+        - 'group_name' *string* - name of the group
+        - 'status' *string* - message content 
+        - 'ln' *string* - The language to display the interface in
+        """
+        _ = gettext_set_language(ln)
+        subject = _("Group %s: Join request has been %s") % (group_name, status)
+        url = weburl + "/yourgroups/display?ln=%s"
+        url %= (ln)
+        link = """<a href="%s">%s</a>""" % (url, _("here"))
+        body = (_(" Your request for joining group %s has been %s.") % (group_name, status)) + '<br/>'
+	body += (_("You can consult the list of %syour groups%s.") % ('<a href="' + url + '">', '</a>')) + '<br />'
+        return subject, body
+    
+    def tmpl_delete_msg(self,
+                        group_name,
+                        ln=cdslang):
+        """
+        return message content when new member is accepted/rejected
+        - 'group_name' *string* - name of the group
+        - 'ln' *string* - The language to display the interface in
+        """
+        _ = gettext_set_language(ln)
+        subject = _("Group %s has been deleted") % group_name
+        url = weburl + "/yourgroups/display?ln=%s"
+        url %= (ln)
+        link = """<a href="%s">%s</a>""" % (url, _("here"))
+        body = (_("Group %s has been deleted by its administrator.") % group_name) + '<br/>'
+        body += (_("You can consult the list of %syour groups%s.") % ('<a href="' + url + '">', '</a>')) + '<br />'
+        return subject, body
+    
+    def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=cdslang):
+        """
+        display infos about groups (used by myaccount.py)
+        @param nb_admin_group: number of groups the user is admin of
+        @param nb_member_group: number of groups the user is member of
+        @param total_group: number of groups the user belongs to
+        @param ln: language
+        return: html output.
+        """
+        _ = gettext_set_language(ln)
+        out = _("You can consult the list of %s%i groups%s you are subscribed to (%i) or administering (%i).")
+        out %= ('<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
+                nb_total_groups,
+                '</a>',
+                nb_admin_groups,
+                nb_member_groups)
+        return out

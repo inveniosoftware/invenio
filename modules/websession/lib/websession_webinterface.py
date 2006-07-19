@@ -80,9 +80,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         aler = webalert.account_list_alerts(uid, ln=args['ln'])
         sear = webalert.account_list_searches(uid, ln=args['ln'])
         msgs = account_new_mail(uid, ln=args['ln'])
-        
+        grps = webgroup.account_group(uid, ln=args['ln'])
         return page(title=_("Your Account"),
-                    body=webaccount.perform_display_account(req,username,bask,aler,sear,msgs,args['ln']),
+                    body=webaccount.perform_display_account(req,username,bask,aler,sear,msgs,grps,args['ln']),
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",
                     uid=uid,
@@ -537,30 +537,29 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         
     def display(self, req, form):
         """
-        Displays the groups the user is admin of
+        Displays groups the user is admin of
         and the groups the user is member of(but not admin)
         @param ln:  language
         @return the page for all the groups
         """
-        args = wash_urlargd(form, {'info':(int, 0)})
+        argd = wash_urlargd(form, {})
         uid = webuser.getUid(req)
 
         # load the right message language
-        _ = gettext_set_language(args['ln'])
+        _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/display")
 
         (body, errors, warnings) = webgroup.perform_request_group_display(uid=uid,
-                                                                       info=args['info'],
-                                                                       ln=args['ln'])
+                                                                          ln=argd['ln'])
         
-        return page(title=_("Your Groups"),
+        return page(title         = _("Your Groups"),
                     body          = body,
-                    navtrail      = webgroup.get_navtrail(args['ln']),
+                    navtrail      = webgroup.get_navtrail(argd['ln']),
                     uid           = uid,
                     req           = req,
-                    language      = args['ln'],
+                    language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings)
@@ -570,8 +569,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
     def create(self, req, form):
         """create(): interface for creating a new group
         @param group_name : name of the new webgroup.Must be filled
-        @param group_name : description of the new webgroup.(optionnal)
-        @param group_name : join policy of the new webgroup.Must be chosen
+        @param group_description : description of the new webgroup.(optionnal)
+        @param join_policy : join policy of the new webgroup.Must be chosen
         @param *button: which button was pressed
         @param ln: language
         @return the compose page Create group
@@ -597,40 +596,35 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             
         if argd['create_button'] :
             (body, errors, warnings)= webgroup.perform_request_create_group(uid=uid,
-                                                                          group_name=argd['group_name'],
-                                                                          group_description=argd['group_description'],
-                                                                          join_policy=argd['join_policy'],
-                                                                          ln = argd['ln'])
+                                                                            group_name=argd['group_name'],
+                                                                            group_description=argd['group_description'],
+                                                                            join_policy=argd['join_policy'],
+                                                                            ln = argd['ln'])
             
             
         else: 
             (body, errors, warnings) = webgroup.perform_request_input_create_group(group_name=argd['group_name'],
-                                                                                group_description=argd['group_description'],
-                                                                                join_policy=argd['join_policy'],
-                                                                                ln=argd['ln'])
+                                                                                   group_description=argd['group_description'],
+                                                                                   join_policy=argd['join_policy'],
+                                                                                   ln=argd['ln'])
         title = _("Create new group")
 
-        if body == 1:
-            url = weburl + '/yourgroups/display?info=1&ln=%s'
-            url %= argd['ln']
-            redirect_to_url(req, url)
-            
-        else :
-            return page(title         = title,
-                        body          = body,
-                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
-                        uid           = uid,
-                        req           = req,
-                        language      = argd['ln'],
-                        lastupdated   = __lastupdated__,
-                        errors        = errors,
-                        warnings      = warnings)
+        
+        return page(title         = title,
+                    body          = body,
+                    navtrail      = webgroup.get_navtrail(argd['ln'], title),
+                    uid           = uid,
+                    req           = req,
+                    language      = argd['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
     
     def join(self, req, form):
         """join(): interface for joining a new group
         @param grpID : list of the group the user wants to become a member.
-        The user must select only one webgroup.
-        @param group_name :  will search for groups with this pattern 
+        The user must select only one group.
+        @param group_name :  will search for groups matching group_name 
         @param *button: which button was pressed
         @param ln: language
         @return the compose page Join group
@@ -659,43 +653,38 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             if argd['group_name']:
                 search = 1
             (body, errors, warnings) = webgroup.perform_request_join_group(uid,
-                                                                        argd['grpID'],
-                                                                        argd['group_name'],
-                                                                        search,
-                                                                        argd['ln'])
+                                                                           argd['grpID'],
+                                                                           argd['group_name'],
+                                                                           search,
+                                                                           argd['ln'])
         else:
             search = 0
             if argd['find_button']:
                 search = 1
             (body, errors, warnings) = webgroup.perform_request_input_join_group(uid,
-                                                                              argd['group_name'],
-                                                                              search,
-                                                                              ln=argd['ln'])
-                        
-        if body in (2, 7):
-            url = weburl + '/yourgroups/display?info=%s&ln=%s'
-            url %= (body, argd['ln'])
-            redirect_to_url(req, url)
+                                                                                 argd['group_name'],
+                                                                                 search,
+                                                                                 ln=argd['ln'])
             
-        else :
-            title = _("Join New Group")
-            return page(title         = title,
-                        body          = body,
-                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
-                        uid           = uid,
-                        req           = req,
-                        language      = argd['ln'],
-                        lastupdated   = __lastupdated__,
-                        errors        = errors,
-                        warnings      = warnings)
+        title = _("Join New Group")
+        return page(title         = title,
+                    body          = body,
+                    navtrail      = webgroup.get_navtrail(argd['ln'], title),
+                    uid           = uid,
+                    req           = req,
+                    language      = argd['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
+
     def leave(self, req, form):
         """leave(): interface for leaving a group
-        @param grpID : list of the group the user wants to become a member.
-        The user must select only one webgroup.
-        @param group_name :  will search for groups with this pattern 
+        @param grpID : group the user wants to leave.
+        @param group_name :  name of the group the user wants to leave 
         @param *button: which button was pressed
+        @param confirmed : the user is first asked to confirm
         @param ln: language
-        @return the compose page Join group
+        @return the compose page Leave group
         """
         
         argd = wash_urlargd(form, {'grpID':(str, ""),
@@ -718,31 +707,37 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             
         if argd['leave_button']:
             (body, errors, warnings) = webgroup.perform_request_leave_group(uid,
-                                                                         argd['grpID'],
-                                                                         argd['confirmed'],
-                                                                         argd['ln'])
+                                                                            argd['grpID'],
+                                                                            argd['confirmed'],
+                                                                            argd['ln'])
         else:
             (body, errors, warnings) = webgroup.perform_request_input_leave_group(uid=uid,
-                                                                                ln=argd['ln'])
-        if body in (2, 7, 8):
-            url = weburl + '/yourgroups/display?info=%s&ln=%s'
-            url %= (body, argd['ln'])
-            redirect_to_url(req, url)
-            
-        else :
-            title = _("Leave Group")
-            return page(title         = title,
-                        body          = body,
-                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
-                        uid           = uid,
-                        req           = req,
-                        language      = argd['ln'],
-                        lastupdated   = __lastupdated__,
-                        errors        = errors,
-                        warnings      = warnings)
+                                                                                  ln=argd['ln'])
+        title = _("Leave Group")
+        return page(title         = title,
+                    body          = body,
+                    navtrail      = webgroup.get_navtrail(argd['ln'], title),
+                    uid           = uid,
+                    req           = req,
+                    language      = argd['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
         
     def edit(self, req, form):
-        argd = wash_urlargd(form, {'grpID': (int, 0),
+        """edit(): interface for editing group
+        @param grpID : group ID
+        @param group_name : name of the new webgroup.Must be filled
+        @param group_description : description of the new webgroup.(optionnal)
+        @param join_policy : join policy of the new webgroup.Must be chosen
+        @param update: button update group pressed
+        @param delete: button delete group pressed
+        @param cancel: button cancel pressed
+        @param confirmed : the user is first asked to confirm before deleting
+        @param ln: language
+        @return the main page displaying all the groups
+        """
+        argd = wash_urlargd(form, {'grpID': (str, ""),
                                    'update': (str, ""),
                                    'cancel': (str, ""),
                                    'delete': (str, ""),
@@ -764,52 +759,58 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             
         elif argd['delete']:
             (body, errors, warnings) = webgroup.perform_request_delete_group(uid=uid,
-                                                                          grpID=argd['grpID'],
-                                                                          confirmed=argd['confirmed'])
+                                                                             grpID=argd['grpID'],
+                                                                             confirmed=argd['confirmed'])
             
         elif argd['update']:
             
             (body, errors, warnings) = webgroup.perform_request_update_group(uid= uid,
-                                                                          grpID=argd['grpID'],
-                                                                          group_name=argd['group_name'],
-                                                                          group_description=argd['group_description'],
-                                                                          join_policy=argd['join_policy'],
-                                                                          ln=argd['ln'])
+                                                                             grpID=argd['grpID'],
+                                                                             group_name=argd['group_name'],
+                                                                             group_description=argd['group_description'],
+                                                                             join_policy=argd['join_policy'],
+                                                                             ln=argd['ln'])
             
         else :
             (body, errors, warnings)= webgroup.perform_request_edit_group(uid=uid,
-                                                                       grpID=argd['grpID'],
-                                                                       ln=argd['ln'])
+                                                                          grpID=argd['grpID'],
+                                                                          ln=argd['ln'])
                                                                  
 
 
-        if body in (3, 4):
-            url = weburl + '/yourgroups/display?info=%s&ln=%s'
-            url %= (body, argd['ln'])
-            redirect_to_url(req, url)
-            
-        else :
-            title = _("Edit Group")
-            return page(title = title,
-                        body          = body,
-                        navtrail      = webgroup.get_navtrail(argd['ln'], title),
-                        uid           = uid,
-                        req           = req,
-                        language      = argd['ln'],
-                        lastupdated   = __lastupdated__,
-                        errors        = errors,
-                        warnings      = warnings)
+        title = _("Edit Group")
+        return page(title = title,
+                    body          = body,
+                    navtrail      = webgroup.get_navtrail(argd['ln'], title),
+                    uid           = uid,
+                    req           = req,
+                    language      = argd['ln'],
+                    lastupdated   = __lastupdated__,
+                    errors        = errors,
+                    warnings      = warnings)
     
 
     def members(self, req, form):
+        """member(): interface for managing members of a group
+        @param grpID : group ID
+        @param add_member: button add_member pressed
+        @param remove_member: button remove_member pressed
+        @param reject_member: button reject__member pressed
+        @param delete: button delete group pressed
+        @param member_id : ID of the existing member selected
+        @param pending_member_id : ID of the pending member selected
+        @param cancel: button cancel pressed
+        @param info : info about last user action 
+        @param ln: language
+        @return the same page with data updated
+        """
         argd = wash_urlargd(form, {'grpID': (int, 0),
                                    'cancel': (str, ""),
                                    'add_member': (str, ""),
                                    'remove_member': (str, ""),
-                                   'member_id': (int, ""),
-                                   'pending_member_id': (int, ""),
-                                   'info': (int, ""),
-                                   'cancel': (str, "")
+                                   'reject_member': (str, ""),
+                                   'member_id': (int, 0),
+                                   'pending_member_id': (int, 0)
                                    })
         uid = webuser.getUid(req)
         # load the right message language
@@ -823,31 +824,28 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
             
         if argd['remove_member']:
-            title = _("Edit group members")
             (body, errors, warnings) = webgroup.perform_request_remove_member(uid=uid,
                                                                               grpID=argd['grpID'],
                                                                               member_id=argd['member_id'],
                                                                               ln=argd['ln'])    
             
-
+        elif argd['reject_member']:
+            (body, errors, warnings) = webgroup.perform_request_reject_member(uid=uid,
+                                                                              grpID=argd['grpID'],
+                                                                              user_id=argd['pending_member_id'],
+                                                                              ln=argd['ln']) 
+        
         elif argd['add_member']:
-            title = _("Edit group members")
             (body, errors, warnings) = webgroup.perform_request_add_member(uid=uid,
                                                                            grpID=argd['grpID'],
                                                                            user_id=argd['pending_member_id'],
                                                                            ln=argd['ln'])
 
         else: 
-            title = _("Edit group members")
             (body, errors, warnings)= webgroup.perform_request_manage_member(uid=uid,
                                                                              grpID=argd['grpID'],
-                                                                             info=argd['info'],
                                                                              ln=argd['ln'])
-        if body in (5, 6):
-            url = weburl + '/yourgroups/members?grpID=%i&info=%s&ln=%s'
-            url %= (argd['grpID'], body, argd['ln'])
-            redirect_to_url(req, url)
-            
+        title = _("Edit group members")
         return page(title         = title,
                     body          = body,
                     navtrail      = webgroup.get_navtrail(argd['ln'], title),

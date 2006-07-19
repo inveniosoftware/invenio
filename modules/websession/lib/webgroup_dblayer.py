@@ -50,7 +50,10 @@ def get_groups_by_user_status(uid, user_status):
     return res  
 
 def get_visible_group_list(uid, pattern=""):
-    """list the group the user can join"""
+    """list the group the user can join (not already member
+    of the group regardless user's status)
+     @return groups {id : name} whose name matches pattern
+    """
     grpID = []
     groups = {}
     #list the group the user is member of"""
@@ -76,29 +79,6 @@ def get_visible_group_list(uid, pattern=""):
     query2 += """ ORDER BY name"""
     res2 = run_sql(query2)
     map(lambda x: groups.setdefault(x[0], x[1]), res2)
-    return groups
-
-def get_groupnames_like(uid, pattern=""):
-    """Get groupnames like pattern. Will return only groups that user is allowed to see
-    """
-    groups = {}
-    query1 = "SELECT id, name FROM usergroup WHERE join_policy like 'V%%'"
-    if pattern :
-        query1 += """ AND name RLIKE '%s'"""
-        pattern = escape_string(pattern)
-        query1 %= pattern
-    res = run_sql(query1)
-    # The line belows inserts into groups dictionary every tuple the database returned, 
-    # assuming field0=key and field1=value
-    map(lambda x: groups.setdefault(x[0], x[1]), res)
-    query2 = """SELECT g.id, g.name 
-                FROM usergroup g, user_usergroup ug 
-                WHERE g.id=ug.id_usergroup AND ug.id_user=%i"""
-    if pattern :
-        pattern_query = """ AND g.name RLIKE '%s'""" % escape_string(pattern)
-        query2 += pattern_query
-    res = run_sql(query2 % uid)
-    map(lambda x: groups.setdefault(x[0], x[1]), res)
     return groups
 
 
@@ -164,7 +144,7 @@ def update_group_infos(grpID,
     return res
 
 def get_user_status(uid, grpID):
-    """Get the status of the given user"""
+    """Get the status of the user for the given group"""
     query = """SELECT user_status FROM user_usergroup
                 WHERE id_user = %i
                 AND id_usergroup=%i"""
@@ -175,7 +155,10 @@ def get_user_status(uid, grpID):
 
 
 def get_users_by_status(grpID, status, ln=cdslang):
-    """Get the list of users with the given status"""
+    """Get the list of users with the given status
+    @return ((id, nickname),) nickname= user # uid if
+    the user has no nickname
+    """
     _ = gettext_set_language(ln)
     query = """SELECT ug.id_user, u.nickname
                FROM user_usergroup ug, user u
@@ -204,15 +187,6 @@ def delete_member(grpID, member_id):
     return res
 
 
-def delete_group(grpID):
-    """Delete member"""
-    query = """DELETE FROM usergroup
-               WHERE id = %i
-               """
-    grpID = int(grpID)
-    res = run_sql(query% grpID)
-    return res
-
 def delete_group_and_members(grpID):
     """Delete the group and its members"""
     query = """DELETE FROM usergroup
@@ -227,7 +201,8 @@ def delete_group_and_members(grpID):
     return res
 
 def add_pending_member(grpID, member_id, user_status):
-    """Pending member becomes normal member"""
+    """Change user status:
+    Pending member becomes normal member"""
     query = """UPDATE user_usergroup
                SET user_status = '%s',user_status_date='%s'
                WHERE id_usergroup = %i
@@ -240,6 +215,8 @@ def add_pending_member(grpID, member_id, user_status):
 
 
 def leave_group(grpID, uid):
+    """Remove user from the group member list
+    """
     query = """DELETE FROM user_usergroup
                WHERE id_usergroup=%i
                AND id_user=%i"""
@@ -249,21 +226,35 @@ def leave_group(grpID, uid):
     return res
 
 def group_name_exist(group_name):
+    """Get all group id whose name like group_name"""
     query = """SELECT id
                FROM usergroup
                WHERE name='%s'"""
     res = run_sql(query % escape_string(group_name))
     return res
 
-########################## helpful functions ##################################
-
-def __wash_count(res):
-    """If query is like SELECT count(x) FROM y, return a washed version"""
+    
+def count_nb_group_user(uid, user_status):
+    """
+    @param uid: user id
+    @param status: member status 
+    @return integer of number of groups the user belongs to
+    with the given status, 0 if none
+    """
+    uid = int(uid)
+    query = """SELECT count(id_user)
+               FROM   user_usergroup
+               WHERE  id_user=%i
+               AND user_status = '%s'
+            """
+    res = run_sql(query%(uid, escape_string(user_status)))
     if res:
         return int(res[0][0])
     else:
         return 0
-        
+
+########################## helpful functions ##################################
+
 def __decompress_last(item):
     """private function, used to shorten code"""
     item = list(item)

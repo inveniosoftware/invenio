@@ -37,16 +37,29 @@ cfg_websession_error_messages = {
 }
 
 cfg_websession_warning_messages = {
-    'WRN_WEBSESSION_DB_ERROR': '_("warning not used ")'
+    'WRN_WEBSESSION_NO_GROUP_NAME': '_("Please enter a group name.")',
+    'WRN_WEBSESSION_NOT_VALID_GROUP_NAME': '_("Please enter a valid group name.")',
+    'WRN_WEBSESSION_GROUP_NAME_EXISTS': '_("Group name already exists. Please choose another group name.")',
+    'WRN_WEBSESSION_NO_JOIN_POLICY': '_("Please choose a group join policy.")',
+    'WRN_WEBSESSION_MULTIPLE_GROUPS': '_("Please select only one group.")',
+    'WRN_WEBSESSION_NO_GROUP_SELECTED': '_("Please select one group.")',
+    'WRN_WEBSESSION_GROUP_ALREADY_DELETED': '_("The group has already been deleted.")',
+    'WRN_WEBSESSION_ALREADY_MEMBER': '_("You are already member of the group")',
+    'WRN_WEBSESSION_NO_MEMBER_SELECTED': '_("Please choose a member if you want to remove him from the group.")',
+    'WRN_WEBSESSION_NO_USER_SELECTED_ADD': '_("Please choose a user from the list if you want him to be added to the group.")',
+    'WRN_WEBSESSION_ALREADY_MEMBER_ADD': '_("The user is already member of the group.")',
+    'WRN_WEBSESSION_ALREADY_MEMBER_REJECT': '_("The user request for joining group has already been rejected.")', 
+    'WRN_WEBSESSION_NO_USER_SELECTED_DEL': '_("Please choose a user from the list if you want him to be removed from waiting list.")'
 }
-cfg_websession_info_messages = {1:'You have successfully created a new group.',
-                                2:'You have successfully joined a new group.',
-                                3:'You have successfully updated a group.',
-                                4:'You have successfully deleted a group.',
-                                5:'You have successfully deleted a member.',
-                                6:'You have successfully added a new member.',
-                                7:'The group administrator has been notified of your request.',
-                                8:'You have successfully left a group.'
+cfg_websession_info_messages = {"GROUP_CREATED":'You have successfully created a new group.',
+                                "JOIN_GROUP":'You have successfully joined a new group.',
+                                "GROUP_UPDATED":'You have successfully updated a group.',
+                                "GROUP_DELETED":'You have successfully deleted a group.',
+                                "MEMBER_DELETED":'You have successfully deleted a member.',
+                                "MEMBER_ADDED":'You have successfully added a new member.',
+                                "MEMBER_REJECTED": 'You have successfully removed a waiting member from the list.',
+                                "JOIN_REQUEST":'The group administrator has been notified of your request.',
+                                "LEAVE_GROUP":'You have successfully left a group.'
                                
 }
 
