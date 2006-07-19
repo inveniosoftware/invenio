@@ -115,13 +115,13 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
         if reviews==0:
             raise ValueError
             
-        return page(title=_("View all reported comments")),
-                body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
-                uid=auid,
-                language=ln,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__,
-                req=req)
+        return page(title=_("View all reported comments"),
+                    body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
+                    uid=auid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
