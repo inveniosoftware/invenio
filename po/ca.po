@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-18 19:47+0200\n"
+"POT-Creation-Date: 2006-07-19 16:58+0200\n"
 "PO-Revision-Date: 2006-06-27 11:50+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
@@ -400,10 +400,10 @@ msgstr "Llista"
 #: modules/webbasket/lib/webbasket_templates.py:1185
 #: modules/webbasket/lib/webbasket_templates.py:1290
 #: modules/webbasket/lib/webbasket_templates.py:1390
-#: modules/websession/lib/websession_templates.py:1148
-#: modules/websession/lib/websession_templates.py:1240
-#: modules/websession/lib/websession_templates.py:1407
-#: modules/websession/lib/websession_templates.py:1479
+#: modules/websession/lib/websession_templates.py:1197
+#: modules/websession/lib/websession_templates.py:1303
+#: modules/websession/lib/websession_templates.py:1474
+#: modules/websession/lib/websession_templates.py:1554
 msgid "Cancel"
 msgstr "Cancel·lar"
 
@@ -518,8 +518,8 @@ msgstr "Esteu segur que voleu esborrar aquest cistell?"
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:475
-#: modules/websession/lib/websession_templates.py:1518
-#: modules/websession/lib/websession_templates.py:1557
+#: modules/websession/lib/websession_templates.py:1593
+#: modules/websession/lib/websession_templates.py:1632
 msgid "Yes"
 msgstr "Sí"
 
@@ -530,8 +530,8 @@ msgstr "Sí"
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:476
-#: modules/websession/lib/websession_templates.py:1519
-#: modules/websession/lib/websession_templates.py:1558
+#: modules/websession/lib/websession_templates.py:1594
+#: modules/websession/lib/websession_templates.py:1633
 msgid "No"
 msgstr "No"
 
@@ -1091,8 +1091,8 @@ msgstr "Visualitzar els resultats:"
 #: modules/webbasket/lib/webbasket_webinterface.py:478
 #: modules/webbasket/lib/webbasket_webinterface.py:528
 #: modules/webmessage/lib/webmessage_templates.py:442
-#: modules/websession/lib/websession_templates.py:429
-#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:1706
 #: modules/websession/lib/websession_webinterface.py:68
 #: modules/websession/lib/websession_webinterface.py:84
 #: modules/websession/lib/websession_webinterface.py:109
@@ -1616,7 +1616,7 @@ msgstr "Visualitzar els cistells:"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:291
 #: modules/websession/lib/websession_templates.py:300
-#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:433
 msgid "Your Baskets"
 msgstr "Els vostres cistells"
 
@@ -1911,6 +1911,10 @@ msgstr "Identificador del comentari"
 msgid "View Comment"
 msgstr "Visualitzar el comentari"
 
+#: modules/webcomment/lib/webcomment_templates.py:1060
+msgid "There have been no reports so far."
+msgstr ""
+
 # Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:1064
 #, fuzzy, python-format
@@ -2197,7 +2201,7 @@ msgstr "S'ha enviat el vostre missatge."
 #: modules/webmessage/lib/webmessage_webinterface.py:65
 #: modules/webmessage/lib/webmessage_webinterface.py:217
 #: modules/webmessage/lib/webmessage_webinterface.py:246
-#: modules/websession/lib/websession_templates.py:430
+#: modules/websession/lib/websession_templates.py:432
 msgid "Your Messages"
 msgstr "Els vostres missatges"
 
@@ -2326,7 +2330,7 @@ msgid "No matching user"
 msgstr "No s'ha trobat cap usuari que coincideixi"
 
 #: modules/webmessage/lib/webmessage_templates.py:589
-#: modules/websession/lib/websession_templates.py:1172
+#: modules/websession/lib/websession_templates.py:1235
 msgid "No matching group"
 msgstr "No s'ha trobat cap grup que coincideixi"
 
@@ -3037,7 +3041,7 @@ msgstr ""
 "interfície."
 
 #: modules/websession/lib/websession_templates.py:298
-#: modules/websession/lib/websession_templates.py:433
+#: modules/websession/lib/websession_templates.py:435
 msgid "Your Searches"
 msgstr "Les vostres cerques"
 
@@ -3100,23 +3104,13 @@ msgstr ""
 "\">desconnectar-vos</a>; b) editar els <a href=\"../youraccount.py/edit?ln=%s"
 "\">vostres paràmetres</a>."
 
-#: modules/websession/lib/websession_templates.py:432
+#: modules/websession/lib/websession_templates.py:434
 msgid "Your Alert Searches"
 msgstr "Les vostres cerques d'alertes"
 
-# Refereed?
-#: modules/websession/lib/websession_templates.py:434
-#, fuzzy, python-format
-msgid ""
-"You can consult the list of %syour groups%s you are administering or are a "
-"member of."
-msgstr ""
-"Podeu consultar la llista de %(your_approval)s amb els documents que heu "
-"aprovat o referenciat."
-
 #: modules/websession/lib/websession_templates.py:436
-#: modules/websession/lib/websession_templates.py:1629
-#: modules/websession/lib/websession_webinterface.py:558
+#: modules/websession/lib/websession_templates.py:1704
+#: modules/websession/lib/websession_webinterface.py:557
 #, fuzzy
 msgid "Your Groups"
 msgstr "Grups"
@@ -3374,201 +3368,271 @@ msgstr "administració"
 msgid "logout"
 msgstr "sortir"
 
-#: modules/websession/lib/websession_templates.py:920
+#: modules/websession/lib/websession_templates.py:950
 #, fuzzy
-msgid "You are an administrator of the following groups"
+msgid "You are an administrator of the following groups:"
 msgstr "No sou membre d'un grup"
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
-#: modules/websession/lib/websession_templates.py:1398
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 #, fuzzy
 msgid "Group"
 msgstr "Grups"
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 #, fuzzy
 msgid "Description"
 msgstr "Qüestió"
 
-#: modules/websession/lib/websession_templates.py:949
+#: modules/websession/lib/websession_templates.py:977
 #, fuzzy
 msgid "You are not an administrator of any groups."
 msgstr "No sou membre d'un grup"
 
-#: modules/websession/lib/websession_templates.py:956
-#: modules/websession/lib/websession_templates.py:1068
+#: modules/websession/lib/websession_templates.py:984
 #, fuzzy
 msgid "Edit group"
 msgstr "Afegir un grup"
 
-#: modules/websession/lib/websession_templates.py:963
+#: modules/websession/lib/websession_templates.py:991
 #, fuzzy, python-format
 msgid "Edit %s members"
 msgstr "%i cistells de grup"
 
-#: modules/websession/lib/websession_templates.py:986
-#: modules/websession/lib/websession_templates.py:1058
-#: modules/websession/lib/websession_templates.py:1060
-#: modules/websession/lib/websession_webinterface.py:611
+#: modules/websession/lib/websession_templates.py:1014
+#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1109
+#: modules/websession/lib/websession_webinterface.py:610
 #, fuzzy
 msgid "Create new group"
 msgstr "Creeu un nou tema"
 
-#: modules/websession/lib/websession_templates.py:992
+#: modules/websession/lib/websession_templates.py:1028
 #, fuzzy
-msgid "You are a member of the following groups"
+msgid "You are a member of the following groups:"
 msgstr "No sou membre d'un grup"
 
-#: modules/websession/lib/websession_templates.py:1015
+#: modules/websession/lib/websession_templates.py:1051
 #, fuzzy
 msgid "You are not a member of any groups."
 msgstr "No sou membre d'un grup"
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1076
 #, fuzzy
 msgid "Join new group"
 msgstr "Trobar un grup"
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_templates.py:1041
-#: modules/websession/lib/websession_templates.py:1467
-#: modules/websession/lib/websession_templates.py:1478
+#: modules/websession/lib/websession_templates.py:1077
+#: modules/websession/lib/websession_templates.py:1542
+#: modules/websession/lib/websession_templates.py:1553
 #, fuzzy
 msgid "Leave group"
 msgstr "Trobar un grup"
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_templates.py:1066
+#: modules/websession/lib/websession_templates.py:1115
 #, fuzzy
 msgid "Update group"
 msgstr "Trobar un grup"
 
-#: modules/websession/lib/websession_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1117
+#, fuzzy, python-format
+msgid "Edit group %s"
+msgstr "Afegir un grup"
+
+#: modules/websession/lib/websession_templates.py:1119
 #, fuzzy
 msgid "Delete group"
 msgstr "Esborrar compte"
 
-#: modules/websession/lib/websession_templates.py:1140
+#: modules/websession/lib/websession_templates.py:1189
 #, fuzzy
-msgid "Group name"
+msgid "Group name:"
 msgstr "Cistells de grup"
 
-#: modules/websession/lib/websession_templates.py:1142
+#: modules/websession/lib/websession_templates.py:1191
 #, fuzzy
-msgid "Group description"
+msgid "Group description:"
 msgstr "Qüestió"
 
-#: modules/websession/lib/websession_templates.py:1143
-msgid "Group join policy"
+#: modules/websession/lib/websession_templates.py:1192
+msgid "Group join policy:"
 msgstr ""
 
 # Una?
-#: modules/websession/lib/websession_templates.py:1170
-#: modules/websession/lib/websession_templates.py:1241
-#: modules/websession/lib/websession_templates.py:1372
-#: modules/websession/lib/websession_templates.py:1465
-#: modules/websession/lib/websession_templates.py:1575
+#: modules/websession/lib/websession_templates.py:1233
+#: modules/websession/lib/websession_templates.py:1304
+#: modules/websession/lib/websession_templates.py:1437
+#: modules/websession/lib/websession_templates.py:1446
+#: modules/websession/lib/websession_templates.py:1540
+#: modules/websession/lib/websession_templates.py:1650
 #, fuzzy
-msgid "Please select"
+msgid "Please select:"
 msgstr "Si us plau seleccioneu-ne un o més:"
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_templates.py:1234
+#: modules/websession/lib/websession_templates.py:1297
 #, fuzzy
 msgid "Join group"
 msgstr "Trobar un grup"
 
-#: modules/websession/lib/websession_templates.py:1236
+#: modules/websession/lib/websession_templates.py:1299
 msgid "or find it"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1237
+#: modules/websession/lib/websession_templates.py:1300
 #, fuzzy
-msgid "Choose group"
+msgid "Choose group:"
 msgstr "Escolliu un tema"
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_templates.py:1239
+#: modules/websession/lib/websession_templates.py:1302
 #, fuzzy
 msgid "Find group"
 msgstr "Trobar un grup"
 
-#: modules/websession/lib/websession_templates.py:1377
+#: modules/websession/lib/websession_templates.py:1442
 #, fuzzy
 msgid "Remove member"
 msgstr "Esborrar l'item"
 
-# Una?
-#: modules/websession/lib/websession_templates.py:1381
+#: modules/websession/lib/websession_templates.py:1444
 #, fuzzy
-msgid "Please Select:"
-msgstr "Si us plau seleccioneu-ne un o més:"
+msgid "No members."
+msgstr "novembre"
 
-#: modules/websession/lib/websession_templates.py:1386
+#: modules/websession/lib/websession_templates.py:1454
 #, fuzzy
-msgid "Add member"
-msgstr "Afegir comentari"
+msgid "Accept member"
+msgstr "setembre"
 
-#: modules/websession/lib/websession_templates.py:1392
+#: modules/websession/lib/websession_templates.py:1454
+#, fuzzy
+msgid "Reject member"
+msgstr "Esborrar l'item"
+
+#: modules/websession/lib/websession_templates.py:1456
+#, fuzzy
+msgid "No members awaiting approval."
+msgstr "esperant les aprovacions"
+
+#: modules/websession/lib/websession_templates.py:1458
+#, fuzzy
+msgid "Current members"
+msgstr "Escriviu un nou missatge"
+
+#: modules/websession/lib/websession_templates.py:1459
+#, fuzzy
+msgid "Members awaiting approval"
+msgstr "esperant les aprovacions"
+
+#: modules/websession/lib/websession_templates.py:1460
 #, fuzzy
 msgid "Invite new members"
 msgstr "Escriviu un nou missatge"
 
-#: modules/websession/lib/websession_templates.py:1395
+#: modules/websession/lib/websession_templates.py:1463
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %s "
-"system."
+"If you want to invite new members to join your group, please use the %sweb "
+"message%s system."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1466
+#: modules/websession/lib/websession_templates.py:1465
+#, fuzzy, python-format
+msgid "Group: %s"
+msgstr "Grups"
+
+#: modules/websession/lib/websession_templates.py:1541
 #, fuzzy
 msgid "Group list"
 msgstr "Grups"
 
-#: modules/websession/lib/websession_templates.py:1469
+#: modules/websession/lib/websession_templates.py:1544
 #, fuzzy
 msgid "You are not member of any group."
 msgstr "No sou membre d'un grup"
 
-#: modules/websession/lib/websession_templates.py:1516
+#: modules/websession/lib/websession_templates.py:1591
 #, fuzzy
 msgid "Are you sure you want to delete this group?"
 msgstr "Esteu segur que voleu esborrar aquest cistell?"
 
-#: modules/websession/lib/websession_templates.py:1555
+#: modules/websession/lib/websession_templates.py:1630
 #, fuzzy
 msgid "Are you sure you want to leave this group?"
 msgstr "Esteu segur que voleu esborrar aquest cistell?"
 
-#: modules/websession/lib/websession_templates.py:1571
+#: modules/websession/lib/websession_templates.py:1646
 msgid "Visible and open for new members"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1573
+#: modules/websession/lib/websession_templates.py:1648
 msgid "Visible but new members need approval"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1650
-msgid "New user request"
-msgstr ""
+#: modules/websession/lib/websession_templates.py:1736
+#, fuzzy, python-format
+msgid "Group %s: New membership request"
+msgstr "El grup '%s' no existeix\n"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1739
+#: modules/websession/lib/websession_templates.py:1759
+#: modules/websession/lib/websession_templates.py:1776
 msgid "here"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1654
+#: modules/websession/lib/websession_templates.py:1741
+#, fuzzy, python-format
+msgid "A user wants to join the group %s."
+msgstr "Esteu segur que voleu esborrar aquest cistell?"
+
+#: modules/websession/lib/websession_templates.py:1742
 #, python-format
-msgid "A new user wants to join group %s."
+msgid "Please %saccept or reject%s this user's request."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1655
+#: modules/websession/lib/websession_templates.py:1756
 #, python-format
-msgid "Click %shere%s to accept the new member"
+msgid "Group %s: Join request has been %s"
 msgstr ""
+
+#: modules/websession/lib/websession_templates.py:1760
+#, python-format
+msgid "Your request for joining group %s has been %s."
+msgstr ""
+
+# Refereed?
+#: modules/websession/lib/websession_templates.py:1761
+#: modules/websession/lib/websession_templates.py:1778
+#, fuzzy, python-format
+msgid "You can consult the list of %syour groups%s."
+msgstr ""
+"Podeu consultar la llista de %(your_approval)s amb els documents que heu "
+"aprovat o referenciat."
+
+#: modules/websession/lib/websession_templates.py:1773
+#, fuzzy, python-format
+msgid "Group %s has been deleted"
+msgstr "El registre ha estat esborrat."
+
+#: modules/websession/lib/websession_templates.py:1777
+#, python-format
+msgid "Group %s has been deleted by its administrator."
+msgstr ""
+
+# Refereed?
+#: modules/websession/lib/websession_templates.py:1791
+#, fuzzy, python-format
+msgid ""
+"You can consult the list of %s%i groups%s you are subscribed to (%i) or "
+"administering (%i)."
+msgstr ""
+"Podeu consultar la llista de %(your_approval)s amb els documents que heu "
+"aprovat o referenciat."
 
 #: modules/websession/lib/webuser.py:102
 #, fuzzy
@@ -3780,23 +3844,21 @@ msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 
 # Trobar o cercar?
-#: modules/websession/lib/websession_webinterface.py:681
+#: modules/websession/lib/websession_webinterface.py:669
 #, fuzzy
 msgid "Join New Group"
 msgstr "Trobar un grup"
 
-#: modules/websession/lib/websession_webinterface.py:733
+#: modules/websession/lib/websession_webinterface.py:716
 msgid "Leave Group"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:792
+#: modules/websession/lib/websession_webinterface.py:781
 #, fuzzy
 msgid "Edit Group"
 msgstr "Afegir un grup"
 
-#: modules/websession/lib/websession_webinterface.py:826
-#: modules/websession/lib/websession_webinterface.py:834
-#: modules/websession/lib/websession_webinterface.py:841
+#: modules/websession/lib/websession_webinterface.py:848
 #, fuzzy
 msgid "Edit group members"
 msgstr "%i cistells de grup"
@@ -4394,6 +4456,28 @@ msgid "Unable to display document."
 msgstr "Puntueu aquest document"
 
 #, fuzzy
+#~ msgid "No waiting member"
+#~ msgstr "No s'ha trobat cap usuari que coincideixi"
+
+#, fuzzy
+#~ msgid "Waiting members"
+#~ msgstr "%i cistells de grup"
+
+# Una?
+#, fuzzy
+#~ msgid "Please select"
+#~ msgstr "Si us plau seleccioneu-ne un o més:"
+
+# Una?
+#, fuzzy
+#~ msgid "Please Select:"
+#~ msgstr "Si us plau seleccioneu-ne un o més:"
+
+#, fuzzy
+#~ msgid "Add member"
+#~ msgstr "Afegir comentari"
+
+#, fuzzy
 #~ msgid "Bring item up"
 #~ msgstr "Puja l'item"
 
@@ -4493,15 +4577,6 @@ msgstr "Puntueu aquest document"
 #, fuzzy
 #~ msgid "Create New Group"
 #~ msgstr "Creeu un nou tema"
-
-#, fuzzy
-#~ msgid "Edit group: "
-#~ msgstr "Afegir un grup"
-
-# Una?
-#, fuzzy
-#~ msgid "Please select:"
-#~ msgstr "Si us plau seleccioneu-ne un o més:"
 
 # Potser canviar el # per un n. ?
 #, fuzzy

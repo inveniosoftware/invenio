@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-18 19:47+0200\n"
+"POT-Creation-Date: 2006-07-19 16:58+0200\n"
 "PO-Revision-Date: 2006-07-11 18:14+0200\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
@@ -396,10 +396,10 @@ msgstr "Πιο Αναλυτικά"
 #: modules/webbasket/lib/webbasket_templates.py:1185
 #: modules/webbasket/lib/webbasket_templates.py:1290
 #: modules/webbasket/lib/webbasket_templates.py:1390
-#: modules/websession/lib/websession_templates.py:1148
-#: modules/websession/lib/websession_templates.py:1240
-#: modules/websession/lib/websession_templates.py:1407
-#: modules/websession/lib/websession_templates.py:1479
+#: modules/websession/lib/websession_templates.py:1197
+#: modules/websession/lib/websession_templates.py:1303
+#: modules/websession/lib/websession_templates.py:1474
+#: modules/websession/lib/websession_templates.py:1554
 msgid "Cancel"
 msgstr "Ακύρωση"
 
@@ -510,8 +510,8 @@ msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετ�
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:475
-#: modules/websession/lib/websession_templates.py:1518
-#: modules/websession/lib/websession_templates.py:1557
+#: modules/websession/lib/websession_templates.py:1593
+#: modules/websession/lib/websession_templates.py:1632
 msgid "Yes"
 msgstr "Ναι"
 
@@ -522,8 +522,8 @@ msgstr "Ναι"
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:476
-#: modules/websession/lib/websession_templates.py:1519
-#: modules/websession/lib/websession_templates.py:1558
+#: modules/websession/lib/websession_templates.py:1594
+#: modules/websession/lib/websession_templates.py:1633
 msgid "No"
 msgstr "Όχι"
 
@@ -1080,8 +1080,8 @@ msgstr "Παρουσίαση ερευνών"
 #: modules/webbasket/lib/webbasket_webinterface.py:478
 #: modules/webbasket/lib/webbasket_webinterface.py:528
 #: modules/webmessage/lib/webmessage_templates.py:442
-#: modules/websession/lib/websession_templates.py:429
-#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:1706
 #: modules/websession/lib/websession_webinterface.py:68
 #: modules/websession/lib/websession_webinterface.py:84
 #: modules/websession/lib/websession_webinterface.py:109
@@ -1592,7 +1592,7 @@ msgstr "Παρουσίαση καλαθιών"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:291
 #: modules/websession/lib/websession_templates.py:300
-#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:433
 msgid "Your Baskets"
 msgstr "Τα καλάθια μου"
 
@@ -1862,6 +1862,10 @@ msgstr "ID σχολίου"
 msgid "View Comment"
 msgstr "Επισκόπηση Σχολίου"
 
+#: modules/webcomment/lib/webcomment_templates.py:1060
+msgid "There have been no reports so far."
+msgstr ""
+
 #: modules/webcomment/lib/webcomment_templates.py:1064
 #, python-format
 msgid "View all %s reported comments"
@@ -2123,7 +2127,7 @@ msgstr "Το μύνημά σας έχει αποσταλεί."
 #: modules/webmessage/lib/webmessage_webinterface.py:65
 #: modules/webmessage/lib/webmessage_webinterface.py:217
 #: modules/webmessage/lib/webmessage_webinterface.py:246
-#: modules/websession/lib/websession_templates.py:430
+#: modules/websession/lib/websession_templates.py:432
 msgid "Your Messages"
 msgstr "Τα Μυνήματά μου"
 
@@ -2240,7 +2244,7 @@ msgid "No matching user"
 msgstr "Δεν βρέθηκε χρήστης"
 
 #: modules/webmessage/lib/webmessage_templates.py:589
-#: modules/websession/lib/websession_templates.py:1172
+#: modules/websession/lib/websession_templates.py:1235
 msgid "No matching group"
 msgstr "Δεν βρέθηκε ομάδα"
 
@@ -2928,7 +2932,7 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:298
-#: modules/websession/lib/websession_templates.py:433
+#: modules/websession/lib/websession_templates.py:435
 msgid "Your Searches"
 msgstr "Οι Αναζητήσεις μου"
 
@@ -2986,22 +2990,13 @@ msgid ""
 "(x_link_end)s; b) edit your %(x_link2_begin)saccount settings%(x_link_end)s."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:432
+#: modules/websession/lib/websession_templates.py:434
 msgid "Your Alert Searches"
 msgstr "Οι αναζητήσεις ειδοποιήσεων μου."
 
-#: modules/websession/lib/websession_templates.py:434
-#, fuzzy, python-format
-msgid ""
-"You can consult the list of %syour groups%s you are administering or are a "
-"member of."
-msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
-"οποίων είστε μέλος."
-
 #: modules/websession/lib/websession_templates.py:436
-#: modules/websession/lib/websession_templates.py:1629
-#: modules/websession/lib/websession_webinterface.py:558
+#: modules/websession/lib/websession_templates.py:1704
+#: modules/websession/lib/websession_webinterface.py:557
 msgid "Your Groups"
 msgstr "Οι ομάδες μου"
 
@@ -3255,183 +3250,254 @@ msgstr "διαχείριση"
 msgid "logout"
 msgstr "αποσύνδεση"
 
-#: modules/websession/lib/websession_templates.py:920
+#: modules/websession/lib/websession_templates.py:950
 #, fuzzy
-msgid "You are an administrator of the following groups"
+msgid "You are an administrator of the following groups:"
 msgstr "Δεν είστε διαχειριστής σε καμία ομάδα."
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
-#: modules/websession/lib/websession_templates.py:1398
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 msgid "Group"
 msgstr "Ομάδα"
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 msgid "Description"
 msgstr "Περιγραφή"
 
-#: modules/websession/lib/websession_templates.py:949
+#: modules/websession/lib/websession_templates.py:977
 #, fuzzy
 msgid "You are not an administrator of any groups."
 msgstr "Δεν είστε διαχειριστής σε καμία ομάδα."
 
-#: modules/websession/lib/websession_templates.py:956
-#: modules/websession/lib/websession_templates.py:1068
+#: modules/websession/lib/websession_templates.py:984
 msgid "Edit group"
 msgstr "Τροποποίηση ομάδας"
 
-#: modules/websession/lib/websession_templates.py:963
+#: modules/websession/lib/websession_templates.py:991
 #, fuzzy, python-format
 msgid "Edit %s members"
 msgstr "Τροποποίηση μελών ομάδας"
 
-#: modules/websession/lib/websession_templates.py:986
-#: modules/websession/lib/websession_templates.py:1058
-#: modules/websession/lib/websession_templates.py:1060
-#: modules/websession/lib/websession_webinterface.py:611
+#: modules/websession/lib/websession_templates.py:1014
+#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1109
+#: modules/websession/lib/websession_webinterface.py:610
 msgid "Create new group"
 msgstr "Δημιουργία νέας ομάδας"
 
-#: modules/websession/lib/websession_templates.py:992
+#: modules/websession/lib/websession_templates.py:1028
 #, fuzzy
-msgid "You are a member of the following groups"
+msgid "You are a member of the following groups:"
 msgstr "Δεν είστε μέλος καμίας ομάδας."
 
-#: modules/websession/lib/websession_templates.py:1015
+#: modules/websession/lib/websession_templates.py:1051
 #, fuzzy
 msgid "You are not a member of any groups."
 msgstr "Δεν είστε μέλος καμίας ομάδας."
 
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1076
 msgid "Join new group"
 msgstr "Κατάταξη σε νέα ομάδα"
 
-#: modules/websession/lib/websession_templates.py:1041
-#: modules/websession/lib/websession_templates.py:1467
-#: modules/websession/lib/websession_templates.py:1478
+#: modules/websession/lib/websession_templates.py:1077
+#: modules/websession/lib/websession_templates.py:1542
+#: modules/websession/lib/websession_templates.py:1553
 msgid "Leave group"
 msgstr "Αποχώρηση από ομάδα"
 
-#: modules/websession/lib/websession_templates.py:1066
+#: modules/websession/lib/websession_templates.py:1115
 msgid "Update group"
 msgstr "Ενημέρωση ομάδας"
 
-#: modules/websession/lib/websession_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1117
+#, fuzzy, python-format
+msgid "Edit group %s"
+msgstr "Τροποποίηση ομάδας:"
+
+#: modules/websession/lib/websession_templates.py:1119
 msgid "Delete group"
 msgstr "Διαγραφή ομάδας"
 
-#: modules/websession/lib/websession_templates.py:1140
+#: modules/websession/lib/websession_templates.py:1189
 #, fuzzy
-msgid "Group name"
+msgid "Group name:"
 msgstr "Όνομα ομάδας: "
 
-#: modules/websession/lib/websession_templates.py:1142
+#: modules/websession/lib/websession_templates.py:1191
 #, fuzzy
-msgid "Group description"
+msgid "Group description:"
 msgstr "Περιγραφή ομάδας: "
 
-#: modules/websession/lib/websession_templates.py:1143
-msgid "Group join policy"
+#: modules/websession/lib/websession_templates.py:1192
+msgid "Group join policy:"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1170
-#: modules/websession/lib/websession_templates.py:1241
-#: modules/websession/lib/websession_templates.py:1372
-#: modules/websession/lib/websession_templates.py:1465
-#: modules/websession/lib/websession_templates.py:1575
-msgid "Please select"
-msgstr "Παρακαλώ επιλέξτε"
+#: modules/websession/lib/websession_templates.py:1233
+#: modules/websession/lib/websession_templates.py:1304
+#: modules/websession/lib/websession_templates.py:1437
+#: modules/websession/lib/websession_templates.py:1446
+#: modules/websession/lib/websession_templates.py:1540
+#: modules/websession/lib/websession_templates.py:1650
+msgid "Please select:"
+msgstr "Παρακαλώ επιλέξτε:"
 
-#: modules/websession/lib/websession_templates.py:1234
+#: modules/websession/lib/websession_templates.py:1297
 msgid "Join group"
 msgstr "Κατάταξη σε ομάδα"
 
-#: modules/websession/lib/websession_templates.py:1236
+#: modules/websession/lib/websession_templates.py:1299
 #, fuzzy
 msgid "or find it"
 msgstr "ή βρείτε την: "
 
-#: modules/websession/lib/websession_templates.py:1237
+#: modules/websession/lib/websession_templates.py:1300
 #, fuzzy
-msgid "Choose group"
+msgid "Choose group:"
 msgstr "Επιλέξτε ομάδα:"
 
-#: modules/websession/lib/websession_templates.py:1239
+#: modules/websession/lib/websession_templates.py:1302
 msgid "Find group"
 msgstr "Εύρεση ομάδας"
 
-#: modules/websession/lib/websession_templates.py:1377
+#: modules/websession/lib/websession_templates.py:1442
 msgid "Remove member"
 msgstr "Αφαίρεση μέλους"
 
-#: modules/websession/lib/websession_templates.py:1381
-msgid "Please Select:"
-msgstr "Παρακαλώ Επιλέξτε"
+#: modules/websession/lib/websession_templates.py:1444
+#, fuzzy
+msgid "No members."
+msgstr "Νοέμβριος"
 
-#: modules/websession/lib/websession_templates.py:1386
-msgid "Add member"
-msgstr "Προσθήκη μέλους"
+#: modules/websession/lib/websession_templates.py:1454
+#, fuzzy
+msgid "Accept member"
+msgstr "Σεπτέμβριος"
 
-#: modules/websession/lib/websession_templates.py:1392
+#: modules/websession/lib/websession_templates.py:1454
+#, fuzzy
+msgid "Reject member"
+msgstr "Αφαίρεση μέλους"
+
+#: modules/websession/lib/websession_templates.py:1456
+#, fuzzy
+msgid "No members awaiting approval."
+msgstr "αναμένοντας έγκριση"
+
+#: modules/websession/lib/websession_templates.py:1458
+#, fuzzy
+msgid "Current members"
+msgstr "Προσκαλέστε νέα μέλη"
+
+#: modules/websession/lib/websession_templates.py:1459
+#, fuzzy
+msgid "Members awaiting approval"
+msgstr "αναμένοντας έγκριση"
+
+#: modules/websession/lib/websession_templates.py:1460
 msgid "Invite new members"
 msgstr "Προσκαλέστε νέα μέλη"
 
-#: modules/websession/lib/websession_templates.py:1395
-#, python-format
+#: modules/websession/lib/websession_templates.py:1463
+#, fuzzy, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %s "
-"system."
+"If you want to invite new members to join your group, please use the %sweb "
+"message%s system."
 msgstr ""
 "Εάν θέλετε να προσκαλέσετε νέα μέλη στην ομάδα σας, παρακαλώ χρησιμοποιήστε "
 "το σύστημα %s. "
 
-#: modules/websession/lib/websession_templates.py:1466
+#: modules/websession/lib/websession_templates.py:1465
+#, fuzzy, python-format
+msgid "Group: %s"
+msgstr "Ομάδες"
+
+#: modules/websession/lib/websession_templates.py:1541
 #, fuzzy
 msgid "Group list"
 msgstr "Λίστα ομάδας: "
 
-#: modules/websession/lib/websession_templates.py:1469
+#: modules/websession/lib/websession_templates.py:1544
 msgid "You are not member of any group."
 msgstr "Δεν είστε μέλος καμίας ομάδας."
 
-#: modules/websession/lib/websession_templates.py:1516
+#: modules/websession/lib/websession_templates.py:1591
 #, fuzzy
 msgid "Are you sure you want to delete this group?"
 msgstr "Είστε σίγουρος οτι θέλετε να σβήσετε αυτήν την ομάδα;"
 
-#: modules/websession/lib/websession_templates.py:1555
+#: modules/websession/lib/websession_templates.py:1630
 #, fuzzy
 msgid "Are you sure you want to leave this group?"
 msgstr "Είστε σίγουρος οτι θέλετε να αφήσετε αυτήν την ομάδα;"
 
-#: modules/websession/lib/websession_templates.py:1571
+#: modules/websession/lib/websession_templates.py:1646
 #, fuzzy
 msgid "Visible and open for new members"
 msgstr "Ορατό και ανοιχτό για εγγραφή νέου μέλους"
 
-#: modules/websession/lib/websession_templates.py:1573
+#: modules/websession/lib/websession_templates.py:1648
 #, fuzzy
 msgid "Visible but new members need approval"
 msgstr "Ορατό, αλλά χρειάζεται έγκριση για εγγραφή νέου μέλους"
 
-#: modules/websession/lib/websession_templates.py:1650
-msgid "New user request"
-msgstr ""
+#: modules/websession/lib/websession_templates.py:1736
+#, fuzzy, python-format
+msgid "Group %s: New membership request"
+msgstr "Η ομάδα '%s' δεν υπάρχει\n"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1739
+#: modules/websession/lib/websession_templates.py:1759
+#: modules/websession/lib/websession_templates.py:1776
 msgid "here"
 msgstr "εδώ"
 
-#: modules/websession/lib/websession_templates.py:1654
+#: modules/websession/lib/websession_templates.py:1741
+#, fuzzy, python-format
+msgid "A user wants to join the group %s."
+msgstr "Είστε σίγουρος οτι θέλετε να αφήσετε αυτήν την ομάδα;"
+
+#: modules/websession/lib/websession_templates.py:1742
 #, python-format
-msgid "A new user wants to join group %s."
+msgid "Please %saccept or reject%s this user's request."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1655
+#: modules/websession/lib/websession_templates.py:1756
 #, python-format
-msgid "Click %shere%s to accept the new member"
+msgid "Group %s: Join request has been %s"
 msgstr ""
+
+#: modules/websession/lib/websession_templates.py:1760
+#, python-format
+msgid "Your request for joining group %s has been %s."
+msgstr ""
+
+#: modules/websession/lib/websession_templates.py:1761
+#: modules/websession/lib/websession_templates.py:1778
+#, fuzzy, python-format
+msgid "You can consult the list of %syour groups%s."
+msgstr ""
+"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
+"οποίων είστε μέλος."
+
+#: modules/websession/lib/websession_templates.py:1773
+#, fuzzy, python-format
+msgid "Group %s has been deleted"
+msgstr "Η εγγραφή έχει διαγραφεί."
+
+#: modules/websession/lib/websession_templates.py:1777
+#, python-format
+msgid "Group %s has been deleted by its administrator."
+msgstr ""
+
+#: modules/websession/lib/websession_templates.py:1791
+#, fuzzy, python-format
+msgid ""
+"You can consult the list of %s%i groups%s you are subscribed to (%i) or "
+"administering (%i)."
+msgstr ""
+"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
+"οποίων είστε μέλος."
 
 #: modules/websession/lib/webuser.py:102
 #, fuzzy
@@ -3635,21 +3701,19 @@ msgstr ""
 "Οι χρήστες δεν μπορούν να εγγραφούν από μόνοι τους, πρέπει να τους εγγράψει "
 "ο διαχειριστής. "
 
-#: modules/websession/lib/websession_webinterface.py:681
+#: modules/websession/lib/websession_webinterface.py:669
 msgid "Join New Group"
 msgstr "Κατάταξη σε Νέα Ομάδας"
 
-#: modules/websession/lib/websession_webinterface.py:733
+#: modules/websession/lib/websession_webinterface.py:716
 msgid "Leave Group"
 msgstr "Αποχώρηση από Ομάδα"
 
-#: modules/websession/lib/websession_webinterface.py:792
+#: modules/websession/lib/websession_webinterface.py:781
 msgid "Edit Group"
 msgstr "Τροποποίηση Ομάδας"
 
-#: modules/websession/lib/websession_webinterface.py:826
-#: modules/websession/lib/websession_webinterface.py:834
-#: modules/websession/lib/websession_webinterface.py:841
+#: modules/websession/lib/websession_webinterface.py:848
 msgid "Edit group members"
 msgstr "Τροποποίηση μελών ομάδας"
 
@@ -4227,6 +4291,26 @@ msgstr "Δεν έχει ζητηθεί ποτέ έγκριση για το έγ�
 msgid "Unable to display document."
 msgstr "Δεν είναι δυνατή η απεικόνειση του εγγράφου."
 
+#, fuzzy
+#~ msgid "No waiting member"
+#~ msgstr "Δεν βρέθηκε χρήστης"
+
+#, fuzzy
+#~ msgid "Waiting members"
+#~ msgstr "Τροποποίηση μελών ομάδας"
+
+#~ msgid "Group: <b>%s</b>"
+#~ msgstr "Ομάδα: <b>%s</b>"
+
+#~ msgid "Please select"
+#~ msgstr "Παρακαλώ επιλέξτε"
+
+#~ msgid "Please Select:"
+#~ msgstr "Παρακαλώ Επιλέξτε"
+
+#~ msgid "Add member"
+#~ msgstr "Προσθήκη μέλους"
+
 #~ msgid "Bring item up"
 #~ msgstr "Μετακίνηση στοιχείου επάνω"
 
@@ -4323,15 +4407,6 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 
 #~ msgid "Create New Group"
 #~ msgstr "Δημιουργία Νέας Ομάδας"
-
-#~ msgid "Edit group: "
-#~ msgstr "Τροποποίηση ομάδας:"
-
-#~ msgid "Please select:"
-#~ msgstr "Παρακαλώ επιλέξτε:"
-
-#~ msgid "Group: <b>%s</b>"
-#~ msgstr "Ομάδα: <b>%s</b>"
 
 #~ msgid "user #%i"
 #~ msgstr "χρήστης #%i"

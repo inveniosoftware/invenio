@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-18 19:47+0200\n"
-"PO-Revision-Date: 2006-07-18 20:04+0200\n"
+"POT-Creation-Date: 2006-07-19 16:58+0200\n"
+"PO-Revision-Date: 2006-07-19 18:52+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -395,10 +395,10 @@ msgstr "Mnohoslovný"
 #: modules/webbasket/lib/webbasket_templates.py:1185
 #: modules/webbasket/lib/webbasket_templates.py:1290
 #: modules/webbasket/lib/webbasket_templates.py:1390
-#: modules/websession/lib/websession_templates.py:1148
-#: modules/websession/lib/websession_templates.py:1240
-#: modules/websession/lib/websession_templates.py:1407
-#: modules/websession/lib/websession_templates.py:1479
+#: modules/websession/lib/websession_templates.py:1197
+#: modules/websession/lib/websession_templates.py:1303
+#: modules/websession/lib/websession_templates.py:1474
+#: modules/websession/lib/websession_templates.py:1554
 msgid "Cancel"
 msgstr "Preruš"
 
@@ -504,8 +504,8 @@ msgstr "Prajete si vskutku zmazať tento záznam?"
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:475
-#: modules/websession/lib/websession_templates.py:1518
-#: modules/websession/lib/websession_templates.py:1557
+#: modules/websession/lib/websession_templates.py:1593
+#: modules/websession/lib/websession_templates.py:1632
 msgid "Yes"
 msgstr "Áno"
 
@@ -516,8 +516,8 @@ msgstr "Áno"
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:476
-#: modules/websession/lib/websession_templates.py:1519
-#: modules/websession/lib/websession_templates.py:1558
+#: modules/websession/lib/websession_templates.py:1594
+#: modules/websession/lib/websession_templates.py:1633
 msgid "No"
 msgstr "Nie"
 
@@ -1061,8 +1061,8 @@ msgstr "Zobraziť výsledky"
 #: modules/webbasket/lib/webbasket_webinterface.py:478
 #: modules/webbasket/lib/webbasket_webinterface.py:528
 #: modules/webmessage/lib/webmessage_templates.py:442
-#: modules/websession/lib/websession_templates.py:429
-#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:1706
 #: modules/websession/lib/websession_webinterface.py:68
 #: modules/websession/lib/websession_webinterface.py:84
 #: modules/websession/lib/websession_webinterface.py:109
@@ -1561,7 +1561,7 @@ msgstr "Zobraziť košíky"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:291
 #: modules/websession/lib/websession_templates.py:300
-#: modules/websession/lib/websession_templates.py:431
+#: modules/websession/lib/websession_templates.py:433
 msgid "Your Baskets"
 msgstr "Vaše košíky"
 
@@ -1826,6 +1826,10 @@ msgstr "ID komentára"
 msgid "View Comment"
 msgstr "Zobraziť komentár"
 
+#: modules/webcomment/lib/webcomment_templates.py:1060
+msgid "There have been no reports so far."
+msgstr "Ešte neboli žiadne hlásenia."
+
 #: modules/webcomment/lib/webcomment_templates.py:1064
 #, python-format
 msgid "View all %s reported comments"
@@ -2077,7 +2081,7 @@ msgstr "Vaša správa bola odoslaná."
 #: modules/webmessage/lib/webmessage_webinterface.py:65
 #: modules/webmessage/lib/webmessage_webinterface.py:217
 #: modules/webmessage/lib/webmessage_webinterface.py:246
-#: modules/websession/lib/websession_templates.py:430
+#: modules/websession/lib/websession_templates.py:432
 msgid "Your Messages"
 msgstr "Vaše správy"
 
@@ -2192,7 +2196,7 @@ msgid "No matching user"
 msgstr "Žiaden vyhovujúci užívateľ"
 
 #: modules/webmessage/lib/webmessage_templates.py:589
-#: modules/websession/lib/websession_templates.py:1172
+#: modules/websession/lib/websession_templates.py:1235
 msgid "No matching group"
 msgstr "Žiadna vyhovujúca grupa"
 
@@ -2867,7 +2871,7 @@ msgstr ""
 "Vaše preferencie o tom ako má rozhranie vyzerať."
 
 #: modules/websession/lib/websession_templates.py:298
-#: modules/websession/lib/websession_templates.py:433
+#: modules/websession/lib/websession_templates.py:435
 msgid "Your Searches"
 msgstr "Vaše hľadania"
 
@@ -2928,22 +2932,13 @@ msgstr ""
 "a) %(x_link1_begin)ssa odhlásiť%(x_link_end)s; b) editovať %(x_link2_begin)"
 "sparametre Vášho konta%(x_link_end)s."
 
-#: modules/websession/lib/websession_templates.py:432
+#: modules/websession/lib/websession_templates.py:434
 msgid "Your Alert Searches"
 msgstr "Vaše avíza"
 
-#: modules/websession/lib/websession_templates.py:434
-#, python-format
-msgid ""
-"You can consult the list of %syour groups%s you are administering or are a "
-"member of."
-msgstr ""
-"Môžete si prezrieť zoznam %sVašich grúp%s ktoré spravujete alebo ktorých ste "
-"členom."
-
 #: modules/websession/lib/websession_templates.py:436
-#: modules/websession/lib/websession_templates.py:1629
-#: modules/websession/lib/websession_webinterface.py:558
+#: modules/websession/lib/websession_templates.py:1704
+#: modules/websession/lib/websession_webinterface.py:557
 msgid "Your Groups"
 msgstr "Vaše grupy"
 
@@ -3181,170 +3176,233 @@ msgstr "administrácia"
 msgid "logout"
 msgstr "odhlásiť"
 
-#: modules/websession/lib/websession_templates.py:920
-msgid "You are an administrator of the following groups"
-msgstr "Ste administrátorom nasledujúcich grúp"
+#: modules/websession/lib/websession_templates.py:950
+msgid "You are an administrator of the following groups:"
+msgstr "Ste administrátorom nasledujúcich grúp:"
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
-#: modules/websession/lib/websession_templates.py:1398
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 msgid "Group"
 msgstr "Grupa"
 
-#: modules/websession/lib/websession_templates.py:942
-#: modules/websession/lib/websession_templates.py:1008
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1044
 msgid "Description"
 msgstr "Popis"
 
-#: modules/websession/lib/websession_templates.py:949
+#: modules/websession/lib/websession_templates.py:977
 msgid "You are not an administrator of any groups."
 msgstr "Nie ste administrátorom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:956
-#: modules/websession/lib/websession_templates.py:1068
+#: modules/websession/lib/websession_templates.py:984
 msgid "Edit group"
 msgstr "Edituj grupu"
 
-#: modules/websession/lib/websession_templates.py:963
+#: modules/websession/lib/websession_templates.py:991
 #, python-format
 msgid "Edit %s members"
 msgstr "Edituj %s členov"
 
-#: modules/websession/lib/websession_templates.py:986
-#: modules/websession/lib/websession_templates.py:1058
-#: modules/websession/lib/websession_templates.py:1060
-#: modules/websession/lib/websession_webinterface.py:611
+#: modules/websession/lib/websession_templates.py:1014
+#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1109
+#: modules/websession/lib/websession_webinterface.py:610
 msgid "Create new group"
 msgstr "Vytvoriť novú grupu"
 
-#: modules/websession/lib/websession_templates.py:992
-msgid "You are a member of the following groups"
-msgstr "Ste členom nasledujúcich grúp"
+#: modules/websession/lib/websession_templates.py:1028
+msgid "You are a member of the following groups:"
+msgstr "Ste členom nasledujúcich grúp:"
 
-#: modules/websession/lib/websession_templates.py:1015
+#: modules/websession/lib/websession_templates.py:1051
 msgid "You are not a member of any groups."
 msgstr "Nie ste členom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1076
 msgid "Join new group"
 msgstr "Pridať sa k novej grupe"
 
-#: modules/websession/lib/websession_templates.py:1041
-#: modules/websession/lib/websession_templates.py:1467
-#: modules/websession/lib/websession_templates.py:1478
+#: modules/websession/lib/websession_templates.py:1077
+#: modules/websession/lib/websession_templates.py:1542
+#: modules/websession/lib/websession_templates.py:1553
 msgid "Leave group"
 msgstr "Opustiť grupu"
 
-#: modules/websession/lib/websession_templates.py:1066
+#: modules/websession/lib/websession_templates.py:1115
 msgid "Update group"
 msgstr "Aktualizovať grupu"
 
-#: modules/websession/lib/websession_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1117
+#, python-format
+msgid "Edit group %s"
+msgstr "Edituj grupu %s"
+
+#: modules/websession/lib/websession_templates.py:1119
 msgid "Delete group"
 msgstr "Zmazať grupu"
 
-#: modules/websession/lib/websession_templates.py:1140
-msgid "Group name"
-msgstr "Meno grupy"
+#: modules/websession/lib/websession_templates.py:1189
+msgid "Group name:"
+msgstr "Meno grupy:"
 
-#: modules/websession/lib/websession_templates.py:1142
-msgid "Group description"
-msgstr "Popis grupy"
+#: modules/websession/lib/websession_templates.py:1191
+msgid "Group description:"
+msgstr "Popis grupy:"
 
-#: modules/websession/lib/websession_templates.py:1143
-msgid "Group join policy"
-msgstr "Politika pridania sa do grupy"
+#: modules/websession/lib/websession_templates.py:1192
+msgid "Group join policy:"
+msgstr "Politika pridania sa do grupy:"
 
-#: modules/websession/lib/websession_templates.py:1170
-#: modules/websession/lib/websession_templates.py:1241
-#: modules/websession/lib/websession_templates.py:1372
-#: modules/websession/lib/websession_templates.py:1465
-#: modules/websession/lib/websession_templates.py:1575
-msgid "Please select"
-msgstr "Prosíme vyberte"
+#: modules/websession/lib/websession_templates.py:1233
+#: modules/websession/lib/websession_templates.py:1304
+#: modules/websession/lib/websession_templates.py:1437
+#: modules/websession/lib/websession_templates.py:1446
+#: modules/websession/lib/websession_templates.py:1540
+#: modules/websession/lib/websession_templates.py:1650
+msgid "Please select:"
+msgstr "Prosíme vyberte:"
 
-#: modules/websession/lib/websession_templates.py:1234
+#: modules/websession/lib/websession_templates.py:1297
 msgid "Join group"
 msgstr "Pridať sa ku grupe"
 
-#: modules/websession/lib/websession_templates.py:1236
+#: modules/websession/lib/websession_templates.py:1299
 msgid "or find it"
 msgstr "alebo nájsť ju"
 
-#: modules/websession/lib/websession_templates.py:1237
-msgid "Choose group"
-msgstr "Zvoliť grupu"
+#: modules/websession/lib/websession_templates.py:1300
+msgid "Choose group:"
+msgstr "Zvoľte grupu:"
 
-#: modules/websession/lib/websession_templates.py:1239
+#: modules/websession/lib/websession_templates.py:1302
 msgid "Find group"
 msgstr "Nájdi grupu"
 
-#: modules/websession/lib/websession_templates.py:1377
+#: modules/websession/lib/websession_templates.py:1442
 msgid "Remove member"
 msgstr "Odstráň člena"
 
-#: modules/websession/lib/websession_templates.py:1381
-msgid "Please Select:"
-msgstr "Prosíme vyberte:"
+#: modules/websession/lib/websession_templates.py:1444
+msgid "No members."
+msgstr "Žiadni členovia."
 
-#: modules/websession/lib/websession_templates.py:1386
-msgid "Add member"
-msgstr "Pridaj člena"
+#: modules/websession/lib/websession_templates.py:1454
+msgid "Accept member"
+msgstr "Prijmi člena"
 
-#: modules/websession/lib/websession_templates.py:1392
+#: modules/websession/lib/websession_templates.py:1454
+msgid "Reject member"
+msgstr "Odmientni člena"
+
+#: modules/websession/lib/websession_templates.py:1456
+msgid "No members awaiting approval."
+msgstr "Žiadni členovia nečakajú na schválenie."
+
+#: modules/websession/lib/websession_templates.py:1458
+msgid "Current members"
+msgstr "Súčasní členovia"
+
+#: modules/websession/lib/websession_templates.py:1459
+msgid "Members awaiting approval"
+msgstr "Členovia čakajúci na schválenie"
+
+#: modules/websession/lib/websession_templates.py:1460
 msgid "Invite new members"
 msgstr "Pozvite nových členov"
 
-#: modules/websession/lib/websession_templates.py:1395
+#: modules/websession/lib/websession_templates.py:1463
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %s "
-"system."
+"If you want to invite new members to join your group, please use the %sweb "
+"message%s system."
 msgstr ""
 "Ak chcete pozvať nových členov aby sa pripojili k Vašej grupe, prosím "
-"použite %s systém."
+"použite systém %sweb správ%s."
 
-#: modules/websession/lib/websession_templates.py:1466
+#: modules/websession/lib/websession_templates.py:1465
+#, python-format
+msgid "Group: %s"
+msgstr "Grupa: %s"
+
+#: modules/websession/lib/websession_templates.py:1541
 msgid "Group list"
 msgstr "Zoznam grúp"
 
-#: modules/websession/lib/websession_templates.py:1469
+#: modules/websession/lib/websession_templates.py:1544
 msgid "You are not member of any group."
 msgstr "Nie ste členom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:1516
+#: modules/websession/lib/websession_templates.py:1591
 msgid "Are you sure you want to delete this group?"
 msgstr "Ste si istí že chcete zmazať túto grupu?"
 
-#: modules/websession/lib/websession_templates.py:1555
+#: modules/websession/lib/websession_templates.py:1630
 msgid "Are you sure you want to leave this group?"
 msgstr "Ste si istí že chcete opustiť túto grupu?"
 
-#: modules/websession/lib/websession_templates.py:1571
+#: modules/websession/lib/websession_templates.py:1646
 msgid "Visible and open for new members"
 msgstr "Viditeľná a otvorená pre nových členov"
 
-#: modules/websession/lib/websession_templates.py:1573
+#: modules/websession/lib/websession_templates.py:1648
 msgid "Visible but new members need approval"
 msgstr "Viditeľná ale noví členovia potrebujú schválenie"
 
-#: modules/websession/lib/websession_templates.py:1650
-msgid "New user request"
-msgstr "Nová požiadavka užívateľa"
+#: modules/websession/lib/websession_templates.py:1736
+#, python-format
+msgid "Group %s: New membership request"
+msgstr "Grupa %s: Nová požiadavka pre členstvo"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1739
+#: modules/websession/lib/websession_templates.py:1759
+#: modules/websession/lib/websession_templates.py:1776
 msgid "here"
 msgstr "tu"
 
-#: modules/websession/lib/websession_templates.py:1654
+#: modules/websession/lib/websession_templates.py:1741
 #, python-format
-msgid "A new user wants to join group %s."
-msgstr "Nový užívateľ sa chce pripojiť ku grupe %s."
+msgid "A user wants to join the group %s."
+msgstr "Užívateľ sa chce pripojiť ku grupe %s."
 
-#: modules/websession/lib/websession_templates.py:1655
+#: modules/websession/lib/websession_templates.py:1742
 #, python-format
-msgid "Click %shere%s to accept the new member"
-msgstr "Kliknite %stu%s aby ste akceptovali nového člena"
+msgid "Please %saccept or reject%s this user's request."
+msgstr "Prosím %sprijmite alebo zamietnite%s žiadosť tohto užívateľa."
+
+#: modules/websession/lib/websession_templates.py:1756
+#, python-format
+msgid "Group %s: Join request has been %s"
+msgstr "Grupa %s: Žiadosť na pripojenie bola %s"
+
+#: modules/websession/lib/websession_templates.py:1760
+#, python-format
+msgid "Your request for joining group %s has been %s."
+msgstr "Vaša žiadosť na pripojenie sa ku grupe %s bola %s."
+
+#: modules/websession/lib/websession_templates.py:1761
+#: modules/websession/lib/websession_templates.py:1778
+#, python-format
+msgid "You can consult the list of %syour groups%s."
+msgstr "Môžete si prezrieť zoznam %sVašich grúp%s."
+
+#: modules/websession/lib/websession_templates.py:1773
+#, python-format
+msgid "Group %s has been deleted"
+msgstr "Grupa %s bola zrušená."
+
+#: modules/websession/lib/websession_templates.py:1777
+#, python-format
+msgid "Group %s has been deleted by its administrator."
+msgstr "Grupa %s bola zrušená jej administrátorom."
+
+#: modules/websession/lib/websession_templates.py:1791
+#, python-format
+msgid ""
+"You can consult the list of %s%i groups%s you are subscribed to (%i) or "
+"administering (%i)."
+msgstr ""
+"Môžete si prezrieť zoznam %s%i Vašich grúp%s ktorých ste členom (%i) alebo "
+"ktoré spravujete (%i)."
 
 #: modules/websession/lib/webuser.py:102
 msgid "Database problem"
@@ -3542,21 +3600,19 @@ msgstr ""
 "Užívatelia sa nemôžu sami zaregistrovať, iba administrátor ich môže "
 "zaregistrovať."
 
-#: modules/websession/lib/websession_webinterface.py:681
+#: modules/websession/lib/websession_webinterface.py:669
 msgid "Join New Group"
 msgstr "Pridaj sa k novej grupe"
 
-#: modules/websession/lib/websession_webinterface.py:733
+#: modules/websession/lib/websession_webinterface.py:716
 msgid "Leave Group"
 msgstr "Opustiť grupu"
 
-#: modules/websession/lib/websession_webinterface.py:792
+#: modules/websession/lib/websession_webinterface.py:781
 msgid "Edit Group"
 msgstr "Edituj grupu"
 
-#: modules/websession/lib/websession_webinterface.py:826
-#: modules/websession/lib/websession_webinterface.py:834
-#: modules/websession/lib/websession_webinterface.py:841
+#: modules/websession/lib/websession_webinterface.py:848
 msgid "Edit group members"
 msgstr "Edituj členov grupy"
 
