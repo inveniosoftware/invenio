@@ -947,7 +947,7 @@ class Template:
         
 
         out = self.tmpl_group_table_title(img="/img/group_admin.png",
-                                          text=_("You are administrator of the following groups:") )        
+                                          text=_("You are an administrator of the following groups:") )        
         
         out += """
 <table class="mailbox">
@@ -1025,7 +1025,7 @@ class Template:
         - 'groups' *list* - All the group the user is member of
         """ 
         _ = gettext_set_language(ln)
-        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are member of the following groups:"))
+        group_text = self.tmpl_group_table_title(img="/img/webbasket_us.png", text=_("You are a member of the following groups:"))
 
         group_text += """
 <table class="mailbox">
@@ -1114,7 +1114,7 @@ class Template:
             action = weburl + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
-            label = _('Edit group: ') + group_name
+            label = _('Edit group %s') % group_name
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
             delete_text %= (_("Delete group"),"delete")
             if grpID != "":
@@ -1441,7 +1441,7 @@ class Template:
             <input type="submit" name="remove_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (member_list,_("Remove member"))
         else :
-            member_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No member")
+            member_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No members.")
         if pending_members :
             pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please select:"))
             pending_text = """
@@ -1453,16 +1453,16 @@ class Template:
             <input type="submit" name="reject_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (pending_list,_("Accept member"), _("Reject member"))
         else :
-            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No waiting member") 
+            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No members awaiting approval.") 
         
         header1 = self.tmpl_group_table_title(text=_("Current members"))
-        header2 = self.tmpl_group_table_title(text=_("Waiting members"))
+        header2 = self.tmpl_group_table_title(text=_("Members awaiting approval"))
         header3 = _("Invite new members")
         link_open = '<a href="%s/yourmessages/write?ln=%s">'
         link_open %= (weburl, ln)
         invite_text = _("If you want to invite new members to join your group, please use the %sweb message%s system.") % (link_open, '</a>')
         action = weburl + '/yourgroups/members?ln=' + ln
-        out %= {'title':_('Group: <b>%s</b>') % group_name,
+        out %= {'title':_('Group: %s') % group_name,
                 'member_text' : member_text,
                 'pending_text' :pending_text,
                 'action':action,
@@ -1733,12 +1733,13 @@ class Template:
         - 'ln' *string* - The language to display the interface in
         """
         _ = gettext_set_language(ln)
-        subject = _("Group %s: New user request") % group_name
+        subject = _("Group %s: New membership request") % group_name
         url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
         link = """<a href="%s">%s</a>""" % (url, _("here"))
-        body = (_("A new user wants to join group %s.") % group_name) + '<br/>'
-	body += (_("You can %saccept or reject%s the new member") % ('<a href="' + url + '">', '</a>')) + '<br />'
+        # FIXME: which user?  We should show his nickname.
+        body = (_("A user wants to join the group %s.") % group_name) + '<br/>'
+	body += (_("Please %saccept or reject%s this user's request.") % ('<a href="' + url + '">', '</a>')) + '<br />'
         return subject, body
 
     def tmpl_member_msg(self,
@@ -1756,7 +1757,7 @@ class Template:
         url = weburl + "/yourgroups/display?ln=%s"
         url %= (ln)
         link = """<a href="%s">%s</a>""" % (url, _("here"))
-        body = (_(" Your request for joining group %s has been %s.") % (group_name, status)) + '<br/>'
+        body = (_("Your request for joining group %s has been %s.") % (group_name, status)) + '<br/>'
 	body += (_("You can consult the list of %syour groups%s.") % ('<a href="' + url + '">', '</a>')) + '<br />'
         return subject, body
     
