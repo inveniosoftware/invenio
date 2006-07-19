@@ -1057,7 +1057,7 @@ class Template:
         u_nickname = 7
 
         if not users_data:
-            return self.tmpl_warnings([_(("There have been no reports so far."), 'green')])
+            return self.tmpl_warnings([(_("There have been no reports so far."), 'green')])
         
         user_rows = ""
         for utuple in users_data:
