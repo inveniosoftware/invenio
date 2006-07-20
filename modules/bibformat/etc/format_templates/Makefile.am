@@ -24,6 +24,7 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Picture_HTML_detailed.bft Default_HTML_brief.bft \
 	   BibTeX.bft
 
-EXTRA_DIST = $(etc_DATA)
+EXTRA_DIST = $(etc_DATA) Test1.bft Test\ 2.bft Test3.bft Test_no_template.test
+
 
 CLEANFILES = *.tmp
