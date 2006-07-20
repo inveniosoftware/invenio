@@ -1008,10 +1008,10 @@ class Template:
         _ = gettext_set_language(ln)
         out = '<p>'
         if f:
-            out += _("Words nearest to %(x_words)s inside %(x_fields)s in any collection are:") % {'x_words': '<em>' + p + '</em>',
-                                                                                                   'x_fields': '<em>' + f + '</em>'}
+            out += _("Words nearest to %(x_word)s inside %(x_field)s in any collection are:") % {'x_word': '<em>' + p + '</em>',
+                                                                                                 'x_field': '<em>' + f + '</em>'}
         else:
-            out += _("Words nearest to %(x_words)s in any collection are:") % {'x_words': '<em>' + p + '</em>'}
+            out += _("Words nearest to %(x_word)s in any collection are:") % {'x_word': '<em>' + p + '</em>'}
         out += '<br />' + nearest_box + '</p>'
         return out
 
