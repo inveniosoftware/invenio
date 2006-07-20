@@ -1,0 +1,29 @@
+<name>Picture HTML brief</name>
+<description>The brief HTML format suitable for displaying pictures. </description>
+
+<hr/>
+<table width="90%">
+<tr> 
+<td valign="top" align="left">
+<BFE_TITLE_BRIEF prefix="<b>" suffix="</b>"/>
+<BFE_FIELD tag="246_1$a" prefix="<br/><b><i>" suffix="</i></b>"/>
+
+<BFE_PUBLICATION_DATE prefix="<br/> " />
+
+<BFE_ABSTRACT limit="1" prefix="<p><i>Abstract</i>: " suffix="</p>"/>
+
+<BFE_KEYWORDS separator=", " prefix="<br/> <i>Keyword</i>: "/>
+
+
+
+<BFE_PRIMARY_REPORT_NUMBER prefix="<br/><i>Picture number</i>: " />
+
+<BFE_FIELD tag="909CP$t" prefix="<br/><I>Available picture(s)</i>: "/>
+
+</td> <td valign="top" align="right">
+
+<BFE_PHOTO_RESOURCES_BRIEF />
+
+</td>
+</tr>
+</table>

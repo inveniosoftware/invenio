@@ -33,8 +33,11 @@ try:
     from invenio.dbquery import run_sql, escape_string
     from invenio.config import *
     from invenio.search_engine import perform_request_search
-    from invenio.search_engine import print_record
+    from invenio.search_engine import print_record, encode_for_xml
     from invenio.access_control_engine import acc_authorize_action
+    from invenio.bibformat_engine import format_record
+    from invenio.bibformat_migration_kit_assistant_lib import use_old_bibformat
+    from invenio.bibrecord import create_records
     import getopt
     import getpass
     import marshal
@@ -114,13 +117,18 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 
 ### Iterate over all records prepared in lists I (option)
     if process:
-        iterate_over(recIDs, weburl, fmt)
+        if use_old_bibformat(): # FIXME: remove this when migration from php to python bibformat is done
+            iterate_over_old(recIDs, weburl, fmt)
+        else:
+            iterate_over_new(recIDs, weburl, fmt)
 
 
 ### Iterate over all records prepared in list II (no_format)
     if process_format and process:
-        iterate_over(without_format, weburl, fmt)
-
+        if use_old_bibformat(): # FIXME: remove this when migration from php to python bibformat is done
+            iterate_over_old(without_format, weburl, fmt)
+        else:
+            iterate_over_new(without_format, weburl, fmt)
 
 ### Final statistics
 
@@ -199,10 +207,66 @@ def without_fmt(sql):
     return lhdiff(xm2,format2)
 
 
-### Bibreformat all selected records
-###
+### Bibreformat all selected records (using new python bibformat)
+### (see iterate_over_old further down)
 
-def iterate_over(list, weburl, fmt):
+def iterate_over_new(list, weburl, fmt):
+    "Iterate odver list of IDs"
+
+    
+    for recID in list:
+
+        message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
+        print message
+
+        t11 = os.times()[4]
+        message = "START bibformat external call"
+        print message
+
+        ### bibformat external call
+        ###
+        formatted_record = format_record(recID, fmt)
+        # Encapsulate record in xml tags that bibupload understands
+        prologue = '''
+    <record>
+       <controlfield tag="001">%s</controlfield>
+          <datafield tag="FMT" ind1="" ind2="">
+             <subfield code="f">%s</subfield>
+             <subfield code="g">'''
+        epilogue = '''
+          </subfield>
+       </datafield>
+    </record>'''
+        
+        formatted_record = prologue + formatted_record + epilogue
+        
+        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
+        filehandle = open(finalfilename,"w")
+        filehandle.write(formatted_record)
+        filehandle.close()
+
+        t22 = os.times()[4]
+        message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
+        print message
+
+        ### bibupload external call
+        ###
+        t11 = os.times()[4]
+        message = "START bibupload external call"
+        print message
+
+        command = "%s/bibupload -f %s" % (bindir,finalfilename)
+        os.system(command)
+
+        t22 = os.times()[4]
+        message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
+        print message
+    
+    
+### Bibreformat all selected records (using old php bibformat)
+### (see iterate_over_new above)
+
+def iterate_over_old(list, weburl, fmt):
     "Iterate odver list of IDs"
 
     n_rec       = 0

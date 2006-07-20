@@ -1,0 +1,9 @@
+tag 980.a :
+PICTURE --- Picture_HTML_detailed.bft
+ARTICLE---Article.bft
+
+tag 950__b:
+tag 980__a:
+THESIS --- Thesis_detailed.bft
+PUBLICATION --- Pub.bft
+default: Default_HTML_detailed.bft

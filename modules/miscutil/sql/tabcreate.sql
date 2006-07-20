@@ -2251,6 +2251,8 @@ CREATE TABLE IF NOT EXISTS format (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
   code varchar(6) NOT NULL,
+  description varchar(255) default '',
+  content_type varchar(255) default '', 
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
 ) TYPE=MyISAM;
@@ -2604,6 +2606,25 @@ CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   KEY client_host (client_host),
   KEY id_user (id_user),
   KEY action_code (action_code)
+) TYPE=MyISAM;
+
+-- tables for BibFormat in Python
+
+CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
+  id mediumint(8) unsigned NOT NULL auto_increment,
+  name varchar(255) default '',
+  description text default '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASEMAPPINGS (
+  id mediumint(8) unsigned NOT NULL auto_increment,
+  m_key varchar(255) NOT NULL default '',
+  m_value text NOT NULL default '',
+  id_fmtKNOWLEDGEBASES mediumint(8) NOT NULL default '0',
+  PRIMARY KEY  (id),
+  KEY id_fmtKNOWLEDGEBASES (id_fmtKNOWLEDGEBASES)
 ) TYPE=MyISAM;
 
 

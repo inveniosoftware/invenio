@@ -22,7 +22,10 @@ webdir=$(localstatedir)/www/admin/bibformat
 FILESWML=$(wildcard $(srcdir)/*.wml)
 web_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+webappdir = $(localstatedir)/www/admin/bibformat
+webapp_DATA = bibformat_migration_kit_assistant.py bibformatadmin.py
+
+EXTRA_DIST =  bibformatmigrationkitadmin.py bibformatadmin.py $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) *~ *.tmp
 

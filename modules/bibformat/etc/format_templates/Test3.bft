@@ -1,0 +1,5 @@
+<name>test</name>
+<description>test</description>
+<h1>hi</h1> this is my template
+<bfe_test_1 /><bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/><lang><en>ten</en><fr>tfr</fr>garbage</lang>
+<bfe_test_5 param1="test me!" param2="<b>ok</b>"/>

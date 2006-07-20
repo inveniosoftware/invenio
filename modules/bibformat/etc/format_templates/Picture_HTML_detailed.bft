@@ -1,0 +1,55 @@
+<name>Picture HTML detailed</name>
+<description>The detailed HTML format suitable for displaying pictures. </description>
+<BFE_TOPBANNER />
+<BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
+
+<BFE_NOTES />
+<BFE_PUBLICATION_DATE prefix="<center>" suffix="</center>"/>
+<BFE_CONTACT />
+<center>
+<BFE_AUTHORS prefix="<center>Photographer:<small>" suffix="</small>" print_links="yes" limit="10" interactive="yes"/>
+<BFE_ADDRESSES prefix="<small>" suffix="</small>" print_link="yes"/>
+</center>
+<br/>
+
+<BFE_KEYWORDS prefix="<small><strong>Keyword(s): </strong>" suffix="</small>"/>
+
+<table> <tr>
+<td valign="top" align="left"> 
+<BFE_FIELD tag="909CP$s" prefix="<br/> <strong>Original ref.</strong>: " suffix=" " />
+<BFE_FIELD tag="909CP$t" prefix="<br/><strong>Available pictures</strong>: " suffix="  "/>
+
+<BFE_FIELD
+ tag="520__$a"
+ prefix = '</p><table><tr><td class="blocknote"> 
+ Caption</td>
+</tr></table> <small>'
+ suffix='</small></p>'/>
+
+<BFE_FIELD
+ tag="590__$a"
+ prefix='</p><table><tr><td class="blocknote">  
+ Légende</td></tr></table>
+ <small>'
+ suffix='</small></p>' />
+
+<BFE_FIELD tag="909C4" prefix='</p><table><tr><td class="blocknote">See also:</td></tr></table><small>' 
+ suffix="</small><br/>" />
+
+</td>
+
+<td valign="top">
+<BFE_PHOTO_RESOURCES prefix='<table><tr><td class="blocknote">Resources</td></tr></table>' />
+</td> 
+
+</tr>
+
+<tr><td colspan="2" class="blocknote">
+ <strong>© CERN Geneva: </strong>
+<small>The use of photos requires prior authorization (from <a href="http://wpedb.cern.ch/databases/Copyright/">CERN copyright</a>). 
+The words CERN Photo must be quoted for each use. </small>
+</td>
+</tr>
+
+</table>
+</p>

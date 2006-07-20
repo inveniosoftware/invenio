@@ -17,6 +17,16 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = common core
+SUBDIRS = common core elements
 
-CLEANFILES = *~
+pylibdir = $(libdir)/python/invenio
+
+pylib_DATA = bibformat_config.py bibformat_templates.py \
+             bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
+	     bibformat_utils.py bibformat_migration_kit_dblayer.py bibformat_migration_kit.py \
+	     bibformat_migration_kit_templates.py  bibformat.py \
+	     bibformat_migration_kit_assistant_lib.py 
+
+EXTRA_DIST = $(pylib_DATA)
+
+CLEANFILES = *~ *.tmp *.pyc

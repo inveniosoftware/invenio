@@ -460,14 +460,14 @@ INSERT INTO field_tag VALUES (8,10,100);
 INSERT INTO field_tag VALUES (9,115,100);
 INSERT INTO field_tag VALUES (14,117,100);
 
-INSERT INTO format VALUES (1,'HTML brief','hb');
-INSERT INTO format VALUES (2,'HTML detailed','hd');
-INSERT INTO format VALUES (6,'portfolio','hp');
-INSERT INTO format VALUES (7,'photo captions only','hc');
-INSERT INTO format VALUES (8,'BibTeX','hx');
-INSERT INTO format VALUES (4,'Dublin Core','xd');
-INSERT INTO format VALUES (3,'MARC','hm');
-INSERT INTO format VALUES (5,'MARCXML','xm');
+INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html');
+INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html');
+INSERT INTO format VALUES (6,'portfolio','hp', 'HTML portfolio-style output format for photos.', 'text/html');
+INSERT INTO format VALUES (7,'photo captions only','hc', 'HTML caption-only output format for photos.', 'text/html');
+INSERT INTO format VALUES (8,'BibTeX','hx', 'BibTeX.', 'text/html');
+INSERT INTO format VALUES (4,'Dublin Core','xd', 'XML Dublin Core.', 'text/xml');
+INSERT INTO format VALUES (3,'MARC','hm', 'HTML MARC.', 'text/html');
+INSERT INTO format VALUES (5,'MARCXML','xm', 'XML MARC.', 'text/xml');
 
 INSERT INTO tag VALUES (1,'first author','100__%');
 INSERT INTO tag VALUES (2,'additional author','700__%');
