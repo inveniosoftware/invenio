@@ -16,10 +16,10 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.90.0\n"
+"Project-Id-Version: CDS-Invenio 0.90.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-19 16:58+0200\n"
-"PO-Revision-Date: 2006-07-19 18:52+0200\n"
+"POT-Creation-Date: 2006-07-20 19:10+0200\n"
+"PO-Revision-Date: 2006-07-20 19:10+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -27,24 +27,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: config/cdswmllib.wml:92 modules/webstyle/lib/webstyle_templates.py:465
+#: config/cdswmllib.wml:92 modules/webstyle/lib/webstyle_templates.py:466
 msgid "This site is also available in the following languages:"
 msgstr "Táto stránka je tiež dostupná v nasledujúcich jazykoch:"
 
 #: config/cdspage.wml:53 config/cdspage.wml:139
 #: modules/websearch/lib/websearch_templates.py:325
 #: modules/websearch/lib/websearch_templates.py:446
-#: modules/websearch/lib/websearch_templates.py:1255
-#: modules/websearch/lib/websearch_templates.py:1354
-#: modules/websearch/lib/websearch_templates.py:1413
-#: modules/webstyle/lib/webstyle_templates.py:342
-#: modules/webstyle/lib/webstyle_templates.py:413
+#: modules/websearch/lib/websearch_templates.py:1250
+#: modules/websearch/lib/websearch_templates.py:1349
+#: modules/websearch/lib/websearch_templates.py:1408
+#: modules/webstyle/lib/webstyle_templates.py:343
+#: modules/webstyle/lib/webstyle_templates.py:414
 msgid "Search"
 msgstr "Hľadaj"
 
 #: config/cdspage.wml:60 config/cdspage.wml:141
-#: modules/webstyle/lib/webstyle_templates.py:345
-#: modules/webstyle/lib/webstyle_templates.py:416
+#: modules/webstyle/lib/webstyle_templates.py:346
+#: modules/webstyle/lib/webstyle_templates.py:417
 msgid "Help"
 msgstr "Pomoc"
 
@@ -164,8 +164,8 @@ msgstr "Pomoc"
 msgid "Admin Area"
 msgstr "Areál Administrátora"
 
-#: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:154
-#: modules/webstyle/lib/webstyle_templates.py:381
+#: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:155
+#: modules/webstyle/lib/webstyle_templates.py:382
 msgid "Last updated"
 msgstr "Posledná aktualizácia"
 
@@ -233,8 +233,8 @@ msgstr "Konvertuj"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
 #: modules/bibedit/lib/bibedit_templates.py:102
-#: modules/webstyle/lib/webstyle_templates.py:343
-#: modules/webstyle/lib/webstyle_templates.py:414
+#: modules/webstyle/lib/webstyle_templates.py:344
+#: modules/webstyle/lib/webstyle_templates.py:415
 #: modules/websubmit/lib/websubmit_engine.py:443
 #: modules/websubmit/lib/websubmit_engine.py:685
 #: modules/websubmit/lib/websubmit_engine.py:721
@@ -243,8 +243,8 @@ msgid "Submit"
 msgstr "Pridaj"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
-#: modules/webstyle/lib/webstyle_templates.py:344
-#: modules/webstyle/lib/webstyle_templates.py:415
+#: modules/webstyle/lib/webstyle_templates.py:345
+#: modules/webstyle/lib/webstyle_templates.py:416
 msgid "Personalize"
 msgstr "Personalizácia"
 
@@ -339,8 +339,8 @@ msgstr "Agenda"
 #: modules/websearch/doc/tips.html.wml:22
 #: modules/websearch/lib/websearch_templates.py:327
 #: modules/websearch/lib/websearch_templates.py:448
-#: modules/websearch/lib/websearch_templates.py:1358
-#: modules/websearch/lib/websearch_templates.py:1417
+#: modules/websearch/lib/websearch_templates.py:1353
+#: modules/websearch/lib/websearch_templates.py:1412
 msgid "Search Tips"
 msgstr "Tipy pre vyhľadávanie"
 
@@ -349,13 +349,13 @@ msgid "Webcast"
 msgstr "Webcast"
 
 #: config/cdspage.wml:64 config/cdspage.wml:66
-#: modules/webstyle/lib/webstyle_templates.py:67
-#: modules/webstyle/lib/webstyle_templates.py:76
-#: modules/webstyle/lib/webstyle_templates.py:248
+#: modules/webstyle/lib/webstyle_templates.py:68
+#: modules/webstyle/lib/webstyle_templates.py:77
+#: modules/webstyle/lib/webstyle_templates.py:249
 msgid "Home"
 msgstr "Hlavná stránka"
 
-#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:419
+#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:420
 msgid "Maintained by"
 msgstr "Spravuje"
 
@@ -370,7 +370,7 @@ msgstr "Buletín"
 msgid "Search Help"
 msgstr "Pomoc pre vyhľadávanie"
 
-#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:418
+#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:419
 msgid "Powered by"
 msgstr "Powered by"
 
@@ -392,13 +392,13 @@ msgid "Verbose"
 msgstr "Mnohoslovný"
 
 #: modules/bibedit/lib/bibedit_templates.py:108
-#: modules/webbasket/lib/webbasket_templates.py:1185
-#: modules/webbasket/lib/webbasket_templates.py:1290
-#: modules/webbasket/lib/webbasket_templates.py:1390
-#: modules/websession/lib/websession_templates.py:1197
-#: modules/websession/lib/websession_templates.py:1303
-#: modules/websession/lib/websession_templates.py:1474
-#: modules/websession/lib/websession_templates.py:1554
+#: modules/webbasket/lib/webbasket_templates.py:1160
+#: modules/webbasket/lib/webbasket_templates.py:1265
+#: modules/webbasket/lib/webbasket_templates.py:1365
+#: modules/websession/lib/websession_templates.py:1211
+#: modules/websession/lib/websession_templates.py:1317
+#: modules/websession/lib/websession_templates.py:1490
+#: modules/websession/lib/websession_templates.py:1570
 msgid "Cancel"
 msgstr "Preruš"
 
@@ -410,8 +410,8 @@ msgid "Delete"
 msgstr "Zmazať"
 
 #: modules/bibedit/lib/bibedit_templates.py:120
-#: modules/webalert/lib/webalert_templates.py:313
-#: modules/webalert/lib/webalert_templates.py:433
+#: modules/webalert/lib/webalert_templates.py:317
+#: modules/webalert/lib/webalert_templates.py:439
 #: modules/webmessage/lib/webmessage_templates.py:82
 #: modules/websubmit/lib/websubmit_templates.py:1398
 msgid "Action"
@@ -419,7 +419,7 @@ msgstr "Akcia"
 
 #: modules/bibedit/lib/bibedit_templates.py:121
 #: modules/bibedit/lib/bibedit_templates.py:136
-#: modules/webcomment/lib/webcomment_templates.py:609
+#: modules/webcomment/lib/webcomment_templates.py:610
 #: modules/webcomment/lib/webcomment_templates.py:1163
 #: modules/websearch/lib/websearch_templates.py:165
 #: modules/websearch/lib/websearch_templates.py:167
@@ -476,58 +476,53 @@ msgid "Please enter the ID of the record you want to edit"
 msgstr "Prosím zadajte ID záznamu ktorý chcete editovať"
 
 #: modules/bibedit/lib/bibedit_templates.py:447
-#: modules/bibedit/lib/bibedit_templates.py:486
-msgid "BibEdit Admin Interface"
-msgstr "BibEdit rozhranie administrátora"
+msgid ""
+"Your modifications have now been submitted. They will be processed as soon "
+"as the task queue is empty."
+msgstr ""
+"Vaše modifikácie boli teraz zaslané. Budú spracované tak skoro ako sa rad "
+"procesov uvoľní."
 
-#: modules/bibedit/lib/bibedit_templates.py:452
-msgid "Your modifications have now been submitted."
-msgstr "Vaše zmeny boli práve podané."
-
-#: modules/bibedit/lib/bibedit_templates.py:453
-msgid "They will be processed as soon as the task queue is empty."
-msgstr "Budú spracované tak skoro ako sa rad procesov uvoľní."
-
-#: modules/bibedit/lib/bibedit_templates.py:454
+#: modules/bibedit/lib/bibedit_templates.py:449
+#: modules/bibedit/lib/bibedit_templates.py:481
 #, python-format
-msgid "You can now go back to %s."
-msgstr "Teraz sa môžete vrátiť ku %s."
+msgid ""
+"You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
+msgstr ""
+"Teraz sa môžete vrátiť ku %(x_url_open)sBibEdit rozhraniu administrátora%"
+"(x_url_close)s."
 
-#: modules/bibedit/lib/bibedit_templates.py:473
+#: modules/bibedit/lib/bibedit_templates.py:469
 msgid "Do you really want to delete this record?"
 msgstr "Prajete si vskutku zmazať tento záznam?"
 
-#: modules/bibedit/lib/bibedit_templates.py:477
-#: modules/webbasket/lib/webbasket_templates.py:1184
+#: modules/bibedit/lib/bibedit_templates.py:473
+#: modules/webbasket/lib/webbasket_templates.py:1159
 #: modules/webcomment/lib/webcomment_templates.py:213
-#: modules/webcomment/lib/webcomment_templates.py:466
+#: modules/webcomment/lib/webcomment_templates.py:464
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:475
-#: modules/websession/lib/websession_templates.py:1593
-#: modules/websession/lib/websession_templates.py:1632
+#: modules/websession/lib/websession_templates.py:1609
+#: modules/websession/lib/websession_templates.py:1648
 msgid "Yes"
 msgstr "Áno"
 
-#: modules/bibedit/lib/bibedit_templates.py:478
-#: modules/webalert/lib/webalert_templates.py:305
+#: modules/bibedit/lib/bibedit_templates.py:474
+#: modules/webalert/lib/webalert_templates.py:309
 #: modules/webcomment/lib/webcomment_templates.py:214
-#: modules/webcomment/lib/webcomment_templates.py:468
+#: modules/webcomment/lib/webcomment_templates.py:466
 #: modules/webcomment/lib/webcomment_templates.py:1300
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webmessage/lib/webmessage_templates.py:476
-#: modules/websession/lib/websession_templates.py:1594
-#: modules/websession/lib/websession_templates.py:1633
+#: modules/websession/lib/websession_templates.py:1610
+#: modules/websession/lib/websession_templates.py:1649
 msgid "No"
 msgstr "Nie"
 
-#: modules/bibedit/lib/bibedit_templates.py:484
+#: modules/bibedit/lib/bibedit_templates.py:479
 msgid "The record will be deleted as soon as the task queue is empty."
 msgstr "Záznam bude vymazaný tak skoro ako sa zástup procesov uvoľní."
-
-#: modules/bibedit/lib/bibedit_templates.py:485
-msgid "You can now go back to"
-msgstr "Teraz sa môžete vrátiť ku"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
@@ -578,7 +573,7 @@ msgstr "História sťahovania"
 #: modules/webbasket/lib/webbasket.py:168
 #: modules/webbasket/lib/webbasket.py:611
 #: modules/websession/lib/webuser.py:200
-#: modules/webstyle/lib/webstyle_templates.py:491
+#: modules/webstyle/lib/webstyle_templates.py:492
 msgid "N/A"
 msgstr "nepríst."
 
@@ -829,13 +824,13 @@ msgstr "Avízo %s bolo úspešne aktualizované."
 #: modules/webalert/lib/webalert.py:369
 #, python-format
 msgid ""
-"You have made %s queries. A %sdetailed list%s is available with a posibility "
-"to (a) view search results and (b) subscribe to an automatic email alerting "
-"service for these queries."
+"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
+"is available with a posibility to (a) view search results and (b) subscribe "
+"to an automatic email alerting service for these queries."
 msgstr ""
-"Spravili ste %s hľadaní. %sDetailný zoznam%s je k dispozícii s možnosťou (a) "
-"zobraziť výsledy hľadania a (b) prihlásiť sa k automatickému elektronickému "
-"avízovému systému pre tieto hľadania."
+"Spravili ste %(x_nb)s hľadaní. %(x_url_open)sDetailný zoznam%(x_url_close)s "
+"je k dispozícii s možnosťou (a) zobraziť výsledy hľadania a (b) prihlásiť sa "
+"k automatickému elektronickému avízovému systému pre tieto hľadania."
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
@@ -906,17 +901,17 @@ msgid "Search-checking frequency:"
 msgstr "Frekvencia hľadania:"
 
 #: modules/webalert/lib/webalert_templates.py:209
-#: modules/webalert/lib/webalert_templates.py:324
+#: modules/webalert/lib/webalert_templates.py:328
 msgid "monthly"
 msgstr "mesačne"
 
 #: modules/webalert/lib/webalert_templates.py:210
-#: modules/webalert/lib/webalert_templates.py:322
+#: modules/webalert/lib/webalert_templates.py:326
 msgid "weekly"
 msgstr "týždenne"
 
 #: modules/webalert/lib/webalert_templates.py:211
-#: modules/webalert/lib/webalert_templates.py:319
+#: modules/webalert/lib/webalert_templates.py:323
 msgid "daily"
 msgstr "denne"
 
@@ -925,118 +920,120 @@ msgid "Send notification email?"
 msgstr "Poslať oznamovaciu elektronickú správu?"
 
 #: modules/webalert/lib/webalert_templates.py:215
-#: modules/webalert/lib/webalert_templates.py:327
+#: modules/webalert/lib/webalert_templates.py:331
 msgid "yes"
 msgstr "áno"
 
 #: modules/webalert/lib/webalert_templates.py:216
-#: modules/webalert/lib/webalert_templates.py:329
+#: modules/webalert/lib/webalert_templates.py:333
 msgid "no"
 msgstr "nie"
 
 #: modules/webalert/lib/webalert_templates.py:217
 #, python-format
-msgid "if %sno%s you must specify a basket"
-msgstr "ak %snie%s tak musíte špecifikovať košík"
+msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
+msgstr "ak %(x_fmt_open)snie%(x_fmt_close)s tak musíte špecifikovať košík"
 
-#: modules/webalert/lib/webalert_templates.py:218
+#: modules/webalert/lib/webalert_templates.py:219
 msgid "Store results in basket?"
 msgstr "Vložiť výsledky do košíka?"
 
-#: modules/webalert/lib/webalert_templates.py:239
+#: modules/webalert/lib/webalert_templates.py:240
 msgid "SET ALERT"
 msgstr "NASTAVIŤ AVÍZO"
 
-#: modules/webalert/lib/webalert_templates.py:240
+#: modules/webalert/lib/webalert_templates.py:241
 msgid "CLEAR DATA"
 msgstr "VYČISTIŤ DÁTA"
 
-#: modules/webalert/lib/webalert_templates.py:290
+#: modules/webalert/lib/webalert_templates.py:291
 #, python-format
 msgid ""
-"Set a new alert from %syour searches%s, the %spopular_searches%s, or the "
-"input form."
+"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
+"(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Nastaviť nové avízo %sVašich hľadaní%s, z %spopulárnych hľadaní%s, alebo zo "
-"vstupného formulára."
+"Nastaviť nové avízo %(x_url1_open)sVašich hľadaní%(x_url1_close)s, z %"
+"(x_url2_open)spopulárnych hľadaní%(x_url2_close)s, alebo zo vstupného "
+"formulára."
 
-#: modules/webalert/lib/webalert_templates.py:306
+#: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
 msgstr "Meno"
 
-#: modules/webalert/lib/webalert_templates.py:307
+#: modules/webalert/lib/webalert_templates.py:311
 msgid "Search checking frequency"
 msgstr "Frekvencia hľadania"
 
-#: modules/webalert/lib/webalert_templates.py:308
+#: modules/webalert/lib/webalert_templates.py:312
 msgid "Notification by email"
 msgstr "Oznámenie elektronickou poštou"
 
-#: modules/webalert/lib/webalert_templates.py:309
+#: modules/webalert/lib/webalert_templates.py:313
 msgid "Result in basket"
 msgstr "Výsledok do košíku"
 
-#: modules/webalert/lib/webalert_templates.py:310
+#: modules/webalert/lib/webalert_templates.py:314
 msgid "Date last run"
 msgstr "Dátum posledného vykonania"
 
-#: modules/webalert/lib/webalert_templates.py:311
+#: modules/webalert/lib/webalert_templates.py:315
 msgid "Creation date"
 msgstr "Dátum vytnorenia"
 
-#: modules/webalert/lib/webalert_templates.py:312
+#: modules/webalert/lib/webalert_templates.py:316
 msgid "Query"
 msgstr "Otázka"
 
-#: modules/webalert/lib/webalert_templates.py:360
+#: modules/webalert/lib/webalert_templates.py:364
 msgid "Remove"
 msgstr "Zruš"
 
-#: modules/webalert/lib/webalert_templates.py:361
+#: modules/webalert/lib/webalert_templates.py:365
 msgid "Modify"
 msgstr "Uprav"
 
-#: modules/webalert/lib/webalert_templates.py:363
-#: modules/webalert/lib/webalert_templates.py:453
+#: modules/webalert/lib/webalert_templates.py:367
+#: modules/webalert/lib/webalert_templates.py:459
 msgid "Execute search"
 msgstr "Vykonaj hľadanie"
 
-#: modules/webalert/lib/webalert_templates.py:369
+#: modules/webalert/lib/webalert_templates.py:373
 #, python-format
 msgid "You have defined %s alerts."
 msgstr "Definovali ste %s avíz."
 
-#: modules/webalert/lib/webalert_templates.py:409
+#: modules/webalert/lib/webalert_templates.py:413
 #, python-format
 msgid ""
-"You have not executed any search yet. Please go to the %ssearch interface%s "
-"first."
+"You have not executed any search yet. Please go to the %(x_url_open)ssearch "
+"interface%(x_url_close)s first."
 msgstr ""
-"Ešte ste nevykonali žiadne hľadanie. Prosím najprv choďte do %shľadacieho "
-"rozhrania%s."
+"Ešte ste nevykonali žiadne hľadanie. Prosím najprv choďte do %(x_url_open)"
+"shľadacieho rozhrania%(x_url_close)s."
 
-#: modules/webalert/lib/webalert_templates.py:417
+#: modules/webalert/lib/webalert_templates.py:422
 #, python-format
 msgid ""
-"You have performed %s searches (%s different questions) during the last 30 "
-"days or so."
+"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
+"the last 30 days or so."
 msgstr ""
-"Vykonali ste %s hľadaní (%s rôznych otázok) počas posledných zhruba 30 dní."
+"Vykonali ste %(x_nb1)s hľadaní (%(x_nb2)s rôznych otázok) počas posledných "
+"zhruba 30 dní."
 
-#: modules/webalert/lib/webalert_templates.py:421
+#: modules/webalert/lib/webalert_templates.py:427
 #, python-format
 msgid "Here are the %s most popular searches."
 msgstr "Tu sú %s najviac populárnych hľadaní."
 
-#: modules/webalert/lib/webalert_templates.py:432
+#: modules/webalert/lib/webalert_templates.py:438
 msgid "Question"
 msgstr "Otázka"
 
-#: modules/webalert/lib/webalert_templates.py:436
+#: modules/webalert/lib/webalert_templates.py:442
 msgid "Last Run"
 msgstr "Posledné spustenie"
 
-#: modules/webalert/lib/webalert_templates.py:454
+#: modules/webalert/lib/webalert_templates.py:460
 msgid "Set new alert"
 msgstr "Nastaviť nové avízo"
 
@@ -1061,8 +1058,8 @@ msgstr "Zobraziť výsledky"
 #: modules/webbasket/lib/webbasket_webinterface.py:478
 #: modules/webbasket/lib/webbasket_webinterface.py:528
 #: modules/webmessage/lib/webmessage_templates.py:442
-#: modules/websession/lib/websession_templates.py:431
-#: modules/websession/lib/websession_templates.py:1706
+#: modules/websession/lib/websession_templates.py:437
+#: modules/websession/lib/websession_templates.py:1722
 #: modules/websession/lib/websession_webinterface.py:68
 #: modules/websession/lib/websession_webinterface.py:84
 #: modules/websession/lib/websession_webinterface.py:109
@@ -1076,7 +1073,7 @@ msgstr "Zobraziť výsledky"
 #: modules/websession/lib/websession_webinterface.py:396
 #: modules/websession/lib/websession_webinterface.py:427
 #: modules/websession/lib/websession_webinterface.py:458
-#: modules/websession/lib/websession_webinterface.py:521
+#: modules/websession/lib/websession_webinterface.py:523
 #: modules/websubmit/web/publiline.py:73
 #: modules/websubmit/web/yourapprovals.py:90
 #: modules/websubmit/web/yoursubmissions.py:168
@@ -1120,11 +1117,11 @@ msgstr "Košíky ostatných"
 #: modules/webbasket/lib/webbasket.py:793
 #, python-format
 msgid ""
-"You have %s personal baskets and are subscribed to %s group baskets and %s "
-"other users public baskets."
+"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
+"s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
-"Máte %s osobných košíkov a ste prihlásení k odberu %s košíkov grúp a %s "
-"verejných košíkov iných užívateľov."
+"Máte %(x_nb_perso)s osobných košíkov a ste prihlásení k odberu %(x_nb_group)"
+"s košíkov grúp a %(x_nb_public)s verejných košíkov iných užívateľov."
 
 #: modules/webbasket/lib/webbasket_templates.py:183
 #, python-format
@@ -1136,422 +1133,435 @@ msgid "updated on"
 msgstr "aktualizované"
 
 #: modules/webbasket/lib/webbasket_templates.py:223
-#: modules/webbasket/lib/webbasket_templates.py:415
+#: modules/webbasket/lib/webbasket_templates.py:420
 msgid "Basket is empty"
 msgstr "Košík je prázdny"
 
-#: modules/webbasket/lib/webbasket_templates.py:234
+#: modules/webbasket/lib/webbasket_templates.py:233
 #, python-format
-msgid "This basket belongs to %s. You can freely %ssubscribe%s to it"
-msgstr "Tento košík patrí %s. Môžete sa voľne %sprihlásiť k odberu%s"
+msgid ""
+"This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
+"(x_url_close)s to it"
+msgstr ""
+"Tento košík patrí %(x_name)s. Môžete sa voľne %(x_url_open)sprihlásiť k "
+"odberu%(x_url_close)s"
 
-#: modules/webbasket/lib/webbasket_templates.py:257
+#: modules/webbasket/lib/webbasket_templates.py:258
 #: modules/webbasket/lib/webbasket_webinterface.py:564
 msgid "Public basket"
 msgstr "Verejné košíky"
 
-#: modules/webbasket/lib/webbasket_templates.py:260
-#: modules/webbasket/lib/webbasket_templates.py:486
-#: modules/webbasket/lib/webbasket_templates.py:773
+#: modules/webbasket/lib/webbasket_templates.py:261
+#: modules/webbasket/lib/webbasket_templates.py:491
+#: modules/webbasket/lib/webbasket_templates.py:750
 msgid "records"
 msgstr "záznamy"
 
-#: modules/webbasket/lib/webbasket_templates.py:261
-#: modules/webbasket/lib/webbasket_templates.py:487
-#: modules/webbasket/lib/webbasket_templates.py:774
+#: modules/webbasket/lib/webbasket_templates.py:262
+#: modules/webbasket/lib/webbasket_templates.py:492
+#: modules/webbasket/lib/webbasket_templates.py:751
 msgid "last update"
 msgstr "posledná aktualizácia"
 
-#: modules/webbasket/lib/webbasket_templates.py:266
+#: modules/webbasket/lib/webbasket_templates.py:267
 msgid "Subscribe to this basket"
 msgstr "Prihlásiť sa k odberu tohto košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:279
-#: modules/webbasket/lib/webbasket_templates.py:960
-#: modules/webbasket/lib/webbasket_templates.py:1204
+#: modules/webbasket/lib/webbasket_templates.py:280
+#: modules/webbasket/lib/webbasket_templates.py:935
+#: modules/webbasket/lib/webbasket_templates.py:1179
 msgid "Basket's name"
 msgstr "Meno košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:280
+#: modules/webbasket/lib/webbasket_templates.py:281
 msgid "Number of views"
 msgstr "Počet pozretí"
 
-#: modules/webbasket/lib/webbasket_templates.py:281
+#: modules/webbasket/lib/webbasket_templates.py:282
 msgid "Owner"
 msgstr "Vlastník"
 
-#: modules/webbasket/lib/webbasket_templates.py:311
+#: modules/webbasket/lib/webbasket_templates.py:312
 msgid "View"
 msgstr "Zobraz"
 
-#: modules/webbasket/lib/webbasket_templates.py:320
+#: modules/webbasket/lib/webbasket_templates.py:321
 msgid "Subscribe"
 msgstr "Prihlásiť sa k odberu"
 
-#: modules/webbasket/lib/webbasket_templates.py:327
+#: modules/webbasket/lib/webbasket_templates.py:328
 msgid "There is currently no publicly accessible basket"
 msgstr "Momentálne neexistuje žiaden verejne prístupný košík."
 
-#: modules/webbasket/lib/webbasket_templates.py:335
+#: modules/webbasket/lib/webbasket_templates.py:336
 #, python-format
-msgid "Displaying baskets %i-%i out of %i baskets in total."
-msgstr "Zobrazujúc košíky %i-%i z pomedzi %i košíkov celkovo."
+msgid ""
+"Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
+"in total."
+msgstr ""
+"Zobrazujúc košíky %(x_nb_begin)i-%(x_nb_end)i z pomedzi %(x_nb_total)i "
+"košíkov celkovo."
 
-#: modules/webbasket/lib/webbasket_templates.py:362
+#: modules/webbasket/lib/webbasket_templates.py:367
 msgid "Actions"
 msgstr "Akcie"
 
-#: modules/webbasket/lib/webbasket_templates.py:393
-#: modules/webbasket/lib/webbasket_templates.py:726
+#: modules/webbasket/lib/webbasket_templates.py:398
+#: modules/webbasket/lib/webbasket_templates.py:703
 msgid "Non-shared basket"
 msgstr "Nezdieľané košíky"
 
-#: modules/webbasket/lib/webbasket_templates.py:396
-#: modules/webbasket/lib/webbasket_templates.py:728
+#: modules/webbasket/lib/webbasket_templates.py:401
+#: modules/webbasket/lib/webbasket_templates.py:705
 msgid "Shared basket"
 msgstr "Zdieľané košíky"
 
-#: modules/webbasket/lib/webbasket_templates.py:399
-#: modules/webbasket/lib/webbasket_templates.py:730
+#: modules/webbasket/lib/webbasket_templates.py:404
+#: modules/webbasket/lib/webbasket_templates.py:707
 msgid "Group-shared basket"
 msgstr "Zdieľané košíky grúp"
 
-#: modules/webbasket/lib/webbasket_templates.py:405
+#: modules/webbasket/lib/webbasket_templates.py:410
 #: modules/webbasket/lib/webbasket_webinterface.py:487
 msgid "Edit basket"
 msgstr "Edituj košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:444
-msgid "You do not have sufficient rights to view this basket's content"
-msgstr "Nemáte dostatočné práva na zobrazenie obsahu tohto košíka"
-
 #: modules/webbasket/lib/webbasket_templates.py:449
-#: modules/webbasket/lib/webbasket_templates.py:735
+msgid "You do not have sufficient rights to view this basket's content."
+msgstr "Nemáte dostatočné práva na zobrazenie obsahu tohto košíka."
+
+#: modules/webbasket/lib/webbasket_templates.py:454
+#: modules/webbasket/lib/webbasket_templates.py:712
 msgid "Unsubscribe from this basket"
 msgstr "Odhlásiť sa od tohto košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:462
-#: modules/webbasket/lib/webbasket_templates.py:601
+#: modules/webbasket/lib/webbasket_templates.py:467
+#: modules/webbasket/lib/webbasket_templates.py:578
 msgid "comments"
 msgstr "komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:462
+#: modules/webbasket/lib/webbasket_templates.py:467
 msgid "last comment:"
 msgstr "posledný komentár:"
 
-#: modules/webbasket/lib/webbasket_templates.py:524
+#: modules/webbasket/lib/webbasket_templates.py:522
 msgid "Move item up"
 msgstr "Posuň položku hore"
 
-#: modules/webbasket/lib/webbasket_templates.py:539
+#: modules/webbasket/lib/webbasket_templates.py:530
 msgid "Move item down"
 msgstr "Posuň položku dole"
 
-#: modules/webbasket/lib/webbasket_templates.py:554
+#: modules/webbasket/lib/webbasket_templates.py:538
 msgid "Copy item"
 msgstr "Skopírovať položku"
 
-#: modules/webbasket/lib/webbasket_templates.py:569
+#: modules/webbasket/lib/webbasket_templates.py:546
 msgid "Remove item"
 msgstr "Odstráň položku"
 
-#: modules/webbasket/lib/webbasket_templates.py:572
+#: modules/webbasket/lib/webbasket_templates.py:549
 msgid "External record"
 msgstr "Externý záznam"
 
-#: modules/webbasket/lib/webbasket_templates.py:602
+#: modules/webbasket/lib/webbasket_templates.py:579
 msgid "last"
 msgstr "posledný"
 
-#: modules/webbasket/lib/webbasket_templates.py:603
+#: modules/webbasket/lib/webbasket_templates.py:580
 #: modules/webbasket/lib/webbasket_webinterface.py:120
 #: modules/webbasket/lib/webbasket_webinterface.py:211
 msgid "Details and comments"
 msgstr "Podrobnosti a komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:627
+#: modules/webbasket/lib/webbasket_templates.py:604
 msgid "This basket is publicly accessible at the following address:"
 msgstr "Tento košík je verejne dostupný na nasledujúcej adrese:"
 
-#: modules/webbasket/lib/webbasket_templates.py:657
-#: modules/websearch/lib/websearch_templates.py:1536
-msgid "Sort by"
-msgstr "Utriediť podľa"
+#: modules/webbasket/lib/webbasket_templates.py:634
+#: modules/websearch/lib/websearch_templates.py:517
+#: modules/websearch/lib/websearch_templates.py:1531
+msgid "Sort by:"
+msgstr "Utriediť podľa:"
 
-#: modules/webbasket/lib/webbasket_templates.py:658
-#: modules/webbasket/lib/webbasket_templates.py:875
-#: modules/websubmit/lib/websubmit_templates.py:1875
+#: modules/webbasket/lib/webbasket_templates.py:635
+#: modules/webbasket/lib/webbasket_templates.py:850
 msgid "Title"
 msgstr "Názov"
 
-#: modules/webbasket/lib/webbasket_templates.py:659
+#: modules/webbasket/lib/webbasket_templates.py:636
 #: modules/webmessage/lib/webmessage_templates.py:82
 msgid "Date"
 msgstr "Dátum"
 
-#: modules/webbasket/lib/webbasket_templates.py:720
+#: modules/webbasket/lib/webbasket_templates.py:697
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:172
 msgid "Comments"
 msgstr "Komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:721
+#: modules/webbasket/lib/webbasket_templates.py:698
 #, python-format
 msgid "There is a total of %i comments"
 msgstr "Existuje celkovo %i komentárov"
 
-#: modules/webbasket/lib/webbasket_templates.py:723
+#: modules/webbasket/lib/webbasket_templates.py:700
 #: modules/webbasket/lib/webbasket_webinterface.py:161
 #: modules/webcomment/lib/webcomment_templates.py:93
-#: modules/webcomment/lib/webcomment_templates.py:571
+#: modules/webcomment/lib/webcomment_templates.py:572
 msgid "Write a comment"
 msgstr "Napíšte komentár"
 
-#: modules/webbasket/lib/webbasket_templates.py:779
+#: modules/webbasket/lib/webbasket_templates.py:756
 msgid "Back to baskets"
 msgstr "Naspäť ku košíkom"
 
-#: modules/webbasket/lib/webbasket_templates.py:804
-#: modules/webbasket/lib/webbasket_templates.py:832
+#: modules/webbasket/lib/webbasket_templates.py:781
+#: modules/webbasket/lib/webbasket_templates.py:809
 msgid "by"
 msgstr "od"
 
-#: modules/webbasket/lib/webbasket_templates.py:805
-#: modules/webbasket/lib/webbasket_templates.py:832
+#: modules/webbasket/lib/webbasket_templates.py:782
+#: modules/webbasket/lib/webbasket_templates.py:809
 msgid "on"
 msgstr "na"
 
-#: modules/webbasket/lib/webbasket_templates.py:817
-#: modules/webcomment/lib/webcomment_templates.py:327
+#: modules/webbasket/lib/webbasket_templates.py:794
+#: modules/webcomment/lib/webcomment_templates.py:325
 #: modules/webmessage/lib/webmessage_templates.py:102
 msgid "Reply"
 msgstr "Odpoveď"
 
-#: modules/webbasket/lib/webbasket_templates.py:818
+#: modules/webbasket/lib/webbasket_templates.py:795
 msgid "Delete comment"
 msgstr "Zmazať komentár"
 
-#: modules/webbasket/lib/webbasket_templates.py:874
-#: modules/webbasket/lib/webbasket_templates.py:879
+#: modules/webbasket/lib/webbasket_templates.py:849
+#: modules/webbasket/lib/webbasket_templates.py:854
 #: modules/webcomment/lib/webcomment_webinterface.py:213
 msgid "Add Comment"
 msgstr "Pridaj komentár"
 
-#: modules/webbasket/lib/webbasket_templates.py:876
-#: modules/webcomment/lib/webcomment_templates.py:618
-#: modules/webcomment/lib/webcomment_templates.py:810
+#: modules/webbasket/lib/webbasket_templates.py:851
+#: modules/webcomment/lib/webcomment_templates.py:619
+#: modules/webcomment/lib/webcomment_templates.py:813
 #: modules/webcomment/lib/webcomment_templates.py:1166
 #: modules/webcomment/lib/webcomment_templates.py:1232
 msgid "Comment"
 msgstr "Komentár"
 
-#: modules/webbasket/lib/webbasket_templates.py:895
-#: modules/webbasket/lib/webbasket_templates.py:991
+#: modules/webbasket/lib/webbasket_templates.py:870
+#: modules/webbasket/lib/webbasket_templates.py:966
 msgid "Create new basket"
 msgstr "Vytvoriť nový košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:945
+#: modules/webbasket/lib/webbasket_templates.py:920
 msgid "Select topic"
 msgstr "Zvoliť tému"
 
-#: modules/webbasket/lib/webbasket_templates.py:961
-#: modules/webbasket/lib/webbasket_templates.py:1206
-#: modules/webbasket/lib/webbasket_templates.py:1215
+#: modules/webbasket/lib/webbasket_templates.py:936
+#: modules/webbasket/lib/webbasket_templates.py:1181
+#: modules/webbasket/lib/webbasket_templates.py:1190
 msgid "Choose topic"
 msgstr "Zvoľte tému"
 
-#: modules/webbasket/lib/webbasket_templates.py:962
-#: modules/webbasket/lib/webbasket_templates.py:1217
+#: modules/webbasket/lib/webbasket_templates.py:937
+#: modules/webbasket/lib/webbasket_templates.py:1192
 msgid "or create a new one"
 msgstr "alebo vytvorte novú"
 
-#: modules/webbasket/lib/webbasket_templates.py:962
+#: modules/webbasket/lib/webbasket_templates.py:937
 msgid "Create new topic"
 msgstr "Vytvoriť novú tému"
 
-#: modules/webbasket/lib/webbasket_templates.py:964
+#: modules/webbasket/lib/webbasket_templates.py:939
 msgid "Create a new basket"
 msgstr "Vytvoriť nový košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:1025
-#: modules/webbasket/lib/webbasket_templates.py:1046
-#: modules/webbasket/lib/webbasket_templates.py:1062
+#: modules/webbasket/lib/webbasket_templates.py:1000
+#: modules/webbasket/lib/webbasket_templates.py:1021
+#: modules/webbasket/lib/webbasket_templates.py:1037
 msgid "Select basket"
 msgstr "Zvoľte košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:1033
+#: modules/webbasket/lib/webbasket_templates.py:1008
 msgid "Add to a personal basket"
 msgstr "Pridaj do osobného košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:1034
-#: modules/webbasket/lib/webbasket_templates.py:1055
-#: modules/webbasket/lib/webbasket_templates.py:1073
+#: modules/webbasket/lib/webbasket_templates.py:1009
+#: modules/webbasket/lib/webbasket_templates.py:1030
+#: modules/webbasket/lib/webbasket_templates.py:1048
 #, python-format
 msgid "%i baskets"
 msgstr "%i košíkov"
 
-#: modules/webbasket/lib/webbasket_templates.py:1054
+#: modules/webbasket/lib/webbasket_templates.py:1029
 msgid "Add to a group-shared basket"
 msgstr "Pridaj do grupou zdieľaného košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:1072
+#: modules/webbasket/lib/webbasket_templates.py:1047
 msgid "Add to a public basket"
 msgstr "Pridaj do verejného košíka"
 
-#: modules/webbasket/lib/webbasket_templates.py:1105
+#: modules/webbasket/lib/webbasket_templates.py:1080
 #, python-format
 msgid "Adding %i records to these baskets"
 msgstr "Pridať %i záznamov do týchto košíkov"
 
-#: modules/webbasket/lib/webbasket_templates.py:1110
+#: modules/webbasket/lib/webbasket_templates.py:1085
 msgid "Add to baskets"
 msgstr "Pridať do košíkov"
 
-#: modules/webbasket/lib/webbasket_templates.py:1117
+#: modules/webbasket/lib/webbasket_templates.py:1092
 #, python-format
 msgid "The selected records have been successfully added to %i baskets."
 msgstr "Vybrané záznamy boli úspešne pridané do %i košíkov."
 
-#: modules/webbasket/lib/webbasket_templates.py:1120
+#: modules/webbasket/lib/webbasket_templates.py:1095
 msgid "No records were added to the selected baskets."
 msgstr "Žiadne záznamy neboli pridané do vybraných košíkov."
 
-#: modules/webbasket/lib/webbasket_templates.py:1140
+#: modules/webbasket/lib/webbasket_templates.py:1115
 msgid "Are you sure you want to delete this basket?"
 msgstr "Ste si istí že chcete vymazať tento košík?"
 
-#: modules/webbasket/lib/webbasket_templates.py:1142
+#: modules/webbasket/lib/webbasket_templates.py:1117
 #, python-format
 msgid "%i users are subscribed to this basket."
 msgstr "%i používateľov sa prihlásilo k odberu tohto košíka."
 
-#: modules/webbasket/lib/webbasket_templates.py:1144
+#: modules/webbasket/lib/webbasket_templates.py:1119
 #, python-format
 msgid "%i user groups are subscribed to this basket."
 msgstr "%i grúp používateľov sa prihlásilo k odberu tohto košíka."
 
-#: modules/webbasket/lib/webbasket_templates.py:1146
+#: modules/webbasket/lib/webbasket_templates.py:1121
 #, python-format
 msgid "You have set %i alerts on this basket."
 msgstr "Nastavili ste %i avíz pre tento košík."
 
-#: modules/webbasket/lib/webbasket_templates.py:1220
+#: modules/webbasket/lib/webbasket_templates.py:1195
 msgid "General settings"
 msgstr "Všeobecné parametre"
 
-#: modules/webbasket/lib/webbasket_templates.py:1235
-#: modules/webbasket/lib/webbasket_templates.py:1364
-#: modules/webbasket/lib/webbasket_templates.py:1391
+#: modules/webbasket/lib/webbasket_templates.py:1210
+#: modules/webbasket/lib/webbasket_templates.py:1339
+#: modules/webbasket/lib/webbasket_templates.py:1366
 msgid "Add group"
 msgstr "Pridaj grupu"
 
-#: modules/webbasket/lib/webbasket_templates.py:1240
+#: modules/webbasket/lib/webbasket_templates.py:1215
 msgid "Manage group rights"
 msgstr "Spravujte práva pre grupy"
 
-#: modules/webbasket/lib/webbasket_templates.py:1252
+#: modules/webbasket/lib/webbasket_templates.py:1227
 msgid "Manage global sharing rights"
 msgstr "Spravujte globálne práva na zdieľanie"
 
-#: modules/webbasket/lib/webbasket_templates.py:1257
+#: modules/webbasket/lib/webbasket_templates.py:1232
 msgid "Delete basket"
 msgstr "Zruš košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:1281
+#: modules/webbasket/lib/webbasket_templates.py:1256
 msgid "Editing basket"
 msgstr "Edituj košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:1289
+#: modules/webbasket/lib/webbasket_templates.py:1264
 msgid "Save changes"
 msgstr "Uložte zmeny"
 
-#: modules/webbasket/lib/webbasket_templates.py:1302
-#: modules/webbasket/lib/webbasket_templates.py:1326
+#: modules/webbasket/lib/webbasket_templates.py:1277
+#: modules/webbasket/lib/webbasket_templates.py:1301
 msgid "No rights"
 msgstr "Žiadne práva"
 
-#: modules/webbasket/lib/webbasket_templates.py:1304
-#: modules/webbasket/lib/webbasket_templates.py:1328
+#: modules/webbasket/lib/webbasket_templates.py:1279
+#: modules/webbasket/lib/webbasket_templates.py:1303
 msgid "View records"
 msgstr "Zobraz záznamy"
 
-#: modules/webbasket/lib/webbasket_templates.py:1306
-#: modules/webbasket/lib/webbasket_templates.py:1308
-#: modules/webbasket/lib/webbasket_templates.py:1310
-#: modules/webbasket/lib/webbasket_templates.py:1312
-#: modules/webbasket/lib/webbasket_templates.py:1314
-#: modules/webbasket/lib/webbasket_templates.py:1316
-#: modules/webbasket/lib/webbasket_templates.py:1330
-#: modules/webbasket/lib/webbasket_templates.py:1332
-#: modules/webbasket/lib/webbasket_templates.py:1334
-#: modules/webbasket/lib/webbasket_templates.py:1336
-#: modules/webbasket/lib/webbasket_templates.py:1338
-#: modules/webbasket/lib/webbasket_templates.py:1340
+#: modules/webbasket/lib/webbasket_templates.py:1281
+#: modules/webbasket/lib/webbasket_templates.py:1283
+#: modules/webbasket/lib/webbasket_templates.py:1285
+#: modules/webbasket/lib/webbasket_templates.py:1287
+#: modules/webbasket/lib/webbasket_templates.py:1289
+#: modules/webbasket/lib/webbasket_templates.py:1291
+#: modules/webbasket/lib/webbasket_templates.py:1305
+#: modules/webbasket/lib/webbasket_templates.py:1307
+#: modules/webbasket/lib/webbasket_templates.py:1309
+#: modules/webbasket/lib/webbasket_templates.py:1311
+#: modules/webbasket/lib/webbasket_templates.py:1313
+#: modules/webbasket/lib/webbasket_templates.py:1315
 msgid "and"
 msgstr "a"
 
-#: modules/webbasket/lib/webbasket_templates.py:1306
-#: modules/webbasket/lib/webbasket_templates.py:1330
+#: modules/webbasket/lib/webbasket_templates.py:1281
+#: modules/webbasket/lib/webbasket_templates.py:1305
 msgid "view comments"
 msgstr "zobraz komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:1308
-#: modules/webbasket/lib/webbasket_templates.py:1332
+#: modules/webbasket/lib/webbasket_templates.py:1283
+#: modules/webbasket/lib/webbasket_templates.py:1307
 msgid "add comments"
 msgstr "pridaj komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:1310
-#: modules/webbasket/lib/webbasket_templates.py:1334
+#: modules/webbasket/lib/webbasket_templates.py:1285
+#: modules/webbasket/lib/webbasket_templates.py:1309
 msgid "add records"
 msgstr "pridaj záznamy"
 
-#: modules/webbasket/lib/webbasket_templates.py:1312
-#: modules/webbasket/lib/webbasket_templates.py:1336
+#: modules/webbasket/lib/webbasket_templates.py:1287
+#: modules/webbasket/lib/webbasket_templates.py:1311
 msgid "delete comments"
 msgstr "zmaž komentáre"
 
-#: modules/webbasket/lib/webbasket_templates.py:1314
-#: modules/webbasket/lib/webbasket_templates.py:1338
+#: modules/webbasket/lib/webbasket_templates.py:1289
+#: modules/webbasket/lib/webbasket_templates.py:1313
 msgid "remove records"
 msgstr "zruš záznamy"
 
-#: modules/webbasket/lib/webbasket_templates.py:1316
-#: modules/webbasket/lib/webbasket_templates.py:1340
+#: modules/webbasket/lib/webbasket_templates.py:1291
+#: modules/webbasket/lib/webbasket_templates.py:1315
 msgid "manage sharing rights"
 msgstr "spravuj práva na zdieľanie"
 
-#: modules/webbasket/lib/webbasket_templates.py:1362
-msgid "You are not a member of a group"
-msgstr "Nie ste členom žiadnej grupy"
+#: modules/webbasket/lib/webbasket_templates.py:1337
+msgid "You are not a member of a group."
+msgstr "Nie ste členom grupy."
 
-#: modules/webbasket/lib/webbasket_templates.py:1384
+#: modules/webbasket/lib/webbasket_templates.py:1359
 msgid "Sharing basket to a new group"
 msgstr "Zdieľať košík s novou grupou"
 
-#: modules/webbasket/lib/webbasket_templates.py:1405
+#: modules/webbasket/lib/webbasket_templates.py:1380
 msgid "no basket"
 msgstr "žiaden košík"
 
-#: modules/webbasket/lib/webbasket_templates.py:1413
-#, python-format
+#: modules/webbasket/lib/webbasket_templates.py:1388
+#: modules/websession/lib/websession_templates.py:343
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session. If you wish you can %slogin or register here%s."
+"of the current session."
 msgstr ""
 "Ste prihlásený ako anonymný hosť, takže Vaše košíky zmiznú na konci terajšej "
-"seanse.  Ak si prajete, môžete sa %sprihlásiť alebo zaregistrovať tu%s."
+"seanse."
 
-#: modules/webbasket/lib/webbasket_templates.py:1428
+#: modules/webbasket/lib/webbasket_templates.py:1389
+#: modules/webbasket/lib/webbasket_templates.py:1406
+#: modules/websession/lib/websession_templates.py:346
 #, python-format
 msgid ""
-"This functionality is forbidden to guest users. If you wish you can %slogin "
-"or register here%s."
+"If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Táto funkcia je neprístupná anonymným hosťom. Ak si prajete, môžete sa %"
-"sprihlásiť alebo zaregistrovať tu%s."
+"Ak si prajete, môžete sa %(x_url_open)sprihlásiť alebo zaregistrovať tu%"
+"(x_url_close)s."
 
-#: modules/webbasket/lib/webbasket_templates.py:1487
-#: modules/webcomment/lib/webcomment_templates.py:610
+#: modules/webbasket/lib/webbasket_templates.py:1405
+msgid "This functionality is forbidden to guest users."
+msgstr "Táto funkcia je neprístupná anonymným hosťom."
+
+#: modules/webbasket/lib/webbasket_templates.py:1466
+#: modules/webcomment/lib/webcomment_templates.py:611
 msgid "Back to search results"
 msgstr "Naspäť ku výsledkom hľadania"
 
@@ -1561,7 +1571,7 @@ msgstr "Zobraziť košíky"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:291
 #: modules/websession/lib/websession_templates.py:300
-#: modules/websession/lib/websession_templates.py:433
+#: modules/websession/lib/websession_templates.py:439
 msgid "Your Baskets"
 msgstr "Vaše košíky"
 
@@ -1591,9 +1601,10 @@ msgid "WebComment Admin"
 msgstr "WebComment administrácia"
 
 #: modules/webcomment/lib/webcomment.py:798
+#: modules/webcomment/lib/webcomment_templates.py:321
 #, python-format
-msgid "%s wrote on %s:"
-msgstr "%s napísal %s:"
+msgid "%(x_name)s wrote on %(x_date)s:"
+msgstr "%(x_name)s napísal dňa %(x_date)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:105
 #, python-format
@@ -1629,168 +1640,167 @@ msgid "You may want to start browsing from %s"
 msgstr "Môžete chcieť začať prehliadať z %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:238
-#: modules/webcomment/lib/webcomment_templates.py:504
+#: modules/webcomment/lib/webcomment_templates.py:502
 msgid "Was this review helpful?"
 msgstr "Bolo toto hodnotenie užitočné?"
 
 #: modules/webcomment/lib/webcomment_templates.py:249
-#: modules/webcomment/lib/webcomment_templates.py:286
-#: modules/webcomment/lib/webcomment_templates.py:571
+#: modules/webcomment/lib/webcomment_templates.py:283
+#: modules/webcomment/lib/webcomment_templates.py:572
 msgid "Write a review"
 msgstr "Napíšte hodnotenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:252
-#: modules/webcomment/lib/webcomment_templates.py:559
+#: modules/webcomment/lib/webcomment_templates.py:253
+#: modules/webcomment/lib/webcomment_templates.py:558
 #, python-format
-msgid "Average review score: %s based on %s reviews"
-msgstr "Priemerné skóre: %s založené na %s hodnoteniach"
+msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
+msgstr ""
+"Priemerné skóre hodnotení: %(x_nb_score)s založené na %(x_nb_reviews)s "
+"hodnoteniach"
 
-#: modules/webcomment/lib/webcomment_templates.py:259
+#: modules/webcomment/lib/webcomment_templates.py:256
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr "Čitatelia pokladali nasledujúcich %s hodnotení za najužitočnejšie."
 
-#: modules/webcomment/lib/webcomment_templates.py:262
-#: modules/webcomment/lib/webcomment_templates.py:285
+#: modules/webcomment/lib/webcomment_templates.py:259
+#: modules/webcomment/lib/webcomment_templates.py:282
 #, python-format
 msgid "View all %s reviews"
 msgstr "Zobraz všetky %s hodnotenia"
 
-#: modules/webcomment/lib/webcomment_templates.py:281
-#: modules/webcomment/lib/webcomment_templates.py:303
+#: modules/webcomment/lib/webcomment_templates.py:278
+#: modules/webcomment/lib/webcomment_templates.py:300
 msgid "Rate this document"
 msgstr "Ohodnoťte tento dokument"
 
-#: modules/webcomment/lib/webcomment_templates.py:304
+#: modules/webcomment/lib/webcomment_templates.py:301
 msgid "Be the first to review this document."
 msgstr "Buďte prvý kto ohodnotí tento dokument."
 
-#: modules/webcomment/lib/webcomment_templates.py:324
-msgid "wrote on"
-msgstr "napísal"
-
-#: modules/webcomment/lib/webcomment_templates.py:331
-#: modules/webcomment/lib/webcomment_templates.py:371
-#: modules/webcomment/lib/webcomment_templates.py:505
+#: modules/webcomment/lib/webcomment_templates.py:329
+#: modules/webcomment/lib/webcomment_templates.py:369
+#: modules/webcomment/lib/webcomment_templates.py:503
 msgid "Report abuse"
 msgstr "Hlás zneužitie"
 
-#: modules/webcomment/lib/webcomment_templates.py:366
+#: modules/webcomment/lib/webcomment_templates.py:364
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Ohodnotené %(x_nickname)s dňa %(x_date)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:367
+#: modules/webcomment/lib/webcomment_templates.py:365
 #, python-format
-msgid "%i out of %i people found this review useful"
-msgstr "%i z %i čitateľov pokladá túto kritiku za užitočnú"
+msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
+msgstr ""
+"%(x_nb_people)i z %(x_nb_total)i čitateľov pokladá túto kritiku za užitočnú"
 
-#: modules/webcomment/lib/webcomment_templates.py:535
+#: modules/webcomment/lib/webcomment_templates.py:533
 msgid "Previous"
 msgstr "Predošlé"
 
-#: modules/webcomment/lib/webcomment_templates.py:551
+#: modules/webcomment/lib/webcomment_templates.py:549
 msgid "Next"
 msgstr "Nasledujúce"
 
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:575
 #, python-format
 msgid "There is a total of %s reviews"
 msgstr "Existuje celkovo %s hodnotení"
 
-#: modules/webcomment/lib/webcomment_templates.py:576
+#: modules/webcomment/lib/webcomment_templates.py:577
 #, python-format
 msgid "There is a total of %s comments"
 msgstr "Existuje celkovo %s komentárov"
 
-#: modules/webcomment/lib/webcomment_templates.py:617
-#: modules/webcomment/lib/webcomment_templates.py:668
+#: modules/webcomment/lib/webcomment_templates.py:618
+#: modules/webcomment/lib/webcomment_templates.py:669
 msgid "review"
 msgstr "ohodnotenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:617
-#: modules/webcomment/lib/webcomment_templates.py:668
+#: modules/webcomment/lib/webcomment_templates.py:618
+#: modules/webcomment/lib/webcomment_templates.py:669
 msgid "comment"
 msgstr "komentár"
 
-#: modules/webcomment/lib/webcomment_templates.py:618
+#: modules/webcomment/lib/webcomment_templates.py:619
 #: modules/webcomment/lib/webcomment_templates.py:1232
 msgid "Review"
 msgstr "Hodnotenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:666
+#: modules/webcomment/lib/webcomment_templates.py:667
 msgid "Viewing"
 msgstr "Zobrazenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:667
+#: modules/webcomment/lib/webcomment_templates.py:668
 msgid "Page:"
 msgstr "Strana:"
 
-#: modules/webcomment/lib/webcomment_templates.py:785
+#: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr "Poznámka: Vaša prezývka, %s, bude zobrazená ako autor tohto komentára"
 
-#: modules/webcomment/lib/webcomment_templates.py:789
+#: modules/webcomment/lib/webcomment_templates.py:790
 #, python-format
 msgid ""
-"Note: you have not %sdefined your nickname%s. %s will be displayed as the "
-"author of this comment."
+"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
+"(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Poznámka: Ešte ste si %snezvolili prezývku%s. %s bude zobrazené ako autor "
-"tohto komentára."
+"Poznámka: Ešte ste si %(x_url_open)snezvolili prezývku%(x_url_close)s. %"
+"(x_nickname)s bude zobrazené ako autor tohto komentára."
 
-#: modules/webcomment/lib/webcomment_templates.py:809
-#: modules/webcomment/lib/webcomment_templates.py:883
+#: modules/webcomment/lib/webcomment_templates.py:812
+#: modules/webcomment/lib/webcomment_templates.py:886
 msgid "Article"
 msgstr "Správa"
 
-#: modules/webcomment/lib/webcomment_templates.py:837
+#: modules/webcomment/lib/webcomment_templates.py:840
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
 "Poznámka: Vaša prezývka, %s, bude zobrazená ako autor tohto hodnotenia."
 
-#: modules/webcomment/lib/webcomment_templates.py:884
+#: modules/webcomment/lib/webcomment_templates.py:887
 msgid "Rate this article"
 msgstr "Ohodnoťte tento článok"
 
-#: modules/webcomment/lib/webcomment_templates.py:885
+#: modules/webcomment/lib/webcomment_templates.py:888
 msgid "Select a score"
 msgstr "Vyber skóre"
 
-#: modules/webcomment/lib/webcomment_templates.py:886
+#: modules/webcomment/lib/webcomment_templates.py:889
 msgid "Give a title to your review"
 msgstr "Zadajte názov vášho hodnotenia"
 
-#: modules/webcomment/lib/webcomment_templates.py:887
+#: modules/webcomment/lib/webcomment_templates.py:890
 msgid "Write your review"
 msgstr "Napíšte Vaše hodnotenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:893
+#: modules/webcomment/lib/webcomment_templates.py:896
 #: modules/webcomment/lib/webcomment_webinterface.py:211
 msgid "Add Review"
 msgstr "Pridaj hodnotenie"
 
-#: modules/webcomment/lib/webcomment_templates.py:912
+#: modules/webcomment/lib/webcomment_templates.py:915
 msgid "Your review was successfully added."
 msgstr "Vaše hodnotenie bolo úspešne pridané."
 
-#: modules/webcomment/lib/webcomment_templates.py:914
+#: modules/webcomment/lib/webcomment_templates.py:917
 msgid "Your comment was successfully added."
 msgstr "Váš komentár bol úspešne pridaný."
 
-#: modules/webcomment/lib/webcomment_templates.py:916
+#: modules/webcomment/lib/webcomment_templates.py:919
 msgid "Back to record"
 msgstr "Naspäť ku záznamu"
 
-#: modules/webcomment/lib/webcomment_templates.py:1001
+#: modules/webcomment/lib/webcomment_templates.py:995
 #: modules/webcomment/web/admin/webcommentadmin.py:118
 msgid "View all reported comments"
 msgstr "Zobraz všetky ohlásené komentáre"
 
-#: modules/webcomment/lib/webcomment_templates.py:1002
+#: modules/webcomment/lib/webcomment_templates.py:998
 msgid "View all reported reviews"
 msgstr "Zobraz všetky ohlásené hodnotenia"
 
@@ -1819,8 +1829,8 @@ msgstr ""
 "ako sa rozhodnete či ho zmazať alebo nie"
 
 #: modules/webcomment/lib/webcomment_templates.py:1037
-msgid "Comment ID"
-msgstr "ID komentára"
+msgid "Comment ID:"
+msgstr "ID komentára:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1039
 msgid "View Comment"
@@ -1851,7 +1861,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1113
 #: modules/webcomment/lib/webcomment_templates.py:1142
 #: modules/websession/lib/websession_templates.py:153
-#: modules/websession/lib/websession_templates.py:693
+#: modules/websession/lib/websession_templates.py:706
 msgid "Nickname"
 msgstr "Prezývka"
 
@@ -1968,9 +1978,9 @@ msgstr "úspešne potlačené správy o zneužití"
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:167
 #: modules/websearch/lib/websearch_templates.py:935
+#: modules/websearch/lib/websearch_templates.py:2445
 #: modules/websearch/lib/websearch_templates.py:2449
 #: modules/websearch/lib/websearch_templates.py:2453
-#: modules/websearch/lib/websearch_templates.py:2457
 msgid "Detailed record"
 msgstr "Úplný záznam"
 
@@ -2081,12 +2091,11 @@ msgstr "Vaša správa bola odoslaná."
 #: modules/webmessage/lib/webmessage_webinterface.py:65
 #: modules/webmessage/lib/webmessage_webinterface.py:217
 #: modules/webmessage/lib/webmessage_webinterface.py:246
-#: modules/websession/lib/websession_templates.py:432
+#: modules/websession/lib/websession_templates.py:438
 msgid "Your Messages"
 msgstr "Vaše správy"
 
 #: modules/webmessage/lib/webmessage_templates.py:82
-#: modules/webmessage/lib/webmessage_templates.py:418
 msgid "Subject"
 msgstr "Predmet"
 
@@ -2131,6 +2140,7 @@ msgid "Groups"
 msgstr "Grupy"
 
 #: modules/webmessage/lib/webmessage_templates.py:274
+#: modules/webmessage/lib/webmessage_templates.py:418
 msgid "Subject:"
 msgstr "Predmet:"
 
@@ -2143,24 +2153,24 @@ msgid "SEND"
 msgstr "POSLAŤ"
 
 #: modules/webmessage/lib/webmessage_templates.py:417
-msgid "From"
-msgstr "Od"
+msgid "From:"
+msgstr "Od:"
 
 #: modules/webmessage/lib/webmessage_templates.py:419
-msgid "Sent on"
-msgstr "Poslané kedy"
+msgid "Sent on:"
+msgstr "Poslané dňa:"
 
 #: modules/webmessage/lib/webmessage_templates.py:420
-msgid "Received on"
-msgstr "Obdržané"
+msgid "Received on:"
+msgstr "Obdržané dňa:"
 
 #: modules/webmessage/lib/webmessage_templates.py:421
-msgid "Sent to"
-msgstr "Poslané komu"
+msgid "Sent to:"
+msgstr "Poslané komu:"
 
 #: modules/webmessage/lib/webmessage_templates.py:422
-msgid "Sent to groups"
-msgstr "Poslané grupám"
+msgid "Sent to groups:"
+msgstr "Poslané grupám:"
 
 #: modules/webmessage/lib/webmessage_templates.py:423
 msgid "REPLY"
@@ -2196,7 +2206,7 @@ msgid "No matching user"
 msgstr "Žiaden vyhovujúci užívateľ"
 
 #: modules/webmessage/lib/webmessage_templates.py:589
-#: modules/websession/lib/websession_templates.py:1235
+#: modules/websession/lib/websession_templates.py:1249
 msgid "No matching group"
 msgstr "Žiadna vyhovujúca grupa"
 
@@ -2227,12 +2237,12 @@ msgid "latest first"
 msgstr "posledný záznam najskôr"
 
 #: modules/websearch/bin/webcoll.in:507
-#: modules/websearch/lib/websearch_templates.py:1542
+#: modules/websearch/lib/websearch_templates.py:1537
 msgid "asc."
 msgstr "vzost."
 
 #: modules/websearch/bin/webcoll.in:508
-#: modules/websearch/lib/websearch_templates.py:1545
+#: modules/websearch/lib/websearch_templates.py:1540
 msgid "desc."
 msgstr "zost."
 
@@ -2249,17 +2259,17 @@ msgid "rank by"
 msgstr "zoradiť podľa"
 
 #: modules/websearch/bin/webcoll.in:537
-#: modules/websearch/lib/websearch_templates.py:1507
+#: modules/websearch/lib/websearch_templates.py:1502
 msgid "results"
 msgstr "výsledky"
 
 #: modules/websearch/bin/webcoll.in:550
-#: modules/websearch/lib/websearch_templates.py:1554
+#: modules/websearch/lib/websearch_templates.py:1549
 msgid "split by collection"
 msgstr "zoskupené podľa kolekcií"
 
 #: modules/websearch/bin/webcoll.in:551
-#: modules/websearch/lib/websearch_templates.py:1551
+#: modules/websearch/lib/websearch_templates.py:1546
 msgid "single list"
 msgstr "jediný list"
 
@@ -2344,18 +2354,19 @@ msgstr "Žiadne hodnoty nenájdené."
 
 #: modules/websearch/lib/search_engine.py:1395
 #, python-format
-msgid "No exact match found for %s, using %s instead..."
+msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"Žiaden presný výsledok pre %s nebol nájdený, skúsme použiť %s namiesto "
-"neho..."
+"Žiaden presný výsledok pre %(x_query1)s nebol nájdený, skúsme použiť %"
+"(x_query2)s namiesto neho..."
 
 #: modules/websearch/lib/search_engine.py:1634
 #, python-format
 msgid ""
-"No match found in collection %s. Other public collections gave %s%d hits%s."
+"No match found in collection %(x_collection)s. Other public collections gave "
+"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"Žiaden záznam nebol nájdený v kolekcii %s. Ostatné verejne dostupné kolekcie "
-"dali %s%d záznamov%s."
+"Žiaden záznam nebol nájdený v kolekcii %(x_collection)s. Ostatné verejne "
+"dostupné kolekcie dali %(x_url_open)s%(x_nb_hits)d záznamov%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:1643
 msgid ""
@@ -2377,11 +2388,11 @@ msgstr "Index viet nie je dostupný pre"
 #: modules/websearch/lib/search_engine.py:1783
 #, python-format
 msgid ""
-"Search term %s inside index %s did not match any record. Nearest terms in "
-"any collection are:"
+"Search term %(x_term)s inside index %(x_index)s did not match any record. "
+"Nearest terms in any collection are:"
 msgstr ""
-"Hľadaný výraz %s v indexe %s neodpovedá žiadnemu záznamu. Najbližšie termíny "
-"nezávisle na kolekcii sú:"
+"Hľadaný výraz %(x_term)s v indexe %(x_index)s neodpovedá žiadnemu záznamu. "
+"Najbližšie termíny nezávisle na kolekcii sú:"
 
 #: modules/websearch/lib/search_engine.py:1787
 #, python-format
@@ -2424,12 +2435,12 @@ msgstr "Záznam bol vymazaný."
 #: modules/websearch/lib/search_engine.py:3048
 #: modules/websearch/lib/websearch_templates.py:326
 #: modules/websearch/lib/websearch_templates.py:447
-#: modules/websearch/lib/websearch_templates.py:1258
-#: modules/websearch/lib/websearch_templates.py:1355
-#: modules/websearch/lib/websearch_templates.py:1414
-#: modules/websearch/lib/websearch_templates.py:1450
-#: modules/websearch/lib/websearch_templates.py:1473
-#: modules/websearch/lib/websearch_templates.py:1503
+#: modules/websearch/lib/websearch_templates.py:1253
+#: modules/websearch/lib/websearch_templates.py:1350
+#: modules/websearch/lib/websearch_templates.py:1409
+#: modules/websearch/lib/websearch_templates.py:1445
+#: modules/websearch/lib/websearch_templates.py:1468
+#: modules/websearch/lib/websearch_templates.py:1498
 msgid "Browse"
 msgstr "Prelistuj"
 
@@ -2451,7 +2462,7 @@ msgid "Search %s records for:"
 msgstr "Hľadaj v %s záznamoch:"
 
 #: modules/websearch/lib/websearch_templates.py:322
-#: modules/websearch/lib/websearch_templates.py:1399
+#: modules/websearch/lib/websearch_templates.py:1394
 msgid "Advanced Search"
 msgstr "Rozšírené Hľadanie"
 
@@ -2461,7 +2472,7 @@ msgid "Search %s records for"
 msgstr "Hľadaj v %s záznamoch"
 
 #: modules/websearch/lib/websearch_templates.py:432
-#: modules/websearch/lib/websearch_templates.py:1315
+#: modules/websearch/lib/websearch_templates.py:1310
 msgid "Simple Search"
 msgstr "Jednoduché Hľadanie"
 
@@ -2470,26 +2481,22 @@ msgid "Search options:"
 msgstr "Voľby hľadania:"
 
 #: modules/websearch/lib/websearch_templates.py:512
-#: modules/websearch/lib/websearch_templates.py:1496
+#: modules/websearch/lib/websearch_templates.py:1491
 msgid "Added since:"
 msgstr "Pridané od:"
 
 #: modules/websearch/lib/websearch_templates.py:513
-#: modules/websearch/lib/websearch_templates.py:1497
+#: modules/websearch/lib/websearch_templates.py:1492
 msgid "until:"
 msgstr "do:"
 
-#: modules/websearch/lib/websearch_templates.py:517
-msgid "Sort by:"
-msgstr "Utriediť podľa:"
-
 #: modules/websearch/lib/websearch_templates.py:518
-#: modules/websearch/lib/websearch_templates.py:1537
+#: modules/websearch/lib/websearch_templates.py:1532
 msgid "Display results:"
 msgstr "Zobraziť výsledky:"
 
 #: modules/websearch/lib/websearch_templates.py:519
-#: modules/websearch/lib/websearch_templates.py:1538
+#: modules/websearch/lib/websearch_templates.py:1533
 msgid "Output format:"
 msgstr "Výstupný formát:"
 
@@ -2514,9 +2521,9 @@ msgid "This collection does not contain any document yet."
 msgstr "Táto kolekcia ešte neobsahuje žiadne záznamy."
 
 #: modules/websearch/lib/websearch_templates.py:833
-#: modules/websearch/lib/websearch_templates.py:2114
-#: modules/websearch/lib/websearch_templates.py:2128
-#: modules/websearch/lib/websearch_templates.py:2145
+#: modules/websearch/lib/websearch_templates.py:2109
+#: modules/websearch/lib/websearch_templates.py:2123
+#: modules/websearch/lib/websearch_templates.py:2140
 msgid "more"
 msgstr "viac"
 
@@ -2525,181 +2532,184 @@ msgid "Latest additions:"
 msgstr "Posledne pridané:"
 
 #: modules/websearch/lib/websearch_templates.py:937
-#: modules/websearch/lib/websearch_templates.py:2096
-#: modules/websearch/lib/websearch_templates.py:2461
+#: modules/websearch/lib/websearch_templates.py:2091
+#: modules/websearch/lib/websearch_templates.py:2457
 msgid "Similar records"
 msgstr "Podobné záznamy"
 
 #: modules/websearch/lib/websearch_templates.py:942
-#: modules/websearch/lib/websearch_templates.py:2466
+#: modules/websearch/lib/websearch_templates.py:2462
 msgid "Cited by"
 msgstr "Citované"
 
 #: modules/websearch/lib/websearch_templates.py:1011
-msgid "Words nearest to"
-msgstr "Slová najbližšie k"
+#, python-format
+msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
+msgstr "Slová blízke %(x_word)s v %(x_field)s vo všetkých kolekciách sú:"
 
-#: modules/websearch/lib/websearch_templates.py:1016
-msgid "inside"
-msgstr "v"
+#: modules/websearch/lib/websearch_templates.py:1014
+#, python-format
+msgid "Words nearest to %(x_word)s in any collection are:"
+msgstr "Slová blízke %(x_word)s vo všetkých kolekciách sú:"
 
-#: modules/websearch/lib/websearch_templates.py:1019
-msgid "in any collection are:"
-msgstr "vo všetkých kolekciách sú:"
-
-#: modules/websearch/lib/websearch_templates.py:1111
+#: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
 msgstr "Zásahy"
 
-#: modules/websearch/lib/websearch_templates.py:1172
-#: modules/websearch/lib/websearch_templates.py:1914
+#: modules/websearch/lib/websearch_templates.py:1167
+#: modules/websearch/lib/websearch_templates.py:1909
 msgid "next"
 msgstr "ďalší"
 
-#: modules/websearch/lib/websearch_templates.py:1265
-#: modules/websearch/lib/websearch_templates.py:1366
+#: modules/websearch/lib/websearch_templates.py:1260
+#: modules/websearch/lib/websearch_templates.py:1361
 msgid "Try your search on..."
 msgstr "Skúste hľadať na..."
 
-#: modules/websearch/lib/websearch_templates.py:1445
+#: modules/websearch/lib/websearch_templates.py:1440
 msgid "collections"
 msgstr "kolekcie"
 
-#: modules/websearch/lib/websearch_templates.py:1467
-msgid "Limit to"
-msgstr "Obmedziť na"
+#: modules/websearch/lib/websearch_templates.py:1462
+msgid "Limit to:"
+msgstr "Obmedziť na:"
 
-#: modules/websearch/lib/websearch_templates.py:1585
+#: modules/websearch/lib/websearch_templates.py:1580
 msgid "MARC tag"
 msgstr "značka MARC"
 
+#: modules/websearch/lib/websearch_templates.py:1609
+#: modules/websearch/lib/websearch_templates.py:1611
 #: modules/websearch/lib/websearch_templates.py:1614
-#: modules/websearch/lib/websearch_templates.py:1616
-#: modules/websearch/lib/websearch_templates.py:1619
-#: modules/websearch/lib/websearch_templates.py:1623
+#: modules/websearch/lib/websearch_templates.py:1618
+#: modules/websearch/lib/websearch_templates.py:1620
 #: modules/websearch/lib/websearch_templates.py:1625
-#: modules/websearch/lib/websearch_templates.py:1630
-#: modules/websearch/lib/websearch_templates.py:1632
+#: modules/websearch/lib/websearch_templates.py:1627
+#: modules/websearch/lib/websearch_templates.py:1629
+#: modules/websearch/lib/websearch_templates.py:1631
 #: modules/websearch/lib/websearch_templates.py:1634
-#: modules/websearch/lib/websearch_templates.py:1636
 #: modules/websearch/lib/websearch_templates.py:1639
-#: modules/websearch/lib/websearch_templates.py:1644
-#: modules/websearch/lib/websearch_templates.py:1648
-#: modules/websearch/lib/websearch_templates.py:1650
-#: modules/websearch/lib/websearch_templates.py:1658
-#: modules/websearch/lib/websearch_templates.py:1660
-#: modules/websearch/lib/websearch_templates.py:1664
-#: modules/websearch/lib/websearch_templates.py:1668
-#: modules/websearch/lib/websearch_templates.py:1674
-#: modules/websearch/lib/websearch_templates.py:1676
-#: modules/websearch/lib/websearch_templates.py:1678
-#: modules/websearch/lib/websearch_templates.py:1680
-#: modules/websearch/lib/websearch_templates.py:1684
-#: modules/websearch/lib/websearch_templates.py:1697
-#: modules/websearch/lib/websearch_templates.py:1700
+#: modules/websearch/lib/websearch_templates.py:1643
+#: modules/websearch/lib/websearch_templates.py:1645
+#: modules/websearch/lib/websearch_templates.py:1653
+#: modules/websearch/lib/websearch_templates.py:1655
+#: modules/websearch/lib/websearch_templates.py:1659
+#: modules/websearch/lib/websearch_templates.py:1663
+#: modules/websearch/lib/websearch_templates.py:1669
+#: modules/websearch/lib/websearch_templates.py:1671
+#: modules/websearch/lib/websearch_templates.py:1673
+#: modules/websearch/lib/websearch_templates.py:1675
+#: modules/websearch/lib/websearch_templates.py:1679
+#: modules/websearch/lib/websearch_templates.py:1692
+#: modules/websearch/lib/websearch_templates.py:1695
+#: modules/websearch/lib/websearch_templates.py:1698
 #: modules/websearch/lib/websearch_templates.py:1703
-#: modules/websearch/lib/websearch_templates.py:1708
-#: modules/websearch/lib/websearch_templates.py:1710
+#: modules/websearch/lib/websearch_templates.py:1705
+#: modules/websearch/lib/websearch_templates.py:1707
 #: modules/websearch/lib/websearch_templates.py:1712
-#: modules/websearch/lib/websearch_templates.py:1717
-#: modules/websearch/lib/websearch_templates.py:1719
-#: modules/websearch/lib/websearch_templates.py:1721
-#: modules/websearch/lib/websearch_templates.py:1723
-#: modules/websearch/lib/websearch_templates.py:1736
-#: modules/websearch/lib/websearch_templates.py:1739
-#: modules/websearch/lib/websearch_templates.py:1742
-#: modules/websearch/lib/websearch_templates.py:1745
-#: modules/websearch/lib/websearch_templates.py:1748
+#: modules/websearch/lib/websearch_templates.py:1714
+#: modules/websearch/lib/websearch_templates.py:1716
+#: modules/websearch/lib/websearch_templates.py:1718
+#: modules/websearch/lib/websearch_templates.py:1731
+#: modules/websearch/lib/websearch_templates.py:1734
+#: modules/websearch/lib/websearch_templates.py:1737
+#: modules/websearch/lib/websearch_templates.py:1740
+#: modules/websearch/lib/websearch_templates.py:1743
 msgid "in"
 msgstr "v"
 
-#: modules/websearch/lib/websearch_templates.py:1753
+#: modules/websearch/lib/websearch_templates.py:1748
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Nenašli ste čo ste hľadali? Skúste Vašu otázku na iných serveroch:"
 
+#: modules/websearch/lib/websearch_templates.py:1866
 #: modules/websearch/lib/websearch_templates.py:1871
-#: modules/websearch/lib/websearch_templates.py:1876
-#: modules/websearch/lib/websearch_templates.py:2213
+#: modules/websearch/lib/websearch_templates.py:2209
 #, python-format
 msgid "%s records found"
 msgstr "%s záznamov nájdených"
 
-#: modules/websearch/lib/websearch_templates.py:1901
+#: modules/websearch/lib/websearch_templates.py:1896
 msgid "begin"
 msgstr "začiatok"
 
-#: modules/websearch/lib/websearch_templates.py:1905
+#: modules/websearch/lib/websearch_templates.py:1900
 #: modules/websubmit/lib/websubmit_templates.py:1162
 msgid "previous"
 msgstr "predošlý"
 
-#: modules/websearch/lib/websearch_templates.py:1918
+#: modules/websearch/lib/websearch_templates.py:1913
 msgid "end"
 msgstr "koniec"
 
-#: modules/websearch/lib/websearch_templates.py:1938
+#: modules/websearch/lib/websearch_templates.py:1933
 msgid "jump to record:"
 msgstr "skoč na záznam:"
 
-#: modules/websearch/lib/websearch_templates.py:1951
+#: modules/websearch/lib/websearch_templates.py:1946
 #, python-format
 msgid "Search took %s seconds."
 msgstr "Hľadanie trvalo %s sekúnd."
 
-#: modules/websearch/lib/websearch_templates.py:2024
-#: modules/websearch/lib/websearch_templates.py:2098
+#: modules/websearch/lib/websearch_templates.py:2019
+#: modules/websearch/lib/websearch_templates.py:2093
 msgid "ADD TO BASKET"
 msgstr "PRIDAŤ DO KOŠÍKA"
 
-#: modules/websearch/lib/websearch_templates.py:2056
-msgid "Format"
-msgstr "Formát"
+#: modules/websearch/lib/websearch_templates.py:2051
+msgid "Format:"
+msgstr "Formát:"
 
-#: modules/websearch/lib/websearch_templates.py:2091
+#: modules/websearch/lib/websearch_templates.py:2086
 #, python-format
-msgid "Record created %s, last modified %s"
-msgstr "Záznam vytvorený %s, zmenený %s"
+msgid ""
+"Record created %(x_date_creation)s, last modified %(x_date_modification)s"
+msgstr "Záznam vytvorený %(x_date_creation)s, zmenený %(x_date_modification)s"
 
-#: modules/websearch/lib/websearch_templates.py:2107
+#: modules/websearch/lib/websearch_templates.py:2102
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Citované: %s záznamami"
 
-#: modules/websearch/lib/websearch_templates.py:2122
+#: modules/websearch/lib/websearch_templates.py:2117
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Spolu citované s: %s záznamami"
 
-#: modules/websearch/lib/websearch_templates.py:2139
+#: modules/websearch/lib/websearch_templates.py:2134
 msgid "People who downloaded this document also downloaded:"
 msgstr "Užívatelia ktorí si stiahli tento dokument si tiež stiahli:"
 
-#: modules/websearch/lib/websearch_templates.py:2154
+#: modules/websearch/lib/websearch_templates.py:2149
 msgid "People who viewed this page also viewed:"
 msgstr "Užívatelia ktorí si prehliadli túto stránku si tiež prehliadli:"
 
-#: modules/websearch/lib/websearch_templates.py:2201
+#: modules/websearch/lib/websearch_templates.py:2196
 #, python-format
-msgid "%sResults overview:%s Found %s records in %s seconds."
-msgstr "%sPrehľad výsledkov:%s Nájdených %s záznamov za %s sekúnd."
+msgid ""
+"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
+"records in %(x_nb_seconds)s seconds."
+msgstr ""
+"%(x_fmt_open)sPrehľad výsledkov:%(x_fmt_close)s Nájdených %(x_nb_records)s "
+"záznamov za %(x_nb_seconds)s sekúnd."
 
-#: modules/websearch/lib/websearch_templates.py:2240
+#: modules/websearch/lib/websearch_templates.py:2236
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Booleovská otázka nevrátila žiaden výsledok. Skúste skombinovať dané termíny "
 "inakšie."
 
-#: modules/websearch/lib/websearch_templates.py:2271
+#: modules/websearch/lib/websearch_templates.py:2267
 msgid "See also: similar author names"
 msgstr "Viď tiež: podobné mená autorov"
 
 #: modules/websearch/lib/websearch_webinterface.py:277
 #: modules/websearch/lib/websearch_webinterface.py:346
 #: modules/websearch/web/admin/websearchadmin.py:1050
-#: modules/websession/lib/websession_webinterface.py:515
-#: modules/webstyle/lib/webstyle_templates.py:497
+#: modules/websession/lib/websession_webinterface.py:517
+#: modules/webstyle/lib/webstyle_templates.py:498
 #: modules/websubmit/lib/websubmit_webinterface.py:378
 #: modules/websubmit/lib/websubmit_webinterface.py:387
 msgid "Internal Error"
@@ -2727,17 +2737,22 @@ msgstr "Nenájdený"
 #: modules/websession/lib/webaccount.py:89
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %slogin%s as a regular user."
+"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
+"s as a regular user."
 msgstr ""
-"Ste prihlásený ako anonymný hosť.  Môžete sa %sprihlásiť%s ako riadny "
-"užívateľ."
+"Ste prihlásený ako anonymný hosť.  Môžete sa %(x_url_open)sprihlásiť%"
+"(x_url_close)s ako riadny užívateľ."
 
-#: modules/websession/lib/webaccount.py:91
+#: modules/websession/lib/webaccount.py:93
 #, python-format
-msgid "The %sguest%s users need to %sregister%s first"
-msgstr "%sAnonymní hostia%s sa musia najprv %szaregistrovať%s"
+msgid ""
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
+"(x_url_close)s first"
+msgstr ""
+"%(x_fmt_open)sAnonymní hostia%(x_fmt_close)s sa musia najprv %(x_url_open)"
+"szaregistrovať%(x_url_close)s"
 
-#: modules/websession/lib/webaccount.py:95
+#: modules/websession/lib/webaccount.py:98
 msgid "No queries found"
 msgstr "Nenájdené žiadne hľadania"
 
@@ -2781,7 +2796,7 @@ msgstr "Edituj parametre"
 
 #: modules/websession/lib/websession_templates.py:156
 #: modules/websession/lib/websession_templates.py:159
-#: modules/websession/lib/websession_templates.py:697
+#: modules/websession/lib/websession_templates.py:710
 msgid "Example"
 msgstr "Príklad"
 
@@ -2790,7 +2805,7 @@ msgid "New email address"
 msgstr "Nová elektronická adresa"
 
 #: modules/websession/lib/websession_templates.py:158
-#: modules/websession/lib/websession_templates.py:695
+#: modules/websession/lib/websession_templates.py:708
 msgid "mandatory"
 msgstr "nutné"
 
@@ -2799,17 +2814,17 @@ msgid "New password"
 msgstr "Nové heslo"
 
 #: modules/websession/lib/websession_templates.py:161
-#: modules/websession/lib/websession_templates.py:696
+#: modules/websession/lib/websession_templates.py:709
 msgid "optional"
 msgstr "voliteľné"
 
 #: modules/websession/lib/websession_templates.py:162
-#: modules/websession/lib/websession_templates.py:698
+#: modules/websession/lib/websession_templates.py:711
 msgid "Note"
 msgstr "Poznámka"
 
 #: modules/websession/lib/websession_templates.py:163
-#: modules/websession/lib/websession_templates.py:699
+#: modules/websession/lib/websession_templates.py:712
 msgid "The password phrase may contain punctuation, spaces, etc."
 msgstr "Heslo môže obsahovať punktuáciu, medzery, atď."
 
@@ -2838,7 +2853,7 @@ msgid "Select method"
 msgstr "Vyber metódu"
 
 #: modules/websession/lib/websession_templates.py:251
-#: modules/websession/lib/websession_templates.py:692
+#: modules/websession/lib/websession_templates.py:705
 msgid "Email address"
 msgstr "Elektronická adresa"
 
@@ -2871,7 +2886,7 @@ msgstr ""
 "Vaše preferencie o tom ako má rozhranie vyzerať."
 
 #: modules/websession/lib/websession_templates.py:298
-#: modules/websession/lib/websession_templates.py:435
+#: modules/websession/lib/websession_templates.py:441
 msgid "Your Searches"
 msgstr "Vaše hľadania"
 
@@ -2913,146 +2928,164 @@ msgstr ""
 "Skontrolujte knihu ktorú máte požičanú, pošlite výpožičné požiadavky, atď.  "
 "Táto služba vyžaduje CERN ID."
 
-#: modules/websession/lib/websession_templates.py:343
+#: modules/websession/lib/websession_templates.py:345
+msgid ""
+"You are logged in as a guest user, so your alerts will disappear at the end "
+"of the current session."
+msgstr ""
+"Ste prihlásený ako anonymný hosť, takže Vaše avíza zmiznú na konci terajšej "
+"seanse."
+
+#: modules/websession/lib/websession_templates.py:370
 #, python-format
 msgid ""
-"You are logged in as a guest user, so your %s will disappear at the end of "
-"the current session. If you wish you can %slogin or register here%s."
+"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
+"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
+"s."
 msgstr ""
-"Ste prihlásený ako anonymný hosť, takže Vaše %s zmiznú na konci terajšej "
-"seanse.  Ak si prajete, môžete sa %sprihlásiť alebo zaregistrovať tu%s."
+"Ste prihlásený ako %(x_user)s.  Môžete a) %(x_url1_open)ssa odhlásiť%"
+"(x_url1_close)s; b) editovať %(x_url2_open)sparametre Vášho konta%"
+"(x_url2_close)s."
 
-#: modules/websession/lib/websession_templates.py:367
-#, python-format
-msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_link1_begin)slogout%"
-"(x_link_end)s; b) edit your %(x_link2_begin)saccount settings%(x_link_end)s."
-msgstr ""
-"Ste prihlásený ako %(x_user)s.  Môžete a)\n"
-"a) %(x_link1_begin)ssa odhlásiť%(x_link_end)s; b) editovať %(x_link2_begin)"
-"sparametre Vášho konta%(x_link_end)s."
-
-#: modules/websession/lib/websession_templates.py:434
+#: modules/websession/lib/websession_templates.py:440
 msgid "Your Alert Searches"
 msgstr "Vaše avíza"
 
-#: modules/websession/lib/websession_templates.py:436
-#: modules/websession/lib/websession_templates.py:1704
-#: modules/websession/lib/websession_webinterface.py:557
+#: modules/websession/lib/websession_templates.py:442
+#, python-format
+msgid ""
+"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
+"administering or are a member of."
+msgstr ""
+"Môžete si prezrieť zoznam %(x_url_open)sVašich grúp%(x_url_close)s ktoré "
+"spravujete alebo ktorých ste členom."
+
+#: modules/websession/lib/websession_templates.py:445
+#: modules/websession/lib/websession_templates.py:1720
+#: modules/websession/lib/websession_webinterface.py:559
 msgid "Your Groups"
 msgstr "Vaše grupy"
 
-#: modules/websession/lib/websession_templates.py:437
+#: modules/websession/lib/websession_templates.py:446
 #, python-format
 msgid ""
-"You can consult the list of %syour submissions%s and inquire about their "
-"status."
-msgstr "Môžete si prezrieť zoznam %sVašich pridaní%s a pýtať sa na ich stav."
+"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
+"and inquire about their status."
+msgstr ""
+"Môžete si prezrieť zoznam %(x_url_open)sVašich pridaní%(x_url_close)s a "
+"dozvedieť sa a ich stave."
 
-#: modules/websession/lib/websession_templates.py:439
+#: modules/websession/lib/websession_templates.py:449
 #: modules/websubmit/web/yoursubmissions.py:165
 msgid "Your Submissions"
 msgstr "Vaše pridania"
 
-#: modules/websession/lib/websession_templates.py:440
+#: modules/websession/lib/websession_templates.py:450
 #, python-format
 msgid ""
-"You can consult the list of %syour approvals%s with the documents you "
-"approved or refereed."
+"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
+"the documents you approved or refereed."
 msgstr ""
-"Môžete si prezrieť zoznam %sVašich schválení%s a dokumenty ktoré ste "
-"schválili alebo zamietli."
+"Môžete si prezrieť zoznam %(x_url_open)sVašich schválení%(x_url_close)s a "
+"dokumenty ktoré ste schválili alebo zamietli."
 
-#: modules/websession/lib/websession_templates.py:442
+#: modules/websession/lib/websession_templates.py:453
 #: modules/websubmit/web/yourapprovals.py:87
 msgid "Your Approvals"
 msgstr "Vaše schválenia"
 
-#: modules/websession/lib/websession_templates.py:443
+#: modules/websession/lib/websession_templates.py:454
 #: modules/websession/lib/websession_webinterface.py:320
 msgid "Your Administrative Activities"
 msgstr "Vaše administračné aktivity"
 
-#: modules/websession/lib/websession_templates.py:470
+#: modules/websession/lib/websession_templates.py:481
 msgid "Try again"
 msgstr "Skúste znovu"
 
-#: modules/websession/lib/websession_templates.py:489
+#: modules/websession/lib/websession_templates.py:500
 #, python-format
 msgid "Okay, password has been emailed to %s."
 msgstr "V pordiadku, heslo bolo poslané elektronickou poštou na %s."
 
-#: modules/websession/lib/websession_templates.py:504
+#: modules/websession/lib/websession_templates.py:515
 msgid "Deleting your account"
 msgstr "Výmaz vášho konta"
 
-#: modules/websession/lib/websession_templates.py:520
-#, python-format
-msgid "You are no longer recognized.  If you wish you can %slogin here%s."
-msgstr "Už nie ste prihlásený.  Ak chcete môžete sa %sprihlásiť tu%s."
+#: modules/websession/lib/websession_templates.py:529
+msgid "You are no longer recognized."
+msgstr "Už nie ste prihlásený."
 
-#: modules/websession/lib/websession_templates.py:548
+#: modules/websession/lib/websession_templates.py:530
+#, python-format
+msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
+msgstr "Ak si prajete, môžete sa %(x_url_open)sprihlásiť tu%(x_url_close)s."
+
+#: modules/websession/lib/websession_templates.py:559
 msgid "If you already have an account, please login using the form below."
 msgstr "Ak už máte konto, prihláste sa doleuvedeným formulárom."
 
-#: modules/websession/lib/websession_templates.py:552
+#: modules/websession/lib/websession_templates.py:563
 #, python-format
 msgid ""
-"If you don't own an account yet, please %sregister%s an internal account."
-msgstr "Ak ešte konto nemáte, prosím %szaregistrujte%s interné konto."
+"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
+"s an internal account."
+msgstr ""
+"Ak ešte konto nemáte, prosím %(x_url_open)szaregistrujte%(x_url_close)s "
+"interné konto."
 
-#: modules/websession/lib/websession_templates.py:554
+#: modules/websession/lib/websession_templates.py:567
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
 msgstr "Nie je možné vytvoriť si konto sám.  Obráťte sa na %s ak chcete konto."
 
-#: modules/websession/lib/websession_templates.py:574
+#: modules/websession/lib/websession_templates.py:587
 msgid "Login via:"
 msgstr "Prihlásiť cez:"
 
-#: modules/websession/lib/websession_templates.py:600
+#: modules/websession/lib/websession_templates.py:613
 msgid "Username"
 msgstr "Užívateľské meno"
 
-#: modules/websession/lib/websession_templates.py:601
-#: modules/websession/lib/websession_templates.py:694
+#: modules/websession/lib/websession_templates.py:614
+#: modules/websession/lib/websession_templates.py:707
 msgid "Password"
 msgstr "Heslo"
 
-#: modules/websession/lib/websession_templates.py:602
-#: modules/websession/lib/websession_templates.py:804
+#: modules/websession/lib/websession_templates.py:615
+#: modules/websession/lib/websession_templates.py:818
 #: modules/websession/lib/websession_webinterface.py:392
 #: modules/websession/lib/websession_webinterface.py:426
 msgid "login"
 msgstr "prihlásiť"
 
-#: modules/websession/lib/websession_templates.py:607
+#: modules/websession/lib/websession_templates.py:620
 #: modules/websession/lib/websession_webinterface.py:223
 msgid "Lost your password?"
 msgstr "Stratili ste heslo?"
 
-#: modules/websession/lib/websession_templates.py:650
+#: modules/websession/lib/websession_templates.py:663
 msgid "Please enter your email address and desired nickname and password:"
 msgstr "Prosíme zadajte Vašu elektronickú adresu a žiadanú prezývku a heslo:"
 
-#: modules/websession/lib/websession_templates.py:652
+#: modules/websession/lib/websession_templates.py:665
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
 msgstr "Konto nebude možné použiť pred tým než bude overené a aktivované."
 
-#: modules/websession/lib/websession_templates.py:700
+#: modules/websession/lib/websession_templates.py:713
 msgid "Retype Password"
 msgstr "Opakujte heslo"
 
-#: modules/websession/lib/websession_templates.py:701
-#: modules/websession/lib/websession_webinterface.py:520
+#: modules/websession/lib/websession_templates.py:714
+#: modules/websession/lib/websession_webinterface.py:522
 msgid "register"
 msgstr "zaregistrujte sa"
 
-#: modules/websession/lib/websession_templates.py:702
+#: modules/websession/lib/websession_templates.py:715
 #, python-format
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
@@ -3069,340 +3102,354 @@ msgstr ""
 "hľadacie avíza ktoré budú hľadať nové preprinty a ktoré Vás upovedomia o "
 "nových prírastkoch prostredníctvom elektronickej pošty."
 
-#: modules/websession/lib/websession_templates.py:731
+#: modules/websession/lib/websession_templates.py:744
 #, python-format
-msgid "You seem to be a guest user. You have to %slogin%s first."
-msgstr "Zdáte sa byť užívateľom-hosťom.  Musíte sa vopred %sprihlásiť%s."
+msgid ""
+"You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
+"first."
+msgstr ""
+"Zdáte sa byť užívateľom-hosťom.  Musíte sa vopred %(x_url_open)sprihlásiť%"
+"(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:735
+#: modules/websession/lib/websession_templates.py:748
 msgid "You are not authorized to access administrative functions."
 msgstr "Nie ste oprávnení k prístupu k administratívnym funkciám."
 
-#: modules/websession/lib/websession_templates.py:738
+#: modules/websession/lib/websession_templates.py:751
 #, python-format
-msgid "You seem to be %s."
-msgstr "Zdáte sa byť %s."
+msgid "You seem to be %(x_role)s."
+msgstr "Zdáte sa byť %(x_role)s."
 
-#: modules/websession/lib/websession_templates.py:739
+#: modules/websession/lib/websession_templates.py:752
 msgid "Here are some interesting web admin links for you:"
 msgstr "Tu sú nejaké zaujímavé administratívne linky pre Vás:"
 
-#: modules/websession/lib/websession_templates.py:745
+#: modules/websession/lib/websession_templates.py:758
 msgid "Run BibEdit"
 msgstr "Spustite BibEdit"
 
-#: modules/websession/lib/websession_templates.py:747
+#: modules/websession/lib/websession_templates.py:760
 msgid "Configure BibFormat"
 msgstr "Konfigurujte BibFormat"
 
-#: modules/websession/lib/websession_templates.py:749
+#: modules/websession/lib/websession_templates.py:762
 msgid "Configure BibHarvest"
 msgstr "Konfigurujte BibHarvest"
 
-#: modules/websession/lib/websession_templates.py:751
+#: modules/websession/lib/websession_templates.py:764
 msgid "Configure BibIndex"
 msgstr "Konfigurujte BibIndex"
 
-#: modules/websession/lib/websession_templates.py:753
+#: modules/websession/lib/websession_templates.py:766
 msgid "Configure BibRank"
 msgstr "Konfigurujte BibRank"
 
-#: modules/websession/lib/websession_templates.py:755
+#: modules/websession/lib/websession_templates.py:768
 msgid "Configure WebAccess"
 msgstr "Konfigurujte WebAccess"
 
-#: modules/websession/lib/websession_templates.py:757
+#: modules/websession/lib/websession_templates.py:770
 msgid "Configure WebComment"
 msgstr "Konfigurujte WebComment"
 
-#: modules/websession/lib/websession_templates.py:759
+#: modules/websession/lib/websession_templates.py:772
 msgid "Configure WebSearch"
 msgstr "Konfigurujte WebSearch"
 
-#: modules/websession/lib/websession_templates.py:761
+#: modules/websession/lib/websession_templates.py:774
 msgid "Configure WebSubmit"
 msgstr "Konfigurujte WebSubmit"
 
-#: modules/websession/lib/websession_templates.py:762
+#: modules/websession/lib/websession_templates.py:775
 #, python-format
-msgid "For more admin-level activities, see the complete %sAdmin Area%s."
+msgid ""
+"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
+"(x_url_close)s."
 msgstr ""
-"Pre viac administratívnych aktivít, pozrite kompletný %sAreál Adminstrátora%"
-"s."
+"Pre viac administratívnych aktivít, pozrite kompletný %(x_url_open)sAreál "
+"Adminstrátora%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:800
+#: modules/websession/lib/websession_templates.py:814
 msgid "guest"
 msgstr "hosť"
 
-#: modules/websession/lib/websession_templates.py:801
+#: modules/websession/lib/websession_templates.py:815
 msgid "session"
 msgstr "seansa"
 
-#: modules/websession/lib/websession_templates.py:802
-#: modules/websession/lib/websession_templates.py:818
+#: modules/websession/lib/websession_templates.py:816
+#: modules/websession/lib/websession_templates.py:832
 msgid "alerts"
 msgstr "avíza"
 
-#: modules/websession/lib/websession_templates.py:803
-#: modules/websession/lib/websession_templates.py:820
+#: modules/websession/lib/websession_templates.py:817
+#: modules/websession/lib/websession_templates.py:834
 msgid "baskets"
 msgstr "košíky"
 
-#: modules/websession/lib/websession_templates.py:817
+#: modules/websession/lib/websession_templates.py:831
 msgid "account"
 msgstr "konto"
 
-#: modules/websession/lib/websession_templates.py:819
+#: modules/websession/lib/websession_templates.py:833
 msgid "messages"
 msgstr "správy"
 
-#: modules/websession/lib/websession_templates.py:821
+#: modules/websession/lib/websession_templates.py:835
 msgid "groups"
 msgstr "grupy"
 
-#: modules/websession/lib/websession_templates.py:827
+#: modules/websession/lib/websession_templates.py:841
 msgid "submissions"
 msgstr "pridania"
 
-#: modules/websession/lib/websession_templates.py:833
+#: modules/websession/lib/websession_templates.py:847
 msgid "approvals"
 msgstr "schválenia"
 
-#: modules/websession/lib/websession_templates.py:839
+#: modules/websession/lib/websession_templates.py:853
 msgid "administration"
 msgstr "administrácia"
 
-#: modules/websession/lib/websession_templates.py:844
+#: modules/websession/lib/websession_templates.py:858
 msgid "logout"
 msgstr "odhlásiť"
 
-#: modules/websession/lib/websession_templates.py:950
+#: modules/websession/lib/websession_templates.py:964
 msgid "You are an administrator of the following groups:"
 msgstr "Ste administrátorom nasledujúcich grúp:"
 
-#: modules/websession/lib/websession_templates.py:970
-#: modules/websession/lib/websession_templates.py:1044
+#: modules/websession/lib/websession_templates.py:984
+#: modules/websession/lib/websession_templates.py:1058
 msgid "Group"
 msgstr "Grupa"
 
-#: modules/websession/lib/websession_templates.py:970
-#: modules/websession/lib/websession_templates.py:1044
+#: modules/websession/lib/websession_templates.py:984
+#: modules/websession/lib/websession_templates.py:1058
 msgid "Description"
 msgstr "Popis"
 
-#: modules/websession/lib/websession_templates.py:977
+#: modules/websession/lib/websession_templates.py:991
 msgid "You are not an administrator of any groups."
 msgstr "Nie ste administrátorom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:984
+#: modules/websession/lib/websession_templates.py:998
 msgid "Edit group"
 msgstr "Edituj grupu"
 
-#: modules/websession/lib/websession_templates.py:991
+#: modules/websession/lib/websession_templates.py:1005
 #, python-format
 msgid "Edit %s members"
 msgstr "Edituj %s členov"
 
-#: modules/websession/lib/websession_templates.py:1014
-#: modules/websession/lib/websession_templates.py:1107
-#: modules/websession/lib/websession_templates.py:1109
-#: modules/websession/lib/websession_webinterface.py:610
+#: modules/websession/lib/websession_templates.py:1028
+#: modules/websession/lib/websession_templates.py:1121
+#: modules/websession/lib/websession_templates.py:1123
+#: modules/websession/lib/websession_webinterface.py:612
 msgid "Create new group"
 msgstr "Vytvoriť novú grupu"
 
-#: modules/websession/lib/websession_templates.py:1028
+#: modules/websession/lib/websession_templates.py:1042
 msgid "You are a member of the following groups:"
 msgstr "Ste členom nasledujúcich grúp:"
 
-#: modules/websession/lib/websession_templates.py:1051
+#: modules/websession/lib/websession_templates.py:1065
 msgid "You are not a member of any groups."
 msgstr "Nie ste členom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:1076
+#: modules/websession/lib/websession_templates.py:1090
 msgid "Join new group"
 msgstr "Pridať sa k novej grupe"
 
-#: modules/websession/lib/websession_templates.py:1077
-#: modules/websession/lib/websession_templates.py:1542
-#: modules/websession/lib/websession_templates.py:1553
+#: modules/websession/lib/websession_templates.py:1091
+#: modules/websession/lib/websession_templates.py:1558
+#: modules/websession/lib/websession_templates.py:1569
 msgid "Leave group"
 msgstr "Opustiť grupu"
 
-#: modules/websession/lib/websession_templates.py:1115
+#: modules/websession/lib/websession_templates.py:1129
 msgid "Update group"
 msgstr "Aktualizovať grupu"
 
-#: modules/websession/lib/websession_templates.py:1117
+#: modules/websession/lib/websession_templates.py:1131
 #, python-format
 msgid "Edit group %s"
 msgstr "Edituj grupu %s"
 
-#: modules/websession/lib/websession_templates.py:1119
+#: modules/websession/lib/websession_templates.py:1133
 msgid "Delete group"
 msgstr "Zmazať grupu"
 
-#: modules/websession/lib/websession_templates.py:1189
+#: modules/websession/lib/websession_templates.py:1203
 msgid "Group name:"
 msgstr "Meno grupy:"
 
-#: modules/websession/lib/websession_templates.py:1191
+#: modules/websession/lib/websession_templates.py:1205
 msgid "Group description:"
 msgstr "Popis grupy:"
 
-#: modules/websession/lib/websession_templates.py:1192
+#: modules/websession/lib/websession_templates.py:1206
 msgid "Group join policy:"
 msgstr "Politika pridania sa do grupy:"
 
-#: modules/websession/lib/websession_templates.py:1233
-#: modules/websession/lib/websession_templates.py:1304
-#: modules/websession/lib/websession_templates.py:1437
-#: modules/websession/lib/websession_templates.py:1446
-#: modules/websession/lib/websession_templates.py:1540
-#: modules/websession/lib/websession_templates.py:1650
+#: modules/websession/lib/websession_templates.py:1247
+#: modules/websession/lib/websession_templates.py:1318
+#: modules/websession/lib/websession_templates.py:1451
+#: modules/websession/lib/websession_templates.py:1460
+#: modules/websession/lib/websession_templates.py:1556
+#: modules/websession/lib/websession_templates.py:1666
 msgid "Please select:"
 msgstr "Prosíme vyberte:"
 
-#: modules/websession/lib/websession_templates.py:1297
+#: modules/websession/lib/websession_templates.py:1311
 msgid "Join group"
 msgstr "Pridať sa ku grupe"
 
-#: modules/websession/lib/websession_templates.py:1299
+#: modules/websession/lib/websession_templates.py:1313
 msgid "or find it"
 msgstr "alebo nájsť ju"
 
-#: modules/websession/lib/websession_templates.py:1300
+#: modules/websession/lib/websession_templates.py:1314
 msgid "Choose group:"
 msgstr "Zvoľte grupu:"
 
-#: modules/websession/lib/websession_templates.py:1302
+#: modules/websession/lib/websession_templates.py:1316
 msgid "Find group"
 msgstr "Nájdi grupu"
 
-#: modules/websession/lib/websession_templates.py:1442
+#: modules/websession/lib/websession_templates.py:1456
 msgid "Remove member"
 msgstr "Odstráň člena"
 
-#: modules/websession/lib/websession_templates.py:1444
+#: modules/websession/lib/websession_templates.py:1458
 msgid "No members."
 msgstr "Žiadni členovia."
 
-#: modules/websession/lib/websession_templates.py:1454
+#: modules/websession/lib/websession_templates.py:1468
 msgid "Accept member"
 msgstr "Prijmi člena"
 
-#: modules/websession/lib/websession_templates.py:1454
+#: modules/websession/lib/websession_templates.py:1468
 msgid "Reject member"
 msgstr "Odmientni člena"
 
-#: modules/websession/lib/websession_templates.py:1456
+#: modules/websession/lib/websession_templates.py:1470
 msgid "No members awaiting approval."
 msgstr "Žiadni členovia nečakajú na schválenie."
 
-#: modules/websession/lib/websession_templates.py:1458
+#: modules/websession/lib/websession_templates.py:1472
 msgid "Current members"
 msgstr "Súčasní členovia"
 
-#: modules/websession/lib/websession_templates.py:1459
+#: modules/websession/lib/websession_templates.py:1473
 msgid "Members awaiting approval"
 msgstr "Členovia čakajúci na schválenie"
 
-#: modules/websession/lib/websession_templates.py:1460
+#: modules/websession/lib/websession_templates.py:1474
 msgid "Invite new members"
 msgstr "Pozvite nových členov"
 
-#: modules/websession/lib/websession_templates.py:1463
+#: modules/websession/lib/websession_templates.py:1477
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %sweb "
-"message%s system."
+"If you want to invite new members to join your group, please use the %"
+"(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
 "Ak chcete pozvať nových členov aby sa pripojili k Vašej grupe, prosím "
-"použite systém %sweb správ%s."
+"použite systém %(x_url_open)sweb správ%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1465
+#: modules/websession/lib/websession_templates.py:1481
 #, python-format
 msgid "Group: %s"
 msgstr "Grupa: %s"
 
-#: modules/websession/lib/websession_templates.py:1541
+#: modules/websession/lib/websession_templates.py:1557
 msgid "Group list"
 msgstr "Zoznam grúp"
 
-#: modules/websession/lib/websession_templates.py:1544
+#: modules/websession/lib/websession_templates.py:1560
 msgid "You are not member of any group."
 msgstr "Nie ste členom žiadnej grupy."
 
-#: modules/websession/lib/websession_templates.py:1591
+#: modules/websession/lib/websession_templates.py:1607
 msgid "Are you sure you want to delete this group?"
 msgstr "Ste si istí že chcete zmazať túto grupu?"
 
-#: modules/websession/lib/websession_templates.py:1630
+#: modules/websession/lib/websession_templates.py:1646
 msgid "Are you sure you want to leave this group?"
 msgstr "Ste si istí že chcete opustiť túto grupu?"
 
-#: modules/websession/lib/websession_templates.py:1646
+#: modules/websession/lib/websession_templates.py:1662
 msgid "Visible and open for new members"
 msgstr "Viditeľná a otvorená pre nových členov"
 
-#: modules/websession/lib/websession_templates.py:1648
+#: modules/websession/lib/websession_templates.py:1664
 msgid "Visible but new members need approval"
 msgstr "Viditeľná ale noví členovia potrebujú schválenie"
 
-#: modules/websession/lib/websession_templates.py:1736
+#: modules/websession/lib/websession_templates.py:1749
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "Grupa %s: Nová požiadavka pre členstvo"
 
-#: modules/websession/lib/websession_templates.py:1739
-#: modules/websession/lib/websession_templates.py:1759
-#: modules/websession/lib/websession_templates.py:1776
-msgid "here"
-msgstr "tu"
-
-#: modules/websession/lib/websession_templates.py:1741
+#: modules/websession/lib/websession_templates.py:1753
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "Užívateľ sa chce pripojiť ku grupe %s."
 
-#: modules/websession/lib/websession_templates.py:1742
+#: modules/websession/lib/websession_templates.py:1754
 #, python-format
-msgid "Please %saccept or reject%s this user's request."
-msgstr "Prosím %sprijmite alebo zamietnite%s žiadosť tohto užívateľa."
+msgid ""
+"Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
+msgstr ""
+"Prosím %(x_url_open)sprijmite alebo zamietnite%(x_url_close)s žiadosť tohto "
+"užívateľa."
 
-#: modules/websession/lib/websession_templates.py:1756
+#: modules/websession/lib/websession_templates.py:1771
 #, python-format
-msgid "Group %s: Join request has been %s"
-msgstr "Grupa %s: Žiadosť na pripojenie bola %s"
+msgid "Group %s: Join request has been accepted"
+msgstr "Grupa %s: Žiadosť na pripojenie bola akceptovaná"
 
-#: modules/websession/lib/websession_templates.py:1760
+#: modules/websession/lib/websession_templates.py:1772
 #, python-format
-msgid "Your request for joining group %s has been %s."
-msgstr "Vaša žiadosť na pripojenie sa ku grupe %s bola %s."
+msgid "Your request for joining group %s has been accepted."
+msgstr "Vaša žiadosť na pripojenie sa ku grupe %s bola akceptovaná."
 
-#: modules/websession/lib/websession_templates.py:1761
+#: modules/websession/lib/websession_templates.py:1774
+#, python-format
+msgid "Group %s: Join request has been rejected"
+msgstr "Grupa %s: Žiadosť na pripojenie bola odmietnutá"
+
+#: modules/websession/lib/websession_templates.py:1775
+#, python-format
+msgid "Your request for joining group %s has been rejected."
+msgstr "Vaša žiadosť na pripojenie sa ku grupe %s bola odmietnutá."
+
 #: modules/websession/lib/websession_templates.py:1778
+#: modules/websession/lib/websession_templates.py:1796
 #, python-format
-msgid "You can consult the list of %syour groups%s."
-msgstr "Môžete si prezrieť zoznam %sVašich grúp%s."
+msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
+msgstr "Môžete si prezrieť zoznam %(x_url_open)sVašich grúp%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1773
+#: modules/websession/lib/websession_templates.py:1792
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "Grupa %s bola zrušená."
 
-#: modules/websession/lib/websession_templates.py:1777
+#: modules/websession/lib/websession_templates.py:1794
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "Grupa %s bola zrušená jej administrátorom."
 
-#: modules/websession/lib/websession_templates.py:1791
+#: modules/websession/lib/websession_templates.py:1811
 #, python-format
 msgid ""
-"You can consult the list of %s%i groups%s you are subscribed to (%i) or "
-"administering (%i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
+"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
 msgstr ""
-"Môžete si prezrieť zoznam %s%i Vašich grúp%s ktorých ste členom (%i) alebo "
-"ktoré spravujete (%i)."
+"Môžete si prezrieť zoznam %(x_url_open)s%(x_nb_total)i Vašich grúp%"
+"(x_url_close)s ktorých ste členom (%(x_nb_member)i) alebo ktoré spravujete (%"
+"(x_nb_admin)i)."
 
 #: modules/websession/lib/webuser.py:102
 msgid "Database problem"
@@ -3435,7 +3482,7 @@ msgid "Settings successfully edited."
 msgstr "Parametre úspešne upravené."
 
 #: modules/websession/lib/websession_webinterface.py:166
-#: modules/websession/lib/websession_webinterface.py:494
+#: modules/websession/lib/websession_webinterface.py:496
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Žiadaná prezývka %s je neplatná."
@@ -3444,10 +3491,10 @@ msgstr "Žiadaná prezývka %s je neplatná."
 #: modules/websession/lib/websession_webinterface.py:173
 #: modules/websession/lib/websession_webinterface.py:186
 #: modules/websession/lib/websession_webinterface.py:192
-#: modules/websession/lib/websession_webinterface.py:485
-#: modules/websession/lib/websession_webinterface.py:490
-#: modules/websession/lib/websession_webinterface.py:495
-#: modules/websession/lib/websession_webinterface.py:506
+#: modules/websession/lib/websession_webinterface.py:487
+#: modules/websession/lib/websession_webinterface.py:492
+#: modules/websession/lib/websession_webinterface.py:497
+#: modules/websession/lib/websession_webinterface.py:508
 msgid "Please try again."
 msgstr "Prosím skúste znovu."
 
@@ -3470,19 +3517,19 @@ msgid "Editing settings failed"
 msgstr "Editovanie parametrov zlyhalo"
 
 #: modules/websession/lib/websession_webinterface.py:172
-#: modules/websession/lib/websession_webinterface.py:489
+#: modules/websession/lib/websession_webinterface.py:491
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "Dodaná elektronická adresa %s je neplatná."
 
 #: modules/websession/lib/websession_webinterface.py:178
-#: modules/websession/lib/websession_webinterface.py:499
+#: modules/websession/lib/websession_webinterface.py:501
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "Dodaná elektronická adresa %s už v databáze existuje."
 
 #: modules/websession/lib/websession_webinterface.py:180
-#: modules/websession/lib/websession_webinterface.py:501
+#: modules/websession/lib/websession_webinterface.py:503
 msgid "Or please try again."
 msgstr "Alebo skúste znovu, prosím."
 
@@ -3492,7 +3539,7 @@ msgid "Desired nickname %s is already in use."
 msgstr "Žiadaná prezývka %s je už použitá."
 
 #: modules/websession/lib/websession_webinterface.py:191
-#: modules/websession/lib/websession_webinterface.py:484
+#: modules/websession/lib/websession_webinterface.py:486
 msgid "Both passwords must match."
 msgstr "Obe heslá musia byť rovnaké."
 
@@ -3576,83 +3623,83 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:482
 #, python-format
-msgid "You can now access your %saccount%s."
-msgstr "Teraz môžete pristúpiť k Vášmu %skontu%s."
+msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
+msgstr "Teraz môžete pristúpiť k Vášmu %(x_url_open)skontu%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:487
-#: modules/websession/lib/websession_webinterface.py:492
-#: modules/websession/lib/websession_webinterface.py:497
-#: modules/websession/lib/websession_webinterface.py:503
-#: modules/websession/lib/websession_webinterface.py:508
-#: modules/websession/lib/websession_webinterface.py:512
-#: modules/websession/lib/websession_webinterface.py:517
+#: modules/websession/lib/websession_webinterface.py:489
+#: modules/websession/lib/websession_webinterface.py:494
+#: modules/websession/lib/websession_webinterface.py:499
+#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:510
+#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:519
 msgid "Registration failure"
 msgstr "Zlyhanie registrácie"
 
-#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:507
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Žiadaná prezývka %s už v databáze existuje."
 
-#: modules/websession/lib/websession_webinterface.py:510
+#: modules/websession/lib/websession_webinterface.py:512
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "Užívatelia sa nemôžu sami zaregistrovať, iba administrátor ich môže "
 "zaregistrovať."
 
-#: modules/websession/lib/websession_webinterface.py:669
+#: modules/websession/lib/websession_webinterface.py:671
 msgid "Join New Group"
 msgstr "Pridaj sa k novej grupe"
 
-#: modules/websession/lib/websession_webinterface.py:716
+#: modules/websession/lib/websession_webinterface.py:718
 msgid "Leave Group"
 msgstr "Opustiť grupu"
 
-#: modules/websession/lib/websession_webinterface.py:781
+#: modules/websession/lib/websession_webinterface.py:783
 msgid "Edit Group"
 msgstr "Edituj grupu"
 
-#: modules/websession/lib/websession_webinterface.py:848
+#: modules/websession/lib/websession_webinterface.py:850
 msgid "Edit group members"
 msgstr "Edituj členov grupy"
 
-#: modules/webstyle/lib/webstyle_templates.py:495
-#: modules/webstyle/lib/webstyle_templates.py:529
-#: modules/webstyle/lib/webstyle_templates.py:531
+#: modules/webstyle/lib/webstyle_templates.py:496
+#: modules/webstyle/lib/webstyle_templates.py:530
+#: modules/webstyle/lib/webstyle_templates.py:532
 #: modules/websubmit/lib/websubmit_engine.py:1073
 #: modules/websubmit/lib/websubmit_webinterface.py:376
 msgid "Error"
 msgstr "Chyba"
 
-#: modules/webstyle/lib/webstyle_templates.py:499
+#: modules/webstyle/lib/webstyle_templates.py:500
 msgid "Browser"
 msgstr "Prehliadač"
 
-#: modules/webstyle/lib/webstyle_templates.py:520
+#: modules/webstyle/lib/webstyle_templates.py:521
 msgid "System Error"
 msgstr "Systémová chyba"
 
-#: modules/webstyle/lib/webstyle_templates.py:533
+#: modules/webstyle/lib/webstyle_templates.py:534
 msgid "Traceback"
 msgstr "Trasa"
 
-#: modules/webstyle/lib/webstyle_templates.py:578
+#: modules/webstyle/lib/webstyle_templates.py:579
 msgid "Time"
 msgstr "Čas"
 
-#: modules/webstyle/lib/webstyle_templates.py:579
+#: modules/webstyle/lib/webstyle_templates.py:580
 msgid "Client"
 msgstr "Klient"
 
-#: modules/webstyle/lib/webstyle_templates.py:580
+#: modules/webstyle/lib/webstyle_templates.py:581
 msgid "Please send an error report to the Administrator."
 msgstr "Prosím pošli chybovú správu administrátorovi."
 
-#: modules/webstyle/lib/webstyle_templates.py:581
+#: modules/webstyle/lib/webstyle_templates.py:582
 msgid "Send error report"
 msgstr "Pošli chybovú správu"
 
-#: modules/webstyle/lib/webstyle_templates.py:584
+#: modules/webstyle/lib/webstyle_templates.py:585
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Prosíme kontaktujte %s a uveďte nasledovné informácie:"
@@ -3946,8 +3993,8 @@ msgid "You are a general referee"
 msgstr "Ste všeobecným referentom"
 
 #: modules/websubmit/lib/websubmit_templates.py:1517
-msgid "You are a referee for category"
-msgstr "Ste referentom pre kategóriu"
+msgid "You are a referee for category:"
+msgstr "Ste referentom pre kategóriu:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1554
 msgid "List of refereed types of documents"
@@ -4019,13 +4066,17 @@ msgstr "číslo správy"
 msgid "Your request has been sent to the referee."
 msgstr "Vaša žiadosť bola zaslaná referentovi."
 
+#: modules/websubmit/lib/websubmit_templates.py:1875
+msgid "Title:"
+msgstr "Názov:"
+
 #: modules/websubmit/lib/websubmit_templates.py:1881
-msgid "Author"
-msgstr "Autor"
+msgid "Author:"
+msgstr "Autor:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1889
-msgid "More information"
-msgstr "Viac informácií"
+msgid "More information:"
+msgstr "Viac informácií:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1890
 msgid "Click here"
@@ -4033,42 +4084,43 @@ msgstr "Kliknite sem"
 
 #: modules/websubmit/lib/websubmit_templates.py:1896
 #, python-format
-msgid "This document is still %swaiting for approval%s."
-msgstr "Tento dokument stále %sčaká na schválenie%s."
+msgid ""
+"This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
+msgstr "Tento dokument stále %(x_fmt_open)sčaká na schválenie%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1898
-#: modules/websubmit/lib/websubmit_templates.py:1917
-#: modules/websubmit/lib/websubmit_templates.py:1926
-msgid "It was first sent for approval on"
-msgstr "Prvý krát bol zaslaný na schválenie"
-
-#: modules/websubmit/lib/websubmit_templates.py:1900
-#: modules/websubmit/lib/websubmit_templates.py:1902
+#: modules/websubmit/lib/websubmit_templates.py:1899
 #: modules/websubmit/lib/websubmit_templates.py:1919
-#: modules/websubmit/lib/websubmit_templates.py:1921
-#: modules/websubmit/lib/websubmit_templates.py:1928
-#: modules/websubmit/lib/websubmit_templates.py:1930
-msgid "Last approval email was sent on"
-msgstr "Posledná schvaľujúca elektronická pošta bola zaslaná"
+#: modules/websubmit/lib/websubmit_templates.py:1929
+msgid "It was first sent for approval on:"
+msgstr "Prvý krát bol zaslaný na schválenie dňa:"
 
+#: modules/websubmit/lib/websubmit_templates.py:1901
 #: modules/websubmit/lib/websubmit_templates.py:1903
+#: modules/websubmit/lib/websubmit_templates.py:1921
+#: modules/websubmit/lib/websubmit_templates.py:1923
+#: modules/websubmit/lib/websubmit_templates.py:1931
+#: modules/websubmit/lib/websubmit_templates.py:1933
+msgid "Last approval email was sent on:"
+msgstr "Posledná elektronická pošta pre schválenie bola zaslaná dňa:"
+
+#: modules/websubmit/lib/websubmit_templates.py:1904
 msgid ""
 "You can send an approval request email again by clicking the following "
-"button."
+"button:"
 msgstr ""
-"Môžte opäť zaslať požiadavku na schválenie kliknutím na nasledujúce tlačidlo."
+"Môžte opäť zaslať požiadavku na schválenie kliknutím na nasledujúce tlačidlo:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1905
+#: modules/websubmit/lib/websubmit_templates.py:1906
 #: modules/websubmit/web/publiline.py:186
 msgid "Send Again"
 msgstr "Pošlite opäť"
 
-#: modules/websubmit/lib/websubmit_templates.py:1906
+#: modules/websubmit/lib/websubmit_templates.py:1907
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr ""
 "UPOZORNENIE! Ak potvrdíte, elektronická pošta bude zaslaná referentovi."
 
-#: modules/websubmit/lib/websubmit_templates.py:1909
+#: modules/websubmit/lib/websubmit_templates.py:1910
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
@@ -4076,31 +4128,31 @@ msgstr ""
 "Ako referent pre tento dokument môžete kliknúť toto tlačidlo aby ste ho "
 "schválili alebo zamietli."
 
-#: modules/websubmit/lib/websubmit_templates.py:1911
+#: modules/websubmit/lib/websubmit_templates.py:1912
 msgid "Approve/Reject"
 msgstr "Schváliť/Zamietnuť"
 
-#: modules/websubmit/lib/websubmit_templates.py:1915
-#, python-format
-msgid "This document has been %sapproved%s."
-msgstr "Tento dokument bol %sschváený%s."
-
 #: modules/websubmit/lib/websubmit_templates.py:1916
-msgid "Its approved reference is"
-msgstr "Jeho schválená referencia je"
+#, python-format
+msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
+msgstr "Tento dokument bol %(x_fmt_open)sschváený%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1922
-msgid "It was approved on"
-msgstr "Bol schválený"
+#: modules/websubmit/lib/websubmit_templates.py:1918
+msgid "Its approved reference is:"
+msgstr "Jeho schválená referencia je:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1924
-#, python-format
-msgid "This document has been %srejected%s."
-msgstr "Tento dokument bol %szamietnutý%s"
+msgid "It was approved on:"
+msgstr "Bol schválený dňa:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1931
-msgid "It was rejected on"
-msgstr "Bol zamietnutý"
+#: modules/websubmit/lib/websubmit_templates.py:1926
+#, python-format
+msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
+msgstr "Tento dokument bol %(x_fmt_open)szamietnutý%(x_fmt_close)s."
+
+#: modules/websubmit/lib/websubmit_templates.py:1934
+msgid "It was rejected on:"
+msgstr "Bol zamietnutý dňa:"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:91
 #: modules/websubmit/lib/websubmit_webinterface.py:99
@@ -4124,3 +4176,40 @@ msgstr "Schválenie tohto dokument nebolo nikdy žiadané."
 #: modules/websubmit/web/publiline.py:183
 msgid "Unable to display document."
 msgstr "Nemožno zobraziť dokument."
+
+#~ msgid "BibEdit Admin Interface"
+#~ msgstr "BibEdit rozhranie administrátora"
+
+#~ msgid "Your modifications have now been submitted."
+#~ msgstr "Vaše zmeny boli práve podané."
+
+#~ msgid "You can now go back to %s."
+#~ msgstr "Teraz sa môžete vrátiť ku %s."
+
+#~ msgid "You can now go back to"
+#~ msgstr "Teraz sa môžete vrátiť ku"
+
+#~ msgid "Sort by"
+#~ msgstr "Utriediť podľa"
+
+#~ msgid "%s wrote on %s:"
+#~ msgstr "%s napísal %s:"
+
+#~ msgid "wrote on"
+#~ msgstr "napísal"
+
+#~ msgid "Words nearest to"
+#~ msgstr "Slová najbližšie k"
+
+#~ msgid "inside"
+#~ msgstr "v"
+
+#~ msgid ""
+#~ "You are logged in as a guest user, so your %s will disappear at the end "
+#~ "of the current session. If you wish you can %slogin or register here%s."
+#~ msgstr ""
+#~ "Ste prihlásený ako anonymný hosť, takže Vaše %s zmiznú na konci terajšej "
+#~ "seanse.  Ak si prajete, môžete sa %sprihlásiť alebo zaregistrovať tu%s."
+
+#~ msgid "here"
+#~ msgstr "tu"
