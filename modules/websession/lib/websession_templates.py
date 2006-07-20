@@ -367,11 +367,13 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = _("You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url_close)s; b) edit your %(x_url2_open)saccount settings%(x_url_close)s.") %\
+        out = _("You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)s.") %\
             {'x_user': user,
              'x_url1_open': '<a href="' + sweburl + '/youraccount/logout?ln=' + ln + '">',
-             'x_url_close': '</a>',
-             'x_url2_open': '<a href="' + sweburl + '/youraccount/edit?ln=' + ln + '">'} 
+             'x_url1_close': '</a>',
+             'x_url2_open': '<a href="' + sweburl + '/youraccount/edit?ln=' + ln + '">',
+             'x_url2_close': '</a>',
+             }
         return out + "<br /><br />"
 
     def tmpl_account_template(self, title, body, ln):
