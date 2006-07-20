@@ -86,12 +86,15 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
     if isGuestUser(uid):
         user = "guest"
         login = "%s/youraccount/login?ln=%s" % (sweburl, ln)
-        accBody = _("You are logged in as guest. You may want to %slogin%s as a regular user.") % ('<a href="' + login + '">', '</a>')
+        accBody = _("You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user.") %\
+            {'x_url_open': '<a href="' + login + '">', 
+             'x_url_close': '</a>'}
 	accBody += "<br /><br />"
-        bask=aler=msgs= _("The %sguest%s users need to %sregister%s first") % ('<strong class="headline">', 
-									       '</strong>',
-									       '<a href="' + login + '">',
-									       '</a>')
+        bask=aler=msgs= _("The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first") %\
+            {'x_fmt_open': '<strong class="headline">', 
+             'x_fmt_close': '</strong>',
+             'x_url_open': '<a href="' + login + '">',
+             'x_url_close': '</a>'}
         sear= _("No queries found")
     else:
         user = username

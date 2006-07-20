@@ -1006,18 +1006,13 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-
-        out = "<p>%(words)s <em>%(p)s</em> " % {
-                 'words' : _("Words nearest to"),
-                     'p' : p,
-              }
+        out = '<p>'
         if f:
-            out += "%(inside)s <em>%(f)s</em> " %{
-                 'inside' : _("inside"),
-                     'f' : f,
-              }
-        out += _("in any collection are:") + "<br />"
-        out += nearest_box
+            out += _("Words nearest to %(x_words)s inside %(x_fields)s in any collection are:") % {'x_words': '<em>' + p + '</em>',
+                                                                                                   'x_fields': '<em>' + f + '</em>'}
+        else:
+            out += _("Words nearest to %(x_words)s in any collection are:") % {'x_words': '<em>' + p + '</em>'}
+        out += '<br />' + nearest_box + '</p>'
         return out
 
     def tmpl_nearest_term_box(self, p, ln, f, terminfo, intro):
@@ -1452,7 +1447,7 @@ class Template:
                        <thead>
                         <tr>
                           <th class="searchboxheader">
-                            %(limitto)s:
+                            %(limitto)s
                           </th>
                         </tr>
                        </thead>
@@ -1464,7 +1459,7 @@ class Template:
                         </tr>
                        </tbody>
                       </table>""" % {
-                        'limitto' : _("Limit to"),
+                        'limitto' : _("Limit to:"),
                         'sizepattern' : cfg_advancedsearch_pattern_box_width,
                         'pl' : cgi.escape(pl, 1),
                       }
@@ -1533,7 +1528,7 @@ class Template:
                   </tr>
                  </tbody>
                 </table>""" % {
-                  'sort_by' : _("Sort by") + ':',
+                  'sort_by' : _("Sort by:"),
                   'display_res' : _("Display results:"),
                   'out_format' : _("Output format:"),
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_formats, selected = sf, css_class = 'address'),
@@ -2052,8 +2047,8 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """ <p><div align="right"><small>%(format)s: """ % {
-                'format' : _("Format")
+        out = """ <p><div align="right"><small>%(format)s """ % {
+                'format' : _("Format:")
               }
 
         result = []
@@ -2088,8 +2083,8 @@ class Template:
                                 <input class="formbutton" type="submit" name="action" value="%(basket)s">
                               </form>
                            ''' % {
-                        'dates': _("Record created %s, last modified %s") % (row['creationdate'],
-                                                                              row['modifydate']),
+                        'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % {'x_date_creation': row['creationdate'],
+                                                                                                                   'x_date_modification': row['modifydate']},
                         'weburl': weburl,
                         'recid': row['recid'],
                         'ln': ln,
@@ -2198,10 +2193,11 @@ class Template:
         out = """<p><table class="searchresultsbox">
                 <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
                 <tbody><tr><td class="searchresultsboxbody"> """ % {
-                'founds' : _("%sResults overview:%s Found %s records in %s seconds.") % ('<strong>',
-											 '</strong>', 
-											 '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>', 
-											 '%.2f' % cpu_time)
+                'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
+                {'x_fmt_open': '<strong>',
+                 'x_fmt_close': '</strong>', 
+                 'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>', 
+                 'x_nb_seconds': '%.2f' % cpu_time}
               }
         # then print hits per collection:
         for coll in colls:

@@ -795,7 +795,7 @@ def perform_request_add_comment_or_remark(recID=0,
                     user_info = get_user_info(comment[2])
                     if user_info:
                         date_creation = convert_datetext_to_dategui(str(comment[4]))
-                        msg = _("%s wrote on %s:")% (user_info[2], date_creation)
+                        msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
                         msg += "\n\n" + comment[3]
                         msg = email_quote_txt(text=msg)
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)

@@ -563,7 +563,7 @@ def perform_request_create_basket(uid,
     @pram ln: language
     """
     if new_basket_name and (new_topic_name or create_in_topic != -1):
-        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+        topics_infos = db.get_personal_topics_infos(uid)
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
             topic = new_topic_name
@@ -573,7 +573,7 @@ def perform_request_create_basket(uid,
             except IndexError:
                 return 0
         db.create_basket(uid, new_basket_name, topic)
-        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+        topics = map(lambda x: x[0], topics_infos)
         try:
             return topics.index(topic)
         except ValueError:
@@ -790,6 +790,8 @@ def account_list_baskets(uid, ln=cdslang):
     else:
         url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text) 
-    out = _("You have %s personal baskets and are subscribed to %s group baskets and %s other users public baskets.") 
-    out %= (personal_text, group_text, external_text)
+    out = _("You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets.") %\
+        {'x_nb_perso': personal_text, 
+         'x_nb_group': group_text, 
+         'x_nb_public': external_text}
     return out

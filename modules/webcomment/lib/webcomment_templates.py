@@ -249,13 +249,10 @@ class Template:
         write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=_("Write a review"))
 
         if nb_comments_total > 0:
-            score = _("Average review score: %s based on %s reviews")
-            score %= ('</b><img src="%(weburl)s/img/%(avg_score_img)s" alt="%(avg_score)s" />',
-                      '%(nb_comments_total)s')
-            score %= {'weburl': weburl,
-                      'avg_score_img': avg_score_img,
-                      'avg_score': avg_score,
-                      'nb_comments_total': nb_comments_total}
+            score = '<b>'
+            score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
+                 'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
             useful_label %= cfg_webcomment_nb_reviews_in_detailed_view > 1 and cfg_webcomment_nb_reviews_in_detailed_view or ""
             view_all_comments_link ='<a href="%s/comments/display?recid=%s&amp;ln=%s&amp;do=hh&amp;reviews=1">' % (weburl, recID, ln)
@@ -269,7 +266,7 @@ class Template:
                     <td class="blocknote">%(comment_title)s:</td>
                   </tr>
                 </table>
-                <b>%(score_label)s<br />
+                %(score_label)s<br />
                 %(useful_label)s
                 <!-- review table -->
                 <table style="border: 0px; border-collapse: separate; border-spacing: 5px; padding: 5px; width: 100%%">
@@ -321,7 +318,8 @@ class Template:
         date_creation = convert_datetext_to_dategui(date_creation)
         out = ''
         final_body = email_quoted_txt2html(body)
-        title = nickname + ' ' + _("wrote on") + ' <i>' + date_creation + '</i>'
+        title = _("%(x_name)s wrote on %(x_date)s:") % {'x_name': nickname, 
+                                                        'x_date': '<i>' + date_creation + '</i>'}
         links = ''
         if reply_link:
             links += '<a href="' + reply_link +'">' + _("Reply") +'</a>'
@@ -364,8 +362,8 @@ class Template:
         out = ""
         date_creation = convert_datetext_to_dategui(date_creation)
         reviewed_label = _("Reviewed by %(x_nickname)s on %(x_date)s") % {'x_nickname': nickname, 'x_date':date_creation}
-        useful_label = _("%i out of %i people found this review useful")
-        useful_label %= (nb_votes_yes, nb_votes_total)
+        useful_label = _("%(x_nb_people)i out of %(x_nb_total)i people found this review useful") % {'x_nb_people': nb_votes_yes,
+                                                                                                     'x_nb_total': nb_votes_total}
         links = ''
         if report_link:
             links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
@@ -556,8 +554,11 @@ class Template:
                 avg_score_img = 'stars-' + str(avg_score).split('.')[0] + '-' + str(avg_score).split('.')[1] + '.png'
             else:
                 avg_score_img = "stars-0-0.png"
-            ranking_average = '<br /><b>' + _("Average review score: %s based on %s reviews") % ('</b><img src="%(weburl)s/img/%(avg_score_img)s" alt="%(avg_score)s" />' % { 'weburl' : weburl, 'avg_score' : avg_score, 'avg_score_img' : avg_score_img },
-                                                                                                 total_nb_comments) + '<br />'
+            ranking_average = '<br /><b>'
+            ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
+                 'x_nb_reviews': total_nb_comments}
+            ranking_average += '<br />'
         else:
             ranking_average = ""
 
@@ -786,8 +787,10 @@ class Template:
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % sweburl
-            note = _("Note: you have not %sdefined your nickname%s. %s will be displayed as the author of this comment.")
-            note %= (link, '</a>', ' <br /><i>' + display + '</i>')
+            note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") %\
+                {'x_url_open': link, 
+                 'x_url_close': '</a>', 
+                 'x_nickname': ' <br /><i>' + display + '</i>'}
 
         from invenio.search_engine import print_record
         record_details = print_record(recID=recID, format='hb', ln=ln)
@@ -988,21 +991,18 @@ class Template:
         out = '<ol>'
         if cfg_webcomment_allow_comments or cfg_webcomment_allow_reviews:
             if cfg_webcomment_allow_comments: 
-                out += '''
-                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>'''
+                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' %\
+                    {'weburl': weburl, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
             if cfg_webcomment_allow_reviews: 
-                out += '''
-                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>'''
-            out += '''
+                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' %\
+                    {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
+            out += """
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></small></li>
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
-                ''' 
-            out = out % {   'weburl'    : weburl,
-                            'reported_cmt_label': _("View all reported comments"),
-                            'reported_rev_label': _("View all reported reviews"),
-                            'delete_label': _("Delete a specific comment/review (by ID)"),
-                            'view_users': _("View all users who have been reported"),
-                            'ln'        : ln        }
+                """ % {'weburl'    : weburl,
+                       'delete_label': _("Delete a specific comment/review (by ID)"),
+                       'view_users': _("View all users who have been reported"),
+                       'ln'        : ln}
         else:
             out += _("Comments and reviews are disabled") + '<br />'
         out += '</ol>'
@@ -1026,7 +1026,7 @@ class Template:
         form = '''
             <table> 
                 <tr>
-                    <td>%s:</td>
+                    <td>%s</td>
                     <td><input type=text name="comid" size="10" maxlength="10" value="" /></td>
                 </tr>
                 <tr>
@@ -1034,7 +1034,7 @@ class Template:
                 <tr>
             </table>
             <br />
-        ''' %_("Comment ID")
+        ''' %_("Comment ID:")
         form_link = "%s/admin/webcomment/webcommentadmin.py/delete?ln=%s" % (weburl, ln)
         form = self.createhiddenform(action=form_link, method="Get", text=form, button=_('View Comment'))
         return warnings + out + form

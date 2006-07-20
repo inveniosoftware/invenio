@@ -214,7 +214,8 @@ class Template:
                  'notif_no' : (notification == 'n' and "selected" or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
-                 'specify' : _("if %sno%s you must specify a basket") % ('<b>', '</b>'),
+                 'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>', 
+                                                                                                  'x_fmt_close': '</b>'},
                  'store_basket' : _("Store results in basket?"),
                  'baskets': baskets 
                }
@@ -287,9 +288,10 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<p>' + _("Set a new alert from %syour searches%s, the %spopular_searches%s, or the input form.") + '</p>'
-        out %= ('<a href="display?ln=%s">' % ln, '</a>', 
-                """<a href="display?ln=%s&amp;p=y">""" % ln, '</a>')
+        out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url_close)s, the %(x_url2_open)spopular_searches%(x_url_close)s, or the input form.") + '</p>'
+        out %= {'x_url1_open': '<a href="display?ln=' + ln + '">', 
+                'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">', 
+                'x_url_close': '</a>'}
         if len(alerts):
               out += """<table class="alrtTable">
                           <tr class="pageboxlefttop" style="text-align: center;">
@@ -406,20 +408,22 @@ class Template:
         _ = gettext_set_language(ln)
 
         if len(queries) == 0:
-            out = _("You have not executed any search yet. Please go to the %ssearch interface%s first.") % ('<a href="%s/?ln=%s">' % (weburl, ln),
-                                                                                                             '</a>')
+            out = _("You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
+                {'x_url_open': '<a href="' + weburl + '/?ln=' + ln +'">',
+                 'x_url_close': '</a>'}
             return out
 
         out = ''
         
         # display message: number of items in the list
         if permanent=="n":
-            msg = _("You have performed %s searches (%s different questions) during the last 30 days or so.") % (nb_queries_total, nb_queries_distinct)
+            msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total, 
+                                                                                                                               'x_nb_2': nb_queries_distinct}
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
             msg = _("Here are the %s most popular searches.") 
-            msg %= ('<b>' + str(len(query_result)) + '</b>')
+            msg %= ('<b>' + str(len(queries)) + '</b>')
             out += '<p>' + msg + '</p>'
 
         # display the list of searches

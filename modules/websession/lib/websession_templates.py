@@ -67,7 +67,7 @@ class Template:
                  <table>
                     <tr>
                       <td align=center>%(message)s
-                       <A href="./%(act)s">%(link)s</A></td>
+                       <a href="./%(act)s">%(link)s</a></td>
                     </tr>
                  </table>
              """% {
@@ -334,14 +334,17 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'type' *string* - The type of data that will get lost in case of guest account
+          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'alerts' or 'baskets')
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
-	
-        msg = _("You are logged in as a guest user, so your %s will disappear at the end of the current session. If you wish you can %slogin or register here%s.")
-	msg %= (type, '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">', '</a>')
+	if (type=='baskets'):
+            msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
+        elif (type=='alerts'):
+            msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
+        msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">', 
+                                                                                               'x_url_close': '</a>'}
         return """<table class="errorbox" summary="">
                            <thead>
                             <tr>
@@ -364,11 +367,12 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return _("You are logged in as %(x_user)s. You may want to a) %(x_link1_begin)slogout%(x_link_end)s; b) edit your %(x_link2_begin)saccount settings%(x_link_end)s.") % {
-            'x_user': user,
-	    'x_link1_begin': '<a href="' + sweburl + '/youraccount/logout?ln=' + ln + '">',
-	    'x_link_end': '</a>',
-	    'x_link2_begin': '<a href="' + sweburl + '/youraccount/edit?ln=' + ln + '">'} + "<br /><br />"
+        out = _("You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url_close)s; b) edit your %(x_url2_open)saccount settings%(x_url_close)s.") %\
+            {'x_user': user,
+             'x_url1_open': '<a href="' + sweburl + '/youraccount/logout?ln=' + ln + '">',
+             'x_url_close': '</a>',
+             'x_url2_open': '<a href="' + sweburl + '/youraccount/edit?ln=' + ln + '">'} 
+        return out + "<br /><br />"
 
     def tmpl_account_template(self, title, body, ln):
         """
@@ -433,12 +437,17 @@ class Template:
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln)
-        out += self.tmpl_account_template(_("Your Groups"), groups, ln)
-        submission_description = _("You can consult the list of %syour submissions%s and inquire about their status.")
-	submission_description %= ('<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">', '</a>')
+	groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
+	groups_description %= {'x_url_open': '<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">', 
+                               'x_url_close': '</a>'}
+        out += self.tmpl_account_template(_("Your Groups"), groups_description, ln)
+	submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
+	submission_description %= {'x_url_open': '<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">', 
+                                   'x_l_c': '</a>'}
         out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln)
-	approval_description =  _("You can consult the list of %syour approvals%s with the documents you approved or refereed.")
-	approval_description %=  ('<a href="' + weburl + '/yourapprovals.py?ln=' + ln + '">', '</a>')
+	approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
+	approval_description %=  {'x_url_open': '<a href="' + weburl + '/yourapprovals.py?ln=' + ln + '">', 
+                                  'x_url_close': '</a>'}
         out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln)
         out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln)
         return out
@@ -515,9 +524,9 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-
-        out = ""
-        out += _("You are no longer recognized.  If you wish you can %slogin here%s.") % ('<a href="./login?ln=' + ln + '">', '</a>')
+        out = _("You are no longer recognized.") + ' '
+        out += _("If you wish you can %(x_url_open)slogin here%(x_url_close)s.") % {'x_url_open': '<a href="./login?ln=' + ln + '">', 
+                                                                                    'x_url_close': '</a>'}
         return out
 
     def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, supportemail):
@@ -549,7 +558,9 @@ class Template:
               }
 
         if register_available:
-            out += _("If you don't own an account yet, please %sregister%s an internal account.") % ('<a href="../youraccount/register?ln=' + ln + '">', '</a>')
+            out += _("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
+                {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">', 
+                 'x_url_close': '</a>'}
         else:
             out += _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) 
         out += """<form method="post" action="../youraccount/login">
@@ -728,14 +739,14 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("You seem to be a guest user. You have to %slogin%s first.") % ('<a href="../youraccount/login?ln=' + ln +'">', '<a/>')
+            return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % ('<a href="../youraccount/login?ln=' + ln +'">', '<a/>')
 
         # no rights condition
         if not roles:
             return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
 
         # displaying form
-        out += "<p>" + (_("You seem to be %s.") % ('<em>' + string.join(roles, ", ") + "</em> ")) + '</p>' 
+        out += "<p>" + (_("You seem to be %(x_role)s.") % ('<em>' + string.join(roles, ", ") + "</em> ")) + '</p>' 
         out += _("Here are some interesting web admin links for you:")
 
         # print proposed links:
@@ -759,8 +770,9 @@ class Template:
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
             if action == "cfgwebsubmit":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
-        out += "<br />" + _("For more admin-level activities, see the complete %sAdmin Area%s.""") %\
-            ('<a href="%s/admin/index.%s.html">' % (weburl, ln), '</a>')
+        out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
+            {'x_url_open': '<a href="' + weburl + '/admin/index.' + ln + '.html">',
+             'x_url_close': '</a>'}
         return out
 
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin):
@@ -1460,7 +1472,9 @@ class Template:
         header3 = _("Invite new members")
         link_open = '<a href="%s/yourmessages/write?ln=%s">'
         link_open %= (weburl, ln)
-        invite_text = _("If you want to invite new members to join your group, please use the %sweb message%s system.") % (link_open, '</a>')
+        invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.") % \
+            {'x_url_open': link_open, 
+             'x_url_close': '</a>'}
         action = weburl + '/yourgroups/members?ln=' + ln
         out %= {'title':_('Group: %s') % group_name,
                 'member_text' : member_text,
@@ -1681,10 +1695,10 @@ class Template:
             infos = [infos]       
         infobox = ""
         for info in infos:
-            infobox += "<div><span class='info'>"
+            infobox += '<div><span class="info">'
             lines = info.split("\n")
             for line in lines[0:-1]:
-                infobox += line + "<br/>\n"
+                infobox += line + "<br />\n"
             infobox += lines[-1] + "</span></div>\n"
         return infobox
 
@@ -1715,17 +1729,14 @@ class Template:
         out = "<div>"
         if img:
             out += """
-            <img src="%s"/>
+            <img src="%s" />
             """ % (weburl + img)
         out += """
         <b>%s</b>
         </div>""" % text
         return out
  
-    def tmpl_admin_msg(self,
-                            group_name,
-                            grpID,
-                            ln=cdslang):
+    def tmpl_admin_msg(self, group_name, grpID, ln=cdslang):
         """
         return message content for joining group
         - 'group_name' *string* - name of the group
@@ -1736,29 +1747,35 @@ class Template:
         subject = _("Group %s: New membership request") % group_name
         url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
-        link = """<a href="%s">%s</a>""" % (url, _("here"))
         # FIXME: which user?  We should show his nickname.
         body = (_("A user wants to join the group %s.") % group_name) + '<br/>'
-	body += (_("Please %saccept or reject%s this user's request.") % ('<a href="' + url + '">', '</a>')) + '<br />'
+	body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.") % {'x_url_open': '<a href="' + url + '">', 
+                                                                                                  'x_url_close': '</a>'}
+        body += '<br />'
         return subject, body
 
     def tmpl_member_msg(self,
                         group_name,
-                        status,
+                        accepted=0,
                         ln=cdslang):
         """
         return message content when new member is accepted/rejected
         - 'group_name' *string* - name of the group
-        - 'status' *string* - message content 
+        - 'accepted' *int* - 1 if new membership has been accepted, 0 if it has been rejected 
         - 'ln' *string* - The language to display the interface in
         """
         _ = gettext_set_language(ln)
-        subject = _("Group %s: Join request has been %s") % (group_name, status)
-        url = weburl + "/yourgroups/display?ln=%s"
-        url %= (ln)
-        link = """<a href="%s">%s</a>""" % (url, _("here"))
-        body = (_("Your request for joining group %s has been %s.") % (group_name, status)) + '<br/>'
-	body += (_("You can consult the list of %syour groups%s.") % ('<a href="' + url + '">', '</a>')) + '<br />'
+        if accepted:
+            subject = _("Group %s: Join request has been accepted") % (group_name)
+            body = _("Your request for joining group %s has been accepted.") % (group_name)
+        else:
+            subject = _("Group %s: Join request has been rejected") % (group_name)
+            body = _("Your request for joining group %s has been rejected.") % (group_name)
+        url = weburl + "/yourgroups/display?ln=" + ln
+        body += '<br />'
+        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">', 
+                                                                                              'x_url_close': '</a>'}
+        body += '<br />'
         return subject, body
     
     def tmpl_delete_msg(self,
@@ -1771,11 +1788,12 @@ class Template:
         """
         _ = gettext_set_language(ln)
         subject = _("Group %s has been deleted") % group_name
-        url = weburl + "/yourgroups/display?ln=%s"
-        url %= (ln)
-        link = """<a href="%s">%s</a>""" % (url, _("here"))
-        body = (_("Group %s has been deleted by its administrator.") % group_name) + '<br/>'
-        body += (_("You can consult the list of %syour groups%s.") % ('<a href="' + url + '">', '</a>')) + '<br />'
+        url = weburl + "/yourgroups/display?ln=" + ln
+        body = _("Group %s has been deleted by its administrator.") % group_name
+        body += '<br/>'
+        body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">', 
+                                                                                              'x_url_close': '</a>'} 
+        body += '<br />'
         return subject, body
     
     def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=cdslang):
@@ -1788,10 +1806,10 @@ class Template:
         return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You can consult the list of %s%i groups%s you are subscribed to (%i) or administering (%i).")
-        out %= ('<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
-                nb_total_groups,
-                '</a>',
-                nb_admin_groups,
-                nb_member_groups)
+        out = _("You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i).")
+        out %= {'x_url_open': '<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
+                'x_nb_total': nb_total_groups,
+                'x_url_close': '</a>',
+                'x_nb_admin': nb_admin_groups,
+                'x_nb_admin': nb_member_groups}
         return out

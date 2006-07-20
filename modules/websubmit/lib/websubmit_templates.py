@@ -1514,7 +1514,7 @@ class Template:
             else:
                 for category in doctype['categories']:
                     out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
-                        'referee' : _("You are a referee for category") + ': ' + str(category['name']) + ' (' + str(category['id']) + ')',
+                        'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
                         'categ' : category['id']}
                     
@@ -1871,36 +1871,37 @@ class Template:
                  'doctype' : doctype,
                }
         if title != "unknown":
-            out += """<strong class="headline">%(title_text)s:</strong>%(title)s<BR><BR>""" % {
-                     'title_text' : _("Title"),
+            out += """<strong class="headline">%(title_text)s</strong>%(title)s<BR><BR>""" % {
+                     'title_text' : _("Title:"),
                      'title' : title,
                    }
 
         if authors != "":
-            out += """<strong class="headline">%(author_text)s:</strong>%(authors)s<BR><BR>""" % {
-                     'author_text' : _("Author"),
+            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<BR><BR>""" % {
+                     'author_text' : _("Author:"),
                      'authors' : authors,
                    }
         if sysno != "":
-            out += """<strong class="headline">%(more)s:</strong>
+            out += """<strong class="headline">%(more)s</strong>
                         <a href="%(url)s?id=%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
-                     'more' : _("More information"),
+                     'more' : _("More information:"),
                      'click' : _("Click here"),
                      'url' : accessurl,
                      'sysno' : sysno,
                    }
 
         if status == "waiting":
-            out += _("This document is still %swaiting for approval%s.") % ('<strong class="headline">', '</strong>')
+            out += _("This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 
+                                                                                                     'x_fmt_close': '</strong>'}
 	    out += "<br /><br />"
-	    out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+	    out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />'
-            out += "<br />" + _("You can send an approval request email again by clicking the following button.") + ": <br />" +\
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) + '</strong><br />'
+            out += "<br />" + _("You can send an approval request email again by clicking the following button:") + " <br />" +\
                    """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
                      'send' : _("Send Again"),
                      'warning' : _("WARNING! Upon confirmation, an email will be sent to the referee.")
@@ -1912,23 +1913,25 @@ class Template:
                          'access' : access
                        }
         if status == "approved":
-            out += _("This document has been %sapproved%s.") % ('<strong class="headline">', '</strong>')
-            out += '<br />' + _("Its approved reference is") + ': <strong class="headline">' + str(newrn) + '</strong><br /><br />'
-            out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+            out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 
+                                                                                         'x_fmt_close': '</strong>'}
+            out += '<br />' + _("Its approved reference is:") + ' <strong class="headline">' + str(newrn) + '</strong><br /><br />'
+            out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) + '</strong><br />' +\
-                       _("It was approved on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) + '</strong><br />' +\
+                       _("It was approved on:") + ' <strong class="headline">' + str(dAction) + '</strong><br />'
         if status == "rejected":
-            out += _("This document has been %srejected%s.") % ('<strong class="headline">', '</strong>') 
+            out += _("This document has been %(x_fmt_open)srejected%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
+                                                                                         'x_fmt_close': '</strong>'} 
             out += "<br /><br />"
-            out += _("It was first sent for approval on") + ': <strong class="headline">' + str(dFirstReq) +'</strong><br />'
+            out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) +'</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:
-                out += _("Last approval email was sent on") + ': <strong class="headline">' + str(dLastReq) +'</strong><br />'
-            out += _("It was rejected on") + ': <strong class="headline">' + str(dAction) + '</strong><br />'
+                out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) +'</strong><br />'
+            out += _("It was rejected on:") + ' <strong class="headline">' + str(dAction) + '</strong><br />'
 
         out += """    </SMALL></FORM>
                       <BR></TD></TR></TABLE>

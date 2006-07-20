@@ -1392,8 +1392,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, _("No exact match found for %s, using %s instead...") % ("<em>"+bsu_p+"</em>",
-                                                                                                    "<em>"+bsu_pn+"</em>"))
+                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % {'x_query1': "<em>"+bsu_p+"</em>",
+                                                                                                                        'x_query2': "<em>"+bsu_pn+"</em>"})
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
@@ -1631,11 +1631,11 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
-                print_warning(req, _("No match found in collection %s. Other public collections gave %s%d hits%s.") %
-                              (string.join(colls, ','), 
-                               '<a class="nearestterms" href="%s">' % (url),
-                               results_in_Home._nbhits,
-                               '</a>'))
+                print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
+                              {'x_collection': string.join(colls, ','), 
+                               'x_url_open': '<a class="nearestterms" href="%s">' % (url),
+                               'x_nb_hits': results_in_Home._nbhits,
+                               'x_url_close': '</a>'})
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
@@ -1780,9 +1780,9 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
     intro = ""
     if intro_text_p: # add full leading introductory text
         if f:
-            intro = _("Search term %s inside index %s did not match any record. Nearest terms in any collection are:") % \
-                     ("<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
-                      "<em>" + get_field_i18nname(f, ln) + "</em>")
+            intro = _("Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:") % \
+                     {'x_term': "<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
+                      'x_index': "<em>" + get_field_i18nname(f, ln) + "</em>"}
         else:
             intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
                      ("<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")

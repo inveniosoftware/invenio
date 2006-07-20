@@ -479,7 +479,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
                 mess += _("A second email will be sent when the account has been activated and can be used.")
             else:
-                mess += _("You can now access your %saccount%s.") % ('<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">', '</a>')
+                mess += _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
+                    {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">', 
+                     'x_url_close': '</a>'}
         elif ruid == -2:
             mess = _("Both passwords must match.")
             mess += " " + _("Please try again.")

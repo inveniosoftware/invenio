@@ -444,14 +444,10 @@ class Template:
         """ Return a end message of Bibedit. """
 
         _ = gettext_set_language(ln)
-        link = '<a href="%s/admin/bibedit/index?ln=%s">%s</a>' % (weburl, ln,  _("BibEdit Admin Interface"))
-        return """  %(message1)s<br\>
-                    %(message2)s<br\><br\>
-                    %(message3)s:
-                   <a href="%(weburl)s/admin/bibedit/index?ln=%(ln)s">%(link)s</a>.
-               """ % {'message1': _("Your modifications have now been submitted."),
-                      'message2': _("They will be processed as soon as the task queue is empty."),
-                      'message3': _("You can now go back to %s.") % link}
+        out =  _("Your modifications have now been submitted. They will be processed as soon as the task queue is empty.") + '<br /><br />'
+        link_open = '<a href="' + weburl + '/admin/bibedit/index?ln=' + ln + '">'
+        out += _("You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s.") % {'x_url_open': link_open, 'x_url_close': '</a>'}
+        return out
     
     def tmpl_deleted(self, ln, message='', recid='', temp='', format_tag=''):
         """ Return a deleted message of Bibedit. """
@@ -480,12 +476,9 @@ class Template:
                           'format_tag'       : format_tag}
         
         else:    
-            out =  """%(message)s %(message_back)s <a href="%(weburl)s/admin/bibedit/index?ln=&(ln)s">%(link)s</a>.""" 
-            out %= {'message': _("The record will be deleted as soon as the task queue is empty."),
-                    'message_back': _("You can now go back to"),
-                    'link'   : _("BibEdit Admin Interface"),
-                    'weburl' : weburl,
-                    'ln'     : ln}
+            out =   _("The record will be deleted as soon as the task queue is empty.") + '<br /><br />'
+            link_open = '<a href="' + weburl + '/admin/bibedit/index?ln=' + ln + '">'
+            out += _("You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s.") % {'x_url_open': link_open, 'x_url_close': '</a>'}
             return out
                        
     def tmpl_link(self, ln, text, url, dest, dict_args='', ancre=''):
@@ -498,7 +491,7 @@ class Template:
             list_args = dict_args.items()
             for arg in list_args:
                 link_args += "%(name)s=%(value)s&amp;" % {'name'  : str(arg[0]),
-                                                      'value' : str(arg[1])} 
+                                                          'value' : str(arg[1])} 
             link_args += "ln=%s" % ln
             
         if ancre != '':

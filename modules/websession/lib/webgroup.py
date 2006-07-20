@@ -611,7 +611,7 @@ def perform_request_add_member(uid,
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
             msg_subjet, msg_body = websession_templates.tmpl_member_msg(group_name=group_name,
-                                                                        status=_("accepted"),
+                                                                        accepted=1,
                                                                         ln=ln)
             (body, errors, warnings, title, navtrail) = perform_request_send(uid,
                                                                              msg_to_user=user,
@@ -671,7 +671,7 @@ def perform_request_reject_member(uid,
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
             msg_subjet, msg_body = websession_templates.tmpl_member_msg(group_name=group_name,
-                                                                        status=_("rejected"),
+                                                                        accepted=0,
                                                                         ln=ln)
             (body, errors, warnings, title, navtrail) = perform_request_send(uid,
                                                                              msg_to_user=user,

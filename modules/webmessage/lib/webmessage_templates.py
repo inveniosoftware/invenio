@@ -339,33 +339,33 @@ class Template:
       <td class="inboxheader" colspan="2">
         <table class="messageheader">
           <tr>
-            <td class="mailboxlabel">%(from_label)s:</td>
+            <td class="mailboxlabel">%(from_label)s</td>
             <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from_display)s</a></td>
           </tr>
           <tr>
-            <td class="mailboxlabel">%(subject_label)s:</td>
+            <td class="mailboxlabel">%(subject_label)s</td>
             <td style="width: 100%%;">%(subject)s</td>
           </tr>
           <tr>
-            <td class="mailboxlabel">%(sent_label)s:</td>
+            <td class="mailboxlabel">%(sent_label)s</td>
             <td>%(sent_date)s</td>
           </tr>"""
         if (msg_received_date != datetext_default):
             out += """
           <tr>
-            <td class="mailboxlabel">%(received_label)s:</td>
+            <td class="mailboxlabel">%(received_label)s</td>
             <td>%(received_date)s</td>
           </tr>"""
         out += """
           <tr>
-            <td class="mailboxlabel">%(sent_to_label)s:</td>
+            <td class="mailboxlabel">%(sent_to_label)s</td>
             <td>%(sent_to)s</td>
           </tr>"""
         if (msg_sent_to_group != ""):
             out += """
           <tr>
-            <td class="mailboxlabel">%(groups_label)s:</td>
-            <td>%(sent_to_group)s:</td>
+            <td class="mailboxlabel">%(groups_label)s</td>
+            <td>%(sent_to_group)s</td>
           </tr>"""
         out += """
         </table>
@@ -414,12 +414,12 @@ class Template:
                      'reply_to': msg_from_id,
                      'msg_id': msg_id,
                      'ln': ln,
-                     'from_label':_("From"),
-                     'subject_label':_("Subject"),
-                     'sent_label': _("Sent on"),
-                     'received_label':_("Received on"),
-                     'sent_to_label': _("Sent to"),
-                     'groups_label': _("Sent to groups"),
+                     'from_label':_("From:"),
+                     'subject_label':_("Subject:"),
+                     'sent_label': _("Sent on:"),
+                     'received_label':_("Received on:"),
+                     'sent_to_label': _("Sent to:"),
+                     'groups_label': _("Sent to groups:"),
                      'reply_but_label':_("REPLY"),
                      'delete_but_label': _("DELETE")}
         return indent_text(out, 2)

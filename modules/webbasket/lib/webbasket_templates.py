@@ -230,8 +230,9 @@ class Template:
             (bskid_owner, bsk_owner_nickname, display) = get_user_info(int(bskid_owner))
         messaging_link = self.__create_messaging_link(bsk_owner_nickname, display, ln)
         link_subscribe = '<a href="%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s">' % (weburl, bskid, ln)
-        end_link_subscribe = '</a>'
-        general_label = _("This basket belongs to %s. You can freely %ssubscribe%s to it") % (messaging_link, link_subscribe, end_link_subscribe)      
+        general_label = _("This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%(x_url_close)s to it") % {'x_name': messaging_link, 
+                                                                                                                               'x_url_open': link_subscribe, 
+                                                                                                                               'x_url_close': '</a>'}      
         out = """
 %(general_label)s      
 <table class="bskbasket">
@@ -332,7 +333,11 @@ class Template:
             footer += change_page % (0, weburl + '/img/sb.gif')
         if inf_limit > 0:
             footer += change_page % (inf_limit - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sp.gif')
-        footer += ' ' + _("Displaying baskets %i-%i out of %i baskets in total.") % (inf_limit+1, inf_limit + len(baskets), total_baskets) + ' '
+        footer += ' ' + _("Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets in total.") %\
+            {'x_nb_begin': inf_limit+1, 
+             'x_nb_end': inf_limit + len(baskets), 
+             'x_nb_total': total_baskets} 
+        footer += ' '
         if inf_limit + len(baskets) < total_baskets:
             footer += change_page % (inf_limit + cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sn.gif')
         if inf_limit + len(baskets) < total_baskets - cfg_webbasket_max_number_of_displayed_baskets:
@@ -441,7 +446,7 @@ class Template:
   <td colspan="3" style="text-align:center; height:100px">
     %s
   </td>
-</tr>""" % _("You do not have sufficient rights to view this basket's content")
+</tr>""" % _("You do not have sufficient rights to view this basket's content.")
         content = ''
         if selected_category == cfg_webbasket_categories['EXTERNAL']:
             url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
@@ -508,67 +513,39 @@ class Template:
         (recid, nb_cmt, last_cmt, val, score) = item
         actions = ''
         if uparrow:
-            url = "%s/yourbaskets/modify?action=moveup&amp;bskid=%i&amp;recid=%i"
-            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
-            url = url % (weburl,
-                         bskid,
-                         recid,
-                         selected_category,
-                         selected_topic,
-                         selected_group,
-                         ln)
+            url = "%s/yourbaskets/modify?action=moveup&amp;bskid=%i&amp;recid=%i" % (weburl, bskid, recid)
+            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s" % (selected_category, selected_topic, selected_group, ln)
             img = "%s/img/webbasket_up.png" % weburl
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
                                  _("Move item up"))
         if downarrow:
-            url = "%s/yourbaskets/modify?action=movedown&amp;bskid=%i&amp;recid=%i"
-            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
-            url = url % (weburl,
-                         bskid,
-                         recid,
-                         selected_category,
-                         selected_topic,
-                         selected_group,
-                         ln)
+            url = "%s/yourbaskets/modify?action=movedown&amp;bskid=%i&amp;recid=%i" % (weburl, bskid, recid)
+            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s" % (selected_category, selected_topic, selected_group, ln)
             img = "%s/img/webbasket_down.png" % weburl
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
                                  _("Move item down"))
         if copy_item:
-            url = "%s/yourbaskets/modify?action=copy&amp;bskid=%i&amp;recid=%i"
-            url += "&amp;category=%s&amp;topic=%i&amp;group_id=%i&amp;ln=%s"
-            url = url % (weburl,
-                         bskid,
-                         recid,
-                         selected_category,
-                         selected_topic,
-                         selected_group,
-                         ln)
+            url = "%s/yourbaskets/modify?action=copy&amp;bskid=%i&amp;recid=%i" % (weburl, bskid, recid)
+            url += "&amp;category=%s&amp;topic=%i&amp;group_id=%i&amp;ln=%s" % (selected_category, selected_topic, selected_group, ln)
             img = "%s/img/webbasket_move.png" % weburl
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
                                  _("Copy item"))
         if delete_item:
-            url = "%s/yourbaskets/modify?action=delete&amp;bskid=%i&amp;recid=%i"
-            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s"
-            url = url % (weburl,
-                         bskid,
-                         recid,
-                         selected_category,
-                         selected_topic,
-                         selected_group,
-                         ln)
+            url = "%s/yourbaskets/modify?action=delete&amp;bskid=%i&amp;recid=%i"  % (weburl, bskid, recid)
+            url += "&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s" % (selected_category, selected_topic, selected_group, ln)
             img = "%s/img/webbasket_delete.png" % weburl
             actions += "<a href=\"%s\"><img src=\"%s\" alt=\"%s\" /></a>"
             actions = actions % (url,
                                  img,
                                  _("Remove item"))
         if recid < 0:
-            actions += "<img src=\"%s/img/webbasket_extern.png\" alt=\"%s\" />"
+            actions += '<img src="%s/img/webbasket_extern.png" alt="%s" />'
             actions = actions % (weburl, _("External record"))
         else:
             pass
@@ -639,7 +616,7 @@ class Template:
       <input type="hidden" name="topic" value="%(topic)i" />
       <input type="hidden" name="group" value="%(group_id)i" />
       <input type="hidden" name="ln" value="%(ln)s" />
-      %(sort_label)s:
+      %(sort_label)s
       <input type="submit" name="sort_by_title" value="%(title_label)s" class="nonsubmitbutton" />
       <input type="submit" name="sort_by_date" value="%(date_label)s" class="nonsubmitbutton" />
     </form>-->
@@ -654,7 +631,7 @@ class Template:
                  'topic': int(selected_topic),
                  'group_id': int(selected_group),
                  'ln': ln,
-                 'sort_label': _("Sort by"),
+                 'sort_label': _("Sort by:"),
                  'title_label': _("Title"),
                  'date_label': _("Date"),
                  'content': content,
@@ -849,10 +826,8 @@ class Template:
         @param ln: language
         @param warnings: list of warnings"""
         _ = gettext_set_language(ln)
-        action = '%s/yourbaskets/save_comment?bskid=%i&amp;recid=%i'
-        action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s'
-        action %= (weburl, bskid, recid,
-                   selected_category, selected_topic, selected_group_id, ln)
+        action = '%s/yourbaskets/save_comment?bskid=%i&amp;recid=%i' % (weburl, bskid, recid)
+        action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s' % ( selected_category, selected_topic, selected_group_id, ln)
         if warnings:
             warnings_box = self.tmpl_warnings(warnings, ln)
         else:
@@ -1359,7 +1334,7 @@ class Template:
             groups_body = """
 <tr>
   <td>%s</td>
-</tr>""" % _("You are not a member of a group")
+</tr>""" % _("You are not a member of a group.")
         groups_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_usergroup.png',
                                             title=_("Add group"),
                                             body=groups_body)
@@ -1410,8 +1385,10 @@ class Template:
     def tmpl_create_guest_warning_box(self, ln=cdslang):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
-        message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session. If you wish you can %slogin or register here%s.")
-        message %= ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), '</a>')
+        message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
+        message += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") %\
+            {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
+             'X_url_close': '</a>'}
         out = """
 <table class="errorbox">
   <thead>
@@ -1425,8 +1402,10 @@ class Template:
     def tmpl_create_guest_forbidden_box(self, ln=cdslang):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
-        message = _("This functionality is forbidden to guest users. If you wish you can %slogin or register here%s.") % ('<a href="%s/youraccount/login?ln=%s">'% (sweburl, ln), 
-                                                                                                                          '</a>')
+        message = _("This functionality is forbidden to guest users.") + ' '
+        message += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") %\
+            {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
+             'x_url_close': '</a>'}
         out = """
 <table class="errorbox">
   <thead>
