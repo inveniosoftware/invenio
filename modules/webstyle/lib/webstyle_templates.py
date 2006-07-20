@@ -26,6 +26,7 @@ import traceback
 import sre
 import urllib
 import sys
+import string
 
 from invenio.config import *
 from invenio.messages import gettext_set_language, language_list_long
