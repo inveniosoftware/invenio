@@ -250,6 +250,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             redirect_to_url(req, url) 
         else:
             return page(uid         = uid,
+                        title       = '',
+                        body        = '',
                         language    = argd['ln'],
                         errors      = errors,
                         req         = req)
@@ -618,7 +620,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/subscribe")
         errors = perform_request_subscribe(uid, argd['bskid'])
         if len(errors):
-            return page(errors=errors, uid=uid, language=argd['ln'], req=req)
+            return page(errors=errors, uid=uid, language=argd['ln'], body = '', title = _("Error"), req=req)
         url = weburl + '/yourbaskets/display?category=%s&ln=%s'
         url %= (cfg_webbasket_categories['EXTERNAL'], argd['ln'])
         redirect_to_url(req, url)

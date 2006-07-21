@@ -165,10 +165,12 @@ def get_max_user_rights_on_basket(uid, bskid):
             public_index = cfg_webbasket_share_levels_ordered.index(res[0][0])
         except:
             return None
-    if group_index > public_index:
-        return cfg_webbasket_share_levels_ordered[group_index]
-    else:
-        return cfg_webbasket_share_levels_ordered[public_index]
+    if group_index or public_index:
+        if group_index > public_index:
+            return cfg_webbasket_share_levels_ordered[group_index]
+        else:
+            return cfg_webbasket_share_levels_ordered[public_index]
+    return None
             
 ########################### Personal baskets ##################################
 
