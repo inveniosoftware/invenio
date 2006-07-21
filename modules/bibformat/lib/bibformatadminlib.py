@@ -1450,7 +1450,8 @@ def check_format_element(name):
                 if len(recIDs) > 0:
                     recID = recIDs[0]
                     bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
-                    (result, errors_) = bibformat_engine.eval_format_element(name, bfo, verbose=7)
+                    element = bibformat_engine.get_format_element(name)
+                    (result, errors_) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
                     errors.extend(errors_)
             except Exception, e:
                 errors.append(("ERR_BIBFORMAT_IN_FORMAT_ELEMENT", name, e))            

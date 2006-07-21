@@ -317,7 +317,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     name, with given BibFormatObject and parameters. Also returns
     the errors of the evaluation.
 
-    @param name a format element structure as returned by get_format_element
+    @param format_element a format element structure as returned by get_format_element
     @param bfo a BibFormatObject used for formatting
     @param parameters a dict of parameters to be used for formatting. Key is parameter and value is value of parameter
     @param verbose the level of verbosity from 0 to 9 (O: silent,
