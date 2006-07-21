@@ -117,6 +117,9 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
     errors = []
     warnings = []
     body = ''
+    if record_exists(recid) in (-1, 0):
+        body = bibedit_templates.tmpl_record_choice_box(ln, 0)
+        return (body, errors, warnings)
     
     (record, junk) = get_record(ln, recid, uid, temp)
     
