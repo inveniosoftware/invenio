@@ -27,6 +27,7 @@ from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
 from invenio.webaccount import warning_guest_user
 from invenio.webbasket import create_personal_baskets_selection_box
+from invenio.webbasket_dblayer import check_user_owns_baskets
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext, convert_datetext_to_dategui
 
@@ -181,18 +182,20 @@ def perform_add_alert(alert_name, frequency, notification,
             new basket name for this alert;
             identifier of the query to be alerted
     output: confirmation message + the list of alerts Web page"""
-    alert_name = alert_name.strip()
-
     # load the right message language
     _ = gettext_set_language(ln)
-
+    if (None in (alert_name, frequency, notification, id_basket, id_query, uid)):
+        return ''
     #check the alert name is not empty
-    if alert_name.strip() == "":
+    alert_name = alert_name.strip()
+    if alert_name == "":
         raise AlertError(_("The alert name cannot be empty."))
-
     #check if the alert can be created
     check_alert_name(alert_name, uid, ln)
     check_alert_is_unique(id_basket, id_query, uid, ln)
+    if not(check_user_owns_baskets(uid, id_basket)):
+        raise AlertError( _("You are not the owner of this basket.") )
+    
 
     # add a row to the alerts table: user_query_basket
     query = """INSERT INTO user_query_basket (id_user, id_query, id_basket,
@@ -257,7 +260,9 @@ def perform_remove_alert(alert_name, id_user, id_query, id_basket, uid, ln=cdsla
     output: confirmation message + the list of alerts Web page"""
     # set variables
     out = ""
-
+    if (None in (alert_name, id_user, id_query, id_basket, uid)):
+        return out
+    
     # remove a row from the alerts table: user_query_basket
     query = """DELETE FROM user_query_basket
                WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
@@ -279,8 +284,10 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
             old identifier of the basket associated to the alert
     output: confirmation message + the list of alerts Web page"""
     #set variables
-    out = ""
-    
+    out = ''
+    if (None in (alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid)):
+        return out
+        
     # load the right message language
     _ = gettext_set_language(ln)
 
