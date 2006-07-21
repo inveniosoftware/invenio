@@ -24,10 +24,12 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
 	     websubmit_webinterface.py \
              websubmit_templates.py \
+             websubmit_regression_tests.py \
              websubmitadmin_config.py \
              websubmitadmin_dblayer.py \
              websubmitadmin_engine.py \
-             websubmitadmin_templates.py
+             websubmitadmin_templates.py \
+             websubmitadmin_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

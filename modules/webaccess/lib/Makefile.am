@@ -19,7 +19,12 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = access_control_engine.py access_control_config.py access_control_admin.py webaccessadmin_lib.py external_authentication.py
+pylib_DATA = access_control_engine.py \
+             access_control_config.py \
+             access_control_admin.py \
+             webaccessadmin_lib.py \
+             external_authentication.py \
+             webaccess_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA) 
 

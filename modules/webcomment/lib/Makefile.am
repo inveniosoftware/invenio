@@ -24,7 +24,8 @@ pylib_DATA = webcomment_config.py \
              webcomment_tests.py \
              webcomment_templates.py \
              webcomment_webinterface.py \
-             webcommentadminlib.py 
+             webcommentadminlib.py \
+             webcomment_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

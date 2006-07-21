@@ -24,7 +24,8 @@ pylib_DATA = webmessage.py \
              webmessage_config.py \
              webmessage_dblayer.py \
              webmessage_mailutils.py \
-             webmessage_webinterface.py
+             webmessage_webinterface.py \
+             webmessage_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

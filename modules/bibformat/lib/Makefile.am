@@ -25,7 +25,8 @@ pylib_DATA = bibformat_config.py bibformat_templates.py \
              bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
 	     bibformat_utils.py bibformat_migration_kit_dblayer.py bibformat_migration_kit.py \
 	     bibformat_migration_kit_templates.py  bibformat.py \
-	     bibformat_migration_kit_assistant_lib.py 
+	     bibformat_migration_kit_assistant_lib.py \
+             bibformatadmin_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -24,8 +24,9 @@ from sets import Set
 
 from mechanize import Browser, LinkNotFoundError
 
-from invenio.testutils import make_suite, make_url, warn_user_about_tests_and_run
 from invenio.config import weburl, cdsname, cdslang
+from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+                              make_url, test_web_page_content, merge_error_messages
 from invenio.urlutils import same_urls_p
 
 def parse_url(url):
@@ -34,7 +35,80 @@ def parse_url(url):
 
     return parts[2].split('/')[1:], query
 
-class WebsearchTestLegacyURLs(unittest.TestCase):
+class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
+    """Check WebSearch web pages whether they are up or not."""
+
+    def test_search_interface_pages_availability(self):
+        """websearch - availability of search interface pages""" 
+
+        baseurl = weburl + '/'
+
+        _exports = ['', 'collection/Poetry', 'collection/Poetry?as=1']
+        
+        error_messages = []
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_search_results_pages_availability(self):
+        """websearch - availability of search results pages""" 
+
+        baseurl = weburl + '/search'
+
+        _exports = ['', '?c=Poetry', '?p=ellis', '/cache', '/log']
+        
+        error_messages = []
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_search_detailed_record_pages_availability(self):
+        """websearch - availability of search detailed record pages""" 
+
+        baseurl = weburl + '/record/'
+
+        _exports = ['', '1', '1/', '1/files', '1/files/']
+        
+        error_messages = []
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_browse_results_pages_availability(self):
+        """websearch - availability of browse results pages""" 
+
+        baseurl = weburl + '/search'
+
+        _exports = ['?p=ellis&f=author&action_browse=Browse']
+        
+        error_messages = []
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_search_user_help_pages_availability(self):
+        """websearch - availability of search user help pages""" 
+
+        baseurl = weburl + '/help/search/'
+
+        _exports = ['', 'index.fr.html', 'tips.fr.html', 'guide.fr.html']
+        
+        error_messages = []
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+class WebSearchTestLegacyURLs(unittest.TestCase):
 
     """ Check that the application still responds to legacy URLs for
     navigating, searching and browsing."""
@@ -93,7 +167,7 @@ class WebsearchTestLegacyURLs(unittest.TestCase):
 
 
 
-class WebsearchTestRecord(unittest.TestCase):
+class WebSearchTestRecord(unittest.TestCase):
     """ Check the interface of the /record results """
 
     def test_format_links(self):
@@ -126,7 +200,7 @@ class WebsearchTestRecord(unittest.TestCase):
         return
 
 
-class WebsearchTestCollections(unittest.TestCase):
+class WebSearchTestCollections(unittest.TestCase):
     
     def test_traversal_links(self):
         """ websearch - traverse all the publications of a collection """
@@ -233,7 +307,7 @@ class WebsearchTestCollections(unittest.TestCase):
         return
 
 
-class WebsearchTestBrowse(unittest.TestCase):
+class WebSearchTestBrowse(unittest.TestCase):
 
     def test_browse_field(self):
         """ websearch - check that browsing works """
@@ -271,7 +345,7 @@ class WebsearchTestBrowse(unittest.TestCase):
         self.failUnlessEqual(batch_1[-2][1]['p'], batch_2[0][1]['p'])
         
 
-class WebsearchTestSearch(unittest.TestCase):
+class WebSearchTestSearch(unittest.TestCase):
 
     def test_hits_in_other_collection(self):
         """ websearch - check extension of a query to the home collection """
@@ -405,11 +479,12 @@ class WebsearchTestSearch(unittest.TestCase):
         l = b.find_link(text="Ellis, R S")
         self.failUnless(same_urls_p(l.url, make_url('/search', p="Ellis, R S", f='author')))
     
-test_suite = make_suite(WebsearchTestSearch,
-                        WebsearchTestBrowse,
-                        WebsearchTestCollections,
-                        WebsearchTestRecord,
-                        WebsearchTestLegacyURLs)
+test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
+                             WebSearchTestSearch,
+                             WebSearchTestBrowse,
+                             WebSearchTestCollections,
+                             WebSearchTestRecord,
+                             WebSearchTestLegacyURLs)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)

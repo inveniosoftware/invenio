@@ -23,9 +23,12 @@ pylib_DATA = oai_repository.py \
              oai_repository_config.py \
              oai_repository_tests.py \
              oai_repository_webinterface.py \
-             bibharvestadminlib.py \
-             oaiarchiveadminlib.py \
+             oai_repository_regression_tests.py \
              bibharvest_templates.py \
+             bibharvestadminlib.py \
+             bibharvestadmin_regression_tests.py \
+             oaiarchiveadminlib.py \
+             oaiarchiveadmin_regression_tests.py \
              oaiharvestlib.py \
              oaiarchive_engine.py
 

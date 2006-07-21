@@ -22,6 +22,7 @@ pylib_DATA = __init__.py \
              errorlib.py \
              errorlib_tests.py \
              errorlib_webinterface.py \
+             errorlib_regression_tests.py \
              config.py \
              dbquery.py \
 	     miscutil_config.py \
@@ -29,7 +30,7 @@ pylib_DATA = __init__.py \
              textutils.py \
              dateutils.py \
 	     testutils.py \
-	     urlutils.py
+	     urlutils.py             
 
 noinst_DATA = testimport.py
 
@@ -40,6 +41,7 @@ EXTRA_DIST = __init__.py \
              errorlib.py \
              errorlib_tests.py \
              errorlib_webinterface.py \
+             errorlib_regression_tests.py \
 	     miscutil_config.py \
              config.py.wml \
              dbquery.py.wml \
