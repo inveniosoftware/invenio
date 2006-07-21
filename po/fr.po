@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-21 16:10+0200\n"
+"POT-Creation-Date: 2006-07-21 18:34+0200\n"
 "PO-Revision-Date: 2006-07-21 16:10+0200\n"
 "Last-Translator: Gregory Favre <gregory.favre@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
@@ -1629,15 +1629,6 @@ msgstr "Créer un panier"
 #: modules/webbasket/lib/webbasket_webinterface.py:591
 msgid "List of public baskets"
 msgstr "Liste des paniers publics"
-
-#: modules/webbasket/lib/webbasket_webinterface.py:623
-#: modules/webstyle/lib/webstyle_templates.py:496
-#: modules/webstyle/lib/webstyle_templates.py:530
-#: modules/webstyle/lib/webstyle_templates.py:532
-#: modules/websubmit/lib/websubmit_engine.py:1073
-#: modules/websubmit/lib/websubmit_webinterface.py:376
-msgid "Error"
-msgstr "Erreur"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
@@ -3733,6 +3724,14 @@ msgstr "Éditer un groupe"
 #: modules/websession/lib/websession_webinterface.py:850
 msgid "Edit group members"
 msgstr "Éditer les membres du groupe"
+
+#: modules/webstyle/lib/webstyle_templates.py:496
+#: modules/webstyle/lib/webstyle_templates.py:530
+#: modules/webstyle/lib/webstyle_templates.py:532
+#: modules/websubmit/lib/websubmit_engine.py:1073
+#: modules/websubmit/lib/websubmit_webinterface.py:376
+msgid "Error"
+msgstr "Erreur"
 
 #: modules/webstyle/lib/webstyle_templates.py:500
 msgid "Browser"
