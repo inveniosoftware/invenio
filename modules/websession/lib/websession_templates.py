@@ -445,7 +445,7 @@ class Template:
         out += self.tmpl_account_template(_("Your Groups"), groups_description, ln)
 	submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
 	submission_description %= {'x_url_open': '<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">', 
-                                   'x_l_c': '</a>'}
+                                   'x_url_close': '</a>'}
         out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln)
 	approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
 	approval_description %=  {'x_url_open': '<a href="' + weburl + '/yourapprovals.py?ln=' + ln + '">', 
@@ -748,7 +748,7 @@ class Template:
             return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
 
         # displaying form
-        out += "<p>" + (_("You seem to be %(x_role)s.") % ('<em>' + string.join(roles, ", ") + "</em> ")) + '</p>' 
+        out += "<p>" + _("You seem to be %(x_role)s.") % {'x_role': ('<em>' + string.join(roles, ", ") + "</em> ")} + '</p>' 
         out += _("Here are some interesting web admin links for you:")
 
         # print proposed links:
@@ -1813,5 +1813,5 @@ class Template:
                 'x_nb_total': nb_total_groups,
                 'x_url_close': '</a>',
                 'x_nb_admin': nb_admin_groups,
-                'x_nb_admin': nb_member_groups}
+                'x_nb_member': nb_member_groups}
         return out
