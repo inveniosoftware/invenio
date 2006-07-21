@@ -348,6 +348,12 @@ class DeleteFieldTest(unittest.TestCase):
         """
         (self.rec, st, e) = bibrecord.create_record(xml_example_record,1,1)
 
+        xml_example_record_empty = """
+        <record>
+        </record>
+        """
+        (self.rec_empty, st, e) = bibrecord.create_record(xml_example_record_empty,1,1)
+
     def test_delete_controlfield(self):
         """bibrecord - deleting controlfield"""
         bibrecord.record_delete_field(self.rec, "001", "", "")
@@ -375,6 +381,20 @@ class DeleteFieldTest(unittest.TestCase):
                          ['On the foo and bar1'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
                          [])
+
+    def test_add_delete_add_field_to_empty_record(self):
+        """bibrecord - adding, deleting, and adding back a field to an empty record"""
+        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", "", "", "SzGeCERN")
+        self.assertEqual(field_number_1, 1)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+                         ['SzGeCERN'])        
+        bibrecord.record_delete_field(self.rec_empty, "003", "", "")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+                         [])        
+        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", "", "", "SzGeCERN2")        
+        self.assertEqual(field_number_1, 1)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+                         ['SzGeCERN2'])        
 
 def create_test_suite():
     """Return test suite for the bibrecord module"""

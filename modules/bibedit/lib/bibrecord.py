@@ -238,7 +238,11 @@ def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafiel
     # detect field number to be used for insertion:
     vals=rec.values()
     if vals != []:
-        newfield_number = 1 + max([f[4] for v in vals for f in v])
+        try:
+            newfield_number = 1 + max([f[4] for v in vals for f in v])
+        except ValueError:
+            # vals could have been a list of empty lists, see test_add_delete_add_field_to_empty_record()
+            newfield_number = 1
     else:
         newfield_number = 1
 
