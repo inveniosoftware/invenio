@@ -33,7 +33,7 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes"):
     
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
     
-    editors = [author for author in authors if bibrecord.field_get_subfield_value(author, "e")=="ed." ]
+    editors = [author for author in authors if bibrecord.field_get_subfield_values(author, "e")=="ed." ]
 
     if print_links.lower() == "yes":
         editors = map(lambda x: '<a href="'+weburl+'/search.py?f=author&p='+ quote(x) +'">'+x+'</a>', editors)
