@@ -56,9 +56,9 @@ def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
         return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
 
     if recid != 0:
-        title = _("Record") + "#" + str(recid)
+        title = _("Record") + " #" + str(recid)
         if add == 3:
-            title = _("Record %s - Add field") % ('#' + str(recid))
+            title = _("Record %s - Add a field") % ('#' + str(recid))
     else:
         title = _("BibEdit Admin Interface")
         
@@ -95,7 +95,7 @@ def edit(req, recid=None, tag=None, num_field='0', format_tag='marc',
     title = _("Edit record %(x_recid)s, field %(x_field)s") % {'x_recid': '#' + str(recid),
                                                                'x_field':  '#' + str(tag[:3])}
     if add == 1:
-        title = _("Edit record %(x_recid)s, field %(x_field)s - Add subfield") % {'x_recid': '#' + str(recid),
+        title = _("Edit record %(x_recid)s, field %(x_field)s - Add a subfield") % {'x_recid': '#' + str(recid),
                                                                                   'x_field':  '#' + str(tag[:3])}        
     return page(title       = title,
                 body        = body,
@@ -112,6 +112,8 @@ def submit(req, recid='', ln=cdslang):
     """ Submit temp_record on database. """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
+    uid = getUid(req)
+
     recid = wash_url_argument(recid, "int")
     (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
     if auth_code == 0:
