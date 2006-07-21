@@ -1356,7 +1356,7 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup.png" alt="%(header1)s" />
+          <img src="%(imgurl)s/webbasket_usergroup.png" alt="%(header1)s" />
         </td>
 
         <td class="bsktitle">
@@ -1385,7 +1385,7 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/webbasket_usergroup_gray.png" alt="%(header2)s" />
+          <img src="%(imgurl)s/webbasket_usergroup_gray.png" alt="%(header2)s" />
         </td>
 
         <td class="bsktitle">
@@ -1414,7 +1414,7 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="http://pcusrent01.cern.ch/img/iconpen.gif" alt="%(header3)s" />
+          <img src="%(imgurl)s/iconpen.gif" alt="%(header3)s" />
         </td>
 
         <td class="bsktitle">
@@ -1444,8 +1444,7 @@ class Template:
 </tr>
 </table>
 </form>
-      """
-        
+"""        
         
         if members :
             member_list =   self.__create_select_menu("member_id", members, _("Please select:"))
@@ -1487,6 +1486,7 @@ class Template:
                 'header2': header2,
                 'header3': header3,
                 'invite_text': invite_text,
+                'imgurl': weburl + '/img',
                 'cancel_label':_("Cancel"),
                 'ln':ln
                 }
