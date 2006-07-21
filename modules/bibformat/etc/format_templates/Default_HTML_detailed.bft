@@ -1,5 +1,5 @@
 <name>Default HTML detailed</name>
-<description>This is the default HTML detailed format. </description>
+<description>This is the default HTML detailed format.</description>
 <BFE_EDIT_RECORD/>
 <BFE_TOPBANNER /> 
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 

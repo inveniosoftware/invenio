@@ -1,5 +1,5 @@
 <name>Picture HTML detailed</name>
-<description>The detailed HTML format suitable for displaying pictures. </description>
+<description>The detailed HTML format suitable for displaying pictures.</description>
 <BFE_TOPBANNER />
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
 

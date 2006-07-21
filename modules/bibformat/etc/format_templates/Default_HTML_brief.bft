@@ -1,5 +1,5 @@
 <name>Default HTML brief</name>
-<description>Brief HTML format</description>
+<description>Brief HTML format.</description>
 
 <strong> <BFE_TITLE_BRIEF/> </strong> 
 <BFE_AUTHORS limit="4" prefix=" / " extension=" ;<em> et al</em> "/>
