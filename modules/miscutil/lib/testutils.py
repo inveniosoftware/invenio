@@ -18,14 +18,26 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Helper functions for building test suites.
+Helper functions for building and running test suites.
 """
 
-import unittest, sys
+__revision__ = "$Id$"
+
+# if verbose level is set to 9, many debugging messages will be
+# printed on stdout, so you may want to run:
+#   $ regressiontestsuite > /tmp/z.log
+# or even:
+#   $ regressiontestsuite > /tmp/z.log 2> /tmp/z.err
+cfg_testutils_verbose = 1
+
+import string
+import sys
+import time
+import unittest
 
 from urllib import urlencode
 
-from invenio.config import weburl
+from invenio.config import weburl, sweburl
 
 def warn_user_about_tests():
     """ Put a standard warning about running tests that might modify
@@ -36,23 +48,28 @@ def warn_user_about_tests():
     if '--yes-i-know' in sys.argv:
         return
 
-    print """\
-----------------------------------------------------------------------
+    sys.stderr.write("""\
+**********************************************************************
+**                                                                  **
+**  ***  I M P O R T A N T   W A R N I N G  ***                     **
+**                                                                  **
+** The regression test suite needs to be run on a clean demo site   **
+** that you can obtain by doing:                                    **
+**                                                                  **
+**    $ make drop-tables                                            **
+**    $ make create-tables                                          **
+**    $ make create-demo-site                                       **
+**    $ make load-demo-records                                      **
+**                                                                  **
+** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
+**                                                                  **
+** (In addition, due to the write nature of some of the tests,      **
+** the demo database may be altered with junk data, so that         **
+** it is recommended to rebuild the demo site anew afterwards.)     **
+**                                                                  **
+**********************************************************************
 
-ATTENTION:
-
-  this suite needs the application to be in 'demo' mode, which WILL
-  ERASE YOUR DATA PERMANENTLY.
-
-  To set it in demo mode, run:
-
-    $ make drop-tables
-    $ make create-tables
-    $ make create-demo-site
-    $ make load-demo-records
-  
-----------------------------------------------------------------------
-    """
+Please confirm by typing "Yes, I know!": """)
 
     # readline provides a nicer input support to the user, but is
     # sometimes unavailable.
@@ -61,9 +78,9 @@ ATTENTION:
     except ImportError:
         pass
 
-    answer = raw_input('Please confirm by typing "yes I know": ')
-    if answer != 'yes I know':
-        print "Test aborted by user."
+    answer = raw_input('')
+    if answer != 'Yes, I know!':
+        sys.stderr.write("Aborted.\n")
         raise SystemExit(0)
 
     return
@@ -74,7 +91,7 @@ def warn_user_about_tests_and_run(testsuite):
     unittest.TextTestRunner(verbosity=2).run(testsuite)
     
 
-def make_suite(*test_cases):
+def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
     
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
@@ -91,3 +108,82 @@ def make_url(path, **kargs):
 
     return url
 
+def make_surl(path, **kargs):
+    """ Helper to generate an absolute invenio Secure URL with query
+    arguments"""
+    
+    url = sweburl + path
+    
+    if kargs:
+        url += '?' + urlencode(kargs, doseq=True)
+
+    return url
+
+def test_web_page_content(url, username="guest", expected_text="</html>"):
+    """Test whether web page URL as seen by user USERNAME contains
+       text EXPECTED_TEXT.  Before doing the tests, login as USERNAME.
+       (E.g. interesting values are "guest" or "admin".)
+
+       Return empty list in case of problems, otherwise list of error
+       messages that may have been encountered during processing of
+       page.
+    """
+    
+    error_messages = []
+    try:
+        import mechanize
+    except ImportError:
+        return ['WARNING: Cannot import mechanize, test skipped.']
+    browser = mechanize.Browser()
+    try:
+        # firstly login:
+        if username == "guest":
+            pass
+        else:
+            browser.open(sweburl + "/youraccount/login")
+            browser.select_form(nr=0)
+            browser['p_un'] = 'admin'
+            browser.submit()
+            username_account_page_body = browser.response().read()
+            try:
+                string.index(username_account_page_body,
+                             "You are logged in as %s." % username)
+            except ValueError:
+                raise StandardError, 'ERROR: Cannot login as %s, test skipped.' % \
+                      username
+
+        # then access URL:
+        browser.open(url)
+        url_body = browser.response().read()
+        string.index(url_body, expected_text)
+
+    except mechanize.HTTPError, msg:
+        error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
+                              (url, username, msg))
+    except ValueError:                
+        error_messages.append('ERROR: Page %s (login %s) does not contain %s.' % \
+                              (url, username, expected_text))
+    except StandardError, msg:
+        error_messages.append('ERROR: Page %s (login %s) led to an error: %s.' % \
+                              (url, username, msg))
+
+    # logout after tests:
+    browser.open(sweburl + "/youraccount/logout")
+
+    if cfg_testutils_verbose >= 9:
+        print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
+              (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
+               url, username, expected_text,
+               string.join(error_messages, ","))
+
+    return error_messages
+
+def merge_error_messages(error_messages):
+    """If the ERROR_MESSAGES list is non-empty, merge them and return nicely
+       formatted string suitable for printing.  Otherwise return empty
+       string.   
+    """
+    out = ""
+    if error_messages:
+        out = "\n*** " + string.join(error_messages, "\n*** ")
+    return out
