@@ -3416,13 +3416,16 @@ def perform_request_cache(req, action="show"):
         for ln in collection_i18nname_cache[coll].keys():
             out += "%s, %s = %s<br>" % (coll, ln, collection_i18nname_cache[coll][ln])
     out += "</blockquote>"
+    req.write("<html>")
     req.write(out)
+    req.write("</html>")
     return "\n"
 
 def perform_request_log(req, date=""):
     """Display search log information for given date."""
     req.content_type = "text/html"
     req.send_http_header()
+    req.write("<html>")
     req.write("<h1>Search Log</h1>")
     if date: # case A: display stats for a day
         yyyymmdd = string.atoi(date)
@@ -3455,6 +3458,7 @@ def perform_request_log(req, date=""):
                 req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
             p.close()
         req.write("</table>")
+    req.write("</html>")
     return "\n"
 
 def profile(p="", f="", c=cdsname):
