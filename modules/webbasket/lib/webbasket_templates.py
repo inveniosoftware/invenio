@@ -1388,7 +1388,7 @@ class Template:
         message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         message += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") %\
             {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
-             'X_url_close': '</a>'}
+             'x_url_close': '</a>'}
         out = """
 <table class="errorbox">
   <thead>
