@@ -47,7 +47,7 @@ def index(req, ln=cdslang):
         return error_page(req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebcomment')
-    if not auth_code:
+    if (auth_code != 'false'):
         return page(title=_("Comment Management"),
                 body=perform_request_index(ln=ln),
                 uid=uid,
@@ -76,7 +76,7 @@ def delete(req, ln=cdslang, comid=""):
         return error_page(req)
                                                                                                                                                                                                      
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
-    if not auth_code:
+    if (auth_code != 'false'):
         (body, errors, warnings) = perform_request_delete(ln=ln, comID=comid)
         return page(title=_("Delete Comment"),
                 body=body,
@@ -110,11 +110,8 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     except Error, e:
         return error_page(req)
     
-    (auth_code, auth_msg) = check_user(auid,'cfgwebcomment')
-    if not auth_code:
-        if reviews==0:
-            raise ValueError
-            
+    (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
+    if (auth_code != 'false'):
         return page(title=_("View all reported comments"),
                     body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
                     uid=auid,
@@ -142,7 +139,7 @@ def users(req, ln=cdslang):
     except Error, e:
         return error_page(req)
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
-    if not auth_code:
+    if (auth_code != 'false'):
         return page(title=_("View all reported users"),
                     body=perform_request_users(ln=ln),
                     uid=uid,
@@ -173,7 +170,7 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
     except Error, e:
         return error_page(req)
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
-    if not auth_code:
+    if (auth_code != 'false'):
         comIDs = []
         args = hidden.keys() 
         for var in args:
