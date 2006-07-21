@@ -20,13 +20,12 @@
 
 def format(bfo):
     """
-    Prints the imprint publication place as HTML
+    Prints the imprint publication date as HTML
     @see date.py , publisher.py, reprints.py, imprint.py
     """
-    place = bfo.field('260$a')
+    date = bfo.field('260$c')
 
-    if place != "sine loco":
-        return place  
+    return date
 
 
 

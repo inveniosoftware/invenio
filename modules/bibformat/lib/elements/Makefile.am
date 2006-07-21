@@ -26,6 +26,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_additional_report_numbers.py\
 	     bfe_addresses.py bfe_contact.py bfe_photo_resources_brief.py\
 	     bfe_collection.py bfe_editors.py bfe_bibtex.py bfe_edit_record.py\
+	     bfe_date.py
 	     __init__.py
 
 EXTRA_DIST = $(pylib_DATA)
