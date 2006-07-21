@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-07-20 19:10+0200\n"
-"PO-Revision-Date: 2006-07-20 19:11+0200\n"
+"POT-Creation-Date: 2006-07-21 16:10+0200\n"
+"PO-Revision-Date: 2006-07-21 16:10+0200\n"
 "Last-Translator: Gregory Favre <gregory.favre@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -419,6 +419,7 @@ msgstr "Action"
 
 #: modules/bibedit/lib/bibedit_templates.py:121
 #: modules/bibedit/lib/bibedit_templates.py:136
+#: modules/bibedit/web/admin/bibeditadmin.py:59
 #: modules/webcomment/lib/webcomment_templates.py:610
 #: modules/webcomment/lib/webcomment_templates.py:1163
 #: modules/websearch/lib/websearch_templates.py:165
@@ -524,6 +525,31 @@ msgstr "Non"
 #: modules/bibedit/lib/bibedit_templates.py:479
 msgid "The record will be deleted as soon as the task queue is empty."
 msgstr "La notice sera supprimée dès que la liste de tâches sera vide."
+
+#: modules/bibedit/web/admin/bibeditadmin.py:61
+#, python-format
+msgid "Record %s - Add a field"
+msgstr "Notice %s - Ajout d'un champ"
+
+#: modules/bibedit/web/admin/bibeditadmin.py:63
+msgid "BibEdit Admin Interface"
+msgstr "Interface d'administration de BibEdit"
+
+#: modules/bibedit/web/admin/bibeditadmin.py:95
+#, python-format
+msgid "Edit record %(x_recid)s, field %(x_field)s"
+msgstr "Édition de la notice %(x_recid)s, champ %(x_field)s"
+
+#: modules/bibedit/web/admin/bibeditadmin.py:98
+#, python-format
+msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
+msgstr ""
+"Édition de la notice %(x_recid)s, champ %(x_field)s - Ajout d'un sous-champ"
+
+#: modules/bibedit/web/admin/bibeditadmin.py:126
+#, python-format
+msgid "Submit and save record %s"
+msgstr "Soumettre et enregistrer la notice %s"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
@@ -796,34 +822,38 @@ msgstr ""
 msgid "Thank you!"
 msgstr "Merci!"
 
-#: modules/webalert/lib/webalert.py:53
+#: modules/webalert/lib/webalert.py:54
 #, python-format
 msgid "You already have an alert named %s."
 msgstr "Vous avez déjà défini une alerte dont le nom est %s."
 
-#: modules/webalert/lib/webalert.py:110
+#: modules/webalert/lib/webalert.py:111
 msgid "unknown"
 msgstr "inconnu"
 
-#: modules/webalert/lib/webalert.py:172
+#: modules/webalert/lib/webalert.py:173
 msgid "You already have an alert defined for the specified query and basket."
 msgstr "Vous avez déjà défini une alerte pour cette requête sur ce panier."
 
-#: modules/webalert/lib/webalert.py:191 modules/webalert/lib/webalert.py:289
+#: modules/webalert/lib/webalert.py:192 modules/webalert/lib/webalert.py:296
 msgid "The alert name cannot be empty."
 msgstr "Le nom de l'alerte ne peut pas être vide."
 
-#: modules/webalert/lib/webalert.py:206
+#: modules/webalert/lib/webalert.py:197
+msgid "You are not the owner of this basket."
+msgstr "Vous n'êtes pas le prpriétaire de ce panier."
+
+#: modules/webalert/lib/webalert.py:209
 #, python-format
 msgid "The alert %s has been added to your profile."
 msgstr "L'alerte %s a été ajoutée à votre compte."
 
-#: modules/webalert/lib/webalert.py:314
+#: modules/webalert/lib/webalert.py:321
 #, python-format
 msgid "The alert %s has been successfully updated."
 msgstr "L'alerte %s a été mise à jour."
 
-#: modules/webalert/lib/webalert.py:369
+#: modules/webalert/lib/webalert.py:376
 #, python-format
 msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
@@ -1056,11 +1086,11 @@ msgstr "Afficher requêtes"
 #: modules/webbasket/lib/webbasket_webinterface.py:113
 #: modules/webbasket/lib/webbasket_webinterface.py:154
 #: modules/webbasket/lib/webbasket_webinterface.py:204
-#: modules/webbasket/lib/webbasket_webinterface.py:295
-#: modules/webbasket/lib/webbasket_webinterface.py:334
-#: modules/webbasket/lib/webbasket_webinterface.py:395
-#: modules/webbasket/lib/webbasket_webinterface.py:478
-#: modules/webbasket/lib/webbasket_webinterface.py:528
+#: modules/webbasket/lib/webbasket_webinterface.py:297
+#: modules/webbasket/lib/webbasket_webinterface.py:336
+#: modules/webbasket/lib/webbasket_webinterface.py:397
+#: modules/webbasket/lib/webbasket_webinterface.py:480
+#: modules/webbasket/lib/webbasket_webinterface.py:530
 #: modules/webmessage/lib/webmessage_templates.py:442
 #: modules/websession/lib/websession_templates.py:437
 #: modules/websession/lib/websession_templates.py:1722
@@ -1151,7 +1181,7 @@ msgstr ""
 "sabonner%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:258
-#: modules/webbasket/lib/webbasket_webinterface.py:564
+#: modules/webbasket/lib/webbasket_webinterface.py:566
 msgid "Public basket"
 msgstr "Panier public"
 
@@ -1226,7 +1256,7 @@ msgid "Group-shared basket"
 msgstr "Panier partagé à un groupe"
 
 #: modules/webbasket/lib/webbasket_templates.py:410
-#: modules/webbasket/lib/webbasket_webinterface.py:487
+#: modules/webbasket/lib/webbasket_webinterface.py:489
 msgid "Edit basket"
 msgstr "Éditer le panier"
 
@@ -1573,32 +1603,41 @@ msgstr "Retour aux résultats de recherche"
 msgid "Display baskets"
 msgstr "Afficher paniers"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:291
+#: modules/webbasket/lib/webbasket_webinterface.py:293
 #: modules/websession/lib/websession_templates.py:300
 #: modules/websession/lib/websession_templates.py:439
 msgid "Your Baskets"
 msgstr "Vos paniers"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:293
+#: modules/webbasket/lib/webbasket_webinterface.py:295
 msgid "Add records to baskets"
 msgstr "Ajouter les notices aux paniers"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:343
+#: modules/webbasket/lib/webbasket_webinterface.py:345
 msgid "Delete a basket"
 msgstr "Supprimer un panier"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:381
+#: modules/webbasket/lib/webbasket_webinterface.py:383
 msgid "Copy record to basket"
 msgstr "Copier la notice dans le panier"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:531
+#: modules/webbasket/lib/webbasket_webinterface.py:533
 msgid "Create basket"
 msgstr "Créer un panier"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:563
-#: modules/webbasket/lib/webbasket_webinterface.py:589
+#: modules/webbasket/lib/webbasket_webinterface.py:565
+#: modules/webbasket/lib/webbasket_webinterface.py:591
 msgid "List of public baskets"
 msgstr "Liste des paniers publics"
+
+#: modules/webbasket/lib/webbasket_webinterface.py:623
+#: modules/webstyle/lib/webstyle_templates.py:496
+#: modules/webstyle/lib/webstyle_templates.py:530
+#: modules/webstyle/lib/webstyle_templates.py:532
+#: modules/websubmit/lib/websubmit_engine.py:1073
+#: modules/websubmit/lib/websubmit_webinterface.py:376
+msgid "Error"
+msgstr "Erreur"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
@@ -1802,7 +1841,7 @@ msgid "Back to record"
 msgstr "Revenir à la notice"
 
 #: modules/webcomment/lib/webcomment_templates.py:995
-#: modules/webcomment/web/admin/webcommentadmin.py:118
+#: modules/webcomment/web/admin/webcommentadmin.py:115
 msgid "View all reported comments"
 msgstr "Voir tous les commentaires signalés"
 
@@ -2014,8 +2053,8 @@ msgstr "Identification"
 #: modules/webcomment/web/admin/webcommentadmin.py:51
 #: modules/webcomment/web/admin/webcommentadmin.py:71
 #: modules/webcomment/web/admin/webcommentadmin.py:106
-#: modules/webcomment/web/admin/webcommentadmin.py:138
-#: modules/webcomment/web/admin/webcommentadmin.py:169
+#: modules/webcomment/web/admin/webcommentadmin.py:135
+#: modules/webcomment/web/admin/webcommentadmin.py:166
 msgid "Comment Management"
 msgstr "Gestion des commentaires"
 
@@ -2023,15 +2062,15 @@ msgstr "Gestion des commentaires"
 msgid "Delete Comment"
 msgstr "Effacer un commentaire"
 
-#: modules/webcomment/web/admin/webcommentadmin.py:146
+#: modules/webcomment/web/admin/webcommentadmin.py:143
 msgid "View all reported users"
 msgstr "Afficher tous les utilisateurs signalés"
 
-#: modules/webcomment/web/admin/webcommentadmin.py:186
+#: modules/webcomment/web/admin/webcommentadmin.py:183
 msgid "Delete comments"
 msgstr "Effacer des commentaires"
 
-#: modules/webcomment/web/admin/webcommentadmin.py:189
+#: modules/webcomment/web/admin/webcommentadmin.py:186
 msgid "Suppress abuse reports"
 msgstr "Supprimer des signalement d'abus"
 
@@ -2553,12 +2592,15 @@ msgstr "Cité par"
 #: modules/websearch/lib/websearch_templates.py:1011
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
-msgstr "Les mots les plus proches de %(x_word)s dans %(x_field)s parmi toutes les collections sont:"
+msgstr ""
+"Les mots les plus proches de %(x_word)s dans %(x_field)s parmi toutes les "
+"collections sont:"
 
 #: modules/websearch/lib/websearch_templates.py:1014
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr "Les mots les plus proches de %(x_word)s parmi toutes les collections sont:"
+msgstr ""
+"Les mots les plus proches de %(x_word)s parmi toutes les collections sont:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
@@ -3319,8 +3361,8 @@ msgstr "Politique pour l'adhésion au groupe:"
 
 #: modules/websession/lib/websession_templates.py:1247
 #: modules/websession/lib/websession_templates.py:1318
-#: modules/websession/lib/websession_templates.py:1451
-#: modules/websession/lib/websession_templates.py:1460
+#: modules/websession/lib/websession_templates.py:1450
+#: modules/websession/lib/websession_templates.py:1459
 #: modules/websession/lib/websession_templates.py:1556
 #: modules/websession/lib/websession_templates.py:1666
 msgid "Please select:"
@@ -3342,39 +3384,39 @@ msgstr "Choisissez un groupe:"
 msgid "Find group"
 msgstr "Chercher un groupe"
 
-#: modules/websession/lib/websession_templates.py:1456
+#: modules/websession/lib/websession_templates.py:1455
 msgid "Remove member"
 msgstr "Supprimer un membre"
 
-#: modules/websession/lib/websession_templates.py:1458
+#: modules/websession/lib/websession_templates.py:1457
 msgid "No members."
 msgstr "Aucun membre."
 
-#: modules/websession/lib/websession_templates.py:1468
+#: modules/websession/lib/websession_templates.py:1467
 msgid "Accept member"
 msgstr "Accepter un nouveau membre"
 
-#: modules/websession/lib/websession_templates.py:1468
+#: modules/websession/lib/websession_templates.py:1467
 msgid "Reject member"
 msgstr "Rejeter l'adhésion du membre"
 
-#: modules/websession/lib/websession_templates.py:1470
+#: modules/websession/lib/websession_templates.py:1469
 msgid "No members awaiting approval."
 msgstr "Aucun membre en attente d'approbation"
 
-#: modules/websession/lib/websession_templates.py:1472
+#: modules/websession/lib/websession_templates.py:1471
 msgid "Current members"
 msgstr "Membres actuels"
 
-#: modules/websession/lib/websession_templates.py:1473
+#: modules/websession/lib/websession_templates.py:1472
 msgid "Members awaiting approval"
 msgstr "Membres en attente d'approbation"
 
-#: modules/websession/lib/websession_templates.py:1474
+#: modules/websession/lib/websession_templates.py:1473
 msgid "Invite new members"
 msgstr "Inviter de nouveaux membres"
 
-#: modules/websession/lib/websession_templates.py:1477
+#: modules/websession/lib/websession_templates.py:1476
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
@@ -3384,7 +3426,7 @@ msgstr ""
 "veuillez utiliser le %(x_url_open)ssystème de messagerie interne%"
 "(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1481
+#: modules/websession/lib/websession_templates.py:1480
 #, python-format
 msgid "Group: %s"
 msgstr "Groupe: %s"
@@ -3691,14 +3733,6 @@ msgstr "Éditer un groupe"
 #: modules/websession/lib/websession_webinterface.py:850
 msgid "Edit group members"
 msgstr "Éditer les membres du groupe"
-
-#: modules/webstyle/lib/webstyle_templates.py:496
-#: modules/webstyle/lib/webstyle_templates.py:530
-#: modules/webstyle/lib/webstyle_templates.py:532
-#: modules/websubmit/lib/websubmit_engine.py:1073
-#: modules/websubmit/lib/websubmit_webinterface.py:376
-msgid "Error"
-msgstr "Erreur"
 
 #: modules/webstyle/lib/webstyle_templates.py:500
 msgid "Browser"
