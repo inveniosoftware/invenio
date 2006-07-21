@@ -8,7 +8,7 @@
 <BFE_TITLE_BRIEF prefix="<b>" suffix="</b>"/>
 <BFE_FIELD tag="246_1$a" prefix="<br/><b><i>" suffix="</i></b>"/>
 
-<BFE_PUBLICATION_DATE prefix="<br/> " />
+<BFE_DATE prefix="<br/> " />
 
 <BFE_ABSTRACT limit="1" prefix="<p><i>Abstract</i>: " suffix="</p>"/>
 

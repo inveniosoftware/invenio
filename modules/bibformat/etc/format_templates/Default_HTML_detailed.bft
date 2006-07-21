@@ -7,7 +7,7 @@
 <BFE_AUTHORS suffix="<br/>" limit="10" interactive="yes"/>
 <BFE_ADDRESSES />
 <BFE_AFFILIATION />
-<BFE_PUBLICATION_DATE prefix="<br/>" suffix="<br/>"/>
+<BFE_DATE prefix="<br/>" suffix="<br/>"/>
 <BFE_PUBLISHER prefix="<small>" suffix="</small>"/>
 <BFE_PLACE prefix="<small>" suffix="</small>"/>
 

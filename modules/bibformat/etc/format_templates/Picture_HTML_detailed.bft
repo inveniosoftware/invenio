@@ -4,7 +4,7 @@
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
 
 <BFE_NOTES />
-<BFE_PUBLICATION_DATE prefix="<center>" suffix="</center>"/>
+<BFE_DATE prefix="<center>" suffix="</center>"/>
 <BFE_CONTACT />
 <center>
 <BFE_AUTHORS prefix="<center>Photographer:<small>" suffix="</small>" print_links="yes" limit="10" interactive="yes"/>
