@@ -43,7 +43,9 @@ The CERN development group currently consists of:
 The EPFL development group currently consists of:
 
  - Frédéric Gobry <frederic.gobry@epfl.ch>
-     Templating system, numerous patches.
+     Contributions to the templating system, the URL handler, the
+     gettext infrastructure, the regression test suite infrastructure,
+     numerous patches for many modules.
 
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
