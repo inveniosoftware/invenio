@@ -126,14 +126,45 @@ A brief description of things we strive at, more or less unsuccessfully.
    use a different technique elsewhere.  (Unless the whole module A is
    going to be refactored, of course.)
 
-   All core code should come with a suitable set of test cases, see
-   the <a href="testsuite.html">test suite strategy</a> for details.
-
    Speed-critical parts should be profiled with pyprof.  Do not forget
    to use tricks like psyco.
 
-   For more hints, thoughts, and other ruminations, see <a
-   href="http://simko.info/vademecum/">Vademecum and Essays</a>.
+   The code should be well tested before committed.  Testing is an
+   integral part of the development process.  Test along as you
+   program.  The testing process should be automatized via our unit
+   test and regression test suite infrastructures.  Please read the 
+   <a href="testsuite.html">test suite strategy</a> to know more.
+
+   Python promotes writing clear, readable, easily maintainable code.
+   Write it as such.  Recall Albert Einstein's ``Everything should be
+   made as simple as possible, but not simpler''.  Things should be
+   neither overengineered nor oversimplified.
+
+   Recall principles Unix is built upon.  As summarized by Eric
+   S. Reymond's <a href="http://www.catb.org/esr/writings/taoup/html/ch01s06.html#id2877537">TAOUP</a>:
+
+      Rule of Modularity: Write simple parts connected by clean interfaces.
+      Rule of Clarity: Clarity is better than cleverness.
+      Rule of Composition: Design programs to be connected with other programs.
+      Rule of Separation: Separate policy from mechanism; separate interfaces from engines.
+      Rule of Simplicity: Design for simplicity; add complexity only where you must.
+      Rule of Parsimony: Write a big program only when it is clear by demonstration that nothing else will do.
+      Rule of Transparency: Design for visibility to make inspection and debugging easier.
+      Rule of Robustness: Robustness is the child of transparency and simplicity.
+      Rule of Representation: Fold knowledge into data, so program logic can be stupid and robust.
+      Rule of Least Surprise: In interface design, always do the least surprising thing.
+      Rule of Silence: When a program has nothing surprising to say, it should say nothing.
+      Rule of Repair: Repair what you can -- but when you must fail, fail noisily and as soon as possible.
+      Rule of Economy: Programmer time is expensive; conserve it in preference to machine time.
+      Rule of Generation: Avoid hand-hacking; write programs to write programs when you can.
+      Rule of Optimization: Prototype before polishing. Get it working before you optimize it.
+      Rule of Diversity: Distrust all claims for one true way.
+      Rule of Extensibility: Design for the future, because it will be here sooner than you think.
+
+   or the golden rule that says it all: ``keep it simple''.  
+
+   For more hints, thoughts, and other ruminations on programming, 
+   see my <a href="http://simko.info/vademecum/">Vademecum and Essays</a>.
 
 5. PHP 
 
