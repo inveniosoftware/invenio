@@ -17,15 +17,20 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking/bibformat
+#include "cdspage.wml" \
+    title="BibFormat Internals" \
+    navbar_name="hacking-bibformat" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a>" \
+    navbar_select="hacking-bibformat-index" 
 
-doc_DATA = index.html api.html
+This page summarizes all the information suitable to dig inside
+BibFormat internals.
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+<blockquote>
+<dl>
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+<dt><a href="api.html">BibFormat API</a> <dd>Explains how to call
+the formatting engine from your Python programs, should a need be.
 
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+</dl>
+</blockquote>

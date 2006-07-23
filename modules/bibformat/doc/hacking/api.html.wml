@@ -1,9 +1,40 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="BibFormat API" \
+    navbar_name="hacking-bibformat" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt; <a class=navtrail href=index.html>BibFormat Internals</a> " \
+    navbar_select="hacking-bibformat-api" 
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+<protect>
+<pre>
+****************************************************************************
+** IMPORTANT NOTE: The new BibFormat is not yet in production.  We expect **
+** to put into production in August 2006.  The APIs presented below are   **
+** still subject to change.                                               **
+****************************************************************************
+
 Technical Overview of the new BibFormat / DRAFT 20060609
 ========================================================
-
-Revision: $Id$
-
-FIXME: subject to change
 
 Contents:
 1. The philosophy behind BibFormat
@@ -239,64 +270,64 @@ thing to do is to create a page in your favourite editor, and once you
 are glad with it, add the dynamic part of the page, that is print the
 fields of the records. Let's say you have defined this page:
 
-  <h1>Some title</h1>
-  <p><i>Abstract: </i>Some abstract</p>
+  &lt;h1>Some title&lt;/h1>
+  &lt;p>&lt;i>Abstract: &lt;/i>Some abstract&lt;/p>
 
 Then you want that instead of "Some title" and "Some abstract", the
 value of the current record that is being displayed is used. To do so,
 you must use a format element brick. Either you know the name of the
 brick by heart, or you look for it in the elements documentation (see
 section 4.3). For example you would find there that you can print the
-title of the record by writting the HTML tag <BFE_TITLE /> in your
+title of the record by writting the HTML tag &lt;BFE_TITLE /> in your
 format template, with parameter 'default' for a default value.
 
-  <h1><BFE_TITLE default="No Title"/></h1>
-  <p><BFE_ABSTRACT limit="1" prefix="<i>Abstract: </i>"
-  default="No abstract"/></p>
+  &lt;h1>&lt;BFE_TITLE default="No Title"/>&lt;/h1>
+  &lt;p>&lt;BFE_ABSTRACT limit="1" prefix="&lt;i>Abstract: &lt;/i>"
+  default="No abstract"/>&lt;/p>
 
-Notice that <BFE_ABSTRACT /> has a parameter "limit" that <BFE_title/>
+Notice that &lt;BFE_ABSTRACT /> has a parameter "limit" that &lt;BFE_title/>
  had not ("limit" allows to limit the number of sentences of the
 abstract, according to the documentation). Note that while format
 elements might have different parameters, they always can take the the
 three following ones: "prefix" and "suffix", whose values are printed
 only if the element is not empty, and "default", which is printed only
 if element is an empty string. We have used "prefix" for the abstract,
-so that the label "<i>Abstract: </i>" is only printed if the record
+so that the label "&lt;i>Abstract: &lt;/i>" is only printed if the record
 has an abstract.
 
 You should also provide these tags in all of your templates:
- -<name>a name for this template in the admin web interface</name>
- -<description>a description to be used in admin web interface for
-  this template</description>
+ -&lt;name>a name for this template in the admin web interface&lt;/name>
+ -&lt;description>a description to be used in admin web interface for
+  this template&lt;/description>
 
 Another feature of the templates is the support for multi-languages
-outputs. You can include <lang> tags, which contain tags labeled with
+outputs. You can include &lt;lang> tags, which contain tags labeled with
 the names of the languages supported in CDS Invenio. For example, one
 might write:
  
-  <lang><en>A record:</en><fr>Une notice:</fr></lang>
-  <h1><BFE_TITLE default="No Title"/></h1>
-  <p><BFE_ABSTRACT limit="1" prefix="<i>Abstract: </i>"
-  default="No abstract"/></p>
+  &lt;lang>&lt;en>A record:&lt;/en>&lt;fr>Une notice:&lt;/fr>&lt;/lang>
+  &lt;h1>&lt;BFE_TITLE default="No Title"/>&lt;/h1>
+  &lt;p>&lt;BFE_ABSTRACT limit="1" prefix="&lt;i>Abstract: &lt;/i>"
+  default="No abstract"/>&lt;/p>
 
 When doing this you should at least make sure that the default
-language of your server installation is available in each <lang>
+language of your server installation is available in each &lt;lang>
 tag. It is the one that is used if the requested language to display
 the record is not available. Note that we could also provide a
 translation in a similar way for the "No Title" default value inside
-<BFE_Title /> tag.
+&lt;BFE_Title /> tag.
 
 Some other considerations on the use of elements inside templates:
  -Format elements names are not case sensitive
- -Format elements names always start with <BFE_
- -Format elements parameters can contain '<' characters,
+ -Format elements names always start with &lt;BFE_
+ -Format elements parameters can contain '&lt;' characters,
   and quotes different from the kind that delimit parameters (you can
-  for example have <BFE_Title default='<a href="#">No Title</a>'/> )
+  for example have &lt;BFE_Title default='&lt;a href="#">No Title&lt;/a>'/> )
  -Format templates must be placed inside the directory
   /etc/bibformat/templates/ of your CDS Invenio installation
  -The format extension of a template is .bft
 
-Trick: you can use the <BFE_FIELD tag="245__a" /> to print the value
+Trick: you can use the &lt;BFE_FIELD tag="245__a" /> to print the value
 of any field 245 $a in your templates.  This practice is however not
 recommended because it would necessitate to revise all format
 templates if you change meaning of the MARC code schema.
@@ -309,7 +340,7 @@ dynamic contents inside format templates.
 For the most basic format elements, you do not even need to write
 them: as long as you define `tag names' for MARC tags in the BibIndex
 Admin's Manage logical fields interface (database table tag),
-BibFormat knows which field must be printed when <BFE_tag_name/> is
+BibFormat knows which field must be printed when &lt;BFE_tag_name/> is
 used inside a template.
 
 However for more complex processing, you will need to write a format
@@ -318,7 +349,7 @@ extension is ".py". The name you choose for the file is the one that
 will be used inside format template to call the element, so choose it
 carefully such that it is not too long, but self explanatory (you can
 prefix the filename with BFE or not, but the element will always be called
-with prefix <BFE_ inside templates).  Then you just need to drop the
+with prefix &lt;BFE_ inside templates).  Then you just need to drop the
 file in the /lib/python/invenio/bibformat_elements/ directory
 of your CDS Invenio installation. Inside your file you have to define a
 function named "format", which takes at least a "bfo" parameter (bfo
@@ -377,12 +408,12 @@ to see which elements are available, what they do, which parameters they
 take, what are the default values of parameters, etc. The
 documentation is automatically extracted from format elements.
 Here follows an sample documentation generated for the element
-<BFE_TITLE />:
+&lt;BFE_TITLE />:
 
 +--------------------------------------------------------------------------------------------+
 |  TITLE                                                                                     |
 |  -----                                                                                     |
-|  <BFE_TITLE separator="..." prefix="..." suffix="..." default="..." />                     |
+|  &lt;BFE_TITLE separator="..." prefix="..." suffix="..." default="..." />                     |
 |                                                                                            |
 |      Prints the title of a record.                                                         |
 |                                                                                            |
@@ -614,3 +645,5 @@ interface and the userID by directly getting the attribute from 'bfo':
   >> 'mangano and neutrino and factory'
 
  -- End of file --
+</pre>
+</protect>
