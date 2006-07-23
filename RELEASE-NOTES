@@ -94,6 +94,10 @@ following steps:
    - If you have backed up your old @prefix@/etc/ directory as
      mentioned before, then restore your old etc files now.
 
+   - Update your database table structure:
+
+        $ make update-v0.90.0-tables
+
    - Optionally, update your tables with the new Bulgarian and updated
      French and Russian dynamic elements:
 
