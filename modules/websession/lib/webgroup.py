@@ -40,8 +40,8 @@ def perform_request_group_display(uid, infos=[], errors = [], warnings = [], ln=
     """
     _ = gettext_set_language(ln)
     body = ""
-    (body_admin, errors_admin) = display_admin_group(uid)
-    (body_member, errors_member) = display_member_group(uid)
+    (body_admin, errors_admin) = display_admin_group(uid, ln)
+    (body_member, errors_member) = display_member_group(uid, ln)
             
     if errors_admin:
         errors.extend(errors_admin)
@@ -55,9 +55,6 @@ def perform_request_group_display(uid, infos=[], errors = [], warnings = [], ln=
                                                         ln=ln)
     return (body, errors, warnings)
 
-    
-
-   
       
 def display_admin_group(uid, ln=cdslang):
     """Display groups the user is admin of
