@@ -1,5 +1,875 @@
+CDS Invenio v0.90.1 (released 2006-07-23)
+=========================================
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS, RELEASE-NOTES: Release of CDS Invenio v0.90.1.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql.wml: Updated French record ID
+	translation to fit the PO file.  Moved Russian translation that was
+	wrongly put into Swedish into its proper place.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/elements/Makefile.am: Removed test and some
+	unused files like bfe_summary from the distribution.  Added only
+	the important missing __init__.py file.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/elements/Makefile.am: Added missing files
+	for the distribution (e.g. __init__.py, bfe_summary.py,
+	bfe_url.py).  All files except "test 1.py" were added.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibharvest/RTdata: Removing unused, empty RTdata file.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/etc/format_templates/Makefile.am: Do not
+	include "Test 2.bft" into EXTRA_DIST due to escaping problems.	The
+	new BibFormat test suite is not yet plugged into testsuite anyway.
+	Do we need to have a test like that?
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/testsuite.html.wml: Added musings on
+	the regression test suite.  Reogranized document to have clean unit
+	testing versus regression testing sectioning.  Used simple
+	regression testing examples; this part could be completed later on
+	when we shall develop more helper functions in the testutils
+	library in order to test easily POST pages too.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/style.html.wml: Developed part on
+	testing.  Added section on ``keeping it simple'' and on ESR's TAOUP
+	principles.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Updated description of Fred's contributions.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Added note on PHP having to be compiled with XML
+	support, thanks to Theodoros.
+
+2006-07-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/doc/hacking/Makefile.am,
+	modules/bibformat/doc/hacking/api.html.wml,
+	modules/bibformat/doc/hacking/api.txt,
+	modules/bibformat/doc/hacking/index.html.wml,
+	modules/webhelp/web/hacking/index.html.wml: BibFormat api.txt moved
+	to api.html.wml to be consistent with what we have in other
+	modules.  Written entry page for BibFormat Internals.  Plugged
+	these pages into the general Hacking CDS Invenio welcome page.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/it.po, po/ja.po,
+	po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po,
+	po/uk.po: Modified PO files to respect the lately added phrases.
+	The files should now be ready for the v0.90.1 release.
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webbasket/lib/webbasket_webinterface.py: Fixed a bug
+	introduced by previous release. Couls not subscribe to a basket
+	anymore.
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* po/fr.po: Introduction of new sentences due to a change in
+	bibEdit module
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/bibedit/web/admin/bibeditadmin.py: English improvement
+	(thanks to Nick)
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webcomment/web/admin/webcommentadmin.py: Added some
+	missing authorization tests. Fixed missing default parameters.
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webalert/lib/webalert.py: Fixed bug while trying to
+	access a page without parameter. Added check for basket ownership
+	while setting an alert on it.
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/bibedit/lib/bibedit_engine.py,
+	modules/bibedit/web/admin/bibeditadmin.py: Fixed missing
+	authorization failure. Fixed missing default parameters. Added some
+	still uninternationalized sentences.
+
+2006-07-21  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webbasket/lib/webbasket_dblayer.py,
+	modules/webbasket/lib/webbasket_webinterface.py: Fixed bugs
+	discovered by the new regression tests (trying to access functions
+	through web interface without any params).
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql.wml,
+	modules/miscutil/sql/tabfill.sql.wml: Completed missing Russian
+	translation of a few dynamic terms, thanks to Iaroslav.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/Makefile.am,
+	modules/bibedit/lib/bibedit_regression_tests.py,
+	modules/bibformat/lib/Makefile.am,
+	modules/bibformat/lib/bibformatadmin_regression_tests.py,
+	modules/bibharvest/lib/Makefile.am,
+	modules/bibharvest/lib/bibharvestadmin_regression_tests.py,
+	modules/bibharvest/lib/oai_repository_regression_tests.py,
+	modules/bibharvest/lib/oaiarchiveadmin_regression_tests.py,
+	modules/bibindex/lib/Makefile.am,
+	modules/bibindex/lib/bibindexadmin_regression_tests.py,
+	modules/bibrank/lib/Makefile.am,
+	modules/bibrank/lib/bibrank_regression_tests.py,
+	modules/bibrank/lib/bibrankadmin_regression_tests.py,
+	modules/miscutil/lib/Makefile.am,
+	modules/miscutil/lib/errorlib_regression_tests.py,
+	modules/webaccess/lib/Makefile.am,
+	modules/webaccess/lib/webaccess_regression_tests.py,
+	modules/webalert/lib/Makefile.am,
+	modules/webalert/lib/webalert_regression_tests.py,
+	modules/webbasket/lib/Makefile.am,
+	modules/webbasket/lib/webbasket_regression_tests.py,
+	modules/webcomment/lib/Makefile.am,
+	modules/webcomment/lib/webcomment_regression_tests.py,
+	modules/webmessage/lib/Makefile.am,
+	modules/webmessage/lib/webmessage_regression_tests.py,
+	modules/websearch/lib/Makefile.am,
+	modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearchadmin_regression_tests.py,
+	modules/websession/lib/Makefile.am,
+	modules/websession/lib/websession_regression_tests.py,
+	modules/websubmit/lib/Makefile.am,
+	modules/websubmit/lib/websubmit_regression_tests.py,
+	modules/websubmit/lib/websubmitadmin_regression_tests.py: Started
+	massive deployment of the regression test suite.  Added basic tests
+	for the availabitily of web pages of all the modules, resulting in
+	216 URLs checked.  The web page availability tests are testing
+	mostly the behaviour of the page when passing no arguments at all.
+	For admin interfaces, the behaviour is tested when logged in as a
+	guest user and as an admin.  Full regression functionality tests
+	for each module to be deployed later.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/testutils.py: Added helper function
+	test_web_page_content() to easily test the availability of web
+	pages.	Added helper function make_surl() to create HTTPS URLs.
+	Reformatted info string showed in the beginning of regression test
+	suite run, using stderr where the usual output goes.  This permits
+	to write detailed verbose info into a separate stdout stream.  More
+	separate helper function (e.g. for logging in) would be added
+	later.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py: Write <html>...</html>
+	envelope for log() and cache() requests.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/.cvsignore: Ignore file messages.mo.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webbasket/lib/webbasket_templates.py: Fixed one more
+	problem of string placeholder replacement.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_editors.py: Corrected
+	bfe_editors bug.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord.py,
+	modules/bibedit/lib/bibrecord_tests.py: Fixed a problem in
+	record_add_field() in case fields were added to a record that have
+	had all the fields deleted.  Added a test case for this situation.
+	Thanks to Eric for spotting the problem.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_editors.py: Corrected
+	bfe_bibtex.py to use already existing bibrecord functions.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/etc/format_templates/BibTeX.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_brief.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_captions.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_detailed.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_portfolio.bft,
+	modules/bibformat/etc/format_templates/Picture_HTML_brief.bft,
+	modules/bibformat/etc/format_templates/Picture_HTML_detailed.bft:
+	Updated description of format templates.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibformatadminlib.py: Corrected docstring in
+	bibformat_engine. Fixed small error in bibformatadminlib.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/etc/format_templates/Default_HTML_detailed.bft,
+	modules/bibformat/etc/format_templates/Picture_HTML_brief.bft,
+	modules/bibformat/etc/format_templates/Picture_HTML_detailed.bft:
+	Modified templates to use format element bfe_date instead of format
+	table.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/Makefile.am,
+	modules/bibformat/lib/elements/bfe_date.py,
+	modules/bibformat/lib/elements/bfe_place.py: Added missing format
+	element. Removed commented code from bfe_place.py.
+
+2006-07-21  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/doc/hacking/api.txt: Modified APIs doc to
+	reflect more current version of BibFormat (even if API are still
+	subject to change).
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Fixed hardcoded
+	image URL (pcusrent01), spotted by Iaroslav.
+
+2006-07-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Fixed several
+	output string formatting bugs introduced during yesterday's I18N
+	standardization process.
+
+2006-07-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/it.po, po/ja.po,
+	po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po,
+	po/uk.po: Updated PO catalogues after last Greg's cleanup.
+	Modified version number in view of forthcoming release.  Fixed a
+	couple of translations in French and Slovak to reflect new string
+	format placeholder names.
+
+2006-07-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/websearch_templates.py: Renamed two string
+	formatting placeholders in two phrases to make it clearer. (x_words
+	became x_word, x_fields became x_field)
+
+2006-07-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/lib/webalert_templates.py,
+	modules/websession/lib/websession_templates.py: Use rather two
+	different %(x_url*_close)s placeholders, for clarity.
+
+2006-07-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, INSTALL: Version bump to v0.90.1, preparing for the
+	forthcoming release.
+
+2006-07-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/etc/format_templates/Makefile.am,
+	modules/bibformat/etc/output_formats/Makefile.am,
+	modules/bibformat/web/admin/Makefile.am: Inclusion of important non
+	installable files in EXTRA_DIST.
+
+2006-07-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/miscutil/sql/tabdrop.sql: Added drop of tables
+	fmtKNOWNLEDGEBASES and fmtKNOWLEDGEBASEMAPPINGS.
+	----------------------------------------------------------------------
+	----------------------------------------------------------------------
+
+2006-07-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* AUTHORS, Makefile.am, configure.ac,
+	modules/bibformat/Makefile.am,
+	modules/bibformat/bin/bibreformat.in,
+	modules/bibformat/doc/admin/.cvsignore,
+	modules/bibformat/doc/admin/Makefile.am,
+	modules/bibformat/doc/admin/guide.html.wml,
+	modules/bibformat/doc/admin/guide_output_format_check_dependencies.png,
+	modules/bibformat/doc/admin/guide_output_format_edit_rule.png,
+	modules/bibformat/doc/admin/guide_output_format_edit_rule2.png,
+	modules/bibformat/doc/admin/guide_output_format_hd_rules.png,
+	modules/bibformat/doc/admin/guide_output_format_update_attributes_tutorial.png,
+	modules/bibformat/doc/admin/guide_output_formats_manage_tutorial.png,
+	modules/bibformat/doc/admin/guide_rules_editor_tutorial.png,
+	modules/bibformat/doc/admin/guide_template_attributes_tutorial.png,
+	modules/bibformat/doc/admin/guide_template_editor.png,
+	modules/bibformat/doc/admin/guide_template_editor_tutorial.png,
+	modules/bibformat/doc/admin/guide_template_preview.png,
+	modules/bibformat/doc/admin/guide_templates_manage_tutorial.png,
+	modules/bibformat/doc/admin/guide_url_bar.png,
+	modules/bibformat/doc/hacking/.cvsignore,
+	modules/bibformat/doc/hacking/api.txt,
+	modules/bibformat/etc/.cvsignore,
+	modules/bibformat/etc/Makefile.am,
+	modules/bibformat/etc/format_templates/.cvsignore,
+	modules/bibformat/etc/format_templates/BibTeX.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_brief.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_captions.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_detailed.bft,
+	modules/bibformat/etc/format_templates/Default_HTML_portfolio.bft,
+	modules/bibformat/etc/format_templates/Makefile.am,
+	modules/bibformat/etc/format_templates/Picture_HTML_brief.bft,
+	modules/bibformat/etc/format_templates/Picture_HTML_detailed.bft,
+	modules/bibformat/etc/format_templates/Test 2.bft,
+	modules/bibformat/etc/format_templates/Test1.bft,
+	modules/bibformat/etc/format_templates/Test3.bft,
+	modules/bibformat/etc/format_templates/Test_no_template.test,
+	modules/bibformat/etc/output_formats/.cvsignore,
+	modules/bibformat/etc/output_formats/HB.bfo,
+	modules/bibformat/etc/output_formats/HC.bfo,
+	modules/bibformat/etc/output_formats/HD.bfo,
+	modules/bibformat/etc/output_formats/HP.bfo,
+	modules/bibformat/etc/output_formats/HX.bfo,
+	modules/bibformat/etc/output_formats/Makefile.am,
+	modules/bibformat/etc/output_formats/TEST1.bfo,
+	modules/bibformat/etc/output_formats/TEST2.bfo,
+	modules/bibformat/etc/output_formats/TEST3.bfo,
+	modules/bibformat/lib/.cvsignore,
+	modules/bibformat/lib/Makefile.am,
+	modules/bibformat/lib/bibformat.py,
+	modules/bibformat/lib/bibformat_config.py,
+	modules/bibformat/lib/bibformat_dblayer.py,
+	modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibformat_engine_tests.py,
+	modules/bibformat/lib/bibformat_migration_kit.py,
+	modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py,
+	modules/bibformat/lib/bibformat_migration_kit_dblayer.py,
+	modules/bibformat/lib/bibformat_migration_kit_templates.py,
+	modules/bibformat/lib/bibformat_templates.py,
+	modules/bibformat/lib/bibformat_utils.py,
+	modules/bibformat/lib/bibformatadminlib.py,
+	modules/bibformat/lib/elements/.cvsignore,
+	modules/bibformat/lib/elements/Makefile.am,
+	modules/bibformat/lib/elements/__init__.py,
+	modules/bibformat/lib/elements/bfe_abstract.py,
+	modules/bibformat/lib/elements/bfe_additional_report_numbers.py,
+	modules/bibformat/lib/elements/bfe_addresses.py,
+	modules/bibformat/lib/elements/bfe_affiliation.py,
+	modules/bibformat/lib/elements/bfe_authors.py,
+	modules/bibformat/lib/elements/bfe_bibtex.py,
+	modules/bibformat/lib/elements/bfe_cited_by.py,
+	modules/bibformat/lib/elements/bfe_collection.py,
+	modules/bibformat/lib/elements/bfe_contact.py,
+	modules/bibformat/lib/elements/bfe_date_rec.py,
+	modules/bibformat/lib/elements/bfe_edit_record.py,
+	modules/bibformat/lib/elements/bfe_editors.py,
+	modules/bibformat/lib/elements/bfe_field.py,
+	modules/bibformat/lib/elements/bfe_fulltext.py,
+	modules/bibformat/lib/elements/bfe_imprint.py,
+	modules/bibformat/lib/elements/bfe_keywords.py,
+	modules/bibformat/lib/elements/bfe_notes.py,
+	modules/bibformat/lib/elements/bfe_photo_resources.py,
+	modules/bibformat/lib/elements/bfe_photo_resources_brief.py,
+	modules/bibformat/lib/elements/bfe_place.py,
+	modules/bibformat/lib/elements/bfe_publi_info.py,
+	modules/bibformat/lib/elements/bfe_publisher.py,
+	modules/bibformat/lib/elements/bfe_references.py,
+	modules/bibformat/lib/elements/bfe_reprints.py,
+	modules/bibformat/lib/elements/bfe_summary.py,
+	modules/bibformat/lib/elements/bfe_test_2.py,
+	modules/bibformat/lib/elements/bfe_test_4.py,
+	modules/bibformat/lib/elements/bfe_title.py,
+	modules/bibformat/lib/elements/bfe_title_brief.py,
+	modules/bibformat/lib/elements/bfe_topbanner.py,
+	modules/bibformat/lib/elements/bfe_url.py,
+	modules/bibformat/lib/elements/test 1.py,
+	modules/bibformat/lib/elements/test3.py,
+	modules/bibformat/lib/elements/test_5.py,
+	modules/bibformat/lib/elements/test_no_element.test,
+	modules/bibformat/web/.cvsignore,
+	modules/bibformat/web/admin/.cvsignore,
+	modules/bibformat/web/admin/Makefile.am,
+	modules/bibformat/web/admin/bibformat_migration_kit_assistant.py,
+	modules/bibformat/web/admin/bibformatadmin.py,
+	modules/miscutil/sql/tabcreate.sql,
+	modules/miscutil/sql/tabfill.sql.wml: Initial release of the new
+	BibFormat in Python.  The status is still experimental, the old PHP
+	version is still the default.  Adapted format table structure,
+	added two new tables.  Test cases to be plugged into the general
+	test suite later.
+
+2006-07-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstyle/lib/webstyle_templates.py: Added forgotten
+	string import.
+
+2006-07-20  Gregory Favre <gregory.favre@cern.ch>
+
+	* po/fr.po: New version, compatible with the newly defined strings.
+	Every string should now respect the documentation (ABOUT_NLS).
+
+2006-07-20  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py,
+	modules/webalert/lib/webalert.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webmessage/lib/webmessage_templates.py,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/webgroup.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websubmit/lib/websubmit_templates.py: Update of strings for
+	internationalization. Now the strings are created with respect to
+	documentation (see ABOUT_NLS).
+
+2006-07-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS: Updated convention on how to write easily-translatable
+	output messages.
+
+2006-07-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/it.po, po/ja.po,
+	po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po,
+	po/uk.po: Regenerated PO catalogue after recent commits and
+	cleanups.  Updated Slovak translation.	Added Bulgarian translation
+	updates from Nikolay.
+
+2006-07-19  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Fixed English for
+	the latest commit.
+
+2006-07-19  Diane Berkovits <diane.berkovits@epfl.ch>
+
+	* modules/websession/lib/webaccount.py,
+	modules/websession/lib/webgroup.py,
+	modules/websession/lib/webgroup_dblayer.py,
+	modules/websession/lib/websession_config.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py: Send webmessage
+	to user when he is accepted or rejected as a new member.Send
+	webmessage to all group member and group admin when a group is
+	deleted.Added check when the page is reloaded to avoid multiple
+	entries.Added docstring.Corrected gui message for
+	internalization.Admin can now reject pending member.
+
+2006-07-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/web/admin/webcommentadmin.py: Fixed extraneous
+	parenthesis in a page() call.
+
+2006-07-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/lib/webcomment_templates.py: Fixed wrongly
+	placed parentheses in a tmpl_warnings() call.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/it.po, po/ja.po,
+	po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po,
+	po/uk.po: Update of PO catalogues after English message cleanup.
+	Updated Slovak translation.
+
+2006-07-18  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py,
+	modules/webalert/lib/webalert.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webmessage/lib/webmessage.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yoursubmissions.py: Fixed English in
+	internationalized output messages.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/it.po, po/ja.po,
+	po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po,
+	po/uk.po: Publishing new PO files now that the general cleanup of
+	output messages is over.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/websubmit_templates.py: Remove dash from
+	e-mail, as used elsewhere.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Added forgotten
+	_() to an output phrase.
+
+2006-07-18  Gregory Favre <gregory.favre@cern.ch>
+
+	* po/fr.po: New french translation. All messages have been
+	translated.
+
+2006-07-18  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py,
+	modules/bibharvest/lib/bibharvest_templates.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webmessage/lib/webmessage_templates.py,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_templates.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_templates.py: Updated strings for
+	better internationalizability.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py,
+	modules/bibharvest/lib/bibharvest_templates.py,
+	modules/bibrank/lib/bibrank_citation_grapher.py,
+	modules/bibrank/lib/bibrank_downloads_grapher.py,
+	modules/webalert/lib/webalert.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/lib/webcomment_webinterface.py,
+	modules/webcomment/web/admin/webcommentadmin.py,
+	modules/webmessage/lib/webmessage.py,
+	modules/webmessage/lib/webmessage_templates.py,
+	modules/websearch/lib/search_engine.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_templates.py, config/cdspage.wml,
+	modules/websubmit/lib/websubmit_webinterface.py: Continued in the
+	process of making the output messages better translatable.
+
+2006-07-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL: Fixed version number in the instructions (use 0.90.0
+	instead of 0.90), thanks to Ypatios Asmanidis.
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS: Added tips for developers on how to write easily
+	translatable phrases.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/web/admin/websubmitadmin.py: Updated strings for
+	internationalization
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webstyle/lib/webpage.py,
+	modules/webstyle/lib/webstyle_templates.py: Updated strings for
+	internationalization.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/websearch/lib/websearch_templates.py,
+	modules/websearch/lib/websearch_webinterface.py: Updated strings
+	for internationalization
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py: Updated strings for
+	internationalization.
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/POTFILES.in: Reflect renaming of sessiongc file.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/web/admin/webcommentadmin.py: Updated strings
+	for internationalization
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/sk.po: Completed Slovak translation.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webalert/lib/webalert.py: Modified some still
+	uninternationalizable strings.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webalert/lib/webalert.py,
+	modules/webalert/lib/webalert_templates.py: Refactored HTML output.
+	Modified strings for internationalization.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webstyle/css/cds.css: Added new styles for BibEdit and
+	WebAlert modules.
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/lib/webcomment_webinterface.py: Added
+	forgotten req argument to a redirect_to_url() call.
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* Makefile.am: Fixed English in the final output message, thanks to
+	Jerome.
+
+2006-07-17  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS: Cite precisely ``no rule to make target'' error
+	phrase.
+
+2006-07-17  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py: Improved HTML quality.
+	Modified some strings for better internationalizability.
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Fixed output
+	message typo (load/loan).
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/sk.po: Continued with the Slovak translation.
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po: Added translations from Nikolay.
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/lib/webalert_templates.py: Respect language
+	context in links and forms.
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webalert/lib/webalert.py: Fixed display of alert name
+	after itl update.  Respect language context in links.
+
+2006-07-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibedit_templates.py: Fixed some BibEdit
+	output messages.
+
+2006-07-14  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/ru.po: Added translations from Iaroslav.
+
+2006-07-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS: Added note to developers on the necessity of running
+	``make update-gmo''.
+
+2006-07-12  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_templates.py: In order to avoid
+	database inconsistencies, guest users cannot share their baskets
+	anymore.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS: Added two extra-PO miscellaneus terms that were
+	previously forgotten.
+
+2006-07-12  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/websession/bin/sessiongc.in: Adapated garbage collection
+	for new version of webbasket module.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/config.wml, modules/miscutil/demo/democfgdata.sql.wml,
+	modules/miscutil/sql/tabfill.sql.wml: Added Bulgarian translation
+	of dynamic elements, as sent by Nikolay.
+
+2006-07-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/lib/config.py.wml: Added variable
+	'xmlmarc2textmarc', containing path to 'xmlmarc2textmarc' tool, as
+	used in WebSubmit.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/index.html.wml: Greek updates from Theodoros.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS, config/cdswmllib.wml, config/config.wml,
+	modules/miscutil/demo/democfgdata.sql.wml,
+	modules/miscutil/lib/config.py.wml,
+	modules/miscutil/sql/tabfill.sql.wml,
+	modules/webhelp/web/Makefile.am,
+	modules/webhelp/web/index.html.wml,
+	modules/webhelp/web/admin/Makefile.am,
+	modules/websearch/doc/Makefile.am,
+	modules/websearch/doc/guide.html.wml,
+	modules/websearch/doc/index.html.wml,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websubmit/doc/Makefile.am,
+	modules/websubmit/doc/admin/Makefile.am, po/LINGUAS, po/bg.po:
+	General support infrastructure for the Bulgarian translation.
+	Dynamic elements (e.g. collection and field names) to come later.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/el.po: Updates from Theodoros.
+
+2006-07-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, modules/websession/bin/Makefile.am,
+	modules/websession/bin/sessiongc.in,
+	modules/websession/bin/sessiongc.wml: Removed dependency of
+	sessiongc on WML.  Added missing import of run_sql.  The basket
+	garbage collection part to be updated to the new module.
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/webgroup.py: Pass language context to
+	display_admin_group() and display_member_group().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Internationalize
+	title phrases for tmpl_group_table_title().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/web/yoursubmissions.py: Use I18N title on the
+	Your Submissions page.
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webbasket/lib/webbasket_templates.py: Respect language
+	context in tmpl_topic_selection().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webbasket/lib/webbasket_webinterface.py: Pass language
+	context to perform_request_create_basket().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/lib/webcomment_templates.py: Pass language
+	context to print_record().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/lib/webcomment_webinterface.py: Pass language
+	context to perform_request_add_comment_or_remark().
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/el.po: Added translations contributed by Theodoros.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/bibedit/lib/xmlmarc2textmarclib.py: Corrected a bug: when
+	making an ALEPH MARC record, controlfields other than '001' were
+	given underscored subfields. (e.g. '003   L 7434_SzGeCERN'). Now no
+	controlfields have subfields, so this would appear as '003   L
+	SzGeCERN'.
+
+2006-07-11  Gregory Favre <gregory.favre@cern.ch>
+
+	* modules/webbasket/lib/webbasket_dblayer.py: Bugfix: impossible to
+	comment on a group-shared basket if this basket is also public and
+	its public rights are lower than group-level ones.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Convert_RecXML_to_RecALEPH.py:
+	Added docstring.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Makefile.am: Added
+	'Convert_RecXML_to_RecALEPH.py' to list of files.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Convert_RecXML_to_RecALEPH.py:
+	Function to convert an XML MARC record to an ALEPH MARC record.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/mail.py: Added copyright message.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py: Added test
+	for age of lock-file. Admin informed by email if lock-file found to
+	be older than N seconds; Replace InvenioWebSubmitError exceptions
+	with 'functionError' exceptions, for now - to change back later.
+
+2006-07-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webcomment/lib/webcomment.py: Fixed
+	query_get_user_contact_info() to really return (nickname, email,
+	last_login) as documented.  Updated some of its callers as needed.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py: Added
+	copyright message.
+
+2006-07-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py,
+	modules/websubmit/lib/functions/Makefile.am: First version of
+	function to allocate an ALEPH System number to a record.
+
+2006-06-30  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Version bump after the v0.90.0 release.
+
 CDS Invenio v0.90.0 (released 2006-06-30)
 =========================================
+
+2006-06-30  Tibor Simko <tibor.simko@cern.ch>
+
+	* ChangeLog, NEWS, RELEASE-NOTES: Releasing v0.90.0.
 
 2006-06-30  Tibor Simko <tibor.simko@cern.ch>
 

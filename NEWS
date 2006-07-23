@@ -7,6 +7,40 @@ Here is a short summary of the most notable changes in CDSware
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDS Invenio v0.90.1 -- released 2006-07-23
+------------------------------------------
+
+ *) output messages improved and enhanced to become more easily
+    translatable in various languages (all modules)
+
+ *) new translation (Bulgarian) and several updated translations
+    (Greek, French, Russian, Slovak)
+
+ *) respect langugage choice in various web application links
+    (WebAlert, WebBasket, WebComment, WebSession, WebSubmit)
+
+ *) fixed problem with commenting rights in a group-shared basket that
+    is also a public basket with lesser rights (WebBasket)
+
+ *) guest users are now forbidden to share baskets (WebBasket)
+
+ *) fixed guest user garbage collection, adapted to the new baskets
+    schema (WebSession)
+
+ *) added possibility to reject group membership requests; sending
+    informational messages when users are approved/refused by group
+    administrators (WebSession)
+
+ *) experimental release of the new BibFormat in Python (BibFormat)
+
+ *) started massive deployment of the regression test suite, checking
+    availability of all web interface pages (BibEdit, BibFormat,
+    BibHarvest, BibIndex, BibRank, MiscUtil, WebAccess, WebBasket,
+    WebComment, WebMessage, WebSearch, WebSession, WebSubmit)
+
+ *) updated developer documentation (I18N output messages policy, test
+    suite policy, coding style)
+
 CDS Invenio v0.90.0 -- released 2006-06-30
 ------------------------------------------
 
