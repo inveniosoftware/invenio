@@ -27,14 +27,16 @@
 
 <h2>Contents</h2>
 <strong>1. <a href="#1">General considerations</a></strong><br>
-<strong>2. <a href="#2">Running test suite</a></strong><br>
-<strong>3. <a href="#3">Writing test code</a></strong><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Testing core code logic (Unit Testing)</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Testing overall functionality (Regression Testing)</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Testing user interface pages</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">File organization</a><br>
-<strong>7. <a href="#4">Conclusions</a></strong><br>
-<strong>8. <a href="#5">Additional information</a></strong><br>
+<strong>2. <a href="#2">Unit testing</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Unit testing philosophy</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Writing unit tests</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.3 <a href="#2.3">Running unit tests</a><br>
+<strong>3. <a href="#3">Regression testing</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Regression testing philosophy</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Writing regression tests</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Running regression tests</a><br>
+<strong>4. <a href="#4">Conclusions</a></strong><br>
+<strong>5. <a href="#5">Additional information</a></strong><br>
 
 <a name="1"></a><h2>1. General considerations</h2>
 
@@ -84,7 +86,128 @@ typical usage scenarios.  Things have a tendency to become atypical
 one day.  Recall that testing is necessary, but not sufficient, to
 write good code.  Therefore, think ahead!
 
-<a name="2"></a><h2>2. Running test suite</h2>
+<a name="2"></a><h2>2. Unit testing</h2>
+
+<a name="2.1"></a><h3>2.1 Unit testing philosophy</h3>
+
+<p>Core functionality, such as the hit set intersection for the search
+engine, or the text input manipulating functions of the BibConvert
+language, should come with a couple of test cases to assure proper
+behaviour of the core functionality.  The test cases should cover
+typical input (e.g. hit set corresponding to the query for ``ellis''),
+as well as the edge cases (e.g. empty/full hit set) and other unusual
+situations (e.g. non-UTF-8 accented input for BibConvert functions to
+test a situation of different number of bytes per char).
+
+<p>The test cases should be written for most important core
+functionality.  Not every function or class in the code is to be
+throughly tested.  Common sense will tell.
+
+<p>Unit test cases are free of side-effects.  Users should be able to
+run them on production database without any harm to their data.  This
+is because the tests test ``units'' of the code, not the application
+as such.  If the behaviour of the function you would like to test
+depends on the status of the database, or some other parameters that
+cannot be passed to the function itself, the unit testing framework is
+not suitable for this kind of situation and you should use the
+regression testing framework instead (see below).
+
+<p>For more information on Pythonic unit testing, see the
+documentation to the unittest module at <a
+href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>.
+For a tutorial, see for example <a
+href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>.
+
+<a name="2.2"></a><h3>2.2 Writing unit tests</h3>
+
+<p>Each core file that is located in the lib directory (such as the
+<code>webbasketlib.py</code> in the example above) should come with a
+testing file where the test cases are stored.  The test file is to be
+named identically as the lib file it tests, but with the suffix
+<code>_tests</code> (in our example,
+<code>webbasketlib_tests.py</code>).
+
+<p>The test cases are written using Pythonic unittest TestCase class.
+An example for testing search engine query parameter washing function:
+
+<blockquote>
+<pre>
+$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+[...]
+import search_engine
+import unittest
+
+class TestWashQueryParameters(unittest.TestCase):
+    """Test for washing of search query parameters."""
+
+    def test_wash_url_argument(self):
+        """search engine washing of URL arguments"""
+        self.assertEqual(1, search_engine.wash_url_argument(['1'],'int'))
+        self.assertEqual("1", search_engine.wash_url_argument(['1'],'str'))
+        self.assertEqual(['1'], search_engine.wash_url_argument(['1'],'list'))
+        self.assertEqual(0, search_engine.wash_url_argument('ellis','int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument('ellis','str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument('ellis','list'))
+        self.assertEqual(0, search_engine.wash_url_argument(['ellis'],'int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument(['ellis'],'str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument(['ellis'],'list'))
+[...] 
+</pre>
+</blockquote>
+
+<p>In addition, each test file is supposed to define a
+<code>create_test_suite()</code> function that will return test suite
+with all the tests available in this file:
+
+<blockquote>
+<pre>
+$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+[...]
+def create_test_suite():
+    """Return test suite for the search engine."""
+    return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,'test'),
+                               unittest.makeSuite(TestStripAccents,'test')))
+[...] 
+</pre>
+</blockquote>
+
+<p>This will enable us to later include this file into
+<code>testsuite</code> executable:
+
+<blockquote>
+<pre>
+$ cat ~/src/cds-invenio/modules/miscutil/bin/testsuite.in
+[...]
+from invenio import search_engine_tests
+    from invenio import bibindex_engine_tests 
+
+def create_all_test_suites():
+    """Return all tests suites for all CDS Invenio modules."""
+    return unittest.TestSuite((search_engine_tests.create_test_suite(),
+                               bibindex_engine_tests.create_test_suite()))
+[...] 
+</pre>
+</blockquote>
+    
+<p>In this way, all the test cases defined in the file
+<code>search_engine_tests.py</code> will be executed when the global
+<code>testcase</code> executable is called.
+
+<p>Note that it may be time-consuming to run all the tests in one go.
+If you are interested in running tests only on a certain file (say
+<code>search_engine_tests.py</code>), then launch:
+
+<blockquote>
+<pre>
+$ python /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+</pre>
+</blockquote>
+    
+<p>For full-scale examples, you may follow
+<code>search_engine_tests.py<code> and other <code>_tests.py</code>
+files in the source distribution.
+
+<a name="2.3"></a><h3>2.3 Running unit tests</h3>
 
 <p>CDS Invenio test suite can be run in the source directory:
 
@@ -153,221 +276,200 @@ FAILED (failures=1)
 </pre>
 </blockquote>
 
-The test suite compliance should be checked before each CVS commit.
+<p>The test suite compliance should be checked before each CVS commit.
 (And, obviously, double-checked before each CDS Invenio release.)
 
-<a name="3"></a><h2>3. Writing test code</h2>
+<a name="3"></a><h2>3. Regression testing</h2>
 
-In this section, we shall firstly briefly touch ideas behind various
-kinds of test code.  Then we'll discuss more earthly matters, like how
-to write the test code, where to put it, etc.
-
-<a name="3.1"></a><h3>3.1 Testing core code logic (Unit Testing)</h3>
-
-<p>Core functionality, such as the hit set intersection for the search
-engine, or the text input manipulating functions of the BibConvert
-language, should come with a couple of test cases to assure proper
-behaviour of the core functionality.  The test cases should cover
-typical input (e.g. hit set corresponding to the query for ``ellis''),
-as well as the edge cases (e.g. empty/full hit set) and other unusual
-situations (e.g. non-UTF-8 accented input for BibConvert functions to
-test a situation of different number of bytes per char).
-
-<p>The test cases should be written for most important core
-functionality.  Not every function or class in the code is to be
-throughly tested.  Common sense will tell.
-
-<p>For more information on Pythonic unit testing, see the
-documentation to the unittest module at <a
-href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>.
-For a tutorial, see for example <a
-href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>.
-
-<a name="3.2"></a><h3>3.2 Testing overall functionality (Regression Testing)</h3>
+<a name="3.1"></a><h3>3.1 Regression testing philosophy</h3>
 
 <p>In addition to the above-mentioned unit testing of important
-functions, a regression testing should ensure that the existing
-program's overall functionality is not altered by new changes.  This
-is especially important if a bug had been previously found.  Then a
-regression test case should be written to assure that it will never
-reapper.  (It also helps to scan the neighborhood of the bug, see the
+functions, a regression testing should ensure that the overall
+application functionality is behaving well and is not altered by code
+changes.  This is especially important if a bug had been previously
+found.  Then a regression test case should be written to assure that
+it will never reapper.  (It also helps to scan the neighborhood of the
+bug, or the whole codebase for occurrences of the same bug, see the
 80/20 thumb rule cited above.)
 
-<p>As an example of a regression test, we have several BibConvert
-example configurations (*.cfg) in CDS Invenio already.  For each
-configuration, we could write more or less complex input examples
-(*.dat) -- some of them are already in the distribution -- that would
-trigger a use of many or all BibConvert functionality.  In addition we
-would provide in the distribution the expected results file (*.res or
-*.out or whatever) for that particular config file and that particular
-input file.  The test suite would then simply run a shell process to
-run bibconvert with the sample configuration on the sample data and
-would compare the output to the known one.
+<p>Moreover, the regression test suite should be used when the
+functionality of the item we would like to test depends on
+extra-parametrical status, such as the database content.  Also, the
+regression framework is suitable for testing the web pages overall
+behaviour.  (In extreme programming, the regression testing is called
+<em>acceptance testing</em>, the name that evolved from previous
+<em>functionality testing</em>.)
+
+<p>Within the framework of the regression test suite, we have liberty
+to alter database content, unlike that of the unit testing framework.
+We can also simulate the web browser in order to test web
+applications.
+
+<p>As an example of a regression test, we can test whether the web
+pages are alive; whether searching for Ellis in the demo site produces
+indeed 12 records; whether searching for aoeuidhtns produces no hits
+but the box of nearest terms, and with which content; whether
+accessing the Theses collection page search prompts an Apache password
+prompt; whether the admin interface is really accessible only to
+admins or also to guests, etc.
 
 <p>For more information on regression testing, see for example <a
 href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>.
 
-<a name="3.3"></a><h3>3.3 Testing user interface pages</h3>
+<a name="3.2"></a><h3>3.2 Writing regression tests</h3>
 
-<p>Web interfaces are an important part of our application, so that we
-should possibly test the most important user interface pages too.
+<p>Regression tests are written per application (or sub-module) in
+files named like <code>websearch_regression_tests.py</code> or
+<code>websubmitadmin_regression_tests.py</code>.
 
-<p>It may be hard to test GUI stuff, though there are ways, see for
-example <a
-href="http://www.xp123.com/xplor/xp0001/index.shtml">http://www.xp123.com/xplor/xp0001/index.shtml</a>.
-In our case mod_python is very unfriendly in this direction, it's
-impossible to run code from within Emacs or command line.  But, if the
-GUI code is structured in the usual CDS Invenio way, then it may be done
-via string comparisons.  That is, for functionality like printing of a
-basket we typically have a web-seen function
-<code>print_basket()</code> that looks, schematically:
-
-FIXME: update this to the new file structure.
-FIXME: write about regression testing suite.
-<blockquote>
-<pre>
-$ cat /opt/cds-invenio/lib/python/invenio/webbasket_webinterface.py
-[...]
-from invenio.webbasketlib import perform_print_basket
-def print_basket(req, basket_name)
-     uid = getUid(req)
-     return perform_print_basket(uid, basket_name)
-[...] 
-</pre>
-</blockquote>
-
-with all the logic being done inside the library
-<code>perform_print_basket()</code>:
+<p>When writing regression tests, you can assume that the site is in
+the fresh demo mode (Atlantis Institute of Fictive Science).  You can
+also safely write not only database-read-only tests, but you can also
+safely insert/update/delete into/from the database whatever values you
+need for testing.  Users are warned prior to running the regression
+test suite about its possibly destructive side-effects. (See below.)
+Therefore you can create users, create user groups, attach users to
+groups to test the group joining process etc, as needed. 
+ 
+<p>For testing web pages using GET arguments, you can take advantage
+of the following helper function:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/webbasketlib.py
+$ cat /opt/cds-invenio/lib/python/invenio/testutils.py
 [...]
-def perform_print_basket(uid, basket_name):    
-    out = ""
-    ## function body goes here
-    return out
-[...]
+def test_web_page_content(url, username="guest", expected_text="</html>"):
+    """Test whether web page URL as seen by user USERNAME contains
+       text EXPECTED_TEXT.  Before doing the tests, login as USERNAME.
+       (E.g. interesting values are "guest" or "admin".)
+
+       Return empty list in case of problems, otherwise list of error
+       messages that may have been encountered during processing of
+       page.
+    """
 </pre>
 </blockquote>
 
-
-The latter function can run outside of Apache, it accepts `normal'
-input variables and returns `normal' text.  The function can therefore
-be easily tested via unit testing technique described above.
-
-<p>Usually, when testing GUIs, we don't want to go as far as to test
-sessions, logins, redirections and stuff.  In case it is interesting
-to automate these tests too, we could look at, for example, WebUnit
-that could be used for these purposes. <a
-href="http://webunit.sourceforge.net/">http://webunit.sourceforge.net/</a>.
-
-<a name="3.4"></a><h3>3.4 File organization</h3>
-
-<p>Each core file that is located in the lib directory (such as the
-<code>webbasketlib.py</code> in the example above) should come with a
-testing file where the test cases are stored.  The test file is to be
-named identically as the lib file it tests, but with the suffix
-<code>_tests</code> (in our example,
-<code>webbasketlib_tests.py</code>).
-
-<p>The test cases are written using Pythonic unittest TestCase class.
-An example for testing search engine query parameter washing function:
+For example you can test whether admins can access WebSearch Admin
+interface but guests cannot:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
-[...]
-import search_engine
-import unittest
+test_web_page_content(weburl + '/admin/websearch/websearchadmin.py',
+                      username='admin')
 
-class TestWashQueryParameters(unittest.TestCase):
-    """Test for washing of search query parameters."""
-
-    def test_wash_url_argument(self):
-        """search engine washing of URL arguments"""
-        self.assertEqual(1, search_engine.wash_url_argument(['1'],'int'))
-        self.assertEqual("1", search_engine.wash_url_argument(['1'],'str'))
-        self.assertEqual(['1'], search_engine.wash_url_argument(['1'],'list'))
-        self.assertEqual(0, search_engine.wash_url_argument('ellis','int'))
-        self.assertEqual("ellis", search_engine.wash_url_argument('ellis','str'))
-        self.assertEqual(["ellis"], search_engine.wash_url_argument('ellis','list'))
-        self.assertEqual(0, search_engine.wash_url_argument(['ellis'],'int'))
-        self.assertEqual("ellis", search_engine.wash_url_argument(['ellis'],'str'))
-        self.assertEqual(["ellis"], search_engine.wash_url_argument(['ellis'],'list'))
-[...] 
+test_web_page_content(weburl + '/admin/websearch/websearchadmin.py',
+                      username='guest',
+                      expected_text='Authorization failure')
 </pre>
 </blockquote>
 
-<p>In addition, each test file is supposed to define a
-<code>create_test_suite()</code> function that will return test suite
-with all the tests available in this file:
+or you can test whether searching for aoeuidhtns produces nearest
+terms box:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
-[...]
-def create_test_suite():
-    """Return test suite for the search engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,'test'),
-                               unittest.makeSuite(TestStripAccents,'test')))
-[...] 
+test_web_page_content(weburl + '/search?p=aoeuidhtns',
+                      expected_text='Nearest terms in any collection are')
 </pre>
 </blockquote>
 
-<p>This will enable us to later include this file into
-<code>testsuite</code> executable:
+<p>For testing web pages using POST argumens or for other more
+advanced testing you should use directly <code>mechanize</code> Python
+module that simulates the browser.  It can post forms, follow links,
+go back to previous pages, etc.  An example of how to test the login
+page functionality:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/source/modules/miscutil/bin/testsuite.wml
-[...]
-from invenio import search_engine_tests
-    from invenio import bibindex_engine_tests 
-
-def create_all_test_suites():
-    """Return all tests suites for all CDS Invenio modules."""
-    return unittest.TestSuite((search_engine_tests.create_test_suite(),
-                               bibindex_engine_tests.create_test_suite()))
-[...] 
+browser = mechanize.Browser()
+browser.open(sweburl + "/youraccount/login")
+browser.select_form(nr=0)
+browser['p_un'] = 'userfoo'
+browser['p_pw'] = 'passbar'
+browser.submit()
+username_account_page_body = browser.response().read()
+try:
+    string.index(username_account_page_body,
+                 "You are logged in as userfoo.")
+except ValueError:
+    self.fail('ERROR: Cannot login as userfoo.')
 </pre>
 </blockquote>
-    
-<p>In this way, all the test cases defined in the file
-<code>search_engine_tests.py</code> will be executed when the global
-<code>testcase</code> executable is called.
 
-<p>Note that it may be time-consuming to run all the tests in one go.
-If you are interested in running tests only on a certain file (say
-<code>search_engine_tests.py</code>), then launch:
+<p>For full-scale examples, you may follow
+<code>websearch_regression_tests.py<code> and other
+<code>_regression_tests.py</code> files in the source distribution.
+
+<a name="3.3"></a><h3>3.3 Running regression test suite</h3>
+
+<p>The regression test suite can be run by invoking:
 
 <blockquote>
 <pre>
-$ python /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+$ /opt/cds-invenio/bin/regressiontestsuite 
 </pre>
 </blockquote>
-    
-<p>For feature-full examples, consult the following files in the
-source distribution:
-    
-    <pre>
-    ./modules/websearch/lib/search_engine.py.wml
-    ./modules/websearch/lib/search_engine_tests.py.wml
-    ./modules/bibindex/lib/bibindex_engine.py.wml
-    ./modules/bibindex/lib/bibindex_engine_tests.py.wml
-    ./modules/miscutil/bin/testsuite.wml
-    </pre>
+
+similarly to the unit test suite.  The notable exception with the unit
+test suite is that:
+
+<ul>
+
+<li><code>regressiontestsuite</code> script assumes the site to be in
+    demo mode (Atlantis Institute of Fictive Science)
+
+<li><code>regressiontestsuite</code> can pollute the database with
+    test data as it sees fit for the regression testing purposes.
+
+</ul>
+
+Therefore beware, <strong>running regression test suite requires clean
+demo site and may destroy your data forever</strong>.  The user is
+warned about this prior to running the suite and is given a chance to
+abort the process:
+
+<blockquote>
+<pre>
+$ /opt/cds-invenio/bin/regressiontestsuite 
+regressiontestsuite: detected 19 regression test modules
+**********************************************************************
+**                                                                  **
+**  ***  I M P O R T A N T   W A R N I N G  ***                     **
+**                                                                  **
+** The regression test suite needs to be run on a clean demo site   **
+** that you can obtain by doing:                                    **
+**                                                                  **
+**    $ make drop-tables                                            **
+**    $ make create-tables                                          **
+**    $ make create-demo-site                                       **
+**    $ make load-demo-records                                      **
+**                                                                  **
+** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
+**                                                                  **
+** (In addition, due to the write nature of some of the tests,      **
+** the demo database may be altered with junk data, so that         **
+** it is recommended to rebuild the demo site anew afterwards.)     **
+**                                                                  **
+**********************************************************************
+
+Please confirm by typing "Yes, I know!": NO  
+Aborted.
+</pre>
+</blockquote>
+
+<p>If you choose to continue, the regression test suite will produce
+the output similar to the unit test suite that was discussed
+previously.
 
 <a name="4"></a><h2>4. Conclusions</h2>
 
-A uniform testing technique and a test suite for CDS Invenio is
-introduced.  Python unittest module is used for both unit testing and
-regression testing, with proper calling of external scripts.  The
-functional core code is the most obvious candidate to start the
-testing process with, but we should also remeber to test the most
-important web page elements too.  Each programmer should plan to write
-the test code alongside the core code development.  The guidelines
-were given as to how to do it in a uniform way.
+A uniform testing technique and two test suites (unit test suite,
+regression test suite) were discussed.  Each programmer should plan to
+write the test code alongside the core code development to test the
+building blocks of his/her code (unit tests) as well as the overall
+application behaviour (regression tests).  The guidelines were given
+how to do so.
 
 <a name="5"></a><h2>5. Additional information</h2>
 
@@ -379,8 +481,7 @@ were given as to how to do it in a uniform way.
 <a href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>
 <a href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>
 <a href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>
-<a href="http://www.xp123.com/xplor/xp0001/index.shtml">http://www.xp123.com/xplor/xp0001/index.shtml</a>
-<a href="http://webunit.sourceforge.net/">http://webunit.sourceforge.net/</a>
+<a href="http://wwwsearch.sourceforge.net/mechanize/">http://wwwsearch.sourceforge.net/mechanize/</a>
 </pre>
 </dl>
 
