@@ -120,8 +120,9 @@ Contents
         (in addition to Apache module) is required, too.  As of PHP
         4.3.0 you'll obtain the CLI executable by default, so you
         don't have to compile it separately.  Note that PHP CLI should
-        be compiled with the process control support (--enable-pcntl)
-        and the compression library (--with-zlib).
+        be compiled with the process control support (--enable-pcntl),
+        the XML support (--with-xml), and the compression library
+        (--with-zlib).
           <http://www.php.net/manual/en/install.commandline.php>
           <http://www.php.net/manual/en/ref.pcntl.php>
 
