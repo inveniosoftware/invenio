@@ -638,15 +638,15 @@ class FormatTest(unittest.TestCase):
 
         #use output format that has no match
         result = bibformat_engine.format_record(recID=None, of="test2", xml_record=self.xml_text_2)
-        self.assertEqual(result,"")
+        self.assertEqual(result.replace("\n", ""),"")
 
         #use output format that link to unknown template
         result = bibformat_engine.format_record(recID=None, of="test3", xml_record=self.xml_text_2)
-        self.assertEqual(result,"")
+        self.assertEqual(result.replace("\n", ""),"")
 
         #Unknown output format
         result = bibformat_engine.format_record(recID=None, of="unkno", xml_record=self.xml_text_3)
-        self.assertEqual(result,"")
+        self.assertEqual(result.replace("\n", ""),"")
 
         #Default formatting
         result = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)

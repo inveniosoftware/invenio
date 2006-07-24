@@ -180,6 +180,28 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
     template = decide_format_template(bfo, of)
 
     if template == None:
+
+        ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
+
+        # look for detailed format existence:
+        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
+        res = run_sql(query, None, 1)
+        if res:
+            # record 'recID' is formatted in 'format', so print it
+            import zlib
+            decompress = zlib.decompress
+            return "%s" % decompress(res[0][0])
+        else:
+            from invenio.search_engine import call_bibformat
+            # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
+            out_record_in_format = call_bibformat(recID, of)
+            if out_record_in_format:
+                return out_record_in_format
+                
+        ############################# END ##################################
+    
+
+        
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
                                        file='error', ln=cdslang)
         errors_.append(error)
@@ -1296,7 +1318,7 @@ def resolve_output_format_filename(code, verbose=0):
         if filename.upper() == code.upper():
             return filename
 
-    #No output format  with that name found
+    #No output format with that name found
     errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME", code)],
                                     file='error', ln=cdslang)
     if verbose == 0:
@@ -1374,7 +1396,7 @@ def get_fresh_output_format_filename(code):
             sys.exit("Output format cannot be named as %s"%code)
             
     return (filename + "." + format_output_extension, filename)
-
+    
 def clear_caches():
     """
     Clear the caches (Output Format, Format Templates and Format Elements)
