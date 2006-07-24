@@ -32,7 +32,9 @@ def highlight(text, keywords_string="", prefix_tag='<b style="color: black; back
     @param keywords_string a string with keywords separated by spaces
     @return highlighted text
     """
-
+    if keywords_string == None or keywords_string == '':
+        return text
+    
     def replace_highlight(match):
         """ replace match.group() by prefix_tag + match.group() + suffix_tag"""
         return prefix_tag + match.group() + suffix_tag

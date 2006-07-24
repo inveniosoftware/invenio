@@ -23,11 +23,12 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_imprint.py bfe_fulltext.py bfe_place.py bfe_publisher.py bfe_topbanner.py \
 	     bfe_date_rec.py bfe_keywords.py bfe_notes.py bfe_reprints.py bfe_publi_info.py \
 	     bfe_cited_by.py bfe_references.py bfe_photo_resources.py bfe_title_brief.py \
-	     bfe_additional_report_numbers.py \
+	     bfe_additional_report_numbers.py bfe_url.py \
 	     bfe_addresses.py bfe_contact.py bfe_photo_resources_brief.py \
 	     bfe_collection.py bfe_editors.py bfe_bibtex.py bfe_edit_record.py \
-	     bfe_date.py __init__.py  
+	     bfe_date.py __init__.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) bfe_test_2.py bfe_test_4.py test3.py test_5.py \
+	     test_no_element.test
 
 CLEANFILES = *~ *.tmp

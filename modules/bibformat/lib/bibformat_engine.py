@@ -1693,7 +1693,7 @@ def bf_profile():
     Runs a benchmark
     """
     for i in range(50):
-        format_record(i, "HB", ln=cdslang, verbose=9, search_pattern=None)
+        format_record(i, "HD", ln=cdslang, verbose=9, search_pattern=None)
     return 
 
 if __name__ == "__main__":   

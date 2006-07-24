@@ -22,10 +22,9 @@ def format(bfo):
     """
     HTML Affiliation display
     """
-    test = bfo.field('909C1$u')
-    affiliations = bfo.field('909C1')
-    if len(test)>0:
-        out =  "<br/>",
+    affiliations = bfo.fields('909C1u')
+    if len(affiliations) > 0:
+        out =  "<br/>"
         for affiliation in affiliations:
-            out += affiliation.get("909C1$u", "")+"       " 
+            out += affiliation +"       " 
         return out
