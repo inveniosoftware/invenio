@@ -27,6 +27,7 @@ from zlib import decompress, compress
 from invenio.dbquery import run_sql, escape_string
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
+from invenio.bibformat_engine import parse_tag
 
 class memoise:
     def __init__(self, function):
@@ -167,29 +168,49 @@ def get_citation_informations(recid_list, config):
     reference_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
     reference_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
     record_publication_info_tag = config.get(config.get("rank_method", "function"),"publication_info_tag")
-
     
-   
+    p_record_pri_number_tag = parse_tag(record_pri_number_tag)
+    p_record_add_number_tag = parse_tag(record_add_number_tag)
+    p_reference_number_tag = parse_tag(reference_number_tag)
+    p_reference_tag = parse_tag(reference_tag)
+    p_record_publication_info_tag = parse_tag(record_publication_info_tag)
+    
     for recid in recid_list:
         xml = print_record(int(recid),'xm')
         rs = create_records(xml)
         recs = map((lambda x:x[0]), rs)
         l_report_numbers = []
         for rec in recs:
-            pri_report_number = record_get_field_values(rec, record_pri_number_tag[0:3], code=record_pri_number_tag[3])
-            add_report_numbers = record_get_field_values(rec, record_add_number_tag[0:3], code=record_add_number_tag[3])
+            pri_report_number = record_get_field_values(rec, p_record_pri_number_tag[0],
+                                                        ind1=p_record_pri_number_tag[1],
+                                                        ind2=p_record_pri_number_tag[2],
+                                                        code=record_pri_number_tag[3])
+            add_report_numbers = record_get_field_values(rec, p_record_add_number_tag[0],
+                                                         ind1=p_record_add_number_tag[1],
+                                                         ind2=p_record_add_number_tag[2],
+                                                         code=record_add_number_tag[3])
             if pri_report_number:
                 l_report_numbers.extend(pri_report_number)
             if add_report_numbers:
                 l_report_numbers.extend(add_report_numbers)
             d_reports_numbers[recid] = l_report_numbers
-            reference_report_number = record_get_field_values(rec, reference_number_tag[0:3], ind1=reference_number_tag[3], ind2=reference_number_tag[4], code=reference_number_tag[5])
+            reference_report_number = record_get_field_values(rec, p_reference_number_tag[0],
+                                                              ind1=p_reference_number_tag[1],
+                                                              ind2=p_reference_number_tag[2],
+                                                              code=p_reference_number_tag[3])
             if reference_report_number:
                 d_references_report_numbers[recid] = reference_report_number
-            references_s = record_get_field_values(rec, reference_tag[0:3], ind1=reference_tag[3], ind2=reference_tag[4], code=reference_tag[5])
+            references_s = record_get_field_values(rec, p_reference_tag[0],
+                                                   ind1=p_reference_tag[1],
+                                                   ind2=p_reference_tag[2],
+                                                   code=p_reference_tag[3])
             if references_s:
                 d_references_s[recid] = references_s
-            record_s = record_get_field_values(rec, record_publication_info_tag[0:3], ind1='', ind2='', code=record_publication_info_tag[3])
+            record_s = record_get_field_values(rec,
+                                               p_record_publication_info_tag[0],
+                                               ind1=p_record_publication_info_tag[1],
+                                               ind2=p_record_publication_info_tag[2],
+                                               code=p_record_publication_info_tag[3])
             if record_s:
                 d_records_s[recid] = record_s[0]
     citation_informations.append(d_reports_numbers)
