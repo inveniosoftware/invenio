@@ -110,7 +110,9 @@
   fputs($err_fh, "--------------------------------------------------------\n");
   fputs($err_fh, "Total processed records: $count_rec\n");
   fputs($err_fh, "Total time: $total_time sec\n");
-  fputs($err_fh, "Avg. time per record: ".$total_time/$count_rec." sec\n");
+  if($count_rec>0){   
+        fputs($err_fh, "Avg. time per record: ".$total_time/$count_rec." sec\n");
+  }
   fputs($err_fh, "--------------------------------------------------------\n");
   fclose($err_fh);
 
