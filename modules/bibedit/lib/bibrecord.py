@@ -34,7 +34,13 @@ try:
 except ImportError, e:
     import_error = 1
     imperr = e
-        
+
+try:
+    import psyco
+    psycho  = 1
+except ImportError, e:
+    psycho = 0
+    
 ## test available parsers:
 try:
     import sys
@@ -161,8 +167,41 @@ def create_records(xmltext,verbose=verbose,correct=correct):
 
 def create_record(xmltext,verbose = verbose, correct=correct):
     """
-    creates a record object and returns it
-    uses pyRXP if installed else uses 4Suite domlette or xml.dom.minidom
+    Creates a record object given its XML representation and returns it.
+
+    Uses pyRXP if installed else uses 4Suite domlette or xml.dom.minidom
+
+    The returned object is a tuple (record, x, list_of_errors), where
+    x is 0 when there are errors, 1 when no errors. The record has this structure:
+    Record := {tag : [Field]}
+    Field := (Subfields, ind1, ind2, value)
+    Subfields := [(code, value)]
+
+    For example:
+                                   ______
+                                  |record|
+                                   ------
+           __________________________|____________________________________________
+           |record['001']                |record['909']           |record['520']  |
+           |                             |                        |               |
+    [list of fields]                [list of fields]       [list of fields]      ...
+           |                       ______|______________          |             
+           |[0]                   |[0]          |[1]    |         |[0]          
+        ___|_____            _____|___       ___|_____ ...    ____|____         
+       |Field 001|          |Field 909|     |Field 909|      |Field 520|       
+        ---------            ---------       ---------        ---------
+         |     __________________|______________    |             |
+        ...   |[0]            |[1]    |[2]      |  ...           ...
+              |               |       |         |
+        [list of subfields]  'C'     '4'
+           ___|_______________________________________________          
+           |                     |                            |
+    ('a', 'a value')  ('b', 'value for subfield b')     ('a', 'another value for another a')
+                                
+    @param xmltext an XML string representation of the record to create
+    @param verbose the level of verbosity: 0(silent) 1-2 (warnings) 3(strict:stop when errors)
+    @param correct 1 to enable correction on XML. Else 0.
+    @return a tuple (record, x, list_of_errors), where x is 0 where there are errors, 1 when no errors
     """
     global parser
 
@@ -196,18 +235,40 @@ def create_record(xmltext,verbose = verbose, correct=correct):
     else:
         return (rec,0,errs)
 
-
-        
 def record_get_field_instances(rec, tag="", ind1="", ind2=""):
-    """Return the list of field instances of record REC matching TAG and IND1 and IND2.
-       When TAG is an emtpy string, then return all field instances."""
+    """
+    Returns the list of field instances for the specified tag and indicators
+    of the record (rec).
+
+    Returns empty list if not found.
+    If tag is empty string, returns all fields
+    
+    Parameters (tag, ind1, ind2) can contain wildcard %.
+
+    @param rec a record structure as returned by create_record()
+    @param tag a 3 characters long string
+    @param ind1 a 1 character long string
+    @param ind2 a 1 character long string
+    @param code a 1 character long string
+    @return a list of field tuples (Subfields, ind1, ind2, value) where subfields is list of (code, value)
+    """
     out = []
     if tag:
-        if record_has_field(rec, tag):
-            for possible_field_instance in rec[tag]:
-                if possible_field_instance[1] == ind1 and \
-                   possible_field_instance[2] == ind2:
-                       out.append(possible_field_instance)
+        if '%' in tag:
+            #Wildcard in tag. Check all possible
+            for field_tag in rec.keys():
+                if tag_matches_pattern(field_tag, tag):
+                    for possible_field_instance in rec[field_tag]:
+                        if (ind1 == '%' or possible_field_instance[1] == ind1) and \
+                               (ind2 == '%' or possible_field_instance[2] == ind2):
+                            out.append(possible_field_instance)
+        else:
+            #Completely defined tag. Use dict
+            if record_has_field(rec, tag):
+                for possible_field_instance in rec[tag]:
+                    if (ind1 == '%' or possible_field_instance[1] == ind1) and \
+                           (ind2 == '%' or possible_field_instance[2] == ind2):
+                        out.append(possible_field_instance) 
     else:
         return rec.items()
     return out
@@ -238,11 +299,7 @@ def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafiel
     # detect field number to be used for insertion:
     vals=rec.values()
     if vals != []:
-        try:
-            newfield_number = 1 + max([f[4] for v in vals for f in v])
-        except ValueError:
-            # vals could have been a list of empty lists, see test_add_delete_add_field_to_empty_record()
-            newfield_number = 1
+        newfield_number = 1 + max([f[4] for v in vals for f in v])
     else:
         newfield_number = 1
 
@@ -272,76 +329,231 @@ def record_delete_field(rec,tag,ind1="",ind2=""):
             if not (field[1]==ind1 and field[2]==ind2):
                 newlist.append(field)
         rec[tag] = newlist
-        
-def record_get_field_value(rec,tag,ind1="",ind2="",code=""):
-    """
-    retrieves the value of the first field containing tag 'tag' and indicators 'ind1' and 'ind2'
-    inside record 'rec'. Returns the found value as a string. If no matching field is found
-    returns the empty string.
-    if the tag has a '%', it will retrieve the value of first field containg tag, which first characters are those before '%' in tag. The ind1, ind2 and code parameters will be ignored
-    """
 
-    s = tag.split('%')
-    if len(s) > 1:
-        t = s[0]
-        keys=rec.keys()
-        tags=[k for k in keys if k.startswith(t)]
-        for tag in tags:
-            fields = rec[tag]
-            for field in fields:
-                if field[3] != "":
-                    return field[3]
-                else:
-                    for subfield in field[0]:
-                            return subfield[1]
+def tag_matches_pattern(tag, pattern):
+    """
+    Returns true if MARC 'tag' matches a 'pattern'.
+    
+    'pattern' is plain text, with % as wildcard
+    
+    Both parameters must be 3 characters long strings.
+    
+    For e.g.
+    >> tag_matches_pattern("909", "909") == True
+    >> tag_matches_pattern("909", "9%9") == True
+    >> tag_matches_pattern("909", "9%8") == False
+    
+    @param tag a 3 characters long string
+    @param pattern a 3 characters long string
+    @return False or True
+    """
+    
+    print tag, pattern, (pattern[0] == '%' or tag[0] == pattern[0]) and \
+          (pattern[1] == '%' or tag[1] == pattern[1]) and \
+          (pattern[2] == '%' or tag[2] == pattern[2])
+    
+    return (pattern[0] == '%' or tag[0] == pattern[0]) and \
+           (pattern[1] == '%' or tag[1] == pattern[1]) and \
+           (pattern[2] == '%' or tag[2] == pattern[2])
+
+def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
+    """
+    Returns first (string) value that matches specified field (tag, ind1, ind2, code)
+    of the record (rec).
+
+    Returns empty string if not found.
+
+    Parameters (tag, ind1, ind2, code) can contain wildcard %.
+
+    Difference between wildcard % and empty '':
+    
+    - Empty char specifies that we are not interested in a field which
+      has one of the indicator(s)/subfield specified.
+
+    - Wildcard specifies that we are interested in getting the value
+      of the field whatever the indicator(s)/subfield is.
+      
+    For e.g. consider the following record in MARC:
+      100C5  $$a val1
+      555AB  $$a val2
+      555AB      val3
+      555        val4
+      555    $$a val5
+      555A       val6
+      
+      >> record_get_field_value(record, '555', 'A', '', '')
+      >> "val6"
+      >> record_get_field_value(record, '555', 'A', '%', '')
+      >> "val3"
+      >> record_get_field_value(record, '555', 'A', '%', '%')
+      >> "val2"
+      >> record_get_field_value(record, '555', 'A', 'B', '')
+      >> "val3"
+      >> record_get_field_value(record, '555', '', 'B', 'a')
+      >> ""
+      >> record_get_field_value(record, '555', '', '', 'a')
+      >> "val6"
+      >> record_get_field_value(record, '555', '', '', '')
+      >> ""
+      >> record_get_field_value(record, '%%%', '%', '%', '%')
+      >> "val1"
+
+      
+    @param rec a record structure as returned by create_record()
+    @param tag a 3 characters long string
+    @param ind1 a 1 character long string
+    @param ind2 a 1 character long string
+    @param code a 1 character long string
+    @return string value (empty if nothing found)
+    """
+    ## Note: the code is quite redundant for speed reasons (avoid calling
+    ## functions or doing tests inside loops)
+    
+    if '%' in tag:
+        #Wild card in tag. Must find all corresponding fields
+        #fields_for_tag = (rec[field_tag] for field_tag in rec.keys() if tag_matches_pattern(field_tag, tag))
+        if code == '':
+            #Code not specified. 
+            for field_tag in rec.keys():
+                if tag_matches_pattern(field_tag, tag):
+                    fields = rec[field_tag]
+                    for field in fields:
+                        if (ind1 == '%' or field[1] == ind1) and \
+                               (ind2 == '%' or field[2] == ind2):
+                            #Return matching field value if not empty
+                            if field[3] != "":
+                                return field[3]
+        elif code == '%':
+            #Code is wildcard. Take first subfield of first matching field
+            for field_tag in rec.keys():
+                if tag_matches_pattern(field_tag, tag):
+                    fields = rec[field_tag]
+                    for field in fields:
+                        if (ind1 == '%' or field[1] == ind1) and \
+                               (ind2 == '%' or field[2] == ind2) and \
+                               (len(field[0]) > 0):
+                            return field[0][0][1]
+        else:
+            #Code is specified. Take corresponding one
+            for field_tag in rec.keys():
+                if tag_matches_pattern(field_tag, tag):
+                    fields = rec[field_tag]
+                    for field in fields:
+                        if (ind1 == '%' or field[1] == ind1) and \
+                               (ind2 == '%' or field[2] == ind2):
+                            for subfield in field[0]:
+                                if subfield[0] == code:
+                                    return subfield[1]
+
     else:
+        #Tag is completely specified. Use tag as dict key
         if rec.has_key(tag):
             fields = rec[tag]
-            for field in fields:
-                if field[1]==ind1 and field[2]==ind2:
-                    if field[3] != "":
-                        return field[3]
-                    else:
-                        for subfield in field[0]:
-                            if subfield[0]==code:
-                               return subfield[1]
-      
-    return ""
+            if code == '':
+                #Code not specified. 
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        #Return matching field value if not empty
+                        #or return "" empty if not exist.
+                        if field[3] != "":
+                            return field[3]
 
-def record_get_field_values(rec,tag,ind1="",ind2="",code=""):
+            elif code == '%':
+                #Code is wildcard. Take first subfield of first matching field
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2) and \
+                           (len(field[0]) > 0):
+                        return field[0][0][1]
+            else:
+                #Code is specified. Take corresponding one
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        for subfield in field[0]:
+                            if subfield[0] == code:
+                                return subfield[1]
+    #Nothing was found 
+    return ""
+               
+def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
     """
-    retrieves the values of all the fields containing tag 'tag' and indicators 'ind1' and 'ind2'
-    inside record 'rec'. Returns the found values as a list. If no matching field is found
-    returns an empty list.
-    if the tag has a '%', it will retrieve the value of all fields containg tag, which first characters are those before '%' in tag.  The ind1, ind2 and code parameters will be ignored
+    Returns the list of (string) values for the specified field (tag, ind1, ind2, code)
+    of the record (rec).
+
+    Returns empty list if not found.
+    
+    Parameters (tag, ind1, ind2, code) can contain wildcard %.
+
+    @param rec a record structure as returned by create_record()
+    @param tag a 3 characters long string
+    @param ind1 a 1 character long string
+    @param ind2 a 1 character long string
+    @param code a 1 character long string
+    @return a list of strings
     """
     tmp = []
-
-    s = tag.split('%')
-    if len(s) > 1:
-        t = s[0]
-        keys=rec.keys()
-        tags=[k for k in keys if k.startswith(t)]
-        for tag in tags:
-            fields = rec[tag]
-            for field in fields:
-                if field[3] != "":
-                    tmp.append(field[3])
-                else:
-                    for subfield in field[0]:
+    
+    if '%' in tag:
+        # Wild card in tag. Must find all corresponding tags and fields
+        keys = rec.keys()
+        tags = [k for k in keys if tag_matches_pattern(k, tag)]
+        if code == '' :
+            #Code not specified. Consider field value (without subfields)
+            for tag in tags:
+                fields = rec[tag]
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                            tmp.append(field[3])
+        
+        elif code == '%':
+            #Code is wildcard. Consider all subfields
+            for tag in tags:
+                fields = rec[tag]
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        for subfield in field[0]:
                             tmp.append(subfield[1])
-    else:
-        if rec.has_key(tag):
-            fields = rec[tag]
-            for field in fields:
-                if field[1]==ind1 and field[2]==ind2:
-                    if field[3] != "":
-                        tmp.append(field[3])
-                    else:
+        else:
+            #Code is specified. Consider all corresponding subfields
+             for tag in tags:
+                fields = rec[tag]
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
                         for subfield in field[0]:
                             if subfield[0]==code:
                                 tmp.append(subfield[1])
-      
+    else:
+        #Tag is completely specified. Use tag as dict key
+        if rec.has_key(tag):
+            fields = rec[tag]
+            if code == '' :
+                #Code not specified. Consider field value (without subfields)
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        tmp.append(field[3])
+            elif code == '%':
+                #Code is wildcard. Consider all subfields
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        for subfield in field[0]:
+                            tmp.append(subfield[1])
+            else:
+                #Code is specified. Take corresponding one
+                for field in fields:
+                    if (ind1 == '%' or field[1] == ind1) and \
+                           (ind2 == '%' or field[2] == ind2):
+                        for subfield in field[0]:
+                            if subfield[0]==code:
+                                tmp.append(subfield[1])
+    
+    #Nothing was found 
     return tmp
 
 def print_rec(rec,format=1):
@@ -965,3 +1177,17 @@ def warnings(l):
         list.append(warning(w))
     return list
 
+
+if psycho == 1:
+    #psyco.full()
+    psyco.bind(wash)
+    psyco.bind(create_record_4suite)
+    psyco.bind(create_record_RXP)
+    psyco.bind(create_record_minidom)
+    psyco.bind(record_order_subfields)
+    psyco.bind(field_get_subfield_values)
+    psyco.bind(create_records)
+    psyco.bind(create_record)
+    psyco.bind(record_get_field_instances)
+    psyco.bind(record_get_field_value)
+    psyco.bind(record_get_field_values)
