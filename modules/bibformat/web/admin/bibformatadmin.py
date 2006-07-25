@@ -391,7 +391,7 @@ def format_templates_manage(req, ln=cdslang, checking='0'):
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 
-def format_template_show(req, bft, code=None, ln=cdslang, ln_for_preview=cdslang, pattern_for_preview="", chosen_option=""):
+def format_template_show(req, bft, code=None, ln=cdslang, ln_for_preview=cdslang, pattern_for_preview="", content_type_for_preview="text/html", chosen_option=""):
     """
     Main page for template edition. Check for authentication and print formats editor.
     
@@ -400,6 +400,8 @@ def format_template_show(req, bft, code=None, ln=cdslang, ln_for_preview=cdslang
     @param bft the name of the template to show
     @param ln_for_preview the language for the preview (for bfo)
     @param pattern_for_preview the search pattern to be used for the preview (for bfo)
+    @param content_type_for_preview the (MIME) content type of the preview
+    @param chosen_option returned value for dialog_box warning
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -441,7 +443,8 @@ def format_template_show(req, bft, code=None, ln=cdslang, ln_for_preview=cdslang
                                                           code=code,
                                                           ln=ln,
                                                           ln_for_preview=ln_preview,
-                                                          pattern_for_preview=pattern_preview),
+                                                          pattern_for_preview=pattern_preview,
+                                                          content_type_for_preview=content_type_for_preview),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -605,7 +608,10 @@ def format_template_add(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
     
-def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None, ln_for_preview=cdslang, pattern_for_preview="", save_action=None, navtrail=""):
+def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None,
+                                         ln_for_preview=cdslang, pattern_for_preview="",
+                                         content_type_for_preview='text/html',
+                                         save_action=None, navtrail=""):
     """
     Print the preview of a record with a format template. To be included inside Format template
     editor. If the save_actiom has a value, then the code should also be saved at the same time
@@ -664,14 +670,21 @@ def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None, ln_for
             
         bfo = bibformat_engine.BibFormatObject(recID, ln_for_preview, pattern_for_preview, None, getUid(req))
         (body, errors) = bibformat_engine.format_with_format_template("", bfo, verbose=7, format_template_code=code)
-        return page(title="",
-                    body=body,
-                    uid=uid,
-                    language=ln_for_preview,
-                    navtrail = navtrail,
-                    lastupdated=__lastupdated__,
-                    req=req)   
-
+        
+        if content_type_for_preview == 'text/html':
+            #Standard page display with CDS headers, etc.
+            return page(title="",
+                        body=body,
+                        uid=uid,
+                        language=ln_for_preview,
+                        navtrail = navtrail,
+                        lastupdated=__lastupdated__,
+                        req=req)
+        else:
+            #Output with chosen content-type.
+            req.content_type = content_type_for_preview
+            req.send_http_header()
+            req.write(body)
     else:
         return page_not_authorized(req=req, text=auth_msg)
 

@@ -1408,7 +1408,6 @@ def clear_caches():
     format_outputs_cache = {}
     kb_mappings_cache = {}
     
-                
 class BibFormatObject:
     """
     An object that encapsulates a record and associated methods, and that is given

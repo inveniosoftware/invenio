@@ -125,7 +125,9 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
     
     return bibformat_templates.tmpl_admin_format_templates_management(ln, sorted_format_templates)
 
-def perform_request_format_template_show(bft, ln=cdslang, code=None, ln_for_preview=cdslang, pattern_for_preview=""):
+def perform_request_format_template_show(bft, ln=cdslang, code=None,
+                                         ln_for_preview=cdslang, pattern_for_preview="",
+                                         content_type_for_preview="text/html"):
     """
     Returns the editor for format templates.
 
@@ -150,13 +152,18 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None, ln_for_prev
             pattern_for_preview = "recid:%s" % recID
 
     editable = can_write_format_template(bft)
+
+    #Look for all existing content_types
+    content_types = bibformat_dblayer.get_existing_content_types()
     
     return bibformat_templates.tmpl_admin_format_template_show(ln, format_template['attrs']['name'],
                                                                format_template['attrs']['description'],
                                                                code, bft,
                                                                ln_for_preview=ln_for_preview,
                                                                pattern_for_preview=pattern_for_preview,
-                                                               editable=editable)
+                                                               editable=editable,
+                                                               content_type_for_preview=content_type_for_preview,
+                                                               content_types=content_types)
 
 def perform_request_format_template_show_dependencies(bft, ln=cdslang):
     """

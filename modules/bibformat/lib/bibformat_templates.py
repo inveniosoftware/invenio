@@ -463,7 +463,7 @@ class Template:
         '''
         return out
     
-    def tmpl_admin_format_template_show(self, ln, name, description, code, filename, ln_for_preview, pattern_for_preview, editable):
+    def tmpl_admin_format_template_show(self, ln, name, description, code, filename, ln_for_preview, pattern_for_preview, editable, content_type_for_preview, content_types):
         """
         Returns the editor for format templates. Edit 'format'
 
@@ -551,16 +551,25 @@ class Template:
         </th>
         </tr>
         <tr><td class="admintdright">
-        <label for="ln_for_preview">Language:</label> <select id="ln_for_preview" name="ln_for_preview">
+        <label for="content_type_for_preview">Content-type (MIME):</label> <select id="content_type_for_preview" name="content_type_for_preview">
         ''' %  {'ln':ln,
                 'weburl':weburl,
                 'filename':filename,
                 'label_hide_doc':_("Hide Documentation"),
                 'code':code,
                 'readonly':readonly,
-                'disabled':disabled,
-                'ln_for_preview':ln_for_preview,
-                'pattern_for_preview':pattern_for_preview}
+                'disabled':disabled}
+
+        for content_type in content_types:
+            if content_type == content_type_for_preview:
+                out += '''<option value="%(content_type)s" selected="selected">%(content_type)s</option>''' % {'content_type':content_type}
+            else:
+                out += '''<option value="%(content_type)s">%(content_type)s</option>''' % {'content_type':content_type}
+
+        out += '''
+        </select>
+        <label for="ln_for_preview">Language:</label> <select id="ln_for_preview" name="ln_for_preview">
+        '''
         
         for lang in language_list_long():
             if lang[0] == ln_for_preview:

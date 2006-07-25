@@ -381,7 +381,7 @@ def get_output_format_description(code):
     @return output format description
     """
     
-    query = "SELECT description FROM format WHERE code='%s'"%escape_string(code)
+    query = "SELECT description FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
     if len(res)>0:
         res = res[0][0]
@@ -405,6 +405,26 @@ def set_output_format_description(code, description):
     params = (description, code.lower())
     run_sql(query, params)
 
+def get_existing_content_types():
+    """
+    Returns the list of all MIME content-types used in existing output
+    formats.
+
+    Always returns at least a list with 'text/html'
+
+    @return a list of content-type strings
+    """
+    query = "SELECT DISTINCT content_type FROM format GROUP BY content_type"
+    res = run_sql(query)
+    
+    if res != None:
+        res = [val[0] for val in res if len(val) > 0]
+        if not 'text/html' in res:
+            res.append('text/html')
+        return res
+    else:
+        return ['text/html']
+
 def get_output_format_content_type(code):
     """
     Returns the content_type of the output format given by code
@@ -414,7 +434,7 @@ def get_output_format_content_type(code):
     @param code the code of the output format to get the description from
     @return output format content_type
     """
-    query = "SELECT content_type FROM format WHERE code='%s'"%escape_string(code)
+    query = "SELECT content_type FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
     if len(res)>0:
         res = res[0][0]
