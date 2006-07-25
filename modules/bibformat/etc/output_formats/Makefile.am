@@ -19,7 +19,7 @@
 
 etcdir = $(sysconfdir)/bibformat/output_formats
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo
+etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo
 
 EXTRA_DIST = $(etc_DATA) TEST1.bfo TEST2.bfo TEST3.bfo  
 
