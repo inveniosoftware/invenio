@@ -50,6 +50,12 @@ archivesize = filedirsize
 cfg_compressed_file_extensions_sorted = cfg_compressed_file_extensions
 cfg_compressed_file_extensions_sorted.sort()
 
+def file_strip_ext(file):
+    for c_ext in cfg_known_file_extensions:
+        if file[-len(c_ext):len(file)]==c_ext and file[-len(c_ext)-1]==".":
+            file = file[0:-len(c_ext)-1]
+    return file
+			    
 class BibRecDocs:
     """this class represents all the files attached to one record"""
     def __init__(self,recid):
@@ -59,9 +65,14 @@ class BibRecDocs:
 
     def buildBibDocList(self):
         self.bibdocs = []
-        res = run_sql("select id_bibdoc,type from bibrec_bibdoc,bibdoc where id=id_bibdoc and id_bibrec=%s and status!='deleted'", (self.id,))
+        res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc where id=id_bibdoc and id_bibrec=%s", (self.id,))
         for row in res:
-                self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
+	        if row[2] == "":
+		    status = 0
+		else:
+		    status = int(row[2])
+	        if status & 1 == 0:
+                    self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
 
     def listBibDocs(self,type=""):
         tmp=[]
@@ -207,6 +218,7 @@ class BibDoc:
             self.recid = recid
             self.docname = res[0][2]
             self.id = bibdocid
+	    self.status = res[0][1]
             group = "g"+str(int(int(self.id)/archivesize))
             self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
         # else it is a new document
@@ -217,7 +229,8 @@ class BibDoc:
                 self.recid = recid
                 self.type = type
                 self.docname = docname
-                self.id = run_sql("insert into bibdoc (docname,creation_date,modification_date) values(%s,NOW(),NOW())", (docname,))
+		self.status = 0
+                self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(str(self.status),%s,NOW(),NOW())", (docname,))
                 if self.id != None:
                     #we link the document to the record if a recid was specified
                     if self.recid != "":
@@ -355,7 +368,7 @@ class BibDoc:
     def getId(self):
         """retrieve bibdoc id"""
         return self.id
-
+	
     def getFile(self,name,format,version):
         if version == "":
             docfiles = self.listLatestFiles()
@@ -375,7 +388,8 @@ class BibDoc:
 
     def delete(self):
         """delete the current bibdoc instance"""
-        run_sql("update bibdoc set status='deleted' where id=%s",(self.id,))
+	self.status = self.status | 1
+        run_sql("update bibdoc set status='" + self.status + "' where id=%s",(self.id,))
 
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
@@ -396,7 +410,7 @@ class BibDoc:
                             break
                     if fullname_extension_postition == -1:
                         # okay, no compressed extension found, so try to find last dot:
-                        fullname_extension_postition = fullname.rfind(".")
+                        fullname_extension_postition = len(file_strip_ext(fullname))
                     # okay, fullname_extension_postition should now indicate where extension starts (incl. compressed ones)
                     if fullname_extension_postition == -1:
                         fullname_basename = fullname
@@ -404,17 +418,22 @@ class BibDoc:
                     else:
                         fullname_basename = fullname[:fullname_extension_postition]
                         fullname_extension = fullname[fullname_extension_postition+1:]
-                    # we can append file:
-                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id))
+                    # we can append file:		    
+                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id,self.status))
 
     def BuildRelatedFileList(self):
-        res = run_sql("select ln.id_bibdoc2,ln.type from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s and status!='deleted'",(self.id,))
+        res = run_sql("select ln.id_bibdoc2,ln.type,bibdoc.status from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s",(self.id,))
         for row in res:
             bibdocid = row[0]
             type = row[1]
-            if not self.relatedFiles.has_key(type):
-                self.relatedFiles[type] = []
-            self.relatedFiles[type].append(BibDoc(bibdocid=bibdocid))
+	    if row[2] == "":
+	        status = 0
+	    else:
+	        status = int(row[2])
+	    if status & 1 == 0:
+                if not self.relatedFiles.has_key(type):
+                    self.relatedFiles[type] = []
+                self.relatedFiles[type].append(BibDoc(bibdocid=bibdocid))
 
     def listAllFiles(self):
         return self.docfiles
@@ -446,11 +465,12 @@ class BibDoc:
 class BibDocFile:
     """this class represents a physical file in the CDS Invenio filesystem"""
 
-    def __init__(self,fullpath,type,version,name,format,bibdocid):
+    def __init__(self,fullpath,type,version,name,format,bibdocid,status):
         self.fullpath = fullpath
         self.type = type
         self.bibdocid = bibdocid
         self.version = version
+	self.status = status
         self.size = os.path.getsize(fullpath)
         self.md = os.path.getmtime(fullpath)
         try:
@@ -486,6 +506,12 @@ class BibDocFile:
                  size = self.size,
                )
 
+    def isRestricted(self):
+        """return restriction state"""
+	if int(self.status) & 10 == 10:
+	    return 1
+	return 0
+	
     def getType(self):
         return self.type
 

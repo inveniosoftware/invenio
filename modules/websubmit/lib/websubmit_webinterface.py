@@ -78,7 +78,10 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             if filename:
                 # We know the complete file name, guess which docid it
                 # refers to
-                name, format = os.path.splitext(filename)
+		## TODO: Change the extension system according to ext.py from setlink
+		##       and have a uniform extension mechanism...
+		name = file_strip_ext(filename)
+		format = filename[len(name):]
                 if format and format[0] == '.':
                     format = format[1:]
                 
@@ -86,10 +89,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 for doc in bibarchive.listBibDocs():
                     if filename in [f.fullname for f in doc.listAllFiles()]:
                         docfile=doc.getFile(name,format,args['version'])
-                        
                         if docfile is None:
                             return warningMsg(_("Unable to find file."), req, cdsname, ln)
-
+                            
+                        if docfile.isRestricted():
+                            return warningMsg(_("This file is restricted!"), req, cdsname, ln)
+			    
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                             res = doc.registerDownload(ip, version, format, uid)
