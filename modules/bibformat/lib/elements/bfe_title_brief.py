@@ -20,9 +20,11 @@
 
 __version__ = "$Id$"
 
-def format(bfo):
+def format(bfo, highlight="no"):
     """
-    Prints a short title, suitable for brief format
+    Prints a short title, suitable for brief format.
+    
+    @param highlight highlights the words corresponding to search query if set to 'yes'
     """
     
     title = bfo.field('245.a')
@@ -35,5 +37,11 @@ def format(bfo):
     if len(edition_statement) > 0:
         out += edition_statement + " ; "
 
+    if highlight == 'yes':
+        from invenio import bibformat_utils
+        out = bibformat_utils.highlight(out, bfo.search_pattern,
+                                        prefix_tag="<span style='font-weight: bolder'>",
+                                        suffix_tag='</style>')
+   
     return out
 

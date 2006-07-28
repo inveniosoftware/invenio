@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def format(bfo, keyword_prefix, keyword_suffix, separator='; ', link='yes'):
+def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
     Display keywords of the record.
     

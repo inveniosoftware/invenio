@@ -21,7 +21,7 @@
 
 import zlib
 from invenio import bibformat_dblayer
-from invenio import bibformat_engine
+
 from invenio.config import cdslang
 
 # Functions to format a single record 
@@ -36,7 +36,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
     The function will define which format template must be applied.
 
     The record to be formatted can be specified with its ID (with 'recID' parameter) or given
-    as XML representation(with 'xml_record' parameter). 
+    as XML representation(with 'xml_record' parameter). If both are specified 'recID' is ignored.
 
     'uid' allows to grant access to some functionalities on a page depending
     on the user's priviledges. Typically use webuser.getUid(req). This uid has sense
@@ -50,7 +50,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
     @param search_pattern the context in which this record was asked to be formatted (User request in web interface)
-    @param record a record (structure as returned by BibRecord) to format
+    @param xml_record an xml string represention of the record to format
     @param uid the user id of the person who will view the formatted page (if applicable)
     @return formatted record
     """
@@ -81,11 +81,95 @@ def get_xml(recID, format='xm', decompress=zlib.decompress):
     @param recID the id of the record to retrieve
     @return the xml string of the record
     """
-
-    return bibformat_engine.get_xml(recID=recID, format=format)
+    from invenio import bibformat_utils
+    return bibformat_utils.get_xml(recID=recID, format=format)
 
 # Helper functions to do complex formatting of multiple records
 ##
+
+def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_records=None, uid=None,
+                   prefix=None, separator=None, suffix=None, req=None):
+    """
+    Returns a list of formatted records given by a list of record IDs or a list of records as xml.
+    Adds a prefix before each record, a suffix after each record, plus a separator between records.
+
+    You can either specify a list of record IDs to format, or a list of xml records,
+    but not both (if both are specified recIDs is ignored).
+    
+    'separator' is a function that returns a string as separator between records.
+    The function must take an integer as unique parameter, which is the index
+    in recIDs (or xml_records) of the record that has just been formatted. For example
+    separator(i) must return the separator between recID[i] and recID[i+1].
+    Alternatively separator can be a single string, which will be used to separate
+    all formatted records.
+
+    'req' is an optional parameter on which the result of the function
+    are printed lively (prints records after records) if it is given.
+    
+    This function takes the same parameters as 'format_record' except for:
+    @param recIDs a list of record IDs
+    @param xml_records a list of xml string representions of the records to format
+    @param header a string printed before all formatted records
+    @param separator either a string or a function that returns string to separate formatted records
+    @param req an optional request object where to print records
+    """
+    formatted_records = ''
+
+    #Fill one of the lists with Nones
+    if xml_records != None:
+        recIDs = map(lambda x:None, xml_records)
+    else:
+        xml_records = map(lambda x:None, recIDs)
+    
+    total_rec = len(recIDs)
+    last_iteration = False
+    for i in range(total_rec):
+        if i == total_rec - 1:
+            last_iteration = True
+       
+        #Print prefix
+        if prefix != None:
+            if isinstance(prefix, str):
+                formatted_records += prefix
+                if req != None:
+                    req.write(prefix)
+            else:
+                string_prefix = prefix(i)
+                formatted_records += string_prefix
+                if req != None:
+                    req.write(string_prefix)
+
+        #Print formatted record
+        formatted_record = format_record(recIDs[i], of, ln, verbose, search_pattern, xml_records[i], uid)
+        formatted_records += formatted_record
+        if req != None:
+            req.write(formatted_record)
+            
+        #Print suffix
+        if suffix != None:
+            if isinstance(suffix, str):
+                formatted_records += suffix
+                if req != None:
+                    req.write(suffix)
+            else:
+                string_suffix = suffix(i)
+                formatted_records += string_suffix
+                if req != None:
+                    req.write(string_suffix)
+                
+        #Print separator if needed
+        if separator != None and not last_iteration:
+            if isinstance(separator, str):
+                formatted_records += separator
+                if req != None:
+                    req.write(separator)
+            else:
+                string_separator = separator(i)
+                formatted_records += string_separator
+                if req != None:
+                    req.write(string_separator)
+  
+    return formatted_records
 
 def create_Excel(recIDs):
     """
@@ -113,8 +197,7 @@ def get_output_format_content_type(of):
 
     return content_type
 
-def encode_for_xml(s):
-    "Encode special chars in string so that it would be XML-compliant."
-    s = s.replace('&', '&amp;')
-    s = s.replace('<', '&lt;')
-    return s
+#Import at the end to avoid recursive import
+#problems due to call to search_engine in
+#bibformat_engine for backward compatibility
+from invenio import bibformat_engine

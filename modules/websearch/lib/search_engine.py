@@ -2285,10 +2285,13 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_record_list_for_similarity_boxen(req, title, recID_score_list, ln=cdslang):
+def print_record_list_for_similarity_boxen(req, title, recID_score_list, ln=cdslang, search_pattern=''):
     """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
     FIXME: templatize.
     """
+    # get user id (for formatting based on priviledge)
+    uid = getUid(req)
+    
     recID_score_list_to_be_printed = []
     # firstly find 5 first public records to print:
     nb_records_to_be_printed = 0
@@ -2307,19 +2310,22 @@ def print_record_list_for_similarity_boxen(req, title, recID_score_list, ln=cdsl
         req.write("""<td><tr><td><table>""")
         for (recID, score) in recID_score_list_to_be_printed:
             req.write("""<tr><td><font class="rankscoreinfo"><a>(%s)&nbsp;</a></font><small>&nbsp;%s</small></td></tr>""" % \
-                      (score,print_record(recID, format="hs", ln=ln)))
+                      (score,print_record(recID, format="hs", ln=ln, search_pattern=search_pattern, uid=uid)))
         req.write("""</table></small></td></tr></table> """)
     return
                               
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress):
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern=''):
     """Prints list of records 'recIDs' formatted accoding to 'format' in groups of 'rg' starting from 'jrec'.
     Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
     A value of 'rg=-9999' means to print all records: to be used with care.
     Print also list of RELEVANCES for each record (if defined), in between RELEVANCE_PROLOGUE and RELEVANCE_EPILOGUE.
     """
-
+    
     # load the right message language
     _ = gettext_set_language(ln)
+    
+    # get user id (for formatting based on priviledge)
+    uid = getUid(req)
 
     # sanity checking:
     if req == None:
@@ -2350,12 +2356,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
         if format.startswith('x'):
             # we are doing XML output:
             for irec in range(irec_max,irec_min,-1):
-                req.write(print_record(recIDs[irec], format, ot, ln))
+                req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid))
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
             for irec in range(irec_max,irec_min,-1):
-                x = print_record(recIDs[irec], format, ot, ln)
+                x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid)
                 req.write(x)
                 if x:
                     req.write('\n')
@@ -2364,7 +2370,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 # portfolio and on-the-fly formats:
                 for irec in range(irec_max,irec_min,-1):
-                    req.write(print_record(recIDs[irec], format, ot, ln))
+                    req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid))
             elif format.startswith("hb"):
                 # HTML brief format:
                 rows = []
@@ -2377,7 +2383,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         temp['relevance'] = relevances[irec]
                     else:
                         temp['relevance'] = ''
-                    temp['record'] = print_record(recIDs[irec], format, ot, ln)
+                    temp['record'] = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid)
                     rows.append(temp)
                 req.write(websearch_templates.tmpl_records_format_htmlbrief(
                            ln = ln,
@@ -2393,7 +2399,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 rows = []
                 for irec in range(irec_max,irec_min,-1):
                     temp = {
-                             'record'      : print_record(recIDs[irec], format, ot, ln),
+                             'record'      : print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid),
                              'recid'       : recIDs[irec],
                              'creationdate': '',
                              'modifydate'  : '',
@@ -2441,9 +2447,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     else:
         print_warning(req, _("Use different search terms."))
 
-def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress):
+def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
+                 search_pattern=None, uid=None):
     "Prints record 'recID' formatted accoding to 'format'."
-
     _ = gettext_set_language(ln)
 
     out = ""
@@ -2604,7 +2610,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += "%s" % decompress(res[0][0])
             else:
                 # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
-                out_record_in_format = call_bibformat(recID, format)
+                out_record_in_format = call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
                 if out_record_in_format:
                     out += out_record_in_format
                 else:
@@ -2619,14 +2625,14 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         if record_exist_p == -1:
             out += _("The record has been deleted.")
         else:
-            out += call_bibformat(recID, format)
+            out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
 
     elif format.startswith("hx"):
         # BibTeX format, called on the fly:
         if record_exist_p == -1:
             out += _("The record has been deleted.")
         else:
-            out += call_bibformat(recID, format)
+            out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
         
     elif format.startswith("hs"):
         # for citation/download similarity navigation links:        
@@ -2687,7 +2693,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             else:
                 # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
                 if cfg_call_bibformat:
-                    out_record_in_format = call_bibformat(recID, format)
+                    out_record_in_format = call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
                     if out_record_in_format:
                         out += out_record_in_format
                     else:
@@ -2726,7 +2732,7 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
-def call_bibformat(recID, format="HD"):
+def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None):
     """Calls BibFormat for the record RECID in the desired output format FORMAT.
        This function is mainly used to display all but brief formats, if they are
        not stored in the 'bibfmt' table.
@@ -2736,23 +2742,27 @@ def call_bibformat(recID, format="HD"):
        FMT $g, as is suitable for prestoring output formats, we
        perform un-XML-izing here in order to return HTML body only.
     """
-    out = ""
-    pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
-    pipe_input.write(print_record(recID, "xm"))
-    pipe_input.close()
-    bibformat_output = pipe_output.read()
-    pipe_output.close()
-    pipe_error.close()
-    if bibformat_output.startswith("<record>"):
-        dom = minidom.parseString(bibformat_output)
-        for e in dom.getElementsByTagName('subfield'):
-            if e.getAttribute('code') == 'g':
-                for t in e.childNodes:
-                    out += t.data.encode('utf-8')
+    if use_old_bibformat:
+        out = ""
+        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
+        #pipe_input.write(print_record(recID, "xm"))
+        pipe_input.write(get_xml(recID, "xm"))
+        pipe_input.close()
+        bibformat_output = pipe_output.read()
+        pipe_output.close()
+        pipe_error.close()
+        if bibformat_output.startswith("<record>"):
+            dom = minidom.parseString(bibformat_output)
+            for e in dom.getElementsByTagName('subfield'):
+                if e.getAttribute('code') == 'g':
+                    for t in e.childNodes:
+                        out += t.data.encode('utf-8')
+        else:
+            out = bibformat_output
+        return out
     else:
-        out = bibformat_output
-    return out
-
+        return format_record(recID, of=format, ln=ln, search_pattern=search_pattern, uid=uid)
+            
 def log_query(hostname, query_args, uid=-1):
     """Log query into the query and user_query tables."""
     if uid > 0:
@@ -2981,7 +2991,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                for internationalization.
 
     """
-
+    
     # wash all arguments requiring special care
     (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
 
@@ -3036,7 +3046,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         if record_exists(recid):
             if recidb<=recid: # sanity check
                 recidb=recid+1
-            print_records(req, range(recid,recidb), -1, -9999, of, ot, ln)            
+            print_records(req, range(recid,recidb), -1, -9999, of, ot, ln, search_pattern=p)            
             if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                 register_page_view_event(recid, uid, client_ip_address)
@@ -3088,7 +3098,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                                                 d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
                     print_warning(req, results_similar_comments)
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
-                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue)
+                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p)
                 elif of=="id":
                     return results_similar_recIDs
             else:
@@ -3125,7 +3135,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
-                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln)
+                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p)
                 elif of=="id":
                     return results_cocited_recIDs
             else:
@@ -3328,7 +3338,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                             print_warning(req, results_final_relevances_prologue)
                             print_warning(req, results_final_relevances_epilogue)
                     print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
-                                  results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue)
+                                  results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, search_pattern=p)
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
@@ -3496,3 +3506,17 @@ def profile(p="", f="", c=cdsname):
 ## profiling:
 #profile("of the this")
 #print perform_request_search(p="ellis")
+
+
+#Import bibformat here as bibformat uses some methods of search_engine
+#(Recursive import)
+use_old_bibformat = True
+from invenio.bibformat import get_xml
+try:
+    from invenio.bibformat_migration_kit_assistant_lib import use_old_bibformat
+    use_old_bibformat = use_old_bibformat()
+    if use_old_bibformat == False:
+        from invenio.bibformat_engine import format_record, get_output_format_content_type
+        from invenio.bibformat_dblayer import get_output_format_content_type
+except:
+    pass 

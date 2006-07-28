@@ -142,7 +142,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
 
     #Either use code being edited, or the original code inside template
     if code == None:
-        code = format_template['code'].replace('%%','%') #.replace("<","&lt;").replace(">","/&gt;").replace("&","&amp;")
+        code = format_template['code']#.replace('%%','%') #.replace("<","&lt;").replace(">","/&gt;").replace("&","&amp;")
 
     #Build a default pattern if it is empty
     if pattern_for_preview == "":

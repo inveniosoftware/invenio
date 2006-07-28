@@ -1,7 +1,4 @@
 <name>MARC XML</name>
 <description>Standard MARC XML output</description>
-<?xml version="1.0" encoding="UTF-8"?>
-<collection xmlns="http://www.loc.gov/MARC21/slim">
 <BFE_XML_RECORD type='xm' encodeForXML='no'/>
-</collection>
     

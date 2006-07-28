@@ -18,11 +18,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-def format(bfo, separator=" "):
+def format(bfo, separator=" ", highlight='no'):
     """
-    Prints the title of a record.
+    Prints the titles of a record.
 
     @param separator separator between the different titles
+    @param highlight highlights the words corresponding to search query if set to 'yes'
     """
     titles = []
    
@@ -43,6 +44,10 @@ def format(bfo, separator=" "):
     if len(title) > 0:
         titles.append( title )
 
+    if highlight == 'yes':
+        from invenio import bibformat_utils
+        titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
+        
     return separator.join(titles)
 
 

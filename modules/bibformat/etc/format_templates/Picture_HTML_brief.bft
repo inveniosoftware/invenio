@@ -5,12 +5,14 @@
 <table width="90%">
 <tr> 
 <td valign="top" align="left">
-<BFE_TITLE_BRIEF prefix="<b>" suffix="</b>"/>
+<BFE_TITLE_BRIEF prefix="<b>" suffix="</b>" highlight="no"/>
 <BFE_FIELD tag="246_1$a" prefix="<br/><b><i>" suffix="</i></b>"/>
 
 <BFE_DATE prefix="<br/> " />
 
-<BFE_ABSTRACT limit="1" prefix="<p><i>Abstract</i>: " suffix="</p>"/>
+<BFE_ABSTRACT limit="1" prefix='<p>' prefix_en="<i>Abstract</i>: "  
+prefix_fr="<br/><i>Résumé</i>: " suffix="</p>"
+highlight="no"/>
 
 <BFE_KEYWORDS separator=", " prefix="<br/> <i>Keyword</i>: "/>
 

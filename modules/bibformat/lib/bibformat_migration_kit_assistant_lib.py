@@ -26,8 +26,6 @@ import os
 from invenio.config import cdslang, weburl, etcdir
 from invenio.urlutils import wash_url_argument
 from invenio.messages import gettext_set_language, wash_language
-from invenio import bibformat_migration_kit
-from invenio.bibformatadminlib import can_write_etc_bibformat_dir
 from invenio.errorlib import get_msgs_for_code_list
 
 import invenio.template
@@ -182,3 +180,6 @@ def use_old_bibformat():
         return True
     else:
         return False
+
+from invenio import bibformat_migration_kit
+from invenio.bibformatadminlib import can_write_etc_bibformat_dir

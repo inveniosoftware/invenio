@@ -20,10 +20,48 @@
 
 def format(bfo):
     """
-    Displays publication information
+    Displays inline publication information with html link to ejournal
+    (when available).
     """
+    from urllib import quote
+    
+    out = ''
+    
     publication_info = bfo.field('909C4')
-    return publication_info  
+    if publication_info == "":
+        return ""
+
+    journal = bfo.kb('ejournals', publication_info.get('p'))
+    volume = publication_info.get('v')
+    year = publication_info.get('y')
+    number = publication_info.get('n')
+    pages = publication_info.get('c')
+
+    if journal != '' and volume != None:
+        out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
+        out += quote(publication_info.get('p'))
+        out += '&amp;volume=' + volume
+        out += '&amp;year=' + year
+        out += '&amp;page='
+        page = pages.split('-')# get first page from range
+        if len(page) > 0:
+            out += page[0]
+        out += '">%(journal)s :%(volume)s %(year)s %(page)s</a>'%{'journal': journal,
+                                                                  'volume': volume,
+                                                                  'year': year,
+                                                                  'page': pages}
+    else:
+        out += publication_info.get('p') + ': '
+        if volume != None:
+            out +=  volume 
+        if year != None:
+            out += ' (' + year + ') '
+        if number != None:
+            out += 'no. ' + number + ', '
+        if pages != None:
+            out += 'pp. ' + pages
+         
+    return out
       
 
 

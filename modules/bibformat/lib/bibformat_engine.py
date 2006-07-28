@@ -24,15 +24,12 @@ import sys
 import os
 import inspect
 import traceback
-import zlib
 
 from invenio.errorlib import register_errors, get_msgs_for_code_list
 from invenio.config import *
-from invenio.search_engine import record_exists, get_fieldvalues, get_modification_date, get_creation_date, encode_for_xml
 from invenio.bibrecord import create_record, record_get_field_instances, record_get_field_value, record_get_field_values
 from invenio.dbquery import run_sql
-from invenio.messages import language_list_long
-
+from invenio.messages import language_list_long, wash_language
 from invenio import bibformat_dblayer
 from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path, elements_import_path
 
@@ -161,7 +158,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
     @return formatted record
     """
     errors_ = []
-   
+    
     #Test record existence
     if xml_record == None and record_exists(recID) == 0:
         #Record does not exist
@@ -381,7 +378,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         #execute function with given parameters and return result.
         output_text = ""
         function = format_element['code']
-        
+        output_text = apply(function, (), params)
         try:
             output_text = apply(function, (), params)
         except Exception, e:
@@ -611,9 +608,6 @@ def get_format_template(filename, with_attributes=False):
     if 'with_attributes' is True, returns the name and description. Else 'attrs' is not
     returned as key in dictionary (it might, if it has already been loaded previously)
 
-    Caution: the code of the template has all % chars escaped as %%
-    (beause we use python formatting capabilites)
-    
     {'code':"<b>Some template code</b>"
      'attrs': {'name': "a name", 'description': "a description"}
     }
@@ -649,7 +643,6 @@ def get_format_template(filename, with_attributes=False):
         code = pattern_format_template_desc.sub("", code_and_description)
         
         # Escape % chars in code (because we will use python formatting capabilities)
-        code = code.replace('%','%%')   
         format_template['code'] = code
 
     except Exception, e:
@@ -1407,7 +1400,11 @@ def clear_caches():
     format_elements_cache = {}
     format_outputs_cache = {}
     kb_mappings_cache = {}
-    
+
+
+from bibformat_utils import get_xml
+from invenio.search_engine import record_exists, get_fieldvalues
+
 class BibFormatObject:
     """
     An object that encapsulates a record and associated methods, and that is given
@@ -1456,8 +1453,9 @@ class BibFormatObject:
             #If record is given as parameter
             self.record = create_record(xml_record)[0]
             recID = record_get_field_value(self.record,"001")
-            
-        self.lang = ln
+
+        
+        self.lang = wash_language(ln)
         self.search_pattern = search_pattern
         self.recID = recID
         self.uid = uid
@@ -1561,154 +1559,16 @@ class BibFormatObject:
         @param string the string we want to translate
         @param default a default value returned if 'string' not found in 'kb'
         """
-        return get_kb_mapping(kb, string, default)
+        if string == None:
+            return default
+        
+        val = get_kb_mapping(kb, string, default)
 
-
-def get_xml(recID, format='xm', decompress=zlib.decompress):
-    """
-    Returns an XML string of the record given by recID.
-
-    The function builds the XML directly from the database,
-    without using the standard formatting process.
-
-    'format' allows to define the flavour of XML:
-        - 'xm' for standard XML
-        - 'marcxml' for MARC XML 
-        - 'oai_dc' for OAI Dublin Core
-        - 'xd' for XML Dublin Core
-
-    If record does not exist, returns empty string.
-
-    @param recID the id of the record to retrieve
-    @return the xml string of the record
-    """
-    #_ = gettext_set_language(ln)
-
-    out = ""
-
-    # sanity check:
-    record_exist_p = record_exists(recID)
-    if record_exist_p == 0: # doesn't exist
-        return out
-
-    # print record opening tags, if needed:
-    if format == "marcxml" or format == "oai_dc":
-        out += "  <record>\n"
-        out += "   <header>\n"
-        for id in get_fieldvalues(recID, cfg_oai_id_field):
-            out += "    <identifier>%s</identifier>\n" % id
-        out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
-        out += "   </header>\n"
-        out += "   <metadata>\n"
-
-    if format.startswith("xm") or format == "marcxml":
-        # look for detailed format existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-        res = run_sql(query, None, 1)
-        if res and record_exist_p == 1:
-            # record 'recID' is formatted in 'format', so print it
-            out += "%s" % decompress(res[0][0])
+        if val == None:
+            return default
         else:
-            # record 'recID' is not formatted in 'format' -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
-            if format == "marcxml":
-                out += """    <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
-                out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
-            elif format.startswith("xm"):
-                out += """    <record>\n"""
-                out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
-            if record_exist_p == -1:
-                # deleted record, so display only OAI ID and 980:
-                oai_ids = get_fieldvalues(recID, cfg_oaiidtag)
-                if oai_ids:
-                    out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
-                           (cfg_oaiidtag[0:3], cfg_oaiidtag[3:4], cfg_oaiidtag[4:5], cfg_oaiidtag[5:6], oai_ids[0])
-                out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
-            else:
-                for digit1 in range(0, 10):
-                    for digit2 in range(0, 10):
-                        bx = "bib%d%dx" % (digit1, digit2)
-                        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-                        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                                "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
-                        res = run_sql(query)
-                        field_number_old = -999
-                        field_old = ""
-                        for row in res:
-                            field, value, field_number = row[0], row[1], row[2]
-                            ind1, ind2 = field[3], field[4]
-                            if ind1 == "_":
-                                ind1 = ""
-                            if ind2 == "_":
-                                ind2 = ""
-                            # print field tag
-                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                                if format.startswith("xm") or format == "marcxml":
-
-                                    fieldid = encode_for_xml(field[0:3])
-
-                                    if field_number_old != -999:
-                                        out += """        </datafield>\n"""
-
-                                    out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
-                                           (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
-
-                                field_number_old = field_number
-                                field_old = field
-                            # print subfield value
-                            if format.startswith("xm") or format == "marcxml":
-                                value = encode_for_xml(value)
-                                out += """            <subfield code="%s">%s</subfield>\n""" % (encode_for_xml(field[-1:]), value)
-
-                        # all fields/subfields printed in this run, so close the tag:
-                        if (format.startswith("xm") or format == "marcxml") and field_number_old != -999:
-                            out += """        </datafield>\n"""
-            # we are at the end of printing the record:
-            if format.startswith("xm") or format == "marcxml":
-                out += "    </record>\n"
-
-    elif format == "xd" or format == "oai_dc":
-        # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-        out += """    <dc xmlns="http://purl.org/dc/elements/1.1/"
-                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                         xsi:schemaLocation="http://purl.org/dc/elements/1.1/
-                                             http://www.openarchives.org/OAI/1.1/dc.xsd">\n"""
-        if record_exist_p == -1:
-            out += ""
-        else:
-            for f in get_fieldvalues(recID, "041__a"):
-                out += "        <language>%s</language>\n" % f
-
-            for f in get_fieldvalues(recID, "100__a"):
-                out += "        <creator>%s</creator>\n" % encode_for_xml(f)
-
-            for f in get_fieldvalues(recID, "700__a"):
-                out += "        <creator>%s</creator>\n" % encode_for_xml(f)
-
-            for f in get_fieldvalues(recID, "245__a"):
-                out += "        <title>%s</title>\n" % encode_for_xml(f)
-
-            for f in get_fieldvalues(recID, "65017a"):
-                out += "        <subject>%s</subject>\n" % encode_for_xml(f)
-
-            for f in get_fieldvalues(recID, "8564_u"):
-                out += "        <identifier>%s</identifier>\n" % encode_for_xml(f)
-
-            for f in get_fieldvalues(recID, "520__a"):
-                out += "        <description>%s</description>\n" % encode_for_xml(f)
-
-            out += "        <date>%s</date>\n" % get_creation_date(recID)
-        out += "    </dc>\n"
-
-  
-    # print record closing tags, if needed:
-    if format == "marcxml" or format == "oai_dc":
-        out += "   </metadata>\n"
-        out += "  </record>\n"
-
-    return out
-
-
+            return val
+        
 def bf_profile():
     """
     Runs a benchmark

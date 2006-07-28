@@ -30,10 +30,9 @@ from invenio.errorlib import *
 from invenio.config import *
 from invenio.bibformat_dblayer import *
 from invenio.bibformat_migration_kit_dblayer import *
-from invenio.bibformat_engine import get_fresh_format_template_filename, get_fresh_output_format_filename
+
 from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path
-from invenio import bibformatadminlib
-from invenio.bibformatadminlib import add_kb_mapping, get_kb_name, update_kb_attributes
+
 #from invenio.bibformat_migration_kit.bibformat_yacc import translate_format #TEMP DISABLED FIXME
 
 #Regular expression for finding attribute in format_exist function in old behaviours
@@ -318,8 +317,15 @@ def format(bfo, a_parameter="a default value"):
     
     return '<span style="color: red;">Formats Migrated with some problems.</span> Please check manually'
 
+
+from invenio.bibformat_engine import get_fresh_format_template_filename, get_fresh_output_format_filename
+from invenio import bibformatadminlib
+from invenio.bibformatadminlib import add_kb_mapping, get_kb_name, update_kb_attributes
+
 if __name__ == "__main__":
     adapt_tables()
     migrate_behaviours()
     migrate_kbs()
     migrate_formats()
+
+
