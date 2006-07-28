@@ -3511,7 +3511,7 @@ def profile(p="", f="", c=cdsname):
 #Import bibformat here as bibformat uses some methods of search_engine
 #(Recursive import)
 use_old_bibformat = True
-from invenio.bibformat import get_xml
+from invenio.bibformat_utils import get_xml
 try:
     from invenio.bibformat_migration_kit_assistant_lib import use_old_bibformat
     use_old_bibformat = use_old_bibformat()
