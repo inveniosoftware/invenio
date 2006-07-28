@@ -556,8 +556,8 @@ class Template:
                 avg_score_img = "stars-0-0.png"
             ranking_average = '<br /><b>'
             ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
-                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
-                 'x_nb_reviews': total_nb_comments}
+                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + str(avg_score) + '" />',
+                 'x_nb_reviews': str(total_nb_comments)}
             ranking_average += '<br />'
         else:
             ranking_average = ""
