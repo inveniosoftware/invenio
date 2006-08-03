@@ -20,9 +20,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 try:
-    import sys, re, string, time
+    import sys, re, string
     import os, getopt, cgi
     from cStringIO import StringIO
+    from time import mktime, localtime
     from invenio.refextract_config import *
 except ImportError, e:
     raise ImportError(e)
@@ -77,7 +78,7 @@ class ReferenceSection:
                 return item
             except IndexError:
                 raise StopIteration
-    def __init__(self, refLineStrings = []):
+    def __init__(self, refLineStrings=None):
         """Initialise a ReferenceSection object with the lines composing the references of a document. If a string argument
            is supplied, it will be appended as the first reference line. If a list argument is supplied, each element of the list
            that contains a string will be appended to the list of reference lines in order. Arguments of neither String or
@@ -85,6 +86,8 @@ class ReferenceSection:
         """
         self._referenceLines = []
         self._lnPtr = 0
+        if refLineStrings is None:
+            refLineStrings = []
         if type(refLineStrings) is list:
             for line in refLineStrings:
                 self.addNewLine(line)
@@ -140,6 +143,11 @@ class ReferenceSection:
         """Return the ReferenceLine at the line number supplied (1..n) Returns 'None' object if line number does not exist"""
         if self.lineExists(lNum-1): return self._referenceLines[lNum-1]
         else: return None
+    def getSelfMARCXML(self):
+        out = ""
+        for x in self._referenceLines:
+            out += x.getSelfMARCXML()
+        return out
     def displayAllLines(self):
         """Display all ReferenceLine objects stored within a ReferenceSection object consecutively as Strings on the standard output stream"""
         for x in self._referenceLines: x.display()
@@ -191,6 +199,11 @@ class ReferenceLine:
     def getContent(self):
         """Return a String version of a ReferenceLine's contents"""
         return self._content
+    def getSelfMARCXML(self):
+        out = """   <datafield tag="999" ind1="C" ind2="7">
+      <subfield code="f">%(rawline)s</subfield>
+   </datafield>\n""" % { 'rawline' : self._content }
+        return out
     def display(self):
         """Display a ReferenceLine as a String on the standard output stream"""
         print self._content.encode("utf-8")
@@ -216,38 +229,45 @@ class ReferenceLine:
         else:
             return False
 
+
 class ReferenceSectionDisplayer:
-    def display(self, refsect, recid=None, myostream=sys.stdout):
-        if isinstance(refsect, ReferenceSection):
-            myostream.write("%s" % (self._rawReferebcesToString(refsect,recid).encode("utf-8"),))
-            myostream.flush()
-        elif isinstance(refsect, ProcessedReferenceSection):
-            myostream.write("%s" % (self._processedReferebcesToMARCXMLString(refsect,recid).encode("utf-8"),))
-            myostream.flush()
-    def _rawReferebcesToString(self,refsect,recid=None):
-        refstr = u""
-        if not refsect.isEmpty():
-            # Section Header
-            refstr += u"#################### START REFERENCE SECTION "
-            if recid is not None:
-                refstr += u"SYSID: '%s' " % (recid,)
-            refstr += u"####################\n"
-            for x in refsect:
-                refstr +=  x.getContent()+u"\n"
-            # Section Footer
-            refstr += u"#################### END REFERENCE SECTION ####################\n"
-        return refstr
-    def _processedReferebcesToMARCXMLString(self,refsect,recid=None):
-        refsectmainbody = refsect.getSelfMARCXML()
-        if len(refsectmainbody.strip()) > 0:
-            out = u""" <record>\n"""
-            if recid is not None and (type(recid) is unicode or type(recid) is str):
-                out += u"""  <controlfield tag="001">"""+cgi.escape(recid)+u"""</controlfield>\n"""
-            out += refsectmainbody
-            out += u""" </record>\n"""
-        else:
-            out = u""
-        return out
+    def display(self, extraction_status, cnt_misc, cnt_preprintref, cnt_journalref, cnt_urlref, processed_refsect,\
+                raw_refsect, recid=None, myostream=sys.stdout):
+        ## sanity checking:
+        ## begin display:
+        out =  u""" <record>\n"""
+        if recid is not None and (type(recid) is unicode or type(recid) is str):
+            out += u"""   <controlfield tag="001">""" + cgi.escape(recid) + u"""</controlfield>\n"""
+
+        ## 999C5 (processed references):
+        references = processed_refsect.getSelfMARCXML()
+        if len(references.strip()) > 0:
+            out += references
+
+        ## add the 999C6 status subfields:
+        out += u"""   <datafield tag="999" ind1="C" ind2="6">
+      <subfield code="a">%(version)s-%(timestamp)s-%(status)s-%(preprintref)s-%(journalref)s-%(urlref)s-%(misc)s</subfield>
+   </datafield>\n""" % { 'version'     : cfg_refextract_version,
+                         'timestamp'   : str(int(mktime(localtime()))),
+                         'status'      : extraction_status,
+                         'preprintref' : cnt_preprintref,
+                         'journalref'  : cnt_journalref,
+                         'urlref'      : cnt_urlref,
+                         'misc'        : cnt_misc,
+                       }
+
+        ## 999C& (raw references)
+        references = raw_refsect.getSelfMARCXML()
+        if len(references.strip()) > 0:
+            out += references
+
+        ## close record
+        out += u""" </record>\n"""
+
+        myostream.write("%s" % (out.encode("utf-8"),))
+        myostream.flush()
+        return
+
 
 class RegexWordSpacer:
     """Concrete Class. Adds optional regex space matchers and quantifiers (\s*?) between the characters of a word. Useful because sometimes
@@ -2570,7 +2590,7 @@ class ReferenceSectionMarkupProcessor:
             found_urlstr = {}
             found_urldescstr = {}
             foundItem = False
-            if foundItem: citationMatch=True
+            if foundItem: citationMatch = True
             # Preliminary line cleaning: transform bad accents, clean punctuation & remove dbl-spaces
             tmpLine = self._accentTransformer.processLine(tmpLine)
             tmpLine = self._lineCleaner.clean(tmpLine)
@@ -2582,10 +2602,10 @@ class ReferenceSectionMarkupProcessor:
             tmpLine2 = self._punctuationStripper.strip(tmpLine2) # Strip punctuation
             (removedSpaces,tmpLine2) = self._multispaceRemover.recordRemove(tmpLine2) # remove multispace & record their positions
             (found_pp_len, found_pp_rep_str, tmpLine2, foundItem) = self._instlist.identifyPreprintReferences(tmpLine2)
-            if foundItem: citationMatch=True
+            if foundItem: citationMatch = True
             # find_nonstandard_titles
             (found_title_len,found_title_txt,tmpLine2,foundItem) = self._titleslist.findPeriodicalTitles(tmpLine2)
-            if foundItem: citationMatch=True
+            if foundItem: citationMatch = True
             # If there is an IBID in the line, do a 2nd pass to try to catch it & identify its meaning
             if tmpLine2.upper().find(u"IBID") != -1:
                 # Record/remove IBID(s) in line
@@ -2634,6 +2654,11 @@ class TitleCitation(Citation):
         self._page = pg
         self._volume = vol
         self._yr = yr
+    def is_complete_citation(self):
+        if None not in (self._title, self._volume, self._yr, self._page):
+            return 1
+        else:
+            return 0
     def getSelfMARCXML(self):
         out = u"""   <datafield tag="999" ind1="C" ind2="5">\n"""
         if self._misc is not None and (type(self._misc) is unicode or type(self._misc) is str):
@@ -2657,6 +2682,11 @@ class TitleCitationStandard(Citation):
         self._page = pg
         self._volume = vol
         self._yr = yr
+    def is_complete_citation(self):
+        if None not in (self._title, self._volume, self._yr, self._page):
+            return 1
+        else:
+            return 0
     def hasMisc(self):
         if self._misc is not None and (type(self._misc) is unicode or type(self._misc) is str) and len(self._misc.strip("()[], {}-")) > 0 or not\
                (self._title is not None and self._page is not None and self._volume is not None and self._yr is not None):
@@ -2700,6 +2730,8 @@ class InstitutePreprintReferenceCitation(Citation):
         self._rn = rn
         if misc is not None and len(misc.strip("()[], {}-")) > 0: self._misc = misc.strip()
         else: self._misc = None
+    def is_complete_citation(self):
+        return 1
     def hasMisc(self):
         if self._misc is not None and (type(self._misc) is unicode or type(self._misc) is str) and len(self._misc.strip()) > 0:
             return True
@@ -2723,6 +2755,8 @@ class URLCitation(Citation):
         self._urldescr = urldescr
         if misc is not None: self._misc = misc.strip()
         else: self._misc = misc
+    def is_complete_citation(self):
+        return 1
     def getSelfMARCXML(self):
         out = u"""   <datafield tag="999" ind1="C" ind2="5">\n"""
         if self._misc is not None and (type(self._misc) is unicode or type(self._misc) is str):
@@ -2759,12 +2793,28 @@ class ProcessedReferenceLine:
         if isinstance(newSect,LineItem):
             self._segments[self._nextposn] = newSect
             self._nextposn += 1
+
     def getNumberCitations(self):
-        numcitations = 0
+        numMisc = 0
+        numURL = 0
+        numPreprintRef = 0
+        numTitle = 0
         numsegments = len(self._segments)
-        for i in range(0,numsegments):
-            if isinstance(self._segments[i], Citation): numcitations += 1
-        return numcitations
+        for i in range(0, numsegments):
+            if isinstance(self._segments[i], LineMiscellaneousText):
+                numMisc += 1
+            elif isinstance(self._segments[i], Citation) \
+                   and not self._segments[i].is_complete_citation():
+                numMisc += 1
+            else:
+                if isinstance(self._segments[i], URLCitation):
+                    numURL += 1
+                elif isinstance(self._segments[i], InstitutePreprintReferenceCitation):
+                    numPreprintRef += 1
+                elif (isinstance(self._segments[i], TitleCitationStandard) or isinstance(self._segments[i], TitleCitation)):
+                    numTitle += 1
+        return (numMisc, numTitle, numPreprintRef, numURL)
+
 
 class ProcessedReferenceSection:
     """This is a reference section after it has been processed to identify cited items.  It contains a list of ProcessedReferenceLines."""
@@ -2782,12 +2832,20 @@ class ProcessedReferenceSection:
         if isinstance(ln, ProcessedReferenceLine):
             self._lines[self._nextline] = ln
             self._nextline += 1
-    def getTotalNumberCitations(self):
-        """Return an integer representing the total number of citations recognised (and thus marked up) in the reference section"""
-        numcitations = 0
+    def getNumberCitations(self):
+        num_misc     = 0
+        num_titles   = 0
+        num_preprefs = 0
+        num_urls     = 0
         numlines = len(self._lines)
-        for i in range(0,numlines): numcitations += self._lines[i].getNumberCitations()
-        return numcitations
+        for i in range(0, numlines):
+            (num_misc_in_line, num_titles_inline, num_preprefs_inline, num_urls_inline) =\
+                                                               self._lines[i].getNumberCitations()
+            num_misc     += num_misc_in_line
+            num_titles   += num_titles_inline
+            num_preprefs += num_preprefs_inline
+            num_urls     += num_urls_inline
+        return (num_misc, num_titles, num_preprefs, num_urls)
 
 class NumerationHandler:
     """Class whose instances identify reference numeration patterns in a text line and rearrange them into standardised numeration patterns
@@ -2871,6 +2929,7 @@ class LineCleaner:
         self._correctionList[re.compile(u'\u002D',re.UNICODE)]         = u'-'
         self._correctionList[re.compile(u'\uFE63',re.UNICODE)]         = u'-'
         self._correctionList[re.compile(u'\uFF0D',re.UNICODE)]         = u'-'
+        self._correctionList[re.compile(unicode(r':(?!\s*<cds)'),re.UNICODE|re.I)] = u'' ## ADDED 02/08/2006
     def clean(self, ln):
         # Remove double spaces:
         p_dblSpace = re.compile(unicode(r'\s{2,}'),re.UNICODE)
@@ -2930,7 +2989,8 @@ def getRecidFilenames(args):
     return files
 
 def main():
-    myoptions, myargs = getopt.getopt(sys.argv[1:], "hV", ["help","version"])
+    displayraw = 0
+    myoptions, myargs = getopt.getopt(sys.argv[1:], "hrV", ["help", "display-raw", "version"])
     for o in myoptions:
         if o[0] in ("-V","--version"):
             sys.stderr.write("%s\n" % (SystemMessage().getVersionMessage(),)) # Version message and stop
@@ -2938,6 +2998,8 @@ def main():
         elif o[0] in ("-h","--help"):
             sys.stderr.write("%s\n" % (SystemMessage().getHelpMessage(),)) # Help message and stop
             sys.exit(0)
+        elif o[0] in ("-r", "--display-raw"):
+            displayraw = 1
     if len(myargs) == 0:
         sys.stderr.write("%s\n" % (SystemMessage().getHelpMessage(),)) # Help message and stop
         sys.exit(0)
@@ -2946,57 +3008,86 @@ def main():
         sys.stderr.write("%s\n" % (SystemMessage().getHelpMessage(),)) # Help message and stop
         sys.exit(0)
     converterList=[PDFtoTextDocumentConverter()] # List of document converters to use
-    titles_kb = KnowledgeBase(fn = cfg_refextract_kb_journal_titles)
-    institutes = InstituteList(fn = cfg_refextract_kb_report_numbers)
+    titles_kb = KnowledgeBase(fn=cfg_refextract_kb_journal_titles)
+    institutes = InstituteList(fn=cfg_refextract_kb_report_numbers)
     refSect_processor  = ReferenceSectionMarkupProcessor(institutes, titles_kb)
     openxmltag         = u"""<?xml version="1.0" encoding="UTF-8"?>"""
     opencollectiontag  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
     closecollectiontag = u"""</collection>\n"""
     done_coltags = False
-    for curitem in recidfiles:
-        # Perform required processing (according to stages):
-        if not os.access(curitem[1], os.F_OK):
-            # path to file invalid
-            sys.stderr.write("E: File Path %s invalid! Ignored.\n" % (curitem,))
-            continue
-        doc = None
-        if len(converterList) < 1:
-            sys.stderr.write("E: No document converter tools available - cannot process reference extraction.\n" % (curitem,))
-            sys.exit(1)
 
-        # Convert file to text:
-        for conv in converterList:
-            doc = conv.convertDocument(curitem[1])
-            try:
-                if not doc.isEmpty():
-                    break
-            except AttributeError:
-                pass
-        if doc is None:
-            sys.stderr.write("""W: File "%s" cannot be converted to plain-text. Cannot be processed.\n""" % (curitem,))
-            continue
-        # Do "Extract References" Stage
-        try:
-            if doc.isEmpty():
-                sys.stderr.write("""W: File "%s" appears to be empty or cannot be read-in. Cannot be processed.\n""" % (curitem,))
-                continue
-        except AttributeError:
-            sys.stderr.write("""W: File "%s" appears to be empty or cannot be read-in. Cannot be processed.\n""" % (curitem,))
-            continue
-        if doc is None:
-            sys.stderr.write("""W: File "%s" appears to be empty or cannot be read-in. Cannot be processed.\n""" % (curitem,))
-            continue
-        refSection = doc.extractReferences()
-        if not done_coltags and not refSection.isEmpty():
+    if len(converterList) < 1:
+        sys.stderr.write("E: No document converter tools available - cannot process reference extraction.\n" % (curitem,))
+        sys.exit(1)
+
+    for curitem in recidfiles:
+        if not done_coltags:
             # Output collection tags:
             sys.stdout.write("%s\n" % (openxmltag.encode("utf-8"),))
             sys.stdout.write("%s\n" % (opencollectiontag.encode("utf-8"),))
             done_coltags = True
-        # Do citation title standardisation stage
-        processedReferenceSection = refSect_processor.getProcessedReferenceSection(refSection)
 
+        extract_error = 0  ## optimistic - extraction was OK unless determined otherwise
+        num_misc = num_preprefs = num_titles = num_urls = 0
 
-        ReferenceSectionDisplayer().display(processedReferenceSection, curitem[0])
+        if os.access(curitem[1], os.F_OK|os.R_OK):
+            # filepath OK - attempt to extract references:
+            doc = None
+
+            # Convert file to text:
+            for conv in converterList:
+                doc = conv.convertDocument(curitem[1])
+                try:
+                    if not doc.isEmpty():
+                        break
+                except AttributeError:
+                    pass
+                
+            # Do "Extract References" Stage
+            try:
+                if not doc.isEmpty():
+                    refSection = doc.extractReferences()
+                    processedReferenceSection = refSect_processor.getProcessedReferenceSection(refSection)
+                    (num_misc, num_titles, num_preprefs, num_urls) = processedReferenceSection.getNumberCitations()
+                    if displayraw == 0:
+                        refSection = ReferenceSection()
+                else:
+                    extract_error = 4
+                    refSection = ReferenceSection()
+                    processedReferenceSection = ProcessedReferenceSection()
+            except AttributeError:
+                extract_error = 4
+                refSection = ReferenceSection()
+                processedReferenceSection = ProcessedReferenceSection()
+        else:
+            ## Invalid filepath (or maybe bad permissions)
+            extract_error = 1
+            refSection = ReferenceSection()
+            processedReferenceSection = ProcessedReferenceSection()
+            
+        ## display extracted references:
+        ReferenceSectionDisplayer().display(extraction_status=extract_error,
+                                            cnt_misc=num_misc,
+                                            cnt_preprintref=num_preprefs,
+                                            cnt_journalref=num_titles,
+                                            cnt_urlref=num_urls,
+                                            processed_refsect=processedReferenceSection,
+                                            raw_refsect=refSection,
+                                            recid=curitem[0])
+
+    ## If an XML collection was opened, display closing tag
     if done_coltags:
         sys.stdout.write("%s\n" % (closecollectiontag.encode("utf-8"),))
+
+
+
+
+
+
+
+
+
+
+
+
 
