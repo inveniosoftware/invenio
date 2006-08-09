@@ -318,7 +318,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                 cmd = ""  # wil keep command to run
                 bingo = 0 # had we success?
                 if os.path.basename(conv_program) == "pdftotext":
-                    cmd = "%s %s %s.txt" % (conv_program, tmp_name, tmp_name)
+                    cmd = "%s -enc UTF-8 %s %s.txt" % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "pstotext":
                     if ext == "ps.gz":
                         # is there gzip available?                        
