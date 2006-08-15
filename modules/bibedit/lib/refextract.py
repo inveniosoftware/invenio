@@ -345,11 +345,11 @@ class PostRefSecnTitleListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        possible titles that usually follow the reference section in a doc
     """
-    def getCompiledPatternList(self, prefix = '', suffix = ''):
+    def getCompiledPatternList(self, prefix='', suffix=''):
         """Return a list of compiled regex patterns used to ID post reference section title"""
         patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix = '', suffix = ''):
+    def createPatterns(self, prefix='', suffix=''):
         """Create the regex patterns (don't compile though)"""
         patterns = []
         thead = unicode(r'^\s*?([\{\(\<\[]?\s*?(\w|\d)\s*?[\)\}\>\.\-\]]?\s*?)?')
@@ -357,57 +357,57 @@ class PostRefSecnTitleListCompiler(DocumentSearchPatternListCompiler):
         numatn = unicode(r'(\d+|\w\b|i{1,3}v?|vi{0,3})[\.\,]?\b')
         s = RegexWordSpacer()
         # Section titles:
-        patterns.append(thead+s.space(u'appendix')+ttail)
-        patterns.append(thead+s.space(u'appendices')+ttail)
-        patterns.append(thead+s.space(u'acknowledgement')+unicode(r's?')+ttail)
-        patterns.append(thead+s.space(u'table')+unicode(r'\w?s?\d?')+ttail)
-        patterns.append(thead+s.space(u'figure')+unicode(r's?')+ttail)
-        patterns.append(thead+s.space(u'annex')+unicode(r's?')+ttail)
-        patterns.append(thead+s.space(u'discussion')+unicode(r's?')+ttail)
-        patterns.append(thead+s.space(u'remercie')+unicode(r's?')+ttail)
+        patterns.append(thead + s.space(u'appendix') + ttail)
+        patterns.append(thead + s.space(u'appendices') + ttail)
+        patterns.append(thead + s.space(u'acknowledgement') + unicode(r's?') + ttail)
+        patterns.append(thead + s.space(u'table') + unicode(r'\w?s?\d?') + ttail)
+        patterns.append(thead + s.space(u'figure') + unicode(r's?') + ttail)
+        patterns.append(thead + s.space(u'annex') + unicode(r's?') + ttail)
+        patterns.append(thead + s.space(u'discussion') + unicode(r's?') + ttail)
+        patterns.append(thead + s.space(u'remercie') + unicode(r's?') + ttail)
         # Figure nums:
-        patterns.append(r'^\s*?'+s.space(u'figure')+numatn)
-        patterns.append(r'^\s*?'+s.space(u'fig')+unicode(r'\.\s*?')+numatn)
-        patterns.append(r'^\s*?'+s.space(u'fig')+unicode(r'\.?\s*?\d\w?\b'))
+        patterns.append(r'^\s*?' + s.space(u'figure') + numatn)
+        patterns.append(r'^\s*?' + s.space(u'fig') + unicode(r'\.\s*?') + numatn)
+        patterns.append(r'^\s*?' + s.space(u'fig') + unicode(r'\.?\s*?\d\w?\b'))
         # Table nums:
-        patterns.append(r'^\s*?'+s.space(u'table')+numatn)
-        patterns.append(r'^\s*?'+s.space(u'tab')+unicode(r'\.\s*?')+numatn)
-        patterns.append(r'^\s*?'+s.space(u'tab')+unicode(r'\.?\s*?\d\w?\b'))
+        patterns.append(r'^\s*?' + s.space(u'table') + numatn)
+        patterns.append(r'^\s*?' + s.space(u'tab') + unicode(r'\.\s*?') + numatn)
+        patterns.append(r'^\s*?' + s.space(u'tab') + unicode(r'\.?\s*?\d\w?\b'))
         return patterns
 
 class PostRefSecnKWListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        Key Words/phrases that are often found in lines following the reference section of a document
     """
-    def getCompiledPatternList(self, prefix = u'', suffix = u''):
+    def getCompiledPatternList(self, prefix=u'', suffix=u''):
         """Return a list of compiled regex patterns used to ID keywords usually found in lines after a reference section"""
         patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix = u'', suffix = u''):
+    def createPatterns(self, prefix=u'', suffix=u''):
         """Create the regex patterns (don't compile though)"""
         patterns = []
         s = RegexWordSpacer()
-        patterns.append(unicode(r'(')+s.space(u'prepared')+unicode(r'|')+s.space(u'created')+unicode(r').*?(AAS\s*?)?\sLATEX'))
-        patterns.append(unicode(r'AAS\s+?LATEX\s+?')+s.space(u'macros')+u'v')
-        patterns.append(unicode(r'^\s*?')+s.space(u'This paper has been produced using'))
-        patterns.append(unicode(r'^\s*?')+s.space(u'This article was processed by the author using Springer-Verlag')+u' LATEX')
+        patterns.append(unicode(r'(') + s.space(u'prepared') + unicode(r'|') + s.space(u'created') + unicode(r').*?(AAS\s*?)?\sLATEX'))
+        patterns.append(unicode(r'AAS\s+?LATEX\s+?') + s.space(u'macros') + u'v')
+        patterns.append(unicode(r'^\s*?') + s.space(u'This paper has been produced using'))
+        patterns.append(unicode(r'^\s*?') + s.space(u'This article was processed by the author using Springer-Verlag') + u' LATEX')
         return patterns
 
 class FirstRefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
     """Concrete class. Used to return a 'DocumentSearchCompiledPatternList' object containing regex patterns enabling the identification of
        the first reference line by its numeration marker
     """
-    def getCompiledPatternList(self, prefix = u'', suffix = u''):
+    def getCompiledPatternList(self, prefix=u'', suffix=u''):
         """Return a list of compiled regex patterns used to ID the first reference line by its numeration marker"""
         patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix = u'', suffix = u''):
+    def createPatterns(self, prefix=u'', suffix=u''):
         """Create the regex patterns (don't compile though)"""
         patterns = []
         g_name = unicode(r'(?P<mark>')
         g_close = u')'
-        patterns.append(g_name+unicode(r'(?P<left>\[)\s*?(?P<num>\d+)\s*?(?P<right>\])')+g_close)
-        patterns.append(g_name+unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})')+g_close)
+        patterns.append(g_name + unicode(r'(?P<left>\[)\s*?(?P<num>\d+)\s*?(?P<right>\])') + g_close)
+        patterns.append(g_name + unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})') + g_close)
         return patterns
 
 class RefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
@@ -418,7 +418,7 @@ class RefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
         """Return a list of compiled regex patterns used to ID the numeration marker for a reference line"""
         patterns = self.createPatterns()
         return CompiledPatternList(patterns)
-    def createPatterns(self, prefix = u'', suffix = u''):
+    def createPatterns(self, prefix=u'', suffix=u''):
         """Create the regex patterns (don't compile though)"""
         patterns = []
         if type(prefix) is str or type(prefix) is unicode:
@@ -428,19 +428,19 @@ class RefLineNumerationListCompiler(DocumentSearchPatternListCompiler):
         g_name = unicode(r'(?P<mark>')
         g_close = u')'
         space = unicode(r'\s*?')
-        patterns.append(space+title+g_name+unicode(r'\[\s*?(?P<linenumber>\d+)\s*?\]')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\[\s*?[a-zA-Z]+\s?(\d{1,4}[A-Za-z]?)?\s*?\]')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\{\s*?\d+\s*?\}')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\<\s*?\d+\s*?\>')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\(\s*?\d+\s*?\)')+g_close)
-        patterns.append(space+title+g_name+unicode(r'(?P<marknum>\d+)\s*?\.')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\d+\s*?')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\d+\s*?\]')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\d+\s*?\}')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\d+\s*?\)')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\d+\s*?\>')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\[\s*?\]')+g_close)
-        patterns.append(space+title+g_name+unicode(r'\*')+g_close)
+        patterns.append(space + title + g_name + unicode(r'\[\s*?(?P<linenumber>\d+)\s*?\]') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\[\s*?[a-zA-Z]+\s?(\d{1,4}[A-Za-z]?)?\s*?\]') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\{\s*?\d+\s*?\}') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\<\s*?\d+\s*?\>') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\(\s*?\d+\s*?\)') + g_close)
+        patterns.append(space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\.') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\d+\s*?') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\d+\s*?\]') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\d+\s*?\}') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\d+\s*?\)') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\d+\s*?\>') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\[\s*?\]') + g_close)
+        patterns.append(space + title + g_name + unicode(r'\*') + g_close)
         return patterns
 
 class CompiledPatternList:
@@ -542,7 +542,7 @@ class EscapeSequenceTransformer(TextLineTransformer):
         try:
             for x in self._patterns.keys():
                 try:
-                    line = line.replace(x,self._patterns[x])
+                    line = line.replace(x, self._patterns[x])
                 except UnicodedecodeError:
                     sys.exit(0)
         except TypeError:
@@ -909,12 +909,12 @@ class TextDocument(Document):
             t = start.getTitleString()
             startIdx = start.getLineNum()
             newline = None
-            sp = re.compile(unicode(r'^.*?')+t,re.UNICODE)
-            newl = sp.split(self._content[startIdx],1)
+            sp = re.compile(unicode(r'^.*?') + t, re.UNICODE)
+            newl = sp.split(self._content[startIdx], 1)
             self._content[startIdx] = newl[1]
         elif start.titlePresent():
             # Pass title
-            startIdx = start.getLineNum()+1
+            startIdx = start.getLineNum() + 1
         else:
             startIdx = start.getLineNum()
         if type(end) is int:
@@ -942,7 +942,7 @@ class TextDocument(Document):
             mk_patterns = CompiledPatternList([refStart.getMarkerPattern()])
         else:
             mk_patterns = RefLineNumerationListCompiler().getCompiledPatternList()
-        garbageDigit_pattern = re.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'),re.UNICODE)
+        garbageDigit_pattern = re.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'), re.UNICODE)
         searcher=LineSearcher()
 
         while (x<len(self._content)) and (not sectEnded):
@@ -951,9 +951,9 @@ class TextDocument(Document):
                 end_match = searcher.findWithinLine(self._content[x], kw_patterns)
             if end_match is not None:
                 # End reference section? Check within next 5 lines for other reference numeration markers
-                y = x+1
+                y = x + 1
                 lineFnd = 0
-                while (y<x+6) and (y<len(self._content)) and (not lineFnd):
+                while (y < x + 6) and ( y < len(self._content)) and (not lineFnd):
                     num_match=searcher.findWithinLine(self._content[y], mk_patterns)
                     if num_match is not None and not num_match.group(0).isdigit():
                         lineFnd = 1
@@ -978,7 +978,7 @@ class TextDocument(Document):
                         sectEnded = 1
                 x = x + 1
         return x - 1
-    def extractReferences(self,no_rebuild = False):
+    def extractReferences(self, no_rebuild=False):
         """Extract references from a TextDocument and return a ReferenceSection object"""
         # Try to remove pagebreaks, headers, footers
         self._removePageBoundaryInformation()
@@ -1022,8 +1022,8 @@ class TextDocument(Document):
                     nxtTestLines = 10
                     y = x + 1
                     tmpFnd = 0
-                    while y < len(self._content) and y < x+nxtTestLines and not tmpFnd:
-                        mk_match2=searcher.findAtStartLine(self._content[y], mk_patterns)
+                    while y < len(self._content) and y < x + nxtTestLines and not tmpFnd:
+                        mk_match2 = searcher.findAtStartLine(self._content[y], mk_patterns)
                         if (mk_match2 is not None) and (string.atoi(mk_match2.group('num')) == 2) and (mk_match.group('left') == mk_match2.group('left')) and (mk_match.group('right') == mk_match2.group('right')):
                             # Found next line:
                             tmpFnd = 1
@@ -1057,7 +1057,7 @@ class TextDocument(Document):
             searcher = LineSearcher()
             p_blank = re.compile(unicode(r'^\s*$'))
             # Try to find refs section title:
-            x = len(self._content)-1
+            x = len(self._content) - 1
             foundTitle = 0
             while x >= 0 and not foundTitle:
                 title_match = searcher.findWithinLine(self._content[x], t_patterns)
@@ -1092,7 +1092,7 @@ class TextDocument(Document):
                             # Move past blank lines
                             m_blank = p_blank.match(self._content[y])
                             while m_blank is not None and y < len(self._content):
-                                y = y+1
+                                y = y + 1
                                 m_blank = p_blank.match(self._content[y])
                             # Is this line numerated like a reference line?
                             mark_match = searcher.findAtStartLine(self._content[y], mk_patterns)
@@ -1165,7 +1165,7 @@ class TextDocument(Document):
         self.chopHeadFootBreaks(pageBreaks, numHeadLn, numFootLn)
     def getheadFootWordPattern(self):
         """Regex pattern used to ID a word in a header/footer line"""
-        return re.compile(unicode(r'([A-Za-z0-9-]+)'),re.UNICODE)
+        return re.compile(unicode(r'([A-Za-z0-9-]+)'), re.UNICODE)
     def getHeadLines(self, breakIndices = []):
         """Using list of indices of pagebreaks in document, attempt to determine how many lines page headers consist of"""
         remainingBreaks = (len(breakIndices) - 1)
@@ -1238,33 +1238,35 @@ class TextDocument(Document):
                             keepChecking = self.checkBoundaryLinesSimilar(grps_headLineWords, grps_thisLineWords)
                     curBreak = curBreak + 1
                 if keepChecking:
-                    numFootLns = numFootLns+1
+                    numFootLns = numFootLns + 1
                 emptyLine = 0
         return numFootLns
-    def chopHeadFootBreaks(self, breakIndices = [], headLn = 0, footLn = 0):
+    def chopHeadFootBreaks(self, breakIndices=None, headLn=0, footLn=0):
         """Remove document lines containing breaks, headers, footers"""
+        if type(breakIndices) not in (tuple, list):
+            breakIndices = []
         numBreaks = len(breakIndices)
         pageLens = []
         for x in range(0,numBreaks):
             if x < numBreaks - 1:
                 pageLens.append(breakIndices[x + 1] - breakIndices[x])
         pageLens.sort()
-        if (len(pageLens) > 0) and (headLn+footLn+1 < pageLens[0]):
+        if (len(pageLens) > 0) and (headLn + footLn + 1 < pageLens[0]):
             # Safe to chop hdrs & ftrs
             breakIndices.reverse()
             first = 1
             for i in range(0, len(breakIndices)):
                 # Unless this is the last page break, chop headers
                 if not first:
-                    for j in range(1,headLn+1):
+                    for j in range(1, headLn + 1):
                         self._content[breakIndices[i]+1:breakIndices[i]+2] = []
                 else:
                     first = 0
                 # Chop page break itself
-                self._content[breakIndices[i]:breakIndices[i]+1] = []
+                self._content[breakIndices[i]:breakIndices[i] + 1] = []
                 # Chop footers (unless this is the first page break)
                 if i != len(breakIndices) - 1:
-                    for k in range(1,footLn + 1):
+                    for k in range(1, footLn + 1):
                         self._content[breakIndices[i] - footLn:breakIndices[i] - footLn + 1] = []
     def checkBoundaryLinesSimilar(self, l_1, l_2):
         """Compare two lists to see if their elements are roughly the same"""
@@ -1289,7 +1291,7 @@ class TextDocument(Document):
     def getDocPageBreakPositions(self):
         """Locate page breaks in the list of document lines and make a list of their indices to be returned"""
         pageBreaks = []
-        p_break = re.compile(unicode(r'^\s*?\f\s*?$'),re.UNICODE)
+        p_break = re.compile(unicode(r'^\s*?\f\s*?$'), re.UNICODE)
         for i in range(len(self._content)):
             if p_break.match(self._content[i]) != None:
                 pageBreaks.append(i)
@@ -1365,7 +1367,7 @@ class Ps2asciiEncodedTextDocument(Document):
         plaintextContent = []
         tempLine = ''
         # Fictitious old line to compare with 1st line:
-        oldRawLine = self.Ps2asciiOutputLine(9999,9999,"",0)
+        oldRawLine = self.Ps2asciiOutputLine(9999, 9999, "", 0)
         posnxEst = 9999
         for line in self._content:
             curRawLine = self.getDataLine(line)
@@ -1379,9 +1381,9 @@ class Ps2asciiEncodedTextDocument(Document):
                 else:
                     # Not new line: concat with last line
                     if curRawLine.isSpaceSeparated(posnxEst):
-                        tempLine = tempLine+' '+curRawLine.getText()
+                        tempLine = tempLine + ' ' + curRawLine.getText()
                     else:
-                        tempLine = tempLine+curRawLine.getText()
+                        tempLine = tempLine + curRawLine.getText()
                 posnxEst = (curRawLine.getPosX() + curRawLine.getDiffPosX())
                 oldRawLine = curRawLine
         # Append very last line to list:
@@ -1785,11 +1787,11 @@ class PDFtoTextDocumentConverter(OSDependentDocumentConverter):
         # Numbers of 'words' and 'whitespaces' found in document:
         numWords = numSpaces = 0
         # whitespace line pattern:
-        ws_patt = re.compile(unicode(r'^\s+$'),re.UNICODE)
+        ws_patt = re.compile(unicode(r'^\s+$'), re.UNICODE)
         # whitespace character pattern:
-        p_space = re.compile(unicode(r'(\s)'),re.UNICODE)
+        p_space = re.compile(unicode(r'(\s)'), re.UNICODE)
         # non-whitespace 'word' pattern:
-        p_noSpace = re.compile(unicode(r'(\S+)'),re.UNICODE)
+        p_noSpace = re.compile(unicode(r'(\S+)'), re.UNICODE)
         for line in convertedLines:
             numWords = numWords + len(p_noSpace.findall(line))
             numSpaces = numSpaces + len(p_space.findall(line))
@@ -1961,7 +1963,7 @@ class KnowledgeBase:
         except KeyError: return None
 
 class PreprintClassificationItem:
-    def __init__(self, srch = '', repl = ''):
+    def __init__(self, srch='', repl=''):
         self._srchStr, self._rpStr = srch, repl
     def setSearchString(self, sstr): self._srchStr = sstr
     def setReplString(self, repstr): self._rpStr = repstr
@@ -2011,18 +2013,21 @@ class Institute:
            yy    -> \d{2}
            yyyy  -> [12]\d{3}
            /     -> \/
+           ## Added 14/08/2006:
+           s     -> \s*?
         """
         # Make the search/replace patterns:
         s_r = []
-        s_r.append((re.compile(unicode(r'([^\]A-Za-z0-9\/\[ "])'),re.UNICODE), unicode(r'\\\g<1>')))
-        s_r.append((re.compile(u'9',re.UNICODE), unicode(r'\d')))
-        s_r.append((re.compile(u'a',re.UNICODE), unicode(r'[A-Za-z]')))
-        s_r.append((re.compile(u'mm',re.UNICODE), unicode(r'(0[1-9]|1[0-2])')))
-        s_r.append((re.compile(u'yyyy',re.UNICODE), unicode(r'[12]\d\d\d')))
-        s_r.append((re.compile(u'yy',re.UNICODE), unicode(r'\d\d')))
-        s_r.append((re.compile(unicode(r'\/'),re.UNICODE), unicode(r'\/')))
-        s_r.append((re.compile(unicode(r'\"([^"]+)\"'),re.UNICODE), unicode(r'\g<1>')))
-        s_r.append((re.compile(unicode(r' \[([^\]]+) \]'),re.UNICODE), unicode(r'( [\g<1>])?')))
+        s_r.append((re.compile(unicode(r'([^\]A-Za-z0-9\/\[ "])'), re.UNICODE), unicode(r'\\\g<1>')))
+        s_r.append((re.compile(u'9', re.UNICODE), unicode(r'\d')))
+        s_r.append((re.compile(u'a', re.UNICODE), unicode(r'[A-Za-z]')))
+        s_r.append((re.compile(u'mm', re.UNICODE), unicode(r'(0[1-9]|1[0-2])')))
+        s_r.append((re.compile(u'yyyy', re.UNICODE), unicode(r'[12]\d\d\d')))
+        s_r.append((re.compile(u'yy', re.UNICODE), unicode(r'\d\d')))
+        s_r.append((re.compile(u's', re.UNICODE), unicode(r'\s*?')))
+        s_r.append((re.compile(unicode(r'\/'), re.UNICODE), unicode(r'\/')))
+        s_r.append((re.compile(unicode(r'\"([^"]+)\"'), re.UNICODE), unicode(r'\g<1>')))
+        s_r.append((re.compile(unicode(r' \[([^\]]+) \]'), re.UNICODE), unicode(r'( [\g<1>])?')))
         for x in s_r:
             ptn = x[0].sub(x[1], ptn)
         return ptn
@@ -2037,7 +2042,7 @@ class Institute:
         return p_list
     def assignNumerationRegex(self):
         """Build the regex patterns for this institute's numeration styles"""
-        def _my_cmpfunc(a,b):
+        def _my_cmpfunc(a, b):
             if a[0] < b[0]: return 1
             elif a[0] == b[0]: return 0
             else: return -1
@@ -2046,17 +2051,17 @@ class Institute:
         lenPtns.sort(_my_cmpfunc)
         # Set own list of regex patterns:
         self._numerationRegex = self._makeOrderedPtns(lenPtns)
-##
+
     def _makeOrderedPtnsList(self, ptns):
         p_list = []
         if len(ptns) > 0:
             for p in ptns:
-                p_itm = u"(?P<numn>"+self._createPattern(p[1])+u")"
+                p_itm = u"(?P<numn>" + self._createPattern(p[1]) + u")"
                 p_list.append(p_itm)
         return p_list
     def assignNumerationRegexList(self):
         """Build the regex patterns for this institute's numeration styles"""
-        def _my_cmpfunc(a,b):
+        def _my_cmpfunc(a, b):
             if a[0] < b[0]: return 1
             elif a[0] == b[0]: return 0
             else: return -1
@@ -2066,7 +2071,7 @@ class Institute:
         # Set own list of regex patterns:
         self._numerationRegexList = self._makeOrderedPtnsList(lenPtns)
     def createTestPatternsList(self):
-        def _my_cmpfunc(a,b):
+        def _my_cmpfunc(a, b):
             if a.length < b.length: return 1
             elif a.length == b.length: return 0
             else: return -1
@@ -2076,12 +2081,12 @@ class Institute:
         for categ in self._preprintCatsList:
             categptnslist = []
             for num_ptn in self._numerationRegexList:
-                categptnslist.append(re.compile(unicode(r'\b((?P<categ>') + categ.s_str + u')' + num_ptn + r')',re.UNICODE))
+                categptnslist.append(re.compile(unicode(r'\b((?P<categ>') + categ.s_str + u')' + num_ptn + r')', re.UNICODE))
             preprintCatPatternsList[categ] = categptnslist
         self._preprintCatPatternsList = preprintCatPatternsList
     def matchCategs2(self, ln):
         """Accept a line. Try to find matches for each of the preprint categories of this institute within that line"""
-        def _my_cmpfunc(a,b):
+        def _my_cmpfunc(a, b):
             if a.length < b.length: return 1
             elif a.length == b.length: return 0
             else: return -1
@@ -2096,6 +2101,11 @@ class Institute:
                     # Get hyphenated numeration segment of category:
                     numnMatch = x.group('numn')
                     numnMatch = re.sub(r'\s', '-', numnMatch)
+                    ## replace funny cases:
+                    numnMatch = re.sub(r'-{2,}', '-', numnMatch)
+                    numnMatch = re.sub(r'/-', '/', numnMatch)
+                    numnMatch = re.sub(r'-/', '/', numnMatch)
+                    numnMatch = re.sub(r'-/-', '/', numnMatch)
                     # Replace found categ in string with lowercase version:
                     foundCateg = x.group('categ')
                     foundCateg = foundCateg.lower()
@@ -2104,7 +2114,6 @@ class Institute:
                     inst_RN_rep_str[x.start()] = categ.r_str + numnMatch
         return (inst_full_len, inst_RN_rep_str, ln)
 
-##
     def matchCategs(self, ln):
         """Accept a line. Try to find matches for each of the preprint categories of this institute within that line"""
         def _my_cmpfunc(a,b):
@@ -2561,63 +2570,206 @@ class ProcessedReferenceLineBuilder:
             uri_virtual_locations[virtual_pos] = idx
         return uri_virtual_locations
 
-class ReferenceSectionMarkupProcessor:
-    """Process a reference section. Line will be cleaned, and cited items will be identified and their notation standardised. ProcessedReferenceLine will be returned"""
+
+## NICK
+    ## making a class to process a line of text for citations, creating a "ProcessedReferenceLine" object.
+    ## will then be possible to test processing a single reference line at a time.
+
+class ProcessedReferenceLineFactory:
     def __init__(self, institutes, titles):
         self._instlist = institutes
         self._titleslist = titles
         self._ibidIdentifier = LineIBIDidentifier()
         self._numerationIdentifier = NumerationHandler()
         self._lineCleaner = LineCleaner()
-        self._lineBuilder = ProcessedReferenceLineBuilder(self._titleslist, self._ibidIdentifier, self._numerationIdentifier, self._lineCleaner)
+        self._lineBuilder = ProcessedReferenceLineBuilder(self._titleslist, self._ibidIdentifier,\
+                                                          self._numerationIdentifier, self._lineCleaner)
         self._accentTransformer = EscapeSequenceTransformer()
         self._punctuationStripper = PunctuationStripper()
         self._multispaceRemover = MultispaceRemover()
         self._urlRemover = URLidentifier()
-    def getProcessedReferenceSection(self, refSect):
+        
+    def createLine(self, refline, verbose=0):
+        ## Sanity Checking:
+        if type(refline) not in (str, unicode):
+            raise TypeError("""Expected argument of type 'str' or 'unicode', got type %s""" % type(refline))
+
+        ## initialise some variables:
+        citationMatch=False
+        foundItem = False
+        found_ibids_len = {}
+        found_ibids_matchtxt = {}
+        found_title_len = {}
+        found_title_txt = {}
+        found_urlmatch_fulllen = {}
+        found_urlstr = {}
+        found_urldescstr = {}
+
+        if verbose != 0:
+            ## display original line, before all attempts to standardise/recognise citations:
+            sys.stderr.write("""Raw Line: %s\n""" % refline.encode("utf-8"))
+
+        tmpLine = refline
+
+        # Preliminary line cleaning: transform bad accents, clean punctuation & remove dbl-spaces
+        tmpLine = self._accentTransformer.processLine(tmpLine)
+        tmpLine = self._lineCleaner.clean(tmpLine)
+        if verbose != 0:
+            ## display line after accent cleaning:
+            sys.stderr.write("""Line Cleaned: %s\n""" % tmpLine.encode("utf-8"))
+
+        # Remove and record details of URLs
+        #(found_urlmatch_fulllen, found_urlstr, found_urldescstr, foundItem, tmpLine) = self._urlRemover.removeURLs(tmpLine)
+        if foundItem:
+            citationMatch = True
+
+        if verbose != 0:
+            ## display line after URLs removed:
+            sys.stderr.write("""URLs Removed: %s\n""" % tmpLine.encode("utf-8"))
+
+        ## Standardise numeration:
+        tmpLine = self._numerationIdentifier.standardise(tmpLine)
+        tmpLine = self._lineCleaner.clean(tmpLine)
+        if verbose != 0:
+            ## display line after numeration identified and re-arranged:
+            sys.stderr.write("""Numeration Treated: %s\n""" % tmpLine.encode("utf-8"))
+
+        ## Upper-case the line:
+        tmpLine2 = string.upper(tmpLine)
+        if verbose != 0:
+            ## display upper-cased line:
+            sys.stderr.write("""Uppercase: %s\n""" % tmpLine2.encode("utf-8"))
+
+        ## strip punctuation:
+        tmpLine2 = self._punctuationStripper.strip(tmpLine2)
+        if verbose != 0:
+            ## display line with punctuation stripped:
+            sys.stderr.write("""Punctuation Stripped: %s\n""" % tmpLine2.encode("utf-8"))
+
+        ## remove multiple spaces:
+        (removedSpaces,tmpLine2) = self._multispaceRemover.recordRemove(tmpLine2) # remove multispace & record their positions
+        if verbose != 0:
+            ## display line with multiple spaces removed:
+            sys.stderr.write("""Mutiple Spaces Stripped: %s\n""" % tmpLine2.encode("utf-8"))
+
+        ## standardise/regognise preprint reference report numbers
+        (found_pp_len, found_pp_rep_str, tmpLine2, foundItem) = self._instlist.identifyPreprintReferences(tmpLine2)
+        if foundItem:
+            citationMatch = True
+        if verbose != 0:
+            ## display line with report numbers recognised:
+            sys.stderr.write("""Preprint References Processed: %s\n""" % tmpLine2.encode("utf-8"))
+
+        ## find non-standard titles:
+        (found_title_len,found_title_txt,tmpLine2,foundItem) = self._titleslist.findPeriodicalTitles(tmpLine2)
+        if foundItem:
+            citationMatch = True
+        if verbose != 0:
+            ## display line with non-standard titles recognised:
+            sys.stderr.write("""Non-Standard Titles Processed: %s\n""" % tmpLine2.encode("utf-8"))
+
+        ## If there is an IBID in the line, do a 2nd pass to try to catch it & identify its meaning
+        if tmpLine2.upper().find(u"IBID") != -1:
+            # Record/remove IBID(s) in line
+            (found_ibids_len,found_ibids_matchtxt,tmpLine2) = self._ibidIdentifier.identify_record_ibids(tmpLine2)
+            # Add found ibids to title matches:
+            for itm in found_ibids_len.keys(): found_title_len[itm] = found_ibids_len[itm]
+            for itm in found_ibids_matchtxt.keys(): found_title_txt[itm] = found_ibids_matchtxt[itm]
+
+        if verbose != 0:
+            ## display line with IBIDs recognised:
+            sys.stderr.write("""IBIDs Processed: %s\n""" % tmpLine2.encode("utf-8"))
+
+        # Create "ProcessedReferenceLine":
+        processed_line = \
+                self._lineBuilder.getProcessedReferenceLine(found_title_len, found_title_txt, found_pp_rep_str, \
+                                                            found_pp_len, found_urlmatch_fulllen, found_urlstr, \
+                                                            found_urldescstr, removedSpaces, refline, tmpLine, \
+                                                            tmpLine2, citationMatch)
+        return processed_line
+
+## END factory for creating ProcessedReferenceLine
+## NICK
+
+class ReferenceSectionMarkupProcessor:
+    """Process a reference section. Line will be cleaned, and cited items will be identified and their notation standardised. ProcessedReferenceLine will be returned"""
+    def __init__(self, institutes, titles):
+        """Initialise the object with its own instance of a "ProcessedReferenceLineFactory" class.
+        """
+        self._processed_line_factory = ProcessedReferenceLineFactory(institutes, titles)
+        
+    def getProcessedReferenceSection(self, refSect, verbose=0):
         """Take a ReferenceSection as argument. For each line, process it"""
         processedRefSection = ProcessedReferenceSection()
         for line in refSect:
-            citationMatch=False
-            found_ibids_len = {}
-            found_ibids_matchtxt = {}
-            found_title_len = {}
-            found_title_txt = {}
-            tmpLine = line.getContent() # Got line as unicode string
-            # Remove and record details of URLs
-            #(found_urlmatch_fulllen, found_urlstr, found_urldescstr, foundItem, tmpLine) = self._urlRemover.removeURLs(tmpLine)
-            found_urlmatch_fulllen = {}
-            found_urlstr = {}
-            found_urldescstr = {}
-            foundItem = False
-            if foundItem: citationMatch = True
-            # Preliminary line cleaning: transform bad accents, clean punctuation & remove dbl-spaces
-            tmpLine = self._accentTransformer.processLine(tmpLine)
-            tmpLine = self._lineCleaner.clean(tmpLine)
-            # Standardise numeration:
-            tmpLine = self._numerationIdentifier.standardise(tmpLine)
-            tmpLine = self._lineCleaner.clean(tmpLine)
-            # ---> Standardise the titles:
-            tmpLine2 = string.upper(tmpLine) # uppercase the line
-            tmpLine2 = self._punctuationStripper.strip(tmpLine2) # Strip punctuation
-            (removedSpaces,tmpLine2) = self._multispaceRemover.recordRemove(tmpLine2) # remove multispace & record their positions
-            (found_pp_len, found_pp_rep_str, tmpLine2, foundItem) = self._instlist.identifyPreprintReferences(tmpLine2)
-            if foundItem: citationMatch = True
-            # find_nonstandard_titles
-            (found_title_len,found_title_txt,tmpLine2,foundItem) = self._titleslist.findPeriodicalTitles(tmpLine2)
-            if foundItem: citationMatch = True
-            # If there is an IBID in the line, do a 2nd pass to try to catch it & identify its meaning
-            if tmpLine2.upper().find(u"IBID") != -1:
-                # Record/remove IBID(s) in line
-                (found_ibids_len,found_ibids_matchtxt,tmpLine2) = self._ibidIdentifier.identify_record_ibids(tmpLine2)
-                # Add found ibids to title matches:
-                for itm in found_ibids_len.keys(): found_title_len[itm] = found_ibids_len[itm]
-                for itm in found_ibids_matchtxt.keys(): found_title_txt[itm] = found_ibids_matchtxt[itm]
-            # Create "ProcessedReferenceLine":
-            thisProcessedLine = self._lineBuilder.getProcessedReferenceLine(found_title_len,found_title_txt,found_pp_rep_str,found_pp_len,\
-                                   found_urlmatch_fulllen, found_urlstr, found_urldescstr,removedSpaces,line.getContent(),tmpLine,tmpLine2,citationMatch)
-            processedRefSection.appendLine(thisProcessedLine)
+            processed_line = self._processed_line_factory.createLine(line.getContent(), verbose)
+
+            processedRefSection.appendLine(processed_line)
         return processedRefSection
+
+
+## class ReferenceSectionMarkupProcessor:
+##     """Process a reference section. Line will be cleaned, and cited items will be identified and their notation standardised. ProcessedReferenceLine will be returned"""
+##     def __init__(self, institutes, titles):
+##         self._instlist = institutes
+##         self._titleslist = titles
+##         self._ibidIdentifier = LineIBIDidentifier()
+##         self._numerationIdentifier = NumerationHandler()
+##         self._lineCleaner = LineCleaner()
+##         self._lineBuilder = ProcessedReferenceLineBuilder(self._titleslist, self._ibidIdentifier, self._numerationIdentifier, self._lineCleaner)
+##         self._accentTransformer = EscapeSequenceTransformer()
+##         self._punctuationStripper = PunctuationStripper()
+##         self._multispaceRemover = MultispaceRemover()
+##         self._urlRemover = URLidentifier()
+##     def getProcessedReferenceSection(self, refSect):
+##         """Take a ReferenceSection as argument. For each line, process it"""
+##         processedRefSection = ProcessedReferenceSection()
+##         for line in refSect:
+##             sys.stderr.write("""Raw Line: %s\n""" % line.getContent().encode("utf-8"))
+##             citationMatch=False
+##             found_ibids_len = {}
+##             found_ibids_matchtxt = {}
+##             found_title_len = {}
+##             found_title_txt = {}
+##             tmpLine = line.getContent() # Got line as unicode string
+##             # Remove and record details of URLs
+##             #(found_urlmatch_fulllen, found_urlstr, found_urldescstr, foundItem, tmpLine) = self._urlRemover.removeURLs(tmpLine)
+##             found_urlmatch_fulllen = {}
+##             found_urlstr = {}
+##             found_urldescstr = {}
+##             foundItem = False
+##             if foundItem: citationMatch = True
+##             # Preliminary line cleaning: transform bad accents, clean punctuation & remove dbl-spaces
+##             tmpLine = self._accentTransformer.processLine(tmpLine)
+##             tmpLine = self._lineCleaner.clean(tmpLine)
+##             sys.stderr.write("""Cleaned Accents/Line: %s\n""" % tmpLine.encode("utf-8"))
+##             # Standardise numeration:
+##             tmpLine = self._numerationIdentifier.standardise(tmpLine)
+##             tmpLine = self._lineCleaner.clean(tmpLine)
+##             sys.stderr.write("""Processed Numeration: %s\n""" % tmpLine.encode("utf-8"))
+##             # ---> Standardise the titles:
+##             tmpLine2 = string.upper(tmpLine) # uppercase the line
+##             sys.stderr.write("""Uppercase: %s\n""" % tmpLine2.encode("utf-8"))
+##             tmpLine2 = self._punctuationStripper.strip(tmpLine2) # Strip punctuation
+##             sys.stderr.write("""Punctuation Stripped: %s\n""" % tmpLine2.encode("utf-8"))
+##             (removedSpaces,tmpLine2) = self._multispaceRemover.recordRemove(tmpLine2) # remove multispace & record their positions
+##             (found_pp_len, found_pp_rep_str, tmpLine2, foundItem) = self._instlist.identifyPreprintReferences(tmpLine2)
+##             if foundItem: citationMatch = True
+##             # find_nonstandard_titles
+##             (found_title_len,found_title_txt,tmpLine2,foundItem) = self._titleslist.findPeriodicalTitles(tmpLine2)
+##             if foundItem: citationMatch = True
+##             # If there is an IBID in the line, do a 2nd pass to try to catch it & identify its meaning
+##             if tmpLine2.upper().find(u"IBID") != -1:
+##                 # Record/remove IBID(s) in line
+##                 (found_ibids_len,found_ibids_matchtxt,tmpLine2) = self._ibidIdentifier.identify_record_ibids(tmpLine2)
+##                 # Add found ibids to title matches:
+##                 for itm in found_ibids_len.keys(): found_title_len[itm] = found_ibids_len[itm]
+##                 for itm in found_ibids_matchtxt.keys(): found_title_txt[itm] = found_ibids_matchtxt[itm]
+##             # Create "ProcessedReferenceLine":
+##             thisProcessedLine = self._lineBuilder.getProcessedReferenceLine(found_title_len,found_title_txt,found_pp_rep_str,found_pp_len,\
+##                                    found_urlmatch_fulllen, found_urlstr, found_urldescstr,removedSpaces,line.getContent(),tmpLine,tmpLine2,citationMatch)
+##             processedRefSection.appendLine(thisProcessedLine)
+##         return processedRefSection
 
 class LineItem:
     def getSelfMARCXML(self):
@@ -2859,23 +3011,81 @@ class NumerationHandler:
         self._setRecheckPatterns()
     def _setRecheckPatterns(self):
         """After the line has been rebuilt with marked up titles, it can be rechecked for numeration patterns because perhaps now more can be found with the aid of the recognised titles"""
-        self._checkAgainPtnList.append([re.compile(unicode(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?'),re.UNICODE),unicode('\\g<1>\\g<2>, \\g<3> \\g<6> (\\g<1>) \\g<8>')])
-        self._checkAgainPtnList.append([re.compile(unicode(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?'),re.UNICODE),unicode('\\g<1>\\g<2>, \\g<3> \\g<6> \\g<7> \\g<8> (\\g<1>)')])
+        self._checkAgainPtnList.append([re.compile(unicode(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                                        unicode('\\g<1>\\g<2>, \\g<3> \\g<6> (\\g<1>) \\g<8>')])
+        self._checkAgainPtnList.append([re.compile(unicode(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                                        unicode('\\g<1>\\g<2>, \\g<3> \\g<6> \\g<7> \\g<8> (\\g<1>)')])
     def _setSearchPatterns(self):
         """Populate self._ptnList with seek/replace numeration pattern pairs"""
+
+        pattern_nucphysb_subtitle = unicode(r'(?:[\(\[]\s*?(?:[Ff][Ss]|[Pp][Mm])\s*?\d{0,4}\s*?[\)\]])?')
+        
         # Delete the colon and expressions as Serie, vol, V. inside the pattern <serie : volume>
-        self._ptnList.append([re.compile(unicode(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?)?\s?(\d+)'),re.UNICODE),unicode('\\g<2> \\g<4>')])
+        self._ptnList.append([re.compile(unicode(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?)?\s?(\d+)'), re.UNICODE),\
+                              unicode('\\g<2> \\g<4>')])
+        
         # Use 4 different patterns to standardise numeration as <serie(?) : volume (year) page>
+
+        ## Pattern 0 (was pattern 3): <x, vol, page, year>
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?([1-2]\d\d\d)\)?'), re.UNICODE),\
+                              unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> ')])
+        self._ptnList.append([re.compile(unicode(r'\b') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?([1-2]\d\d\d)\)?'), re.UNICODE),\
+                              unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> ')])
+
         # Pattern 1: <x, vol, year, page>
-        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'),re.UNICODE), unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+##                               unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+        ## <v, [FS]?, y, p>
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                              unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+        ## <[FS]?, v, y, p>
+        self._ptnList.append([re.compile(unicode(r'\b') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                              unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+
+
         # Pattern 2: <vol, serie, year, page>
-        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'),re.UNICODE), unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> ')])
-        # Pattern 3: <x, vol, page, year>
-        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?([1-2]\d\d\d)\)?'),re.UNICODE), unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> ')])
+##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+##                               unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> ')])
+
+        ## <v, s, [FS]?, y, p>
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                              unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> ')])
+        ## <v, [FS]?, s, y, p
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
+                              unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> ')])
+
+
+
         # Pattern 4: <vol, serie, page, year>
-        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)'),re.UNICODE), unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)'), re.UNICODE),\
+##                               unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+
+        ## <v, s, [FS]?, p, y>
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)'), re.UNICODE),\
+                              unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+
+        ## <v, [FS]?, s, p, y>
+        self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?') +\
+                                         pattern_nucphysb_subtitle +\
+                                         unicode(r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)'), re.UNICODE),\
+                              unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
+        
     def removeSeriesTags(self, ln):
-        """Remove any "<cds.SER/>" tags from a line.  Series information should be part of a title, not separate"""
+        """Remove any "<cds.SER />" tags from a line.  Series information should be part of a title, not separate"""
         m_seriesTagLine = self._ptn_seriesRemove.search(ln)
         while m_seriesTagLine is not None:
             whole_match = m_seriesTagLine.group(0)
