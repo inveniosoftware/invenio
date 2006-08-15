@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-07-21 18:34+0200\n"
-"PO-Revision-Date: 2006-07-26 06:18+0200\n"
+"PO-Revision-Date: 2006-08-15 11:53+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -985,10 +985,7 @@ msgstr "BORRAR DATOS"
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
-msgstr ""
-"Definir una nueva alerta a partir de %(x_url1_open)ssus búsquedas"
-"(x_url1_close)s, las %(x_url2_open)sbúsquedas más habituales%(x_url2_close)"
-"s, o el formulari de datos."
+msgstr "Definir una nueva alerta a partir de %(x_url1_open)ssus búsquedas%(x_url1_close)s, las %(x_url2_open)sbúsquedas más habituales%(x_url2_close)s, o el formulari de datos."
 
 #: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
@@ -1041,9 +1038,7 @@ msgstr "Usted ha definido %s alertas."
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
-msgstr ""
-"Todavía no ha ejecutado ninguna búsqueda. Vaya primero a la %(x_url_open)"
-"sinterfaz de búsqueda(x_url_close)s."
+msgstr "Todavía no ha ejecutado ninguna búsqueda. Vaya primero a la %(x_url_open)sinterfaz de búsqueda%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:422
 #, python-format
@@ -2270,7 +2265,7 @@ msgstr "Buscar un grupo"
 #: modules/webmessage/lib/webmessage_templates.py:640
 #, python-format
 msgid "You have %s new messages out of %s messages"
-msgstr "Tiene %i mensajes nuevos de un total de %i mensajes"
+msgstr "Tiene %s mensajes nuevos de un total de %s mensajes"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:274
 msgid "Read a message"
@@ -2598,7 +2593,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1014
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr "Las palabras más cercanas a %s, en cualquier colección, son:"
+msgstr "Las palabras más cercanas a %(x_word)s, en cualquier colección, son:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"

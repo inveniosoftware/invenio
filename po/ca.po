@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-07-21 18:34+0200\n"
-"PO-Revision-Date: 2006-06-27 11:50+0200\n"
+"PO-Revision-Date: 2006-08-15 11:54+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -986,10 +986,7 @@ msgstr "ESBORRAR DADES"
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
-msgstr ""
-"Definir una nova alerta a partir de %(x_url1_open)sles vostres cerques"
-"(x_url1_close)s, les %(x_url2_open)scerques més habituals%(x_url2_close)s, o "
-"el formulari de dades."
+msgstr "Definir una nova alerta a partir de %(x_url1_open)sles vostres cerques%(x_url1_close)s, les %(x_url2_open)scerques més habituals%(x_url2_close)s, o el formulari de dades."
 
 #: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
@@ -1697,7 +1694,7 @@ msgstr "Escriviu-ne una ressenya"
 #: modules/webcomment/lib/webcomment_templates.py:558
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr "Puntuació mitjana: %(x_nb_score), basada en %(x_nb_reviews)s ressenyes"
+msgstr "Puntuació mitjana: %(x_nb_score)s, basada en %(x_nb_reviews)s ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:256
 #, python-format
@@ -2280,7 +2277,7 @@ msgstr "Cercar un grup"
 #: modules/webmessage/lib/webmessage_templates.py:640
 #, python-format
 msgid "You have %s new messages out of %s messages"
-msgstr "Teniu %i missates nous d'un total de %i missatges"
+msgstr "Teniu %s missates nous d'un total de %s missatges"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:274
 msgid "Read a message"
@@ -2605,7 +2602,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1014
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr "Les paraules més properes a %s, a qualsevol col·lecció, són:"
+msgstr "Les paraules més properes a %(x_word)s, a qualsevol col·lecció, són:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
