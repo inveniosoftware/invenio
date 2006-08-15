@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-07-21 18:34+0200\n"
-"PO-Revision-Date: 2006-07-24 09:01+0200\n"
+"PO-Revision-Date: 2006-07-26 06:18+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -166,9 +166,8 @@ msgstr "Área del Administrador"
 
 #: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:155
 #: modules/webstyle/lib/webstyle_templates.py:382
-#, fuzzy
 msgid "Last updated"
-msgstr "Última actualización:"
+msgstr "Última actualización"
 
 #: modules/websubmit/doc/admin/actionimplement.html.wml:23
 #: modules/websubmit/doc/admin/actionmodify.html.wml:23
@@ -454,7 +453,6 @@ msgid "To save this record, please click on submit."
 msgstr "Para guardar este registro, haga clic en submit."
 
 #: modules/bibedit/lib/bibedit_templates.py:407
-#, fuzzy
 msgid "This record does not exist."
 msgstr "Este registro no existe."
 
@@ -463,12 +461,10 @@ msgid "Please try another record ID."
 msgstr "Pruebe otro número de registro."
 
 #: modules/bibedit/lib/bibedit_templates.py:416
-#, fuzzy
 msgid "This record is currently being edited by another user."
 msgstr "Este registro está siendo editado por otra persona."
 
 #: modules/bibedit/lib/bibedit_templates.py:417
-#, fuzzy
 msgid "Please try again later."
 msgstr "Vuélvalo a intentar."
 
@@ -478,14 +474,16 @@ msgstr "No se puede editar un registro suprimido."
 
 #: modules/bibedit/lib/bibedit_templates.py:435
 msgid "Please enter the ID of the record you want to edit"
-msgstr ""
+msgstr "Entre el identificador del registro que desea editar"
 
 #: modules/bibedit/lib/bibedit_templates.py:447
 #, fuzzy
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
-msgstr "Se procesarán tan pronto como la cola de tareas esté vacía"
+msgstr ""
+"Sus modificaciones han sido enviadas. Se procesarán tan pronto como la cola "
+"de tareas esté vacía"
 
 #: modules/bibedit/lib/bibedit_templates.py:449
 #: modules/bibedit/lib/bibedit_templates.py:481
@@ -493,9 +491,10 @@ msgstr "Se procesarán tan pronto como la cola de tareas esté vacía"
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
 msgstr ""
+"Puede volver a %(x_url_open)sla interfaz de administración de BibEdit%"
+"(x_url_close)s."
 
 #: modules/bibedit/lib/bibedit_templates.py:469
-#, fuzzy
 msgid "Do you really want to delete this record?"
 msgstr "Está seguro que quiere suprimir este registro?"
 
@@ -524,14 +523,14 @@ msgid "No"
 msgstr "No"
 
 #: modules/bibedit/lib/bibedit_templates.py:479
-#, fuzzy
 msgid "The record will be deleted as soon as the task queue is empty."
-msgstr "Se procesarán tan pronto como la cola de tareas esté vacía"
+msgstr ""
+"Este registro se suprimirá tan pronto como la cola de tareas esté vacía."
 
 #: modules/bibedit/web/admin/bibeditadmin.py:61
 #, python-format
 msgid "Record %s - Add a field"
-msgstr ""
+msgstr "Registro %s - Añadir un campo"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:63
 msgid "BibEdit Admin Interface"
@@ -540,17 +539,18 @@ msgstr "Interfaz de administración de BibEdit"
 #: modules/bibedit/web/admin/bibeditadmin.py:95
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s"
-msgstr ""
+msgstr "Edición del registro %(x_recid)s, campo %(x_field)s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:98
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
 msgstr ""
+"Edición del registro %(x_recid)s, campo %(x_field)s - Añadir un subcampo"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:126
-#, fuzzy, python-format
+#, python-format
 msgid "Submit and save record %s"
-msgstr "Registros similares"
+msgstr "Enviar i guardar el registro %s"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
@@ -578,29 +578,25 @@ msgid "current status:"
 msgstr "status actual:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:120
-#, fuzzy
 msgid "No oaiharvest task currently scheduled."
 msgstr "No hay ninguna tarea oaiharvest programada"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:221
 #, fuzzy
 msgid "successfully validated"
-msgstr "validado correctamente!"
+msgstr "validado correctamente"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:222
-#, fuzzy
 msgid "does not seem to be a OAI-compliant baseURL"
-msgstr "no parece una baseURL que compla con OAI"
+msgstr "no parece una baseURL que cumpla con OAI"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:118
-#, fuzzy
 msgid "Citation history"
-msgstr "Histórico de citas:"
+msgstr "Histórico de citas"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:95
-#, fuzzy
 msgid "Downloads history"
-msgstr "Histórico de descargas:"
+msgstr "Histórico de descargas"
 
 #: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:168
@@ -827,30 +823,26 @@ msgid "Thank you!"
 msgstr "¡Gracias!"
 
 #: modules/webalert/lib/webalert.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "You already have an alert named %s."
-msgstr "Ya tiene una alerta con el nombre de <b>%(name)s</b>"
+msgstr "Ya tiene una alerta con el nombre de %s."
 
-# O desconocida?
+# En femenino porque es una fecha
 #: modules/webalert/lib/webalert.py:111
-#, fuzzy
 msgid "unknown"
-msgstr "desconocido"
+msgstr "desconocida"
 
 #: modules/webalert/lib/webalert.py:173
-#, fuzzy
 msgid "You already have an alert defined for the specified query and basket."
-msgstr "Ya tiene una alerta definida para esta búsqueda y cesta"
+msgstr "Ya tiene una alerta definida para esta búsqueda y cesta."
 
 #: modules/webalert/lib/webalert.py:192 modules/webalert/lib/webalert.py:296
-#, fuzzy
 msgid "The alert name cannot be empty."
-msgstr "La alerta no puede estar <b>vacía</b>."
+msgstr "La alerta no puede estar vacía."
 
 #: modules/webalert/lib/webalert.py:197
-#, fuzzy
 msgid "You are not the owner of this basket."
-msgstr "Ha puesto %i alertas en esta cesta"
+msgstr "Usted no es el propietario de esta cesta"
 
 #: modules/webalert/lib/webalert.py:209
 #, python-format
@@ -863,15 +855,16 @@ msgid "The alert %s has been successfully updated."
 msgstr "La alerta %s se ha actualitzado correctamente."
 
 #: modules/webalert/lib/webalert.py:376
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
 "is available with a posibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
 msgstr ""
-"Ha hecho %(number)s búsquedas.  Hay una %(detailed_list)s disponible con la "
-"posibilidad de (a) ver los resultados de la búsqueda y (b) subscribir-se "
-"para recibir notificaciones por correo electrónic de estas búsquedas"
+"Ha hecho %(x_nb)s búsquedas.  Hay una %(x_url_open)sdetailed_list%"
+"(x_url_close)s disponible con la posibilidad de (a) ver los resultados de la "
+"búsqueda y (b) subscribirse para recibir notificaciones por correo "
+"electrónico de estas búsquedas"
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
@@ -910,9 +903,8 @@ msgid "Collection"
 msgstr "Colección"
 
 #: modules/webalert/lib/webalert_templates.py:112
-#, fuzzy
 msgid "You own the following alerts:"
-msgstr "Tiene las siguientes alertas:"
+msgstr "Usted ha definido las siguientes alertas:"
 
 #: modules/webalert/lib/webalert_templates.py:113
 msgid "alert name"
@@ -923,13 +915,12 @@ msgid "SHOW"
 msgstr "MOSTRAR"
 
 #: modules/webalert/lib/webalert_templates.py:164
-#, fuzzy
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
 msgstr ""
 "Esta alerta le notificará cada vez/sólo si un nuevo item satisface la "
-"següiente búsqueda"
+"següiente búsqueda:"
 
 #: modules/webalert/lib/webalert_templates.py:165
 msgid "QUERY"
@@ -959,7 +950,6 @@ msgid "daily"
 msgstr "diaria"
 
 #: modules/webalert/lib/webalert_templates.py:212
-#, fuzzy
 msgid "Send notification email?"
 msgstr "Enviar notificación por correo electrónico?"
 
@@ -974,9 +964,9 @@ msgid "no"
 msgstr "no"
 
 #: modules/webalert/lib/webalert_templates.py:217
-#, fuzzy, python-format
+#, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr "si <b>no</b> debe especificar una cesta"
+msgstr "si %(x_fmt_open)sno%(x_fmt_close)s debe especificar una cesta"
 
 #: modules/webalert/lib/webalert_templates.py:219
 msgid "Store results in basket?"
@@ -984,20 +974,21 @@ msgstr "Guardar los resultados en una cesta?"
 
 #: modules/webalert/lib/webalert_templates.py:240
 msgid "SET ALERT"
-msgstr "PONER ALERTA"
+msgstr "ACTIVAR LA ALERTA"
 
 #: modules/webalert/lib/webalert_templates.py:241
 msgid "CLEAR DATA"
 msgstr "BORRAR DATOS"
 
 #: modules/webalert/lib/webalert_templates.py:291
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Definir una nueva búsqueda para %(your_searches)s, las %(popular_searches)s "
-"o el formulario de entrada"
+"Definir una nueva alerta a partir de %(x_url1_open)ssus búsquedas"
+"(x_url1_close)s, las %(x_url2_open)sbúsquedas más habituales%(x_url2_close)"
+"s, o el formulari de datos."
 
 #: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
@@ -1008,7 +999,6 @@ msgid "Search checking frequency"
 msgstr "Frecuencia de comprobación de la búsqueda"
 
 #: modules/webalert/lib/webalert_templates.py:312
-#, fuzzy
 msgid "Notification by email"
 msgstr "Notificación por correo electrónico"
 
@@ -1042,33 +1032,34 @@ msgid "Execute search"
 msgstr "Ejecutar la búsqueda"
 
 #: modules/webalert/lib/webalert_templates.py:373
-#, fuzzy, python-format
+#, python-format
 msgid "You have defined %s alerts."
-msgstr "Usted ha definido <B>%(number)s</B> alertas."
+msgstr "Usted ha definido %s alertas."
 
 #: modules/webalert/lib/webalert_templates.py:413
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
-msgstr "Todavía no ha ejecutado ninguna búsqueda. %(click_here)s per buscar."
+msgstr ""
+"Todavía no ha ejecutado ninguna búsqueda. Vaya primero a la %(x_url_open)"
+"sinterfaz de búsqueda(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:422
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
 msgstr ""
-"Ha ejecutado <B>%(number)d</B> búsquedas (<strong>%(different)d</strong> "
-"diferentes cuestiones) durante los últimos 30 día aproximadamente."
+"Ha ejecutado %(x_nb1)s búsquedas (%(x_nb2)s cuestiones diferentes) durante "
+"los últimos 30 días aproximadamente."
 
 #: modules/webalert/lib/webalert_templates.py:427
-#, fuzzy, python-format
+#, python-format
 msgid "Here are the %s most popular searches."
-msgstr "las búsquedas más habituales"
+msgstr "Estas son las %s búsquedas más habituales"
 
 #: modules/webalert/lib/webalert_templates.py:438
-#, fuzzy
 msgid "Question"
 msgstr "Cuestión"
 
@@ -1163,6 +1154,8 @@ msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
 "s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
+"Tiene %(x_nb_perso)s cestas personales, está subscrito a %(x_nb_group)s "
+"cestas de grupo, y a %(x_nb_public)s cestas públicas de otros usuarios."
 
 #: modules/webbasket/lib/webbasket_templates.py:183
 #, python-format
@@ -1183,7 +1176,9 @@ msgstr "La cesta está vacía"
 msgid ""
 "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
 "(x_url_close)s to it"
-msgstr "Esta cesta pertenece a %s. Puede %ssubscribe%s librement"
+msgstr ""
+"Esta cesta pertenece a %(x_name)s. Puede %(x_url_open)ssubscribirse%"
+"(x_url_close)s libremente."
 
 #: modules/webbasket/lib/webbasket_templates.py:258
 #: modules/webbasket/lib/webbasket_webinterface.py:566
@@ -1233,11 +1228,13 @@ msgid "There is currently no publicly accessible basket"
 msgstr "No hay en este momento ninguna cesta públicamente accesible"
 
 #: modules/webbasket/lib/webbasket_templates.py:336
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
 "in total."
-msgstr "Mostrando cestas %i-%i de un total de %i cestas."
+msgstr ""
+"Lista de las cestas %(x_nb_begin)i-%(x_nb_end)i de un total de %(x_nb_total)"
+"i cestas."
 
 #: modules/webbasket/lib/webbasket_templates.py:367
 msgid "Actions"
@@ -1264,9 +1261,8 @@ msgid "Edit basket"
 msgstr "Editar cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:449
-#, fuzzy
 msgid "You do not have sufficient rights to view this basket's content."
-msgstr "No tiene suficientes permisos para ver el contenido de esta cesta"
+msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:454
 #: modules/webbasket/lib/webbasket_templates.py:712
@@ -1284,22 +1280,20 @@ msgid "last comment:"
 msgstr "último comentario"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
-#, fuzzy
 msgid "Move item up"
-msgstr "Elimina el item"
+msgstr "Subirlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:530
-#, fuzzy
 msgid "Move item down"
-msgstr "Bajar el item"
+msgstr "Bajarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:538
 msgid "Copy item"
-msgstr "Copiar el item"
+msgstr "Copiarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:546
 msgid "Remove item"
-msgstr "Elimina el item"
+msgstr "Eliminarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:549
 msgid "External record"
@@ -1316,9 +1310,8 @@ msgid "Details and comments"
 msgstr "Detalles y comentarios"
 
 #: modules/webbasket/lib/webbasket_templates.py:604
-#, fuzzy
 msgid "This basket is publicly accessible at the following address:"
-msgstr "Esta cesta es accesible públicament en esta dirección: %s."
+msgstr "Esta cesta es accesible públicament en esta dirección:"
 
 #: modules/webbasket/lib/webbasket_templates.py:634
 #: modules/websearch/lib/websearch_templates.py:517
@@ -1438,9 +1431,8 @@ msgid "%i baskets"
 msgstr "%i cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1029
-#, fuzzy
 msgid "Add to a group-shared basket"
-msgstr "Añadir a una cesta compartida en grupo"
+msgstr "Añadir a una cesta de grupo"
 
 #: modules/webbasket/lib/webbasket_templates.py:1047
 msgid "Add to a public basket"
@@ -1456,9 +1448,9 @@ msgid "Add to baskets"
 msgstr "Añadir a las cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1092
-#, fuzzy, python-format
+#, python-format
 msgid "The selected records have been successfully added to %i baskets."
-msgstr "Los registros seleccionados se han añadido correctamente en %i cestas"
+msgstr "Los registros seleccionados se han añadido correctamente en %i cestas."
 
 #: modules/webbasket/lib/webbasket_templates.py:1095
 msgid "No records were added to the selected baskets."
@@ -1471,17 +1463,17 @@ msgstr "Está seguro que quiere suprimir esta cesta?"
 #: modules/webbasket/lib/webbasket_templates.py:1117
 #, fuzzy, python-format
 msgid "%i users are subscribed to this basket."
-msgstr "%i usuarios se han subscrito a esta cesta"
+msgstr "%i usuarios se han subscrito a esta cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:1119
-#, fuzzy, python-format
+#, python-format
 msgid "%i user groups are subscribed to this basket."
-msgstr "%i grupos de usuarios se han subscrito a esta cesta"
+msgstr "%i grupos de usuarios se han subscrito a esta cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:1121
-#, fuzzy, python-format
+#, python-format
 msgid "You have set %i alerts on this basket."
-msgstr "Ha puesto %i alertas en esta cesta"
+msgstr "Ha puesto %i alertas en esta cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:1195
 msgid "General settings"
@@ -1507,9 +1499,8 @@ msgid "Delete basket"
 msgstr "Suprimir la cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:1256
-#, fuzzy
 msgid "Editing basket"
-msgstr "Editar cestas"
+msgstr "Editar cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:1264
 msgid "Save changes"
@@ -1570,10 +1561,10 @@ msgstr "elimina registros"
 msgid "manage sharing rights"
 msgstr "gestionar los permisos de compartición"
 
+# De ningún?
 #: modules/webbasket/lib/webbasket_templates.py:1337
-#, fuzzy
 msgid "You are not a member of a group."
-msgstr "Usted no es miembro de ningún grupo."
+msgstr "Usted no es miembro de un grupo."
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
 msgid "Sharing basket to a new group"
@@ -1585,14 +1576,12 @@ msgstr "ninguna cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:1388
 #: modules/websession/lib/websession_templates.py:343
-#, fuzzy
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
 msgstr ""
 "Ahora usted está identificado como usuario visitante, con lo que sus cestas "
-"desaparecerán al final de esta sesión.  Si lo desea, puede %slogin or "
-"register here%s."
+"desaparecerán al final de esta sesión."
 
 #: modules/webbasket/lib/webbasket_templates.py:1389
 #: modules/webbasket/lib/webbasket_templates.py:1406
@@ -1601,16 +1590,16 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
+"Si lo desea, puede %(x_url_open)slogin or register here%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
 msgid "This functionality is forbidden to guest users."
-msgstr ""
+msgstr "Esta funcionalidad no está permitida a los usuarios visitantes."
 
 #: modules/webbasket/lib/webbasket_templates.py:1466
 #: modules/webcomment/lib/webcomment_templates.py:611
-#, fuzzy
 msgid "Back to search results"
-msgstr "(Volver al resultado de la búsqueda)"
+msgstr "Volver al resultado de la búsqueda"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:77
 msgid "Display baskets"
@@ -1649,9 +1638,9 @@ msgstr "Administración de WebComment"
 
 #: modules/webcomment/lib/webcomment.py:798
 #: modules/webcomment/lib/webcomment_templates.py:321
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr "%s escribió en %s:"
+msgstr "%(x_name)s escribió en %(x_date)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:105
 #, python-format
@@ -1699,9 +1688,9 @@ msgstr "Escriba una reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:253
 #: modules/webcomment/lib/webcomment_templates.py:558
-#, fuzzy, python-format
+#, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr "Puntuación media: %s, basada en %s resseñas"
+msgstr "Puntuación media: %(x_nb_score)s, basada en %(x_nb_reviews)s resseñas"
 
 #: modules/webcomment/lib/webcomment_templates.py:256
 #, python-format
@@ -1731,24 +1720,23 @@ msgid "Report abuse"
 msgstr "Denuncie un abuso"
 
 #: modules/webcomment/lib/webcomment_templates.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
-msgstr "Reseñado por %(nickname)s el %(date)s"
+msgstr "Reseñado por %(x_nickname)s el %(x_date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:365
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr "%i de %i personas han encontrado esta reseña útil"
+msgstr ""
+"%(x_nb_people)i de %(x_nb_total)i personas han encontrado esta reseña útil"
 
 #: modules/webcomment/lib/webcomment_templates.py:533
-#, fuzzy
 msgid "Previous"
-msgstr "< Anterior"
+msgstr "Anterior"
 
 #: modules/webcomment/lib/webcomment_templates.py:549
-#, fuzzy
 msgid "Next"
-msgstr "< Siguiente"
+msgstr "Siguiente"
 
 #: modules/webcomment/lib/webcomment_templates.py:575
 #, python-format
@@ -1780,9 +1768,8 @@ msgid "Viewing"
 msgstr "Visualización"
 
 #: modules/webcomment/lib/webcomment_templates.py:668
-#, fuzzy
 msgid "Page:"
-msgstr "Página: "
+msgstr "Página:"
 
 #: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
@@ -1790,11 +1777,13 @@ msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr "Su alias, %s, será el que se muestre como autor de este comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:790
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
 "(x_nickname)s will be displayed as the author of this comment."
-msgstr "Su alias, %s, será el que se muestre como autor de este comentario"
+msgstr ""
+"Atención: todavía no ha %(x_url_open)sdefinido su alias%(x_url_close)s. %"
+"(x_nickname)s, será el que se muestre como autor de este comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:812
 #: modules/webcomment/lib/webcomment_templates.py:886
@@ -1802,11 +1791,11 @@ msgid "Article"
 msgstr "Artículo"
 
 #: modules/webcomment/lib/webcomment_templates.py:840
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
-"Atención: su alias, %s, será el que se muestre como autor de esta reseña"
+"Atención: su alias, %s, será el que se muestre como autor de esta reseña."
 
 #: modules/webcomment/lib/webcomment_templates.py:887
 msgid "Rate this article"
@@ -1831,38 +1820,33 @@ msgid "Add Review"
 msgstr "Añada la reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:915
-#, fuzzy
 msgid "Your review was successfully added."
-msgstr "Su reseña se ha añadido correctamente"
+msgstr "Su reseña se ha añadido correctamente."
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#, fuzzy
 msgid "Your comment was successfully added."
-msgstr "Su comentario se ha añadido correctamente"
+msgstr "Su comentario se ha añadido correctamente."
 
 #: modules/webcomment/lib/webcomment_templates.py:919
 msgid "Back to record"
 msgstr "Volver al registro"
 
-# Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:995
 #: modules/webcomment/web/admin/webcommentadmin.py:115
 msgid "View all reported comments"
-msgstr "Visualizar todos los comentarios"
+msgstr "Visualizar todos los comentarios denunciados"
 
-# Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:998
 msgid "View all reported reviews"
-msgstr "Visualizar todas las reseñas"
+msgstr "Visualizar todas las reseñas denunciadas"
 
 #: modules/webcomment/lib/webcomment_templates.py:1003
 msgid "Delete a specific comment/review (by ID)"
 msgstr "Suprimir un comentario/critica (por número)"
 
-# reported?
 #: modules/webcomment/lib/webcomment_templates.py:1004
 msgid "View all users who have been reported"
-msgstr "Ver todos los usuarios que han sido avisados"
+msgstr "Ver todos los usuarios que han sido denunciados"
 
 #: modules/webcomment/lib/webcomment_templates.py:1007
 msgid "Comments and reviews are disabled"
@@ -1873,7 +1857,6 @@ msgid "Menu"
 msgstr "Menu"
 
 #: modules/webcomment/lib/webcomment_templates.py:1025
-#, fuzzy
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -1882,9 +1865,8 @@ msgstr ""
 "decidir si lo suprime no"
 
 #: modules/webcomment/lib/webcomment_templates.py:1037
-#, fuzzy
 msgid "Comment ID:"
-msgstr "Número del comentario"
+msgstr "Número del comentario:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1039
 msgid "View Comment"
@@ -1892,28 +1874,25 @@ msgstr "Visualizar el comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:1060
 msgid "There have been no reports so far."
-msgstr ""
+msgstr "De momento no hay denuncias."
 
-# Reports -> denuncias?
 #: modules/webcomment/lib/webcomment_templates.py:1064
 #, python-format
 msgid "View all %s reported comments"
 msgstr "Visualizar todos los %s comentarios denunciados"
 
-# Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:1067
 #, python-format
 msgid "View all %s reported reviews"
 msgstr "Visualizar todas las %s reseñas denunciadas"
 
 #: modules/webcomment/lib/webcomment_templates.py:1105
-#, fuzzy
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
 msgstr ""
-"Aquí hay una lista, ordenada por el número de denuncias, de todos los "
-"usuarios que tieen al menens una denuncia a alguno de sus comentarios."
+"Esta es la lista, ordenada por el número de denuncias, de los usuarios que "
+"han tenido al menos una denuncia a alguno de sus comentarios."
 
 #: modules/webcomment/lib/webcomment_templates.py:1113
 #: modules/webcomment/lib/webcomment_templates.py:1142
@@ -2011,26 +1990,23 @@ msgid "Here is comment/review %s"
 msgstr "Este es el comentario/reseña %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-msgstr "Este es el comentario/reseña %s escrita por el usuario %s"
+msgstr ""
+"Este es el comentario/reseña %(x_cmtID)s escrita por el usuario %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1281
-#, fuzzy
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr ""
-"Estas son todas las reseñas denunciadas, ordenadas por las que lo son más"
+msgstr "Estas son todas las reseñas denunciadas, ordenadas de más a menos"
 
 #: modules/webcomment/lib/webcomment_templates.py:1283
-#, fuzzy
 msgid "Here are all reported comments sorted by the most reported"
-msgstr ""
-"Estos son todos los comentarios denunciados, ordenados por los que lo son más"
+msgstr "Estos son todos los comentarios denunciados, ordenados de más a menos"
 
 #: modules/webcomment/lib/webcomment_templates.py:1308
 #: modules/webcomment/lib/webcomment_templates.py:1333
 msgid "comment ID"
-msgstr "Número de comentario"
+msgstr "número de comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "successfully deleted"
@@ -2083,7 +2059,6 @@ msgid "Delete Comment"
 msgstr "Suprimir comentario"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:143
-#, fuzzy
 msgid "View all reported users"
 msgstr "Visualizar todos los usuarios denunciados"
 
@@ -2096,32 +2071,28 @@ msgid "Suppress abuse reports"
 msgstr "Eliminar las denuncias de abuso"
 
 #: modules/webmessage/lib/webmessage.py:132
-#, fuzzy
 msgid "The message could not be deleted."
-msgstr "El mensaje no se ha podido suprimir"
+msgstr "El mensaje no se ha podido suprimir."
 
 #: modules/webmessage/lib/webmessage.py:134
-#, fuzzy
 msgid "The message was successfully deleted."
-msgstr "suprimido correctamente"
+msgstr "El mensaje se ha suprimido correctamente."
 
 #: modules/webmessage/lib/webmessage.py:151
-#, fuzzy
 msgid "Your mailbox has been emptied."
-msgstr "Se ha vaciado su buzón"
+msgstr "Se ha vaciado su buzón."
 
 #: modules/webmessage/lib/webmessage.py:341
-#, fuzzy, python-format
+#, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
-msgstr "La fecha escogida (%(year)i/%(month)i/%(day)i) no es válida"
+msgstr "La fecha escogida (%(x_year)i-%(x_month)i-%(x_day)i) no es válida"
 
 #: modules/webmessage/lib/webmessage.py:350
-#, fuzzy
 msgid "Please enter a user name or a group name."
-msgstr "Entre un nombre de usuario o un nombre de grupo"
+msgstr "Entre un nombre de usuario o de grupo."
 
 #: modules/webmessage/lib/webmessage.py:354
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
 "characters."
@@ -2130,14 +2101,14 @@ msgstr ""
 "caracteres."
 
 #: modules/webmessage/lib/webmessage.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s does not exist."
-msgstr "El grupo '%s' no existe\n"
+msgstr "El grupo %s no existe"
 
 #: modules/webmessage/lib/webmessage.py:387
-#, fuzzy, python-format
+#, python-format
 msgid "User %s does not exist."
-msgstr "El usuario '%s' no existe\n"
+msgstr "El usuario %s no existe"
 
 #: modules/webmessage/lib/webmessage.py:399
 #: modules/webmessage/lib/webmessage_webinterface.py:102
@@ -2146,11 +2117,12 @@ msgid "Write a message"
 msgstr "Escriba un mensaje"
 
 #: modules/webmessage/lib/webmessage.py:416
-#, fuzzy
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
-msgstr "No se ha podido enviar su mensaje a los seguentes destinatarios\n"
+msgstr ""
+"No se ha podido enviar su mensaje a los seguentes destinatarios debido a su "
+"cuota:"
 
 #: modules/webmessage/lib/webmessage.py:420
 msgid "Your message has been sent."
@@ -2179,9 +2151,8 @@ msgid "No messages"
 msgstr "Sin mensajes"
 
 #: modules/webmessage/lib/webmessage_templates.py:92
-#, fuzzy
 msgid "No subject"
-msgstr "[Sin asunto]"
+msgstr "Sin asunto"
 
 #: modules/webmessage/lib/webmessage_templates.py:133
 msgid "Write new message"
@@ -2192,9 +2163,8 @@ msgid "Delete All"
 msgstr "Suprimirlos todo"
 
 #: modules/webmessage/lib/webmessage_templates.py:180
-#, fuzzy
 msgid "Re:"
-msgstr "Re: "
+msgstr "Re:"
 
 #: modules/webmessage/lib/webmessage_templates.py:270
 msgid "Send later?"
@@ -2226,29 +2196,25 @@ msgid "SEND"
 msgstr "ENVIAR"
 
 #: modules/webmessage/lib/webmessage_templates.py:417
-#, fuzzy
 msgid "From:"
-msgstr "Desde"
+msgstr "De:"
 
+# 'en' o 'el'?
 #: modules/webmessage/lib/webmessage_templates.py:419
-#, fuzzy
 msgid "Sent on:"
-msgstr "Enviado el"
+msgstr "Enviado el:"
 
 #: modules/webmessage/lib/webmessage_templates.py:420
-#, fuzzy
 msgid "Received on:"
-msgstr "Recibido el"
+msgstr "Recibido el:"
 
 #: modules/webmessage/lib/webmessage_templates.py:421
-#, fuzzy
 msgid "Sent to:"
-msgstr "Enviado a"
+msgstr "Enviado a:"
 
 #: modules/webmessage/lib/webmessage_templates.py:422
-#, fuzzy
 msgid "Sent to groups:"
-msgstr "Enviado a grupos"
+msgstr "Enviado a los grupos:"
 
 #: modules/webmessage/lib/webmessage_templates.py:423
 msgid "REPLY"
@@ -2304,7 +2270,7 @@ msgstr "Buscar un grupo"
 #: modules/webmessage/lib/webmessage_templates.py:640
 #, python-format
 msgid "You have %s new messages out of %s messages"
-msgstr "Tiene %s mensajes nuevos de un total de %s mensajes"
+msgstr "Tiene %i mensajes nuevos de un total de %i mensajes"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:274
 msgid "Read a message"
@@ -2433,21 +2399,21 @@ msgid "No values found."
 msgstr "No se han encontrado valors."
 
 #: modules/websearch/lib/search_engine.py:1395
-#, fuzzy, python-format
+#, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"No se han encontrado coincidencias con <em>%s</em>, pero usando <em>%s</"
-"em>..."
+"No se han encontrado coincidencias con %(x_query1)s, pero cambiándolo por %"
+"(x_query2)s..."
 
 #: modules/websearch/lib/search_engine.py:1634
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"No se ha encontrado ninguna coincidencia en la coleción %s. Otras "
-"colecciones públicas dieron <a class=\"nearestterms\" href=\"%s\">%d "
-"resultados</a>."
+"No se ha encontrado ninguna coincidencia en la coleción %(x_collection)s. "
+"Otras colecciones públicas dieron %(x_url_open)s%(x_nb_hits)d resultados%"
+"(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:1643
 msgid ""
@@ -2467,37 +2433,38 @@ msgid "No phrase index available for"
 msgstr "No hay ningún índice de frases disponible para"
 
 #: modules/websearch/lib/search_engine.py:1783
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
 msgstr ""
-"no se ha encontrado en ningún registro. Los términos aproximados en todas "
-"las colección son:"
+"El término de búsqueda %(x_term)s en el índice %(x_index)s no se ha "
+"encontrado en ningún registro. Los términos aproximados en cualquier "
+"colección son:"
 
 #: modules/websearch/lib/search_engine.py:1787
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr ""
-"no se ha encontrado en ningún registro. Los términos aproximados en todas "
-"las colección son:"
+"El término de búsqueda %s no se ha encontrado en ningún registro. Los "
+"términos aproximados, en cualquier las colección, son:"
 
 #: modules/websearch/lib/search_engine.py:2215
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr ""
-"Sólo se puede ordenar en conjuntos de hasta %d registros.  Ordenado per "
-"defecto (\"primero el último\")."
+"Sólo se puede ordenar en conjuntos de hasta %d registros.  Ordenado por "
+"defecto (\"primero los más recientes\")."
 
 #: modules/websearch/lib/search_engine.py:2239
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
-msgstr "No es posible ordenar por '%s'.  Ha quedado ordenado por título."
+msgstr "No es posible ordenar por %s.  Ha quedado ordenado por título."
 
 #: modules/websearch/lib/search_engine.py:2442
 msgid "Use different search terms."
@@ -2625,13 +2592,13 @@ msgstr "Citado por"
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
+"Las palabras más cercanas a %(x_word)s en %(x_field)s, en cualquier "
+"colección, son:"
 
 #: modules/websearch/lib/websearch_templates.py:1014
-#, fuzzy, python-format
+#, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr ""
-"no se ha encontrado en ningún registro. Los términos aproximados en todas "
-"las colección son:"
+msgstr "Las palabras más cercanas a %s, en cualquier colección, son:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
@@ -2652,9 +2619,8 @@ msgid "collections"
 msgstr "colecciones"
 
 #: modules/websearch/lib/websearch_templates.py:1462
-#, fuzzy
 msgid "Limit to:"
-msgstr "Limitar a"
+msgstr "Limitar a:"
 
 #: modules/websearch/lib/websearch_templates.py:1580
 msgid "MARC tag"
@@ -3765,52 +3731,48 @@ msgid "Browser"
 msgstr "Explorar"
 
 #: modules/webstyle/lib/webstyle_templates.py:521
-#, fuzzy
 msgid "System Error"
-msgstr "Error Interno"
+msgstr "Error de sistema"
 
 #: modules/webstyle/lib/webstyle_templates.py:534
 msgid "Traceback"
-msgstr ""
+msgstr "Traceback"
 
 #: modules/webstyle/lib/webstyle_templates.py:579
 msgid "Time"
-msgstr ""
+msgstr "Hora"
 
 #: modules/webstyle/lib/webstyle_templates.py:580
 msgid "Client"
-msgstr ""
+msgstr "Client"
 
 #: modules/webstyle/lib/webstyle_templates.py:581
 msgid "Please send an error report to the Administrator."
-msgstr ""
+msgstr "Envie por favor el informe de error al administrador."
 
 #: modules/webstyle/lib/webstyle_templates.py:582
 msgid "Send error report"
-msgstr ""
+msgstr "Enviar el informe de error"
 
 #: modules/webstyle/lib/webstyle_templates.py:585
-#, fuzzy, python-format
+#, python-format
 msgid "Please contact %s quoting the following information:"
-msgstr ""
-"Por favor contacte <a href=\"mailto:%s\">%s</a> indicando la siguiente "
-"información:"
+msgstr "Por favor contacte com %s indicando la siguiente información:"
 
 #: modules/websubmit/lib/websubmit_engine.py:74
 #: modules/websubmit/lib/websubmit_engine.py:483
 #: modules/websubmit/web/yoursubmissions.py:64
 msgid "Sorry, you must log in to perform this action."
-msgstr ""
+msgstr "Tiene que identificarse para ejecutar esta acción."
 
 #: modules/websubmit/lib/websubmit_engine.py:79
 #: modules/websubmit/lib/websubmit_engine.py:487
-#, fuzzy
 msgid "Invalid parameter"
-msgstr "Editar parámetros"
+msgstr "Parámetro no válido"
 
 #: modules/websubmit/lib/websubmit_engine.py:84
 msgid "Unable to find the submission directory."
-msgstr ""
+msgstr "No se puede encontrar el directori de envíos."
 
 #: modules/websubmit/lib/websubmit_engine.py:90
 msgid "Unknown document type"
