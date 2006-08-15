@@ -16,10 +16,10 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.90.1\n"
+"Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-07-21 18:34+0200\n"
-"PO-Revision-Date: 2006-07-20 19:01+0200\n"
+"PO-Revision-Date: 2006-07-24 09:00+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,8 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 # TODO:
-# settings configuracio; parametres  = ?
+# settings = configuracio; parametres  = ?
+# delete = suprimir; remove = elimina
 #: config/cdswmllib.wml:92 modules/webstyle/lib/webstyle_templates.py:466
 msgid "This site is also available in the following languages:"
 msgstr "Aquest lloc està també disponible en els següents idiomes:"
@@ -379,7 +380,7 @@ msgstr "Powered by"
 
 #: modules/bibedit/lib/bibedit_templates.py:50
 msgid "Add Subfield"
-msgstr ""
+msgstr "Afegir cubcamp"
 
 #: modules/bibedit/lib/bibedit_templates.py:61
 #: modules/webalert/lib/webalert_templates.py:75
@@ -387,14 +388,12 @@ msgid "Field"
 msgstr "Camp"
 
 #: modules/bibedit/lib/bibedit_templates.py:84
-#, fuzzy
 msgid "Add Field"
-msgstr "Camp"
+msgstr "Afegir camp"
 
 #: modules/bibedit/lib/bibedit_templates.py:91
-#, fuzzy
 msgid "Verbose"
-msgstr "Llista"
+msgstr "Verbós"
 
 #: modules/bibedit/lib/bibedit_templates.py:108
 #: modules/webbasket/lib/webbasket_templates.py:1160
@@ -412,9 +411,8 @@ msgstr "Cancel·lar"
 #: modules/bibedit/lib/bibedit_templates.py:302
 #: modules/bibedit/lib/bibedit_templates.py:345
 #: modules/webmessage/lib/webmessage_templates.py:105
-#, fuzzy
 msgid "Delete"
-msgstr "Esborrar"
+msgstr "Suprimir"
 
 #: modules/bibedit/lib/bibedit_templates.py:120
 #: modules/webalert/lib/webalert_templates.py:317
@@ -435,44 +433,43 @@ msgid "Record"
 msgstr "Registre"
 
 #: modules/bibedit/lib/bibedit_templates.py:122
-#, fuzzy
 msgid "Display"
-msgstr "Visualitzar les alertes"
+msgstr "Mostrar"
 
 #: modules/bibedit/lib/bibedit_templates.py:236
 msgid "Save"
-msgstr ""
+msgstr "Desar"
 
 #: modules/bibedit/lib/bibedit_templates.py:238
-#, fuzzy
 msgid "Return to Record"
-msgstr "saltar al registre:"
+msgstr "Tornar al registre:"
 
 #: modules/bibedit/lib/bibedit_templates.py:337
 #: modules/bibedit/lib/bibedit_templates.py:438
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: modules/bibedit/lib/bibedit_templates.py:392
 msgid "Your changes are TEMPORARY."
-msgstr ""
+msgstr "Els vostres canvis són TEMPORALS."
 
 #: modules/bibedit/lib/bibedit_templates.py:393
 msgid "To save this record, please click on submit."
-msgstr ""
+msgstr "Per a desar aquest registre, feu clic a submit."
 
 #: modules/bibedit/lib/bibedit_templates.py:407
 #, fuzzy
 msgid "This record does not exist."
-msgstr "L'usuari '%s' no existeix\n"
+msgstr "Aquest registre no existeix."
 
 #: modules/bibedit/lib/bibedit_templates.py:408
 msgid "Please try another record ID."
-msgstr ""
+msgstr "Proveu un altre número de registre."
 
 #: modules/bibedit/lib/bibedit_templates.py:416
+#, fuzzy
 msgid "This record is currently being edited by another user."
-msgstr ""
+msgstr "Aquest registre ara mateix l'està editant algú més."
 
 #: modules/bibedit/lib/bibedit_templates.py:417
 #, fuzzy
@@ -481,7 +478,7 @@ msgstr "Proveu-ho de nou"
 
 #: modules/bibedit/lib/bibedit_templates.py:424
 msgid "Cannot edit deleted record."
-msgstr ""
+msgstr "No es pot editar un registre suprimit."
 
 #: modules/bibedit/lib/bibedit_templates.py:435
 #, fuzzy
@@ -489,10 +486,11 @@ msgid "Please enter the ID of the record you want to edit"
 msgstr "Seleccioneu el tipus de document que voleu lliurar"
 
 #: modules/bibedit/lib/bibedit_templates.py:447
+#, fuzzy
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
-msgstr ""
+msgstr "Es processaran tan aviat com la cua de tasques estigui buida"
 
 #: modules/bibedit/lib/bibedit_templates.py:449
 #: modules/bibedit/lib/bibedit_templates.py:481
@@ -504,7 +502,7 @@ msgstr ""
 #: modules/bibedit/lib/bibedit_templates.py:469
 #, fuzzy
 msgid "Do you really want to delete this record?"
-msgstr "Esteu segur que voleu esborrar aquest cistell?"
+msgstr "Esteu segur que voleu suprimir aquest cistell?"
 
 #: modules/bibedit/lib/bibedit_templates.py:473
 #: modules/webbasket/lib/webbasket_templates.py:1159
@@ -531,8 +529,9 @@ msgid "No"
 msgstr "No"
 
 #: modules/bibedit/lib/bibedit_templates.py:479
+#, fuzzy
 msgid "The record will be deleted as soon as the task queue is empty."
-msgstr ""
+msgstr "Es processaran tan aviat com la cua de tasques estigui buida"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:61
 #, python-format
@@ -541,7 +540,7 @@ msgstr ""
 
 #: modules/bibedit/web/admin/bibeditadmin.py:63
 msgid "BibEdit Admin Interface"
-msgstr ""
+msgstr "Interfície d'aministració de BibEdit"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:95
 #, python-format
@@ -576,12 +575,10 @@ msgid "Next oaiharvest task"
 msgstr "Propera tasca oaiharvest"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:118
-#, fuzzy
 msgid "scheduled time:"
 msgstr "previst per:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:119
-#, fuzzy
 msgid "current status:"
 msgstr "status actual:"
 
@@ -875,10 +872,9 @@ msgid ""
 "is available with a posibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
 msgstr ""
-"Heu fet %(number)s cerques.  Hi ha una %(detailed_list)s disponible \n"
-"amb possibilitat de (a) veure els resultats de la cerca i (b) \n"
-"subscriure-us per rebre notificacions per correu electrònic d'aquestes \n"
-"cerques"
+"Heu fet %(number)s cerques.  Hi ha una %(detailed_list)s disponible amb "
+"possibilitat de (a) veure els resultats de la cerca i (b) subscriure-us per "
+"rebre notificacions per correu electrònic d'aquestes cerques"
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
@@ -927,7 +923,7 @@ msgstr "nom de l'alerta"
 
 #: modules/webalert/lib/webalert_templates.py:121
 msgid "SHOW"
-msgstr "MOSTRA"
+msgstr "MOSTRAR"
 
 #: modules/webalert/lib/webalert_templates.py:164
 #, fuzzy
@@ -943,12 +939,10 @@ msgid "QUERY"
 msgstr "CERCA"
 
 #: modules/webalert/lib/webalert_templates.py:203
-#, fuzzy
 msgid "Alert identification name:"
 msgstr "Nom d'identificació de l'alerta"
 
 #: modules/webalert/lib/webalert_templates.py:205
-#, fuzzy
 msgid "Search-checking frequency:"
 msgstr "Freqüència de comprovació de la cerca:"
 
@@ -985,7 +979,7 @@ msgstr "no"
 #: modules/webalert/lib/webalert_templates.py:217
 #, fuzzy, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr "si <no> cal que especifiqueu un cistell"
+msgstr "si <b>no</b> cal que especifiqueu un cistell"
 
 #: modules/webalert/lib/webalert_templates.py:219
 msgid "Store results in basket?"
@@ -1019,7 +1013,7 @@ msgstr "Freqüència de comprovació de la cerca"
 #: modules/webalert/lib/webalert_templates.py:312
 #, fuzzy
 msgid "Notification by email"
-msgstr "Notificació per correu-e"
+msgstr "Notificació per correu electrònic"
 
 #: modules/webalert/lib/webalert_templates.py:313
 msgid "Result in basket"
@@ -1039,7 +1033,7 @@ msgstr "Cerca"
 
 #: modules/webalert/lib/webalert_templates.py:364
 msgid "Remove"
-msgstr "Esborrar"
+msgstr "Eliminar"
 
 #: modules/webalert/lib/webalert_templates.py:365
 msgid "Modify"
@@ -1074,10 +1068,9 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:427
 #, fuzzy, python-format
 msgid "Here are the %s most popular searches."
-msgstr "les cerques més populars"
+msgstr "les cerques més habituals"
 
 #: modules/webalert/lib/webalert_templates.py:438
-#, fuzzy
 msgid "Question"
 msgstr "Qüestió"
 
@@ -1091,7 +1084,7 @@ msgstr "Definir una nova alerta"
 
 #: modules/webalert/lib/webalert_webinterface.py:66
 msgid "Display searches"
-msgstr "Visualitzar els resultats:"
+msgstr "Mostrar les cerques"
 
 #: modules/webalert/lib/webalert_webinterface.py:71
 #: modules/webalert/lib/webalert_webinterface.py:111
@@ -1145,11 +1138,10 @@ msgstr "Modificar l'alerta"
 #: modules/webalert/lib/webalert_webinterface.py:246
 #: modules/webalert/lib/webalert_webinterface.py:276
 msgid "Display alerts"
-msgstr "Visualitzar les alertes"
+msgstr "Mostrar les alertes"
 
 # Mirar com traduir 'posted'
 #: modules/webbasket/lib/webbasket.py:344
-#, fuzzy
 msgid "Your comment has been successfully posted"
 msgstr "El vostre comentari ha estat publicat"
 
@@ -1163,18 +1155,18 @@ msgstr "Cistells personals"
 msgid "Group baskets"
 msgstr "Cistells de grup"
 
+# 'altri' per 'tercers'?
 #: modules/webbasket/lib/webbasket.py:758
 #: modules/webbasket/lib/webbasket_templates.py:103
-#, fuzzy
 msgid "Others' baskets"
 msgstr "Cistells d'altri"
 
 #: modules/webbasket/lib/webbasket.py:793
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
 "s group baskets and %(x_nb_public)s other users public baskets."
-msgstr "Heu %s i esteu subscrits a %s i %s."
+msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:183
 #, python-format
@@ -1195,14 +1187,12 @@ msgstr "El cistell està buit"
 msgid ""
 "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
 "(x_url_close)s to it"
-msgstr ""
-"Aquest cistell pertany a %s. Us hi podeu subscriure lliurement usant "
-"l'enllaç d'aquí sota"
+msgstr "Aquest cistell pertany a %s. Us hi podeu %ssubscribe%s lliurement"
 
 #: modules/webbasket/lib/webbasket_templates.py:258
 #: modules/webbasket/lib/webbasket_webinterface.py:566
 msgid "Public basket"
-msgstr "Cistells públics"
+msgstr "Cistell públic"
 
 #: modules/webbasket/lib/webbasket_templates.py:261
 #: modules/webbasket/lib/webbasket_templates.py:491
@@ -1226,10 +1216,9 @@ msgstr "Subscriure's a aquest cistell"
 msgid "Basket's name"
 msgstr "Nom del cistell"
 
-# falta 'of'?
 #: modules/webbasket/lib/webbasket_templates.py:281
 msgid "Number of views"
-msgstr "Número de vistes"
+msgstr "Número de viualitzacions"
 
 #: modules/webbasket/lib/webbasket_templates.py:282
 msgid "Owner"
@@ -1252,7 +1241,7 @@ msgstr "No hi ha ara mateix cap cistell públicament accessible"
 msgid ""
 "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
 "in total."
-msgstr "Visualitzant els cistells %i-%i d'un total de %i cistells."
+msgstr "Mostrant els cistells %i-%i d'un total de %i cistells."
 
 #: modules/webbasket/lib/webbasket_templates.py:367
 msgid "Actions"
@@ -1266,7 +1255,7 @@ msgstr "Cistell no compartits"
 #: modules/webbasket/lib/webbasket_templates.py:401
 #: modules/webbasket/lib/webbasket_templates.py:705
 msgid "Shared basket"
-msgstr "Cistells compartits"
+msgstr "Cistell compartit"
 
 #: modules/webbasket/lib/webbasket_templates.py:404
 #: modules/webbasket/lib/webbasket_templates.py:707
@@ -1283,6 +1272,7 @@ msgstr "Editar cistell"
 msgid "You do not have sufficient rights to view this basket's content."
 msgstr "No teniu prou permisos per a veure el contingut d'aquest cistell"
 
+# Segur que és dessubscriure's?
 #: modules/webbasket/lib/webbasket_templates.py:454
 #: modules/webbasket/lib/webbasket_templates.py:712
 #, fuzzy
@@ -1296,14 +1286,13 @@ msgstr "comentaris"
 
 # Darrer o últim?
 #: modules/webbasket/lib/webbasket_templates.py:467
-#, fuzzy
 msgid "last comment:"
 msgstr "darrer comentari:"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
 #, fuzzy
 msgid "Move item up"
-msgstr "Esborrar l'item"
+msgstr "Elimina l'item"
 
 #: modules/webbasket/lib/webbasket_templates.py:530
 #, fuzzy
@@ -1316,7 +1305,7 @@ msgstr "Copiar l'item"
 
 #: modules/webbasket/lib/webbasket_templates.py:546
 msgid "Remove item"
-msgstr "Esborrar l'item"
+msgstr "Elimina l'item"
 
 #: modules/webbasket/lib/webbasket_templates.py:549
 msgid "External record"
@@ -1324,7 +1313,6 @@ msgstr "Registre extern"
 
 # Últim o darrer?
 #: modules/webbasket/lib/webbasket_templates.py:579
-#, fuzzy
 msgid "last"
 msgstr "últim"
 
@@ -1384,7 +1372,6 @@ msgstr "per"
 
 #: modules/webbasket/lib/webbasket_templates.py:782
 #: modules/webbasket/lib/webbasket_templates.py:809
-#, fuzzy
 msgid "on"
 msgstr "el"
 
@@ -1396,7 +1383,7 @@ msgstr "Contestar"
 
 #: modules/webbasket/lib/webbasket_templates.py:795
 msgid "Delete comment"
-msgstr "Esborrar comentari"
+msgstr "Suprimir comentari"
 
 #: modules/webbasket/lib/webbasket_templates.py:849
 #: modules/webbasket/lib/webbasket_templates.py:854
@@ -1415,7 +1402,7 @@ msgstr "Comentari"
 #: modules/webbasket/lib/webbasket_templates.py:870
 #: modules/webbasket/lib/webbasket_templates.py:966
 msgid "Create new basket"
-msgstr "Crear cistells nous"
+msgstr "Crear un nou cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:920
 msgid "Select topic"
@@ -1448,7 +1435,7 @@ msgstr "Seleccioneu el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1008
 msgid "Add to a personal basket"
-msgstr "Afegiu al cistell personal"
+msgstr "Afegir al cistell personal"
 
 #: modules/webbasket/lib/webbasket_templates.py:1009
 #: modules/webbasket/lib/webbasket_templates.py:1030
@@ -1478,7 +1465,8 @@ msgstr "Afegir als cistells"
 #: modules/webbasket/lib/webbasket_templates.py:1092
 #, fuzzy, python-format
 msgid "The selected records have been successfully added to %i baskets."
-msgstr "Els registres sleccionats han estat afegits correctament a %i cistells"
+msgstr ""
+"Els registres seleccionats han estat afegits correctament a %i cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:1095
 msgid "No records were added to the selected baskets."
@@ -1486,7 +1474,7 @@ msgstr "No s'han afegit registres als cistells seleccionats."
 
 #: modules/webbasket/lib/webbasket_templates.py:1115
 msgid "Are you sure you want to delete this basket?"
-msgstr "Esteu segur que voleu esborrar aquest cistell?"
+msgstr "Esteu segur que voleu suprimir aquest cistell?"
 
 #: modules/webbasket/lib/webbasket_templates.py:1117
 #, fuzzy, python-format
@@ -1519,13 +1507,12 @@ msgstr "Gestionar permisos del grup"
 
 # Potser: 'per a compartir'?
 #: modules/webbasket/lib/webbasket_templates.py:1227
-#, fuzzy
 msgid "Manage global sharing rights"
 msgstr "Gestionar permisos globals de compartició"
 
 #: modules/webbasket/lib/webbasket_templates.py:1232
 msgid "Delete basket"
-msgstr "Esborrar cistell"
+msgstr "Suprimir el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1256
 #, fuzzy
@@ -1534,12 +1521,11 @@ msgstr "Editar cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1264
 msgid "Save changes"
-msgstr "Guardar els canvis"
+msgstr "Desar els canvis"
 
 # O 'permisos'?
 #: modules/webbasket/lib/webbasket_templates.py:1277
 #: modules/webbasket/lib/webbasket_templates.py:1301
-#, fuzzy
 msgid "No rights"
 msgstr "Sense permís"
 
@@ -1581,31 +1567,28 @@ msgstr "afegir registres"
 #: modules/webbasket/lib/webbasket_templates.py:1287
 #: modules/webbasket/lib/webbasket_templates.py:1311
 msgid "delete comments"
-msgstr "esborrar comentaris"
+msgstr "suprimir comentaris"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
 #: modules/webbasket/lib/webbasket_templates.py:1313
 msgid "remove records"
-msgstr "esborrar registres"
+msgstr "elimina registres"
 
 #: modules/webbasket/lib/webbasket_templates.py:1291
 #: modules/webbasket/lib/webbasket_templates.py:1315
-#, fuzzy
 msgid "manage sharing rights"
 msgstr "gestionar els permisos de compartició"
 
 #: modules/webbasket/lib/webbasket_templates.py:1337
 #, fuzzy
 msgid "You are not a member of a group."
-msgstr "No sou membre d'un grup"
+msgstr "No sou membre de cap grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
-#, fuzzy
 msgid "Sharing basket to a new group"
 msgstr "Compartir cistell amb un nou grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1380
-#, fuzzy
 msgid "no basket"
 msgstr "cap cistell"
 
@@ -1616,8 +1599,9 @@ msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
 msgstr ""
-"Com que esteu connectat com a usuari visitant, els cistells desapareixeran "
-"al final d'aquesta sessió. Si voleu podeu %slogin or register here%s."
+"Ara esteu connectat com a usuari visitant, de manera que els vostres "
+"cistells desapareixeran al final d'aquesta sessió. Si voleu podeu %slogin or "
+"register here%s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1389
 #: modules/webbasket/lib/webbasket_templates.py:1406
@@ -1628,11 +1612,8 @@ msgid ""
 msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
-#, fuzzy
 msgid "This functionality is forbidden to guest users."
 msgstr ""
-"Com que esteu connectat com a usuari visitant, els cistells desapareixeran "
-"al final d'aquesta sessió. Si voleu podeu %slogin or register here%s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1466
 #: modules/webcomment/lib/webcomment_templates.py:611
@@ -1656,11 +1637,9 @@ msgstr "Afegir registres als cistells"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:345
 msgid "Delete a basket"
-msgstr "Esborrar un cistell"
+msgstr "Suprimir un cistell"
 
-# Al o a un?
 #: modules/webbasket/lib/webbasket_webinterface.py:383
-#, fuzzy
 msgid "Copy record to basket"
 msgstr "Copiar el registre al cistell"
 
@@ -1681,10 +1660,10 @@ msgstr "Administració de WebComment"
 #: modules/webcomment/lib/webcomment_templates.py:321
 #, fuzzy, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr "Comentat per %s el %s"
+msgstr "%s va escriure el %s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:105
-#, fuzzy, python-format
+#, python-format
 msgid "Showing the latest %i comments:"
 msgstr "Mostrar els darrers %i comentaris:"
 
@@ -1695,7 +1674,7 @@ msgstr "Comenteu aquest document"
 
 #: modules/webcomment/lib/webcomment_templates.py:146
 msgid "Start a discussion about any aspect of this document."
-msgstr "Comenceu un comentari sobre qualsevol aspecte d'aquest document."
+msgstr "Enceteu un debat sobre qualsevol aspecte d'aquest document."
 
 #: modules/webcomment/lib/webcomment_templates.py:162
 #, python-format
@@ -1703,79 +1682,73 @@ msgid "Sorry, the record %s does not seem to exist."
 msgstr "Sembla que el registre %s no existeix."
 
 #: modules/webcomment/lib/webcomment_templates.py:164
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, %s is not a valid ID value."
-msgstr "El registre %s no és un identificador vàlid."
+msgstr "%s no és un identificador vàlid."
 
-# Heu?
 #: modules/webcomment/lib/webcomment_templates.py:166
-#, fuzzy
 msgid "Sorry, no record ID was provided."
-msgstr "No heu donat número de registre."
+msgstr "No heu donat el número de registre."
 
-# bug: & -> %
 #: modules/webcomment/lib/webcomment_templates.py:170
-#, fuzzy, python-format
+#, python-format
 msgid "You may want to start browsing from %s"
-msgstr "Podeu començar a visualitzar des de &s"
+msgstr "Podeu començar a visualitzar des de %s"
 
-# review: comentari, crítica, ???
 #: modules/webcomment/lib/webcomment_templates.py:238
 #: modules/webcomment/lib/webcomment_templates.py:502
-#, fuzzy
 msgid "Was this review helpful?"
-msgstr "Ha estat útil aquesta crítica?"
+msgstr "Ha estat útil aquesta ressenya?"
 
 #: modules/webcomment/lib/webcomment_templates.py:249
 #: modules/webcomment/lib/webcomment_templates.py:283
 #: modules/webcomment/lib/webcomment_templates.py:572
 msgid "Write a review"
-msgstr "Escriviu-ne una crítica"
+msgstr "Escriviu-ne una ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:253
 #: modules/webcomment/lib/webcomment_templates.py:558
 #, fuzzy, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr "Puntuació mitja: %s basada en %s crítiques"
+msgstr "Puntuació mitjana: %s, basada en %s ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:256
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr ""
-"Els lectors han trobat que les següents %s crítiques són les més útils."
+"Els lectors han trobat que les següents %s ressenyes són les més útils."
 
 # Temps verbal: visualita?  Visualitzeu?
 #: modules/webcomment/lib/webcomment_templates.py:259
 #: modules/webcomment/lib/webcomment_templates.py:282
-#, fuzzy, python-format
+#, python-format
 msgid "View all %s reviews"
-msgstr "Visualitzar totes les %s crítiques"
+msgstr "Visualitzar totes les %s ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:278
 #: modules/webcomment/lib/webcomment_templates.py:300
 msgid "Rate this document"
-msgstr "Puntueu aquest document"
+msgstr "Valoreu aquest document"
 
 #: modules/webcomment/lib/webcomment_templates.py:301
 msgid "Be the first to review this document."
-msgstr "Sigueu el primer a escriure una crítica d'aquest document."
+msgstr "Sigueu el primer a escriure una ressenya d'aquest document."
 
 #: modules/webcomment/lib/webcomment_templates.py:329
 #: modules/webcomment/lib/webcomment_templates.py:369
 #: modules/webcomment/lib/webcomment_templates.py:503
-#, fuzzy
 msgid "Report abuse"
-msgstr "Aviseu d'un abús"
+msgstr "Denuncieu-ne un abús"
 
 #: modules/webcomment/lib/webcomment_templates.py:364
 #, fuzzy, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
-msgstr "Comentat per %s el %s"
+msgstr "Ressenyat per %(nickname)s el %(date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:365
 #, fuzzy, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr "%i de %i persones han trobat aquesta crítica útil"
+msgstr "%i de %i persones han trobat aquesta ressenya útil"
 
 #: modules/webcomment/lib/webcomment_templates.py:533
 #, fuzzy
@@ -1788,21 +1761,19 @@ msgid "Next"
 msgstr "< Següent"
 
 #: modules/webcomment/lib/webcomment_templates.py:575
-#, fuzzy, python-format
+#, python-format
 msgid "There is a total of %s reviews"
-msgstr "Hi ha un total de %s %s"
+msgstr "Hi ha un total de %s ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:577
-#, fuzzy, python-format
+#, python-format
 msgid "There is a total of %s comments"
-msgstr "Hi ha un total de %i comentaris"
+msgstr "Hi ha un total de %s comentaris"
 
-# Revisar 'review'
 #: modules/webcomment/lib/webcomment_templates.py:618
 #: modules/webcomment/lib/webcomment_templates.py:669
-#, fuzzy
 msgid "review"
-msgstr "crítica"
+msgstr "ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:618
 #: modules/webcomment/lib/webcomment_templates.py:669
@@ -1812,11 +1783,10 @@ msgstr "comentari"
 #: modules/webcomment/lib/webcomment_templates.py:619
 #: modules/webcomment/lib/webcomment_templates.py:1232
 msgid "Review"
-msgstr "Crítica"
+msgstr "Ressenya"
 
 # Conjugació? Gerundi!?!?
 #: modules/webcomment/lib/webcomment_templates.py:667
-#, fuzzy
 msgid "Viewing"
 msgstr "Visualització"
 
@@ -1826,10 +1796,10 @@ msgid "Page:"
 msgstr "Pàgina: "
 
 #: modules/webcomment/lib/webcomment_templates.py:786
-#, fuzzy, python-format
+#, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr ""
-"El vostre àlias, <i>%s</i>, serà el que es vegi com autor d'aquest comentari"
+"El vostre àlias, %s, serà el que es mostri com autor d'aquest comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:790
 #, fuzzy, python-format
@@ -1850,8 +1820,8 @@ msgstr "Article"
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
-"Noteu: el vostre àlias, <i>%s</i>, serà el que es mostri com a autor "
-"d'questa crítica"
+"Compte: el vostre àlias, %s, serà el que es mostri com a autor d'aquesta "
+"ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:887
 msgid "Rate this article"
@@ -1863,28 +1833,27 @@ msgstr "Seleccioneu una puntuació"
 
 #: modules/webcomment/lib/webcomment_templates.py:889
 msgid "Give a title to your review"
-msgstr "Doneu un títol a la vostra crítica"
+msgstr "Doneu un títol a la vostra ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:890
 msgid "Write your review"
-msgstr "Escriviu la vostra crítica"
+msgstr "Escriviu la vostra ressenya"
 
+# 'la' o 'una'?
 #: modules/webcomment/lib/webcomment_templates.py:896
 #: modules/webcomment/lib/webcomment_webinterface.py:211
 msgid "Add Review"
-msgstr "Afegiu una crítica"
+msgstr "Afegiu la ressenya"
 
-# Gènere?  El o La?  Segons el codi font, tant pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:915
 #, fuzzy
 msgid "Your review was successfully added."
-msgstr "El vostre %s ha estat afegit"
+msgstr "La vostra ressenya ha estat afegit correctament"
 
-# Gènere?  El o La?  Segons el codi font, tant pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:917
 #, fuzzy
 msgid "Your comment was successfully added."
-msgstr "El vostre %s ha estat afegit"
+msgstr "El vostre comentari ha estat afegit correctament"
 
 #: modules/webcomment/lib/webcomment_templates.py:919
 msgid "Back to record"
@@ -1893,29 +1862,26 @@ msgstr "Tornar al registre"
 # Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:995
 #: modules/webcomment/web/admin/webcommentadmin.py:115
-#, fuzzy
 msgid "View all reported comments"
 msgstr "Visualitzar tots els comentaris"
 
 # Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:998
-#, fuzzy
 msgid "View all reported reviews"
-msgstr "Visualitzar totes les crítiques"
+msgstr "Visualitzar totes les ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1003
 msgid "Delete a specific comment/review (by ID)"
-msgstr "Esborrar un comentari/crítica específic (per codi)"
+msgstr "Suprimir un comentari/ressenya específic (per número)"
 
 # reported?
 #: modules/webcomment/lib/webcomment_templates.py:1004
-#, fuzzy
 msgid "View all users who have been reported"
 msgstr "Visualitzar tots els usuaris que han estat informats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1007
 msgid "Comments and reviews are disabled"
-msgstr "Els comentaris i les crítiques estan desactivades"
+msgstr "Els comentaris i les ressenyes estan desactivades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1010
 msgid "Menu"
@@ -1927,13 +1893,13 @@ msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
 msgstr ""
-"Entreu l'identificador del comentari/crítica per poder visualitzar-ho abans "
-"de decidir d'esborrar-lo o no"
+"Entreu el número del comentari/ressenya per poder visualitzar-ho abans de "
+"decidir de suprimir-lo o no"
 
 #: modules/webcomment/lib/webcomment_templates.py:1037
 #, fuzzy
 msgid "Comment ID:"
-msgstr "Identificador del comentari"
+msgstr "Número del comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1039
 msgid "View Comment"
@@ -1943,19 +1909,19 @@ msgstr "Visualitzar el comentari"
 msgid "There have been no reports so far."
 msgstr ""
 
-# Falta 'reported'
+# Reports -> denúncies?
 #: modules/webcomment/lib/webcomment_templates.py:1064
-#, fuzzy, python-format
+#, python-format
 msgid "View all %s reported comments"
-msgstr "Visualitzar tots els %s comentaris"
+msgstr "Visualitzar tots els %s comentaris denunciats"
 
-# Falta 'reported'
+# Reports -> denúncies?
 #: modules/webcomment/lib/webcomment_templates.py:1067
-#, fuzzy, python-format
+#, python-format
 msgid "View all %s reported reviews"
-msgstr "Visualitzar totes les %s critiques"
+msgstr "Visualitzar totes les %s ressenyes denunciades"
 
-# Reports -> informes?
+# Reports -> denúncies?
 #: modules/webcomment/lib/webcomment_templates.py:1105
 #, fuzzy
 msgid ""
@@ -1980,47 +1946,40 @@ msgstr "Adreça electrònica"
 #: modules/webcomment/lib/webcomment_templates.py:1115
 #: modules/webcomment/lib/webcomment_templates.py:1144
 msgid "User ID"
-msgstr "Identificador d'usuari"
+msgstr "Número d'usuari"
 
-# falta 'of'?
+# Falta 'of'?
 #: modules/webcomment/lib/webcomment_templates.py:1117
-#, fuzzy
 msgid "Number positive votes"
-msgstr "Número de vots positius"
+msgstr "Nombre de vots positius"
 
 # Falta 'of'?
 #: modules/webcomment/lib/webcomment_templates.py:1118
-#, fuzzy
 msgid "Number negative votes"
-msgstr "Número de vots negatius"
+msgstr "Nombre de vots negatius"
 
+# Falta 'of'?
 #: modules/webcomment/lib/webcomment_templates.py:1119
 msgid "Total number votes"
-msgstr "Número total de vots"
+msgstr "Nombre total de vots"
 
-# 'reports' per 'informes'?
 #: modules/webcomment/lib/webcomment_templates.py:1120
-#, fuzzy
 msgid "Total number of reports"
-msgstr "Número total d'informes"
+msgstr "Nombre total de denúncies"
 
-# Falta 'reported'
 #: modules/webcomment/lib/webcomment_templates.py:1121
-#, fuzzy
 msgid "View all user's reported comments/reviews"
-msgstr "Visualitzar tots els comentaris/crítiques dels usuaris"
+msgstr "Visualitzar tots els comentaris/ressenyes denunciades d'aquest usuari"
 
-# Gènere, aquest[a]?  Segons el codi font, tan pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:1154
-#, fuzzy, python-format
+#, python-format
 msgid "This review has been reported %i times"
-msgstr "Aquest %s ha estat informat %i vegades"
+msgstr "Aquesta ressenya ha estat denunciada %i cops"
 
-# Gènere, aquest[a]?  Segons el codi font, tan pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:1156
-#, fuzzy, python-format
+#, python-format
 msgid "This comment has been reported %i times"
-msgstr "Aquest %s ha estat informat %i vegades"
+msgstr "Aquest comentari ha estat denunciat %i vegades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1233
 msgid "Written by"
@@ -2032,75 +1991,67 @@ msgstr "Informacions generals"
 
 # Conjugar?
 #: modules/webcomment/lib/webcomment_templates.py:1235
-#, fuzzy
 msgid "Select"
 msgstr "Seleccioneu"
 
-# Gènere? Tant pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:1249
-#, fuzzy
 msgid "Delete selected reviews"
-msgstr "Esborrar els %s seleccionats"
+msgstr "Suprimir les ressenyes seleccionades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1250
 #: modules/webcomment/lib/webcomment_templates.py:1255
 msgid "Suppress selected abuse report"
 msgstr "Suprimir l'informe d'abús seleccionat"
 
-# Gènere? Tant pot ser 'review' com 'comment'
 #: modules/webcomment/lib/webcomment_templates.py:1254
-#, fuzzy
 msgid "Delete selected comments"
-msgstr "Esborrar els %s seleccionats"
+msgstr "Suprimir els comentaris seleccionats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1263
 msgid "OK"
 msgstr ""
 
-# He ignorat 'reported'
-# Tant pot ser 'review' com 'comment'
-# És correcte, 'aquí teniu', o millor 'Aquí hi ha'?
 #: modules/webcomment/lib/webcomment_templates.py:1269
-#, fuzzy, python-format
+#, python-format
 msgid "Here are the reported reviews of user %s"
-msgstr "Aquests són els %s de l'usuari %s"
+msgstr "Aquestes són les ressenyes denunciades de l'usuari %s"
 
-# He ignorat 'reported'
-# Tant pot ser 'review' com 'comment'
-# És correcte, 'aquí teniu', o millor 'Aquí hi ha'?
 #: modules/webcomment/lib/webcomment_templates.py:1271
-#, fuzzy, python-format
+#, python-format
 msgid "Here are the reported comments of user %s"
-msgstr "Aquests són els %s de l'usuari %s"
+msgstr "Aquests són els comentaris denunciats de l'usuari %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1274
 #, python-format
 msgid "Here is comment/review %s"
-msgstr "Aquest és el comentari/crítica %s"
+msgstr "Aquest és el comentari/ressenya %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
 #, fuzzy, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-msgstr "Aquest és el comentari/crítica %s escrita per l'usuari %s"
+msgstr "Aquest és el comentari/ressenya %s escrita per l'usuari %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1281
 #, fuzzy
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr "Aquest són els %s informats ordenats pels més informats"
+msgstr ""
+"Aquestes són totes les ressenyes denunciades, ordenades per les que ho són "
+"més"
 
 #: modules/webcomment/lib/webcomment_templates.py:1283
 #, fuzzy
 msgid "Here are all reported comments sorted by the most reported"
-msgstr "Aquest són els %s informats ordenats pels més informats"
+msgstr ""
+"Aquests són tots els comentaris denunciats, ordenats pels que ho són més"
 
 #: modules/webcomment/lib/webcomment_templates.py:1308
 #: modules/webcomment/lib/webcomment_templates.py:1333
 msgid "comment ID"
-msgstr "Identificador de comentari"
+msgstr "Número de comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "successfully deleted"
-msgstr "esborrat correctament"
+msgstr "suprimit correctament"
 
 #: modules/webcomment/lib/webcomment_templates.py:1333
 msgid "successfully suppressed abuse report"
@@ -2118,7 +2069,7 @@ msgstr "Registre complet"
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:172
 msgid "Reviews"
-msgstr "Crítiques"
+msgstr "Ressenyes"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:124
 #: modules/webcomment/lib/webcomment_webinterface.py:225
@@ -2133,7 +2084,6 @@ msgstr "Abans d'afegir el vostre comentari, us heu d'identificar"
 #: modules/webcomment/lib/webcomment_webinterface.py:191
 #: modules/websession/lib/websession_webinterface.py:394
 #: modules/websession/lib/websession_webinterface.py:425
-#, fuzzy
 msgid "Login"
 msgstr "Identificació"
 
@@ -2148,30 +2098,30 @@ msgstr "Gestió de comentaris"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:81
 msgid "Delete Comment"
-msgstr "Esborrar comentari"
+msgstr "Suprimir comentari"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:143
 #, fuzzy
 msgid "View all reported users"
-msgstr "Visualitzar tots els usuaris informats"
+msgstr "Visualitzar tots els usuaris denunciats"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:183
 msgid "Delete comments"
-msgstr "Esborrar comentaris"
+msgstr "Suprimir comentaris"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:186
 msgid "Suppress abuse reports"
-msgstr "Eliminar els informes d'abús"
+msgstr "Eliminar les denúncies d'abús"
 
 #: modules/webmessage/lib/webmessage.py:132
 #, fuzzy
 msgid "The message could not be deleted."
-msgstr "El missatge no s'ha pogut esborrar."
+msgstr "El missatge no s'ha pogut suprimit."
 
 #: modules/webmessage/lib/webmessage.py:134
 #, fuzzy
 msgid "The message was successfully deleted."
-msgstr "esborrat correctament"
+msgstr "suprimit correctament"
 
 #: modules/webmessage/lib/webmessage.py:151
 #, fuzzy
@@ -2222,7 +2172,7 @@ msgstr "No s'ha pogut enviar el vostre missatge als següents destinataris\n"
 
 #: modules/webmessage/lib/webmessage.py:420
 msgid "Your message has been sent."
-msgstr "S'ha enviat el vostre missatge."
+msgstr "El vostre missatge s'ha enviat."
 
 #: modules/webmessage/lib/webmessage.py:424
 #: modules/webmessage/lib/webmessage_templates.py:440
@@ -2243,7 +2193,7 @@ msgstr "Remitent"
 
 #: modules/webmessage/lib/webmessage_templates.py:89
 msgid "No messages"
-msgstr "No hi ha missatges"
+msgstr "Sense missatges"
 
 #: modules/webmessage/lib/webmessage_templates.py:92
 #, fuzzy
@@ -2252,12 +2202,11 @@ msgstr "[Sense assumpte]"
 
 #: modules/webmessage/lib/webmessage_templates.py:133
 msgid "Write new message"
-msgstr "Escriviu un nou missatge"
+msgstr "Escriviu el missatge"
 
-# O totes?
 #: modules/webmessage/lib/webmessage_templates.py:134
 msgid "Delete All"
-msgstr "Esborrar-los tots"
+msgstr "Suprimir-los tots"
 
 #: modules/webmessage/lib/webmessage_templates.py:180
 #, fuzzy
@@ -2286,14 +2235,12 @@ msgid "Subject:"
 msgstr "Assumpte:"
 
 #: modules/webmessage/lib/webmessage_templates.py:275
-#, fuzzy
 msgid "Message:"
 msgstr "Missatge:"
 
 #: modules/webmessage/lib/webmessage_templates.py:276
-#, fuzzy
 msgid "SEND"
-msgstr "SEND"
+msgstr "ENVIAR"
 
 #: modules/webmessage/lib/webmessage_templates.py:417
 #, fuzzy
@@ -2322,17 +2269,14 @@ msgid "Sent to groups:"
 msgstr "Enviat a grups"
 
 #: modules/webmessage/lib/webmessage_templates.py:423
-#, fuzzy
 msgid "REPLY"
-msgstr "REPLY"
+msgstr "CONTESTAR"
 
 #: modules/webmessage/lib/webmessage_templates.py:424
-#, fuzzy
 msgid "DELETE"
-msgstr "DELETE"
+msgstr "SUPRIMIR"
 
 #: modules/webmessage/lib/webmessage_templates.py:473
-#, fuzzy
 msgid "Are you sure you want to empty your whole mailbox?"
 msgstr "Esteu segur que voleu buidar tota la vostra bústia?"
 
@@ -2343,17 +2287,14 @@ msgstr "Quota usada: %i missatges d'un màxim de %i"
 
 # Una?
 #: modules/webmessage/lib/webmessage_templates.py:551
-#, fuzzy
 msgid "Please select one or more:"
-msgstr "Si us plau seleccioneu-ne un o més:"
+msgstr "Seleccioneu-ne un o més:"
 
 #: modules/webmessage/lib/webmessage_templates.py:582
-#, fuzzy
 msgid "Add to users"
 msgstr "Afegir als usuaris"
 
 #: modules/webmessage/lib/webmessage_templates.py:584
-#, fuzzy
 msgid "Add to groups"
 msgstr "Afegir als grups"
 
@@ -2366,30 +2307,22 @@ msgstr "No s'ha trobat cap usuari que coincideixi"
 msgid "No matching group"
 msgstr "No s'ha trobat cap grup que coincideixi"
 
-# Trobar o cercar?
 #: modules/webmessage/lib/webmessage_templates.py:623
-#, fuzzy
 msgid "Find users or groups:"
-msgstr "Trobar usuaris o grups:"
+msgstr "Cercar usuaris o grups:"
 
-# Trobar o cercar?
 #: modules/webmessage/lib/webmessage_templates.py:624
-#, fuzzy
 msgid "Find a user"
-msgstr "Trobar un usuari"
+msgstr "Cercar un usuari"
 
-# Trobar o cercar?
 #: modules/webmessage/lib/webmessage_templates.py:625
-#, fuzzy
 msgid "Find a group"
-msgstr "Trobar un grup"
+msgstr "Cercar un grup"
 
 #: modules/webmessage/lib/webmessage_templates.py:640
-#, fuzzy, python-format
+#, python-format
 msgid "You have %s new messages out of %s messages"
-msgstr ""
-"Teniu <b>%i</b> missates nous d'un total de <a href=\"%s/yourmessages.py?ln=%"
-"s\">%i missatges</a>"
+msgstr "Teniu %s missates nous d'un total de %s missatges"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:274
 msgid "Read a message"
@@ -2520,8 +2453,8 @@ msgstr "No s'han trobat valors."
 #, fuzzy, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"No s'ha trobat cap coincidència exacta per <em>%s</em>, però en canvi usant "
-"<em>%s</em> ..."
+"No s'ha trobat cap coincidència exacta per <em>%s</em>, però usant <em>%s</"
+"em>..."
 
 #: modules/websearch/lib/search_engine.py:1634
 #, fuzzy, python-format
@@ -2530,8 +2463,7 @@ msgid ""
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "No s'ha trobat cap coincidència dins la col·lecció %s. Altres col·leccions "
-"públiques han donat <a class=\"nearestterms\" href=\"%s/search.py?%s\">%d "
-"resultats</a>."
+"públiques han donat <a class=\"nearestterms\" href=\"%s\">%d resultats</a>."
 
 #: modules/websearch/lib/search_engine.py:1643
 msgid ""
@@ -2575,15 +2507,12 @@ msgstr ""
 "Només es permet ordenar en conjunts de fins a %d registres.  Ordenat per "
 "defecte (\"el darrer primer\")."
 
-# Instead?
 #: modules/websearch/lib/search_engine.py:2239
 #, fuzzy, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
-msgstr ""
-"No sembla que '%s' sigui una opció vàlida d'ordenació.  Ha quedat ordenat "
-"per títol."
+msgstr "No és possible ordenar per '%s'.  Ha quedat ordenat per títol."
 
 #: modules/websearch/lib/search_engine.py:2442
 msgid "Use different search terms."
@@ -2595,7 +2524,7 @@ msgstr "Useu termes diferents de cerca."
 #: modules/websearch/lib/search_engine.py:2634
 #: modules/websearch/lib/search_engine.py:2680
 msgid "The record has been deleted."
-msgstr "El registre ha estat esborrat."
+msgstr "El registre ha estat suprimit."
 
 #: modules/websearch/lib/search_engine.py:3048
 #: modules/websearch/lib/websearch_templates.py:326
@@ -2622,7 +2551,7 @@ msgstr ""
 "Descartant aquesta condició..."
 
 #: modules/websearch/lib/websearch_templates.py:289
-#, fuzzy, python-format
+#, python-format
 msgid "Search %s records for:"
 msgstr "Cercar en %s registres per"
 
@@ -2642,7 +2571,6 @@ msgid "Simple Search"
 msgstr "Cerca simple"
 
 #: modules/websearch/lib/websearch_templates.py:465
-#, fuzzy
 msgid "Search options:"
 msgstr "Opcions de cerca:"
 
@@ -2653,29 +2581,24 @@ msgstr "Afegit des de:"
 
 #: modules/websearch/lib/websearch_templates.py:513
 #: modules/websearch/lib/websearch_templates.py:1492
-#, fuzzy
 msgid "until:"
 msgstr "fins:"
 
 #: modules/websearch/lib/websearch_templates.py:518
 #: modules/websearch/lib/websearch_templates.py:1532
-#, fuzzy
 msgid "Display results:"
-msgstr "Visualitzar els resultats:"
+msgstr "Mostrar els resultats:"
 
 #: modules/websearch/lib/websearch_templates.py:519
 #: modules/websearch/lib/websearch_templates.py:1533
-#, fuzzy
 msgid "Output format:"
 msgstr "Format de visualizació:"
 
 #: modules/websearch/lib/websearch_templates.py:696
-#, fuzzy
 msgid "Narrow by collection:"
 msgstr "Limitar per col·lecció:"
 
 #: modules/websearch/lib/websearch_templates.py:697
-#, fuzzy
 msgid "Focus on:"
 msgstr "Enfocat a:"
 
@@ -2699,7 +2622,6 @@ msgid "more"
 msgstr "més"
 
 #: modules/websearch/lib/websearch_templates.py:848
-#, fuzzy
 msgid "Latest additions:"
 msgstr "Darreres entrades:"
 
@@ -2715,14 +2637,16 @@ msgid "Cited by"
 msgstr "Citat per"
 
 #: modules/websearch/lib/websearch_templates.py:1011
-#, fuzzy, python-format
+#, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
-msgstr "en qualsevol col·lecció són:"
+msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:1014
 #, fuzzy, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr "en qualsevol col·lecció són:"
+msgstr ""
+"no s'ha trobat en cap registre. Els termes aproximats en totes les "
+"col·leccions són:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
@@ -2792,7 +2716,6 @@ msgid "in"
 msgstr "dins"
 
 #: modules/websearch/lib/websearch_templates.py:1748
-#, fuzzy
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "No heu trobat el que estaveu cercant? Proveu la vostra cerca a:"
@@ -2806,7 +2729,7 @@ msgstr "Cercar en %s registres per"
 
 #: modules/websearch/lib/websearch_templates.py:1896
 msgid "begin"
-msgstr "començar"
+msgstr "inici"
 
 #: modules/websearch/lib/websearch_templates.py:1900
 #: modules/websubmit/lib/websubmit_templates.py:1162
@@ -2815,14 +2738,12 @@ msgstr "anterior"
 
 # Final, últim?
 #: modules/websearch/lib/websearch_templates.py:1913
-#, fuzzy
 msgid "end"
 msgstr "final"
 
 #: modules/websearch/lib/websearch_templates.py:1933
-#, fuzzy
 msgid "jump to record:"
-msgstr "saltar al registre:"
+msgstr "anar al registre:"
 
 #: modules/websearch/lib/websearch_templates.py:1946
 #, fuzzy, python-format
@@ -2843,7 +2764,7 @@ msgstr "Format"
 #, fuzzy, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr "Registre creat el %s, modificat el %s"
+msgstr "Registre creat el %s, última modificació el %s"
 
 #: modules/websearch/lib/websearch_templates.py:2102
 #, python-format
@@ -2856,23 +2777,19 @@ msgid "Co-cited with: %s records"
 msgstr "Co-citat amb: %s registres"
 
 #: modules/websearch/lib/websearch_templates.py:2134
-#, fuzzy
 msgid "People who downloaded this document also downloaded:"
 msgstr "Els usuaris que han baixat aquest document també han baixat:"
 
 #: modules/websearch/lib/websearch_templates.py:2149
-#, fuzzy
 msgid "People who viewed this page also viewed:"
 msgstr "Els usuaris que han vist aquesta pàgina també han vist:"
 
 #: modules/websearch/lib/websearch_templates.py:2196
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"<strong>Resultats globals:</strong> Trobats <strong>%s</strong> registres en "
-"%.2f segons."
 
 #: modules/websearch/lib/websearch_templates.py:2236
 msgid ""
@@ -2900,11 +2817,10 @@ msgstr "Error intern"
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Sembla que el registre %s no existeix."
 
-# bug: & -> %
 #: modules/websearch/lib/websearch_webinterface.py:290
 #, fuzzy, python-format
 msgid "You may want to start browsing from %s."
-msgstr "Podeu començar a visualitzar des de &s"
+msgstr "Podeu començar a visualitzar des de %s"
 
 #: modules/websearch/lib/websearch_webinterface.py:291
 #, python-format
@@ -2922,24 +2838,21 @@ msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
 "s as a regular user."
 msgstr ""
-"Esteu connectat com a visitant.  Potser voleu <A href=\"../youraccount.py/"
-"login?ln=%s\">identificar-vos</A> com a usuari conegut"
+"Esteu connectat com a visitant.  Potser voleu <A href=\"%s\">identificar-"
+"vos</A> com a usuari conegut"
 
 #: modules/websession/lib/webaccount.py:93
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
 "(x_url_close)s first"
 msgstr ""
-"Els usuaris <strong class=\"headline\">visitants</strong> abans han d'<A "
-"href=\"../youraccount.py/login?ln=%s\">identificar-se</A>"
 
 #: modules/websession/lib/webaccount.py:98
 msgid "No queries found"
 msgstr "No s'ha trobat cap cerca"
 
 #: modules/websession/lib/websession_templates.py:46
-#, fuzzy
 msgid ""
 "If you have lost password for your CDS Invenio internal account, then please "
 "enter your email address below and the lost password will be emailed to you."
@@ -2948,7 +2861,6 @@ msgstr ""
 "escriviu la vostra adreça de correu electrònic i us l'enviarem."
 
 #: modules/websession/lib/websession_templates.py:48
-#, fuzzy
 msgid ""
 "Note that if you have been using an external login system (such as CERN "
 "NICE), then we cannot do anything and you have to ask there."
@@ -2971,13 +2883,12 @@ msgid ""
 "If you want to change your email address or password, please set new values "
 "in the form below."
 msgstr ""
-"Si voleu canviar la vostra adreça de correu electrònic i la vostra "
-"contrasenya, poseu-hi els nous valors en aquest formulari."
+"Si voleu canviar la vostra adreça de correu electrònic o contrasenya, poseu-"
+"hi els nous valors en aquest formulari."
 
 #: modules/websession/lib/websession_templates.py:152
-#, fuzzy
 msgid "Edit parameters"
-msgstr "paràmetre no vàlid"
+msgstr "Editar paràmetres"
 
 #: modules/websession/lib/websession_templates.py:156
 #: modules/websession/lib/websession_templates.py:159
@@ -2992,7 +2903,7 @@ msgstr "Nova adreça de correu electrònic"
 #: modules/websession/lib/websession_templates.py:158
 #: modules/websession/lib/websession_templates.py:708
 msgid "mandatory"
-msgstr "obligatory"
+msgstr "obligatori"
 
 #: modules/websession/lib/websession_templates.py:160
 msgid "New password"
@@ -3017,15 +2928,13 @@ msgstr "La contrasenya pot contenir puntuació, espais, etc."
 msgid "Retype password"
 msgstr "Torneu a escriure la contrasenya"
 
-# Segur que aquest 'set' és 'gravar' o 'guardar'?
 #: modules/websession/lib/websession_templates.py:165
-#, fuzzy
 msgid "Set new values"
 msgstr "Guardar els nous valors"
 
 #: modules/websession/lib/websession_templates.py:200
 msgid "Edit login method"
-msgstr "Editeu el tipus d'identificació"
+msgstr "Editeu el mètode d'identificació"
 
 #: modules/websession/lib/websession_templates.py:201
 msgid ""
@@ -3054,10 +2963,10 @@ msgid ""
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"El CDS Search us ofereix la possibilitat de personalitzar la \n"
-"interfície, crear la vostra pròpia biblioteca de documents, o crear \n"
-"alertes automàtiques que s'executin periòdicament i us notifiquin del \n"
-"resultat de la cerca per correu electrònic."
+"CDS Invenio us ofereix la possibilitat de personalitzar la interfície, crear "
+"la vostra pròpia biblioteca de documents, o crear alertes automàtiques que "
+"s'executin periòdicament i us notifiquin del resultat de la cerca per correu "
+"electrònic."
 
 #: modules/websession/lib/websession_templates.py:287
 #: modules/websession/lib/websession_webinterface.py:105
@@ -3071,7 +2980,7 @@ msgid ""
 "preferences about the look and feel of the interface."
 msgstr ""
 "Poseu o canvieu la vostra adreça de correu electrònic d'aquest compte o la "
-"contrasenya.  Especifiquey les vostres preferències de com ha de ser la "
+"contrasenya.  Especifiqueu les vostres preferències de com ha de ser la "
 "interfície."
 
 #: modules/websession/lib/websession_templates.py:298
@@ -3125,8 +3034,9 @@ msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
 msgstr ""
-"Com que esteu connectat com a usuari visitant, els cistells desapareixeran "
-"al final d'aquesta sessió. Si voleu podeu %slogin or register here%s."
+"Ara esteu connectat com a usuari visitant, de manera que els vostres "
+"cistells desapareixeran al final d'aquesta sessió. Si voleu podeu %slogin or "
+"register here%s."
 
 #: modules/websession/lib/websession_templates.py:370
 #, fuzzy, python-format
@@ -3207,11 +3117,8 @@ msgid "Deleting your account"
 msgstr "Esborrar el vostre compte"
 
 #: modules/websession/lib/websession_templates.py:529
-#, fuzzy
 msgid "You are no longer recognized."
 msgstr ""
-"Ja heu deixat d'estar identificat.  Si voleu podeu <A \n"
-"href=\"./login?ln=%s\">identificar-vos aquí</A>."
 
 #: modules/websession/lib/websession_templates.py:530
 #, python-format
@@ -3242,13 +3149,11 @@ msgstr ""
 "contacte amb %s si en voleu un."
 
 #: modules/websession/lib/websession_templates.py:587
-#, fuzzy
 msgid "Login via:"
 msgstr "Identificació via:"
 
 # Confirmar que no hagi de ser l'email!
 #: modules/websession/lib/websession_templates.py:613
-#, fuzzy
 msgid "Username"
 msgstr "Nom d'usuari"
 
@@ -3270,10 +3175,8 @@ msgid "Lost your password?"
 msgstr "Heu perdut la contrasenya?"
 
 #: modules/websession/lib/websession_templates.py:663
-#, fuzzy
 msgid "Please enter your email address and desired nickname and password:"
-msgstr ""
-"Entreu la vostra adreça de correu electrònic i la contrasenya escollida:"
+msgstr "Entreu la vostra adreça de correu electrònic i l'àlias i contrasenya:"
 
 #: modules/websession/lib/websession_templates.py:665
 #, fuzzy
@@ -3289,7 +3192,6 @@ msgstr "Torneu a escriure la contrasenya"
 # Confirmar segons el contexte
 #: modules/websession/lib/websession_templates.py:714
 #: modules/websession/lib/websession_webinterface.py:522
-#, fuzzy
 msgid "register"
 msgstr "donar-se d'alta"
 
@@ -3329,45 +3231,44 @@ msgid "You seem to be %(x_role)s."
 msgstr "Sembla que sou <em>%s</em>"
 
 #: modules/websession/lib/websession_templates.py:752
-#, fuzzy
 msgid "Here are some interesting web admin links for you:"
 msgstr "Aquí teniu alguns enllaços d'administració interessants:"
 
 #: modules/websession/lib/websession_templates.py:758
 msgid "Run BibEdit"
-msgstr ""
+msgstr "Executar BibEdit"
 
 #: modules/websession/lib/websession_templates.py:760
 msgid "Configure BibFormat"
-msgstr "Configuració de BibFormat"
+msgstr "Configurar BibFormat"
 
 #: modules/websession/lib/websession_templates.py:762
 msgid "Configure BibHarvest"
-msgstr "Configuració de BibHarvest"
+msgstr "Configurar de BibHarvest"
 
 #: modules/websession/lib/websession_templates.py:764
 msgid "Configure BibIndex"
-msgstr "Configuració de BibIndex"
+msgstr "Configurar de BibIndex"
 
 #: modules/websession/lib/websession_templates.py:766
 msgid "Configure BibRank"
-msgstr "Configuració de BibRank"
+msgstr "Configurar de BibRank"
 
 #: modules/websession/lib/websession_templates.py:768
 msgid "Configure WebAccess"
-msgstr "Configuració de WebAccess"
+msgstr "Configurar de WebAccess"
 
 #: modules/websession/lib/websession_templates.py:770
 msgid "Configure WebComment"
-msgstr "Configuració de WebComment"
+msgstr "Configurar de WebComment"
 
 #: modules/websession/lib/websession_templates.py:772
 msgid "Configure WebSearch"
-msgstr "Configuració de WebSearch"
+msgstr "Configurar de WebSearch"
 
 #: modules/websession/lib/websession_templates.py:774
 msgid "Configure WebSubmit"
-msgstr "Configuració de WebSubmit"
+msgstr "Configurar de WebSubmit"
 
 #: modules/websession/lib/websession_templates.py:775
 #, fuzzy, python-format
@@ -3403,9 +3304,8 @@ msgid "messages"
 msgstr "missatges"
 
 #: modules/websession/lib/websession_templates.py:835
-#, fuzzy
 msgid "groups"
-msgstr "Grups"
+msgstr "grups"
 
 #: modules/websession/lib/websession_templates.py:841
 msgid "submissions"
@@ -3426,122 +3326,108 @@ msgstr "sortir"
 #: modules/websession/lib/websession_templates.py:964
 #, fuzzy
 msgid "You are an administrator of the following groups:"
-msgstr "No sou membre d'un grup"
+msgstr "No sou administrador de cap grup"
 
 #: modules/websession/lib/websession_templates.py:984
 #: modules/websession/lib/websession_templates.py:1058
-#, fuzzy
 msgid "Group"
-msgstr "Grups"
+msgstr "Grup"
 
 #: modules/websession/lib/websession_templates.py:984
 #: modules/websession/lib/websession_templates.py:1058
-#, fuzzy
 msgid "Description"
-msgstr "Qüestió"
+msgstr "Descripció"
 
 #: modules/websession/lib/websession_templates.py:991
 #, fuzzy
 msgid "You are not an administrator of any groups."
-msgstr "No sou membre d'un grup"
+msgstr "No sou administrador de cap grup"
 
 #: modules/websession/lib/websession_templates.py:998
-#, fuzzy
 msgid "Edit group"
-msgstr "Afegir un grup"
+msgstr "Editar un grup"
 
 #: modules/websession/lib/websession_templates.py:1005
 #, fuzzy, python-format
 msgid "Edit %s members"
-msgstr "%i cistells de grup"
+msgstr "Editar els membres del grup"
 
 #: modules/websession/lib/websession_templates.py:1028
 #: modules/websession/lib/websession_templates.py:1121
 #: modules/websession/lib/websession_templates.py:1123
 #: modules/websession/lib/websession_webinterface.py:612
-#, fuzzy
 msgid "Create new group"
-msgstr "Creeu un nou tema"
+msgstr "Crear un nou grup"
 
 #: modules/websession/lib/websession_templates.py:1042
 #, fuzzy
 msgid "You are a member of the following groups:"
-msgstr "No sou membre d'un grup"
+msgstr "No sou membre de cap grup"
 
 #: modules/websession/lib/websession_templates.py:1065
 #, fuzzy
 msgid "You are not a member of any groups."
-msgstr "No sou membre d'un grup"
+msgstr "No sou membre de cap grup"
 
-# Trobar o cercar?
 #: modules/websession/lib/websession_templates.py:1090
-#, fuzzy
 msgid "Join new group"
-msgstr "Trobar un grup"
+msgstr "Afegir-se a un nou grup"
 
-# Trobar o cercar?
 #: modules/websession/lib/websession_templates.py:1091
 #: modules/websession/lib/websession_templates.py:1558
 #: modules/websession/lib/websession_templates.py:1569
-#, fuzzy
 msgid "Leave group"
-msgstr "Trobar un grup"
+msgstr "Deixar el grup"
 
-# Trobar o cercar?
 #: modules/websession/lib/websession_templates.py:1129
-#, fuzzy
 msgid "Update group"
-msgstr "Trobar un grup"
+msgstr "Actualitzar grup"
 
 #: modules/websession/lib/websession_templates.py:1131
 #, fuzzy, python-format
 msgid "Edit group %s"
-msgstr "Afegir un grup"
+msgstr "Editar grup: "
 
 #: modules/websession/lib/websession_templates.py:1133
-#, fuzzy
 msgid "Delete group"
-msgstr "Esborrar compte"
+msgstr "Suprimeix el grup"
 
 #: modules/websession/lib/websession_templates.py:1203
 #, fuzzy
 msgid "Group name:"
-msgstr "Cistells de grup"
+msgstr "Nom del grup: "
 
 #: modules/websession/lib/websession_templates.py:1205
 #, fuzzy
 msgid "Group description:"
-msgstr "Qüestió"
+msgstr "Descripció del grup: "
 
 #: modules/websession/lib/websession_templates.py:1206
+#, fuzzy
 msgid "Group join policy:"
-msgstr ""
+msgstr "Política per a unir-se al grup: "
 
-# Una?
 #: modules/websession/lib/websession_templates.py:1247
 #: modules/websession/lib/websession_templates.py:1318
 #: modules/websession/lib/websession_templates.py:1450
 #: modules/websession/lib/websession_templates.py:1459
 #: modules/websession/lib/websession_templates.py:1556
 #: modules/websession/lib/websession_templates.py:1666
-#, fuzzy
 msgid "Please select:"
-msgstr "Si us plau seleccioneu-ne un o més:"
+msgstr "Seleccioneu:"
 
-# Trobar o cercar?
 #: modules/websession/lib/websession_templates.py:1311
-#, fuzzy
 msgid "Join group"
-msgstr "Trobar un grup"
+msgstr "Unir-se a un grup"
 
 #: modules/websession/lib/websession_templates.py:1313
+#, fuzzy
 msgid "or find it"
-msgstr ""
+msgstr "o cercar-lo: "
 
 #: modules/websession/lib/websession_templates.py:1314
-#, fuzzy
 msgid "Choose group:"
-msgstr "Escolliu un tema"
+msgstr "Escolliu grup:"
 
 # Trobar o cercar?
 #: modules/websession/lib/websession_templates.py:1316
@@ -3550,9 +3436,8 @@ msgid "Find group"
 msgstr "Trobar un grup"
 
 #: modules/websession/lib/websession_templates.py:1455
-#, fuzzy
 msgid "Remove member"
-msgstr "Esborrar l'item"
+msgstr "Eliminar el membre"
 
 #: modules/websession/lib/websession_templates.py:1457
 #, fuzzy
@@ -3567,7 +3452,7 @@ msgstr "setembre"
 #: modules/websession/lib/websession_templates.py:1467
 #, fuzzy
 msgid "Reject member"
-msgstr "Esborrar l'item"
+msgstr "Eliminar el membre"
 
 #: modules/websession/lib/websession_templates.py:1469
 #, fuzzy
@@ -3577,7 +3462,7 @@ msgstr "esperant les aprovacions"
 #: modules/websession/lib/websession_templates.py:1471
 #, fuzzy
 msgid "Current members"
-msgstr "Escriviu un nou missatge"
+msgstr "Convidar nous membres"
 
 #: modules/websession/lib/websession_templates.py:1472
 #, fuzzy
@@ -3585,16 +3470,17 @@ msgid "Members awaiting approval"
 msgstr "esperant les aprovacions"
 
 #: modules/websession/lib/websession_templates.py:1473
-#, fuzzy
 msgid "Invite new members"
-msgstr "Escriviu un nou missatge"
+msgstr "Convidar nous membres"
 
 #: modules/websession/lib/websession_templates.py:1476
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
 "(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
+"Si voleu convidar nous membres a formar part del vostre grup, useu el sisema "
+"%s."
 
 #: modules/websession/lib/websession_templates.py:1480
 #, fuzzy, python-format
@@ -3607,37 +3493,38 @@ msgid "Group list"
 msgstr "Grups"
 
 #: modules/websession/lib/websession_templates.py:1560
-#, fuzzy
 msgid "You are not member of any group."
-msgstr "No sou membre d'un grup"
+msgstr "No sou membre de cap grup"
 
 #: modules/websession/lib/websession_templates.py:1607
 #, fuzzy
 msgid "Are you sure you want to delete this group?"
-msgstr "Esteu segur que voleu esborrar aquest cistell?"
+msgstr "Esteu segur que voleu suprimir aquest grup?"
 
 #: modules/websession/lib/websession_templates.py:1646
 #, fuzzy
 msgid "Are you sure you want to leave this group?"
-msgstr "Esteu segur que voleu esborrar aquest cistell?"
+msgstr "Esteu segur que voleu deixar aquest grup?"
 
 #: modules/websession/lib/websession_templates.py:1662
+#, fuzzy
 msgid "Visible and open for new members"
-msgstr ""
+msgstr "Visible i obert per a nous membres"
 
 #: modules/websession/lib/websession_templates.py:1664
+#, fuzzy
 msgid "Visible but new members need approval"
-msgstr ""
+msgstr "Visible però necessita l'aprovació per a nous membres"
 
 #: modules/websession/lib/websession_templates.py:1749
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: New membership request"
-msgstr "El grup '%s' no existeix\n"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1753
-#, fuzzy, python-format
+#, python-format
 msgid "A user wants to join the group %s."
-msgstr "Esteu segur que voleu esborrar aquest cistell?"
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1754
 #, python-format
@@ -3646,9 +3533,9 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1771
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: Join request has been accepted"
-msgstr "El registre ha estat esborrat."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1772
 #, python-format
@@ -3656,43 +3543,38 @@ msgid "Your request for joining group %s has been accepted."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1774
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: Join request has been rejected"
-msgstr "El registre ha estat esborrat."
+msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1775
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr ""
 
-# Refereed?
 #: modules/websession/lib/websession_templates.py:1778
 #: modules/websession/lib/websession_templates.py:1796
 #, fuzzy, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
-"Podeu consultar la llista de %(your_approval)s amb els documents que heu "
-"aprovat o referenciat."
+"Podeu consultar la llista de %(your_submissions)s i investigar el seu status"
 
 #: modules/websession/lib/websession_templates.py:1792
 #, fuzzy, python-format
 msgid "Group %s has been deleted"
-msgstr "El registre ha estat esborrat."
+msgstr "El registre ha estat suprimit."
 
 #: modules/websession/lib/websession_templates.py:1794
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr ""
 
-# Refereed?
 #: modules/websession/lib/websession_templates.py:1811
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
 "s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
 msgstr ""
-"Podeu consultar la llista de %(your_approval)s amb els documents que heu "
-"aprovat o referenciat."
 
 #: modules/websession/lib/webuser.py:102
 #, fuzzy
@@ -3712,25 +3594,25 @@ msgstr "S'han editat els paràmetres"
 #: modules/websession/lib/websession_webinterface.py:138
 #: modules/websession/lib/websession_webinterface.py:163
 msgid "Show account"
-msgstr "Visualitzar el compte"
+msgstr "Mostrar el compte"
 
 #: modules/websession/lib/websession_webinterface.py:142
 msgid "Login method successfully selected."
-msgstr "Mètode d'identificació seleccionat."
+msgstr "Mètode d'identificació seleccionat correctament."
 
 #: modules/websession/lib/websession_webinterface.py:159
 msgid "Password successfully edited."
-msgstr "S'ha editat la contrasenya."
+msgstr "S'ha editat la contrasenya correctament."
 
 #: modules/websession/lib/websession_webinterface.py:161
 msgid "Settings successfully edited."
-msgstr "S'han editat els paràmetres"
+msgstr "S'han editat els paràmetres correctament."
 
 #: modules/websession/lib/websession_webinterface.py:166
 #: modules/websession/lib/websession_webinterface.py:496
 #, python-format
 msgid "Desired nickname %s is invalid."
-msgstr ""
+msgstr "L'àlias %s no és vàlid."
 
 #: modules/websession/lib/websession_webinterface.py:167
 #: modules/websession/lib/websession_webinterface.py:173
@@ -3780,19 +3662,17 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:180
 #: modules/websession/lib/websession_webinterface.py:503
 msgid "Or please try again."
-msgstr ""
+msgstr "O proveu-ho de nou."
 
 #: modules/websession/lib/websession_webinterface.py:185
 #, python-format
 msgid "Desired nickname %s is already in use."
-msgstr ""
+msgstr "L'àlias %s ja està en ús."
 
 #: modules/websession/lib/websession_webinterface.py:191
 #: modules/websession/lib/websession_webinterface.py:486
-#, fuzzy
 msgid "Both passwords must match."
-msgstr ""
-"Les dues contrasenyes han de coincidir, si us plau torneu-ho a intentar."
+msgstr "Les dues contrasenyes han de coincidir."
 
 #: modules/websession/lib/websession_webinterface.py:197
 msgid "Could not update settings."
@@ -3830,7 +3710,7 @@ msgid ""
 "correctly (e.g. johndoe@example.com)."
 msgstr ""
 "L'adreça de correu electrònic que heu entrat és incorrecte.  Comproveu si us "
-"plau que estigui escrita correctament (ex., setciencies@exemple.cat)."
+"plau que estigui escrita correctament (ex., Set.Ciencies@exemple.cat)."
 
 #: modules/websession/lib/websession_webinterface.py:290
 msgid "Incorrect email address"
@@ -3842,7 +3722,7 @@ msgstr "S'ha enviat la contrasenya perduda"
 
 #: modules/websession/lib/websession_webinterface.py:341
 msgid "Delete Account"
-msgstr "Esborrar compte"
+msgstr "Suprimeix compte"
 
 #: modules/websession/lib/websession_webinterface.py:362
 msgid "Logout"
@@ -3894,34 +3774,31 @@ msgid "Registration failure"
 msgstr "Ha fallat l'alta"
 
 #: modules/websession/lib/websession_webinterface.py:507
-#, fuzzy, python-format
+#, python-format
 msgid "Desired nickname %s already exists in the database."
-msgstr ""
-"Aquest usuari ja existeix a la base de dades, si us plau torneu-ho a provar."
+msgstr "L'àlias sol·licitat %s ja existeix a la base de dades."
 
 #: modules/websession/lib/websession_webinterface.py:512
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
+"Els usuaris no poden donar-se d'alta ells mateixos; només ho pot fer "
+"l'administrador."
 
-# Trobar o cercar?
 #: modules/websession/lib/websession_webinterface.py:671
-#, fuzzy
 msgid "Join New Group"
-msgstr "Trobar un grup"
+msgstr "Unir-se a un nou grup"
 
 #: modules/websession/lib/websession_webinterface.py:718
 msgid "Leave Group"
-msgstr ""
+msgstr "Sortir del grup"
 
 #: modules/websession/lib/websession_webinterface.py:783
-#, fuzzy
 msgid "Edit Group"
-msgstr "Afegir un grup"
+msgstr "Editar el grup"
 
 #: modules/websession/lib/websession_webinterface.py:850
-#, fuzzy
 msgid "Edit group members"
-msgstr "%i cistells de grup"
+msgstr "Editar els membres del grup"
 
 #: modules/webstyle/lib/webstyle_templates.py:496
 #: modules/webstyle/lib/webstyle_templates.py:530
@@ -4029,7 +3906,7 @@ msgstr "tipus de document desconegut"
 #: modules/websubmit/lib/websubmit_engine.py:619
 #, fuzzy
 msgid "This action does not exist for this document type."
-msgstr "aquesta acció no és aplicable a aquest tipus de document"
+msgstr "Aquesta col·lecció encara no conté cap document."
 
 #: modules/websubmit/lib/websubmit_engine.py:852
 #, fuzzy
@@ -4043,7 +3920,6 @@ msgstr "L'acció que heu escollit no és aplicable pel document"
 
 #: modules/websubmit/lib/websubmit_engine.py:1084
 #: modules/websubmit/lib/websubmit_webinterface.py:385
-#, fuzzy
 msgid "Warning"
 msgstr "Atenció"
 
@@ -4062,9 +3938,8 @@ msgid "No document types available."
 msgstr "Encara no hi ha tipus de documents..."
 
 #: modules/websubmit/lib/websubmit_templates.py:240
-#, fuzzy
 msgid "Please log in first."
-msgstr "Proveu-ho de nou"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:240
 #, fuzzy
@@ -4133,14 +4008,10 @@ msgid "Back to main menu"
 msgstr "torna al menú principal"
 
 #: modules/websubmit/lib/websubmit_templates.py:546
-#, fuzzy
 msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
 msgstr ""
-"(1) haurieu de prendre nota d'aquest número al començament del vostre "
-"lliurament, perquè us permeterà recuperar la vostra informació en cas que el "
-"navegador fa fallida abans del final del lliurament."
 
 #: modules/websubmit/lib/websubmit_templates.py:547
 #, fuzzy
@@ -4292,12 +4163,12 @@ msgstr "últim accés"
 
 #: modules/websubmit/lib/websubmit_templates.py:1414
 msgid "Are you sure you want to delete this submission?"
-msgstr "Esteu segur que voleu esborrar aquest lliurament?"
+msgstr "Esteu segur que voleu suprimir aquest lliurament?"
 
 #: modules/websubmit/lib/websubmit_templates.py:1415
 #, fuzzy, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
-msgstr "esborrar lliuraments %(id)s a %(docname)s"
+msgstr "suprimeix lliuraments %(id)s a %(docname)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1431
 #, fuzzy
@@ -4307,20 +4178,21 @@ msgstr "encara no se li ha assignat referència"
 # Refereed, Referee?
 #: modules/websubmit/lib/websubmit_templates.py:1502
 msgid "Refereed Documents"
-msgstr ""
+msgstr "Documents revisats"
 
 #: modules/websubmit/lib/websubmit_templates.py:1512
+#, fuzzy
 msgid "You are a general referee"
-msgstr ""
+msgstr "Sou revisor general"
 
 #: modules/websubmit/lib/websubmit_templates.py:1517
 #, fuzzy
 msgid "You are a referee for category:"
-msgstr "No sou membre d'un grup"
+msgstr "Sou revisor per a la categoria: %(name)s (%(id)s)"
 
 #: modules/websubmit/lib/websubmit_templates.py:1554
 msgid "List of refereed types of documents"
-msgstr ""
+msgstr "Llista de tipus de documents revisats"
 
 #: modules/websubmit/lib/websubmit_templates.py:1555
 #, fuzzy
@@ -4330,9 +4202,10 @@ msgstr ""
 "Seleccioneu un dels tipus de documents següents per a comprovar l'estat dels "
 "documents"
 
+# Revisar
 #: modules/websubmit/lib/websubmit_templates.py:1613
 msgid "List of refereed categories"
-msgstr ""
+msgstr "Llista de les categories revisades"
 
 #: modules/websubmit/lib/websubmit_templates.py:1614
 msgid "Please choose a category"
@@ -4380,9 +4253,10 @@ msgstr "ja aprovats"
 msgid "Some documents are pending."
 msgstr "quedent alguns documents pendents"
 
+# Revisar
 #: modules/websubmit/lib/websubmit_templates.py:1736
 msgid "List of refereed documents"
-msgstr ""
+msgstr "Llista de documents revisats"
 
 #: modules/websubmit/lib/websubmit_templates.py:1737
 #, fuzzy
@@ -4396,7 +4270,7 @@ msgstr "Número d'informe"
 #: modules/websubmit/lib/websubmit_templates.py:1861
 #, fuzzy
 msgid "Your request has been sent to the referee."
-msgstr "S'ha enviat el vostre missatge."
+msgstr "La vostra petició ha estat enviada al revisor"
 
 #: modules/websubmit/lib/websubmit_templates.py:1875
 #, fuzzy
@@ -4430,9 +4304,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1929
 #, fuzzy
 msgid "It was first sent for approval on:"
-msgstr ""
-"Ha estat enviar per aprovació el primer cop el: <strong class=\"headline\">%"
-"(date)s</strong>"
+msgstr "esperant les aprovacions"
 
 #: modules/websubmit/lib/websubmit_templates.py:1901
 #: modules/websubmit/lib/websubmit_templates.py:1903
@@ -4458,47 +4330,45 @@ msgid "Send Again"
 msgstr "Tornar-ho a enviar"
 
 #: modules/websubmit/lib/websubmit_templates.py:1907
+#, fuzzy
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr ""
+"ATENCIÓ! Un correu electònic serà enviat al vostre revisor si ho confirmeu."
 
 #: modules/websubmit/lib/websubmit_templates.py:1910
+#, fuzzy
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
 msgstr ""
+"Com a revisor d'aquest document, podeu fer clic en aquest botó per a aprovar-"
+"lo o rebutjar-lo:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1912
 msgid "Approve/Reject"
 msgstr "Aprovar/Rebutjar"
 
-# Gènere, aquest[a]?  Segons el codi font, tan pot ser 'review' com 'comment'
 #: modules/websubmit/lib/websubmit_templates.py:1916
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
-msgstr "Aquest %s ha estat informat %i vegades"
+msgstr ""
 
-# Està bé el plural?
 #: modules/websubmit/lib/websubmit_templates.py:1918
-#, fuzzy
 msgid "Its approved reference is:"
-msgstr "aprovats"
+msgstr ""
 
-# Està bé el plural?
 #: modules/websubmit/lib/websubmit_templates.py:1924
-#, fuzzy
 msgid "It was approved on:"
-msgstr "aprovats"
+msgstr ""
 
-# Gènere, aquest[a]?  Segons el codi font, tan pot ser 'review' com 'comment'
 #: modules/websubmit/lib/websubmit_templates.py:1926
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
-msgstr "Aquest %s ha estat informat %i vegades"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1934
-#, fuzzy
 msgid "It was rejected on:"
-msgstr "rebutjats"
+msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:91
 #: modules/websubmit/lib/websubmit_webinterface.py:99
@@ -4524,28 +4394,136 @@ msgstr "Aquest document no s'ha demanat mai que s'aprovés!"
 #: modules/websubmit/web/publiline.py:183
 #, fuzzy
 msgid "Unable to display document."
-msgstr "Puntueu aquest document"
+msgstr "No es pot mostrar aquest document"
 
-#, fuzzy
+#~ msgid "MARC"
+#~ msgstr "MARC"
+
+#~ msgid "Please try to come back later."
+#~ msgstr "Proveu a intentar-ho més endavant."
+
+#~ msgid "Please enter"
+#~ msgstr "Entreu"
+
+#~ msgid "record ID"
+#~ msgstr "el número registre"
+
+#~ msgid "to edit"
+#~ msgstr "a editar"
+
 #~ msgid "Your modifications have now been submitted."
-#~ msgstr "S'ha buidat la vostra bústia"
+#~ msgstr "Les vostres modificacions ja s'han lliurat"
 
-#, fuzzy
-#~ msgid "You can now go back to %s."
-#~ msgstr "Us hi podeu connectar a"
-
-#, fuzzy
 #~ msgid "You can now go back to"
-#~ msgstr "Us hi podeu connectar a"
+#~ msgstr "Ara podeu tornar a"
+
+#~ msgid ""
+#~ "The record as soon deleted when the task queue is empty.You can now go "
+#~ "back to"
+#~ msgstr ""
+#~ "Aquest registre s'esborrarà quan la cua de tasques estigui buida.  Ara "
+#~ "podeu tornar a"
+
+#~ msgid "detailed list"
+#~ msgstr "llista detallada"
+
+#~ msgid "your searches"
+#~ msgstr "les vostres cerques"
+
+#~ msgid "#"
+#~ msgstr "n."
+
+#~ msgid "%i personal baskets"
+#~ msgstr "%i cistells personals"
+
+#~ msgid "%i group baskets"
+#~ msgstr "%i cistells de grup"
+
+# 'altri' per 'tercers'?
+#~ msgid "%i others' baskets"
+#~ msgstr "%i cistells d'altri"
+
+# 'Teniu' o 'heu'?
+#~ msgid "You have %s and are subscribed to %s and %s."
+#~ msgstr "Teniu %s i esteu subscrits a %s i %s."
+
+#~ msgid "Bring item up"
+#~ msgstr "Puja l'item"
 
 #~ msgid "Sort by"
 #~ msgstr "Ordenar per:"
 
-#~ msgid "%s wrote on %s:"
-#~ msgstr "%s va escriure el %s:"
+#~ msgid "Editing basket \"%s\""
+#~ msgstr "Edició del cistell \"%s\""
+
+#~ msgid "You're not member of a group"
+#~ msgstr "No sou membre d'un grup"
+
+# Discuss: discussió o comentari?
+#~ msgid "Discuss this document:"
+#~ msgstr "Comenteu aquest document:"
 
 #~ msgid "wrote on"
 #~ msgstr "va escriure el"
+
+#~ msgid "(Report abuse)"
+#~ msgstr "(Avisar d'un abús)"
+
+#~ msgid "Average review score"
+#~ msgstr "Puntuació mitjana de les ressenyes"
+
+#~ msgid "based on %(nb_comments_total)s reviews"
+#~ msgstr "basat en %(nb_comments_total)s ressenyes"
+
+# Conjugar?
+# Modificar el font perquè siguin dues coses diferents (review or comment)
+#~ msgid "Write a %s"
+#~ msgstr "Escriviu un %s"
+
+#~ msgid ""
+#~ "Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s."
+#~ msgstr "Compte: encara no heu %(link_open)sdefinit un àlias%(link_close)s."
+
+#~ msgid "%s will temporarly be displayed as author of this comment."
+#~ msgstr "%s es mostrarà temporalment com autor d'aquest comentari"
+
+#~ msgid "Article:"
+#~ msgstr "Article:"
+
+#~ msgid "Comment:"
+#~ msgstr "Comentari:"
+
+#~ msgid "email"
+#~ msgstr "adreça electrònica"
+
+#~ msgid "Ok"
+#~ msgstr "D'acord"
+
+#~ msgid "Detailed record #%s"
+#~ msgstr "Registre complet #%s"
+
+# Reported? Informats?
+# Tant pot ser 'reviews' com 'comments'
+#~ msgid "View all Reported %s"
+#~ msgstr "Visualitzar tots els %s denunciats"
+
+#~ msgid "Delete successful"
+#~ msgstr "Suprimit correctament"
+
+#~ msgid "These users are overquota: "
+#~ msgstr "Aquests usuaris han sobrepassat la seva quota: "
+
+#~ msgid "Search term <em>%s</em>"
+#~ msgstr "El terme de cerca <em>%s</em>"
+
+#~ msgid "inside <em>%s</em> index"
+#~ msgstr "dins l'índex <em>%s</em>"
+
+#~ msgid "Record #%d: %s"
+#~ msgstr "Registre #%d: %s"
+
+#~ msgid "Record #%d"
+#~ msgstr "Registre #%d"
 
 #~ msgid "Words nearest to"
 #~ msgstr "Paraules més properes a"
@@ -4553,105 +4531,18 @@ msgstr "Puntueu aquest document"
 #~ msgid "inside"
 #~ msgstr "dins"
 
-#, fuzzy
-#~ msgid ""
-#~ "You are logged in as a guest user, so your %s will disappear at the end "
-#~ "of the current session. If you wish you can %slogin or register here%s."
-#~ msgstr ""
-#~ "Com que esteu connectat com a usuari visitant, els cistells "
-#~ "desapareixeran al final d'aquesta sessió. Si voleu podeu %slogin or "
-#~ "register here%s."
-
-#, fuzzy
-#~ msgid "No waiting member"
-#~ msgstr "No s'ha trobat cap usuari que coincideixi"
-
-#, fuzzy
-#~ msgid "Waiting members"
-#~ msgstr "%i cistells de grup"
-
-# Una?
-#, fuzzy
-#~ msgid "Please select"
-#~ msgstr "Si us plau seleccioneu-ne un o més:"
-
-# Una?
-#, fuzzy
-#~ msgid "Please Select:"
-#~ msgstr "Si us plau seleccioneu-ne un o més:"
-
-#, fuzzy
-#~ msgid "Add member"
-#~ msgstr "Afegir comentari"
-
-#, fuzzy
-#~ msgid "Bring item up"
-#~ msgstr "Puja l'item"
-
-#~ msgid "You're not member of a group"
-#~ msgstr "No sou membre d'un grup"
-
-#~ msgid "Ok"
-#~ msgstr "D'acord"
-
-#, fuzzy
-#~ msgid "Delete successful."
-#~ msgstr "Esborrat correctament"
-
-#, fuzzy
-#~ msgid "Cannot find number of pages."
-#~ msgstr "no és possible calcular el número de pàgines"
-
-#, fuzzy
-#~ msgid "Cannot find document."
-#~ msgstr "No es pot trobar el document %s"
-
-#~ msgid "go"
-#~ msgstr "endavant"
-
-#~ msgid "You now have to"
-#~ msgstr "Ara heu de"
-
-#~ msgid ""
-#~ "You first have to login before using this feature. Use the left menu to "
-#~ "log in."
-#~ msgstr ""
-#~ "Abans de fer aquesta acció us heu d'identificar.  Useu el menú de "
-#~ "l'esquerra per a fer-ho."
-
-#, fuzzy
-#~ msgid "All of the words"
-#~ msgstr "Totes les paraules:"
-
-#, fuzzy
-#~ msgid "Any of the words"
-#~ msgstr "Qualsevol de les paraules:"
-
-#, fuzzy
-#~ msgid "Exact phrase"
-#~ msgstr "Frase exacta:"
-
-#, fuzzy
-#~ msgid "Partial phrase"
-#~ msgstr "Part de la frase:"
-
-#, fuzzy
-#~ msgid "Regular expression"
-#~ msgstr "Expressió regular:"
-
-#, fuzzy
-#~ msgid "Added since"
-#~ msgstr "Afegit des de:"
-
-#, fuzzy
-#~ msgid "Record #%d: %s"
-#~ msgstr "Registre #%d: %s"
-
-#~ msgid "Record #%d"
-#~ msgstr "Registre #%d"
+#~ msgid "in any collection are:"
+#~ msgstr "en qualsevol col·lecció són:"
 
 #~ msgid "<strong>%s</strong> records found"
 #~ msgstr "<strong>%s</strong> registres trobats"
+
+#~ msgid ""
+#~ "<strong>Results overview:</strong> Found <strong>%s</strong> records in "
+#~ "%.2f seconds."
+#~ msgstr ""
+#~ "<strong>Resultats globals:</strong> Trobats <strong>%s</strong> registres "
+#~ "en %.2f segons."
 
 #~ msgid ""
 #~ "<p>Sorry, collection <strong>%s</strong> does not seem to exist. <p>You "
@@ -4659,6 +4550,13 @@ msgstr "Puntueu aquest document"
 #~ msgstr ""
 #~ "<p>Ho sentim, la col·lecció <strong>%s</strong> no existeix. <p>Proveu-ho "
 #~ "començant des de <a href=\"%s\">%s</a>."
+
+#~ msgid ""
+#~ "The <strong class=\"headline\">guest</strong> users need to <A href=\"%s"
+#~ "\">register</A> first"
+#~ msgstr ""
+#~ "Els usuaris <strong class=\"headline\">visitants</strong> abans han d'<A "
+#~ "href=\"%s\">identificar-se</A>"
 
 #, fuzzy
 #~ msgid ""
@@ -4681,9 +4579,35 @@ msgstr "Puntueu aquest document"
 #~ msgid "your approvals"
 #~ msgstr "les vostres aprovacions"
 
-#, fuzzy
+#~ msgid ""
+#~ "You are no longer recognized.  If you wish you can <A href=\"./login?ln=%s"
+#~ "\">login here</A>."
+#~ msgstr ""
+#~ "Ja heu deixat d'estar identificat.  Si voleu podeu <A \n"
+#~ "href=\"./login?ln=%s\">identificar-vos aquí</A>."
+
+#~ msgid "Edit<br/>members"
+#~ msgstr "Editar<br/>membres"
+
 #~ msgid "Create New Group"
-#~ msgstr "Creeu un nou tema"
+#~ msgstr "Crear un nou grup"
+
+# Una?
+#, fuzzy
+#~ msgid "Please Select:"
+#~ msgstr "Si us plau seleccioneu-ne un o més:"
+
+#~ msgid "Add member"
+#~ msgstr "Afegir membre"
+
+#~ msgid "Group: <b>%s</b>"
+#~ msgstr "Grup: <b>%s</b>"
+
+#~ msgid "Please select"
+#~ msgstr "Seleccioneu"
+
+#~ msgid "here"
+#~ msgstr "aquí"
 
 # Potser canviar el # per un n. ?
 #, fuzzy
@@ -4693,14 +4617,38 @@ msgstr "Puntueu aquest document"
 #~ msgid "Error: %s"
 #~ msgstr "Error: %s"
 
+#~ msgid "can't figure number of pages"
+#~ msgstr "no és possible calcular el número de pàgines"
+
+#~ msgid "this action does not apply on this type of document"
+#~ msgstr "aquesta acció no és aplicable a aquest tipus de document"
+
+#~ msgid "Cannot find document %s"
+#~ msgstr "No es pot trobar el document %s"
+
 #~ msgid "error"
 #~ msgstr "error"
 
 #~ msgid "warning"
 #~ msgstr "atenció"
 
+#~ msgid "go"
+#~ msgstr "endavant"
+
 #~ msgid "Submission no(1)"
 #~ msgstr "Lliurament núm(1)"
+
+#~ msgid ""
+#~ "(1) you should take note of this number at the beginning of the "
+#~ "submission, it will allow you to get your information back in case your "
+#~ "browser crashes before the end of the submission."
+#~ msgstr ""
+#~ "(1) haurieu de prendre nota d'aquest número al començament del vostre "
+#~ "lliurament, perquè us permeterà recuperar la vostra informació en cas que "
+#~ "el navegador fa fallida abans del final del lliurament."
+
+#~ msgid "You now have to"
+#~ msgstr "Ara heu de"
 
 # O núm?
 #, fuzzy
@@ -4718,12 +4666,26 @@ msgstr "Puntueu aquest document"
 #~ msgid "pending"
 #~ msgstr "pendent"
 
+# Està bé el plural?
+#, fuzzy
+#~ msgid "approved"
+#~ msgstr "aprovats"
+
+#~ msgid "rejected"
+#~ msgstr "rebutjats"
+
 #~ msgid "click here"
 #~ msgstr "Feu clic aquí"
 
-#, fuzzy
 #~ msgid ""
-#~ "Last approval email was sent on: <strong class=\"headline\">%(date)s</"
+#~ "It has first been sent to approval on: <strong class=\"headline\">%(date)"
+#~ "s</strong>"
+#~ msgstr ""
+#~ "Ha estat enviar per aprovació el primer cop el: <strong class=\"headline"
+#~ "\">%(date)s</strong>"
+
+#~ msgid ""
+#~ "Last approval e-mail was sent on: <strong class=\"headline\">%(date)s</"
 #~ "strong>"
 #~ msgstr ""
 #~ "L'últim correu electrònic d'aprovació av ser enviat el <strong class="
@@ -4751,101 +4713,15 @@ msgstr "Puntueu aquest document"
 #~ "It has been rejected on: <strong class=\"headline\">%(date)s</strong>"
 #~ msgstr "Ha estat rebutjat el: <strong class=\"headline\">%(date)s</strong>."
 
+#~ msgid ""
+#~ "You first have to login before using this feature. Use the left menu to "
+#~ "log in."
+#~ msgstr ""
+#~ "Abans de fer aquesta acció us heu d'identificar.  Useu el menú de "
+#~ "l'esquerra per a fer-ho."
+
 #~ msgid "%s"
 #~ msgstr "%s"
-
-#~ msgid "Detailed record #%s"
-#~ msgstr "Registre complet #%s"
-
-#~ msgid "These users are overquota: "
-#~ msgstr "Aquests usuaris han sobrepassat la seva quota: "
-
-#~ msgid "Search term <em>%s</em>"
-#~ msgstr "El terme de cerca <em>%s</em>"
-
-#~ msgid "inside <em>%s</em> index"
-#~ msgstr "dins l'índex <em>%s</em>"
-
-#, fuzzy
-#~ msgid "%s will temporarly be displayed as author of this comment."
-#~ msgstr ""
-#~ "El vostre àlias, <i>%s</i>, serà el que es vegi com autor d'aquest "
-#~ "comentari"
-
-#~ msgid "Article:"
-#~ msgstr "Article:"
-
-#~ msgid "Comment:"
-#~ msgstr "Comentari:"
-
-#~ msgid "email"
-#~ msgstr "adreça electrònica"
-
-# Conjugar?
-#, fuzzy
-#~ msgid "Write a %s"
-#~ msgstr "Escriviu un %s"
-
-#~ msgid "#"
-#~ msgstr "n."
-
-#, fuzzy
-#~ msgid "Editing basket \"%s\""
-#~ msgstr "Editar cistell \"%s\""
-
-# Discuss: discussió o comentari?
-#, fuzzy
-#~ msgid "Discuss this document:"
-#~ msgstr "Comenteu aquest document:"
-
-#, fuzzy
-#~ msgid "(Report abuse)"
-#~ msgstr "(Aviseu d'un abús)"
-
-#~ msgid "Average review score"
-#~ msgstr "Puntuació mitja"
-
-#~ msgid "based on %(nb_comments_total)s reviews"
-#~ msgstr "basat en %(nb_comments_total)s crítiques"
-
-#, fuzzy
-#~ msgid "MARC"
-#~ msgstr "Etiqueta MARC"
-
-#, fuzzy
-#~ msgid "Please try to come back later."
-#~ msgstr "Seleccioneu una categoria"
-
-#, fuzzy
-#~ msgid "Please enter"
-#~ msgstr "Seleccioneu una categoria"
-
-#, fuzzy
-#~ msgid "record ID"
-#~ msgstr "registres"
-
-#~ msgid "detailed list"
-#~ msgstr "llista detallada"
-
-#~ msgid "your searches"
-#~ msgstr "les vostres cerques"
-
-#~ msgid "%i personal baskets"
-#~ msgstr "%i cistells personals"
-
-#~ msgid "%i group baskets"
-#~ msgstr "%i cistells de grup"
-
-# 'altri' per 'tercers'?
-#, fuzzy
-#~ msgid "%i others' baskets"
-#~ msgstr "%i cistells d'altri"
-
-# Reported? Informats?
-# Tant pot ser 'reviews' com 'comments'
-#, fuzzy
-#~ msgid "View all Reported %s"
-#~ msgstr "Visualitzar tots els %s"
 
 #~ msgid "Sorry, the record %s does not seem to be a number."
 #~ msgstr "El registre %s no sembla un número."
