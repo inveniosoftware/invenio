@@ -3037,8 +3037,6 @@ class NumerationHandler:
                               unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> ')])
 
         # Pattern 1: <x, vol, year, page>
-##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
-##                               unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
         ## <v, [FS]?, y, p>
         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?') +\
                                          pattern_nucphysb_subtitle +\
@@ -3052,9 +3050,6 @@ class NumerationHandler:
 
 
         # Pattern 2: <vol, serie, year, page>
-##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?'), re.UNICODE),\
-##                               unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> ')])
-
         ## <v, s, [FS]?, y, p>
         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?') +\
                                          pattern_nucphysb_subtitle +\
@@ -3069,9 +3064,6 @@ class NumerationHandler:
 
 
         # Pattern 4: <vol, serie, page, year>
-##         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)'), re.UNICODE),\
-##                               unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> ')])
-
         ## <v, s, [FS]?, p, y>
         self._ptnList.append([re.compile(unicode(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?') +\
                                          pattern_nucphysb_subtitle +\
