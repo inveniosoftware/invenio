@@ -352,9 +352,9 @@ def tag_matches_pattern(tag, pattern):
     @return False or True
     """
     
-    print tag, pattern, (pattern[0] == '%' or tag[0] == pattern[0]) and \
-          (pattern[1] == '%' or tag[1] == pattern[1]) and \
-          (pattern[2] == '%' or tag[2] == pattern[2])
+#     print tag, pattern, (pattern[0] == '%' or tag[0] == pattern[0]) and \
+#           (pattern[1] == '%' or tag[1] == pattern[1]) and \
+#           (pattern[2] == '%' or tag[2] == pattern[2])
     
     return (pattern[0] == '%' or tag[0] == pattern[0]) and \
            (pattern[1] == '%' or tag[1] == pattern[1]) and \
