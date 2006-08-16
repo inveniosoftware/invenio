@@ -420,7 +420,7 @@ class Template:
         # display message: number of items in the list
         if permanent=="n":
             msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total, 
-                                                                                                                               'x_nb_2': nb_queries_distinct}
+                                                                                                                               'x_nb2': nb_queries_distinct}
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
