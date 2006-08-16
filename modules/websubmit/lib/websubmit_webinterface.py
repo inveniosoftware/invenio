@@ -49,7 +49,6 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         self.recid = recid
         return
     
-
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
         # name (with possible path in the case of archives to be
@@ -123,6 +122,11 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
         return getfile, []
 
+    def __call__(self, req, form):
+        """Called in case of URLs like /record/123/files without
+           trailing slash.
+        """
+        return redirect_to_url(req, '%s/record/%s/files/' % (weburl, self.recid))
 
 def websubmit_legacy_getfile(req, form):
     """ Handle legacy /getfile.py URLs """
