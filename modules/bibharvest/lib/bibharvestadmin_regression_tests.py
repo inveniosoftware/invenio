@@ -37,8 +37,7 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
 
         baseurl = weburl + '/admin/bibharvest/bibharvestadmin.py/'
 
-        _exports = ['', 'editsource', 'modifysource', 'addsource',
-                    'delsource']
+        _exports = ['', 'editsource', 'addsource', 'delsource']
         
         error_messages = []
         for url in [baseurl + page for page in _exports]:
