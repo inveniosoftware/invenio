@@ -38,7 +38,7 @@ from invenio.access_control_config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.webuser import getUid, get_email, page_not_authorized
+from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
 from invenio.search_engine import print_record
 from invenio.webuser import email_valid_p, get_user_preferences, set_user_preferences
 
@@ -1103,6 +1103,14 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
 
 def perform_delegate_startarea(req):
     """start area for lower level delegation of rights."""
+
+    # refuse access to guest users:
+    uid = getUid(req)
+    if isGuestUser(uid):
+        return index(req=req,
+                     title='Delegate Rights',
+                     adminarea=0,
+                     authorized=0)
 
     subtitle = 'select what to do'
 
