@@ -25,7 +25,7 @@ import sys
 
 import invenio.bibharvestadminlib as bhc
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import cdsname, weburl, cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
@@ -37,69 +37,52 @@ def index(req, ln=cdslang):
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
-
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
         return page(title="BibHarvest Admin Interface",
-                body=bhc.perform_request_index(ln),
-                uid=uid,
-                language=ln,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__,
-                req=req)
+                    body=bhc.perform_request_index(ln),
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
         return page(title="Edit OAI Source",
                     body=bhc.perform_request_editsource(oai_src_id=oai_src_id,
-                                                oai_src_name=oai_src_name,
-                                                oai_src_baseurl=oai_src_baseurl,
-                                                oai_src_prefix=oai_src_prefix,
-                                                oai_src_frequency=oai_src_frequency,
-                                                oai_src_config=oai_src_config,
-                                                oai_src_post=oai_src_post,
-                                                ln=ln,
-                                                confirm=confirm),
-                    uid=uid,
-                    language=ln,
-                    req=req,
-                    navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
-    else:
-        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def modifysource(req, oai_src_id, oai_src_name, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1):
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
- 
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return error_page(req)
-
-    auth = bhc.check_user(uid,'cfgbibharvest')
-    if not auth[0]:
-        return page(title="Edit OAI Source",
-                    body=bhc.perform_request_modifysource(oai_src_id=oai_src_id,
-                                                  oai_src_name=oai_src_name,
-                                                  oai_src_baseurl=oai_src_baseurl,
-                                                  oai_src_prefix=oai_src_prefix,
-                                                  oai_src_frequency=oai_src_frequency,
-                                                  oai_src_config=oai_src_config,
-                                                  oai_src_post=oai_src_post,
-                                                  ln=ln,
-                                                  confirm=confirm),
+                                                        oai_src_name=oai_src_name,
+                                                        oai_src_baseurl=oai_src_baseurl,
+                                                        oai_src_prefix=oai_src_prefix,
+                                                        oai_src_frequency=oai_src_frequency,
+                                                        oai_src_config=oai_src_config,
+                                                        oai_src_post=oai_src_post,
+                                                        ln=ln,
+                                                        confirm=confirm),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -114,7 +97,13 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
@@ -137,13 +126,19 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delsource(req, oai_src_id, ln=cdslang, confirm=0):
+def delsource(req, oai_src_id=None, ln=cdslang, confirm=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
     
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
@@ -158,4 +153,3 @@ def delsource(req, oai_src_id, ln=cdslang, confirm=0):
                     lastupdated=__lastupdated__)    
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
