@@ -1125,7 +1125,7 @@ def perform_delegate_startarea(req):
     </dl>
     <dl>
      <dt><a href="delegate_adminsetup">Set up delegation rights</a></dt>
-     <dd>spesialized area to set up the delegation rights used in the areas above. <br>
+     <dd>specialized area to set up the delegation rights used in the areas above. <br>
          you need to be a web administrator to access the area.</dd>
     </dl>
     """
