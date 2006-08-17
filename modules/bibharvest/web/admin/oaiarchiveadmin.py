@@ -26,7 +26,7 @@ import sys
 import invenio.oaiarchiveadminlib as bhc
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
-#from invenio.dbquery import Error
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 __version__ = "$Id$"
@@ -37,8 +37,13 @@ def index(req, ln=cdslang):
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
-
+        return page(title="OAI Archive Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
@@ -60,7 +65,13 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="OAI Archive Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
@@ -91,13 +102,19 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delset(req, oai_set_id, ln=cdslang, func=0):
+def delset(req, oai_set_id=None, ln=cdslang, func=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
     
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="OAI Archive Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
@@ -113,14 +130,20 @@ def delset(req, oai_set_id, ln=cdslang, func=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editset(req, oai_set_id, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
+def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
 
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
 
     try:
         uid = getUid(req)
     except Error, e:
-        return error_page(req)
+        return page(title="OAI Archive Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
