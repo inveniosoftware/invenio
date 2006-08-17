@@ -507,8 +507,9 @@ class Template:
                 host_s = req.hostname
                 page_s = req.unparsed_uri
                 client_s = req.connection.remote_ip 
-            except:
-                pass
+            except: # FIXME: bad except
+                browser_s += ': ' + info_not_available
+                host_s = page_s = client_s = info_not_available
         else:    
             browser_s += ': ' + info_not_available
             host_s = page_s = client_s = info_not_available
