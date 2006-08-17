@@ -102,6 +102,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/edit")
 
+        if webuser.isGuestUser(uid):
+            return webuser.page_not_authorized(req, "../youraccount/edit", text=_("This functionality is forbidden to guest users."))
+
         return page(title= _("Your Settings"),
                     body=webaccount.perform_set(webuser.get_email(uid),
                                                 webuser.get_password(uid),
