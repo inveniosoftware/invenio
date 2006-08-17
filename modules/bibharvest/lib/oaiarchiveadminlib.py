@@ -86,7 +86,7 @@ def perform_request_index(ln=cdslang):
     return out
 
 
-def perform_request_addset(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, ln=cdslang, func=0):
+def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
     """add a new OAI set"""
 
     out  = ""
@@ -118,8 +118,11 @@ def perform_request_addset(oai_set_name, oai_set_spec, oai_set_collection, oai_s
     return nice_box("", body)
 
 
-def perform_request_editset(oai_set_id, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
+def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
     """creates html form to edit an OAI set."""
+
+    if oai_set_id is None:
+        return "No OAI set ID selected."
 
     out  = ""
 
@@ -194,15 +197,15 @@ def perform_request_editset(oai_set_id, oai_set_name='', oai_set_spec='', oai_se
     return nice_box("", body)
 
 
-def perform_request_delset(oai_set_id, ln=cdslang, callback='yes', func=0):
+def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
     """creates html form to delete an OAI set"""
+
+    out = ""
 
     if oai_set_id:
         oai_set = get_oai_set(oai_set_id)
         nameset = (oai_set[0][1])
         pagetitle = """Delete OAI set: %s""" % nameset
-
-        out  = ""
 
         if func in ["0", 0]:
 
