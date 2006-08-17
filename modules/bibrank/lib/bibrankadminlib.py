@@ -354,7 +354,12 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
 
     rnkID - id of the rank method
     """
- 
+    
+    if not rnkID:
+        return "No ranking method selected."
+    if not get_rnk_code(rnkID):
+        return "Ranking method %s does not seem to exist." % str(rnkID)
+
     subtitle = 'Step 1 - Please modify the wanted values below'
     if not rnkcode:
         oldcode = get_rnk_code(rnkID)[0]
@@ -524,6 +529,11 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
 def perform_showrankdetails(rnkID, ln=cdslang):
     """Returns details about the rank method given by rnkID"""
 
+    if not rnkID:
+        return "No ranking method selected."
+    if not get_rnk_code(rnkID):
+        return "Ranking method %s does not seem to exist." % str(rnkID)
+    
     subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
     text  = """
     BibRank code: %s<br>
