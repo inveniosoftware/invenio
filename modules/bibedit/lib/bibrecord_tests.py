@@ -337,9 +337,8 @@ class GettingFieldValuesViaWildcardsTest(unittest.TestCase):
                          [])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "%", ""),
                          [])
-        if 0: # FIXME
-            self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", ""),
-                             [])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", ""),
+                         [])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", "z"),
                          [])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "%"),
@@ -358,9 +357,8 @@ class GettingFieldValuesViaWildcardsTest(unittest.TestCase):
                          ['val3', 'val7a'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "A", "", "a"),
                          ['val7a'])
-        if 0: # FIXME
-            self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", ""),
-                             [])                           
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", ""),
+                         [])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", "z"),
                          [])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", "%"),

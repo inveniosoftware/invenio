@@ -350,12 +350,7 @@ def tag_matches_pattern(tag, pattern):
     @param tag a 3 characters long string
     @param pattern a 3 characters long string
     @return False or True
-    """
-    
-#     print tag, pattern, (pattern[0] == '%' or tag[0] == pattern[0]) and \
-#           (pattern[1] == '%' or tag[1] == pattern[1]) and \
-#           (pattern[2] == '%' or tag[2] == pattern[2])
-    
+    """    
     return (pattern[0] == '%' or tag[0] == pattern[0]) and \
            (pattern[1] == '%' or tag[1] == pattern[1]) and \
            (pattern[2] == '%' or tag[2] == pattern[2])
@@ -381,12 +376,11 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
       100C5  $$a val1
       555AB  $$a val2
       555AB      val3
-      555        val4
-      555    $$a val5
-      555A       val6
+      555    $$a val4
+      555A       val5
       
       >> record_get_field_value(record, '555', 'A', '', '')
-      >> "val6"
+      >> "val5"
       >> record_get_field_value(record, '555', 'A', '%', '')
       >> "val3"
       >> record_get_field_value(record, '555', 'A', '%', '%')
@@ -396,7 +390,7 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
       >> record_get_field_value(record, '555', '', 'B', 'a')
       >> ""
       >> record_get_field_value(record, '555', '', '', 'a')
-      >> "val6"
+      >> "val4"
       >> record_get_field_value(record, '555', '', '', '')
       >> ""
       >> record_get_field_value(record, '%%%', '%', '%', '%')
@@ -509,9 +503,8 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                 fields = rec[tag]
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
-                           (ind2 == '%' or field[2] == ind2):
+                           (ind2 == '%' or field[2] == ind2) and field[3] != '':
                             tmp.append(field[3])
-        
         elif code == '%':
             #Code is wildcard. Consider all subfields
             for tag in tags:
@@ -529,7 +522,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
                         for subfield in field[0]:
-                            if subfield[0]==code:
+                            if subfield[0] == code:
                                 tmp.append(subfield[1])
     else:
         #Tag is completely specified. Use tag as dict key
@@ -539,7 +532,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                 #Code not specified. Consider field value (without subfields)
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
-                           (ind2 == '%' or field[2] == ind2):
+                           (ind2 == '%' or field[2] == ind2) and field[3] != '':
                         tmp.append(field[3])
             elif code == '%':
                 #Code is wildcard. Consider all subfields
@@ -554,7 +547,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
                         for subfield in field[0]:
-                            if subfield[0]==code:
+                            if subfield[0] == code:
                                 tmp.append(subfield[1])
     
     #Nothing was found 
