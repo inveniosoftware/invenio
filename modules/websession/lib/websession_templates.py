@@ -741,7 +741,9 @@ class Template:
         out = ""
         # guest condition
         if guest:
-            return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % ('<a href="../youraccount/login?ln=' + ln +'">', '<a/>')
+            return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % \
+                        {'x_url_open': '<a href="../youraccount/login?ln=' + ln + '">',
+                         'x_url_close': '<a/>'}
 
         # no rights condition
         if not roles:
