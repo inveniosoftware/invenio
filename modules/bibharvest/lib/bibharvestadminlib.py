@@ -101,9 +101,12 @@ def perform_request_index(ln=cdslang):
     
     return output
 
-def perform_request_editsource(oai_src_id, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1):
+def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1):
     """creates html form to edit a OAI source. this method is calling other methods which again is calling this and sending back the output of the method.
     confirm - determines the validation status of the data input into the form"""
+
+    if oai_src_id is None:
+        return "No OAI source ID selected."
 
     output  = ""
     subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "edit source", subtitle = "Edit OAI source", guideurl = guideurl)
@@ -167,8 +170,11 @@ def perform_request_editsource(oai_src_id, oai_src_name='', oai_src_baseurl='', 
 
     return addadminbox(subtitle, body)
 
-def perform_request_addsource(oai_src_name, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1):
+def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1):
     """creates html form to add a new source"""
+
+    if oai_src_name is None:
+        return "No OAI source name selected."
 
     subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "add source", subtitle = "Add new OAI source", guideurl = guideurl)
     output  = ""
@@ -252,10 +258,13 @@ def perform_request_addsource(oai_src_name, oai_src_baseurl='', oai_src_prefix='
 
     return addadminbox(subtitle, body)
 
-def perform_request_delsource(oai_src_id, ln=cdslang, callback='yes', confirm=0):
+def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confirm=0):
     """creates html form to delete a source
     """
-   
+
+    output = ""
+    subtitle = ""
+
     if oai_src_id:
         oai_src = get_oai_src(oai_src_id)
         namesrc = (oai_src[0][1])
