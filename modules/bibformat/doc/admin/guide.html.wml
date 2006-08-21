@@ -21,7 +21,7 @@
     title="BibFormat Admin Guide" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/bibformat/>BibFormat Admin</a>" \
     navbar_name="admin" \
-    navbar_select="bibformat-guide"
+    navbar_select="bibformat-admin-guide"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
