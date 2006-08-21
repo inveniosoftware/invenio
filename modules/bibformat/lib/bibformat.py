@@ -38,8 +38,13 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.config import cdslang
+from invenio.config import cdslang, weburl
 from invenio.bibformat_config import use_old_bibformat
+try:
+    import invenio.template
+    websearch_templates = invenio.template.load('websearch')
+except:
+    pass
 
 # Functions to format a single record 
 ##
@@ -75,15 +80,28 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     if use_old_bibformat:
         return bibformat_engine.call_old_bibformat(recID, format=of)
     ############################# END ##################################
-    
-    return bibformat_engine.format_record(recID=recID,
-                                          of=of,
-                                          ln=ln,
-                                          verbose=verbose,
-                                          search_pattern=search_pattern,
-                                          xml_record=xml_record,
-                                          uid=uid)
-
+    try:
+        return bibformat_engine.format_record(recID=recID,
+                                              of=of,
+                                              ln=ln,
+                                              verbose=verbose,
+                                              search_pattern=search_pattern,
+                                              xml_record=xml_record,
+                                              uid=uid)
+    except:
+        #Failsafe execution mode
+        if of == 'hd':
+            return websearch_templates.tmpl_print_record_detailed(
+                ln = ln,
+                recID = recID,
+                weburl = weburl,
+                )
+        
+        return websearch_templates.tmpl_print_record_brief(ln = ln,
+                                                           recID = recID,
+                                                           weburl = weburl,
+                                                           )
+        
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """

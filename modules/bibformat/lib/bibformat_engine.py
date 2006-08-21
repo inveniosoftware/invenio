@@ -207,7 +207,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     # Call new BibFormat
     # But if format not found for new BibFormat, then call old BibFormat  
 
-    #Create a BibFormat Object to give that contain record and context    
+    #Create a BibFormat Object to pass that contain record and context    
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, uid)
         
     #Find out which format template to use based on record and output format.
