@@ -351,7 +351,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
     if not req: 
         return # we were called from CLI
 
-    #req.content_type = get_output_format_content_type(of)
+    content_type = get_output_format_content_type(of)
 
     if of.startswith('x'):
         # we are doing XML output:
@@ -368,9 +368,9 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
-    elif req.content_type == 'text/html':
+    elif content_type == 'text/html':
         # we are doing HTML output:
-        #req.content_type = "text/html"
+        req.content_type = "text/html"
         req.send_http_header()
 
         if not description:
