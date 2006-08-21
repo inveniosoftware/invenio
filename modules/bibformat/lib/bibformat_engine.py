@@ -18,12 +18,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+Formats a single XML Marc record using specified format.
+There is no API for the engine. Instead use bibformat.py.
+
+SEE: bibformat.py, bibformat_utils.py
+"""
 
 import re
 import sys
 import os
 import inspect
 import traceback
+import zlib
 
 from invenio.errorlib import register_errors, get_msgs_for_code_list
 from invenio.config import *
@@ -32,6 +39,7 @@ from invenio.dbquery import run_sql
 from invenio.messages import language_list_long, wash_language
 from invenio import bibformat_dblayer
 from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path, elements_import_path
+from bibformat_utils import record_get_xml
 
 __lastupdated__ = """$Date$"""
 
@@ -131,7 +139,44 @@ pattern_format_element_seealso = re.compile('''@see\s*(?P<see>.*)''', re.VERBOSE
 ##      (?P=sep2)
 ##      ''', re.VERBOSE | re.MULTILINE)    
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_record=None, uid=None):
+def call_old_bibformat(recID, format="HD"):
+    """
+    FIXME: REMOVE FUNCTION WHEN MIGRATION IS DONE
+    Calls BibFormat for the record RECID in the desired output format FORMAT.
+
+    Note: this functions always try to return HTML, so when
+    bibformat returns XML with embedded HTML format inside the tag
+    FMT $g, as is suitable for prestoring output formats, we
+    perform un-XML-izing here in order to return HTML body only.
+    """
+    # look for formatted notice existence:
+    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
+    res = run_sql(query, None, 1)
+    if res:
+        # record 'recID' is formatted in 'format', so print it
+        decompress = zlib.decompress
+        return "%s" % decompress(res[0][0])
+    else:
+        # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
+        out = ""
+        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
+        #pipe_input.write(print_record(recID, "xm"))
+        pipe_input.write(record_get_xml(recID, "xm"))
+        pipe_input.close()
+        bibformat_output = pipe_output.read()
+        pipe_output.close()
+        pipe_error.close()
+        if bibformat_output.startswith("<record>"):
+            dom = minidom.parseString(bibformat_output)
+            for e in dom.getElementsByTagName('subfield'):
+                if e.getAttribute('code') == 'g':
+                    for t in e.childNodes:
+                        out += t.data.encode('utf-8')
+        else:
+            out = bibformat_output
+        return out
+
+def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None):
     """
     Formats a record given output format. Main entry function of bibformat engine.
     
@@ -152,53 +197,28 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
-    @param search_pattern the context in which this record was asked to be formatted (User request in web interface)
+    @param search_pattern list of strings representing the user request in web interface
     @param xml_record an xml string representing the record to format
     @param uid the user id of the person who will view the formatted page
     @return formatted record
     """
     errors_ = []
-    
-    #Test record existence
-    if xml_record == None and record_exists(recID) == 0:
-        #Record does not exist
-        error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", "recid:%s" % recID)],
-                                       file='error', ln=cdslang)
-        errors_.append(error)
-        if verbose == 0:
-            register_errors(error, 'error')
-        return ("", errors_)
+    # Temporary workflow (during migration of formats):
+    # Call new BibFormat
+    # But if format not found for new BibFormat, then call old BibFormat  
 
     #Create a BibFormat Object to give that contain record and context    
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, uid)
-
         
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
 
-    if template == None:
-
+    if template == None:  
         ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-
-        # look for detailed format existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
-        res = run_sql(query, None, 1)
-        if res:
-            # record 'recID' is formatted in 'format', so print it
-            import zlib
-            decompress = zlib.decompress
-            return "%s" % decompress(res[0][0])
-        else:
-            from invenio.search_engine import call_bibformat
-            # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
-            out_record_in_format = call_bibformat(recID, of)
-            if out_record_in_format:
-                return out_record_in_format
-                
+        # template not found in new BibFormat. Call old one
+        return call_old_bibformat(recID, format=of)
         ############################# END ##################################
-    
-
-        
+     
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
                                        file='error', ln=cdslang)
         errors_.append(error)
@@ -776,7 +796,6 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         module_name = filename
         if module_name.endswith(".py"):
             module_name = module_name[:-3]
-        #module = __import__(elements_import_path+"."+module_name)
          
         try:
             module = __import__(elements_import_path+"."+module_name)
@@ -1401,10 +1420,6 @@ def clear_caches():
     format_outputs_cache = {}
     kb_mappings_cache = {}
 
-
-from bibformat_utils import get_xml
-from invenio.search_engine import record_exists, get_fieldvalues
-
 class BibFormatObject:
     """
     An object that encapsulates a record and associated methods, and that is given
@@ -1421,9 +1436,9 @@ class BibFormatObject:
     #The language in which the formatting has to be done
     lang = cdslang
 
-    #A string pattern describing the context in which the record has to be formatted.
-    #It represents the user request in web interface search
-    search_pattern = None
+    #A list of string describing the context in which the record has to be formatted.
+    #It represents the words of the user request in web interface search
+    search_pattern = []
 
     #The id of the record
     recID = 0
@@ -1433,7 +1448,7 @@ class BibFormatObject:
     #who have right to edit a record.
     uid = None
     
-    def __init__(self, recID, ln=cdslang, search_pattern=None, xml_record=None, uid=None):
+    def __init__(self, recID, ln=cdslang, search_pattern=[], xml_record=None, uid=None):
         """
         Creates a new bibformat object, with given record.
 
@@ -1445,7 +1460,7 @@ class BibFormatObject:
         
         @param recID the id of a record
         @param ln the language in which the record has to be formatted
-        @param search_pattern the request used by the user in web interface
+        @param search_pattern list of string representing the request used by the user in web interface
         @param xml_record a xml string of the record to format
         @param uid the user id of the person who will view the formatted page
         """
@@ -1469,7 +1484,7 @@ class BibFormatObject:
         
         #Create record if necessary
         if self.record == None:
-            record = create_record(get_xml(self.recID, 'xm'))
+            record = create_record(record_get_xml(self.recID, 'xm'))
             self.record = record[0]
 
         return self.record
@@ -1574,7 +1589,7 @@ def bf_profile():
     Runs a benchmark
     """
     for i in range(50):
-        format_record(i, "HD", ln=cdslang, verbose=9, search_pattern=None)
+        format_record(i, "HD", ln=cdslang, verbose=9, search_pattern=[])
     return 
 
 if __name__ == "__main__":   

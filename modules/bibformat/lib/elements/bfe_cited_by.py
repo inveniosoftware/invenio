@@ -30,8 +30,8 @@ def format(bfo, separator='; '):
     primary_report_numbers = bfo.fields('037$a')
     additional_report_numbers = bfo.fields('088$a')
 
-    primary_citations = map(lambda x: '<a href="'+weburl+'/search.py?f=reference&p='+quote(x)+'">'+x+'</a>', primary_report_numbers)
-    additional_citations = map(lambda x: '<a href="'+weburl+'/search.py?f=reference&p='+quote(x)+'">'+x+'</a>', additional_report_numbers)
+    primary_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', primary_report_numbers)
+    additional_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', additional_report_numbers)
 
     citations = primary_citations
     citations.extend(additional_citations)

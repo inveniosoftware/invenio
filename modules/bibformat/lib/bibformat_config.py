@@ -24,16 +24,10 @@ __lastupdated__ = """$Date$"""
 import os
 from invenio.config import etcdir, pylibdir
 
-#Debug mode 0 is silent: no error message or warnings. Don't stop formatting
-#Debug mode 1 is verbose: print error messages and warnings.
-#debug = 1
-
-#True if old php format written in EL must be used by bibreformat.
-#False if new python format must be used by bibreformat.
-use_php_el_formats = False
-
-#The name of the function to call inside elements
-#elements_function_name = "format"
+#True if old php format written in EL must be used by Invenio.
+#False if new python format must be used. If set to 'False' but
+#new format cannot be found, old format will be used.
+use_old_bibformat = False
 
 #Paths to main formats directories
 templates_path = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)

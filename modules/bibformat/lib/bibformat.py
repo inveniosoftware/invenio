@@ -19,15 +19,32 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import zlib
-from invenio import bibformat_dblayer
+"""
+Format records using specified format.
 
+API functions: format_record, format_records, create_excel, get_output_format_content_type
+
+Used to wrap the BibFormat engine and associated functions. This is also where
+special formatting of multiple records (that the engine does not handle, as it works
+on a single record basis) should be put, with name create_*.
+
+SEE: bibformat_utils.py
+
+FIXME: currently copies record_exists() code from search engine.  Refactor later.
+"""
+
+import zlib
+
+from invenio import bibformat_dblayer
+from invenio import bibformat_engine
+from invenio import bibformat_utils
 from invenio.config import cdslang
+from invenio.bibformat_config import use_old_bibformat
 
 # Functions to format a single record 
 ##
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_record=None, uid=None):
+def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None):
     """
     Formats a record given output format.
     
@@ -49,11 +66,16 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
-    @param search_pattern the context in which this record was asked to be formatted (User request in web interface)
+    @param search_pattern list of strings representing the user request in web interface
     @param xml_record an xml string represention of the record to format
     @param uid the user id of the person who will view the formatted page (if applicable)
     @return formatted record
     """
+    ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
+    if use_old_bibformat:
+        return bibformat_engine.call_old_bibformat(recID, format=of)
+    ############################# END ##################################
+    
     return bibformat_engine.format_record(recID=recID,
                                           of=of,
                                           ln=ln,
@@ -63,7 +85,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=None, xml_rec
                                           uid=uid)
 
 
-def get_xml(recID, format='xm', decompress=zlib.decompress):
+def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """
     Returns an XML string of the record given by recID.
 
@@ -81,10 +103,13 @@ def get_xml(recID, format='xm', decompress=zlib.decompress):
     @param recID the id of the record to retrieve
     @return the xml string of the record
     """
-    from invenio import bibformat_utils
-    return bibformat_utils.get_xml(recID=recID, format=format)
+    return bibformat_utils.record_get_xml(recID=recID, format=format)
 
 # Helper functions to do complex formatting of multiple records
+#
+# You should not modify format_records when adding a complex
+# formatting of multiple records, but add a create_* method
+# that relies on format_records to do the formatting.
 ##
 
 def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_records=None, uid=None,
@@ -114,7 +139,7 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
     @param req an optional request object where to print records
     """
     formatted_records = ''
-
+        
     #Fill one of the lists with Nones
     if xml_records != None:
         recIDs = map(lambda x:None, xml_records)
@@ -171,14 +196,51 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
   
     return formatted_records
 
-def create_Excel(recIDs):
+def create_excel(recIDs, req=None, ln=cdslang):
     """
-    Returns an Excel readable format containing the given recIDs
+    Returns an Excel readable format containing the given recIDs.
+    If 'req' is given, also prints the output in 'req' while individual
+    records are being formatted.
+
+    This method shows how to create a custom formatting of multiple
+    records.
+    The excel format is a basic HTML table that most spreadsheets
+    applications can parse.
 
     @param recIDs a list of record IDs
     @return a string in Excel format
     """
-    return ""
+    # Prepare the column headers to display in the Excel file
+    column_headers_list = ['Title',
+                           'Authors',
+                           'Addresses',
+                           'Affiliation',
+                           'Date',
+                           'Publisher',
+                           'Place',
+                           'Abstract',
+                           'Keywords',
+                           'Notes']
+
+    # Prepare Content
+    column_headers = '</b></td><td style="border-color:black; border-style:solid; border-width:thin; background-color:black;color:white"><b>'.join(column_headers_list) + ''
+    column_headers = '<table style="border-collapse: collapse;">\n'+ '<td style="border-color:black; border-style:solid; border-width:thin; background-color:black;color:white"><b>' + column_headers + '</b></td>'
+    footer = '</table>'
+
+    #Apply content_type and print column headers
+    if req != None:
+        req.content_type = get_output_format_content_type('excel')
+        req.headers_out["Content-Disposition"] = "inline; filename=%s" % 'results.xls'
+        req.send_http_header()
+        req.write(column_headers)
+
+    #Format the records
+    excel_formatted_records = format_records(recIDs, 'excel', ln=cdslang,
+                                             separator='\n', req=req)
+    if req != None:
+        req.write(footer)
+    
+    return column_headers + excel_formatted_records + footer
 
 # Utility functions
 ##
@@ -196,8 +258,3 @@ def get_output_format_content_type(of):
         content_type = 'text/html'
 
     return content_type
-
-#Import at the end to avoid recursive import
-#problems due to call to search_engine in
-#bibformat_engine for backward compatibility
-from invenio import bibformat_engine

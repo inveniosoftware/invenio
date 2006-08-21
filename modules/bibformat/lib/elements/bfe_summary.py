@@ -18,9 +18,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+FIXME implement me
+"""
 def format(bfo, maxNbLines):
     """Returns lines of the full-text which are relevant to the search pattern of the user
-
+    (NOT IMPLEMENTED YET)
     @param maxNbLines the maximum number of lines to return.
     """
     out = ''

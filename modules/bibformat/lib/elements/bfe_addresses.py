@@ -31,7 +31,7 @@ def format(bfo, separator="; ", print_link="yes"):
     addresses = bfo.fields('270')
     list_addresses = []
     for address in addresses:
-        list_addresses.append('<a href="'+weburl+'/search.py?f=author&p='+ quote(address.get('p', "")) +'">'+address.get('p', "")+'</a>')
+        list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ quote(address.get('p', "")) +'">'+address.get('p', "")+'</a>')
         list_addresses.append(address.get('g', ""))
 
     return separator.join(list_addresses)

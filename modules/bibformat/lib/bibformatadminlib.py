@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Deal with Bibformat configuraion files.
-
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -18,6 +16,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Handle requests from the web interface to configure BibFormat.
+"""
 
 __lastupdated__ = """$Date$"""
 
@@ -47,39 +49,19 @@ def getnavtrail(previous = '', ln=cdslang):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_request_index(version="", ln=cdslang, warnings=None):
+def perform_request_index(ln=cdslang, warnings=None):
     """
     Returns the main BibFormat admin page.
 
-    The page offers for some times the choice between the old and new BibFormat.
+    
     This is the only page where the code needs to be cleaned
     when the migration kit will be removed. #TODO: remove when removing migration_kit
-    
    
     @param ln language
-    @param version the version of BibFormat to use ('new'|'old')
     @param warnings a list of messages to display at top of the page, that prevents writability in etc
     @return the main admin page
-    """
-    #FIXME: correct function when removing migration kit
-    from invenio.bibformat_migration_kit_assistant_lib import save_status, use_old_bibformat  #FIXME: remove when removing migration_kit
-    
-    #Save the status (Use or not old BibFormat)
-    if not warnings:
-        if version == "new": 
-            save_status("use old BibFormat", status="NO")
-        elif version == "old":
-            save_status("use old BibFormat", status="YES")
-    else:
-        if version != "":
-            warnings.append(('WRN_BIBFORMAT_CANNOT_EXECUTE_REQUEST'))
-        warnings = get_msgs_for_code_list(warnings, 'warning', ln)
-        warnings = [x[1] for x in warnings] # Get only message, not code
-    #Read status to display in the web interface
-    use_old_bibformat  = use_old_bibformat()
-    
-    return bibformat_templates.tmpl_admin_index(use_old_bibformat, ln, warnings)
-
+    """   
+    return bibformat_templates.tmpl_admin_index(ln, warnings)
 
 def perform_request_format_templates_management(ln=cdslang, checking=0):
     """
@@ -231,7 +213,11 @@ def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_patter
     elements = map(elements.get, keys) 
 
     def filter_elem(element):
-        "Keep element if is string representation contains all keywords of search_doc_pattern"
+        """Keep element if is string representation contains all keywords of search_doc_pattern,
+        and if its name does not start with a number (to remove 'garbage' from elements in tags table)"""
+        if element['type'] != 'python' and \
+               element['attrs']['name'][0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            return False
         text = str(element).upper() #Basic text representation
         if search_doc_pattern != "":
             for word in search_doc_pattern.split():
@@ -259,9 +245,12 @@ def perform_request_format_elements_documentation(ln=cdslang):
     
     keys =  elements.keys()
     keys.sort()
-    elements = map(elements.get, keys) 
-        
-    return bibformat_templates.tmpl_admin_format_elements_documentation(ln, elements)
+    elements = map(elements.get, keys)
+    #Remove all elements found in table and that begin with a number (to remove 'garbage')
+    filtered_elements = [element for element in elements if element['type'] == 'python' or \
+                         element['attrs']['name'][0] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
+    
+    return bibformat_templates.tmpl_admin_format_elements_documentation(ln, filtered_elements)
 
 def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
     """

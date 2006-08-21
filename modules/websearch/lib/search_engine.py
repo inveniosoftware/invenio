@@ -53,6 +53,7 @@ from invenio.config import *
 from invenio.search_engine_config import *
 from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+from invenio.bibformat import format_record, get_output_format_content_type, create_excel
 
 if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
@@ -349,6 +350,9 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
     
     if not req: 
         return # we were called from CLI
+
+    #req.content_type = get_output_format_content_type(of)
+
     if of.startswith('x'):
         # we are doing XML output:
         req.content_type = "text/xml"
@@ -364,9 +368,9 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
-    else:
+    elif req.content_type == 'text/html':
         # we are doing HTML output:
-        req.content_type = "text/html"
+        #req.content_type = "text/html"
         req.send_http_header()
 
         if not description:
@@ -382,7 +386,9 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                                  uid=uid,
                                  language=ln))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
-
+    #else:
+    #    req.send_http_header()
+        
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
@@ -2365,6 +2371,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 req.write(x)
                 if x:
                     req.write('\n')
+        elif format == 'excel':
+            recIDs_to_print = [recIDs[x] for x in range(irec_max,irec_min,-1)]
+            create_excel(recIDs=recIDs_to_print, req=req, ln=ln)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
@@ -2458,7 +2467,6 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     record_exist_p = record_exists(recID)
     if record_exist_p == 0: # doesn't exist
         return out
-
     # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
@@ -2733,35 +2741,22 @@ def encode_for_xml(s):
     return s
 
 def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None):
-    """Calls BibFormat for the record RECID in the desired output format FORMAT.
-       This function is mainly used to display all but brief formats, if they are
-       not stored in the 'bibfmt' table.
-       
-       Note: this functions always try to return HTML, so when
-       bibformat returns XML with embedded HTML format inside the tag
-       FMT $g, as is suitable for prestoring output formats, we
-       perform un-XML-izing here in order to return HTML body only.
     """
-    if use_old_bibformat:
-        out = ""
-        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
-        #pipe_input.write(print_record(recID, "xm"))
-        pipe_input.write(get_xml(recID, "xm"))
-        pipe_input.close()
-        bibformat_output = pipe_output.read()
-        pipe_output.close()
-        pipe_error.close()
-        if bibformat_output.startswith("<record>"):
-            dom = minidom.parseString(bibformat_output)
-            for e in dom.getElementsByTagName('subfield'):
-                if e.getAttribute('code') == 'g':
-                    for t in e.childNodes:
-                        out += t.data.encode('utf-8')
-        else:
-            out = bibformat_output
-        return out
-    else:
-        return format_record(recID, of=format, ln=ln, search_pattern=search_pattern, uid=uid)
+    Calls BibFormat and returns formatted record.
+
+    BibFormat will decide by itself if old or new BibFormat must be used.
+    """
+    
+    keywords = []
+    if search_pattern != None:
+        units = create_basic_search_units(None, str(search_pattern), None)
+        keywords = [unit[1] for unit in units if unit[0] != '-']
+
+    return format_record(recID,
+                         of=format,
+                         ln=ln,
+                         search_pattern=keywords,
+                         uid=uid)
             
 def log_query(hostname, query_args, uid=-1):
     """Log query into the query and user_query tables."""
@@ -3506,17 +3501,3 @@ def profile(p="", f="", c=cdsname):
 ## profiling:
 #profile("of the this")
 #print perform_request_search(p="ellis")
-
-
-#Import bibformat here as bibformat uses some methods of search_engine
-#(Recursive import)
-use_old_bibformat = True
-from invenio.bibformat_utils import get_xml
-try:
-    from invenio.bibformat_migration_kit_assistant_lib import use_old_bibformat
-    use_old_bibformat = use_old_bibformat()
-    if use_old_bibformat == False:
-        from invenio.bibformat_engine import format_record, get_output_format_content_type
-        from invenio.bibformat_dblayer import get_output_format_content_type
-except:
-    pass 

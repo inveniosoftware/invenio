@@ -143,7 +143,7 @@ def read_status():
     Returns a dictionary with step name as key ('kbs', 'behaviours', 'formats') and status string as value
     """
 
-    status = {'kbs':'Not Migrated', 'behaviours':'Not Migrated', 'formats':'Not Migrated', 'use old BibFormat':'YES'}
+    status = {'kbs':'Not Migrated', 'behaviours':'Not Migrated', 'formats':'Not Migrated'}
 
     try:
         if os.path.exists(status_filepath):
@@ -169,17 +169,6 @@ def can_write_migration_status_file():
     else:
         #check writability of etc/bibformat dir
         return can_write_etc_bibformat_dir()
-
-def use_old_bibformat():
-    """
-    Returns True if the old BibFormat must be used. Else returns False.
-    """
-    status = read_status()
-    
-    if status["use old BibFormat"] == "YES":
-        return True
-    else:
-        return False
 
 from invenio import bibformat_migration_kit
 from invenio.bibformatadminlib import can_write_etc_bibformat_dir

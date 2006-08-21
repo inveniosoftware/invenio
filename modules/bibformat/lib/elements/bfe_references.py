@@ -40,7 +40,7 @@ def format(bfo, reference_prefix, reference_suffix):
             out += "<small>"+ reference['m']+ "</small> "
 
         if reference.has_key('r'):
-            out += '<small> [<a href="'+weburl+'/search.py?f=reportnumber&amp;p='+ reference['r']+ '">'+ reference['r']+ "</a>] </small> <br/>"
+            out += '<small> [<a href="'+weburl+'/search?f=reportnumber&amp;p='+ reference['r']+ '">'+ reference['r']+ "</a>] </small> <br/>"
 
         if reference.has_key('t'):
             ejournal = bfo.kb("ejournals", reference.get('t', ""))

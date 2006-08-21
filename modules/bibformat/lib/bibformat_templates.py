@@ -33,34 +33,18 @@ from invenio.messages import language_list_long
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
 
-    def tmpl_admin_index(self, use_old_bibformat, ln, warnings):
+    def tmpl_admin_index(self, ln, warnings):
         """
         Returns the main BibFormat admin page.
 
-        The page offers for some times the choice between the old and new BibFormat.
-        This is the only page where the code needs to be cleaned
-        when the migration kit will be removed. #FIXME: remove when removing migration kit
-
         @param ln language
-        @param use_old_bibformat if True use old BibFormat. If False, use new.
         @param warnings a list of warnings to display at top of page. None if no warning
         @return main BibFormat admin page
         """
 
         _ = gettext_set_language(ln)    # load the right message language
 
-        if use_old_bibformat:
-            old_bibformat_checked = "checked"
-            new_bibformat_checked = ""
-        else:
-            old_bibformat_checked = ""
-            new_bibformat_checked = "checked"
-
-        out = ''' For the time being it is recommended to use
-        <a href="%s/admin/bibformat">this BibFormat administration interface</a><br/><br/><br/><br/><br/>
-        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-        ''' % weburl
+        out = ''
 
         if warnings:
             out += '''
@@ -78,38 +62,27 @@ class Template:
         <tr>
         <th class="errorboxheader">
         <big>Bibformat has changed!</big>
-        <p>You will need to migrate your formats. You can read the <a href="">documentation</a> to learn how to write
+        <p>You will need to migrate your formats. You can read the <a href="%(weburl)s/admin/bibformat/guide.html">documentation</a> to learn how to write
         formats, or use the <a href="%(weburl)s/admin/bibformat/bibformat_migration_kit_assistant.py">migration assistant</a>.</p>
         <p>However for some time the old Bibformat will still run along the new one, so that you can
-        transition smoothly. Choose which one to run:</p>
-        <div style="text-align: center;">
-        <form  action="" method="post">
-
-        <input type="radio" name="version" id="old" value="old" %(old_bibformat_checked)s/><label for="old">Old version (php)</label>
-        <input type="radio" name="version" id="new" value="new" %(new_bibformat_checked)s/><label for="new">New version (python)</label>
-        <input type="submit" value="Apply change"/>
-        </form>
-        </div>
+        transition smoothly.</p>
         </th>
         </tr>
         </table>
-        ''' % {'old_bibformat_checked':old_bibformat_checked,
-               'new_bibformat_checked':new_bibformat_checked,
-               'weburl':weburl}
+        ''' % {'weburl':weburl}
         
         out += '''
         <p>
          This is where you can edit the formatting style available for the collections. You need to 
          <a href="%(weburl)s/youraccount.py/login?referer=%(weburl)s/admin/webcomment/">login</a> to enter.
         </p>
-
-        <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
-        <dd>Create, edit and delete output formats, the rules that define which format template must be used for a given record.</dd>
-        </dl>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%(ln)s">Manage Format Templates</a></dt>
         <dd>Create, edit and delete format templates, which define how to format a record.</dd>
+        </dl>
+        <dl>
+        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
+        <dd>Create, edit and delete output formats, the rules that define which format template must be used for a given record.</dd>
         </dl>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
@@ -324,7 +297,7 @@ class Template:
         out = ""
 
         out += '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a></small>&nbsp;</td>
@@ -398,16 +371,16 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
         
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
-        <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a></small>&nbsp;</td>
+        <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a>&nbsp;</small></td>
         <td>1.&nbsp;<small><a href="format_template_show?ln=%(ln)s&amp;bft=%(filename)s">%(template_editor)s</a></small>&nbsp;</td>
         <td>2.&nbsp;<small><a href="format_template_show_attributes?ln=%(ln)s&amp;bft=%(filename)s">%(modify_template_attributes)s</a></small>&nbsp;</td>
         <td>3.&nbsp;<small>%(check_dependencies)s</small>&nbsp;</td>
         </tr>
         </table>
-        <table width="90%%" class="admin_wvar"><tr>
+        <table width="90%%" class="admin_wvar" cellspacing="0"><tr>
         <th class="adminheaderleft">Output Formats that use %(name)s</th>
         <th class="adminheaderleft">Format Elements used by %(name)s*</th>
         <th class="adminheaderleft">All Tags Called*</th>
@@ -480,7 +453,9 @@ class Template:
         out = ""
 
         out += '''
-        <table class="admin_wvar">
+        <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
+        
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a></small>&nbsp;</td>
@@ -513,15 +488,17 @@ class Template:
                'close_editor': _("Close Editor"),
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
-               'check_dependencies': _("Check Dependencies")
+               'check_dependencies': _("Check Dependencies"),
+               'weburl': sweburl or weburl
                }
 
         disabled = ""
         readonly = ""
+        toolbar = '<script type="text/javascript">edToolbar();</script>'
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
-            
+            toolbar = ''
 
         #First column: template code and preview
         out += '''
@@ -537,8 +514,10 @@ class Template:
         </th>
         </tr>
         <tr><td colspan="2">
+        %(toolbar)s
         <textarea name="code" id="code" rows="25" %(readonly)s
         style="width:100%%">%(code)s</textarea>
+        <script type="text/javascript">var edCanvas = document.getElementById('code');</script>
         </td></tr>
         <tr><td align="right" valign="top">
         <input type="submit" class="adminbutton" name="save_action" value="Save Changes" %(disabled)s/>
@@ -558,7 +537,8 @@ class Template:
                 'label_hide_doc':_("Hide Documentation"),
                 'code':code,
                 'readonly':readonly,
-                'disabled':disabled}
+                'disabled':disabled,
+                'toolbar':toolbar}
 
         for content_type in content_types:
             if content_type == content_type_for_preview:
@@ -648,7 +628,8 @@ class Template:
         <html>
         <head>
         <title>BibFormat Short Documentation of Format Elements</title>
-        <link rel="stylesheet" href="%(cssurl)s/img/cds.css">
+        <link rel="stylesheet" href="%(weburl)s/img/cds.css">
+        <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         </head>
         <body>
@@ -665,18 +646,51 @@ class Template:
 	}
 	if (show=='show'){
 	element.style.background='rgb(201, 218, 255)'
-	element.style.cursor='text'
+	element.style.cursor='pointer'
 	child.style.display=''
 	} else {
 	element.style.background="rgb("+r+","+g+","+b+")"
 	child.style.display='none'
 	} 
 	}
+        ///// FROM JS QuickTags ///////
 
+        // Copyright (c) 2002-2005 Alex King
+        // http://www.alexking.org/
+        //
+        // Licensed under the LGPL license
+        // http://www.gnu.org/copyleft/lesser.html
         
-   
+        function insertAtCursor(myField, myValue) {
+        //IE support
+        if (document.selection) {
+        myField.focus();
+        sel = document.selection.createRange();
+        sel.text = myValue;
+        }
+        //MOZILLA/NETSCAPE support
+        else if (myField.selectionStart || myField.selectionStart == '0') {
+        var startPos = myField.selectionStart;
+        var endPos = myField.selectionEnd;
+        myField.value = myField.value.substring(0, startPos)
+        + myValue
+        + myField.value.substring(endPos, myField.value.length);
+        } else {
+        myField.value += myValue;
+        }
+        }
+        ///// END FROM JS QuickTags  /////
+        
+        function insert_my_code_into_container(code){
+        var codeArea = parent.document.getElementById("code");
+        if (codeArea.readOnly == false){
+        //var clean_code = code.replace(=#,'="');
+        //clean_code = clean_code.replace(# ,'" ');
+        insertAtCursor(codeArea, code);
+        }
+        }  
         </script>
-        ''' % {'cssurl': sweburl or weburl}
+        ''' % {'weburl': sweburl or weburl}
         
         if len(format_elements) == 0:
             out += '''
@@ -689,21 +703,28 @@ class Template:
             for format_element in format_elements:
                 format_attributes = format_element['attrs']
                 row_content = ""
+                name = format_attributes['name']
+                description = format_attributes['description']
+                params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['params']]
+                builtin_params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['builtin_params']]
+                code = "<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>"
+                
                 if line % 2:
                     row_content += '''<div onmouseover="toggle_visibility(this, 'show', 235, 247, 255);"
                     onmouseout="toggle_visibility(this, 'hide', 235, 247, 255);"
-                    style="background-color: rgb(235, 247, 255);"><hr/>'''
+                    style="background-color: rgb(235, 247, 255);"
+                    onclick="insert_my_code_into_container('%s')"
+                    ><hr/>''' % code
                 else:
                     row_content += '''<div onmouseover="toggle_visibility(this, 'show', 255, 255, 255);"
                     onmouseout="toggle_visibility(this, 'hide', 255, 255, 255);"
-                    >'''
-                name = format_attributes['name']
-                description = format_attributes['description']
-                
+                    onclick="insert_my_code_into_container('%s')"
+                    >''' % code
+
                 params_names = ""
                 for param in format_attributes['params']:
                     params_names += "<b>"+param['name'] +'</b> '
-
+                    
                 row_content += '''
                 <code> <b>&lt;BFE_%(name)s/&gt;</b><br/></code>
                 <small>%(description)s.</small>
@@ -750,11 +771,11 @@ class Template:
 
         #top of the page and table header
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
-        <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a></small>&nbsp;</td>
-        <td>1.&nbsp;<small>%(manage_format_templates)s</small>&nbsp;</td>
+        <td>0.&nbsp;<small>%(manage_format_templates)s</small>&nbsp;</td>
+        <td>1.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a>&nbsp;</td>
         <td>2.&nbsp;<small><a href="format_elements_doc?ln=%(ln)s">%(format_elements_documentation)s</a></small>&nbsp;</td>
         <td>3.&nbsp;<small><a href="kb_manage?ln=%(ln)s">%(manage_knowledge_bases)s</a></small>&nbsp;</td>
         </tr>
@@ -765,7 +786,7 @@ class Template:
         learn which elements you can use in your templates.</p>
 
   
-        <table class="admin_wvar" width="95%%">
+        <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" >%(name)s</th>
@@ -878,11 +899,11 @@ class Template:
 
         #top of the page and table header
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
-        <td>0.&nbsp;<small>%(manage_output_formats)s</small>&nbsp;</td>
-        <td>1.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>1.&nbsp;<small>%(manage_output_formats)s</small>&nbsp;</td>
         <td>2.&nbsp;<small><a href="format_elements_doc?ln=%(ln)s">%(format_elements_documentation)s</a></small>&nbsp;</td>
         <td>3.&nbsp;<small><a href="kb_manage?ln=%(ln)s">%(manage_knowledge_bases)s</a></small>&nbsp;</td>
         </tr>
@@ -890,7 +911,7 @@ class Template:
 
         <p>From here you can add, edit or delete output formats available for collections. Output formats define which template to use. <br/>To edit templates go to the <a href="format_templates_manage?ln=%(ln)s">template administration page</a>.</p>
  
-        <table class="admin_wvar" width="95%%">
+        <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" ><a href="output_formats_manage?ln=%(ln)s&amp;sortby=code">%(code)s</a></th>
@@ -1009,7 +1030,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         out = '''
-          <table class="admin_wvar">
+          <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(close_output_format)s</a></small>&nbsp;</td>
@@ -1048,7 +1069,7 @@ class Template:
         line = 1
         for rule in rules:
             out += '''
-            <table align="center" class="admin_wvar">
+            <table align="center" class="admin_wvar" cellspacing="0">
             <tr>
             '''  
 
@@ -1116,7 +1137,7 @@ class Template:
             line += 1
             
         out += '''
-        <table width="100%" align="center" class="admin_wvar">
+        <table width="100%" align="center" class="admin_wvar" cellspacing="0">
         <tr>
         '''
 
@@ -1174,7 +1195,7 @@ class Template:
         out = ""
 
         out += '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(close_output_format)s</a></small>&nbsp;</td>
@@ -1200,7 +1221,7 @@ class Template:
         
         out += '''
         <form action="output_format_update_attributes?ln=%(ln)s&amp;bfo=%(code)s" method="POST">
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr>
         <th colspan="2" class="adminheaderleft">
         Output Format Attributes&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#attrsOutputFormat">?</a>]</th>
@@ -1266,7 +1287,7 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
         out = '''
         <table class="admin_wvar">
-        <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
+        <tr><th colspan="4" class="adminheaderleft" cellspacing="0">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(close_output_format)s</a></small>&nbsp;</td>
         <td>1.&nbsp;<small><a href="output_format_show?ln=%(ln)s&amp;bfo=%(code)s">%(rules)s</a></small>&nbsp;</td>
@@ -1274,7 +1295,7 @@ class Template:
         <td>3.&nbsp;<small>%(check_dependencies)s</small>&nbsp;</td>
         </tr>
         </table><br/>
-        <table width="90%%" class="admin_wvar"><tr>
+        <table width="90%%" class="admin_wvar" cellspacing="0"><tr>
 
         <th class="adminheaderleft">Output Formats that use %(name)s</th>
         <th class="adminheaderleft">Format Elements used by %(name)s</th>
@@ -1334,11 +1355,11 @@ class Template:
 
         #top of the page and table header
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
-        <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a></small>&nbsp;</td>
-        <td>1.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>1.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a></small>&nbsp;</td>
         <td>2.&nbsp;<small>%(format_elements_documentation)s</small>&nbsp;</td>
         <td>3.&nbsp;<small><a href="kb_manage?ln=%(ln)s">%(manage_knowledge_bases)s</a></small>&nbsp;</td>
         </tr>
@@ -1475,7 +1496,7 @@ class Template:
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
         ''' % {'ln':ln, 'name':name.upper()}
         
-        out += ''' <table width="90%" class="admin_wvar"><tr>'''
+        out += ''' <table width="90%" class="admin_wvar" cellspacing="0"><tr>'''
         out += '''
         <th class="adminheaderleft">Format Templates that use %(name)s</th>
         <th class="adminheaderleft">Tags Called*</th>
@@ -1592,16 +1613,16 @@ class Template:
 
         #top of the page and table header
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
-        <td>0.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a></small>&nbsp;</td>
-        <td>1.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(manage_format_templates)s</a></small>&nbsp;</td>
+        <td>1.&nbsp;<small><a href="output_formats_manage?ln=%(ln)s">%(manage_output_formats)s</a></small>&nbsp;</td>
         <td>2.&nbsp;<small><a href="format_elements_doc?ln=%(ln)s">%(format_elements_documentation)s</a></small>&nbsp;</td>
         <td>3.&nbsp;<small>%(manage_knowledge_bases)s</small>&nbsp;</td>
         </tr>
         </table>
-        <table class="admin_wvar" width="95%%">
+        <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" >Name</th>
@@ -1676,7 +1697,7 @@ class Template:
         
         #top of the page and  main table that split screen in two parts
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="kb_manage?ln=%(ln)s&amp;sortby=%(sortby)s">%(close)s</a></small>&nbsp;</td>
@@ -1709,7 +1730,7 @@ class Template:
                                                                                                       'kb_id':kb_id,
                                                                                                       'sortby':sortby}
         out += '''
-        <table class="admin_wvar" width="100%%">
+        <table class="admin_wvar" width="100%%" cellspacing="0">
         <tr>
         <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#addMappingKB">?</a>]</th>
         </tr>
@@ -1842,7 +1863,7 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
         
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="kb_manage?ln=%(ln)s&amp;sortby=%(sortby)s">%(close)s</a></small>&nbsp;</td>
@@ -1862,7 +1883,7 @@ class Template:
         out += '''
         <form name="updateAttributes"
         action="kb_update_attributes?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" method="post">
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr>
 
         ''' % {'ln':ln,
@@ -1910,7 +1931,7 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
         
         out = '''
-        <table class="admin_wvar">
+        <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="kb_manage?ln=%(ln)s&amp;sortby=%(sortby)s">%(close)s</a></small>&nbsp;</td>
@@ -1927,7 +1948,7 @@ class Template:
                              'attributes':_("Knowledge Base Attributes"),
                              'dependencies':_("Knowledge Base Dependencies")}
 
-        out += ''' <table width="90%" class="admin_wvar"><tr>'''
+        out += ''' <table width="90%" class="admin_wvar" cellspacing="0"><tr>'''
         out += '''
         <th class="adminheaderleft">Format Elements used by %(name)s*</th>
         </tr>

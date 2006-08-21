@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Set of utilities functions to be used in format elements.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -19,38 +18,42 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Utilities for special formatting of records.
+
+API functions: highlight, get_contextual_content, encode_for_xml
+
+Used mainly by BibFormat elements.
+
+Depends on search_engine.py for record_exists()
+
+FIXME: currently copies record_exists() code from search engine.  Refactor later.
+"""
+
 import re
 import zlib
 from invenio.dbquery import run_sql
 
-def highlight(text, keywords_string="", prefix_tag='<strong>', suffix_tag="</strong>"):
+def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     """
     Returns text with all words highlighted with given tags (this
     function places 'prefix_tag' and 'suffix_tag' before and after
-    keywords from 'keywords_string' in 'text' with respectively)
+    words from 'keywords' in 'text').
     
     for example set prefix_tag='<b style="color: black; background-color: rgb(255, 255, 102);">' and suffix_tag="</b>"
 
-    The function determines keywords from keywords_string in the same
-    way as the search_engine does with search patterns
-
     @param text the text to modify
-    @param keywords_string a string with keywords separated by spaces
+    @param keywords a list of string
     @return highlighted text
     """
-    from invenio.search_engine import create_basic_search_units
     
-    if keywords_string == None or keywords_string == '':
+    if keywords == []:
         return text
     
     #FIXME decide if non english accentuated char should be desaccentuaded
     def replace_highlight(match):
         """ replace match.group() by prefix_tag + match.group() + suffix_tag"""
         return prefix_tag + match.group() + suffix_tag
-
-    #Search for keywords
-    units = create_basic_search_units(None, str(keywords_string), None)
-    keywords = [unit[1] for unit in units if unit[0] != '-']
     
     #Build a pattern of the kind keyword1 | keyword2 | keyword3
     pattern = '|'.join(keywords)
@@ -59,21 +62,16 @@ def highlight(text, keywords_string="", prefix_tag='<strong>', suffix_tag="</str
     #Replace and return keywords with prefix+keyword+suffix
     return compiled_pattern.sub(replace_highlight, text) 
     
-def get_contextual_content(text, keywords_string="", max_lines=2):
+def get_contextual_content(text, keywords, max_lines=2):
     """
     Returns some lines from a text contextually to the keywords in
     'keywords_string'
 
     @param text the text from which we want to get contextual content
-    @param keywords_string a string with keywords separated by spaces ("the context")
+    @param keywords a list of keyword strings ("the context")
     @param max_lines the maximum number of line to return from the record
     @return a string
     """
-    from invenio.search_engine import create_basic_search_units
-    
-    #Search for keywords
-    units = create_basic_search_units(None, str(keywords_string), None)
-    keywords = [unit[1] for unit in units if unit[0] != '-']
     
     def grade_line(text_line, keywords):
         """
@@ -127,7 +125,7 @@ def get_contextual_content(text, keywords_string="", max_lines=2):
     else:
         return lines[index_with_highest_weight:index_with_highest_weight+max_lines]
 
-def get_xml(recID, format='xm', decompress=zlib.decompress):
+def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     """
     Returns an XML string of the record given by recID.
 
@@ -145,7 +143,41 @@ def get_xml(recID, format='xm', decompress=zlib.decompress):
     @param recID the id of the record to retrieve
     @return the xml string of the record
     """
-    from invenio.search_engine import record_exists, get_fieldvalues, get_modification_date, get_creation_date
+    from invenio.search_engine import record_exists
+    
+    def get_fieldvalues(recID, tag):
+        """Return list of field values for field TAG inside record RECID."""
+        out = []
+        if tag == "001___":
+            # we have asked for recID that is not stored in bibXXx tables
+            out.append(str(recID))
+        else:
+            # we are going to look inside bibXXx tables
+            digit = tag[0:2]
+            bx = "bib%sx" % digit
+            bibx = "bibrec_bib%sx" % digit
+            query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
+                    "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
+            res = run_sql(query)
+            for row in res:
+                out.append(row[0])
+        return out
+
+    def get_creation_date(recID, fmt="%Y-%m-%d"):
+        "Returns the creation date of the record 'recID'."
+        out = ""
+        res = run_sql("SELECT DATE_FORMAT(creation_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
+        if res:
+            out = res[0][0]
+        return out
+
+    def get_modification_date(recID, fmt="%Y-%m-%d"):
+        "Returns the date of last modification for the record 'recID'."
+        out = ""
+        res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
+        if res:
+            out = res[0][0]
+        return out
 
     #_ = gettext_set_language(ln)
 

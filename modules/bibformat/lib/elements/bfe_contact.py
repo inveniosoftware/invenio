@@ -30,7 +30,7 @@ def format(bfo, separator='; ', link="yes"):
 
     addresses = bfo.fields('270$p')
 
-    addresses = map(lambda x: '<a href="'+weburl+'/search.py?f=author&p='+ quote(x) +'">'+x+'</a>', addresses)
+    addresses = map(lambda x: '<a href="'+weburl+'/search?f=author&p='+ quote(x) +'">'+x+'</a>', addresses)
 
     return separator.join(addresses)
 

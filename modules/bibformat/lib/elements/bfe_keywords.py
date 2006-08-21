@@ -36,7 +36,7 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     if len(keywords) > 0:
 
         if link == 'yes':
-            keywords = map(lambda x: '<a href="'+weburl+'/search.py?f=keyword&p='+ quote(x)+'">'+x+'</a>', keywords)
+            keywords = map(lambda x: '<a href="'+weburl+'/search?f=keyword&p='+ quote(x)+'">'+x+'</a>', keywords)
 
         keywords = map(lambda x: keyword_prefix+x+keyword_suffix, keywords)
         return separator.join(keywords)

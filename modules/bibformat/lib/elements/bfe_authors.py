@@ -49,7 +49,7 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
         authors = [bibformat_utils.highlight(x, bfo.search_pattern) for x in authors]
 
     if print_links.lower() == "yes":
-        authors = map(lambda x: '<a href="'+weburl+'/search.py?f=author&amp;p='+ quote(x) +'">'+x+'</a>', authors)
+        authors = map(lambda x: '<a href="'+weburl+'/search?f=author&amp;p='+ quote(x) +'">'+x+'</a>', authors)
 
     if limit.isdigit() and len(authors) > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
