@@ -36,8 +36,15 @@ class TestStemmer(unittest.TestCase):
                          bibindex_engine_stemmer.stem("information", None))
     def test_stemmer_english(self):
         """bibindex engine - English stemmer"""
-        self.assertEqual("inform",
-                         bibindex_engine_stemmer.stem("information", "en"))
+        try:
+            import Stemmer
+            self.assertEqual("inform",
+                             bibindex_engine_stemmer.stem("information", "en"))
+        except ImportError:
+            # we don't have Stemmer available:
+            self.assertEqual("information",
+                             bibindex_engine_stemmer.stem("information", "en"))
+            self.fail("WARNING: cannot import Stemmer module; test not run.")
 
 def create_test_suite():
     """Return test suite for the indexing engine."""
