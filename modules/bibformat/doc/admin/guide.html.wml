@@ -653,7 +653,7 @@ from invenio.messages import gettext_set_language
 ln = bfo.ln
 _ = gettext_set_language(ln)
 
-translated_welcome =  _("Welcome")
+translated_welcome =  &#95;("Welcome")
 </pre>
 </p>
     <p>Notice the access to <code>bfo.ln</code> to get access to the current language of the user. For simpler translations or behaviour depending on the language you can simply check the value <code>bfo.ln</code> to return your custom text.</p>
