@@ -265,7 +265,7 @@ engine.
     
 </td>
 <td>
-  <a href="bibformat/">BibFormat Admin Interface</a>
+  <a href="bibformat/bibformatadmin.py">BibFormat Admin Interface</a>
 </td>
 <td>
   <a href="bibformat/guide.html">BibFormat Admin Guide</a>
