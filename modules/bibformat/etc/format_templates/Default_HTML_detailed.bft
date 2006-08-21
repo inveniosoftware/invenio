@@ -4,7 +4,7 @@
 <BFE_TOPBANNER /> 
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
 <p><center>
-<BFE_AUTHORS suffix="<br/>" limit="10" interactive="yes"/>
+<BFE_AUTHORS suffix="<br/>" limit="25" interactive="yes"/>
 <BFE_ADDRESSES />
 <BFE_AFFILIATION />
 <BFE_DATE prefix="<br/>" suffix="<br/>"/>
@@ -21,8 +21,6 @@ prefix_fr="<small><strong>Résumé: </strong>"
 suffix_en="</small><br/>" 
 suffix_fr="</small><br/>"
 />
-
-<BFE_DATE_REC prefix="<br/><small><strong>Arrived: </strong>" suffix=" </small>"/>
 
 <BFE_KEYWORDS 
 prefix="<br/><small><strong>Keyword(s): </strong></small>"

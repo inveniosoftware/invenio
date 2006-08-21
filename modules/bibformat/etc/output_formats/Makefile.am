@@ -19,8 +19,12 @@
 
 etcdir = $(sysconfdir)/bibformat/output_formats
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo
+etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo
 
-EXTRA_DIST = $(etc_DATA) TEST1.bfo TEST2.bfo TEST3.bfo  
+tmpdir = $(prefix)/var/tmp
+
+tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo 
+
+EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
 
 CLEANFILES = *.tmp
