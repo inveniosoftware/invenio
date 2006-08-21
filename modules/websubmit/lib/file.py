@@ -230,7 +230,7 @@ class BibDoc:
                 self.type = type
                 self.docname = docname
 		self.status = 0
-                self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(str(self.status),%s,NOW(),NOW())", (docname,))
+                self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
                 if self.id != None:
                     #we link the document to the record if a recid was specified
                     if self.recid != "":
