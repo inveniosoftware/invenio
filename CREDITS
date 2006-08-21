@@ -54,4 +54,8 @@ the Environment (University of California, Davis) is kindly used as an
 example ontology for automatic document classification.
 <http://cain.nbii.org/thesauri>
 
+Javascript Quicktags scripts from Alex King are being used to provide
+additional capabilities to the edition of BibFormat templates through
+the web admin interface.  <http://www.alexking.org>
+
 - end of file -
