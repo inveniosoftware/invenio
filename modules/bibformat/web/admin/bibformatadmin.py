@@ -35,14 +35,13 @@ from invenio.search_engine import perform_request_search
 __version__ = "$Id$"
 
 
-def index(req, version="", ln=cdslang):
+def index(req, ln=cdslang):
     """
     Main BibFormat administration page.
 
     Displays a warning if we find out that etc/biformat dir is not writable by us
     (as most opeation of BibFormat must write in this directory).
 
-    @param version the version of BibFormat to use ('new'|'old')
     @param ln: language
     """
     warnings = []
@@ -61,7 +60,7 @@ def index(req, version="", ln=cdslang):
     navtrail = """<a class=navtrail href="%s/admin/index?ln=%s">%s</a>""" % (weburl, ln, _("Admin Area"))
     
     return page(title=_("BibFormat Admin"),
-                body=perform_request_index(version, ln=ln, warnings=warnings),
+                body=perform_request_index(ln=ln, warnings=warnings),
                 language=ln,
                 navtrail = navtrail,
                 lastupdated=__lastupdated__,

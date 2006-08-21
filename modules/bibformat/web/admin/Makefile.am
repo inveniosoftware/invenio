@@ -23,9 +23,9 @@ FILESWML=$(wildcard $(srcdir)/*.wml)
 web_DATA=$(FILESWML:$(srcdir)/%.wml=%)
 
 webappdir = $(localstatedir)/www/admin/bibformat
-webapp_DATA = bibformat_migration_kit_assistant.py bibformatadmin.py
+webapp_DATA = bibformat_migration_kit_assistant.py bibformatadmin.py js_quicktags.js
 
-EXTRA_DIST =  bibformat_migration_kit_assistant.py bibformatadmin.py $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST =  bibformat_migration_kit_assistant.py bibformatadmin.py js_quicktags.js $(FILESWML:$(srcdir)/%=%)
 
 CLEANFILES = $(wildcard *.php) *~ *.tmp
 
