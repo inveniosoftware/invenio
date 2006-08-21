@@ -46,7 +46,7 @@
   <navbar:button id=bibclassify txt="BibClassify Admin" url="<WEBURL>/admin/bibclassify/" hint="CDS Invenio BibClassify Admin" menu="admin-bibclassify">
   <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDS Invenio BibConvert Admin" menu="admin-bibconvert">
   <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDS Invenio BibEdit Admin" menu="admin-bibedit">
-  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDS Invenio BibFormat Admin" menu="admin-bibformat">
+  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/bibformatadmin.py" hint="CDS Invenio BibFormat Admin" menu="admin-bibformat">
   <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDS Invenio BibHarvest Admin" menu="admin-bibharvest">
   <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDS Invenio BibIndex Admin" menu="admin-bibindex">
   <navbar:button id=bibmatch txt="BibMatch Admin" url="<WEBURL>/admin/bibmatch/" hint="CDS Invenio BibMatch Admin" menu="admin-bibmatch">
@@ -157,16 +157,8 @@
 
   <navbar:prolog><tr valign=top><td></td><td class=adminboxbody> &nbsp;&nbsp;&nbsp;</navbar:prolog>
 
-  <navbar:button id=BEH_display txt="Behaviours" url="<WEBURL>/admin/bibformat/BEH_display.php" hint="BibFormat Admin - Behaviours">
-  <navbar:button id=OAIER_display txt="Extraction&nbsp;Rules" url="<WEBURL>/admin/bibformat/OAIER_display.php" hint="BibFormat Admin - Extraction Rules">
-  <navbar:button id=LINK_display txt="Link Rules" url="<WEBURL>/admin/bibformat/LINK_display.php" hint="BibFormat Admin - Link Rules">
-  <navbar:button id=LINK_FORMAT_display txt="File Formats" url="<WEBURL>/admin/bibformat/LINK_FORMAT_display.php" hint="BibFormat Admin - File Formats">
-  <navbar:button id=UDF_display txt="UDFs" url="<WEBURL>/admin/bibformat/UDF_display.php" hint="BibFormat Admin - User Defined Functions">
-  <navbar:button id=FORMAT_display txt="Formats" url="<WEBURL>/admin/bibformat/FORMAT_display.php" hint="BibFormat Admin - Formats">
-  <navbar:button id=KB_display txt="KBs" url="<WEBURL>/admin/bibformat/KB_display.php" hint="BibFormat Admin - Knowledge Bases">
-  <navbar:button id=test txt="Execution Test" url="<WEBURL>/admin/bibformat/test.php" hint="BibFormat Admin - Execution Test">
-  <navbar:button id=BIBREFORMAT_display txt="Reformat&nbsp;Records" url="<WEBURL>/admin/bibformat/BIBREFORMAT_display.php" hint="BibFormat Admin - Reformat Records">
-  <navbar:button id=bibformat-guide txt="Guide" url="<WEBURL>/admin/bibformat/guide.html" hint="BibFormat Admin - Guide">
+  <navbar:button id=bibformat-admin-interface txt="Interface" url="<WEBURL>/admin/bibformat/bibformatadmin.py">
+  <navbar:button id=bibformat-admin-guide txt="Guide" url="<WEBURL>/admin/bibformat/guide.html">
 
   <navbar:epilog> </td><td></td></tr> </navbar:epilog>
 
