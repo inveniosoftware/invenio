@@ -541,7 +541,7 @@ class BibDocFile:
             req.content_type = self.mime
             req.encoding = self.encoding
             req.filename = self.fullname
-            req.headers_out["Content-Disposition"] = "file; filename=%s" % quoteattr(self.fullname)
+            req.headers_out["Content-Disposition"] = "attachment; filename=%s" % quoteattr(self.fullname)
             req.send_http_header()
             fp = file(self.fullpath,"r")
             content = fp.read()
