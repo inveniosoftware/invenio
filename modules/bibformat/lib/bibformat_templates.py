@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Administration of Bibformat config files
+## Administration of BibFormat config files
                                               
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -61,10 +61,10 @@ class Template:
         <table width="66%%" class="errorbox" style="margin-left: auto; margin-right: auto;">
         <tr>
         <th class="errorboxheader">
-        <big>Bibformat has changed!</big>
+        <big>BibFormat has changed!</big>
         <p>You will need to migrate your formats. You can read the <a href="%(weburl)s/admin/bibformat/guide.html">documentation</a> to learn how to write
         formats, or use the <a href="%(weburl)s/admin/bibformat/bibformat_migration_kit_assistant.py">migration assistant</a>.</p>
-        <p>However for some time the old Bibformat will still run along the new one, so that you can
+        <p>However for some time the old BibFormat will still run along the new one, so that you can
         transition smoothly.</p>
         </th>
         </tr>

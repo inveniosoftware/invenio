@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Bibformat. Format records using specified format.
+## BibFormat. Format records using specified format.
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.

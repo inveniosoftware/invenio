@@ -35,9 +35,9 @@ try:
     from invenio.search_engine import perform_request_search
     from invenio.search_engine import print_record, encode_for_xml
     from invenio.access_control_engine import acc_authorize_action
-    from invenio.bibformat_engine import format_record
+    from invenio.bibformat import format_record
     from invenio.bibformat_utils import encode_for_xml
-    from invenio.bibformat_migration_kit_assistant_lib import use_old_bibformat
+    from invenio.bibformat_config import use_old_bibformat
     from invenio.bibrecord import create_records
     import getopt
     import getpass
@@ -118,7 +118,7 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 
 ### Iterate over all records prepared in lists I (option)
     if process:
-        if use_old_bibformat(): # FIXME: remove this when migration from php to python bibformat is done
+        if use_old_bibformat: # FIXME: remove this when migration from php to python bibformat is done
             iterate_over_old(recIDs, weburl, fmt)
         else:
             iterate_over_new(recIDs, weburl, fmt)
@@ -126,7 +126,7 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 
 ### Iterate over all records prepared in list II (no_format)
     if process_format and process:
-        if use_old_bibformat(): # FIXME: remove this when migration from php to python bibformat is done
+        if use_old_bibformat: # FIXME: remove this when migration from php to python bibformat is done
             iterate_over_old(without_format, weburl, fmt)
         else:
             iterate_over_new(without_format, weburl, fmt)

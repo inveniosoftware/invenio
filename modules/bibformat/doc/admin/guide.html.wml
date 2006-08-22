@@ -209,7 +209,7 @@ a typical workflow:</p>
     is mainly written using HTML. There are however some tags that
     are not part of standard HTML. Those tags that starts with
     <em>&lt;BFE_</em> are placeholders for the record values. For
-    example &lt;BFE_MAIN_TITLE/&gt; tells Bibformat to write the title
+    example &lt;BFE_MAIN_TITLE/&gt; tells BibFormat to write the title
     of the record. We call these tags &quot;elements&quot;. Some
     elements have parameters. This is the case of the <span
     class="formatElementBox">&lt;BFE_AUTHORS&gt; </span> element,

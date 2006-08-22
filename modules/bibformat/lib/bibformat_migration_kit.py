@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Bibformt Migration Kit. Migrate previous php Bibformat config files to
-## new python Bibformat files.
+## BibFormat Migration Kit. Migrate previous php BibFormat config files to
+## new python BibFormat files.
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -79,16 +79,16 @@ pattern_parse_format_call = re.compile('''
 ##     {
 ##     'kbs':('yes',''),
 ##     'behaviours':('yes', ''),
-##     'formats':('no', 'Formats have not migrated to new Bibformat style'),
-##     'udf':('no': 'Bibformat does not support links rules any longer. Please use format elements instead.'),
-##     'links':('no', 'Bibformat does not support links rules any longer. Please use format elements instead.'),
-##     'extraction':('no', 'Bibformat does not support links rules any longer.'),
-##     'file_formats':('no', 'Bibformat does not support links rules any longer.')
+##     'formats':('no', 'Formats have not migrated to new BibFormat style'),
+##     'udf':('no': 'BibFormat does not support links rules any longer. Please use format elements instead.'),
+##     'links':('no', 'BibFormat does not support links rules any longer. Please use format elements instead.'),
+##     'extraction':('no', 'BibFormat does not support links rules any longer.'),
+##     'file_formats':('no', 'BibFormat does not support links rules any longer.')
 ##     }
 ##     """
 ##     status = {}
 ##     if old_kbs_exist(): #check kbs status
-##         status['kbs'] = ('no', 'Old nowledge bases have not been migrated to new Bibformat knowledge bases')
+##         status['kbs'] = ('no', 'Old nowledge bases have not been migrated to new BibFormat knowledge bases')
 ##     else:
 ##         status['kbs'] = ('yes', '')
         

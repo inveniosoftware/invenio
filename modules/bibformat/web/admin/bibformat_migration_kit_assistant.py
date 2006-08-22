@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Migrate PHP version of Bibformat to Python version
+## Migrate PHP version of BibFormat to Python version
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
@@ -44,7 +44,7 @@ def index(req, ln=cdslang):
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-        return page(title=_("Migrate Bibformat Settings"),
+        return page(title=_("Migrate BibFormat Settings"),
                 body=perform_request_migration_kit_status(ln=ln),
                 uid=uid,
                 language=ln,

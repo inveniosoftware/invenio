@@ -143,7 +143,7 @@ class Template:
         you to write new formats (and also help you manage fields of
         the system).<br/> Here are some explanations that can help you
         understand why we advice you to rewrite format manually:</p>
-        <p>The new Bibformat now uses format files that separate the presentation
+        <p>The new BibFormat now uses format files that separate the presentation
         from the business logic, which is something that cannot be
         completely automated. The formats will be moved to new kinds
         of configuration files, called "<i>Format templates</i> (for
@@ -151,7 +151,7 @@ class Template:
         that binds the record in database to the format
         template). Format templates are written in HTML. Format
         elements are written in Python. However basic format elements
-        do not even need to be written, as Bibformat can guess which
+        do not even need to be written, as BibFormat can guess which
         field of a record it has to retrieve by looking at an internal
         mapping table (maps a label to a marc code). It is why it is
         important that you fill this table correctly BEFORE running
@@ -178,5 +178,5 @@ class Template:
         use the <a href="%s/admin/bibformat/format_templates_manage.py">Format template management console</a> or edit files directly in directory etc/bibformat/templates/ of your CDS Invenio installation base.</p>'''
         out += '''<p>To check and edit your format elements, open files in lib/python/invenio/bibformat_elements directory of your CDS Invenio installation base</p>'''
 
-        out += '''<a href="%s/admin/bibformat/">Click here to go back to main Bibformat administration page</a>'''%weburl
+        out += '''<a href="%s/admin/bibformat/">Click here to go back to main BibFormat administration page</a>'''%weburl
         return indent_text(out)
