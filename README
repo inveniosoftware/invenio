@@ -59,8 +59,8 @@ local features should such a need arise.  If you are interested in
 concluding a support contract with us, please contact the CDS
 Development Group at <cds.support@cern.ch>.
 
-CDS Invenio runs on Unix-like systems and requires MySQL database server
-and Apache/Python/PHP web application server.  Please consult the
+CDS Invenio runs on Unix-like systems and requires MySQL database
+server and Apache/Python web application server.  Please consult the
 INSTALL file for more information.
 
 Good luck, and thanks for choosing CDS Invenio.
