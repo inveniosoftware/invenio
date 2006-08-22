@@ -101,12 +101,9 @@ def perform_request_index(ln=cdslang):
     
     return output
 
-def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1):
+def perform_request_editsource(oai_src_id, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1):
     """creates html form to edit a OAI source. this method is calling other methods which again is calling this and sending back the output of the method.
     confirm - determines the validation status of the data input into the form"""
-
-    if oai_src_id is None:
-        return "No OAI source ID selected."
 
     output  = ""
     subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "edit source", subtitle = "Edit OAI source", guideurl = guideurl)
@@ -170,11 +167,8 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
 
     return addadminbox(subtitle, body)
 
-def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1):
+def perform_request_addsource(oai_src_name, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1):
     """creates html form to add a new source"""
-
-    if oai_src_name is None:
-        return "No OAI source name selected."
 
     subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "add source", subtitle = "Add new OAI source", guideurl = guideurl)
     output  = ""
@@ -188,22 +182,13 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                   button="Validate",
                                   confirm=0)
 
-    if confirm not in ["-1", -1] and validate(oai_src_baseurl)==1:
-        lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_output_validate_info(cdslang, 1, str(oai_src_baseurl))
-        output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
-        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
-        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
-        output += """or"""
-        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
-        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
-
-    if confirm not in ["-1", -1] and validate(oai_src_baseurl)==0:
+    if confirm not in ["-1", -1] and validate(oai_src_baseurl) == 0:
         output += bibharvest_templates.tmpl_output_validate_info(cdslang, 0, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
         text = bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
 
         metadatas = findMetadataFormats(oai_src_baseurl)
+
         prefixes = []
         for value in metadatas:
             prefixes.append([value, str(value)])
@@ -221,18 +206,39 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                    ln=ln,
                                    confirm=1)
 
+    elif confirm not in ["-1", -1] and validate(oai_src_baseurl) == 1:
+        lnargs = [["ln", ln]]
+        output += bibharvest_templates.tmpl_output_validate_info(cdslang, 1, str(oai_src_baseurl))
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += """or"""
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
+
+    elif confirm not in ["-1", -1]:
+        lnargs = [["ln", ln]]
+        output += bibharvest_templates.tmpl_output_error_info(cdslang, str(oai_src_baseurl), str(validate(oai_src_baseurl)))
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += """or"""
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
+
+
 
     if confirm in [1, "1"] and not oai_src_name:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a name for the source.") 
-    elif confirm in [1, "1"] and not oai_src_prefix:
+    if confirm in [1, "1"] and not oai_src_prefix:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a metadata prefix.") 
-    elif confirm in [1, "1"] and not oai_src_frequency:
+    if confirm in [1, "1"] and not oai_src_frequency:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting") 
-    elif confirm in [1, "1"] and not oai_src_lastrun:
+    if confirm in [1, "1"] and not oai_src_lastrun:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose the harvesting starting date")
-    elif confirm in [1, "1"] and not oai_src_post:
+    if confirm in [1, "1"] and not oai_src_post:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode") 
-    elif confirm in [1, "1"] and (oai_src_post=="h-c" or oai_src_post=="h-c-u") and (not oai_src_config or validatefile(oai_src_config)!=0):
+    if confirm in [1, "1"] and (oai_src_post=="h-c" or oai_src_post=="h-c-u") and (not oai_src_config or validatefile(oai_src_config)!=0):
         output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.") 
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid full path to a bibConvert config file or change postprocess mode.") 
     elif oai_src_name and confirm in [1, "1"]:
@@ -258,13 +264,10 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
     return addadminbox(subtitle, body)
 
-def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confirm=0):
+def perform_request_delsource(oai_src_id, ln=cdslang, callback='yes', confirm=0):
     """creates html form to delete a source
     """
-
-    output = ""
-    subtitle = ""
-
+   
     if oai_src_id:
         oai_src = get_oai_src(oai_src_id)
         namesrc = (oai_src[0][1])
@@ -402,19 +405,25 @@ def validate(oai_src_baseurl):
         url = oai_src_baseurl + "?verb=Identify"
         urllib.urlretrieve(url, tmppath)
 
-        grepOUT1 = os.popen('grep -iwc "<identify>" '+tmppath).read()
-        grepOUT2 = os.popen('grep -iwc "<OAI-PMH" '+tmppath).read()
-        if int(grepOUT1) >> 0 and int(grepOUT2) >> 0:
+        # First check if we have xml oai-pmh output
+        grepOUT1 = os.popen('grep -iwc "<OAI-PMH" '+tmppath).read()
+        if int(grepOUT1) == 0:
+            # No.. we have an http error
+            return os.popen('cat '+tmppath).read()
+
+        grepOUT2 = os.popen('grep -iwc "<identify>" '+tmppath).read()
+        if int(grepOUT2) >> 0:
             #print "Valid!"
             return 0
         else:
             #print "Not valid!"
             return 1
+        
     except StandardError, e:
         return 1
 
 def validatefile(oai_src_config):
-    """This function checks whether teh given path to text file exists or not
+    """This function checks whether the given path to text file exists or not
      0 = okay
      1 = file non existing
      """
