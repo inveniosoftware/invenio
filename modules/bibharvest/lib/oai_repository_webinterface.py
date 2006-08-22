@@ -61,8 +61,9 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         ## takes argd directly):
         args = urllib.urlencode(argd)
 
-        ## check availability
-
+        ## check availability (OAI requests for Identify and
+        ## ListMetadataFormats are served immediately, otherwise we
+        ## shall wait for cfg_oai_sleep seconds between requests):
         elif os.path.exists("%s/RTdata/RTdata" % cachedir) and argd['verb'] not in ["Identify", "ListMetadataFormats"]:
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
             if(time_gap < cfg_oai_sleep):
