@@ -1778,10 +1778,17 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
         argd.update(urlargd)
 
         # check which fields contained the requested parameter, and replace it.
-        for field in ('p', 'p1', 'p2', 'p3'):
-            if field in argd and argd[field] == p:
-                argd[field] = term
-                break
+        for (px, fx) in ('p', 'f'),('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
+            if px in argd:
+                if f == argd[fx] or f == "anyfield" or f == "":
+                    if string.find(argd[px], p) > -1:
+                        argd[px] = string.replace(argd[px], p, term)
+                        break
+                else:
+                    if string.find(f+":"+argd[px], p) > -1:
+                        argd[px] = string.replace(f+":"+argd[px], f+":"+p, term)
+                        break
+                    
         terminfo.append((term, hits, argd))
 
     intro = ""
