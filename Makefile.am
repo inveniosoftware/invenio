@@ -44,6 +44,13 @@ test:
 	    echo "Hmm, testsuite does not seem to be installed.  Please do 'make install' first."; \
 	fi
 
+regression-test:
+	@if [ -e @prefix@/bin/regressiontestsuite ]; then \
+	    @prefix@/bin/regressiontestsuite ; \
+	else \
+	    echo "Hmm, regressiontestsuite does not seem to be installed.  Please do 'make install' first."; \
+	fi
+
 install-data-local:
 	for d in / /cache /log /tmp /data /run ; do	\
 		mkdir -p $(localstatedir)$$d &&		\
