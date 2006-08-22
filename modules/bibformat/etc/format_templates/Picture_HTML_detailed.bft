@@ -1,6 +1,8 @@
 <name>Picture HTML detailed</name>
 <description>The detailed HTML format suitable for displaying pictures.</description>
-<BFE_EDIT_RECORD/>
+<BFE_EDIT_RECORD style='color:rgb(255,0,0)'
+prefix='<div style="text-align:right;font-size:small;">' 
+suffix='</div>'/>
 <BFE_TOPBANNER />
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
 

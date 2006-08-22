@@ -19,9 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def format(bfo):
+def format(bfo, style):
     """
     Prints a link to BibEdit, if authorization is granted
+
+    @param style the CSS style to be applied to the link.
     """
     from invenio.config import weburl
     from invenio.webuser import getUid
@@ -33,6 +35,10 @@ def format(bfo):
     if uid != None:
         (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
         if auth_code == 0:
-            out += '<a href="'+weburl + '/admin/bibedit/bibeditadmin.py/index?recid=' + str(bfo.recID) +'">Edit This Record</a>'
+            print_style = ''
+            if style != '':
+                print_style = 'style="' + style + '"'
+            
+            out += '<a href="'+weburl + '/admin/bibedit/bibeditadmin.py/index?recid=' + str(bfo.recID) +'" ' + print_style + '>Edit This Record</a>'
             
     return out
