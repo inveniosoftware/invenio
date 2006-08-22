@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 import time
 
-from invenio.config import weburl
+from invenio.config import weburl, cfg_oai_sleep
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -38,19 +38,27 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
 
         baseurl = weburl + '/oai2d'
 
-        _exports = ['?verb=Identify',
+        _exports = [#fast commands first:
+                    '?verb=Identify',
+                    '?verb=ListMetadataFormats',
+                    # sleepy commands now:
                     '?verb=ListSets',
                     '?verb=ListRecords',
-                    '?verb=GetRecord',
-                    '?verb=ListMetadataFormats',]
+                    '?verb=GetRecord']
         
         error_messages = []
         for url in [baseurl + page for page in _exports]:
+            if url.endswith('Identify') or \
+               url.endswith('ListMetadataFormats'):
+                pass
+            else:
+                # some sleep required for verbs other than Identify
+                # and ListMetadataFormats, since oai2d refuses too
+                # frequent access:
+                time.sleep(cfg_oai_sleep) 
             error_messages.extend(test_web_page_content(url,
                                                         expected_text=
                                                         '</OAI-PMH>'))
-            # some sleep required since oai2d refuses too frequent access
-            time.sleep(10) 
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
