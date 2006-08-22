@@ -83,6 +83,7 @@ cdspageboxrightbottom = """<CDSPAGEBOXRIGHTBOTTOM>"""
 cdspagefooter = """<CDSPAGEFOOTER>"""
 
 ## helper programs:
+php = "<PHP>"
 pdftotext = "<PDFTOTEXT>"
 pstotext = "<PSTOTEXT>"
 pstoascii = "<PSTOASCII>"
