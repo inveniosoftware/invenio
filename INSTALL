@@ -16,7 +16,6 @@ Contents
 0. Prerequisites
 1. Quick instructions for the impatient CDS Invenio admin
 2. Detailed instructions for the patient CDS Invenio admin
-3. Configuration philosophy explained and elucidated
 
 0. Prerequisites
 ================
@@ -38,11 +37,10 @@ Contents
         running:
 
           $ sudo apt-get install libapache2-mod-python2.3 \
-              libapache2-mod-php4 apache2-mpm-prefork mysql-server \
-              mysql-client php4-cli php4-mysql python2.3-mysqldb \
-              python2.3-numeric python2.3-4suite rxp \
-              wml gnuplot xpdf-utils gs-common antiword catdoc wv \
-              html2text ppthtml xlhtml clisp gettext      
+              apache2-mpm-prefork mysql-server mysql-client \
+              python2.3-mysqldb python2.3-numeric python2.3-4suite \
+              rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
+              wv html2text ppthtml xlhtml clisp gettext
 
         If available, you can also install:
 
@@ -103,40 +101,17 @@ Contents
         problems with MySQL connectivity in our experience.
           <http://www.modpython.org/>
 
-     f) PHP compiled as Apache module, including MySQL support.
-        Tested mainly with PHP version 4.3.0 and above.  (Note that if
-        you are compiling mod_php from source, it is good to compile
-        it against the same MySQL client library as mod_python, so
-        that the two Apache modules are using the same MySQL client
-        library.  We saw Apache/PHP/Python problems in the past when
-        they weren't.  A care should be taken even when you are using
-        precompiled packages.  For example, on Ubuntu 5.10 "Breezy
-        Badger" it seems that python2.4-mysqldb depends on
-        libmysqlclient14, while php5-mysql on libmysqlclient12, which
-        leads to Apache segmentation faults.)
-          <http://www.php.net/>
-
-     g) PHP compiled as a standalone command-line executable (CLI)
-        (in addition to Apache module) is required, too.  As of PHP
-        4.3.0 you'll obtain the CLI executable by default, so you
-        don't have to compile it separately.  Note that PHP CLI should
-        be compiled with the process control support (--enable-pcntl),
-        the XML support (--with-xml), and the compression library
-        (--with-zlib).
-          <http://www.php.net/manual/en/install.commandline.php>
-          <http://www.php.net/manual/en/ref.pcntl.php>
-
-     h) WML - Website META Language.  Tested mainly with versions
+     f) WML - Website META Language.  Tested mainly with versions
         2.0.8 and 2.0.9.  Note that on Red Hat Linux 9 the WML 2.0.9
         compiled with Perl 5.8.0 exhibits problems, so you better use
         downgraded/upgraded Perl for compiling WML on that platform.       
           <http://www.engelschall.com/sw/wml/>
 
-     i) If you want to be able to extract references from PDF fulltext
+     g) If you want to be able to extract references from PDF fulltext
         files, then you need to install pdftotext version 3 at least.
           <http://www.foolabs.com/xpdf/home.html> 
 
-     j) If you want to be able to search for words in the fulltext files 
+     h) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
         some of the following tools: 
           - for PDF files: pdftotext or pstotext
@@ -155,7 +130,7 @@ Contents
               <http://chicago.sourceforge.net/xlhtml/>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
 
-     k) If you have chosen to install fast XML MARC Python processors 
+     i) If you have chosen to install fast XML MARC Python processors 
         in the step d) above, then you have to install the parsers
         themselves:
           - (optional) RXP: 
@@ -163,14 +138,14 @@ Contents
           - (optional) 4suite:
              <http://4suite.org/>
 
-     l) (recommended) Gnuplot, the command-line driven interactive
+     j) (recommended) Gnuplot, the command-line driven interactive
         plotting program.  It is used to display download and citation
         history graphs on the Detailed record pages on the web
         interface.  Note that Gnuplot is not required, only
         recommended.
           <http://www.gnuplot.info/>                      
 
-     m) (recommended) A Common Lisp implementation, such as CLISP,
+     k) (recommended) A Common Lisp implementation, such as CLISP,
         SBCL or CMUCL.  It is used for the web server log analysing
         tool and the metadata checking program.  Note that any of the
         three implementations CLISP, SBCL, or CMUCL will do.  CMUCL
@@ -181,7 +156,7 @@ Contents
           <http://www.cons.org/cmucl/>
           <http://sbcl.sourceforge.net/>     
 
-     n) GNU Gettext, a set of tools that makes it possible to
+     l) GNU Gettext, a set of tools that makes it possible to
 	translate the application in multiple languages. 
            <http://www.gnu.org/software/gettext/>
 	This is available by default on many systems.
@@ -217,7 +192,6 @@ Contents
           mysql> CREATE DATABASE cdsinvenio;
           mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* TO cdsinvenio@webserver.domain.com IDENTIFIED BY 'myp1ss';
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
-      $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
       $ make create-tables       ## optional
       $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
@@ -296,12 +270,13 @@ Contents
                  hold command-line binaries and program libraries
                  containing the core CDS Invenio functionality, but
                  also to store web pages, runtime log and cache
-                 information.  Several subdirs like `bin', `lib', and
-                 `var' will be created inside the --prefix directory
-                 to this effect.  Note that the --prefix directory
-                 should be chosen outside of the Apache htdocs tree,
-                 since only one subdirectory (prefix/var/www) is to be
-                 accessible directly on the Web (see below).
+                 information, etc.  Several subdirs like `bin', `lib',
+                 and `var' will be created inside the --prefix
+                 directory to this effect.  Note that the --prefix
+                 directory should be chosen outside of the Apache
+                 htdocs tree, since only one its subdirectory
+                 (prefix/var/www) is to be accessible directly via the
+                 Web (see below).
 
               --with-weburl=http://webserver.domain.com
 
@@ -345,14 +320,12 @@ Contents
           Do not use trailing slashes when specifying any of the above
           values.
 
-          This configuration step is mandatory, and is referred to as
-          "pre-compile time configuration step a)" in the elucidative
-          explanatory commentary below.  
+          This configuration step is mandatory.  Usually, you do this
+          step only once.
 
           Note that if you prefer to build CDS Invenio out of its
           source tree, you may run the above configure command like
-          this: 
-             $ mkdir build && cd build && ../configure --prefix=...
+          this: (mkdir build && cd build && ../configure --prefix=...).
 
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
@@ -366,13 +339,14 @@ Contents
           administration modules, and you will certainly do.
 
           The rest of the "config.wml" file enables you to change the
-          CDS Invenio web page look and feel, and otherwise to influence
-          its behaviour and default parameters.
+          CDS Invenio web page look and feel, and otherwise to
+          influence its behaviour and default parameters.  CDS Invenio
+          HTML pages will be pre-generated using the values set in the
+          config.wml file.
 
           This configuration step is optional, but strongly
-          recommended.  It is referred to as "compile time
-          configuration step b)" in the elucidative explanatory
-          commentary below.
+          recommended.  If you change some values in config.wml, you
+          should restart the installation from here.
 
       $ make
 
@@ -405,15 +379,12 @@ Contents
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
 
           Please ask your webserver administrator to put the following
-          lines in your "httpd.conf" configuration file:
+          line in your "httpd.conf" configuration file:
 
               AddDefaultCharset UTF-8
-              AddType application/x-httpd-php .php
-              AddType application/x-httpd-php-source .phps
 
           This is to ensure that the browsers will get UTF-8 as the
-          default page encoding, and that "*.php" files will be
-          interpreted by the web server as PHP files.
+          default page encoding.
 
           As mentioned above, the web pages will get installed into
           the `prefix/var/www' directory.  Therefore you should
@@ -435,7 +406,7 @@ Contents
                       ErrorLog /opt/cds-invenio/var/log/apache.err
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache.log combined
-                      DirectoryIndex index.en.html index.html index.en.php index.php
+                      DirectoryIndex index.en.html index.html
                       <LocationMatch "^(/$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
@@ -473,7 +444,7 @@ Contents
                       ErrorLog /opt/cds-invenio/var/log/apache-ssl.err
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
-                      DirectoryIndex index.en.html index.html index.en.php index.php
+                      DirectoryIndex index.en.html index.html
                       <LocationMatch "^(/$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
@@ -486,32 +457,10 @@ Contents
                       </Directory>
               </VirtualHost>
                                 
-      $ sudo vi /path/to/php/conf/php.ini ## see below in part 2
-
-          Please ask your webserver administrator to put the following
-          lines in your "php.ini" configuration file:
-          
-              log_errors = on
-              display_errors = off
-              expose_php = off
-              max_execution_time = 160
-	      register_globals = on
-	      short_open_tag = on
-
-          This will set up some relevant PHP variables.
-
-          If your OS uses dynamic loading PHP MySQL libraries, such as
-          Debian "Sarge" GNU/Linux, you will also have to specify:
-
-              extension=mysql.so
-
-          in both /etc/php4/{cli,apache2}/php.ini files.
-           
       $ sudo /path/to/apache/bin/apachectl graceful
 
           Please ask your webserver administrator to restart the
-          Apache server after the above "httpd.conf" and "php.ini"
-          changes.
+          Apache server after the above "httpd.conf" changes.
 
           After these admin-level tasks to be performed as root, let's
           now go back to finish the installation of the CDS Invenio
@@ -611,129 +560,19 @@ Contents
 
       $ firefox http://webserver.domain.com/admin/ ## optional
 
-          Optionally, do further runtime configuration of the CDS Invenio,
-          like definition of data collections, document types,
-          document formats, word file tables, etc.
+          Optionally, do further runtime configurations of CDS
+          Invenio, like definition of data collections, document
+          types, document formats, word file tables, etc.
 
-          This configuration step is optional, and is referred to as
-          "runtime configuration step c)" in the elucidative
-          explanatory commentary below.  
-
-3. Configuration philosophy explained and elucidated
-====================================================
-
-   As you could see from the above, the configuration of the CDS Invenio is
-   threefold: 
-
-      (a) pre-compile time configuration phase 
-          [uses command line options / while doing "configure"]
-      (b) compile time configuration phase 
-          [uses WML / after "configure", while doing "make && make install"]
-      (c) runtime configuration phase 
-          [uses MySQL / after "make install", while doing "netscape http://webserver.domain.com/DEMO/admin/"]
-
-   What is the difference, and why?
-
-      (a) pre-compile time configuration phase 
-          [uses command line options / while doing "configure"]
-
-          This configures essential CDS Invenio parameters that makes your
-          CDS Invenio copy installable and runable.  The essential parameters
-          include: general CDS Invenio installation directory containing
-          (among others) binaries, libraries, and log and cache
-          directories; install directory for Web scripts and pages;
-          and MySQL user and server credentials.
-
-          This configuration step uses standard GNU autoconf approach,
-          i.e. you will run the standard "configure" script.  Note
-          that the only arguments that CDS Invenio takes into consideration
-          are the general "--prefix" one and CDS Invenio-specific
-          "--with-foo" arguments, see the end of "configure --help"
-          output.
-
-          This configuration step is mandatory.  Without knowing
-          theses essential parameters there is nothing to install and
-          nothing to run.  
-
-          Usually, you do this step only once.
-
-      (b) compile time configuration phase 
-          [uses WML / after "configure", while doing "make && make install"]
-
-          Optionally, you may choose to influence CDS Invenio behaviour, to
-          set up CDS Invenio system name, to choose its default parameters,
-          to change its look and feel, to add your local web pages, etc.  
-
-          This configuration step uses WML, the Website META Language.
-          The most important configuration file is "config/config.wml"
-          that you can edit at your will.  Optionally, if you are an
-          advanced user, you may edit other WML files in the
-          distribution tree.
-
-          After that, when you type "make", the CDS Invenio pages will be
-          pre-generated.  We prefer that this configuration step is
-          done during compile-time and not runtime, because of
-          multiple reasons: (i) the pre-generated pages impose less
-          load on the web server and the database server and so they
-          are served faster to the end user; (ii) we use several
-          different languages (Python, PHP) and by using independent
-          compile-time configuration language we can share the same
-          configuration variables across heterogeneous languages;
-          (iii) use of WML and page templates enables you to easily
-          change anything in the CDS Invenio system, even into deep
-          levels.
-
-          If you are changing parameters and/or look and feel
-          of CDS Invenio pages, you may want to repeat these step several
-          times:
-
-              $ vi config/config.wml
-              $ make drop-tables
-              $ make create-tables
-              $ make create-demo-site
-              $ make load-demo-records
-              $ firefox http://webserver.domain.com/
-              [...]
-
-          to see what it brings, until you are satisfied with the
-          result.
-
-          (Note that you may as well choose to change these parameters
-          inside the CDS Invenio library configuration files later on,
-          during runtime, at least for non-static Python and PHP
-          pages.)
-
-      (c) runtime configuration phase 
-          [uses MySQL / after "make install", while doing "firefox http://webserver.domain.com/admin/"]
-
-          Optionally, you will most probably want to define specific
-          data collections, to configure submit and search page for those
-          collections, to specify search options and word files to
-          search in, formats how to display data, etc.  
+          This configuration step is optional but you will most
+          probably want to define specific data collections to your
+          setup, or to configure submit pages for fill your
+          collections, to define new output formats, etc.
 
           This configuration step uses MySQL configuration tables and
-          is done during the runtime, for your convenience.  It means
-          that after previous configuration step (b), and after
-          successful "make install", if you are happy with its result
-          you no longer edit WML files within the CDS Invenio source tree but
-          rather configure "fully running" CDS Invenio installation via
-          its Administration web interface.
-         
-          Usually, you will do this step many times in the future, to
-          tweak the running installation, to add new collections and
-          data types, etc.
-
-          (Note that if you want to change something "deeper" in a
-          running CDS Invenio installation, such as look and feel of pages,
-          or to add some new pages, then you may want to edit library
-          configuration files for Python and PHP non-static pages, as
-          noted above.  But if you want to do really "deep" changes,
-          you need to go back to WML source, so you may want to leave
-          your customized copy of the CDS Invenio WML source tree around.)
-
-   We hope that this explains why we have chosen this three-level
-   configuration model, and that you will find it convenient in real
-   life.
+          can be done anytime during the production of your system,
+          unlike the configure-time or compile-time configurations
+          presented above.
 
 Good luck, and thanks for choosing CDS Invenio.
   
