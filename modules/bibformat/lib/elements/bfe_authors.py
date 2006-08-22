@@ -44,6 +44,8 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
     authors.extend(authors_2)
     authors.extend(authors_3)
 
+    nb_authors = len(authors)
+
     if highlight == 'yes':
         from invenio import bibformat_utils
         authors = [bibformat_utils.highlight(x, bfo.search_pattern) for x in authors]
@@ -51,10 +53,10 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
     if print_links.lower() == "yes":
         authors = map(lambda x: '<a href="'+weburl+'/search?f=author&amp;p='+ quote(x) +'">'+x+'</a>', authors)
 
-    if limit.isdigit() and len(authors) > int(limit) and interactive != "yes":
+    if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
 
-    elif limit.isdigit() and len(authors) > int(limit) and interactive == "yes":
+    elif limit.isdigit() and nb_authors > int(limit) and interactive == "yes":
         out = '''
         <script>
         function toggle_authors_visibility(){
@@ -69,25 +71,25 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
                 more.style.display = 'none';
                 extension.style.display = '';
                 link.innerHTML = "%(show_more)s"
-            } 
+            }
+            link.style.color = "rgb(204,0,0);"
         }
 
         function set_up(){
             var extension = document.getElementById('extension');
-            extension.innerHTML = "%(extension)s"
-            toggle_authors_visibility()
+            extension.innerHTML = "%(extension)s";
+            toggle_authors_visibility();
         }
         
         </script>
-        '''%{'show_less':_("Show Less"), 'show_more':_("Show All"), 'extension':extension}
+        '''%{'show_less':_("Hide"), 'show_more':_("Show All %i Authors") % nb_authors, 'extension':extension}
         out += '<a name="show_hide" />'
         out += separator.join(authors[:int(limit)])
         out += '<span id="more" style="">'+separator.join(authors[int(limit):])+'</span>'
         out += ' <span id="extension"></span>'
-        out += ' <small><i><a id="link" href="#" onclick="toggle_authors_visibility()"></a></i></small>'
+        out += ' <small><i><a id="link" href="#" onclick="toggle_authors_visibility()" style="color:rgb(204,0,0);"></a></i></small>'
         out += '<script>set_up()</script>'
-        
         return out
-    elif len(authors) > 0:
+    elif nb_authors > 0:
         return separator.join(authors)
 
