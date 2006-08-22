@@ -1,0 +1,4 @@
+<name>XML Dublin Core</name>
+<description>XML Dublin Core output</description>
+<BFE_XML_RECORD type='xd' encodeForXML='no'/>
+    

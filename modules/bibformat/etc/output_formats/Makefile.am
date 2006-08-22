@@ -19,7 +19,8 @@
 
 etcdir = $(sysconfdir)/bibformat/output_formats
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo
+etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
+	   XD.bfo
 
 tmpdir = $(prefix)/var/tmp
 
