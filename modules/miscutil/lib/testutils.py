@@ -63,9 +63,9 @@ def warn_user_about_tests():
 **                                                                  **
 ** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
 **                                                                  **
-** (In addition, due to the write nature of some of the tests,      **
-** the demo database may be altered with junk data, so that         **
-** it is recommended to rebuild the demo site anew afterwards.)     **
+** In addition, due to the write nature of some of the tests,       **
+** the demo DATABASE will be ALTERED WITH JUNK DATA, so that        **
+** it is recommended to rebuild the demo site anew afterwards.      **
 **                                                                  **
 **********************************************************************
 
