@@ -228,8 +228,9 @@ Contents
       $ sudo chown -R www-data /opt/cds-invenio/var
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
+      $ make regression-test     ## optional
       $ make remove-demo-records ## optional
-      $ make drop-demo-site   ## optional
+      $ make drop-demo-site      ## optional
       $ firefox http://webserver.domain.com/admin/ ## optional
 
 2. Detailed instructions for the patient CDS Invenio admin
@@ -556,8 +557,8 @@ Contents
 
       $ make test
 
-          Optionally, you can run our test suite to verify the results
-          of known tests on your local CDS Invenio installation.  Note
+          Optionally, you can run the unit test suite to verify the
+          unit behaviour of your local CDS Invenio installation.  Note
           that this command should be run only after you have
           installed the whole system via `make install'.
 
@@ -585,6 +586,16 @@ Contents
           indexing and searching of your local demo CDS Invenio
           installation.
 
+      $ make regression-test     ## optional
+
+           Optionally, you can run the full regression test suite to
+           verify the functional behaviour of your local CDS Invenio
+           installation.  Note that this command requires to have
+           created the demo site and loaded the demo records.  Note
+           also that running the regression test suite may alter the
+           database content with junk data, so that rebuilding the
+           demo site is stongly recommended afterwards.
+
       $ make remove-demo-records ## optional
 
           Optionally, remove the demo records loaded in the previous
@@ -607,7 +618,7 @@ Contents
           This configuration step is optional, and is referred to as
           "runtime configuration step c)" in the elucidative
           explanatory commentary below.  
-   
+
 3. Configuration philosophy explained and elucidated
 ====================================================
 
