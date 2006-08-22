@@ -63,7 +63,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         ## check availability
 
-        if os.path.exists("%s/RTdata/RTdata" % cachedir):
+        elif os.path.exists("%s/RTdata/RTdata" % cachedir) and argd['verb'] not in ["Identify", "ListMetadataFormats"]:
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
             if(time_gap < cfg_oai_sleep):
                 req.err_headers_out["Status-Code"] = "503"
