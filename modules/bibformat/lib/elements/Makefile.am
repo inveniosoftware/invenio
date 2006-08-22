@@ -28,8 +28,6 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_collection.py bfe_editors.py bfe_bibtex.py bfe_edit_record.py \
 	     bfe_date.py bfe_xml_record.py bfe_external_publications.py __init__.py
 
-EXTRA_DIST = $(pylib_DATA)
-
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
 tmp_DATA = test_1.py bfe_test_2.py bfe_test_4.py test3.py test_5.py \
