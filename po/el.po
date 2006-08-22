@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-07-21 18:34+0200\n"
-"PO-Revision-Date: 2006-07-20 19:01+0200\n"
+"PO-Revision-Date: 2006-07-25 19:01+0200\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -166,9 +166,8 @@ msgstr "Περιοχή Διαχειριστή"
 
 #: config/cdspage.wml:144 modules/webstyle/lib/webstyle_templates.py:155
 #: modules/webstyle/lib/webstyle_templates.py:382
-#, fuzzy
 msgid "Last updated"
-msgstr "Τελευταία ενημέρωση:"
+msgstr "Τελευταία ενημέρωση"
 
 #: modules/websubmit/doc/admin/actionimplement.html.wml:23
 #: modules/websubmit/doc/admin/actionmodify.html.wml:23
@@ -347,7 +346,7 @@ msgstr "Παραδείγματα αναζήτησης"
 
 #: config/cdspage.wml:57
 msgid "Webcast"
-msgstr ""
+msgstr "Webcast"
 
 #: config/cdspage.wml:64 config/cdspage.wml:66
 #: modules/webstyle/lib/webstyle_templates.py:68
@@ -454,7 +453,6 @@ msgid "To save this record, please click on submit."
 msgstr "Για να αποθηκεύσετε, παρακαλώ επιλέξτε 'υποβολή'."
 
 #: modules/bibedit/lib/bibedit_templates.py:407
-#, fuzzy
 msgid "This record does not exist."
 msgstr "Αυτή η εγγραφή δεν υπάρχει."
 
@@ -463,30 +461,26 @@ msgid "Please try another record ID."
 msgstr "Παρακαλώ δοκιμάστε διαφορετικό αριθμό εγγραφής."
 
 #: modules/bibedit/lib/bibedit_templates.py:416
-#, fuzzy
 msgid "This record is currently being edited by another user."
 msgstr "Αυτή η εγγραφή επεξεργάζεται από κάποιον άλλο."
 
 #: modules/bibedit/lib/bibedit_templates.py:417
-#, fuzzy
 msgid "Please try again later."
-msgstr "Παρακαλώ δοκιμάστε ξανά."
+msgstr "Παρακαλώ δοκιμάστε ξανά, αργότερα."
 
 #: modules/bibedit/lib/bibedit_templates.py:424
 msgid "Cannot edit deleted record."
-msgstr "Δεν είναι δυνατό να επεξεργαστείτε διαγραμμένη εγγραφή."
+msgstr "Δεν είναι δυνατό να επεξεργαστείτε μια διαγραμμένη εγγραφή."
 
 #: modules/bibedit/lib/bibedit_templates.py:435
-#, fuzzy
 msgid "Please enter the ID of the record you want to edit"
-msgstr "Παρακαλώ επιλέξτε τον τύπο του εγγράφου που θέλετε να υποβάλετε"
+msgstr "Παρακαλώ το ID της εγγραφής που θέλετε να επεξεργαστείτε"
 
 #: modules/bibedit/lib/bibedit_templates.py:447
-#, fuzzy
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
-msgstr "Θα επεξεργαστούν μόλις αδειάσει η ουρά εργασιών."
+msgstr "Οι τροποποιήσεις σας έχουν υποβληθεί. Θα επεξεργαστούν μόλις αδειάσει η ουρά εργασιών."
 
 #: modules/bibedit/lib/bibedit_templates.py:449
 #: modules/bibedit/lib/bibedit_templates.py:481
@@ -494,9 +488,9 @@ msgstr "Θα επεξεργαστούν μόλις αδειάσει η ουρά 
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
 msgstr ""
+"Μπορείτε να επιστρέψετε στο %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
 
 #: modules/bibedit/lib/bibedit_templates.py:469
-#, fuzzy
 msgid "Do you really want to delete this record?"
 msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε την εγγραφή αυτή;"
 
@@ -525,14 +519,13 @@ msgid "No"
 msgstr "Όχι"
 
 #: modules/bibedit/lib/bibedit_templates.py:479
-#, fuzzy
 msgid "The record will be deleted as soon as the task queue is empty."
-msgstr "Θα επεξεργαστούν μόλις αδειάσει η ουρά εργασιών."
+msgstr "Η εγγραφή θα διαγραφεί, μόλις αδειάσει η ουρά εργασιών."
 
 #: modules/bibedit/web/admin/bibeditadmin.py:61
 #, python-format
 msgid "Record %s - Add a field"
-msgstr ""
+msgstr "Εγγραφή %s - Προσθήκη πεδίου"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:63
 msgid "BibEdit Admin Interface"
@@ -541,17 +534,17 @@ msgstr "BibEdit Admin Interface"
 #: modules/bibedit/web/admin/bibeditadmin.py:95
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s"
-msgstr ""
+msgstr "Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_field)s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:98
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-msgstr ""
+msgstr "Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_field)s - Προσθήκη υποπεδίου"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:126
-#, fuzzy, python-format
+#, python-format
 msgid "Submit and save record %s"
-msgstr "Παρόμοιες εγγραφές"
+msgstr "Υποβολή και αποθήκευση εγγραφής %s"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:51
 #: modules/bibharvest/lib/bibharvest_templates.py:69
@@ -571,37 +564,30 @@ msgid "Next oaiharvest task"
 msgstr "Επόμενη εργασία oaiharvest"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:118
-#, fuzzy
 msgid "scheduled time:"
 msgstr "προγραμματισμένος χρόνος:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:119
-#, fuzzy
 msgid "current status:"
 msgstr "τρέχουσα κατάσταση:"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:120
-#, fuzzy
 msgid "No oaiharvest task currently scheduled."
 msgstr "Δεν υπάρχει καμία προγραμματισμένη εργασία oaiharvest"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:221
-#, fuzzy
 msgid "successfully validated"
 msgstr "επικυρώθηκε επιτυχώς!"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:222
-#, fuzzy
 msgid "does not seem to be a OAI-compliant baseURL"
 msgstr "το baseURL δεν φαίνεται να είναι συμβατό με το ΟΑΙ"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:118
-#, fuzzy
 msgid "Citation history"
 msgstr "Ιστορικό παραπομπών:"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:95
-#, fuzzy
 msgid "Downloads history"
 msgstr "Ιστορικό downloads:"
 
@@ -683,7 +669,7 @@ msgstr "Φεβ"
 
 #: modules/miscutil/lib/dateutils.py:170
 msgid "Mar"
-msgstr "Μάρ"
+msgstr "Μαρ"
 
 #: modules/miscutil/lib/dateutils.py:171
 msgid "Apr"
@@ -697,15 +683,15 @@ msgstr "Μάιος"
 
 #: modules/miscutil/lib/dateutils.py:173
 msgid "Jun"
-msgstr "Ιούν"
+msgstr "Ιουν"
 
 #: modules/miscutil/lib/dateutils.py:174
 msgid "Jul"
-msgstr "Ιούλ"
+msgstr "Ιουλ"
 
 #: modules/miscutil/lib/dateutils.py:175
 msgid "Aug"
-msgstr "Άυγ"
+msgstr "Αυγ"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Sep"
@@ -822,37 +808,32 @@ msgstr "Ευχαριστούμε που βοηθάτε να γίνει το CDS 
 
 #: modules/miscutil/lib/errorlib_webinterface.py:85
 msgid "Use the back button of your browser to return to the previous page."
-msgstr ""
-"Χρησιμοποιήστε το αντίστοιχο κουμπί του φυλλομετρητή σας για να επιστρέψετε "
-"στην προηγούμενη σελίδα."
+msgstr "Χρησιμοποιήστε το αντίστοιχο κουμπί του φυλλομετρητή σας για να επιστρέψετε στην προηγούμενη σελίδα."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:87
 msgid "Thank you!"
 msgstr "Σας ευχαριστούμε!"
 
 #: modules/webalert/lib/webalert.py:54
-#, fuzzy, python-format
+#, python-format
 msgid "You already have an alert named %s."
-msgstr "Έχετε ήδη μια ειδοποίηση με όνομα <b>%(name)s</b>"
+msgstr "Έχετε ήδη μια ειδοποίηση με όνομα %s."
 
 #: modules/webalert/lib/webalert.py:111
 msgid "unknown"
 msgstr "άγνωστο"
 
 #: modules/webalert/lib/webalert.py:173
-#, fuzzy
 msgid "You already have an alert defined for the specified query and basket."
-msgstr "Έχετε ορίσει ήδη μια ειδοποίηση για την συγκεκριμένη έρευνα"
+msgstr "Έχετε ορίσει ήδη μια ειδοποίηση για την συγκεκριμένη έρευνα και καλάθι."
 
 #: modules/webalert/lib/webalert.py:192 modules/webalert/lib/webalert.py:296
-#, fuzzy
 msgid "The alert name cannot be empty."
-msgstr "Το όνομα της ειδοποίησης <b>δεν</b> πρέπει να είναι κενό."
+msgstr "Το όνομα της ειδοποίησης δεν πρέπει να είναι κενό."
 
 #: modules/webalert/lib/webalert.py:197
-#, fuzzy
 msgid "You are not the owner of this basket."
-msgstr "Έχετε θέσει %i ειδοποιήσεις στο καλάθι αυτό"
+msgstr "Δεν είστε ο ιδιοκτήτης του καλαθιού αυτού."
 
 #: modules/webalert/lib/webalert.py:209
 #, python-format
@@ -871,6 +852,9 @@ msgid ""
 "is available with a posibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
 msgstr ""
+"Έχετε εκτελέσει %(x_nb)s έρευνες. Μια %(x_url_open)sαναλυτική λίστα%(x_url_close)s "
+"είναι διαθέσιμη με δυνατότητα (α) να δείτε τα αποτελέσματα τους και (β) να εγγραφείτε "
+"σε μια υπηρεσία που θα σας ενημερώνει με email για τις έρευνες αυτές."
 
 #: modules/webalert/lib/webalert_templates.py:73
 msgid "Pattern"
@@ -909,7 +893,6 @@ msgid "Collection"
 msgstr "Συλλογή"
 
 #: modules/webalert/lib/webalert_templates.py:112
-#, fuzzy
 msgid "You own the following alerts:"
 msgstr "Έχετε τις παρακάτω ειδοποιήσεις:"
 
@@ -922,27 +905,24 @@ msgid "SHOW"
 msgstr "ΠΡΟΒΟΛΗ"
 
 #: modules/webalert/lib/webalert_templates.py:164
-#, fuzzy
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
 msgstr ""
 "Η ειδοποίηση αυτή θα σας ενημερώνει κάθε φορά/μόνο εάν ένα νέο αντικείμενο "
-"ικανοποιεί τηνπαρακάτω έρευνα"
+"ικανοποιεί τηνπαρακάτω έρευνα:"
 
 #: modules/webalert/lib/webalert_templates.py:165
 msgid "QUERY"
 msgstr "ΕΡΕΥΝΑ"
 
 #: modules/webalert/lib/webalert_templates.py:203
-#, fuzzy
 msgid "Alert identification name:"
 msgstr "Όνομα ειδοποίησης:"
 
 #: modules/webalert/lib/webalert_templates.py:205
-#, fuzzy
 msgid "Search-checking frequency:"
-msgstr "Συχνότητα ελέγχου έρευνας"
+msgstr "Συχνότητα ελέγχου έρευνας:"
 
 #: modules/webalert/lib/webalert_templates.py:209
 #: modules/webalert/lib/webalert_templates.py:328
@@ -960,7 +940,6 @@ msgid "daily"
 msgstr "ημερησίως"
 
 #: modules/webalert/lib/webalert_templates.py:212
-#, fuzzy
 msgid "Send notification email?"
 msgstr "Να αποσταλεί ενημερωτικό email;"
 
@@ -975,9 +954,9 @@ msgid "no"
 msgstr "όχι"
 
 #: modules/webalert/lib/webalert_templates.py:217
-#, fuzzy, python-format
+#, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr "εάν <B>όχι<B> πρέπει να καθορίσετε ένα καλάθι"
+msgstr "εάν %(x_fmt_open)sόχι%(x_fmt_close)s πρέπει να καθορίσετε ένα καλάθι"
 
 #: modules/webalert/lib/webalert_templates.py:219
 msgid "Store results in basket?"
@@ -992,13 +971,13 @@ msgid "CLEAR DATA"
 msgstr "ΚΑΘΑΡΙΣΜΟΣ ΔΕΔΟΜΕΝΩΝ"
 
 #: modules/webalert/lib/webalert_templates.py:291
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Καθορίστε μια νέα ειδοποίηση από τις %(your_searches)s, τις %"
-"(popular_searches)s ή την φόρμα εισαγωγής."
+"Καθορίστε μια νέα ειδοποίηση από τις %(x_url1_open)sέρευνές σας%(x_url1_close)s, τις %"
+"(x_url2_open)sδημοφιλείς έρευνες%(x_url2_close)s ή την φόρμα εισαγωγής."
 
 #: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
@@ -1009,9 +988,8 @@ msgid "Search checking frequency"
 msgstr "Συχνότητα ελέγχου έρευνας"
 
 #: modules/webalert/lib/webalert_templates.py:312
-#, fuzzy
 msgid "Notification by email"
-msgstr "Αναφορά με email"
+msgstr "Γνωστοποίηση με email"
 
 #: modules/webalert/lib/webalert_templates.py:313
 msgid "Result in basket"
@@ -1043,30 +1021,32 @@ msgid "Execute search"
 msgstr "Έκτέλεση έρευνας"
 
 #: modules/webalert/lib/webalert_templates.py:373
-#, fuzzy, python-format
+#, python-format
 msgid "You have defined %s alerts."
-msgstr "Έχετε ορίσει <B>%(number)s</B> ειδοποιήσεις."
+msgstr "Έχετε ορίσει %s ειδοποιήσεις."
 
 #: modules/webalert/lib/webalert_templates.py:413
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
-msgstr "Δεν έχετε εκτελέσει καμιά έρευνα ακόμη. %(click_here)s για έρευνα."
+msgstr ""
+"Δεν έχετε εκτελέσει καμιά έρευνα ακόμη. Παρακαλώ επισκευτείτε την σελίδα της %(x_url_open)sαναζήτησης "
+"%(x_url_close)s πρώτα."
 
 #: modules/webalert/lib/webalert_templates.py:422
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
 msgstr ""
-"Έχετε  πραγματοποιήσει <B>%(number)d</B> έρευνες (<strong>%(different)d</"
-"strong> διαφορετικές ερωτήσεις) τις τελευταίες 30 ημέρες."
+"Έχετε  πραγματοποιήσει %(x_nb1)s έρευνες (%(x_nb2)s διαφορετικές ερωτήσεις) "
+"τις τελευταίες 30 ημέρες."
 
 #: modules/webalert/lib/webalert_templates.py:427
-#, fuzzy, python-format
+#, python-format
 msgid "Here are the %s most popular searches."
-msgstr "δημοφιλέστερες έρευνες"
+msgstr "Ορίστε οι %s δημοφιλέστερες έρευνες."
 
 #: modules/webalert/lib/webalert_templates.py:438
 msgid "Question"
@@ -1158,11 +1138,13 @@ msgid "Others' baskets"
 msgstr "Καλάθια άλλων"
 
 #: modules/webbasket/lib/webbasket.py:793
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
 "s group baskets and %(x_nb_public)s other users public baskets."
-msgstr "Έχετε %s και είσαστε εγγεγραμμένοι σε %s και %s."
+msgstr ""
+"Έχετε %(x_nb_perso)s προσωπικά καλάθια και είσαστε εγγεγραμμένος σε %(x_nb_group)"
+"s ομαδικά καλάθια και σε %(x_nb_public)s δημόσια καλάθια άλλων χρηστών."
 
 #: modules/webbasket/lib/webbasket_templates.py:183
 #, python-format
@@ -1179,12 +1161,13 @@ msgid "Basket is empty"
 msgstr "Το καλάθι είναι άδειο"
 
 #: modules/webbasket/lib/webbasket_templates.py:233
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
 "(x_url_close)s to it"
 msgstr ""
-"Το καλάθι αυτό ανήκει στον/ην %s. Μπορείτε ελεύθερα να %ssubscribe%s σε αυτό."
+"Το καλάθι αυτό ανήκει στον/ην %(x_name)s. Μπορείτε ελεύθερα να %(x_url_open)sεγγραφείτε%"
+"(x_url_close)s σε αυτό"
 
 #: modules/webbasket/lib/webbasket_templates.py:258
 #: modules/webbasket/lib/webbasket_webinterface.py:566
@@ -1234,11 +1217,11 @@ msgid "There is currently no publicly accessible basket"
 msgstr "Δεν υπάρχει κάποιο δημόσιο καλάθι διαθέσιμο"
 
 #: modules/webbasket/lib/webbasket_templates.py:336
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
 "in total."
-msgstr "Προβολή καλαθιών %i-%i από συνόλου %i."
+msgstr "Προβολή καλαθιών %(x_nb_begin)i-%(x_nb_end)i από συνόλου %(x_nb_total)i."
 
 #: modules/webbasket/lib/webbasket_templates.py:367
 msgid "Actions"
@@ -1265,11 +1248,8 @@ msgid "Edit basket"
 msgstr "Διόρθωση καλαθιού"
 
 #: modules/webbasket/lib/webbasket_templates.py:449
-#, fuzzy
 msgid "You do not have sufficient rights to view this basket's content."
-msgstr ""
-"Δεν έχετε τα απαιτούμενα δικαιώματα για να αλλάξετε τα περιεχόμενα του "
-"καλαθιού"
+msgstr "Δεν έχετε τα απαιτούμενα δικαιώματα για να αλλάξετε τα περιεχόμενα του καλαθιού αυτού."
 
 #: modules/webbasket/lib/webbasket_templates.py:454
 #: modules/webbasket/lib/webbasket_templates.py:712
@@ -1282,17 +1262,14 @@ msgid "comments"
 msgstr "σχόλια"
 
 #: modules/webbasket/lib/webbasket_templates.py:467
-#, fuzzy
 msgid "last comment:"
 msgstr "τελευταίο σχόλιο:"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
-#, fuzzy
 msgid "Move item up"
-msgstr "Διαγραφή στοιχείου"
+msgstr "Μετακίνηση στοιχείου επάνω"
 
 #: modules/webbasket/lib/webbasket_templates.py:530
-#, fuzzy
 msgid "Move item down"
 msgstr "Μετακίνηση στοιχείου κάτω"
 
@@ -1319,9 +1296,8 @@ msgid "Details and comments"
 msgstr "Λεπτομέρειες και σχόλια"
 
 #: modules/webbasket/lib/webbasket_templates.py:604
-#, fuzzy
 msgid "This basket is publicly accessible at the following address:"
-msgstr "Το καλάθι αυτό είναι δημοσίως προσβάσιμο στην διεύθυνση: %s."
+msgstr "Το καλάθι αυτό είναι δημοσίως προσβάσιμο στην διεύθυνση:"
 
 #: modules/webbasket/lib/webbasket_templates.py:634
 #: modules/websearch/lib/websearch_templates.py:517
@@ -1441,9 +1417,8 @@ msgid "%i baskets"
 msgstr "%i καλάθια"
 
 #: modules/webbasket/lib/webbasket_templates.py:1029
-#, fuzzy
 msgid "Add to a group-shared basket"
-msgstr "Προσθήκη σε ομαδικά μοιρασμένα καλάθια"
+msgstr "Προσθήκη σε καλάθι μοιρασμένο σε ομάδα"
 
 #: modules/webbasket/lib/webbasket_templates.py:1047
 msgid "Add to a public basket"
@@ -1459,32 +1434,32 @@ msgid "Add to baskets"
 msgstr "Προσθήκη στα καλάθια"
 
 #: modules/webbasket/lib/webbasket_templates.py:1092
-#, fuzzy, python-format
+#, python-format
 msgid "The selected records have been successfully added to %i baskets."
-msgstr "Οι επιλεγμένες εγγραφές έχουν προστεθεί σε %i καλάθια επιτυχώς"
+msgstr "Οι επιλεγμένες εγγραφές έχουν προστεθεί σε %i καλάθια επιτυχώς."
 
 #: modules/webbasket/lib/webbasket_templates.py:1095
 msgid "No records were added to the selected baskets."
-msgstr "Καμία εγγραφή δεν προστέθηκε στα επιλεγμένα καλάθια"
+msgstr "Καμία εγγραφή δεν προστέθηκε στα επιλεγμένα καλάθια."
 
 #: modules/webbasket/lib/webbasket_templates.py:1115
 msgid "Are you sure you want to delete this basket?"
 msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε το καλάθι αυτό;"
 
 #: modules/webbasket/lib/webbasket_templates.py:1117
-#, fuzzy, python-format
+#, python-format
 msgid "%i users are subscribed to this basket."
-msgstr "%i χρήστες είναι εγγεγραμμένοι στο καλάθι αυτό"
+msgstr "%i χρήστες είναι εγγεγραμμένοι στο καλάθι αυτό."
 
 #: modules/webbasket/lib/webbasket_templates.py:1119
-#, fuzzy, python-format
+#, python-format
 msgid "%i user groups are subscribed to this basket."
-msgstr "%i ομάδες χρηστών είναι εγγεγραμμένοι στο καλάθι αυτό"
+msgstr "%i ομάδες χρηστών είναι εγγεγραμμένοι στο καλάθι αυτό."
 
 #: modules/webbasket/lib/webbasket_templates.py:1121
-#, fuzzy, python-format
+#, python-format
 msgid "You have set %i alerts on this basket."
-msgstr "Έχετε θέσει %i ειδοποιήσεις στο καλάθι αυτό"
+msgstr "Έχετε θέσει %i ειδοποιήσεις στο καλάθι αυτό."
 
 #: modules/webbasket/lib/webbasket_templates.py:1195
 msgid "General settings"
@@ -1509,9 +1484,8 @@ msgid "Delete basket"
 msgstr "Διαγραφή καλαθιού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1256
-#, fuzzy
 msgid "Editing basket"
-msgstr "Διόρθωση καλαθιού"
+msgstr "Επεξεργασία καλαθιού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1264
 msgid "Save changes"
@@ -1573,9 +1547,8 @@ msgid "manage sharing rights"
 msgstr "διαχείρηση δικαιωμάτων διαμοιρασμού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1337
-#, fuzzy
 msgid "You are not a member of a group."
-msgstr "Δεν είστε μέλος καμίας ομάδας."
+msgstr "Δεν είστε μέλος κάποιας ομάδας."
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
 msgid "Sharing basket to a new group"
@@ -1587,14 +1560,12 @@ msgstr "κανένα καλάθι"
 
 #: modules/webbasket/lib/webbasket_templates.py:1388
 #: modules/websession/lib/websession_templates.py:343
-#, fuzzy
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
 msgstr ""
-"Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν στο "
-"τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %slogin ή "
-"να εγγραφείτε εδώ.%s"
+"Έχετε συνδεθεί σαν επισκέπτης, οπότε τα καλάθια σας θα εξαφανιστούν στο "
+"τέλος της τρέχουσας συνεδρίας. "
 
 #: modules/webbasket/lib/webbasket_templates.py:1389
 #: modules/webbasket/lib/webbasket_templates.py:1406
@@ -1603,20 +1574,16 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
+"Αν επιθυμείτε, μπορείτε να κάνετε %(x_url_open)slogin η να εγγραφείτε εδώ%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
-#, fuzzy
 msgid "This functionality is forbidden to guest users."
-msgstr ""
-"Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν στο "
-"τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %slogin ή "
-"να εγγραφείτε εδώ.%s"
+msgstr "Η λειτουργία αυτή δεν επιτρέπεται στους χρήστες guest."
 
 #: modules/webbasket/lib/webbasket_templates.py:1466
 #: modules/webcomment/lib/webcomment_templates.py:611
-#, fuzzy
 msgid "Back to search results"
-msgstr "(Επιστροφή στα αποτελέσματα αναζήτησης)"
+msgstr "Επιστροφή στα αποτελέσματα αναζήτησης"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:77
 msgid "Display baskets"
@@ -1655,9 +1622,9 @@ msgstr "Διαχειριστής WebComment"
 
 #: modules/webcomment/lib/webcomment.py:798
 #: modules/webcomment/lib/webcomment_templates.py:321
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr "Κρίθηκε από τον %(nickname)s στις %(date)s"
+msgstr "%(x_name)s έγγραψε στις %(x_date)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:105
 #, python-format
@@ -1671,8 +1638,7 @@ msgstr "Συζήτηση για στο έγγραφο"
 
 #: modules/webcomment/lib/webcomment_templates.py:146
 msgid "Start a discussion about any aspect of this document."
-msgstr ""
-"Ξεκινήστε μια συζήτηση σχετικά με οποιοδήποτε κομμάτι του εγγράφου αυτού."
+msgstr "Ξεκινήστε μια συζήτηση σχετικά με οποιοδήποτε κομμάτι του εγγράφου αυτού."
 
 #: modules/webcomment/lib/webcomment_templates.py:162
 #, python-format
@@ -1706,9 +1672,9 @@ msgstr "Γράψτε μια κριτική"
 
 #: modules/webcomment/lib/webcomment_templates.py:253
 #: modules/webcomment/lib/webcomment_templates.py:558
-#, fuzzy, python-format
+#, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr "Μέση βαθμολογία κριτικών: %s βασισμένη σε %s κριτικές"
+msgstr "Μέση βαθμολογία κριτικών: %(x_nb_score)s βασισμένη σε %(x_nb_reviews)s κριτικές"
 
 #: modules/webcomment/lib/webcomment_templates.py:256
 #, python-format
@@ -1737,24 +1703,22 @@ msgid "Report abuse"
 msgstr "Αναφορά κακόβουλης χρήσης"
 
 #: modules/webcomment/lib/webcomment_templates.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
-msgstr "Κρίθηκε από τον %(nickname)s στις %(date)s"
+msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:365
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr "%i από %i ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
+msgstr "%(x_nb_people)i από %(x_nb_total)i ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
 
 #: modules/webcomment/lib/webcomment_templates.py:533
-#, fuzzy
 msgid "Previous"
-msgstr "< Προηγούμενο"
+msgstr "Προηγούμενο"
 
 #: modules/webcomment/lib/webcomment_templates.py:549
-#, fuzzy
 msgid "Next"
-msgstr "< Επόμενο"
+msgstr "Επόμενο"
 
 #: modules/webcomment/lib/webcomment_templates.py:575
 #, python-format
@@ -1786,7 +1750,6 @@ msgid "Viewing"
 msgstr "Βλέπετε την "
 
 #: modules/webcomment/lib/webcomment_templates.py:668
-#, fuzzy
 msgid "Page:"
 msgstr "Σελίδα: "
 
@@ -1796,11 +1759,13 @@ msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr "Σημείωση: Ο χρήστης %s θα εμφανίζεται σαν συγγραφέας του σχολίου αυτού"
 
 #: modules/webcomment/lib/webcomment_templates.py:790
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
 "(x_nickname)s will be displayed as the author of this comment."
-msgstr "Σημείωση: Ο χρήστης %s θα εμφανίζεται σαν συγγραφέας του σχολίου αυτού"
+msgstr ""
+"Σημείωση: δεν έχετε %(x_url_open)sορίσει το ψευδώνυμό σας%(x_url_close)s. Ο %"
+"(x_nickname)s θα εμφανίζεται σαν συντάκτης του σχολίου αυτού."
 
 #: modules/webcomment/lib/webcomment_templates.py:812
 #: modules/webcomment/lib/webcomment_templates.py:886
@@ -1808,11 +1773,11 @@ msgid "Article"
 msgstr "Άρθρο"
 
 #: modules/webcomment/lib/webcomment_templates.py:840
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
-"Σημείωση: Ο χρήστης %s θα εμφανίζεται σαν συγγραφέας της κριτικής αυτής"
+"Σημείωση: Ο %s, θα εμφανίζεται σαν συγγραφέας της κριτικής αυτής."
 
 #: modules/webcomment/lib/webcomment_templates.py:887
 msgid "Rate this article"
@@ -1836,14 +1801,12 @@ msgid "Add Review"
 msgstr "Προσθήκη Κριτικής"
 
 #: modules/webcomment/lib/webcomment_templates.py:915
-#, fuzzy
 msgid "Your review was successfully added."
-msgstr "Η κριτική σας προστέθηκε επιτυχώς"
+msgstr "Η κριτική σας προστέθηκε επιτυχώς."
 
 #: modules/webcomment/lib/webcomment_templates.py:917
-#, fuzzy
 msgid "Your comment was successfully added."
-msgstr "Το σχόλιό σας προστέθηκε επιτυχώς"
+msgstr "Το σχόλιό σας προστέθηκε επιτυχώς."
 
 #: modules/webcomment/lib/webcomment_templates.py:919
 msgid "Back to record"
@@ -1875,18 +1838,16 @@ msgid "Menu"
 msgstr "Μενού"
 
 #: modules/webcomment/lib/webcomment_templates.py:1025
-#, fuzzy
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
 msgstr ""
 "Παρακαλώ εισάγετε το ID του σχολίου/κριτικής ώστε να μπορέσετε να το δείτε "
-"πριν αποφασίσετε να το σβήσετε"
+"πριν αποφασίσετε εάν θα το σβήσετε"
 
 #: modules/webcomment/lib/webcomment_templates.py:1037
-#, fuzzy
 msgid "Comment ID:"
-msgstr "ID σχολίου"
+msgstr "ID σχολίου:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1039
 msgid "View Comment"
@@ -1894,7 +1855,7 @@ msgstr "Επισκόπηση Σχολίου"
 
 #: modules/webcomment/lib/webcomment_templates.py:1060
 msgid "There have been no reports so far."
-msgstr ""
+msgstr "Δεν υπάρχουν αναφορές μέχρι στιγμής."
 
 #: modules/webcomment/lib/webcomment_templates.py:1064
 #, python-format
@@ -1907,20 +1868,19 @@ msgid "View all %s reported reviews"
 msgstr "Επισκόπηση και των %s reviews που υπάρχουν"
 
 #: modules/webcomment/lib/webcomment_templates.py:1105
-#, fuzzy
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
 msgstr ""
-"Ορίστε μια λίστα,  ταξινομημένη με τον συνολικό αριθμό αναφορών, από "
-"όλουςτους χρήστες που είχαν τουλάχιστον μιά αναφορά στα σχόλια τους."
+"Ακολουθεί μια λίστα,  ταξινομημένη με τον συνολικό αριθμό αναφορών, από "
+"όλους τους χρήστες που είχαν τουλάχιστον μιά αναφορά στα σχόλια τους."
 
 #: modules/webcomment/lib/webcomment_templates.py:1113
 #: modules/webcomment/lib/webcomment_templates.py:1142
 #: modules/websession/lib/websession_templates.py:153
 #: modules/websession/lib/websession_templates.py:706
 msgid "Nickname"
-msgstr ""
+msgstr "Ψευδώνυμο"
 
 #: modules/webcomment/lib/webcomment_templates.py:1114
 #: modules/webcomment/lib/webcomment_templates.py:1146
@@ -1989,7 +1949,7 @@ msgstr "Διαγραφή επιλεγμένων σχολίων"
 
 #: modules/webcomment/lib/webcomment_templates.py:1263
 msgid "OK"
-msgstr ""
+msgstr "ΟΚ"
 
 #: modules/webcomment/lib/webcomment_templates.py:1269
 #, python-format
@@ -2007,17 +1967,15 @@ msgid "Here is comment/review %s"
 msgstr "Ορίστε ένα σχόλιο/κριτική %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-msgstr "Ορίστε το σχόλιο/review %s γραμμένο από τον χρήστη %s"
+msgstr "Ορίστε το σχόλιο/review %(x_cmtID)s γραμμένο από τον χρήστη %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1281
-#, fuzzy
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr "Ορίστε όλες οι κριτικές, ταξινομημένα κατά αριθμό αναφορών"
+msgstr "Ορίστε όλες οι κριτικές, ταξινομημένες κατά αριθμό αναφορών"
 
 #: modules/webcomment/lib/webcomment_templates.py:1283
-#, fuzzy
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Ορίστε όλα τα σχόλια, ταξινομημένα κατά αριθμό αναφορών"
 
@@ -2077,7 +2035,6 @@ msgid "Delete Comment"
 msgstr "Διαγραφή Σχολίου"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:143
-#, fuzzy
 msgid "View all reported users"
 msgstr "Επισκόπηση όλων των Χρηστών"
 
@@ -2090,50 +2047,44 @@ msgid "Suppress abuse reports"
 msgstr "Απόκρυψη προσβλητικών αναφορών"
 
 #: modules/webmessage/lib/webmessage.py:132
-#, fuzzy
 msgid "The message could not be deleted."
-msgstr "Το μύνημα δεν μπόρεσε να διαγραφεί"
+msgstr "Το μύνημα δεν μπόρεσε να διαγραφεί."
 
 #: modules/webmessage/lib/webmessage.py:134
-#, fuzzy
 msgid "The message was successfully deleted."
-msgstr "διαγράφηκε επιτυχώς"
+msgstr "Το μύνημα διαγράφηκε επιτυχώς."
 
 #: modules/webmessage/lib/webmessage.py:151
-#, fuzzy
 msgid "Your mailbox has been emptied."
-msgstr "Το γραμματοκιβώτιο σας έχει αδειάσει"
+msgstr "Το γραμματοκιβώτιο σας έχει αδειάσει."
 
 #: modules/webmessage/lib/webmessage.py:341
-#, fuzzy, python-format
+#, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
-msgstr "Η επιλεγμένη ημ/νία (%(year)i/%(month)i/%(day)i) είναι λανθασμένη"
+msgstr "Η επιλεγμένη ημ/νία (%(x_year)i/%(x_month)i/%(x_day)i) είναι λανθασμένη."
 
 #: modules/webmessage/lib/webmessage.py:350
-#, fuzzy
 msgid "Please enter a user name or a group name."
-msgstr "Παρακαλώ εισάγετε όνομα χρήστη ή ομάδας"
+msgstr "Παρακαλώ εισάγετε όνομα χρήστη ή ομάδας."
 
 #: modules/webmessage/lib/webmessage.py:354
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
 "characters."
 msgstr ""
-"Το μύνημά σας είναι πολύ μεγάλο, παρακαλώ διορθώστε το\n"
-"                             Το μέγιστο επιτρεπόμενο μήκος είναι %i "
-"χαρακτήρες\n"
-"                          "
+"Το μύνημά σας είναι πολύ μεγάλο, παρακαλώ διορθώστε το. "
+"Το μέγιστο επιτρεπόμενο μήκος είναι %i χαρακτήρες."
 
 #: modules/webmessage/lib/webmessage.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s does not exist."
-msgstr "Η ομάδα '%s' δεν υπάρχει\n"
+msgstr "Η ομάδα %s δεν υπάρχει."
 
 #: modules/webmessage/lib/webmessage.py:387
-#, fuzzy, python-format
+#, python-format
 msgid "User %s does not exist."
-msgstr "Ο χρήστης '%s' δεν υπάρχει\n"
+msgstr "Ο χρήστης %s δεν υπάρχει."
 
 #: modules/webmessage/lib/webmessage.py:399
 #: modules/webmessage/lib/webmessage_webinterface.py:102
@@ -2142,11 +2093,12 @@ msgid "Write a message"
 msgstr "Γράψτε ένα μύνημα"
 
 #: modules/webmessage/lib/webmessage.py:416
-#, fuzzy
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
-msgstr "Το μύνημά σας δεν μπόρεσε να αποσταλεί στους παρακάτω παραλήπτες\n"
+msgstr ""
+"Το μύνημά σας δεν μπόρεσε να αποσταλεί στους παρακάτω παραλήπτες "
+" εξαιτίας του ορίου τους:"
 
 #: modules/webmessage/lib/webmessage.py:420
 msgid "Your message has been sent."
@@ -2174,7 +2126,6 @@ msgid "No messages"
 msgstr "Δεν υπάρχουν μυνήματα"
 
 #: modules/webmessage/lib/webmessage_templates.py:92
-#, fuzzy
 msgid "No subject"
 msgstr "[Χωρίς θέμα]"
 
@@ -2188,7 +2139,7 @@ msgstr "Διαγραφή Όλων"
 
 #: modules/webmessage/lib/webmessage_templates.py:180
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
 #: modules/webmessage/lib/webmessage_templates.py:270
 msgid "Send later?"
@@ -2212,7 +2163,6 @@ msgid "Subject:"
 msgstr "Θέμα"
 
 #: modules/webmessage/lib/webmessage_templates.py:275
-#, fuzzy
 msgid "Message:"
 msgstr "Μύνημα:"
 
@@ -2221,29 +2171,24 @@ msgid "SEND"
 msgstr "ΑΠΟΣΤΟΛΗ"
 
 #: modules/webmessage/lib/webmessage_templates.py:417
-#, fuzzy
 msgid "From:"
-msgstr "Από"
+msgstr "Από:"
 
 #: modules/webmessage/lib/webmessage_templates.py:419
-#, fuzzy
 msgid "Sent on:"
-msgstr "Απεστάλη στις"
+msgstr "Απεστάλη στις:"
 
 #: modules/webmessage/lib/webmessage_templates.py:420
-#, fuzzy
 msgid "Received on:"
-msgstr "Παρελήφθη στις"
+msgstr "Παρελήφθη στις:"
 
 #: modules/webmessage/lib/webmessage_templates.py:421
-#, fuzzy
 msgid "Sent to:"
-msgstr "Απεστάλη στον"
+msgstr "Απεστάλη στον/στην:"
 
 #: modules/webmessage/lib/webmessage_templates.py:422
-#, fuzzy
 msgid "Sent to groups:"
-msgstr "Απεστάλη στις ομάδες"
+msgstr "Απεστάλη στις ομάδες:"
 
 #: modules/webmessage/lib/webmessage_templates.py:423
 msgid "REPLY"
@@ -2426,20 +2371,18 @@ msgid "No values found."
 msgstr "Δεν βρέθηκαν τιμές."
 
 #: modules/websearch/lib/search_engine.py:1395
-#, fuzzy, python-format
+#, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
-msgstr ""
-"Δεν βρέθηκε κανένα αποτέλεσμα για <em>%s</em>, θα γίνει χρήση του <em>%s</"
-"em> στην θέση του..."
+msgstr "Δεν βρέθηκε κανένα αποτέλεσμα για %(x_query1)s, θα γίνει χρήση του %(x_query2)s αντ'αυτού..."
 
 #: modules/websearch/lib/search_engine.py:1634
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"Κανένα αποτέλεσμα στην συλλογή %s. Άλλες συλλογές έδωσαν <a class="
-"\"nearestterms\" href=\"%s\">%d αποτελέσματα</a>."
+"Κανένα αποτέλεσμα στην συλλογή %(x_collection)s. Άλλες συλλογές έδωσαν "
+"%(x_url_open)s%(x_nb_hits)d αποτελέσματα%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:1643
 msgid ""
@@ -2458,29 +2401,32 @@ msgid "No phrase index available for"
 msgstr "Δεν υπάρχει ευρετήριο φράσεων για"
 
 #: modules/websearch/lib/search_engine.py:1783
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
-msgstr "δεν ταίριαξε με κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:"
+msgstr ""
+"Ο όρος %(x_term)s στο ευρετήριο %(x_index)s δεν ταίριαξε σε κάποια εγγραφή. "
+"Παραπλήσιοι όροι σε όλες τις συλλογές:"
 
 #: modules/websearch/lib/search_engine.py:1787
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
-msgstr "δεν ταίριαξε με κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:"
+msgstr ""
+"Ο όρος %s δεν ταίριαξε σε κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις συλλογές:"
 
 #: modules/websearch/lib/search_engine.py:2215
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr ""
 "Λυπάμαι, ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα γίνει "
-"χρήση της της εξ΄ορισμού ταξινόμησης (\"latest first\")."
+"χρήση της της εξ΄ορισμού ταξινόμησης."
 
 #: modules/websearch/lib/search_engine.py:2239
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
@@ -2524,7 +2470,7 @@ msgstr ""
 "Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
 
 #: modules/websearch/lib/websearch_templates.py:289
-#, fuzzy, python-format
+#, python-format
 msgid "Search %s records for:"
 msgstr "Αναζήτηση %s εγγραφών για:"
 
@@ -2534,7 +2480,7 @@ msgid "Advanced Search"
 msgstr "Σύνθετη αναζήτηση"
 
 #: modules/websearch/lib/websearch_templates.py:389
-#, fuzzy, python-format
+#, python-format
 msgid "Search %s records for"
 msgstr "Αναζήτηση %s εγγραφών για:"
 
@@ -2544,7 +2490,6 @@ msgid "Simple Search"
 msgstr "Απλή αναζήτηση"
 
 #: modules/websearch/lib/websearch_templates.py:465
-#, fuzzy
 msgid "Search options:"
 msgstr "Επιλογές αναζήτησης:"
 
@@ -2555,29 +2500,24 @@ msgstr "Προστέθηκαν από:"
 
 #: modules/websearch/lib/websearch_templates.py:513
 #: modules/websearch/lib/websearch_templates.py:1492
-#, fuzzy
 msgid "until:"
 msgstr "έως:"
 
 #: modules/websearch/lib/websearch_templates.py:518
 #: modules/websearch/lib/websearch_templates.py:1532
-#, fuzzy
 msgid "Display results:"
 msgstr "Παρουσίαση αποτελεσμάτων:"
 
 #: modules/websearch/lib/websearch_templates.py:519
 #: modules/websearch/lib/websearch_templates.py:1533
-#, fuzzy
 msgid "Output format:"
 msgstr "Μορφή αποτελεσμάτων:"
 
 #: modules/websearch/lib/websearch_templates.py:696
-#, fuzzy
 msgid "Narrow by collection:"
 msgstr "Περιορισμός με συλλογή:"
 
 #: modules/websearch/lib/websearch_templates.py:697
-#, fuzzy
 msgid "Focus on:"
 msgstr "Επικέντρωση σε:"
 
@@ -2601,7 +2541,6 @@ msgid "more"
 msgstr "περισσότερα"
 
 #: modules/websearch/lib/websearch_templates.py:848
-#, fuzzy
 msgid "Latest additions:"
 msgstr "Πρόσφατες προσθήκες:"
 
@@ -2617,18 +2556,18 @@ msgid "Cited by"
 msgstr "Παραπομπή από"
 
 #: modules/websearch/lib/websearch_templates.py:1011
-#, fuzzy, python-format
+#, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
-msgstr "σε οποιαδήποτε συλλογή είναι:"
+msgstr "Οι πλησιέστερες λέξεις στο %(x_word)s στο πεδίο %(x_field)s, σε οποιαδήποτε συλλογή είναι:"
 
 #: modules/websearch/lib/websearch_templates.py:1014
-#, fuzzy, python-format
+#, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr "σε οποιαδήποτε συλλογή είναι:"
+msgstr "Οι πλησιέστερες λέξεις στο %(x_word)s, σε οποιαδήποτε συλλογή είναι:"
 
 #: modules/websearch/lib/websearch_templates.py:1106
 msgid "Hits"
-msgstr ""
+msgstr "Hits"
 
 #: modules/websearch/lib/websearch_templates.py:1167
 #: modules/websearch/lib/websearch_templates.py:1909
@@ -2645,9 +2584,8 @@ msgid "collections"
 msgstr "συλλογές"
 
 #: modules/websearch/lib/websearch_templates.py:1462
-#, fuzzy
 msgid "Limit to:"
-msgstr "Περιοσμός σε"
+msgstr "Περιοσμός σε:"
 
 #: modules/websearch/lib/websearch_templates.py:1580
 msgid "MARC tag"
@@ -2694,19 +2632,18 @@ msgid "in"
 msgstr "σε"
 
 #: modules/websearch/lib/websearch_templates.py:1748
-#, fuzzy
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr ""
 "Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους "
-"εξυπηρετητές:"
+"servers:"
 
 #: modules/websearch/lib/websearch_templates.py:1866
 #: modules/websearch/lib/websearch_templates.py:1871
 #: modules/websearch/lib/websearch_templates.py:2209
-#, fuzzy, python-format
+#, python-format
 msgid "%s records found"
-msgstr "Αναζήτηση %s εγγραφών για:"
+msgstr "%s εγγραφές βρέθηκαν"
 
 #: modules/websearch/lib/websearch_templates.py:1896
 msgid "begin"
@@ -2722,14 +2659,13 @@ msgid "end"
 msgstr "τέλος"
 
 #: modules/websearch/lib/websearch_templates.py:1933
-#, fuzzy
 msgid "jump to record:"
 msgstr "μετάβαση στην εγγραφή:"
 
 #: modules/websearch/lib/websearch_templates.py:1946
-#, fuzzy, python-format
+#, python-format
 msgid "Search took %s seconds."
-msgstr "Η έρευνα πήρε %.2f δευτερόλεπτα."
+msgstr "Η έρευνα πήρε %s δευτερόλεπτα."
 
 #: modules/websearch/lib/websearch_templates.py:2019
 #: modules/websearch/lib/websearch_templates.py:2093
@@ -2737,15 +2673,14 @@ msgid "ADD TO BASKET"
 msgstr "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
 
 #: modules/websearch/lib/websearch_templates.py:2051
-#, fuzzy
 msgid "Format:"
-msgstr "Διαμόρφωση"
+msgstr "Μορφοποίηση:"
 
 #: modules/websearch/lib/websearch_templates.py:2086
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr "Δημιουργία εγγραφής %s, τελευταία αλλαγή %s"
+msgstr "Δημιουργία εγγραφής %(x_date_creation)s, τελευταία τροποποίηση %(x_date_modification)s"
 
 #: modules/websearch/lib/websearch_templates.py:2102
 #, python-format
@@ -2758,23 +2693,21 @@ msgid "Co-cited with: %s records"
 msgstr "Παραπέμπεται σε συνδιασμό από: %s εγγραφές"
 
 #: modules/websearch/lib/websearch_templates.py:2134
-#, fuzzy
 msgid "People who downloaded this document also downloaded:"
 msgstr "Όσοι κατέβασαν το έγγραφο αυτό, κατέβασαν επίσης:"
 
 #: modules/websearch/lib/websearch_templates.py:2149
-#, fuzzy
 msgid "People who viewed this page also viewed:"
 msgstr "Όσοι είδαν την σελίδα αυτή, είδαν επίσης:"
 
 #: modules/websearch/lib/websearch_templates.py:2196
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"<strong>Αποτελέσμα έρευνας:</strong> Βρέθηκαν <strong>%s</strong> εγγραφές "
-"σε %.2f δευτερόλεπτα."
+"%(x_fmt_open)sΑποτελέσμα έρευνας:%(x_fmt_close)s Βρέθηκαν %(x_nb_records)s "
+"εγγραφές σε %(x_nb_seconds)s δευτερόλεπτα."
 
 #: modules/websearch/lib/websearch_templates.py:2236
 msgid ""
@@ -2798,14 +2731,14 @@ msgid "Internal Error"
 msgstr "Εσωτερικό Σφάλμα"
 
 #: modules/websearch/lib/websearch_webinterface.py:289
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, collection %s does not seem to exist."
-msgstr "Λυπάμαι, η εγγραφή %s δεν υπάρχει."
+msgstr "Λυπάμαι, η συλλογή %s δεν υπάρχει."
 
 #: modules/websearch/lib/websearch_webinterface.py:290
-#, fuzzy, python-format
+#, python-format
 msgid "You may want to start browsing from %s."
-msgstr "Πιθανόν να θέλετε να φυλλομετρήσετε από %s"
+msgstr "Πιθανόν να θέλετε να ξεκινήσετε την φυλλομετρήση από το %s."
 
 #: modules/websearch/lib/websearch_webinterface.py:291
 #, python-format
@@ -2813,27 +2746,26 @@ msgid "Collection %s Not Found"
 msgstr "Η Συλλογή %s Δεν Βρέθηκε"
 
 #: modules/websearch/lib/websearch_webinterface.py:293
-#, fuzzy
 msgid "Not found"
-msgstr "Η εγγραφή δεν βρέθηκε"
+msgstr "Δεν βρέθηκε"
 
 #: modules/websession/lib/webaccount.py:89
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
 "s as a regular user."
 msgstr ""
-"Βρίσκεστε στο σύστημα σαν επισκέπτης. Ίσως θα θέλατε να κάνετε <A href=\"%s"
-"\">login</A> σαν κανονικός χρήστης"
+"Βρίσκεστε στο σύστημα σαν επισκέπτης. Ίσως θα θέλατε να κάνετε %(x_url_open)slogin%(x_url_close)"
+"s σαν κανονικός χρήστης."
 
 #: modules/websession/lib/webaccount.py:93
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
 "(x_url_close)s first"
 msgstr ""
-"Οι χρήστες που βρίσκονται στο σύστημα σαν <strong class=\"headline"
-"\">επισκέπτες</strong>χρειάζεται πρώτα να <A href=\"%s\">εγγραφούν</A>"
+"Οι χρήστες που βρίσκονται στο σύστημα σαν %(x_fmt_open)sεπισκέπτες%(x_fmt_close)s "
+"χρειάζεται πρώτα να %(x_url_open)sεγγραφούν%(x_url_close)s"
 
 #: modules/websession/lib/webaccount.py:98
 msgid "No queries found"
@@ -2946,13 +2878,13 @@ msgid "Send lost password"
 msgstr "Αποστολή κωδικού"
 
 #: modules/websession/lib/websession_templates.py:278
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"Η έρευνα του CDS σας προσφέρει την δυνατότητα να εξατομικεύσετε το "
+"Το %s σας προσφέρει την δυνατότητα να εξατομικεύσετε το "
 "interface, να ορίσετε την δική σας προσωπική βιβλιοθήκη εγγράφων, ή να "
 "θέσετε μια αυτόματη έρευνα που θα εκτελείται περιοδικά και θα σας ενημερώνει "
 "με email για οποιεσδήποτε αλλαγές στα αποτελέσματα αναζήτησης."
@@ -2967,6 +2899,8 @@ msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
 msgstr ""
+"Ορίστε η αλλάξτε τον το email σας ή τον κωδικό σας. Ορίστε τις "
+"προτιμήσεις σας σχετικά με την μορφή εμφάνισης του interface."
 
 #: modules/websession/lib/websession_templates.py:298
 #: modules/websession/lib/websession_templates.py:441
@@ -2991,7 +2925,6 @@ msgid "Your Alerts"
 msgstr "Οι Ειδοποιήσεις μου"
 
 #: modules/websession/lib/websession_templates.py:310
-#, fuzzy
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
@@ -3009,38 +2942,38 @@ msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
 msgstr ""
+"Για να ελέγξετε το βιβλίο που έχετε δανεισμένο, να υποβάλετε αιτήματα δανεισμού, κτλ. πρέπει να έχετε CERN ID."
 
 #: modules/websession/lib/websession_templates.py:345
-#, fuzzy
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
 msgstr ""
 "Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν στο "
-"τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %slogin ή "
-"να εγγραφείτε εδώ.%s"
+"τέλος της τρέχουσας συνεδρίας."
 
 #: modules/websession/lib/websession_templates.py:370
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
 "(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
 "s."
 msgstr ""
-"Βρίσκεστε στο σύστημα σαν επισκέπτης. Ίσως θα θέλατε να κάνετε <A href=\"%s"
-"\">login</A> σαν κανονικός χρήστης"
+"Έχετε συνθεθεί ως %(x_user)s. Ίσως να θέλετε α) %(x_url1_open)sνα κάνετε logout%"
+"(x_url1_close)s; β) να τροποποιήσετε τις %(x_url2_open)sρυθμίσεις του λογαριασμού%(x_url2_close)"
+"s σας."
 
 #: modules/websession/lib/websession_templates.py:440
 msgid "Your Alert Searches"
 msgstr "Οι αναζητήσεις ειδοποιήσεων μου."
 
 #: modules/websession/lib/websession_templates.py:442
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
 "administering or are a member of."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
+"Μπορείτε να συμβουλευτείτε την λίστα των %(x_url_open)sομάδων%(x_url_close)s που διαχειρίζεστε ή των "
 "οποίων είστε μέλος."
 
 #: modules/websession/lib/websession_templates.py:445
@@ -3050,12 +2983,12 @@ msgid "Your Groups"
 msgstr "Οι ομάδες μου"
 
 #: modules/websession/lib/websession_templates.py:446
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_submissions)s σας και να δείτε "
+"Μπορείτε να συμβουλευτείτε την λίστα των %(x_url_open)sυποβολών%(x_url_close)s σας και να δείτε "
 "την κατάστασή τους."
 
 #: modules/websession/lib/websession_templates.py:449
@@ -3064,13 +2997,13 @@ msgid "Your Submissions"
 msgstr "Οι υποβολές μου"
 
 #: modules/websession/lib/websession_templates.py:450
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_approvals)s σας, με τα έγγραφα "
-"που έχετε εγκρίνει ή εξετάσει."
+"Μπορείτε να συμβουλευτείτε την λίστα των %(x_url_open)sεγκρίσεών%(x_url_close)s σας, με τα έγγραφα "
+"που εσείς έχετε εγκρίνει ή εξετάσει."
 
 #: modules/websession/lib/websession_templates.py:453
 #: modules/websubmit/web/yourapprovals.py:87
@@ -3087,40 +3020,35 @@ msgid "Try again"
 msgstr "Δοκιμάστε ξανά"
 
 #: modules/websession/lib/websession_templates.py:500
-#, fuzzy, python-format
+#, python-format
 msgid "Okay, password has been emailed to %s."
-msgstr "Ο κωδικός έχει αποσταλεί με email στο %s"
+msgstr "Ο κωδικός έχει αποσταλεί με email στο %s."
 
 #: modules/websession/lib/websession_templates.py:515
 msgid "Deleting your account"
 msgstr "Διαγραφή του λογαριασμού σας"
 
 #: modules/websession/lib/websession_templates.py:529
-#, fuzzy
 msgid "You are no longer recognized."
-msgstr ""
-"Η ταυτότητά σας δεν αναγνωρίζεται πια. Άν επιθυμείτε μπορείτε να κάνετε <A "
-"href=\"./login?ln=%s\">login εδώ</A>."
+msgstr "Η ταυτότητά σας δεν αναγνωρίζεται πια από το σύστημα."
 
 #: modules/websession/lib/websession_templates.py:530
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
-msgstr ""
+msgstr "Αν επιθυμείτε μπορείτε να κάνετε %(x_url_open)slogin εδώ%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:559
 msgid "If you already have an account, please login using the form below."
-msgstr ""
-"Εάν έχετε ήδη λογαριασμό, παρακαλώ μπείτε στο σύστημα χρησιμοποιώντας την "
-"παρακάτω φόρμα."
+msgstr "Εάν έχετε ήδη λογαριασμό, παρακαλώ μπείτε στο σύστημα χρησιμοποιώντας την παρακάτω φόρμα."
 
 #: modules/websession/lib/websession_templates.py:563
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
 "s an internal account."
 msgstr ""
-"Εάν δεν έχετε ήδη λογαριασμό, παρακαλώ <a href=\"../youraccount/register?ln=%"
-"s\">εγγραφείτε εδώ</a>."
+"Εάν δεν έχετε ήδη λογαριασμό, παρακαλώ κάντε %(x_url_open)sεγγραφή%(x_url_close)"
+"s για έναν εσωτερικό λογαριασμό."
 
 #: modules/websession/lib/websession_templates.py:567
 #, python-format
@@ -3132,7 +3060,6 @@ msgstr ""
 "τον %s για να δημιουργήσει έναν για εσάς."
 
 #: modules/websession/lib/websession_templates.py:587
-#, fuzzy
 msgid "Login via:"
 msgstr "Είσοδος μέσω:"
 
@@ -3158,14 +3085,10 @@ msgid "Lost your password?"
 msgstr "Ξεχάσατε τον κωδικό σας;"
 
 #: modules/websession/lib/websession_templates.py:663
-#, fuzzy
 msgid "Please enter your email address and desired nickname and password:"
-msgstr ""
-"Παρακαλώ εισάγετε την διεύθυνση του email, το επιθυμητό nickname και τον "
-"κωδικό:"
+msgstr "Παρακαλώ εισάγετε την διεύθυνση του email, το επιθυμητό ψευδώνυμο και τον κωδικό:"
 
 #: modules/websession/lib/websession_templates.py:665
-#, fuzzy
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
@@ -3198,63 +3121,61 @@ msgstr ""
 "s."
 
 #: modules/websession/lib/websession_templates.py:744
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Φαίνεται οτι είστε χρήστης guest. Θα πρέπει πρώτα να κάνετε <a href=\"../"
-"youraccount/login?ln=%s\">login.</a>"
+"Φαίνεται οτι είστε χρήστης guest. Θα πρέπει πρώτα να κάνετε %(x_url_open)slogin%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:748
 msgid "You are not authorized to access administrative functions."
 msgstr "Δεν έχετε πρόσβαση στις υπηρεσίες διαχείρησης."
 
 #: modules/websession/lib/websession_templates.py:751
-#, fuzzy, python-format
+#, python-format
 msgid "You seem to be %(x_role)s."
-msgstr "Φαίνεται να είστε ο <em>%s</em>"
+msgstr "Φαίνεται να είστε %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:752
-#, fuzzy
 msgid "Here are some interesting web admin links for you:"
 msgstr "Ορίστε ορισμένοι χρήσιμοι σύνδεσμοι για σας:"
 
 #: modules/websession/lib/websession_templates.py:758
 msgid "Run BibEdit"
-msgstr ""
+msgstr "Εκτέλεση BibEdit"
 
 #: modules/websession/lib/websession_templates.py:760
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "Παραμετροποίηση BibFormat"
 
 #: modules/websession/lib/websession_templates.py:762
 msgid "Configure BibHarvest"
-msgstr ""
+msgstr "Παραμετροποίηση BibHarvest"
 
 #: modules/websession/lib/websession_templates.py:764
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "Παραμετροποίηση BibIndex"
 
 #: modules/websession/lib/websession_templates.py:766
 msgid "Configure BibRank"
-msgstr ""
+msgstr "Παραμετροποίηση BibRank"
 
 #: modules/websession/lib/websession_templates.py:768
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "Παραμετροποίηση WebAccess"
 
 #: modules/websession/lib/websession_templates.py:770
 msgid "Configure WebComment"
-msgstr ""
+msgstr "Παραμετροποίηση WebComment"
 
 #: modules/websession/lib/websession_templates.py:772
 msgid "Configure WebSearch"
-msgstr ""
+msgstr "Παραμετροποίηση WebSearch"
 
 #: modules/websession/lib/websession_templates.py:774
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "Παραμετροποίηση WebSubmit"
 
 #: modules/websession/lib/websession_templates.py:775
 #, python-format
@@ -3262,6 +3183,8 @@ msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
 "(x_url_close)s."
 msgstr ""
+"Για περισσότερες λειτουργίες διαχείρισης, επισκεφθείτε την %(x_url_open)sΠεριοχή Διαχειριστή%"
+"(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:814
 msgid "guest"
@@ -3310,9 +3233,8 @@ msgid "logout"
 msgstr "αποσύνδεση"
 
 #: modules/websession/lib/websession_templates.py:964
-#, fuzzy
 msgid "You are an administrator of the following groups:"
-msgstr "Δεν είστε διαχειριστής σε καμία ομάδα."
+msgstr "Είστε διαχειριστής στις ακόλουθες ομάδες:"
 
 #: modules/websession/lib/websession_templates.py:984
 #: modules/websession/lib/websession_templates.py:1058
@@ -3325,7 +3247,6 @@ msgid "Description"
 msgstr "Περιγραφή"
 
 #: modules/websession/lib/websession_templates.py:991
-#, fuzzy
 msgid "You are not an administrator of any groups."
 msgstr "Δεν είστε διαχειριστής σε καμία ομάδα."
 
@@ -3334,9 +3255,9 @@ msgid "Edit group"
 msgstr "Τροποποίηση ομάδας"
 
 #: modules/websession/lib/websession_templates.py:1005
-#, fuzzy, python-format
+#, python-format
 msgid "Edit %s members"
-msgstr "Τροποποίηση μελών ομάδας"
+msgstr "Τροποποίηση %s μελών"
 
 #: modules/websession/lib/websession_templates.py:1028
 #: modules/websession/lib/websession_templates.py:1121
@@ -3346,12 +3267,10 @@ msgid "Create new group"
 msgstr "Δημιουργία νέας ομάδας"
 
 #: modules/websession/lib/websession_templates.py:1042
-#, fuzzy
 msgid "You are a member of the following groups:"
-msgstr "Δεν είστε μέλος καμίας ομάδας."
+msgstr "Είστε μέλος των ακόλουθων ομάδων:"
 
 #: modules/websession/lib/websession_templates.py:1065
-#, fuzzy
 msgid "You are not a member of any groups."
 msgstr "Δεν είστε μέλος καμίας ομάδας."
 
@@ -3370,27 +3289,25 @@ msgid "Update group"
 msgstr "Ενημέρωση ομάδας"
 
 #: modules/websession/lib/websession_templates.py:1131
-#, fuzzy, python-format
+#, python-format
 msgid "Edit group %s"
-msgstr "Τροποποίηση ομάδας:"
+msgstr "Τροποποίηση ομάδας %s"
 
 #: modules/websession/lib/websession_templates.py:1133
 msgid "Delete group"
 msgstr "Διαγραφή ομάδας"
 
 #: modules/websession/lib/websession_templates.py:1203
-#, fuzzy
 msgid "Group name:"
-msgstr "Όνομα ομάδας: "
+msgstr "Όνομα ομάδας:"
 
 #: modules/websession/lib/websession_templates.py:1205
-#, fuzzy
 msgid "Group description:"
-msgstr "Περιγραφή ομάδας: "
+msgstr "Περιγραφή ομάδας:"
 
 #: modules/websession/lib/websession_templates.py:1206
 msgid "Group join policy:"
-msgstr ""
+msgstr "Πολιτική προσχώρησης σε ομάδα:"
 
 #: modules/websession/lib/websession_templates.py:1247
 #: modules/websession/lib/websession_templates.py:1318
@@ -3403,15 +3320,13 @@ msgstr "Παρακαλώ επιλέξτε:"
 
 #: modules/websession/lib/websession_templates.py:1311
 msgid "Join group"
-msgstr "Κατάταξη σε ομάδα"
+msgstr "Προσχώρηση σε ομάδα"
 
 #: modules/websession/lib/websession_templates.py:1313
-#, fuzzy
 msgid "or find it"
-msgstr "ή βρείτε την: "
+msgstr "ή βρείτε την"
 
 #: modules/websession/lib/websession_templates.py:1314
-#, fuzzy
 msgid "Choose group:"
 msgstr "Επιλέξτε ομάδα:"
 
@@ -3424,152 +3339,138 @@ msgid "Remove member"
 msgstr "Αφαίρεση μέλους"
 
 #: modules/websession/lib/websession_templates.py:1457
-#, fuzzy
 msgid "No members."
-msgstr "Νοέμβριος"
+msgstr "Χωρίς μέλη."
 
 #: modules/websession/lib/websession_templates.py:1467
-#, fuzzy
 msgid "Accept member"
-msgstr "Σεπτέμβριος"
+msgstr "Αποδοχή μέλους"
 
 #: modules/websession/lib/websession_templates.py:1467
-#, fuzzy
 msgid "Reject member"
-msgstr "Αφαίρεση μέλους"
+msgstr "Απόρριψη μέλους"
 
 #: modules/websession/lib/websession_templates.py:1469
-#, fuzzy
 msgid "No members awaiting approval."
-msgstr "αναμένοντας έγκριση"
+msgstr "Δεν υπάρχουν μέλη που αναμένουν έγκριση."
 
 #: modules/websession/lib/websession_templates.py:1471
-#, fuzzy
 msgid "Current members"
-msgstr "Προσκαλέστε νέα μέλη"
+msgstr "Τρέχοντα μέλη"
 
 #: modules/websession/lib/websession_templates.py:1472
-#, fuzzy
 msgid "Members awaiting approval"
-msgstr "αναμένοντας έγκριση"
+msgstr "Μέλη που αναμένουν έγκριση"
 
 #: modules/websession/lib/websession_templates.py:1473
 msgid "Invite new members"
 msgstr "Προσκαλέστε νέα μέλη"
 
 #: modules/websession/lib/websession_templates.py:1476
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
 "(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
 "Εάν θέλετε να προσκαλέσετε νέα μέλη στην ομάδα σας, παρακαλώ χρησιμοποιήστε "
-"το σύστημα %s. "
+"το σύστημα του %(x_url_open)sweb message%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1480
-#, fuzzy, python-format
+#, python-format
 msgid "Group: %s"
-msgstr "Ομάδες"
+msgstr "Ομάδα: %s"
 
 #: modules/websession/lib/websession_templates.py:1557
-#, fuzzy
 msgid "Group list"
-msgstr "Λίστα ομάδας: "
+msgstr "Λίστα ομάδας"
 
 #: modules/websession/lib/websession_templates.py:1560
 msgid "You are not member of any group."
 msgstr "Δεν είστε μέλος καμίας ομάδας."
 
 #: modules/websession/lib/websession_templates.py:1607
-#, fuzzy
 msgid "Are you sure you want to delete this group?"
 msgstr "Είστε σίγουρος οτι θέλετε να σβήσετε αυτήν την ομάδα;"
 
 #: modules/websession/lib/websession_templates.py:1646
-#, fuzzy
 msgid "Are you sure you want to leave this group?"
 msgstr "Είστε σίγουρος οτι θέλετε να αφήσετε αυτήν την ομάδα;"
 
 #: modules/websession/lib/websession_templates.py:1662
-#, fuzzy
 msgid "Visible and open for new members"
-msgstr "Ορατό και ανοιχτό για εγγραφή νέου μέλους"
+msgstr "Ορατό και ανοιχτό για εγγραφή νέων μελών"
 
 #: modules/websession/lib/websession_templates.py:1664
-#, fuzzy
 msgid "Visible but new members need approval"
-msgstr "Ορατό, αλλά χρειάζεται έγκριση για εγγραφή νέου μέλους"
+msgstr "Ορατό, αλλά χρειάζεται έγκριση για εγγραφή νέων μελών"
 
 #: modules/websession/lib/websession_templates.py:1749
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: New membership request"
-msgstr "Η ομάδα '%s' δεν υπάρχει\n"
+msgstr "Ομάδα %s: Αίτηση νέου μέλους"
 
 #: modules/websession/lib/websession_templates.py:1753
-#, fuzzy, python-format
+#, python-format
 msgid "A user wants to join the group %s."
-msgstr "Είστε σίγουρος οτι θέλετε να αφήσετε αυτήν την ομάδα;"
+msgstr "Ένας χρήστης θέλει να προσχωρήσει στην ομάδα %s."
 
 #: modules/websession/lib/websession_templates.py:1754
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
+"Παρακαλώ %(x_url_open)sεπιλέξτε ή απορρίψτε%(x_url_close)s το αίτημα του χρήστη αυτού."
 
 #: modules/websession/lib/websession_templates.py:1771
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: Join request has been accepted"
-msgstr "Η εγγραφή έχει διαγραφεί."
+msgstr "Ομάδα %s: Η αίτηση προσχώρησης έχει γίνει αποδεκτή"
 
 #: modules/websession/lib/websession_templates.py:1772
 #, python-format
 msgid "Your request for joining group %s has been accepted."
-msgstr ""
+msgstr "Το αίτημα σας για προσχώρηση στην ομάδα %s, έγινε αποδεκτό."
 
 #: modules/websession/lib/websession_templates.py:1774
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s: Join request has been rejected"
-msgstr "Η εγγραφή έχει διαγραφεί."
+msgstr "Ομάδα %s: Η αίτηση προσχώρησης έχει απορριφθεί"
 
 #: modules/websession/lib/websession_templates.py:1775
 #, python-format
 msgid "Your request for joining group %s has been rejected."
-msgstr ""
+msgstr "Το αίτημα σας για προσχώρηση στην ομάδα %s, απορρίφθηκε."
 
 #: modules/websession/lib/websession_templates.py:1778
 #: modules/websession/lib/websession_templates.py:1796
-#, fuzzy, python-format
+#, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
-msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
-"οποίων είστε μέλος."
+msgstr "Μπορείτε να συμβουλευτείτε την λίστα των %(x_url_open)sομάδων%(x_url_close)s σας."
 
 #: modules/websession/lib/websession_templates.py:1792
-#, fuzzy, python-format
+#, python-format
 msgid "Group %s has been deleted"
-msgstr "Η εγγραφή έχει διαγραφεί."
+msgstr "Η ομάδα %s διαγράφηκε"
 
 #: modules/websession/lib/websession_templates.py:1794
 #, python-format
 msgid "Group %s has been deleted by its administrator."
-msgstr ""
+msgstr "Η ομάδα %s διεγράφη από τον διαχειριστή."
 
 #: modules/websession/lib/websession_templates.py:1811
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
 "s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
 msgstr ""
-"Μπορείτε να συμβουλευτείτε την λίστα %(your_groups)s που διαχειρίζεστε ή των "
-"οποίων είστε μέλος."
+"Μπορείτε να συμβουλευτείτε την λίστα των %(x_url_open)s%(x_nb_total)i ομάδων%(x_url_close)s "
+"οποίων είστε μέλος ή %(x_nb_member)i) διαχειρίζεστε (%(x_nb_admin)i)."
 
 #: modules/websession/lib/webuser.py:102
-#, fuzzy
 msgid "Database problem"
-msgstr "Πρόβλημα βάσης δεδομένων: %s"
+msgstr "Πρόβλημα βάσης δεδομένων"
 
 #: modules/websession/lib/webuser.py:198
-#, fuzzy
 msgid "user"
 msgstr "όνομα χρήστη"
 
@@ -3662,9 +3563,8 @@ msgid "Could not update settings."
 msgstr "Δεν μπόρεσα να ενημερώσω τις ρυθμίσεις."
 
 #: modules/websession/lib/websession_webinterface.py:263
-#, fuzzy
 msgid "The entered email address does not exist in the database."
-msgstr "Το email που εισάγατε δεν υπάρχει στην βάση"
+msgstr "Το email που εισάγατε δεν υπάρχει στην βάση."
 
 #: modules/websession/lib/websession_webinterface.py:276
 msgid "Credentials for"
@@ -3723,14 +3623,12 @@ msgid "Account created"
 msgstr "Ο Λογαριασμός σας δημιουργήθηκε"
 
 #: modules/websession/lib/websession_webinterface.py:478
-#, fuzzy
 msgid ""
 "An email has been sent to the given address with the account information."
 msgstr ""
 " Έχει σταλεί email στην διεύθυνση που δώσατε με τα στοιχεία του λογαριασμού."
 
 #: modules/websession/lib/websession_webinterface.py:480
-#, fuzzy
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -3739,9 +3637,9 @@ msgstr ""
 "έτοιμος για χρήση."
 
 #: modules/websession/lib/websession_webinterface.py:482
-#, fuzzy, python-format
+#, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
-msgstr " Έχετε τώρα πρόσβαση στον <a href=\"%s\">λογαριασμό</a> σας."
+msgstr " Έχετε τώρα πρόσβαση στον %(x_url_open)sλογαριασμό%(x_url_close)s σας."
 
 #: modules/websession/lib/websession_webinterface.py:489
 #: modules/websession/lib/websession_webinterface.py:494
@@ -3750,7 +3648,6 @@ msgstr " Έχετε τώρα πρόσβαση στον <a href=\"%s\">λογαρ
 #: modules/websession/lib/websession_webinterface.py:510
 #: modules/websession/lib/websession_webinterface.py:514
 #: modules/websession/lib/websession_webinterface.py:519
-#, fuzzy
 msgid "Registration failure"
 msgstr "Πρόβλημα στην εγγραφή"
 
@@ -3794,107 +3691,90 @@ msgid "Browser"
 msgstr "Φυλλομετρητής"
 
 #: modules/webstyle/lib/webstyle_templates.py:521
-#, fuzzy
 msgid "System Error"
-msgstr "Σφάλμα Συστήματος:  %s %s\n"
+msgstr "Σφάλμα Συστήματος"
 
 #: modules/webstyle/lib/webstyle_templates.py:534
 msgid "Traceback"
-msgstr ""
+msgstr "Traceback"
 
 #: modules/webstyle/lib/webstyle_templates.py:579
 msgid "Time"
-msgstr ""
+msgstr "Ώρα"
 
 #: modules/webstyle/lib/webstyle_templates.py:580
 msgid "Client"
-msgstr ""
+msgstr "Πελάτης"
 
 #: modules/webstyle/lib/webstyle_templates.py:581
-#, fuzzy
 msgid "Please send an error report to the Administrator."
-msgstr "Παρακαλώ αποστείλατε την αναφορά σφάλματος στον Διαχειριστή"
+msgstr "Παρακαλώ αποστείλατε την αναφορά σφάλματος στον Διαχειριστή."
 
 #: modules/webstyle/lib/webstyle_templates.py:582
 msgid "Send error report"
 msgstr "Αποστολή αναφοράς σφάλματος"
 
 #: modules/webstyle/lib/webstyle_templates.py:585
-#, fuzzy, python-format
+#, python-format
 msgid "Please contact %s quoting the following information:"
-msgstr ""
-"Παρακαλώ επικοινωνήστε με τον <a href=\"mailto:%s\">%s</a> αναφέροντας τα "
-"παρακάτω στοιχεία:"
+msgstr "Παρακαλώ επικοινωνήστε με τον %s αναφέροντας τα παρακάτω στοιχεία:"
 
 #: modules/websubmit/lib/websubmit_engine.py:74
 #: modules/websubmit/lib/websubmit_engine.py:483
 #: modules/websubmit/web/yoursubmissions.py:64
-#, fuzzy
 msgid "Sorry, you must log in to perform this action."
-msgstr ""
-"Λυπάμαι, πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή. "
-"Χρησιμοποιείστε το πάνω δεξιά μενού για τον σκοπό αυτό. "
+msgstr "Λυπάμαι, πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή."
 
 #: modules/websubmit/lib/websubmit_engine.py:79
 #: modules/websubmit/lib/websubmit_engine.py:487
-#, fuzzy
 msgid "Invalid parameter"
-msgstr "λανθασμένη παράμετρος"
+msgstr "Λανθασμένη παράμετρος"
 
 #: modules/websubmit/lib/websubmit_engine.py:84
-#, fuzzy
 msgid "Unable to find the submission directory."
-msgstr "δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών"
+msgstr "Δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών."
 
 #: modules/websubmit/lib/websubmit_engine.py:90
-#, fuzzy
 msgid "Unknown document type"
-msgstr "άγνωστος τύπος εγγράφου"
+msgstr "Άγνωστος τύπος εγγράφου"
 
 #: modules/websubmit/lib/websubmit_engine.py:96
 #: modules/websubmit/lib/websubmit_engine.py:612
-#, fuzzy
 msgid "Unknown action"
-msgstr "άγνωστη ενέργεια"
+msgstr "Άγνωστη ενέργεια"
 
 #: modules/websubmit/lib/websubmit_engine.py:103
 msgid "Unable to determine the number of submission pages."
-msgstr ""
+msgstr "Δεν είναι δυνατόν να προσδιορισθεί ο αριθμός των σελίδων που υποβάλετε."
 
 #: modules/websubmit/lib/websubmit_engine.py:129
 msgid "Unable to create a directory for this submission."
-msgstr ""
+msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος για την υποβολή αυτή."
 
 #: modules/websubmit/lib/websubmit_engine.py:190
 #: modules/websubmit/lib/websubmit_engine.py:506
-#, fuzzy
 msgid "Cannot create submission directory."
-msgstr "δεν μπορώ να δημιουργήσω τον κατάλογο υποβολών"
+msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος υποβολών."
 
 #: modules/websubmit/lib/websubmit_engine.py:492
-#, fuzzy
 msgid "Cannot find submission directory."
-msgstr "δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών"
+msgstr "Δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών."
 
 #: modules/websubmit/lib/websubmit_engine.py:606
-#, fuzzy
 msgid "Unknown type of document"
-msgstr "άγνωστος τύπος εγγράφου"
+msgstr "Άγνωστος τύπος εγγράφου"
 
 #: modules/websubmit/lib/websubmit_engine.py:619
-#, fuzzy
 msgid "This action does not exist for this document type."
-msgstr "η ενέργεια αυτή δεν ταιριάζει σε αυτόν τον τύπο εγγράφου"
+msgstr "Η ενέργεια αυτή δεν ταιριάζει σε αυτόν τον τύπο εγγράφου."
 
 #: modules/websubmit/lib/websubmit_engine.py:852
-#, fuzzy
 msgid "Unable to find document type."
-msgstr "άγνωστος τύπος εγγράφου"
+msgstr "Δεν είναι δυνατόν να βρεθεί ο τύπος εγγράφου."
 
 #: modules/websubmit/lib/websubmit_engine.py:1018
-#, fuzzy
 msgid "The chosen action is not supported by the document type."
-msgstr "Η επιλεγμένη ενέργεια δεν υποστηρίζεται από το έγγραφο"
+msgstr "Η επιλεγμένη ενέργεια δεν υποστηρίζεται από το έγγραφο."
 
 #: modules/websubmit/lib/websubmit_engine.py:1084
 #: modules/websubmit/lib/websubmit_webinterface.py:385
@@ -3906,55 +3786,44 @@ msgid "Document types available for submission"
 msgstr "Διαθέσιμοι τύποι εγγράφων προς υποβολή"
 
 #: modules/websubmit/lib/websubmit_templates.py:82
-#, fuzzy
 msgid "Please select the type of document you want to submit."
-msgstr "Παρακαλώ επιλέξτε τον τύπο του εγγράφου που θέλετε να υποβάλετε"
+msgstr "Παρακαλώ επιλέξτε τον τύπο του εγγράφου που θέλετε να υποβάλετε."
 
 #: modules/websubmit/lib/websubmit_templates.py:98
-#, fuzzy
 msgid "No document types available."
-msgstr "Δεν υπάρχουν είδη εγγράφων ακόμη..."
+msgstr "Δεν υπάρχουν διαθέσιμα είδη εγγράφων."
 
 #: modules/websubmit/lib/websubmit_templates.py:240
-#, fuzzy
 msgid "Please log in first."
-msgstr "Παρακαλώ δοκιμάστε ξανά."
+msgstr "Παρακαλώ κάντε login πρώτα."
 
 #: modules/websubmit/lib/websubmit_templates.py:240
-#, fuzzy
 msgid "Use the top-right menu to log in."
-msgstr ""
-"παρακαλώ κάντε login πρώτα.\\nΧρησιμοποιείστε το πάνω δεξιά μενού για να "
-"κάνετε login."
+msgstr "Χρησιμοποιείστε το πάνω δεξιά μενού για να κάνετε login."
 
 #: modules/websubmit/lib/websubmit_templates.py:283
-#, fuzzy
 msgid "Please select a category"
-msgstr "παρακαλώ επιλέξτε μια κατηγορία"
+msgstr "Παρακαλώ επιλέξτε μια κατηγορία"
 
 #: modules/websubmit/lib/websubmit_templates.py:321
 msgid "Notice"
 msgstr "Ειδοποίηση"
 
 #: modules/websubmit/lib/websubmit_templates.py:322
-#, fuzzy
 msgid "Select a category and then click on an action button."
-msgstr ""
-"Επιλέξτε μια κατηγορία και μετά κάντε κλίκ στο κουμπί για να εκτελέσετε την "
-"επιλεγμένη ενέργεια."
+msgstr "Επιλέξτε μια κατηγορία και μετά κάντε κλίκ στο κουμπί της ενέργειας."
 
 #: modules/websubmit/lib/websubmit_templates.py:343
-#, fuzzy
 msgid ""
 "To continue with a previously interrupted submission, enter an access number "
 "into the box below:"
 msgstr ""
-"Για να συνεχίσετε κάποια υποβολή που διακόπηκε, πληκτρολογήστε στο πεδίο το "
-"access number."
+"Για να συνεχίσετε κάποια υποβολή που διακόπηκε, πληκτρολογήστε στο παρακάτω πεδίο το "
+"access number:"
 
 #: modules/websubmit/lib/websubmit_templates.py:345
 msgid "GO"
-msgstr ""
+msgstr "GO"
 
 #: modules/websubmit/lib/websubmit_templates.py:470
 #: modules/websubmit/lib/websubmit_templates.py:905
@@ -3962,77 +3831,65 @@ msgid "SUMMARY"
 msgstr "ΠΕΡΙΛΗΨΗ"
 
 #: modules/websubmit/lib/websubmit_templates.py:507
-#, fuzzy
 msgid "Previous page"
-msgstr "προηγούμενη σελίδα"
+msgstr "Προηγούμενη σελίδα"
 
 #: modules/websubmit/lib/websubmit_templates.py:513
-#, fuzzy
 msgid "Submission number"
 msgstr "Αριθμός υποβολής"
 
 #: modules/websubmit/lib/websubmit_templates.py:527
-#, fuzzy
 msgid "Next page"
-msgstr "επόμενη σελίδα"
+msgstr "Επόμενη σελίδα"
 
 #: modules/websubmit/lib/websubmit_templates.py:542
 #: modules/websubmit/lib/websubmit_templates.py:944
 msgid "Are you sure you want to quit this submission?"
-msgstr ""
-"Είστε σίγουροι πως θέλετε να εγκαταλείψετε την παρούσα διαδικασία υποβολής;"
+msgstr "Είστε σίγουροι πως θέλετε να εγκαταλείψετε την παρούσα διαδικασία υποβολής;"
 
 #: modules/websubmit/lib/websubmit_templates.py:543
 #: modules/websubmit/lib/websubmit_templates.py:951
-#, fuzzy
 msgid "Back to main menu"
-msgstr "επιστροφή στο βασικό μενού"
+msgstr "Επιστροφή στο βασικό μενού"
 
 #: modules/websubmit/lib/websubmit_templates.py:546
-#, fuzzy
 msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
 msgstr ""
-"(1) παρακαλώ σημειώστε το νούμερο αυτό στην αρχή της υποβολής, καθώς θα σας "
-"βοηθήσει να ξαναβρείτε τα στοιχεία που εισάγατε σε περίπτωση που "
-"παρουσιαστεί πρόβλημα με τον υπολογιστή ή τον φυλλομετρητή σας πριν την "
-"ολοκλήρωση της υποβολής."
+"Αυτός είναι ο αριθμός υποβολής σας. Μπορεί να χρησιμοποιηθεί για να ολοκληρώσετε "
+"κάποια μη ολοκληρωμένη υποβολή σε περίπτωση προβλήματος."
 
 #: modules/websubmit/lib/websubmit_templates.py:547
-#, fuzzy
 msgid "Mandatory fields appear in red in the SUMMARY window."
-msgstr ""
-"(2) τα υποχρεωτικά πεδία εμφανίζονται στο παράθυρο της 'Περίληψη' με κόκκινο."
+msgstr "Τα υποχρεωτικά πεδία εμφανίζονται στο παράθυρο της 'Περίληψης' με κόκκινο."
 
 #: modules/websubmit/lib/websubmit_templates.py:687
-#, fuzzy, python-format
+#, python-format
 msgid "The field %s is mandatory."
-msgstr "Το πεδίο `%s` είναι υποχρεωτικό. Πρακαλώ συμπληρώστε το."
+msgstr "Το πεδίο %s είναι υποχρεωτικό."
 
 #: modules/websubmit/lib/websubmit_templates.py:687
-#, fuzzy
 msgid "Please make a choice in the select box"
-msgstr "Το πεδίο `%s` είναι υποχρεωτικό.\\n Παρακαλώ επιλέξτε κάτι."
+msgstr "Παρακαλώ επιλέξτε κάτι στο κουτί επιλογών"
 
 #: modules/websubmit/lib/websubmit_templates.py:701
 msgid "Please press a button."
 msgstr "Παρακαλώ πατήστε ένα κουμπί."
 
 #: modules/websubmit/lib/websubmit_templates.py:709
-#, fuzzy, python-format
+#, python-format
 msgid "The field %s is mandatory. Please fill it in."
-msgstr "Το πεδίο `%s` είναι υποχρεωτικό. Πρακαλώ συμπληρώστε το."
+msgstr "Το πεδίο %s είναι υποχρεωτικό. Πρακαλώ συμπληρώστε το."
 
 #: modules/websubmit/lib/websubmit_templates.py:785
-#, fuzzy, python-format
+#, python-format
 msgid "The field %(field)s is mandatory."
-msgstr ""
-"Το πεδίο '%(field)s' είναι υποχρεωτικό.\\nΕπιστροφή στην σελίδα %(page)s"
+msgstr "Το πεδίο %(field)s είναι υποχρεωτικό."
 
 #: modules/websubmit/lib/websubmit_templates.py:785
 msgid "Going back to page"
-msgstr ""
+msgstr "Επιστροφή στην σελίδα"
 
 #: modules/websubmit/lib/websubmit_templates.py:896
 msgid "finished!"
@@ -4052,6 +3909,8 @@ msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
 "(x_step)s"
 msgstr ""
+"Ορίστε η %(x_action)s λίστα ενεργειών για τα %(x_doctype)s έγγραφα στο επίπεδο %"
+"(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:999
 msgid "Function"
@@ -4062,32 +3921,29 @@ msgid "Score"
 msgstr "Βαθμολογία"
 
 #: modules/websubmit/lib/websubmit_templates.py:1001
-#, fuzzy
 msgid "Running function"
-msgstr "Εκτέλεση Λειτουργίας"
+msgstr "Λειτουργία που εκτελείται"
 
 #: modules/websubmit/lib/websubmit_templates.py:1007
-#, fuzzy, python-format
+#, python-format
 msgid "Function %s does not exist."
-msgstr "η λειτουργία %s δεν υπάρχει..."
+msgstr "Η λειτουργία %s δεν υπάρχει."
 
 #: modules/websubmit/lib/websubmit_templates.py:1046
 msgid "You must now"
-msgstr ""
+msgstr "Πρέπει τώρα"
 
 #: modules/websubmit/lib/websubmit_templates.py:1051
 msgid "or"
 msgstr "ή"
 
 #: modules/websubmit/lib/websubmit_templates.py:1078
-#, fuzzy
 msgid "record"
-msgstr "εγγραφές"
+msgstr "εγγραφή"
 
 #: modules/websubmit/lib/websubmit_templates.py:1080
-#, fuzzy
 msgid "document"
-msgstr " έγγραφο #%s"
+msgstr "έγγραφο"
 
 #: modules/websubmit/lib/websubmit_templates.py:1082
 #: modules/websubmit/lib/websubmit_templates.py:1173
@@ -4116,62 +3972,55 @@ msgstr "Κατάσταση"
 
 #: modules/websubmit/lib/websubmit_templates.py:1400
 msgid "Id"
-msgstr ""
+msgstr "Id"
 
 #: modules/websubmit/lib/websubmit_templates.py:1401
-#, fuzzy
 msgid "Reference"
-msgstr "αριθμός αναφοράς"
+msgstr "Αριθμός αναφοράς"
 
 #: modules/websubmit/lib/websubmit_templates.py:1403
-#, fuzzy
 msgid "First access"
-msgstr "πρώτη προσπέλαση"
+msgstr "Πρώτη προσπέλαση"
 
 #: modules/websubmit/lib/websubmit_templates.py:1404
-#, fuzzy
 msgid "Last access"
-msgstr "τελευταία προσπέλαση"
+msgstr "Τελευταία προσπέλαση"
 
 #: modules/websubmit/lib/websubmit_templates.py:1414
 msgid "Are you sure you want to delete this submission?"
 msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε την υποβολή αυτή;"
 
 #: modules/websubmit/lib/websubmit_templates.py:1415
-#, fuzzy, python-format
+#, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
-msgstr "διαγραφή υποβολής %(id)s στην κατηγορια %(docname)s"
+msgstr "Διαγραφή υποβολής %(x_id)s στην κατηγορια %(x_docname)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1431
-#, fuzzy
 msgid "Reference not yet given"
-msgstr "δεν έχει δοθεί ακόμη αριθμος αναφοράς"
+msgstr "Δεν έχει δοθεί ακόμη αριθμος αναφοράς"
 
 #: modules/websubmit/lib/websubmit_templates.py:1502
 msgid "Refereed Documents"
 msgstr "Έγγραφα που εξετάζετε"
 
 #: modules/websubmit/lib/websubmit_templates.py:1512
-#, fuzzy
 msgid "You are a general referee"
 msgstr "Είστε γενικός εξεταστής"
 
 #: modules/websubmit/lib/websubmit_templates.py:1517
-#, fuzzy
 msgid "You are a referee for category:"
-msgstr "Είστε εξεταστής για την κατηγορία: %(name)s (%(id)s)"
+msgstr "Είστε εξεταστής για την κατηγορία:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1554
 msgid "List of refereed types of documents"
 msgstr "Λίστα από τύπους εγγράφων που εξετάζετε"
 
 #: modules/websubmit/lib/websubmit_templates.py:1555
-#, fuzzy
 msgid ""
 "Select one of the following types of documents to check the documents status."
 msgstr ""
 "Επιλέξτε έναν από τους παρακάτω τύπους εγγράφων για να ελέγξετε την "
-"κατάσταση του εγγράφου:"
+"κατάσταση του εγγράφου."
 
 #: modules/websubmit/lib/websubmit_templates.py:1613
 msgid "List of refereed categories"
@@ -4205,71 +4054,60 @@ msgid "Key"
 msgstr "Κλειδί"
 
 #: modules/websubmit/lib/websubmit_templates.py:1676
-#, fuzzy
 msgid "Waiting for approval"
-msgstr "αναμένοντας έγκριση"
+msgstr "Αναμονή έγκρισης"
 
 #: modules/websubmit/lib/websubmit_templates.py:1678
-#, fuzzy
 msgid "Already approved"
-msgstr "ήδη εγκεκριμένα"
+msgstr "Ήδη εγκεκριμένα"
 
 #: modules/websubmit/lib/websubmit_templates.py:1681
-#, fuzzy
 msgid "Some documents are pending."
-msgstr "κάποια έγγραφα εκκρεμούν ακόμη"
+msgstr "Κάποια έγγραφα εκκρεμούν ακόμη"
 
 #: modules/websubmit/lib/websubmit_templates.py:1736
 msgid "List of refereed documents"
 msgstr "Λίστα εγγράφων που ελεγχετε"
 
 #: modules/websubmit/lib/websubmit_templates.py:1737
-#, fuzzy
 msgid "Click on a report number for more information."
-msgstr "Κάντε κλικ στον αριθμό αναφοράς για να πάρετε επιπλέον πληροφορίες"
+msgstr "Κάντε κλικ στον αριθμό αναφοράς για να πάρετε επιπλέον πληροφορίες."
 
 #: modules/websubmit/lib/websubmit_templates.py:1738
 msgid "Report Number"
 msgstr "Αριθμός αναφοράς"
 
 #: modules/websubmit/lib/websubmit_templates.py:1861
-#, fuzzy
 msgid "Your request has been sent to the referee."
 msgstr "Το αίτημά σας έχει αποσταλεί"
 
 #: modules/websubmit/lib/websubmit_templates.py:1875
-#, fuzzy
 msgid "Title:"
-msgstr "Τίτλο"
+msgstr "Τίτλος:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1881
-#, fuzzy
 msgid "Author:"
-msgstr "Συγγραφέας"
+msgstr "Συγγραφέας:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1889
-#, fuzzy
 msgid "More information:"
-msgstr "Περισσότερες πληροφορίες"
+msgstr "Περισσότερες πληροφορίες:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1890
 msgid "Click here"
 msgstr "Κάντε κλικ εδώ"
 
 #: modules/websubmit/lib/websubmit_templates.py:1896
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
-msgstr "Το έγγραφο αυτό <strong class=\"headline\">αναμένει έγκριση</strong>."
+msgstr "Το έγγραφο αυτό %(x_fmt_open)sαναμένει έγκριση%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:1899
 #: modules/websubmit/lib/websubmit_templates.py:1919
 #: modules/websubmit/lib/websubmit_templates.py:1929
-#, fuzzy
 msgid "It was first sent for approval on:"
-msgstr ""
-"Απεστάλη για έγκριση πρώτη φορά στις: <strong class=\"headline\">%(date)s</"
-"strong>"
+msgstr "Απεστάλη για έγκριση πρώτη φορά στις:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1901
 #: modules/websubmit/lib/websubmit_templates.py:1903
@@ -4278,10 +4116,9 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1931
 #: modules/websubmit/lib/websubmit_templates.py:1933
 msgid "Last approval email was sent on:"
-msgstr ""
+msgstr "Το τελευταίο email για έγκριση εστάλη στις:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1904
-#, fuzzy
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
@@ -4295,55 +4132,48 @@ msgid "Send Again"
 msgstr "Αποστολή εκ νέου"
 
 #: modules/websubmit/lib/websubmit_templates.py:1907
-#, fuzzy
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
-msgstr ""
-"ΠΡΟΕΙΔΟΠΟΙΗΣΗ! Μετά την επιβεβαίωση, θα αποσταλεί email στον ελεγκτή σας. "
+msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ! Μετά την επιβεβαίωση, θα αποσταλεί email στον ελεγκτή σας."
 
 #: modules/websubmit/lib/websubmit_templates.py:1910
-#, fuzzy
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
 msgstr ""
 "Ώς ελεγκτής του εγγράφου αυτού, μπορείτε να κάνετε κλίκ στο κουμπί αυτό για "
-"να το αποδεχτείτε ή να το απορρίψετε:"
+"να το αποδεχτείτε ή να το απορρίψετε."
 
 #: modules/websubmit/lib/websubmit_templates.py:1912
 msgid "Approve/Reject"
 msgstr "Αποδοχή/Απόρριψη"
 
 #: modules/websubmit/lib/websubmit_templates.py:1916
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
-msgstr "Αυτό το σχόλιο έχει αναφερθεί %i φορές"
+msgstr "Αυτό το έγγραφο έχει γίνει %(x_fmt_open)sαποδεκτό%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:1918
-#, fuzzy
 msgid "Its approved reference is:"
-msgstr "εγκεκριμένα"
+msgstr "Ο αριθμός έγκρισης είναι:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1924
-#, fuzzy
 msgid "It was approved on:"
-msgstr "εγκεκριμένα"
+msgstr "Εγκρίθηκε στις:"
 
 #: modules/websubmit/lib/websubmit_templates.py:1926
-#, fuzzy, python-format
+#, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
-msgstr "Αυτό το σχόλιο έχει αναφερθεί %i φορές"
+msgstr "Αυτό το έγγραφο %(x_fmt_open)sαπορρίφθηκε%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:1934
-#, fuzzy
 msgid "It was rejected on:"
-msgstr "απορριφθέντα"
+msgstr "Απορρίφθηκε στις:"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:91
 #: modules/websubmit/lib/websubmit_webinterface.py:99
 #: modules/websubmit/lib/websubmit_webinterface.py:161
-#, fuzzy
 msgid "Unable to find file."
-msgstr "δεν είναι δυνατό να βρεθεί κάποιο αρχείο..."
+msgstr "Δεν είναι δυνατό να βρεθεί το αρχείο."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:112
 #: modules/websubmit/lib/websubmit_webinterface.py:193
@@ -4355,28 +4185,24 @@ msgid "Parameter docid missing"
 msgstr "Η παράμετρος docid λείπει"
 
 #: modules/websubmit/web/publiline.py:178
-#, fuzzy
 msgid "Approval has never been requested for this document."
-msgstr "Δεν έχει ζητηθεί ποτέ έγκριση για το έγγραφο αυτό!"
+msgstr "Δεν έχει ζητηθεί ποτέ έγκριση για το έγγραφο αυτό."
 
 #: modules/websubmit/web/publiline.py:183
-#, fuzzy
 msgid "Unable to display document."
 msgstr "Δεν είναι δυνατή η απεικόνειση του εγγράφου."
 
 #~ msgid "Your modifications have now been submitted."
 #~ msgstr "Οι τροποποιήσεις σας έχουν υποβληθεί."
 
-#, fuzzy
 #~ msgid "You can now go back to %s."
-#~ msgstr "Μπορείτε να επιστρέψετε στο"
+#~ msgstr "Μπορείτε να επιστρέψετε στο %s."
 
-#, fuzzy
 #~ msgid "You can now go back to"
 #~ msgstr "Μπορείτε να επιστρέψετε στο"
 
 #~ msgid "Sort by"
-#~ msgstr "Ταξινόμηση με:"
+#~ msgstr "Ταξινόμηση με"
 
 #~ msgid "%s wrote on %s:"
 #~ msgstr "%s καταγράφηκε στις %s:"
@@ -4387,25 +4213,22 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 #~ msgid "inside"
 #~ msgstr "μέσα"
 
-#, fuzzy
 #~ msgid ""
 #~ "You are logged in as a guest user, so your %s will disappear at the end "
 #~ "of the current session. If you wish you can %slogin or register here%s."
 #~ msgstr ""
 #~ "Έχετε συνδεθεί σαν χρήστης guest, οπότε τα καλάθια σας θα εξαφανιστούν "
-#~ "στο τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %"
-#~ "slogin ή να εγγραφείτε εδώ.%s"
+#~ "στο τέλος της τρέχουσας συνεδρίας. Εάν επιθυμείτε, μπορείτε να κάνετε %s"
+#~ "login ή να εγγραφείτε εδώ.%s"
 
 #~ msgid "here"
 #~ msgstr "εδώ"
 
-#, fuzzy
 #~ msgid "No waiting member"
-#~ msgstr "Δεν βρέθηκε χρήστης"
+#~ msgstr "Δεν βρέθηκε χρήστης σε αναμονή"
 
-#, fuzzy
 #~ msgid "Waiting members"
-#~ msgstr "Τροποποίηση μελών ομάδας"
+#~ msgstr "Χρήστες σε αναμονή"
 
 #~ msgid "Group: <b>%s</b>"
 #~ msgstr "Ομάδα: <b>%s</b>"
@@ -4428,17 +4251,14 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 #~ msgid "Ok"
 #~ msgstr "Εντάξει"
 
-#, fuzzy
 #~ msgid "Delete successful."
-#~ msgstr "Διαγραφή επιτυχής"
+#~ msgstr "Διαγραφή επιτυχής."
 
-#, fuzzy
 #~ msgid "Cannot find number of pages."
-#~ msgstr "δεν μπορώ να βρώ τον αριθμό των σελίδων"
+#~ msgstr "Δεν μπορώ να βρώ τον αριθμό των σελίδων."
 
-#, fuzzy
 #~ msgid "Cannot find document."
-#~ msgstr "Δεν μπορώ να βρω το έγγραφο %s"
+#~ msgstr "Δεν μπορώ να βρω το έγγραφο."
 
 #~ msgid "You now have to"
 #~ msgstr "Τώρα πρέπει να"
@@ -4450,29 +4270,23 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 #~ "Πρέπει να κάνετε login (από το μενού στα αριστερά) για να χρησιμοποιήσετε "
 #~ "την λειτουργία αυτή."
 
-#, fuzzy
 #~ msgid "All of the words"
 #~ msgstr "Όλες οι λέξεις"
 
-#, fuzzy
 #~ msgid "Any of the words"
 #~ msgstr "Οποιαδήποτε από τις λέξεις"
 
-#, fuzzy
 #~ msgid "Exact phrase"
-#~ msgstr "Ακριβής φράση:"
+#~ msgstr "Ακριβής φράση"
 
-#, fuzzy
 #~ msgid "Partial phrase"
-#~ msgstr "Επιμέρους φράση:"
+#~ msgstr "Επιμέρους φράση"
 
-#, fuzzy
 #~ msgid "Regular expression"
-#~ msgstr "Regular expression:"
+#~ msgstr "Regular expression"
 
-#, fuzzy
 #~ msgid "Added since"
-#~ msgstr "Προστέθηκαν από:"
+#~ msgstr "Προστέθηκαν από"
 
 #~ msgid "Record #%d: %s"
 #~ msgstr "Εγγραφή #%d: %s"
@@ -4543,7 +4357,6 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 #~ msgid "click here"
 #~ msgstr "κάντε κλίκ εδώ"
 
-#, fuzzy
 #~ msgid ""
 #~ "Last approval email was sent on: <strong class=\"headline\">%(date)s</"
 #~ "strong>"
@@ -4610,7 +4423,6 @@ msgstr "Δεν είναι δυνατή η απεικόνειση του εγγρ
 #~ msgid "Write a %s"
 #~ msgstr "Γράψτε μια %s"
 
-#, fuzzy
 #~ msgid ""
 #~ "The record will be deleted as soon as the task queue is empty. You can "
 #~ "now go back to"
