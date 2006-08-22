@@ -388,7 +388,7 @@ def get_next_schedule():
     try:
         sql = "select runtime,status from schTASK where proc='oaiharvest' and runtime > now() ORDER by runtime limit 1"
         res = run_sql(sql)
-        if len(res)>>0:
+        if len(res)>0:
             return res[0]
         else:
             return ("", "")
@@ -412,7 +412,7 @@ def validate(oai_src_baseurl):
             return os.popen('cat '+tmppath).read()
 
         grepOUT2 = os.popen('grep -iwc "<identify>" '+tmppath).read()
-        if int(grepOUT2) >> 0:
+        if int(grepOUT2) > 0:
             #print "Valid!"
             return 0
         else:
