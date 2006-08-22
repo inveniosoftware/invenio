@@ -121,14 +121,8 @@ if test $? -ne 0; then
 fi
 AC_MSG_RESULT(found)
 
-## Check for PHP:
+## Check for PHP
 AC_PATH_PROG(PHP, php)
-if test -z "$PHP"; then
-   AC_MSG_ERROR([
-   PHP standalone command-line executable (i.e. not compiled as Apache module!) 
-   was not found in your PATH.  Please install it first.
-   Available from <http://www.php.net/manual/en/install.commandline.php>.])
-fi
 
 ## Check for Acrobat Reader:
 AC_PATH_PROG(ACROREAD, acroread)
