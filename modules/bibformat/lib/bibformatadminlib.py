@@ -60,7 +60,10 @@ def perform_request_index(ln=cdslang, warnings=None):
     @param ln language
     @param warnings a list of messages to display at top of the page, that prevents writability in etc
     @return the main admin page
-    """   
+    """
+    if warnings != None and len(warnings) > 0:
+        warnings = get_msgs_for_code_list(warnings, 'warning', ln)
+        warnings = [x[1] for x in warnings] # Get only message, not code
     return bibformat_templates.tmpl_admin_index(ln, warnings)
 
 def perform_request_format_templates_management(ln=cdslang, checking=0):
