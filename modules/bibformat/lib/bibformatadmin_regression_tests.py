@@ -37,11 +37,11 @@ class BibFormatAdminWebPagesAvailabilityTest(unittest.TestCase):
 
         baseurl = weburl + '/admin/bibformat/'
 
-        _exports = ['', 'BEH_display.php', 'OAIER_display.php',
-                    'LINK_display.php', 'LINK_FORMAT_display.php',
-                    'UDF_display.php', 'FORMAT_display.php',
-                    'KB_display.php', 'test.php',
-                    'BIBREFORMAT_display.php']
+        _exports = ['bibformatadmin.py/format_templates_manage',
+                    'bibformatadmin.py/output_formats_manage',
+                    'bibformatadmin.py/format_elements_doc',
+                    'bibformatadmin.py/kb_manage',
+                    'bibformat_migration_kit_assistant.py']
         
         error_messages = []
         for url in [baseurl + page for page in _exports]:
