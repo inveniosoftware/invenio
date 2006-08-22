@@ -159,6 +159,11 @@ def authenticate(user, header="BibUpload Task Submission", action="runbibupload"
        Return user name upon authorization success,
        do system exit upon authorization failure.
        """
+
+    # FIXME: for the time being do not authenticate but always let the
+    # tasks in, because of automated inserts:
+    return user
+
     print header
     print "=" * len(header)
     if user == "":
