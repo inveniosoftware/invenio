@@ -208,7 +208,7 @@ class Template:
         """Outputs some <br>s"""
         _ = gettext_set_language(ln)
         text = ""
-        while howmany>>0:
+        while howmany>0:
             text += """<br>"""
             howmany = howmany - 1
         return text
