@@ -220,10 +220,16 @@ class Template:
         _ = gettext_set_language(ln)
         msg_success = _("successfully validated")
         msg_nosuccess = _("does not seem to be a OAI-compliant baseURL")
-        if (outcome==0):
+        if outcome==0:
             output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
             return output
         else:
             output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_nosuccess)
             return output
 
+    def tmpl_output_error_info(self, ln, base, error):
+        """Prints a http error message"""
+        _ = gettext_set_language(ln)
+        msg_error = "returns the following HTTP error: "
+        output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span><BR><blockquote>%s</blockquote>""" % (base, msg_error, error)
+        return output
