@@ -54,6 +54,7 @@ from invenio.search_engine_config import *
 from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, get_output_format_content_type, create_excel
+from invenio.bibformat_config import use_old_bibformat
 
 if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
@@ -2467,6 +2468,40 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     record_exist_p = record_exists(recID)
     if record_exist_p == 0: # doesn't exist
         return out
+
+    # New Python BibFormat procedure for formatting
+    # Old procedure follows further below
+    # We must still check some special formats, but these
+    # should disappear when BibFormat improves.
+    if not use_old_bibformat \
+           and not format.lower().startswith('t') \
+           and not format.lower().startswith('hm') \
+           and not str(format[0:3]).isdigit():
+        if record_exist_p == -1:
+            out += _("The record has been deleted.")
+        else:
+            if format == '':
+                format = 'hd'
+            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
+            res = run_sql(query)
+            if res:
+                # record 'recID' is formatted in 'format', so print it
+                out += "%s" % decompress(res[0][0])
+            else:
+                # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
+                out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
+    
+            # at the end of HTML brief mode, print the "Detailed record" functionality:
+            if format.lower().startswith('hb'):
+                out += websearch_templates.tmpl_print_record_brief_links(
+                    ln = ln,
+                    recID = recID,
+                    weburl = weburl,
+                        )
+
+            return out
+
+    # Old PHP BibFormat procedure for formatting
     # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
