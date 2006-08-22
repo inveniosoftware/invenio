@@ -1,5 +1,8 @@
+#!@PYTHON@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -16,7 +19,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+BibUpload Engine configuration.
+"""
+ 
+__version__ = "$Id$"
 
-SUBDIRS = bin doc lib
-
-CLEANFILES = *~ 
+cfg_bibupload_controlfield_tags = ['001', '002', '003', '004', '005', '006', '007', '008']
+cfg_bibupload_special_tags = ['FMT', 'FFT']
+cfg_bibupload_reference_tag = "909"
+cfg_bibupload_external_sysno_tag = "970"
