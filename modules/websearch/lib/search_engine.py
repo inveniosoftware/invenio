@@ -2019,9 +2019,8 @@ def get_fieldvalues(recID, tag):
     return out
 
 def get_fieldvalues_alephseq_like(recID, tags_in):
-    """Return textual lines in ALEPH sequential like format for field 'tag' inside record 'recID'."""
+    """Return buffer of ALEPH sequential-like textual format with fields found in the list TAGS_IN for record RECID."""
     out = ""
-
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
         ##         (use with care: can false you if field has multiple occurrences)
@@ -2030,7 +2029,6 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
         ## case B: print our "text MARC" format; works safely all the time
         # find out which tags to output:
         dict_of_tags_out = {}
-
         if not tags_in:
             for i in range(0,10):
                 for j in range(0,10):
@@ -2630,20 +2628,20 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif format.startswith('t'):
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag)
+            out += get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"])
         else:
             out += get_fieldvalues_alephseq_like(recID, ot)
 
     elif format == "hm":
         if record_exist_p == -1:
-            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag)) + "</pre>"
+            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"])) + "</pre>"
         else:
             out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += "<pre>" + get_fieldvalues_alephseq_like(recID, "001,%s,980" % cfg_oaiidtag) + "</pre>"
+            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"]) + "</pre>"
         else:
             out += "<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
 
@@ -3539,6 +3537,7 @@ def profile(p="", f="", c=cdsname):
 #print call_bibformat(68, "HB_FLY")
 #print create_collection_i18nname_cache()
 #print get_fieldvalues_alephseq_like(11,"980__a")
+#print get_fieldvalues_alephseq_like(11,["001", "980"])
 
 ## profiling:
 #profile("of the this")
