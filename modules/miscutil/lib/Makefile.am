@@ -30,6 +30,7 @@ pylib_DATA = __init__.py \
              textutils.py \
              dateutils.py \
 	     testutils.py \
+	     testutils_regression_tests.py \
 	     urlutils.py             
 
 noinst_DATA = testimport.py
@@ -50,6 +51,7 @@ EXTRA_DIST = __init__.py \
              textutils.py \
              dateutils.py \
 	     testutils.py \
+	     testutils_regression_tests.py \
              urlutils.py \
              testimport.py
 
