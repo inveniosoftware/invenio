@@ -119,10 +119,26 @@ def make_surl(path, **kargs):
 
     return url
 
-def test_web_page_content(url, username="guest", expected_text="</html>"):
+class InvenioTestUtilsBrowserException(Exception):
+    """Helper exception for the regression test suite browser."""
+    pass
+
+def test_web_page_content(url,
+                          username="guest",
+                          password="",
+                          expected_text="</html>",
+                          expected_link_target=None,
+                          expected_link_label=None):
     """Test whether web page URL as seen by user USERNAME contains
-       text EXPECTED_TEXT.  Before doing the tests, login as USERNAME.
-       (E.g. interesting values are "guest" or "admin".)
+       text EXPECTED_TEXT and, eventually, contains a link to
+       EXPECTED_LINK_TARGET (if set) labelled EXPECTED_LINK_LABEL (if
+       set).  The EXPECTED_TEXT is checked via substring matching, the
+       EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL via exact string
+       matching.
+
+       Before doing the tests, login as USERNAME with password
+       PASSWORD.  E.g. interesting values for USERNAME are "guest" or
+       "admin".
 
        Return empty list in case of problems, otherwise list of error
        messages that may have been encountered during processing of
@@ -142,28 +158,43 @@ def test_web_page_content(url, username="guest", expected_text="</html>"):
         else:
             browser.open(sweburl + "/youraccount/login")
             browser.select_form(nr=0)
-            browser['p_un'] = 'admin'
+            browser['p_un'] = username
+            browser['p_pw'] = password
             browser.submit()
             username_account_page_body = browser.response().read()
             try:
                 string.index(username_account_page_body,
                              "You are logged in as %s." % username)
             except ValueError:
-                raise StandardError, 'ERROR: Cannot login as %s, test skipped.' % \
-                      username
-
-        # then access URL:
+                raise InvenioTestUtilsBrowserException, \
+                      'ERROR: Cannot login as %s, test skipped.' % username
+        
+        # secondly read page body:
         browser.open(url)
         url_body = browser.response().read()
-        string.index(url_body, expected_text)
 
+        # now test for EXPECTED_TEXT:
+        try:
+            string.index(url_body, expected_text)
+        except ValueError:
+            raise InvenioTestUtilsBrowserException, \
+                  'ERROR: Page %s (login %s) does not contain %s.' % \
+                              (url, username, expected_text)
+
+        # now test for EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL:
+        if expected_link_target or expected_link_label:
+            try:
+                browser.find_link(url=expected_link_target,
+                                  text=expected_link_label)
+            except mechanize.LinkNotFoundError:
+                raise InvenioTestUtilsBrowserException, \
+                      'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
+                                  (url, username, expected_link_target, expected_link_label)
+                  
     except mechanize.HTTPError, msg:
         error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
                               (url, username, msg))
-    except ValueError:                
-        error_messages.append('ERROR: Page %s (login %s) does not contain %s.' % \
-                              (url, username, expected_text))
-    except StandardError, msg:
+    except InvenioTestUtilsBrowserException, msg:
         error_messages.append('ERROR: Page %s (login %s) led to an error: %s.' % \
                               (url, username, msg))
 
