@@ -937,6 +937,12 @@ some use of Marc codes might not be indicated. This is because it is not
 possible (or at least not trivial) to guess that the call to <code>field(str(5+4)+"80"+".a")</code>
 is equal to a call to <code>field("980.a")</code>. You should then not completely rely on this indication.</p>
 
+<h3>How are displayed deleted record?</h3>
+<p>By default, CDS Invenio displays a standard "The record has been deleted." message for all
+output formats with a 'text/html' content type. Your output format, format templates and format elements
+are bypassed by the engine. 
+However, for more advanced output formats, CDS Invenio
+goes through the regular formatting process and let your formats do the job. This allows you to customize how a record should be displayed once it has been deleted.</p>
 
 <h3>Why are some format elements omitted in the "Knowledge Base Dependencies" page?</h3>
 <p>When you check the dependencies of a knowledge base, the page reminds you that
