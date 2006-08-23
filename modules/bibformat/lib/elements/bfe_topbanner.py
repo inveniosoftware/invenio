@@ -22,12 +22,12 @@ def format(bfo):
     """
     HTML top page banner containing category, rep. number, etc
     """
-    collection_indicator = bfo.kb("dbcollid2coll", bfo.field("980$a"))
-    subject = bfo.field("65017$a") 
-    subject_2 = bfo.field("65027$a")
+    collection_indicator = bfo.kb("dbcollid2coll", bfo.field("980__a"))
+    subject = bfo.field("65017a") 
+    subject_2 = bfo.field("65027a")
 
-    additional_report_numbers = bfo.fields("088$a")
-    source_of_aquisition = bfo.field("037$a")
+    additional_report_numbers = bfo.fields("088__a")
+    source_of_aquisition = bfo.field("037__a")
 
     out = '<table border="0" width="100%"><tr class="blocknote">'
     out += '''<td valign="left">

@@ -25,7 +25,7 @@ def format(bfo):
     @see place.py, date.py, reprints.py, imprint.py
     """
 
-    publisher = bfo.field('260$b')
+    publisher = bfo.field('260__b')
 
     if publisher != "sine nomine":    
         return publisher

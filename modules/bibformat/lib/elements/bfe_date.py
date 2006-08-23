@@ -23,7 +23,7 @@ def format(bfo):
     Prints the imprint publication date as HTML
     @see date.py , publisher.py, reprints.py, imprint.py
     """
-    date = bfo.field('260$c')
+    date = bfo.field('260__c')
 
     return date
 

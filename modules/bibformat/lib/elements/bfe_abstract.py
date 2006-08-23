@@ -34,12 +34,12 @@ def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[
     """
     out = ''
     
-    abstract_en = bfo.fields('520$a')
-    abstract_en.extend(bfo.fields('520$b'))
+    abstract_en = bfo.fields('520__a')
+    abstract_en.extend(bfo.fields('520__b'))
     abstract_en = "<br/>".join(abstract_en)
     
-    abstract_fr = bfo.fields('590$a')
-    abstract_fr.extend(bfo.fields('590$b'))
+    abstract_fr = bfo.fields('590__a')
+    abstract_fr.extend(bfo.fields('590__b'))
     abstract_fr = "<br/>".join(abstract_fr)
 
     if contextual == 'yes' and limit != "" and limit.isdigit() and int(limit) > 0:

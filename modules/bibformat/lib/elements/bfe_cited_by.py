@@ -27,8 +27,8 @@ def format(bfo, separator='; '):
     from urllib import quote
     from invenio.config import weburl
 
-    primary_report_numbers = bfo.fields('037$a')
-    additional_report_numbers = bfo.fields('088$a')
+    primary_report_numbers = bfo.fields('037__a')
+    additional_report_numbers = bfo.fields('088__a')
 
     primary_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', primary_report_numbers)
     additional_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', additional_report_numbers)

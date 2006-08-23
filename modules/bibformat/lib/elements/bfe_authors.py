@@ -36,9 +36,9 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
     _ = gettext_set_language(bfo.lang)    # load the right message language
     
     authors = []
-    authors_1 = bfo.fields('100.a')
-    authors_2 = bfo.fields('700.a')
-    authors_3 = bfo.fields('270.p')
+    authors_1 = bfo.fields('100__a')
+    authors_2 = bfo.fields('700__a')
+    authors_3 = bfo.fields('270__p')
 
     authors.extend(authors_1)
     authors.extend(authors_2)

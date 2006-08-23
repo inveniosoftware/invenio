@@ -26,7 +26,7 @@ def format(bfo, separator):
     @see place.py, publisher.py , imprint.py, date.py
     """
 
-    reprints = bfo.field('260$g')
+    reprints = bfo.field('260__g')
     if len(reprints) > 0:
         return separator.join(reprints)
        

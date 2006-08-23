@@ -27,8 +27,8 @@ def format(bfo, separator=" ", highlight='no'):
     """
     titles = []
    
-    title = bfo.field('245.a')
-    title_remainder = bfo.field('245.b')
+    title = bfo.field('245__a')
+    title_remainder = bfo.field('245__b')
 
     titles.append( title + title_remainder )
 
@@ -36,11 +36,11 @@ def format(bfo, separator=" ", highlight='no'):
     if len(title) > 0:
         titles.append( title )
 
-    title = bfo.field('246.a')
+    title = bfo.field('246__a')
     if len(title) > 0:
         titles.append( title )
 
-    title = bfo.field('246_1.a')
+    title = bfo.field('246_1a')
     if len(title) > 0:
         titles.append( title )
 

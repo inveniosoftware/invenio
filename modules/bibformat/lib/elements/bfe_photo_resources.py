@@ -34,5 +34,5 @@ def format(bfo):
             out += '<br/>High resolution: <a href="'+resource.get("q", "") +'">'+ resource.get("q", "") +"</a>"
 
     out += "<br/><font size=-2><b>© CERN Geneva</b></font>" 
-    out += '<br/> <a href="'+bfo.field("8564_.u")+'">'+ bfo.field("8564_.z") + "</a>" 
+    out += '<br/> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>" 
     return out

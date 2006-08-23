@@ -28,7 +28,7 @@ def format(bfo, separator='; ', link="yes"):
     from urllib import quote
     from invenio.config import weburl
 
-    addresses = bfo.fields('270$p')
+    addresses = bfo.fields('270__p')
 
     addresses = map(lambda x: '<a href="'+weburl+'/search?f=author&p='+ quote(x) +'">'+x+'</a>', addresses)
 

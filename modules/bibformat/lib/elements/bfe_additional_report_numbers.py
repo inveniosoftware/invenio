@@ -27,5 +27,5 @@ def format(bfo, separator):
     
     @param separator the separator between report numbers.
     """
-    numbers = bfo.fields("088.a")    
+    numbers = bfo.fields("088__a")    
     return separator.join(numbers)

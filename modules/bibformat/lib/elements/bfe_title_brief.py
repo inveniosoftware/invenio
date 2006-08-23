@@ -27,9 +27,9 @@ def format(bfo, highlight="no"):
     @param highlight highlights the words corresponding to search query if set to 'yes'
     """
     
-    title = bfo.field('245.a')
-    title_remainder = bfo.field('245.b')
-    edition_statement = bfo.field('250.a')
+    title = bfo.field('245__a')
+    title_remainder = bfo.field('245__b')
+    edition_statement = bfo.field('250__a')
 
     out = title
     if len(title_remainder) > 0:

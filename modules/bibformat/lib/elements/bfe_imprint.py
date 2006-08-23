@@ -29,9 +29,9 @@ def format(bfo, place_label, publisher_label, date_label, separator=', ',):
     @see place.py, publisher.py, date.py, reprints.py
     """
     
-    place = bfo.field('260$a')
-    publisher = bfo.field('260$b')
-    date = bfo.field('260$c')
+    place = bfo.field('260__a')
+    publisher = bfo.field('260__b')
+    date = bfo.field('260__c')
     
     out = ""
     

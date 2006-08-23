@@ -23,7 +23,7 @@ def format(bfo):
     Prints the imprint publication place as HTML
     @see date.py , publisher.py, reprints.py, imprint.py
     """
-    place = bfo.field('260$a')
+    place = bfo.field('260__a')
 
     if place != "sine loco":
         return place  

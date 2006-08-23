@@ -326,7 +326,7 @@ def get_name(string):
     old BibFormat. We need to return the same value, to keep back
     compatibility with already generated BibTeX notices.
     
-    Eg: get_name("Østlund, Øyvind B") returns "Østlund".
+    Eg: get_name("Ø³tlund, Ø¹vind B") returns "Ø³tlund".
     """
     names = string.split(',')
 

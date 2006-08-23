@@ -28,34 +28,32 @@ def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
     """
     notes = []
 
-    notes_group_1 = bfo.fields('594$p')
+    notes_group_1 = bfo.fields('594__p')
     if len(notes_group_1) > 0:
         notes_group_1 = separator.join(notes_group_1)
         notes.append(notes_group_1)
 
-    notes_group_2 = bfo.fields('500$a')  
+    notes_group_2 = bfo.fields('500__a')  
     if len(notes_group_2) > 0:
         notes_group_2 = separator.join(notes_group_2)
         notes.append(notes_group_2)
 
 
-    notes_group_3 = bfo.fields('502$a')    
-    notes_group_3.extend(bfo.fields('909CC$r'))
-    notes_group_3.extend(bfo.fields('909CP$n'))
-    notes_group_3.extend(bfo.fields('711$a'))
+    notes_group_3 = bfo.fields('502__a')    
+    notes_group_3.extend(bfo.fields('909CCr'))
+    notes_group_3.extend(bfo.fields('909CPn'))
+    notes_group_3.extend(bfo.fields('711__a'))
     if len(notes_group_3) > 0:
         notes_group_3 = separator.join(notes_group_3)
         notes.append(notes_group_3)
 
-    notes_group_4 = bfo.fields('596$a')
+    notes_group_4 = bfo.fields('596__a')
+    
     if len(notes_group_4) > 0:
         notes_group_4 = separator.join(notes_group_4)
         notes.append(notes_group_4)
 
     if len(notes) > 0:
-        #print prologue,
+        notes  = map(lambda x: note_prefix + x + note_suffix, notes)
+        return "".join(notes)
 
-        notes  = map(lambda x: note_prefix+x+note_suffix, notes)
-        return "".join(notes),
-
-        #print epilogue,

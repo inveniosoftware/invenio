@@ -24,6 +24,6 @@ def format(bfo):
 
     @see date.py
     """
-    date = bfo.field('909C1$c')
+    date = bfo.field('909C1c')
 
     return date

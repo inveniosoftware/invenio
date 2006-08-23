@@ -31,7 +31,7 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     from urllib import quote
     from invenio.config import weburl
     
-    keywords = bfo.fields('6531_$a')
+    keywords = bfo.fields('6531_a')
 
     if len(keywords) > 0:
 

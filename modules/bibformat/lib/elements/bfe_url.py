@@ -25,7 +25,7 @@ def format(bfo, style, separator='; '):
     @param style CSS class of the link
     """
 
-    urls_u = bfo.fields("8564_$u")
+    urls_u = bfo.fields("8564_u")
     if style != "":
         style = 'class="'+style+'"'
         
