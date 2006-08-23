@@ -699,8 +699,8 @@ translated_welcome =  &#95;("Welcome")
     <p>Go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
     <p>Each detailed documentation shows you:
     <ul>
-    <li>A description of what the element does.<li>
-    <li>A list of all parameters you can use for this element.<li>
+    <li>A description of what the element does.</li>
+    <li>A list of all parameters you can use for this element.</li>
     <li>For each parameter, a description and the default value when parameter is ommitted.</li>
     <li>A link to a tool to track the dependencies of your element.</li>
     <li>A link to a tool to check the correctness of your element.</li>
