@@ -418,12 +418,36 @@ However you must make sure that it is removed from the tables <code>format</code
     <h3><a name="attrsOutputFormat">Edit the Attributes of an Output Format</a></h3>
     <p>An output format has the following attributes:
     <ul>
-    <li><code>code</code>: a short identifier that is used to identify the output format. It must be unique and contain a maximum of 6 letters. The short identifier ignores letter case ("HB" is equal to "hb").</li>
+    <li><code>code</code>: a short identifier that is used to identify the output format. It must be unique and contain a maximum of 6 letters. Note that the <b>code is not case sensitive</b> ("HB" is equal to "hb").</li>
     <li><code>content type</code>: this is the content type of the format, specified in Mime. For example if you were to produce an Excel output, you could use <code>application/ms-excel</code> as content type. If a content type is specified, CDS Invenio will not print the usual header and footerfor the page, but will trigger a download in the client's browser when viewing the page (Unless the browser handles this content type).</li>
     <li><code>name</code>: a generic name to display in the interface for this output format.</li>
     <li>(*) <code>name</code>: internationalized names for the output format, used for displaying localized name in the search interface.</li>
     <li><code>description</code>: an optional description for the output format.</li>
     </ul></p>
+    <p><b>Please read this information regarding output format codes:</b>
+    There are some reserved codes that you should not use, or at least be aware of when choosing a code for your
+    output format. The table below summarizes these special words:
+    </p>
+    <p align="center">
+    <small>
+      <table width="40%" border="1">
+      <tr>
+      <th>Code</th><th>Purpose</th>
+      </tr><tr>
+      <td>HB</td><td>Used for displaying list of results of a search.</td>
+      </tr><tr>
+      <td>HD</td><td>Used when no format is specified when viewing a record.</td>
+      </tr><tr>
+      <td>HM</td><td>Used for Marc output. The format is special in the sense that it filters
+      fields to display according to the 'ot' GET parameter of the HTTP request.</td>
+      </tr><tr>
+      <td>Starting with letter 't'</td><td>Used for displaying the value of the field specified by the 'ot' GET parameter of the HTTP request.</td>
+      </tr><tr>
+      <td>Starting with 3 digits</td><td>Used for displaying the value of the field specified by the digits.</td>
+      </tr>
+      </table>
+    </small>
+    </p>
     <strong>For developers and adventurers only:</strong>
     <p>Excepted for the code, output format attributes cannot be changed in the output format file. These
     attributes are saved in the database. As for the <code>code</code>, it is the name of the output format file,
@@ -666,10 +690,11 @@ translated_welcome =  &#95;("Welcome")
     </ul>
     </p>
     <h3><a name="dependenciesFormatElement">Check the Dependencies of a Format Element</a></h3>
-    <p>There are two ways to check the a </p>
+    <p>There are two ways to check the dependencies of a format element. The simplest way is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Dependencies of this element" for the element you want to check.</p>
+    <p>The second method to check the dependencies of an element is through regular unix tools: for example <code>$ grep -r -i 'bfe_<i>your_element_name</i>' .</code> inside the format templates directory will tell you which templates call your element.</p>
     <h3><a name="validityFormatElement">Check the Validity of a Format Element</a></h3>
      <p>There are two ways to check the validity of an element. The simplest one is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Correctness of this element" for the element you want to check.</p>
-     <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass it to the <code>bfo</code> parameter of the <code>format</code> function of your element.</p>
+     <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass as <code>bfo</code> parameter to the <code>format</code> function of your element.</p>
     <h3><a name="browseDocFormatElement">Browse the Format Elements Documentation</a></h3>
     <p>Go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
     <p>Each detailed documentation shows you:
