@@ -478,13 +478,76 @@ class WebSearchTestSearch(unittest.TestCase):
 
         l = b.find_link(text="Ellis, R S")
         self.failUnless(same_urls_p(l.url, make_url('/search', p="Ellis, R S", f='author')))
-    
+
+class WebSearchNearestTermsTest(unittest.TestCase):
+    """Check various alternatives of searches leading to the nearest
+    terms box."""
+
+    def test_nearest_terms_box_in_okay_query(self):
+        """ websearch - no nearest terms box for an okay query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellis',
+                                               expected_text="jump to record"))
+        
+    def test_nearest_terms_box_in_failed_simple_query(self):
+        """ websearch - nearest terms box for failed simple query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellisz',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=embed",
+                                               expected_link_label='embed'))
+
+    def test_nearest_terms_box_in_failed_structured_query(self):
+        """ websearch - nearest terms box for failed structured query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellisz&f=author',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=fabbro&f=author",
+                                               expected_link_label='fabbro'))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=author%3Aellisz',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=author%3Afabbro",
+                                               expected_link_label='fabbro'))
+
+    def test_nearest_terms_box_in_failed_phrase_query(self):
+        """ websearch - nearest terms box for failed phrase query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=%22ellisz%22&f=author',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_label='Enqvist, K'))
+
+    def test_nearest_terms_box_in_failed_boolean_query(self):
+        """ websearch - nearest terms box for failed boolean query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=title%3Aellisz+author%3Aellisz',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aellisz",
+                                               expected_link_label='energie'))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=title%3Aenergie+author%3Aenergie',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aenqvist",
+                                               expected_link_label='enqvist'))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=title%3Aellisz+author%3Aellisz&f=keyword',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aellisz&f=keyword",
+                                               expected_link_label='energie'))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=title%3Aenergie+author%3Aenergie&f=keyword',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aenqvist&f=keyword",
+                                               expected_link_label='enqvist'))
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
                              WebSearchTestCollections,
                              WebSearchTestRecord,
-                             WebSearchTestLegacyURLs)
+                             WebSearchTestLegacyURLs,
+                             WebSearchNearestTermsTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
