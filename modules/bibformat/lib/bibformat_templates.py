@@ -29,16 +29,18 @@ from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.config import weburl, sweburl
 from invenio.messages import language_list_long
+from invenio.config import php
 
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
 
-    def tmpl_admin_index(self, ln, warnings):
+    def tmpl_admin_index(self, ln, warnings, is_admin):
         """
         Returns the main BibFormat admin page.
 
         @param ln language
         @param warnings a list of warnings to display at top of page. None if no warning
+        @param is_admin indicate if user is authorized to use BibFormat
         @return main BibFormat admin page
         """
 
@@ -57,226 +59,245 @@ class Template:
             </table>
             ''' % {'warnings': '<br/>'.join(warnings)}
 
+        if php:
+            # If PHP enabled, old bibformat can still run
+            comment_on_php_admin_interface = '''
+            <p>For some time the old BibFormat will still run along the new one, so that you can transition smoothly (See old Admin Interface further below).</p>
+            '''
+
         out += '''
         <table width="66%%" class="errorbox" style="margin-left: auto; margin-right: auto;">
         <tr>
         <th class="errorboxheader">
         <big>BibFormat has changed!</big>
-        <p>You will need to migrate your formats. You can read the <a href="%(weburl)s/admin/bibformat/guide.html">documentation</a> to learn how to write
+        <p>You will need to migrate your old formats if you are not a new user. You can read the <a href="%(weburl)s/admin/bibformat/guide.html">documentation</a> to learn how to write
         formats, or use the <a href="%(weburl)s/admin/bibformat/bibformat_migration_kit_assistant.py">migration assistant</a>.</p>
-        <p>However for some time the old BibFormat will still run along the new one, so that you can
-        transition smoothly.</p>
+        %(comment_on_php_admin_interface)s
         </th>
         </tr>
         </table>
-        ''' % {'weburl':weburl}
+        ''' % {'weburl':weburl,
+               'comment_on_php_admin_interface':comment_on_php_admin_interface}
         
         out += '''
         <p>
-         This is where you can edit the formatting style available for the collections. You need to 
-         <a href="%(weburl)s/youraccount.py/login?referer=%(weburl)s/admin/webcomment/">login</a> to enter.
+         This is where you can edit the formatting styles available for the records. '''
+        
+        if not is_admin:
+            out += '''You need to
+            <a href="%(weburl)s/youraccount/login?referer=%(weburl)s/admin/bibformat/">login</a> to enter.
+         ''' % {'weburl':weburl}
+        
+        out += '''
         </p>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%(ln)s">Manage Format Templates</a></dt>
-        <dd>Create, edit and delete format templates, which define how to format a record.</dd>
+        <dd>Define how to format a record.</dd>
         </dl>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
-        <dd>Create, edit and delete output formats, the rules that define which format template must be used for a given record.</dd>
+        <dd>Define which template is applied to which record for a given output.</dd>
         </dl>
+         <dl>
+        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
+        <dd>Define mappings of values, for standardizing records or declaring often used values.</dd>
+        </dl>
+        <br/>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
         <dd>Documentation of the format elements to be used inside format templates.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
-        <dd>Specify how an incomplete or non standard record has to be transformed into a nice standard text.</dd>
-        </dl>
-        <dl>
         <dt><a href="%(weburl)s/admin/bibformat/guide.html">BibFormat Admin Guide</a></dt>
-        <dd>Everything you want to know about BibFormat administration</dd>
+        <dd>Documentation about BibFormat administration</dd>
         </dl>
+        '''% {'weburl':weburl, 'ln':ln}
+        
+        if php:
+            #Show PHP admin only if PHP is enabled
+            out += '''
+            <br/><br/><br/><br/>
+            <div style="background-color:rgb(204, 204, 204)";>
 
-        <div style="background-color:rgb(204, 204, 204)";>
+            <h2><span style="color:rgb(204, 0, 0);">Old</span>
+            BibFormat admin interface (in gray box)</h2>
+            <em>
+            <p>The BibFormat admin interface enables you to specify how the
+            bibliographic data is presented to the end user in the search
+            interface and search results pages.  For example, you may specify that
+            titles should be printed in bold font, the abstract in small italic,
+            etc.  Moreover, the BibFormat is not only a simple bibliographic data
+            <em>output formatter</em>, but also an automated <em>link
+            constructor</em>.  For example, from the information on journal name
+            and pages, it may automatically create links to publisher's site based
+            on some configuration rules.
 
-        <p><b>OLD BIBFORMAT ADMIN FOLLOWS:</b>
-        <em>
-        <p>The BibFormat admin interface enables you to specify how the
-        bibliographic data is presented to the end user in the search
-        interface and search results pages.  For example, you may specify that
-        titles should be printed in bold font, the abstract in small italic,
-        etc.  Moreover, the BibFormat is not only a simple bibliographic data
-        <em>output formatter</em>, but also an automated <em>link
-        constructor</em>.  For example, from the information on journal name
-        and pages, it may automatically create links to publisher's site based
-        on some configuration rules.
+            <h2>Configuring BibFormat</h2>
 
-        <h2>Configuring BibFormat</h2>
+            <p>By default, a simple HTML format based on the most common fields
+            (title, author, abstract, keywords, fulltext link, etc) is defined.
+            You certainly want to define your own ouput formats in case you have a
+            specific metadata structure.
 
-        <p>By default, a simple HTML format based on the most common fields
-        (title, author, abstract, keywords, fulltext link, etc) is defined.
-        You certainly want to define your own ouput formats in case you have a
-        specific metadata structure.
+            <p>Here is a short guide of what you can configure:
 
-        <p>Here is a short guide of what you can configure:
+            <blockquote>
+            <dl>
 
-        <blockquote>
-        <dl>
+            <dt><a href="BEH_display.php">Behaviours</a>
 
-        <dt><a href="BEH_display.php">Behaviours</a>
+            <dd>Define one or more output BibFormat behaviours.  These are then
+            passed as parameters to the BibFormat modules while executing
+            formatting. 
 
-        <dd>Define one or more output BibFormat behaviours.  These are then
-        passed as parameters to the BibFormat modules while executing
-        formatting. 
+            <br><em>Example:</em> You can tell BibFormat that is has to enrich the
+            incoming metadata file by the created format, or that it only has to
+            print the format out.
 
-        <br><em>Example:</em> You can tell BibFormat that is has to enrich the
-        incoming metadata file by the created format, or that it only has to
-        print the format out.
+            <dt><a href="OAIER_display.php">Extraction Rules</a>
 
-        <dt><a href="OAIER_display.php">Extraction Rules</a>
+            <dd>Define how the metadata tags from input are mapped into internal
+            BibFormat variable names.  The variable names can afterwards be used
+            in formatting and linking rules.
 
-        <dd>Define how the metadata tags from input are mapped into internal
-        BibFormat variable names.  The variable names can afterwards be used
-        in formatting and linking rules.
+            <br><em>Example:</em> You can tell that <code>100 $a</code> field
+            should be mapped into <code>$100.a</code> internal variable that you
+            could use later.
 
-        <br><em>Example:</em> You can tell that <code>100 $a</code> field
-        should be mapped into <code>$100.a</code> internal variable that you
-        could use later.
+            <dt><a href="LINK_display.php">Link Rules</a> 
 
-        <dt><a href="LINK_display.php">Link Rules</a> 
+            <dd>Define rules for automated creation of URI links from mapped
+            internal variables.
 
-        <dd>Define rules for automated creation of URI links from mapped
-        internal variables.
+            <br><em>Example:</em> You can tell a rule how to create a link to
+            People database out of the <code>$100.a</code> internal variable
+            repesenting author's name.  (The <code>$100.a</code> variable was mapped
+            in the previous step, see the Extraction Rules.)
 
-        <br><em>Example:</em> You can tell a rule how to create a link to
-        People database out of the <code>$100.a</code> internal variable
-        repesenting author's name.  (The <code>$100.a</code> variable was mapped
-        in the previous step, see the Extraction Rules.)
+            <dt><a href="LINK_FORMAT_display.php">File Formats</a>
 
-        <dt><a href="LINK_FORMAT_display.php">File Formats</a>
+            <dd>Define file format types based on file extensions.  This will be
+            used when proposing various fulltext services.
 
-        <dd>Define file format types based on file extensions.  This will be
-        used when proposing various fulltext services.
+            <br><em>Example:</em> You can tell that <code>*.pdf</code> files will
+            be treated as PDF files.  
 
-        <br><em>Example:</em> You can tell that <code>*.pdf</code> files will
-        be treated as PDF files.  
+            <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
 
-        <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
+            <dd>Define your own functions that you can reuse when creating your
+            own output formats.  This enables you to do complex formatting without
+            ever touching the BibFormat core code.
 
-        <dd>Define your own functions that you can reuse when creating your
-        own output formats.  This enables you to do complex formatting without
-        ever touching the BibFormat core code.
+            <br><em>Example:</em> You can define a function how to match and
+            extract email addresses out of a text file.
 
-        <br><em>Example:</em> You can define a function how to match and
-        extract email addresses out of a text file.
+            <dt><a href="FORMAT_display.php">Formats</a>
 
-        <dt><a href="FORMAT_display.php">Formats</a>
+            <dd>Define the output formats, i.e. how to create the output out of
+            internal BibFormat variables that were extracted in a previous step.
+            This is the functionality you would want to configure most of the
+            time.  It may reuse formats, user defined functions, knowledge bases,
+            etc.
 
-        <dd>Define the output formats, i.e. how to create the output out of
-        internal BibFormat variables that were extracted in a previous step.
-        This is the functionality you would want to configure most of the
-        time.  It may reuse formats, user defined functions, knowledge bases,
-        etc.
+            <br><em>Example:</em> You can tell that authors should be printed in
+            italic, that if there are more than 10 authors only the first three
+            should be printed, etc.
 
-        <br><em>Example:</em> You can tell that authors should be printed in
-        italic, that if there are more than 10 authors only the first three
-        should be printed, etc.
+            <dt><a href="KB_display.php">Knowledge Bases (KBs)</a>
 
-        <dt><a href="KB_display.php">Knowledge Bases (KBs)</a>
+            <dd>Define one or more knowledge bases that enables you to transform
+            various forms of input data values into the unique standard form on
+            the output.
 
-        <dd>Define one or more knowledge bases that enables you to transform
-        various forms of input data values into the unique standard form on
-        the output.
+            <br><em>Example:</em> You can tell that <em>Phys Rev D</em> and
+            <em>Physical Review D</em> are both the same journal and that these
+            names should be standardized to <em>Phys Rev : D</em>.
 
-        <br><em>Example:</em> You can tell that <em>Phys Rev D</em> and
-        <em>Physical Review D</em> are both the same journal and that these
-        names should be standardized to <em>Phys Rev : D</em>.
+            <dt><a href="test.php">Execution Test</a>
 
-        <dt><a href="test.php">Execution Test</a>
+            <dd>Enables you to test your formats on your sample data file.  Useful
+            when debugging newly created formats.
 
-        <dd>Enables you to test your formats on your sample data file.  Useful
-        when debugging newly created formats.
+            </dl>
+            </blockquote>
 
-        </dl>
-        </blockquote>
+            <p>To learn more on BibFormat configuration, you can consult the <a
+            href="guide.html">BibFormat Admin Guide</a>.</small>
 
-        <p>To learn more on BibFormat configuration, you can consult the <a
-        href="guide.html">BibFormat Admin Guide</a>.</small>
+            <h2>Running BibFormat</h2>
 
-        <h2>Running BibFormat</h2>
+            <h3>From the Web interface</h3>
+            <p>
+            Run <a href="BIBREFORMAT_display.php">Reformat Records</a> tool.
+            This tool permits you to update stored formats for bibliographic records.
+            <br>
+            It should normally be used after configuring BibFormat's
+            <a href="BEH_display.php">Behaviours</a> and
+            <a href="FORMAT_display.php">Formats</a>.
+            When these are ready, you can choose to rebuild formats for selected
+            collections or you can manually enter a search query and the web interface
+            will accomplish all necessary formatting steps.
+            <br>
+            <i>Example:</i> You can request Photo collections to have their HTML 
+            brief formats rebuilt, or you can reformat all the records written by Ellis.
 
-        <h3>From the Web interface</h3>
-        <p>
-        Run <a href="BIBREFORMAT_display.php">Reformat Records</a> tool.
-        This tool permits you to update stored formats for bibliographic records.
-        <br>
-        It should normally be used after configuring BibFormat's
-        <a href="BEH_display.php">Behaviours</a> and
-        <a href="FORMAT_display.php">Formats</a>.
-        When these are ready, you can choose to rebuild formats for selected
-        collections or you can manually enter a search query and the web interface
-        will accomplish all necessary formatting steps.
-        <br>
-        <i>Example:</i> You can request Photo collections to have their HTML 
-        brief formats rebuilt, or you can reformat all the records written by Ellis.
+            <h3>From the command-line interface</h3>
 
-        <h3>From the command-line interface</h3>
+            <p>Consider having an XML MARC data file that is to be uploaded into
+            the CDS Invenio.  (For example, it might have been harvested from other
+            sources and processed via <a href="../bibconvert/">BibConvert</a>.)
+            Having configured BibFormat and its default output type behaviour, you
+            would then run this file throught BibFormat as follows:
 
-        <p>Consider having an XML MARC data file that is to be uploaded into
-        the CDS Invenio.  (For example, it might have been harvested from other
-        sources and processed via <a href="../bibconvert/">BibConvert</a>.)
-        Having configured BibFormat and its default output type behaviour, you
-        would then run this file throught BibFormat as follows:
+            <blockquote>
+            <pre>
+            $ bibformat < /tmp/sample.xml > /tmp/sample_with_fmt.xml
+            <pre>
+            </blockquote>
 
-        <blockquote>
-        <pre>
-        $ bibformat < /tmp/sample.xml > /tmp/sample_with_fmt.xml
-        <pre>
-        </blockquote>
+            that would create default HTML formats and would "enrich" the input
+            XML data file by this format.  (You would then continue the upload
+            procedure by calling successively <a
+            href="../bibupload/">BibUpload</a> and <a
+            href="../bibwords/">BibWords</a>.)
 
-        that would create default HTML formats and would "enrich" the input
-        XML data file by this format.  (You would then continue the upload
-        procedure by calling successively <a
-        href="../bibupload/">BibUpload</a> and <a
-        href="../bibwords/">BibWords</a>.)
+            <p>Now consider a different situation.  You would like to add a new
+            possible format, say "HTML portfolio" and "HTML captions" in order to
+            nicely format multiple photographs in one page.  Let us suppose that
+            these two formats are called <code>hp</code> and <code>hc</code> and
+            are already loaded in the <code>collection_format</code> table.
+            (TODO: describe how this is done via WebAdmin.)  You would then
+            proceed as follows: firstly, you would prepare the corresponding <a
+            href="BEH_display.php">output behaviours</a> called <code>HP</code>
+            and <code>HC</code> (TODO: note the uppercase!) that would not enrich
+            the input file but that would produce an XML file with only
+            <code>001</code> and <code>FMT</code> tags.  (This is in order not to
+            update the bibliographic information but the formats only.)  You would
+            also prepare corresponding <a href="FORMAT_display.php">formats</a>
+            at the same time.  Secondly, you would launch the formatting as
+            follows:
 
-        <p>Now consider a different situation.  You would like to add a new
-        possible format, say "HTML portfolio" and "HTML captions" in order to
-        nicely format multiple photographs in one page.  Let us suppose that
-        these two formats are called <code>hp</code> and <code>hc</code> and
-        are already loaded in the <code>collection_format</code> table.
-        (TODO: describe how this is done via WebAdmin.)  You would then
-        proceed as follows: firstly, you would prepare the corresponding <a
-        href="BEH_display.php">output behaviours</a> called <code>HP</code>
-        and <code>HC</code> (TODO: note the uppercase!) that would not enrich
-        the input file but that would produce an XML file with only
-        <code>001</code> and <code>FMT</code> tags.  (This is in order not to
-        update the bibliographic information but the formats only.)  You would
-        also prepare corresponding <a href="FORMAT_display.php">formats</a>
-        at the same time.  Secondly, you would launch the formatting as
-        follows:
+            <blockquote>
+            <pre>
+            $ bibformat otype=HP,HC < /tmp/sample.xml > /tmp/sample_fmts_only.xml
+            <pre>
+            </blockquote>
 
-        <blockquote>
-        <pre>
-        $ bibformat otype=HP,HC < /tmp/sample.xml > /tmp/sample_fmts_only.xml
-        <pre>
-        </blockquote>
+            that should give you an XML file containing only 001 and FMT tags.
+            Finally, you would upload the formats:
 
-        that should give you an XML file containing only 001 and FMT tags.
-        Finally, you would upload the formats:
+            <blockquote>
+            <pre>
+            $ bibupload < /tmp/sample_fmts_only.xml
+            <pre>
+            </blockquote>
 
-        <blockquote>
-        <pre>
-        $ bibupload < /tmp/sample_fmts_only.xml
-        <pre>
-        </blockquote>
+            and that's it. The new formats should now appear in <a
+            href="%(weburl)s">WebSearch</a>.
+            </em>
+            </div>
 
-        and that's it. The new formats should now appear in <a
-        href="%(weburl)s">WebSearch</a>.
-        </em>
-        </div>
-
-        ''' % {'weburl':weburl, 'ln':ln}
+            ''' % {'weburl':weburl, 'ln':ln}
 
         return indent_text(out)
 
@@ -494,7 +515,7 @@ class Template:
 
         disabled = ""
         readonly = ""
-        toolbar = '<script type="text/javascript">edToolbar();</script>'
+        toolbar = """<script type="text/javascript">edToolbar('%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s');</script>""" % (weburl, ln)
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
@@ -1366,7 +1387,7 @@ class Template:
         </table>
 
         
-        <p>Here you can manage the formats elements, the elementary bricks for formats.</p>
+        <p>Here you can read the APIs of the formats elements, the elementary bricks for formats.</p>
         ''' % {'ln':ln,
                'menu': _("Menu"),
                'manage_output_formats':_("Manage Output Formats"),

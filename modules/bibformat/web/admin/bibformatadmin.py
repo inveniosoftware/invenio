@@ -56,12 +56,27 @@ def index(req, ln=cdslang):
     
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    
+
+    # Check if user is authorized to administer
+    # If not, still display page but offer to log in
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    if not auth_code:
+        is_admin = True 
+    else:
+        is_admin = False
+        
     navtrail = """<a class=navtrail href="%s/admin/index?ln=%s">%s</a>""" % (weburl, ln, _("Admin Area"))
     
     return page(title=_("BibFormat Admin"),
-                body=perform_request_index(ln=ln, warnings=warnings),
+                body=perform_request_index(ln=ln,
+                                           warnings=warnings,
+                                           is_admin=is_admin),
                 language=ln,
+                uid=uid,
                 navtrail = navtrail,
                 lastupdated=__lastupdated__,
                 req=req,

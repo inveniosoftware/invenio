@@ -49,7 +49,7 @@ def getnavtrail(previous = '', ln=cdslang):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_request_index(ln=cdslang, warnings=None):
+def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
     """
     Returns the main BibFormat admin page.
 
@@ -59,12 +59,14 @@ def perform_request_index(ln=cdslang, warnings=None):
    
     @param ln language
     @param warnings a list of messages to display at top of the page, that prevents writability in etc
+    @param is_admin indicate if user is authorized to use BibFormat
     @return the main admin page
     """
     if warnings != None and len(warnings) > 0:
         warnings = get_msgs_for_code_list(warnings, 'warning', ln)
         warnings = [x[1] for x in warnings] # Get only message, not code
-    return bibformat_templates.tmpl_admin_index(ln, warnings)
+
+    return bibformat_templates.tmpl_admin_index(ln, warnings, is_admin)
 
 def perform_request_format_templates_management(ln=cdslang, checking=0):
     """

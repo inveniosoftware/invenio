@@ -392,7 +392,7 @@ function edQuickLink(i, thisSelect) {
 	}
 }
 
-function edSpell(myField) {
+function edSpell(myField, docurl) {
 	var word = '';
 	if (document.selection) {
 		myField.focus();
@@ -409,14 +409,26 @@ function edSpell(myField) {
 		}
 	}
 	if (word == '') {
-		word = prompt('Enter a word to look up:', '');
+		word = prompt('Enter a format element name to look up:', '');
 	}
 	if (word != '') {
-		window.open('http://www.answers.com/' + escape(word));
+           word = word.replace( /^\s+/g, "" ); // remove leading white space
+
+           var words = new Array(); 
+           words = word.split(' ');
+           word = words[0] // take only element name
+           if (word.substring(0,1) == '<'){ // remove start of tag
+                word = word.substring(1,word.length)
+           }
+           if (word.substring(0,4).toLowerCase() == 'bfe_'){ // remove bfe_
+                word = word.substring(4,word.length)
+           }
+           word = word.toUpperCase() //use upper case
+           window.open(docurl +'#'+ escape(word));
 	}
 }
 
-function edToolbar() {
+function edToolbar(docurl) {
 	document.write('<div id="ed_toolbar"><span>');
 	for (i = 0; i < extendedStart; i++) {
 		edShowButton(edButtons[i], i);
@@ -424,7 +436,7 @@ function edToolbar() {
 	if (edShowExtraCookie()) {
 		document.write(
 			'<input type="button" id="ed_close" class="ed_button" onclick="edCloseAllTags();" value="Close Tags" />'
-			+ '<input type="button" id="ed_spell" class="ed_button" onclick="edSpell(edCanvas);" value="Dict" />'
+			+ '<input type="button" id="ed_spell" class="ed_button" onclick="edSpell(edCanvas,\''+ docurl+'\');" value="Element Doc" />'
 			+ '<input type="button" id="ed_extra_show" class="ed_button" onclick="edShowExtra()" value="&raquo;" style="visibility: hidden;" />'
 			+ '</span><br />'
 			+ '<span id="ed_extra_buttons">'
@@ -434,7 +446,7 @@ function edToolbar() {
 	else {
 		document.write(
 			'<input type="button" id="ed_close" class="ed_button" onclick="edCloseAllTags();" value="Close Tags" />'
-			+ '<input type="button" id="ed_spell" class="ed_button" onclick="edSpell(edCanvas);" value="Dict" />'
+			+ '<input type="button" id="ed_spell" class="ed_button" onclick="edSpell(edCanvas,\''+ docurl+'\');" value="Element Doc" />'
 			+ '<input type="button" id="ed_extra_show" class="ed_button" onclick="edShowExtra()" value="&raquo;" />'
 			+ '</span><br />'
 			+ '<span id="ed_extra_buttons" style="display: none;">'

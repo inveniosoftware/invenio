@@ -216,7 +216,8 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     if template == None:  
         ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
         # template not found in new BibFormat. Call old one
-        return call_old_bibformat(recID, format=of)
+        if php:
+            return call_old_bibformat(recID, format=of)
         ############################# END ##################################
      
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],

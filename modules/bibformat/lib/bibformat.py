@@ -38,7 +38,7 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.config import cdslang, weburl
+from invenio.config import cdslang, weburl, php
 from invenio.bibformat_config import use_old_bibformat
 try:
     import invenio.template
@@ -77,7 +77,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     @return formatted record
     """
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    if use_old_bibformat:
+    if use_old_bibformat and php:
         return bibformat_engine.call_old_bibformat(recID, format=of)
     ############################# END ##################################
     try:
