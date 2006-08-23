@@ -29,6 +29,6 @@ def format(bfo):
     for resource in resources:
 
         if resource.get("x", "") == "icon" and resource.get("u", "") == "": 
-            out += '<a href="'+weburl+'/search?recid='+bfo.control_field("001")+'"><img src="' + resource.get("q", "").replace(" ","") + '" alt="" /></a>'
+            out += '<a href="'+weburl+'/record/'+bfo.control_field("001")+'"><img src="' + resource.get("q", "").replace(" ","") + '" alt="" /></a>'
 
     return out 

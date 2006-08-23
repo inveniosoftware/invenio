@@ -33,6 +33,7 @@ FIXME: currently copies record_exists() code from search engine.  Refactor later
 import re
 import zlib
 from invenio.dbquery import run_sql
+from invenio.config import *
 
 def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     """
