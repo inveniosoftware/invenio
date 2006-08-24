@@ -2272,35 +2272,6 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_record_list_for_similarity_boxen(req, title, recID_score_list, ln=cdslang, search_pattern=''):
-    """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
-    FIXME: templatize.
-    """
-    # get user id (for formatting based on priviledge)
-    uid = getUid(req)
-    
-    recID_score_list_to_be_printed = []
-    # firstly find 5 first public records to print:
-    nb_records_to_be_printed = 0
-    nb_records_seen = 0
-    while nb_records_to_be_printed < 5 and nb_records_seen < len(recID_score_list) and nb_records_seen < 50:        
-        # looking through first 50 records only, picking first 5 public ones
-        (recID, score) = recID_score_list[nb_records_seen]
-        nb_records_seen += 1
-        if record_public_p(recID):            
-            nb_records_to_be_printed += 1
-            recID_score_list_to_be_printed.append([recID,score])
-    # secondly print them:
-    if nb_records_to_be_printed > 0:
-        req.write("""<table><tr><td>""")
-        req.write("""<table><tr><td class="blocknote">%s</td></tr></table>""" % title)      
-        req.write("""<td><tr><td><table>""")
-        for (recID, score) in recID_score_list_to_be_printed:
-            req.write("""<tr><td><font class="rankscoreinfo"><a>(%s)&nbsp;</a></font><small>&nbsp;%s</small></td></tr>""" % \
-                      (score,print_record(recID, format="hs", ln=ln, search_pattern=search_pattern, uid=uid)))
-        req.write("""</table></small></td></tr></table> """)
-    return
-                              
 def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern=''):
     """Prints list of records 'recIDs' formatted accoding to 'format' in groups of 'rg' starting from 'jrec'.
     Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
@@ -2456,6 +2427,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     if not use_old_bibformat \
            and not format.lower().startswith('t') \
            and not format.lower().startswith('hm') \
+           and not format.lower().startswith('hs') \
            and not str(format[0:3]).isdigit():
 
         #Unspecified format is hd
