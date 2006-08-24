@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,15 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-""" urlutils: tools for managing URL related problems:
-- washing,
-- redirection
+
+
+"""
+urlutils.py -- helper functions for URL related problems such as
+argument washing, redirection, etc.
 """
 
 __lastupdated__ = """$Date$"""
 __version__ = "$Id$"
 
-from urllib import urlencode
+import sre
+from urllib import urlencode, quote_plus
 from urlparse import urlparse
 from cgi import parse_qs
 
@@ -37,7 +40,6 @@ except ImportError:
     pass
 
 from invenio.config import cdslang
-
 
 def wash_url_argument(var, new_type):
     """
@@ -121,7 +123,6 @@ def get_referer(req, replace_ampersands=1):
     except KeyError:
         return ''
 
-
 def drop_default_urlargd(urlargd, default_urlargd):
     lndefault = {}
     lndefault.update(default_urlargd)
@@ -163,7 +164,6 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 
     return ''
 
-
 def a_href(text, **kargs):
     """ Build a properly escaped <a href="...">...</a> fragment.
 
@@ -179,7 +179,6 @@ def a_href(text, **kargs):
 
     return '<a %s>%s</a>' % (' '.join(attrs), text)
 
-
 def same_urls_p(a, b):
     """ Compare two URLs, ignoring reorganizing of query arguments """
 
@@ -190,4 +189,34 @@ def same_urls_p(a, b):
     ub[4] = parse_qs(ub[4], True)
 
     return ua == ub
+
+def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
+    """Analyze `urlargs' (URL CGI GET query arguments in string form)
+       and for each occurrence of argument matching `regexp_argname'
+       replace every substring `text_old' by `text_new'.  Return the
+       resulting new URL.
+
+       Used to be used for search engine's create_nearest_terms_box,
+       now it is not used there anymore.  It is left here in case it
+       will become possibly useful later.
+    """
+    out = ""
+    # parse URL arguments into a dictionary:
+    urlargsdict = parse_qs(urlargs)
+    ## construct new URL arguments:
+    urlargsdictnew = {}
+    for key in urlargsdict.keys():
+        if sre.match(regexp_argname, key): # replace `arg' by new values
+            urlargsdictnew[key] = []
+            for parg in urlargsdict[key]:
+                urlargsdictnew[key].append(parg.replace(text_old, text_new))
+        else: # keep old values
+            urlargsdictnew[key] = urlargsdict[key]
+    # build new URL for this word:
+    for key in urlargsdictnew.keys():
+        for val in urlargsdictnew[key]:
+            out += "&" + key + "=" + quote_plus(val, '')
+    if out.startswith("&"):
+        out = out[1:]
+    return out
 
