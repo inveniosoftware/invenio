@@ -1,4 +1,3 @@
-#!@PYTHON@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
@@ -63,7 +62,6 @@ import string
 import marshal
 import time
 import traceback
-from time import localtime
 from zlib import compress
 import MySQLdb
 import re
@@ -194,6 +192,7 @@ def authenticate(user, header="BibUpload Task Submission", action="runbibupload"
 
 def task_submit(options):
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+    global task_id
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
         del options["task"]
@@ -285,7 +284,7 @@ def task_run():
             #We proceed each record by record
             for record in recs:
                 error = bibupload(record)
-                if error == 1:
+                if error[0] == 1:
                     stat['nb_errors'] += 1
                 task_update_progress("Done %d out of %d." % (stat['nb_records_inserted'] + stat['nb_records_updated'],
                                                     stat['nb_records_to_upload']))
@@ -444,18 +443,22 @@ def parse_command():
     return 0
     
 def bibupload(record):
-    """ Main function: proceed a record and fit it in the tables bibfmt, bibrec, bibrec_bibxxx, bibxxx with proper record metadata """
+    """Main function: process a record and fit it in the tables
+       bibfmt, bibrec, bibrec_bibxxx, bibxxx with proper record
+       metadata.
 
+       Return (error_code, recID) of the processed record.
+    """
     error = None
     #If there are special tags to proceed check if it exists in the record
     if options['tag'] != None and not(record.has_key(options['tag'])):
         write_message("    Failed: Tag not found, enter a valid tag to update.", verbose=1, stream=sys.stderr)
-        return 1
+        return (1, -1)
     
     #Extraction of the Record Id
     rec_id = retrieve_rec_id(record)
     if rec_id == -1:
-        return 1
+        return (1, -1)
     else:
         write_message("   -Retrieve record Id (found %s) : DONE." % rec_id, verbose=2)
     write_message("   -Check if the xml marc file is already in the database : DONE" , verbose=2)
@@ -465,7 +468,7 @@ def bibupload(record):
         error = extract_tag_from_record(record, cfg_bibupload_reference_tag)
         if error == None:
             write_message("   Failed : No reference tags has been found...", verbose=1, stream=sys.stderr)
-            return 1
+            return (1, -1)
         else:
             error = None
             write_message("   -Check if reference tags exist : DONE", verbose=2)
@@ -481,7 +484,7 @@ def bibupload(record):
             write_message("   Failed: " \
                                          "Error during adding the 001 controlfield "  \
                                          "to the record", verbose=1, stream=sys.stderr)
-            return 1
+            return (1, rec_id)
         else:
             error = None
 
@@ -491,7 +494,7 @@ def bibupload(record):
         rec_old = create_record(print_record(int(rec_id),'xm'), 2)[0]
         if rec_old == None:
             write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
-            return 1
+            return (1, rec_id)
         else:
             write_message("   -Retrieve the old record to update : DONE", verbose=2)
         
@@ -516,11 +519,11 @@ def bibupload(record):
         record = insert_fmt_tags(record, rec_id)
         if record == None:
             write_message("   Stage 1 failed: Error while inserting FMT tags", verbose=1, stream=sys.stderr)
-            return 1
+            return (1, rec_id)
         elif record == 0:
             #Mode format finished
             stat['nb_records_updated'] += 1
-            return 0
+            return (0, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -546,7 +549,7 @@ def bibupload(record):
         error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
         if error == 1:
             write_message("   Failed: error during update_bibfmt_format", verbose=1, stream=sys.stderr)
-            return 1
+            return (1, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     
     # Update the database MetaData
@@ -560,7 +563,7 @@ def bibupload(record):
     # Finally we update the bibrec table with the current date
     write_message("Stage 5 : Start (Update bibrec table with current date).", verbose=2)
     if options['stage_to_start_from'] <= 5 and options['mode'] != 'insert' and options['notimechange'] == 0:
-        now = convert_datestruct_to_datetext(localtime())
+        now = convert_datestruct_to_datetext(time.localtime())
         write_message("   -Retrieve current localtime : DONE", verbose=2)
         update_bibrec_modif_date(now, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
@@ -575,7 +578,7 @@ def bibupload(record):
     
     #Upload of this record finish
     write_message("Record "+str(rec_id)+" DONE", verbose=1)
-    return 0
+    return (0, rec_id)
 
 def usage():
     """Print help"""
@@ -786,13 +789,13 @@ def retrieve_rec_id(record):
                 return -1
             else:
                 options['mode'] = 'insert'
-
+    return rec_id
 
 ### Insert functions
 
 def create_new_record():
     """Create new record in the database"""
-    now = convert_datestruct_to_datetext(localtime())
+    now = convert_datestruct_to_datetext(time.localtime())
     query = """INSERT INTO bibrec (creation_date, modification_date)
                 VALUES (%s, %s)"""
     params = (now, now)
@@ -801,7 +804,7 @@ def create_new_record():
         return rec_id
     except Error, error:
         write_message("   Error during the creation_new_record function : %s " % error, verbose=1, stream=sys.stderr) 
-
+    return None
     
 def insert_bibfmt(id_bibrec, marc, format):
     """Insert the format in the table bibfmt"""
@@ -809,13 +812,14 @@ def insert_bibfmt(id_bibrec, marc, format):
     #pickled_marc =  MySQLdb.escape_string(compress(marc))
     pickled_marc =  compress(marc)
     # get the current time
-    now = convert_datestruct_to_datetext(localtime())
+    now = convert_datestruct_to_datetext(time.localtime())
     query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s )"""
     try:
         row_id  = run_sql(query, (id_bibrec, format, now, pickled_marc))
         return row_id
     except Error, error:
         write_message("   Error during the insert_bibfmt function : %s " % error, verbose=1, stream=sys.stderr) 
+    return None
 
 def insert_record_bibxxx(tag, value):
     """Insert the record into bibxxx"""
@@ -1015,7 +1019,7 @@ def update_bibrec_modif_date(now, bibrec_id):
     params = (now, bibrec_id)
     try:
         res = run_sql(query, params)
-        if res != 0:
+        if res != 1:
             write_message("   Failed : Sql error during the update of the bibrec modification_date", verbose=1, stream=sys.stderr)
         else:
             write_message("   -Update record modification date : DONE" , verbose=2)
@@ -1031,7 +1035,7 @@ def update_bibfmt_format(id_bibrec, marc, format):
     if int(found[0]) == 1:
         # Update the format
         # get the current time
-        now = convert_datestruct_to_datetext(localtime())
+        now = convert_datestruct_to_datetext(time.localtime())
         # compress the marc value
         pickled_marc =  compress(marc)
         
@@ -1236,7 +1240,7 @@ def delete_tags_to_correct(record, rec_old):
         #Do we have to delete only a special tag or all?
         if options['tag'] == None:
             # See if these tags exist in the old record
-            if rec_old.has_key(tag):
+            if rec_old.has_key(tag) and tag != '001':
                 # Delete the tag found
                 write_message("      Delete tag: "+tag+" ind1= "+rec_old[tag][0][1]+" ind2= "+rec_old[tag][0][2], verbose=9)
                 record_delete_field(rec_old, tag, rec_old[tag][0][1], rec_old[tag][0][2])
