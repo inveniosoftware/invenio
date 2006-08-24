@@ -2357,21 +2357,34 @@ class Template:
         out += "<p><p>"
         return out
 
-    def tmpl_print_record_list_for_similarity_boxen(self, title, score_list, ln=cdslang):
+    def tmpl_print_record_list_for_similarity_boxen(self, title, recID_score_list, ln=cdslang):
         """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
-           FIXME: bad symbol names again, e.g. SCORE_LIST is *not* a list of scores.  Humph.
+           RECID_SCORE_LIST is a list of (recID1, score1), (recID2, score2), etc.
         """
 
-        from invenio.search_engine import print_record
+        from invenio.search_engine import print_record, record_public_p
 
+        recID_score_list_to_be_printed = []
+        
+        # firstly find 5 first public records to print:
+        nb_records_to_be_printed = 0
+        nb_records_seen = 0
+        while nb_records_to_be_printed < 5 and nb_records_seen < len(recID_score_list) and nb_records_seen < 50:        
+            # looking through first 50 records only, picking first 5 public ones
+            (recID, score) = recID_score_list[nb_records_seen]
+            nb_records_seen += 1
+            if record_public_p(recID):            
+                nb_records_to_be_printed += 1
+                recID_score_list_to_be_printed.append([recID,score])
+
+        # secondly print them:
         out = '''
         <table><tr><td>
           <table><tr><td class="blocknote">%(title)s</td></tr></table>
         </td>
         <tr><td><table>
         ''' % { 'title': title }
-
-        for recid, score in score_list [:5]:
+        for recid, score in recID_score_list_to_be_printed:
             out += '''
             <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
                 'score': score,
@@ -2379,8 +2392,7 @@ class Template:
                 }
 
         out += """</table></small></td></tr></table> """
-        return out
-                              
+        return out                              
 
     def tmpl_print_record_brief(self, ln, recID, weburl):
         """Displays a brief record on-the-fly
