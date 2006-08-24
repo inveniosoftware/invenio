@@ -692,31 +692,6 @@ def is_selected(var, fld):
         return " selected"
     return ""
 
-def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
-    """Analyze `urlargs' (URL CGI GET query arguments) and for each
-       occurrence of argument matching `regexp_argname' replace every
-       substring `text_old' by `text_new'.  Return the resulting URL.
-       Useful for create_nearest_terms_box."""
-    out = ""
-    # parse URL arguments into a dictionary:
-    urlargsdict = cgi.parse_qs(urlargs)
-    ## construct new URL arguments:
-    urlargsdictnew = {}
-    for key in urlargsdict.keys():
-        if sre.match(regexp_argname, key): # replace `arg' by new values
-            urlargsdictnew[key] = []
-            for parg in urlargsdict[key]:
-                urlargsdictnew[key].append(string.replace(parg, text_old, text_new))
-        else: # keep old values
-            urlargsdictnew[key] = urlargsdict[key]
-    # build new URL for this word:
-    for key in urlargsdictnew.keys():
-        for val in urlargsdictnew[key]:
-            out += "&" + key + "=" + urllib.quote_plus(val, '')
-    if out.startswith("&"):
-        out = out[1:]
-    return out
-
 class HitSet:
     """Class describing set of records, implemented as bit vectors of recIDs.
     Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
