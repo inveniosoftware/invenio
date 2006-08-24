@@ -20,7 +20,8 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibupload_config.py \
-             bibupload.py 
+             bibupload.py \
+             bibupload_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 
