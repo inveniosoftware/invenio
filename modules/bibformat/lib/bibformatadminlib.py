@@ -373,7 +373,9 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
         path = outputs_path + os.sep + filename
         output_format['editable'] = can_write_output_format(code)
         output_format['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
+        #Validate the output format
         status = check_output_format(code)
+        # If there is an error but the error is just 'format is not writable', do not display as error
         if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_WRITE_OUTPUT_FILE'):
             status = '''
             <a style="color: rgb(255, 0, 0);"

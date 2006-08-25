@@ -367,8 +367,8 @@ However you must make sure that it is removed from the tables <code>format</code
     <p><div style="float:right"><img src="guide_output_format_edit_rule2.png" alt="Reorder rules using arrows"/></div>
     The above configuration will use format template "Default HTML Detailed" if all above rules fail (in that case
     if field 980.a is different from "PICTURE"). If you have more rules, you decide in which order the conditions are evaluated. You can reorder rules by clicking on the small arrows on the left of the rules.
-    
     </p>
+    <p>Note that when you are migrating your output formats from the old PHP BibFormat, you might not have translated all the formats to which your output formats refers. In that case you should use <code>defined in old BibFormat</code> option in the format templates menu, to make BibFormat understand that a match for this rule must trigger a call to the <i>Behaviour</i> of the old BibFormat. See section on <a href="#runSideBySide">Run old and new formats side by side</a> for more details on this.</p>
     <strong>For developers and adventurers only:</strong>
     <p>To write an output format, use the following syntax:<br/>
     First you
@@ -912,6 +912,25 @@ formats, or only modified default formats in some limited places. You
 will get cleaner code if you write format elements and format
 templates yourself.
 </p>
+
+<h3><a name="runSideBySide">Run old and new formats side by side</a></h3>
+<p>You might want to migrate your formats over a long period of time, making new formats available to your
+users once they have been migrated, while old formats are still being used if they have not been translated.
+BibFormat will do this almost automatically. This section tells you what you should be aware of if you want this to work seamlessly.</p>
+<p>When BibFormat has to format a record with a given output format code, it first tries to find a corresponding
+output format in the (new) output formats directory. If the output format cannot be found, it handle the formatting process
+to the old BibFormat, which will look for a behaviour with a name corresponding to code. This leads to the first rule you should follow:</p>
+<p align="center"><i>For each of the Behaviours you want to migrate, you should have an Output Format with a code corresponding to the name of the Behaviour.</i></p>
+<p>The second (and last) rule is as simple as the first one. Imagine you have a Behaviour "HD" that you want to migrate to Output Format "HB". Let's say that "HD" links to 'picture_HTML_detailed' format if field <code>980$a</code> is equal to "Picture", and links to 'default_HTML_detailed' in all other cases, but that 'picture_HTML_detailed' has not been migrated to a new format template. Then second rule says:<p>
+<p align="center"><i>Output Formats should have the same conditions on tags as Behaviours, even if format for that condition has not been migrated.</i></p>
+<p>In our example if you open the "HD" ouput format in the web interface, we can add a rule that works on condition <code>"If 980$a is PICTURE"</code> and set the template to be used to "defined in old BibFormat" in the template menu. This looks strange, this is the only way to tell BibFormat that it should consider this condition and not go to the default rule and use the default template.</p>
+<strong>For developers and adventurers only:</strong>
+<p>If you are to write Output Formats without the web interface, you should use the name <code>migration_in_progress</code> for each template which has not been migrated. The above example would therefore become:<br/>
+  <code>tag 980.a :<br/>
+PICTURE --- migration_in_progress<br/>
+default: Default_HTML_detailed.bft</code>
+  </p>
+
 <h2><a name="faq">FAQ</a></h2>
 
 <h3>Why do we need output formats? Wouldn't format templates be sufficient?</h3>

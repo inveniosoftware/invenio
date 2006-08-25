@@ -1128,11 +1128,20 @@ class Template:
                     out += '''<option value="%(template)s" selected="selected">%(name)s</option>''' % attrs
             
             if not format_templates.has_key(rule['template']) and rule['template'] != "":
-                #case where a non existing format tempate is use in output format
+                #case where a non existing format template is use in output format
                 #we need to add it as option
                 out += '''<option value="%s" selected="selected">%s</option>''' % (rule['template'],
                                                                                    rule['template'])
                 
+            ################ FIXME remove when migration is done ####################
+            #Let the user choose a non existing template, that is a placeholder
+            #meaning that the template has not been migrated
+            selected = ''
+            if rule['template'] == 'migration_in_progress':
+                selected = 'selected="selected"'
+            out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
+            ################               END FIXME             ####################
+            
             out += '''</select>&nbsp;if field
             &nbsp;<input type="text" name="r_fld" value="%(field)s" size="10" %(readonly)s/>&nbsp;is equal to&nbsp;<input type="text" value="%(value)s" name="r_val" %(readonly)s/>
             </td>
@@ -1178,6 +1187,16 @@ class Template:
             #case where a non existing format tempate is use in output format
             #we need to add it as option (only if it is not empty string)
             out += '''<option value="%s" selected="selected">%s</option>''' % (default,default)
+
+        ################ FIXME remove when migration is done ####################
+        #Let the user choose a non existing template, that is a placeholder
+        #meaning that the template has not been migrated
+        selected = ''
+        if default == 'migration_in_progress':
+            selected = 'selected="selected"'
+        out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
+        ################               END FIXME             ####################
+            
         out += '''</select></td>
         </tr>
         </table>

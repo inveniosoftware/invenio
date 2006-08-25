@@ -41,6 +41,8 @@ from invenio import bibformat_dblayer
 from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path, elements_import_path
 from bibformat_utils import record_get_xml
 
+from xml.dom import minidom #Remove when call_old_bibformat is removed
+
 __lastupdated__ = """$Date$"""
 
 #Cache for data we have allready read and parsed
@@ -150,7 +152,7 @@ def call_old_bibformat(recID, format="HD"):
     perform un-XML-izing here in order to return HTML body only.
     """
     # look for formatted notice existence:
-    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
+    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
     res = run_sql(query, None, 1)
     if res:
         # record 'recID' is formatted in 'format', so print it
@@ -213,12 +215,13 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
 
-    if template == None:  
-        ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
+    ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
+    path = "%s%s%s" % (templates_path, os.sep, template)
+    if template == None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
         if php:
             return call_old_bibformat(recID, format=of)
-        ############################# END ##################################
+    ############################# END ##################################
      
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
                                        file='error', ln=cdslang)

@@ -80,6 +80,13 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     if use_old_bibformat and php:
         return bibformat_engine.call_old_bibformat(recID, format=of)
     ############################# END ##################################
+    return bibformat_engine.format_record(recID=recID,
+                                          of=of,
+                                          ln=ln,
+                                          verbose=verbose,
+                                          search_pattern=search_pattern,
+                                          xml_record=xml_record,
+                                          uid=uid)
     try:
         return bibformat_engine.format_record(recID=recID,
                                               of=of,
