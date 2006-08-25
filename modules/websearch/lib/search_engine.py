@@ -2427,7 +2427,6 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     if not use_old_bibformat \
            and not format.lower().startswith('t') \
            and not format.lower().startswith('hm') \
-           and not format.lower().startswith('hs') \
            and not str(format[0:3]).isdigit():
 
         #Unspecified format is hd
