@@ -1139,7 +1139,9 @@ class Template:
             selected = ''
             if rule['template'] == 'migration_in_progress':
                 selected = 'selected="selected"'
-            out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
+            if php or selected != '':
+                out += '''<option disabled="disabled">For Migration:</option>'''
+                out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
             ################               END FIXME             ####################
             
             out += '''</select>&nbsp;if field
@@ -1194,7 +1196,9 @@ class Template:
         selected = ''
         if default == 'migration_in_progress':
             selected = 'selected="selected"'
-        out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
+        if php or selected != '':
+            out += '''<option disabled="disabled">For Migration:</option>'''
+            out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
         ################               END FIXME             ####################
             
         out += '''</select></td>
