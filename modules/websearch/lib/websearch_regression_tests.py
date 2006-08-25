@@ -484,21 +484,21 @@ class WebSearchNearestTermsTest(unittest.TestCase):
     terms box."""
 
     def test_nearest_terms_box_in_okay_query(self):
-        """ websearch - no nearest terms box for an okay query """
+        """ websearch - no nearest terms box for a successful query """
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=ellis',
                                                expected_text="jump to record"))
         
-    def test_nearest_terms_box_in_failed_simple_query(self):
-        """ websearch - nearest terms box for failed simple query """
+    def test_nearest_terms_box_in_unsuccessful_simple_query(self):
+        """ websearch - nearest terms box for unsuccessful simple query """
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=ellisz',
                                                expected_text="Nearest terms in any collection are",
                                                expected_link_target=weburl+"/search?p=embed",
                                                expected_link_label='embed'))
 
-    def test_nearest_terms_box_in_failed_structured_query(self):
-        """ websearch - nearest terms box for failed structured query """
+    def test_nearest_terms_box_in_unsuccessful_structured_query(self):
+        """ websearch - nearest terms box for unsuccessful structured query """
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
@@ -510,16 +510,21 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=weburl+"/search?p=author%3Afabbro",
                                                expected_link_label='fabbro'))
 
-    def test_nearest_terms_box_in_failed_phrase_query(self):
-        """ websearch - nearest terms box for failed phrase query """
+    def test_nearest_terms_box_in_unsuccessful_phrase_query(self):
+        """ websearch - nearest terms box for unsuccessful phrase query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=author%3A%22Ellis%2C+Z%22',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=weburl+"/search?p=author%3A%22Enqvist%2C+K%22",
+                                               expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=%22ellisz%22&f=author',
                                                expected_text="Nearest terms in any collection are",
                                                expected_link_target=weburl+"/search?p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
-
-    def test_nearest_terms_box_in_failed_boolean_query(self):
-        """ websearch - nearest terms box for failed boolean query """
+        
+    def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
+        """ websearch - nearest terms box for unsuccessful boolean query """
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=title%3Aellisz+author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
@@ -541,13 +546,53 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
+class WebSearchBooleanQueryTest(unittest.TestCase):
+    """Check various boolean queries."""
+
+    def test_successful_boolean_query(self):
+        """ websearch - successful boolean query """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellis+muon',
+                                               expected_text="records found",
+                                               expected_link_label="Detailed record"))
+
+    def test_unsuccessful_boolean_query_where_all_individual_terms_match(self):
+        """ websearch - unsuccessful boolean query where all individual terms match """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellis+muon+letter',
+                                               expected_text="Boolean query returned no hits. Please combine your search terms differently."))
+
+class WebSearchAuthorQueryTest(unittest.TestCase):
+    """Check various author-related queries."""
+
+    def test_propose_similar_author_names_box(self):
+        """ websearch - propose similar author names box """
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=Ellis%2C+R&f=author',
+                                               expected_text="See also: similar author names",
+                                               expected_link_target=weburl+"/search?p=Ellis%2C+R+K&f=author",
+                                               expected_link_label="Ellis, R K"))
+
+    def test_do_not_propose_similar_author_names_box(self):
+        """ websearch - do not propose similar author names box """
+        errmsgs = test_web_page_content(weburl + '/search?p=author%3A%22Ellis%2C+R%22',
+                                        expected_link_target=weburl+"/search?p=Ellis%2C+R+K&f=author",
+                                        expected_link_label="Ellis, R K")
+        if errmsgs[0].find("does not contain link to") > -1:
+            pass
+        else:
+            self.fail("Should not propose similar author names box.")
+        return
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
                              WebSearchTestCollections,
                              WebSearchTestRecord,
                              WebSearchTestLegacyURLs,
-                             WebSearchNearestTermsTest)
+                             WebSearchNearestTermsTest,
+                             WebSearchBooleanQueryTest,
+                             WebSearchAuthorQueryTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
