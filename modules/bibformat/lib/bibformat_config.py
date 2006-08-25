@@ -43,7 +43,7 @@ cfg_bibformat_error_messages = \
 {   'ERR_BIBFORMAT_INVALID_TAG'                   :  '%s is an invalid tag.',
     'ERR_BIBFORMAT_NO_TEMPLATE_FOUND'             :  'No template could be found for output format %s.',
     'ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME'   :  'Could not find format element corresponding to %s.',
-    'ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME '   :  'Could not find output format corresponding to %s.',
+    'ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME'   :  'Could not find output format corresponding to %s.',
     'ERR_BIBFORMAT_CANNOT_RESOLVE_TEMPLATE_FILE'  :  'Could not find format template corresponding to %s.', 
     'ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND'      :  'Format element %s could not be found.',
     'ERR_BIBFORMAT_BAD_BFO_RECORD'                :  'Could not initialize new BibFormatObject with record id %s.',

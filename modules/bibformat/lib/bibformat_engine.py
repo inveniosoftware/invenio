@@ -454,7 +454,12 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
 
         #Get values corresponding to tags
         for tag in tags:
-            values = bfo.fields(tag)#Retrieve record values for tag
+            p_tag = parse_tag(tag)
+            values = record_get_field_values(bfo.get_record(),
+                                             p_tag[0],
+                                             p_tag[1],
+                                             p_tag[2],
+                                             p_tag[3])
             if len(values)>0 and isinstance(values[0], dict):#flatten dict to its values only
                 values_list = map(lambda x: x.values(), values)
                 #output_text.extend(values)

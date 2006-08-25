@@ -30,7 +30,8 @@ def format(bfo, separator=" ", highlight='no'):
     title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
 
-    titles.append( title + title_remainder )
+    if len(title) > 0:
+        titles.append( title + title_remainder )
 
     title = bfo.field('0248_a')
     if len(title) > 0:
@@ -43,6 +44,12 @@ def format(bfo, separator=" ", highlight='no'):
     title = bfo.field('246_1a')
     if len(title) > 0:
         titles.append( title )
+
+    if len(titles) > 0:
+        #Display 'Conference' title only if other titles were not found
+        title = bfo.field('111__a')
+        if len(title) > 0:
+            titles.append( title )
 
     if highlight == 'yes':
         from invenio import bibformat_utils

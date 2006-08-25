@@ -26,7 +26,7 @@ def format(bfo, highlight="no"):
     
     @param highlight highlights the words corresponding to search query if set to 'yes'
     """
-    
+
     title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
     edition_statement = bfo.field('250__a')
@@ -36,6 +36,10 @@ def format(bfo, highlight="no"):
         out += title_remainder + " : "
     if len(edition_statement) > 0:
         out += edition_statement + " ; "
+
+    #Try to display 'Conference' title if other titles were not found
+    if out == '':
+        out += bfo.field('111__a')
 
     if highlight == 'yes':
         from invenio import bibformat_utils

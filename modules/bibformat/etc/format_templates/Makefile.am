@@ -22,7 +22,8 @@ etcdir = $(sysconfdir)/bibformat/format_templates
 etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Default_HTML_detailed.bft Default_HTML_portfolio.bft \
 	   Picture_HTML_detailed.bft Default_HTML_brief.bft \
-	   BibTeX.bft MARCXML.bft Excel.bft XMLDC.bft
+	   BibTeX.bft MARCXML.bft Excel.bft XMLDC.bft \
+	   Default_HTML_similarity.bft
 
 tmpdir = $(prefix)/var/tmp
 
