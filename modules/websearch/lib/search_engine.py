@@ -1760,8 +1760,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
                         argd[px] = string.replace(argd[px], p, term)
                         break
                 else:
-                    if string.find(argd[px], f+":"+p) > -1:
-                        argd[px] = string.replace(argd[px], f+":"+p, f+":"+term)
+                    if string.find(argd[px], f+':'+p) > -1:
+                        argd[px] = string.replace(argd[px], f+':'+p, f+':'+term)
+                        break
+                    elif string.find(argd[px], f+':"'+p+'"') > -1:
+                        argd[px] = string.replace(argd[px], f+':"'+p+'"', f+':"'+term+'"')
                         break
                     
         terminfo.append((term, hits, argd))
