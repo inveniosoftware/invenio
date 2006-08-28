@@ -107,9 +107,7 @@ sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
 sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
 
-
-
-def get_alphabetically_ordered_collection_list(collid=1, level=0):
+def get_alphabetically_ordered_collection_list(level=0):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
