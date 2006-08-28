@@ -88,11 +88,11 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                         if fields != "empty":
                             for field in fields:
                                 if tag != '001':
-                                    body += bibedit_templates.tmpl_table_value(ln, recid, temp, tag,
+                                    body += bibedit_templates.tmpl_table_value(ln, recid, tag,
                                                                                field, format_tag, "record", add)
 
                     if add == 3:
-                        body += bibedit_templates.tmpl_table_value(ln, recid, temp, '', [], format_tag, "record", add, 1)
+                        body += bibedit_templates.tmpl_table_value(ln, recid, '', [], format_tag, "record", add, 1)
 
                     body += bibedit_templates.tmpl_table_footer(ln, "record", add)
 
@@ -147,7 +147,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
     if fields != "empty":
         for field in fields:
             if field[4] == int(num_field) :
-                body += bibedit_templates.tmpl_table_value(ln, recid, temp, tag, field, format_tag, "edit", add)
+                body += bibedit_templates.tmpl_table_value(ln, recid, tag, field, format_tag, "edit", add)
                 break
             
     body += bibedit_templates.tmpl_table_footer(ln, "edit", add)
