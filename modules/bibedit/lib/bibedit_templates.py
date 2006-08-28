@@ -138,7 +138,7 @@ class Template:
                                   'result' : result}
 
         
-    def tmpl_table_value(self, ln, recid, temp, tag, field, format_tag, type_table, add, form_add=0):        
+    def tmpl_table_value(self, ln, recid, tag, field, format_tag, type_table, add, form_add=0):        
         """ Return a field to print in table. """
 
         if form_add == 0:
