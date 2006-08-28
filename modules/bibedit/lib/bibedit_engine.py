@@ -323,7 +323,7 @@ def add_subfield(recid, uid, tag, record, num_field, subcode, value):
                 if subfield[0] == subcode:
                     same_subfield = True
 
-            if same_subfield == False:     
+            if same_subfield is False:     
                 field_add_subfield(record[tag][i], subcode, value)
                 break
 
