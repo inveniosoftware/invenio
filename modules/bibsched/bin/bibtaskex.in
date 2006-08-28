@@ -20,8 +20,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio Bibliographic Task Example.  Demonstrates BibTask <-> BibSched connectivity,
-signal handling, error handling, etc.
+"""CDS Invenio Bibliographic Task Example.
+
+Demonstrates BibTask <-> BibSched connectivity, signal handling,
+error handling, etc.
 """
 
 __version__ = "$Id$"
@@ -37,13 +39,13 @@ try:
     import signal
     import sre
     import string
-    import sys
     import time
     import traceback
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
+
+options = {} # global variable to hold task options
 
 cfg_n_default = 30 # how many Fibonacci numbers to calculate if none submitted?
 
@@ -78,17 +80,23 @@ def write_message(msg, stream=sys.stdout):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
@@ -101,6 +109,8 @@ def task_sig_stop(sig, frame):
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -109,7 +119,8 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def fib(n):
     """Returns Fibonacci number for 'n'."""
@@ -153,8 +164,9 @@ def authenticate(user, header="BibTaskEx Task Submission", action="runbibtaskex"
             sys.exit(1)
     return user
 
-def task_submit(options):
+def task_submit():
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+    global options
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
         del options["task"]
@@ -175,17 +187,17 @@ def task_submit(options):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
 
 def task_read_status(task_id):
     """Read status information in the BibSched task table."""
@@ -207,11 +219,11 @@ def task_get_options(id):
         sys.exit(1)
     return out
 
-def task_run():
+def task_run(task_id):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call.
-       The task prints Fibinacci numbers for up to NUM on the stdout, and some messages on stderr.
+       The task prints Fibonacci numbers for up to NUM on the stdout, and some messages on stderr.
        Return 1 in case of success and 0 in case of failure."""
-    global task_id, options
+    global options
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -277,13 +289,13 @@ def usage(exitcode=1, msg=""):
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
        Useful for learning on how to write BibSched tasks."""
-    global task_id, options
+    global options
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
         try:
-            if not task_run():
+            if not task_run(task_id):
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
@@ -325,7 +337,7 @@ def main():
                     usage(1)
         except StandardError, e:
             usage(e)        
-        task_submit(options)
+        task_submit()
     return
 
 ### okay, here we go:
