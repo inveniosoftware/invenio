@@ -9,6 +9,7 @@ autom4te.cache
 aclocal.m4
 z_*
 *.O
+*.pyc
 *~
 *.tar.gz
 index.wml
