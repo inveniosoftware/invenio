@@ -138,23 +138,29 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 ##
 
 def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_records=None, uid=None,
-                   prefix=None, separator=None, suffix=None, req=None):
+                   record_prefix=None, record_separator=None, record_suffix=None,
+                   prologue="", epilogue="", req=None):
     """
     Returns a list of formatted records given by a list of record IDs or a list of records as xml.
     Adds a prefix before each record, a suffix after each record, plus a separator between records.
 
+    Also add optional prologue and epilogue to the complete formatted list.
+    
     You can either specify a list of record IDs to format, or a list of xml records,
     but not both (if both are specified recIDs is ignored).
     
-    'separator' is a function that returns a string as separator between records.
+    'record_separator' is a function that returns a string as separator between records.
     The function must take an integer as unique parameter, which is the index
     in recIDs (or xml_records) of the record that has just been formatted. For example
     separator(i) must return the separator between recID[i] and recID[i+1].
     Alternatively separator can be a single string, which will be used to separate
     all formatted records.
+    The same applies to 'record_prefix' and 'record_suffix'.
 
     'req' is an optional parameter on which the result of the function
     are printed lively (prints records after records) if it is given.
+    Note that you should set 'req' content-type by yourself, and send http header before calling
+    this function as it will not do it. 
     
     This function takes the same parameters as 'format_record' except for:
     @param recIDs a list of record IDs
@@ -163,8 +169,11 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
     @param separator either a string or a function that returns string to separate formatted records
     @param req an optional request object where to print records
     """
+    if req != None:
+        req.write(prologue)
+    
     formatted_records = ''
-        
+
     #Fill one of the lists with Nones
     if xml_records != None:
         recIDs = map(lambda x:None, xml_records)
@@ -178,13 +187,13 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
             last_iteration = True
        
         #Print prefix
-        if prefix != None:
-            if isinstance(prefix, str):
-                formatted_records += prefix
+        if record_prefix != None:
+            if isinstance(record_prefix, str):
+                formatted_records += record_prefix
                 if req != None:
-                    req.write(prefix)
+                    req.write(record_prefix)
             else:
-                string_prefix = prefix(i)
+                string_prefix = record_prefix(i)
                 formatted_records += string_prefix
                 if req != None:
                     req.write(string_prefix)
@@ -196,30 +205,33 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
             req.write(formatted_record)
             
         #Print suffix
-        if suffix != None:
-            if isinstance(suffix, str):
-                formatted_records += suffix
+        if record_suffix != None:
+            if isinstance(record_suffix, str):
+                formatted_records += record_suffix
                 if req != None:
-                    req.write(suffix)
+                    req.write(record_suffix)
             else:
-                string_suffix = suffix(i)
+                string_suffix = record_suffix(i)
                 formatted_records += string_suffix
                 if req != None:
                     req.write(string_suffix)
                 
         #Print separator if needed
-        if separator != None and not last_iteration:
-            if isinstance(separator, str):
-                formatted_records += separator
+        if record_separator != None and not last_iteration:
+            if isinstance(record_separator, str):
+                formatted_records += record_separator
                 if req != None:
-                    req.write(separator)
+                    req.write(record_separator)
             else:
-                string_separator = separator(i)
+                string_separator = record_separator(i)
                 formatted_records += string_separator
                 if req != None:
                     req.write(string_separator)
+
+    if req != None:
+        req.write(epilogue)
   
-    return formatted_records
+    return prologue + formatted_records + epilogue
 
 def create_excel(recIDs, req=None, ln=cdslang):
     """
@@ -257,15 +269,15 @@ def create_excel(recIDs, req=None, ln=cdslang):
         req.content_type = get_output_format_content_type('excel')
         req.headers_out["Content-Disposition"] = "inline; filename=%s" % 'results.xls'
         req.send_http_header()
-        req.write(column_headers)
 
     #Format the records
     excel_formatted_records = format_records(recIDs, 'excel', ln=cdslang,
-                                             separator='\n', req=req)
-    if req != None:
-        req.write(footer)
+                                             record_separator='\n',
+                                             prologue = column_headers,
+                                             epilogue = footer,
+                                             req=req)
     
-    return column_headers + excel_formatted_records + footer
+    return excel_formatted_records
 
 # Utility functions
 ##
