@@ -1155,9 +1155,7 @@ def create_collection_i18nname_cache():
         return names
     for c,ln,i18nname in res:
         if i18nname:
-            try:
-                names[c]
-            except KeyError:
+            if not names.has_key(c):
                 names[c] = {}
             names[c][ln] = i18nname
     # update timestamp:
@@ -1189,9 +1187,7 @@ def create_field_i18nname_cache():
         return names
     for f,ln,i18nname in res:
         if i18nname:
-            try:
-                names[f]
-            except KeyError:
+            if not names.has_key(f):
                 names[f] = {}
             names[f][ln] = i18nname
     # update timestamp:
