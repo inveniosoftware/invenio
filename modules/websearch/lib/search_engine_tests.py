@@ -173,7 +173,7 @@ class TestQueryParser(unittest.TestCase):
         
     def test_parsing_structured_regexp_query(self):
         "search engine - parsing structured regexp query"
-        self._check("title:/(one|two)/", '', None, [['+', '(one|two)', 'title', 'r']]),
+        self._check("title:/(one|two)/", '', None, [['+', '(one|two)', 'title', 'r']])
         
     def test_parsing_combined_structured_query_in_a_field(self):
         "search engine - parsing structured query in a field"
