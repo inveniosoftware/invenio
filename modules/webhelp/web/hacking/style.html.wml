@@ -80,7 +80,6 @@ A brief description of things we strive at, more or less unsuccessfully.
    uninitialized variables and to improve its quality and conformance
    to the coding standard.  The typical incantation may be:
 
-       $ cd <LIBDIR>/python/invenio
        $ pylint --max-line-length=120 oai_repository.py | most
 
    If you develop in Emacs, run M-x pylint RET on your buffers
