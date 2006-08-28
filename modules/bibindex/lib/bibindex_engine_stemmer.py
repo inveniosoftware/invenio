@@ -22,15 +22,15 @@ from invenio.bibindex_engine_config import *
 def create_stemmers():
     """Create stemmers dictionary for all possible languages."""
     languages = {'fr': 'french', 'en': 'english', 'no':'norwegian', 'sv':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
-    stemmers = {}
+    stemmers_initialized = {}
     try:
         import Stemmer
         for (key, value) in languages.iteritems():
-            stemmers[key] = Stemmer.Stemmer(value)
+            stemmers_initialized[key] = Stemmer.Stemmer(value)
 
     except ImportError:
         pass # PyStemmer isn't available
-    return stemmers
+    return stemmers_initialized
 
 stemmers = create_stemmers()
 
@@ -38,10 +38,12 @@ def is_stemmer_available_for_language(lang):
     """Return true if stemmer for language LANG is available.
        Return false otherwise.
     """
+    global stemmers
     return stemmers.has_key(lang)
     
 def stem(word, lang=cfg_bibindex_stemmer_default_language):
     """Return WORD stemmed according to language LANG (e.g. 'en')."""
+    global stemmers
     if lang and is_stemmer_available_for_language(lang):
         return stemmers[lang].stem(word)
     else:
