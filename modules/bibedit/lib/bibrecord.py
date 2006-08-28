@@ -20,159 +20,113 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibRecord - XML MARC processing library for CDS Invenio
+BibRecord - XML MARC processing library for CDS Invenio.
+
+Does not access the database, the input is MARCXML only.
 """
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
     
-## import interesting modules:
-try:
-    import sys
-    import re
-    from zlib import decompress
-    import_error = 0
-except ImportError, e:
-    import_error = 1
-    imperr = e
-
+import string
+import sys
+import re
 try:
     import psyco
-    psycho  = 1
-except ImportError, e:
-    psycho = 0
+    psycho_available  = 1
+except ImportError:
+    psycho_available = 0
     
-## test available parsers:
-try:
-    import sys
-    import string
-    err=[]
-except ImportError, e:
-    parser = -3
-    err1 = e
+from invenio.bibrecord_config import cfg_marc21_dtd, \
+                                     cfg_bibrecord_warning_msgs, \
+                                     cfg_bibrecord_default_verbose_level, \
+                                     cfg_bibrecord_default_correct, \
+                                     cfg_bibrecord_parsers_available
 
-try:
-    from invenio.bibrecord_config import *
-    verbose = cfg_bibrecord_default_verbose_level
-    correct = cfg_bibrecord_default_correct
-    parsers = cfg_bibrecord_parsers_available
-except ImportError, e:
-    parser = -2
-    verbose = 0
-    correct = 0
-    parsers = []
-
-if parsers == []:
-    print 'No parser available'
-    sys.exit(2)
-else:
-    j,i=1,1
-
-    if 2 in parsers:
-        try:
-            import pyRXP
-            parser = 2
-    ## function to show the pyRXP_parser warnings ##
-            def warnCB(s):
-                """ function used to treat the PyRXP parser warnings"""
-                global err
-                err.append((0,'Parse warning:\n'+s))
-        
-            err2 = ""
-        except ImportError,e :
-            err2=e
-            i=0
-    elif 1 in parsers:
-        try:
-            from Ft.Xml.Domlette import NonvalidatingReader
-            parser = 1
-        except ImportError,e :
-            err2=e
-            j=0
-    elif 0 in parsers:
-        try:
-            from xml.dom.minidom import parseString
-            parser = 0
-        except ImportError,e :
-            err2=e
-            parser = -1
-
-    if not i:
-        if 1 in parsers:
-            try:
-                from Ft.Xml.Domlette import NonvalidatingReader
-                parser = 1
-            except ImportError,e :
-                err2=e
-                j=0
-        elif 0 in parsers:
-            try:
-                from xml.dom.minidom import parseString
-                parser = 0
-            except ImportError,e :
-                err2=e
-                parser = -1
-        else:
-            parser = -1
-
-    if not j:
-        if 0 in parsers:
-            try:
-                from xml.dom.minidom import parseString
-                parser = 0
-            except ImportError,e :
-                err2=e
-                parser = -1
-        else:
-            parser = -1
+# find out about the best usable parser:
+err = []
+parser = -1
+if 2 in cfg_bibrecord_parsers_available:
+    try:
+        import pyRXP
+        parser = 2
+        def warnCB(s):
+            """ function used to treat the PyRXP parser warnings"""
+            global err
+            err.append((0, 'Parse warning:\n'+s))
+    except ImportError:
+        pass
+if parser == -1 and \
+       1 in cfg_bibrecord_parsers_available:
+    try:
+        from Ft.Xml.Domlette import NonvalidatingReader
+        parser = 1
+    except ImportError:
+        pass
+if parser == -1 and \
+       0 in cfg_bibrecord_parsers_available:
+    try:
+        from xml.dom.minidom import parseString
+        parser = 0
+    except ImportError:
+        pass
 
 ### INTERFACE / VISIBLE FUNCTIONS
 
-def create_records(xmltext,verbose=verbose,correct=correct):
-	"""
-	creates a list of records 
-	"""
-        global import_error
-        err = []
+def create_records(xmltext,
+                   verbose=cfg_bibrecord_default_verbose_level,
+                   correct=cfg_bibrecord_default_correct):
+    """
+    Create list of record from XMLTEXT.  Return a list of objects
+    initiated by create_record() function; please see that function's
+    docstring.
+    """
+    global parser
+    err = []
 
-        if import_error == 1:
-            err.append((6,imperr))
+    if parser == -1:
+        err.append((6, "import error"))
+    else:
+        if sys.version >= '2.3':
+            pat = r"<record.*?>.*?</record>"
+            p = re.compile(pat, re.DOTALL) # DOTALL - to ignore whitespaces
+            alist = p.findall(xmltext)
         else:
-            if sys.version >= '2.3':
-                pat = r"<record.*?>.*?</record>"
-                p = re.compile(pat,re.DOTALL) # DOTALL - to ignore whitespaces
-                list = p.findall(xmltext)
-            else:
-                l = xmltext.split('<record>')
-                n=len(l)
-                ind = (l[n-1]).rfind('</record>')
-                aux = l[n-1][:ind+9]
-                l[n-1] = aux
-                list=[]
-                for s in l:
-                    if s != '':
-                        i = -1
-                        while (s[i].isspace()):
-                            i=i-1
-                        if i == -1:#in case there are no spaces  at the end
-                            i=len(s)-1
-                        if s[:i+1].endswith('</record>'):
-                            list.append('<record>'+s)            
-            listofrec = map((lambda x:create_record(x,verbose,correct)),list)
-            return listofrec
-        return []
+            l = xmltext.split('<record>')
+            n = len(l)
+            ind = (l[n-1]).rfind('</record>')
+            aux = l[n-1][:ind+9]
+            l[n-1] = aux
+            alist = []
+            for s in l:
+                if s != '':
+                    i = -1
+                    while (s[i].isspace()):
+                        i = i - 1
+                    if i == -1:#in case there are no spaces  at the end
+                        i = len(s) - 1
+                    if s[:i+1].endswith('</record>'):
+                        alist.append('<record>'+s)            
+        listofrec = map((lambda x:create_record(x, verbose, correct)),
+                        alist)
+        return listofrec
+    return []
 
 # Record :: {tag : [Field]}
 # Field :: (Subfields,ind1,ind2,value)
 # Subfields :: [(code,value)]
 
-def create_record(xmltext,verbose = verbose, correct=correct):
+def create_record(xmltext,
+                  verbose=cfg_bibrecord_default_verbose_level,
+                  correct=cfg_bibrecord_default_correct):
     """
-    Creates a record object given its XML representation and returns it.
+    Create a record object from XMLTEXT and return it.
 
-    Uses pyRXP if installed else uses 4Suite domlette or xml.dom.minidom
+    Uses pyRXP if installed else uses 4Suite domlette or xml.dom.minidom.
 
-    The returned object is a tuple (record, x, list_of_errors), where
-    x is 0 when there are errors, 1 when no errors. The record has this structure:
+    The returned object is a tuple (record, status_code, list_of_errors), where
+    status_code is 0 when there are errors, 1 when no errors.
+
+    The return record structure is as follows:
     Record := {tag : [Field]}
     Field := (Subfields, ind1, ind2, value)
     Subfields := [(code, value)]
@@ -201,39 +155,36 @@ def create_record(xmltext,verbose = verbose, correct=correct):
     @param xmltext an XML string representation of the record to create
     @param verbose the level of verbosity: 0(silent) 1-2 (warnings) 3(strict:stop when errors)
     @param correct 1 to enable correction on XML. Else 0.
-    @return a tuple (record, x, list_of_errors), where x is 0 where there are errors, 1 when no errors
+    @return a tuple (record, status_code, list_of_errors), where status_code is 0 where there are errors, 1 when no errors
     """
     global parser
 
-    (i,errors) = testImports(parser)
-    if i==0:
-        print "Error: no suitable XML parsers found.  Please read INSTALL file."
-        sys.exit()
-
     try:
-        if parser==2:
+        if parser == 2:
             ## the following is because of DTD validation
             t = """<?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE collection SYSTEM "file://%s">
             <collection>\n""" % cfg_marc21_dtd
-            t = "%s%s" % (t,xmltext)
+            t = "%s%s" % (t, xmltext)
             t = "%s</collection>" % t
             xmltext = t
-            (rec,er) = create_record_RXP(xmltext,verbose,correct)
-        elif parser:
-            (rec,er) = create_record_4suite(xmltext,verbose,correct)
+            (rec, er) = create_record_RXP(xmltext, verbose, correct)
+        elif parser == 1:
+            (rec, er) = create_record_4suite(xmltext, verbose, correct)
+        elif parser == 0:
+            (rec, er) = create_record_minidom(xmltext, verbose, correct)
         else:
-            (rec,er) = create_record_minidom(xmltext,verbose,correct)
+            (rec, er) = (None, "ERROR: No usable XML parsers found.")
         errs = warnings(er)
     except Exception, e:
         print e
         errs = warnings(concat(err))
-        return (None,0,errs)
+        return (None, 0, errs)
     
     if errs == []: 
-        return (rec,1,errs)
+        return (rec, 1, errs)
     else:
-        return (rec,0,errs)
+        return (rec, 0, errs)
 
 def record_get_field_instances(rec, tag="", ind1="", ind2=""):
     """
@@ -273,7 +224,7 @@ def record_get_field_instances(rec, tag="", ind1="", ind2=""):
         return rec.items()
     return out
 
-def record_has_field(rec,tag):
+def record_has_field(rec, tag):
     """checks whether record 'rec' contains tag 'tag'"""
     return rec.has_key(tag)
         
@@ -297,7 +248,7 @@ def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafiel
     """
 
     # detect field number to be used for insertion:
-    vals=rec.values()
+    vals = rec.values()
     if vals != []:
         try:
             newfield_number = 1 + max([f[4] for v in vals for f in v])
@@ -322,7 +273,7 @@ def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafiel
     # return new field number:
     return newfield_number
         
-def record_delete_field(rec,tag,ind1="",ind2=""):
+def record_delete_field(rec, tag, ind1="", ind2=""):
     """
     delete all fields defined with marc tag 'tag' and indicators 'ind1' and 'ind2'
     from record 'rec'
@@ -504,7 +455,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2) and field[3] != '':
-                            tmp.append(field[3])
+                        tmp.append(field[3])
         elif code == '%':
             #Code is wildcard. Consider all subfields
             for tag in tags:
@@ -516,7 +467,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                             tmp.append(subfield[1])
         else:
             #Code is specified. Consider all corresponding subfields
-             for tag in tags:
+            for tag in tags:
                 fields = rec[tag]
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
@@ -553,20 +504,20 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
     #Nothing was found 
     return tmp
 
-def print_rec(rec,format=1):
+def print_rec(rec, format=1):
     """prints a record
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
       """
 
-    if format==1:
+    if format == 1:
         text = record_xml_output(rec)
     else:
         return ''
 
     return text
 
-def print_recs(listofrec,format=1):
+def print_recs(listofrec, format=1):
     """prints a list of records
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
@@ -578,7 +529,7 @@ def print_recs(listofrec,format=1):
         return ""
     else:
         for rec in listofrec:
-            text = "%s\n%s" % (text,print_rec(rec,format))
+            text = "%s\n%s" % (text, print_rec(rec, format))
     return text
 
 def record_xml_output(rec):
@@ -586,13 +537,13 @@ def record_xml_output(rec):
     xmltext = "<record>\n"
     if rec:
         # add the tag 'tag' to each field in rec[tag]
-        fields=[]
+        fields = []
         for tag in rec.keys():
             for field in rec[tag]:
-                fields.append((tag,field))
+                fields.append((tag, field))
         record_order_fields(fields)    
         for field in fields:
-            xmltext += str(field_xml_output(field[1],field[0]))
+            xmltext += str(field_xml_output(field[1], field[0]))
     xmltext = "%s</record>" % xmltext
     return xmltext
 
@@ -619,14 +570,16 @@ def field_get_subfield_values(field_instance, code):
             out.append(sf_value)
     return out
         
-def field_add_subfield(field,code,value):
+def field_add_subfield(field, code, value):
     """adds a subfield to field 'field'"""
-    field[0].append(create_subfield(code,value))        
+    field[0].append(create_subfield(code, value))        
 
 
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 
-def create_record_RXP(xmltext, verbose=verbose, correct=correct):
+def create_record_RXP(xmltext,
+                      verbose=cfg_bibrecord_default_verbose_level,
+                      correct=cfg_bibrecord_default_correct):
     """
     creates a record object and returns it
     uses the RXP parser
@@ -648,7 +601,7 @@ def create_record_RXP(xmltext, verbose=verbose, correct=correct):
             # the order of the fields
 
 
-    TAG, ATTRS,CHILD_LIST = range(3)
+    TAG, ATTRS, CHILD_LIST = range(3)
     
     if verbose > 3:
         p = pyRXP.Parser(ErrorOnValidityErrors=1,
@@ -665,60 +618,60 @@ def create_record_RXP(xmltext, verbose=verbose, correct=correct):
 
     
     if correct:
-        (rec,e) = wash(xmltext)
+        (rec, e) = wash(xmltext)
         err.extend(e)
-        return (rec,e)
+        return (rec, e)
 
     
-    root1=p(xmltext) #root = (tagname, attr_dict, child_list, reserved)
+    root1 = p(xmltext) #root = (tagname, attr_dict, child_list, reserved)
 
-    if root1[0]=='collection':
-        recs = [t for t in root1[CHILD_LIST] if type(t).__name__=='tuple' and t[TAG]=="record"]
-        if recs !=[]:
+    if root1[0] == 'collection':
+        recs = [t for t in root1[CHILD_LIST] if type(t).__name__ == 'tuple' and t[TAG] == "record"]
+        if recs != []:
             root = recs[0]
         else:
             root = None
     else:
-        root=root1
+        root = root1
     
     
 
     # get childs of 'controlfield'
     childs_controlfield = []
-    if not root[2]==None:
-        childs_controlfield =[t for t in root[CHILD_LIST] if type(t).__name__=='tuple' and t[TAG]=="controlfield"]
+    if not root[2] == None:
+        childs_controlfield = [t for t in root[CHILD_LIST] if type(t).__name__ == 'tuple' and t[TAG] == "controlfield"]
         
     # get childs of 'datafield'
     childs_datafield = []
-    if not root[CHILD_LIST]==None:
-        childs_datafield =[t for t in root[CHILD_LIST] if type(t).__name__=='tuple' and t[TAG]=="datafield"]
+    if not root[CHILD_LIST] == None:
+        childs_datafield = [t for t in root[CHILD_LIST] if type(t).__name__ == 'tuple' and t[TAG] == "datafield"]
         
     for controlfield in childs_controlfield:
-        s=controlfield[ATTRS]["tag"]
-        value=''
-        if not controlfield==None:
-            value=''.join([ n for n in controlfield[CHILD_LIST] if type(n).__name__ == 'str'])
+        s = controlfield[ATTRS]["tag"]
+        value = ''
+        if not controlfield == None:
+            value = ''.join([n for n in controlfield[CHILD_LIST] if type(n).__name__ == 'str'])
 
         name = type(value).__name__
         
-        if name in ["int","long"] :
+        if name in ["int", "long"] :
             st = str(value)
         elif name in ['str', 'unicode']:
             st = value
         else:
             if verbose:
-                err.append((7,'Type found: ' + name))
+                err.append((7, 'Type found: ' + name))
             st = "" # the type of value is not correct. (user insert something like a list...)
         
 
-        field = ([],"","",st,ord) #field = (subfields, ind1, ind2,value,ord)
+        field = ([], "", "", st, ord) #field = (subfields, ind1, ind2,value,ord)
 
         if record.has_key(s):
             record[s].append(field)
         else:
-            record[s]=[field]
+            record[s] = [field]
             
-        ord = ord+1
+        ord = ord + 1
 
     for datafield in childs_datafield:
 
@@ -726,18 +679,18 @@ def create_record_RXP(xmltext, verbose=verbose, correct=correct):
         subfields = []
 
         childs_subfield = []
-        if not datafield[CHILD_LIST]==None:
-            childs_subfield =[t for t in datafield[CHILD_LIST] if type(t).__name__=='tuple' and t[0]=="subfield"]
+        if not datafield[CHILD_LIST] == None:
+            childs_subfield = [t for t in datafield[CHILD_LIST] if type(t).__name__ == 'tuple' and t[0] == "subfield"]
 
         for subfield in childs_subfield:
-            value=''
-            if not subfield==None:
-                value=''.join([ n for n in subfield[CHILD_LIST] if type(n).__name__ == 'str'])
+            value = ''
+            if not subfield == None:
+                value = ''.join([n for n in subfield[CHILD_LIST] if type(n).__name__ == 'str'])
                                        #get_string_value(subfield)
             if subfield[ATTRS].has_key('code'):
-                subfields.append((subfield[ATTRS]["code"],value))
+                subfields.append((subfield[ATTRS]["code"], value))
             else:
-                subfields.append(('!',value))
+                subfields.append(('!', value))
 
         #create field
 
@@ -756,72 +709,72 @@ def create_record_RXP(xmltext, verbose=verbose, correct=correct):
         else:
             ind2 = '!'
         
-        field = (subfields,ind1,ind2,"",ord)
+        field = (subfields, ind1, ind2, "", ord)
             
         if record.has_key(s):
             record[s].append(field)
         else:
-            record[s]=[field]
+            record[s] = [field]
 
         ord = ord+1
     
-    return (record,err)
-
-
+    return (record, err)
     
-def create_record_minidom(xmltext, verbose=verbose, correct=correct):
+def create_record_minidom(xmltext,
+                          verbose=cfg_bibrecord_default_verbose_level,
+                          correct=cfg_bibrecord_default_correct):
     """
     creates a record object and returns it
     uses xml.dom.minidom
     """
     
     record = {}
-    ord=1
+    ord = 1
     global err
 
     if correct:
         xmlt = xmltext
-        (rec,e) = wash(xmlt,0)
+        (rec, e) = wash(xmlt, 0)
         err.extend(e)
-        return (rec,err)
+        return (rec, err)
         
     dom = parseString(xmltext)
     root = dom.childNodes[0]
 
-    for controlfield in get_childs_by_tag_name(root,"controlfield"):
+    for controlfield in get_childs_by_tag_name(root, "controlfield"):
         s = controlfield.getAttribute("tag")
 
         text_nodes = controlfield.childNodes
         v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
 
         name = type(v).__name__
-        if (name in ["int","long"]) :
-            field = ([],"","",str(v),ord) # field = (subfields, ind1, ind2,value)
+        if (name in ["int", "long"]) :
+            field = ([], "", "", str(v), ord) # field = (subfields, ind1, ind2,value)
         elif name in ['str', 'unicode']:
-            field = ([],"","",v,ord)
+            field = ([], "", "", v, ord)
         else:
             if verbose:
-                err.append((7,'Type found: ' + name))
+                err.append((7, 'Type found: ' + name))
   
-            field = ([],"","","",ord)# the type of value is not correct. (user insert something like a list...)
+            field = ([], "", "", "", ord)# the type of value is not correct. (user insert something like a list...)
 
         if record.has_key(s):
             record[s].append(field)
         else:
-            record[s]=[field]
-        ord=ord+1
+            record[s] = [field]
+        ord = ord + 1
 
-    for datafield in get_childs_by_tag_name(root,"datafield"):
+    for datafield in get_childs_by_tag_name(root, "datafield"):
         subfields = []
         
-        for subfield in get_childs_by_tag_name(datafield,"subfield"):
+        for subfield in get_childs_by_tag_name(datafield, "subfield"):
             text_nodes = subfield.childNodes
             v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
             code = subfield.getAttributeNS(None,'code').encode("utf-8")
             if code != '':
-                subfields.append((code,v))
+                subfields.append((code, v))
             else:
-                subfields.append(('!',v))
+                subfields.append(('!', v))
 
         s = datafield.getAttribute("tag").encode("utf-8")
         if s == '':
@@ -832,15 +785,17 @@ def create_record_minidom(xmltext, verbose=verbose, correct=correct):
         ind2 = datafield.getAttribute("ind2").encode("utf-8")         
         
         if record.has_key(s):
-            record[s].append((subfields,ind1,ind2,"",ord))
+            record[s].append((subfields, ind1, ind2, "", ord))
         else:
-            record[s]=[(subfields,ind1,ind2,"",ord)]
-        ord = ord+1
+            record[s] = [(subfields, ind1, ind2, "", ord)]
+        ord = ord + 1
 
-    return (record,err)
+    return (record, err)
 
 
-def create_record_4suite(xmltext,verbose=verbose,correct=correct):
+def create_record_4suite(xmltext,
+                         verbose=cfg_bibrecord_default_verbose_level,
+                         correct=cfg_bibrecord_default_correct):
     """
     creates a record object and returns it
     uses 4Suite domlette
@@ -851,131 +806,125 @@ def create_record_4suite(xmltext,verbose=verbose,correct=correct):
 
     if correct:
         xmlt = xmltext
-        (rec,e) = wash(xmlt,1)
+        (rec, e) = wash(xmlt, 1)
         err.extend(e)
-        return (rec,e)
+        return (rec, e)
         
-    dom = NonvalidatingReader.parseString(xmltext,"urn:dummy")
+    dom = NonvalidatingReader.parseString(xmltext, "urn:dummy")
     
     root = dom.childNodes[0]
     
-    ord=1
-    for controlfield in get_childs_by_tag_name(root,"controlfield"):
-        s = controlfield.getAttributeNS(None,"tag")
+    ord = 1
+    for controlfield in get_childs_by_tag_name(root, "controlfield"):
+        s = controlfield.getAttributeNS(None, "tag")
 
         text_nodes = controlfield.childNodes
-        v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
+        v = u''.join([n.data for n in text_nodes]).encode("utf-8")
 
         name = type(v).__name__
-        if (name in ["int","long"]) :
-            field = ([],"","",str(v),ord) # field = (subfields, ind1, ind2,value)
-        elif name in ['str','unicode']:
-            field = ([],"","",v,ord)
+        if (name in ["int", "long"]) :
+            field = ([], "", "", str(v), ord) # field = (subfields, ind1, ind2,value)
+        elif name in ['str', 'unicode']:
+            field = ([], "", "", v, ord)
         else:
             if verbose:
-                err.append((7,'Type found: ' + name))
+                err.append((7, 'Type found: ' + name))
 
-            field = ([],"","","",ord)# the type of value is not correct. (user insert something like a list...)
+            field = ([], "", "", "", ord)# the type of value is not correct. (user insert something like a list...)
         
 
         if record.has_key(s):
             record[s].append(field)
         else:
-            record[s]=[field]
-        ord=ord+1
+            record[s] = [field]
+        ord = ord + 1
 
-
-    for datafield in get_childs_by_tag_name(root,"datafield"):
+    for datafield in get_childs_by_tag_name(root, "datafield"):
         subfields = []
 
-        for subfield in get_childs_by_tag_name(datafield,"subfield"):
-             text_nodes = subfield.childNodes
-             v = u''.join([ n.data for n in text_nodes ]).encode("utf-8")
+        for subfield in get_childs_by_tag_name(datafield, "subfield"):
+            text_nodes = subfield.childNodes
+            v = u''.join([n.data for n in text_nodes]).encode("utf-8")
 
-             code = subfield.getAttributeNS(None,'code').encode("utf-8")
-             if code != '':
-                 subfields.append((code,v))
-             else:
-                subfields.append(('!',v))
+            code = subfield.getAttributeNS(None, 'code').encode("utf-8")
+            if code != '':
+                subfields.append((code, v))
+            else:
+                subfields.append(('!', v))
 
-        s = datafield.getAttributeNS(None,"tag").encode("utf-8")
+        s = datafield.getAttributeNS(None, "tag").encode("utf-8")
         if s == '':
             s = '!'
             
-        ind1 = datafield.getAttributeNS(None,"ind1").encode("utf-8")
+        ind1 = datafield.getAttributeNS(None, "ind1").encode("utf-8")
         
-        ind2 = datafield.getAttributeNS(None,"ind2").encode("utf-8")
+        ind2 = datafield.getAttributeNS(None, "ind2").encode("utf-8")
                      
-  
         if record.has_key(s):
-            record[s].append((subfields,ind1,ind2,"",ord))
+            record[s].append((subfields, ind1, ind2, "", ord))
         else:
-            record[s]=[(subfields,ind1,ind2,"",ord)]
-        ord=ord+1
+            record[s] = [(subfields, ind1, ind2, "", ord)]
+        ord = ord + 1
 
-    return (record,err)
+    return (record, err)
 
-def record_order_fields(rec,fun="order_by_ord"):
+def record_order_fields(rec, fun="order_by_ord"):
     """orders field inside record 'rec' according to a function"""
     rec.sort(eval(fun))
     return
 
-def record_order_subfields(rec,fun="order_by_code"):
+def record_order_subfields(rec, fun="order_by_code"):
     """orders subfield inside record 'rec' according to a function"""
     for tag in rec:
         for field in rec[tag]:
             field[0].sort(eval(fun))
     return
     
-def concat(list):
+def concat(alist):
     """concats a list of lists"""
     newl = []
-    for l in list:
+    for l in alist:
         newl.extend(l)
     return newl
 
 def create_subfield(code, value):
     """Create a subfield object and return it."""
-    if type(value).__name__ in ["int","long"]:
+    if type(value).__name__ in ["int", "long"]:
         s = str(value)
     else:
         s = value
     subfield = (code, s)    
     return subfield
     
-def field_add_subfield(field,code,value):
-    """adds a subfield to field 'field'"""
-    field[0].append(create_subfield(code,value))
-        
-def field_xml_output(field,tag):
+def field_xml_output(field, tag):
     """generates the XML for field 'field' and returns it as a string"""
     xmltext = ""
     if field[3] != "":
-        xmltext = "%s  <controlfield tag=\"%s\">%s</controlfield>\n" % (xmltext,tag,encode_for_xml(field[3]))
+        xmltext = "%s  <controlfield tag=\"%s\">%s</controlfield>\n" % (xmltext, tag, encode_for_xml(field[3]))
     else:
-        xmltext = "%s  <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (xmltext,tag,field[1],field[2])
+        xmltext = "%s  <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (xmltext, tag, field[1], field[2])
         for subfield in field[0]:
-            xmltext = "%s%s" % (xmltext,subfield_xml_output(subfield))
+            xmltext = "%s%s" % (xmltext, subfield_xml_output(subfield))
         xmltext = "%s </datafield>\n" % xmltext
     return xmltext
         
 def subfield_xml_output(subfield):
     """generates the XML for a subfield object and return it as a string"""
-    xmltext = "    <subfield code=\"%s\">%s</subfield>\n" % (subfield[0],encode_for_xml(subfield[1]))
+    xmltext = "    <subfield code=\"%s\">%s</subfield>\n" % (subfield[0], encode_for_xml(subfield[1]))
     return xmltext
         
 def order_by_ord(field1, field2):
     """function used to order the fields according to their ord value"""
     return cmp(field1[1][4], field2[1][4])
     
-def order_by_code(subfield1,subfield2):
+def order_by_code(subfield1, subfield2):
     """function used to order the subfields according to their code value"""
-    return cmp(subfield1[0],subfield2[0])
+    return cmp(subfield1[0], subfield2[0])
     
 def get_childs_by_tag_name(node, local):
     """retrieves all childs from node 'node' with name 'local' and returns them as a list"""
     cNodes = list(node.childNodes)
-    res = [child for child in cNodes if child.nodeName==local]
+    res = [child for child in cNodes if child.nodeName == local]
     return res
 
 def get_string_value(node):
@@ -983,14 +932,13 @@ def get_string_value(node):
     text_nodes = node.childNodes
     return u''.join([ n.data for n in text_nodes ])
     
-def get_childs_by_tag_name_RXP(listofchilds,tag):
+def get_childs_by_tag_name_RXP(listofchilds, tag):
     """retrieves all childs from 'listofchilds' with tag name 'tag' and returns them as a list.
        listofchilds is a list returned by the RXP parser
     """
-    l=[]
-    if not listofchilds==None:
-        l =[t for t in listofchilds if type(t).__name__=='tuple' and t[0]==tag]
-  
+    l = []
+    if not listofchilds == None:
+        l = [t for t in listofchilds if type(t).__name__ == 'tuple' and t[0] == tag]
     return l
     
 def getAttribute_RXP(root, attr):
@@ -999,12 +947,12 @@ def getAttribute_RXP(root, attr):
     """
     try:
         return u''.join(root[1][attr])
-    except KeyError,e:
+    except KeyError:
         return ""
 
 def get_string_value_RXP(node):
     """gets all child text nodes of node 'node' and returns them as a unicode string"""
-    if not node==None:
+    if not node == None:
         return ''.join([ n for n in node[2] if type(n).__name__ == 'str'])
     else:
         return ""
@@ -1015,13 +963,11 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
-def print_errors(list):
+def print_errors(alist):
     """ creates a unique string with the strings in list, using '\n' as a separator """
-    text=""
-    
-    for l in list:
-        text = '%s\n%s'% (text,l)
-
+    text = ""
+    for l in alist:
+        text = '%s\n%s'% (text, l)
     return text
 
 def wash(xmltext, parser=2):
@@ -1032,43 +978,43 @@ def wash(xmltext, parser=2):
     parser = 0 - minidom
     """
     
-    errors=[]
-    i,e1 = tagclose('datafield',xmltext)
-    j,e2 = tagclose('controlfield',xmltext)
-    k,e3 = tagclose('subfield',xmltext)
-    w,e4 = tagclose('record',xmltext)
+    errors = []
+    i, e1 = tagclose('datafield', xmltext)
+    j, e2 = tagclose('controlfield', xmltext)
+    k, e3 = tagclose('subfield', xmltext)
+    w, e4 = tagclose('record', xmltext)
     errors.extend(e1)
     errors.extend(e2)
     errors.extend(e3)
     errors.extend(e4)
     
-    if i and j and k and w and parser!=-3:
-        if parser==1:
-            (rec,ee) = create_record_4suite(xmltext,0,0)
-        elif parser==2:
-            (rec,ee) = create_record_RXP(xmltext,0,0)
+    if i and j and k and w and parser > -1:
+        if parser == 2:
+            (rec, ee) = create_record_RXP(xmltext, 0, 0)
+        elif parser == 1:
+            (rec, ee) = create_record_4suite(xmltext, 0, 0)
+        elif parser == 0:
+            (rec, ee) = create_record_minidom(xmltext, 0, 0)
         else:
-            (rec,ee) = create_record_minidom(xmltext,0,0)
+            (rec, ee) = (None, "ERROR: No usable XML parsers found.")
     else:
-        return (None,errors)
-        
-
-    
+        return (None, errors)
+            
     keys = rec.keys()
     
     for tag in keys:
         upper_bound = '999'
         n = len(tag)
         
-        if n>3:
-            i=n-3
-            while i>0:
-                upper_bound = '%s%s' % ('0',upper_bound)
-                i = i-1
+        if n > 3:
+            i = n-3
+            while i > 0:
+                upper_bound = '%s%s' % ('0', upper_bound)
+                i = i - 1
         
         if tag == '!': # missing tag
-            errors.append((1, '(field number(s): ' + ([f[4] for f in rec[tag]]).__str__()+')'))
-            v=rec[tag]
+            errors.append((1, '(field number(s): ' + ([f[4] for f in rec[tag]]).__str__() + ')'))
+            v = rec[tag]
             rec.__delitem__(tag)
             rec['000'] = v
             tag = '000'
@@ -1079,79 +1025,63 @@ def wash(xmltext, parser=2):
             rec['000'] = v
             tag = '000'
             
-        fields =[]
+        fields = []
         for field in rec[tag]:
-            if field[0]==[] and field[3]=='': ## datafield without any subfield
-                errors.append((8,'(field number: '+field[4].__str__()+')'))
+            if field[0] == [] and field[3] == '': ## datafield without any subfield
+                errors.append((8,'(field number: ' + field[4].__str__() + ')'))
             
-            subfields=[]
+            subfields = []
             for subfield in field[0]:
-                if subfield[0]=='!': 
-                    errors.append((3,'(field number: '+field[4].__str__()+')'))
-                    newsub = ('',subfield[1])
+                if subfield[0] == '!': 
+                    errors.append((3,'(field number: ' + field[4].__str__() + ')'))
+                    newsub = ('', subfield[1])
                 else:
                     newsub = subfield
                 subfields.append(newsub)
                     
-            if field[1]=='!':
-                errors.append((4,'(field number: '+field[4].__str__()+')'))
+            if field[1] == '!':
+                errors.append((4,'(field number: ' + field[4].__str__() + ')'))
                 ind1 = ""
             else:
                 ind1 = field[1]
 
-            if field[2]=='!':
-                errors.append((5,'(field number: '+field[4].__str__()+')'))
+            if field[2] == '!':
+                errors.append((5,'(field number: ' + field[4].__str__() + ')'))
                 ind2 = ""
             else:
-                ind2=field[2]
+                ind2 = field[2]
                 
-            newf = (subfields,ind1,ind2,field[3],field[4])
+            newf = (subfields, ind1, ind2, field[3], field[4])
             fields.append(newf)
             
-        rec[tag]=fields
+        rec[tag] = fields
     
-    return (rec,errors)
+    return (rec, errors)
                          
-def tagclose(tagname,xmltext):
+def tagclose(tagname, xmltext):
     """ checks if an XML document does not hae any missing tag with name tagname
     """
-    import re
-    errors=[]
-    pat_open = '<'+tagname+'.*?>'
-    pat_close = '</'+tagname+'>'
-    p_open = re.compile(pat_open,re.DOTALL) # DOTALL - to ignore whitespaces
-    p_close = re.compile(pat_close,re.DOTALL)
+    errors = []
+    pat_open = '<' + tagname + '.*?>'
+    pat_close = '</' + tagname + '>'
+    p_open = re.compile(pat_open, re.DOTALL) # DOTALL - to ignore whitespaces
+    p_close = re.compile(pat_close, re.DOTALL)
     list1 = p_open.findall(xmltext)
     list2 = p_close.findall(xmltext)
 
     if len(list1)!=len(list2):
         errors.append((99,'(Tagname : ' + tagname + ')'))
-        return (0,errors)
+        return (0, errors)
     else:
-        return (1,errors)
+        return (1, errors)
         
-def testImports(c):
-    """ Test if the import statements did not failed"""
-    errors=[]
-    global err1,err2
-    
-    if c==-1:
-        i = 0
-        errors.append((6,err2))
-    elif c == -3:
-        i=0
-        errors.append((6,err1))
-    else:
-        i=1
-    return (i,errors)
-
 def warning(code):
     """ It returns a warning message of code 'code'.
         If code = (cd, str) it returns the warning message of code 'cd'
         and appends str at the end"""
     
     ws = cfg_bibrecord_warning_msgs
-    s=''
+    s = ''
 
     if type(code).__name__ == 'str':
         return code
@@ -1169,13 +1099,12 @@ def warning(code):
 
 def warnings(l):
     """it applies the function warning to every element in l"""
-    list = []
+    alist = []
     for w in l:
-        list.append(warning(w))
-    return list
+        alist.append(warning(w))
+    return alist
 
-
-if psycho == 1:
+if psycho_available == 1:
     #psyco.full()
     psyco.bind(wash)
     psyco.bind(create_record_4suite)
