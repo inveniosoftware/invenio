@@ -2464,8 +2464,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
-        for id in get_fieldvalues(recID,cfg_oai_id_field):
-            out += "    <identifier>%s</identifier>\n" % id
+        for oai_id in get_fieldvalues(recID, cfg_oai_id_field):
+            out += "    <identifier>%s</identifier>\n" % oai_id
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
         out += "   </header>\n"
         out += "   <metadata>\n"
@@ -2513,15 +2513,10 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                             # print field tag
                             if field_number != field_number_old or field[:-1] != field_old[:-1]:
                                 if format.startswith("xm") or format == "marcxml":
-
-                                    fieldid = encode_for_xml(field[0:3])
-
                                     if field_number_old != -999:
                                         out += """        </datafield>\n"""
-
                                     out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
                                            (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
-
                                 field_number_old = field_number
                                 field_old = field
                             # print subfield value
