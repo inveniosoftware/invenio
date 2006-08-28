@@ -22,13 +22,15 @@
 """
 BibRecord - XML MARC processing library for CDS Invenio.
 
-Does not access the database, the input is MARCXML only.
+For API, see create_record(), record_get_field_instances() and friends
+in the source code of this file in the section entitled INTERFACE.
+
+Note: Does not access the database, the input is MARCXML only.
 """
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
     
 import string
-import sys
 import re
 try:
     import psyco
@@ -86,26 +88,10 @@ def create_records(xmltext,
     if parser == -1:
         err.append((6, "import error"))
     else:
-        if sys.version >= '2.3':
-            pat = r"<record.*?>.*?</record>"
-            p = re.compile(pat, re.DOTALL) # DOTALL - to ignore whitespaces
-            alist = p.findall(xmltext)
-        else:
-            l = xmltext.split('<record>')
-            n = len(l)
-            ind = (l[n-1]).rfind('</record>')
-            aux = l[n-1][:ind+9]
-            l[n-1] = aux
-            alist = []
-            for s in l:
-                if s != '':
-                    i = -1
-                    while (s[i].isspace()):
-                        i = i - 1
-                    if i == -1:#in case there are no spaces  at the end
-                        i = len(s) - 1
-                    if s[:i+1].endswith('</record>'):
-                        alist.append('<record>'+s)            
+        pat = r"<record.*?>.*?</record>"
+        p = re.compile(pat, re.DOTALL) # DOTALL - to ignore whitespaces
+        alist = p.findall(xmltext)
+
         listofrec = map((lambda x:create_record(x, verbose, correct)),
                         alist)
         return listofrec
