@@ -641,8 +641,13 @@ def xml_marc_to_records(xml_marc):
     """create the records"""
     # Creation of the records from the xml Marc in argument
     recs = create_records(xml_marc, 1, 1)
-    if recs[0][0] == None:
-        write_message("Error: Xml Marc has a wrong format: %s" % recs[0][2], verbose=1, stream=sys.stderr)
+    if recs == []:
+        write_message("Error: Cannot parse MARCXML file.", verbose=1, stream=sys.stderr)
+        write_message("Exiting.", sys.stderr)
+        task_update_status("ERROR")                                   
+        sys.exit(1)        
+    elif recs[0][0] == None:
+        write_message("Error: MARCXML file has wrong format: %s" % recs[0][2], verbose=1, stream=sys.stderr)
         write_message("Exiting.", sys.stderr)
         task_update_status("ERROR")                                   
         sys.exit(1)
