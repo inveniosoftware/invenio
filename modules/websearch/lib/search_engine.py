@@ -27,13 +27,7 @@ __version__ = "$Id$"
 ## import general modules:
 import cgi
 import copy
-import Cookie
-import cPickle
-import marshal
-import fileinput
-import getopt
 import string
-from string import split
 import os
 import sre
 import sys
@@ -42,10 +36,6 @@ import traceback
 import urllib
 import zlib
 import Numeric
-import md5
-import base64
-import unicodedata
-
 from xml.dom import minidom
 
 ## import CDS Invenio stuff:
@@ -173,7 +163,7 @@ def get_index_id(field):
 def get_words_from_pattern(pattern):
     "Returns list of whitespace-separated words from pattern."
     words = {}
-    for word in split(pattern):
+    for word in string.split(pattern):
         if not words.has_key(word):
             words[word] = 1;
     return words.keys()
@@ -261,7 +251,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             p = sre_logical_or.sub(" |", p)
             p = sre_logical_not.sub(" -", p)
             p = sre_operators.sub(r' \1', p)
-            for pi in split(p): # iterate through separated units (or items, as "pi" stands for "p item")
+            for pi in string.split(p): # iterate through separated units (or items, as "pi" stands for "p item")
                 pi = sre_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
@@ -272,7 +262,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     oi = '+' # by default we are doing set intersection...
                 # secondly, determine search pattern and field:
                 if string.find(pi, ":") > 0:
-                    fi, pi = split(pi, ":", 1)
+                    fi, pi = string.split(pi, ":", 1)
                 else:
                     fi, pi = f, pi
                 # look also for old ALEPH field names:
@@ -1815,7 +1805,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
        Return list of [phrase1, phrase2, ... , phrase_n]."""
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
-        f, p = split(p, ":", 1)
+        f, p = string.split(p, ":", 1)
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
@@ -1894,7 +1884,7 @@ def get_nbhits_in_bibxxx(p, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
-        f, p = split(p, ":", 1)
+        f, p = string.split(p, ":", 1)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
