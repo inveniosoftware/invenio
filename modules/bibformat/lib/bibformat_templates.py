@@ -59,6 +59,7 @@ class Template:
             </table>
             ''' % {'warnings': '<br/>'.join(warnings)}
 
+        comment_on_php_admin_interface = ''
         if php:
             # If PHP enabled, old bibformat can still run
             comment_on_php_admin_interface = '''
