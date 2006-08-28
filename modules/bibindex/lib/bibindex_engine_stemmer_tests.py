@@ -39,6 +39,8 @@ class TestStemmer(unittest.TestCase):
         try:
             import Stemmer
             self.assertEqual("inform",
+                             Stemmer.Stemmer('english').stem("information"))
+            self.assertEqual("inform",
                              bibindex_engine_stemmer.stem("information", "en"))
         except ImportError:
             # we don't have Stemmer available:
