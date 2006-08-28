@@ -73,17 +73,25 @@ A brief description of things we strive at, more or less unsuccessfully.
    href="cdsware.el">cdsware.el</a> for inspiration.
 
    All the Python code should be extensively documented via
-   docstrings, so you can always try to run pydoc file.py to
-   peruse a module's documentation in one go.
+   docstrings, so you can always run pydoc file.py to peruse the
+   file's documentation in one simple go.
 
-   Do not forget to run pylint on your code to check errors like
+   Do not forget to run pylint on your code to check for errors like
    uninitialized variables and to improve its quality and conformance
-   to coding standards.  The typical incantation may be:
+   to the coding standard.  The typical incantation may be:
 
        $ cd <LIBDIR>/python/invenio
-       $ pylint --max-line-length=160 oai_repository.py | most
+       $ pylint --max-line-length=120 oai_repository.py | most
 
-   Read and implement pylint suggestions.
+   If you develop in Emacs, run M-x pylint RET on your buffers
+   frequently.  Read and implement pylint suggestions.  (Note that
+   using lambda and friends may lead to false pylint warnings.)
+
+   Do not forget to run pychecker on your code either.  It is another
+   source code checker that catches some situations better and some
+   situations worse than pylint.  If you develop in Emacs, run C-c C-w
+   (M-x py-pychecker-run RET) on your buffers frequently.  (Note that
+   using psyco on classes may lead to false pychecker warnings.)
 
    Do not hardcode magic constants in your code.  Every magic string or
    a number should be put into accompanying file_config.py with 
