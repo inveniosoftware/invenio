@@ -25,7 +25,7 @@ from string import expandtabs, replace
 from invenio.config import tmpdir, etcdir
 from invenio import bibrecord
 
-class SanityTest(unittest.TestCase):
+class BibRecordSanityTest(unittest.TestCase):
     """ bibrecord - sanity test (xml -> create records -> xml)"""
     def test_for_sanity(self):
         """ bibrecord - demo file sanity test (xml -> create records -> xml)"""
@@ -48,7 +48,7 @@ class SanityTest(unittest.TestCase):
         x = x.replace('</record></collection>', "</record>\n</collection>\n")
         self.assertEqual(x, y)
 
-class SuccessTest(unittest.TestCase):
+class BibRecordSuccessTest(unittest.TestCase):
     """ bibrecord - demo file parsing test """
     def setUp(self):
         f = open(tmpdir + '/demobibdata.xml', 'r')
@@ -88,7 +88,7 @@ class SuccessTest(unittest.TestCase):
             ret.append(rec)
         self.assertEqual(fields, cr)
   
-class BadInputTreatmentTest(unittest.TestCase):
+class BibRecordBadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
     def test_wrong_attribute(self):
         """bibrecord - bad input subfield \'cde\' instead of \'code\'"""
@@ -188,7 +188,7 @@ class BadInputTreatmentTest(unittest.TestCase):
                     ee = i
         self.assertEqual(bibrecord.warning((99, '(Tagname : datafield)')), ee)
 
-class AccentedUnicodeLettersTest(unittest.TestCase):
+class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
     """ bibrecord - testing accented UTF-8 letters """
 
     def setUp(self):
@@ -222,7 +222,7 @@ class AccentedUnicodeLettersTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", "", "1"),
                          [([('a', 'Пушкин')], '', '1', '', 5)])
 
-class GettingFieldValuesTest(unittest.TestCase):
+class BibRecordGettingFieldValuesTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values """
 
     def setUp(self):
@@ -276,7 +276,7 @@ class GettingFieldValuesTest(unittest.TestCase):
         self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
         self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
 
-class GettingFieldValuesViaWildcardsTest(unittest.TestCase):
+class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values via wildcards """
 
     def setUp(self):
@@ -427,7 +427,7 @@ class GettingFieldValuesViaWildcardsTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "", "", "a"),
                          'val4a')                           
 
-class AddFieldTest(unittest.TestCase):
+class BibRecordAddFieldTest(unittest.TestCase):
     """ bibrecord - testing adding field """
 
     def setUp(self):
@@ -478,7 +478,7 @@ class AddFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
                          ['editor', 'editor'])
 
-class DeleteFieldTest(unittest.TestCase):
+class BibRecordDeleteFieldTest(unittest.TestCase):
     """ bibrecord - testing field deletion """
 
     def setUp(self):
@@ -553,16 +553,146 @@ class DeleteFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
                          ['SzGeCERN2'])        
 
+class BibRecordSpecialTagParsingTest(unittest.TestCase):
+    """ bibrecord - parsing special tags (FMT, FFT)"""
+
+    def setUp(self):
+        """setting up example records"""
+        self.xml_example_record_with_fmt = """
+        <record>
+         <controlfield tag="001">33</controlfield>
+         <datafield tag="041" ind1="" ind2="">
+          <subfield code="a">eng</subfield>
+         </datafield>
+         <datafield tag="FMT" ind1="" ind2="">
+          <subfield code="f">HB</subfield>
+          <subfield code="g">Let us see if this gets inserted well.</subfield>
+         </datafield>
+        </record>
+        """
+        self.xml_example_record_with_fft = """
+        <record>
+         <controlfield tag="001">33</controlfield>
+         <datafield tag="041" ind1="" ind2="">
+          <subfield code="a">eng</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1="" ind2="">
+          <subfield code="a">file:///foo.pdf</subfield>
+          <subfield code="a">http://bar.com/baz.ps.gz</subfield>
+         </datafield>
+        </record>
+        """
+        self.xml_example_record_with_xxx = """
+        <record>
+         <controlfield tag="001">33</controlfield>
+         <datafield tag="041" ind1="" ind2="">
+          <subfield code="a">eng</subfield>
+         </datafield>
+         <datafield tag="XXX" ind1="" ind2="">
+          <subfield code="f">HB</subfield>
+          <subfield code="g">Let us see if this gets inserted well.</subfield>
+         </datafield>
+        </record>
+        """
+
+    def test_parsing_file_containing_fmt_special_tag_with_correcting(self):
+        """bibrecord - parsing special FMT tag, correcting on"""
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 1)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "f"),
+                         ['HB'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "g"),
+                         ['Let us see if this gets inserted well.'])
+
+    def test_parsing_file_containing_fmt_special_tag_without_correcting(self):
+        """bibrecord - parsing special FMT tag, correcting off"""
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 0)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "f"),
+                         ['HB'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "g"),
+                         ['Let us see if this gets inserted well.'])
+
+    def test_parsing_file_containing_fft_special_tag_with_correcting(self):
+        """bibrecord - parsing special FFT tag, correcting on"""
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 1)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", "", "", "a"),
+                         ['file:///foo.pdf', 'http://bar.com/baz.ps.gz'])
+
+    def test_parsing_file_containing_fft_special_tag_without_correcting(self):
+        """bibrecord - parsing special FFT tag, correcting off"""
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 0)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", "", "", "a"),
+                         ['file:///foo.pdf', 'http://bar.com/baz.ps.gz'])
+
+    def test_parsing_file_containing_xxx_special_tag_with_correcting(self):
+        """bibrecord - parsing unrecognized special XXX tag, correcting on"""
+        # XXX should not get accepted when correcting is on; should get changed to 000
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_xxx, 1, 1)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          '000': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XXX", "", "", "f"),
+                         [])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XXX", "", "", "g"),
+                         [])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "000", "", "", "f"),
+                         ['HB'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "000", "", "", "g"),
+                         ['Let us see if this gets inserted well.'])
+
+    def test_parsing_file_containing_xxx_special_tag_without_correcting(self):
+        """bibrecord - parsing unrecognized special XXX tag, correcting off"""
+        # XXX should get accepted without correcting
+        rec, st, e = bibrecord.create_record(self.xml_example_record_with_xxx, 1, 0)
+        self.assertEqual(rec,
+                         {u'001': [([], '', '', '33', 1)],
+                          'XXX': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
+                          '041': [([('a', 'eng')], '', '', '', 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         ['eng'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XXX", "", "", "f"),
+                         ['HB'])
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XXX", "", "", "g"),
+                         ['Let us see if this gets inserted well.'])
+
+
 def create_test_suite():
     """Return test suite for the bibrecord module"""
-    return unittest.TestSuite((unittest.makeSuite(SanityTest, 'test'),
-                               unittest.makeSuite(SuccessTest, 'test'),
-                               unittest.makeSuite(BadInputTreatmentTest, 'test'),
-                               unittest.makeSuite(GettingFieldValuesTest, 'test'),
-                               unittest.makeSuite(GettingFieldValuesViaWildcardsTest, 'test'),
-                               unittest.makeSuite(AddFieldTest, 'test'),
-                               unittest.makeSuite(DeleteFieldTest, 'test'),
-                               unittest.makeSuite(AccentedUnicodeLettersTest, 'test')))
+    return unittest.TestSuite((unittest.makeSuite(BibRecordSanityTest, 'test'),
+                               unittest.makeSuite(BibRecordSuccessTest, 'test'),
+                               unittest.makeSuite(BibRecordBadInputTreatmentTest, 'test'),
+                               unittest.makeSuite(BibRecordGettingFieldValuesTest, 'test'),
+                               unittest.makeSuite(BibRecordGettingFieldValuesViaWildcardsTest, 'test'),
+                               unittest.makeSuite(BibRecordAddFieldTest, 'test'),
+                               unittest.makeSuite(BibRecordDeleteFieldTest, 'test'),
+                               unittest.makeSuite(BibRecordAccentedUnicodeLettersTest, 'test'),
+                               unittest.makeSuite(BibRecordSpecialTagParsingTest, 'test'),
+                               ))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
-  
