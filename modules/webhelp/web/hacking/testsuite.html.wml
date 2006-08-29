@@ -225,9 +225,8 @@ $ /opt/cds-invenio/bin/testsuite
 </pre>
 </blockquote>
 
-The ``testsuite'' executable will run all available unit tests,
-regression tests, and all the other kind of tests provided with
-CDS Invenio.
+The ``testsuite'' executable will run all available unit tests
+provided with CDS Invenio.
 
 <p>The informative output is of the form:
 
@@ -288,9 +287,9 @@ functions, a regression testing should ensure that the overall
 application functionality is behaving well and is not altered by code
 changes.  This is especially important if a bug had been previously
 found.  Then a regression test case should be written to assure that
-it will never reapper.  (It also helps to scan the neighborhood of the
-bug, or the whole codebase for occurrences of the same bug, see the
-80/20 thumb rule cited above.)
+it will never reappear.  (It also helps to scan the neighborhood of
+the bug, or the whole codebase for occurrences of the same kind of
+bug, see the 80/20 thumb rule cited above.)
 
 <p>Moreover, the regression test suite should be used when the
 functionality of the item we would like to test depends on
@@ -411,15 +410,15 @@ $ /opt/cds-invenio/bin/regressiontestsuite
 </pre>
 </blockquote>
 
-similarly to the unit test suite.  The notable exception with the unit
-test suite is that:
+similarly to the unit test suite cited above.  The notable exception
+when compared to running the unit test suite is:
 
 <ul>
 
 <li><code>regressiontestsuite</code> script assumes the site to be in
     demo mode (Atlantis Institute of Fictive Science)
 
-<li><code>regressiontestsuite</code> can pollute the database with
+<li><code>regressiontestsuite</code> will pollute the database with
     test data as it sees fit for the regression testing purposes.
 
 </ul>
