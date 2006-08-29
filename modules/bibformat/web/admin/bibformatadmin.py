@@ -30,7 +30,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url, get_referer
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, create_basic_search_units
 
 __version__ = "$Id$"
 
@@ -681,8 +681,9 @@ def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None,
                             req=req) 
             else:
                 recID = recIDs[0]
-            
-        bfo = bibformat_engine.BibFormatObject(recID, ln_for_preview, pattern_for_preview, None, getUid(req))
+        units = create_basic_search_units(None, pattern_for_preview, None)
+        keywords = [unit[1] for unit in units if unit[0] != '-']
+        bfo = bibformat_engine.BibFormatObject(recID, ln_for_preview, keywords, None, getUid(req))
         (body, errors) = bibformat_engine.format_with_format_template("", bfo, verbose=7, format_template_code=code)
         
         if content_type_for_preview == 'text/html':
