@@ -94,8 +94,8 @@ def acc_authorize_action(id_user, name_action, verbose=0, **arguments):
         if not res2:
             raise Exception
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res2[0][1] not in [1, "1"]:
-            if res[0][1]:
-                return (9, "%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][1], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
+            if res2[0][0]:
+                return (9, "%s %s" % (cfg_webaccess_warning_msgs[9] % res2[0][0], (called_from and "%s %s" % (cfg_webaccess_msgs[0] % name_action[3:], cfg_webaccess_msgs[1]) or "")))
             else:
                 raise Exception
         query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
