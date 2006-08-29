@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-## Alert engine implementation.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -26,6 +27,7 @@ __version__ = "$Id$"
 
 from cgi import parse_qs
 from sre import search, sub
+import sys
 from time import localtime, strftime, mktime, sleep
 from string import split
 import smtplib
@@ -39,12 +41,10 @@ from invenio.config import *
 from invenio.search_engine import perform_request_search
 from invenio.alert_engine_config import *
 from invenio.webinterface_handler import wash_urlargd
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
 from invenio.dbquery import run_sql
 from invenio.htmlparser import *
-
 import invenio.template
+websearch_templates = invenio.template.load('websearch')
 webalert_templates = invenio.template.load('webalert')
 
 def update_date_lastrun(alert):
@@ -217,7 +217,6 @@ def get_record_ids(argstr, date_from, date_until):
     cc      = get_argument(argd, 'cc')
     as      = get_argument(argd, 'as')
     f       = get_argument(argd, 'f')
-    rg      = get_argument(argd, 'rg')
     so      = get_argument(argd, 'so')
     sp      = get_argument(argd, 'sp')
     ot      = get_argument(argd, 'ot')
