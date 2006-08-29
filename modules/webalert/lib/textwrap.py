@@ -23,11 +23,11 @@ import string, re
 import types
 
 
-#   The 'True' and 'False' constants weren't introduced until Python 2.3.
-try:
-    True
-except NameError:
-    True, False = 1, 0
+# #   The 'True' and 'False' constants weren't introduced until Python 2.3.
+# try:
+#     True
+# except NameError:
+#     True, False = 1, 0
 # END BACKPORT SECTION.
 
 class TextWrapper:
