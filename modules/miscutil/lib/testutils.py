@@ -71,13 +71,6 @@ def warn_user_about_tests():
 
 Please confirm by typing "Yes, I know!": """)
 
-    # readline provides a nicer input support to the user, but is
-    # sometimes unavailable.
-    try:
-        import readline
-    except ImportError:
-        pass
-
     answer = raw_input('')
     if answer != 'Yes, I know!':
         sys.stderr.write("Aborted.\n")
