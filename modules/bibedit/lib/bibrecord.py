@@ -166,7 +166,7 @@ def create_record(xmltext,
         print e
         errs = warnings(concat(err))
         return (None, 0, errs)
-    
+
     if errs == []: 
         return (rec, 1, errs)
     else:
@@ -1004,7 +1004,8 @@ def wash(xmltext, parser=2):
             rec.__delitem__(tag)
             rec['000'] = v
             tag = '000'
-        elif not ("001" <= tag <=upper_bound):
+        elif not (("001" <= tag <= upper_bound) or \
+                  tag in ('FMT', 'FFT')):
             errors.append(2)
             v = rec[tag]
             rec.__delitem__(tag)
