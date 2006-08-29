@@ -49,6 +49,8 @@ from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, s
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_config import conv_programs, conv_programs_helpers
 
+options = {} # global variable to hold task options
+
 ## safety parameters concerning DB thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
 cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
@@ -941,7 +943,7 @@ def word_index(row, run):
         print "Warning: Psyco", e
         pass
 
-    global options, task_id, wordTables, languages 
+    global options, wordTables, languages 
       
     # read from SQL row:
     task_id = row[0]
@@ -1369,7 +1371,7 @@ def test_word_separators(phrase="hep-th/0101001"):
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -1377,14 +1379,14 @@ def task_sig_sleep(sig, frame):
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     errcode = 0
@@ -1410,7 +1412,7 @@ def task_sig_stop_commands():
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -1419,23 +1421,22 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)    
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
 
 def getName(methname, ln=cdslang, type='ln'):
     """Returns the name of the rank method, either in default language or given language.

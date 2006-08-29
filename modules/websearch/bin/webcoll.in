@@ -36,16 +36,13 @@ try:
     import cgi
     import sre
     import os
-    import math
     import string
-    import urllib
     import zlib
     import Numeric
     import time
     import traceback
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 try:
@@ -60,7 +57,6 @@ try:
     websearch_templates = invenio.template.load('websearch')
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 ## global vars
@@ -692,7 +688,7 @@ class Collection:
         try:
             query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
                     (self.nbrecs, escape_string(zlib.compress(Numeric.dumps(self.reclist._set))), self.id)
-            res = run_sql(query)
+            run_sql(query)
             self.reclist_updated_since_start = 1
         except Error, e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
@@ -782,19 +778,10 @@ def set_cache_last_updated_timestamp(timestamp):
     f.close()
     return timestamp
 
-def write_message(msg, stream=sys.stdout):
-    """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        stream.write("%s\n" % msg)
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -802,14 +789,14 @@ def task_sig_sleep(sig, frame):
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     pass # FIXME: is there anything to be done?
@@ -819,7 +806,7 @@ def task_sig_stop(sig, frame):
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -828,7 +815,8 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
     """Authenticate the user against the user database.
@@ -865,8 +853,9 @@ def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
             sys.exit(1)
     return user
 
-def task_submit(options):
+def task_submit():
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+    global options
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
         del options["task"]
@@ -887,13 +876,13 @@ def task_submit(options):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 def task_read_status(task_id):
     """Read status information in the BibSched task table."""
@@ -915,14 +904,14 @@ def task_get_options(id):
         sys.exit(1)
     return out
 
-def task_run():
+def task_run(task_id):
     """Run the WebColl task by fetching arguments from the BibSched task queue.
        This is what BibSched will be invoking via daemon call.
        The task will update collection reclist cache and collection web pages for
        given collection. (default is all).
        Arguments described in usage() function.
        Return 1 in case of success and 0 in case of failure."""
-    global task_id, options
+    global options
     task_run_start_timestamp = get_current_time_timestamp()
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
@@ -1029,14 +1018,14 @@ def usage(exitcode=1, msg=""):
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
        Useful for learning on how to write BibSched tasks."""
-    global task_id
+    global options
 
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
         try:
-            if not task_run():
+            if not task_run(task_id):
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
@@ -1080,7 +1069,7 @@ def main():
                     usage(1)
         except StandardError, e:
             usage(e)
-        task_submit(options)
+        task_submit()
     return
 
 ### okay, here we go:

@@ -307,23 +307,23 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if options["verbose"] >= 9:
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     errcode = 0
@@ -346,8 +346,8 @@ def task_sig_stop_commands():
 
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -356,13 +356,12 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), task_id)
+    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), options["task"])
     if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -370,7 +369,7 @@ def task_update_progress(msg):
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), task_id)
+    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), options["task"])
     if options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -408,7 +407,7 @@ def bibrank_engine(row, run):
         print "Psyco ERROR",e 
 
     startCreate = time.time()
-    global options, task_id
+    global options
     task_id = row[0]
     task_proc = row[1]
     options = loads(row[6])

@@ -64,7 +64,7 @@ Usage: %s [options]
 __version__ = "$Id$"
 
 try:
-    from marshal import loads,dumps
+    import marshal
     from zlib import compress,decompress
     from string import split,translate,lower,upper
     import getopt
@@ -95,7 +95,6 @@ try:
 except ImportError, e:
     import sys
 
-task_id = -1 # the task id
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
@@ -115,10 +114,10 @@ def deserialize_via_numeric_array(string):
     return Numeric.loads(decompress(string))
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(dumps(obj)))
+    return escape_string(compress(marshal.dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
-    return loads(decompress(string))
+    return marshal.loads(decompress(string))
 
 def authenticate(user, header="BibRank Task Submission", action="runbibrank"):
     print header
@@ -212,16 +211,16 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    if bibrank_options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if bibrank_options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if bibrank_options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    if bibrank_options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
@@ -234,8 +233,9 @@ def task_sig_stop_commands():
 
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    if bibrank_options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
+    global bibrank_options
+    if bibrank_options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -244,13 +244,13 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if bibrank_options["verbose"]>= 9:
-        write_message("got signal %d" % sig)
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), task_id)
+    global bibrank_options
+    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), bibrank_options["task"])
     if bibrank_options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -258,7 +258,8 @@ def task_update_progress(msg):
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), task_id)
+    global bibrank_options
+    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), bibrank_options["task"])
     if bibrank_options["verbose"]>= 9:
         write_message(query)
     run_sql(query)
@@ -375,7 +376,16 @@ def command_line():
     if bibrank_options["verbose"]>=9:
         write_message("Storing task options %s" % bibrank_options)
 
-    new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank',%s,%s,%s,%s,'WAITING')""", (user, sched_time, sleeptime, dumps(bibrank_options)))
+    ## sanity check: remove eventual "task" option:
+    if bibrank_options.has_key("task"):
+        del bibrank_options["task"]
+
+    new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status) VALUES ('bibrank',%s,%s,%s,%s,'WAITING')""",
+                          (user, sched_time, sleeptime, marshal.dumps(bibrank_options)))
+
+    ## update task number: 
+    bibrank_options["task"] = new_task_id
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(bibrank_options), new_task_id))
 
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
@@ -385,10 +395,10 @@ def task_run(row):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-    global task_id, bibrank_options
+    global bibrank_options
     task_id = row[0]
     task_proc = row[1]
-    bibrank_options = loads(row[6])
+    bibrank_options = marshal.loads(row[6])
     task_status = row[7]
 
 
@@ -441,6 +451,7 @@ def task_run(row):
     return 1
 
 def main():
+    global bibrank_options
     if len(sys.argv) == 2:
         try:
             id = int(sys.argv[1])

@@ -24,12 +24,11 @@
 BibIndex indexing engine implementation.  See bibindex executable for entry point.
 """
 
-from marshal import loads,dumps
+import marshal
 from zlib import compress,decompress
-from string import split,translate,lower,upper
+import string
 import getopt
 import getpass
-import string
 import os
 import sre
 import sys
@@ -38,7 +37,6 @@ import Numeric
 import urllib
 import signal
 import tempfile
-import unicodedata
 import traceback
 import cStringIO
 
@@ -55,7 +53,7 @@ from invenio.bibindex_engine_stemmer import stem
 try:
     import psyco
     psyco.bind(get_words_from_phrase)
-    psyco.bind(merge_with_old_recIDs)
+    psyco.bind(WordTable.merge_with_old_recIDs)
     psyco.bind(serialize_via_numeric_array)
     psyco.bind(serialize_via_marshal)
     psyco.bind(deserialize_via_numeric_array)
@@ -97,12 +95,11 @@ sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 wordTables = []
-task_id = -1
 base_process_size = 4500 # process base size
 options = {} # will hold task options
 
 ## Dictionary merging functions
-def intersection(dict, dict2):
+def intersection(dict1, dict2):
     "Returns intersection of the two dictionaries."
     int_dict = {}
     if len(dict1) > len(dict2): 
@@ -240,6 +237,7 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
 def get_words_from_fulltext(url_direct_or_indirect,
                             separators="[^\w]",
                             split=string.split,
+                            lower=string.lower,
                             force_file_extension=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by
@@ -417,7 +415,7 @@ def get_words_from_phrase(phrase, split=string.split):
     words = {}
     if cfg_bibindex_remove_html_markup and string.find(phrase, "</") > -1:
         phrase = sre_html.sub(' ', phrase)
-    phrase = str.lower(phrase)
+    phrase = string.lower(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
         # 2nd remove leading/trailing punctuation and add block:
@@ -574,8 +572,8 @@ def authenticate(user, header="BibIndex Task Submission", action="runbibindex"):
 def split_ranges(parse_string):
     recIDs = []
     ranges = string.split(parse_string, ",")
-    for range in ranges:
-        tmp_recIDs = string.split(range, "-")
+    for arange in ranges:
+        tmp_recIDs = string.split(arange, "-")
         
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
@@ -588,7 +586,7 @@ def split_ranges(parse_string):
     return recIDs
 
 def get_word_tables(tables):
-    wordTables = []
+    global wordTables
     if tables:
         indexes = string.split(tables, ",")
         for index in indexes:
@@ -645,11 +643,11 @@ def create_range_list(res):
     else:
         range_list = [[row[0],row[0]]]
     for row in res[1:]:
-        id = row[0]
-        if id == range_list[-1][1] + 1:
-            range_list[-1][1] = id
+        row_id = row[0]
+        if row_id == range_list[-1][1] + 1:
+            range_list[-1][1] = row_id
         else:
-            range_list.append([id,id])
+            range_list.append([row_id,row_id])
     return range_list
         
 def beautify_range_list(range_list):
@@ -679,11 +677,11 @@ def deserialize_via_numeric_array(string):
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(dumps(obj)))
+    return escape_string(compress(marshal.dumps(obj)))
 
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
-    return loads(decompress(string))
+    return marshal.loads(decompress(string))
 
 class WordTable:
     "A class to hold the words table."
@@ -822,7 +820,7 @@ class WordTable:
                 set_changed_p = 1
         return set_changed_p
 
-    def put_word_into_db(self, word, split=string.split):
+    def put_word_into_db(self, word):
         """Flush a single word to the database and delete it from memory"""
 
         set = self.load_old_recIDs(word)
@@ -912,16 +910,16 @@ class WordTable:
         records_done = 0
         records_to_go = 0
 
-        for range in recIDs:
-            records_to_go = records_to_go + range[1] - range[0] + 1
+        for arange in recIDs:
+            records_to_go = records_to_go + arange[1] - arange[0] + 1
             
         time_started = time.time() # will measure profile time
-        for range in recIDs:
-            i_low = range[0]
+        for arange in recIDs:
+            i_low = arange[0]
             chunksize_count = 0
-            while i_low <= range[1]:
+            while i_low <= arange[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,range[1])
+                i_high = min(i_low+options["flush"]-flush_count-1,arange[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
@@ -969,9 +967,9 @@ class WordTable:
            the last update of the index.
         """
         if not dates:
-            id = self.tablename[-3:-1]
+            table_id = self.tablename[-3:-1]
             query = """SELECT last_updated FROM idxINDEX WHERE id='%s'
-            """ % id
+            """ % table_id
             res = run_sql(query)
             if not res:
                 return
@@ -992,12 +990,12 @@ class WordTable:
                               WHERE b.modification_date >= %s AND 
                                     b.modification_date <= %s ORDER BY b.id ASC""",
                           (dates[0], dates[1]))
-        list = create_range_list(res)
-        if not list:
+        alist = create_range_list(res)
+        if not alist:
             if options["verbose"]:
                 write_message( "No new records added. %s is up to date" % self.tablename)
         else:
-            self.add_recIDs(list)
+            self.add_recIDs(alist)
         
     def add_recID_range(self, recID1, recID2):
         empty_list_string = serialize_via_marshal([])
@@ -1032,7 +1030,7 @@ class WordTable:
                     # content in order to decide how to index them
                     # (directly for Indico, indirectly for Setlink).                    
                     filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
-                    filename_extension = lower(split(filename, ".")[-1])
+                    filename_extension = string.lower(string.split(filename, ".")[-1])
                     if filename_extension in conv_programs.keys():
                         new_words = get_words_function(phrase, force_file_extension=filename_extension) # ,self.separators
                     else:
@@ -1131,7 +1129,7 @@ class WordTable:
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."        
         try:
-            word = lower(word[:50])
+            word = string.lower(word[:50])
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
@@ -1147,9 +1145,9 @@ class WordTable:
         [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
         """
         count = 0
-        for range in recIDs:
-            self.del_recID_range(range[0],range[1])
-            count = count + range[1] - range[0]
+        for arange in recIDs:
+            self.del_recID_range(arange[0],arange[1])
+            count = count + arange[1] - arange[0]
         self.put_into_db()
         
     def del_recID_range(self, low, high):
@@ -1240,16 +1238,16 @@ class WordTable:
         records_done = 0
         records_to_go = 0
 
-        for range in recIDs:
-            records_to_go = records_to_go + range[1] - range[0] + 1
+        for arange in recIDs:
+            records_to_go = records_to_go + arange[1] - arange[0] + 1
 
         time_started = time.time() # will measure profile time
-        for range in recIDs:
-            i_low = range[0]
+        for arange in recIDs:
+            i_low = arange[0]
             chunksize_count = 0
-            while i_low <= range[1]:
+            while i_low <= arange[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,range[1])
+                i_high = min(i_low+options["flush"]-flush_count-1,arange[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
 
                 try:
@@ -1376,12 +1374,12 @@ def task_run(row):
     Return 1 in case of success and 0 in case of failure.
     """
     
-    global options, task_id, wordTables, stemmer, stopwords
+    global options, wordTables, stemmer, stopwords
 
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
-    options = loads(row[6])
+    options = marshal.loads(row[6])
     task_status = row[7]
 
     # sanity check:
@@ -1421,7 +1419,7 @@ def task_run(row):
                         recIDs_range.append([recID,recID])
                     wordTable.del_recIDs(recIDs_range)
                 else:
-                    write_message("Missing IDs of records to delete from index %s.", wordTable.tablename,
+                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
                                   sys.stderr)
                     raise StandardError
             elif options["cmd"] == "add":
@@ -1546,9 +1544,17 @@ def command_line():
         print ""
         write_message("storing task options %s\n" % options)
 
+    ## sanity check: remove eventual "task" option:
+    if options.has_key("task"):
+        del options["task"]
+
     new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
                              VALUES ('bibindex',%s,%s,%s,%s,'WAITING')""",
-                      (user, sched_time, sleeptime, dumps(options)))
+                      (user, sched_time, sleeptime, marshal.dumps(options)))
+
+    ## update task number: 
+    options["task"] = new_task_id
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), new_task_id))
 
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
@@ -1556,7 +1562,7 @@ def command_line():
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -1564,14 +1570,14 @@ def task_sig_sleep(sig, frame):
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     errcode = 0
@@ -1597,7 +1603,7 @@ def task_sig_stop_commands():
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -1606,23 +1612,22 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)    
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
 
 def test_fulltext_indexing():
     """Tests fulltext indexing programs on PDF, PS, DOC, PPT,
@@ -1630,7 +1635,7 @@ def test_fulltext_indexing():
     integrate anything into the database.  Useful when debugging
     problems with fulltext indexing: call this function instead of main().
     """
-    options = {}
+    global options
     options["verbose"] = 9
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=atlnot&categ=Communication&id=com-indet-2002-012") # protected URL
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=agenda&categ=a00388&id=a00388s2t7") # XLS
@@ -1649,12 +1654,12 @@ def main():
     """Reads arguments and either runs the task, or starts user-interface (command line)."""
     if len(sys.argv) == 2:
         try:
-            id = int(sys.argv[1])
-        except StandardError, err:
+            task_id = int(sys.argv[1])
+        except StandardError:
             command_line()
             sys.exit()
 
-        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
+        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (task_id), None, 1)
         if not res:
             write_message("Selected task not found.", sys.stderr)
             sys.exit(1)

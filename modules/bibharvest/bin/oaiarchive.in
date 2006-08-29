@@ -69,6 +69,7 @@ try:
     from invenio.search_engine import print_record
     from invenio.access_control_engine import acc_authorize_action
     import getopt
+    import getpass
     import string
     import marshal
     import signal
@@ -77,13 +78,12 @@ try:
 
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
+options = {} # global variable to hold task options
 
 sleeptime      = ""                           # default sleeptime
-format_string  = "%Y-%m-%d %H:%M:%S"          # date/time format
-sched_time     = time.strftime(format_string) # scheduled execution time in the date/time format
+sched_time     = time.strftime("%Y-%m-%d %H:%M:%S") # scheduled execution time in the date/time format
 
 ### Bibshed compatibility procedures
 ###
@@ -121,6 +121,8 @@ def write_message(msg, stream=sys.stdout):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -128,12 +130,16 @@ def task_sig_sleep(sig, frame):
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
@@ -147,6 +153,8 @@ def task_sig_stop(sig, frame):
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -156,7 +164,8 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def authenticate(user, header="OAI Archive Task Submission", action="runoaiarchive"):
     """Authenticate the user against the user database.
@@ -193,10 +202,10 @@ def authenticate(user, header="OAI Archive Task Submission", action="runoaiarchi
             sys.exit(1)
     return user
 
-def task_submit(options):
+def task_submit():
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
 
-    global sched_time, sleep_time
+    global options, sched_time, sleep_time
 
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
@@ -216,14 +225,14 @@ def task_submit(options):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 
 def task_read_status(task_id):
@@ -248,9 +257,9 @@ def task_get_options(id):
     return out
 
 
-def task_run():
+def task_run(task_id):
     """Runs the task"""
-    
+    global options
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -292,19 +301,19 @@ def task_run():
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
        Useful for learning on how to write BibSched tasks."""
-    global task_id, sched_time, sleeptime
+    global options, sched_time, sleeptime
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
-        task_run()
+        task_run(task_id)
     else:
         ## B - submit the task
         options = {} # will hold command-line options
         options["verbose"] = 1
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:ado:pirn", ["help", "version", "verbose=","user=","sleeptime=","time=","add","delete","oaiset=","upload","info","report","no-process"])
-        except getopt.GetoptError, err:
+        except getopt.GetoptError:
             printInfo()
             sys.exit(1)
 
@@ -349,10 +358,10 @@ def main():
                 elif opt[0] in ["-n", "--no-process"]:
                     options["upload"] = 0
 
-        except StandardError, e:
+        except StandardError:
             printInfo()
             sys.exit(1)
-        task_submit(options)
+        task_submit()
     return
 
 

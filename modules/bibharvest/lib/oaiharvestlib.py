@@ -23,7 +23,7 @@ oaiharvest implementation.  See oaiharvest executable for entry point.
 
 __version__ = "$Id$"
 
-from marshal import loads,dumps
+import marshal
 import getopt
 import getpass
 import string
@@ -31,7 +31,6 @@ import os
 import sre
 import sys
 import time
-import Numeric
 import signal
 import traceback
 import calendar
@@ -40,6 +39,8 @@ from invenio.config import *
 from invenio.bibindex_engine_config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.access_control_engine import acc_authorize_action
+
+options = {} # global variable to hold task options
 
 ## precompile some often-used regexp for speed reasons:
 sre_subfields = sre.compile('\$\$\w');
@@ -145,7 +146,7 @@ def task_run(row):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-    global options, task_id
+    global options
 
     reposlist = []
     datelist = []
@@ -154,7 +155,7 @@ def task_run(row):
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
-    options = loads(row[6])
+    options = marshal.loads(row[6])
     task_status = row[7]
 
     # sanity check:
@@ -469,9 +470,17 @@ def command_line():
         print ""
         write_message("storing task options %s\n" % options)
 
+    ## sanity check: remove eventual "task" option:
+    if options.has_key("task"):
+        del options["task"]
+
     new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
                              VALUES ('oaiharvest',%s,%s,%s,%s,'WAITING')""",
-                      (user, sched_time, sleeptime, dumps(options)))
+                      (user, sched_time, sleeptime, marshal.dumps(options)))
+
+    ## update task number: 
+    options["task"] = new_task_id
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), new_task_id))
 
     print "Task #%d was successfully scheduled for execution." % new_task_id
     return
@@ -489,7 +498,7 @@ def get_dates(dates):
                     try:
                         if int(datechunks[0]) and int(datechunks[1]) and int(datechunks[2]):
                             twodates.append(date)
-                    except StandardError, e:
+                    except StandardError:
                         write_message("Dates have invalid format, not 'yyyy-mm-dd:yyyy-mm-dd'")
                         twodates=None
                         return twodates
@@ -533,7 +542,7 @@ def get_repository_names(repositories):
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -541,14 +550,14 @@ def task_sig_sleep(sig, frame):
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     errcode = 0
@@ -566,15 +575,14 @@ def task_sig_stop_commands():
     """Do all the commands necessary to stop the task before quitting.
     Useful for task_sig_stop() handler.    
     """
-    write_message("stopping commands started")    
-    for table in wordTables:
-        table.put_into_db()    
+    write_message("stopping commands started")
+    pass
     write_message("stopping commands ended")    
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -583,34 +591,33 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    if options["verbose"] >= 9:
-        write_message("got signal %d" % sig)    
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates state information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
 
 def main():
     """Reads arguments and either runs the task, or starts user-interface (command line)."""
     if len(sys.argv) == 2:
         try:
-            id = int(sys.argv[1])
-        except StandardError, err:
+            task_id = int(sys.argv[1])
+        except StandardError:
             command_line()
             sys.exit()
 
-        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (id), None, 1)
+        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (task_id), None, 1)
         if not res:
             write_message("Selected task not found.", sys.stderr)
             sys.exit(1)

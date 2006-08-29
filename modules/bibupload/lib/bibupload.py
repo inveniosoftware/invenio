@@ -39,7 +39,8 @@ Receive a MARC XML file and update the appropriate database tables according to 
  -i --insert : insert the new record in the database
  -r --replace : the existing record is entirely replaced by the new one
  -z --reference : update references (update only 999 fields)
- -s --stage : stage to start from in the algorithme ( 0 : always done ; 1: FMT tags ; 2:FFT tags; 3: BibFmt; 4: Metadata update; 5 : time update)
+ -s --stage : execution stage to start from (0: all; 1: FMT tags; 2: FFT tags;
+              3: BibFmt; 4: Metadata update; 5: time update)
  
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
@@ -116,17 +117,23 @@ def write_message(msg, stream=sys.stdout, verbose=1):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
@@ -139,6 +146,8 @@ def task_sig_stop(sig, frame):
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -147,7 +156,8 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def authenticate(user, header="BibUpload Task Submission", action="runbibupload"):
     """Authenticate the user against the user database.
@@ -190,9 +200,9 @@ def authenticate(user, header="BibUpload Task Submission", action="runbibupload"
             sys.exit(1)
     return user
 
-def task_submit(options):
+def task_submit():
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
-    global task_id
+    global options
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
         del options["task"]
@@ -213,17 +223,17 @@ def task_submit(options):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    global task_id, options
+    global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
 
 def task_read_status(task_id):
     """Read status information in the BibSched task table."""
@@ -245,11 +255,11 @@ def task_get_options(id):
         sys.exit(1)
     return out
 
-def task_run():
+def task_run(task_id):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call.
        The task prints Fibinacci numbers for up to NUM on the stdout, and some messages on stderr.
        Return 1 in case of success and 0 in case of failure."""
-    global task_id, options, stat
+    global options, stat
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -774,7 +784,8 @@ def retrieve_rec_id(record):
             #Retrieve the rec id from the database
             rec_id = find_record_from_sysno(sysno)
             if rec_id != None and options['mode'] == 'insert':
-                write_message("   Failed : Record id found in the database: Please choose another mode than insert. -h for help.", verbose=1, stream=sys.stderr)
+                write_message("   Failed : Record id found in the database: Please choose another mode than insert. -h for help.",
+                              verbose=1, stream=sys.stderr)
                 return -1
             elif rec_id == None and options['mode'] != 'insert':
                 if options['mode'] != 'replace_insert':
@@ -1291,13 +1302,13 @@ def delete_bibrec_bibdoc(id_bibrec):
 
 def main():
     """main entry point for bibupload"""
-    global task_id, options
+    global options
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
         try:
-            if not task_run():
+            if not task_run(task_id):
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, erro:
             write_message("Unexpected error occurred: %s." % erro, sys.stderr)
@@ -1313,7 +1324,7 @@ def main():
         # set user-defined options:
         error = parse_command()
         if error == 0:
-            task_submit(options)
+            task_submit()
         else:
             sys.exit(1)
     return

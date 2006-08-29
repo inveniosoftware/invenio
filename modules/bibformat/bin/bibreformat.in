@@ -53,6 +53,8 @@ except ImportError, e:
     import sys
     sys.exit(1)
 
+options = {} # global variable to hold task options
+
 sql_queries    = []                           # holds SQL queries to be executed
 cds_query      = {}                           # holds CDS query parameters (fields, collection, pattern)
 process_format = 0                            # flag, process records without created format
@@ -444,6 +446,8 @@ def write_message(msg, stream=sys.stdout):
 
 def task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -451,12 +455,16 @@ def task_sig_sleep(sig, frame):
 
 def task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
     write_message("continuing...")
     task_update_status("CONTINUING")
 
 
 def task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
     write_message("stopping...")
     task_update_status("STOPPING")
     write_message("flushing cache or whatever...")
@@ -470,6 +478,8 @@ def task_sig_stop(sig, frame):
     
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
+    if options["verbose"] >= 9:
+        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
@@ -479,7 +489,8 @@ def task_sig_suicide(sig, frame):
 
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
-    write_message("unknown signal %d ignored" % sig) # do nothing for other signals
+    # do nothing for unknown signals:
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
 
 def authenticate(user, header="BibReformat Task Submission", action="runbibformat"):
     """Authenticate the user against the user database.
@@ -516,10 +527,10 @@ def authenticate(user, header="BibReformat Task Submission", action="runbibforma
             sys.exit(1)
     return user
 
-def task_submit(options):
+def task_submit():
     """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
 
-    global sched_time, sleep_time
+    global options, sched_time, sleep_time
 
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
@@ -539,14 +550,14 @@ def task_submit(options):
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
 
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    global task_id
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, task_id))
+    global options
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 
 def task_read_status(task_id):
@@ -571,10 +582,10 @@ def task_get_options(id):
     return out
 
 
-def task_run(process_format):
+def task_run(task_id, process_format):
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
-    global task_id, process, fmt, sched_time
+    global options, process, fmt, sched_time
     options = task_get_options(task_id) # get options from BibSched task table
     ## check task id:
     if not options.has_key("task"):
@@ -677,13 +688,13 @@ def usage(exitcode=1, msg=""):
 def main():
     """Main function that analyzes command line input and calls whatever is appropriate.
        Useful for learning on how to write BibSched tasks."""
-    global task_id, sched_time, sleeptime
+    global options, sched_time, sleeptime
     ## parse command line:
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
         task_id = int(sys.argv[1])
         process_format = 0
-        task_run(process_format)
+        task_run(task_id, process_format)
     else:
         ## B - submit the task
         process_format = 0
@@ -738,7 +749,7 @@ def main():
         
         except StandardError, e:
             usage(e)
-        task_submit(options)
+        task_submit()
     return
 
 
