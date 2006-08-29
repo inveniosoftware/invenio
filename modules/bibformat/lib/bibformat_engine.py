@@ -402,7 +402,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         #execute function with given parameters and return result.
         output_text = ""
         function = format_element['code']
-        output_text = apply(function, (), params)
+        
         try:
             output_text = apply(function, (), params)
         except Exception, e:

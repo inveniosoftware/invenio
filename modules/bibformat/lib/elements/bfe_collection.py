@@ -26,7 +26,7 @@ def format(bfo, kb):
     @param kb a knowledge base use to translate the collection identifier
     """
 
-    collection_identifier = bfo.field("980")['a']
+    collection_identifier = bfo.field("980__a")
 
     
     translated_collection_identifier = bfo.kb(kb, collection_identifier)
