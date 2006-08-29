@@ -871,7 +871,7 @@ def get_format_elements(with_built_in_params=False):
     files = os.listdir(elements_path)
     for filename in files:
         filename_test = filename.upper().replace(" ", "_")
-        if filename_test.endswith(".PY") and filename != "__INIT__.PY":
+        if filename_test.endswith(".PY") and filename.upper() != "__INIT__.PY":
             if filename_test.startswith("BFE_"):
                 filename_test = filename_test[4:]
             element_name = filename_test[:-3]
