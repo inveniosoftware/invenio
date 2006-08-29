@@ -34,7 +34,7 @@ import sre
 import sys
 import time
 import Numeric
-import urllib
+import urllib2
 import signal
 import tempfile
 import traceback
@@ -60,18 +60,6 @@ try:
     psyco.bind(deserialize_via_marshal)
 except:
     pass
-
-## override urllib's default password-asking behaviour:
-class MyFancyURLopener(urllib.FancyURLopener):
-    def prompt_user_passwd(self, host, realm):
-        # supply some dummy credentials by default
-        return (cfg_bibindex_urlopener_username, cfg_bibindex_urlopener_password)
-    def http_error_401(self, url, fp, errcode, errmsg, headers):
-        # do not bother with protected pages
-        raise IOError, (999, 'unauthorized access')  
-        return None
-    
-urllib._urlopener = MyFancyURLopener()
 
 def write_message(msg, stream=sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr)."""
@@ -235,21 +223,20 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
     return out
 
 def get_words_from_fulltext(url_direct_or_indirect,
-                            separators="[^\w]",
                             split=string.split,
                             lower=string.lower,
                             force_file_extension=None):
     """Returns all the words contained in the document specified by
-       URL_DIRECT_OR_INDIRECT with the words being split by
-       SEPARATORS.  If FORCE_FILE_EXTENSION is set (e.g. to "pdf",
-       then treat URL_DIRECT_OR_INDIRECT as a PDF file.  (This is
-       interesting to index Indico for example.)  Note also that
-       URL_DIRECT_OR_INDIRECT may be either a direct URL to the
-       fulltext file or an URL to a setlink-like page body that
+       URL_DIRECT_OR_INDIRECT with the words being split by various
+       SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
+       set (e.g. to "pdf", then treat URL_DIRECT_OR_INDIRECT as a PDF
+       file.  (This is interesting to index Indico for example.)  Note
+       also that URL_DIRECT_OR_INDIRECT may be either a direct URL to
+       the fulltext file or an URL to a setlink-like page body that
        presents the links to be indexed.  In the latter case the
        URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
        to fulltext documents, for all knows file extensions as
-       specified by global conv_programs config variable.
+       specified by global conv_programs config variable.   
     """
 
     if cfg_bibindex_fulltext_index_local_files_only and string.find(url_direct_or_indirect, weburl) < 0:
@@ -271,7 +258,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         if not fulltext_urls:
             # read "setlink" data
             try:
-                htmlpagebody = urllib.urlopen(url_direct_or_indirect).read()
+                htmlpagebody = urllib2.urlopen(url_direct_or_indirect).read()
             except:
                 sys.stderr.write("Error: Cannot read %s.\n" % url_direct_or_indirect)
                 return []
@@ -295,18 +282,17 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # read fulltext file:
         try:
-            url = urllib.urlopen(url_direct)
+            url = urllib2.urlopen(url_direct)
         except:
             sys.stderr.write("Error: Cannot read %s.\n" % url_direct)
             break # try other fulltext files...
         
-        tmp_name = tempfile.mktemp('invenio.tmp')
-        tmp_fd = open(tmp_name, "w")
+        tmp_fd, tmp_name = tempfile.mkstemp('invenio.tmp')
         data_chunk = url.read(8*1024)
         while data_chunk:
-            tmp_fd.write(data_chunk)
+            os.write(tmp_fd, data_chunk)
             data_chunk = url.read(8*1024)
-        tmp_fd.close()
+        os.close(tmp_fd)
 
         # try all available conversion programs according to their order:
         bingo = 0
@@ -613,6 +599,7 @@ def get_date_range(var):
         low = get_datetime(limits[0])
         high = get_datetime(limits[1])
         return low,high
+    return None,None
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
@@ -713,7 +700,7 @@ class WordTable:
         "Cleans the words table."
         self.value={}
 
-    def put_into_db(self, mode="normal", split=string.split):
+    def put_into_db(self, mode="normal"):
         """Updates the current words table in the corresponding DB
            idxFOO table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
@@ -736,7 +723,7 @@ class WordTable:
                 run_sql(query)
 
         nb_words_total = len(self.value)
-        nb_words_report = int(nb_words_total/10)
+        nb_words_report = int(nb_words_total/10.0)
         nb_words_done = 0
         for word in self.value.keys():
             self.put_word_into_db(word)
@@ -1013,8 +1000,6 @@ class WordTable:
                     WHERE bb.id_bibrec BETWEEN %d AND %d
                     AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)    
             res = run_sql(query)
-            nb_total_to_read = len(res)
-            verbose_idx = 0     # for verbose pretty printing            
             for row in res:
                 recID,phrase = row
                 if not wlist.has_key(recID): wlist[recID] = []
@@ -1138,7 +1123,6 @@ class WordTable:
         except:
             write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
 
-
     def del_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds
         them to the wordTable.  The recIDs range list is of the form:
@@ -1220,15 +1204,9 @@ class WordTable:
         else: 
             nb_bad_records = 0
             
-        # find number of records:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR""" % (self.tablename[:-1])
-        res = run_sql(query)
-        if res:
-            nb_records = res[0][0]
-        else:
-            nb_records = 0
         if nb_bad_records == 0:
             return
+
         query = """SELECT id_bibrec FROM %sR WHERE type <> 'CURRENT' ORDER BY id_bibrec""" \
                 % (self.tablename[:-1])
         res = run_sql(query)
@@ -1278,8 +1256,6 @@ class WordTable:
             self.log_progress(time_started,records_done,records_to_go)
         write_message("%s inconsistencies repaired." % self.tablename)
 
-
-
     def chk_recID_range(self, low, high):
         """Check if the reverse index table is in proper state"""
         ## check db
@@ -1296,7 +1272,6 @@ class WordTable:
         write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibindex --repair' is recommended.""" \
             % (self.tablename, self.tablename[:-1]))
         raise StandardError
-
         
     def fix_recID_range(self, low, high):
         """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
@@ -1365,9 +1340,7 @@ class WordTable:
                 of the %s - %sR tables. Deleting affected records is
                 recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
-                
-
-                    
+                                    
 def task_run(row):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
