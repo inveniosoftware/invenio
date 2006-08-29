@@ -3,4 +3,5 @@ Makefile.in
 z_*
 *.O
 *.shtml
+*.pyc
 *~
