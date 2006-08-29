@@ -19,38 +19,31 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibUpload :
+BibUpload: Receive MARC XML file and update the appropriate database tables according to options.
 
-Receive a MARC XML file and update the appropriate database tables according to options
+    Usage: bibupload [options] input.xml
+    Examples:  
+      $ bibupload -i input.xml
 
- Usage: bibupload [options] input.xml
- Examples:
-  
- $ bibupload -i input.xml
+    Options:
+     -a, --append            new fields are appended to the existing record
+     -c, --correct           fields are replaced by the new ones in the existing record
+     -f, --format            takes only the FMT fields into account. Does not update
+     -i, --insert            insert the new record in the database
+     -r, --replace           the existing record is entirely replaced by the new one
+     -z, --reference         update references (update only 999 fields)
+     -s, --stage=STAGE       stage to start from in the algorithm (0: always done; 1: FMT tags;
+                             2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
+     -n,  --notimechange     do not change record last modification date when updating
 
- Options:
-
-
- Input:
-
- -a --append : new fields are appended to the existing record
- -c --correct : fields are replaced by the new ones in the existing record
- -f --format    : takes only the FMT fields into account. Does not update
- -i --insert : insert the new record in the database
- -r --replace : the existing record is entirely replaced by the new one
- -z --reference : update references (update only 999 fields)
- -s --stage : execution stage to start from (0: all; 1: FMT tags; 2: FFT tags;
-              3: BibFmt; 4: Metadata update; 5: time update)
- 
- Scheduling options:
- -u,  --user=USER          user name to store task, password needed
-
- General options:
- -h,  --help               print this help and exit
- -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
- -n --notimechange : do not change record last modification date when updating
-  -V  --version : print the script version
- """
+    Scheduling options:
+     -u, --user=USER         user name to store task, password needed
+    
+    General options:
+     -h, --help              print this help and exit
+     -v, --verbose=LEVEL     verbose level (from 0 to 9, default 1)
+     -V  --version           print the script version    
+"""
  
 __version__ = "$Id$"
 
@@ -75,7 +68,9 @@ from invenio.bibrecord import create_records, \
                               create_record, \
                               record_add_field, \
                               record_delete_field, \
-                              record_xml_output
+                              record_xml_output, \
+                              record_get_field_instances, \
+                              field_get_subfield_values
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.search_engine import print_record
 from invenio.config import filedir, \
@@ -226,14 +221,14 @@ def task_update_progress(msg):
     global options
     if options["verbose"] >= 9:
         write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
+    return run_sql("UPDATE schTASK SET progress=%s WHERE id=%s", (msg, options["task"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
     global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
+    return run_sql("UPDATE schTASK SET status=%s WHERE id=%s", (val, options["task"]))    
 
 def task_read_status(task_id):
     """Read status information in the BibSched task table."""
@@ -289,7 +284,7 @@ def task_run(task_id):
     if options['file_path'] != None: 
         recs = xml_marc_to_records(open_marc_file(options['file_path']))
         stat['nb_records_to_upload'] = len(recs)
-        write_message("   -Open XML marc : DONE", verbose=2)
+        write_message("   -Open XML marc: DONE", verbose=2)
         if recs != None:
             #We proceed each record by record
             for record in recs:
@@ -299,7 +294,7 @@ def task_run(task_id):
                 task_update_progress("Done %d out of %d." % (stat['nb_records_inserted'] + stat['nb_records_updated'],
                                                     stat['nb_records_to_upload']))
         else:
-            write_message("   Error bibupload failed : No record found", verbose=1, stream=sys.stderr)
+            write_message("   Error bibupload failed: No record found", verbose=1, stream=sys.stderr)
     
     if options['verbose'] >= 1:
         #Print out the statistics
@@ -470,23 +465,23 @@ def bibupload(record):
     if rec_id == -1:
         return (1, -1)
     else:
-        write_message("   -Retrieve record Id (found %s) : DONE." % rec_id, verbose=2)
-    write_message("   -Check if the xml marc file is already in the database : DONE" , verbose=2)
+        write_message("   -Retrieve record Id (found %s): DONE." % rec_id, verbose=2)
+    write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
     
     # Reference mode check if there are reference tag 
     if options['mode'] == 'reference':
         error = extract_tag_from_record(record, cfg_bibupload_reference_tag)
         if error == None:
-            write_message("   Failed : No reference tags has been found...", verbose=1, stream=sys.stderr)
+            write_message("   Failed: No reference tags has been found...", verbose=1, stream=sys.stderr)
             return (1, -1)
         else:
             error = None
-            write_message("   -Check if reference tags exist : DONE", verbose=2)
+            write_message("   -Check if reference tags exist: DONE", verbose=2)
      
     if options['mode'] == 'insert':
         # Insert the record into the bibrec databases to have a recordId
         rec_id = create_new_record()
-        write_message("   -Creation of a new record id (%d) : DONE" % rec_id, verbose=2)
+        write_message("   -Creation of a new record id (%d): DONE" % rec_id, verbose=2)
         
         # we add the record Id control field to the record            
         error = record_add_field(record, '001', '', '', rec_id)
@@ -506,7 +501,7 @@ def bibupload(record):
             write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
             return (1, rec_id)
         else:
-            write_message("   -Retrieve the old record to update : DONE", verbose=2)
+            write_message("   -Retrieve the old record to update: DONE", verbose=2)
         
         #Delete tags to correct in the record
         if options['mode'] == 'correct' or options['mode'] == 'reference':
@@ -525,7 +520,7 @@ def bibupload(record):
     
     #Have a look if we have FMT tags
     write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record,'FMT') != None:
+    if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record, 'FMT') != None:
         record = insert_fmt_tags(record, rec_id)
         if record == None:
             write_message("   Stage 1 failed: Error while inserting FMT tags", verbose=1, stream=sys.stderr)
@@ -540,7 +535,7 @@ def bibupload(record):
    
     #Have a look if we have FFT tags 
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record,'FFT') != None:
+    if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record, 'FFT') != None:
         
         if options['mode'] == 'insert' or options['mode'] == 'append':
             record = insert_fft_tags(record, rec_id)
@@ -551,19 +546,20 @@ def bibupload(record):
         write_message("   -Stage NOT NEEDED", verbose=2)
     
     # Update of the BibFmt
-    write_message("Stage 3 : Start (Update bibfmt).", verbose=2)
+    write_message("Stage 3: Start (Update bibfmt).", verbose=2)
     if options['stage_to_start_from'] <= 3:
         # format the single record as xml
         rec_xml_new = record_xml_output(record)
         #Update bibfmt with the format xm of this record
-        error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
+        if options['mode'] != 'format': 
+            error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
         if error == 1:
             write_message("   Failed: error during update_bibfmt_format", verbose=1, stream=sys.stderr)
             return (1, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     
     # Update the database MetaData
-    write_message("Stage 4 : Start (Update the database with the metadata).", verbose=2)
+    write_message("Stage 4: Start (Update the database with the metadata).", verbose=2)
     if options['stage_to_start_from'] <= 4:
         update_database_with_metadata(record, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
@@ -571,10 +567,10 @@ def bibupload(record):
         write_message("   -Stage NOT NEEDED", verbose=2)
     
     # Finally we update the bibrec table with the current date
-    write_message("Stage 5 : Start (Update bibrec table with current date).", verbose=2)
+    write_message("Stage 5: Start (Update bibrec table with current date).", verbose=2)
     if options['stage_to_start_from'] <= 5 and options['mode'] != 'insert' and options['notimechange'] == 0:
         now = convert_datestruct_to_datetext(time.localtime())
-        write_message("   -Retrieve current localtime : DONE", verbose=2)
+        write_message("   -Retrieve current localtime: DONE", verbose=2)
         update_bibrec_modif_date(now, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
@@ -592,35 +588,30 @@ def bibupload(record):
 
 def usage():
     """Print help"""
-    print """Receive a MARC XML file and update the appropriate database tables according to options
+    print """Receive MARC XML file and update appropriate database tables according to options.
 
     Usage: bibupload [options] input.xml
-    Examples:
-  
-    $ bibupload -i input.xml
+    Examples:  
+      $ bibupload -i input.xml
 
     Options:
-    
-    
-    Input:
-
-    -a --append : new fields are appended to the existing record
-    -c --correct : fields are replaced by the new ones in the existing record
-    -f --format    : takes only the FMT fields into account. Does not update
-    -i --insert : insert the new record in the database
-    -r --replace : the existing record is entirely replaced by the new one
-    -z --reference : update references (update only 999 fields)
-    -s --stage : stage to start from in the algorithme (0: always done; 1: FMT tags; 2:FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
+     -a, --append            new fields are appended to the existing record
+     -c, --correct           fields are replaced by the new ones in the existing record
+     -f, --format            takes only the FMT fields into account. Does not update
+     -i, --insert            insert the new record in the database
+     -r, --replace           the existing record is entirely replaced by the new one
+     -z, --reference         update references (update only 999 fields)
+     -s, --stage=STAGE       stage to start from in the algorithm (0: always done; 1: FMT tags;
+                             2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
+     -n,  --notimechange     do not change record last modification date when updating
 
     Scheduling options:
-     -u,  --user=USER          user name to store task, password needed
+     -u, --user=USER         user name to store task, password needed
     
     General options:
-    -h,  --help               print this help and exit
-    -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
-    -n  --notimechange : do not change record last modification date when updating
-    -V  --version : print the script version
-    
+     -h, --help              print this help and exit
+     -v, --verbose=LEVEL     verbose level (from 0 to 9, default 1)
+     -V  --version           print the script version    
     """    
     
 def print_out_bibupload_statistics():
@@ -667,7 +658,7 @@ def xml_marc_to_records(xml_marc):
     
 def find_record_bibrec(rec_id):
     """ receives the record ID and returns if this record exist in bibrec """
-    query = """SELECT id FROM bibrec where id = %s"""
+    query = """SELECT id FROM bibrec WHERE id = %s"""
     params = (rec_id,)
     try:
         res = run_sql(query, params)
@@ -679,23 +670,28 @@ def find_record_bibrec(rec_id):
         return None
         
 def find_record_format(rec_id, format):
-    """ receives the record ID and returns if this record exist in bibrec """
-    query = """SELECT count(id) FROM bibfmt where id_bibrec = %s and format = %s"""
+    """Look whether record REC_ID is formatted in FORMAT,
+       i.e. whether FORMAT exists in the bibfmt table for this record.
+    
+       Return the number of times it is formatted: 0 if not, 1 if yes,
+       2 if found more than once (should never occur).
+    """
+    out = 0
+    query = """SELECT COUNT(id) FROM bibfmt WHERE id_bibrec=%s AND format=%s"""
     params = (rec_id, format)
+    res = []
     try:
         res = run_sql(query, params)
+        out = res[0][0]
     except Error, error:
         write_message("   Error during find_record_format() : %s " % error, verbose=1, stream=sys.stderr) 
-    if len(res):
-        return res[0]
-    else:
-        return None
+    return out
 
 def find_record_bibfmt(marc):
     """ receives the xmlmarc containing a record and returns the id in bibrec if the record exists in bibfmt"""
     # compress the marc value
     pickled_marc =  MySQLdb.escape_string(compress(marc))
-    query = """SELECT id_bibrec FROM bibfmt where value = %s"""
+    query = """SELECT id_bibrec FROM bibfmt WHERE value = %s"""
     # format for marc xml is xm
     params = (pickled_marc,)
     try:
@@ -710,7 +706,7 @@ def find_record_bibfmt(marc):
 def find_record_from_sysno(sysno):
     """receive the sysno number and return the record id"""
     table_name = 'bib'+cfg_bibupload_external_sysno_tag[0:2]+'x'
-    query = """SELECT DISTINCT id FROM `%s` where value = '%s'"""
+    query = """SELECT DISTINCT id FROM `%s` WHERE value = '%s'"""
     params = (table_name, sysno)
     try:
         res = run_sql(query % params)
@@ -719,7 +715,7 @@ def find_record_from_sysno(sysno):
         
     if len(res):
         table_name = 'bibrec_bib'+cfg_bibupload_external_sysno_tag[0:2]+'x'
-        query = """SELECT DISTINCT id_bibrec FROM `%s` where id_bibxxx = '%s'"""
+        query = """SELECT DISTINCT id_bibrec FROM `%s` WHERE id_bibxxx = '%s'"""
         params = (table_name, res[0][0])
         
         try:
@@ -735,13 +731,10 @@ def find_record_from_sysno(sysno):
         return None
 
 def extract_tag_from_record(record, tag_number):
-    """ Extract the recordId """
+    """ Extract the tag_number for record."""
     # first step verify if the record is not already in the database
     if record:
-        for tag in record.keys():
-            #Check the recordId
-            if tag == tag_number:
-                return record[tag]
+        return record.get(tag_number, None)
     return None
             
 def retrieve_rec_id(record):
@@ -859,8 +852,8 @@ def insert_record_bibxxx(tag, value):
 
     # check if the tag, value combination exists in the table
 
-    query = """SELECT id  FROM %s """ % table_name
-    query += """ WHERE tag = %s and value = %s"""
+    query = """SELECT id FROM %s """ % table_name
+    query += """ WHERE tag=%s AND value=%s"""
     params = (tag, value)
     try:
         res = run_sql(query, params)
@@ -915,7 +908,7 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx, field_number, id_bibrec):
 def insert_fft_tags(record, rec_id):
     """Process and insert FFT tags"""
     tuple_list = None
-    tuple_list = extract_tag_from_record(record,'FFT')
+    tuple_list = extract_tag_from_record(record, 'FFT')
     #If there is a FFT TAG :)
     if tuple_list != None:
         for single_tuple in tuple_list:
@@ -995,26 +988,29 @@ def insert_fft_tags(record, rec_id):
 
 def insert_fmt_tags(record, rec_id):
     """Process and insert FMT tags"""
-    
-    tuple_list = None
-    tuple_list = extract_tag_from_record(record, 'FMT')
-    #If there is a FMT TAG :)
-    if tuple_list != None:
-        for single_tuple in tuple_list:
-            # Get the inside of the FMT file
-            f_value = single_tuple[0][0][1]
-            g_value = single_tuple[0][1][1]
-            
-            #Update the format
+
+    fmt_fields = record_get_field_instances(record, 'FMT')
+    if fmt_fields:
+        for fmt_field in fmt_fields:
+            # Get the f, g subfields of the FMT tag
+            try:
+                f_value = field_get_subfield_values(fmt_field, "f")[0]
+            except IndexError:
+                f_value = ""
+            try:
+                g_value = field_get_subfield_values(fmt_field, "g")[0]            
+            except IndexError:
+                g_value = ""
+            # Update the format
             res = update_bibfmt_format(rec_id, g_value, f_value)
             if res == 1:
                 write_message("   Failed: Error during update_bibfmt", verbose=1, stream=sys.stderr)
                 
-        #If we are in mode format, we only care about the FMT tag
+        # If we are in format mode, we only care about the FMT tag
         if options['mode'] == 'format':
             return 0
         # We delete the FMT Tag of the record
-        record_delete_field(record,'FMT')
+        record_delete_field(record, 'FMT')
         write_message("   -Delete field FMT from record : DONE", verbose=2)
         return record
 
@@ -1029,9 +1025,7 @@ def insert_fmt_tags(record, rec_id):
     
 def update_bibrec_modif_date(now, bibrec_id):
     """Update the date of the record in bibrec table """    
-    query = """UPDATE bibrec
-    SET modification_date =  %s
-    WHERE id = %s"""
+    query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
     params = (now, bibrec_id)
     try:
         res = run_sql(query, params)
@@ -1042,50 +1036,45 @@ def update_bibrec_modif_date(now, bibrec_id):
     except Error, error:
         write_message("   Error during update_bibrec_modif_date function : %s" % error, verbose=1, stream=sys.stderr)
 
-def update_bibfmt_format(id_bibrec, marc, format):
+def update_bibfmt_format(id_bibrec, format_value, format_name):
     """Update the format in the table bibfmt"""
 
     # We check if the format is already in bibFmt
-    found = find_record_format(id_bibrec, format)
+    nb_found = find_record_format(id_bibrec, format_name)
     
-    if int(found[0]) == 1:
+    if nb_found == 1:
         # Update the format
         # get the current time
         now = convert_datestruct_to_datetext(time.localtime())
-        # compress the marc value
-        pickled_marc =  compress(marc)
+        # compress the format_value value
+        pickled_format_value =  compress(format_value)
         
-        query = """UPDATE  bibfmt 
-                        SET format = %s, 
-                               last_updated = %s,
-                               value = %s
-                        WHERE id_bibrec = %s """ 
-        params = (format, now, pickled_marc, id_bibrec)
+        query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s""" 
+        params = (now, pickled_format_value, id_bibrec, format_name)
         try:
             row_id  = run_sql(query, params)
             if row_id == None:
                 write_message("   Failed: Error during update_bibfmt_format function", verbose=1, stream=sys.stderr)
                 return 1
             else:
-                write_message("   -Update the format %s in bibfmt : DONE" % format , verbose=2)
+                write_message("   -Update the format %s in bibfmt : DONE" % format_name , verbose=2)
                 return 0
         except Error, error:
             write_message("   Error during the update_bibfmt_format function : %s " % error, verbose=1, stream=sys.stderr)     
        
-    elif int(found[0]) > 1:
-        write_message("   Failed: Same format %s found several time in bibfmt for the same record." % format, verbose=1, stream=sys.stderr)
+    elif nb_found > 1:
+        write_message("   Failed: Same format %s found several time in bibfmt for the same record." % format_name, verbose=1, stream=sys.stderr)
         return 1
     else:
         # Insert the format information in BibFMT
-        res = insert_bibfmt(id_bibrec, marc, format)
+        res = insert_bibfmt(id_bibrec, format_value, format_name)
         if res == None:
             write_message("   Failed: Error during insert_bibfmt", verbose=1, stream=sys.stderr)
             return 1
         else:
-            write_message("   -Insert the format %s in bibfmt : DONE" % format , verbose=2)
+            write_message("   -Insert the format %s in bibfmt : DONE" % format_name , verbose=2)
             return 0
     
-
 def update_database_with_metadata(record, rec_id):
     """Update the database tables with the record and the record id given in parameter"""
     for tag in record.keys():
@@ -1283,7 +1272,7 @@ def delete_bibrec_bibxxx(record, id_bibrec):
 
 def delete_bibdoc(id_bibrec):
     """Delete document from bibdoc which correspond to the bibrec id given in parameter"""
-    query = """UPDATE bibdoc SET status='deleted' WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc where id_bibrec = %s)"""
+    query = """UPDATE bibdoc SET status='deleted' WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s)"""
     params = (id_bibrec,)
     try:
         run_sql(query, params)
@@ -1293,7 +1282,7 @@ def delete_bibdoc(id_bibrec):
 def delete_bibrec_bibdoc(id_bibrec):
     """Delete the bibrec record from the table bibrec_bibdoc given in parameter"""
     # delete all the records with proper id_bibrec
-    query = """DELETE FROM bibrec_bibdoc where id_bibrec = %s"""
+    query = """DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s"""
     params = (id_bibrec,)
     try:
         run_sql(query, params)
