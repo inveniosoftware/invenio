@@ -20,16 +20,13 @@
 
 """CDS Invenio BibRank Administrator Interface."""
 
-__lastupdated__ = """$Date$"""
-
-## fill config variables:
-
 import cgi
 import re
 import Numeric
 import os
 import ConfigParser
 from zlib import compress,decompress
+import marshal
 from mod_python import apache
 
 import invenio.access_control_engine as acce
@@ -38,6 +35,8 @@ from invenio.config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
+
+__lastupdated__ = """$Date$"""
 
 __version__ = "$Id$"
 
@@ -959,10 +958,10 @@ def deserialize_via_numeric_array(string):
     return Numeric.loads(decompress(string))
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(dumps(obj)))
+    return escape_string(compress(marshal.dumps(obj)))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
-    return loads(decompress(string))
+    return marshal.loads(decompress(string))
 def get_languages():
     languages = []
     for (lang, lang_namelong) in language_list_long():
