@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,14 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import urllib
 import time
-import cgi
-import gettext
 import string
-import locale
-import re
-import operator
 
 from invenio.config import *
 from invenio.messages import gettext_set_language
@@ -246,15 +240,13 @@ class Template:
 
         return out
 
-    def tmpl_list_alerts(self, ln, weburl, alerts, guest, guesttxt):
+    def tmpl_list_alerts(self, ln, alerts, guest, guesttxt):
         """
         Displays the list of alerts
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'alerts' *array* - The existing alerts:
 
@@ -375,15 +367,13 @@ class Template:
             out += guesttxt
         return out
 
-    def tmpl_display_alerts(self, ln, weburl, permanent, nb_queries_total, nb_queries_distinct, queries, guest, guesttxt):
+    def tmpl_display_alerts(self, ln, permanent, nb_queries_total, nb_queries_distinct, queries, guest, guesttxt):
         """
         Displays the list of alerts
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'permanent' *string* - If displaying most popular searches ('y') or only personal searches ('n')
 

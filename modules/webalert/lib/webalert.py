@@ -22,7 +22,7 @@
 import cgi
 import time
 
-from invenio.config import weburl, cdslang
+from invenio.config import cdslang
 from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
 from invenio.webaccount import warning_guest_user
@@ -124,8 +124,7 @@ def perform_display(permanent, uid, ln=cdslang):
              nb_queries_distinct = nb_queries_distinct,
              queries = queries,
              guest = isGuestUser(uid),
-             guesttxt = warning_guest_user(type="alerts", ln=ln),
-             weburl = weburl
+             guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
 def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None, ln = cdslang):
@@ -245,7 +244,7 @@ def perform_list_alerts (uid, ln=cdslang):
             })
 
     # link to the "add new alert" form
-    out = webalert_templates.tmpl_list_alerts(ln=ln, weburl=weburl, alerts=alerts,
+    out = webalert_templates.tmpl_list_alerts(ln=ln, alerts=alerts,
                                               guest=isGuestUser(uid),
                                               guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
