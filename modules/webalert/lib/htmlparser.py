@@ -25,12 +25,12 @@ __version__ = "$Id$"
 import sre
 from HTMLParser import HTMLParser
 from string import split
+import textwrap
 
 from invenio.config import *
 from invenio.alert_engine_config import cfg_webalert_max_num_of_chars_per_line_in_alert_email
 from invenio.search_engine import print_record
 from invenio.bibindex_engine import sre_html
-from invenio import textwrap
 
 def wrap(text):
     lines = textwrap.wrap(text, cfg_webalert_max_num_of_chars_per_line_in_alert_email)

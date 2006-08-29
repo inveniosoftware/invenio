@@ -148,7 +148,6 @@ modules/webalert/doc/admin/guide.html.wml
 modules/webalert/doc/admin/index.html.wml
 modules/webalert/lib/alert_engine.py
 modules/webalert/lib/htmlparser.py
-modules/webalert/lib/textwrap.py
 modules/webalert/lib/webalert.py
 modules/webalert/lib/webalert_templates.py
 modules/webalert/lib/webalert_webinterface.py

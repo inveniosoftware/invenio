@@ -25,7 +25,6 @@ pylib_DATA = webalert.py \
              alert_engine.py \
              alert_engine_config.py \
              htmlparser.py \
-             textwrap.py \
              webalert_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
