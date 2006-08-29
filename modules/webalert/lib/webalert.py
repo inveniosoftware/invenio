@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -31,7 +31,6 @@ from invenio.webbasket_dblayer import check_user_owns_baskets
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext, convert_datetext_to_dategui
 
-
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
 
@@ -42,15 +41,15 @@ class AlertError(Exception):
 
 def check_alert_name(alert_name, uid, ln=cdslang):
     """check this user does not have another alert with this name."""
-    sql = """select id_query
-           from user_query_basket
-           where id_user=%s and alert_name='%s'"""%(uid, alert_name.strip())
-    res =  run_sql( sql )
 
     # load the right message language
     _ = gettext_set_language(ln)
 
-    if len( run_sql( sql ) ) > 0:
+    sql = """select id_query
+           from user_query_basket
+           where id_user=%s and alert_name='%s'"""%(uid, alert_name.strip())
+    res =  run_sql(sql)
+    if len(res) > 0:
         raise AlertError( _("You already have an alert named %s.") % ('<b>' + alert_name + '</b>',) )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=cdslang):
@@ -76,7 +75,6 @@ def perform_display(permanent, uid, ln=cdslang):
     # first detect number of queries:
     nb_queries_total = 0
     nb_queries_distinct = 0
-    id_queries_distinct = []
     query = "SELECT COUNT(*),COUNT(DISTINCT(id_query)) FROM user_query WHERE id_user=%s"
     res = run_sql(query, (uid,), 1)
     try:
@@ -361,12 +359,9 @@ def account_list_searches(uid, ln=cdslang):
     out =""
   # first detect number of queries:
     nb_queries_total = 0
-    nb_queries_distinct = 0
-    id_queries_distinct = []
-    res = run_sql("SELECT COUNT(*),COUNT(DISTINCT(id_query)) FROM user_query WHERE id_user=%s", (uid,), 1)
+    res = run_sql("SELECT COUNT(*) FROM user_query WHERE id_user=%s", (uid,), 1)
     try:
         nb_queries_total = res[0][0]
-        nb_queries_distinct = res[0][1]
     except:
         pass
 
