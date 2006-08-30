@@ -18,8 +18,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__lastupdated__ = """$Date$"""
-
 from invenio.config import cdslang, weburl
 from invenio.webcomment import query_get_comment
 from invenio.urlutils import wash_url_argument
@@ -198,8 +196,8 @@ def perform_request_del_com(ln=cdslang, comIDs=[]):
         return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
  
     del_res=[]
-    for id in comIDs:
-        del_res.append((id, query_delete_comment(id)))
+    for comID in comIDs:
+        del_res.append((comID, query_delete_comment(comID)))
     return webcomment_templates.tmpl_admin_del_com(del_res=del_res, ln=ln)
 
 def suppress_abuse_report(ln=cdslang, comIDs=[]):
@@ -219,8 +217,8 @@ def suppress_abuse_report(ln=cdslang, comIDs=[]):
         return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
  
     del_res=[]
-    for id in comIDs:
-        del_res.append((id, query_suppress_abuse_report(id)))
+    for comID in comIDs:
+        del_res.append((comID, query_suppress_abuse_report(comID)))
     return webcomment_templates.tmpl_admin_suppress_abuse_report(del_res=del_res, ln=ln)
 
 def query_suppress_abuse_report(comID):
