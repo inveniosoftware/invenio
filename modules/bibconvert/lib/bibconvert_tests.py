@@ -25,7 +25,6 @@
 __version__ = "$Id$"
 
 import unittest
-import re
 
 from invenio import bibconvert
 
@@ -130,10 +129,11 @@ def create_test_suite():
                                unittest.makeSuite(TestGenerateValues, 'test'),
                                unittest.makeSuite(TestParseData, 'test'),
                                unittest.makeSuite(TestRegExp, 'test'),
-                               unittest.makeSuite(TestBCCL, 'test'),
-                               unittest.makeSuite(TestKnowledgeBase, 'test'),
-                               unittest.makeSuite(TestErrorCodes, 'test'),
-                               unittest.makeSuite(TestEncodings, 'test')))
+                               #unittest.makeSuite(TestBCCL, 'test'),
+                               #unittest.makeSuite(TestKnowledgeBase, 'test'),
+                               #unittest.makeSuite(TestErrorCodes, 'test'),
+                               #unittest.makeSuite(TestEncodings, 'test'),
+                               ))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
