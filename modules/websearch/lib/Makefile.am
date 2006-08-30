@@ -27,7 +27,15 @@ pylib_DATA = \
 	search_engine.py \
 	search_engine_config.py \
 	search_engine_tests.py  \
-        websearchadmin_regression_tests.py 
+    	websearchadmin_regression_tests.py \
+	websearch_external_collections.py \
+	websearch_external_collections_config.py \
+	websearch_external_collections_page_getter.py \
+	websearch_external_collections_parser.py \
+	websearch_external_collections_searcher.py \
+	websearch_external_collections_templates.py \
+	websearch_external_collections_tests.py \
+	websearch_external_collections_utils.py 
 
 EXTRA_DIST = $(pylib_DATA)
 

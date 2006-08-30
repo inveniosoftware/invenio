@@ -37,6 +37,8 @@ from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
+from invenio.websearch_external_collections import external_collections_dictionary, external_collection_load_db_infos, external_collection_set_default_type, external_collection_is_default, external_collection_disable, external_collection_enable_seealso, external_collection_enable, external_collection_is_enabled, external_collection_is_seealso_enabled, sort_engine_by_name
+
 __version__ = "$Id$"
 
 def getnavtrail(previous = ''):
@@ -1751,6 +1753,77 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     else:
         return addadminbox(subtitle, body)
 
+def perform_manage_external_collections(colID, ln, callback='yes', content='', confirm=-1):
+    """Show the interface to configure external collections to the user."""
+
+    colID = int(colID)
+    external_collection_load_db_infos()
+
+    subtitle = """<a name="11">11. Configuration of external collections.</a>"""
+    output = ""
+
+    table_header = ['External collection name', 'Type', 'Actions', 'Checked by default']
+    table_content = []
+    external_collections = sort_engine_by_name(external_collections_dictionary.values())
+    for collection in external_collections:
+        collection_name = collection.name
+       
+        type = '[Disabled]'
+        checked = ''
+        actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable_seealso">See also</a>' % locals()
+        actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable_seealso;recurse=1">(R)</a>' % locals()
+        if collection.parser:
+            actions += ' | <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable">Enable</a>' % locals()
+            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable;recurse=1">(R)</a>' % locals()
+        if external_collection_is_enabled(collection, colID):
+            type = '[Enabled]'
+            actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable">Disable</a>' % locals()
+            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable;recurse=1">(R)</a>' % locals()
+            if external_collection_is_default(collection, colID):
+                checked = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_disable">Disable</a>' % locals()
+                checked += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_disable;recurse=1">(R)</a>' % locals()
+            else:
+                checked = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_enable">Enable</a>' % locals()
+                checked += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_enable;recurse=1">(R)</a>' % locals()
+        if external_collection_is_seealso_enabled(collection, colID):
+            type = '{SeeAlso}'
+            actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable">Disable</a>' % locals()
+            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable;recurse=1">(R)</a>' % locals()
+
+        table_content.append([collection_name, type, actions, checked])
+
+    output += tupletotable(header=table_header, tuple=table_content)
+
+    body = [output]
+    
+    return addadminbox(subtitle, body)
+
+def perform_update_external_collections(colID, ln, action, collection_name, recurse):
+    colID = int(colID)
+    recurse = (recurse == 1)
+
+    if not external_collections_dictionary.has_key(collection_name):
+        return 'Unknow external collection : %(collection_name)s' % locals()
+
+    collection = external_collections_dictionary[collection_name]
+
+    if action == "enable":
+        external_collection_enable(collection, colID, recurse)
+        
+    if action == "enable_seealso":
+        external_collection_enable_seealso(collection, colID, recurse)
+
+    if action == "disable":
+        external_collection_disable(collection, colID, recurse)
+
+    if action == "check_enable":
+        external_collection_set_default_type(collection, colID, True, recurse)
+
+    if action == "check_disable":
+        external_collection_set_default_type(collection, colID, False, recurse)
+
+    return perform_manage_external_collections(colID, ln)
+
 def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.
     colID - the collection the format should be added to
@@ -2224,9 +2297,10 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
     </tr><tr>
     <td>10.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
+    <td>11.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of external search engines</a></small></td>
     </tr>
     </table>
-    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
+    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
 
     if mtype == "perform_modifydbquery" and content:
         fin_output += content
@@ -2277,7 +2351,12 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_showoutputformats" or not mtype:
         fin_output += perform_showoutputformats(colID, ln, callback='')
-            
+
+    if mtype == "perform_manage_external_collections" and content:
+        fin_output += content
+    elif mtype == "perform_manage_external_collections" or not mtype:
+        fin_output += perform_manage_external_collections(colID, ln, callback='')
+
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
@@ -2447,41 +2526,6 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
         return perform_index(colID, ln, "perform_checkcollectionstatus", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-
-def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
-    """form to remove an output format from a collection.
-    colID - the collection id of the current collection.
-    fmtID - the format id.
-    """
-
-    subtitle = """<a name="10.5"></a>Remove output format"""
-    output  = ""
-
-    col_dict = dict(get_def_name('', "collection"))
-    fmt_dict = dict(get_def_name('', "format"))
-
-    if colID and fmtID:
-        colID = int(colID)
-        fmtID = int(fmtID)
-
-        if confirm in ["0", 0]:
-            text = """Do you want to remove the output format '%s' from the collection '%s'.""" % (fmt_dict[fmtID], col_dict[colID])
-            output += createhiddenform(action="removeoutputformat#10.5",
-                                       text=text,
-                                       button="Confirm",
-                                       colID=colID,
-                                       fmtID=fmtID,
-                                       confirm=1)
-        elif confirm in ["1", 1]:
-            res = remove_fmt(colID, fmtID)
-            output += write_outcome(res)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
-
-    output = "<br>" + addadminbox(subtitle, body)
-    return perform_showoutputformats(colID, ln, content=output)
 
 def get_col_tree(colID, rtype=''):
     """Returns a presentation of the tree as a list. TODO: Add loop detection

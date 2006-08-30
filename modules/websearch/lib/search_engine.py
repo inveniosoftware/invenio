@@ -46,6 +46,8 @@ from invenio.bibrank_downloads_similarity import register_page_view_event, calcu
 from invenio.bibformat import format_record, get_output_format_content_type, create_excel
 from invenio.bibformat_config import use_old_bibformat
 
+from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
+
 if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
@@ -420,40 +422,9 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     box += """</select>"""
     return box
 
-def create_google_box(cc, p, f, p1, p2, p3, ln=cdslang,
-                      prolog_start="""<table class="googlebox"><tr><th colspan="2" class="googleboxheader">""",
-                      prolog_end="""</th></tr><tr><td class="googleboxbody">""",
-                      column_separator="""</td><td class="googleboxbody">""",
-                      link_separator= """<br>""",
-                      epilog="""</td></tr></table>"""):
-    "Creates the box that proposes links to other useful search engines like Google.  'p' is the search pattern."
-    if not p and (p1 or p2 or p3):
-        p = p1 + " " + p2 + " " + p3
-    # check suitable p's whether we want to print it
-    if cfg_google_box == 0 or \
-           p == "" or \
-           string.find(p, "recid:")>=0 or \
-           string.find(p, "sysno:")>=0 or \
-           string.find(p, "sysnos:")>=0:
-        return ""
-    # remove our logical field index names:
-    p = sre.sub(r'\w+:', '', p)
-
-    return websearch_templates.tmpl_google_box(
-             ln = ln,
-             cc = cc,
-             p = p,
-             f = f,
-             prolog_start = prolog_start,
-             prolog_end = prolog_end,
-             column_separator = column_separator,
-             link_separator = link_separator,
-             epilog = epilog,
-           )
-
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                       ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3,
-                      m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec,
+                      m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec,
                       action=""):
     
     "Create search box for 'search again in the results page' functionality."
@@ -579,7 +550,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              formats = formats,
              of = of,
              pl = pl,
-             jrec=jrec,
+             jrec = jrec,
+             ec = ec,
            )
 
 def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1):
@@ -2807,7 +2779,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
-                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang):
+                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang, ec = None):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -2957,7 +2929,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
           ln - language of the search interface (e.g. "en").  Useful
                for internationalization.
 
+          ec - List of external search engines enabled.
     """
+    selected_external_collections_infos = None
     
     # wash all arguments requiring special care
     (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
@@ -3025,7 +2999,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Browse"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
         try:
             if as==1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg)
@@ -3043,7 +3017,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
         if record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
@@ -3082,7 +3056,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results")) 
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
         recID = p[12:]
         if record_exists(recID) != 1:
             # record does not exist
@@ -3116,7 +3090,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
         t1 = os.times()[4]
         results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):
@@ -3125,7 +3099,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
                 if results_in_any_collection._nbhits == 0:
                     if of.startswith("h"):
-                        req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                     return page_end(req, of, ln)
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3141,7 +3115,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     results_in_any_collection.calculate_nbhits()
                     if results_in_any_collection._nbhits == 0:
                         if of.startswith("h"):
-                            req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                            perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                         return page_end(req, of, ln)
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3158,7 +3132,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
         else:
             ## 3B - simple search
@@ -3167,12 +3141,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
 
         if results_in_any_collection._nbhits == 0:
             if of.startswith("h"):
-                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             return page_end(req, of, ln)
 
 #             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
@@ -3190,12 +3164,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
-                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             return page_end(req, of, ln)
 
         if results_final == {}:
             if of.startswith("h"):
-                req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             return page_end(req, of, ln)
 
         # search stage 5: apply search option limits and restrictions:
@@ -3211,11 +3185,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
             if results_final == {}:
                 if of.startswith("h"):
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
 
 
@@ -3232,11 +3206,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
             if results_final == {}:
                 if of.startswith("h"):
-                    req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
 
         t2 = os.times()[4]
@@ -3275,6 +3249,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 return recIDs
             elif of.startswith("h"):
                 req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
+                selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
@@ -3320,9 +3295,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 # do not log query if req is None (used by CLI interface)
                 pass
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
-    ## 4 - write footer:
+
+    # External searches
     if of.startswith("h"):
-        req.write(create_google_box(cc, p, f, p1, p2, p3, ln))
+        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+
     return page_end(req, of, ln)
 
 def perform_request_cache(req, action="show"):

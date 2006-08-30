@@ -59,6 +59,8 @@ except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
 
+from invenio.websearch_external_collections import build_dictionnaries_from_db_tables
+
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 options = {} # will hold task options
@@ -333,7 +335,7 @@ class Collection:
                          searchfor = self.create_searchfor(as, lang),
                          np_portalbox = self.create_portalbox(lang, 'np'),
                          narrowsearch = self.create_narrowsearch(as, lang, 'r'),
-                         focuson = self.create_narrowsearch(as, lang, "v"),
+                         focuson = self.create_narrowsearch(as, lang, "v") + self.create_external_collections_box(),
                          instantbrowse = self.create_instant_browse(as=as, ln=lang),
                          ne_portalbox = self.create_portalbox(lang, 'ne')
                        )
@@ -411,6 +413,17 @@ class Collection:
                  display_grandsons = cfg_narrow_search_show_grandsons,
                  grandsons = grandsons
                )
+
+    def create_external_collections_box(self, ln=cdslang):
+
+        (dico_collection_external_searches, dico_collection_external_seealso) = build_dictionnaries_from_db_tables()
+        if not dico_collection_external_searches.has_key(self.id):
+            return ""
+
+        engines_list = [engine for engine in dico_collection_external_searches[self.id]]
+        engines_list.sort(lambda x, y: cmp(x.name, y.name))
+
+        return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
     def create_instant_browse(self, rg=cfg_instant_browse, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."

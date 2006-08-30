@@ -3026,6 +3026,15 @@ CREATE TABLE IF NOT EXISTS schTASK (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+-- External collections
+
+CREATE TABLE IF NOT EXISTS collection_externalcollection (
+  id_collection INT, 
+  name_external_searchengine VARCHAR(256),
+  type INT, 
+  is_default BOOL
+) TYPE=MyISAM;
+
 -- webMessage tables
 
 -- end of file

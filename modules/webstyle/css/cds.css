@@ -1283,4 +1283,67 @@ input.hyperlinkformSubmitButton {
     padding: 3px;
 }
 /* end of WebAlert module */
+
+/* externalcollections */
+.externalcollectionsbox {
+   color: #333;
+   background: ##fffbf5;
+   text-align: left;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 50px;
+   padding: 10px;
+   font-size: small;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0;
+}
+
+.externalcollectionsboxheader {
+   color: #333;
+   background: #ffeacc;
+   font-weight: normal;
+   font-size: small;
+   vertical-align: top;
+}
+
+.externalcollectionsboxbody {
+   color: #333;
+   background: ##fffbf5;
+   padding: 0px 5px 0px 5px;
+   font-size: small;
+   text-align: left;
+   vertical-align: top;
+}
+
+.externalcollectionsresultsbox {
+   color: #000;
+   background: #fffbf5;
+   padding: 0px;
+   margin-top: 15px;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0;
+   width: 100%;
+}
+.externalcollectionsresultsboxheader {
+   color: #000;
+   background: #ffeacc;
+   padding: 2px;
+   border-spacing: 0px;
+   text-align: left;
+   font-weight: normal;
+}
+.externalcollectionsresultsboxbody {
+   color: #000;
+   background: #fffbf5;
+   border-top: 1px dotted #fc0;
+   border-bottom: 1px dotted #fc0;
+   padding: 2px;
+}
+.externalcollectionsresultsboxrecords {
+   color: #000;
+   background: transparent;
+   margin-left: 0px;
+   margin-right: 20px;
+}
+
 /* end of cds.css */

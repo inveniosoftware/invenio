@@ -32,6 +32,8 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine_config import *
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
 
+from invenio.websearch_external_collections import external_collection_is_default
+
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
        FIXME: should be imported commonly for search_engine too."""
@@ -78,7 +80,8 @@ class Template:
 
     # Type of the allowed parameters for the web interface for search results
     search_results_default_urlargd = {
-        'cc': (str, cdsname), 'c': (list, []),
+        'cc': (str, cdsname),
+        'c': (list, []),
         'p': (str, ""), 'f': (str, ""),
         'rg': (int, 10),
         'sf': (str, ""),
@@ -102,6 +105,7 @@ class Template:
         'd2y': (int, 0), 'd2m': (int, 0), 'd2d': (int, 0),
         'ap': (int, 1),
         'verbose': (int, 0),
+        'ec': (list, []),
         }
 
     # ...and for search interfaces
@@ -673,10 +677,6 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'weburl' *string* - The base URL for the site
-
-          - 'title' *string* - The title of the produced box
-
           - 'type' *string* - The type of the produced box (virtual collections or normal collections)
 
           - 'father' *collection* - The current collection
@@ -743,6 +743,32 @@ class Template:
         out += "</tbody></table>"
 
         return out
+
+    def tmpl_searchalso(self, ln, engines_list, collection_id):
+        _ = gettext_set_language(ln)
+
+        box_name = _("Search also :")
+
+        html = """<table cellspacing="0" cellpadding="0" border="0">
+            <tr><td valign="top"><table class="narrowsearchbox">
+            <thead><tr><th colspan="2" align="left" class="narrowsearchboxheader">%(box_name)s
+            </th></tr></thead><tbody>
+        """ % locals()
+
+        for engine in engines_list:
+            internal_name = engine.name
+            name = _(internal_name)
+            if external_collection_is_default(engine, collection_id):
+                checked = ' checked'
+            else:
+                checked = ''
+
+            html += """<tr><td class="narrowsearchboxbody" valign="top">
+                <input type=checkbox name="ec" value="%(internal_name)s" %(checked)s>&nbsp;</td>
+                <td valign="top"><strong>%(name)s</strong></td></tr>""" % locals()
+
+        html += """</tr></tbody></table></table>"""
+        return html
 
     def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=cdslang):
         """
@@ -1175,7 +1201,7 @@ class Template:
                         action, fieldslist, f1, f2, f3, m1, m2, m3,
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
                         d1y, d2y, d1m, d2m, d1d, d2d, sort_formats,
-                        sf, so, ranks, sc, rg, formats, of, pl, jrec):
+                        sf, so, ranks, sc, rg, formats, of, pl, jrec, ec):
         
         """
           Displays the *Nearest search terms* box
@@ -1233,7 +1259,7 @@ class Template:
         # directly
         argd = drop_default_urlargd({
             'ln': ln, 'as': as,
-            'cc': cc, 'ot': ot, 'sp': sp,
+            'cc': cc, 'ot': ot, 'sp': sp, 'ec': ec, 
             }, self.search_results_default_urlargd)
         
 
@@ -1562,6 +1588,10 @@ class Template:
 
     def tmpl_input_hidden(self, name, value):
         "Produces the HTML code for a hidden field "
+        if isinstance(value, list):
+            list_input = [self.tmpl_input_hidden(name, val) for val in value]
+            return "\n".join(list_input)
+
         return """<input type="hidden" name="%(name)s" value="%(value)s">""" % {
                  'name' : cgi.escape(str(name), 1),
                  'value' : cgi.escape(str(value), 1),
@@ -1579,178 +1609,6 @@ class Template:
             out.append({'value' : value,
                         'text' : str(value) + " " + _("MARC tag")
                         })
-        return out
-
-    def tmpl_google_box(self, ln, cc, p, f, prolog_start, prolog_end, column_separator, link_separator, epilog):
-        """Creates the box that proposes links to other useful search engines like Google.
-
-        Parameters:
-
-          - 'ln' *string* - The language to display in
-
-          - 'cc' *string* - the internal current collection name
-
-          - 'p' *string* - the search query
-
-          - 'f' *string* - the current field
-
-          - 'prolog_start, prolog_end, column_separator, link_separator, epilog' *strings* - default HTML code for the specified position in the box
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out_links = []
-        p_quoted = urllib.quote(p)
-        # Amazon
-        if cfg_google_box_servers.get('Amazon', 0):
-            if string.find(cc, "Book") >= 0:
-                if f == "author":
-                    out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?field-author=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, _('in')))
-                else:
-                    out_links.append("""<a class="google" href="http://www.amazon.com/exec/obidos/external-search/?keyword=%s&tag=cern">%s %s Amazon</a>""" % (p_quoted, p, _('in')))
-        # CERN Intranet:
-        if cfg_google_box_servers.get('CERN Intranet', 0):
-            out_links.append("""<a class="google" href="http://search.cern.ch/query.html?qt=%s">%s %s CERN&nbsp;Intranet</a>""" % (urllib.quote(string.replace(p, ' ', ' +')), p, _('in')))
-        # CERN Agenda:
-        if cfg_google_box_servers.get('CERN Agenda', 0):
-            if f == "author":
-                out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=speaker&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, _('in')))
-            elif f == "title":
-                out_links.append("""<a class="google" href="http://agenda.cern.ch/search.php?field=title&keywords=%s&search=Search">%s %s CERN&nbsp;Agenda</a>""" % (p_quoted, p, _('in')))
-        # CERN EDMS:
-        if cfg_google_box_servers.get('CERN Agenda', 0):
-            # FIXME: reusing CERN Agenda config variable until we can enter CERN EDMS into config.wml
-            if f == "author":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_author=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
-            elif f == "title" or f == "abstract" or f == "keyword":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_title=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
-            elif f == "reportnumber":
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=ADVANCED&p_document_id=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
-            else:
-                out_links.append("""<a class="google" href="https://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text=%s">%s %s CERN&nbsp;EDMS</a>""" % (p_quoted, p, _("in")))
-        # CiteSeer:
-        if cfg_google_box_servers.get('CiteSeer', 0):
-            out_links.append("""<a class="google" href="http://citeseer.ist.psu.edu/cs?q=%s">%s %s CiteSeer</a>""" % (p_quoted, p, _('in')))
-        # Google Print:
-        if cfg_google_box_servers.get('Google Scholar', 0):
-            # FIXME: reusing Google Scholar config variable until we can enter Google Print into config.wml
-            if string.find(cc, "Book") >= 0:
-                out_links.append("""<a class="google" href="http://print.google.com/print?q=%s">%s %s Google Print</a>""" % (p_quoted, p, _("in")))
-        # Google Scholar:
-        if cfg_google_box_servers.get('Google Scholar', 0):
-            if f == "author":
-                out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=author%%3A%s">%s %s Google Scholar</a>""" % (p_quoted, p, _('in')))
-            else:
-                out_links.append("""<a class="google" href="http://scholar.google.com/scholar?q=%s">%s %s Google Scholar</a>""" % (p_quoted, p, _('in')))
-        # Google Web:
-        if cfg_google_box_servers.get('Google Web', 0):
-            if f == "author":
-                p_google = p
-                if string.find(p, ",") >= 0 and (not p.startswith('"')) and (not p.endswith('"')):
-                    p_lastname, p_firstnames = string.split(p, ",", 1)
-                    p_google = '"%s %s" OR "%s %s"' % (p_lastname, p_firstnames, p_firstnames, p_lastname)
-                out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (urllib.quote(p_google), p_google, _('in')))
-            else:
-                out_links.append("""<a class="google" href="http://google.com/search?q=%s">%s %s Google Web</a>""" % (p_quoted, p, _('in')))
-        # IEC
-        if cfg_google_box_servers.get('IEC', 0):
-            if string.find(cc, "Standard") >= 0:
-                out_links.append("""<a class="google" href="http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor=%s">%s %s IEC</a>""" % (p_quoted, p, _('in')))
-        # IHS
-        if cfg_google_box_servers.get('IHS', 0):
-            if string.find(cc, "Standard") >= 0:
-                out_links.append("""<a class="google" href="http://global.ihs.com/search_res.cfm?&input_doc_title=%s">%s %s IHS</a>""" % (p_quoted, p, _('in')))
-        # INSPEC
-        if cfg_google_box_servers.get('INSPEC', 0):
-            if f == "author":
-                p_inspec = sre.sub(r'(, )| ', '-', p)
-                p_inspec = sre.sub(r'(-\w)\w+$', '\\1', p_inspec)
-                out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.au.">%s %s INSPEC</a>""" % (urllib.quote(p_inspec), p_inspec, _('in')))
-            elif f == "title":
-                out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ti.">%s %s INSPEC</a>""" % (p_quoted, p, _('in')))
-            elif f == "abstract":
-                out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.ab.">%s %s INSPEC</a>""" % (p_quoted, p, _('in')))
-            elif f == "year":
-                out_links.append("""<a class="google" href="http://www.datastarweb.com/cern/?dblabel=inzz&query=%s.yr.">%s %s INSPEC</a>""" % (p_quoted, p, _('in')))
-        # ISO
-        if cfg_google_box_servers.get('ISO', 0):
-            if string.find(cc, "Standard") >= 0:
-                out_links.append("""<a class="google" href="http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en&keyword=%s&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stagescope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO">%s %s ISO</a>""" % (p_quoted, p, _('in')))
-        # KEK
-        if cfg_google_box_servers.get('KEK', 0):
-            kek_search_title = "KEK KISS Preprints"
-            kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_prepri?"
-            if string.find(cc, "Book") >= 0:
-                kek_search_title = "KEK Library Books"
-                kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=1&"
-            elif string.find(cc, "Periodical") >= 0:
-                kek_search_title = "KEK Library Journals"
-                kek_search_baseurl = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=2&"
-            if f == "author":
-                out_links.append("""<a class="google" href="%sAU=%s">%s %s %s</a>""" % \
-                                 (kek_search_baseurl, p_quoted, p, _('in'), kek_search_title))
-            elif f == "title":
-                out_links.append("""<a class="google" href="%sTI=%s">%s %s %s</a>""" % \
-                                 (kek_search_baseurl, p_quoted, p, _('in'), kek_search_title))
-            elif f == "reportnumber":
-                out_links.append("""<a class="google" href="%sRP=%s">%s %s %s</a>""" % \
-                                 (kek_search_baseurl, p_quoted, p, _('in'), kek_search_title))
-        # NEBIS
-        if cfg_google_box_servers.get('NEBIS', 0):
-            if string.find(cc, "Book") >= 0:
-                if f == "author":
-                    out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WAU">%s %s NEBIS</a>""" % (p_quoted, p, _('in')))
-                elif f == "title":
-                    out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WTI">%s %s NEBIS</a>""" % (p_quoted, p, _('in')))
-                else:
-                    out_links.append("""<a class="google" href="http://opac.nebis.ch/F/?func=find-b&REQUEST=%s&find_code=WRD">%s %s NEBIS</a>""" % (p_quoted, p, _('in')))
-        # Scirus:
-        if cfg_google_box_servers.get('Google Scholar', 0):
-            # FIXME: reusing Google Scholar config variable until we can enter Scirus into config.wml
-            if f == "author":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=author%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
-            elif f == "title":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=title%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
-            elif f == "keyword":
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=keywords%%3A%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
-            else:
-                out_links.append("""<a class="google" href="http://www.scirus.com/srsapp/search?q=%s">%s %s Scirus</a>""" % (p_quoted, p, _("in")))
-        # SPIRES
-        if cfg_google_box_servers.get('SPIRES', 0):
-            spires_search_title = "SLAC SPIRES HEP"
-            spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/hep/"
-            if string.find(cc, "Book") >= 0:
-                spires_search_title = "SLAC Library Books"
-                spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/books/"
-            elif string.find(cc, "Periodical") >= 0:
-                spires_search_title = "SLAC Library Journals"
-                spires_search_baseurl = "http://www.slac.stanford.edu/spires/find/tserials/"
-            if f == "author":
-                out_links.append("""<a class="google" href="%swww?AUTHOR=%s">%s %s %s</a>""" % \
-                       (spires_search_baseurl, p_quoted, p, _('in'), spires_search_title))
-            elif f == "title":
-                out_links.append("""<a class="google" href="%swww?TITLE=%s">%s %s %s</a>""" % \
-                       (spires_search_baseurl, p_quoted, p, _('in'), spires_search_title))
-            elif f == "reportnumber":
-                out_links.append("""<a class="google" href="%swww?REPORT-NUM=%s">%s %s %s</a>""" % \
-                       (spires_search_baseurl, p_quoted, p, _('in'), spires_search_title))
-            elif f == "keyword":
-                out_links.append("""<a class="google" href="%swww?k=%s">%s %s %s</a>""" % \
-                       (spires_search_baseurl, p_quoted, p, _('in'), spires_search_title))
-            else: # invent a poor man's any field search since SPIRES doesn't support one
-                out_links.append("""<a class="google" href="%swww?rawcmd=find+t+%s+or+a+%s+or+k+%s+or+s+%s+or+r+%s">%s %s %s</a>""" % \
-                (spires_search_baseurl, p_quoted, p_quoted, p_quoted, p_quoted, p_quoted, p, _('in'), spires_search_title))
-        # okay, so print the box now:
-        out = ""
-        if out_links:
-            out += """<a name="googlebox"></a>"""
-            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers:") + prolog_end
-            nb_out_links_in_one_column = len(out_links)/2
-            out += string.join(out_links[:nb_out_links_in_one_column], link_separator)
-            out += column_separator
-            out += string.join(out_links[nb_out_links_in_one_column:], link_separator)
-            out += epilog
         return out
 
     def tmpl_search_pagestart(self, ln) :
