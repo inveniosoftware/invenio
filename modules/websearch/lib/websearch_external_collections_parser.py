@@ -125,6 +125,13 @@ class ExternalCollectionResultsParser(object):
         self.parse()
         return self.results
 
+    def buffer_decode_from(self, charset):
+        """Convert the buffer to UTF-8 from the specified charset. Ignore errors."""
+        try:
+            self.buffer = self.buffer.decode(charset, 'ignore').encode('utf-8', 'ignore')
+        except:
+            pass
+
 class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     """Parser for CDS Indico"""
 
@@ -155,7 +162,8 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def parse(self):
         """Parse buffer to extract records."""
 
-        self.buffer = self.buffer.decode('Shift_JIS', 'ignore').encode('utf-8', 'ignore')
+        self.buffer_decode_from('Shift_JIS')
+
         elements = self.buffer.split("<DL>")
         if len(elements) <= 1:
             return
@@ -181,7 +189,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def parse(self):
         """Parse buffer to extract records."""
 
-        self.buffer = self.buffer.decode('Shift_JIS', 'ignore').encode('utf-8', 'ignore')
+        self.buffer_decode_from('Shift_JIS')
         self.buffer = self.buffer.replace('\n', ' ')
 
         html = ""
