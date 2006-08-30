@@ -51,6 +51,9 @@ Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
 
+ - Olivier Serres <olivier.serres@gmail.com>
+     External collections searching, for WebSearch.
+
  - Eric Stahl <eric.stahl@utbm.fr>
      Rewrite of BibUpload in Python.
 
