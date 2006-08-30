@@ -52,6 +52,7 @@ __revision__ = "0.0.1"
 import asyncore
 import mimetools
 import socket
+import sys
 import StringIO
 import time
 import urlparse
@@ -74,7 +75,10 @@ def async_download(pagegetter_list, finish_function=None, datastructure_list=Non
             nb_remaining += 1
  
     while (time.time() - time_start < timeout) and nb_remaining > 0:
-        asyncore.loop(0.01, True, None, 1)
+        if sys.hexversion < 0x2040000:
+            asyncore.poll(0.01)
+        else:
+            asyncore.loop(0.01, True, None, 1)
         check_redirected(pagegetter_list)
         for i in range(len(pagegetter_list)):
             if pagegetter_list[i] and not finished_list[i] and pagegetter_list[i].done:
@@ -209,4 +213,6 @@ def check_redirected(pagegetter_list):
         if getter and getter.redirected != None:
             if getter.redirected.startswith('http://'):
                 getter = HTTPAsyncPageGetter(getter.redirected)
+            else:
+                getter.done = True
         pagegetter_list[i] = getter
