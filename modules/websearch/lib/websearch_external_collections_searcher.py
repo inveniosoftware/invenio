@@ -494,7 +494,6 @@ class INSPECSearchEngine(ExternalSearchEngine):
         self.search_url = "http://www.datastarweb.com/cern/?dblabel=inzz&query="
         self.combiner = " AND "
         
-    @staticmethod
     def build_search_unit_unit(basic):
         """Build a search string from a search unit. This is the base
         version that just keep keywords with "+". """
@@ -510,6 +509,8 @@ class INSPECSearchEngine(ExternalSearchEngine):
         if basic[2] == "year":
             return word + ".yr."
         return word + ".ti. OR " + word + ".ab."
+
+    build_search_unit_unit = staticmethod(build_search_unit_unit)
 
 class NEBISSearchEngine(ExternalSearchEngine):
     """NEBIS"""
