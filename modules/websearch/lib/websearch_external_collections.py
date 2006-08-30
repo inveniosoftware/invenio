@@ -297,14 +297,14 @@ def db_insert_type(external_collection_search_engine, collection_id, search_type
     """
     engine_name = external_collection_search_engine.name
     sql = 'INSERT INTO collection_externalcollection (id_collection, name_external_searchengine, type, is_default) VALUES ' + \
-        '(%(collection_id)d, "%(name_external_searchengine)s", %(type)d, false);' % escape_dictionary(
+        '(%(collection_id)d, "%(name_external_searchengine)s", %(type)d, 0);' % escape_dictionary(
         {'collection_id': collection_id, 'name_external_searchengine': engine_name, 'type': search_type})
     run_sql(sql)
 
 def db_update(external_collection_search_engine, collection_id, search_type):
     """Change the type for the given collection."""
     engine_name = external_collection_search_engine.name
-    sql = 'UPDATE collection_externalcollection SET is_default=false, ' + \
+    sql = 'UPDATE collection_externalcollection SET is_default=0, ' + \
         'type=%(type)d WHERE id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s";' % \
         escape_dictionary({'type': search_type, 'collection_id': collection_id, 'engine_name': engine_name})
     run_sql(sql)
@@ -320,7 +320,7 @@ def db_delete(external_collection_search_engine, collection_id):
 def external_collection_is_default(external_collection_search_engine, collection_id):
     """Return true if the current search engine is enabled for the given collection."""
     engine_name = external_collection_search_engine.name
-    sql = 'SELECT * FROM collection_externalcollection WHERE  type=1 AND is_default=true AND ' + \
+    sql = 'SELECT * FROM collection_externalcollection WHERE  type=1 AND is_default=1 AND ' + \
         'id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s";' % \
         escape_dictionary({'collection_id': collection_id, 'engine_name': engine_name})
     results = run_sql(sql)
@@ -329,8 +329,10 @@ def external_collection_is_default(external_collection_search_engine, collection
 def external_collection_set_default_type(external_collection_search_engine, collection_id, default=True, recurse=False):
     """Set default in database for an external collection (checked or not)."""
     engine_name = external_collection_search_engine.name
-    sql_default = str(default).lower()
-
+    if default is True:
+        sql_default = 1
+    else:
+        sql_default = 0
     sql = ('UPDATE collection_externalcollection SET is_default=%(is_default)s WHERE ' + \
         'id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s" AND type=1;') % \
         escape_dictionary({'is_default': sql_default, 'collection_id': collection_id, 'engine_name': engine_name})
