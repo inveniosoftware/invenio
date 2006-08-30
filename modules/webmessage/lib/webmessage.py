@@ -181,18 +181,17 @@ def perform_request_write(uid,
             # The user doesn't own this message
             errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
         else:
-            # Junk== make pylint happy!
-            junk = 0
+            # dummy == variable name to make pylint and pychecker happy!
             (msg_id,
              msg_from_id,
              msg_from_nickname,
-             junk,
-             junk,
+             dummy,
+             dummy,
              msg_subject,
              msg_body,
-             junk,
-             junk,
-             junk) = get_message(uid, msg_reply_id)    
+             dummy,
+             dummy,
+             dummy) = get_message(uid, msg_reply_id)    
             if (msg_id == ""):
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
