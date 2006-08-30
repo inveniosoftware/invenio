@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-## $Id$
 ## 
-## Every db-related function of module webmessage
+## $Id$
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
@@ -19,6 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Every db-related function of module webmessage"""
 
 from time import localtime, mktime
 
@@ -525,7 +526,6 @@ def clean_messages():
     current_time = localtime()
     seconds = mktime(current_time)
     seconds -= cfg_webmessage_days_before_delete_orphans * 86400
-    format = "%Y-%m-%d %H:%M:%S"
     sql_date = convert_datestruct_to_datetext(localtime(seconds))    
     deleted_items = 0
     #find id and email from every user who has got an email
