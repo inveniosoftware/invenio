@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## Comments and reviews for records.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -19,12 +19,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Comments and reviews administrative interface."""
+
 __lastupdated__ = """$Date$"""
 
 from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import weburl,cdslang,cdsname
 from invenio.dbquery import Error 
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -43,8 +45,13 @@ def index(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgwebcomment')
     if (auth_code != 'false'):
@@ -72,9 +79,14 @@ def delete(req, ln=cdslang, comid=""):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
-                                                                                                                                                                                                     
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
+    
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if (auth_code != 'false'):
         (body, errors, warnings) = perform_request_delete(ln=ln, comID=comid)
@@ -107,8 +119,13 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     
     try:
         auid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
     
     (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
     if (auth_code != 'false'):
@@ -136,8 +153,14 @@ def users(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
+
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if (auth_code != 'false'):
         return page(title=_("View all reported users"),
@@ -167,8 +190,14 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
+
     (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
     if (auth_code != 'false'):
         comIDs = []
