@@ -132,6 +132,9 @@ update-v0.90.0-tables: local-dbexec
 	echo "ALTER TABLE format ADD COLUMN (description varchar(255) default '');" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE format ADD COLUMN (content_type varchar(255) default '');" | ./modules/miscutil/bin/dbexec
 
+update-v0.90.1-tables: local-dbexec
+	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
