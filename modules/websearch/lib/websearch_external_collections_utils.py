@@ -57,7 +57,7 @@ def escape_dictionary(dictionary):
 collections_id = None
 
 def collections_id_load(force_reload=False):
-    """If needed, load the database for building the dictionnary collection_name -> collection_id."""
+    """If needed, load the database for building the dictionary collection_name -> collection_id."""
 
     global collections_id
 

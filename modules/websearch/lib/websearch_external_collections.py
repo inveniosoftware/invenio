@@ -203,9 +203,9 @@ init.done = False
 def external_collection_load_db_infos():
     """Load and cache informations about external collections."""
     global dico_collection_external_searches, dico_collection_seealso
-    (dico_collection_external_searches, dico_collection_seealso) = build_dictionnaries_from_db_tables()
+    (dico_collection_external_searches, dico_collection_seealso) = build_dictionaries_from_db_tables()
 
-def build_dictionnaries_from_db_tables():
+def build_dictionaries_from_db_tables():
     """Read a db table and build the dictionary making the association between a collection and a search engine."""
     global dico_collection_external_searches, dico_collection_seealso
     dico_collection_external_searches = {}

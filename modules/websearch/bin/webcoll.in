@@ -59,7 +59,7 @@ except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
 
-from invenio.websearch_external_collections import build_dictionnaries_from_db_tables
+from invenio.websearch_external_collections import build_dictionaries_from_db_tables
 
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
@@ -416,7 +416,7 @@ class Collection:
 
     def create_external_collections_box(self, ln=cdslang):
 
-        (dico_collection_external_searches, dico_collection_external_seealso) = build_dictionnaries_from_db_tables()
+        (dico_collection_external_searches, dico_collection_external_seealso) = build_dictionaries_from_db_tables()
         if not dico_collection_external_searches.has_key(self.id):
             return ""
 

@@ -67,6 +67,10 @@ via both a high-level and low-level API interface.
                  c - collectin list (e.g. ["Theses", "Books"]).  The
                      collections user may have selected/deselected when
                      starting to search from 'cc'.
+
+                ec - external collection list (e.g. ['CiteSeer', 'Google']). The
+                     external collections may have been selected/deselected by the
+                     user.
       
                  p - pattern to search for (e.g. "ellis and muon or kaon").
       

@@ -18,7 +18,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Testing function for the external collections search.
+"""Testing functions for the external collections search.
+
+   More tests of the page_getter module can be done with 
+       websearch_external_collections_page_getter_tests.py
 """
 
 __lastupdated__ = """$Date$"""
@@ -32,63 +35,23 @@ import unittest
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
 
-def async_download_test():
-    """Test varius cases for the async_download function:
-    - test 2 workings pages : google, kernel.org
-    - test 1 unresolvable name : rjfreijoiregjreoijgoirg.fr
-    - test 1 bad ip : 1.2.3.4
-    Return True if the test is succefull."""
-
-    urls = ['http://www.google.com/', 'http://rjfreijoiregjreoijgoirg.fr', 'http://1.2.3.4/', 'http://www.kernel.org']
-    checks = [  ['<title>Google</title>', False], 
-                [None, False],
-                [None, False],
-                ['<title>The Linux Kernel Archives</title>', False] ]
-
-    def finished(pagegetter, data, current_time):
-        """Function called when a page is received."""
-        check = data[0]
-        is_ok = pagegetter.status != None
-       
-        if check and is_ok:
-            is_ok = pagegetter.data.find(check) > 0
- 
-        result = is_ok == (check != None)
-        if result:
-            print "Test Ok (%f): " % current_time + pagegetter.uri
-        else:
-            print "Test failed (%f): " % current_time + pagegetter.uri
-
-        data[1] = result
-
-    pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
-    finished_list = async_download(pagegetters, finished, checks, 20)
-
-    for (finished, check, pagegetter) in zip(finished_list, checks, pagegetters):
-        if not finished:
-            if check[0] == None:
-                print "Test Ok: " + pagegetter.uri
-                check[1] = True
-
-    errors = [check for check in checks if check == False]
-    print errors
-    return len(errors) == 0
-
 def download_and_parse():
     """Try to make a query that always return results on all search engines. 
-    Check that a page is well returned and that the result can be parsed."""
+    Check that a page is well returned and that the result can be parsed.
+
+    This test is not included in the general test suite.
+
+    This test give false positive if any of the external server is non working or too slow.
+    """
     test = [['+', 'ieee', '', 'w']]
     errors = []
 
     external_collections = external_collections_dictionary.values()
-    urls = [engine.build_search_url(test)for engine in external_collections]
+    urls = [engine.build_search_url(test) for engine in external_collections]
     pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
     finished_list = async_download(pagegetters, None, None, 30)
-    print urls
-    print finished_list
 
     for (page, engine, url) in zip(pagegetters, external_collections, urls):
-        print engine.name + " - " + str(len(page.data)) + " - " + url
         if not url:
             errors.append("Unable to build url for : " + engine.name)
             continue
@@ -98,7 +61,6 @@ def download_and_parse():
         if engine.parser:
             results = engine.parser.parse_and_get_results(page.data)
             num_results = engine.parser.parse_num_results()
-            print "  parser : " + str(len(results)) + " on " + str(num_results)
             if len(results) == 0:
                 errors.append("Unable to parse results for : " + engine.name)
                 continue
@@ -125,22 +87,11 @@ def build_search_urls_test():
             url = engine.build_search_url(test)
             print "    Url: " + str(url)
 
-def _test():
-    """Make small test on the module."""
-    async_download_test()
-    build_search_urls_test()
-    for error in download_and_parse():
-        print error
-
 class TestSuite(unittest.TestCase):
     """Test suite for websearch_external_collections_*"""
 
-    def test_async_download(self):
-        """test of async_download function."""
-        self.assertEqual(True, async_download_test())
-
     def test_download_and_parse(self):
-        """Download page on all know search engines and check if the result is parsable."""
+        """websearch_external_collections - download_and_parse (not reliable, see docstring)"""
         self.assertEqual([], download_and_parse())
 
 def create_test_suite():
@@ -148,5 +99,6 @@ def create_test_suite():
     return unittest.TestSuite((unittest.makeSuite(TestSuite, 'test')))
 
 if __name__ == "__main__":
-	_test()
+    build_search_urls_test()
+    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
 

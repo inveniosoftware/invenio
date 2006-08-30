@@ -48,6 +48,7 @@ from invenio import bibconvert_tests
 from invenio import errorlib_tests
 from invenio import elmsubmit_tests
 from invenio import bibformat_engine_tests
+from invenio import websearch_external_collections_page_getter_tests
 
 def usage():
     """Print usage info on standard error output."""
@@ -74,7 +75,8 @@ def create_all_test_suites():
 			       errorlib_tests.create_test_suite(),
                                elmsubmit_tests.create_test_suite(),
                                webinterface_tests.create_test_suite(),
-                               bibformat_engine_tests.create_test_suite()))
+                               bibformat_engine_tests.create_test_suite(),
+                               websearch_external_collections_page_getter_tests.create_test_suite()))
 
 def print_info_line():
     """Prints info line about tests to be executed."""
