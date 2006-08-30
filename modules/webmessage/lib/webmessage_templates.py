@@ -56,7 +56,7 @@ class Template:
         @return the list in HTML format                                            
         """
         _ = gettext_set_language(ln)
-        junk = 0
+        dummy = 0
         inbox = self.tmpl_warning(warnings, ln)
         inbox += self.tmpl_infobox(infos, ln)
         if not(no_quota):
@@ -314,13 +314,13 @@ class Template:
             for to in tos[0:-1]:
                 to_display = to
                 if to.isdigit():
-                    (junk, to, to_display) = get_user_info(int(to), ln)
+                    (dummy, to, to_display) = get_user_info(int(to), ln)
                 sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
                 sent_to_link += '%s</a>%s '% (to_display, cfg_webmessage_separator)
             to_display = tos[-1]
             to = tos[-1]
             if to.isdigit():
-                (junk, to, to_display) = get_user_info(int(to), ln)
+                (dummy, to, to_display) = get_user_info(int(to), ln)
             sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, to_display)
         group_to_link = ""
         groups = msg_sent_to_group.split(cfg_webmessage_separator)
@@ -502,6 +502,7 @@ class Template:
         @param ln=language
         @return html output
         """
+        _ = gettext_set_language(ln)
         if not((type(warnings) is list) or (type(warnings) is tuple)):
             warnings = [warnings]
         warningbox = ""
