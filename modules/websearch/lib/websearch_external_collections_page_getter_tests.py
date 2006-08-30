@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -31,48 +32,46 @@ import unittest
 
 from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
 
-def async_download_test():
-    """Test varius cases for the async_download function:
-    - test 2 workings pages : google, kernel.org
-    - test 1 unresolvable name : rjfreijoiregjreoijgoirg.fr
-    - test 1 bad ip : 1.2.3.4
-    Return the list of errors."""
-
-    checks = [  {'url': 'http://public.web.cern.ch/public/', 'content': "<title>CERN - The world's largest particle physics laboratory</title>"}, 
-                {'url': 'http://cdsware.cern.ch/invenio/index.html', 'content': '<title>CDS Invenio: Overview</title>'},
-                {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
-                {'url': 'http://1.2.3.4/'} ] 
-
-    def finished(pagegetter, check, current_time):
-        """Function called when a page is received."""
-        is_ok = pagegetter.status != None
-       
-        if check.has_key('content') and is_ok:
-            is_ok = pagegetter.data.find(check['content']) > 0
- 
-        check['result'] = is_ok == check.has_key('content')
-
-    pagegetters = [HTTPAsyncPageGetter(check['url']) for check in checks]
-    finished_list = async_download(pagegetters, finished, checks, 20)
-
-    for (finished, check) in zip(finished_list, checks):
-        if not finished:
-            check['result'] = not check.has_key('content')
-
-    errors = [check for check in checks if not check['result']]
-
-    return errors
-
-class TestSuite(unittest.TestCase):
+class AsyncDownloadTest(unittest.TestCase):
     """Test suite for websearch_external_collections_*"""
 
     def test_async_download(self):
-        """websearch_external_collections_page_getter - async_download"""
-        self.assertEqual([], async_download_test())
+        """websearch_external_collections_page_getter - asynchronous download"""
+
+        ## Test varius cases for the async_download function:
+        ##   - test 2 workings pages : google, kernel.org
+        ##   - test 1 unresolvable name : rjfreijoiregjreoijgoirg.fr
+        ##   - test 1 bad ip : 1.2.3.4
+        ## Return the list of errors.
+
+        checks = [  {'url': 'http://public.web.cern.ch/public/', 'content': "<title>CERN - The world's largest particle physics laboratory</title>"}, 
+                    {'url': 'http://cdsware.cern.ch/invenio/index.html', 'content': '<title>CDS Invenio: Overview</title>'},
+                    {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
+                    {'url': 'http://1.2.3.4/'} ] 
+
+        def finished(pagegetter, check, current_time):
+            """Function called when a page is received."""
+            is_ok = pagegetter.status != None
+
+            if check.has_key('content') and is_ok:
+                is_ok = pagegetter.data.find(check['content']) > 0
+
+            check['result'] = is_ok == check.has_key('content')
+
+        pagegetters = [HTTPAsyncPageGetter(check['url']) for check in checks]
+        finished_list = async_download(pagegetters, finished, checks, 20)
+
+        for (finished, check) in zip(finished_list, checks):
+            if not finished:
+                check['result'] = not check.has_key('content')
+
+        errors = [check for check in checks if not check['result']]
+
+        self.assertEqual(errors, [])
 
 def create_test_suite():
     """Return test suite for the external collection tests."""
-    return unittest.TestSuite((unittest.makeSuite(TestSuite, 'test')))
+    return unittest.TestSuite((unittest.makeSuite(AsyncDownloadTest, 'test'),))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
