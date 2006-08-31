@@ -117,7 +117,11 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
 
     def handle_connect(self):
         """Handle the connection event. By sending the request to the server."""
-        self.send(self.request)
+        try:
+            self.send(self.request)
+        except socket.error:
+            # do nothing because self.done is False by default
+            pass
 
     def handle_expt(self):
         """Handle an exception. Close the socket and put done at True."""
