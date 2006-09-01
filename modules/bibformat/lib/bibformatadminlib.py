@@ -1474,3 +1474,29 @@ def check_tag(tag):
     errors = []
     return errors
 
+
+def perform_request_dreamweaver_floater():
+    """
+    Returns a floater for Dreamweaver with all Format Elements avalaible.
+    """
+    #get format elements lists of attributes
+    elements = bibformat_engine.get_format_elements(with_built_in_params=True)
+
+    keys =  elements.keys()
+    keys.sort()
+    elements = map(elements.get, keys) 
+
+    def filter_elem(element):
+        """Keep element if is string representation contains all keywords of search_doc_pattern,
+        and if its name does not start with a number (to remove 'garbage' from elements in tags table)"""
+        if element['type'] != 'python' and \
+               element['attrs']['name'][0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            return False
+        else:
+            return True
+    
+    elements = filter(filter_elem, elements)
+
+  
+        
+    return bibformat_templates.tmpl_dreamweaver_floater(cdslang, elements)

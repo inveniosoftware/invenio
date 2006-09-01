@@ -1460,7 +1460,8 @@ class Template:
 
     def tmpl_admin_print_format_element_documentation(self, ln, name, attributes, print_see_also=True):
         """
-        Prints the formatted documentation of a single element
+        Prints the formatted documentation of a single element. Used in main documentation of element and
+        in creation of floater for Dreamweaver.
 
         @param ln language
         @param name the name of the element
@@ -2015,6 +2016,114 @@ class Template:
         '''
         
         return indent_text(out)
+
+    def tmpl_dreamweaver_floater(self, ln, format_elements):
+        """
+        Returns the content of the BibFormat palette for Dreamweaver. This
+        'floater' will let users of Dreamweaver to insert Format elements
+        into their code right from the floater.
+
+        @param format_elements an ordered list of format elements structures as returned by get_format_elements
+        """
+        names_list = [] # list of element names such as ['Authors', 'Title']
+        codes_list = [] # list of element code such as ['<BFE_AUTHORS limit="" separator="," />', '<BFE_TITLE />']
+        docs_list = [] # list of HTML doc for each element
+        
+        for format_element in format_elements:
+            format_attributes = format_element['attrs']
+            name = format_attributes['name']
+            #description = format_attributes['description']
+            params = [x['name'] + '="'+x['default']+'"' for x in format_attributes['params']]
+            builtin_params = [x['name'] + '="'+x['default']+'"' for x in format_attributes['builtin_params']]
+            code = ("<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>").replace("'", r"\'")
+            doc = self.tmpl_admin_print_format_element_documentation(ln, name, format_attributes, print_see_also=False).replace("'", r"\'")
+            
+            names_list.append(name)
+            codes_list.append(code)
+            docs_list.append(doc)
+                                  
+        out = '''
+        <!DOCTYPE HTML SYSTEM "-//Macromedia//DWExtension layout-engine5.0//floater">
+        <html>
+        <head>
+        <!-- This file is to be used as floating panel for Dreamweaver.
+        
+             To install, drag and drop inside /Configuration/Floaters of your Dreamweaver
+             application directory. You also have to enable a menu to open the floater:
+             Edit file Menu.xml located inside /Configuration/Menus of your Dreamweaver
+             application directory and copy-paste the following line in the menu you want
+             (typically inside tag 'menu' with attribute id = 'DWMenu_Window_Others'):     
+             <menuitem name="BibFormat Elements" enabled="true" command="dw.toggleFloater('BibFormat_floater.html')" checked="dw.getFloaterVisibility('BibFormat_floater.html')" /> 
+         -->
+        <title>BibFormat Elements</title>
+        <script language="JavaScript">
+        var docs = new Array(%(docs)s);
+        var codes = new Array(%(codes)s);
+        function selectionChanged(){
+            // get the selected node 
+            var theDOM = dw.getDocumentDOM();
+            var theNode = theDOM.getSelectedNode();
+
+            // check if node is a BibFormat Element 
+            if (theNode.nodeType == Node.COMMENT_NODE && theNode.data.length >= 5  && theNode.data.toLowerCase().substring(0,5) == "<bfe_"){
+                var names = document.elementsList.options;
+                for (i=0;i<names.length; i++){
+                    if (names[i].text.toLowerCase() == theNode.data.split(' ')[0].toLowerCase() ||
+                        names[i].text.toLowerCase() == theNode.data.split(' ')[0].toLowerCase().substring(5,theNode.data.length)){
+                        document.elementsList.selectedIndex = i;
+                        selectElement(document.elementsList);
+                        return;
+                    }
+                }
+             }
+        }
+        function isAvailableInCodeView(){
+            return true;
+        }
+
+        function selectElement(elementsList){
+            document.infoBFE.innerHTML = docs[elementsList.selectedIndex];
+        }
+        function insertElement(){
+            // insert selection into code
+            var element_code = codes[document.elementsList.selectedIndex];
+
+            // get the DOM 
+            var theDOM = dw.getDocumentDOM();
+            var theDocEl = theDOM.documentElement;
+            var theWholeDoc = theDocEl.outerHTML;
+            // Get the offsets of the selection
+            var theSel = theDOM.getSelection();
+            
+            theDocEl.outerHTML = theWholeDoc.substring(0,theSel[0]) + element_code + theWholeDoc.substring(theSel[1]);
+            
+        }
+        </script>
+        </head>
+
+        <body>
+        <table width="100%%" border="0" cellspacing="0" cellpadding="3">
+          <tr>
+            <td valign="top">
+                <select name="elementsList" id="elementsList" size="15" onChange="selectElement(this)">
+                %(names)s
+                  </select><br/>
+                  <input type="submit" name="Submit" value="Insert" onClick="insertElement()">
+        </td>
+            <td valign="top" width="100%%">
+                <div id="infoBFE">
+                <center>No Format Element selected. Select one from the list on the right.</center>
+                </div>
+                </td>
+          </tr>
+        </table>
+        </body>
+        </html>
+        ''' % {'docs': ', '.join(["'"+x+"'" for x in docs_list]).replace('\n','\\n'),
+               'codes': ', '.join(["'"+x+"'" for x in codes_list]).replace('\n','\\n'),
+               'names': '\n'.join(['<option>'+x+'</option>' for x in names_list])}
+                        
+        return out
 
     def tmpl_admin_validate_format(self, ln, errors):
         """
