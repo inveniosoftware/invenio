@@ -1272,6 +1272,16 @@ def validate_format(req, ln=cdslang, bfo=None, bft=None, bfe=None):
         
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
+def download_dreamweaver_floater(req):
+    """
+    Trigger download of a BibFormat palette for Dreamweaver.
+    """
+    bibformat_templates = invenio.template.load('bibformat')
+    req.content_type = 'text/html'
+    req.headers_out["Content-Disposition"] = "attachment; filename=BibFormat_floater.html"
+    req.send_http_header()
+    req.write(perform_request_dreamweaver_floater())
+
 def dialog_box(req, url="", ln=cdslang, navtrail="", title="", message="", options=[]):
     """
     Returns a dialog box with a given title, message and options.
