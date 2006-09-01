@@ -96,7 +96,7 @@ class ExternalSearchEngine(object):
         return self.combiner.join(units)
 
     def __repr__(self):
-        return 'ExternalSearchEngine.' + self.name
+        return 'ec:' + self.name
 
 class SortedFieldsSearchEngine(ExternalSearchEngine):
     """Class for search engines that used separate query box for fields."""
@@ -494,7 +494,7 @@ class INSPECSearchEngine(ExternalSearchEngine):
         self.search_url = "http://www.datastarweb.com/cern/?dblabel=inzz&query="
         self.combiner = " AND "
         
-    def build_search_unit_unit(basic):
+    def build_search_unit_unit(self, basic):
         """Build a search string from a search unit. This is the base
         version that just keep keywords with "+". """
         word = format_basic(basic)
@@ -509,8 +509,6 @@ class INSPECSearchEngine(ExternalSearchEngine):
         if basic[2] == "year":
             return word + ".yr."
         return word + ".ti. OR " + word + ".ab."
-
-    build_search_unit_unit = staticmethod(build_search_unit_unit)
 
 class NEBISSearchEngine(ExternalSearchEngine):
     """NEBIS"""

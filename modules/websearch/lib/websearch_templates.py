@@ -32,7 +32,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine_config import *
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
 
-from invenio.websearch_external_collections import external_collection_is_default
+from invenio.websearch_external_collections import external_collection_get_state
 
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
@@ -758,7 +758,7 @@ class Template:
         for engine in engines_list:
             internal_name = engine.name
             name = _(internal_name)
-            if external_collection_is_default(engine, collection_id):
+            if external_collection_get_state(engine, collection_id) == 3:
                 checked = ' checked'
             else:
                 checked = ''

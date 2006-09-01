@@ -44,8 +44,8 @@ from invenio.websearch_external_collections_utils import get_collection_id, get_
 import invenio.template
 template = invenio.template.load('websearch_external_collections')
 
-dico_collection_external_searches = {}
-dico_collection_seealso = {}
+#dico_collection_external_searches = {}
+#dico_collection_seealso = {}
 
 def print_external_results_overview(req, current_collection, pattern_list, field,
         external_collection, verbosity_level=0, lang=cdslang):
@@ -67,7 +67,7 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     vprint(3, 'search_engines = ' + str(search_engines))
     vprint(3, 'seealso_engines = ' + str(seealso_engines))
 
-    search_engines_list = sort_engine_by_name(search_engines)
+    search_engines_list = external_collection_sort_engine_by_name(search_engines)
     vprint(3, 'search_engines_list (sorted) : ' + str(search_engines_list))
     html = template.external_collection_overview(lang, search_engines_list)
     req.write(html)
@@ -112,7 +112,7 @@ def create_seealso_box(req, lang, vprint, basic_search_units=None, seealso_engin
     "Create the box that proposes links to other useful search engines like Google."
 
     vprint(3, 'Create seealso box')
-    seealso_engines_list = sort_engine_by_name(seealso_engines)
+    seealso_engines_list = external_collection_sort_engine_by_name(seealso_engines)
     vprint(3, 'seealso_engines_list = ' + str(seealso_engines_list))
     links = build_seealso_links(basic_search_units, seealso_engines_list, lang, query)
     html = template.external_collection_seealso_box(lang, links)
@@ -138,8 +138,6 @@ def select_external_engines(basic_search_units, collection_name, selected_extern
     collection_id = get_collection_id(collection_name)
     if not collection_id:
         return (None, None)
-
-    init()    
 
     if not type(selected_external_searches) is list:
         selected_external_searches = [selected_external_searches]
@@ -193,159 +191,111 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
             print_timeout(req, lang, engine[1], name, url)
 
 # Database management
-def init():
-    """Load db infos if it's not already done."""
-    if not init.done:
-        external_collection_load_db_infos()
-        init.done = True
-init.done = False
+def external_collection_load_states():
+    global external_collections_state, dico_collection_external_searches, dico_collection_seealso
 
-def external_collection_load_db_infos():
-    """Load and cache informations about external collections."""
-    global dico_collection_external_searches, dico_collection_seealso
-    (dico_collection_external_searches, dico_collection_seealso) = build_dictionaries_from_db_tables()
-
-def build_dictionaries_from_db_tables():
-    """Read a db table and build the dictionary making the association between a collection and a search engine."""
-    global dico_collection_external_searches, dico_collection_seealso
+    external_collections_state = {}
     dico_collection_external_searches = {}
     dico_collection_seealso = {}
 
-    query = "SELECT id_collection, name_external_searchengine, type FROM collection_externalcollection;"
+    query = "SELECT collection_externalcollection.id_collection, collection_externalcollection.type, externalcollection.name FROM collection_externalcollection, externalcollection WHERE collection_externalcollection.id_externalcollection = externalcollection.id;"
     results = run_sql(query)
     if results:
         for result in results:
             collection_id = int(result[0])
-            engine_name = result[1]
-            search_type = int(result[2])
+            search_type = int(result[1])
+            engine_name = result[2]
 
             if not external_collections_dictionary.has_key(engine_name):
                 warning("No search engine : " + engine_name)
                 continue
 
             engine = external_collections_dictionary[engine_name]
-            if search_type == 0:
-                continue
+
+            if not external_collections_state.has_key(collection_id):
+                external_collections_state[collection_id] = {}
+            col_states = external_collections_state[collection_id]
+
+            col_states[engine] = search_type
+
+            dictionary = None
 
             if search_type == 1:
+                dictionary = dico_collection_seealso
+
+            if search_type in [2, 3]:
                 dictionary = dico_collection_external_searches
 
-            if search_type == 2:
-                dictionary = dico_collection_seealso
+            if dictionary == None:
+                continue
 
             if not dictionary.has_key(collection_id):
                 dictionary[collection_id] = Set()
             engine_set = dictionary[collection_id]
             engine_set.add(engine)
-    return(dico_collection_external_searches, dico_collection_seealso) 
 
-def external_collection_is_enabled(external_collection_search_engine, collection_id):
-    """Return true if this search engine is enabled for a specific collection_id."""
-    return is_enable_collection_dico(external_collection_search_engine, collection_id, dico_collection_external_searches)
+def external_collection_init():
+    """Load db infos if it's not already done."""
+    if not external_collection_init.done:
+        external_collection_load_states()
+        external_collection_init.done = True
+external_collection_init.done = False
 
-def external_collection_is_seealso_enabled(external_collection_search_engine, collection_id):
-    """Return true if this engine is used to provide See also links for the given collection_id."""
-    return is_enable_collection_dico(external_collection_search_engine, collection_id, dico_collection_seealso)
+def external_collection_get_state(external_collection, collection_id):
+    external_collection_load_states()
+    if not external_collections_state.has_key(collection_id):
+        return 0
+    col_states = external_collections_state[collection_id]
+    if not col_states.has_key(external_collection):
+        return 0
+    return col_states[external_collection]
 
-def is_enable_collection_dico(external_collection_search_engine, collection_id, dico):
-    """Check if an external search engine is enabled for a collection."""
+def external_collection_get_update_state_list(external_collection, collection_id, state, recurse=False):
+    changes = []
 
-    if not dico.has_key(collection_id):
-        return False
+    if external_collection_get_state(external_collection, collection_id) != state:
+        changes = ['(%(collection_id)d, %(id_externalcollection)d, %(state)d)' % 
+            {'collection_id': collection_id, 'id_externalcollection': external_collection_getid(external_collection), 'state': state}]
 
-    engines_set = dico[collection_id]
-    for engine in engines_set:
-        if engine.name == external_collection_search_engine.name:
-            return True
-    return False
+    if not recurse:
+        return changes
+    
+    for descendant_id in get_collection_descendants(collection_id):
+        changes += external_collection_get_update_state_list(external_collection, descendant_id, state)
 
-def external_collection_enable(external_collection_search_engine, collection_id, recurse=False, search_type=1):
-    """Enable this search engine for a given collection. """
-    external_collection_load_db_infos()
+    return changes
 
-    if external_collection_is_enabled(external_collection_search_engine, collection_id):
+def external_collection_apply_changes(changes_list):
+    if not changes_list:
         return
-    if external_collection_is_seealso_enabled(external_collection_search_engine, collection_id):
-        db_update(external_collection_search_engine, collection_id, search_type)
-    db_insert_type(external_collection_search_engine, collection_id, search_type)
 
-    if recurse:
-        for descendant_id in get_collection_descendants(collection_id):
-            external_collection_enable(external_collection_search_engine, descendant_id, False, search_type)
-
-    external_collection_load_db_infos()
-
-def external_collection_enable_seealso(external_collection_search_engine, collection_id, recurse=False):
-    """Enable this search engine for See also links."""
-    external_collection_enable(external_collection_search_engine, collection_id, recurse, 2)
-
-def external_collection_disable(external_collection_search_engine, collection_id, recurse=False):
-    """Disable this search engine (for search or see also)."""
-    external_collection_load_db_infos()
-
-    db_delete(external_collection_search_engine, collection_id)
-
-    if recurse:
-        for descendant_id in get_collection_descendants(collection_id):
-            external_collection_disable(external_collection_search_engine, descendant_id)
-
-    external_collection_load_db_infos()
-
-def db_insert_type(external_collection_search_engine, collection_id, search_type):
-    """Insert a record in the db the enable the current search engine for the given collection.
-        type can be 1 for search or 2 for see also
-    """
-    engine_name = external_collection_search_engine.name
-    sql = 'INSERT INTO collection_externalcollection (id_collection, name_external_searchengine, type, is_default) VALUES ' + \
-        '(%(collection_id)d, "%(name_external_searchengine)s", %(type)d, 0);' % escape_dictionary(
-        {'collection_id': collection_id, 'name_external_searchengine': engine_name, 'type': search_type})
+    sql_values = ", ".join(changes_list)
+    sql = 'INSERT INTO collection_externalcollection (id_collection, id_externalcollection, type) VALUES ' + sql_values + 'ON DUPLICATE KEY UPDATE type=VALUES(type);'
     run_sql(sql)
-
-def db_update(external_collection_search_engine, collection_id, search_type):
-    """Change the type for the given collection."""
-    engine_name = external_collection_search_engine.name
-    sql = 'UPDATE collection_externalcollection SET is_default=0, ' + \
-        'type=%(type)d WHERE id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s";' % \
-        escape_dictionary({'type': search_type, 'collection_id': collection_id, 'engine_name': engine_name})
-    run_sql(sql)
-
-def db_delete(external_collection_search_engine, collection_id):
-    """Remove a row in the db, (disable an external collection)."""
-    engine_name = external_collection_search_engine.name
-    sql = 'DELETE FROM collection_externalcollection WHERE ' + \
-        'id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s";' % \
-        escape_dictionary({'collection_id': collection_id, 'engine_name': engine_name})
-    run_sql(sql)
-
-def external_collection_is_default(external_collection_search_engine, collection_id):
-    """Return true if the current search engine is enabled for the given collection."""
-    engine_name = external_collection_search_engine.name
-    sql = 'SELECT * FROM collection_externalcollection WHERE  type=1 AND is_default=1 AND ' + \
-        'id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s";' % \
-        escape_dictionary({'collection_id': collection_id, 'engine_name': engine_name})
-    results = run_sql(sql)
-    return len(results) > 0
-
-def external_collection_set_default_type(external_collection_search_engine, collection_id, default=True, recurse=False):
-    """Set default in database for an external collection (checked or not)."""
-    engine_name = external_collection_search_engine.name
-    if default is True:
-        sql_default = 1
-    else:
-        sql_default = 0
-    sql = ('UPDATE collection_externalcollection SET is_default=%(is_default)s WHERE ' + \
-        'id_collection=%(collection_id)d AND name_external_searchengine="%(engine_name)s" AND type=1;') % \
-        escape_dictionary({'is_default': sql_default, 'collection_id': collection_id, 'engine_name': engine_name})
-    run_sql(sql)
-
-    if recurse:
-        for descendant_id in get_collection_descendants(collection_id):
-            external_collection_set_default_type(external_collection_search_engine, descendant_id, default)
-
+    
 # Misc functions
-def sort_engine_by_name(engines_set):
+def external_collection_sort_engine_by_name(engines_set):
     """Return a list of sorted (by name) search engines."""
     engines_list = [engine for engine in engines_set]
     engines_list.sort(lambda x, y: cmp(x.name, y.name))
     return engines_list
+
+# External search ID
+def external_collection_getid(external_collection):
+    """Return the id of an external_collection. Will create a new entry in DB if needed."""
+
+    if external_collection.__dict__.has_key('id'):
+        return external_collection.id
+
+    query = 'SELECT id FROM externalcollection WHERE name="%(name)s";' % {'name': external_collection.name}
+    results = run_sql(query)
+    if not results:
+        query = 'INSERT INTO externalcollection (name) VALUES ("%(name)s");' % {'name': external_collection.name}
+        run_sql(query)
+        return external_collection_getid(external_collection)
+    
+    external_collection.id = results[0][0]
+    return external_collection.id
+
+external_collection_init()
 

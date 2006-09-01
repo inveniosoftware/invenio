@@ -37,7 +37,9 @@ from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
-from invenio.websearch_external_collections import external_collections_dictionary, external_collection_load_db_infos, external_collection_set_default_type, external_collection_is_default, external_collection_disable, external_collection_enable_seealso, external_collection_enable, external_collection_is_enabled, external_collection_is_seealso_enabled, sort_engine_by_name
+from invenio.websearch_external_collections import external_collections_dictionary, external_collection_sort_engine_by_name, \
+    external_collection_get_state, external_collection_get_update_state_list, external_collection_apply_changes
+from invenio.websearch_external_collections_config import cfg_external_collection_states_name
 
 __version__ = "$Id$"
 
@@ -1753,76 +1755,76 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     else:
         return addadminbox(subtitle, body)
 
+def external_collections_build_select(colID, external_collection):
+    output = '<select name="state" class="admin_w200">'
+
+    if external_collection.parser:
+        max_state = 4
+    else:
+        max_state = 2
+
+    num_selected = external_collection_get_state(external_collection, colID)
+
+    for num in range(max_state):
+        state_name = cfg_external_collection_states_name[num]
+        if num == num_selected:
+            selected = ' selected'
+        else:
+            selected = ''
+        output += '<option value="%(num)d"%(selected)s>%(state_name)s</option>' % {'num': num, 'selected': selected, 'state_name': state_name}
+    
+    output += '</select>\n'
+    return output
+
 def perform_manage_external_collections(colID, ln, callback='yes', content='', confirm=-1):
     """Show the interface to configure external collections to the user."""
 
     colID = int(colID)
-    external_collection_load_db_infos()
 
     subtitle = """<a name="11">11. Configuration of external collections.</a>"""
-    output = ""
+    output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
-    table_header = ['External collection name', 'Type', 'Actions', 'Checked by default']
+    table_header = ['External collection', 'Mode', 'Apply also on subcollection']
     table_content = []
-    external_collections = sort_engine_by_name(external_collections_dictionary.values())
-    for collection in external_collections:
-        collection_name = collection.name
-       
-        type = '[Disabled]'
-        checked = ''
-        actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable_seealso">See also</a>' % locals()
-        actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable_seealso;recurse=1">(R)</a>' % locals()
-        if collection.parser:
-            actions += ' | <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable">Enable</a>' % locals()
-            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=enable;recurse=1">(R)</a>' % locals()
-        if external_collection_is_enabled(collection, colID):
-            type = '[Enabled]'
-            actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable">Disable</a>' % locals()
-            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable;recurse=1">(R)</a>' % locals()
-            if external_collection_is_default(collection, colID):
-                checked = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_disable">Disable</a>' % locals()
-                checked += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_disable;recurse=1">(R)</a>' % locals()
-            else:
-                checked = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_enable">Enable</a>' % locals()
-                checked += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=check_enable;recurse=1">(R)</a>' % locals()
-        if external_collection_is_seealso_enabled(collection, colID):
-            type = '{SeeAlso}'
-            actions = '<a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable">Disable</a>' % locals()
-            actions += ' <a href="update_external_collections?colID=%(colID)d&amp;collection_name=%(collection_name)s&amp;action=disable;recurse=1">(R)</a>' % locals()
 
-        table_content.append([collection_name, type, actions, checked])
+    external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
+    for external_collection in external_collections:
+        collection_name = external_collection.name
+        select = external_collections_build_select(colID, external_collection) 
+        recurse = '<input type=checkbox name="recurse" value="%(collection_name)s">' % {'collection_name': collection_name}
+        table_content.append([collection_name, select, recurse])
 
     output += tupletotable(header=table_header, tuple=table_content)
 
-    body = [output]
-    
-    return addadminbox(subtitle, body)
+    output += '<input class="adminbutton" type="submit" value="Modify"/>'
+    output += '</form>'
 
-def perform_update_external_collections(colID, ln, action, collection_name, recurse):
+    return addadminbox(subtitle, [output])
+
+def perform_update_external_collections(colID, ln, state_list, recurse_list):
     colID = int(colID)
-    recurse = (recurse == 1)
+    changes = []
+    output = ""
 
-    if not external_collections_dictionary.has_key(collection_name):
-        return 'Unknow external collection : %(collection_name)s' % locals()
+    if not state_list:
+        return 'Warning : No state found.<br>' + perform_manage_external_collections(colID, ln)
+    
+    external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
+    
+    if len(external_collections) != len(state_list):
+        return 'Warning : Size of state_list different from external_collections!<br>' + perform_manage_external_collections(colID, ln)
 
-    collection = external_collections_dictionary[collection_name]
+    for (external_collection, state) in zip(external_collections, state_list):
+        state = int(state)
+        collection_name = external_collection.name
+        recurse = recurse_list and collection_name in recurse_list
+        oldstate = external_collection_get_state(external_collection, colID)
+        if oldstate != state or recurse:
+            changes += external_collection_get_update_state_list(external_collection, colID, state, recurse)
 
-    if action == "enable":
-        external_collection_enable(collection, colID, recurse)
-        
-    if action == "enable_seealso":
-        external_collection_enable_seealso(collection, colID, recurse)
+    external_collection_apply_changes(changes)
 
-    if action == "disable":
-        external_collection_disable(collection, colID, recurse)
-
-    if action == "check_enable":
-        external_collection_set_default_type(collection, colID, True, recurse)
-
-    if action == "check_disable":
-        external_collection_set_default_type(collection, colID, False, recurse)
-
-    return perform_manage_external_collections(colID, ln)
+    return output + '<br><br>' + perform_manage_external_collections(colID, ln)
 
 def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.

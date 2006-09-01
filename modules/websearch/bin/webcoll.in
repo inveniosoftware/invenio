@@ -59,7 +59,7 @@ except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
 
-from invenio.websearch_external_collections import build_dictionaries_from_db_tables
+from invenio.websearch_external_collections import external_collection_load_states, dico_collection_external_searches, external_collection_sort_engine_by_name
 
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
@@ -415,13 +415,11 @@ class Collection:
                )
 
     def create_external_collections_box(self, ln=cdslang):
-
-        (dico_collection_external_searches, dico_collection_external_seealso) = build_dictionaries_from_db_tables()
+        external_collection_load_states()
         if not dico_collection_external_searches.has_key(self.id):
             return ""
 
-        engines_list = [engine for engine in dico_collection_external_searches[self.id]]
-        engines_list.sort(lambda x, y: cmp(x.name, y.name))
+        engines_list = external_collection_sort_engine_by_name(dico_collection_external_searches[self.id])
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 

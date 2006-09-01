@@ -74,3 +74,6 @@ cfg_external_collections = {
     'SLAC Library Books':
         {'engine': 'SPIRESBooks'},
 }
+
+cfg_external_collection_states_name = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}
+

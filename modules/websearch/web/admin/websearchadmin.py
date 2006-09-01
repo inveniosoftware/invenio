@@ -482,7 +482,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def update_external_collections(req, colID, ln=cdslang, action='', collection_name='', recurse=0):
+def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
     try:
@@ -490,12 +490,10 @@ def update_external_collections(req, colID, ln=cdslang, action='', collection_na
     except Error, e:
         return error_page(req)
 
-    recurse = int(recurse)
-
     auth = wsc.check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
-                body = wsc.perform_update_external_collections(colID, ln, action, collection_name, recurse),
+                body = wsc.perform_update_external_collections(colID, ln, state, recurse),
                     uid=uid,
                     language=ln,
                     req=req,

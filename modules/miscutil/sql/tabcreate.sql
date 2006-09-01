@@ -3028,11 +3028,17 @@ CREATE TABLE IF NOT EXISTS schTASK (
 -- External collections
 
 CREATE TABLE IF NOT EXISTS collection_externalcollection (
-  id_collection mediumint(9) unsigned NOT NULL default '0',
-  name_external_searchengine varchar(255) NOT NULL default '',
+  id_collection         mediumint(9) unsigned NOT NULL default '0',
+  id_externalcollection mediumint(9) unsigned NOT NULL default '0',
   type tinyint(4) unsigned NOT NULL default '0',
-  is_default tinyint(1) unsigned NOT NULL default '0',
-  PRIMARY KEY (id_collection, name_external_searchengine)
+  PRIMARY KEY (id_collection, id_externalcollection)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS externalcollection (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  name varchar(255) NOT NULL default '',
+  PRIMARY KEY (id),
+  UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
 -- end of file
