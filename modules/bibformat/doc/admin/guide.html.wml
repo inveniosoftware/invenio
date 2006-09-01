@@ -90,7 +90,8 @@
     </ol>
 </li>
 <li><a href="#marcNotation">MARC Notation in Formats</a></li>
-<li><a href="#migration">Migrating from Previous BibFormat</a></li>   
+<li><a href="#migration">Migrating from Previous BibFormat</a></li>
+<li><a href="#integrationDreamweaver">Intergrating BibFormat into Dreamweaver MX</a></li>
 <li><a href="#faq">FAQ</a></li>
 </ol>
 
@@ -930,7 +931,35 @@ to the old BibFormat, which will look for a behaviour with a name corresponding 
 PICTURE --- migration_in_progress<br/>
 default: Default_HTML_detailed.bft</code>
   </p>
-
+<h2><a name="integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></h2>
+<p>BibFormat templates have been thought to be editable in custom HTML editors. We propose in this section
+a way to extend one particular editor, Dreamweaver.</p>
+<h3>Make Dreamweaver Recognizes Format Elements in Layout View</h3>
+<p>To make Dreamweaver understand the format elements and display an icon for each of them in the layout editor, you must
+edit a Dreamweaver configuration file named <code>Tags.xml</code> located inside /Configuration/ThirdPartyTags directory
+of your Dreamweaver installation folder. At the end of this file, copy-paste the following lines:
+  <pre>
+  &lt;!-- BibFormat (CDS Invenio) --&gt;
+  &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;BFE_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
+  &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;bfe_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
+  </pre>
+  Also copy this icon <img src="bibformat.gif" alt="bibformat.gif"/> in the same directory as <code>Tags.xml</code> (right-click on icon, or ctrl-click on one-button mouse, and "Save Image As..."). Make sure the downloaded image is named "<code>bibformat.gif</code>".
+  </p>
+  <p>Note that Dreamweaver might not recognize Format Elements when complex formatting is involved due to these elements.</p>
+  <h3>Add a Format Elements Floating Panel</h3>
+  <p>You can add a floating panel that will you to insert Format Elements in your document and read the documentation
+  of all available Format Elements.</p>
+  <p>The first step is to declare in which menu of Dreamweaver this floating panel is going to be available.
+  To do so, edit file "<code>Menu.xml</code>" located inside /Configuration/Menus of your Dreamweaver
+             application directory and copy-paste the following line in the menu you want
+             (typically inside tag <code>'menu'</code> with attribute <code>id='DWMenu_Window_Others')</code>:</p>
+  <pre>
+   &lt;menuitem name="BibFormat Elements" enabled="true" command="dw.toggleFloater('BibFormat_floater.html')" checked="dw.getFloaterVisibility('BibFormat_floater.html')" /&gt;
+  </pre>
+  </p>
+  <p>Once this is done, you can <a href="bibformatadmin.py/download_dreamweaver_floater">download the floating palette</a> (if file opens in your browser instead of downloading, right-click on icon, or ctrl-click on one-button mouse, and "Save Target As...") and move the dowloaded file "<code>BibFormat_floater.html</code>" (do not rename it) into /Configuration/Floaters directory of your Dreamweaver application folder.</p>
+  <p>To use the BibFormat floating panel, open Dreamweaver, and choose <code>Window &gt; Others &gt; BibFormat Elements</code>.</p>
+  <p>Whenever a new version of the palette is available, you can skip the edition of file "<code>Menu.xml</code>" and just replace the old "<code>BibFormat_floater</code>" file with the new one.</p>
 <h2><a name="faq">FAQ</a></h2>
 
 <h3>Why do we need output formats? Wouldn't format templates be sufficient?</h3>
