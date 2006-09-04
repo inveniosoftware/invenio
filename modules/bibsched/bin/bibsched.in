@@ -78,7 +78,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         return None
 
 def get_my_pid(process,args=''):
-    if sys.platform in ['freebsd6']:
+    if sys.platform.startswith('freebsd'):
         COMMAND = "ps -o pid,args | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, args)
     else:
         COMMAND = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, process, args)
