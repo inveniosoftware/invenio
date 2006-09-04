@@ -637,6 +637,9 @@ def auth_apache_user_p(user, password):
     Apache password data file.  Return 0 in case of failure, 1 in case
     of success."""
     try:
+        from invenio.config import cfg_apache_password_file
+        if not cfg_apache_password_file.startswith("/"):
+            cfg_apache_password_file = tmpdir + "/" + cfg_apache_password_file
         pipe_input, pipe_output = os.popen2(["grep", "^" + user + ":", cfg_apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
         password_apache = string.split(string.strip(line),":")[1]
@@ -652,6 +655,10 @@ def auth_apache_user_in_groups(user):
     """Return list of Apache groups to which Apache user belong."""
     out = []
     try:
+        from invenio.config import cfg_apache_group_file
+        if not cfg_apache_group_file.startswith("/"):
+            cfg_apache_group_file = tmpdir + "/" + cfg_apache_group_file
+        print cfg_apache_group_file
         pipe_input,pipe_output = os.popen2(["grep", user, cfg_apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(string.split(string.strip(line),":")[0])
