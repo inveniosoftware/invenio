@@ -201,24 +201,24 @@ def display&#95;msg(req, msgid=-1, ln=cdslang):
 
 <p>The following functions can be useful (see source code for other functions):</p>
 <pre>
-   get&#95;msgs&#95;for&#95;code&#95;list(code&#95;list, file='error', ln=cdslang)
+   get&#95;msgs&#95;for&#95;code&#95;list(code&#95;list, stream='error', ln=cdslang)
         Returns formatted strings for the given errors 
         @param code&#95;list: list of tuples  [(err&#95;name, arg1, ..., argN), ...]
-        @param file: 'error' or 'warning'
+        @param stream: 'error' or 'warning'
         @return list of tuples of length 2 [('ERR&#95;...', err&#95;msg), ...]
                 if code&#95;list empty, will return None.
                 if errors retrieving error messages, will append an error to
                 the list     
 
-    register&#95;errors(errors&#95;or&#95;warnings&#95;list, file, req=None)
+    register&#95;errors(errors&#95;or&#95;warnings&#95;list, stream, req=None)
         log errors to invenio.err and warnings to invenio.log
         errors will be logged with client information (if req is given)
         and a tracestack
         warnings will be logged with just the warning message
         @param errors&#95;or&#95;warnings&#95;list: list of tuples (err&#95;name, err&#95;msg)
-        @param file: 'error' or 'warning'
+        @param stream: 'error' or 'warning'
         @param req = mod&#95;python request
-        @return integer 1 if successfully wrote to file, integer 0 if not
+        @return integer 1 if successfully wrote to stream, integer 0 if not
                 will append another error to errors&#95;list if unsuccessful
 
     send&#95;error&#95;report&#95;to&#95;admin(header, url, time, browser, client,
@@ -281,7 +281,7 @@ that your dictionary is correctly named:
     cfg&#95;&lt;module-name&gt;&#95;error&#95;messages
 </pre>
 You could also have inverted errors and warnings if only one dictionary was provided.<br/>
-This can also happen when using direct API if the <code>file</code> argument is misspelled.
+This can also happen when using direct API if the <code>stream</code> argument is misspelled.
 </dd>
 
 <dt><b><code>ERR&#95;MISCUTIL&#95;NO&#95;MESSAGE&#95;IN&#95;DICT</code></b></dt>
