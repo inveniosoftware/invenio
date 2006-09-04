@@ -342,7 +342,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
         (result, errors) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
         result = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", search_pattern)],
-                                        file='error', ln=cdslang)[0][1]
+                                        stream='error', ln=cdslang)[0][1]
 
     return bibformat_templates.tmpl_admin_format_element_test(ln,
                                                               bfe,

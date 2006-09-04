@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## Bibformt engine. Format XML Marc record using specified format.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005 CERN.
 ##
@@ -224,7 +224,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     ############################# END ##################################
      
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
-                                       file='error', ln=cdslang)
+                                       stream='error', ln=cdslang)
         errors_.append(error)
         if verbose == 0:
             register_errors(error, 'error')
@@ -414,7 +414,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 register_errors(errors, 'error')
             elif verbose >=5:
                 tb = sys.exc_info()[2]
-                error_string = get_msgs_for_code_list(error, file='error', ln=cdslang)
+                error_string = get_msgs_for_code_list(error, stream='error', ln=cdslang)
                 stack = traceback.format_exception(Exception, e, tb, limit=None)
                 output_text = '<b><span style="color: rgb(255, 0, 0);">'+error_string[0][1] + "".join(stack) +'</span></b> '
 
@@ -479,7 +479,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 if verbose < 5:
                     register_errors(error, 'error')
                 elif verbose >=5:
-                    error_string = get_msgs_for_code_list(error, file='error', ln=cdslang)
+                    error_string = get_msgs_for_code_list(error, stream='error', ln=cdslang)
                     output_text = output_text.append(error_string[0][1])
 
 
@@ -494,7 +494,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     else:
         #c) Element is unknown
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", format_element)],
-                                    file='error', ln=cdslang)
+                                       stream='error', ln=cdslang)
         errors.append(error)
         if verbose < 5:
             register_errors(error, 'error')
@@ -676,7 +676,7 @@ def get_format_template(filename, with_attributes=False):
 
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
-                                        file='error', ln=cdslang)
+                                        stream='error', ln=cdslang)
         register_errors(errors, 'error')
 
     #Save attributes if necessary
@@ -739,7 +739,7 @@ def get_format_template_attrs(filename):
             attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
-                                        file='error', ln=cdslang)
+                                        stream='error', ln=cdslang)
         register_errors(errors, 'error')
         attrs['name'] = filename
 
@@ -792,7 +792,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         
         else:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND", element_name)],
-                                            file='error', ln=cdslang)
+                                            stream='error', ln=cdslang)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >=5:
@@ -830,7 +830,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             return format_element
         except Exception, e:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND", element_name)],
-                                            file='error', ln=cdslang)
+                                            stream='error', ln=cdslang)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
@@ -1105,7 +1105,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
     
     if filename == None:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_OUTPUT_FORMAT_CODE_UNKNOWN", code)],
-                                        file='error', ln=cdslang)
+                                        stream='error', ln=cdslang)
         register_errors(errors, 'error')
         if with_attributes == True: #Create empty attrs if asked for attributes
             output_format['attrs'] = get_output_format_attrs(code, verbose)
@@ -1155,7 +1155,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", filename, str(e))],
-                                        file='error', ln=cdslang)
+                                        stream='error', ln=cdslang)
         register_errors(errors, 'error')
              
     #cache and return 
@@ -1341,7 +1341,7 @@ def resolve_output_format_filename(code, verbose=0):
 
     #No output format with that name found
     errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME", code)],
-                                    file='error', ln=cdslang)
+                                    stream='error', ln=cdslang)
     if verbose == 0:
         register_errors(errors, 'error')
     elif verbose >= 5:
@@ -1412,7 +1412,7 @@ def get_fresh_output_format_filename(code):
         #We should not try more than 99999... Well I don't see how we could get there.. Sanity check.
         if index >= 99999:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED", code)],
-                                            file='error', ln=cdslang)
+                                            stream='error', ln=cdslang)
             register_errors(errors, 'error')
             sys.exit("Output format cannot be named as %s"%code)
             
