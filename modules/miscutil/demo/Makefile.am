@@ -20,10 +20,12 @@
 noinst_DATA=democfgdata.sql
 
 tmpdir = $(prefix)/var/tmp
-tmp_DATA = demobibdata.xml
+tmp_DATA = demobibdata.xml \
+           demo-site-apache-user-passwords \
+           demo-site-apache-user-groups 
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) demobibdata.xml
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(tmp_DATA)
 
 CLEANFILES = $(noinst_DATA) *~ *.tmp democfgdata.sql 
 
