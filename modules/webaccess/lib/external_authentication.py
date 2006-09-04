@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-## CDS Invenio Access Control Config in mod_python.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -18,21 +19,27 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""External user authentication for CDS Invenio."""
+
 import httplib
 import urllib
 import re
 
 class external_auth_nice:
+    """External authentication example for a custom HTTPS-based
+    authentication service (CERN NICE)."""
+    
     users = {}
     name = ""
 
     def __init__(self):
-        #Initialize stuff here
+        """Initialize stuff here"""
         pass
 
     def auth_user(self, username, password):
-        #login user here
-
+        """Check USERNAME and PASSWORD against CERN NICE database.
+        Return None if authentication failed, email address of the
+        person if authentication succeeded."""
         params = urllib.urlencode({'Username': username, 'Password': password})
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
         conn = httplib.HTTPSConnection("weba5.cern.ch") 
@@ -43,7 +50,7 @@ class external_auth_nice:
         m = re.search('<CCID>\d+</CCID>', data)
         if m:
             m = m.group()
-            CCID = int(re.search('\d+',m).group())
+            CCID = int(re.search('\d+', m).group())
             if CCID > 0:
                 m = re.search('<EMAIL>.*?</EMAIL>', data)
                 if m:
@@ -54,11 +61,16 @@ class external_auth_nice:
         return None
 
 class external_auth_template:
+    """External authentication template example."""
+    
     def __init__(self):
-        #Initialize stuff here
+        """Initialize stuff here"""
         pass
 
     def auth_user(self, username, password):
-        #login user here
-        return email
+        """Authenticate user-supplied USERNAME and PASSWORD.  Return
+        None if authentication failed, or the email address of the
+        person if the authentication was successful.  In order to do
+        this you may perhaps have to keep a translation table between
+        usernames and email addresses."""
         return None

@@ -924,13 +924,21 @@ II. Example - connecting role and user</a>
      is not authenticated, return None.
 
      Example template:
+
       class external_auth_template:
+          """External authentication template example."""
+          
           def __init__(self):
+              """Initialize stuff here"""
               pass
-
+      
           def auth_user(self, username, password):
-              return email
+              """Authenticate user-supplied USERNAME and PASSWORD.  Return
+              None if authentication failed, or the email address of the
+              person if the authentication was successful.  In order to do
+              this you may perhaps have to keep a translation table between
+              usernames and email addresses."""
               return None
-
+      
 - end of file -
 </pre>
