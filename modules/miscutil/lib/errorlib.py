@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,22 +18,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ Error handling library """
 
-__lastupdated__ = """$Date$"""
+import traceback
+import sys
+import time
 
-# CDS Invenio imports
 from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail
 from invenio.miscutil_config import cfg_miscutil_error_messages  
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
-
-
-#External imports
-import traceback
-import sys
-import time
 
 def get_client_info(req):
     """
@@ -61,34 +58,37 @@ def get_tracestack():
         tracestack = traceback.extract_stack()[:-1] #force traceback except for this call
         tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
         for trace_tuple in tracestack:
-            tracestack_pretty += '''
+            tracestack_pretty += """
     File "%(file)s", line %(line)s, in %(function)s
-        %(text)s''' % \
+        %(text)s""" % \
                 {   'file'      : trace_tuple[0],
                     'line'      : trace_tuple[1],
                     'function'  : trace_tuple[2],
-                    'text'      : trace_tuple[3] is None and "" or "%s" % trace_tuple[3]     
+                    'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
                 }
     return tracestack_pretty
 
 
-def register_errors(errors_or_warnings_list, file, req=None):
+def register_errors(errors_or_warnings_list, stream, req=None):
     """
     log errors to invenio.err and warnings to invenio.log
     errors will be logged with client information (if req is given) and a tracestack
     warnings will be logged with just the warning message
+
     @param errors_or_warnings_list: list of tuples (err_name, err_msg)
 
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
     as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
 
+    @param stream: 'error' or 'warning'
+
     @param req = mod_python request
-    @return tuple integer 1 if successfully wrote to file, integer 0 if not
+    @return tuple integer 1 if successfully wrote to stream, integer 0 if not
             will append another error to errors_list if unsuccessful
     """
     client_info_dict = ""
-    if file == "error":
+    if stream == "error":
         # call the stack trace now
         tracestack_pretty = get_tracestack()
         # if req is given, get client info
@@ -105,20 +105,20 @@ def register_errors(errors_or_warnings_list, file, req=None):
             client_info = "No client information available"
     # check arguments
     errors_or_warnings_list = wash_url_argument(errors_or_warnings_list, 'list')
-    file = wash_url_argument(file, 'str')
+    stream = wash_url_argument(stream, 'str')
     for etuple in errors_or_warnings_list:
         etuple = wash_url_argument(etuple, 'tuple')                        
-    # check file arg, if error default to warnings file + add error
-    if file == 'error':
-        file = 'err'
-    elif file == 'warning':
-        file = 'log'
+    # check stream arg for presence of [error,warning]; when none, add error and default to warning
+    if stream == 'error':
+        stream = 'err'
+    elif stream == 'warning':
+        stream = 'log'
     else:
-        file = 'log'
+        stream = 'log'
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
-        errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% file))
+        errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% stream))
     # update log_errors
-    file_pwd = logdir + '/invenio.' + file
+    stream_location = logdir + '/invenio.' + stream
     errors = ''
     for etuple in errors_or_warnings_list:
         try: 
@@ -127,36 +127,36 @@ def register_errors(errors_or_warnings_list, file, req=None):
             errors += "%s%s \n " % (' '*4*7+' ', etuple)
     if errors:
         errors = errors[(4*7+1):-3] # get rid of begining spaces and last '\n'
-    msg = '''
-%(time)s --> %(errors)s%(error_file)s''' % \
+    msg = """
+%(time)s --> %(errors)s%(error_file)s""" % \
     {   'time'          : client_info_dict and client_info_dict['time'] or time.strftime("%Y-%m-%d %H:%M:%S"),
         'errors'        : errors,
-        'error_file'    : file=='err' and "\n%s%s\n%s\n" % (' '*4, client_info, tracestack_pretty) or ""
+        'error_file'    : stream=='err' and "\n%s%s\n%s\n" % (' '*4, client_info, tracestack_pretty) or ""
     }
     try:
-        file_to_write = open(file_pwd, 'a+')
-        file_to_write.writelines(msg)
-        file_to_write.close()
+        stream_to_write = open(stream_location, 'a+')
+        stream_to_write.writelines(msg)
+        stream_to_write.close()
         return_value = 1
     except :
         error = 'ERR_MISCUTIL_WRITE_FAILED'
-        errors_or_warnings_list.append((error, cfg_miscutil_error_messages[error] % file_pwd))
+        errors_or_warnings_list.append((error, cfg_miscutil_error_messages[error] % stream_location))
         return_value = 0
     return return_value
 
-def get_msg_associated_to_code(err_code, file='error'):
+def get_msg_associated_to_code(err_code, stream='error'):
     """
     Returns string of code
     @param code: error or warning code
-    @param file: 'error' or 'warning'
+    @param stream: 'error' or 'warning'
     @return tuple (err_code, formatted_message)
     """
     err_code = wash_url_argument(err_code, 'str')
-    file = wash_url_argument(file, 'str')
+    stream = wash_url_argument(stream, 'str')
     try:
         module_directory_name = err_code.split('_')[1].lower()
         module_config = module_directory_name + '_config'
-        module_dict_name = "cfg_" + module_directory_name + "_%s_messages" % file
+        module_dict_name = "cfg_" + module_directory_name + "_%s_messages" % stream
         module = __import__(module_config, globals(), locals(), [module_dict_name])
         module_dict = getattr(module, module_dict_name)
         err_msg = module_dict[err_code]
@@ -182,7 +182,7 @@ def get_msg_associated_to_code(err_code, file='error'):
         err_code = error
     return (err_code, err_msg) 
 
-def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
+def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
     """
     @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
     
@@ -192,6 +192,8 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
     For warnings, same thing except:
         err_name can begin with either 'ERR' or 'WRN'
         dict name ends with _warning_messages
+
+    @param stream: 'error' or 'warning'
 
     @return list of tuples of length 2 [('ERR_...', err_msg), ...]
             if code_list empty, will return None.
@@ -203,21 +205,21 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
     if type(code_list) is None:
         return None
     code_list = wash_url_argument(code_list, 'list')
-    file = wash_url_argument(file, 'str')
+    stream = wash_url_argument(stream, 'str')
     for code_tuple in code_list:
         if not(type(code_tuple) is tuple):
             code_tuple = (code_tuple,)
         nb_tuple_args = len(code_tuple) - 1
         err_code = code_tuple[0]
-        if file == 'error' and not err_code.startswith('ERR'):
+        if stream == 'error' and not err_code.startswith('ERR'):
             error = 'ERR_MISCUTIL_NO_ERROR_MESSAGE'
             out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
-        elif file == 'warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
+        elif stream == 'warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
             error = 'ERR_MISCUTIL_NO_WARNING_MESSAGE'
             out.append((error, eval(cfg_miscutil_error_messages[error])))
             continue
-        (new_err_code, err_msg) = get_msg_associated_to_code(err_code, file)
+        (new_err_code, err_msg) = get_msg_associated_to_code(err_code, stream)
         if err_msg[:2] == '_(' and err_msg[-1] == ')':
             # err_msg is internationalized
             err_msg = eval(err_msg)
@@ -237,7 +239,7 @@ def get_msgs_for_code_list(code_list, file='error', ln=cdslang):
                 parsing_error_message %= code_tuple[0]
             elif nb_msg_args > nb_tuple_args:
                 code_tuple = list(code_tuple)
-                for i in range(nb_msg_args - nb_tuple_args):
+                for dummy in range(nb_msg_args - nb_tuple_args):
                     code_tuple.append('???')
                     code_tuple = tuple(code_tuple)
                 err_msg = err_msg % code_tuple[1:]
