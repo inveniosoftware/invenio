@@ -147,14 +147,24 @@ cds.support@cern.ch
 8000
 </define-tag>
 
-## CFG_APACHE_PASSWORD_FILE -- where Apache user credentials are stored
+## CFG_APACHE_PASSWORD_FILE -- the file where Apache user credentials
+## are stored.  Must be an absolute pathname.  If the value does not
+## start by a slash, it is considered to be the filename of a file
+## located under prefix/var/tmp directory.  This is useful for the
+## demo site testing purposes.  For the production site, if you plan
+## to restrict access to some collections based on the Apache user
+## authentication mechanism, you should put here an absolute path to
+## your Apache password file.
+##  (example: "/usr/local/apache/passwd/passwords")
 <define-tag CFG_APACHE_PASSWORD_FILE whitespace=delete>
-/soft/httpd-bis/conf/httpd.password
+demo-site-apache-user-passwords
 </define-tag>
 
-## CFG_APACHE_GROUP_FILE -- where Apache user groups are stored
+## CFG_APACHE_GROUP_FILE -- the file where Apache user groups are
+## defined.  See the documentation of the preceding config variable.
+##  (example: "/usr/local/apache/passwd/groups")
 <define-tag CFG_APACHE_GROUP_FILE whitespace=delete>
-/soft/httpd-bis/conf/httpd.group
+demo-site-apache-user-groups
 </define-tag>
 
 ## CFG_CERN_SITE -- do we want to enable CERN-specific code, like the
