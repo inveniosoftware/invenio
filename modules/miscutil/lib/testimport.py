@@ -33,10 +33,10 @@ def deduce_site_packages_location():
        deduced from the sys variable.  Otherwise return example
        directory.  Suitable to advise people how to create Python
        invenio module symlink."""
-    out = "/usr/lib/python2.3/site-packages"
+    out = "/usr/lib/python2.3/site-packages" # example directory
     for path in sys.path:
         if path.find("site-package") >= 0:
-            out = path
+            out = path # put proper directory instead of the example one
             break
     return out
 
