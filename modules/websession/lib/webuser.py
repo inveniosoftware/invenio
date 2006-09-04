@@ -658,7 +658,6 @@ def auth_apache_user_in_groups(user):
         from invenio.config import cfg_apache_group_file
         if not cfg_apache_group_file.startswith("/"):
             cfg_apache_group_file = tmpdir + "/" + cfg_apache_group_file
-        print cfg_apache_group_file
         pipe_input,pipe_output = os.popen2(["grep", user, cfg_apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(string.split(string.strip(line),":")[0])
