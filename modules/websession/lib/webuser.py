@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-## CDS Invenio User related utilities.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -19,18 +20,19 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-This file implements all methods necessary for working with users and sessions in invenio.
-Contains methods for logging/registration when a user log/register into the system, checking if it
-is a guest user or not.
+This file implements all methods necessary for working with users and
+sessions in CDS Invenio.  Contains methods for logging/registration
+when a user log/register into the system, checking if it is a guest
+user or not.
 
-At the same time this presents all the stuff it could need with sessions managements, working with websession.
+At the same time this presents all the stuff it could need with
+sessions managements, working with websession.
 
 It also contains Apache-related user authentication stuff.
 """
 
-from marshal import loads,dumps
-from zlib import compress,decompress
-import sys
+from marshal import loads, dumps
+from zlib import compress, decompress
 import time
 import os
 import crypt
@@ -51,6 +53,8 @@ import invenio.template
 tmpl = invenio.template.load('websession')
 
 sre_invalid_nickname = sre.compile(""".*[,'@]+.*""")
+
+# pylint: disable-msg=C0301
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields
@@ -137,16 +141,16 @@ def getUid (req):
     guest = 0
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(req)
-    except SessionError,e:
-	sm.revoke_session_cookie (req)
-	s = sm.get_session(req)
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie (req)
+        s = sm.get_session(req)
     userId = s.getUid()
     if userId == -1: # first time, so create a guest user
         s.setUid(createGuestUser())
         userId = s.getUid()
         guest = 1
-    sm.maintain_session(req,s)
+    sm.maintain_session(req, s)
 
     if guest == 0:
         guest = isGuestUser(userId)
@@ -165,17 +169,17 @@ def getUid (req):
         else:
             return -1
 
-def setUid(req,uid):
+def setUid(req, uid):
     """It sets the userId into the session, and raise the cookie to the client.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(req)
-    except SessionError,e:
-	sm.revoke_session_cookie (req)
-	s = sm.get_session(req)
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
     s.setUid(uid)
-    sm.maintain_session(req,s)
+    sm.maintain_session(req, s)
     return uid
 
 def get_user_info(uid, ln=cdslang):
@@ -216,7 +220,7 @@ def isGuestUser(uid):
 
 def isUserSubmitter(uid):
     u_email = get_email(uid)
-    res = run_sql("select * from sbmSUBMISSIONS where email=%s",(u_email,))
+    res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
     if len(res) > 0:
         return 1
     else:
@@ -227,13 +231,13 @@ def isUserReferee(uid):
     for row in res:
         doctype = row[0]
         categ = "*"
-        (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
+        (auth_code, auth_message) = acc_authorize_action(uid, "referee", doctype=doctype, categ=categ)
         if auth_code == 0:
             return 1
-        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s",(doctype,))
+        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
         for row2 in res2:
             categ = row2[0]
-            (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
+            (auth_code, auth_message) = acc_authorize_action(uid, "referee", doctype=doctype, categ=categ)
             if auth_code == 0:
                 return 1
     return 0
@@ -296,12 +300,12 @@ def registerUser(req, email, passw, nickname=""):
     # is email already taken?
     res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
     if len(res) > 0:
-	return 3
+        return 3
 
     # is nickname already taken?
     res = run_sql("SELECT * FROM user WHERE nickname=%s", (nickname,))
     if len(res) > 0:
-	return 4
+        return 4
 
     # okay, go on and register the user:
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
@@ -322,18 +326,18 @@ def registerUser(req, email, passw, nickname=""):
         sendNewAdminAccountWarning(email, adminemail)
     return 0
 
-def updateDataUser(req,uid,email,password,nickname):
+def updateDataUser(uid, email, password, nickname):
     """Update user data.  Used when a user changed his email or password or nickname.
     """
     if email == 'guest':
         return 0
 
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-        query_result = run_sql("update user set password=%s where id=%s", (password,uid))
+        run_sql("update user set password=%s where id=%s", (password, uid))
     else:
-        query_result = run_sql("update user set email=%s,password=%s where id=%s", (email,password,uid))
+        run_sql("update user set email=%s,password=%s where id=%s", (email, password, uid))
     if nickname and nickname != '':
-        query_result = run_sql("update user set nickname=%s where id=%s", (nickname,uid))
+        run_sql("update user set nickname=%s where id=%s", (nickname, uid))
     return 1
 
 def loginUser(req, p_un, p_pw, login_method):
@@ -385,17 +389,16 @@ def loginUser(req, p_un, p_pw, login_method):
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
-    uid = getUid(req)
-
+    getUid(req)
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
-	s = sm.get_session(req)
-    except SessionError,e:
-	sm.revoke_session_cookie (req)
-	s = sm.get_session(req)
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
     id1 = createGuestUser()
     s.setUid(id1)
-    sm.maintain_session(req,s)
+    sm.maintain_session(req, s)
     return id1
 
 def username_exists_p(username):
@@ -436,13 +439,13 @@ def nicknameUnique(p_nickname):
         return 0
     return -1
 
-def update_Uid(req,p_email,p_pw):
+def update_Uid(req, p_email, p_pw):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system
     with a given email and password
     """
     query_ID = int(run_sql("select id from user where email=%s and password=%s",
-                           (p_email,p_pw))[0][0])
-    setUid(req,query_ID)
+                           (p_email, p_pw))[0][0])
+    setUid(req, query_ID)
     return query_ID
 
 def givePassword(email):
@@ -450,14 +453,14 @@ def givePassword(email):
 	the password if the user exists, otherwise it returns -999
     """
 
-    query_pass = run_sql("select password from user where email =%s",(email,))
+    query_pass = run_sql("select password from user where email =%s", (email,))
     if len(query_pass)>0:
         return query_pass[0][0]
     return -999
 
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
-
+    _ = gettext_set_language(ln)
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
@@ -481,7 +484,7 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
 
     try:
         server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
+    except smtplib.SMTPRecipientsRefused:
         return 0
 
     server.quit()
@@ -489,7 +492,7 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
 
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
-
+    _ = gettext_set_language(ln)
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
@@ -509,7 +512,7 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
 
     try:
         server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
+    except smtplib.SMTPRecipientsRefused:
         return 0
 
     server.quit()
@@ -615,7 +618,7 @@ def list_users_in_roles(role_list):
     """
     if not(type(role_list) is list or type(role_list) is tuple):
         role_list = [role_list]
-    params=''
+    params = ''
     query = """SELECT distinct(uacc.id_user)
                FROM user_accROLE uacc JOIN accROLE acc
                     ON uacc.id_accROLE=acc.id
@@ -632,15 +635,14 @@ def list_users_in_roles(role_list):
 
 ## --- follow some functions for Apache user/group authentication
 
-def auth_apache_user_p(user, password):
+def auth_apache_user_p(user, password, apache_password_file=cfg_apache_password_file):
     """Check whether user-supplied credentials correspond to valid
     Apache password data file.  Return 0 in case of failure, 1 in case
     of success."""
     try:
-        from invenio.config import cfg_apache_password_file
-        if not cfg_apache_password_file.startswith("/"):
-            cfg_apache_password_file = tmpdir + "/" + cfg_apache_password_file
-        pipe_input, pipe_output = os.popen2(["grep", "^" + user + ":", cfg_apache_password_file], 'r')
+        if not apache_password_file.startswith("/"):
+            apache_password_file = tmpdir + "/" + apache_password_file
+        dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
         password_apache = string.split(string.strip(line),":")[1]
     except: # no pw found, so return not-allowed status
@@ -651,14 +653,13 @@ def auth_apache_user_p(user, password):
     else:
         return 0
 
-def auth_apache_user_in_groups(user):
+def auth_apache_user_in_groups(user, apache_group_file=cfg_apache_group_file):
     """Return list of Apache groups to which Apache user belong."""
     out = []
     try:
-        from invenio.config import cfg_apache_group_file
-        if not cfg_apache_group_file.startswith("/"):
-            cfg_apache_group_file = tmpdir + "/" + cfg_apache_group_file
-        pipe_input,pipe_output = os.popen2(["grep", user, cfg_apache_group_file], 'r')
+        if not apache_group_file.startswith("/"):
+            apache_group_file = tmpdir + "/" + apache_group_file
+        dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(string.split(string.strip(line),":")[0])
     except: # no groups found, so return empty list
@@ -691,7 +692,7 @@ def get_user_preferences(uid):
     return None
 
 def set_user_preferences(uid, pref):
-    res = run_sql("UPDATE user SET settings='%s' WHERE id=%s" % (serialize_via_marshal(pref),uid))
+    run_sql("UPDATE user SET settings='%s' WHERE id=%s" % (serialize_via_marshal(pref), uid))
 
 def get_default_user_preferences():
     user_preference = {
