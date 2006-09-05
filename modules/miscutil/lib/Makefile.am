@@ -25,6 +25,7 @@ pylib_DATA = __init__.py \
              errorlib_regression_tests.py \
              config.py \
              dbquery.py \
+             dbquery_tests.py \
 	     miscutil_config.py \
              messages.py \
              textutils.py \
@@ -46,6 +47,7 @@ EXTRA_DIST = __init__.py \
 	     miscutil_config.py \
              config.py.wml \
              dbquery.py.wml \
+             dbquery_tests.py \
              messages.py.wml \
              errorHandling.php.wml \
              textutils.py \
