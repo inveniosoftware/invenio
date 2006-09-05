@@ -1918,7 +1918,9 @@ class Template:
                              ('hx', 'BibTeX'),
                              ('xd', 'DC'),
                              ('hm', 'MARC'),
-                             ('xm', 'MARCXML')):
+                             ('xm', 'MARCXML'),
+                             ('xe', 'EndNote'),
+                             ):
             if format == abbrev:
                 result.append(name)
             else:
