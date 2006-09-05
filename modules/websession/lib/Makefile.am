@@ -19,10 +19,10 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = websession.py session.py webuser.py webaccount.py	\
-             websession_templates.py websession_webinterface.py \
+pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
+             websession_templates.py websession_webinterface.py	\
 	     webgroup.py webgroup_dblayer.py websession_config.py \
-             websession_regression_tests.py
+             webaccount.py websession_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 
