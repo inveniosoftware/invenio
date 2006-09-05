@@ -39,6 +39,7 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     ProgrammingError
 
 import string
+import datetime
 from MySQLdb import connect
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
@@ -158,3 +159,27 @@ def log_sql_query(sql, param=None):
         log_file.close()
     except:
         pass
+
+def get_table_update_time(tablename):
+    """Return update time of TABLENAME.  TABLENAME can contain
+       wildcard `%' in which case we return the maximum update time
+       value.
+    """
+    # Note: in order to work with all of MySQL 4.0, 4.1, 5.0, this
+    # function uses SHOW TABLE STATUS technique with a dirty column
+    # position lookup to return the correct value.  When we shall use
+    # solely MySQL-5.0, we can employ a much cleaner technique of
+    # using SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
+    # table_name='collection'.
+    res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
+    update_times = [] # store all update times
+    for row in res:
+        if type(row[10]) is datetime.datetime:
+            # MySQL-4.0 has creation_time in 10th position, so return
+            # next column:
+            update_times.append(str(row[11]))
+        else:
+            # MySQL-4.1 and 5.0 have creation_time in 11th position,
+            # so return next column:
+            update_times.append(str(row[12]))
+    return max(update_times)
