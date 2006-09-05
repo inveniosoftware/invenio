@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
-## CDS Invenio Web Session utilities, implementing persistence.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -19,25 +20,32 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Classes necessary for using in CDS Invenio, as a complement of session, which adds persistence to sessions
-by using a MySQL table. Consists of the following classes:
+Classes necessary for using in CDS Invenio, as a complement of
+session, which adds persistence to sessions by using a MySQL
+table. Consists of the following classes:
 
-	- SessionNotInDb: Exception to be raised when a session doesn't exit
-	- pSession(Session): Specialisation of the class Session which adds persistence to session
-	- pSessionMapping: Implements only the necessary methods to make it work with the session manager 
+ - SessionNotInDb: Exception to be raised when a session doesn't exit
+
+ - pSession(Session): Specialisation of the class Session which adds
+   persistence to session
+
+ - pSessionMapping: Implements only the necessary methods to make it
+   work with the session manager
 """
+
+__revision__ = "$Id$"
+
 import cPickle
-import time
 from UserDict import UserDict
 
-from invenio.dbquery import run_sql, blob_to_string, OperationalError, IntegrityError
+from invenio.dbquery import run_sql, blob_to_string, \
+     OperationalError, IntegrityError
 from invenio.session import Session
 
 class SessionNotInDb(Exception):
     """Exception to be raised when a requested session doesn't exist in the DB
     """
     pass
-
 
 class pSession(Session):
     """Specialisation of the class Session which adds persistence to sessions 
@@ -80,16 +88,20 @@ class pSession(Session):
             self.__dirty = 1
 
     def retrieve( cls, sessionId ):
-        """method for retrieving a session from the DB for the given id. If the
-             id has no corresponding session an exception is raised
+        """method for retrieving a session from the DB for the given
+           id. If the id has no corresponding session an exception is
+           raised
         """
-        sql = "select session_object from %s where session_key='%s'"%(cls.__tableName, sessionId)
+        sql = "select session_object from %s where session_key='%s'" % \
+              (cls.__tableName, sessionId)
         try:            
             res = run_sql(sql)
         except OperationalError:
-            raise SessionNotInDb("Session %s doesn't exist"%sessionId)            
+            raise SessionNotInDb("Session %s doesn't exist" % \
+                                 sessionId)            
         if len(res)==0:
-            raise SessionNotInDb("Session %s doesn't exist"%sessionId)
+            raise SessionNotInDb("Session %s doesn't exist" % \
+                                 sessionId)
         s = cPickle.loads(blob_to_string(res[0][0]))
         return s
     retrieve = classmethod( retrieve )
@@ -104,22 +116,30 @@ class pSession(Session):
             corresponding SQL update
         """
       
-        repr = self.__getRepr().replace("'", "\\\'")
-        repr = repr.replace('"', '\\\"')
+        sessrepr = self.__getRepr().replace("'", "\\\'")
+        sessrepr = sessrepr.replace('"', '\\\"')
         try:
-            sql = 'INSERT INTO %s (session_key, session_expiry, session_object, uid) values ("%s","%s","%s","%s")' % \
-                  (self.__class__.__tableName, self.id, self.get_access_time()+60*60*24*2, repr, int(self.getUid()))
-            res = run_sql(sql)
+            sql = """INSERT INTO %s
+                     (session_key, session_expiry, session_object, uid)
+                     VALUES ("%s","%s","%s","%s")""" % \
+                  (self.__class__.__tableName, self.id,
+                   self.get_access_time()+60*60*24*2, sessrepr,
+                   int(self.getUid()))
+            run_sql(sql)
         except IntegrityError:
             try:
-                sql = 'UPDATE %s SET uid=%s, session_expiry=%s, session_object="%s" WHERE session_key="%s"' % \
-                      (self.__class__.__tableName, int(self.getUid()), self.get_access_time()+60*60*24*2, repr, self.id)
-                res = run_sql(sql)
+                sql = """UPDATE %s SET uid=%s, session_expiry=%s,
+                                       session_object="%s" 
+                                 WHERE session_key="%s" """ % \
+                      (self.__class__.__tableName, int(self.getUid()),
+                       self.get_access_time()+60*60*24*2, sessrepr,
+                       self.id)
+                run_sql(sql)
             except OperationalError:
                 pass
-            self.__dirty=0
+            self.__dirty = 0
         except OperationalError:
-            self.__dirty=0            
+            self.__dirty = 0            
 
 class pSessionMapping(UserDict):
     """Only the necessary methods to make it work with the session manager 
@@ -131,7 +151,7 @@ class pSessionMapping(UserDict):
             try:
                 s = pSession.retrieve( key )
                 self.data[key] = s
-            except SessionNotInDb, e:
+            except SessionNotInDb:
                 pass
 
     def __setitem__(self, key, v):
