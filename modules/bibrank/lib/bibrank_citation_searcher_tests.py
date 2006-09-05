@@ -28,26 +28,29 @@ import unittest
 from invenio import bibrank_citation_searcher
 
 class TestCitationSearcher(unittest.TestCase):
+
     def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
         self.recid = 339705
         self.recids = [339705, 339706]
         self.rank_method_code = 'cit'
        
-    def test_init_cited_by_dictionary(self):
+    def xtest_init_cited_by_dictionary(self):
         """bibrank citation searcher - init cited-by data"""
         # FIXME: test postponed
         #self.assert_(bibrank_citation_searcher.init_cited_by_dictionary()) 
 
-    def test_init_reference_list_dictionary(self):
+    def xtest_init_reference_list_dictionary(self):
         """bibrank citation searcher - init reference data"""
         # FIXME: test postponed
         #self.assert_(bibrank_citation_searcher.init_reference_list_dictionary())
 
-    def test_calculate_cited_by_list(self):
+    def xtest_calculate_cited_by_list(self):
         """bibrank citation searcher - get citing relevance"""
         # FIXME: test postponed
 
-    def test_calculate_co_cited_with_list(self):
+    def xtest_calculate_co_cited_with_list(self):
         """bibrank citation searcher - get co-cited-with data"""
         # FIXME: test postponed
             
