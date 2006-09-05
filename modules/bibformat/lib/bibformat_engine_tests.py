@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
 ##                                              
 ## This file is part of the CERN Document Server Software (CDSware).
@@ -18,9 +19,12 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Test cases for the BibFormat engine."""
+
+# pylint: disable-msg=C0301
+
 import unittest
 import os
-import re
 import sys
 
 from invenio import bibformat_engine
@@ -103,6 +107,7 @@ class FormatElementTest(unittest.TestCase):
     """ bibformat - tests on format templates"""
 
     def setUp(self):
+        # pylint: disable-msg=C0103
         """bibformat - setting python path to test elements"""
         sys.path.append('%s' % tmpdir)
         
@@ -413,24 +418,6 @@ class PatternTest(unittest.TestCase):
         <description>a <b>description</b> on
         2 lines </description>
         <h1>the content of the template</h1>
-        <BFE_tiTLE param1="<b>value1</b>" param2=""/>
-        my content is so nice!
-        <BFE_title param1="value1"/>
-        <BFE_title param1="value1"/>
-        '''
-        result = bibformat_engine.pattern_tag.search(text)
-        self.assertEqual(result.group('function_name'), "tiTLE")
-        self.assertEqual(result.group('params'), 'param1="<b>value1</b>" param2=""')
-
-
-    def test_pattern_tag(self):
-        """ bibformat - correctness of pattern 'pattern_tag'"""
-        text = '''
-        garbage but part of content
-        <name><b>a name</b></name>
-        <description>a <b>description</b> on
-        2 lines </description>
-        <h1>the content of the template</h1>
         <BFE_tiTLE param1="<b>value1</b>"
         param2=""/>
         my content is so nice!
@@ -531,6 +518,7 @@ class FormatTest(unittest.TestCase):
     """ bibformat - generic tests on function that do the formatting. Main functions"""
 
     def setUp(self):
+        # pylint: disable-msg=C0103
         """ bibformat - prepare BibRecord objects"""
 
         self.xml_text_1 = '''
