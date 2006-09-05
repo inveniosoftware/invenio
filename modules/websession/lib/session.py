@@ -49,7 +49,7 @@ DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
 DEFAULT_CHECK_SESSION_ADDR = 1
 
-import sys, string, re
+import re
 from time import time, localtime, strftime, clock
 try:
     from mod_python import apache
@@ -307,19 +307,19 @@ class SessionManager:
         cookie in 'request'.  Return None if no such cookie or the
         cookie has been expired, otherwise return the cookie's value.
         """
-        id = request.cookies.get(self._getSessionCookieName())
-        if id == "" or id == "*del*":
+        sessid = request.cookies.get(self._getSessionCookieName())
+        if sessid == "" or sessid == "*del*":
             return None
         else:
-            return id
+            return sessid
             
     def _create_session (self, request):
         # Generate a session ID, which is just the value of the session
         # cookie we are about to drop on the user.  (It's also the key
         # used with the session manager mapping interface.)
-        id = None
-        while id is None or self.has_session(id):
-            id = "%016X" % randlong(8)  # 64-bit random number
+        sessid = None
+        while sessid is None or self.has_session(sessid):
+            sessid = "%016X" % randlong(8)  # 64-bit random number
 
         # Create a session object which will be looked up the next
         # time this user comes back carrying the session cookie
@@ -344,10 +344,10 @@ class SessionManager:
         on the user.  Those are both the responsibility of
         maintain_session(), called at the end of a request.
         """
-        id = self._get_session_id(request)
+        sessid = self._get_session_id(request)
         session = None
-        if id is not None:
-            session = self.get(id)
+        if sessid is not None:
+            session = self.get(sessid)
             if session is None:
                 # Note that it's important to revoke the session cookie
                 # so the user doesn't keep getting "Expired session ID"
@@ -356,14 +356,15 @@ class SessionManager:
                 # exist yet.  Thus, the code that formats SessionError
                 # exceptions -- SessionError.format() by default -- is
                 # responsible for revoking the session cookie.  Yuck.
-                raise SessionError(session_id=id)
+                raise SessionError(session_id=sessid)
             if (self._getSessionCheckAddress() and
-                session.get_remote_address() != request.get_environ("REMOTE_ADDR")):
+                session.get_remote_address() != \
+                request.get_environ("REMOTE_ADDR")):
                 raise SessionError("Remote IP address does not match the "
                                    "IP address that created the session",
-                                   session_id=id)
+                                   session_id=sessid)
 
-        if id is None or session is None:
+        if sessid is None or session is None:
             # Generate a session ID and create the session.
             session = self._create_session(request)
 
@@ -459,11 +460,11 @@ class SessionManager:
         default), we just check for the existence of the session cookie
         and don't inspect its content at all.
         """
-        id = request.cookies.get(self._getSessionCookieName())
-        if id is None:
+        sessid = request.cookies.get(self._getSessionCookieName())
+        if sessid is None:
             return 0
         if must_exist:
-            return self.has_session(id)
+            return self.has_session(sessid)
         else:
             return 1
 
@@ -531,21 +532,6 @@ class Session:
         for has_info().  See doc/session-mgmt.txt.
         """
         return 0
-
-    def dump (self, file=None, header=1, deep=1):
-        time_fmt = "%Y-%m-%d %H:%M:%S"
-        ctime = strftime(time_fmt, localtime(self.__creation_time))
-        atime = strftime(time_fmt, localtime(self.__access_time))
-
-        if header:
-            file.write('session %s:' % self.id)
-        file.write('  user %s' % self.user)
-        file.write('  __remote_address: %s' % self.__remote_address)
-        file.write('  created %s, last accessed %s' % (ctime, atime))
-        file.write('  _form_tokens: %s\n' % self._form_tokens)
-
-    # dump()
-
 
     # -- Simple accessors and modifiers --------------------------------
 
@@ -633,12 +619,13 @@ class MPSessionManager(SessionManager):
         SessionManager.expire_session(self, rw )
 
     def revoke_session_cookie (self, request):
-	"""Proxy method to SessionManager revoke_session_cookie. It converts the 
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
+        """Proxy method to SessionManager revoke_session_cookie. It
+           converts the mod_python request objects in a SessionManager
+           compatible one and executes the parent implementation
+           passing the compatible object
         """
-	rw = RequestWrapper.getWrapper( request)
-	SessionManager.revoke_session_cookie(self,rw)
+        rw = RequestWrapper.getWrapper( request)
+        SessionManager.revoke_session_cookie(self, rw)
 
 class RequestWrapper:
     """This class implements a HTTP request which is compatible with Quixote's
@@ -667,14 +654,15 @@ class RequestWrapper:
         self.__request = request
         try:
             self.cookies = parse_cookie(self.__request.headers_in[ "Cookie" ])
-        except KeyError, e:
+        except KeyError:
             self.cookies = {}
         self.environ = {}
-        self.environ["REMOTE_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+        self.environ["REMOTE_ADDR"] = \
+               self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
-        except AttributeError, e:
+        except AttributeError:
             self.session = None
         request.cds_wrapper = self #sticks the current wrapper to the mp request
                                    # so in succesive request it can be recovered
@@ -732,10 +720,13 @@ class ResponseWrapper:
                 continue
             if name in ("max_age", "path"):
                 name = name.replace("_", "-")
-                options += "; %s=%s"%(name, value)
+                options += "; %s=%s" % (name, value)
             elif name =="secure" and value:
                 options += "; secure"
-        self.request.headers_out["Set-Cookie"] = "%s=%s%s"%(cookie_name, cookie_value, options)
+        self.request.headers_out["Set-Cookie"] = "%s=%s%s" % \
+                                                 (cookie_name,
+                                                  cookie_value,
+                                                  options)
 
 
 class SessionError(Exception):
