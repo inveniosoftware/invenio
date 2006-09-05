@@ -324,7 +324,7 @@ class SessionManager:
         # Create a session object which will be looked up the next
         # time this user comes back carrying the session cookie
         # with the session ID just generated.
-        return self.new_session(request, id)
+        return self.new_session(request, sessid)
 
     def get_session (self, request):
         """get_session(request : HTTPRequest) -> Session
