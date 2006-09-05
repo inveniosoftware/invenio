@@ -21,25 +21,33 @@
 
 """Unit tests for the citation indexer."""
 
-__version__ = "$Id$"
+# pylint: disable-msg=C0301
+
+__revision__ = "$Id$"
 
 import unittest
 
 from invenio.bibrank_citation_indexer import last_updated_result
 
 class TestCitationIndexer(unittest.TestCase):
+    """Testing citation indexer."""
 
     def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
         self.rank_method_code = 'cit'
         self.updated_recid_list = [339705, 339704, 339708]
 
     def test_last_updated_result(self):
         """bibrank citation indexer - last updated result"""
-        self.assert_(last_updated_result(self.rank_method_code, self.updated_recid_list))
+        self.assert_(last_updated_result(self.rank_method_code,
+                                         self.updated_recid_list))
 
 def create_test_suite():
     """Return test suite for the bibrank citation indexer."""
-    return unittest.TestSuite((unittest.makeSuite(TestCitationIndexer, 'test'),))
+    return unittest.TestSuite((
+        unittest.makeSuite(TestCitationIndexer, 'test'),
+        ))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())

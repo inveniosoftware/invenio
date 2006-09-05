@@ -21,6 +21,8 @@
 
 """Regression tests for the bibupload."""
 
+# pylint: disable-msg=C0301
+
 __version__ = "$Id$"
 
 import sre
@@ -60,6 +62,7 @@ class BibUploadInsertModeTest(unittest.TestCase):
     """Testing insert mode."""
     
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialise the MARCXML variable"""
         self.test = """<record>
         <datafield tag ="245" ind1="" ind2="">
@@ -146,6 +149,7 @@ class BibUploadAppendModeTest(unittest.TestCase):
     """Testing append mode."""
     
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_controfield001 = """<record>
         <controlfield tag ="001">002</controlfield>
@@ -228,6 +232,7 @@ class BibUploadCorrectModeTest(unittest.TestCase):
     """Testing correct mode."""
     
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_correct = """<record>
         <datafield tag ="100" ind1="" ind2="">
@@ -268,6 +273,7 @@ class BibUploadReplaceModeTest(unittest.TestCase):
     """Testing replace mode."""
     
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_replace = """<record>
         <datafield tag ="100" ind1="" ind2="">
@@ -308,6 +314,7 @@ class BibUploadReferencesModeTest(unittest.TestCase):
     """Testing references mode."""
     
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_insert = """<record>
         <datafield tag ="100" ind1="" ind2="">
@@ -359,6 +366,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
     """Testing FMT mode."""
 
     def setUp(self):
+        # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.new_marcxml_with_fmt = """
         <record>
