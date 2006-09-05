@@ -50,6 +50,7 @@ from invenio import elmsubmit_tests
 from invenio import bibformat_engine_tests
 from invenio import websearch_external_collections_page_getter_tests
 from invenio import webuser_tests
+from invenio import dbquery_tests
 
 def usage():
     """Print usage info on standard error output."""
@@ -79,6 +80,7 @@ def create_all_test_suites():
                                bibformat_engine_tests.create_test_suite(),
                                websearch_external_collections_page_getter_tests.create_test_suite(),
                                webuser_tests.create_test_suite(),
+                               dbquery_tests.create_test_suite(),
                                ))
 
 def print_info_line():
