@@ -1917,9 +1917,9 @@ class Template:
         for abbrev, name in (('hd', 'HTML'),
                              ('hx', 'BibTeX'),
                              ('xd', 'DC'),
+                             ('xe', 'EndNote'),
                              ('hm', 'MARC'),
                              ('xm', 'MARCXML'),
-                             ('xe', 'EndNote'),
                              ):
             if format == abbrev:
                 result.append(name)
