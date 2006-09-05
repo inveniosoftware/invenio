@@ -32,7 +32,7 @@ from zlib import compress,decompress
 from mod_python import apache
 
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, escape_string, get_table_update_time
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
@@ -2374,10 +2374,8 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     collection_table_update_time = ""
     collection_web_update_time = ""
     
-    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    if res:
-        collection_table_update_time = re.sub(r'\.00$', '', str(res[0][11]))
-        output += "Collection table last updated: %s<br>" % collection_table_update_time
+    collection_table_update_time = get_table_update_time('collection')
+    output += "Collection table last updated: %s<br>" % collection_table_update_time
     try:
         file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
         collection_web_update_time = string.strip(file.readline())

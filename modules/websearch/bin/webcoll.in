@@ -50,7 +50,7 @@ try:
     from invenio.messages import gettext_set_language, language_list_long
     from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname
     from invenio.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
-    from invenio.dbquery import run_sql, escape_string, Error
+    from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
     from invenio.access_control_engine import acc_authorize_action
     from invenio.bibrank_record_sorter import get_bibrank_methods
     import invenio.template
@@ -759,14 +759,14 @@ def get_database_last_updated_timestamp():
        record-related database tables.
     """
     database_tables_timestamps = []
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'bibrec'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'bibfmt'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'idxWORD%%'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'collection%%'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'portalbox'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'field%%'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'format%%'")))
-    database_tables_timestamps.extend(map(lambda x: str(x[11]), run_sql("SHOW TABLE STATUS LIKE 'rnkMETHODNAME'")))
+    database_tables_timestamps.append(get_table_update_time('bibrec'))
+    database_tables_timestamps.append(get_table_update_time('bibfmt'))
+    database_tables_timestamps.append(get_table_update_time('idxWORD%'))
+    database_tables_timestamps.append(get_table_update_time('collection%'))
+    database_tables_timestamps.append(get_table_update_time('portalbox'))
+    database_tables_timestamps.append(get_table_update_time('field%'))
+    database_tables_timestamps.append(get_table_update_time('format%'))
+    database_tables_timestamps.append(get_table_update_time('rnkMETHODNAME'))
     return max(database_tables_timestamps)
 
 def get_cache_last_updated_timestamp():

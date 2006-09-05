@@ -52,7 +52,7 @@ if cfg_experimental_features:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
     from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-from invenio.dbquery import run_sql, escape_string, Error
+from invenio.dbquery import run_sql, get_table_update_time, escape_string, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
@@ -947,8 +947,7 @@ def get_coll_i18nname(c, ln=cdslang):
     global collection_i18nname_cache
     global collection_i18nname_cache_timestamp
     # firstly, check whether the collectionname table was modified:
-    res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
-    if res and str(res[0][11])>collection_i18nname_cache_timestamp:
+    if get_table_update_time('collectionname') > collection_i18nname_cache_timestamp:
         # yes it was, cache clear-up needed:
         collection_i18nname_cache = create_collection_i18nname_cache()
     # secondly, read i18n name from either the cache or return common name:
@@ -965,8 +964,7 @@ def get_field_i18nname(f, ln=cdslang):
     global field_i18nname_cache
     global field_i18nname_cache_timestamp
     # firstly, check whether the fieldname table was modified:
-    res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
-    if res and str(res[0][11])>field_i18nname_cache_timestamp:
+    if get_table_update_time('fieldname') > field_i18nname_cache_timestamp:
         # yes it was, cache clear-up needed:
         field_i18nname_cache = create_field_i18nname_cache()
     # secondly, read i18n name from either the cache or return common name:
@@ -1043,8 +1041,7 @@ def get_collection_reclist(coll):
     global collection_reclist_cache
     global collection_reclist_cache_timestamp
     # firstly, check whether the collection table was modified:
-    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    if res and str(res[0][11])>collection_reclist_cache_timestamp:
+    if get_table_update_time('collection') > collection_reclist_cache_timestamp:
         # yes it was, cache clear-up needed:
         collection_reclist_cache = create_collection_reclist_cache()
     # secondly, read reclist from either the cache or the database:
@@ -3321,8 +3318,7 @@ def perform_request_cache(req, action="show"):
         collection_reclist_cache = create_collection_reclist_cache()
     # show collection reclist cache:
     out += "<h3>Collection reclist cache</h3>"
-    res = run_sql("SHOW TABLE STATUS LIKE 'collection'")
-    out += "- collection table last updated: %s" % str(res[0][11])
+    out += "- collection table last updated: %s" % get_table_update_time('collection')
     out += "<br>- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
     out += "<br>- reclist cache contents:"
     out += "<blockquote>"
@@ -3350,8 +3346,7 @@ def perform_request_cache(req, action="show"):
     out += """<p><a href="%s/search/cache?action=clear">clear cache</a>""" % weburl
     # show field i18nname cache:
     out += "<h3>Field I18N names cache</h3>"
-    res = run_sql("SHOW TABLE STATUS LIKE 'fieldname'")
-    out += "- fieldname table last updated: %s" % str(res[0][11])
+    out += "- fieldname table last updated: %s" % get_table_update_time('fieldname')
     out += "<br>- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
     out += "<br>- i18nname cache contents:"
     out += "<blockquote>"
@@ -3361,8 +3356,7 @@ def perform_request_cache(req, action="show"):
     out += "</blockquote>"
     # show collection i18nname cache:
     out += "<h3>Collection I18N names cache</h3>"
-    res = run_sql("SHOW TABLE STATUS LIKE 'collectionname'")
-    out += "- collectionname table last updated: %s" % str(res[0][11])
+    out += "- collectionname table last updated: %s" % get_table_update_time('collectionname')
     out += "<br>- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
     out += "<br>- i18nname cache contents:"
     out += "<blockquote>"
