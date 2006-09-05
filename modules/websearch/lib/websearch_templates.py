@@ -1820,7 +1820,10 @@ class Template:
             locale.setlocale(locale.LC_NUMERIC, self.tmpl_localemap.get(ln, self.tmpl_default_locale))
         except locale.Error:
             return str(number)
-        number = locale.format('%d', number, True)
+        try:
+            number = locale.format('%d', number, True)
+        except TypeError:
+            return str(number)
         locale.setlocale(locale.LC_NUMERIC, ol)
         return number
 
