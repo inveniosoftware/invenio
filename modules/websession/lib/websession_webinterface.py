@@ -155,7 +155,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0) \
                and args['password'] == args['password2']:
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-                    change = webuser.updateDataUser(req,uid,args['email'],args['password'],args['nickname'],)
+                    change = webuser.updateDataUser(uid,args['email'],args['password'],args['nickname'],)
                 else:
                     return webuser.page_not_authorized(req, "../youraccount/change")
                 if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
