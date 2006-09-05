@@ -1,0 +1,4 @@
+<name>XML EndNote</name>
+<description>XML EndNote output using BFX engine.</description>
+<BFE_BFX_ENGINE template="EndNote"/>
+

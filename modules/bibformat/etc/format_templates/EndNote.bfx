@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bx:template xmlns:bx="http://cdsware.cern.ch/invenio/"
+             name="EndNote XML"
+             description="An example for the EndNote XML format."
+             content="text/xml">
+  <records>
+    <bx:loop object="record">
+      <record>
+        <authors>
+          <bx:loop object="author">
+            <author><bx:field name="author"/></author>
+          </bx:loop>
+        </authors>
+        <title><bx:field name="title"/></title>
+        <secondary_title><bx:field name="secondary_title"/></secondary_title>
+        <pages><bx:field name="pages"/></pages>
+        <number><bx:field name="journal_issue"/></number>
+        <volume><bx:field name="journal_volume"/></volume>
+        <abstract><bx:field name="abstract"/></abstract>
+        <keywords>
+          <bx:loop object="keyword">
+            <keyword><bx:field name="keyword"/></keyword>
+          </bx:loop>
+        </keywords>
+        <year><bx:field name="year"/></year>
+        <date><bx:field name="date"/></date>
+      </record>
+    </bx:loop>
+  </records>
+</bx:template>

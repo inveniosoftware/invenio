@@ -11,24 +11,27 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = common core elements
+from cStringIO import StringIO
+from invenio.bibformat_bfx_engine import format_with_bfx
 
-pylibdir = $(libdir)/python/invenio
+def format(bfo, template='DC'):
+    """
+    An entry point to the BibFormat BFX engine, when used as an element.
+    Formats the record according to a template.
 
-pylib_DATA = bibformat_config.py bibformat_templates.py \
-             bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
-	     bibformat_utils.py bibformat_migration_kit_dblayer.py bibformat_migration_kit.py \
-	     bibformat_migration_kit_templates.py  bibformat.py \
-	     bibformat_migration_kit_assistant_lib.py \
-             bibformatadmin_regression_tests.py bibformat_engine_tests.py \
-             bibformat_bfx_engine.py bibformat_bfx_engine_config.py
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+    For further details, please read the documentation.
+    
+    @param template the name of the template file without the bfx extension
+    """
+    output = ""
+    recIDs=[bfo.recID]
+    outFile=StringIO() # a virtual file-like object to write in
+    format_with_bfx(recIDs, outFile, template)
+    output=outFile.getvalue()        
+    return output
