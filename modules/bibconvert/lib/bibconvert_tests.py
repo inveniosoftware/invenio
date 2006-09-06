@@ -87,7 +87,7 @@ class TestRegExp(unittest.TestCase):
 class TestBCCL(unittest.TestCase):
     """Test bibconvert BCCL complinacy"""
 
-    def test_bccl_09(self):
+    def xtest_bccl_09(self):
         """bibconvert - BCCL v.0.9 compliancy"""
 
         # FIXME: put proper tests here
@@ -96,7 +96,7 @@ class TestBCCL(unittest.TestCase):
 class TestKnowledgeBase(unittest.TestCase):
     """Test bibconvert knowledge base"""
 
-    def test_enc(self):
+    def xtest_enc(self):
         """bibconvert - knowledge base"""
         
         # FIXME: put proper tests here
@@ -105,7 +105,7 @@ class TestKnowledgeBase(unittest.TestCase):
 class TestErrorCodes(unittest.TestCase):
     """Test bibconvert error codes"""
 
-    def test_enc(self):
+    def xtest_enc(self):
         """bibconvert - error codes"""
         
         # FIXME: put proper tests here
@@ -114,7 +114,7 @@ class TestErrorCodes(unittest.TestCase):
 class TestEncodings(unittest.TestCase):
     """Test bibconvert encodings"""
 
-    def test_enc(self):
+    def xtest_enc(self):
         """bibconvert - encodings"""
         
         # FIXME: put proper tests here
@@ -129,10 +129,10 @@ def create_test_suite():
                                unittest.makeSuite(TestGenerateValues, 'test'),
                                unittest.makeSuite(TestParseData, 'test'),
                                unittest.makeSuite(TestRegExp, 'test'),
-                               #unittest.makeSuite(TestBCCL, 'test'),
-                               #unittest.makeSuite(TestKnowledgeBase, 'test'),
-                               #unittest.makeSuite(TestErrorCodes, 'test'),
-                               #unittest.makeSuite(TestEncodings, 'test'),
+                               unittest.makeSuite(TestBCCL, 'test'),
+                               unittest.makeSuite(TestKnowledgeBase, 'test'),
+                               unittest.makeSuite(TestErrorCodes, 'test'),
+                               unittest.makeSuite(TestEncodings, 'test'),
                                ))
 
 if __name__ == "__main__":
