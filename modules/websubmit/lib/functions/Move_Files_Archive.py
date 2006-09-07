@@ -27,7 +27,7 @@ def Move_Files_Archive(parameters,curdir,form):
         dir = watcheddirs[type]
         if os.path.exists(dir):
             formats = {}
-            files = os.listdir(dir):
+            files = os.listdir(dir)
             files.sort()
             for file in files:
                 extension = re.sub("^[^\.]*\.","",file)
