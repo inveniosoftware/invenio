@@ -246,7 +246,7 @@ def main(srcdir):
                 'avg_pylint_score': kwalitee[modulename][5],
               }
     # at the end, print total numbers:
-    print "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
+    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
     print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
               { 'modulename': kwalitee['TOTAL'][0],
                 'nb_loc': kwalitee['TOTAL'][1],
