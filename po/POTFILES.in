@@ -110,8 +110,6 @@ modules/elmsubmit/lib/elmsubmit_misc.py
 modules/elmsubmit/lib/elmsubmit.py
 modules/elmsubmit/lib/elmsubmit_richtext2txt.py
 modules/elmsubmit/lib/elmsubmit_submission_parser.py
-modules/elmsubmit/lib/encdet.py
-modules/elmsubmit/lib/encdet_utf8.py
 modules/elmsubmit/lib/magic/compile_magic.py
 modules/elmsubmit/lib/magic/__init__.py
 modules/elmsubmit/lib/myhtmlentitydefs.py
