@@ -213,14 +213,14 @@ def main(srcdir):
     print "CDS Invenio Python Code Kwalitee Check %41s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print "="*80
     print ""
-    print "%(modulename)13s %(nb_loc)8s %(nb_unit)6s %(nb_regression)6s %(nb_tests_per_1k_loc)8s %(nb_pychecker_warnings)8s %(avg_pylint_score)11s" % \
+    print "%(modulename)13s %(nb_loc)8s %(nb_unit)6s %(nb_regression)6s %(nb_tests_per_1k_loc)8s %(nb_pychecker_warnings)12s %(avg_pylint_score)11s" % \
           { 'modulename': 'Module',
             'nb_loc': '#LOC',
             'nb_unit': '#UnitT',
             'nb_regression': '#RegrT',
             'nb_tests_per_1k_loc': '#T/1kLOC',
-            'nb_pychecker_warnings': '#PyChk/1kLOC',
-            'avg_pylint_score': 'PylintScore'}
+            'nb_pychecker_warnings': '#PyChk/1kSRC',
+            'avg_pylint_score': 'PyLintScore'}
     print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
     for modulename in modulenames:
         # calculate kwalitee for this modulename:
@@ -232,7 +232,7 @@ def main(srcdir):
         kwalitee['TOTAL'][4] += kwalitee[modulename][4]
         kwalitee['TOTAL'][5] += kwalitee[modulename][5]
         # print results for this modulename:
-        print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.2f %(avg_pylint_score)8.2f/10" % \
+        print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
               { 'modulename': kwalitee[modulename][0],
                 'nb_loc': kwalitee[modulename][1],
                 'nb_unit': kwalitee[modulename][2],
@@ -247,7 +247,7 @@ def main(srcdir):
               }
     # at the end, print total numbers:
     print "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
-    print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.2f %(avg_pylint_score)8.2f/10" % \
+    print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
               { 'modulename': kwalitee['TOTAL'][0],
                 'nb_loc': kwalitee['TOTAL'][1],
                 'nb_unit': kwalitee['TOTAL'][2],
