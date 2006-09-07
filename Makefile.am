@@ -51,6 +51,9 @@ regression-test:
 	    echo "Hmm, regressiontestsuite does not seem to be installed.  Please do 'make install' first."; \
 	fi
 
+kwalitee-check:
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)/modules/
+
 install-data-local:
 	for d in / /cache /log /tmp /data /run ; do	\
 		mkdir -p $(localstatedir)$$d &&		\

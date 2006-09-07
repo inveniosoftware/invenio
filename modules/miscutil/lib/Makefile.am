@@ -34,7 +34,8 @@ pylib_DATA = __init__.py \
 	     testutils_regression_tests.py \
 	     urlutils.py             
 
-noinst_DATA = testimport.py
+noinst_DATA = testimport.py \
+              kwalitee.py
 
 phplibdir = $(libdir)/php/invenio/errors
 phplib_DATA = errorHandling.php
@@ -55,7 +56,8 @@ EXTRA_DIST = __init__.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
              urlutils.py \
-             testimport.py
+             testimport.py \
+             kwalitee.py
 
 install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
