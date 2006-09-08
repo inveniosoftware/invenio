@@ -269,7 +269,7 @@ Legend:
   #RegrT = number of regression test cases
   #T/1kLOC = number of tests per 1k lines of code [desirable state: > 10]
   #PyChk/1kSRC = number of PyChecker warnings per 1k sources [desirable: 0]
-  PyLintScore = average PyLint score [desirable state: > 8.0]
+  PyLintScore = average PyLint score [desirable state: > 9.0]
   """
     return
 
