@@ -19,6 +19,9 @@
 
 """OAI repository config"""
 
+__revision__ = "$Id$"
+
+# pylint: disable-msg=W0611
 from invenio.config import cfg_oai_id_prefix, \
      cfg_oai_sample_identifier, \
      cfg_oai_identify_description, \
