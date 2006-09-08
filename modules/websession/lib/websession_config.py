@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## 
-## Every db-related function of module webmessage
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
@@ -20,11 +19,15 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebSession configuration parameters."""
 
+__revision__ = "$Id$"
+
+# pylint: disable-msg=C0301
 cfg_websession_group_join_policy = {'VISIBLEOPEN': 'VO',
-                               'VISIBLEMAIL': 'VM',
-                               'INVISIBLEOPEN': 'IO',
-                               'INVISIBLEMAIL': 'IM'  
+                                    'VISIBLEMAIL': 'VM',
+                                    'INVISIBLEOPEN': 'IO',
+                                    'INVISIBLEMAIL': 'IM'  
                                     }
 cfg_websession_usergroup_status = {'ADMIN':  'A',
                                    'MEMBER':'M',

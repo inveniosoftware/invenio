@@ -19,6 +19,8 @@
 
 """CDS Invenio Submission Web Interface config file."""
 
+__revision__ = "$Id$"
+
 ## import config variables defined from config.wml:
 from invenio.config import adminemail, \
      supportemail, \
@@ -51,10 +53,12 @@ test = "FALSE"
 cfg_websubmit_copy_mails_to_admin = 0
 
 ## known compressed file extensions: 
-cfg_compressed_file_extensions = ["z", "gz", "tar", "tgz", "tar", "tar.gz",
-                                  "zip", "rar", "arj", "arc", "pak", "lha", "lhz",
-                                  "sit", "sea", "sitx", "cpt", "hqx", "uu", "uue", 
-                                  "bz", "bz2", "bzip", "tbz", "tbz2", "tar.bz", "tar.bz2"]
+cfg_compressed_file_extensions = ["z", "gz", "tar", "tgz", "tar",
+                                  "tar.gz", "zip", "rar", "arj",
+                                  "arc", "pak", "lha", "lhz", "sit",
+                                  "sea", "sitx", "cpt", "hqx", "uu",
+                                  "uue", "bz", "bz2", "bzip", "tbz",
+                                  "tbz2", "tar.bz", "tar.bz2"]
                                 
 cfg_known_file_extensions = ["lis",
 			     "sxi",

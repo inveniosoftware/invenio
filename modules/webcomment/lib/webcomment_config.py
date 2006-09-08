@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## Comments and reviews for records. 
+## 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -18,7 +19,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebComment configuration parameters."""
+
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
+
+# pylint: disable-msg=C0301
 
 cfg_webcomment_error_messages = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%s is an invalid record ID")',

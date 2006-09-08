@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -16,6 +16,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""WebSubmit Admin configuration parameters."""
+
+__revision__ = "$Id$"
+
+# pylint: disable-msg=C0301
 
 from invenio.config import weburl
 
@@ -52,7 +58,7 @@ functions_with_file_params = ["Make_Record", "Make_Modify_Record"]
 
 
 
-cfg_websubmitadmin_warning_messages =\
+cfg_websubmitadmin_warning_messages = \
  {
      'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE' : '_("Unable to delete field at position %s from page %s of submission \'%s\'")',
      'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE' : \

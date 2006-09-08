@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## 
-## Every db-related function of module webmessage
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
@@ -20,15 +19,18 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebBasket configuration parameters."""
+
+__revision__ = "$Id$"
 
 cfg_webbasket_share_levels = {'READITM': 'RI',
-                               'READCMT': 'RC',
-                               'ADDCMT': 'AC',
-                               'ADDITM': 'AI',
-                               'DELCMT': 'DC',
-                               'DELITM': 'DI',
-                               'MANAGE': 'MA'
-                               }
+                              'READCMT': 'RC',
+                              'ADDCMT': 'AC',
+                              'ADDITM': 'AI',
+                              'DELCMT': 'DC',
+                              'DELITM': 'DI',
+                              'MANAGE': 'MA'
+                              }
 cfg_webbasket_share_levels_ordered = [cfg_webbasket_share_levels['READITM'],
                                       cfg_webbasket_share_levels['READCMT'],
                                       cfg_webbasket_share_levels['ADDCMT'],
@@ -50,6 +52,7 @@ cfg_webbasket_warning_messages = {
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")'
 }
 
+# pylint: disable-msg=C0301
 cfg_webbasket_error_messages = {
     'ERR_WEBBASKET_CANNOT_COMMENT': '_("Sorry, you can\'t post in this baket")',
     'ERR_WEBBASKET_DB_ERROR': '_("Sorry there was an error with  the database")',
