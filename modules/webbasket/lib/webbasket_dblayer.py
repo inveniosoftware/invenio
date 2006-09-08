@@ -910,8 +910,8 @@ def get_group_infos(uid):
     query = """SELECT g.id,
                       g.name,
                       count(ugb.id_bskBASKET)
-               FROM usergroup g LEFT JOIN user_usergroup ug,
-                                          usergroup_bskBASKET ugb
+               FROM usergroup g LEFT JOIN (user_usergroup ug,
+                                           usergroup_bskBASKET ugb)
                                 ON (g.id=ug.id_usergroup
                                             AND
                                     g.id=ugb.id_usergroup)
