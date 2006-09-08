@@ -1918,6 +1918,7 @@ class Template:
                              ('hx', 'BibTeX'),
                              ('xd', 'DC'),
                              ('xe', 'EndNote'),
+                             ('xn', 'NLM'),
                              ('hm', 'MARC'),
                              ('xm', 'MARCXML'),
                              ):
