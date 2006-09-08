@@ -78,19 +78,20 @@ A brief description of things we strive at, more or less unsuccessfully.
 
    Do not forget to run pylint on your code to check for errors like
    uninitialized variables and to improve its quality and conformance
-   to the coding standard.  The typical incantation may be:
-
-       $ pylint --max-line-length=120 oai_repository.py | most
-
-   If you develop in Emacs, run M-x pylint RET on your buffers
-   frequently.  Read and implement pylint suggestions.  (Note that
-   using lambda and friends may lead to false pylint warnings.)
+   to the coding standard.  If you develop in Emacs, run M-x pylint
+   RET on your buffers frequently.  Read and implement pylint
+   suggestions.  (Note that using lambda and friends may lead to false
+   pylint warnings.  You can switch them off by putting block comments
+   of the form ``# pylint: disable-msg=C0301''.)
 
    Do not forget to run pychecker on your code either.  It is another
    source code checker that catches some situations better and some
    situations worse than pylint.  If you develop in Emacs, run C-c C-w
    (M-x py-pychecker-run RET) on your buffers frequently.  (Note that
    using psyco on classes may lead to false pychecker warnings.)
+
+   You can check the kwalitee of your code by running ``python
+   modules/miscutil/lib/kwalitee.py *.py'' on your files.
 
    Do not hardcode magic constants in your code.  Every magic string or
    a number should be put into accompanying file_config.py with 
