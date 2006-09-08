@@ -21,6 +21,10 @@
 
 __version__ = "$Id$"
 
+__revision__ = "$Id$"
+
+# pylint: disable-msg=C0301
+
 ## global configuration parameters:
 from invenio.config import *
 
