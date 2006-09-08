@@ -26,6 +26,8 @@ __version__ = "$Id$"
 
 __revision__ = "0.0.1"
 
+# pylint: disable-msg=C0301
+
 cfg_external_collection_timeout = 10
 cfg_external_collection_maxresults = 25
 cfg_external_collections = {
@@ -47,13 +49,13 @@ cfg_external_collections = {
         {'engine': 'GoogleScholar'},
     'IEC':
         {'base_url': "http://www.iec.ch",
-        'search_url': "http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor="},
+         'search_url': "http://www.iec.ch/cgi-bin/procgi.pl/www/iecwww.p?wwwlang=E&wwwprog=sea22.p&search=text&searchfor="},
     'IHS':
         {'base_url': "http://global.ihs.com",
-        'search_url': "http://global.ihs.com/search_res.cfm?&input_doc_title="},
+         'search_url': "http://global.ihs.com/search_res.cfm?&input_doc_title="},
     'ISO':
         {'base_url': "http://www.iso.org",
-        'search_url': "http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en" + \
+         'search_url': "http://www.iso.org/iso/en/StandardsQueryFormHandler.StandardsQueryFormHandler?languageCode=en" + \
             "&lastSearch=false&title=true&isoNumber=&isoPartNumber=&isoDocType=ALL&isoDocElem=ALL&ICS=&stageCode=&stages" + \
             "cope=Current&repost=1&stagedatepredefined=&stageDate=&committee=ALL&subcommittee=&scopecatalogue=CATALOGUE&" + \
             "scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO&keyword="},
@@ -76,4 +78,3 @@ cfg_external_collections = {
 }
 
 cfg_external_collection_states_name = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}
-
