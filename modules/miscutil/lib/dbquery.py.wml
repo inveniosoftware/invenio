@@ -31,7 +31,10 @@
 
 """CDS Invenio utility to run SQL queries."""
 
+__revision__ = "$Id$"
+
 # dbquery clients can import these from here:
+# pylint: disable-msg=W0611
 from MySQLdb import escape_string 
 from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
@@ -150,8 +153,8 @@ def log_sql_query(sql, param=None):
     log_path = logdir + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
-    message += indent_text('Query:\n' + indent_text(str(sql),2),2)
-    message += indent_text('Params:\n' + indent_text(str(param),2),2)
+    message += indent_text('Query:\n' + indent_text(str(sql), 2), 2)
+    message += indent_text('Params:\n' + indent_text(str(param), 2), 2)
     message += '-----------------------------\n\n'
     try:
         log_file = open(log_path, 'a+')

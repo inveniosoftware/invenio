@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## Comments and reviews for records.
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,12 +18,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ Configuration file for miscutil module.
 - Contains standard error messages for errorlib
   e.g. No error message given, etc.
 """
-__lastupdated__ = """$Date$"""
 
+__revision__ = "$Id$"
+
+# pylint: disable-msg=C0301
 cfg_miscutil_error_messages = \
 {   'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED':  '_("Invalid argument %s was passed")',
     'ERR_MISCUTIL_WRITE_FAILED': '_("Unable to write to file %s")',
