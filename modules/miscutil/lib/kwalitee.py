@@ -39,6 +39,8 @@ import time
 
 __revision__ = "$Id$"
 
+verbose = 0
+
 def get_list_of_python_code_files(modulesdir, modulename):
     """Return list of Python source code files for MODULENAME in MODULESDIR,
        excluding test files.
@@ -114,7 +116,7 @@ def get_nb_test_cases_in_file(filename):
 def get_pylint_score(filename):
     """Run pylint and return the code score for FILENAME.  If score
        cannot be detected, print an error and return -999999999.
-    """    
+    """
     (dummy, pipe, dummy) = os.popen3("pylint %s" % filename)
     pylint_output = pipe.read()
     pylint_score = -999999999
@@ -123,6 +125,8 @@ def get_pylint_score(filename):
         pylint_score = pylint_score_matched.group(1)
     else:
         print "ERROR: cannot detect pylint score for %s" % filename
+    if verbose >= 9:
+        print "get_pylint_score(%s) = %s" % (filename, pylint_score)
     return float(pylint_score)
 
 def get_nb_pychecker_warnings(filename):
@@ -131,12 +135,14 @@ def get_nb_pychecker_warnings(filename):
        inside FILENAME.
     """
     nb_warnings_found = 0
-    filename_to_watch_for = sre.sub(r'^\.\/', '', filename) # pychecker strips leading ./
+    filename_to_watch_for = sre.sub(r'^[\.\/]+', '', filename) # pychecker strips leading ../.. stuff
     (dummy, pipe, dummy) = os.popen3("pychecker %s" % filename)
     pychecker_output_lines = pipe.readlines()
     for line in pychecker_output_lines:
-        if line.find(filename_to_watch_for + ":") > -1:
+        if line.find(filename_to_watch_for + ":") > -1:            
             nb_warnings_found += 1            
+    if verbose >= 9:
+        print "get_nb_pychecker_warnings(%s) = %s" % (filename, nb_warnings_found)
     return nb_warnings_found    
 
 def calculate_module_kwalitee(modulesdir, modulename):
