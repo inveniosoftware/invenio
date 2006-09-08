@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bx:style xmlns:bx="http://cdsware.cern.ch/invenio/"
+          xmlns:xlink="http://www.w3.org/1999/xlink/">
+  <bx:format  name="NLM" description="The NLM output format." content-type="text/xml">
+    <articles>
+      <bx:loop object="record">
+
+        <bx:if name="doc_type" nin="ARTICLE REPORT THESIS">
+          <bx:then><bx:template_ref name="NLM_DEFAULT"/></bx:then>
+          
+          <bx:elif name="doc_type" eq="ARTICLE">
+            <bx:then><bx:template_ref name="NLM_ARTICLE"/></bx:then>
+            
+            <bx:elif name="doc_type" eq="REPORT">
+              <bx:then><bx:template_ref name="NLM_REPORT"/></bx:then>
+              
+              <bx:else name="doc_type" eq="THESIS">
+                 <bx:template_ref name="NLM_THESIS"/>
+                
+              </bx:else>    
+            </bx:elif>
+          </bx:elif>
+        </bx:if>
+        
+      </bx:loop>
+    </articles>      
+  </bx:format>
+
+  <bx:template name="NLM_ARTICLE">
+    <article>
+      <front>
+        <journal-meta>
+          <journal-title><bx:field name="journal_name_long"/></journal-title>
+          <abbrev-journal-title><bx:field name="journal_name_short"/></abbrev-journal-title>
+          <issn><bx:field name="issn"/></issn>
+          <publisher>
+            <publisher-name><bx:field name="publisher"/></publisher-name>
+          </publisher>
+        </journal-meta>
+        <article-meta>
+          <title-group>
+            <article-title><bx:field name="title"/></article-title>
+          </title-group>
+          <article-id pub-id-type="doi"><bx:field name="doi"/></article-id>
+          <contrib-group>
+            <contrib contrib-type="author">
+              <bx:loop object="author">
+              <name>
+                <surname><bx:field name="author.surname"/></surname>
+                <given-names><bx:field name="author.names"/></given-names>
+              </name>
+              </bx:loop>
+          </contrib>
+          </contrib-group>
+          <pub-date pub-type="pub">
+            <bx:if name="day">
+              <bx:then><day><bx:field name="day"/></day></bx:then>
+            </bx:if>
+            <bx:if name="month">
+              <bx:then><month><bx:field name="month"/></month></bx:then>
+            </bx:if>              
+            <year><bx:field name="year"/></year>
+          </pub-date>
+          <volume><bx:field name="journal_volume"/></volume>
+          <bx:if name="journal_issue">
+            <bx:then><issue><bx:field name="journal_issue"/></issue></bx:then>
+          </bx:if>
+          <fpage><bx:field name="first_page"/></fpage>
+          <lpage><bx:field name="last_page"/></lpage>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:loop object="uri">
+            <self-uri xlink:href="[!uri]"/>
+          </bx:loop>  
+        </article-meta>
+        <abstract><bx:field name="abstract"/></abstract>
+      </front>
+      <article-type>research-article</article-type>
+      <ref>
+        <bx:loop object="reference">
+          <nlm-citation>
+            <comment><bx:field name="reference"/></comment>
+          </nlm-citation>
+        </bx:loop> 
+      </ref>
+    </article>
+  </bx:template>
+  
+  <bx:template name="NLM_REPORT">
+    <article>
+      <front>
+        <publisher>
+            <publisher-name><bx:field name="publisher"/></publisher-name>
+            <publisher-loc><bx:field name="publisher_location"/></publisher-loc>
+        </publisher>
+        <article-meta>
+          <title-group>
+            <article-title><bx:field name="title"/></article-title>
+          </title-group>
+          <article-id pub-id-type="publisher-id"><bx:field name="article_id"/></article-id>
+          <contrib-group>
+            <contrib contrib-type="author">
+              <bx:loop object="author">           
+                <name>
+                  <surname><bx:field name="author.surname"/></surname>
+                  <given-names><bx:field name="author.names"/></given-names>
+                </name>
+              </bx:loop>
+            </contrib>
+          </contrib-group>
+          <pub-date pub-type="pub">
+            <bx:if name="day">
+              <bx:then><day><bx:field name="day"/></day></bx:then>
+            </bx:if>
+            <bx:if name="month">
+              <bx:then><month><bx:field name="month"/></month></bx:then>
+            </bx:if>              
+            <year><bx:field name="year"/></year>
+          </pub-date>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:loop object="uri">
+            <self-uri xlink:href="[!uri]"/>
+          </bx:loop>        
+        </article-meta>
+        <abstract><bx:field name="abstract"/></abstract>
+      </front>
+      <article-type>technical-report</article-type>
+    </article>
+  </bx:template>
+  
+  <bx:template name="NLM_DEFAULT">
+    <article>
+      <front>
+        <article-meta>
+          <title-group>
+            <article-title><bx:field name="title"/></article-title>
+          </title-group>
+          <contrib-group>
+            <contrib contrib-type="author">
+              <bx:loop object="author">
+              <name>
+                <surname><bx:field name="author.surname"/></surname>
+                <given-names><bx:field name="author.names"/></given-names>
+              </name>
+              </bx:loop>
+          </contrib>
+          </contrib-group>
+          <pub-date pub-type="pub">
+            <year><bx:field name="year"/></year>
+          </pub-date>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:loop object="uri">
+            <self-uri xlink:href="[!uri]"/>
+          </bx:loop>  
+        </article-meta>
+        <abstract><bx:field name="abstract"/></abstract>
+      </front>
+      <article-type>
+        <bx:field name="doc_type"/>
+      </article-type>
+    </article>
+  </bx:template>
+
+  <bx:template name="NLM_THESIS">
+  
+  </bx:template>
+
+</bx:style>

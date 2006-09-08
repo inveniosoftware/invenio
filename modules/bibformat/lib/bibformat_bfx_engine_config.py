@@ -36,6 +36,7 @@ cfg_bibformat_bfx_label_definitions = {
 'title':                     [r'/245__/a'],
 'subtitle':                  [r'/245__/b'],
 'secondary_title':           [r'/773__/p'],
+'first_author':              [r'/100__/a'],
 'author':                    [r'/100__/a',
                               r'/700__/a'],
 'author.surname':            [r'author#(?P<value>.*),[ ]*(.*)'],
@@ -83,23 +84,27 @@ cfg_bibformat_bfx_label_definitions = {
 #BFX error and warning messages
 cfg_bibformat_bfx_error_messages = \
 {
-    'ERR_BFX_TEMPLATE_REF_NO_NAME'                   :  'Missing attribute "name" in TEMPLATE_REF.',
-    'ERR_BFX_TEMPLATE_NOT_FOUND'                     :  'Template %s not found.',
-    'ERR_BFX_ELEMENT_NO_NAME'                        :  'Missing attribute "name" in ELEMENT.',
-    'ERR_BFX_FIELD_NO_NAME'                          :  'Missing attribute "name" in FIELD.',
-    'ERR_BFX_LOOP_NO_OBJECT'                         :  'Missing attribute "object" in LOOP.',
-    'ERR_BFX_NO_SUCH_FIELD'                          :  'Field %s is not defined',
-    'ERR_BFX_IF_NO_NAME'                             :  'Missing attrbute "name" in IF.',
-    'ERR_BFX_TEXT_NO_VALUE'                          :  'Missing attribute "value" in TEXT.',
-    'ERR_BFX_INVALID_RE'                             :  'Invalid regular expression: %s',
-    'ERR_BFX_INVALID_OPERATOR_NAME'                  :  'Name %s is not recognised as a valid operator name.',
-    'ERR_BFX_INVALID_DISPLAY_TYPE'                   :  'Invalid display type. Must be one of: value, tag, ind1, ind2, code; received: %s',
-    'ERR_BFX_IF_WRONG_SYNTAX'                        :  'Invalid syntax of IF statement.'
+    'ERR_BFX_TEMPLATE_REF_NO_NAME'                   :  'Error: Missing attribute "name" in TEMPLATE_REF.',
+    'ERR_BFX_TEMPLATE_NOT_FOUND'                     :  'Error: Template %s not found.',
+    'ERR_BFX_ELEMENT_NO_NAME'                        :  'Error: Missing attribute "name" in ELEMENT.',
+    'ERR_BFX_FIELD_NO_NAME'                          :  'Error: Missing attribute "name" in FIELD.',
+    'ERR_BFX_LOOP_NO_OBJECT'                         :  'Error: Missing attribute "object" in LOOP.',
+    'ERR_BFX_NO_SUCH_FIELD'                          :  'Error: Field %s is not defined',
+    'ERR_BFX_IF_NO_NAME'                             :  'Error: Missing attrbute "name" in IF.',
+    'ERR_BFX_TEXT_NO_VALUE'                          :  'Error: Missing attribute "value" in TEXT.',
+    'ERR_BFX_INVALID_RE'                             :  'Error: Invalid regular expression: %s',
+    'ERR_BFX_INVALID_OPERATOR_NAME'                  :  'Error: Name %s is not recognised as a valid operator name.',
+    'ERR_BFX_INVALID_DISPLAY_TYPE'                   :  'Error: Invalid display type. Must be one of: value, tag, ind1, ind2, code; received: %s',
+    'ERR_BFX_IF_WRONG_SYNTAX'                        :  'Error: Invalid syntax of IF statement.',
+    'ERR_BFX_DUPLICATE_NAME'                         :  'Error: Duplicate name: %s.',
+    'ERR_BFX_TEMPLATE_NO_NAME'                       :  'Error: No name defined for the template.',
+    'ERR_BFX_NO_TEMPLATES_FOUND'                     :  'Error: No templates found in the document.',
+    'ERR_BFX_TOO_MANY_TEMPLATES'                     :  'Error: More than one templates found in the document. No format found.'
 }
 
 cfg_bibformat_bfx_warning_messages = \
 {
-    'WRN_BFX_TEMPLATE_NO_NAME'          : 'No name defined for the template.',
-    'WRN_BFX_TEMPLATE_NO_DESCRIPTION'   : 'No description entered for the template.',
-    'WRN_BFX_TEMPLATE_NO_CONTENT'       : 'No content type specified for the template. Using default: text/xml.'
+    'WRN_BFX_TEMPLATE_NO_DESCRIPTION'   : 'Warning: No description entered for the template.',
+    'WRN_BFX_TEMPLATE_NO_CONTENT'       : 'Warning: No content type specified for the template. Using default: text/xml.',
+    'WRN_BFX_NO_FORMAT_FOUND'           : 'Warning: No format found. Will look for a default template.'
 }

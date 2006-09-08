@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bx:template xmlns:bx="http://cdsware.cern.ch/invenio/"
+             name="MARC XML"
+             description="An example BFX template for MARC XML generation(not to be used yet)"
+             content="text/xml">
+  <collection xmlns="http://www.loc.gov/MARC21/slim">
+    <bx:loop object="record">
+      <record>
+        <bx:loop object="controlfield"> 
+            <controlfield tag="[!controlfield:tag]"><bx:field name="controlfield" display="value"/></controlfield>
+        </bx:loop>
+        <bx:loop object="datafield">
+            <datafield tag="[!datafield:tag]" ind1="[!datafield:ind1]" ind2="[!datafield:ind2]">
+              <bx:loop object="datafield.subfield">
+                <subfield code="[!datafield.subfield:code]"><bx:field name="datafield.subfield" display="value"/></subfield>
+              </bx:loop>
+            </datafield>
+        </bx:loop>   
+      </record>
+    </bx:loop>
+  </collection>
+</bx:template>

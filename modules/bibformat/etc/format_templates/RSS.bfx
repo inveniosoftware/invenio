@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bx:style xmlns:bx="http://cdsware.cern.ch/invenio/">
+
+  <bx:format name="RSS" description="RSS new output format" content-type="application/rss+xml">
+    <rss version="2.0">
+      <channel>
+        <title>RSS 2.0 feed service.</title>
+        <link><bx:element name="server_info" var="weburl"/></link>
+        <description>Latest additions in the server.</description>
+        <language><bx:element name="server_info" var="lang"/></language>
+        <pubDate>Here goes current date/time?</pubDate>
+        <category></category>
+        <generator><bx:element name="server_info" var="version"/></generator>
+        <ttl>1440</ttl>
+        <image>
+            <url>http://cdsweb.cern.ch/img/cds.gif</url>
+            <title><bx:element name="server_info" var="name"/></title>
+            <link><bx:element name="server_info" var="weburl"/></link>
+        </image>
+        <textInput>
+          <title>Search </title>
+          <description>Search this site:</description>
+          <name>p</name>
+          <link><bx:element name="server_info" var="searchurl"/></link>
+        </textInput>
+        
+        <bx:loop object="record">
+          <bx:template_ref name="RSS_DEFAULT"/>
+        </bx:loop>
+        
+      </channel>    
+    </rss>  
+  </bx:format>
+  
+  <bx:template name="RSS_DEFAULT">
+    <item>
+      <title><bx:field name="title"/></title>
+      <link><bx:element name="server_info" var="recurl"/></link>
+      <description><bx:field name="abstract"/></description>
+      <author><bx:field name="author"/></author>
+      <pubDate><bx:element name="creation_date" format="%a, %d %b %Y %H:%i:%s"/></pubDate>
+      <guid><bx:field name="recid"/></guid>
+    </item>
+  </bx:template>
+
+</bx:style>

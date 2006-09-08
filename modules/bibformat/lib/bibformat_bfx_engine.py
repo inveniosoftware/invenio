@@ -84,17 +84,47 @@ class BFXParser:
         @param translator the translator used by the class instance
         '''
         self.translator = translator
-        self.known_operators = ['template', 'template_ref', 'text', 'field', 'element', 'loop', 'if', 'then', 'else', 'elif']
+        self.known_operators = ['style', 'format', 'template', 'template_ref', 'text', 'field', 'element', 'loop', 'if', 'then', 'else', 'elif']
+        self.flags = {} # store flags here;
+        self.templates = {} # store templates and formats here
+        self.start_template_name = None #the name of the template from which the 'execution' starts; 
+                                        #this is usually a format or the only template found in a doc
 
     def load_template(self, template_name):
         '''
-        Loads a BFX template.
+        Load a BFX template file.
+        A template file can have one of two forms:
+            - it is a file with a single template. Root tag is 'template'.
+              In an API call the single template element is 'executed'.
+            - it is a 'style' file which contains exactly one format and zero or more templates. Root tag is 'style' with children 'format' and 'template'(s).
+              In this case only the format code is 'executed'. Naturaly, in it, it would have references to other templates in the document.
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
         template_file_name = cfg_bibformat_bfx_templates_path + '/' + template_name + '.' + cfg_bibformat_bfx_format_template_extension
-        template = minidom.parse(template_file_name)
-        return template
+        #load document
+        doc = minidom.parse(template_file_name)
+        #set exec flag to false and walk document to find templates and formats
+        self.flags['exec'] = False
+        self.walk(doc)
+        #check found templates
+        if self.start_template_name:
+            start_template = self.templates[self.start_template_name]['node']
+        else:
+            print cfg_bibformat_bfx_warning_messages['WRN_BFX_NO_FORMAT_FOUND']
+            if len(self.templates) == 1:
+                # no format found, check if there is a default template
+                self.start_template_name = self.templates.keys()[0]
+                start_template = self.templates[self.start_template_name]['node']
+            else:
+                #no formats found, templates either zero or more than one
+                if len(self.templates) > 1:
+                    print cfg_bibformat_bfx_error_messages['ERR_BFX_TOO_MANY_TEMPLATES']
+                else:
+                    print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_TEMPLATES_FOUND']
+                return None
+        self.flags['exec'] = True
+        return start_template
 
     def parse_attribute(self, expression):
         '''
@@ -118,11 +148,15 @@ class BFXParser:
         output = xml_escape(output)
         return output
                         
-    def walk(self, parent, out_file):
+    def walk(self, parent, out_file=None):
         '''
         Walk a template DOM tree.
         The main function in the parser. It is recursively called until all the nodes are processed.
-        
+        This function is used in two different ways:
+           - for initial loading of the template (and validation)
+           - for 'execution' of a format/template
+        The different behaviour is achieved through the use of flags, which can be set to True or False.
+
         @param parent a node to process; in an API call this is the root node
         @param out_file an object to write to; must have a 'write' method
         
@@ -132,7 +166,8 @@ class BFXParser:
             if node.nodeType == Node.TEXT_NODE:
                 value = get_node_value(node)
                 value = value.strip()
-                out_file.write(value)
+                if out_file:
+                    out_file.write(value)
             if node.nodeType == Node.ELEMENT_NODE:
                 #get values
                 name, attributes, element_namespace = get_node_name(node), get_node_attributes(node), get_node_namespace(node)
@@ -142,14 +177,21 @@ class BFXParser:
                     for key in attributes.keys():
                         attributes[key] = self.parse_attribute(attributes[key])
                     if node_has_subelements(node):
-                        out_file.write(create_xml_element(name=name, attrs=attributes, element_type=xmlopen))
+                        if out_file:
+                            out_file.write(create_xml_element(name=name, attrs=attributes, element_type=xmlopen))
                         self.walk(node, out_file) #walk subnodes
-                        out_file.write(create_xml_element(name=name, element_type=xmlclose))
+                        if out_file:
+                            out_file.write(create_xml_element(name=name, element_type=xmlclose))
                     else:
-                        out_file.write(create_xml_element(name=name, attrs=attributes, element_type=xmlempty))
+                        if out_file:
+                            out_file.write(create_xml_element(name=name, attrs=attributes, element_type=xmlempty))
                 #name is a special name, must fall in one of the next cases:
+                elif node.localName == 'style':
+                    self.ctl_style(node, out_file)
+                elif node.localName == 'format':
+                    self.ctl_format(node, out_file)
                 elif node.localName == 'template':
-                    self.ctl_template(node, out_file) 
+                    self.ctl_template(node, out_file)
                 elif node.localName == 'template_ref':
                     self.ctl_template_ref(node, out_file)
                 elif node.localName == 'element':
@@ -157,7 +199,7 @@ class BFXParser:
                 elif node.localName == 'field':
                     self.ctl_field(node, out_file)
                 elif node.localName == 'text':
-                    self.ctl_text(node, out_file)                    
+                    self.ctl_text(node, out_file)
                 elif node.localName == 'loop':
                     self.ctl_loop(node, out_file)
                 elif node.localName == 'if':
@@ -175,51 +217,118 @@ class BFXParser:
                         print cfg_bibformat_bfx_error_messages['ERR_BFX_INVALID_OPERATOR_NAME'] % (name)
         return None
 
-    def ctl_template(self, node, out_file):
+    def ctl_style(self, node, out_file):
         '''
-        Process the root node of the template.
+        Process a style root node.
+        '''
+        #exec mode
+        if self.flags['exec']:
+            return None
+        #test mode
+        self.walk(node, out_file)
+        return None
+
+    def ctl_format(self, node, out_file):
+        '''
+        Process a format node.
         Get name, description and content attributes.
+        This function is called only in test mode.
         '''
+        #exec mode
+        if self.flags['exec']:
+            return None
+        #test mode
         attrs = get_node_attributes(node)
+        #get template name and give control to ctl_template
         if attrs.has_key('name'):
             name = attrs['name']
+            if self.templates.has_key(name):
+                print cfg_bibformat_bfx_error_messages['ERR_BFX_DUPLICATE_NAME'] % (name)
+                return None
+            self.start_template_name = name
+            self.ctl_template(node, out_file)
         else:
-            name = ''
-            print cfg_bibformat_bfx_warning_messages['WRN_BFX_TEMPLATE_NO_NAME']
+            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NO_NAME']
+            return None
+        return None
+    
+    def ctl_template(self, node, out_file):
+        '''
+        Process a template node.
+        Get name, description and content attributes.
+        Register name and store for later calls from template_ref.
+        This function is called only in test mode.
+        '''
+        #exec mode
+        if self.flags['exec']:
+            return None
+        #test mode
+        attrs = get_node_attributes(node)
+        #get template name
+        if attrs.has_key('name'):
+            name = attrs['name']
+            if self.templates.has_key(name):
+                print cfg_bibformat_bfx_error_messages['ERR_BFX_DUPLICATE_NAME'] % (name)
+                return None
+            self.templates[name] = {}
+            self.templates[name]['node'] = node
+        else:
+            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NO_NAME']
+            return None
+        #get template description
         if attrs.has_key('description'):
             description = attrs['description']
         else:
             description = ''
             print cfg_bibformat_bfx_warning_messages['WRN_BFX_TEMPLATE_NO_DESCRIPTION']
+        self.templates[name]['description'] = description
+        #get content-type of resulting output
         if attrs.has_key('content'):
             content_type = attrs['content']
         else:
             content_type = 'text/xml'
             print cfg_bibformat_bfx_warning_messages['WRN_BFX_TEMPLATE_NO_CONTENT']
-        #do something with name, description, content
+        self.templates[name]['content_type'] = content_type
         #walk node
         self.walk(node, out_file)
         return None
         
     def ctl_template_ref(self, node, out_file):
-        '''Reference to an external template.'''
+        '''
+        Reference to an external template.
+        This function is called only in execution mode. Bad references appear as run-time errors.
+        '''
+        #test mode
+        if not self.flags['exec']:
+            return None
+        #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'): 
             print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_REF_NO_NAME']
             return None
         name = attrs['name']
-        #form a filename
-        template_file_name = cfg_bibformat_bfx_templates_path + name + '/' + cfg_bibformat_bfx_format_template_extension 
-        try:
-            node = minidom.parse(template_file_name)
-        except:
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NOT_FOUND'] % (template_file_name)
+        #first check for a template in the same file, that is in the already cached templates
+        if self.templates.has_key(name):
+            node_to_walk = self.templates[name]['node']
+            self.walk(node_to_walk, out_file)
         else:
-            self.walk(node, out_file) # walk the template tree and write output in out_file
+            #load a file and execute it
+            pass
+            #template_file_name = cfg_bibformat_bfx_templates_path + name + '/' + cfg_bibformat_bfx_format_template_extension 
+            #try:
+            #    node = minidom.parse(template_file_name)
+            #except:
+            #    print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NOT_FOUND'] % (template_file_name)
         return None
         
     def ctl_element(self, node, out_file):
-        '''Call an external element written in Python.'''
+        '''
+        Call an external element (written in Python).
+        '''
+        #test mode
+        if not self.flags['exec']:
+            return None
+        #exec mode
         parameters = get_node_attributes(node)
         if not parameters.has_key('name'):
             print cfg_bibformat_bfx_error_messages['ERR_BFX_ELEMENT_NO_NAME']
@@ -237,6 +346,10 @@ class BFXParser:
         '''
         Get the value of a field by it's name.
         '''
+        #test mode
+        if not self.flags['exec']: 
+            return None
+        #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'):
             print cfg_bibformat_bfx_error_messages['ERR_BFX_FIELD_NO_NAME']
@@ -254,21 +367,34 @@ class BFXParser:
         return None
 
     def ctl_text(self, node, out_file):
-        '''Output a text'''
+        '''
+        Output a text
+        '''
+        #test mode
+        if not self.flags['exec']: 
+            return None
+        #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('value'):
             print cfg_bibformat_bfx_error_messages['ERR_BFX_TEXT_NO_VALUE']
             return None
         value = attrs['value']
         value = value.replace(r'\n', '\n')
-        value = xml_escape(value)
+        #value = xml_escape(value)
         if type(value) == type(u''):
             value = value.encode('utf-8')
         out_file.write(value)
         return None
 
     def ctl_loop(self, node, out_file):
-        '''Loop through a set of values.'''
+        '''
+        Loop through a set of values.
+        '''
+        #test mode
+        if not self.flags['exec']: 
+            self.walk(node, out_file)
+            return None
+        #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('object'):
             print cfg_bibformat_bfx_error_messages['ERR_BFX_LOOP_NO_OBJECT']
@@ -305,6 +431,11 @@ class BFXParser:
           </elif>
         </if>
         '''
+        #test mode
+        if not self.flags['exec']:
+            self.walk(node, out_file)
+            return None
+        #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'):
             print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_NO_NAME']
@@ -405,6 +536,11 @@ class BFXParser:
         '''
         Calling 'then' directly from the walk function means a syntax error.
         '''
+        #test mode
+        if not self.flags['exec']:
+            self.walk(node, out_file)
+            return None
+        #exec mode
         print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
         return None
         
@@ -412,6 +548,11 @@ class BFXParser:
         '''
         Calling 'else' directly from the walk function means a syntax error.
         '''
+        #test mode
+        if not self.flags['exec']:
+            self.walk(node, out_file)
+            return None
+        #exec mode
         print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
         return None
     
@@ -419,6 +560,11 @@ class BFXParser:
         '''
         Calling 'elif' directly from the walk function means a syntax error.
         '''
+        #test mode
+        if not self.flags['exec']:
+            self.walk(node, out_file)
+            return None
+        #exec mode        
         print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
         return None
             
@@ -995,12 +1141,20 @@ def create_xml_element(name, value='', attrs=None, element_type=xmlfull, level=0
 
 def xml_escape(value):
     '''
-    Escape a string value for use as a xml value
+    Escape a string value for use as a xml element or attribute value.
     @param value the string value to escape
     @return escaped value
     '''
     return saxutils.escape(value)
 
+def xml_unescape(value):
+    '''
+    Unescape a string value for use as a xml element.
+    @param value the string value to unescape
+    @return unescaped value
+    '''
+    return saxutils.unescape(value)
+    
 def node_has_subelements(node):
     '''
     Check if a node has any childnodes.
