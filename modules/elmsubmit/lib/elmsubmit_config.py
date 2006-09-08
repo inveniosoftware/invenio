@@ -1,5 +1,5 @@
-## $Id$</protect>
-
+## $Id$
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,6 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""ElmSubmit configuration parameters."""
+
+__revision__ = "$Id$"
+
 from invenio.config import adminemail, \
      weburl
 
@@ -28,6 +32,8 @@ files = {
          }
 # Messages we need to send to the user, before we've identified the
 # correct language to talk to them in (so we assume English!):
+
+# pylint: disable-msg=C0301
 
 nolangmsgs = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
              'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % weburl,
@@ -56,14 +62,14 @@ required_fields = ['title',
 # mapping code as a list means the first element is mapped to the first element
 # of the list, and the rest to the second
 
-marc_mapping = {'author': ['100__a','700__a'],
+marc_mapping = {'author': ['100__a', '700__a'],
                 'title': '245__a',
                 'subtitle': '245__b',
                 'photocaption': '246__b',
                 'subject': '65017a',
                 'secondary_subject': '65027a',
                 'email': '8560_f',
-                'files': ['FFT__a','FFT__a'],    
+                'files': ['FFT__a', 'FFT__a'],    
                 'affiliation': ['100__u', '700__u'],
                 'language': '041__a',
                 'abstract': '520__a',

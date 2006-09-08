@@ -19,6 +19,10 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""BibFormat configuration parameters."""
+
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import os
@@ -38,6 +42,8 @@ outputs_path = "%s%sbibformat%soutput_formats" % (etcdir, os.sep, os.sep)
 #File extensions of formats
 format_template_extension = "bft"
 format_output_extension = "bfo"
+
+# pylint: disable-msg=C0301
 
 cfg_bibformat_error_messages = \
 {   'ERR_BIBFORMAT_INVALID_TAG'                   :  '%s is an invalid tag.',

@@ -23,8 +23,12 @@
 BibIndex indexing engine configuration parameters.  
 """
 
+__revision__ = "$Id$"
+
 ## configuration parameters read from the general config file:
-from invenio.config import cfg_bibindex_fulltext_index_local_files_only, \
+# pylint: disable-msg=W0611
+from invenio.config import \
+     cfg_bibindex_fulltext_index_local_files_only, \
      cfg_bibindex_stemmer_default_language, \
      cfg_bibindex_remove_stopwords, \
      cfg_bibindex_path_to_stopwords_file, \
@@ -50,17 +54,22 @@ from invenio.config import cfg_bibindex_fulltext_index_local_files_only, \
 bibindex_engine_version = "CDS Invenio/%s bibindex/%s" % (version, version)
 
 ## programs used to convert fulltext files to text:
-conv_programs = {#"ps": [pstotext,pstoascii],  # switched off at the moment, since PDF is faster
-                 #"ps.gz": [pstotext,pstoascii],
-                 "pdf": [pdftotext,pstotext,pstoascii],
-                 "doc": [antiword,catdoc,wvtext],
-                 "ppt": [ppthtml],
-                 "xls": [xlhtml]}
-## helper programs used if the above programs convert only to html or other intermediate file formats:
+conv_programs = { ### PS switched off at the moment, since PDF is faster
+    #"ps": [pstotext,pstoascii],  
+    #"ps.gz": [pstotext,pstoascii],               
+    "pdf": [pdftotext,pstotext,pstoascii],
+    "doc": [antiword,catdoc,wvtext],
+    "ppt": [ppthtml],
+    "xls": [xlhtml]}
+
+## helper programs used if the above programs convert only to html or
+## other intermediate file formats:
 conv_programs_helpers =  {"html": htmltotext,
                           "gz": gzip}
 
 ## safety parameters concerning DB thread-multiplication problem:
 cfg_check_mysql_threads = 0 # to check or not to check the problem? 
-cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
-cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more than X seconds
+cfg_max_mysql_threads = 50 # how many threads (connections) we
+                           # consider as still safe
+cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping
+                              # for more than X seconds
