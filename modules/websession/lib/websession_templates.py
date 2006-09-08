@@ -759,7 +759,7 @@ class Template:
             if action == "runbibedit":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
             if action == "cfgbibformat":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
+                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
             if action == "cfgbibharvest":
                 out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibHarvest"))
             if action == "cfgbibindex":
