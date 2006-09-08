@@ -261,6 +261,16 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                      0,
                 'avg_pylint_score': kwalitee['TOTAL'][5] / (len(kwalitee.keys()) - 1)
               }
+    # print legend:
+    print """
+Legend:
+  #LOC = number of lines of code (excl. test files, incl. comments/blanks)
+  #UnitT = number of unit test cases  
+  #RegrT = number of regression test cases
+  #T/1kLOC = number of tests per 1k lines of code [desirable state: > 10]
+  #PyChk/1kSRC = number of PyChecker warnings per 1k sources [desirable: 0]
+  PyLintScore = average PyLint score [desirable state: > 8.0]
+  """
     return
 
 def generate_kwalitee_stats_for_some_files(filenames):
@@ -273,7 +283,7 @@ def generate_kwalitee_stats_for_some_files(filenames):
         'filename': 'File',
         'nb_loc': '#LOC',
         'nb_pychecker_warnings': '#PyChk',
-        'avg_pylint_score': 'PylintScore',
+        'avg_pylint_score': 'PyLintScore',
         }
     print " ", "-"*48, "-"*8, "-"*6, "-"*11
     files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
@@ -302,6 +312,13 @@ def generate_kwalitee_stats_for_some_files(filenames):
         'nb_pychecker_warnings': kwalitee['TOTAL'][1],
         'avg_pylint_score': kwalitee['TOTAL'][2] / (len(kwalitee.keys()) - 1),
         }
+    # print legend:
+    print """
+Legend:
+  #LOC = number of lines of code (incl. comments/blanks)
+  #PyChk = number of PyChecker warnings [desirable state: 0]
+  PyLintScore = PyLint score [desirable state: > 9.0]
+  """
     return
 
 def usage():
