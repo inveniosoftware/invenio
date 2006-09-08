@@ -18,15 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Tools to check the kwalitee of the CDS Invenio Python code.
+Check the kwalitee of the CDS Invenio Python code.
 
 Q: What is kwalitee?
 A: <http://qa.perl.org/phalanx/kwalitee.html>
 
-Usage: python kwalitee.py [modulesdir]
-
-Note: The CLI API to be refined in order to provide nicer (and richer)
-capabilities for check kwalitee per module or on certain files.
+Usage: python kwalitee.py <topsrcdir | file1.py file2.py ...>
+Examples:
+    $ python kwalitee.py ~/src/cds-invenio/
+    $ python kwalitee.py ../../websearch/lib/*.py
 """
 
 import os
@@ -39,11 +39,10 @@ import time
 
 __revision__ = "$Id$"
 
-def get_list_of_python_code_files(modulename="websearch"):
-    """Return list of Python source code files for MODULENAME,
+def get_list_of_python_code_files(modulesdir, modulename):
+    """Return list of Python source code files for MODULENAME in MODULESDIR,
        excluding test files.
     """
-    global modulesdir
     out = []
     # firstly, find out *.py files:
     (dummy, pipe, dummy)= os.popen3("find %s/%s/ -name '*.py'" % (modulesdir, modulename))
@@ -59,15 +58,34 @@ def get_list_of_python_code_files(modulename="websearch"):
     pipe.close()
     # last, remove Makefile, test files, z_ files:
     # pylint: disable-msg=W0141
-    out = filter(lambda x: not x.endswith("/Makefile.in"), out)
+    out = filter(lambda x: not x.endswith("Makefile.in"), out)
     out = filter(lambda x: not x.endswith("_tests.py"), out)
     out = filter(lambda x: x.find("/z_") == -1, out)
     # return list:
     return out
 
-def get_list_of_python_unit_test_files(modulename="websearch"):
-    """Return list of Python unit test files for MODULENAME."""
-    global modulesdir
+def wash_list_of_python_files_for_pylinting(filenames):
+    """Remove away some Python files that are not suitable for
+       pylinting, e.g. known wrong test files or empty init files.
+    """
+    # pylint: disable-msg=W0141
+    # take only .py files for pylinting:
+    filenames = filter(lambda x: x.endswith(".py"),
+                                 filenames)
+    # remove empty __init__.py files (FIXME: we may check for file size here
+    # in case we shall have non-empty __init__.py files one day)    
+    filenames = filter(lambda x: not x.endswith("__init__.py"),
+                                 filenames)
+    # take out unloadable bibformat test files:
+    filenames = filter(lambda x: not x.endswith("bfe_test_4.py"),
+                                 filenames)
+    # take out test unloadable file:
+    filenames = filter(lambda x: not x.endswith("test3.py"),
+                                 filenames)
+    return filenames
+
+def get_list_of_python_unit_test_files(modulesdir, modulename):
+    """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
     (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_tests.py'" % (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
@@ -76,9 +94,8 @@ def get_list_of_python_unit_test_files(modulename="websearch"):
     out = filter(lambda x: not x.endswith("_regression_tests.py"), out)
     return out
 
-def get_list_of_python_regression_test_files(modulename="websearch"):
-    """Return list of Python unit test files for MODULENAME."""
-    global modulesdir
+def get_list_of_python_regression_test_files(modulesdir, modulename):
+    """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
     (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_regression_tests.py'" % (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
@@ -106,7 +123,6 @@ def get_pylint_score(filename):
         pylint_score = pylint_score_matched.group(1)
     else:
         print "ERROR: cannot detect pylint score for %s" % filename
-    #print "get_pylint_score(%s) = %s" % (filename, pylint_score)
     return float(pylint_score)
 
 def get_nb_pychecker_warnings(filename):
@@ -121,17 +137,16 @@ def get_nb_pychecker_warnings(filename):
     for line in pychecker_output_lines:
         if line.find(filename_to_watch_for + ":") > -1:
             nb_warnings_found += 1            
-    #print "get_nb_pychecker_warnings(%s) = %s" % (filename, nb_warnings_found)
     return nb_warnings_found    
 
-def calculate_module_kwalitee(modulename="websearch"):
-    """Run kwalitee tests for MODULENAME and return tuple (modulename,
-       nb_loc, nb_unit_tests, nb_regression_tests,
+def calculate_module_kwalitee(modulesdir, modulename):
+    """Run kwalitee tests for MODULENAME in MODULESDIR
+       and return tuple (modulename, nb_loc, nb_unit_tests, nb_regression_tests,
        nb_pychecker_warnings, avg_pylint_score).       
     """
-    files_code = get_list_of_python_code_files(modulename)
-    files_unit = get_list_of_python_unit_test_files(modulename)
-    files_regression = get_list_of_python_regression_test_files(modulename)
+    files_code = get_list_of_python_code_files(modulesdir, modulename)
+    files_unit = get_list_of_python_unit_test_files(modulesdir, modulename)
+    files_regression = get_list_of_python_regression_test_files(modulesdir, modulename)
     # 1 - calculate LOC:
     nb_loc = 0
     for filename in files_code:
@@ -147,21 +162,7 @@ def calculate_module_kwalitee(modulename="websearch"):
     # 4 - calculate pylint score:
     avg_pylint_score = 0.0
     files_for_pylinting = files_code + files_unit + files_regression
-    # take only .py files for pylinting:
-    # pylint: disable-msg=W0141
-    files_for_pylinting = filter(lambda x: x.endswith(".py"),
-                                 files_for_pylinting)
-
-    # remove empty __init__.py files (FIXME: we may check for file size here
-    # in case we shall have non-empty __init__.py files one day)    
-    files_for_pylinting = filter(lambda x: not x.endswith("/__init__.py"),
-                                 files_for_pylinting)
-    # take out unloadable bibformat test files:
-    files_for_pylinting = filter(lambda x: not x.endswith("/bfe_test_4.py"),
-                                 files_for_pylinting)
-    # take out test unloadable file:
-    files_for_pylinting = filter(lambda x: not x.endswith("/test3.py"),
-                                 files_for_pylinting)
+    files_for_pylinting = wash_list_of_python_files_for_pylinting(files_for_pylinting)
     for filename in files_for_pylinting:
         avg_pylint_score += get_pylint_score(filename)
     # pylint: disable-msg=W0704
@@ -195,7 +196,7 @@ def get_invenio_modulenames(dirname="."):
     modulenames.sort()
     return modulenames
 
-def main(srcdir):
+def generate_kwalitee_stats_for_all_modules(modulesdir):
     """Run kwalitee estimation for each CDS Invenio module and print
        the results on stdout.
     """
@@ -203,9 +204,9 @@ def main(srcdir):
     kwalitee = {}
     kwalitee['TOTAL'] = ['TOTAL', 0, 0, 0, 0, 0]
     # detect CDS Invenio modules:
-    modulenames = get_invenio_modulenames(srcdir)
+    modulenames = get_invenio_modulenames(modulesdir)
     if "websearch" not in modulenames:
-        print "Cannot find CDS Invenio modules in %s." % srcdir
+        print "Cannot find CDS Invenio modules in %s." % modulesdir
         print "Usage: python kwalitee.py [modulesdir]."
         sys.exit(1)
     # print header
@@ -224,7 +225,7 @@ def main(srcdir):
     print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
     for modulename in modulenames:
         # calculate kwalitee for this modulename:
-        kwalitee[modulename] = calculate_module_kwalitee(modulename)
+        kwalitee[modulename] = calculate_module_kwalitee(modulesdir, modulename)
         # add it to global results:
         kwalitee['TOTAL'][1] += kwalitee[modulename][1]
         kwalitee['TOTAL'][2] += kwalitee[modulename][2]
@@ -245,7 +246,7 @@ def main(srcdir):
                      0,
                 'avg_pylint_score': kwalitee[modulename][5],
               }
-    # at the end, print total numbers:
+    # print totals:
     print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*12, "-"*11
     print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
               { 'modulename': kwalitee['TOTAL'][0],
@@ -260,11 +261,83 @@ def main(srcdir):
                      0,
                 'avg_pylint_score': kwalitee['TOTAL'][5] / (len(kwalitee.keys()) - 1)
               }
+    return
 
+def generate_kwalitee_stats_for_some_files(filenames):
+    """Run kwalitee checks on FILENAMES and print results."""
+    # init kwalitee measurement structure:
+    kwalitee = {}
+    kwalitee['TOTAL'] = [0, 0, 0]
+    # print header:
+    print "%(filename)50s %(nb_loc)8s %(nb_pychecker_warnings)6s %(avg_pylint_score)11s" % {
+        'filename': 'File',
+        'nb_loc': '#LOC',
+        'nb_pychecker_warnings': '#PyChk',
+        'avg_pylint_score': 'PylintScore',
+        }
+    print " ", "-"*48, "-"*8, "-"*6, "-"*11
+    files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
+    for filename in files_for_pylinting:
+        # calculate the kwalitee of the files:
+        kwalitee[filename] = [0, 0, 0]
+        kwalitee[filename][0] = get_nb_lines_in_file(filename) 
+        kwalitee[filename][1] = get_nb_pychecker_warnings(filename)
+        kwalitee[filename][2] = get_pylint_score(filename) 
+        # add it to the total results:
+        kwalitee['TOTAL'][0] += kwalitee[filename][0] 
+        kwalitee['TOTAL'][1] += kwalitee[filename][1]
+        kwalitee['TOTAL'][2] += kwalitee[filename][2]
+        # print results for this filename:
+        print "%(filename)50s %(nb_loc)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10" % {
+            'filename': filename,
+            'nb_loc': kwalitee[filename][0],
+            'nb_pychecker_warnings': kwalitee[filename][1],
+            'avg_pylint_score': kwalitee[filename][2],
+            }        
+    # print totals:
+    print " ", "-"*48, "-"*8, "-"*6, "-"*11
+    print "%(filename)50s %(nb_loc)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10" % {
+        'filename': 'TOTAL',
+        'nb_loc': kwalitee['TOTAL'][0],
+        'nb_pychecker_warnings': kwalitee['TOTAL'][1],
+        'avg_pylint_score': kwalitee['TOTAL'][2] / (len(kwalitee.keys()) - 1),
+        }
+    return
+
+def usage():
+    """Print usage info."""
+    print """\
+Usage: python kwalitee.py <topsrcdir | file1.py file2.py ...>
+Description: check the kwalitee of the CDS Invenio Python code.
+Examples:
+    $ python kwalitee.py ~/src/cds-invenio/
+    $ python kwalitee.py ../../websearch/lib/*.py"""
+    return
+
+def main():
+    """Analyze CLI options and invoke appropriate actions."""
+    if len(sys.argv) < 2:
+        usage()
+        sys.exit(1)
+    first_argument = sys.argv[1]
+    if first_argument.startswith("-h") or first_argument.startswith("--help"):
+        usage()
+        sys.exit(0)
+    elif os.path.isdir(first_argument):
+        modulesdir = first_argument + "/modules"
+        if os.path.isdir(modulesdir):
+            generate_kwalitee_stats_for_all_modules(modulesdir)
+        else:
+            print "ERROR: %s does not seem to be CDS Invenio top source directory." % first_argument
+            usage()
+            sys.exit(0)
+    elif os.path.isfile(first_argument):
+        generate_kwalitee_stats_for_some_files(sys.argv[1:])            
+    else:
+        print "ERROR: don't know what to do with %s." % first_argument
+        usage()
+        sys.exit(1)
+    return
+    
 if __name__ == "__main__":
-    try:
-        modulesdir = sys.argv[1]
-    except IndexError:
-        # we possibly run from miscutil/lib/
-        modulesdir = "../.."
-    main(modulesdir)
+    main()

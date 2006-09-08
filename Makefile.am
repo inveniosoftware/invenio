@@ -52,7 +52,7 @@ regression-test:
 	fi
 
 kwalitee-check:
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)/modules/
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)
 
 install-data-local:
 	for d in / /cache /log /tmp /data /run ; do	\
