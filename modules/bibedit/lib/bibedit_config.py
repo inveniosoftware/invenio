@@ -17,6 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""BibEdit Configuration."""
+
+__revision__ = "$Id$"
+
 ## When a user edits a record, this record is locked to prevent other
 ## users to edit it at the same time.  After how many seconds the
 ## locked record will be again free for other people to edit?
