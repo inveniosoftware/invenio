@@ -19,6 +19,10 @@
 
 """CDS Invenio Search Engine config parameters."""
 
+__revision__ = "$Id$"
+
+# pylint: disable-msg=W0611
+
 ## import config variables defined from config.wml:
 from invenio.config import cfg_max_recID, \
      cfg_instant_browse, \
