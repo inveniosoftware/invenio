@@ -1,6 +1,5 @@
 ## $Id$
-## Administrator interface for BibIndex
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -28,10 +27,9 @@ import urllib
 import time
 import random
 from zlib import compress,decompress
-from mod_python import apache
 
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, escape_string, get_table_status_info
 from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
@@ -217,8 +215,8 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
     for idxID, idxNAME, idxDESC,idxUPD in idx:
-        table_status_forward = get_table_status('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
-        table_status_reverse = get_table_status('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
+        forward_table_status_info = get_table_status_info('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
+        reverse_table_status_info = get_table_status_info('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
         if str(idxUPD)[-3:] == ".00":
             idxUPD = str(idxUPD)[0:-3]
         lang = get_lang_list("idxINDEXNAME", "id_idxINDEX", idxID) 
@@ -233,12 +231,37 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         date = (idxUPD and idxUPD or """<b><span class="info">Not updated</span></b>""")
 
     
-        if table_status_forward and table_status_reverse:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)), "%s MB" % websearch_templates.tmpl_nice_number(table_status_forward[0][5] / 1048576), "%s MB" % websearch_templates.tmpl_nice_number(table_status_reverse[0][5] / 1048576), websearch_templates.tmpl_nice_number(table_status_forward[0][3]), websearch_templates.tmpl_nice_number(table_status_reverse[0][3]), date, fld, lang)
-        elif not table_status_forward:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "Error", "%s MB" % websearch_templates.tmpl_nice_number(table_status_reverse[0][5] / 1048576),"Error", websearch_templates.tmpl_nice_number(table_status_reverse[0][3]), date, "", lang)
-        elif not table_status_reverse:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % (idxID, """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)), "%s MB" % websearch_templates.tmpl_nice_number(table_status_forward[0][5] / 1048576), "Error", websearch_templates.tmpl_nice_number(table_status_forward[0][3]), "Error", date, "", lang)
+        if forward_table_status_info and reverse_table_status_info:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+                      (idxID,
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
+                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0),
+                       "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0),
+                       websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
+                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows']),
+                       date,
+                       fld,
+                       lang)
+        elif not forward_table_status_info:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+                      (idxID,
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0),
+                       "Error",
+                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows']),
+                       date,
+                       "",
+                       lang)
+        elif not reverse_table_status_info:
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+                      (idxID,
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0),
+                       "Error", websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
+                       "Error",
+                       date,
+                       "",
+                       lang)
     output += "</table>"
 
     try:
@@ -1247,14 +1270,6 @@ def compare_on_val(first, second):
     
     return cmp(first[1], second[1])
 
-def get_table_status(tblname):
-    sql = "SHOW TABLE STATUS LIKE '%s'" % tblname
-    try:
-        res = run_sql(sql)
-        return res
-    except StandardError, e:
-        return ""
-
 def get_col_fld(colID=-1, type = '', id_field=''):
     """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
     colID - collection id
@@ -1471,7 +1486,7 @@ def add_idx(idxNAME):
   
         for i in range(1, 100):
             res = run_sql("SELECT id from idxINDEX WHERE id=%s" % i)
-            res2 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%s%%'" % (i < 10 and "0%s" % i or i))
+            res2 = get_table_status_info("idxWORD%s%%" % (i < 10 and "0%s" % i or i))
             if not res and not res2: 
                 idxID = i
                 break
@@ -1513,8 +1528,8 @@ def add_idx(idxNAME):
                          ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
 
         res = run_sql("SELECT id from idxINDEX WHERE id=%s" % idxID)
-        res2 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%sF'" % (idxID < 10 and "0%s" % idxID or idxID))
-        res3 = run_sql("SHOW TABLE STATUS LIKE 'idxWORD%sR'" % (idxID < 10 and "0%s" % idxID or idxID))
+        res2 = get_table_status_info("idxWORD%sF" % (idxID < 10 and "0%s" % idxID or idxID))
+        res3 = get_table_status_info("idxWORD%sR" % (idxID < 10 and "0%s" % idxID or idxID))
         if res and res2 and res3:
             return (1, res[0][0])
         elif not res:
