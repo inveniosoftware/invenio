@@ -29,7 +29,7 @@ __version__ = "$Id$"
 ## import interesting modules:
 try:
     import sys
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, get_table_status_info
     from marshal import loads,dumps
     from zlib import compress,decompress
     from string import split,translate,lower,upper
@@ -50,12 +50,18 @@ except ImportError, e:
     sys.exit(1)
 
 def report_table_status(tablename):
-    """Report stats for the table TABLENAME."""
+    """Report stats for the table TABLENAME.  If TABLENAME does not
+       exists, return empty string.
+    """
     out = ""
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,))
-    for row in res:
-        out += "%14s %17d %17d %17d" % (row[0], row[3], row[5], row[7]) # Name, Rows, Data_length, Max_data_length
-    return out    
+    table_info = get_table_status_info(tablename)
+    if table_info:
+        out =  "%14s %17d %17d %17d" % (table_info['Name'],
+                                        table_info['Rows'],
+                                        table_info['Data_length'],
+                                        table_info['Max_data_length']
+                                        )
+    return out
 
 def report_on_all_bibliographic_tables():
     """Report stats for all the interesting bibliographic tables."""
