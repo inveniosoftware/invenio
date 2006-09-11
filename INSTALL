@@ -392,8 +392,8 @@ Contents
 
               ServerSignature Off
               ServerTokens Prod
-              NameVirtualHost *
-              <VirtualHost *>
+              NameVirtualHost *:80
+              <VirtualHost *:80>
                       ServerName webserver.domain.com
                       ServerAdmin cds.support@cern.ch
                       DocumentRoot /opt/cds-invenio/var/www
