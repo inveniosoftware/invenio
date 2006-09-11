@@ -51,6 +51,9 @@ Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
 
+ - Nikolay Dyankov <ndyankov@gmail.com>
+     XML-based formatting engine, for BibFormat.
+
  - Olivier Serres <olivier.serres@gmail.com>
      External collections searching, for WebSearch.
 
@@ -63,7 +66,7 @@ project.  In an approximate decreasing chronological order:
  - Yohann Paris <paris.yohann@gmail.com>
      BibEdit Admin.
 
- - Paulo Cabral <paulo.cabral@cern.ch>
+ - Paulo Cabral <cabralp@gmail.com>
      WebComment, error library, design of collaborative features.
 
  - Thomas Baron <thomas.baron@cern.ch>
