@@ -24,17 +24,14 @@ Contents
    start installing CDS Invenio:
 
      a) Unix-like operating system.  The main development and
-        production platform for CDS Invenio at CERN is Debian GNU/Linux,
-        but any Unix system supporting the software listed below
-        should do.  Note that localhost should have an MTA running
-        so that CDS Invenio can email notification alerts or registration
-        information to the end users, contact moderators and
-        reviewers of submitted documents, inform administrators about
-        various runtime system information, etc.
+        production platform for CDS Invenio at CERN is Debian
+        GNU/Linux, but we actively develop also on FreeBSD and 
+        Mac OS X.  Basically any Unix system supporting the software
+        listed below should do.
 
         Note that if you are using Debian "Sarge" GNU/Linux, you can
-        install most of the prerequisites and recommendations by
-        running:
+        install most of the below-mentioned prerequisites and
+        recommendations by running:
 
           $ sudo apt-get install libapache2-mod-python2.3 \
               apache2-mpm-prefork mysql-server mysql-client \
@@ -42,14 +39,20 @@ Contents
               rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
 
-        If available, you can also install:
+        You can also install the following packages:
 
           $ sudo apt-get install python2.3-psyco sbcl cmucl 
 
         The last three packages are not available on all Debian
-        "Sarge" GNU/Linux architectures, but they are not required,
-        only recommended, so you can safely continue without them if
-        they are not present on your architecture (e.g. AMD64).
+        "Sarge" GNU/Linux architectures (e.g. not on AMD64), but they
+        are only recommended so you can safely continue without them.
+
+        Note that the web application server should run a Message
+        Transfer Agent (MTA) such as Postfix so that CDS Invenio can
+        email notification alerts or registration information to the
+        end users, contact moderators and reviewers of submitted
+        documents, inform administrators about various runtime system
+        information, etc.
 
      b) MySQL server (may be on a remote machine), and MySQL client
         (must be available locally too).  MySQL versions 4.0.x are
