@@ -17,6 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebSearch module regression tests."""
+
+__revision__ = "$Id$"
+
 import unittest
 import re
 import urlparse, cgi
@@ -25,8 +29,10 @@ from sets import Set
 from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import weburl, cdsname, cdslang
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
-                              make_url, test_web_page_content, merge_error_messages
+from invenio.testutils import make_test_suite, \
+                              warn_user_about_tests_and_run, \
+                              make_url, test_web_page_content, \
+                              merge_error_messages
 from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search
 
@@ -117,11 +123,11 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
     def test_legacy_collections(self):
         """ websearch - collections handle legacy urls """
 
-        b = Browser()
+        browser = Browser()
 
         def check(legacy, new):
-            b.open(legacy)
-            got = b.geturl()
+            browser.open(legacy)
+            got = browser.geturl()
             
             self.failUnless(same_urls_p(got, new), got)
 
@@ -150,11 +156,11 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
     def test_legacy_search(self):
         """ websearch - search queries handle legacy urls """
 
-        b = Browser()
+        browser = Browser()
 
         def check(legacy, new):
-            b.open(legacy)
-            got = b.geturl()
+            browser.open(legacy)
+            got = browser.geturl()
             
             self.failUnless(same_urls_p(got, new), got)
 
@@ -174,11 +180,11 @@ class WebSearchTestRecord(unittest.TestCase):
     def test_format_links(self):
         """ websearch - check format links for records """
 
-        b = Browser()
+        browser = Browser()
 
         # We open the record in all known HTML formats
         for hformat in ('hd', 'hx', 'hm'):
-            b.open(make_url('/record/1', of=hformat))
+            browser.open(make_url('/record/1', of=hformat))
 
             # all except the selected links should be present in the
             # page.
@@ -187,14 +193,14 @@ class WebSearchTestRecord(unittest.TestCase):
                 
                 if oformat == hformat:
                     try:
-                        b.find_link(url=target)
+                        browser.find_link(url=target)
                     except LinkNotFoundError:
                         continue
 
                     self.fail('link %r should not be in page' % target)
                 else:
                     try:
-                        b.find_link(url=target)
+                        browser.find_link(url=target)
                     except LinkNotFoundError:
                         self.fail('link %r should be in page' % target)
                     
@@ -209,11 +215,11 @@ class WebSearchTestCollections(unittest.TestCase):
         # Ensure that it is possible to traverse a collection as
         # /collection/My_Collection?jrec=...
 
-        b = Browser()
+        browser = Browser()
 
         try:
             for as in (0, 1):
-                b.open(make_url('/collection/Preprints', as=as))
+                browser.open(make_url('/collection/Preprints', as=as))
 
                 for jrec in (11, 21, 11, 23):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
@@ -221,21 +227,21 @@ class WebSearchTestCollections(unittest.TestCase):
                         args['as'] = as
                         
                     url = make_url('/search', **args)
-                    b.follow_link(url=url)
+                    browser.follow_link(url=url)
                     
         except LinkNotFoundError:
-            self.fail('no link %r in %r' % (url, b.geturl()))
+            self.fail('no link %r in %r' % (url, browser.geturl()))
             
     def test_collections_links(self):
         """ websearch - enter in collections and subcollections """
 
-        b = Browser()
+        browser = Browser()
 
         def tryfollow(url):
-            cur = b.geturl()
-            body = b.response().read()
+            cur = browser.geturl()
+            body = browser.response().read()
             try:
-                b.follow_link(url=url)
+                browser.follow_link(url=url)
             except LinkNotFoundError:
                 print body
                 self.fail("in %r: could not find %r" % (
@@ -243,17 +249,20 @@ class WebSearchTestCollections(unittest.TestCase):
             return
 
         for as in (0, 1):
-            if as: kargs = {'as': 1}
-            else:  kargs = {}
+            if as:
+                kargs = {'as': 1}
+            else:
+                kargs = {}
                 
             # We navigate from immediate son to immediate son...
-            b.open(make_url('/', **kargs))
-            tryfollow(make_url('/collection/Articles%20%26%20Preprints', **kargs))
+            browser.open(make_url('/', **kargs))
+            tryfollow(make_url('/collection/Articles%20%26%20Preprints',
+                               **kargs))
             tryfollow(make_url('/collection/Articles', **kargs))
 
             # But we can also jump to a grandson immediately
-            b.back()
-            b.back()
+            browser.back()
+            browser.back()
             tryfollow(make_url('/collection/ALEPH', **kargs))
 
         return
@@ -261,8 +270,8 @@ class WebSearchTestCollections(unittest.TestCase):
     def test_records_links(self):
         """ websearch - check the links toward records in leaf collections """
         
-        b = Browser()
-        b.open(make_url('/collection/Preprints'))
+        browser = Browser()
+        browser.open(make_url('/collection/Preprints'))
 
         def harvest():
 
@@ -273,7 +282,7 @@ class WebSearchTestCollections(unittest.TestCase):
             records = Set()
             similar = Set()
             
-            for link in b.links():
+            for link in browser.links():
                 path, q = parse_url(link.url)
 
                 if not path:
@@ -300,8 +309,8 @@ class WebSearchTestCollections(unittest.TestCase):
 
         # When clicking on the "Search" button, we must also have
         # these 10 links on the records.
-        b.select_form(name="search")
-        b.submit()
+        browser.select_form(name="search")
+        browser.submit()
 
         found = harvest()
         self.failUnlessEqual(len(found), 10)
@@ -313,22 +322,23 @@ class WebSearchTestBrowse(unittest.TestCase):
     def test_browse_field(self):
         """ websearch - check that browsing works """
 
-        b = Browser()
-        b.open(make_url('/'))
+        browser = Browser()
+        browser.open(make_url('/'))
 
-        b.select_form(name='search')
-        b['f'] = ['title']
-        b.submit(name='action_browse')
+        browser.select_form(name='search')
+        browser['f'] = ['title']
+        browser.submit(name='action_browse')
 
         def collect():
             # We'll get a few links to search for the actual hits, plus a
             # link to the following results.
             res = []
-            for link in b.links(url_regex=re.compile(weburl + r'/search\?')):
+            for link in browser.links(url_regex=re.compile(weburl +
+                                                           r'/search\?')):
                 if link.text == 'Advanced Search':
                     continue
             
-                path, q = parse_url(link.url)
+                dummy, q = parse_url(link.url)
                 res.append((link, q))
 
             return res
@@ -337,7 +347,7 @@ class WebSearchTestBrowse(unittest.TestCase):
         # batch. There is an overlap of one item.
         batch_1 = collect()
 
-        b.follow_link(link=batch_1[-1][0])
+        browser.follow_link(link=batch_1[-1][0])
 
         batch_2 = collect()
 
@@ -351,20 +361,20 @@ class WebSearchTestSearch(unittest.TestCase):
     def test_hits_in_other_collection(self):
         """ websearch - check extension of a query to the home collection """
 
-        b = Browser()
+        browser = Browser()
         
         # We do a precise search in an isolated collection
-        b.open(make_url('/collection/ISOLDE', ln='en'))
+        browser.open(make_url('/collection/ISOLDE', ln='en'))
         
-        b.select_form(name='search')
-        b['f'] = ['author']
-        b['p'] = 'matsubara'
-        b.submit()
+        browser.select_form(name='search')
+        browser['f'] = ['author']
+        browser['p'] = 'matsubara'
+        browser.submit()
 
-        path, current_q = parse_url(b.geturl())
+        dummy, current_q = parse_url(browser.geturl())
         
-        link = b.find_link(text_regex=re.compile('.*hit', re.I))
-        path, target_q = parse_url(link.url)
+        link = browser.find_link(text_regex=re.compile('.*hit', re.I))
+        dummy, target_q = parse_url(link.url)
 
         # the target query should be the current query without any c
         # or cc specified.
@@ -377,15 +387,15 @@ class WebSearchTestSearch(unittest.TestCase):
     def test_nearest_terms(self):
         """ websearch - provide a list of nearest terms """
         
-        b = Browser()
-        b.open(make_url(''))
+        browser = Browser()
+        browser.open(make_url(''))
 
         # Search something weird
-        b.select_form(name='search')
-        b['p'] = 'gronf'
-        b.submit()
+        browser.select_form(name='search')
+        browser['p'] = 'gronf'
+        browser.submit()
 
-        path, original = parse_url(b.geturl())
+        dummy, original = parse_url(browser.geturl())
         
         for to_drop in ('cc', 'action_search', 'f'):
             if to_drop in original:
@@ -397,11 +407,11 @@ class WebSearchTestSearch(unittest.TestCase):
         if 'cc' in original:
             del original['cc']
         
-        for link in b.links(url_regex=re.compile(weburl + r'/search\?')):
+        for link in browser.links(url_regex=re.compile(weburl + r'/search\?')):
             if link.text == 'Advanced Search':
                 continue
             
-            path, target = parse_url(link.url)
+            dummy, target = parse_url(link.url)
 
             original['p'] = [link.text]
             self.failUnlessEqual(original, target)
@@ -411,56 +421,60 @@ class WebSearchTestSearch(unittest.TestCase):
     def test_switch_to_simple_search(self):
         """ websearch - switch to simple search """
         
-        b = Browser()
-        b.open(make_url('/collection/ISOLDE', as=1))
+        browser = Browser()
+        browser.open(make_url('/collection/ISOLDE', as=1))
 
-        b.select_form(name='search')
-        b['p1'] = 'tandem'
-        b['f1'] = ['title']
-        b.submit()
+        browser.select_form(name='search')
+        browser['p1'] = 'tandem'
+        browser['f1'] = ['title']
+        browser.submit()
 
-        b.follow_link(text='Simple Search')
+        browser.follow_link(text='Simple Search')
 
-        path, q = parse_url(b.geturl())
+        dummy, q = parse_url(browser.geturl())
 
-        self.failUnlessEqual(q, {'cc': ['ISOLDE'], 'p': ['tandem'], 'f': ['title']})
-
+        self.failUnlessEqual(q, {'cc': ['ISOLDE'],
+                                 'p': ['tandem'],
+                                 'f': ['title']})
         
     def test_switch_to_advanced_search(self):
         """ websearch - switch to advanced search """
         
-        b = Browser()
-        b.open(make_url('/collection/ISOLDE'))
+        browser = Browser()
+        browser.open(make_url('/collection/ISOLDE'))
 
-        b.select_form(name='search')
-        b['p'] = 'tandem'
-        b['f'] = ['title']
-        b.submit()
+        browser.select_form(name='search')
+        browser['p'] = 'tandem'
+        browser['f'] = ['title']
+        browser.submit()
 
-        b.follow_link(text='Advanced Search')
+        browser.follow_link(text='Advanced Search')
 
-        path, q = parse_url(b.geturl())
+        dummy, q = parse_url(browser.geturl())
 
-        self.failUnlessEqual(q, {'cc': ['ISOLDE'], 'p1': ['tandem'], 'f1': ['title'], 'as': ['1']})
+        self.failUnlessEqual(q, {'cc': ['ISOLDE'],
+                                 'p1': ['tandem'],
+                                 'f1': ['title'],
+                                 'as': ['1']})
         
     def test_no_boolean_hits(self):
         """ websearch - check the 'no boolean hits' proposed links """
         
-        b = Browser()
-        b.open(make_url(''))
+        browser = Browser()
+        browser.open(make_url(''))
 
-        b.select_form(name='search')
-        b['p'] = 'quasinormal muon'
-        b.submit()
+        browser.select_form(name='search')
+        browser['p'] = 'quasinormal muon'
+        browser.submit()
 
-        path, q = parse_url(b.geturl())
+        dummy, q = parse_url(browser.geturl())
 
         for to_drop in ('cc', 'action_search', 'f'):
             if to_drop in q:
                 del q[to_drop]
         
         for bsu in ('quasinormal', 'muon'):
-            l = b.find_link(text=bsu)
+            l = browser.find_link(text=bsu)
             q['p'] = bsu
 
             if not same_urls_p(l.url, make_url('/search', **q)):
@@ -469,16 +483,20 @@ class WebSearchTestSearch(unittest.TestCase):
     def test_similar_authors(self):
         """ websearch - test similar authors box """
 
-        b = Browser()
-        b.open(make_url(''))
+        browser = Browser()
+        browser.open(make_url(''))
 
-        b.select_form(name='search')
-        b['p'] = 'Ellis, R K'
-        b['f'] = ['author']
-        b.submit()
+        browser.select_form(name='search')
+        browser['p'] = 'Ellis, R K'
+        browser['f'] = ['author']
+        browser.submit()
 
-        l = b.find_link(text="Ellis, R S")
-        self.failUnless(same_urls_p(l.url, make_url('/search', p="Ellis, R S", f='author')))
+        l = browser.find_link(text="Ellis, R S")
+        self.failUnless(same_urls_p(l.url, make_url('/search',
+                                                    p="Ellis, R S",
+                                                    f='author')))
+
+# pylint: disable-msg=C0301
 
 class WebSearchNearestTermsTest(unittest.TestCase):
     """Check various alternatives of searches leading to the nearest
