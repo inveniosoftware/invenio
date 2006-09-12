@@ -2982,14 +2982,19 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         if of == "hb":
             of = "hd"
         if record_exists(recid):
-            if recidb<=recid: # sanity check
-                recidb=recid+1
-            print_records(req, range(recid,recidb), -1, -9999, of, ot, ln, search_pattern=p)
+            if recidb <= recid: # sanity check
+                recidb = recid + 1
+            if of == "id":
+                return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
+            else:
+                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p)
             if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                 register_page_view_event(recid, uid, client_ip_address)
         else: # record does not exist
-            if of.startswith("h"):
+            if of == "id":
+                return []
+            elif of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
     elif action == "browse":
         ## 2 - browse needed
