@@ -49,7 +49,7 @@ except:
 # Functions to format a single record 
 ##
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None):
+def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None, on_the_fly=False):
     """
     Formats a record given output format.
     
@@ -74,27 +74,31 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     @param search_pattern list of strings representing the user request in web interface
     @param xml_record an xml string represention of the record to format
     @param uid the user id of the person who will view the formatted page (if applicable)
+    @param on_the_fly if False, try to return an already preformatted version of the record in the database
     @return formatted record
     """
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     if use_old_bibformat and php:
         return bibformat_engine.call_old_bibformat(recID, format=of)
     ############################# END ##################################
-    return bibformat_engine.format_record(recID=recID,
-                                          of=of,
-                                          ln=ln,
-                                          verbose=verbose,
-                                          search_pattern=search_pattern,
-                                          xml_record=xml_record,
-                                          uid=uid)
+
+    if on_the_fly == False:
+	# Try to fetch preformatted record
+        out = bibformat_dblayer.get_preformatted_record(recID, of)
+        if out != None:
+            # record 'recID' is formatted in 'of', so return it
+            return out
+
+    # Live formatting of records in all other cases
     try:
-        return bibformat_engine.format_record(recID=recID,
-                                              of=of,
-                                              ln=ln,
-                                              verbose=verbose,
-                                              search_pattern=search_pattern,
-                                              xml_record=xml_record,
-                                              uid=uid)
+        out = bibformat_engine.format_record(recID=recID,
+					     of=of,
+					     ln=ln,
+					     verbose=verbose,
+					     search_pattern=search_pattern,
+					     xml_record=xml_record,
+					     uid=uid)
+        return out
     except:
         #Failsafe execution mode
         if of == 'hd':
@@ -128,7 +132,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     @param recID the id of the record to retrieve
     @return the xml string of the record
     """
-    return bibformat_utils.record_get_xml(recID=recID, format=format)
+    return bibformat_utils.record_get_xml(recID=recID, format=format, decompress=decompress)
 
 # Helper functions to do complex formatting of multiple records
 #
@@ -139,7 +143,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 
 def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_records=None, uid=None,
                    record_prefix=None, record_separator=None, record_suffix=None,
-                   prologue="", epilogue="", req=None):
+                   prologue="", epilogue="", req=None, on_the_fly=False):
     """
     Returns a list of formatted records given by a list of record IDs or a list of records as xml.
     Adds a prefix before each record, a suffix after each record, plus a separator between records.
@@ -168,6 +172,7 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
     @param header a string printed before all formatted records
     @param separator either a string or a function that returns string to separate formatted records
     @param req an optional request object where to print records
+    @param on_the_fly if False, try to return an already preformatted version of the record in the database
     """
     if req != None:
         req.write(prologue)
@@ -199,7 +204,7 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
                     req.write(string_prefix)
 
         #Print formatted record
-        formatted_record = format_record(recIDs[i], of, ln, verbose, search_pattern, xml_records[i], uid)
+        formatted_record = format_record(recIDs[i], of, ln, verbose, search_pattern, xml_records[i], uid, on_the_fly)
         formatted_records += formatted_record
         if req != None:
             req.write(formatted_record)

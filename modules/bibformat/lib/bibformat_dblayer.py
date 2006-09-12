@@ -21,19 +21,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MySQLdb import escape_string
-#from time import localtime, mktime
 from invenio.config import *
 from invenio.dbquery import run_sql
+import zlib
 
 #Cache the mapping name -> id for each kb
 kb_id_name_cache = {}
-#from invenio.webmessage_config import cfg_webmessage_status_code, \
-#                                      cfg_webmessage_max_nb_of_messages, \
-#                                      cfg_webmessage_roles_without_quota, \
-#                                      cfg_webmessage_days_before_delete_orphans
-#from invenio.dateutils import datetext_default, \
- #                             convert_datestruct_to_datetext
-#from invenio.webuser import list_users_in_roles
 
 ## MARC-21 tag/field access functions
 def get_fieldvalues(recID, tag):
@@ -547,6 +540,27 @@ def change_output_format_code(old_code, new_code):
     
     query = "UPDATE format SET code='%s' WHERE id='%s'"%(new_code, id)
     run_sql(query)
+    
+def get_preformatted_record(recID, of, decompress=zlib.decompress):
+    """
+    Returns the preformatted record with id 'recID' and format 'of'
+    
+    If corresponding record does not exist for given output format,
+    returns None
+
+    @param recID the id of the record to fetch
+    @param of the output format code
+    @param decompress the method used to decompress the preformatted record in database
+    @return formatted record as String, or None if not exist
+    """
+    # Try to fetch preformatted record
+    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
+    res = run_sql(query)
+    if res:
+	# record 'recID' is formatted in 'of', so return it
+	return "%s" % decompress(res[0][0])
+    else:
+	return None
     
 ## def keep_formats_in_db(output_formats):
 ##     """
