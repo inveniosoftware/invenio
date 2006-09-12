@@ -74,10 +74,10 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         return
     
     def __call__(self, req, form):
-        args = wash_search_urlargd(form)
-        args['recid'] = self.recid
+        argd = wash_search_urlargd(form)
+        argd['recid'] = self.recid
 
-        req.argd = args
+        req.argd = argd
 
         from invenio.webuser import getUid, page_not_authorized
 
@@ -85,7 +85,12 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if uid == -1:
             return page_not_authorized(req, "../")
         
-        return search_engine.perform_request_search(req, **args) 
+        # mod_python does not like to return [] in case when of=id:
+        out = search_engine.perform_request_search(req, **argd)
+        if out == []:
+            return str(out)
+        else:
+            return out
 
     # Return the same page wether we ask for /record/123 or /record/123/
     index = __call__
@@ -115,17 +120,21 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
         req.argd = argd
-        
-        return search_engine.perform_request_search(req, **argd) 
 
+        # mod_python does not like to return [] in case when of=id:
+        out = search_engine.perform_request_search(req, **argd)
+        if out == []:
+            return str(out)
+        else:
+            return out
         
     def cache(self, req, form):
-        args = wash_urlargd(form, {'action': (str, 'show')})
-        return search_engine.perform_request_cache(req, action=args['action'])
+        argd = wash_urlargd(form, {'action': (str, 'show')})
+        return search_engine.perform_request_cache(req, action=argd['action'])
     
     def log(self, req, form):
-        args = wash_urlargd(form, {'date': (str, '')})
-        return search_engine.perform_request_log(req, date=args['date'])
+        argd = wash_urlargd(form, {'date': (str, '')})
+        return search_engine.perform_request_log(req, date=argd['date'])
 
 
     def authenticate(self, req, form):
@@ -146,9 +155,12 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # search_engine itself to derivate other queries
         req.argd = argd
 
-        return search_engine.perform_request_search(req, **argd) 
-        
-        
+        # mod_python does not like to return [] in case when of=id:
+        out = search_engine.perform_request_search(req, **argd)
+        if out == []:
+            return str(out)
+        else:
+            return out                
 
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
@@ -179,17 +191,17 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 # Accessing collections: this is for accessing the
                 # cached page on top of each collection.
 
-                args = wash_urlargd(form, search_interface_default_urlargd)
+                argd = wash_urlargd(form, search_interface_default_urlargd)
 
                 # We simply return the cached page of the collection
-                args['c'] = c
+                argd['c'] = c
 
-                if not args['c']:
+                if not argd['c']:
                     # collection argument not present; display
                     # home collection by default
-                    args['c'] = cdsname
+                    argd['c'] = cdsname
                     
-                return display_collection(req, **args)
+                return display_collection(req, **argd)
         
             return answer, []
 
@@ -217,42 +229,42 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
     
     def legacy_collection(self, req, form):
-        args = wash_urlargd(form, legacy_collection_default_urlargd)
+        argd = wash_urlargd(form, legacy_collection_default_urlargd)
 
         # If we specify no collection, then we don't need to redirect
         # the user, so that accessing <http://yoursite/> returns the
         # default collection.
         if not form.has_key('c'):
-            return display_collection(req, ** args)
+            return display_collection(req, **argd)
         
         # make the collection an element of the path, and keep the
         # other query elements as is. If the collection is cdsname,
         # however, redirect to the main URL.
-        c = args['c']
-        del args['c']
+        c = argd['c']
+        del argd['c']
 
         if c == cdsname:
             target = '/'
         else:
             target = '/collection/' + quote(c)
 
-        target += make_canonical_urlargd(args, legacy_collection_default_urlargd)
+        target += make_canonical_urlargd(argd, legacy_collection_default_urlargd)
         return redirect_to_url(req, target)
 
 
     def legacy_search(self, req, form):
-        args = wash_search_urlargd(form)
+        argd = wash_search_urlargd(form)
 
         # We either jump into the generic search form, or the specific
         # /record/... display if a recid is requested
-        if args['recid'] != -1:
-            target = '/record/%d' % args['recid']
-            del args['recid']
+        if argd['recid'] != -1:
+            target = '/record/%d' % argd['recid']
+            del argd['recid']
             
         else:
             target = '/search'
 
-        target += make_canonical_urlargd(args, search_results_default_urlargd)
+        target += make_canonical_urlargd(argd, search_results_default_urlargd)
         return redirect_to_url(req, target)
         
 
