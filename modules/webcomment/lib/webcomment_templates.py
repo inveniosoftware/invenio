@@ -249,6 +249,9 @@ class Template:
         write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=_("Write a review"))
 
         if nb_comments_total > 0:
+            avg_score_img = str(avg_score_img)
+            avg_score = str(avg_score)
+            nb_comments_total = str(nb_comments_total)
             score = '<b>'
             score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
@@ -329,7 +332,9 @@ class Template:
             links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
         out += """
 <div style="margin-bottom: 20px;">%(title)s<br />
+    <blockquote>
 %(body)s
+    </blockquote>
 <br />
 %(links)s
 </div>""" % \
@@ -392,7 +397,7 @@ class Template:
                'title'         : title,
                'reviewed_label': reviewed_label,
                'useful_label'  : useful_label,
-               'body'          : body,
+               'body'          : email_quoted_txt2html(body),
                'abuse'         : links
                }
         return out
