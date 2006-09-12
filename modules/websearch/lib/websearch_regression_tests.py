@@ -28,6 +28,7 @@ from invenio.config import weburl, cdsname, cdslang
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               make_url, test_web_page_content, merge_error_messages
 from invenio.urlutils import same_urls_p
+from invenio.search_engine import perform_request_search
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -584,6 +585,68 @@ class WebSearchAuthorQueryTest(unittest.TestCase):
             self.fail("Should not propose similar author names box.")
         return
 
+class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
+    """Check typical search engine Python API calls on the demo data."""
+
+    def test_search_engine_python_api_for_failed_query(self):
+        """websearch - search engine Python API for failed query"""
+        self.assertEqual([],
+                         perform_request_search(p='aoeuidhtns'))        
+
+    def test_search_engine_python_api_for_successful_query(self):
+        """websearch - search engine Python API for successful query"""
+        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+                         perform_request_search(p='ellis'))
+
+    def test_search_engine_python_api_for_existing_record(self):
+        """websearch - search engine Python API for existing record"""
+        self.assertEqual([8],
+                         perform_request_search(recid=8))
+
+    def test_search_engine_python_api_for_unexisting_record(self):
+        """websearch - search engine Python API for unexisting record"""
+        self.assertEqual([],
+                         perform_request_search(recid=1234567809))
+
+    def test_search_engine_python_api_for_range_of_records(self):
+        """websearch - search engine Python API for range of records"""
+        self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9],
+                         perform_request_search(recid=1, recidb=10))
+
+class WebSearchSearchEngineWebAPITest(unittest.TestCase):
+    """Check typical search engine Web API calls on the demo data."""
+
+    def test_search_engine_web_api_for_failed_query(self):
+        """websearch - search engine Web API for failed query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=aoeuidhtns&of=id',
+                                               expected_text="[]"))
+        
+
+    def test_search_engine_web_api_for_successful_query(self):
+        """websearch - search engine Web API for successful query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellis&of=id',
+                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+
+    def test_search_engine_web_api_for_existing_record(self):
+        """websearch - search engine Web API for existing record"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?recid=8&of=id',
+                                               expected_text="[8]"))
+
+    def test_search_engine_web_api_for_unexisting_record(self):
+        """websearch - search engine Web API for unexisting record"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?recid=123456789&of=id',
+                                               expected_text="[]"))
+
+    def test_search_engine_web_api_for_range_of_records(self):
+        """websearch - search engine Web API for range of records"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?recid=1&recidb=10&of=id',
+                                               expected_text="[1, 2, 3, 4, 5, 6, 7, 8, 9]"))
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -592,7 +655,9 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestLegacyURLs,
                              WebSearchNearestTermsTest,
                              WebSearchBooleanQueryTest,
-                             WebSearchAuthorQueryTest)
+                             WebSearchAuthorQueryTest,
+                             WebSearchSearchEnginePythonAPITest,
+                             WebSearchSearchEngineWebAPITest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
