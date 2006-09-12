@@ -213,7 +213,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
     modulenames = get_invenio_modulenames(modulesdir)
     if "websearch" not in modulenames:
         print "Cannot find CDS Invenio modules in %s." % modulesdir
-        print "Usage: python kwalitee.py [modulesdir]."
+        usage()
         sys.exit(1)
     # print header
     print "="*80
