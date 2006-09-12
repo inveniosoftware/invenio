@@ -24,11 +24,7 @@
        websearch_external_collections_page_getter_tests.py
 """
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 import unittest
 
@@ -49,7 +45,7 @@ def download_and_parse():
     external_collections = external_collections_dictionary.values()
     urls = [engine.build_search_url(test) for engine in external_collections]
     pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
-    finished_list = async_download(pagegetters, None, None, 30)
+    dummy = async_download(pagegetters, None, None, 30)
 
     for (page, engine, url) in zip(pagegetters, external_collections, urls):
         if not url:

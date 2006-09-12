@@ -20,11 +20,7 @@
 
 """CDS Invenio external search Engines."""
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 import urllib
 

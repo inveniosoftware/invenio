@@ -25,11 +25,7 @@ Each parser try to extract results from a web page returned by an external searc
 engine.
 """
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 import re
 from invenio.websearch_external_collections_config import cfg_external_collection_maxresults

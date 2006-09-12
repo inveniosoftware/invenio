@@ -20,11 +20,7 @@
 
 """Template for the external collections search."""
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language

@@ -21,11 +21,7 @@
 """External collection 'core' file.
     Perform search, database access."""
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 from copy import copy
 from sets import Set
@@ -63,7 +59,7 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     basic_search_units = create_basic_search_units(None, pattern, field)
     vprint(3, 'basic_search_units = ' + str(basic_search_units))
 
-    (search_engines, seealso_engines) = select_external_engines(basic_search_units, current_collection, external_collection)
+    (search_engines, seealso_engines) = select_external_engines(current_collection, external_collection)
     vprint(3, 'search_engines = ' + str(search_engines))
     vprint(3, 'seealso_engines = ' + str(seealso_engines))
 
@@ -131,7 +127,7 @@ def build_seealso_links(basic_search_units, seealso_engines, lang, query):
     return links
 
 # Selection
-def select_external_engines(basic_search_units, collection_name, selected_external_searches):
+def select_external_engines(collection_name, selected_external_searches):
     """Build a tuple of two sets. The first one is the list of engine to use for an external search and the
     second one is for the seealso box."""
 
@@ -157,7 +153,7 @@ def select_external_engines(basic_search_units, collection_name, selected_extern
             if engine.parser:
                 search_engines.add(engine)
         else:
-            warning('select_external_engines: %(ext_search_name)s unknow.' % locals())
+            warning('select_external_engines: %(ext_search_name)s unknown.' % locals())
 
     seealso_engines = seealso_engines.difference(search_engines)
 

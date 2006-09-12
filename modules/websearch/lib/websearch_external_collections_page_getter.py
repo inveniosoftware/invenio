@@ -43,11 +43,7 @@ pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
 async_download(pagegetters, func, ['info1', 'info2'], 10)
 """
 
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
-
-__revision__ = "0.0.1"
+__revision__ = "$Id$"
 
 import asyncore
 import mimetools
