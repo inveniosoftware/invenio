@@ -55,26 +55,18 @@ Contents
         information, etc.
 
      b) MySQL server (may be on a remote machine), and MySQL client
-        (must be available locally too).  MySQL versions 4.0.x are
-        recommended, versions above 4.1.0 may cause troubles.
-        Please set the variable ``max_allowed_packet'' in your
-        ``my.cnf'' init file to at least 4M.
-          <http://mysql.com/>
+        (must be available locally too).  MySQL versions 4.1 or 5.0
+        are recommended, because some parts of the CDS Invenio code
+        use SQL features not present in MySQL 4.0.  Please set the
+        variable ``max_allowed_packet'' in your ``my.cnf'' init file
+        to at least 4M.
+           <http://mysql.com/>
 
      c) Apache 2 server, with support for loading DSO modules, and
         optionally with SSL support for HTTPS-secure user
         authentication.  Tested mainly with version 2.0.43 and above.
         Apache 2.x is required for the mod_python module (see below).
           <http://httpd.apache.org/>
-
-        Note for FreeBSD users: Thierry Thomas <thierry@FreeBSD.org>
-        reports troubles with Python open() in the Apache 2 and
-        mod_python context.  The solution is either (1) to compile
-        Apache 2 with --enable-threads (the port has a knob
-        WITH_THREADS to do that); or (2) to add the two following two
-        lines in Apache's envvars file:
-          LD_PRELOAD=/usr/lib/libc_r.so  # or libpthread.so
-          export LD_PRELOAD
 
      d) Python v2.3 or above:
          <http://python.org/>
