@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -17,11 +17,19 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibindex_engine_config import *
+"""BibIndex engine stemmer facility."""
+
+__revision__ = "$Id$"
+
+from invenio.config import cfg_bibindex_stemmer_default_language
 
 def create_stemmers():
     """Create stemmers dictionary for all possible languages."""
-    languages = {'fr': 'french', 'en': 'english', 'no':'norwegian', 'sv':'swedish', 'de': 'german', 'it':'italian', 'pt':'portuguese'}
+
+    languages = {'fr': 'french', 'en': 'english', 'no':'norwegian',
+                 'sv':'swedish', 'de': 'german', 'it':'italian',
+                 'pt':'portuguese'}
+
     stemmers_initialized = {}
     try:
         import Stemmer

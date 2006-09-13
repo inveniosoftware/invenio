@@ -46,14 +46,14 @@ from invenio.search_engine import perform_request_search, strip_accents, HitSet
 from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibindex_engine_config import conv_programs, conv_programs_helpers
+from invenio.bibindex_engine_config import CONV_PROGRAMS, CONV_PROGRAMS_HELPERS
 
 options = {} # global variable to hold task options
 
 ## safety parameters concerning DB thread-multiplication problem:
-cfg_check_mysql_threads = 0 # to check or not to check the problem? 
-cfg_max_mysql_threads = 50 # how many threads (connections) we consider as still safe
-cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping for more than X seconds
+CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem? 
+CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we consider as still safe
+CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping for more than X seconds
 
 ## override urllib's default password-asking behaviour:
 class MyFancyURLopener(urllib.FancyURLopener):
@@ -95,7 +95,7 @@ def dict_union(list1, list2):
     return union_dict
 
 ## safety function for killing slow DB threads:
-def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=cfg_mysql_thread_timeout):
+def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=CFG_MYSQL_THREAD_TIMEOUT):
     """Check the number of DB threads and if there are more than
        MAX_THREADS of them, lill all threads that are in a sleeping
        state for more than THREAD_TIMEOUT seconds.  (This is useful
@@ -518,7 +518,7 @@ class WordTable:
                 if options["verbose"]:
                     write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
-                if cfg_check_mysql_threads:
+                if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
                 task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
 		self.del_recID_range(i_low, i_high)

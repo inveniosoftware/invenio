@@ -24,6 +24,8 @@
 BibIndex indexing engine implementation.  See bibindex executable for entry point.
 """
 
+__revision__ = "$Id$"
+
 import marshal
 from zlib import compress,decompress
 import string
@@ -126,7 +128,7 @@ def list_union(list1, list2):
     return union_dict.keys()
 
 ## safety function for killing slow DB threads:
-def kill_sleepy_mysql_threads(max_threads=cfg_max_mysql_threads, thread_timeout=cfg_mysql_thread_timeout):
+def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=CFG_MYSQL_THREAD_TIMEOUT):
     """Check the number of DB threads and if there are more than
        MAX_THREADS of them, lill all threads that are in a sleeping
        state for more than THREAD_TIMEOUT seconds.  (This is useful
@@ -205,10 +207,10 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
        probable fulltexts.
        Returns an array of (ext,url_direct) to fulltexts.
        Note: it looks for file format extensions as defined by global
-       'conv_programs'structure.
+       'CONV_PROGRAMS'structure.
        """
     out = []
-    for ext in conv_programs.keys():
+    for ext in CONV_PROGRAMS.keys():
         expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
                            ext + r")\"") 
         match =  expr.search(htmlpagebody)
@@ -235,7 +237,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
        presents the links to be indexed.  In the latter case the
        URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
        to fulltext documents, for all knows file extensions as
-       specified by global conv_programs config variable.   
+       specified by global CONV_PROGRAMS config variable.   
     """
 
     if cfg_bibindex_fulltext_index_local_files_only and string.find(url_direct_or_indirect, weburl) < 0:
@@ -250,7 +252,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         # check for direct link in url
         url_direct_or_indirect_ext = lower(split(url_direct_or_indirect,".")[-1])
 
-        if url_direct_or_indirect_ext in conv_programs.keys():
+        if url_direct_or_indirect_ext in CONV_PROGRAMS.keys():
             fulltext_urls = [(url_direct_or_indirect_ext,url_direct_or_indirect)]
 
         # Indirect url. Try to fetch the real fulltext(s)
@@ -295,7 +297,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # try all available conversion programs according to their order:
         bingo = 0
-        for conv_program in conv_programs[ext]:
+        for conv_program in CONV_PROGRAMS[ext]:
             if os.path.exists(conv_program):
                 # intelligence on how to run various conversion programs:
                 cmd = ""  # wil keep command to run
@@ -305,18 +307,18 @@ def get_words_from_fulltext(url_direct_or_indirect,
                 elif os.path.basename(conv_program) == "pstotext":
                     if ext == "ps.gz":
                         # is there gzip available?                        
-                        if os.path.exists(conv_programs_helpers["gz"]): 
+                        if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]): 
                             cmd = "%s -cd %s | %s > %s.txt" \
-                                  % (conv_programs_helpers["gz"], tmp_name, conv_program, tmp_name)
+                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_name)
                     else:
                         cmd = "%s %s > %s.txt" \
                               % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "ps2ascii":
                     if ext == "ps.gz":
                          # is there gzip available?                        
-                        if os.path.exists(conv_programs_helpers["gz"]):
+                        if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
                             cmd = "%s -cd %s | %s > %s.txt"\
-                                  % (conv_programs_helpers["gz"], tmp_name,
+                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name,
                                      conv_program, tmp_name)
                     else:
                         cmd = "%s %s %s.txt" \
@@ -329,19 +331,19 @@ def get_words_from_fulltext(url_direct_or_indirect,
                     cmd = "%s %s %s.txt" % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "ppthtml":
                     # is there html2text available?
-                    if os.path.exists(conv_programs_helpers["html"]): 
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]): 
                         cmd = "%s %s | %s > %s.txt"\
                               % (conv_program, tmp_name,
-                                 conv_programs_helpers["html"], tmp_name)
+                                 CONV_PROGRAMS_HELPERS["html"], tmp_name)
                     else:
                         cmd = "%s %s > %s.txt" \
                               % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "xlhtml":
                     # is there html2text available?
-                    if os.path.exists(conv_programs_helpers["html"]): 
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]): 
                         cmd = "%s %s | %s > %s.txt" % \
                               (conv_program, tmp_name,
-                               conv_programs_helpers["html"], tmp_name)
+                               CONV_PROGRAMS_HELPERS["html"], tmp_name)
                     else:
                         cmd = "%s %s > %s.txt" % \
                               (conv_program, tmp_name, tmp_name)
@@ -919,7 +921,7 @@ class WordTable:
                 if options["verbose"]:
                     write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
-                if cfg_check_mysql_threads:
+                if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
                 task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
                 self.del_recID_range(i_low, i_high)
@@ -1015,7 +1017,7 @@ class WordTable:
                     # (directly for Indico, indirectly for Setlink).                    
                     filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
                     filename_extension = string.lower(string.split(filename, ".")[-1])
-                    if filename_extension in conv_programs.keys():
+                    if filename_extension in CONV_PROGRAMS.keys():
                         new_words = get_words_function(phrase, force_file_extension=filename_extension) # ,self.separators
                     else:
                         new_words = get_words_function(phrase) # ,self.separators
@@ -1462,7 +1464,7 @@ def command_line():
             if opt == ("-h","")  or opt == ("--help",""):
                 usage(1)
             elif opt == ("-V","")  or opt == ("--version",""):
-                print bibindex_engine_version
+                print BIBINDEX_ENGINE_VERSION
                 sys.exit(1)
             elif opt[0] in ["--verbose", "-v"]:
                 options["verbose"] = int(opt[1])

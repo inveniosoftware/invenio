@@ -1,6 +1,5 @@
 ## $Id$
-## BibIndex stopwords facility.
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -18,21 +17,24 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import string
+"""BibIndex engine stopwords facility."""
 
-from invenio.bibindex_engine_config import *
+__revision__ = "$Id$"
+
+from invenio.config import cfg_bibindex_path_to_stopwords_file, \
+     cfg_bibindex_remove_stopwords
 
 def create_stopwords(filename=cfg_bibindex_path_to_stopwords_file):
     """Create stopword dictionary out of FILENAME."""
     try:
-        filename = open(filename, 'r')
-    except:
+        file_descriptor = open(filename, 'r')
+    except IOError:
         return {}
-    lines = filename.readlines()
-    filename.close()
+    lines = file_descriptor.readlines()
+    file_descriptor.close()
     stopdict  = {}
     for line in lines:
-       stopdict[string.rstrip(line)] = 1
+        stopdict[line.rstrip()] = 1
     return stopdict
 
 stopwords = create_stopwords()
@@ -46,6 +48,7 @@ def is_stopword(word, force_check=0):
        useful for ranking.
     """    
     # note: input word is assumed to be in lowercase
-    if (cfg_bibindex_remove_stopwords or force_check) and stopwords.has_key(word):
+    if (cfg_bibindex_remove_stopwords or force_check) and \
+           stopwords.has_key(word):
         return True
     return False

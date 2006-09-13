@@ -23,21 +23,11 @@
 BibIndex indexing engine configuration parameters.  
 """
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 ## configuration parameters read from the general config file:
-# pylint: disable-msg=W0611
 from invenio.config import \
-     cfg_bibindex_fulltext_index_local_files_only, \
-     cfg_bibindex_stemmer_default_language, \
-     cfg_bibindex_remove_stopwords, \
-     cfg_bibindex_path_to_stopwords_file, \
-     cfg_bibindex_chars_alphanumeric_separators, \
-     cfg_bibindex_chars_punctuation, \
-     cfg_bibindex_remove_html_markup, \
-     cfg_bibindex_min_word_length, \
-     cfg_bibindex_urlopener_username, \
-     cfg_bibindex_urlopener_password, \
      version, \
      pdftotext, \
      pstotext, \
@@ -51,10 +41,10 @@ from invenio.config import \
      gzip
 
 ## version number:
-bibindex_engine_version = "CDS Invenio/%s bibindex/%s" % (version, version)
+BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (version, version)
 
 ## programs used to convert fulltext files to text:
-conv_programs = { ### PS switched off at the moment, since PDF is faster
+CONV_PROGRAMS = { ### PS switched off at the moment, since PDF is faster
     #"ps": [pstotext,pstoascii],  
     #"ps.gz": [pstotext,pstoascii],               
     "pdf": [pdftotext,pstotext,pstoascii],
@@ -64,12 +54,12 @@ conv_programs = { ### PS switched off at the moment, since PDF is faster
 
 ## helper programs used if the above programs convert only to html or
 ## other intermediate file formats:
-conv_programs_helpers =  {"html": htmltotext,
+CONV_PROGRAMS_HELPERS =  {"html": htmltotext,
                           "gz": gzip}
 
 ## safety parameters concerning DB thread-multiplication problem:
-cfg_check_mysql_threads = 0 # to check or not to check the problem? 
-cfg_max_mysql_threads = 50 # how many threads (connections) we
+CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem? 
+CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we
                            # consider as still safe
-cfg_mysql_thread_timeout = 20 # we'll kill threads that were sleeping
+CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping
                               # for more than X seconds
