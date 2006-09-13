@@ -26,9 +26,10 @@ import string
 import os
 import sre
 import sys
+import time
 
-# Please fill in the following variables if using standalone (Invenio-independent) version
-TMPDIR_STANDALONE = "/usr/local/invenio/var/tmp"
+# Please point the following variables to the correct paths if using standalone (Invenio-independent) version
+TMPDIR_STANDALONE = "/tmp"
 PDFTOTEXT_STANDALONE = "/usr/bin/pdftotext"
 
 fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
@@ -53,18 +54,16 @@ Usage: bibclassify [options]
 
  Examples:
       bibclassify -f file.pdf -k thesaurus.txt -o TEXT
-      bibclassify -s -t file.txt -K ontology.rdf -m SLOW
+      bibclassify -f file.txt -K taxonomy.rdf -l 120 -m FULL
 
  Specific options:
- -s, --standalone            run as a standalone program rather than as Invenio module (need to set some variables manually)
- -f, --pdffile=FILENAME      name of the pdf file to be classified
- -t, --textfile=FILENAME     name of the text file to be classified
- -k, --thesaurus=FILENAME    name of the text thesaurus (taxonomy)
- -K, --ontology=FILENAME     name of the RDF ontology (a local file or URL)
+ -f, --file=FILENAME         name of the file to be classified (Use '.pdf' extension for PDF files; every other extension is treated as text)
+ -k, --thesaurus=FILENAME    name of the text thesaurus (one keyword per line)
+ -K, --taxonomy=FILENAME     name of the RDF SKOS taxonomy/ontology (a local file or URL)
  -o, --output=HTML|TEXT      output list of keywords in either HTML or text
- -n, --nkeywords=NUMBER      number of keywords that will be processed to generate results (the higher the n, the higher the number of generated composite keywords)
- -N, --Nkeywords=NUMBER      number of output keywords that will be generated (the higher the N, the higher the number of generated main keywords)
- -m, --mode=FAST|SLOW        processing mode: FAST (run on abstract and selected pages), SLOW (run on whole document - more accurate) 
+ -l, --limit=INTEGER         maximum number of keywords that will be processed to generate results (the higher the l, the higher the number of possible composite keywords)
+ -n, --nkeywords=INTEGER     maximum number of single keywords that will be generated
+ -m, --mode=FULL|PARTIAL     processing mode: PARTIAL (run on abstract and selected pages), FULL (run on whole document - more accurate, but slower) 
  -q, --spires                outputs composite keywords in the SPIRES standard format (ckw1, ckw2)
  
  General options:
@@ -106,7 +105,7 @@ def generate_keywords(textfile, dictfile):
 
     return keyws
 
-def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode, spires):
+def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, spires):
     """ A method that generates a sorted list of keywords (text or html output) based on a RDF thesaurus. """
 
     import rdflib
@@ -125,10 +124,10 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
     html_out = []
 
     delimiter = ""
-    if spires==True: delimiter = ","
+    if spires: delimiter = ","
     else: delimiter = ":"
     
-    ns_skos = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
+    namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
     
     store = rdflib.Graph()
     store.parse(dictfile)              
@@ -141,14 +140,14 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
     abstract = " " + str(atmp.read(int(size*0.1))) + " "
     
     if mode == 1:
-        # Fast mode: analysing only abstract + title + middle portion of document
+        # Partial mode: analysing only abstract + title + middle portion of document
         # Abstract and title is generally never more than 20% of whole document.
         text_string = " " + str(rtmp.read(int(size*0.2)))
         throw_away = str(rtmp.read(int(size*0.25)))
         text_string += str(rtmp.read(int(size*0.2)))
 
     else:
-        # Slow mode: get all document
+        # Full mode: get all document
         text_string = " " + str(rtmp.read()) + " "
         
     atmp.close()
@@ -171,7 +170,7 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
 
     # Here we start the big for loop around all concepts in the RDF ontology
 
-    for s,pref in store.subject_objects(ns_skos["prefLabel"]):
+    for s,pref in store.subject_objects(namespace["prefLabel"]):
 
         dictOUT = 0
         safeOUT = 0
@@ -183,16 +182,19 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
         nostandalone = False
         
         # For each concept, we gather the candidates (i.e. prefLabel, hiddenLabel and altLabel)
-        # ADDITION: we also consider spiresLabel: this is HEP ontology specific
         candidates.append(pref.strip())
 
-        if store.value(s,ns_skos["note"],any=True) == "nostandalone":
+        # If the candidate is a ckw and it has no altLabel, we are not interested at this point, go to the next item
+        if store.value(s,namespace["compositeOf"],default=False,any=True) and not store.value(s,namespace["altLabel"],default=False,any=True):
+            continue
+
+        if store.value(s,namespace["note"],any=True) == "nostandalone":
             nostandalone = True
         
-        for alt in store.objects(s, ns_skos["altLabel"]):
+        for alt in store.objects(s, namespace["altLabel"]):
             candidates.append(alt.strip())
 
-        for hid in store.objects(s, ns_skos["hiddenLabel"]):
+        for hid in store.objects(s, namespace["hiddenLabel"]):
             candidates.append(hid.strip())
 
         # We then create a regex pattern for each candidate and we match it in the document
@@ -245,7 +247,7 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
 
         dictOUT += hideOUT
 
-        if dictOUT > 0 and store.value(s,ns_skos["compositeOf"],default=False,any=True):
+        if dictOUT > 0 and store.value(s,namespace["compositeOf"],default=False,any=True):
             # This is a ckw whose altLabel occurs in the text
             ckwlist[s.strip()] = dictOUT
                                        
@@ -257,26 +259,26 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
     keylist.sort()
     keylist.reverse()
 
-    if nkeywords > len(keylist):
-        nkeywords = len(keylist)
+    if limit > len(keylist):
+        limit = len(keylist)
 
-    if Nkeywords > nkeywords:
-        Nkeywords = nkeywords
+    if nkeywords > limit:
+        nkeywords = limit
 
-    # Sort out composite keywords based on nkeywords (default=70)
-    # Work out whether among nkeywords MKWS, there are possible composite combinations 
+    # Sort out composite keywords based on limit (default=70)
+    # Work out whether among l single keywords, there are possible composite combinations 
     # Generate compositesIDX dictionary of the form:   s (URI) : keylist 
-    for i in range(nkeywords):
+    for i in range(limit):
         try:
-            if store.value(rdflib.Namespace(keylist[i][1]),ns_skos["composite"],default=False,any=True):
+            if store.value(rdflib.Namespace(keylist[i][1]),namespace["composite"],default=False,any=True):
                 compositesIDX[keylist[i][1]] = keylist[i]
-                for composite in store.objects(rdflib.Namespace(keylist[i][1]),ns_skos["composite"]):
+                for composite in store.objects(rdflib.Namespace(keylist[i][1]),namespace["composite"]):
                     if composites.has_key(composite):
                         composites[composite].append(keylist[i][1])
                     else:
                         composites[composite]=[keylist[i][1]]
 
-            elif store.value(rdflib.Namespace(keylist[i][1]),ns_skos["compositeOf"],default=False,any=True):
+            elif store.value(rdflib.Namespace(keylist[i][1]),namespace["compositeOf"],default=False,any=True):
                 compositesIDX[keylist[i][1]] = keylist[i]
 
             else:
@@ -295,7 +297,7 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
             comp_two = compositesIDX[composites.get(s_CompositeOf)[1]][2]
 
             # Now check that comp_one and comp_two really correspond to ckw1 : ckw2
-            if store.value(rdflib.Namespace(s_CompositeOf),ns_skos["prefLabel"],default=False,any=True).split(":")[0].strip() == comp_one:
+            if store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True).split(":")[0].strip() == comp_one:
                 # order is correct
                 searchables_one = compositesIDX[composites.get(s_CompositeOf)[0]][4]
                 searchables_two = compositesIDX[composites.get(s_CompositeOf)[1]][4]
@@ -357,18 +359,18 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
                 # Add count and pop the item out of the dictionary
                 compOUT += ckwlist.pop(s_CompositeOf)
 
-            if compOUT > 0 and spires==True:
+            if compOUT > 0 and spires:
                 # Output ckws in spires standard output mode (,)
-                if store.value(rdflib.Namespace(s_CompositeOf),ns_skos["spiresLabel"],default=False,any=True):
-                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),ns_skos["spiresLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
+                if store.value(rdflib.Namespace(s_CompositeOf),namespace["spiresLabel"],default=False,any=True):
+                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["spiresLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
                 else:
-                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),ns_skos["prefLabel"],default=False,any=True).replace(":",","), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
+                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True).replace(":",","), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
                 keys2drop.append(comp_one.strip())
                 keys2drop.append(comp_two.strip())
 
             elif compOUT > 0:
                 # Output ckws in bibclassify mode (:)
-                compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),ns_skos["prefLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
+                compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
                 keys2drop.append(comp_one.strip())
                 keys2drop.append(comp_two.strip())
 
@@ -379,15 +381,15 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
         ckwleft = ckwleft - 1
 
     for s_CompositeTOADD, compTOADD_OUT in compositesTOADD:
-        if spires == True:
-            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),ns_skos["prefLabel"],default=False,any=True).replace(":",","), "null", "null", 0, 0])
+        if spires:
+            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True).replace(":",","), "null", "null", 0, 0])
         else:
-            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),ns_skos["prefLabel"],default=False,any=True), "null", "null", 0, 0])
+            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True), "null", "null", 0, 0])
     
     compositesOUT.sort()
     compositesOUT.reverse()
 
-    # Some more keylist filtering: inclusion, e.g remove "magnetic" if have "magnetic field"
+    # Some more keylist filtering: inclusion, e.g subtract "magnetic" if have "magnetic field"
     for i in keylist:
         pattern_to_match = " " + i[2].strip() + " "
         for j in keylist:
@@ -396,7 +398,7 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
                 keys2drop.append(pattern_to_match.strip())
 
 
-    text_out += "\nComposites:\n"
+    text_out += "\nComposite keywords:\n"
     for ncomp, pref_cOf_label, comp_one, comp_two, comp_oneOUT, comp_twoOUT in compositesOUT:
         safe_comp_mark = " "
         safe_one_mark = ""
@@ -411,8 +413,8 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
         if safe_comp_mark == "*": html_out.append([ncomp, str(pref_cOf_label), 1])
         else: html_out.append([ncomp, str(pref_cOf_label), 0])
 
-    text_out += "\n\nMain Keywords:\n"
-    for i in range(nkeywords):
+    text_out += "\n\nSingle keywords:\n"
+    for i in range(limit):
         safe_mark = " "
         try:
             idx = keys2drop.index(keylist[i][2].strip())
@@ -422,11 +424,11 @@ def generate_keywords_rdf(textfile, dictfile, output, nkeywords, Nkeywords, mode
         if safe_keys.find(keylist[i][2])>-1:
             safe_mark = "*"
 
-        if idx == -1 and Nkeywords > 0 and keylist[i][5] == False:
+        if idx == -1 and nkeywords > 0 and keylist[i][5] == False:
             text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n" 
             if safe_mark == "*": html_out.append([keylist[i][0], keylist[i][2], 1])
             else: html_out.append([keylist[i][0], keylist[i][2], 0])
-            Nkeywords = Nkeywords - 1
+            nkeywords = nkeywords - 1
 
     if output == 0:
         # Output some text
@@ -526,12 +528,6 @@ def makeCompPattern(candidates, modes):
         - 2 : hyphen
         - 3 : wildcard"""
 
-    # NB. For the moment, some patterns are compiled having an optional trailing "s"
-    #     This is a very basic method to find plurals in English.
-    #     If this program is to be used in other languages, please remove the "s?" from the REGEX
-    #     Also, inclusion of plurals at the ontology level would be preferred. 
-
-
     begREGEX = '(?:[^A-Za-z0-9\+-])('
     endREGEX = ')(?=[^A-Za-z0-9\+-])'
 
@@ -579,7 +575,7 @@ def makePattern(candidate, mode):
         - 2 : hyphen
         - 3 : wildcard"""
 
-    # NB. For the moment, some patterns are compiled having an optional trailing "s"
+    # NB. At the moment, some patterns are compiled having an optional trailing "s".
     #     This is a very basic method to find plurals in English.
     #     If this program is to be used in other languages, please remove the "s?" from the REGEX
     #     Also, inclusion of plurals at the ontology level would be preferred. 
@@ -630,19 +626,18 @@ def main():
     """Main function """
 
     global options
-    long_flags =["standalone", "pdffile=", "textfile="
+    long_flags =["file=",
                  "thesaurus=","ontology=",
-                 "output=","nkeywords=", "Nkeywords=", "mode=",
+                 "output=","limit=", "nkeywords=", "mode=",
                  "spires", "help", "version"]
-    short_flags ="sf:t:k:K:o:n:N:m:qhV"
-    standalone = False
+    short_flags ="f:k:K:o:l:n:m:qhV"
     spires = False
-    nkeywords = 70
-    Nkeywords = 25
+    limit = 70
+    nkeywords = 25
     input_file = ""
     dict_file = ""
-    output = 1
-    mode = 1
+    output = 0
+    mode = 0
     
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
@@ -653,20 +648,13 @@ def main():
         usage(1)
 
     try:
-        for opt in opts:
-            if opt[0] in [ "-s", "--standalone" ]:
-                tmpdir = TMPDIR_STANDALONE
-                pdftotext = PDFTOTEXT_STANDALONE
-                standalone = True
-        if not standalone:
-            # Invenio-specific dependencies
-            from invenio.config import tmpdir, pdftotext, version
-            version_bibclassify = 0.1
-            bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (version, version_bibclassify)
+        from invenio.config import tmpdir, pdftotext, version
+        version_bibclassify = 0.1
+        bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (version, version_bibclassify)
 
-    except StandardError, e:
-        write_message(e, sys.stderr)
-        sys.exit(1)
+    except:
+        tmpdir = TMPDIR_STANDALONE
+        pdftotext = PDFTOTEXT_STANDALONE
 
     temp_text = tmpdir + '/bibclassify.pdftotext.' + str(os.getpid())
 
@@ -679,8 +667,9 @@ def main():
                 print bibclassify_engine_version
                 sys.exit(1)
 
-            elif opt[0] in [ "-f", "--pdffile" ]:
-                if input_file=="":
+            elif opt[0] in [ "-f", "--file" ]:
+                if opt[1].find(".pdf")>-1:
+                    # Treat as PDF
                     cmd = "%s " % pdftotext + opt[1] + " " + temp_text
                     errcode = os.system(cmd)
                     if errcode == 0 and os.path.exists("%s" % temp_text):
@@ -689,15 +678,8 @@ def main():
                         print "Error while running %s.\n" % cmd 
                         sys.exit(1)
                 else:
-                    print "Either text of pdf file in input"
-                    sys.exit(1)
-                    
-            elif opt[0] in [ "-t", "--textfile" ]:
-                if input_file=="":
+                    # Treat as text
                     input_file = opt[1]
-                else:
-                    print "Either text of pdf file in input"
-                    sys.exit(1)
                     
             elif opt[0] in [ "-k", "--thesaurus" ]:
                 if dict_file=="":
@@ -706,7 +688,7 @@ def main():
                     print "Either a text thesaurus or an ontology (in .rdf format)"
                     sys.exit(1)
                     
-            elif opt[0] in [ "-K", "--ontology" ]:
+            elif opt[0] in [ "-K", "--taxonomy" ]:
                 if dict_file=="" and opt[1].find(".rdf")!=-1:
                     dict_file = opt[1]
                 else:
@@ -726,39 +708,39 @@ def main():
 
             elif opt[0] in [ "-m", "--mode" ]:
                 try:
-                    if str(opt[1]).lower().strip() == "fast":
+                    if str(opt[1]).lower().strip() == "partial":
                         mode = 1
-                    elif str(opt[1]).lower().strip() == "slow":
+                    elif str(opt[1]).lower().strip() == "full":
                         mode = 0
                     else:
-                        write_message('Processing mode (-m) can only be "FAST" or "SLOW". Using default output mode (fast)')
+                        write_message('Processing mode (-m) can only be "PARTIAL" or "FULL". Using default output mode (FULL)')
                 except:
-                    write_message('Processing mode (-m) can only be "FAST" or "SLOW". Using default output mode (fast)')
+                    write_message('Processing mode (-m) can only be "PARTIAL" or "FULL". Using default output mode (FULL)')
 
             elif opt[0] in [ "-q", "--spires" ]:
                 spires = True
                 
+            elif opt[0] in [ "-l", "--limit" ]:
+                try:
+                    num = int(opt[1])
+                    if num>1:
+                        limit = num
+                    else:
+                        write_message("Number of keywords for processing (--limit) must be an integer higher than 1. Using default value of 70...")
+
+                except ValueError:
+                    write_message("Number of keywords for processing (-n) must be an integer. Using default value of 70...")
+
             elif opt[0] in [ "-n", "--nkeywords" ]:
                 try:
                     num = int(opt[1])
                     if num>1:
                         nkeywords = num
                     else:
-                        write_message("Number of keywords for processing (-nkeywords) must be an integer higher than 1. Using default value of 70...")
+                        write_message("Number of keywords (--nkeywords) must be an integer higher than 1. Using default value of 25...")
 
                 except ValueError:
-                    write_message("Number of keywords for processing (-n) must be an integer. Using default value of 70...")
-
-            elif opt[0] in [ "-N", "--Nkeywords" ]:
-                try:
-                    num = int(opt[1])
-                    if num>1:
-                        Nkeywords = num
-                    else:
-                        write_message("Number of keywords (-Nkeywords) must be an integer higher than 1. Using default value of 25...")
-
-                except ValueError:
-                    write_message("Number of keywords (-N) must be an integer. Using default value of 25...")
+                    write_message("Number of keywords (--n) must be an integer. Using default value of 25...")
 
     except StandardError, e:
         write_message(e, sys.stderr)
@@ -770,13 +752,13 @@ def main():
 
     # Weak method to detect dict_file. Need to improve this (e.g. by looking inside the metadata with rdflib?)
     if dict_file.find(".rdf")!=-1:
-        outcome = generate_keywords_rdf(input_file, dict_file, output, nkeywords, Nkeywords, mode, spires)
+        outcome = generate_keywords_rdf(input_file, dict_file, output, limit, nkeywords, mode, spires)
 
     else: # Treat as text
         outcome = generate_keywords(input_file, dict_file)
-        if nkeywords > len(outcome): nkeywords = len(outcome)
+        if limit > len(outcome): limit = len(outcome)
         if output == 0:
-            for i in range(nkeywords):
+            for i in range(limit):
                 print outcome[i]
         else:
             print "<html>"
@@ -785,7 +767,7 @@ def main():
             print "<body>"
             print "<table>"
             print '<tr><div class="pagebox2" align="top"><small>'
-            for i in range(nkeywords):
+            for i in range(limit):
                 print "<b>" + str(outcome[i]) + "</b><br>"
             print '</small></div></tr>'
             print "</table></body>"
