@@ -24,7 +24,7 @@ eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
 running from configure.ac.
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
