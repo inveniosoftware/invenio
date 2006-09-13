@@ -26,7 +26,7 @@ import re
 import urlparse, cgi
 from sets import Set
 
-from mechanize import Browser, LinkNotFoundError
+from mechanize import Browser, LinkNotFoundError, HTTPError
 
 from invenio.config import weburl, cdsname, cdslang
 from invenio.testutils import make_test_suite, \
@@ -665,6 +665,66 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?recid=1&recidb=10&of=id',
                                                expected_text="[1, 2, 3, 4, 5, 6, 7, 8, 9]"))
 
+class WebSearchRestrictedCollectionTest(unittest.TestCase):
+    """Test of the restricted Theses collection behaviour."""
+
+    def test_restricted_collection_interface_page(self):
+        """websearch - restricted collection interface page body"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/collection/Theses',
+                                               expected_text="The contents of this collection is restricted."))
+
+    def test_restricted_search_as_anonymous_guest(self):
+        """websearch - restricted collection not searchable by anonymous guest"""
+        errmsgs = test_web_page_content(weburl + '/search?c=Theses')
+        if errmsgs[0].find("HTTP Error 401: Authorization Required") > -1:
+            pass
+        else:
+            self.fail("Oops, searching restricted collection without password should have returned HTTP Error 401.")
+        return
+
+    def test_restricted_search_as_authorized_person(self):
+        """websearch - restricted collection searchable by authorized person"""
+        testurl = weburl + '/search?c=Theses'
+        browser = Browser()
+        # Dr. Jekyll should be able to connect:
+        browser.add_password(testurl, "jekyll", "jekyll")
+        browser.open(testurl)
+        if browser.response().read().find("records found") > -1:
+            pass
+        else:
+            self.fail("Oops, Dr. Jekyll should be able to search Theses collection.")
+
+    def test_restricted_search_as_unauthorized_person(self):
+        """websearch - restricted collection not searchable by unauthorized person"""
+        testurl = weburl + '/search?c=Theses'
+        browser = Browser()
+        # Mr. Hyde should not be able to connect:
+        browser.add_password(testurl, "hyde", "hyde")
+        try:
+            browser.open(testurl)
+        except HTTPError, errmsg:
+            if str(errmsg) == "HTTP Error 401: Authorization Required":
+                # good, things worked
+                return
+        # if we got here, things are broken:
+        self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
+
+    def test_restricted_search_with_wrong_credentials(self):
+        """websearch - restricted collection not searchable with wrong credentials"""
+        testurl = weburl + '/search?c=Theses'
+        browser = Browser()
+        # Dr. Jekyll with wrong password should not be able to connect:
+        browser.add_password(testurl, "jekyll", "hyde")
+        try:
+            browser.open(testurl)
+        except HTTPError, errmsg:
+            if str(errmsg) == "HTTP Error 401: Authorization Required":
+                # good, things worked
+                return 
+        # if we got here, things are broken:
+        self.fail("Oops, Dr. Jekyll with wrong password should not be able to search Theses collection.")
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -675,7 +735,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchBooleanQueryTest,
                              WebSearchAuthorQueryTest,
                              WebSearchSearchEnginePythonAPITest,
-                             WebSearchSearchEngineWebAPITest)
+                             WebSearchSearchEngineWebAPITest,
+                             WebSearchRestrictedCollectionTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
