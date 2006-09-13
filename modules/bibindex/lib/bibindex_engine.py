@@ -42,7 +42,6 @@ import cStringIO
 
 from invenio.config import *
 from invenio.bibindex_engine_config import *
-from invenio.search_engine_config import cfg_max_recID
 from invenio.search_engine import perform_request_search, strip_accents
 from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.access_control_engine import acc_authorize_action

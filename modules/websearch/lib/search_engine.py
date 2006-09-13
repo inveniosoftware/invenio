@@ -40,7 +40,7 @@ from xml.dom import minidom
 
 ## import CDS Invenio stuff:
 from invenio.config import *
-from invenio.search_engine_config import *
+from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, get_output_format_content_type, create_excel

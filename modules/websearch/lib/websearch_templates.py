@@ -29,7 +29,7 @@ import sre
 from invenio.config import *
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
-from invenio.search_engine_config import *
+from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
 
 from invenio.websearch_external_collections import external_collection_get_state

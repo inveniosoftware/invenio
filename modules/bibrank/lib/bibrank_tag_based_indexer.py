@@ -45,7 +45,6 @@ import types
 import ConfigParser
 
 from invenio.config import *
-from invenio.search_engine_config import cfg_max_recID
 from invenio.search_engine import perform_request_search, strip_accents
 from invenio.search_engine import HitSet, get_index_id, create_basic_search_units
 from invenio.bibrank_citation_indexer import get_citation_weight

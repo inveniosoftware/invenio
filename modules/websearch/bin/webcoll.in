@@ -49,7 +49,6 @@ try:
     from invenio.config import *
     from invenio.messages import gettext_set_language, language_list_long
     from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname
-    from invenio.search_engine_config import cfg_author_et_al_threshold, cfg_instant_browse, cfg_max_recID, cfg_narrow_search_show_grandsons
     from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
     from invenio.access_control_engine import acc_authorize_action
     from invenio.bibrank_record_sorter import get_bibrank_methods

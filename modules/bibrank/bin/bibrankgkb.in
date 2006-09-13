@@ -65,7 +65,6 @@ except ImportError, e:
 
 try:
     from invenio.config import *
-    from invenio.search_engine_config import cfg_max_recID
     from invenio.search_engine import perform_request_search, strip_accents
     from invenio.search_engine import HitSet
     from invenio.dbquery import run_sql, escape_string

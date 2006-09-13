@@ -36,7 +36,6 @@ from invenio.config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.search_engine_config import cfg_max_recID
 from invenio.bibrank_citation_searcher import calculate_cited_by_list
 
 class HitSet:

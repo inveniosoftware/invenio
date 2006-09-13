@@ -42,7 +42,6 @@ import re
 import ConfigParser
 
 from invenio.config import *
-from invenio.search_engine_config import cfg_max_recID
 from invenio.search_engine import perform_request_search, strip_accents, HitSet
 from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
