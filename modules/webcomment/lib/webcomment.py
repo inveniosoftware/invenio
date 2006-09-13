@@ -48,7 +48,7 @@ from invenio.dateutils import convert_datetext_to_dategui, \
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
 from invenio.webuser import isGuestUser
-from invenio.webcomment_config import cfg_webcomment_action_code
+from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 
 try:
     import invenio.template
@@ -178,7 +178,7 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
     uid = wash_url_argument(uid, 'int')
     if cmt_id > 0 and value in [-1, 1] and check_user_can_vote(cmt_id, client_ip_address, uid):
         action_date = convert_datestruct_to_datetext(time.localtime())
-        action_code = cfg_webcomment_action_code['VOTE']
+        action_code = CFG_WEBCOMMENT_ACTION_CODE['VOTE']
         query = """INSERT INTO cmtACTIONHISTORY
                    VALUES (%i, NULL ,%i, inet_aton('%s'), '%s', '%s')"""
         query %= (cmt_id, uid, client_ip_address, action_date, action_code)
@@ -199,7 +199,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     uid = wash_url_argument(uid, 'int')
     max_action_time = time.time() - cfg_webcomment_timelimit_processing_comments_in_seconds
     max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
-    action_code = cfg_webcomment_action_code['ADD_COMMENT']
+    action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_COMMENT']
     query = """SELECT id_bibrec
                FROM cmtACTIONHISTORY
                WHERE id_bibrec=%i AND
@@ -220,7 +220,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
-    action_code = cfg_webcomment_action_code['ADD_REVIEW']
+    action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_REVIEW']
     query = """SELECT id_bibrec
                FROM cmtACTIONHISTORY
                WHERE id_bibrec=%i AND
@@ -268,7 +268,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     if not(check_user_can_report(cmt_id, client_ip_address, uid)):
         return 0
     action_date = convert_datestruct_to_datetext(time.localtime())
-    action_code = cfg_webcomment_action_code['REPORT_ABUSE']
+    action_code = CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE']
     query = """INSERT INTO cmtACTIONHISTORY
                VALUES (%i, NULL, %i, inet_aton('%s'), '%s', '%s')"""
     query %= (cmt_id, uid, client_ip_address, action_date, action_code)
@@ -568,7 +568,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", sco
     params = (recID, uid, msg, current_date, score, 0, note)
     res = run_sql(query, params)
     if res:
-        action_code = cfg_webcomment_action_code[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
+        action_code = CFG_WEBCOMMENT_ACTION_CODE[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
         action_time = convert_datestruct_to_datetext(time.localtime()) 
         query2 = """INSERT INTO cmtACTIONHISTORY
                     values ('', %i, %i, inet_aton('%s'), '%s', '%s')"""

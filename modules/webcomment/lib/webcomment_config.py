@@ -23,8 +23,6 @@
 
 __revision__ = "$Id$"
 
-__lastupdated__ = """$Date$"""
-
 # pylint: disable-msg=C0301
 
 cfg_webcomment_error_messages = \
@@ -65,7 +63,7 @@ cfg_webcomment_warning_messages = \
     'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")'
 }
 
-cfg_webcomment_action_code = {    
+CFG_WEBCOMMENT_ACTION_CODE = {    
     'ADD_COMMENT': 'C',
     'ADD_REVIEW': 'R',
     'VOTE': 'V',
