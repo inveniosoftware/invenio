@@ -32,7 +32,7 @@ from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
 class TestFunctionTestWebPageContent(unittest.TestCase):
     """Check browser test_web_page_content() function."""
 
-    def test_function_test_web_page_content_login(self):
+    def test_twpc_username_arg(self):
         """testutils - test_web_page_content() and username arguments""" 
         # should login as admin without password:
         self.assertEqual([],
@@ -50,7 +50,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
             self.fail("Should not be able to login as admin with foo password.")
         return
     
-    def test_function_test_web_page_content_via_expected_text_argument(self):
+    def test_twpc_expected_text_arg(self):
         """testutils - test_web_page_content() and expected_text argument""" 
         # should find HTML in an HTML page:
         self.assertEqual([],
@@ -64,25 +64,25 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
             self.fail("Should not find </html> in an XML page.")
         return
 
-    def test_function_test_web_page_content_via_expected_link_arguments(self):
-        """testutils - test_web_page_content() and expected_link arguments""" 
+    def test_twpc_expected_link_arg(self):
+        """testutils - test_web_page_content() and expected_link argument""" 
         # should find link to ALEPH:
         self.assertEqual([],
                          test_web_page_content(weburl,
-                                               expected_link_target=weburl+"/collection/ALEPH"))
+                              expected_link_target=weburl+"/collection/ALEPH"))
         # should find link entitled ISOLDE:
         self.assertEqual([],
                          test_web_page_content(weburl,
-                                               expected_link_label="ISOLDE"))
+                              expected_link_label="ISOLDE"))
         # should find link to ISOLDE entitled ISOLDE:
         self.assertEqual([],
                          test_web_page_content("http://localhost/",
-                                               expected_link_target=weburl+"/collection/ISOLDE",
-                                               expected_link_label="ISOLDE"))
+                              expected_link_target=weburl+"/collection/ISOLDE",
+                              expected_link_label="ISOLDE"))
         # should not find link to ALEPH entitled ISOLDE:
         errmsgs = test_web_page_content(weburl,
-                                        expected_link_target=weburl+"/collection/ALEPH",
-                                        expected_link_label="ISOLDE")
+                              expected_link_target=weburl+"/collection/ALEPH",
+                              expected_link_label="ISOLDE")
         if errmsgs[0].find(" does not contain link to ") > -1:
             pass
         else:

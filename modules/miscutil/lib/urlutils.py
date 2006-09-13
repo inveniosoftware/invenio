@@ -18,14 +18,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
 """
 urlutils.py -- helper functions for URL related problems such as
 argument washing, redirection, etc.
 """
 
-__lastupdated__ = """$Date$"""
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import sre
 from urllib import urlencode, quote_plus
@@ -117,7 +115,7 @@ def get_referer(req, replace_ampersands=1):
     """
     try:
         referer = req.headers_in['Referer']
-        if replace_ampersands==1:
+        if replace_ampersands == 1:
             return referer.replace('&', '&amp;')
         return referer
     except KeyError:
@@ -175,7 +173,7 @@ def a_href(text, **kargs):
         kargs['class'] = kargs['_class']
         del kargs['_class']
         
-    attrs = ['%s=%s' %(k, quoteattr(kargs[k])) for k in kargs.keys()]
+    attrs = ['%s=%s' % (k, quoteattr(kargs[k])) for k in kargs.keys()]
 
     return '<a %s>%s</a>' % (' '.join(attrs), text)
 

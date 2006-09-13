@@ -24,7 +24,7 @@ symlink in case of troubles during import.  Exit status: 0 if
 okay, 1 if not okay.  Useful for running during make install.
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import sys
 
@@ -41,7 +41,7 @@ def deduce_site_packages_location():
     return out
 
 try:
-    prefix = sys.argv[1]
+    PREFIX = sys.argv[1]
 except IndexError:
     print "Error: no argument passed."
     print "Usage: %s <prefix>" % sys.argv[0]
@@ -49,6 +49,7 @@ except IndexError:
     
 try:
     import invenio
+    DUMMY = invenio # to make checkers happy
 except ImportError, e:
     print """
     ******************************************************
@@ -68,6 +69,6 @@ except ImportError, e:
     ** message and fix the problem before continuing.   **
     ******************************************************
     """ % (e,
-           prefix,
+           PREFIX,
            deduce_site_packages_location())
     sys.exit(1)

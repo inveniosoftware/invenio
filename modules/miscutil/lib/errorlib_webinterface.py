@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -18,11 +19,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__lastupdated__ = """$Date$"""
+# pylint: disable-msg=C0301
+
+"""ErrorLib web interface."""
+
+__revision__ = "$Id$"
+
+__lastupdated__ = "$Date$"
 
 from invenio.config import weburl
 from invenio.webpage import page
-from invenio.errorlib import *
+from invenio.errorlib import send_error_report_to_admin
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 from invenio.messages import gettext_set_language
@@ -56,13 +63,25 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if argd['client'] == "NA":
-            return page(title=_("Sorry"), body=_("Cannot send error request, %s parameter missing.") % 'client', req=req)
+            return page(title=_("Sorry"),
+                        body=_("Cannot send error request, %s parameter missing.") % 'client',
+                        lastupdated=__lastupdated__,
+                        req=req)
         elif argd['url'] == "NA":
-            return page(title=_("Sorry"), body=_("Cannot send error request, %s parameter missing.") % 'url', req=req)
+            return page(title=_("Sorry"),
+                        body=_("Cannot send error request, %s parameter missing.") % 'url',
+                        lastupdated=__lastupdated__,
+                        req=req)
         elif argd['time'] == "NA":
-            return page(title=_("Sorry"), body=_("Cannot send error request, %s parameter missing.") % 'time', req=req)
+            return page(title=_("Sorry"),
+                        body=_("Cannot send error request, %s parameter missing.") % 'time',
+                        lastupdated=__lastupdated__,
+                        req=req)
         elif argd['error'] == "NA":
-            return page(title=_("Sorry"), body=_("Cannot send error request, %s parameter missing.") % 'error', req=req)
+            return page(title=_("Sorry"),
+                        body=_("Cannot send error request, %s parameter missing.") % 'error',
+                        lastupdated=__lastupdated__,
+                        req=req)
         else:
             send_error_report_to_admin(argd['header'],
                                        argd['url'],
@@ -78,11 +97,13 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
             <p>%(message)s
             <p>%(back)s
             """ % \
-                {
-                    'title' : _("The error report has been sent."),
-                    'message' : _("Many thanks for helping us make CDS Invenio better."),
-                    'back' : argd['referer']!="NA" and "<a href=\"%s\">back</a>" % (argd['referer'],) or \
-                             _("Use the back button of your browser to return to the previous page.")
+                {'title' : _("The error report has been sent."),
+                 'message' : _("Many thanks for helping us make CDS Invenio better."),
+                 'back' : argd['referer']!="NA" and "<a href=\"%s\">back</a>" % (argd['referer'],) or \
+                          _("Use the back button of your browser to return to the previous page.")
                 }
-            return page(title=_("Thank you!"), body=out, req=req)
+            return page(title=_("Thank you!"),
+                        body=out,
+                        lastupdated=__lastupdated__,
+                        req=req)
 
