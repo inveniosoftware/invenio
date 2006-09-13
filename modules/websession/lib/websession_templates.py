@@ -27,7 +27,7 @@ import locale
 from invenio.config import *
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
-from invenio.websession_config import cfg_websession_group_join_policy
+from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 class Template:
     def tmpl_lost_password_message(self, ln, supportemail):
         """
@@ -1656,13 +1656,13 @@ class Template:
     
     def __create_join_policy_selection_menu(self, name, current_join_policy, ln=cdslang):
         """Private function. create a drop down menu for selection of join policy
-        @param current_join_policy: join policy as defined in cfg_websession_group_join_policy
+        @param current_join_policy: join policy as defined in CFG_WEBSESSION_GROUP_JOIN_POLICY
         @param ln: language
         """
         _ = gettext_set_language(ln)
-        elements = [(cfg_websession_group_join_policy['VISIBLEOPEN'],
+        elements = [(CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEOPEN'],
                      _("Visible and open for new members")),
-                    (cfg_websession_group_join_policy['VISIBLEMAIL'],
+                    (CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEMAIL'],
                      _("Visible but new members need approval"))
                     ]
         select_text = _("Please select:")

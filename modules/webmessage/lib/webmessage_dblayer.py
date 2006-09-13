@@ -32,7 +32,7 @@ from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.webuser import list_users_in_roles
 from invenio.webbasket_dblayer import get_groups_user_member_of
-from invenio.websession_config import cfg_websession_usergroup_status
+from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 def check_user_owns_message(uid, msgid):
     """
@@ -343,7 +343,7 @@ def get_uids_members_of_groups(gids):
     query = """SELECT DISTINCT id_user 
                FROM user_usergroup 
                WHERE user_status!='%s' AND (
-            """ % cfg_websession_usergroup_status['PENDING']
+            """ % CFG_WEBSESSION_USERGROUP_STATUS['PENDING']
     if len(gids) > 0:
         for gid in gids[0:-1]:
             query += " id_usergroup=" + str(int(gid)) + " OR"

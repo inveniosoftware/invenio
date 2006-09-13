@@ -24,12 +24,12 @@
 __revision__ = "$Id$"
 
 # pylint: disable-msg=C0301
-cfg_websession_group_join_policy = {'VISIBLEOPEN': 'VO',
+CFG_WEBSESSION_GROUP_JOIN_POLICY = {'VISIBLEOPEN': 'VO',
                                     'VISIBLEMAIL': 'VM',
                                     'INVISIBLEOPEN': 'IO',
                                     'INVISIBLEMAIL': 'IM'  
                                     }
-cfg_websession_usergroup_status = {'ADMIN':  'A',
+CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'MEMBER':'M',
                                    'PENDING':'P'
                                    }
@@ -54,7 +54,8 @@ cfg_websession_warning_messages = {
     'WRN_WEBSESSION_ALREADY_MEMBER_REJECT': '_("The user request for joining group has already been rejected.")', 
     'WRN_WEBSESSION_NO_USER_SELECTED_DEL': '_("Please choose a user from the list if you want him to be removed from waiting list.")'
 }
-cfg_websession_info_messages = {"GROUP_CREATED":'You have successfully created a new group.',
+
+CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED":'You have successfully created a new group.',
                                 "JOIN_GROUP":'You have successfully joined a new group.',
                                 "GROUP_UPDATED":'You have successfully updated a group.',
                                 "GROUP_DELETED":'You have successfully deleted a group.',

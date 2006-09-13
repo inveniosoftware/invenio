@@ -28,7 +28,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED
 from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.websession_config import cfg_websession_usergroup_status
+from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 ########################### Table of contents ################################
 #
@@ -107,7 +107,7 @@ def count_baskets(uid):
                                                ON ugbsk.id_usergroup=uug.id_usergroup
                 WHERE uug.id_user=%i AND uug.user_status!='%s'
                 GROUP BY ugbsk.id_usergroup"""
-    params = (int(uid), cfg_websession_usergroup_status['PENDING'])
+    params = (int(uid), CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
     res2 = run_sql(query2 % params)
     if len(res2):
         groups = reduce(lambda x, y: x + y, map(lambda x: x[0], res2))
@@ -144,7 +144,7 @@ def get_max_user_rights_on_basket(uid, bskid):
                               ON ug.id_usergroup=ub.id_usergroup
     WHERE ug.id_user=%i AND ub.id_bskBASKET=%i AND NOT(ub.share_level='NO') AND ug.user_status!='%s'
     """
-    params_group_baskets = (uid, bskid, cfg_websession_usergroup_status['PENDING'])
+    params_group_baskets = (uid, bskid, CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
     res = run_sql(query_group_baskets % params_group_baskets)
     group_index = None
     if res:
@@ -918,14 +918,14 @@ def get_group_infos(uid):
                WHERE ug.id_user=%i AND NOT(ugb.share_level='NO') AND ug.user_status!='%s'
                GROUP BY g.id
                ORDER BY g.name"""
-    params = (int(uid), cfg_websession_usergroup_status['PENDING'])
+    params = (int(uid), CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
     res = run_sql(query% params)
     return res  
 
 def count_groups_user_member_of(uid):
     """Return number of groups user has joined."""
     query = "SELECT count(id_usergroup) FROM user_usergroup WHERE id_user=%i AND user_status!='%s'"
-    params = (int(uid), cfg_websession_usergroup_status['PENDING'])
+    params = (int(uid), CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
     return __wash_count(run_sql(query % params))
 
 def get_groups_user_member_of(uid):
@@ -942,7 +942,7 @@ def get_groups_user_member_of(uid):
     WHERE ug.id_user=%i and ug.user_status!='%s'
     ORDER BY g.name
     """
-    params = (int(uid), cfg_websession_usergroup_status['PENDING'])
+    params = (int(uid), CFG_WEBSESSION_USERGROUP_STATUS['PENDING'])
     res = run_sql(query % params)
     if res:
         return res
