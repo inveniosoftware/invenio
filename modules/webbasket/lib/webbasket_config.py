@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-cfg_webbasket_share_levels = {'READITM': 'RI',
+CFG_WEBBASKET_SHARE_LEVELS = {'READITM': 'RI',
                               'READCMT': 'RC',
                               'ADDCMT': 'AC',
                               'ADDITM': 'AI',
@@ -31,22 +31,26 @@ cfg_webbasket_share_levels = {'READITM': 'RI',
                               'DELITM': 'DI',
                               'MANAGE': 'MA'
                               }
-cfg_webbasket_share_levels_ordered = [cfg_webbasket_share_levels['READITM'],
-                                      cfg_webbasket_share_levels['READCMT'],
-                                      cfg_webbasket_share_levels['ADDCMT'],
-                                      cfg_webbasket_share_levels['ADDITM'],
-                                      cfg_webbasket_share_levels['DELCMT'],
-                                      cfg_webbasket_share_levels['DELITM'],
-                                      cfg_webbasket_share_levels['MANAGE']]
-cfg_webbasket_categories = {'PRIVATE':  'P',
+
+CFG_WEBBASKET_SHARE_LEVELS_ORDERED = [CFG_WEBBASKET_SHARE_LEVELS['READITM'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['ADDITM'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['DELCMT'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
+                                      CFG_WEBBASKET_SHARE_LEVELS['MANAGE']]
+
+CFG_WEBBASKET_CATEGORIES = {'PRIVATE':  'P',
                             'GROUP':    'G',
                             'EXTERNAL': 'E'}
-cfg_webbasket_actions = {'DELETE': 'delete',
+
+CFG_WEBBASKET_ACTIONS = {'DELETE': 'delete',
                          'UP': 'moveup',
                          'DOWN': 'movedown',
                          'COPY': 'copy'}
 
-cfg_webbasket_max_number_of_displayed_baskets = 20
+CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS = 20
+
 cfg_webbasket_warning_messages = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")'

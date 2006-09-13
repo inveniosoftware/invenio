@@ -27,13 +27,13 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
 from invenio.search_engine import print_record
-from invenio.webbasket_config import cfg_webbasket_share_levels, \
-                                     cfg_webbasket_share_levels_ordered, \
-                                     cfg_webbasket_categories, \
-                                     cfg_webbasket_actions, \
+from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
+                                     CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
+                                     CFG_WEBBASKET_CATEGORIES, \
+                                     CFG_WEBBASKET_ACTIONS, \
                                      cfg_webbasket_warning_messages, \
                                      cfg_webbasket_error_messages, \
-                                     cfg_webbasket_max_number_of_displayed_baskets
+                                     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webuser import isGuestUser
                             
 import invenio.webbasket_dblayer as db
@@ -44,7 +44,7 @@ except ImportError:
     pass
     
 def perform_request_display(uid,
-                            category=cfg_webbasket_categories['PRIVATE'],
+                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                             selected_topic=0,
                             selected_group_id=0,
                             ln=cdslang):
@@ -63,13 +63,13 @@ def perform_request_display(uid,
     nb_external_baskets = db.count_external_baskets(uid)
     selectionbox = ''
     infobox = ''
-    if category == cfg_webbasket_categories['EXTERNAL']:
+    if category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
         baskets = db.get_external_baskets_infos(uid)
         if len(baskets):
             map(list, baskets)
         else:
-            category = cfg_webbasket_categories['PRIVATE']
-    if category == cfg_webbasket_categories['GROUP']:
+            category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
+    if category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         groups = db.get_group_infos(uid)
         if len(groups):
             if selected_group_id == 0 and len(groups):
@@ -82,12 +82,12 @@ def perform_request_display(uid,
                 """Suppress unused element in tuple."""
                 out = list(item)
                 if out[-1] == uid:
-                    out[-2] = cfg_webbasket_share_levels['MANAGE']
+                    out[-2] = CFG_WEBBASKET_SHARE_LEVELS['MANAGE']
                 return out[:-1]
             baskets = map(adapt_group_rights, baskets)
         else:
-            category = cfg_webbasket_categories['PRIVATE']
-    if category == cfg_webbasket_categories['PRIVATE']:
+            category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         topics_list = db.get_personal_topics_infos(uid)
         if not selected_topic and len(topics_list):
             selected_topic = 0
@@ -101,7 +101,7 @@ def perform_request_display(uid,
         def add_manage_rights(item):
             """ Convert a tuple to a list and add rights"""
             out = list(item)
-            out.append(cfg_webbasket_share_levels['MANAGE'])
+            out.append(CFG_WEBBASKET_SHARE_LEVELS['MANAGE'])
             return out
         baskets = map(add_manage_rights, baskets)
     
@@ -110,7 +110,7 @@ def perform_request_display(uid,
         bskids.append(basket[0])
     levels = dict(db.is_shared_to(bskids))
     create_link = ''
-    if category == cfg_webbasket_categories['PRIVATE']:
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         create_link = webbasket_templates.tmpl_create_basket_link(selected_topic, ln)
     infobox = webbasket_templates.tmpl_baskets_infobox(map(lambda x: (x[0], x[1], x[2]),
                                                            baskets), 
@@ -147,7 +147,7 @@ def perform_request_display(uid,
 def __display_basket(bskid, name, date_modification, nb_views,
                      nb_items, last_added,
                      share_level, group_sharing_level,
-                     category=cfg_webbasket_categories['PRIVATE'],
+                     category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      selected_topic=0, selected_group_id=0,
                      ln=cdslang):
     """Private function. Display a basket giving its category and topic or group.
@@ -193,11 +193,11 @@ def __display_basket(bskid, name, date_modification, nb_views,
                                            date_modification,
                                            nb_views,
                                            nb_items, last_added,
-                                           (__check_sufficient_rights(share_level, cfg_webbasket_share_levels['READITM']),
-                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['MANAGE']),
-                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['READCMT']),
-                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['ADDITM']),
-                                            __check_sufficient_rights(share_level, cfg_webbasket_share_levels['DELITM'])),
+                                           (__check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
+                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
+                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
                                            nb_bsk_cmts, last_cmt,
                                            group_sharing_level,
                                            category, selected_topic, selected_group_id,
@@ -206,7 +206,7 @@ def __display_basket(bskid, name, date_modification, nb_views,
     return (body, errors, warnings)
 
 def perform_request_display_item(uid, bskid, recid, format='hb',
-                                 category=cfg_webbasket_categories['PRIVATE'],
+                                 category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                  topic=0, group_id=0, ln=cdslang):
     """Display an item of a basket of given category, topic or group.
     @param uid: user id
@@ -222,15 +222,15 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     warnings = []
     
     rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if not(__check_sufficient_rights(rights, cfg_webbasket_share_levels['READITM'])):
+    if not(__check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
         return (body, errors, warnings)    
-    if category == cfg_webbasket_categories['PRIVATE']:
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         topics_list = db.get_personal_topics_infos(uid)
         if not topic and len(topics_list):
             topic = 0
         topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
-    elif category == cfg_webbasket_categories['GROUP']:
+    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         groups = db.get_group_infos(uid)
         if group_id == 0 and len(groups):
             group_id = groups[0][0]
@@ -252,9 +252,9 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     item_html = webbasket_templates.tmpl_item(basket, 
                                               recid, record, comments,
                                               group_sharing_level, 
-                                              (__check_sufficient_rights(rights, cfg_webbasket_share_levels['READCMT']),
-                                               __check_sufficient_rights(rights, cfg_webbasket_share_levels['ADDCMT']),
-                                               __check_sufficient_rights(rights, cfg_webbasket_share_levels['DELCMT'])),
+                                              (__check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                               __check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
+                                               __check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
                                               selected_category=category, selected_topic=topic, selected_group_id=group_id,
                                               ln=ln)
     body = webbasket_templates.tmpl_display(topicsbox=topicsbox, baskets=[item_html], 
@@ -265,7 +265,7 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     return (body, errors, warnings)
 
 def perform_request_write_comment(uid, bskid, recid, cmtid=0,
-                                  category=cfg_webbasket_categories['PRIVATE'],
+                                  category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                   topic=0, group_id=0,
                                   ln=cdslang):
     """Display a comment writing form
@@ -307,12 +307,12 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                                   selected_topic=topic,
                                                   selected_group_id=group_id,
                                                   warnings=warnings)
-    if category == cfg_webbasket_categories['PRIVATE']:
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         topics_list = db.get_personal_topics_infos(uid)
         if not topic and len(topics_list):
             topic = 0
         topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
-    elif category == cfg_webbasket_categories['GROUP']:
+    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         groups = db.get_group_infos(uid)
         if group_id == 0 and len(groups):
             group_id = groups[0][0]
@@ -347,7 +347,7 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=cdslan
 def perform_request_delete_comment(uid, bskid, recid, cmtid):
     """Delete comment cmtid on record recid for basket bskid."""
     errors = []
-    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELCMT']):
+    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELCMT']):
         db.delete_comment(bskid, recid, cmtid)
     else:
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
@@ -415,7 +415,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     return (body, errors, warnings)
 
 def perform_request_delete(uid, bskid, confirmed=0,
-                           category=cfg_webbasket_categories['PRIVATE'],
+                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
                            ln=cdslang):
     """Delete a given basket.
@@ -450,7 +450,7 @@ def delete_record(uid, bskid, recid):
     @param bskid: basket id
     @param recid: record id
     """
-    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['DELITM']):
+    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELITM']):
         db.delete_item(bskid, recid)
 
 def move_record(uid, bskid, recid, direction):
@@ -458,9 +458,9 @@ def move_record(uid, bskid, recid, direction):
     @param uid: user id (user has to have manage rights over this basket)
     @param bskid: basket id
     @param recid: record we want to move
-    @param direction: cfg_webbasket_actions['UP'] or cfg_webbasket_actions['DOWN']
+    @param direction: CFG_WEBBASKET_ACTIONS['UP'] or CFG_WEBBASKET_ACTIONS['DOWN']
     """
-    if __check_user_can_perform_action(uid, bskid, cfg_webbasket_share_levels['MANAGE']):
+    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']):
         db.move_item(bskid, recid, direction)
 
 def perform_request_edit(uid, bskid, topic=0, new_name='', 
@@ -484,7 +484,7 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
     warnings = []
 
     rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if rights != cfg_webbasket_share_levels['MANAGE']:
+    if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
         errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
         return (body, errors, warnings)
     bsk_name = db.get_basket_name(bskid)
@@ -543,7 +543,7 @@ def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
     @param ln: language
     """
     if group_id:
-        db.share_basket_with_group(bskid, group_id, cfg_webbasket_share_levels['READITM'])
+        db.share_basket_with_group(bskid, group_id, CFG_WEBBASKET_SHARE_LEVELS['READITM'])
     else:
         groups = db.get_groups_user_member_of(uid)
         body = webbasket_templates.tmpl_add_group(bskid, topic, groups, ln)
@@ -637,7 +637,7 @@ def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=cdslang)
     errors = []
     warnings = []
     total_baskets = db.count_public_baskets()
-    baskets = db.get_public_baskets_list(inf_limit, cfg_webbasket_max_number_of_displayed_baskets, order, asc)
+    baskets = db.get_public_baskets_list(inf_limit, CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, order, asc)
     body = webbasket_templates.tmpl_display_list_public_baskets(baskets, inf_limit, total_baskets, order, asc, ln)
     return (body, errors, warnings)
         
@@ -656,10 +656,10 @@ def perform_request_unsubscribe(uid, bskid):
     
 def __check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
-    min_right = cfg_webbasket_share_levels['ADDCMT']
+    min_right = CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']
     rights = db.get_max_user_rights_on_basket(uid, bskid)
     if rights:
-        if cfg_webbasket_share_levels_ordered.index(rights) >= cfg_webbasket_share_levels_ordered.index(min_right):
+        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
             return 1
     return 0
 
@@ -668,14 +668,14 @@ def __check_user_can_perform_action(uid, bskid, rights):
     min_right = rights
     rights = db.get_max_user_rights_on_basket(uid, bskid)
     if rights:
-        if cfg_webbasket_share_levels_ordered.index(rights) >= cfg_webbasket_share_levels_ordered.index(min_right):
+        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
             return 1
     return 0
 
 def __check_sufficient_rights(rights_user_has, rights_needed):
     """Private function, check if the rights are sufficient."""
     try:
-        out = cfg_webbasket_share_levels_ordered.index(rights_user_has) >= cfg_webbasket_share_levels_ordered.index(rights_needed)
+        out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_needed)
     except ValueError:
         out = 0
     return out
@@ -701,18 +701,18 @@ def create_personal_baskets_selection_box(uid,
                                                                    ln)
 
 def create_basket_navtrail(uid, 
-                           category=cfg_webbasket_categories['PRIVATE'], topic=0, group=0, 
+                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic=0, group=0, 
                            bskid=0, ln=cdslang):
     """display navtrail for basket navigation.
     @param uid: user id (int)
-    @param category: selected category (see cfg_webbasket_categories)
+    @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
     @param topic: selected topic # if personal baskets
     @param group: selected group id for displaying (int)
     @param bskid: basket id (int)
     @param ln: language"""
     _ = gettext_set_language(ln)
     out = ''
-    if category == cfg_webbasket_categories['PRIVATE']:
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Personal baskets"))
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
@@ -732,7 +732,7 @@ def create_basket_navtrail(uid,
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
                             basket[1])
                 
-    elif category == cfg_webbasket_categories['GROUP']:
+    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
         groups = db.get_group_infos(uid)
@@ -753,7 +753,7 @@ def create_basket_navtrail(uid,
                             'category=' + category + '&amp;group=' + str(group) + \
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
                             basket[1])
-    elif category == cfg_webbasket_categories['EXTERNAL']:
+    elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Others' baskets"))
         if bskid:
@@ -778,15 +778,15 @@ def account_list_baskets(uid, ln=cdslang):
     base_url = weburl + '/yourbaskets/display?category=%s&amp;ln=' + ln
     personal_text = personal
     if personal:
-        url = base_url % cfg_webbasket_categories['PRIVATE']
+        url = base_url % CFG_WEBBASKET_CATEGORIES['PRIVATE']
         personal_text = link % (url, personal_text)
     group_text = group
     if group:
-        url = base_url % cfg_webbasket_categories['GROUP']
+        url = base_url % CFG_WEBBASKET_CATEGORIES['GROUP']
         group_text = link % (url, group_text)
     external_text = external
     if external:
-        url = base_url % cfg_webbasket_categories['EXTERNAL']
+        url = base_url % CFG_WEBBASKET_CATEGORIES['EXTERNAL']
     else:
         url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text) 

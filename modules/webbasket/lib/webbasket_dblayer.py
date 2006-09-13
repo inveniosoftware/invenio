@@ -24,9 +24,9 @@ from zlib import decompress
 from time import localtime
 
 from invenio.dbquery import run_sql, escape_string
-from invenio.webbasket_config import cfg_webbasket_share_levels, \
-                                     cfg_webbasket_actions, \
-                                     cfg_webbasket_share_levels_ordered
+from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
+                                     CFG_WEBBASKET_ACTIONS, \
+                                     CFG_WEBBASKET_SHARE_LEVELS_ORDERED
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.websession_config import cfg_websession_usergroup_status
 
@@ -136,7 +136,7 @@ def get_max_user_rights_on_basket(uid, bskid):
     res = run_sql(query_owner % params_owner)
     if res and res[0][0]:
         # if this user is owner of this baskets he can do anything he wants.
-        return cfg_webbasket_share_levels['MANAGE']
+        return CFG_WEBBASKET_SHARE_LEVELS['MANAGE']
     # not owner => group member ?
     query_group_baskets = """
     SELECT share_level
@@ -149,7 +149,7 @@ def get_max_user_rights_on_basket(uid, bskid):
     group_index = None
     if res:
         try:
-            group_index = cfg_webbasket_share_levels_ordered.index(res[0][0])
+            group_index = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(res[0][0])
         except:
             return None
     # public basket ?
@@ -162,14 +162,14 @@ def get_max_user_rights_on_basket(uid, bskid):
     res = run_sql(query_public_baskets % bskid)
     if res:
         try:
-            public_index = cfg_webbasket_share_levels_ordered.index(res[0][0])
+            public_index = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(res[0][0])
         except:
             return None
     if group_index or public_index:
         if group_index > public_index:
-            return cfg_webbasket_share_levels_ordered[group_index]
+            return CFG_WEBBASKET_SHARE_LEVELS_ORDERED[group_index]
         else:
-            return cfg_webbasket_share_levels_ordered[public_index]
+            return CFG_WEBBASKET_SHARE_LEVELS_ORDERED[public_index]
     return None
             
 ########################### Personal baskets ##################################
@@ -366,9 +366,9 @@ def get_basket_record(bskid, recid, format='hb'):
     return ()
 
 def share_basket_with_group(bskid, group_id,
-                            share_level=cfg_webbasket_share_levels['READITM']):
+                            share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM']):
     """ Share basket bskid with group group_id with given share_level
-    @param share_level:  see cfg_webbasket_share_levels in webbasket_config
+    @param share_level:  see CFG_WEBBASKET_SHARE_LEVELS in webbasket_config
     """
     now = convert_datestruct_to_datetext(localtime())
     query = """REPLACE INTO usergroup_bskBASKET
@@ -406,7 +406,7 @@ def move_item(bskid, recid, direction):
     (recids, scores) = (list(recids), list(scores))
     if len(recids) and recid in recids:
         current_index = recids.index(recid)
-        if direction == cfg_webbasket_actions['UP']:
+        if direction == CFG_WEBBASKET_ACTIONS['UP']:
             switch_index = 0
             if current_index != 0:
                 switch_index = current_index -1
@@ -554,13 +554,13 @@ def get_group_baskets_infos(gid):
     return ()
 
 def get_all_group_baskets_names(uid,
-                                min_rights=cfg_webbasket_share_levels['ADDCMT']):
+                                min_rights=CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']):
     """ for a given user returns every group baskets in which he can <min_rights>
     return a list of tuples: (bskid, bsk_name, group_name)
     """
     uid = int(uid)
     try:
-        min_rights_num = cfg_webbasket_share_levels_ordered.index(min_rights)
+        min_rights_num = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_rights)
     except ValueError:
         return ()
     groups = get_groups_user_member_of(uid)
@@ -570,9 +570,9 @@ def get_all_group_baskets_names(uid,
             where_clause += 'ugbsk.id_usergroup=%i OR ' % int(group_id)
         where_clause += 'ugbsk.id_usergroup=%i)' % int(groups[-1][0])
         where_clause += ' AND (' 
-        for right in cfg_webbasket_share_levels_ordered[min_rights_num:-1]:
+        for right in CFG_WEBBASKET_SHARE_LEVELS_ORDERED[min_rights_num:-1]:
             where_clause += "ugbsk.share_level = '%s' OR " % right
-        where_clause += "ugbsk.share_level = '%s')" % cfg_webbasket_share_levels_ordered[-1]
+        where_clause += "ugbsk.share_level = '%s')" % CFG_WEBBASKET_SHARE_LEVELS_ORDERED[-1]
         query = """
         SELECT bsk.id,
                bsk.name,
@@ -650,7 +650,7 @@ def count_external_baskets(uid):
     return __wash_count(run_sql(query % (int(uid), int(uid))))
 
 def get_all_external_baskets_names(uid,
-                                   min_rights=cfg_webbasket_share_levels['ADDCMT']):
+                                   min_rights=CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']):
     
     """ for a given user returns every basket which he has subscribed to and in which
     he can <min_rights>
@@ -658,13 +658,13 @@ def get_all_external_baskets_names(uid,
     """
     uid = int(uid)
     try:
-        min_rights_num = cfg_webbasket_share_levels_ordered.index(min_rights)
+        min_rights_num = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_rights)
     except ValueError:
         return ()
     where_clause = ' AND ('
-    for right in cfg_webbasket_share_levels_ordered[min_rights_num:-1]:
+    for right in CFG_WEBBASKET_SHARE_LEVELS_ORDERED[min_rights_num:-1]:
         where_clause += "ugbsk.share_level = '%s' OR " % right
-    where_clause += "ugbsk.share_level = '%s')" % cfg_webbasket_share_levels_ordered[-1]
+    where_clause += "ugbsk.share_level = '%s')" % CFG_WEBBASKET_SHARE_LEVELS_ORDERED[-1]
     query = """
     SELECT bsk.id,
            bsk.name

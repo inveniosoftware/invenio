@@ -18,9 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.messages import gettext_set_language
-from invenio.webbasket_config import cfg_webbasket_categories, \
-                                     cfg_webbasket_share_levels, \
-                                     cfg_webbasket_max_number_of_displayed_baskets
+from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
+                                     CFG_WEBBASKET_SHARE_LEVELS, \
+                                     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.config import weburl, sweburl, cdslang
 from invenio.textutils import indent_text
@@ -35,7 +35,7 @@ class Template:
                      topicsbox='',
                      baskets_infobox='',
                      baskets=[],
-                     selected_category=cfg_webbasket_categories['PRIVATE'],
+                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      nb_groups=0,
                      nb_external_baskets=0,
                      ln=cdslang):
@@ -68,16 +68,16 @@ class Template:
         return out
     
     def __create_tabs(self,
-                      selected_category=cfg_webbasket_categories['PRIVATE'],
+                      selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                       nb_groups=0,
                       nb_external_baskets=0,
                       ln=cdslang):
         """private function, display tabs (private baskets, group baskets, others' basket)."""
         _ = gettext_set_language(ln)
         selected = ' id="bsktab_selected"'
-        private = cfg_webbasket_categories['PRIVATE']
-        group = cfg_webbasket_categories['GROUP']
-        external = cfg_webbasket_categories['EXTERNAL']
+        private = CFG_WEBBASKET_CATEGORIES['PRIVATE']
+        group = CFG_WEBBASKET_CATEGORIES['GROUP']
+        external = CFG_WEBBASKET_CATEGORIES['EXTERNAL']
         tab = """
 <div class="bsktab"%(selected)s>
   <img src="%(url)s/img/%(img)s" alt="%(label)s" />
@@ -112,7 +112,7 @@ class Template:
         """Display the topics selection area.
         @param topics_list: list of (topic name, number of baskets) tuples
         @param selected_topic: # of selected topic in topics_list"""
-        category = cfg_webbasket_categories['PRIVATE']
+        category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
         if len(topics_list):
             selected_topic = selected_topic <= len(topics_list) and selected_topic or 0
             i = 0
@@ -149,7 +149,7 @@ class Template:
         @param groups_list: list of (group id, group name, number of baskets) tuples
         @param selected_group id: id of group selected"""
         out = ''
-        category = cfg_webbasket_categories['GROUP']
+        category = CFG_WEBBASKET_CATEGORIES['GROUP']
         if len(groups_list): 
             for (group_id, group_name, number_of_baskets) in groups_list:
                 out += '<span class="bsktopic">'
@@ -329,19 +329,19 @@ class Template:
         change_page = '<a href="' + weburl + '/yourbaskets/list_public_baskets?inf_limit=%i&amp;order=' + str(order)
         change_page += '&amp;asc=' + str(asc) + '&amp;ln=' + str(ln) + '"><img src="%s" style="border: 0px;"/></a> '
         footer = ''
-        if inf_limit > (cfg_webbasket_max_number_of_displayed_baskets * 2)-1:
+        if inf_limit > (CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS * 2)-1:
             footer += change_page % (0, weburl + '/img/sb.gif')
         if inf_limit > 0:
-            footer += change_page % (inf_limit - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sp.gif')
+            footer += change_page % (inf_limit - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, weburl + '/img/sp.gif')
         footer += ' ' + _("Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets in total.") %\
             {'x_nb_begin': inf_limit+1, 
              'x_nb_end': inf_limit + len(baskets), 
              'x_nb_total': total_baskets} 
         footer += ' '
         if inf_limit + len(baskets) < total_baskets:
-            footer += change_page % (inf_limit + cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/sn.gif')
-        if inf_limit + len(baskets) < total_baskets - cfg_webbasket_max_number_of_displayed_baskets:
-            footer += change_page % (total_baskets - cfg_webbasket_max_number_of_displayed_baskets, weburl + '/img/se.gif')
+            footer += change_page % (inf_limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, weburl + '/img/sn.gif')
+        if inf_limit + len(baskets) < total_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS:
+            footer += change_page % (total_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, weburl + '/img/se.gif')
 
         out = """
 <table>
@@ -380,7 +380,7 @@ class Template:
                     user_can_view_comments, user_can_add_item, user_can_delete_item),
                     nb_comments, last_comment,
                     group_sharing_level,
-                    selected_category=cfg_webbasket_categories['PRIVATE'],
+                    selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                     selected_topic=0, selected_group=0,
                     items=[],
                     ln=cdslang):
@@ -448,7 +448,7 @@ class Template:
   </td>
 </tr>""" % _("You do not have sufficient rights to view this basket's content.")
         content = ''
-        if selected_category == cfg_webbasket_categories['EXTERNAL']:
+        if selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
             action %= (url, _("Unsubscribe from this basket"))
@@ -500,7 +500,7 @@ class Template:
                          bskid,
                          item,
                          uparrow=0, downarrow=0, copy_item=0, delete_item=0, view_comments=0,
-                         selected_category=cfg_webbasket_categories['PRIVATE'],
+                         selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                          selected_topic=0, selected_group=0,
                          ln=cdslang):
         """
@@ -586,7 +586,7 @@ class Template:
 
     def tmpl_basket_footer(self,
                            bskid,
-                           selected_category=cfg_webbasket_categories['PRIVATE'],
+                           selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0,
                            selected_group=0,
                            group_sharing_level=None,
@@ -646,7 +646,7 @@ class Template:
                   recid, record, comments,
                   group_sharing_level, 
                   (user_can_view_comments, user_can_add_comment, user_can_delete_comment),
-                  selected_category=cfg_webbasket_categories['PRIVATE'],
+                  selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                   selected_topic=0, selected_group_id=0, ln=cdslang):
         """display a specific item inside a basket. first parameter is this a big tuple which defines a basket.
         @param group sharing level: None: basket is not shared, 
@@ -706,7 +706,7 @@ class Template:
         else:
             img = '<img src="%s/img/webbasket_usergroup.png" alt="%s" />' % (weburl, _("Group-shared basket"))
         content = ''
-        if selected_category == cfg_webbasket_categories['EXTERNAL']:
+        if selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             url = "%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s" % (weburl, bskid, ln)
             action = "<a href=\"%s\">%s</a>"
             action %= (url, _("Unsubscribe from this basket"))
@@ -759,7 +759,7 @@ class Template:
     def __tmpl_display_comment(self, bskid, recid, 
                                (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid),
                                (user_can_add_comment, user_can_delete_comment),
-                               selected_category=cfg_webbasket_categories['PRIVATE'],
+                               selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                selected_topic=0, selected_group_id=0, ln=cdslang):
         """Display a given comment. """
         _ = gettext_set_language(ln)
@@ -812,7 +812,7 @@ class Template:
     def tmpl_write_comment(self, bskid, recid,
                            record,
                            cmt_body='',
-                           selected_category=cfg_webbasket_categories['PRIVATE'],
+                           selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
                            ln=cdslang,
                            warnings=[]):
@@ -820,7 +820,7 @@ class Template:
         @param bskid: basket id (int)
         @param recid: record id (int)
         @param record: text of the record (str)
-        @param selected_category: cfg_webbasket_categories
+        @param selected_category: CFG_WEBBASKET_CATEGORIES
         @param selected_topic: # of topic
         @param selected_group_id: in case of category: group, id of selected group
         @param ln: language
@@ -1098,7 +1098,7 @@ class Template:
     
     def tmpl_confirm_delete(self, bskid,
                             (nb_users, nb_groups, nb_alerts),
-                            category=cfg_webbasket_categories['PRIVATE'],
+                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                             selected_topic=0, selected_group_id=0,
                             ln=cdslang):
         """
@@ -1164,7 +1164,7 @@ class Template:
                   display_general=0, display_sharing=0, display_delete=0, ln=cdslang):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
-        @param external_rights: rights as defined in cfg_webbasket_share_levels for public access.
+        @param external_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS for public access.
         @param display_general: display fields name and topic, used with personal baskets
         @param display_sharing: display sharing possibilities
         @param display_delete: display delete basket button
@@ -1270,48 +1270,48 @@ class Template:
     def __create_rights_selection_menu(self, name, current_rights, ln=cdslang):
         """Private function. create a drop down menu for selection of rights
         @param name: name of menu (for HTML name attribute)
-        @param current_rights: rights as defined in cfg_webbasket_share_levels
+        @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
         @param ln: language
         """
         _ = gettext_set_language(ln)
         elements = [('NO', _("No rights")),
-                    (cfg_webbasket_share_levels['READITM'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                      _("View records")),
-                    (cfg_webbasket_share_levels['READCMT'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
                      '... ' + _("and") + ' ' + _("view comments")),
-                    (cfg_webbasket_share_levels['ADDCMT'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
                      '... ' + _("and") + ' ' + _("add comments")),
-                    (cfg_webbasket_share_levels['ADDITM'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['ADDITM'],
                      '... ' + _("and") + ' ' + _("add records")),
-                    (cfg_webbasket_share_levels['DELCMT'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['DELCMT'],
                      '... ' + _("and") + ' ' + _("delete comments")),
-                    (cfg_webbasket_share_levels['DELITM'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
                      '... ' + _("and") + ' ' + _("remove records")),
-                    (cfg_webbasket_share_levels['MANAGE'],
+                    (CFG_WEBBASKET_SHARE_LEVELS['MANAGE'],
                      '... ' + _("and") + ' ' + _("manage sharing rights"))
                     ]
         return self.__create_select_menu(name, elements, current_rights)
 
     def __create_group_rights_selection_menu(self, group_id, current_rights, ln=cdslang):
         """Private function. create a drop down menu for selection of rights
-        @param current_rights: rights as defined in cfg_webbasket_share_levels
+        @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
         @param ln: language
         """
         _ = gettext_set_language(ln)
         elements = [(str(group_id) + '_' + 'NO', _("No rights")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['READITM'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                      _("View records")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['READCMT'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
                      '... ' + _("and") + ' ' + _("view comments")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['ADDCMT'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
                      '... ' + _("and") + ' ' + _("add comments")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['ADDITM'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDITM'],
                      '... ' + _("and") + ' ' + _("add records")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['DELCMT'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELCMT'],
                      '... ' + _("and") + ' ' + _("delete comments")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['DELITM'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
                      '... ' + _("and") + ' ' + _("remove records")),
-                    (str(group_id) + '_' + cfg_webbasket_share_levels['MANAGE'],
+                    (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['MANAGE'],
                      '... ' + _("and") + ' ' + _("manage sharing rights"))
                     ]
         return self.__create_select_menu('groups', elements, str(group_id) + '_' + current_rights)

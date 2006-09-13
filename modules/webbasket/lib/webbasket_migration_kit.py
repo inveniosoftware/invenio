@@ -34,7 +34,7 @@ Main function: migrate_v071_baskets()
 """
 
 from invenio.dbquery import run_sql, escape_string
-from invenio.webbasket_config import cfg_webbasket_share_levels
+from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS
 
 import sys
 
@@ -76,10 +76,10 @@ def migrate_v071_baskets():
         except:
             choosed = 0
     share_levels = [None, 
-                    cfg_webbasket_share_levels['READITM'],
-                    cfg_webbasket_share_levels['READCMT'],
-                    cfg_webbasket_share_levels['ADDCMT'],
-                    cfg_webbasket_share_levels['ADDITM']]
+                    CFG_WEBBASKET_SHARE_LEVELS['READITM'],
+                    CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
+                    CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
+                    CFG_WEBBASKET_SHARE_LEVELS['ADDITM']]
     default_share_level = share_levels[default_share_level]
     print "==============================="
     print "Checking database consistency..."
@@ -242,7 +242,7 @@ def __check_baskets_exist():
     
     
 def __update_baskets(default_topic_name="Imported baskets", 
-                     default_share_level=cfg_webbasket_share_levels['READITM'],
+                     default_share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                      drop_old_tables=0):
     """"""
     __import_baskets(default_topic_name, default_share_level)
@@ -252,7 +252,7 @@ def __update_baskets(default_topic_name="Imported baskets",
         __drop_baskets()
 
 def __import_baskets(default_topic_name="Imported baskets", 
-                     default_share_level=cfg_webbasket_share_levels['READITM']):
+                     default_share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM']):
     """"""
     query1 = """SELECT bsk.id,
                        bsk.name,
