@@ -170,7 +170,7 @@ def perform_request_submit(ln, recid):
 def get_file_path(recid):
     """ return the file path of record. """
     
-    return "%s/%s_%s" % (tmpdir, cfg_bibedit_tmpfilenameprefix, str(recid))
+    return "%s/%s_%s" % (tmpdir, CFG_BIBEDIT_TMPFILENAMEPREFIX, str(recid))
 
 
 def save_xml_record(recid):    
@@ -221,7 +221,7 @@ def get_record(ln, recid, uid, temp):
         if uid_record_temp != uid:
 
             time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
-            time_out_file = int(time.time()) - cfg_bibedit_timeout
+            time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
             
             if time_tmp_file < time_out_file :
                 

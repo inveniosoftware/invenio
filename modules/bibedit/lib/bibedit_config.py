@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 ## When a user edits a record, this record is locked to prevent other
 ## users to edit it at the same time.  After how many seconds the
 ## locked record will be again free for other people to edit?
-cfg_bibedit_timeout = 3600 # 1 hour
+CFG_BIBEDIT_TIMEOUT = 3600 # 1 hour
 
 ## Beginning of the name of the temporary files:
-cfg_bibedit_tmpfilenameprefix = "bibedit_record"
+CFG_BIBEDIT_TMPFILENAMEPREFIX = "bibedit_record"
