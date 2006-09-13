@@ -39,7 +39,6 @@ except ImportError, e:
 try:
     from invenio.config import *
     from invenio.search_engine import perform_request_search
-    from invenio.oai_repository_config import cfg_oai_id_prefix
 
 except ImportError, e:
     print "Error: %s" % e
