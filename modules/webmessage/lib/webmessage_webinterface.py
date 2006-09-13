@@ -27,7 +27,7 @@ from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.config import weburl, cdslang
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webmessage import *
-from invenio.webmessage_config import cfg_webmessage_results_field
+from invenio.webmessage_config import CFG_WEBMESSAGE_RESULTS_FIELD
 from invenio.webpage import page
 from invenio.messages import gettext_set_language
 from invenio.urlutils import redirect_to_url
@@ -122,7 +122,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param_msg_send_month: month to send this message on (int)
         @param_msg_send_day: day to send this message on (int)
         @param results_field: value determining which results field to display. 
-                              See cfg_webmessage_results_field in webmessage_config.py
+                              See CFG_WEBMESSAGE_RESULTS_FIELD in webmessage_config.py
         @param names_to_add: list of usernames ['str'] to add to msg_to_user / group
         @param search_pattern: will search for users/groups with this pattern (str)
         @param add_values: if 1 users_to_add will be added to msg_to_user field..
@@ -137,7 +137,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                    'msg_send_year': (int, 0),
                                    'msg_send_month': (int, 0),
                                    'msg_send_day': (int, 0),
-                                   'results_field': (str, cfg_webmessage_results_field['NONE']),
+                                   'results_field': (str, CFG_WEBMESSAGE_RESULTS_FIELD['NONE']),
                                    'names_selected': (list, []), 
                                    'search_pattern': (str, ""), 
                                    'send_button': (str, ""), 
@@ -152,22 +152,22 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
             return page_not_authorized(req, "%s/yourmessages/send" % (weburl,))
         _ = gettext_set_language(argd['ln'])
         if argd['send_button']:
-           (body, errors, warnings, title, navtrail) = perform_request_send(uid=uid,
-                                                                            msg_to_user=argd['msg_to_user'],
-                                                                            msg_to_group=argd['msg_to_group'],
-                                                                            msg_subject=argd['msg_subject'],
-                                                                            msg_body=argd['msg_body'],
-                                                                            msg_send_year=argd['msg_send_year'],
-                                                                            msg_send_month=argd['msg_send_month'],
-                                                                            msg_send_day=argd['msg_send_day'],
-                                                                            ln=argd['ln'])
+            (body, errors, warnings, title, navtrail) = perform_request_send(uid=uid,
+                                                                             msg_to_user=argd['msg_to_user'],
+                                                                             msg_to_group=argd['msg_to_group'],
+                                                                             msg_subject=argd['msg_subject'],
+                                                                             msg_body=argd['msg_body'],
+                                                                             msg_send_year=argd['msg_send_year'],
+                                                                             msg_send_month=argd['msg_send_month'],
+                                                                             msg_send_day=argd['msg_send_day'],
+                                                                             ln=argd['ln'])
         else:
             title = _('Write a message')
             navtrail = get_navtrail(argd['ln'], title)
             if argd['search_user']:
-                argd['results_field'] = cfg_webmessage_results_field['USER']
+                argd['results_field'] = CFG_WEBMESSAGE_RESULTS_FIELD['USER']
             elif argd['search_group']:
-                argd['results_field'] = cfg_webmessage_results_field['GROUP']
+                argd['results_field'] = CFG_WEBMESSAGE_RESULTS_FIELD['GROUP']
             add_values = 0
             if argd['add_group'] or argd['add_user']:
                 add_values = 1

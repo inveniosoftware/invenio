@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-## Messaging system (internal)
-
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -19,12 +18,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ WebMessage module, messaging system"""
 
-__lastupdated__ = "$Date$"
 __version__ = "$Id$"
 
-# CDSWare imports
 from invenio.webmessage_dblayer import *
 from invenio.webmessage_config import *
 from invenio.config import cdslang
@@ -71,8 +69,8 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
 	    # but not in table msgMESSAGE => table inconsistency
             errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
         else:
-            if (msg_status == cfg_webmessage_status_code['NEW']):
-                set_message_status(uid, msgid, cfg_webmessage_status_code['READ'])
+            if (msg_status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
+                set_message_status(uid, msgid, CFG_WEBMESSAGE_STATUS_CODE['READ'])
             body = webmessage_templates.tmpl_display_msg(msg_id, 
                                                          msg_from_id,
                                                          msg_from_nickname,
@@ -97,7 +95,7 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
     rows = get_all_messages_for_user(uid)
     nb_messages = 0
     nb_messages = count_nb_messages(uid)
-    no_quota_users = list_users_in_roles(cfg_webmessage_roles_without_quota)
+    no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
     no_quota = 0
     if uid in no_quota_users:
        no_quota = 1
@@ -218,7 +216,7 @@ def perform_request_write_with_search(uid,
                                       msg_send_day=0,
                                       names_selected=[],
                                       search_pattern="",
-                                      results_field=cfg_webmessage_results_field['NONE'],
+                                      results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
                                       add_values=0,
                                       ln=cdslang):
     """
@@ -244,9 +242,9 @@ def perform_request_write_with_search(uid,
     search_results_list = []
     def cat_names(name1, name2):
         """ name1, name2 => 'name1, name2' """
-        return name1 + cfg_webmessage_separator + " " + name2
+        return name1 + CFG_WEBMESSAGE_SEPARATOR + " " + name2
     
-    if results_field == cfg_webmessage_results_field['USER']:
+    if results_field == CFG_WEBMESSAGE_RESULTS_FIELD['USER']:
         if add_values and len(names_selected):
             usernames_to_add = reduce(cat_names, names_selected)
             if msg_to_user:
@@ -259,7 +257,7 @@ def perform_request_write_with_search(uid,
             for user_name in users_found:
                 search_results_list.append((user_name[0], user_name[0] in names_selected))
         
-    elif results_field == cfg_webmessage_results_field['GROUP']:
+    elif results_field == CFG_WEBMESSAGE_RESULTS_FIELD['GROUP']:
         if add_values and len(names_selected):
             groupnames_to_add = reduce(cat_names, names_selected)
             if msg_to_group:
@@ -314,8 +312,8 @@ def perform_request_send(uid,
         """suppress spaces before and after x (str)"""
         return str.strip()
     # wash user input
-    users_to = map(strip_spaces, msg_to_user.split(cfg_webmessage_separator))
-    groups_to = map(strip_spaces, msg_to_group.split(cfg_webmessage_separator))
+    users_to = map(strip_spaces, msg_to_user.split(CFG_WEBMESSAGE_SEPARATOR))
+    groups_to = map(strip_spaces, msg_to_group.split(CFG_WEBMESSAGE_SEPARATOR))
 
     if users_to == ['']:
         users_to = []
@@ -328,14 +326,14 @@ def perform_request_send(uid,
     infos = []
     problem = None
 
-    users_to_str = cfg_webmessage_separator.join(users_to)
-    groups_to_str = cfg_webmessage_separator.join(groups_to)
+    users_to_str = CFG_WEBMESSAGE_SEPARATOR.join(users_to)
+    groups_to_str = CFG_WEBMESSAGE_SEPARATOR.join(groups_to)
     
     send_on_date = get_datetext(msg_send_year, msg_send_month, msg_send_day)
     if (msg_send_year == msg_send_month == msg_send_day == 0):
-        status = cfg_webmessage_status_code['NEW']
+        status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
     else:
-        status = cfg_webmessage_status_code['REMINDER']
+        status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
         if send_on_date == datetext_default:
             warning = _("The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid.")
             warning = warning % {'x_year': msg_send_year,
@@ -349,8 +347,8 @@ def perform_request_send(uid,
         warnings.append(_("Please enter a user name or a group name."))
         problem = 1
         
-    if len(msg_body) > cfg_webmessage_max_size_of_message:
-        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.")%(cfg_webmessage_max_size_of_message,))
+    if len(msg_body) > CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE:
+        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.")%(CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))
         problem = 1
 
     users_dict = get_uids_from_nicks(users_to)

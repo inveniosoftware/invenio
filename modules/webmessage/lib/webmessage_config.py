@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
 ## 
-## Configuration for webmessage module
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -19,11 +18,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 webmessage config file, here you can manage error messages, size of messages,
 quotas, and some db related fields...
 """
-__revision__ = '1.3, 15 nov 2005 '
+
+__revision__ = "$Id$"
 
 # error messages. (should not happen, except in case of reload, or url altering) 
 cfg_webmessage_error_messages = \
@@ -33,14 +34,14 @@ cfg_webmessage_error_messages = \
 }
 
 # status of message (table user_msgMESSAGE)
-cfg_webmessage_status_code = \
+CFG_WEBMESSAGE_STATUS_CODE = \
 {
     'NEW': 'N',
     'READ': 'R',
     'REMINDER': 'M'
 }
 # values indicating which results field to display while writing a message
-cfg_webmessage_results_field = \
+CFG_WEBMESSAGE_RESULTS_FIELD = \
 {
     'USER': 'user',
     'GROUP': 'group',
@@ -48,15 +49,15 @@ cfg_webmessage_results_field = \
 }
 
 # separator used in every list of recipients
-cfg_webmessage_separator = ','
+CFG_WEBMESSAGE_SEPARATOR = ','
 
 # max length of a message
-cfg_webmessage_max_size_of_message = 20000
+CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE = 20000
 
 # quota for messages for users (admins, see below)
-cfg_webmessage_max_nb_of_messages = 30
+CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES = 30
 
 # list of roles (find them in accROLE table) without quota
-cfg_webmessage_roles_without_quota = ['superadmin']
+CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 
-cfg_webmessage_days_before_delete_orphans = 60
+CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS = 60

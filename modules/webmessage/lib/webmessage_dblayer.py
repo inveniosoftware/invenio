@@ -24,10 +24,10 @@
 from time import localtime, mktime
 
 from invenio.dbquery import run_sql, escape_string
-from invenio.webmessage_config import cfg_webmessage_status_code, \
-                                      cfg_webmessage_max_nb_of_messages, \
-                                      cfg_webmessage_roles_without_quota, \
-                                      cfg_webmessage_days_before_delete_orphans
+from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
+                                      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
+                                      CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.webuser import list_users_in_roles
@@ -96,7 +96,7 @@ def set_message_status(uid, msgid, new_status):
     """ 
     Change the status of a message (e.g. from "new" to "read").
     the status is a single character string, specified in constant
-    cfg_webmessage_status_code in file webmessage_config.py
+    CFG_WEBMESSAGE_STATUS_CODE in file webmessage_config.py
     examples:
         N: New message
         R: alreay Read message
@@ -120,7 +120,7 @@ def get_nb_new_messages_for_user(uid):
     @return number of new mails as int.
     """
     update_user_inbox_for_reminders(uid)
-    new_status = cfg_webmessage_status_code['NEW']
+    new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
     query = """SELECT count(id_msgMESSAGE)
                FROM user_msgMESSAGE
                WHERE id_user_to=%i AND
@@ -136,7 +136,7 @@ def get_nb_readable_messages_for_user(uid):
     @param uid: user id (int)
     @return number of messages (int)
     """
-    reminder_status = cfg_webmessage_status_code['REMINDER']
+    reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query = """SELECT count(id_msgMESSAGE)
                FROM user_msgMESSAGE
                WHERE id_user_to=%i AND
@@ -162,7 +162,7 @@ def get_all_messages_for_user(uid):
               message_status)]
     """
     update_user_inbox_for_reminders(uid)
-    reminder_status = cfg_webmessage_status_code['REMINDER']
+    reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query = """SELECT  m.id,
                        m.id_user_from,
                        u.nickname,
@@ -250,7 +250,7 @@ def delete_all_messages(uid):
     @param uid: user id
     @return the number of messages deleted 
     """
-    reminder_status = cfg_webmessage_status_code['REMINDER']
+    reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query1 = """SELECT id_msgMESSAGE
                FROM user_msgMESSAGE
                WHERE id_user_to=%i AND
@@ -396,7 +396,7 @@ def create_message(uid_from,
     msg_id = run_sql(query%params)
     return int(msg_id)
 
-def send_message(uids_to, msgid, status=cfg_webmessage_status_code['NEW']):
+def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
     """
     Send message to uids
     @param uids: sequence of user ids
@@ -408,7 +408,7 @@ def send_message(uids_to, msgid, status=cfg_webmessage_status_code['NEW']):
         uids_to = [uids_to]   
     user_problem = []
     if len(uids_to) > 0:
-        users_quotas = check_quota(cfg_webmessage_max_nb_of_messages - 1)
+        users_quotas = check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
         query = """INSERT INTO user_msgMESSAGE
                            (id_user_to, id_msgMESSAGE, status)
                     VALUES """
@@ -432,7 +432,7 @@ def check_quota(nb_messages):
     @return a dictionary of users over-quota
     """
     where = ''
-    no_quota_users = list_users_in_roles(cfg_webmessage_roles_without_quota)
+    no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
     if len(no_quota_users) > 0:
         where = """WHERE """
         for uid in no_quota_users[:-1]:
@@ -459,8 +459,8 @@ def update_user_inbox_for_reminders(uid):
     @return integer number of new expired reminders
     """
     now =  convert_datestruct_to_datetext(localtime())
-    reminder_status = cfg_webmessage_status_code['REMINDER']
-    new_status = cfg_webmessage_status_code['NEW']        
+    reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
+    new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']        
     query1 = """SELECT m.id
                 FROM   msgMESSAGE m,
                        user_msgMESSAGE um
@@ -525,7 +525,7 @@ def clean_messages():
     """ Cleans msgMESSAGE table"""
     current_time = localtime()
     seconds = mktime(current_time)
-    seconds -= cfg_webmessage_days_before_delete_orphans * 86400
+    seconds -= CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS * 86400
     sql_date = convert_datestruct_to_datetext(localtime(seconds))    
     deleted_items = 0
     #find id and email from every user who has got an email

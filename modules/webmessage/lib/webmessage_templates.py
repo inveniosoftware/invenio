@@ -23,10 +23,10 @@
 
 # CDS imports
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
-from invenio.webmessage_config import cfg_webmessage_status_code, \
-                                      cfg_webmessage_separator, \
-                                      cfg_webmessage_max_nb_of_messages, \
-                                      cfg_webmessage_results_field
+from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
+                                      CFG_WEBMESSAGE_SEPARATOR, \
+                                      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+                                      CFG_WEBMESSAGE_RESULTS_FIELD
 from invenio.textutils import indent_text
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
@@ -105,7 +105,7 @@ class Template:
                                                                             _("Delete"))
             s_date = convert_datetext_to_dategui(sent_date, ln)
             stat_style = ''
-            if (status == cfg_webmessage_status_code['NEW']):
+            if (status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
                 stat_style = ' style="font-weight:bold"' 
             inbox += """
     <tr class="mailboxrecord">
@@ -146,7 +146,7 @@ class Template:
                    warnings=[],
                    search_results_list=[],
                    search_pattern="",
-                   results_field=cfg_webmessage_results_field['NONE'],
+                   results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
                    ln=cdslang):
         """
         Displays a writing message form with optional prefilled fields
@@ -159,7 +159,7 @@ class Template:
         @param warnings: display warnings on top of page
         @param search_results_list: list of tuples. (user/groupname, is_selected)
         @param search_pattern: pattern used for searching
-        @param results_field: 'none', 'user' or 'group', see cfg_webmessage_results_field
+        @param results_field: 'none', 'user' or 'group', see CFG_WEBMESSAGE_RESULTS_FIELD
         @param ln: language of the form
         @return the form in HTML format
         """
@@ -309,25 +309,25 @@ class Template:
         _ = gettext_set_language(ln)
         
         sent_to_link = ''
-        tos = msg_sent_to.split(cfg_webmessage_separator)
+        tos = msg_sent_to.split(CFG_WEBMESSAGE_SEPARATOR)
         if (tos):
             for to in tos[0:-1]:
                 to_display = to
                 if to.isdigit():
                     (dummy, to, to_display) = get_user_info(int(to), ln)
                 sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
-                sent_to_link += '%s</a>%s '% (to_display, cfg_webmessage_separator)
+                sent_to_link += '%s</a>%s '% (to_display, CFG_WEBMESSAGE_SEPARATOR)
             to_display = tos[-1]
             to = tos[-1]
             if to.isdigit():
                 (dummy, to, to_display) = get_user_info(int(to), ln)
             sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, to_display)
         group_to_link = ""
-        groups = msg_sent_to_group.split(cfg_webmessage_separator)
+        groups = msg_sent_to_group.split(CFG_WEBMESSAGE_SEPARATOR)
         if (groups):
             for group in groups[0:-1]:
                 group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">'% (group, ln)
-                group_to_link += '%s</a>%s '% (group, cfg_webmessage_separator)
+                group_to_link += '%s</a>%s '% (group, CFG_WEBMESSAGE_SEPARATOR)
             group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">%s</a>'% (groups[-1], ln, groups[-1])
         # format the msg so that the '>>' chars give vertical lines
         final_body = email_quoted_txt2html(msg_body)
@@ -526,13 +526,13 @@ class Template:
         @return html output
         """
         _ = gettext_set_language(ln)
-        quota = float(cfg_webmessage_max_nb_of_messages)
+        quota = float(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES)
         ratio = float(nb_messages) / quota
         out = """
 %(quota_label)s<br/>
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
-</div>""" %{'quota_label' : _("Quota used: %i messages out of max. %i")%(nb_messages, cfg_webmessage_max_nb_of_messages),
+</div>""" %{'quota_label' : _("Quota used: %i messages out of max. %i")%(nb_messages, CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES),
             'width' : int(ratio * 200)
             }
 
@@ -562,29 +562,29 @@ class Template:
     def tmpl_user_or_group_search(self,
                                   tuples_list=[],
                                   search_pattern="",
-                                  results_field=cfg_webmessage_results_field['NONE'],
+                                  results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
                                   ln=cdslang):
         """
         Display a box for user searching
         @param tuples_list: list of (value, is_selected) tuples
         @param search_pattern: text to display in this field
-        @param results_field: either 'none', 'user', 'group', look at cfg_webmessage_results_field
+        @param results_field: either 'none', 'user', 'group', look at CFG_WEBMESSAGE_RESULTS_FIELD
         @param ln: language
         @return html output
         """
         _ = gettext_set_language(ln)
         multiple_select = ''
         add_button = ''
-        if results_field != cfg_webmessage_results_field['NONE'] and results_field in cfg_webmessage_results_field.values():
+        if results_field != CFG_WEBMESSAGE_RESULTS_FIELD['NONE'] and results_field in CFG_WEBMESSAGE_RESULTS_FIELD.values():
             if len(tuples_list):
                 multiple_select = self.tmpl_multiple_select('names_selected', tuples_list)
                 add_button = '<input type="submit" name="%s" value="%s" class="nonsubmitbutton" />'
-                if results_field == cfg_webmessage_results_field['USER']:
+                if results_field == CFG_WEBMESSAGE_RESULTS_FIELD['USER']:
                     add_button = add_button % ('add_user', _("Add to users"))
                 else:
                     add_button = add_button % ('add_group', _("Add to groups"))
             else:
-                if results_field == cfg_webmessage_results_field['USER']:
+                if results_field == CFG_WEBMESSAGE_RESULTS_FIELD['USER']:
                     multiple_select = _("No matching user")
                 else:
                     multiple_select = _("No matching group")
