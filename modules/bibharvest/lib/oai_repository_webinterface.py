@@ -32,7 +32,7 @@ from mod_python import apache
 from invenio.dbquery import run_sql
 from invenio.oai_repository_config import *
 from invenio import oai_repository
-from invenio.config import cachedir
+from invenio.config import cachedir, cfg_oai_sleep
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
