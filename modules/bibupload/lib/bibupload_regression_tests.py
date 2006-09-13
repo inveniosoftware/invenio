@@ -19,21 +19,20 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Regression tests for the bibupload."""
-
 # pylint: disable-msg=C0301
 
-__version__ = "$Id$"
+"""Regression tests for the BibUpload."""
+
+__revision__ = "$Id$"
 
 import sre
 import unittest
-import re
 import time
-from invenio.bibupload import *
+from invenio import bibupload
 from invenio.search_engine import print_record
-from invenio.config import tmpdir, etcdir
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
-                              make_url, test_web_page_content, merge_error_messages
+from invenio.dbquery import run_sql
+from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.testutils import make_test_suite, warn_user_about_tests_and_run
 
 # helper functions:
 
@@ -117,29 +116,29 @@ class BibUploadInsertModeTest(unittest.TestCase):
     
     def test_create_record_id(self):
         """bibupload - insert mode, trying to create a new record ID in the database"""
-        rec_id = create_new_record()
+        rec_id = bibupload.create_new_record()
         self.assertNotEqual(-1, rec_id)
     
     def test_no_retrieve_record_id(self):
         """bibupload - insert mode, detection of record ID in the input file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
+        bibupload.options['mode'] = 'insert'
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test)
+        recs = bibupload.xml_marc_to_records(self.test)
         # We call the function which should retrieve the record id
-        rec_id = retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0])
         # We compare the value found with None
         self.assertEqual(None, rec_id)
     
     def test_insert_complete_xmlmarc(self):
         """bibupload - insert mode, trying to insert complete MARCXML file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test)
+        recs = bibupload.xml_marc_to_records(self.test)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # We retrieve the inserted xml
         inserted_xml = print_record(int(info[1]),'xm')
         # Compare if the two MARCXML are the same
@@ -178,28 +177,28 @@ class BibUploadAppendModeTest(unittest.TestCase):
     def test_retrieve_record_id(self):
         """bibupload - append mode, the input file should contain a record ID"""
         # Initialize the global variable
-        options['mode'] = 'append'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'append'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_controfield001)
+        recs = bibupload.xml_marc_to_records(self.test_controfield001)
         # We call the function which should retrieve the record id
-        rec_id = retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0])
         # We compare the value found with None
         self.assertEqual('002', rec_id)
     
     def test_update_modification_record_date(self):
         """bibupload - append mode, checking the update of the modification date"""
         # Initialize the global variable
-        options['mode'] = 'append'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'append'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_controfield001)
+        recs = bibupload.xml_marc_to_records(self.test_controfield001)
         # We call the function which should retrieve the record id
-        rec_id = retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0])
         # Retrieve current localtime
         now = time.localtime()
         # We update the modification date
-        update_bibrec_modif_date(convert_datestruct_to_datetext(now), rec_id)
+        bibupload.update_bibrec_modif_date(convert_datestruct_to_datetext(now), rec_id)
         # We retrieve the modification date from the database
         query = """SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec where id = %s"""
         res = run_sql(query % rec_id)
@@ -209,20 +208,20 @@ class BibUploadAppendModeTest(unittest.TestCase):
     def test_append_complete_xml_marc(self):
         """bibupload - append mode, appending complete MARCXML file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_append)
+        recs = bibupload.xml_marc_to_records(self.test_append)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # Now we append a datafield
-        options['mode'] = 'append'
+        bibupload.options['mode'] = 'append'
         # We add the controfield 001
         xml_with_controlfield = self.test_controfield001.replace('<controlfield tag ="001">002</controlfield>', '<controlfield tag ="001">'+str(info[1])+'</controlfield>')
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(xml_with_controlfield)
+        recs = bibupload.xml_marc_to_records(xml_with_controlfield)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # We retrieve the inserted xml
         append_xml = print_record(int(info[1]),'xm')
         # Compare if the two MARCXML are the same
@@ -250,20 +249,20 @@ class BibUploadCorrectModeTest(unittest.TestCase):
     def test_correct_complete_xml_marc(self):
         """bibupload - correct mode, correcting complete MARCXML file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_correct)
+        recs = bibupload.xml_marc_to_records(self.test_correct)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # Now we append a datafield
-        options['mode'] = 'correct'
+        bibupload.options['mode'] = 'correct'
         # We add the controfield 001
         xml_with_controlfield = self.test_correct_expected.replace('<record>', '<record>\n<controlfield tag ="001">'+str(info[1])+'</controlfield>')
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(xml_with_controlfield)
+        recs = bibupload.xml_marc_to_records(xml_with_controlfield)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # We retrieve the inserted xml
         correct_xml = print_record(int(info[1]),'xm')
         # Compare if the two MARCXML are the same
@@ -291,20 +290,20 @@ class BibUploadReplaceModeTest(unittest.TestCase):
     def test_replace_complete_xml_marc(self):
         """bibupload - replace mode, replacing complete MARCXML file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_replace)
+        recs = bibupload.xml_marc_to_records(self.test_replace)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # Now we append a datafield
-        options['mode'] = 'replace'
+        bibupload.options['mode'] = 'replace'
         # We add the controfield 001
         xml_with_controlfield = self.test_replace_expected.replace('<record>', '<record>\n<controlfield tag ="001">'+str(info[1])+'</controlfield>')
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(xml_with_controlfield)
+        recs = bibupload.xml_marc_to_records(xml_with_controlfield)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # We retrieve the inserted xml
         replace_xml = print_record(int(info[1]),'xm')
         # Compare if the two MARCXML are the same
@@ -323,7 +322,7 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         </datafield>
         </record>"""
         self.test_reference = """<record>
-        <datafield tag =\""""+cfg_bibupload_reference_tag+"""\" ind1="C" ind2="5">
+        <datafield tag =\"""" + bibupload.CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
         <subfield code="m">M. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,</subfield>
         <subfield code="s">J. High Energy Phys. 07 (2004) 014</subfield>
         </datafield>
@@ -333,7 +332,7 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         <subfield code="a">Simko, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
-        <datafield tag =\""""+cfg_bibupload_reference_tag+"""\" ind1="C" ind2="5">
+        <datafield tag =\"""" + bibupload.CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
         <subfield code="m">M. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,</subfield>
         <subfield code="s">J. High Energy Phys. 07 (2004) 014</subfield>
         </datafield>
@@ -342,20 +341,20 @@ class BibUploadReferencesModeTest(unittest.TestCase):
     def test_reference_complete_xml_marc(self):
         """bibupload - reference mode, inserting complete MARCXML file"""
         # Initialize the global variable
-        options['mode'] = 'insert'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(self.test_insert)
+        recs = bibupload.xml_marc_to_records(self.test_insert)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # Now we append a datafield
-        options['mode'] = 'reference'
+        bibupload.options['mode'] = 'reference'
         # We add the controfield 001
         xml_with_controlfield = self.test_reference.replace('<record>', '<record>\n<controlfield tag ="001">'+str(info[1])+'</controlfield>')
         # We create create the record out of the xml marc
-        recs = xml_marc_to_records(xml_with_controlfield)
+        recs = bibupload.xml_marc_to_records(xml_with_controlfield)
         # We call the main function with the record as a parameter
-        info = bibupload(recs[0])
+        info = bibupload.bibupload(recs[0])
         # We retrieve the inserted xml
         reference_xml = print_record(int(info[1]),'xm')
 
@@ -438,10 +437,10 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_inserting_new_record_containing_fmt_tag(self):
         """bibupload - FMT tag, inserting new record containing FMT tag"""
-        options['mode'] = 'insert'
-        options['verbose'] = 0
-        recs = xml_marc_to_records(self.new_marcxml_with_fmt)
-        (dummy, new_recid) = bibupload(recs[0])
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
+        recs = bibupload.xml_marc_to_records(self.new_marcxml_with_fmt)
+        (dummy, new_recid) = bibupload.bibupload(recs[0])
         marcxml_after = print_record(new_recid, 'xm')    
         hb_after = print_record(new_recid, 'hb')
         self.failUnless(compare_xmlbuffers(marcxml_after,
@@ -450,19 +449,19 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_format_mode(self):
         """bibupload - FMT tag, updating existing record via format mode"""
-        options['mode'] = 'format'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'format'
+        bibupload.options['verbose'] = 0
         marcxml_before = print_record(10, 'xm')
         # insert first format value:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         hd_after = print_record(10, 'hd')
@@ -472,19 +471,19 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_correct_mode(self):
         """bibupload - FMT tag, updating existing record via correct mode"""
-        options['mode'] = 'correct'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'correct'
+        bibupload.options['verbose'] = 0
         marcxml_before = print_record(10, 'xm')
         # insert first format value:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         hd_after = print_record(10, 'hd')
@@ -494,19 +493,19 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_replace_mode(self):
         """bibupload - FMT tag, updating existing record via replace mode"""
-        options['mode'] = 'replace'
-        options['verbose'] = 0
+        bibupload.options['mode'] = 'replace'
+        bibupload.options['verbose'] = 0
         # insert first format value:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         self.failUnless(compare_xmlbuffers(marcxml_after,
                                            '<record><controlfield tag="001">10</controlfield></record>'), 0)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         hd_after = print_record(10, 'hd')
@@ -518,8 +517,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
         # final insertion and recheck:
-        recs = xml_marc_to_records(self.recid10_marcxml_with_fmt)
-        bibupload(recs[0])
+        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt)
+        bibupload.bibupload(recs[0])
         marcxml_after = print_record(10, 'xm')
         hb_after = print_record(10, 'hb')
         hd_after = print_record(10, 'hd')

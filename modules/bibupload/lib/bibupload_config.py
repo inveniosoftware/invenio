@@ -25,8 +25,11 @@ BibUpload Engine configuration.
  
 __revision__ = "$Id$"
 
-cfg_bibupload_controlfield_tags = ['001', '002', '003', '004',
+CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',
                                    '005', '006', '007', '008']
-cfg_bibupload_special_tags = ['FMT', 'FFT']
-cfg_bibupload_reference_tag = "909"
-cfg_bibupload_external_sysno_tag = "970"
+
+CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT']
+
+CFG_BIBUPLOAD_REFERENCE_TAG = "909"
+
+CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = "970"

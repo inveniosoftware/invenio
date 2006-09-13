@@ -18,8 +18,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# pylint: disable-msg=C0301
+
 """
-BibUpload: Receive MARC XML file and update the appropriate database tables according to options.
+BibUpload: Receive MARC XML file and update the appropriate database
+tables according to options.
 
     Usage: bibupload [options] input.xml
     Examples:  
@@ -45,7 +49,7 @@ BibUpload: Receive MARC XML file and update the appropriate database tables acco
      -V  --version           print the script version    
 """
  
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import os
 import sys
@@ -103,7 +107,8 @@ def write_message(msg, stream=sys.stdout, verbose=1):
     """
     if stream == sys.stdout or stream == sys.stderr:
         if options['verbose'] >= verbose:
-            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
+                                       time.localtime()))
             stream.write("%s\n" % msg)
             stream.flush()
     else:
@@ -239,14 +244,14 @@ def task_read_status(task_id):
         out = 'UNKNOWN'
     return out
 
-def task_get_options(id):
-    """Returns options for the task 'id' read from the BibSched task queue table."""
+def task_get_options(task_id):
+    """Returns options for the task 'task_id' read from the BibSched task queue table."""
     out = {}
-    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='bibupload'", (id,))
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='bibupload'", (task_id,))
     try:
         out = marshal.loads(res[0][0])
     except:
-        write_message("Error: BibUpload task %d does not seem to exist." % id, sys.stderr)
+        write_message("Error: BibUpload task %d does not seem to exist." % task_id, sys.stderr)
         sys.exit(1)
     return out
 
@@ -435,7 +440,7 @@ def parse_command():
 
         # Version mode option
         if opt in ["-V", "--version"]:
-            write_message( __version__, verbose=1)
+            write_message(__revision__, verbose=1)
             return 2
 
     if options['mode'] == None:
@@ -470,7 +475,7 @@ def bibupload(record):
     
     # Reference mode check if there are reference tag 
     if options['mode'] == 'reference':
-        error = extract_tag_from_record(record, cfg_bibupload_reference_tag)
+        error = extract_tag_from_record(record, CFG_BIBUPLOAD_REFERENCE_TAG)
         if error == None:
             write_message("   Failed: No reference tags has been found...", verbose=1, stream=sys.stderr)
             return (1, -1)
@@ -705,7 +710,7 @@ def find_record_bibfmt(marc):
 
 def find_record_from_sysno(sysno):
     """receive the sysno number and return the record id"""
-    table_name = 'bib'+cfg_bibupload_external_sysno_tag[0:2]+'x'
+    table_name = 'bib'+CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:2]+'x'
     query = """SELECT DISTINCT id FROM `%s` WHERE value = '%s'"""
     params = (table_name, sysno)
     try:
@@ -714,7 +719,7 @@ def find_record_from_sysno(sysno):
         write_message("   Error during find_record_from_sysno function 1st query : %s " % error, verbose=1, stream=sys.stderr) 
         
     if len(res):
-        table_name = 'bibrec_bib'+cfg_bibupload_external_sysno_tag[0:2]+'x'
+        table_name = 'bibrec_bib'+CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:2]+'x'
         query = """SELECT DISTINCT id_bibrec FROM `%s` WHERE id_bibxxx = '%s'"""
         params = (table_name, res[0][0])
         
@@ -768,7 +773,7 @@ def retrieve_rec_id(record):
 
     if rec_id == None:
         #2nd step we look for the sysno code
-        sysno = extract_tag_from_record(record, cfg_bibupload_external_sysno_tag)
+        sysno = extract_tag_from_record(record, CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)
         if sysno != None:
             #retrieve the SYSNO code from the tuple SYSNO
             sysno = sysno[0][0][0][1]
@@ -1078,8 +1083,8 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
 def update_database_with_metadata(record, rec_id):
     """Update the database tables with the record and the record id given in parameter"""
     for tag in record.keys():
-        # check if tag is not a control field : tag not in cfg_bibupload_controlfield_tags and
-        if tag not in cfg_bibupload_special_tags:
+        # check if tag is not a control field : tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS and
+        if tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:
             # for each tag there is a list of tuples representing datafields
             tuple_list = record[tag]
             # this list should contain the elements of a full tag [tag, ind1, ind2, subfield_code]
@@ -1101,7 +1106,7 @@ def update_database_with_metadata(record, rec_id):
                     tag_list.append(ind2)
                 datafield_number = single_tuple[4]
                 
-                if tag in cfg_bibupload_controlfield_tags and tag != "001":
+                if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS and tag != "001":
                     value = single_tuple[3]
                     # get the full tag
                     full_tag = ''.join(tag_list)
@@ -1150,7 +1155,7 @@ def append_new_tag_to_old_record(record, rec_old):
     """Append new tags to a old record"""
     if options['tag'] != None:
         tag = options['tag'] 
-        if tag in cfg_bibupload_controlfield_tags:
+        if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
             if tag == '001':
                 pass
             else:
@@ -1179,7 +1184,7 @@ def append_new_tag_to_old_record(record, rec_old):
         for tag in record.keys():
             # Reference mode append only reference tag
             if options['mode'] == 'reference':
-                if tag == cfg_bibupload_reference_tag:
+                if tag == CFG_BIBUPLOAD_REFERENCE_TAG:
                     for single_tuple in record[tag]: 
                         # We retrieve the information of the tag
                         subfield_list = single_tuple[0]
@@ -1192,7 +1197,7 @@ def append_new_tag_to_old_record(record, rec_old):
                         if newfield_number == None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
             else:
-                if tag in cfg_bibupload_controlfield_tags:
+                if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
                     if tag == '001':
                         pass
                     else:
