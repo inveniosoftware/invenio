@@ -19,9 +19,8 @@
 
 """CDS Invenio Search Engine config parameters."""
 
-__revision__ = "$Id$"
-
-# pylint: disable-msg=W0611
+__revision__ = \
+    "$Id$"
 
 ## import config variables defined from config.wml:
 from invenio.config import cfg_max_recID, \
@@ -41,4 +40,4 @@ from invenio.config import cfg_max_recID, \
      cfg_google_box_servers
 
 ## do we want experimental features? (0=no, 1=yes)
-cfg_experimental_features = 0
+CFG_EXPERIMENTAL_FEATURES = 0

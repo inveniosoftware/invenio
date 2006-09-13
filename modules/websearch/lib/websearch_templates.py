@@ -963,7 +963,7 @@ class Template:
             'similar': a_href(_("Similar records"), _class="moreinfo",
                               href=self.build_search_url(p="recid:%d" % recid, rm='wrd', ln=ln))}
                  
-        if cfg_experimental_features:
+        if CFG_EXPERIMENTAL_FEATURES:
             out += '''<span class="moreinfo"> - %s </span>''' % \
                    a_href(_("Cited by"), _class="moreinfo",
                           href=self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln))
@@ -2333,7 +2333,7 @@ class Template:
                    a_href(_("Similar records"), _class="moreinfo",
                           href=self.build_search_url(p="recid:%d" % recID, rm="wrd", ln=ln))
 
-        if cfg_experimental_features:
+        if CFG_EXPERIMENTAL_FEATURES:
             out += '<span class="moreinfo"> - %s</span>' % \
                    a_href(_("Cited by"), _class="moreinfo",
                           href=self.build_search_url(p="recid:%d" % recID, rm="cit", ln=ln))

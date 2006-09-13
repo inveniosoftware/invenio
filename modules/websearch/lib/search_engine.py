@@ -48,7 +48,7 @@ from invenio.bibformat_config import use_old_bibformat
 
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 
-if cfg_experimental_features:
+if CFG_EXPERIMENTAL_FEATURES:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
     from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -2325,7 +2325,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         temp['creationdate'] = get_creation_date(recIDs[irec])
                         temp['modifydate'] = get_modification_date(recIDs[irec])
 
-                    if cfg_experimental_features:
+                    if CFG_EXPERIMENTAL_FEATURES:
                        r = calculate_cited_by_list(recIDs[irec])
                        if r:
                            temp ['citinglist'] = r
@@ -3053,7 +3053,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 if of == "id":
                     return []
 
-    elif cfg_experimental_features and p.startswith("cocitedwith:"):
+    elif CFG_EXPERIMENTAL_FEATURES and p.startswith("cocitedwith:"):
         ## 3-terter - cited by search needed
         page_start(req, of, cc, as, ln, uid, _("Search Results")) 
         if of.startswith("h"):
