@@ -22,7 +22,7 @@
 
 __lastupdated__ = """$Date$"""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 ## import general modules:
 import cgi

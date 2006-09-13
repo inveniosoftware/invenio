@@ -21,7 +21,7 @@
 
 """ WebMessage module, messaging system"""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 from invenio.webmessage_dblayer import *
 from invenio.webmessage_config import *

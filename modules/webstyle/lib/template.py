@@ -19,7 +19,7 @@
 
 """CDS Invenio templating framework."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 from invenio.config import cfg_template_skin
 

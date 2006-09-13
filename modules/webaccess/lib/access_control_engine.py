@@ -20,7 +20,7 @@
 
 """CDS Invenio Access Control Engine in mod_python."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 from invenio.config import *
 from invenio.dbquery import run_sql, ProgrammingError

@@ -20,7 +20,7 @@
 
 """HTML parser for records."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import sre
 from HTMLParser import HTMLParser

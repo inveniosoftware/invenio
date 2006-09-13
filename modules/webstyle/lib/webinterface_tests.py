@@ -11,7 +11,7 @@
 
 """Unit tests for the webinterface module."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import unittest, sys, cgi
 

@@ -22,7 +22,7 @@
 
 """Alert engine command line interface"""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import sys
@@ -66,7 +66,7 @@ def main():
             usage()
             sys.exit()
         if o in ("-V", "--version"):
-            print __version__
+            print __revision__
             sys.exit(0)
         if o in ("-d", "--date"):
             year, month, day = map(int, a.split('-'))

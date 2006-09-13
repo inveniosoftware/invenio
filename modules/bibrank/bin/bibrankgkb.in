@@ -36,7 +36,7 @@ Usage: bibrankgkb %s [options]
  -v,  --verbose=LEVEL       verbose level (from 0 to 9, default 1)
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     from marshal import loads,dumps
@@ -145,7 +145,7 @@ def bibrankgkb(config):
     #Writing output file
     if opts_dict["output"]:
         f = open(opts_dict["output"], 'w')
-        f.write("#Created by %s\n" % __version__)
+        f.write("#Created by %s\n" % __revision__)
         f.write("#Sources:\n")
         for key in journals.keys():
             f.write("%s---%s\n" % (key,journals[key]))
@@ -296,7 +296,7 @@ def command_line():
             if opt == ("-h","") or opt == ("--help",""):
                 usage(1)
             elif opt == ("-V","") or opt == ("--version",""):
-                print __version__
+                print __revision__
                 sys.exit(1)
             elif opt[0] in ["--input", "-i"]:
                 opts_dict["input"] = opt[1]

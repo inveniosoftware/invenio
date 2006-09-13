@@ -20,6 +20,10 @@
 
 """CDS Invenio BibRank Administrator Interface."""
 
+__revision__ = "$Id$"
+
+__lastupdated__ = """$Date$"""
+
 import cgi
 import re
 import Numeric
@@ -35,10 +39,6 @@ from invenio.config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
-
-__lastupdated__ = """$Date$"""
-
-__version__ = "$Id$"
 
 def getnavtrail(previous = ''):
     navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/bibrank/">BibRank Admin</a> """ % (weburl, weburl)

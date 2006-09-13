@@ -24,7 +24,7 @@
 XML MARC to TEXT MARC utility.
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 from invenio.xmlmarc2textmarclib import *
 import getopt, sys
@@ -49,7 +49,7 @@ def main():
         if opt in ["-h", "--help"]:
             usage (0)
         elif opt in ["-V", "--version"]:
-            print __version__
+            print __revision__
             sys.exit(0)
         elif opt == "--aleph-marc":
             options["aleph-marc"] = 1

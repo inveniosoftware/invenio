@@ -19,6 +19,8 @@
 
 """CDS Invenio WebSearch Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import sys
@@ -29,8 +31,6 @@ from invenio.config import weburl, sweburl, cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
-
-__version__ = "$Id$"
 
 def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)

@@ -19,8 +19,6 @@
 
 """CDS Invenio Access Control Config. """
 
-__version__ = "$Id$"
-
 __revision__ = "$Id$"
 
 # pylint: disable-msg=C0301

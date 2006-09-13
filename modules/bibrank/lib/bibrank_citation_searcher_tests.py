@@ -21,7 +21,7 @@
 
 """Unit tests for the citation searcher."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import unittest
 

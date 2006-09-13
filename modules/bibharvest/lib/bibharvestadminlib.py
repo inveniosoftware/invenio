@@ -20,6 +20,8 @@
 
 """CDS Invenio Bibharvest Administrator Interface."""
 
+__revision__ = "$Id$"
+
 import cgi
 import re
 import Numeric
@@ -45,8 +47,6 @@ guideurl = "admin/bibharvest/guide.html"
 freqs = [[0, "never"], [24, "daily"], [168, "weekly"], [720, "monthly"] ]
 posts = [["h", "harvest only (h)"], ["h-c", "harvest and convert (h-c)"], ["h-u", "harvest and upload (h-u)"], ["h-c-u", "harvest, convert and upload (h-c-u)"]]
 dates = [[0, "from beginning"], [1, "from today"]]
-
-__version__ = "$Id$"
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""

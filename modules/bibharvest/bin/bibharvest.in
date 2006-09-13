@@ -22,7 +22,7 @@
 
 """CDS Invenio OAI harvestor."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import httplib
@@ -257,7 +257,7 @@ def main():
         elif opt == "-x":
             stylesheet                          = opt_value
         elif opt in ["-V", "--version"]:
-            print __version__
+            print __revision__
             sys.exit(0)
         else:
             help()

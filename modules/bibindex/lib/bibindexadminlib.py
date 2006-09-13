@@ -19,6 +19,8 @@
 
 """CDS Invenio BibIndex Administrator Interface."""
 
+__revision__ = "$Id$"
+
 import cgi
 import re
 import Numeric
@@ -36,8 +38,6 @@ from invenio.webuser import getUid, get_email
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
     
-__version__ = "$Id$"
-
 def getnavtrail(previous = ''):
     """Get the navtrail"""
     

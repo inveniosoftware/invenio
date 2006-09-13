@@ -19,7 +19,7 @@
 
 """BibConvert tool to convert bibliographic records from any format to any format."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import fileinput

@@ -20,6 +20,8 @@
 
 """OAI repository archive and management tool"""
 
+__revision__ = "$Id$"
+
 try:
     import fileinput 
     import string
@@ -38,8 +40,6 @@ try:
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
-
-__version__ = "$Id$"
 
 def printInfo():
     """Print help"""

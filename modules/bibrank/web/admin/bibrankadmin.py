@@ -19,6 +19,8 @@
 
 """CDS Invenio BibRank Administrator Interface."""
 
+__revision__ = "$Id$"
+    
 __lastupdated__ = """$Date$"""
 
 import sys
@@ -29,8 +31,6 @@ from invenio.config import weburl,cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
-__version__ = "$Id$"
-    
 def index(req, ln=cdslang):
     navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (weburl)
     

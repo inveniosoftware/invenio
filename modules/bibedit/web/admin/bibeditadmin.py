@@ -19,8 +19,9 @@
 
 """CDS Invenio BibEdit Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
-__version__     = "$Id$"
 
 from invenio.config import cdslang, weburl
 from invenio.webpage import page

@@ -20,6 +20,8 @@
 
 """CDS Invenio OAI Repository and Archive Administrator Interface."""
 
+__revision__ = "$Id$"
+
 import sys
 import cgi
 import re
@@ -44,8 +46,6 @@ bibharvest_templates = invenio.template.load('bibharvest')
 
 tmppath = tmpdir + '/oaiarchiveadmin.' + str(os.getpid())
 guideurl = "admin/bibharvest/guide.html"
-
-__version__ = "$Id$"
 
 def getnavtrail(previous = ''):
     """Get navtrail"""

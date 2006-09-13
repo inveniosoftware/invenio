@@ -22,7 +22,7 @@
 
 """WebMessage Admin -- clean messages"""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import getpass
@@ -63,7 +63,7 @@ def main():
     if alen > 1 and sys.argv[1] in ["-h", "--help"]:
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
-        print __version__
+        print __revision__
         sys.exit(0)    
     if alen != 2 or sys.argv[1] not in ['clean']: 
         usage(1)

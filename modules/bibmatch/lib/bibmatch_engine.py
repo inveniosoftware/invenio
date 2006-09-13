@@ -19,7 +19,7 @@
 
 """BibMatch tool to match records with database content."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import fileinput
@@ -330,7 +330,7 @@ def main():
             usage()
             sys.exit(0)
         if opt in ["-V", "--version"]:
-            print __version__
+            print __revision__
             sys.exit(0)
         if opt in ["-v", "--verbose"]:
             verbose = int(opt_value)

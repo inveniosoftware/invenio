@@ -23,7 +23,7 @@
 """BibSched - task management, scheduling and executing system for CDS Invenio
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 ### -- local configuration section starts here ---
 cfg_valid_processes = ["bibindex","bibupload","bibreformat","webcoll","bibtaskex","bibrank","oaiharvest","oaiarchive"] # which tasks are reconized as valid?
@@ -763,7 +763,7 @@ def main():
             usage (0)
 
         elif opt in ["-V", "--version"]:
-            print __version__
+            print __revision__
             sys.exit(0)
 
         elif opt in ["-d", "--daemon"]:

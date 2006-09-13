@@ -23,7 +23,7 @@
 
 ## rest of the Python code goes below
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 from cgi import parse_qs
 from sre import search, sub

@@ -54,8 +54,6 @@ dbname = "<DBNAME>"
 dbuser = "<DBUSER>"
 dbpass = "<DBPASS>"
 
-__version__ = "$Id$"
-
 def _db_login(relogin = 0):
     """Login to the database."""
     global DB_CONN

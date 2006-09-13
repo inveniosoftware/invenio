@@ -22,7 +22,7 @@
 
 """BibConvert tool to convert bibliographic records from any format to any format."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import fileinput
@@ -128,7 +128,7 @@ for opt, opt_value in opts:
         sys.exit(0)
 
     elif opt in ["-V", "--version"]:
-        print __version__
+        print __revision__
         sys.exit(0)
 
     elif opt in ["-l", "--length"]:

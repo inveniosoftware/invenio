@@ -19,8 +19,9 @@
 
 """CDS Invenio OAI provider interface, compliant with OAI-PMH/2.0"""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
-__version__ = "$Id$"
 
 import os
 import sys

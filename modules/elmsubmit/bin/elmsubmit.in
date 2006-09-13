@@ -46,7 +46,7 @@ if __name__ == '__main__':
             if opt[0] in ["-h", "--help"]:
                 usage(0)
             elif opt[0] in ["-V", "--version"]:
-                print elmsubmit.__version__
+                print elmsubmit.__revision__
                 sys.exit(0)
     except StandardError, e:
         usage(e)

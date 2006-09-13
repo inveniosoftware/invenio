@@ -22,7 +22,7 @@
 
 """authaction -- CLI interface to Access Control Engine"""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import sys
@@ -65,7 +65,7 @@ def main():
     if alen > 1 and sys.argv[1] in ["-h", "--help"]:
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
-        sys.stderr.write("%s\n" % __version__)
+        sys.stderr.write("%s\n" % __revision__)
         sys.exit(0)    
     if alen < 3 or alen % 2 == 0:
         print "7 - %s" % cfg_webaccess_warning_msgs[7]

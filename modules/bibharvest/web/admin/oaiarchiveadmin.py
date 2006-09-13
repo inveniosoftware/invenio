@@ -19,6 +19,8 @@
 
 """CDS Invenio OAI Archive Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import sys
@@ -28,8 +30,6 @@ from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
-
-__version__ = "$Id$"
 
 def index(req, ln=cdslang):
     navtrail_previous_links = bhc.getnavtrail()

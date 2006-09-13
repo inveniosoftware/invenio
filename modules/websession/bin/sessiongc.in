@@ -24,7 +24,7 @@
 Guest user sessions garbage collector.  To be run via cron once per day. (say)
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import sys
 try:
@@ -393,7 +393,7 @@ def main():
             if opt[0] in ['-h', '--help']:
                 usage(0)
             elif opt[0] in ['-V', '--version']:
-                print __version__
+                print __revision__
                 sys.exit(0)
             elif opt[0] in ['-v', '--verbose']:
                 options['verbose'] = int(opt[1])

@@ -22,7 +22,7 @@
 
 """Unit tests for the bibconvert."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import unittest
 

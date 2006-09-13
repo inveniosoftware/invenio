@@ -20,6 +20,8 @@
 
 """CDS Invenio WebAccess Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 ## fill config variables:
@@ -41,9 +43,6 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
 from invenio.search_engine import print_record
 from invenio.webuser import email_valid_p, get_user_preferences, set_user_preferences
-
-__version__ = "$Id$"
-
 
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
     """main function to show pages for webaccessadmin.

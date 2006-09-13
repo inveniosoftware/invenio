@@ -20,8 +20,7 @@
 
 """CDS Invenio Access Control Admin."""
 
-__version__ = "$Id$"
-
+__revision__ = "$Id$"
 
 # check this: def acc_addUserRole(id_user, id_role=0, name_role=0):
 

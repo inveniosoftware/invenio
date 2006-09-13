@@ -24,7 +24,7 @@
 XML MARC lint - check your XML MARC files.
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import getopt
 import string
@@ -52,7 +52,7 @@ except getopt.GetoptError:
 
 for opt in opts:
     if opt[0] in ("-V","--version"):
-        print __version__
+        print __revision__
         sys.exit(0)
     elif opt[0] in ("-h","--help"):
         sys.stderr.write(cmdusage)

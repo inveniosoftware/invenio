@@ -22,7 +22,7 @@
 
 """Run CDS Invenio regression test suite."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import getopt
 import sys
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     for opt in opts:
         if opt[0] in ("-V","--version"):
-            print __version__
+            print __revision__
             sys.exit(0)
         elif opt[0] in ("-h","--help"):
             usage()

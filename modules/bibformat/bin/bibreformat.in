@@ -23,7 +23,7 @@
 """Call BibFormat engine and create HTML brief (and other) formats for bibliographic records.
    Upload formats via BibUpload."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 ## import interesting modules:
 try:
@@ -713,7 +713,7 @@ def main():
                 if opt[0] in ["-h", "--help"]:
                     usage(0)
                 elif opt[0] in ["-V", "--version"]:
-                    print __version__
+                    print __revision__
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
                     options["user"]   = opt[1]

@@ -19,6 +19,8 @@
 
 """CDS Invenio BibHarvest Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import invenio.bibharvestadminlib as bhc
@@ -26,8 +28,6 @@ from invenio.webpage import page, create_error_box
 from invenio.config import cdsname, weburl, cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
-
-__version__ = "$Id$"
 
 def index(req, ln=cdslang):
     navtrail_previous_links = bhc.getnavtrail()

@@ -57,7 +57,7 @@
 
 """
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 try:
     import sys
@@ -330,7 +330,7 @@ def main():
                     printInfo()
                     sys.exit(0)
                 elif opt[0] in ["-V", "--version"]:
-                    print __version__
+                    print __revision__
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
                     options["user"]   = opt[1]

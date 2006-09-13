@@ -18,13 +18,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
 from invenio.bibrecord import create_records, create_record, record_get_field_values
 from random import randint, seed
 from os.path import basename
 from __future__ import generators
 import sys
-
-__version__ = "$Id$"
 
 ## maximum length of an ALEPH MARC record line
 max_line_len = 1500

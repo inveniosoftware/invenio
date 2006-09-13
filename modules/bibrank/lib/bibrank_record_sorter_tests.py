@@ -21,7 +21,7 @@
 
 """Unit tests for the ranking engine."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import unittest
 

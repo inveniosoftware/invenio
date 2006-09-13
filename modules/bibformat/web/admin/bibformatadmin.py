@@ -19,6 +19,8 @@
 
 """CDS Invenio BibFormat Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import MySQLdb
@@ -31,9 +33,6 @@ from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url, get_referer
 from invenio.search_engine import perform_request_search, create_basic_search_units
-
-__version__ = "$Id$"
-
 
 def index(req, ln=cdslang):
     """

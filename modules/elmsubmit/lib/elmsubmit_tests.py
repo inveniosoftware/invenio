@@ -22,7 +22,7 @@
 
 """Unit tests for the elmsubmit."""
 
-__version__ = "$Id$"
+__revision__ = "$Id$"
 
 import unittest
 import re

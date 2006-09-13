@@ -19,14 +19,14 @@
 
 """CDS Invenio WebAccess Administrator Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import sys
 import invenio.webaccessadmin_lib as wal
 # reload(wal)
 # from invenio.webaccessadmin_lib import index
-
-__version__ = "$Id$"
 
 index = wal.index
 

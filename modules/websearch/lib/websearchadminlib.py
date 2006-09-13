@@ -20,6 +20,8 @@
 
 """CDS Invenio WebSearch Administrator Interface."""
 
+__revision__ = "$Id$"
+
 import cgi
 import re
 import Numeric
@@ -40,8 +42,6 @@ from invenio.webuser import getUid, get_email
 from invenio.websearch_external_collections import external_collections_dictionary, external_collection_sort_engine_by_name, \
     external_collection_get_state, external_collection_get_update_state_list, external_collection_apply_changes
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
-
-__version__ = "$Id$"
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
