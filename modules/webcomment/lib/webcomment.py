@@ -19,8 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """ Comments and reviews for records """
 
-__lastupdated__ = """$Date$"""
-
 # non CDS Invenio imports:
 import time
 import math

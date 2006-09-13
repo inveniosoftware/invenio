@@ -22,8 +22,6 @@
 
 __revision__ = "$Id$"
 
-__lastupdated__ = """$Date$"""
-
 import cgi
 import re
 import Numeric

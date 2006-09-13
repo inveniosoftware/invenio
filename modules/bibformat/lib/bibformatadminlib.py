@@ -21,8 +21,6 @@
 Handle requests from the web interface to configure BibFormat.
 """
 
-__lastupdated__ = """$Date$"""
-
 import os
 import re
 import stat

@@ -43,8 +43,6 @@ from bibformat_utils import record_get_xml
 
 from xml.dom import minidom #Remove when call_old_bibformat is removed
 
-__lastupdated__ = """$Date$"""
-
 #Cache for data we have allready read and parsed
 format_templates_cache = {}
 format_elements_cache = {}

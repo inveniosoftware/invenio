@@ -23,8 +23,6 @@
 
 __revision__ = "$Id$"
 
-__lastupdated__ = """$Date$"""
-
 import os
 from invenio.config import etcdir, pylibdir
 

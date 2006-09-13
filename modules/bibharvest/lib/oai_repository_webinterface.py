@@ -21,8 +21,6 @@
 
 __revision__ = "$Id$"
 
-__lastupdated__ = """$Date$"""
-
 import os
 import sys
 import urllib

@@ -21,8 +21,6 @@
 
 __revision__ = "$Id$"
 
-__lastupdated__ = """$Date$"""
-
 import sys
 import invenio.webaccessadmin_lib as wal
 # reload(wal)

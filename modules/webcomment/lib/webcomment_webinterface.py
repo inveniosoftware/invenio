@@ -21,7 +21,6 @@
 
 """ Comments and reviews for records: web interface """
 
-__lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
 from invenio.webcomment import check_recID_is_in_range, \
