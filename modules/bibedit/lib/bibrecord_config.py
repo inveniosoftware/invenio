@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 from invenio.config import etcdir
 
 # location of the MARC21 DTD file:
-cfg_marc21_dtd = "%s/bibedit/MARC21slim.dtd" % etcdir
+CFG_MARC21_DTD = "%s/bibedit/MARC21slim.dtd" % etcdir
 
 # pylint: disable-msg=C0301
 
@@ -46,10 +46,10 @@ cfg_bibrecord_warning_msgs = {
     } 
 
 # verbose level to be used when creating records from XML: (0=least, ..., 9=most)
-cfg_bibrecord_default_verbose_level = 0
+CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL = 0
 
 # correction level to be used when creating records from XML: (0=no, 1=yes)
-cfg_bibrecord_default_correct = 0
+CFG_BIBRECORD_DEFAULT_CORRECT = 0
 
 # XML parsers available: (0=minidom, 1=4suite, 2=PyRXP)
-cfg_bibrecord_parsers_available = [0, 1, 2]                                           
+CFG_BIBRECORD_PARSERS_AVAILABLE = [0, 1, 2]                                           

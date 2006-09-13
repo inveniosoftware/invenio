@@ -38,16 +38,16 @@ try:
 except ImportError:
     psycho_available = 0
     
-from invenio.bibrecord_config import cfg_marc21_dtd, \
+from invenio.bibrecord_config import CFG_MARC21_DTD, \
                                      cfg_bibrecord_warning_msgs, \
-                                     cfg_bibrecord_default_verbose_level, \
-                                     cfg_bibrecord_default_correct, \
-                                     cfg_bibrecord_parsers_available
+                                     CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
+                                     CFG_BIBRECORD_DEFAULT_CORRECT, \
+                                     CFG_BIBRECORD_PARSERS_AVAILABLE
 
 # find out about the best usable parser:
 err = []
 parser = -1
-if 2 in cfg_bibrecord_parsers_available:
+if 2 in CFG_BIBRECORD_PARSERS_AVAILABLE:
     try:
         import pyRXP
         parser = 2
@@ -58,14 +58,14 @@ if 2 in cfg_bibrecord_parsers_available:
     except ImportError:
         pass
 if parser == -1 and \
-       1 in cfg_bibrecord_parsers_available:
+       1 in CFG_BIBRECORD_PARSERS_AVAILABLE:
     try:
         from Ft.Xml.Domlette import NonvalidatingReader
         parser = 1
     except ImportError:
         pass
 if parser == -1 and \
-       0 in cfg_bibrecord_parsers_available:
+       0 in CFG_BIBRECORD_PARSERS_AVAILABLE:
     try:
         from xml.dom.minidom import parseString
         parser = 0
@@ -75,8 +75,8 @@ if parser == -1 and \
 ### INTERFACE / VISIBLE FUNCTIONS
 
 def create_records(xmltext,
-                   verbose=cfg_bibrecord_default_verbose_level,
-                   correct=cfg_bibrecord_default_correct):
+                   verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+                   correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """
     Create list of record from XMLTEXT.  Return a list of objects
     initiated by create_record() function; please see that function's
@@ -102,8 +102,8 @@ def create_records(xmltext,
 # Subfields :: [(code,value)]
 
 def create_record(xmltext,
-                  verbose=cfg_bibrecord_default_verbose_level,
-                  correct=cfg_bibrecord_default_correct):
+                  verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+                  correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """
     Create a record object from XMLTEXT and return it.
 
@@ -150,7 +150,7 @@ def create_record(xmltext,
             ## the following is because of DTD validation
             t = """<?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE collection SYSTEM "file://%s">
-            <collection>\n""" % cfg_marc21_dtd
+            <collection>\n""" % CFG_MARC21_DTD
             t = "%s%s" % (t, xmltext)
             t = "%s</collection>" % t
             xmltext = t
@@ -537,7 +537,7 @@ def records_xml_output(listofrec):
     """generates the XML for the list of records 'listofrec' and returns it as a string"""
     xmltext = """<?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE collection SYSTEM "file://%s">
-    <collection>\n""" % cfg_marc21_dtd
+    <collection>\n""" % CFG_MARC21_DTD
     
     for rec in listofrec:
         xmltext = "%s%s" % (xmltext, record_xml_output(rec))
@@ -564,8 +564,8 @@ def field_add_subfield(field, code, value):
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 
 def create_record_RXP(xmltext,
-                      verbose=cfg_bibrecord_default_verbose_level,
-                      correct=cfg_bibrecord_default_correct):
+                      verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+                      correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """
     creates a record object and returns it
     uses the RXP parser
@@ -707,8 +707,8 @@ def create_record_RXP(xmltext,
     return (record, err)
     
 def create_record_minidom(xmltext,
-                          verbose=cfg_bibrecord_default_verbose_level,
-                          correct=cfg_bibrecord_default_correct):
+                          verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+                          correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """
     creates a record object and returns it
     uses xml.dom.minidom
@@ -780,8 +780,8 @@ def create_record_minidom(xmltext,
 
 
 def create_record_4suite(xmltext,
-                         verbose=cfg_bibrecord_default_verbose_level,
-                         correct=cfg_bibrecord_default_correct):
+                         verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+                         correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """
     creates a record object and returns it
     uses 4Suite domlette
