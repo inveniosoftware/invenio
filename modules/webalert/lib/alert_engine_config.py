@@ -19,20 +19,21 @@
 
 """CDS Invenio Alert Engine config parameters."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 # how many records at most do we send in an outgoing alert emails?
-cfg_webalert_max_num_of_records_in_alert_email = 20
+CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL = 20
 
 # number of chars per line in outgoing alert emails?
-cfg_webalert_max_num_of_chars_per_line_in_alert_email = 72
+CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL = 72
 
 # when sending alert emails fails, how many times we retry?
-cfg_webalert_send_email_number_of_tries = 3
+CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES = 3
 
 # when sending alert emails fails, what is the sleeptime between
 # tries? (in seconds)
-cfg_webalert_send_email_sleeptime_between_tries = 300 
+CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES = 300 
 
 # are we debugging?
 ## 0 = production, nothing on the console, email sent
@@ -40,5 +41,5 @@ cfg_webalert_send_email_sleeptime_between_tries = 300
 ## 2 = messages on the console, no email sent
 ## 3 = many messages on the console, no email sent
 ## 4 = many messages on the console, email sent to supportemail
-cfg_webalert_debug_level = 0
+CFG_WEBALERT_DEBUG_LEVEL = 0
 

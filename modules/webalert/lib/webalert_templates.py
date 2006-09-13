@@ -23,7 +23,7 @@ import string
 from invenio.config import *
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
-from invenio.alert_engine_config import cfg_webalert_max_num_of_records_in_alert_email
+from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -515,16 +515,16 @@ url: <%(url)s>
        'url': url}
         
         
-        for index, recid in enumerate(records[:cfg_webalert_max_num_of_records_in_alert_email]):
+        for index, recid in enumerate(records[:CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL]):
             body += "\n%i) " % (index + 1)
             body += self.tmpl_alert_email_record(recid)
             body += "\n"
 
-        if len(records) > cfg_webalert_max_num_of_records_in_alert_email:
+        if len(records) > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
             body += '''
 Only the first %s records were displayed.  Please consult the search
 URL given at the top of this email to see all the results.
-''' % cfg_webalert_max_num_of_records_in_alert_email
+''' % CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 
 
         body += '''

@@ -28,12 +28,12 @@ from string import split
 import textwrap
 
 from invenio.config import *
-from invenio.alert_engine_config import cfg_webalert_max_num_of_chars_per_line_in_alert_email
+from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
 from invenio.search_engine import print_record
 from invenio.bibindex_engine import sre_html
 
 def wrap(text):
-    lines = textwrap.wrap(text, cfg_webalert_max_num_of_chars_per_line_in_alert_email)
+    lines = textwrap.wrap(text, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
     r = ''
     for l in lines:
         r += l + '\n'
@@ -43,7 +43,7 @@ def wrap_records(text):
     lines = split(text, '\n')
     result = ''
     for l in lines:
-        newlines = textwrap.wrap(l, cfg_webalert_max_num_of_chars_per_line_in_alert_email)
+        newlines = textwrap.wrap(l, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
         for ll in newlines:
             result += ll + '\n'
     return result

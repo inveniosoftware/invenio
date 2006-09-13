@@ -63,7 +63,7 @@ def get_alerts(query, frequency):
 
     
 # def add_record_to_basket(record_id, basket_id):
-#     if cfg_webalert_debug_level > 0:
+#     if CFG_WEBALERT_DEBUG_LEVEL > 0:
 #         print "-> adding record %s into basket %s" % (record_id, basket_id)
 #     try:
 #         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
@@ -85,10 +85,10 @@ def add_records_to_basket(record_ids, basket_id):
         if nrec > 1:
             for i in record_ids[1:]:
                 vals += ',(%s, %s)' % (basket_id, i)
-        if cfg_webalert_debug_level > 0:
+        if CFG_WEBALERT_DEBUG_LEVEL > 0:
             print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
         try:
-            if cfg_webalert_debug_level < 4:
+            if CFG_WEBALERT_DEBUG_LEVEL < 4:
                 return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
@@ -124,7 +124,7 @@ def send_email(fromaddr, toaddr, body,
     
     try:
         server = smtplib.SMTP('localhost')
-        if cfg_webalert_debug_level > 2:
+        if CFG_WEBALERT_DEBUG_LEVEL > 2:
             server.set_debuglevel(1)
         else:
             server.set_debuglevel(0)
@@ -132,7 +132,7 @@ def send_email(fromaddr, toaddr, body,
         server.quit()
     except:
         if attempt_times > 1:
-            if (cfg_webalert_debug_level > 1):
+            if (CFG_WEBALERT_DEBUG_LEVEL > 1):
                 print 'Error connecting to SMTP server, retrying in %d seconds. Exception raised: %s' % (attempt_sleeptime, sys.exc_info()[0])
             sleep(attempt_sleeptime)
             return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
@@ -159,7 +159,7 @@ def email_notify(alert, records, argstr):
 
     msg = ""
     
-    if cfg_webalert_debug_level > 0:
+    if CFG_WEBALERT_DEBUG_LEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
     url = weburl + "/search?" + argstr
@@ -187,19 +187,19 @@ def email_notify(alert, records, argstr):
     
     body = msg.as_string()
 
-    if cfg_webalert_debug_level > 0:
+    if CFG_WEBALERT_DEBUG_LEVEL > 0:
         print "********************************************************************************"
         print body
         print "********************************************************************************"
 
-    if cfg_webalert_debug_level < 2:
+    if CFG_WEBALERT_DEBUG_LEVEL < 2:
         send_email(sender, email, body,
-                   cfg_webalert_send_email_number_of_tries,
-                   cfg_webalert_send_email_sleeptime_between_tries)
-    if cfg_webalert_debug_level == 4:
+                   CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+                   CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
+    if CFG_WEBALERT_DEBUG_LEVEL == 4:
         send_email(sender, supportemail, body,
-                   cfg_webalert_send_email_number_of_tries,
-                   cfg_webalert_send_email_sleeptime_between_tries)
+                   CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+                   CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
 
 def get_argument(args, argname):
     if args.has_key(argname):
@@ -296,7 +296,7 @@ def run_query(query, frequency, date_until):
     if n:
         log('query %08s produced %08s records' % (query[0], len(recs)))
     
-    if cfg_webalert_debug_level > 2:
+    if CFG_WEBALERT_DEBUG_LEVEL > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
             strftime("%c"), query, date_from, date_until, recs)
 
