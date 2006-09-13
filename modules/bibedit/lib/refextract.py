@@ -57,7 +57,7 @@ class StringBuffer2:
 class SystemMessage:
     def __init__(self):
         self._helpMessage = """refextract recid:pdffile [recid:pdffile]"""
-        self._versionMessage = cfg_refextract_version
+        self._versionMessage = CFG_REFEXTRACT_VERSION
     def getHelpMessage(self):
         return self._helpMessage
     def getVersionMessage(self):
@@ -247,7 +247,7 @@ class ReferenceSectionDisplayer:
         ## add the 999C6 status subfields:
         out += u"""   <datafield tag="999" ind1="C" ind2="6">
       <subfield code="a">%(version)s-%(timestamp)s-%(status)s-%(preprintref)s-%(journalref)s-%(urlref)s-%(misc)s</subfield>
-   </datafield>\n""" % { 'version'     : cfg_refextract_version,
+   </datafield>\n""" % { 'version'     : CFG_REFEXTRACT_VERSION,
                          'timestamp'   : str(int(mktime(localtime()))),
                          'status'      : extraction_status,
                          'preprintref' : cnt_preprintref,
@@ -1749,7 +1749,7 @@ class PDFtoTextDocumentConverter(OSDependentDocumentConverter):
         """Initialise PDFtoTextDocumentConverter object"""
         OSDependentDocumentConverter.__init__(self)
         self._applicationPath = ''
-        self.setApplicationPath(cfg_refextract_pdftotext)
+        self.setApplicationPath(CFG_REFEXTRACT_PDFTOTEXT)
     def setApplicationPath(self, newPath):
         """Set path to conversion application"""
         self._applicationPath = newPath
@@ -1811,9 +1811,9 @@ class PS2AsciiDocumentConverter(OSDependentDocumentConverter):
         """Initialise PS2AsciiDocumentConverter object"""
         OSDependentDocumentConverter.__init__(self)
         self._catAppPath = self._gunzipAppPath = self._gsAppPath = ''
-        self.setCATapplicationPath(cfg_refextract_cat)
-        self.setGUNZIPapplicationPath(cfg_refextract_gunzip)
-        self.setGSapplicationPath(cfg_refextract_gs)
+        self.setCATapplicationPath(CFG_REFEXTRACT_CAT)
+        self.setGUNZIPapplicationPath(CFG_REFEXTRACT_GUNZIP)
+        self.setGSapplicationPath(CFG_REFEXTRACT_GS)
     def setCATapplicationPath(self, catAppPath):
         """Set the path to the 'cat' application, used in conversion"""
         self._catAppPath = catAppPath
@@ -2369,7 +2369,7 @@ class ProcessedReferenceLineBuilder:
                 thismisc += m_uknowntag.group(3)
                 ln = ln[m_uknowntag.end():]
             m_tag = self._p_tagFinder.search(ln)
-        if processedLine.getNumberCitations() == 0 and cfg_refextract_no_citation_treatment == 0:
+        if processedLine.getNumberCitations() == 0 and CFG_REFEXTRACT_NO_CITATION_TREATMENT == 0:
             # No Citations were found and strict mode in use demanding that when no citations are found the entire ORIGINAL, UNTOUCHED line be marked up into misc
             processedLine = ProcessedReferenceLine()
             untouchedline = string.lstrip(rawline)
@@ -3210,8 +3210,8 @@ def main():
         sys.stderr.write("%s\n" % (SystemMessage().getHelpMessage(),)) # Help message and stop
         sys.exit(0)
     converterList=[PDFtoTextDocumentConverter()] # List of document converters to use
-    titles_kb = KnowledgeBase(fn=cfg_refextract_kb_journal_titles)
-    institutes = InstituteList(fn=cfg_refextract_kb_report_numbers)
+    titles_kb = KnowledgeBase(fn=CFG_REFEXTRACT_KB_JOURNAL_TITLES)
+    institutes = InstituteList(fn=CFG_REFEXTRACT_KB_REPORT_NUMBERS)
     refSect_processor  = ReferenceSectionMarkupProcessor(institutes, titles_kb)
     openxmltag         = u"""<?xml version="1.0" encoding="UTF-8"?>"""
     opencollectiontag  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
