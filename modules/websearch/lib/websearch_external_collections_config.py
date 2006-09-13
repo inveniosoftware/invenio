@@ -25,9 +25,11 @@
 
 __revision__ = "$Id$"
 
-cfg_external_collection_timeout = 10
-cfg_external_collection_maxresults = 25
-cfg_external_collections = {
+CFG_EXTERNAL_COLLECTION_TIMEOUT = 10
+
+CFG_EXTERNAL_COLLECTION_MAXRESULTS = 25
+
+CFG_EXTERNAL_COLLECTIONS = {
     'Amazon': 
         {'engine': 'Amazon'},
     'CERN - CDS Indico': 
@@ -74,4 +76,4 @@ cfg_external_collections = {
         {'engine': 'SPIRESBooks'},
 }
 
-cfg_external_collection_states_name = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}
+CFG_EXTERNAL_COLLECTION_STATES_NAME = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}

@@ -30,7 +30,7 @@ from invenio.config import cdslang
 from invenio.dbquery import run_sql 
 from invenio.messages import gettext_set_language
 
-from invenio.websearch_external_collections_config import cfg_external_collection_timeout
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
 from invenio.websearch_external_collections_templates import print_results, print_timeout
@@ -178,7 +178,7 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
         Will parse and print the results of this page."""
         print_results(req, lang, pagegetter, data, current_time)    
 
-    finished_list = async_download(pagegetters_list, finished, engines_list, cfg_external_collection_timeout)
+    finished_list = async_download(pagegetters_list, finished, engines_list, CFG_EXTERNAL_COLLECTION_TIMEOUT)
 
     for (finished, engine) in zip(finished_list, engines_list):
         if not finished:

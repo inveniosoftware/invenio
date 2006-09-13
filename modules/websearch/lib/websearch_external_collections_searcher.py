@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 import urllib
 
 from invenio.config import cdslang
-from invenio.websearch_external_collections_config import cfg_external_collections, cfg_external_collection_maxresults
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.websearch_external_collections_parser import CDSIndicoCollectionResutsParser, \
     GoogleExternalCollectionResultsParser, \
     KISSExternalCollectionResultsParser, GoogleScholarExternalCollectionResultsParser, \
@@ -185,7 +185,7 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
         else:
             dest_lang = self.lang_translator['default']
 
-        return url + '&ln=' + dest_lang + '&rg=' + str(cfg_external_collection_maxresults)
+        return url + '&ln=' + dest_lang + '&rg=' + str(CFG_EXTERNAL_COLLECTION_MAXRESULTS)
 
 class CERNEDMSSearchEngine(SortedFieldsSearchEngine):
     """CERN EDMS"""
@@ -530,7 +530,7 @@ external_collections_dictionary = {}
 
 def build_external_collections_dictionary():
     """Build the dictionary of the external collections."""
-    for (name, configuration) in cfg_external_collections.iteritems():
+    for (name, configuration) in CFG_EXTERNAL_COLLECTIONS.iteritems():
         engine_name = configuration.pop('engine', 'External') + 'SearchEngine'
         configuration['name'] = name
         if globals().has_key(engine_name):

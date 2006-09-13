@@ -28,7 +28,7 @@ engine.
 __revision__ = "$Id$"
 
 import re
-from invenio.websearch_external_collections_config import cfg_external_collection_maxresults
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
@@ -96,7 +96,7 @@ class ExternalCollectionResultsParser(object):
         if not html:
             return
 
-        if len(self.results) >= cfg_external_collection_maxresults:
+        if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
             return
 
         html = correct_url(html, self.host, self.path) + '\n'
@@ -165,7 +165,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
             return
 
         for element in elements[1:]:
-            if len(self.results) >= cfg_external_collection_maxresults:
+            if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
                 return
             end_index = element.find('</DL>')
             if end_index != -1:
@@ -191,7 +191,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
         html = ""
         results_to_parse = self.line.finditer(self.buffer)
         for result in results_to_parse:
-            if len(self.results) >= cfg_external_collection_maxresults:
+            if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
                 return
             data = result.group()
             
