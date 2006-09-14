@@ -250,7 +250,7 @@ def migrate_kbs():
         kb_table = table[1]
         kb_description = table[2]
         print "Migrating ", kb_name
-        #Note: kb_name was already unique. No risk of creating two tables with same name.
+        #Note: kb_name was already unique. No risk of creating two tables with same name. (excepted if migration is done twice)
         kb_id = bibformatadminlib.add_kb(kb_name)
         kb_name = get_kb_name(kb_id)
         update_kb_attributes(kb_name, kb_name, kb_description)

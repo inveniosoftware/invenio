@@ -870,6 +870,10 @@ def update_kb_mapping(kb_name, old_key, key, value):
     """
     bibformat_dblayer.update_kb_mapping(kb_name, old_key, key, value)
 
+def kb_exists(kb_name):
+    """Returns True if a kb with the given name exists"""
+    return bibformat_dblayer.kb_exists(kb_name)
+
 def get_kb_name(kb_id):
     """
     Returns the name of the kb given by id

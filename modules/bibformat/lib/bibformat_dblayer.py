@@ -124,6 +124,11 @@ def delete_kb(kb_name):
     run_sql(query)
     query = """DELETE FROM fmtKNOWLEDGEBASES WHERE id = '%s'"""%(k_id)
     run_sql(query)
+
+    #Update cache
+    if kb_id_name_cache.has_key(kb_name):
+	del kb_id_name_cache[kb_name]
+    
     return True
 
 def kb_exists(kb_name):
@@ -143,6 +148,10 @@ def update_kb(kb_name, new_name, new_description):
     SET name = '%s' , description = '%s'
     WHERE id = '%s'"""%(escape_string(new_name), escape_string(new_description), k_id)
     run_sql(query)
+    #Update cache
+    if kb_id_name_cache.has_key(kb_name):
+	del kb_id_name_cache[kb_name]
+    kb_id_name_cache[new_name] = k_id
     return True
 
 def add_kb_mapping(kb_name, key, value):
