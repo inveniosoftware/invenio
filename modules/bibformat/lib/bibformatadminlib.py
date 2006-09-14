@@ -711,15 +711,15 @@ def update_format_template_attributes(filename, name="", description="", duplica
     If name already exist, use fresh filename (we never overwrite other templates) amd
     remove old one.
 
-    if duplicate is different from None, then it means that we must copy
+    if duplicate is different from None and is not empty string, then it means that we must copy
     the code of the template whoose filename is given in 'duplicate' for the code
-    of our template,
+    of our template.
 
     @param duplicate the filename of a template that we want to copy
     @return the filename of the modified format
     """
     format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-    if duplicate != None:
+    if duplicate != None and duplicate != "":
 	format_template_to_copy = bibformat_engine.get_format_template(duplicate)
 	code = format_template_to_copy['code']
     else:

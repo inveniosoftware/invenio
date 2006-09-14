@@ -361,6 +361,8 @@ class Template:
 	     </tr>
 	    <tr>
 	    <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
+	    <option value="">None (Blank Page)</option>
+	    <option value="" disabled="disabled">-------------</option>
 	    ''' %  {'weburl': weburl,
 		    'readonly':readonly}
 	    for (o_filename, o_name) in all_templates:
