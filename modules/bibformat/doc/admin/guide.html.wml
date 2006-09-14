@@ -472,7 +472,8 @@ However you must make sure that it is removed from the tables <code>format</code
 <h2><a name="formatTemplates">Format Templates</a></h2>
     <p>A format template defines the how a record should be formatted. For example it specifies which fields of the record are to be displayed, in which order and with which visual attributes. Basically the format template is written in HTML, so that it is easy for anyone to edit it.</p>
     <h3><a name="addFormatTemplate">Add a Format Template</a></h3>
-    <p>To add a new format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template. See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about it.<p>
+    <p>To add a new format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template, or ask to make a copy of an existing format.
+ See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about editing the attributes.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new format template file into the
   /etc/bibformat/format_templates/ directory of your CDS Invenio installation, if you have
@@ -934,7 +935,7 @@ default: Default_HTML_detailed.bft</code>
 <h2><a name="integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></h2>
 <p>BibFormat templates have been thought to be editable in custom HTML editors. We propose in this section
 a way to extend one particular editor, Dreamweaver.</p>
-<h3>Make Dreamweaver Recognizes Format Elements in Layout View</h3>
+<h3>Make Dreamweaver Recognize Format Elements in Layout View</h3>
 <p>To make Dreamweaver understand the format elements and display an icon for each of them in the layout editor, you must
 edit a Dreamweaver configuration file named <code>Tags.xml</code> located inside /Configuration/ThirdPartyTags directory
 of your Dreamweaver installation folder. At the end of this file, copy-paste the following lines:
