@@ -24,7 +24,7 @@ from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
       CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      cfg_websession_warning_messages
+      CFG_WEBSESSION_WARNING_MESSAGES
 from invenio.webuser import nickname_valid_p, get_user_info
 from invenio.webmessage import perform_request_send
 import invenio.webgroup_dblayer as db

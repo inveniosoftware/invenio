@@ -58,7 +58,7 @@ functions_with_file_params = ["Make_Record", "Make_Modify_Record"]
 
 
 
-cfg_websubmitadmin_warning_messages = \
+CFG_WEBSUBMITADMIN_WARNING_MESSAGES = \
  {
      'WRN_WEBSUBMITADMIN_UNABLE_TO_DELETE_FIELD_FROM_SUBMISSION_PAGE' : '_("Unable to delete field at position %s from page %s of submission \'%s\'")',
      'WRN_WEBSUBMITADMIN_INVALID_FIELD_NUMBERS_SUPPLIED_WHEN_TRYING_TO_MOVE_FIELD_ON_SUBMISSION_PAGE' : \

@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 # pylint: disable-msg=C0301
 
-cfg_webcomment_error_messages = \
+CFG_WEBCOMMENT_ERROR_MESSAGES = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%s is an invalid record ID")',
     'ERR_WEBCOMMENT_RECID_NAN'           :  '_("Record ID %s is not a number")',
     'ERR_WEBCOMMENT_UID_INVALID'         :  '_("%s is an invalid user ID")',
@@ -39,7 +39,7 @@ cfg_webcomment_error_messages = \
     'ERR_WEBCOMMENT_DB_INSERT_ERROR' : '_("Failed to insert your comment to the database. Please try again.")'
 }
 
-cfg_webcomment_warning_messages = \
+CFG_WEBCOMMENT_WARNING_MESSAGES = \
 {   'WRN_WEBCOMMENT_INVALID_PAGE_NB': '_("Bad page number --> showing first page")',
     'WRN_WEBCOMMENT_INVALID_NB_RESULTS_PER_PAGE': '_("Bad number of results per page --> showing 10 results per page")',
     'WRN_WEBCOMMENT_INVALID_REVIEW_DISPLAY_ORDER': '_("Bad display order --> showing most helpful first")',

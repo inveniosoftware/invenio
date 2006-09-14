@@ -26,7 +26,7 @@ import sys
 import time
 
 from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail
-from invenio.miscutil_config import cfg_miscutil_error_messages  
+from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES  
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -79,7 +79,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
 
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-    as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
+    as the key for dict with name:  CFG_ + %(module_directory_name)s + _ERROR_MESSAGES
 
     @param stream: 'error' or 'warning'
 
@@ -116,7 +116,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
     else:
         stream = 'log'
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
-        errors_or_warnings_list.append((error, eval(cfg_miscutil_error_messages[error])% stream))
+        errors_or_warnings_list.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
     # update log_errors
     stream_location = logdir + '/invenio.' + stream
     errors = ''
@@ -140,7 +140,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
         return_value = 1
     except :
         error = 'ERR_MISCUTIL_WRITE_FAILED'
-        errors_or_warnings_list.append((error, cfg_miscutil_error_messages[error] % stream_location))
+        errors_or_warnings_list.append((error, CFG_MISCUTIL_ERROR_MESSAGES[error] % stream_location))
         return_value = 0
     return return_value
 
@@ -156,29 +156,29 @@ def get_msg_associated_to_code(err_code, stream='error'):
     try:
         module_directory_name = err_code.split('_')[1].lower()
         module_config = module_directory_name + '_config'
-        module_dict_name = "cfg_" + module_directory_name + "_%s_messages" % stream
+        module_dict_name = "CFG_" + module_directory_name.upper() + "_%s_MESSAGES" % stream.upper()
         module = __import__(module_config, globals(), locals(), [module_dict_name])
         module_dict = getattr(module, module_dict_name)
         err_msg = module_dict[err_code]
     except ImportError:
         error = 'ERR_MISCUTIL_IMPORT_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+        err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % (err_code,
                                                         module_config)
         err_code = error
     except AttributeError:
         error = 'ERR_MISCUTIL_NO_DICT'
-        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+        err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % (err_code,
                                                         module_config,
                                                         module_dict_name)
         err_code = error
     except KeyError:
         error = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
-        err_msg = cfg_miscutil_error_messages[error] % (err_code,
+        err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % (err_code,
                                                         module_config + '.' + module_dict_name)
         err_code = error
     except:
         error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
-        err_msg = cfg_miscutil_error_messages[error] % err_code
+        err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % err_code
         err_code = error
     return (err_code, err_msg) 
 
@@ -188,7 +188,7 @@ def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
     
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-    as the key for dict with name:  cfg_ + %(module_directory_name)s + _error_messages
+    as the key for dict with name:  CFG_ + %(module_directory_name)s + _ERROR_MESSAGES
     For warnings, same thing except:
         err_name can begin with either 'ERR' or 'WRN'
         dict name ends with _warning_messages
@@ -213,11 +213,11 @@ def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
         err_code = code_tuple[0]
         if stream == 'error' and not err_code.startswith('ERR'):
             error = 'ERR_MISCUTIL_NO_ERROR_MESSAGE'
-            out.append((error, eval(cfg_miscutil_error_messages[error])))
+            out.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])))
             continue
         elif stream == 'warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
             error = 'ERR_MISCUTIL_NO_WARNING_MESSAGE'
-            out.append((error, eval(cfg_miscutil_error_messages[error])))
+            out.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])))
             continue
         (new_err_code, err_msg) = get_msg_associated_to_code(err_code, stream)
         if err_msg[:2] == '_(' and err_msg[-1] == ')':
@@ -235,7 +235,7 @@ def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
             elif nb_msg_args < nb_tuple_args:
                 err_msg = err_msg % code_tuple[1:nb_msg_args+1]
                 parsing_error =  'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
-                parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+                parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
                 parsing_error_message %= code_tuple[0]
             elif nb_msg_args > nb_tuple_args:
                 code_tuple = list(code_tuple)
@@ -244,11 +244,11 @@ def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
                     code_tuple = tuple(code_tuple)
                 err_msg = err_msg % code_tuple[1:]
                 parsing_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
-                parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+                parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
                 parsing_error_message %= code_tuple[0]
         except:
             parsing_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
-            parsing_error_message = eval(cfg_miscutil_error_messages[parsing_error])
+            parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
             parsing_error_message %= code_tuple[0]           
         out.append((err_code, err_msg))
         if parsing_error:

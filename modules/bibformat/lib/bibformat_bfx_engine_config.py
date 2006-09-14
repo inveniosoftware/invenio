@@ -88,7 +88,7 @@ cfg_bibformat_bfx_label_definitions = {
 
 
 #BFX error and warning messages
-cfg_bibformat_bfx_error_messages = \
+CFG_BIBFORMAT_BFX_ERROR_MESSAGES = \
 {
     'ERR_BFX_TEMPLATE_REF_NO_NAME'                   :  'Error: Missing attribute "name" in TEMPLATE_REF.',
     'ERR_BFX_TEMPLATE_NOT_FOUND'                     :  'Error: Template %s not found.',
@@ -108,7 +108,7 @@ cfg_bibformat_bfx_error_messages = \
     'ERR_BFX_TOO_MANY_TEMPLATES'                     :  'Error: More than one templates found in the document. No format found.'
 }
 
-cfg_bibformat_bfx_warning_messages = \
+CFG_BIBFORMAT_BFX_WARNING_MESSAGES = \
 {
     'WRN_BFX_TEMPLATE_NO_DESCRIPTION'   : 'Warning: No description entered for the template.',
     'WRN_BFX_TEMPLATE_NO_CONTENT'       : 'Warning: No content type specified for the template. Using default: text/xml.',

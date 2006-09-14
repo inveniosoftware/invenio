@@ -43,7 +43,7 @@ format_output_extension = "bfo"
 
 # pylint: disable-msg=C0301
 
-cfg_bibformat_error_messages = \
+CFG_BIBFORMAT_ERROR_MESSAGES = \
 {   'ERR_BIBFORMAT_INVALID_TAG'                   :  '%s is an invalid tag.',
     'ERR_BIBFORMAT_NO_TEMPLATE_FOUND'             :  'No template could be found for output format %s.',
     'ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME'   :  'Could not find format element corresponding to %s.',
@@ -84,7 +84,7 @@ cfg_bibformat_error_messages = \
     'ERR_BIBFORMAT_NBMAX_NOT_INT'                 :  '"nbMax" parameter for %s must be an "int".'
 }
 
-cfg_bibformat_warning_messages = \
+CFG_BIBFORMAT_WARNING_MESSAGES = \
 {   'WRN_BIBFORMAT_OUTPUT_FORMAT_NAME_TOO_LONG'   : 'Name %s is too long for output format %s in language %s. Truncated to first 256 characters.',
     'WRN_BIBFORMAT_KB_NAME_UNKNOWN'               : 'Cannot find knowledge base named %s.',
     'WRN_BIBFORMAT_KB_MAPPING_UNKNOWN'            : 'Cannot find a mapping with key %s in knowledge base %s.',

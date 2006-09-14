@@ -29,7 +29,7 @@ from xml.sax import saxutils
 from invenio.bibformat_engine import BibFormatObject, get_format_element, eval_format_element
 from invenio.bibformat_bfx_engine_config import cfg_bibformat_bfx_label_definitions, cfg_bibformat_bfx_templates_path 
 from invenio.bibformat_bfx_engine_config import cfg_bibformat_bfx_format_template_extension, cfg_bibformat_bfx_element_namespace
-from invenio.bibformat_bfx_engine_config import cfg_bibformat_bfx_error_messages, cfg_bibformat_bfx_warning_messages
+from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_ERROR_MESSAGES, CFG_BIBFORMAT_BFX_WARNING_MESSAGES
 
 address_pattern = r'(?P<parent>[a-z_]*):?/?(?P<tag>[0-9_?\w]*)/?(?P<code>[\w_?]?)#?(?P<reg>.*)'
 
@@ -111,7 +111,7 @@ class BFXParser:
         if self.start_template_name:
             start_template = self.templates[self.start_template_name]['node']
         else:
-            print cfg_bibformat_bfx_warning_messages['WRN_BFX_NO_FORMAT_FOUND']
+            print CFG_BIBFORMAT_BFX_WARNING_MESSAGES['WRN_BFX_NO_FORMAT_FOUND']
             if len(self.templates) == 1:
                 # no format found, check if there is a default template
                 self.start_template_name = self.templates.keys()[0]
@@ -119,9 +119,9 @@ class BFXParser:
             else:
                 #no formats found, templates either zero or more than one
                 if len(self.templates) > 1:
-                    print cfg_bibformat_bfx_error_messages['ERR_BFX_TOO_MANY_TEMPLATES']
+                    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TOO_MANY_TEMPLATES']
                 else:
-                    print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_TEMPLATES_FOUND']
+                    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_TEMPLATES_FOUND']
                 return None
         self.flags['exec'] = True
         return start_template
@@ -214,7 +214,7 @@ class BFXParser:
                     if node.localName in self.known_operators:
                         print 'Note for programmer: you haven\'t implemented operator %s.' % (name)
                     else:
-                        print cfg_bibformat_bfx_error_messages['ERR_BFX_INVALID_OPERATOR_NAME'] % (name)
+                        print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_INVALID_OPERATOR_NAME'] % (name)
         return None
 
     def ctl_style(self, node, out_file):
@@ -243,12 +243,12 @@ class BFXParser:
         if attrs.has_key('name'):
             name = attrs['name']
             if self.templates.has_key(name):
-                print cfg_bibformat_bfx_error_messages['ERR_BFX_DUPLICATE_NAME'] % (name)
+                print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_DUPLICATE_NAME'] % (name)
                 return None
             self.start_template_name = name
             self.ctl_template(node, out_file)
         else:
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_NO_NAME']
             return None
         return None
     
@@ -268,26 +268,26 @@ class BFXParser:
         if attrs.has_key('name'):
             name = attrs['name']
             if self.templates.has_key(name):
-                print cfg_bibformat_bfx_error_messages['ERR_BFX_DUPLICATE_NAME'] % (name)
+                print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_DUPLICATE_NAME'] % (name)
                 return None
             self.templates[name] = {}
             self.templates[name]['node'] = node
         else:
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_NO_NAME']
             return None
         #get template description
         if attrs.has_key('description'):
             description = attrs['description']
         else:
             description = ''
-            print cfg_bibformat_bfx_warning_messages['WRN_BFX_TEMPLATE_NO_DESCRIPTION']
+            print CFG_BIBFORMAT_BFX_WARNING_MESSAGES['WRN_BFX_TEMPLATE_NO_DESCRIPTION']
         self.templates[name]['description'] = description
         #get content-type of resulting output
         if attrs.has_key('content'):
             content_type = attrs['content']
         else:
             content_type = 'text/xml'
-            print cfg_bibformat_bfx_warning_messages['WRN_BFX_TEMPLATE_NO_CONTENT']
+            print CFG_BIBFORMAT_BFX_WARNING_MESSAGES['WRN_BFX_TEMPLATE_NO_CONTENT']
         self.templates[name]['content_type'] = content_type
         #walk node
         self.walk(node, out_file)
@@ -304,7 +304,7 @@ class BFXParser:
         #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'): 
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_REF_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_REF_NO_NAME']
             return None
         name = attrs['name']
         #first check for a template in the same file, that is in the already cached templates
@@ -318,7 +318,7 @@ class BFXParser:
             #try:
             #    node = minidom.parse(template_file_name)
             #except:
-            #    print cfg_bibformat_bfx_error_messages['ERR_BFX_TEMPLATE_NOT_FOUND'] % (template_file_name)
+            #    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_NOT_FOUND'] % (template_file_name)
         return None
         
     def ctl_element(self, node, out_file):
@@ -331,7 +331,7 @@ class BFXParser:
         #exec mode
         parameters = get_node_attributes(node)
         if not parameters.has_key('name'):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_ELEMENT_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_ELEMENT_NO_NAME']
             return None
         function_name = parameters['name']
         del parameters['name']
@@ -352,14 +352,14 @@ class BFXParser:
         #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_FIELD_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_FIELD_NO_NAME']
             return None
         display = ''
         if attrs.has_key('display'):
             display = attrs['display']
         var = attrs['name']
         if not self.translator.is_defined(var):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_SUCH_FIELD'] % (var)
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_SUCH_FIELD'] % (var)
             return None
         value = self.translator.get_value(var, display)
         value = xml_escape(value)
@@ -376,7 +376,7 @@ class BFXParser:
         #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('value'):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_TEXT_NO_VALUE']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEXT_NO_VALUE']
             return None
         value = attrs['value']
         value = value.replace(r'\n', '\n')
@@ -397,11 +397,11 @@ class BFXParser:
         #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('object'):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_LOOP_NO_OBJECT']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_LOOP_NO_OBJECT']
             return None
         name = attrs['object']
         if not self.translator.is_defined(name):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_SUCH_FIELD'] % (name)
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_SUCH_FIELD'] % (name)
             return None
         for new_object in self.translator.iterator(name):
             self.walk(node, out_file)
@@ -438,12 +438,12 @@ class BFXParser:
         #exec mode
         attrs = get_node_attributes(node)
         if not attrs.has_key('name'):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_NO_NAME']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_NO_NAME']
             return None
         #determine result        
         var = attrs['name']
         if not self.translator.is_defined(var):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_SUCH_FIELD'] % (var)
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_SUCH_FIELD'] % (var)
             return None        
         value = self.translator.get_value(var)
         value = value.strip()
@@ -506,7 +506,7 @@ class BFXParser:
                 expr = re.compile(pattern)
                 result = expr.match(value)
             except:
-                print cfg_bibformat_bfx_error_messages['ERR_BFX_INVALID_RE'] % (pattern)
+                print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_INVALID_RE'] % (pattern)
         #simple form: True if non-empty, otherwise False
         else:
             result = value
@@ -518,7 +518,7 @@ class BFXParser:
         elif_node = get_node_subelement(node, 'elif', cfg_bibformat_bfx_element_namespace)
         #having else and elif siblings at the same time is a syntax error
         if (else_node is not None) and (elif_node is not None):
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
             return None
         #now walk appropriate nodes, according to the result        
         if result: #True
@@ -541,7 +541,7 @@ class BFXParser:
             self.walk(node, out_file)
             return None
         #exec mode
-        print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
+        print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
         
     def ctl_else(self, node, out_file):
@@ -553,7 +553,7 @@ class BFXParser:
             self.walk(node, out_file)
             return None
         #exec mode
-        print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
+        print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
     
     def ctl_elif(self, node, out_file):
@@ -565,7 +565,7 @@ class BFXParser:
             self.walk(node, out_file)
             return None
         #exec mode        
-        print cfg_bibformat_bfx_error_messages['ERR_BFX_IF_WRONG_SYNTAX']
+        print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
             
         
@@ -606,7 +606,7 @@ class MARCTranslator:
                     parent_name = match.group('parent')
                     if parent_name:
                         if not self.memory.has_key(parent_name):
-                            print cfg_bibformat_bfx_error_messages['ERR_BFX_NO_SUCH_FIELD'] % (parent_name)
+                            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_SUCH_FIELD'] % (parent_name)
                         else:
                             self.memory[name]['parent'] = parent_name
                             #now make parent aware of children
@@ -821,7 +821,7 @@ class MARCTranslator:
         elif display_type == 'fulltag':
             output = tag + ind1 + ind2
         else:
-            print cfg_bibformat_bfx_error_messages['ERR_BFX_INVALID_DISPLAY_TYPE'] % (display_type)
+            print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_INVALID_DISPLAY_TYPE'] % (display_type)
         return output            
 
 '''

@@ -31,8 +31,8 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS, \
-                                     cfg_webbasket_warning_messages, \
-                                     cfg_webbasket_error_messages, \
+                                     CFG_WEBBASKET_WARNING_MESSAGES, \
+                                     CFG_WEBBASKET_ERROR_MESSAGES, \
                                      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webuser import isGuestUser
                             
@@ -296,7 +296,7 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                                               comment[3],
                                                               ln)
         else:
-            warning = (cfg_webbasket_warning_messages['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
+            warning = (CFG_WEBBASKET_WARNING_MESSAGES['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
             warnings.append(warning)
     record = db.get_basket_record(bskid, recid, 'hb')
     body = webbasket_templates.tmpl_write_comment(bskid=bskid,

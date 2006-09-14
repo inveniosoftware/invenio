@@ -34,12 +34,12 @@ CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'PENDING':'P'
                                    }
 
-cfg_websession_error_messages = {
+CFG_WEBSESSION_ERROR_MESSAGES = {
     'ERR_WEBSESSION_DB_ERROR': '_("Sorry there was an error with  the database")',
     'ERR_WEBSESSION_GROUP_NO_RIGHTS': '_("Sorry, You don\'t have sufficient rights on this group")'
 }
 
-cfg_websession_warning_messages = {
+CFG_WEBSESSION_WARNING_MESSAGES = {
     'WRN_WEBSESSION_NO_GROUP_NAME': '_("Please enter a group name.")',
     'WRN_WEBSESSION_NOT_VALID_GROUP_NAME': '_("Please enter a valid group name.")',
     'WRN_WEBSESSION_GROUP_NAME_EXISTS': '_("Group name already exists. Please choose another group name.")',

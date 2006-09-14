@@ -51,13 +51,13 @@ CFG_WEBBASKET_ACTIONS = {'DELETE': 'delete',
 
 CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS = 20
 
-cfg_webbasket_warning_messages = {
+CFG_WEBBASKET_WARNING_MESSAGES = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")'
 }
 
 # pylint: disable-msg=C0301
-cfg_webbasket_error_messages = {
+CFG_WEBBASKET_ERROR_MESSAGES = {
     'ERR_WEBBASKET_CANNOT_COMMENT': '_("Sorry, you can\'t post in this baket")',
     'ERR_WEBBASKET_DB_ERROR': '_("Sorry there was an error with  the database")',
     'ERR_WEBBASKET_NO_RIGHTS': '_("Sorry, you don\'t have sufficient rights on this basket")',

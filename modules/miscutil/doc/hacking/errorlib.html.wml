@@ -65,8 +65,8 @@ definitions, variables avoiding &quot;magic&quot; number or strings, etc.</p>
 <p>Errors and warnings are eventually stored into dictionaries. The dictionaries
 are to be named against the following convention:</p>
 <pre>
-    cfg&#95;&lt;module-name&gt;&#95;error&#95;messages and
-    cfg&#95;&lt;module-name&gt;&#95;warning&#95;messages
+    CFG&#95;&lt;MODULENAME&gt;&#95;ERROR&#95;MESSAGES and
+    CFG&#95;&lt;MODULENAME&gt;&#95;WARNING&#95;MESSAGES
 </pre>
 <p>These two dictionaries (one can choose to implement only one if he doesn&apos;t
 need warnings, for example) contain an error-name -&gt; displayable message
@@ -96,7 +96,7 @@ been chosen is to nest the classical <code>&#95;()</code> function inside the st
 </pre>
 <p>A complete example of correct dictionary is given below:</p>
 <pre>    
-    cfg&#95;webcomment&#95;error&#95;messages =
+    CFG&#95;WEBCOMMENT&#95;ERROR&#95;MESSAGES =
     {   'ERR&#95;WEBCOMMENT&#95;RECID&#95;INVALID'       :  '&#95;("%i is an invalid record ID")',
         'ERR&#95;WEBCOMMENT&#95;RECID&#95;NAN'           :  '&#95;("Record ID %i is not a number")',
         'ERR&#95;WEBCOMMENT&#95;UID&#95;INVALID'         :  '&#95;("%i is an invalid user ID")'
@@ -143,7 +143,7 @@ a more convenient reading, some (non error-related) parts of code have been supp
 <h5>webmessage&#95;config.py</h5>
 <pre>
 &#35; error messages. (should not happen, except in case of reload, or url altering) 
-cfg&#95;webmessage&#95;error&#95;messages = \
+CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES = \
 {   'ERR&#95;WEBMESSAGE&#95;NOTOWNER':  '&#95;("This message is not in your mailbox")',
     'ERR&#95;WEBMESSAGE&#95;NONICKNAME':'&#95;("No nickname or user for uid #%s")',
     'ERR&#95;WEBMESSAGE&#95;NOMESSAGE': '&#95;("This message doesn\'t exist")'
@@ -152,7 +152,7 @@ cfg&#95;webmessage&#95;error&#95;messages = \
 
 <h5>webmessage.py: business logic</h5>
 <pre>
-from invenio.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
+from invenio.webmessage&#95;config import CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES
 
 def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
     uid   = wash&#95;url&#95;argument(uid, 'int')
@@ -245,14 +245,14 @@ cfg&#95;webmessage&#95;error&#95;messages = \
 
 <h5>webmessage&#95;example&#95;bin.py</h5>
 <pre>
-from invenio.webmessage&#95;config import cfg&#95;webmessage&#95;error&#95;messages
+from invenio.webmessage&#95;config import CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES
 from invenio.errorlib import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
 
 def handle&#95;error(error):
     errorlist = get&#95;msgs&#95;for&#95;code&#95;list([error])
 
     &#35; error is a tuple of error name, arguments => we only need the name
-    if cfg&#95;webmessage&#95;error&#95;messages[error[0]]:
+    if CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES[error[0]]:
         print("Error in webmessage: %s" % errorlist[0][1])
     else:
         for error in errorlist:
@@ -278,7 +278,7 @@ Check that the error is named following this pattern:
 <dd>No dictionary could be found in <code>&lt;module-name&gt;&#95;config.py</code>. Check
 that your dictionary is correctly named:
 <pre>
-    cfg&#95;&lt;module-name&gt;&#95;error&#95;messages
+    CFG&#95;&LT;MODULENAME&GT;&#95;ERROR&#95;MESSAGES
 </pre>
 You could also have inverted errors and warnings if only one dictionary was provided.<br/>
 This can also happen when using direct API if the <code>stream</code> argument is misspelled.
