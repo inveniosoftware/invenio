@@ -35,7 +35,6 @@ from invenio.webuser import getUid, get_email, list_registered_users, page_not_a
 from invenio.messages import gettext_set_language, wash_language
 from invenio.websubmit_config import *
 from invenio.search_engine import search_pattern
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
 execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)

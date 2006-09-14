@@ -36,9 +36,9 @@ from mod_python import apache
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
+from invenio.config import *
 from invenio.access_control_config import * 
 from invenio.dbquery import run_sql, escape_string
-from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
 from invenio.search_engine import print_record

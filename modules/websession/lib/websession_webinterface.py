@@ -27,7 +27,7 @@ from mod_python import apache
 import smtplib
 
 from invenio import webuser
-from invenio.config import weburl, sweburl, cdsname, cdslang, supportemail
+from invenio.config import *
 from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket
@@ -35,7 +35,6 @@ from invenio import webalert
 from invenio import webuser
 from invenio.webmessage import account_new_mail
 from invenio.access_control_config import *
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE, cfg_webaccess_warning_msgs, CFG_EXTERNAL_AUTHENTICATION
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup

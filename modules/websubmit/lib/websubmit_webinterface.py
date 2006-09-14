@@ -34,7 +34,6 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.websubmit_config import *
 from invenio.file import *
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language

@@ -29,9 +29,9 @@ __revision__ = "$Id$"
 import sys
 import time
 
-from invenio.access_control_engine import acc_authorize_action    
-from invenio.access_control_config import *
 from invenio.config import *
+from invenio.access_control_config import *
+from invenio.access_control_engine import acc_authorize_action    
 from invenio.dbquery import run_sql, ProgrammingError
 
 # ACTIONS

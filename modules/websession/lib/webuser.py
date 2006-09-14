@@ -45,9 +45,9 @@ from invenio.dbquery import run_sql, escape_string, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.config import *
+from invenio.access_control_config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions
-from invenio.access_control_config import *
 from invenio.messages import gettext_set_language
 import invenio.template
 tmpl = invenio.template.load('websession')

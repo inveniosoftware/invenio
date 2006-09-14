@@ -23,8 +23,7 @@
 
 __lastupdated__ = """$Date$"""
 
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, cdslang, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webmessage import *
 from invenio.webmessage_config import CFG_WEBMESSAGE_RESULTS_FIELD

@@ -22,11 +22,11 @@ import string
 import cgi
 
 from invenio.config import *
+from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
 from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
 from invenio.access_control_admin import acc_findUserRoleActions
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, CFG_EXTERNAL_AUTHENTICATION
 
 from invenio.messages import gettext_set_language
 

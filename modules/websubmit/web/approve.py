@@ -34,7 +34,6 @@ from invenio.websubmit_config import *
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.messages import wash_language
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 
 def index(req,c=cdsname,ln=cdslang):
 

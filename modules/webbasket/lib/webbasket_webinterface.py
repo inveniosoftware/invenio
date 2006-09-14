@@ -23,14 +23,13 @@ __lastupdated__ = """$Date$"""
 
 from mod_python import apache
 
-from invenio.config import weburl, webdir, cdslang
+from invenio.config import weburl, webdir, cdslang, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webbasket import *
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES 
 from invenio.urlutils import get_referer, redirect_to_url
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceYourBasketsPages(WebInterfaceDirectory):

@@ -27,11 +27,10 @@ import zlib
 import urllib
 from mod_python import apache
 
-from invenio.config import weburl, sweburl, cdslang, cdsname
+from invenio.config import weburl, sweburl, cdslang, cdsname, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webpage import page
 from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized
-from invenio.access_control_config import CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 
