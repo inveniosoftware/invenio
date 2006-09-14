@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 from invenio.config import weburl, cdslang
-from invenio.websubmitadmin_config import websubmitadmin_weburl, functions_with_file_params, websubmitadmin_oldweburl
+from invenio.websubmitadmin_config import WEBSUBMITADMIN_WEBURL, FUNCTIONS_WITH_FILE_PARAMS, WEBSUBMITADMIN_OLDWEBURL
 
 def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end=""):
     """Create a table from a tuple or a list.
@@ -263,7 +263,7 @@ class Template:
         </table>
         </div>
         <br />
-        """ % {'adminurl' : websubmitadmin_weburl, 'oldadminurl' : websubmitadmin_oldweburl}
+        """ % {'adminurl' : WEBSUBMITADMIN_WEBURL, 'oldadminurl' : WEBSUBMITADMIN_OLDWEBURL}
         return self._create_adminbox(header="Main Menu", datalist=[menu_body])
 
     def _element_display_preview_get_element(self,
@@ -331,7 +331,7 @@ class Template:
         <tr>
         <td>
         <br />&nbsp;&nbsp;
-        """ % {'adminurl' : websubmitadmin_weburl}
+        """ % {'adminurl' : WEBSUBMITADMIN_WEBURL}
         ## Based on element type, display a preview of element:
         body += self._element_display_preview_get_element(eltype=eltype, elsize=elsize, elrows=elrows, elcols=elcols,
                                                           elval=elval, elfidesc=elfidesc)
@@ -398,7 +398,7 @@ class Template:
             body_content += "<br />"
 
         body_content += """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
-                       % {'websubadmin_url': websubmitadmin_weburl, 'perform_action': perform_act}
+                       % {'websubadmin_url': WEBSUBMITADMIN_WEBURL, 'perform_action': perform_act}
         body_content += """
         <table width="100%%" class="admin_wvar">
          <thead>
@@ -535,7 +535,7 @@ class Template:
                 try:
                     body_content += """<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s"""\
                                     """&action=%(action)s&pagenum=%(pageno)s">&nbsp;%(subname)s: Page %(pageno)s</a></small><br />\n"""\
-                                    % { 'websubadmin_url'       : websubmitadmin_weburl,
+                                    % { 'websubadmin_url'       : WEBSUBMITADMIN_WEBURL,
                                         'doctype'               : usecase[0],
                                         'action'                : usecase[1],
                                         'subname'               : "%s%s" % (usecase[1], usecase[0]),
@@ -577,7 +577,7 @@ class Template:
         output += self._create_user_message_string(user_msg)
 
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
-                       % {'websubadmin_url': websubmitadmin_weburl, 'perform_action': perform_act}
+                       % {'websubadmin_url': WEBSUBMITADMIN_WEBURL, 'perform_action': perform_act}
         body_content += """
         <table width="90%%">
          <tr>
@@ -639,7 +639,7 @@ class Template:
          </tr>
         </table>
         </form>
-        """ % { 'websubadmin_url' : websubmitadmin_weburl }
+        """ % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL }
 
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Enter Action Details:", datalist=[body_content])
@@ -667,7 +667,7 @@ class Template:
         output += self._create_user_message_string(user_msg)
 
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
-                       % {'websubadmin_url': websubmitadmin_weburl, 'perform_action': perform_act}
+                       % {'websubadmin_url': WEBSUBMITADMIN_WEBURL, 'perform_action': perform_act}
         body_content += """
         <table width="90%%">
          <tr>
@@ -738,7 +738,7 @@ class Template:
         output += self._create_user_message_string(user_msg)
 
         body_content = """<form method="post" action="%(websubadmin_url)s/%(perform_action)s">""" \
-                       % {'websubadmin_url' : websubmitadmin_weburl, 'perform_action': perform_act}
+                       % {'websubadmin_url' : WEBSUBMITADMIN_WEBURL, 'perform_action': perform_act}
 
         ## Function Name and description:
         body_content += """<br />
@@ -798,7 +798,7 @@ class Template:
                 params_tablebody.append( ("<small>%s</small>" % (cgi.escape(parameter[0], 1),),
                                           """<small><a href="%(websubadmin_url)s/functionedit?funcparamdelcommit=funcparamdelcommit""" \
                                           """&amp;funcname=%(func_name)s&amp;funceditdelparam=%(delparam_name)s">delete</a></small>""" \
-                                          % { 'websubadmin_url' : websubmitadmin_weburl,
+                                          % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                                               'func_name' : cgi.escape(funcname, 1),
                                               'delparam_name' : cgi.escape(parameter[0], 1)
                                             }
@@ -864,7 +864,7 @@ class Template:
                            "<small>%s</small>" % (cgi.escape(usage[5], 1),),
                            """<small><a href="%s/doctypeconfiguresubmissionfunctions?doctype=%s&action=%s"""\
                            """&viewSubmissionFunctions=true">Show</a></small>"""\
-                           % (websubmitadmin_weburl, cgi.escape(usage[0], 1), cgi.escape(usage[2], 1))
+                           % (WEBSUBMITADMIN_WEBURL, cgi.escape(usage[0], 1), cgi.escape(usage[2], 1))
                           )
                         )
         body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody)
@@ -890,11 +890,11 @@ class Template:
             body_content += """<tr>
 <td align="left">&nbsp;&nbsp;<a href="%s/actionedit?actid=%s">%s: %s</a></td>
 </tr>
-""" % (websubmitadmin_weburl, cgi.escape(action[0], 1), cgi.escape(action[0], 1), cgi.escape(action[1], 1))
+""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(action[0], 1), cgi.escape(action[0], 1), cgi.escape(action[1], 1))
         body_content += """</table>"""
         ## Button to create new action:
         body_content += """<br><form action="%s/actionadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Action" /></form>""" \
-                        % (websubmitadmin_weburl,)
+                        % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Select an Action:", datalist=[body_content])
@@ -918,11 +918,11 @@ class Template:
             body_content += """<tr>
 <td align="left">&nbsp;&nbsp;<a href="%s/doctypeconfigure?doctype=%s">**%s**&nbsp;&nbsp;&nbsp;%s</a></td>
 </tr>
-""" % (websubmitadmin_weburl, cgi.escape(doctype[0], 1), cgi.escape(doctype[0], 1), cgi.escape(doctype[1], 1))
+""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(doctype[0], 1), cgi.escape(doctype[0], 1), cgi.escape(doctype[1], 1))
         body_content += """</table>"""
         ## Button to create new action:
         body_content += """<br><form action="%s/doctypeadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Doctype" /></form>""" \
-                        % (websubmitadmin_weburl,)
+                        % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Select a Document Type:", datalist=[body_content])
@@ -947,11 +947,11 @@ class Template:
             body_content += """<tr>
 <td align="left">&nbsp;&nbsp;<a href="%s/jscheckedit?chname=%s">%s</a></td>
 </tr>
-""" % (websubmitadmin_weburl, cgi.escape(jscheck[0], 1), cgi.escape(jscheck[0], 1))
+""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(jscheck[0], 1), cgi.escape(jscheck[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
         body_content += """<br><form action="%s/jscheckadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Check" /></form>""" \
-                        % (websubmitadmin_weburl,)
+                        % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Select a Checking Function:", datalist=[body_content])
@@ -975,13 +975,13 @@ class Template:
         for function in functions:
             tbody.append(("&nbsp;&nbsp;%s" % (cgi.escape(function[0], 1),),
                           """<small><a href="%s/functionusage?funcname=%s">View Usage</a></small>""" % \
-                              (websubmitadmin_weburl, cgi.escape(function[0], 1)),
+                              (WEBSUBMITADMIN_WEBURL, cgi.escape(function[0], 1)),
                           """<small><a href="%s/functionedit?funcname=%s">Edit Details</a></small>""" % \
-                          (websubmitadmin_weburl, cgi.escape(function[0], 1))
+                          (WEBSUBMITADMIN_WEBURL, cgi.escape(function[0], 1))
                          ))
         button_newfunc = """<form action="%s/functionadd" METHOD="post">
           <input class="adminbutton" type="submit" value="Add New Function" />
-          </form>""" % (websubmitadmin_weburl,)
+          </form>""" % (WEBSUBMITADMIN_WEBURL,)
         body_content += create_html_table_from_tuple(tableheader=header, tablebody=tbody, end=button_newfunc)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
@@ -1007,11 +1007,11 @@ class Template:
             body_content += """<tr>
 <td align="left">&nbsp;&nbsp;<a href="%s/elementedit?elname=%s">%s</a></td>
 </tr>
-""" % (websubmitadmin_weburl, cgi.escape(element[0], 1), cgi.escape(element[0], 1))
+""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(element[0], 1), cgi.escape(element[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
         body_content += """<br><form action="%s/elementadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Element" /></form>""" \
-                        % (websubmitadmin_weburl,)
+                        % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Select an Element:", datalist=[body_content])
@@ -1026,7 +1026,7 @@ class Template:
             ## Display the confirmation message:
             body_content += """<form method="get" action="%(websubadmin_url)s/doctyperemove">""" \
                             """<input type="hidden" name="doctype" value="%(doc_type)s" />\n""" \
-                            % { 'websubadmin_url' : websubmitadmin_weburl, 'doc_type' : cgi.escape(doctype, 1) }
+                            % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL, 'doc_type' : cgi.escape(doctype, 1) }
             body_content += """<div><span class="info"><i>Really</i> remove document type "%s" and all of its configuration details?</span> <input name="doctypedeleteconfirm" class="adminbutton\""""\
              """type="submit" value="Confirm" /></div>\n</form>\n""" % (cgi.escape(doctype,) )
         else:
@@ -1035,7 +1035,7 @@ class Template:
                 ## bad list of document types - reset
                 alldoctypes = ()
             body_content += """<form method="get" action="%(websubadmin_url)s/doctyperemove">""" \
-                       % { 'websubadmin_url' : websubmitadmin_weburl }
+                       % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL }
             body_content += """
             <table width="100%%" class="admin_wvar">
              <thead>
@@ -1071,7 +1071,7 @@ class Template:
         output = ""
         output += self._create_user_message_string(user_msg)
         body_content = """<form method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
-                   % { 'websubadmin_url' : websubmitadmin_weburl , 'formaction' : cgi.escape("doctypeconfigure", 1) }
+                   % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL , 'formaction' : cgi.escape("doctypeconfigure", 1) }
         body_content += """
         <input type="hidden" name="doctype" value="%(doctype)s" />
         <input type="hidden" name="action" value="%(action)s" />
@@ -1112,7 +1112,7 @@ class Template:
         body_content += """<form method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
                         """<input type="hidden" name="doctype" value="%(doctype)s" />\n""" \
                         """<input type="hidden" name="action" value="%(action)s" />\n""" \
-                        % { 'websubadmin_url' : websubmitadmin_weburl,
+                        % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                             'formaction'      : "doctypeconfigure",
                             'doctype'         : cgi.escape(doctype, 1),
                             'action'          : cgi.escape(action, 1)
@@ -1144,7 +1144,7 @@ class Template:
         output = ""
         output += self._create_user_message_string(user_msg)
         body_content = """<form method="get" action="%(websubadmin_url)s/%(action)s">""" \
-                   % { 'websubadmin_url' : websubmitadmin_weburl , 'action' : cgi.escape(perform_act, 1) }
+                   % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL , 'action' : cgi.escape(perform_act, 1) }
         body_content += """
         <table width="90%%">"""
 
@@ -1256,7 +1256,7 @@ class Template:
             ## bad list of document types - reset
             alldoctypes = ()
         body_content += """<form method="get" action="%(websubadmin_url)s/%(action)s">""" \
-                   % { 'websubadmin_url' : websubmitadmin_weburl , 'action' : cgi.escape(perform_act, 1) }
+                   % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL , 'action' : cgi.escape(perform_act, 1) }
         body_content += """
         <table width="90%%">
          <tr>
@@ -1381,7 +1381,7 @@ class Template:
                           'doctype_name' : cgi.escape(doctypename, 1),
                           'doctype_descr' : doctypedescr,
                           'performaction' : cgi.escape(perform_act, 1),
-                          'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                          'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                         }
         return txt
 
@@ -1423,7 +1423,7 @@ class Template:
                                           """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                             'category' : cgi.escape(str(categ[0]), 1),
                                                             'performaction' : cgi.escape(perform_act, 1),
-                                                            'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                           },
                                           """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(performaction)s">""" \
                                           """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
@@ -1435,7 +1435,7 @@ class Template:
                                           """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                             'category' : cgi.escape(str(categ[0]), 1),
                                                             'performaction' : cgi.escape(perform_act, 1),
-                                                            'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                           }
                                          ) )
             txt += create_html_table_from_tuple(tableheader=categs_tableheader, tablebody=categs_tablebody)
@@ -1467,7 +1467,7 @@ class Template:
          </tbody>
         </table>""" % { 'formaction' : cgi.escape(perform_act, 1),
                         'doctype' : cgi.escape(doctype, 1),
-                        'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                        'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                       }
         return txt
 
@@ -1523,7 +1523,7 @@ class Template:
                                                """class="hyperlinkformSubmitButton" />""" \
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
-                                                                 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                                 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                                },
                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctions">""" \
                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
@@ -1534,7 +1534,7 @@ class Template:
                                                """class="hyperlinkformSubmitButton" />""" \
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
-                                                                 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                                 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                                },
                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
@@ -1546,7 +1546,7 @@ class Template:
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
                                                                  'formaction' : cgi.escape(perform_act, 1),
-                                                                 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                                 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                                },
                                                """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(formaction)s">""" \
                                                """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
@@ -1558,7 +1558,7 @@ class Template:
                                                """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
                                                                  'action' : cgi.escape(str(subm[2]), 1),
                                                                  'formaction' : cgi.escape(perform_act, 1),
-                                                                 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                                                                 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                                                                }
                                             ) )
 
@@ -1584,7 +1584,7 @@ class Template:
            </form>""" \
                     % { 'doctype' : cgi.escape(doctype, 1),
                         'performaction' : cgi.escape(perform_act, 1),
-                        'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                        'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                         'submissions_list' : create_html_select_list(select_name="action", option_list=add_actions_list,
                                                                      css_style="margin: 5px 10px 5px 10px;")
                       }
@@ -1657,7 +1657,7 @@ class Template:
          </tbody>
         </table>""" % { 'doctype_id' : cgi.escape(doctype, 1),
                         'performaction' : cgi.escape(perform_act, 1),
-                        'websubadmin_url' : cgi.escape(websubmitadmin_oldweburl, 1)
+                        'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_OLDWEBURL, 1)
                       }
         return txt
 
@@ -1748,7 +1748,7 @@ class Template:
                'doctype'    : cgi.escape(doctype, 1),
                'categdescr' : cgi.escape(categdescr, 1),
                'performaction' : cgi.escape(perform_act, 1),
-               'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+               'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
               }
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Edit Details of '%(categid)s' Category of '%(doctype)s' Document Type:" \
@@ -1828,7 +1828,7 @@ class Template:
          </tr>
         </table>""" % { 'doctype'         : cgi.escape(doctype, 1),
                         'action'          : cgi.escape(action, 1),
-                        'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                        'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                         'performaction'   : cgi.escape(perform_act, 1),
                         'step'            : cgi.escape(addfunctionstep, 1),
                         'score'           : cgi.escape(addfunctionscore, 1),
@@ -1918,7 +1918,7 @@ class Template:
                 t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
                           """moveupfunctionname=%(func)s&moveupfunctionstep=%(step)s&moveupfunctionscore=%(score)s">"""\
                           """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Function Up" /></a>""" \
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'performaction'   : cgi.escape(perform_act, 1),
                               'weburl'          : cgi.escape(weburl, 1),
                               'doctype'         : cgi.escape(doctype, 1),
@@ -1936,7 +1936,7 @@ class Template:
                 t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&action=%(action)s&"""\
                           """movedownfunctionname=%(func)s&movedownfunctionstep=%(step)s&movedownfunctionscore=%(score)s">"""\
                           """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Function Down" /></a>""" \
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'performaction'   : cgi.escape(perform_act, 1),
                               'weburl'          : cgi.escape(weburl, 1),
                               'doctype'         : cgi.escape(doctype, 1),
@@ -1956,7 +1956,7 @@ class Template:
                               """movefromfunctionname=%(func)s&movefromfunctionstep=%(step)s&movefromfunctionscore=%(score)s">"""\
                               """<img border="0" src="%(weburl)s/img/move_from.gif" title="Move %(func)s (step %(step)s, score %(score)s)"""\
                               """ from this location" /></a>"""\
-                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                   'performaction'   : cgi.escape(perform_act, 1),
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'doctype'         : cgi.escape(doctype, 1),
@@ -1984,7 +1984,7 @@ class Template:
                                   """movetofunctionname=%(tofunc)s&movetofunctionstep=%(tostep)s&movetofunctionscore=%(toscore)s">"""\
                                   """<img border="0" src="%(weburl)s/img/move_to.gif" title="Move %(fromfunc)s (step %(fromstep)s, score %(fromscore)s)"""\
                                   """ to this location (step %(tostep)s, score %(toscore)s)" /></a>"""\
-                                  % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                                  % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                       'performaction'   : cgi.escape(perform_act, 1),
                                       'weburl'          : cgi.escape(weburl, 1),
                                       'doctype'         : cgi.escape(doctype, 1),
@@ -2013,7 +2013,7 @@ class Template:
                       """<input class="hyperlinkformHiddenInput" name="functionname" value="%(thisfunctionname)s" type="hidden" />"""\
                       """<input type="submit" name="viewfunctionparameters" value="view parameters" class="hyperlinkformSubmitButton" />"""\
                       """</form>\n"""\
-                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
                           'thisfunctionname' : cgi.escape(thisfunctionname, 1)
@@ -2029,7 +2029,7 @@ class Template:
                       """<input class="hyperlinkformHiddenInput" name="deletefunctionscore" value="%(score)s" type="hidden" />"""\
                       """<input type="submit" name="deletefunction" value="delete" class="hyperlinkformSubmitButton" />"""\
                       """</form>\n"""\
-                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'performaction'   : cgi.escape(perform_act, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
@@ -2046,7 +2046,7 @@ class Template:
                    num_functions > 1:
                     t_row += ["""<img border="0" src="%(weburl)s/img/move_from.gif" title="Moving %(fromfunc)s (step %(fromstep)s, """\
                               """score %(fromscore)s) from this location" />"""\
-                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                   'performaction'   : cgi.escape(perform_act, 1),
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'fromfunc'        : cgi.escape(movefromfunctionname, 1),
@@ -2087,7 +2087,7 @@ class Template:
           </tr>
          </table>""" % { 'doctype' : cgi.escape(doctype, 1),
                          'action'  : cgi.escape(action, 1),
-                         'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1)
+                         'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                        }
 
         
@@ -2195,7 +2195,7 @@ class Template:
          <tr>
           <td width="20%%"><span class="adminlabel">Field Name:</span></td>
           <td width="80%%">%(fieldname)s</td>
-         </tr>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+         </tr>""" % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                       'fieldname'       : create_html_select_list(select_name="fieldname",
                                                                   option_list=allelements,
                                                                   selected_values=fieldname,
@@ -2236,7 +2236,7 @@ class Template:
           </td>
          </tr>
          </tbody>
-        </table>\n""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+        </table>\n""" % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'performaction'   : cgi.escape(perform_act, 1),
                           'doctype'         : cgi.escape(doctype, 1),
                           'action'          : cgi.escape(action, 1),
@@ -2292,7 +2292,7 @@ class Template:
          <tr>
           <td width="20%%"><span class="adminlabel">Field Name:</span></td>
           <td width="80%%"><span class="info">%(fieldname)s</span></td>
-         </tr>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+         </tr>""" % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                       'pagenum'         : cgi.escape(pagenum, 1),
                       'fieldnum'        : cgi.escape(fieldnum, 1),
                       'fieldname'       : cgi.escape(fieldname, 1),
@@ -2351,7 +2351,7 @@ class Template:
                           'action'          : cgi.escape(action, 1),
                           'pagenum'         : cgi.escape(pagenum, 1),
                           'fieldnum'        : cgi.escape(fieldnum, 1),
-                          'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'performaction'   : cgi.escape(perform_act, 1)
                         }
 
@@ -2390,7 +2390,7 @@ class Template:
         <a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&pagenum=%(pagenum)s">
          Return to details of page [%(pagenum)s] of submission [%(submission)s]</a>
         </div>
-        <hr />""" % { 'websubadmin_url' : websubmitadmin_weburl,
+        <hr />""" % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                       'doctype'         : cgi.escape(doctype, 1),
                       'action'          : cgi.escape(action, 1),
                       'pagenum'         : cgi.escape(pagenum, 1),
@@ -2411,7 +2411,7 @@ class Template:
         <tr bgcolor="#f1f1f1">
         <td>
         <br />&nbsp;&nbsp;
-        """ % {'websubadmin_url' : websubmitadmin_weburl}
+        """ % {'websubadmin_url' : WEBSUBMITADMIN_WEBURL}
 
         for field in fields:
             body_content += self._element_display_preview_get_element(elname=field[0], eltype=field[3], elsize=field[4],
@@ -2475,7 +2475,7 @@ class Template:
                </form>
               </td>
              </tr>
-            </table>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+            </table>""" % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                             'doctype_id'      : cgi.escape(doctype, 1),
                             'action'          : cgi.escape(action, 1),
                             'pagenum'         : cgi.escape(pagenum, 1)
@@ -2497,7 +2497,7 @@ class Template:
                               """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s">"""\
                               """<img border="0" src="%(weburl)s/img/move_from.gif" title="Move field at position %(fieldnum)s"""\
                               """ from this location" /></a>"""\
-                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'doctype'         : cgi.escape(doctype, 1),
                                   'action'          : cgi.escape(action, 1),
@@ -2520,7 +2520,7 @@ class Template:
                                   """pagenum=%(pagenum)s&movefieldfromposn=%(movefieldfromposn)s&movefieldtoposn=%(fieldnum)s">"""\
                                   """<img border="0" src="%(weburl)s/img/move_to.gif" title="Move field at position %(movefieldfromposn)s"""\
                                   """ to this location at position %(fieldnum)s" /></a>"""\
-                                  % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                                  % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                       'weburl'           : cgi.escape(weburl, 1),
                                       'doctype'          : cgi.escape(doctype, 1),
                                       'action'           : cgi.escape(action, 1),
@@ -2538,7 +2538,7 @@ class Template:
                 t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
                           """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s&movefieldtoposn=%(previousfield)s">"""\
                           """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Element Up" /></a>"""\
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'weburl'          : cgi.escape(weburl, 1),
                               'doctype'         : cgi.escape(doctype, 1),
                               'action'          : cgi.escape(action, 1),
@@ -2555,7 +2555,7 @@ class Template:
                 t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
                           """pagenum=%(pagenum)s&movefieldfromposn=%(fieldnum)s&movefieldtoposn=%(nextfield)s">"""\
                           """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Element Down" /></a>"""\
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'weburl'          : cgi.escape(weburl, 1),
                               'doctype'         : cgi.escape(doctype, 1),
                               'action'          : cgi.escape(action, 1),
@@ -2597,7 +2597,7 @@ class Template:
             ## View/Edit field:
             t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
                       """pagenum=%(pagenum)s&editfieldposn=%(fieldnum)s"><small>edit</small></a>"""\
-                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'weburl'          : cgi.escape(weburl, 1),
                           'doctype'         : cgi.escape(doctype, 1),
                           'action'          : cgi.escape(action, 1),
@@ -2609,7 +2609,7 @@ class Template:
             ## Delete Element from page:
             t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
                       """pagenum=%(pagenum)s&deletefieldposn=%(fieldnum)s"><small>delete</small></a>"""\
-                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'weburl'          : cgi.escape(weburl, 1),
                           'doctype'         : cgi.escape(doctype, 1),
                           'action'          : cgi.escape(action, 1),
@@ -2621,7 +2621,7 @@ class Template:
             ## View/Edit Element Definition:
             t_row += ["""<a href="%(websubadmin_url)s/elementedit?elname=%(elementname)s&doctype=%(doctype)s&action=%(action)s&"""\
                       """pagenum=%(pagenum)s"><small>element</small></a>"""\
-                      % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'weburl'          : cgi.escape(weburl, 1),
                           'doctype'         : cgi.escape(doctype, 1),
                           'action'          : cgi.escape(action, 1),
@@ -2685,7 +2685,7 @@ class Template:
             </tr>
            </table>
           </td>
-         </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+         </tr>""" % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                       'doctype_id'      : cgi.escape(doctype, 1),
                       'action'          : cgi.escape(action, 1),
                       'pagenum'         : cgi.escape(pagenum, 1)
@@ -2743,7 +2743,7 @@ class Template:
           </td>
          </tr>
          </tbody>
-        </table>\n""" % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+        </table>\n""" % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
                           'function'         : cgi.escape(function, 1),
@@ -2805,7 +2805,7 @@ class Template:
           </td>
          </tr>
          </tbody>
-        </table>\n""" % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+        </table>\n""" % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
                           'function'         : cgi.escape(function, 1),
@@ -2831,7 +2831,7 @@ class Template:
             params = ()
 
         ## make table of function parameters:
-        if function in functions_with_file_params:
+        if function in FUNCTIONS_WITH_FILE_PARAMS:
             linktoparamfile = 1
         t_header = ["Parameter Name", "Parameter Value", "Edit Parameter", "%s" \
                   % ((linktoparamfile == 1 and "Edit File") or ("&nbsp;"),)]
@@ -2853,7 +2853,7 @@ class Template:
                       """<input class="hyperlinkformHiddenInput" name="paramname" value="%(thisparamname)s" type="hidden" />"""\
                       """<input type="submit" name="editfunctionparametervalue" value="edit value" class="hyperlinkformSubmitButton" />"""\
                       """</form>\n"""\
-                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
                           'function'         : cgi.escape(function, 1),
@@ -2868,7 +2868,7 @@ class Template:
                       """<input class="hyperlinkformHiddenInput" name="paramname" value="%(thisparamname)s" type="hidden" />"""\
                       """<input type="submit" name="editfunctionparameterfile" value="edit file" class="hyperlinkformSubmitButton" />"""\
                       """</form>\n"""\
-                      % { 'websubadmin_url'  : cgi.escape(websubmitadmin_weburl, 1),
+                      % { 'websubadmin_url'  : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                           'doctype'          : cgi.escape(doctype, 1),
                           'action'           : cgi.escape(action, 1),
                           'function'         : cgi.escape(function, 1),
@@ -2901,7 +2901,7 @@ class Template:
             </form>
           </td>
          </tr>
-        </table>""" % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+        </table>""" % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                         'doctype'         : cgi.escape(doctype, 1),
                         'action'          : cgi.escape(action, 1),
                         'paramstable'     : create_html_table_from_tuple(tableheader=t_header, tablebody=t_body)
@@ -2976,7 +2976,7 @@ class Template:
                     t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
                               """pagenum=%(pagenum)s&movepage=true&movepagedirection=up">"""\
                               """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Page Up" /></a>""" \
-                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'doctype'         : cgi.escape(doctype, 1),
                                   'action'          : cgi.escape(action, 1),
@@ -2991,7 +2991,7 @@ class Template:
                     t_row += ["""<a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
                               """pagenum=%(pagenum)s&movepage=true&movepagedirection=down">"""\
                               """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Page Down" /></a>""" \
-                              % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                                   'weburl'          : cgi.escape(weburl, 1),
                                   'doctype'         : cgi.escape(doctype, 1),
                                   'action'          : cgi.escape(action, 1),
@@ -3004,7 +3004,7 @@ class Template:
                 ## "view page" link:
                 t_row += ["""<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpageelements?doctype=%(doctype)s&action=%(action)s&"""\
                           """pagenum=%(pagenum)s">view page</a></small>""" \
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'doctype'         : cgi.escape(doctype, 1),
                               'action'          : cgi.escape(action, 1),
                               'pagenum'         : cgi.escape(str(i), 1)
@@ -3014,7 +3014,7 @@ class Template:
                 ## "delete page" link:
                 t_row += ["""<small><a href="%(websubadmin_url)s/doctypeconfiguresubmissionpages?doctype=%(doctype)s&action=%(action)s&"""\
                           """pagenum=%(pagenum)s&deletepage=true">delete page</a></small>""" \
-                          % { 'websubadmin_url' : cgi.escape(websubmitadmin_weburl, 1),
+                          % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'doctype'         : cgi.escape(doctype, 1),
                               'action'          : cgi.escape(action, 1),
                               'pagenum'         : cgi.escape(str(i), 1)
@@ -3055,7 +3055,7 @@ class Template:
                 </tr>
                </table>
               </td>
-             </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+             </tr>""" % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                           'doctype_id' : cgi.escape(doctype, 1),
                           'action'     : cgi.escape(action, 1)
                         }
@@ -3092,7 +3092,7 @@ class Template:
                 </tr>
                </table>
               </td>
-             </tr>""" % { 'websubadmin_url' : websubmitadmin_weburl,
+             </tr>""" % { 'websubadmin_url' : WEBSUBMITADMIN_WEBURL,
                           'doctype_id' : cgi.escape(doctype, 1),
                           'action'     : cgi.escape(action, 1),
                           'pagenum'    : cgi.escape(deletepagenum, 1)

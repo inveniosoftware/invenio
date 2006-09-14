@@ -19,14 +19,15 @@
 
 """WebSubmit Admin configuration parameters."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 # pylint: disable-msg=C0301
 
 from invenio.config import weburl
 
-websubmitadmin_weburl = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
-websubmitadmin_oldweburl = "%s/admin/websubmit" % (weburl,)
+WEBSUBMITADMIN_WEBURL = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
+WEBSUBMITADMIN_OLDWEBURL = "%s/admin/websubmit" % (weburl,)
 
 
 class InvenioWebSubmitAdminWarningIOError(Exception):
@@ -54,7 +55,7 @@ class InvenioWebSubmitAdminWarningReferentialIntegrityViolation(Exception):
 
 ## List of the names of functions for which the parameters are files that can be edited.
 ## In particular, this applies to the record creation functions that make use of bibconvert.
-functions_with_file_params = ["Make_Record", "Make_Modify_Record"]
+FUNCTIONS_WITH_FILE_PARAMS = ["Make_Record", "Make_Modify_Record"]
 
 
 
