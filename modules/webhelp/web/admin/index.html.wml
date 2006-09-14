@@ -243,10 +243,10 @@ engine.
 </td>
 <td>
   Enables you to automatically classify documents according to
-  ontologies and keyword thesauri.
+  keyword taxonomies and thesauri.
 </td>
 <td>
-  <a href="bibclassify/">BibClassify Admin Interface</a>
+  <small class="note">command-line configuration</small>
 </td>
 <td>
   <a href="bibclassify/guide.html">BibClassify Admin Guide</a>
