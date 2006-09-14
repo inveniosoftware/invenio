@@ -27,7 +27,7 @@ import sys
 from urllib import quote
 
 from invenio.dbquery import run_sql, Error
-from invenio.config import cdsname,cdslang,weburl
+from invenio.config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box

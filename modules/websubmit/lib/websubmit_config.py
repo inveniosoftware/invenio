@@ -21,46 +21,21 @@
 
 __revision__ = "$Id$"
 
-## import config variables defined from config.wml:
-from invenio.config import adminemail, \
-     supportemail, \
-     images, \
-     urlpath, \
-     accessurl, \
-     counters, \
-     storage, \
-     filedir, \
-     filedirsize, \
-     gfile, \
-     gzip, \
-     tar, \
-     gunzip, \
-     acroread, \
-     distiller, \
-     convert, \
-     tmpdir, \
-     bibupload, \
-     bibformat, \
-     bibwords, \
-     bibconvert, \
-     bibconvertconf, \
-     htdocsurl
-
 ## test:
 test = "FALSE"
 
 ## CC all action confirmation mails to administrator? (0 == NO; 1 == YES)
-cfg_websubmit_copy_mails_to_admin = 0
+CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN = 0
 
 ## known compressed file extensions: 
-cfg_compressed_file_extensions = ["z", "gz", "tar", "tgz", "tar",
+CFG_COMPRESSED_FILE_EXTENSIONS = ["z", "gz", "tar", "tgz", "tar",
                                   "tar.gz", "zip", "rar", "arj",
                                   "arc", "pak", "lha", "lhz", "sit",
                                   "sea", "sitx", "cpt", "hqx", "uu",
                                   "uue", "bz", "bz2", "bzip", "tbz",
                                   "tbz2", "tar.bz", "tar.bz2"]
                                 
-cfg_known_file_extensions = ["lis",
+CFG_KNOWN_FILE_EXTENSIONS = ["lis",
 			     "sxi",
    		 	     "zip",
 			     "kpr",

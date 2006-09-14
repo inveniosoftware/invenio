@@ -30,7 +30,7 @@
    ##             titleFile: name of the file containing the title
 
 from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
-from invenio.websubmit_config import cfg_websubmit_copy_mails_to_admin
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 
 execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
 
@@ -99,7 +99,7 @@ def Send_Approval_Request (parameters,curdir,form):
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
     tostring = addresses.strip()
-    if cfg_websubmit_copy_mails_to_admin:
+    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         # Copy mail to admins:
         if len(tostring) > 0:
             tostring += ",%s" % (adminemail,)

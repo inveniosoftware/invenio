@@ -26,7 +26,7 @@ import types
 import re
 from mod_python import apache
 
-from invenio.config import cdsname,cdslang
+from invenio.config import *
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole

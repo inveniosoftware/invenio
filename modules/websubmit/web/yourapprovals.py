@@ -21,7 +21,7 @@
 import os
 import sys
 
-from invenio.config import weburl, sweburl, cdsname, cdslang
+from invenio.config import *
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *

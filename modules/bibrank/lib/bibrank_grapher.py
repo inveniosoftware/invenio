@@ -26,7 +26,7 @@ import sys
 import time 
 import tempfile 
 
-from invenio.config import webdir 
+from invenio.config import * 
 from invenio.websubmit_config import * 
  
 ## test gnuplot presence:   

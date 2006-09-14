@@ -47,11 +47,11 @@ archivepath = filedir
 archivesize = filedirsize
 
 # sort compressed file extensions list to get lengthy ones first:
-cfg_compressed_file_extensions_sorted = cfg_compressed_file_extensions
-cfg_compressed_file_extensions_sorted.sort()
+CFG_COMPRESSED_FILE_EXTENSIONS_SORTED = CFG_COMPRESSED_FILE_EXTENSIONS
+CFG_COMPRESSED_FILE_EXTENSIONS_SORTED.sort()
 
 def file_strip_ext(file):
-    for c_ext in cfg_known_file_extensions:
+    for c_ext in CFG_KNOWN_FILE_EXTENSIONS:
         if file[-len(c_ext):len(file)]==c_ext and file[-len(c_ext)-1]==".":
             file = file[0:-len(c_ext)-1]
     return file
@@ -404,7 +404,7 @@ class BibDoc:
                     fullname_lowercase = fullname.lower()
                     fullname_extension_postition = -1
                     # first try to detect compressed file extensions:
-                    for compressed_file_extension in cfg_compressed_file_extensions_sorted:
+                    for compressed_file_extension in CFG_COMPRESSED_FILE_EXTENSIONS_SORTED:
                         if fullname_lowercase.endswith("." + compressed_file_extension):
                             fullname_extension_postition = fullname[:-len(compressed_file_extension)-1].rfind(".")
                             break

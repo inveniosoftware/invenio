@@ -28,7 +28,7 @@
    ##             emailFile: name of the file containing the email of the
    ##                        user
 
-from invenio.websubmit_config import cfg_websubmit_copy_mails_to_admin
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 
 execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
 
@@ -68,7 +68,7 @@ def Send_Modify_Mail (parameters,curdir,form):
             tostring += ",%s" % (addresses,)
         else:
             tostring = addresses
-    if cfg_websubmit_copy_mails_to_admin:
+    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         # Copy mail to admins:
         if len(tostring) > 0:
             tostring += ",%s" % (adminemail,)

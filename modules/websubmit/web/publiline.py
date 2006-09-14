@@ -26,7 +26,7 @@ import types
 import re
 import shutil
 
-from invenio.config import cdsname,cdslang,supportemail,pylibdir, sweburl
+from invenio.config import *
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
