@@ -64,13 +64,9 @@ A brief description of things we strive at, more or less unsuccessfully.
    We aim at following recommendations from <a
    href="http://www.python.org/peps/pep-0008.html">PEP 8</a>, although
    the existing code surely do not fulfil them here and there.
-
-   The most easily notable exception from PEP 8 is perhaps the line
-   width, that usually exceeds 72 characters per line in our sources,
-   as we tend to use fullscreen editors.  The code indentation is done
-   via spaces only, please do not use tabs.  One tab counts as four
-   spaces.  Emacs users can look into our <a
-   href="cdsware.el">cdsware.el</a> for inspiration.
+   The code indentation is done via spaces only, please do not use
+   tabs.  One tab counts as four spaces.  Emacs users can look into
+   our <a href="cdsware.el">cdsware.el</a> for inspiration.
 
    All the Python code should be extensively documented via
    docstrings, so you can always run pydoc file.py to peruse the
@@ -91,7 +87,9 @@ A brief description of things we strive at, more or less unsuccessfully.
    using psyco on classes may lead to false pychecker warnings.)
 
    You can check the kwalitee of your code by running ``python
-   modules/miscutil/lib/kwalitee.py *.py'' on your files.
+   modules/miscutil/lib/kwalitee.py *.py'' on your files.  You can
+   also check the code kwalitee across all the modules by running
+   ``make kwalitee-check'' in the main source directory.
 
    Do not hardcode magic constants in your code.  Every magic string or
    a number should be put into accompanying file_config.py with 
