@@ -64,7 +64,7 @@ def print_marc(marc_dict):
             ind2 = ''
 
         # subfields joined into one field
-        if key in elmsubmit_config.marc_fields_joined.keys():
+        if key in elmsubmit_config.CFG_ELMSUBMIT_MARC_FIELDS_JOINED.keys():
 
             tuple_list = marc_dict[key]
             
@@ -80,7 +80,7 @@ def print_marc(marc_dict):
                     prefix_dict[subfield_tuple[0]] = 1
 
 
-            for linked_prefix_list in elmsubmit_config.marc_fields_joined[key]:
+            for linked_prefix_list in elmsubmit_config.CFG_ELMSUBMIT_MARC_FIELDS_JOINED[key]:
 
                 #we found a list of prefixes to join, build a field out of them
 
@@ -151,15 +151,15 @@ def generate_data_field(field, value, marc_dict):
     """ for a given data field, determine if it is in the marc dictionary dictionary and update marc_dict accordingly
     """
     
-    if (field in elmsubmit_config.marc_mapping):
+    if (field in elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING):
         # print "field:", field
 
         # field is a normal field
         
-        if isinstance(elmsubmit_config.marc_mapping[field], list) == False:
+        if isinstance(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field], list) == False:
             
             for value_part in value:
-                (datafield, subfield) = process_marc(elmsubmit_config.marc_mapping[field])
+                (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field])
                 if marc_dict.has_key(datafield) == 1:
                     marc_dict[datafield].append((subfield, value_part))
                 else:
@@ -173,13 +173,13 @@ def generate_data_field(field, value, marc_dict):
 
             for value_part in value:
                 if value.index(value_part) == 0:
-                    (datafield, subfield) = process_marc(elmsubmit_config.marc_mapping[field][0])
+                    (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field][0])
                     if marc_dict.has_key(datafield) == 1:
                         marc_dict[datafield].append((subfield, value_part))
                     else:
                         marc_dict[datafield] = [(subfield, value_part)]
                 else:
-                    (datafield, subfield) = process_marc(elmsubmit_config.marc_mapping[field][1])
+                    (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field][1])
                     if marc_dict.has_key(datafield) == 1:
                         marc_dict[datafield].append((subfield, value_part))
                     else:

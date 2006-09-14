@@ -25,7 +25,7 @@ from invenio.config import adminemail, \
      weburl
 
 # elmsubmit configuration file:
-files = {
+CFG_ELMSUBMIT_FILES = {
          'mailprefix': 'mail',
          'test_case_1': 'elmsubmit_tests_1.mbox',
          'test_case_2': 'elmsubmit_tests_2.mbox',
@@ -35,7 +35,7 @@ files = {
 
 # pylint: disable-msg=C0301
 
-nolangmsgs = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
+CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
              'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % weburl,
               'missing_type':  'The submission data that you have provided does not contain a TYPE field. This is mandatory for all submissions.',
               'unsupported_type': 'The TYPE field of your submission does not contain a recognized value.',
@@ -46,12 +46,12 @@ nolangmsgs = {'bad_email': 'Your email could not be parsed correctly to discover
               'missing_attachment': 'We could not find the following file attached to your submission email:',
               'temp_problem': 'There is a temporary problem with CDS Invenio\'s email submission interface. Please retry your submission again shortly.'}
 
-servers = {'smtp': 'localhost'}
+CFG_ELMSUBMIT_SERVERS = {'smtp': 'localhost'}
 
-people = {'admin': adminemail}
+CFG_ELMSUBMIT_PEOPLE = {'admin': adminemail}
 
 # fields required in the submission mail
-required_fields = ['title',
+CFG_ELMSUBMIT_REQUIRED_FIELDS = ['title',
                    'author',
                    'date',
                    'files']
@@ -61,8 +61,7 @@ required_fields = ['title',
 
 # mapping code as a list means the first element is mapped to the first element
 # of the list, and the rest to the second
-
-marc_mapping = {'author': ['100__a', '700__a'],
+CFG_ELMSUBMIT_MARC_MAPPING = {'author': ['100__a', '700__a'],
                 'title': '245__a',
                 'subtitle': '245__b',
                 'photocaption': '246__b',
@@ -90,8 +89,7 @@ marc_mapping = {'author': ['100__a', '700__a'],
 
 # the list of the fields determines which subfields should be joined into a
 # single datafield
-
-marc_fields_joined = {'700__': [['a', 'u']],
+CFG_ELMSUBMIT_MARC_FIELDS_JOINED = {'700__': [['a', 'u']],
                       '100__': [['a', 'u']],
                       #test tags
                       '111__': [['a','c'],['b','d']]

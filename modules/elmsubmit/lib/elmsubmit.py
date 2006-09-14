@@ -56,12 +56,12 @@ def process_email(email_string):
 
 
             response = elmsubmit_EZEmail.CreateMessage(to=err.basic_email_info['from'],
-                                                       _from=elmsubmit_config.people['admin'],
-                                                       message=elmsubmit_config.nolangmsgs['bad_email'],
+                                                       _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
+                                                       message=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['bad_email'],
                                                        subject="Re: " + (err.basic_email_info.get('Subject', '') or ''),
                                                        references=[err.basic_email_info.get('message-id', '') or ''],
                                                        wrap_message=False)
-            _send_smtp(_from=elmsubmit_config.people['admin'], to=err.basic_email_info['from'], msg=response)
+            _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=err.basic_email_info['from'], msg=response)
             raise elmsubmitError("Email could not be parsed. Reported to sender.")
         except ValueError:
             raise elmsubmitError("From: field of submission email could not be parsed. Could not report to sender.")
@@ -75,20 +75,20 @@ def process_email(email_string):
         submission_dict['SuE'] = e.from_email.encode('utf8')
 
     except elmsubmit_submission_parser.SubmissionParserError:
-        _notify(msg=e, response=elmsubmit_config.nolangmsgs.bad_submission)
+        _notify(msg=e, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['bad_submission'])
         raise elmsubmitSubmissionError("Could not parse submission.")
 
     # Check we have been given the required fields:
     available_fields = submission_dict.keys()
     
-    if not len(filter(lambda x: x in available_fields, elmsubmit_config.required_fields)) == len(elmsubmit_config.required_fields):
-        response = elmsubmit_config.nolangmsgs['missing_fields_1'] + elmsubmit_config.nolangmsgs['missing_fields_2'] + "\n\n" + repr(elmsubmit_config.required_fields)
+    if not len(filter(lambda x: x in available_fields, elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)) == len(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS):
+        response = elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_1'] + elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_2'] + "\n\n" + repr(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)
         _notify(msg=e, response=response)
-        raise elmsubmitSubmissionError("Submission does not contain the required fields for document type %s. Required fields: %s" % (doctype, elmsubmit_config.required_fields))
+        raise elmsubmitSubmissionError("Submission does not contain the required fields for document type %s. Required fields: %s" % (doctype, elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS))
 
     # Check that the fields we have been given validate OK:
     
-    map(lambda field: validate_submission_field(e, submission_dict, field, submission_dict[field]), elmsubmit_config.required_fields)
+    map(lambda field: validate_submission_field(e, submission_dict, field, submission_dict[field]), elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)
 
     # Get a submission directory:
     
@@ -99,7 +99,7 @@ def process_email(email_string):
     try:
         os.makedirs(storage_dir)
     except EnvironmentError:
-        _notify(e=e, response=elmsubmit_config.nolangmsgs['temp_problem'])
+        _notify(e=e, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['temp_problem'])
         _notify_admin(response="Could not create directory: %s" % (storage_dir))
         raise elmsubmitError("Could not create directory: %s" % (storage_dir))
 
@@ -119,7 +119,7 @@ def process_email(email_string):
     try:
         open(fullpath, 'wb').write(marc_xml)
     except EnvironmentError:
-        response_email = elmsubmit_config.nolangmsgs['temp_problem']
+        response_email = elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['temp_problem']
         admin_response_email = "There was a problem writing data to directory %s." % (storage_dir)
         error = elmsubmitError("There was a problem writing data to directory %s." % (storage_dir))
         return (response_email, admin_response_email, error)
@@ -136,8 +136,8 @@ def validate_submission_field(msg, submission_dict, field, value):
         submission_dict[field] = fixed_value.encode('utf8')
 
         if not validation_success:
-            _notify(msg=msg, response=elmsubmit_config.nolangmsgs['bad_field'] + ' ' + field.upper() + '\n\n'
-                    + elmsubmit_config.nolangmsgs['correct_format'] + '\n\n' + field_documentation)
+            _notify(msg=msg, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['bad_field'] + ' ' + field.upper() + '\n\n'
+                    + elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['correct_format'] + '\n\n' + field_documentation)
             raise elmsubmitSubmissionError("Submission contains field %s which does not validate." % (field))
     except AttributeError:
         # No validation defined for this field:
@@ -185,7 +185,7 @@ def process_files(msg, submission_dict, storage_dir):
             try:
                 file_attachment = nominal_attachments[0]['file']
             except IndexError:
-                _notify(msg=msg, response=elmsubmit_config.nolangmsgs['missing_attachment'] + ' ' + filename)
+                _notify(msg=msg, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_attachment'] + ' ' + filename)
                 raise elmsubmitSubmissionError("Submission is missing attached file: %s" % (filename))
 
         file_dict[filename.encode('utf8')] = file_attachment
@@ -224,7 +224,7 @@ def process_files(msg, submission_dict, storage_dir):
     try:
         map(create_files, file_dict.items())
     except EnvironmentError:
-        response_email = elmsubmit_config.nolangmsgs['temp_problem']
+        response_email = elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['temp_problem']
         admin_response_email = "There was a problem writing data to directory %s." % (storage_dir)
         error = elmsubmitError("There was a problem writing data to directory %s." % (storage_dir))
         return (response_email, admin_response_email, error)
@@ -236,27 +236,27 @@ def process_files(msg, submission_dict, storage_dir):
 def _send_smtp(_from, to, msg):
     
     s = smtplib.SMTP()
-    s.connect(host=elmsubmit_config.servers['smtp'])
+    s.connect(host=elmsubmit_config.CFG_ELMSUBMIT_SERVERS['smtp'])
     s.sendmail(_from, to, msg)
     s.close()
 
 def _notify(msg, response):
     response = elmsubmit_EZEmail.CreateMessage(to=[(msg.from_name, msg.from_email)],
-                                               _from=elmsubmit_config.people['admin'],
+                                               _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                message=response,
                                                subject="Re: " + msg.subject,
                                                references=[msg.message_id],
                                                wrap_message=False)
 
-    _send_smtp(_from=elmsubmit_config.people['admin'], to=msg.from_email, msg=response)
+    _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=msg.from_email, msg=response)
 
 def _notify_admin(response):
-    response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.people['admin'],
-                                               _from=elmsubmit_config.people['admin'],
+    response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
+                                               _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                message=response,
                                                subject="CDSWare / elmsubmit problem.",
                                                wrap_message=False)
-    _send_smtp(_from=elmsubmit_config.people['admin'], to=elmsubmit_config.people['admin'], msg=response)
+    _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], msg=response)
 
 class elmsubmitError(Exception):
     pass

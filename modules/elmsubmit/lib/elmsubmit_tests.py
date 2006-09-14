@@ -40,7 +40,7 @@ class MarcTest(unittest.TestCase):
     def test_simple_marc(self):
         """elmsubmit - parsing simple email"""
         try:
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_1']),'r')
+            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']),'r')
             email = f.read()
             f.close()
 
@@ -91,7 +91,7 @@ class MarcTest(unittest.TestCase):
     def test_complex_marc(self):
         """elmsubmit - parsing complex email with multiple fields"""
         try:        
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_2']),'r')
+            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
             f.close()
 
@@ -185,7 +185,7 @@ class FileStorageTest(unittest.TestCase):
         """elmsubmit - reading text files"""
         try:
             
-            f=open(os.path.join(tmpdir, elmsubmit_config.files['test_case_2']),'r')
+            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
             f.close()
 
