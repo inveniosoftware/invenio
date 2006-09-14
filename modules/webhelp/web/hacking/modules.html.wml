@@ -40,7 +40,11 @@ descriptions the module relationship diagram is presented.
 
  <li><strong>BibCheck</strong>: FIXME 
 
- <li><strong>BibClassify</strong>: FIXME 
+ <li><strong>BibClassify</strong> allows automatic extraction of
+ keywords from fulltext documents, based on the frequency of specific
+ terms, taken from a controlled vocabulary. Controlled vocabularies
+ can be expressed as simple text thesauri or as structured, RDF-compliant,
+ taxonomies, to allow a semantic classification.
 
  <li><strong>BibConvert</strong> allows metadata conversion from any
  structured or semi-structured proprietary format into any other
