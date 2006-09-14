@@ -137,6 +137,9 @@ __author__
 
 ---------------------
 """
+
+__revision__ = "$Id$"
+
 # text values determining begin and end of submission
 
 submission_frame_values = ['cdson:::', 'cdsoff:::']

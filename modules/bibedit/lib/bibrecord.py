@@ -28,6 +28,8 @@ in the source code of this file in the section entitled INTERFACE.
 Note: Does not access the database, the input is MARCXML only.
 """
 
+__revision__ = "$Id$"
+
 ### IMPORT INTERESTING MODULES AND XML PARSERS
     
 import string

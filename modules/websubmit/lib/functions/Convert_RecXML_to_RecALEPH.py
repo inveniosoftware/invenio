@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
 from os import system, access, R_OK
 
 def Convert_RecXML_to_RecALEPH(parameters, curdir, form):

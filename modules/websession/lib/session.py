@@ -43,6 +43,8 @@ process shuts down, all session data is lost.  You will need to
 subclass SessionManager if you want to implement persistent sessions.
 """
 
+__revision__ = "$Id$"
+
 #default configuration values
 DEFAULT_SESSION_COOKIE_NAME = "CDSSESSION"
 DEFAULT_SESSION_COOKIE_DOMAIN = None 

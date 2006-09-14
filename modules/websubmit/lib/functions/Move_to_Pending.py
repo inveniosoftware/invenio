@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
    ## Description:   function Move_to_Pending
    ##                This function moves the current working directory to 
    ##             /pending (usually the document is then waiting for

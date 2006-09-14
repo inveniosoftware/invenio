@@ -33,6 +33,8 @@ SEE: bibformat_utils.py
 FIXME: currently copies record_exists() code from search engine.  Refactor later.
 """
 
+__revision__ = "$Id$"
+
 import zlib
 
 from invenio import bibformat_dblayer

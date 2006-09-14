@@ -18,6 +18,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
 def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[...] ",extension_fr="[...] ", contextual="no", highlight='no'):
     """
     Prints the abstract of a record in english and then french

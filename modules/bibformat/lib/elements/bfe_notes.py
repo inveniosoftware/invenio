@@ -18,6 +18,8 @@
 ## along with CDSware; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
 def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
     """
     Displays notes (various note fields)

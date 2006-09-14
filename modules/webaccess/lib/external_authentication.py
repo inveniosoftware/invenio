@@ -21,6 +21,8 @@
 
 """External user authentication for CDS Invenio."""
 
+__revision__ = "$Id$"
+
 import httplib
 import urllib
 import re

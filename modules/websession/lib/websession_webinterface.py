@@ -20,6 +20,8 @@
 
 """CDS Invenio ACCOUNT HANDLING"""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import sys

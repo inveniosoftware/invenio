@@ -22,6 +22,8 @@ BFX formatting engine.
 For API: see format_with_bfx() docstring below.
 """
 
+__revision__ = "$Id$"
+
 import re
 from xml.dom import minidom, Node
 from xml.sax import saxutils

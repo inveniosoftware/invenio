@@ -85,6 +85,8 @@ charset is allowed in any text/enriched file. Quoting RFC1896:
 > these instances.
 """
 
+__revision__ = "$Id$"
+
 def enriched2txt(string):
    
     # f and g will be our input/output streams.

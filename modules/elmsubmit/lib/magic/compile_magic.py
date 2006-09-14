@@ -24,6 +24,8 @@
 Compile magic files listed on the command line. Print name of compiled file.
 """
 
+__revision__ = "$Id$"
+
 import sys
 import os
 import magic.magic as magic

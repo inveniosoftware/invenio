@@ -19,6 +19,8 @@
 
 """WebBasket Web Interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 from mod_python import apache

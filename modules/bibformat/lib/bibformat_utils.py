@@ -30,6 +30,8 @@ Depends on search_engine.py for record_exists()
 FIXME: currently copies record_exists() code from search engine.  Refactor later.
 """
 
+__revision__ = "$Id$"
+
 import re
 import zlib
 from invenio.dbquery import run_sql

@@ -19,6 +19,8 @@
 
 """Group features."""
 
+__revision__ = "$Id$"
+
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \

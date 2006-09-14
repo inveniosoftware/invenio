@@ -19,7 +19,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ templates for webmessage module """
+
+__revision__ = "$Id$"
 
 # CDS imports
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt

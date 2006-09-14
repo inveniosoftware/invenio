@@ -23,6 +23,8 @@
 Miscellaneous utlity functions that have the potential for re-use.
 """
 
+__revision__ = "$Id$"
+
 import tempfile
 import os
 import os.path

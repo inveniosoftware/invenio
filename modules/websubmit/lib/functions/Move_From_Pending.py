@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
    ## Description:   function Move_From_Pending
    ##                This function retrieves an old submisison directory which
    ##             had been saved in /pending and moves all the data files

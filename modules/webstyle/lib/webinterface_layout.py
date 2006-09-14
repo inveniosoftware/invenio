@@ -25,6 +25,8 @@ This module binds together CDS Invenio's modules and maps them to
 their corresponding URLs (ie, /search to the websearch modules,...)
 """
 
+__revision__ = "$Id$"
+
 from invenio.config import webdir
 from invenio.webinterface_handler import create_handler, WebInterfaceDirectory
 

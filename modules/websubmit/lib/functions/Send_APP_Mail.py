@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
    ## Description:   function Send_APP_Mail
    ##                This function send an email informing the original 
    ##             submitter of a document that the referee has approved/

@@ -19,6 +19,8 @@
 
 """CDS Invenio Web Page Functions"""
 
+__revision__ = "$Id$"
+
 import re
 import string
 import sys

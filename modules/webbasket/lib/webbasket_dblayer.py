@@ -20,6 +20,8 @@
 
 """ Database related functions for webbasket module """
 
+__revision__ = "$Id$"
+
 from zlib import decompress
 from time import localtime
 

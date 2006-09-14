@@ -19,6 +19,8 @@
 
 """OAI interface for CDS Invenio written in Python compliant with OAI-PMH2.0"""
 
+__revision__ = "$Id$"
+
 import cPickle
 import string
 from string import split

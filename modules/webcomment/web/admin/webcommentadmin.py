@@ -21,6 +21,8 @@
 
 """Comments and reviews administrative interface."""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 from invenio.webcommentadminlib import *

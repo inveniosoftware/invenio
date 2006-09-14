@@ -68,6 +68,8 @@ Shortcomings:
  
 """
 
+__revision__ = "$Id$"
+
 # Quicker to do "from email import *" but this gives us a reminder of
 # what's available:
 

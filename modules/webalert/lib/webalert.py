@@ -19,6 +19,8 @@
 
 """PERSONAL FEATURES - YOUR ALERTS"""
 
+__revision__ = "$Id$"
+
 import cgi
 import time
 

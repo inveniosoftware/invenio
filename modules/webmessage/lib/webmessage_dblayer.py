@@ -21,6 +21,8 @@
 
 """Every db-related function of module webmessage"""
 
+__revision__ = "$Id$"
+
 from time import localtime, mktime
 
 from invenio.dbquery import run_sql, escape_string

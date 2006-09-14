@@ -25,6 +25,8 @@ There is no API for the engine. Instead use bibformat.py.
 SEE: bibformat.py, bibformat_utils.py
 """
 
+__revision__ = "$Id$"
+
 import re
 import sys
 import os

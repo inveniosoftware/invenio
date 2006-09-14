@@ -21,6 +21,9 @@
 """
 FIXME implement me
 """
+
+__revision__ = "$Id$"
+
 def format(bfo, maxNbLines):
     """Returns lines of the full-text which are relevant to the search pattern of the user
     (NOT IMPLEMENTED YET)

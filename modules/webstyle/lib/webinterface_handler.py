@@ -26,6 +26,8 @@ scheme (/search.py queries), HTTP/HTTPS switching, language
 specification,...
 """
 
+__revision__ = "$Id$"
+
 import os
 import urlparse
 import base64

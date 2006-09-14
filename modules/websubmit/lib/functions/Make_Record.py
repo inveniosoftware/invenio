@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
    ## Description:   function Make_Weblib_Record
    ##                This function creates the bibliographic record
    ##             using bibConvert and the configuration files passed as

@@ -116,6 +116,8 @@ Document options somewhere here.
 
 """
 
+__revision__ = "$Id$"
+
 def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force_conversion=False,
                   recursive=False, just_closed_para=True, output_file=None):
 

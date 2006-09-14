@@ -21,6 +21,8 @@
 Bibclassify keyword extractor command line entry point.
 """
 
+__revision__ = "$Id$"
+
 import getopt
 import string
 import os

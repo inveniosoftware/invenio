@@ -31,6 +31,8 @@ sessions managements, working with websession.
 It also contains Apache-related user authentication stuff.
 """
 
+__revision__ = "$Id$"
+
 from marshal import loads, dumps
 from zlib import compress, decompress
 import time

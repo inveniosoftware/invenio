@@ -21,6 +21,8 @@
 
 """Test cases for the BibFormat engine."""
 
+__revision__ = "$Id$"
+
 # pylint: disable-msg=C0301
 
 import unittest

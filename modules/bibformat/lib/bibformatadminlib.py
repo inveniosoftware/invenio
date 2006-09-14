@@ -21,6 +21,8 @@
 Handle requests from the web interface to configure BibFormat.
 """
 
+__revision__ = "$Id$"
+
 import os
 import re
 import stat

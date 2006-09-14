@@ -19,6 +19,8 @@
 
 """PERSONAL FEATURES - YOUR ALERTS"""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 import sys

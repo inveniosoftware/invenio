@@ -19,6 +19,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ Migration from webbasket [v0.7.1] to [v0.9.0]
 Usage: python webbasket_migration_kit.py
 This utility will copy records and baskets from CDSware 0.7.1 to CDS Invenio 0.9
@@ -32,6 +33,8 @@ duplicates entries).
 
 Main function: migrate_v071_baskets()
 """
+
+__revision__ = "$Id$"
 
 from invenio.dbquery import run_sql, escape_string
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS

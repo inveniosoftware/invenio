@@ -26,6 +26,8 @@ tag:
 These tags can span several lines. Extra whitespace is discarded. 
 """
 
+__revision__ = "$Id$"
+
 import sys
 import os
 import re

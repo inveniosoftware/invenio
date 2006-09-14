@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+
    ## Description:   function CaseEDS
    ##                This function compares the content of a file to different
    ##                values and directly goes to a different step in the action

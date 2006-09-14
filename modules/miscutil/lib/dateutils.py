@@ -40,6 +40,8 @@ Lexicon
         default value: _("N/A")
 """
 
+__revision__ = "$Id$"
+
 # External imports
 from time import strptime, strftime, localtime
 

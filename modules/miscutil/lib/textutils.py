@@ -17,10 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ Functions for text handling:
 - indenting
 - ...
 """
+
+__revision__ = "$Id$"
 
 def indent_text(text,
                 nb_tabs=0,

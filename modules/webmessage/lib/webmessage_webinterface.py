@@ -21,6 +21,8 @@
 
 """WebMessage web interface"""
 
+__revision__ = "$Id$"
+
 __lastupdated__ = """$Date$"""
 
 from invenio.config import weburl, cdslang, CFG_ACCESS_CONTROL_LEVEL_SITE

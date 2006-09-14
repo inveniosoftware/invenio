@@ -19,6 +19,8 @@
 
 """Web Baskets features."""
 
+__revision__ = "$Id$"
+
 from zlib import decompress
 
 from invenio.config import cdslang, weburl

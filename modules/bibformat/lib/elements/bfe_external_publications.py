@@ -1,3 +1,5 @@
+__revision__ = "$Id$"
+
 def format(bfo, separator='<br/>'):
     """
     Prints list of links to external publications.

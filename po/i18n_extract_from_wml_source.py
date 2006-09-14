@@ -28,6 +28,8 @@ The sentences to translate are marked with the following tag:
 These tags can span several lines. Extra whitespace is discarded. 
 """
 
+__revision__ = "$Id$"
+
 import sys, re, os
 
 _tag_re = re.compile(r'_\((.*?)\)_', re.M)

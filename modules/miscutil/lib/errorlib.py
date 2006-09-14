@@ -21,6 +21,8 @@
 
 """ Error handling library """
 
+__revision__ = "$Id$"
+
 import traceback
 import sys
 import time
