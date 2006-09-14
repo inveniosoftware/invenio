@@ -60,6 +60,11 @@ sources get installed to, what is the visible URL policy, etc.</dd>
 <blockquote>
 <dl>
 
+<dt><a href="bibclassify/index.html">BibClassify Internals</a></dt>
+<dd>Describes information useful to understand how BibClassify works,
+the taxonomy extensions we use, how the keyword extraction algorithm works.
+</dd>
+
 <dt><a href="bibconvert/index.html">BibConvert Internals</a></dt>
 <dd>Describes information useful to understand how BibConvert works,
  and the BibConvert functions can be reused.</dd>
