@@ -466,12 +466,18 @@ def format_template_show(req, bft, code=None, ln=cdslang, ln_for_preview=cdslang
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def format_template_show_attributes(req, bft, ln=cdslang):
+def format_template_show_attributes(req, bft, ln=cdslang, new=0):
     """
     Page for template name and descrition attributes edition.
     
+    This is also the first page shown when a format template
+    has just been added. In that case new is different from
+    False and we can offer specific option to user (for ex
+    let him make a duplicate of existing template).
+
     @param ln language
     @param bft the name of the template to show 
+    @param new if "False", the template has not just been added
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -486,6 +492,7 @@ def format_template_show_attributes(req, bft, ln=cdslang):
     if not auth_code:
         format_template = wash_url_argument(bft, 'str')
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
+	is_new = wash_url_argument(new, 'int')
 
         if not can_read_format_template(bft): #No read permission
             return page(title=_("Restricted Format Template"),
@@ -497,7 +504,7 @@ def format_template_show_attributes(req, bft, ln=cdslang):
                         req=req)
         
         return page(title=_("Format Template %s Attributes"%format_name),
-                    body=perform_request_format_template_show_attributes(bft, ln=ln),
+                    body=perform_request_format_template_show_attributes(bft, ln=ln, new=is_new),
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links ,
@@ -539,7 +546,7 @@ def format_template_show_dependencies(req, bft, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_update_attributes(req, bft, ln=cdslang, name = "", description=""):
+def format_template_update_attributes(req, bft, ln=cdslang, name = "", description="", duplicate=None):
     """
     Update the name and description of given format template
      
@@ -547,6 +554,7 @@ def format_template_update_attributes(req, bft, ln=cdslang, name = "", descripti
     @param description the new description
     @param name the new name
     @param bft the filename of the template to update
+    @param duplicate the filename of template that we want to copy (the code)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -558,10 +566,12 @@ def format_template_update_attributes(req, bft, ln=cdslang, name = "", descripti
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-
+	
+	if duplicate != None:
+	    duplicate = wash_url_argument(duplicate, 'str')
         name = wash_url_argument(name, 'str')
         description = wash_url_argument(description, 'str')
-        bft = update_format_template_attributes(bft, name, description)
+        bft = update_format_template_attributes(bft, name, description, duplicate)
         
         redirect_to_url(req, "format_template_show?ln=%(ln)s&bft=%(bft)s" % {'ln':ln, 'bft':bft})
     else:
@@ -617,7 +627,7 @@ def format_template_add(req, ln=cdslang):
     if not auth_code:
 
         bft = add_format_template()
-        redirect_to_url(req, "format_template_show_attributes?ln=%(ln)s&bft=%(bft)s"%{'ln':ln, 'bft':bft})
+        redirect_to_url(req, "format_template_show_attributes?ln=%(ln)s&bft=%(bft)s&new=1"%{'ln':ln, 'bft':bft})
     else:
         return page_not_authorized(req=req, text=auth_msg)
     
