@@ -19,7 +19,7 @@
 
 etcdir = $(sysconfdir)/bibclassify
 
-etc_DATA = CERESTheme.rdf
+etc_DATA = HEP.rdf
 
 EXTRA_DIST = $(etc_DATA)
 
