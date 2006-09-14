@@ -177,14 +177,36 @@ def perform_request_format_template_show_dependencies(bft, ln=cdslang):
                                                                             format_elements,
                                                                             tags)
     
-def perform_request_format_template_show_attributes(bft, ln=cdslang):
+def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
     """
     Page for template name and descrition attributes edition.
     
+    If format template is new, offer the possibility to 
+    make a duplicate of an existing format template.
+
     @param ln language
     @param bft the template to edit
+    @param new if True, the template has just been added (is new)
     @return the main page for format templates attributes edition
     """
+    all_templates = []
+    if new == True:
+	all_templates_attrs = bibformat_engine.get_format_templates(with_attributes=True)
+	if all_templates_attrs.has_key(bft): #Sanity check. Should always be true at this stage
+	    del all_templates_attrs[bft] # Remove in order not to make a duplicate of self..
+    
+    #sort according to name, inspired from Python Cookbook
+        
+	def sort_by_name(seq, keys):
+	    intermed = [(x['attrs']['name'], keys[i], i, x) for i, x in enumerate(seq)]
+	    intermed.sort()
+	    return [(x[1], x[0]) for x in intermed]
+	
+	all_templates = sort_by_name(all_templates_attrs.values(), all_templates_attrs.keys())
+	#keys = all_templates_attrs.keys()
+	#keys.sort()
+	#all_templates = map(lambda x: (x, all_templates_attrs.get(x)['attrs']['name']), keys) 
+
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
     name = format_template['attrs']['name']
     description = format_template['attrs']['description']
@@ -194,7 +216,9 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang):
                                                                           name,
                                                                           description,
                                                                           bft,
-                                                                          editable)
+                                                                          editable,
+									  all_templates,
+									  new)
 
    
 def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_pattern=""):
@@ -677,7 +701,7 @@ def update_format_template_code(filename, code=""):
     
     bibformat_engine.clear_caches()
     
-def update_format_template_attributes(filename, name="", description=""):
+def update_format_template_attributes(filename, name="", description="", duplicate=None):
     """
     Saves name and description inside template given by filename.
 
@@ -687,10 +711,19 @@ def update_format_template_attributes(filename, name="", description=""):
     If name already exist, use fresh filename (we never overwrite other templates) amd
     remove old one.
 
+    if duplicate is different from None, then it means that we must copy
+    the code of the template whoose filename is given in 'duplicate' for the code
+    of our template,
+
+    @param duplicate the filename of a template that we want to copy
     @return the filename of the modified format
     """
     format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-    code = format_template['code']
+    if duplicate != None:
+	format_template_to_copy = bibformat_engine.get_format_template(duplicate)
+	code = format_template_to_copy['code']
+    else:
+	code = format_template['code']
     if format_template['attrs']['name'] != name:
         #name has changed, so update filename
         old_filename = filename

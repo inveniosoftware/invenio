@@ -301,15 +301,21 @@ class Template:
 
         return indent_text(out)
 
-    def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable):
+    def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable, 
+						   all_templates=[], new=False):
         """
         Returns a page to change format template name and description
+
+	If template is new, offer a way to create a duplicate from an 
+	existing template
 
         @param ln language
         @param name the name of the format
         @param description the description of the format
         @param filename the filename of the template
         @param editable True if we let user edit, else False
+	@param all_templates a list of tuples (filename, name) of all other templates
+	@param new if True, the format template has just been added (is new)
         @return editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
@@ -344,6 +350,26 @@ class Template:
             
         out += '''
         <form action="format_template_update_attributes?ln=%(ln)s&amp;bft=%(filename)s" method="POST">
+	''' % {'ln':ln,
+	       'filename':filename}
+	       
+	if new == True:
+	    #Offer the possibility to make a duplicate of existing format template code
+	    out += '''
+	     <table><tr>
+	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#addFormatTemplate">?</a>]</th>
+	     </tr>
+	    <tr>
+	    <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
+	    ''' %  {'weburl': weburl,
+		    'readonly':readonly}
+	    for (o_filename, o_name) in all_templates:
+		out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
+												 'template_filename': o_filename}
+	    out += ''' </select> 
+	    </td></tr></table>'''
+
+	out += '''
         <table><tr>
         <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#attrsFormatTemplate">?</a>]</th>
         </tr>
@@ -352,27 +378,35 @@ class Template:
         
         <input type="hidden" name="key" value="%(name)s"/>
         <label for="name">%(name_label)s</label>:&nbsp;</td>
-        <td><input tabindex="4" name="name" type="text" id="name" size="25" value="%(name)s" %(readonly)s/>
+        <td><input tabindex="2" name="name" type="text" id="name" size="25" value="%(name)s" %(readonly)s/>
         <input type="hidden" value="%(filename)s"/>
         </td>
         </tr>
+	''' % {"name": name,
+	       'ln':ln,
+	       'filename':filename,
+	       'disabled':disabled,
+	       'readonly':readonly,
+	       'name_label': _("Name"),
+	       'weburl':weburl
+	       }
+
+	out += '''
         <tr>
         <td class="admintdright" valign="top"><label for="description">%(description_label)s</label>:&nbsp;</td>
-        <td><textarea tabindex="5" name="description" id="description" rows="4" cols="25" %(readonly)s>%(description)s</textarea> </td>
+        <td><textarea tabindex="3" name="description" id="description" rows="4" cols="25" %(readonly)s>%(description)s</textarea> </td>
         </tr>
         <tr>
         <td>&nbsp;</td>
         <td align="right"><input tabindex="6" class="adminbutton" type="submit" value="%(update_format_attributes)s" %(disabled)s/></td>
         </tr>
         </table></form>
-        ''' % {"name": name,
-               "description": description,
+        ''' % {"description": description,
                'ln':ln,
                'filename':filename,
                'disabled':disabled,
                'readonly':readonly,
                'description_label': _("Description"),
-               'name_label': _("Name"),
                'update_format_attributes': _("Update Format Attributes"),
                'weburl':weburl
                }

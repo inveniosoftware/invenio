@@ -688,7 +688,7 @@ def get_format_template(filename, with_attributes=False):
 
 def get_format_templates(with_attributes=False):
     """
-    Returns the list of all format templates
+    Returns the list of all format templates, as dictionary with filenames as keys
 
     if 'with_attributes' is True, returns the name and description. Else 'attrs' is not
     returned as key in each dictionary (it might, if it has already been loaded previously)
