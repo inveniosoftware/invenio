@@ -1,0 +1,263 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+    title="The code behind BibClassify: the extraction algorithm" \
+    navbar_name="hacking-bibclassify" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a>  &gt; <a class=navtrail href=<WEBURL>/hacking/bibclassify/>BibClassify Internals</a> " \
+    navbar_select="hacking-bibclassify-index" 
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+<strong>2. <a href="#2">Preprocessing</a></strong><br>
+<strong>3. <a href="#3">Single Keyword (mkw) processing</a></strong><br>
+<strong>4. <a href="#4">Composite keyword (ckw)processing</a></strong><br>
+<strong>5. <a href="#5">Postprocessing</a></strong><br>
+
+<a name="1"></a><h2>1. Overview</h2>
+
+<p> This section provides a detailed account of the phrase matching
+techniques used by BibClassify to automatically extract significant terms
+from fulltext documents. While reading this guide, you are advised to refer to the original
+BibClassify code, mostly contained in <code>lib/python/invenio/bibclassifylib.py</code>.
+This guide refers to version 2006/09/15.  
+
+<p>The bulk of the extraction mechanism takes place inside the function
+<code>generate_keywords_rdf</code>. This function is triggered when
+BibClassify is launched with parameter <code>-K,
+--taxonomy=FILENAME</code>. Let's have a look at what happens inside this function, step-by-step.
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> BibClassify can also run on top of simple text thesauri
+(parameter <code>-k, --thesaurus=FILENAME</code>, function
+<code>generate_keywords</code>), however this mode is now deprecated
+and no longer maintained.</span>
+
+<a name="2"></a><h2>2. Preprocessing</h2>
+
+<p> At the beginning of the function, various local variables are
+declared. Among these,
+<ul>
+<li><code>namespace</code>: This variable
+points to the main rdf:Namespace used in the taxonomy. In the case of
+RDF SKOS, this is
+<code>http://www.w3.org/2004/02/skos/core#</code>. If you need to use namespaces other than this one, please modify this variable
+accordingly.</li>
+<li><code>delimiter</code>: This variable represents the delimiter
+symbol used to separate composite keywords. For example, current HEP
+taxonomy adopts ":" (e.g. <em>baryon: asymmetry</em>) whereas the SPIRES standard
+adopts "," (e.g. <em>baryon, asymmetry</em>). If you intend to set up and use
+composite keywords in your taxonomy, please set this variable to the desired format.
+</ul>
+
+<p>The taxonomy (<code>dictfile</code>) is stored and parsed into memory via <a href="http://rdflib.net/">RDFlib</a> by the following two lines of code:
+<blockquote>
+<code>
+store = rdflib.Graph()<br>
+store.parse(dictfile)
+</code>              
+</blockquote>
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> RDFLib provides very handy
+libraries for RDF manipulation, however when dealing with large RDF
+files, loading and parsing are by far the principal
+factor affecting the performance of BibClassify. For example, when
+loading the <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">HEP taxonomy</a> (7.4 MB, 16000 Concepts) on an Intel(R)
+Xeon(TM) CPU 3.06GHz the two lines of code above take a total of <b>26
+seconds</b> to complete (over two thirds of the total execution time - 36 seconds).
+If performance is your main concern, consider a faster library or
+working on a pre-loaded RDF store.
+</span>
+
+<p>At this point, the fulltext of the document is converted from text
+to PDF (using standard linux command <code>pdftotext</code>) and stored into a
+string <code>text_string</code>. This string will contain the full
+document if running in slow mode or an arbitrary excerpt of the
+document (about 40%) if running in fast mode. Moreover, the very
+beginning of the string (10%) is stored in a variable called
+<code>abstract</code>. This is done base on the assumption that
+manuscripts generally contain crucial information such as title and
+abstract in the very first portion of the document. This portion can
+be then treated to be more relevant than the remainder of the document. Please
+bear this in mind if running BibClassify on documents with different
+structures or when running on heterogeneous collections.
+
+<p> In many manuscripts, the author includes a list of pre-assigned
+terms that describe the topic of the article. The last step before
+keyword extraction begins is to locate these author-assigned
+keywords. We try to isolate these by searching for the key phrase
+<em>Keywords</em> followed by a list of terms. When found, the string
+is stored into variable <code>safe_keys</code> and used later to match
+BibClassify output against author assigned keywords (these are marked
+in the output with an asterisk, e.g. <code>13* Hubble constant</code>)
+
+<a name="3"></a><h2>3. Single Keyword (mkw) processing</h2>
+
+<p> The bulk of the phrase matching operations - the extraction of the single
+keywords from the fulltext - is contained in a big <code>for</code> loop. In this
+loop, every RDF <code>Concept</code> is parsed, one at a time, and its
+components (such as <code>prefLabel</code> and <code>altLabel</code>) matched inside the document.
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> For a detailed explanation
+of the RDF SKOS syntax, please refer to the 
+<a href="http://www.w3.org/TR/2005/WD-swbp-skos-core-guide-20051102/">SKOS W3C
+website</a>. <br>
+The rationale behind single and composite keywords is covered in the <a
+href="<WEBURL>/hacking/bibclassify/hep-taxonomy.html">HEP taxonomy hacking
+section</a>.</span>
+
+<p> For every concept in the taxonomy that has a <code>prefLabel</code>, we store
+its searchable labels (<code>altLabel</code> and <code>hiddenLabel</code>) in a list
+(<code>candidates</code>). At this point we also check whether the
+concept has been flagged with a <code>nostandalone</code> note,
+i.e. it will be used for the computation of composite keywords, but it
+does not count as a single keyword on its own (this is the case of many
+short particle names that if considered on their own would generate a lot of noise
+output).
+
+<p> For every <code>candidate</code> term in the
+<code>candidates</code> list, a regex is compiled around the term. In
+doing this, it is important to consider carefully the anatomy of the
+term:
+
+<ul>
+<li> When the candidate term contains a hyphen/minus sign (<b>-</b>): need
+to understand whether it is a minus sign or a hyphen by splitting the
+string around it. 
+<ul>
+<li>If it is a minus sign, retain it and perform a
+standard search. </li>
+<li>If it is a hyphen, search for it and every possible alternative form too
+(e.g. <em>word-word</em> will also try to match <em>wordword</em> and
+<em>word word</em>).</li></ul></li>  
+<li> When the candidate term is an uppercase word
+(e.g. <em>ATLAS</em>) or it is a very short string (e.g. <em>B+</em>):
+perform a case sensitive search.</li>
+<li> In all other cases, perform a case-insensitive search.
+</ul>
+
+<code>hiddenLabel</code> containing wildcards (e.g. <em>gauge theor*</em>) are
+processed separately at the beginning. This is done to avoid double
+matching, i.e. if a <code>hiddenLabel</code>'s regex matches any other label, the
+latter will be excluded from the occurrence calculation.
+
+<p>The assembling and compilation of the regex is performed for each
+candidate in the function <code>makePattern</code>. The function wraps
+a regex around the candidate term according to the type of term
+detected, as explained above. When compiling the regular expressions around
+the candidate terms, the basic rule for making patterns is:
+<blockquote><b>(?:[^A-Za-z0-9\+-])(</b> + candidate term
++ <b>)(?=[^A-Za-z0-9\+-])</b></blockquote> The word separator (in bold) differs from the
+standard regex for non-whitespace character (<em>\s</em>) as it
+includes plus and minus signs (that in the case of HEP
+thesaurus terms cannot be regarded as whitespace).  The compiled
+pattern is then matched inside the <code>text_string</code> via a
+<code>sre.findall</code> and the resulting keyword occurrences stored
+in a list of single keywords(<code>keylist</code>). This list is then
+sorted by term occurrence and can be used for the final processing
+task: the computation of the combined keywords.
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> The compilation of
+candidate terms into regex patterns also affects negatively performance times.
+However, this is not as influent as the storing and parsing of the RDF taxonomy, demonstrated above.
+When compiling the 16000 Concepts of the <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">HEP taxonomy</a> on an Intel(R) Xeon(TM) CPU 3.06GHz
+this step takes a total of <b>9 seconds</b> (one fourth of the total
+execution time - 36 seconds).  It is clear that such performance can be
+greatly improved by working on a pre-compiled set of regex patterns,
+to be re-generated only whenever the taxonomy is modified.
+</span>
+
+<a name="4"></a><h2>4. Composite keyword (ckw) processing</h2>
+
+<p>This is the final processing step of the extraction
+mechanism. Although this step takes place only if composite keywords
+are present in the taxonomy, it is the one step that - in the case of high energy physics - produces the most
+accurate results - especially thanks to the richness and level of
+detail reached by the current HEP thesaurus.
+
+<p>In this part, BibClassify looks for possible keyword combinations
+and key pairs by analysing the list of most recurrent single keywords
+(<code>keylist</code>). The total number of mkws that are possible ckw
+candidates is defined by the parameter <code>-l,
+--limit</code>. The higher this value (default is 70), the higher
+the number of mkws that make it to the pool of ckw candidates.  In
+order to compute possible combinations, BibClassify loops around
+<code>l</code> single keywords in <code>keylist</code>. For each entry,
+it creates key : value pairs in two dictionaries: <ul> <li>
+<code>compositesIDX</code>, an index dictionary to aid retrieval of components in
+<code>keylist</code> (key:value pair of the form <em>URI : keylist entry</em>)
+</li> <li><code>composites</code>, a dictionary to keep track of possible
+combinations between mkws (key: value pair of the form
+<em>ckwURI : [mkw1URI, mkw2URI]</em>)</li> </ul>
+
+
+For example, if the mkws <em>zinc</em>
+and <em>tungsten</em> both appear in the <code>keylist</code>, they make
+a possible composite keyword as the ckw <em>zinc, tungsten</em> exist
+in the taxonomy. Bibclassify would then create entries in the 
+<code>composites</code> dictionary as follows:
+<blockquote>
+<em> http://cern.ch/thesauri/HEP.rdf#Composite.zinctungsten : [http://cern.ch/thesauri/HEP.rdf#zinc, http://cern.ch/thesauri/HEP.rdf#tungsten] </em>
+</blockquote>
+which would be a valid ckw candidate.
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> One could add at this point
+the possibility of having combinations of more than two mkws, e.g.
+<em>ckwURI : [mkw1URI, mkw2URI, mkw3URI]</em>. This is feasible, but
+was not implemented at this stage, because of the performance overhead that would
+be generated by the phrase matching of more complex regular expressions.</span>
+
+<p>Once the <code>composites</code> dictionary is completed, its keys
+that point to lists of two values (like the example above) are ckw
+candidates. We now need to check whether they actually appear one next
+to the other in the text. This is done in function
+<code>makeCompPattern</code> by compiling a pair of regular
+expressions: one for <em>mkw1</em> followed by <em>mkw2</em> and one
+for the inverse situation, <em>mkw2</em> followed by <em>mkw1</em>. Once again,
+when compiling the regex pattern we have to take extra care to treat
+special cases (hyphens, short names, wildcards) accordingly. The sum
+of the incidence of the two patterns in the <code>text_string</code> is
+stored in a list (<code>compositesOUT</code>) that is then sorted (by
+occurrence) and output.
+
+
+<a name="5"></a><h2>5. Postprocessing</h2>
+
+
+<p> Before presenting the results to the user, some extra filtering
+occurs, primarily to refine the output keywords. The main postprocessing actions performed on the results are:
+<ul>
+<li> Ensure that the order of the occurrence counter ([n1,n2]) for composite keywords (e.g. <em>baryon: asymmetry [7, 12]</em>) is correct.</li>
+<li> Ensure that "stray" wildcard labels (e.g. hiddenLabels of composite keywords) do not cause double phrase matching.</li>
+<li> Produce the desired output using the chosen ckw delimiter: the BibClassify standard (:) or the SPIRES one (,).</li>
+<li> Filter out single keywords that match one into each other, e.g. if <em>magnetic</em> and <em>magnetic field</em> appear among mkws, subtract the occurrence of <em>magnetic</em> from <em>magnetic field</em>.
+<p><span class="adminbox">&nbsp;<b>NB.</b> One could also perform this
+last post-processing step at the composite keyword level, e.g. <em>energy:
+density</em> to be overridden by <em>dark energy: density</em>. This has
+not been yet implemented for security reasons (the incidence of altLabels
+on the ckw computation).</li></ul>
+
+<p> The final results that are produced to the user consist of the
+first <code>n</code> entries of <code>keylist</code> (the single
+keywords) and the entries in <code>compositesOUT</code> (the composite
+keywords).  The results may be presented in text or html format,
+according to the output mode chosen at the command line. Sample output (both text and html) can be found in the 
+<a href="<WEBURL>/admin/bibclassify/guide.html">BibClassify Admin Guide</a>.
+
+
+
