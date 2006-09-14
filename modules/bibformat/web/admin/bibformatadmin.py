@@ -1066,7 +1066,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo, update="", delete="", sortby="
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def kb_update_attributes(req, kb, name, description, sortby="to", ln=cdslang):
+def kb_update_attributes(req, kb="", name="", description="", sortby="to", ln=cdslang, chosen_option=None):
     """
     Update the attributes of the kb
     
@@ -1075,6 +1075,7 @@ def kb_update_attributes(req, kb, name, description, sortby="to", ln=cdslang):
     @param sortby the sorting criteria ('from' or 'to')
     @param name the new name of the kn
     @param description the new description of the kb
+    @param chosen_option set to dialog box value
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1088,7 +1089,13 @@ def kb_update_attributes(req, kb, name, description, sortby="to", ln=cdslang):
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-        kb_id = wash_url_argument(kb, 'int')
+	kb_id = wash_url_argument(kb, 'int')
+	if chosen_option != None:
+	    # Update could not be performed.
+	    # Redirect to kb attributes page
+	    redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+
+       
         kb_name = get_kb_name(kb_id)
 
         if kb_name == None:
@@ -1101,6 +1108,16 @@ def kb_update_attributes(req, kb, name, description, sortby="to", ln=cdslang):
                         req=req)
 
         new_name = wash_url_argument(name, 'str')
+	if kb_name != new_name and kb_exists(new_name):
+	    #A knowledge base with that name already exist
+	    #Do not update
+	    return dialog_box(req=req,
+			      ln=ln,
+			      title="Name already in use",
+			      message="<i>%s</i> cannot be renamed to %s: Another knowledge base already has that name. <br/>Please choose another name." % (kb_name, new_name),
+			      navtrail=navtrail_previous_links,
+			      options=[ _("Ok")])
+	    
         new_desc = wash_url_argument(description, 'str')
         update_kb_attributes(kb_name, new_name, new_desc)
         redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
