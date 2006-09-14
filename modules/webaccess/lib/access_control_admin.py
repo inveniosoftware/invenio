@@ -1365,22 +1365,22 @@ def acc_add_default_settings(superusers=[]):
     # imported from config
     global supportemail
     # imported from access_control_config
-    global def_roles
-    global def_users
-    global def_actions
-    global def_auths
+    global DEF_ROLES
+    global DEF_USERS
+    global DEF_ACTIONS
+    global DEF_AUTHS
     
     # from superusers: allow input formats ['email1', 'email2'] and [['email1'], ['email2']] and [['email1', id], ['email2', id]]
     for user in superusers:
         if type(user) is str: user = [user]
-        def_users.append(user[0])
-    if supportemail not in def_users: def_users.append(supportemail)
+        DEF_USERS.append(user[0])
+    if supportemail not in DEF_USERS: DEF_USERS.append(supportemail)
 
     # add data
     
     # add roles
     insroles = []
-    for (name, description) in def_roles:
+    for (name, description) in DEF_ROLES:
         # try to add, don't care if description is different
         id = acc_addRole(name_role=name,
                          description=description)
@@ -1391,13 +1391,13 @@ def acc_add_default_settings(superusers=[]):
 
     # add users to superadmin
     insuserroles = []
-    for user in def_users:
+    for user in DEF_USERS:
         insuserroles.append(acc_addUserRole(email=user,
                                             name_role=SUPERADMINROLE))
 
     # add actions
     insactions = []
-    for (name, description, allkeys, optional) in def_actions:
+    for (name, description, allkeys, optional) in DEF_ACTIONS:
         # try to add action as new
         id = acc_addAction(name, description, optional, allkeys)
         # action with the name exist
@@ -1410,7 +1410,7 @@ def acc_add_default_settings(superusers=[]):
 
     # add authorizations
     insauths = []
-    for (name_role, name_action, arglistid, optional, args) in def_auths:
+    for (name_role, name_action, arglistid, optional, args) in DEF_AUTHS:
         # add the authorization
         acc_addRoleActionArguments_names(name_role=name_role,
                                          name_action=name_action,

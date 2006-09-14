@@ -19,15 +19,12 @@
 
 """CDS Invenio Access Control Config. """
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 # pylint: disable-msg=C0301
 
-## global configuration parameters:
-from invenio.config import *
-
-## local configuration parameters:
-
+from invenio.config import cdsname, sweburl, supportemail
 from invenio.external_authentication import *
 
 # VALUES TO BE EXPORTED
@@ -35,17 +32,23 @@ from invenio.external_authentication import *
 
 # name of the role giving superadmin rights
 SUPERADMINROLE      = 'superadmin'
+
 # name of the webaccess webadmin role
 WEBACCESSADMINROLE  = 'webaccessadmin'
+
 # name of the action allowing roles to access the web administrator interface
 WEBACCESSACTION     = 'cfgwebaccess'
+
 # name of the action allowing roles to delegate the rights to other roles
 # ex: libraryadmin to delegate libraryworker
 DELEGATEADDUSERROLE = 'accdelegaterole'
+
 # max number of users to display in the drop down selects
 MAXSELECTUSERS = 25
+
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
+
 # Use external source for access control?
 # Atleast one must be added
 # Adviced not to change the name, since it is used to identify the account
@@ -54,17 +57,20 @@ CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
 #CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
 
 # default data for the add_default_settings function
+
 # roles
 #           name          description
-def_roles = ((SUPERADMINROLE, 'superuser with all rights'),
+DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights'),
              ('photoadmin',   'Photo collection administrator'),
              (WEBACCESSADMINROLE,     'WebAccess administrator'))
+
 # users
 # list of e-mail addresses
-def_users = []
+DEF_USERS = []
+
 # actions
 #            name                  desc     allowedkeywords   optional
-def_actions = (
+DEF_ACTIONS = (
                ('cfgwebsearch',         'configure WebSearch',       '',              'no'),
                ('cfgbibformat',         'configure BibFormat',       '',              'no'),
                ('cfgwebsubmit',         'configure WebSubmit',       '',              'no'),
@@ -85,9 +91,10 @@ def_actions = (
                ('runoaiarchive',         'run oaiarchive task',       '',              'no'),
                ('runbibedit',         'run BibEdit',       '',              'no'),
               )
+
 # authorizations
 #          role              action          arglistid  optional   arguments
-def_auths = (
+DEF_AUTHS = (
              (SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
              (SUPERADMINROLE,    'cfgbibformat',         -1,      0,       {}),
              (SUPERADMINROLE,    'cfgwebsubmit',         -1,      0,       {}),
@@ -108,6 +115,7 @@ def_auths = (
              (SUPERADMINROLE,    'runoaiarchive',            -1,      0,       {}),
              (SUPERADMINROLE,    'runbibedit',            -1,      0,       {}),
             )
+
 cfg_webaccess_msgs = {
                                 0: 'Try to <a href="%s/youraccount/login?referer=%s/admin/%s">login</a> with another account.' % (sweburl, sweburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
@@ -119,7 +127,6 @@ cfg_webaccess_msgs = {
                                 7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
                                 8: 'Functionality temporarily closed'
 		} 
-
 
 cfg_webaccess_warning_msgs = {
            			0: 'Authorization granted',
