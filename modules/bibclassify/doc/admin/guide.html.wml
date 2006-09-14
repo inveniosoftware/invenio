@@ -24,6 +24,232 @@
     navbar_name="admin" \
     navbar_select="bibclassify-admin-guide"
 
-<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.1 <a href="#1.1">Thesaurus</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.2 <a href="#1.2">Keyword extraction</a><br>
+<strong>2. <a href="#2">Running BibClassify</a></strong><br>
 
-<p>FIXME.
+<a name="1"></a><h2>1. Overview</h2>
+
+<p>BibClassify automatically extracts keywords from fulltext documents.
+The automatic assignment of keywords to textual documents has clear
+benefits in the digital library environment as it aids
+catalogization, classification and retrieval of documents. 
+
+<a name="1.1"></a><h3>1.1 Thesaurus</h3>
+
+<p> BibClassify performs an extraction of keywords based on the
+recurrence of specific terms, taken from a controlled vocabulary. A
+controlled vocabulary is a thesaurus of all the terms that are
+relevant in a specific context.  When a context is defined by a
+discipline or branch of knowledge then the vocabulary is said to be a
+<em>subject thesaurus</em>. Various existing subject thesauri can be found <a href="http://www.lub.lu.se/metadata/subject-help.html">here</a>. 
+
+<p> A subject thesarus can be expressed in several different
+formats. Different institutions/disciplines have developed different
+ways of representing their vocabulary systems. BibClassify accepts thesauri in two formats:
+<ul>
+<li> <b>Simple text</b>. <br>
+This is a simple list of allowed keywords. One keyword per line. E.g. <br>
+
+<blockquote>
+<pre>
+asymmetry
+asymptotic behavior
+ATLAS
+atmosphere 
+</pre>
+</blockquote>
+
+</li><li> <b> RDF SKOS taxonomy </b>. <br>
+This is a richer and more complex structure to describe concepts. E.g. <br>
+
+<blockquote>
+<pre>
+&lt;Concept rdf:about="http://cern.ch/thesauri/HEP.rdf#asymmetry"&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.yieldasymmetry"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.timeasymmetry"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.timereversalasymmetry"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.supernovaasymmetry"/&gt;
+  &lt;prefLabel xml:lang="en"&gt;asymmetry&lt;/prefLabel&gt;
+  &lt;hiddenLabel xml:lang="en"&gt;/asymmetr\w*/&lt;/hiddenLabel&gt;
+  &lt;hiddenLabel xml:lang="en"&gt;/nonsymmetric\w*/&lt;/hiddenLabel&gt;
+&lt;/Concept&gt;
+
+&lt;Concept rdf:about="http://cern.ch/thesauri/HEP.rdf#asymptoticbehavior"&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.transformationasymptoticbehavior"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.totalcrosssectionasymptoticbehavior"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.space-timeasymptoticbehavior"/&gt;
+  &lt;prefLabel xml:lang="en"&gt;asymptotic behavior&lt;/prefLabel&gt;
+  &lt;altLabel xml:lang="en"&gt;asymptotic behaviour&lt;/altLabel&gt;
+&lt;/Concept&gt;
+
+&lt;Concept rdf:about="http://cern.ch/thesauri/HEP.rdf#ATLAS"&gt;
+  &lt;prefLabel xml:lang="en"&gt;ATLAS&lt;/prefLabel&gt;
+&lt;/Concept&gt;
+
+&lt;Concept rdf:about="http://cern.ch/thesauri/HEP.rdf#atmosphere"&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.nucleusatmosphere"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.neutrinoatmosphere"/&gt;
+  &lt;composite rdf:resource="http://cern.ch/thesauri/HEP.rdf#Composite.muonatmosphere"/&gt;
+  &lt;prefLabel xml:lang="en"&gt;atmosphere&lt;/prefLabel&gt;
+  &lt;hiddenLabel xml:lang="en"&gt;/atmospher\w*/&lt;/hiddenLabel&gt;
+&lt;/Concept&gt;
+</pre>
+</blockquote>
+</li></ul>
+
+In RDF SKOS, every keyword is wrapped around a <em>concept</em> which
+encapsulates the full semantics and hierarchical status of a term -
+including synonyms, alternative forms, broader concepts, notes and so
+on - rather than just a plain keyword.
+
+<p> The specification of the SKOS language and <a href="http://www.w3.org/TR/2005/WD-swbp-thesaurus-pubguide-20050517/">various manuals</a> that
+aid the building of a semantic thesaurus can be found at the <a href="http://www.w3.org/TR/2005/WD-swbp-skos-core-guide-20051102/">SKOS W3C
+website</a>. Furthermore, BibClassify can function on top
+of an extended version of SKOS, which includes special elements such
+as keychains, composite keywords and special annotations. The
+extension of the SKOS language is documented in the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a>.
+
+<a name="1.2"></a><h3>1.1 Keyword extraction</h3>
+
+<p>BibClassify computes the keywords of a fulltext document based on
+the frequency of thesaurus terms in it. In other words, it calculates
+how many times a thesaurus keyword (and its alternative and hidden
+labels, defined in the taxonomy) appear in a text and it ranks the
+results. Unlike other similar systems, BibClassify does not use any
+machine learning or AI methodologies - just plain phrase matching
+using <a href="http://en.wikipedia.org/wiki/Regex">regular expressions</a>: it exploits the conformation and richness
+of the thesaurus to produce accurate results.  It is then clear that
+BibClassify performs best on top of rich, well-structured, subject
+thesauri expressed in the RDF SKOS language. The simple text mode,
+described in 1.1, has been retained only for historical and
+demonstrative reasons.
+
+<p> A detailed account of the phrase matching mechanisms used by
+BibClassify is included in the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a>.
+
+
+<a name="2"></a><h2>2. Running BibClassify</h2>
+
+<p><span class="adminbox">&nbsp;<b>Dependencies.</b> BibClassify
+requires Python <a href="http://rdflib.net/">RDFLib</a> in
+order to process the RDF SKOS taxonomy.</span>
+
+<p>In order to extract relevant keywords from a document
+<code>fulltext.pdf</code> based on a controlled vocabulary
+<code>thesaurus.rdf</code>, you would run BibClassify as follows:
+
+<blockquote>
+<pre>
+$ bibclassify -t fulltext.pdf -K thesaurus.rdf
+</pre>
+</blockquote>
+
+<p>Here, the following basic parameters were used: 
+<ul> 
+<li><code>-f, --file=FILENAME</code>.<br> 
+The path to the PDF document that you would like to extract keywords from. If you
+would like to analyse a text (ASCII) file, rather than a PDF, you can use the <code>-t, --textfile=FILENAME</code> 
+parameter instead.</li>
+<li><code>-K, --taxonomy=FILENAME</code>.<br> 
+The path to the RDF SKOS thesaurus. Make sure that the RDF file is
+well-formed and validated.  If you would like to use a simple text
+thesaurus (one keyword per line), you can use the paramater <code>-k,
+--thesaurus=FILENAME</code> instead (NB. this mode is deprecated). </li>
+</ul>
+
+<p>In addition, you can tweak the output and performance of BibClassify by setting the following parameters:
+<ul> 
+<li><code>-o, --output=HTML|TEXT</code>.<br> 
+Sets the desired output to html or text (default is text). The html
+output generates an html page containing a tag cloud representation of
+the most recurrent keywords in the fulltext. A sample html output is shown below.</li>
+<li><code>-m, --mode=PARTIAL|FULL</code>.<br> 
+Sets the desired processing mode, partial or full (default is full). The
+partial mode will run BibClassify on the initial portion of the document
+(abstract) and a small set of selected random pages. The full mode runs on the whole
+of the document. Although both modes yield similar results, the partial
+mode is only reccommended when performance times are an issue or when
+dealing with extremely large documents (over 150 pages).</li>
+<li><code>-q, --spires</code>.<br> 
+When set, the generated keywords (composite keywords) are output in
+the traditional <a href="http://www.slac.stanford.edu/spires/">SPIRES</a> format, i.e.
+<code>keyword1, keyword2</code> rather than the standard 
+BibClassify format <code>keyword1: keyword2</code></li>
+<li><code>-n, --nkeywords=NUMBER</code>.<br> 
+This parameter sets the number of output (single) keywords that will be output (default is 25).</li>
+<li><code>-l, --limit=NUMBER</code>.<br> 
+This parameter sets the maximum number of single keywords that will make part of  
+the pool of composite candidates, i.e. the single keywords that occur in the vicinity creating sequences of keywords.
+(default is 70). Tweaking with this value can have drastic effects on
+the generated results. Please check the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a> to find out more.</li>
+</ul>
+
+
+<p><span class="adminbox">&nbsp;<b>NB.</b> BibClassify can run as a CDS Invenio
+module or as a standalone program. If you already run a server with a CDS Invenio installation, 
+you can simply run <em>INVENIO_INSTALLATION/bin/bibclassify</em>. Otherwise, run <em>python bibclassifylib.py</em> and you might need to set
+a couple of variables manually (location of pdftotext binary and
+temporary directory)</li></span>
+
+
+<p>As an example, running BibClassify on document <a
+href="http://cdsweb.cern.ch/search.py?recid=977446&ln=en">hep-ph/0608096</a>
+using the <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">high-energy physics SKOS taxonomy</a> would yield the following results (text output):
+
+<pre><code>
+<b>Composite keywords:</b>
+22  inflaton: decay [38, 82]
+20  energy: density [26, 21]
+9  field theory: scalar [0, 0]
+8  effect: nonperturbative [23, 42]
+8  baryon: asymmetry [11, 18]
+6  supersymmetry: flat direction [29, 144]
+4  operator: nonrenormalizable [9, 5]
+4  interaction: nonlinear [21, 4]
+4  decay: time [82, 30]
+3  potential: scalar [27, 16]
+2  time: conformal [30, 4]
+2  symmetry: U(1) [7, 5]
+2  supersymmetry: potential [29, 27]
+2  inflaton: oscillation [38, 22]
+2  coupling: minimal [18, 6]
+2  coupling: conformal [18, 4]
+1  temperature: reheating [6, 10]
+1  supersymmetry: minimal [29, 6]
+1  resonance: effect [15, 23]
+1  operator: scalar [9, 16]
+1  n: decay [5, 82]
+1  inflaton: potential [38, 27]
+1  fundamental constant: fine structure [0, 0]
+1  entropy: density [3, 21]
+1  coupling: gauge [18, 18]
+
+
+<b>Single keywords:</b>
+80  preheating
+58  mass
+29  rotation
+14  inflation
+12  magnetic moment
+11  fluctuation
+9  gravitation
+8  Hubble constant
+7  scaling
+7  mixing
+7  longitudinal
+5  supergravity
+4  gauge boson
+4  boundary condition
+3  matter
+3  grand unified theory
+
+</pre></code>
+
+or, the following keyword-cloud HTML visualization:<br>
+<br>
+<img src="<WEBURL>/admin/bibclassify/guide_cloud.jpeg" alt="tag-cloud for document hep-ph/0608096" border="0" />
+
+

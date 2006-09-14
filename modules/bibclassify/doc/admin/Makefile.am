@@ -19,7 +19,7 @@
 
 docdir=$(localstatedir)/www/admin/bibclassify
 
-doc_DATA=index.html guide.html
+doc_DATA=index.html guide.html guide_cloud.jpeg
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
