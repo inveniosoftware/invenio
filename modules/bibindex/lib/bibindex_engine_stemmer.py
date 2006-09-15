@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import cfg_bibindex_stemmer_default_language
+from invenio.config import CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE
 
 def create_stemmers():
     """Create stemmers dictionary for all possible languages."""
@@ -49,7 +49,7 @@ def is_stemmer_available_for_language(lang):
     global stemmers
     return stemmers.has_key(lang)
     
-def stem(word, lang=cfg_bibindex_stemmer_default_language):
+def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
     """Return WORD stemmed according to language LANG (e.g. 'en')."""
     global stemmers
     if lang and is_stemmer_available_for_language(lang):

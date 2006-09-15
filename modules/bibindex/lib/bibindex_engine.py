@@ -75,10 +75,10 @@ def write_message(msg, stream=sys.stdout):
 ## precompile some often-used regexp for speed reasons:
 sre_subfields = sre.compile('\$\$\w');
 sre_html = sre.compile("(?s)<[^>]*>|&#?\w+;")
-sre_block_punctuation_begin = sre.compile(r"^"+cfg_bibindex_chars_punctuation+"+")
-sre_block_punctuation_end = sre.compile(cfg_bibindex_chars_punctuation+"+$")
-sre_punctuation = sre.compile(cfg_bibindex_chars_punctuation)
-sre_separators = sre.compile(cfg_bibindex_chars_alphanumeric_separators)
+sre_block_punctuation_begin = sre.compile(r"^"+CFG_BIBINDEX_CHARS_PUNCTUATION+"+")
+sre_block_punctuation_end = sre.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
+sre_punctuation = sre.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
+sre_separators = sre.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
 sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 nb_char_in_line = 50  # for verbose pretty printing
@@ -240,7 +240,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
        specified by global CONV_PROGRAMS config variable.   
     """
 
-    if cfg_bibindex_fulltext_index_local_files_only and string.find(url_direct_or_indirect, weburl) < 0:
+    if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY and string.find(url_direct_or_indirect, weburl) < 0:
         return []
     if options["verbose"] >= 2:
         write_message("... reading fulltext files from %s started" % url_direct_or_indirect)
@@ -400,7 +400,7 @@ def get_words_from_phrase(phrase, split=string.split):
        punctuation characters definition present in the config file.
     """
     words = {}
-    if cfg_bibindex_remove_html_markup and string.find(phrase, "</") > -1:
+    if CFG_BIBINDEX_REMOVE_HTML_MARKUP and string.find(phrase, "</") > -1:
         phrase = sre_html.sub(' ', phrase)
     phrase = string.lower(phrase)
     # 1st split phrase into blocks according to whitespace
@@ -429,13 +429,13 @@ def apply_stemming_and_stopwords_and_length_check(word):
        See the config file in order to influence these.
     """
     # stem word, when configured so:
-    if cfg_bibindex_stemmer_default_language != "":
-        word = stem(word, cfg_bibindex_stemmer_default_language)
+    if CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE != "":
+        word = stem(word, CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE)
     # now check against stopwords: 
     if is_stopword(word): 
         return ""
     # finally check the word length:
-    if len(word) < cfg_bibindex_min_word_length:
+    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
         return ""
     return word
 

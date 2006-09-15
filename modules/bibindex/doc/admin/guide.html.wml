@@ -87,8 +87,8 @@ with other desired parameters.
 <a name="3.2"></a><h3>3.2 Configure Word-Breaking Procedure</h3>
 
 <p>Can be configured by changing
-<b>cfg_bibindex_chars_alphanumeric_separators</b> and
-<b>cfg_bibindex_chars_punctuation</b> in the general config file.
+<b>CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS</b> and
+<b>CFG_BIBINDEX_CHARS_PUNCTUATION</b> in the general config file.
 
 <p>How the words are broken up defines what is added to the index. Should
 only "director-general" be added, or should "director", "general" and
@@ -103,7 +103,7 @@ smaller by removing much used words.
 
 <p>Which stopword list that should be used can be configured in the
 general config file file by changing the value of the variable
-cfg_bibindex_path_to_stopwords_file. If no stopword list should be
+CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE. If no stopword list should be
 used, the value should be 0. 
 
 <a name="3.4"></a><h3>3.4 Configure stemming</h3>
@@ -127,19 +127,19 @@ French, English, Norwegian, Swedish, German, Italian and Portugese.
 desired stemmers interface.
 
 <p>To change the default language to use for the stemmer, change the
-variable <b>cfg_bibindex_stemmer_default_language</b> in the general
+variable <b>CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE</b> in the general
 config file.  To disable use of stemmer, set the value to empty
 string.
 
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
 
-<p>By setting the value of <b>cfg_bibindex_min_word_length</b> in the
+<p>By setting the value of <b>CFG_BIBINDEX_MIN_WORD_LENGTH</b> in the
 general config file higher than 0, only words with the number of
 characters higher than this will be added to the index.
 
 <a name="3.6"></a><h3>3.6 Configure Removal of HTML Code</h3>
 
-<p>By setting the value of <b>cfg_bibindex_remove_html_markup</b> in
+<p>By setting the value of <b>CFG_BIBINDEX_REMOVE_HTML_MARKUP</b> in
 the general config file, the indexer may try to remove all HTML code
 from documents before indexing, and index only the text left.  (HTML
 code is defined as everything between '<' and '>' in a text.)
