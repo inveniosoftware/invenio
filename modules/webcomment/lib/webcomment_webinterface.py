@@ -23,17 +23,18 @@
 
 __revision__ = """$Id$"""
 
+import urllib
 from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks,\
                                perform_request_add_comment_or_remark,\
                                perform_request_vote,\
                                perform_request_report
 from invenio.config import cdslang, \
-                           weburl,\
+                           weburl, \
+                           sweburl, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
-from invenio.webaccount import create_login_page_box
 from invenio.webpage import page
 from invenio.search_engine import create_navtrail_links, guess_primary_collection_of_a_record
 from invenio.urlutils import get_client_ip_address, \
@@ -179,16 +180,18 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             # if guest, must log in first 
             if isGuestUser(uid):
-                msg = _("Before you add your comment, you need to log in first")
                 referer = "%s/comments/add?recid=%s&amp;ln=%s&amp;reviews=%s&amp;comid=%s&amp;action=%s" % (weburl,
                                                                                                             argd['recid'],
                                                                                                             argd['ln'],
                                                                                                             argd['reviews'],
                                                                                                             argd['comid'],
                                                                                                             argd['action'])
-                login_box = create_login_page_box(referer=referer, ln=argd['ln'])
+                msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
+                          'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
+                                        (sweburl, urllib.quote(referer)),
+                          'x_url_close': '</a>'} 
                 return page(title=_("Login"),
-                            body=msg+login_box,
+                            body=msg,
                             navtrail=navtrail,
                             uid=uid,
                             language=cdslang,
