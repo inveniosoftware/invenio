@@ -30,8 +30,8 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_report
 from invenio.config import cdslang, \
                            weburl,\
-                           cfg_webcomment_allow_comments,\
-                           cfg_webcomment_allow_reviews
+                           CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+                           CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webaccount import create_login_page_box
 from invenio.webpage import page
@@ -174,7 +174,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 argd['action'] = 'DISPLAY'
 
             # is page allowed to be viewed
-            if uid == -1 or (not cfg_webcomment_allow_comments and not cfg_webcomment_allow_reviews):
+            if uid == -1 or (not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS):
                 return page_not_authorized(req, "../comments/add")
 
             # if guest, must log in first 

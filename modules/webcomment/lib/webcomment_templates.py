@@ -34,10 +34,10 @@ from invenio.config import weburl, \
                            sweburl, \
                            cdslang, \
                            cdsnameintl,\
-                           cfg_webcomment_nb_reviews_in_detailed_view, \
-                           cfg_webcomment_allow_reviews, \
-                           cfg_webcomment_allow_comments, \
-                           cfg_webcomment_nb_comments_in_detailed_view
+                           CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW, \
+                           CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+                           CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+                           CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW
                            
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
@@ -102,9 +102,9 @@ class Template:
         # output
         if nb_comments_total > 0:
             out = warnings
-            comments_label = cfg_webcomment_nb_comments_in_detailed_view and \
-                             cfg_webcomment_nb_comments_in_detailed_view>1 and \
-                             _("Showing the latest %i comments:")% cfg_webcomment_nb_comments_in_detailed_view or ""
+            comments_label = CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW and \
+                             CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and \
+                             _("Showing the latest %i comments:")% CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW or ""
             out += """
 <table>
   <tr>
@@ -126,11 +126,11 @@ class Template:
              'comment_rows': comment_rows,
              'tab': '&nbsp;'*4,
              'weburl': weburl,
-             's': cfg_webcomment_nb_comments_in_detailed_view>1 and 's' or "",
+             's': CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and 's' or "",
              'view_all_comments_link': nb_comments_total>0 and '''<a href="%s/comments/display?recid=%s&amp;reviews=0">View all %s comments</a>''' \
                                                                   % (weburl, recID, nb_comments_total) or "",
              'write_button_form': write_button_form,
-             'nb_comments': cfg_webcomment_nb_comments_in_detailed_view>1 and cfg_webcomment_nb_comments_in_detailed_view or ""
+             'nb_comments': CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW or ""
             }
         else:
             out = """
@@ -259,7 +259,7 @@ class Template:
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
-            useful_label %= cfg_webcomment_nb_reviews_in_detailed_view > 1 and cfg_webcomment_nb_reviews_in_detailed_view or ""
+            useful_label %= CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW > 1 and CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW or ""
             view_all_comments_link ='<a href="%s/comments/display?recid=%s&amp;ln=%s&amp;do=hh&amp;reviews=1">' % (weburl, recID, ln)
             view_all_comments_link += _("View all %s reviews") % nb_comments_total
             view_all_comments_link += '</a><br />'
@@ -407,7 +407,7 @@ class Template:
     def tmpl_get_comments(self, recID, ln,
                           nb_per_page, page, nb_pages,
                           display_order, display_since,
-                          cfg_webcomment_allow_reviews, 
+                          CFG_WEBCOMMENT_ALLOW_REVIEWS, 
                           comments, total_nb_comments,
                           avg_score,
                           warnings,
@@ -430,7 +430,7 @@ class Template:
                                 nm = n months ago
                                 ny = n years ago
                                 where n is a single digit integer between 0 and 9
-        @param cfg_webcomment_allow_reviews: is ranking enable, get from config.py/cfg_webcomment_allow_reviews
+        @param CFG_WEBCOMMENT_ALLOW_REVIEWS: is ranking enable, get from config.py/CFG_WEBCOMMENT_ALLOW_REVIEWS
         @param comments: tuple as returned from webcomment.py/query_retrieve_comments_or_remarks
         @param total_nb_comments: total number of comments for this record
         @param avg_score: average score of reviews for this record
@@ -996,11 +996,11 @@ class Template:
         _ = gettext_set_language(ln)
    
         out = '<ol>'
-        if cfg_webcomment_allow_comments or cfg_webcomment_allow_reviews:
-            if cfg_webcomment_allow_comments: 
+        if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
+            if CFG_WEBCOMMENT_ALLOW_COMMENTS: 
                 out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' %\
                     {'weburl': weburl, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
-            if cfg_webcomment_allow_reviews: 
+            if CFG_WEBCOMMENT_ALLOW_REVIEWS: 
                 out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' %\
                     {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
             out += """
@@ -1079,7 +1079,7 @@ class Template:
                 nickname = user_info[2]
             else:
                 nickname = utuple[u_nickname]
-            if cfg_webcomment_allow_reviews:
+            if CFG_WEBCOMMENT_ALLOW_REVIEWS:
                 review_row = """
 <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%s</td>
 <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%s</td>
@@ -1104,8 +1104,8 @@ class Template:
              'review_row': review_row,
              'weburl'    : weburl,
              'ln'        : ln,
-             'com_link'  : cfg_webcomment_allow_comments and com_link or "",
-             'rev_link'  : cfg_webcomment_allow_reviews and rev_link or ""
+             'com_link'  : CFG_WEBCOMMENT_ALLOW_COMMENTS and com_link or "",
+             'rev_link'  : CFG_WEBCOMMENT_ALLOW_REVIEWS and rev_link or ""
              }
  
         out = "<br />"
@@ -1120,7 +1120,7 @@ class Template:
         out += _("Nickname") + '</th>\n'
         out += indent_text('<th>' + _("Email") + '</th>\n', 3) 
         out += indent_text('<th>' + _("User ID") + '</th>\n', 3)
-        if cfg_webcomment_allow_reviews > 0:
+        if CFG_WEBCOMMENT_ALLOW_REVIEWS > 0:
             out += indent_text('<th>' + _("Number positive votes") + '</th>\n', 3)
             out += indent_text('<th>' + _("Number negative votes") + '</th>\n', 3)
             out += indent_text('<th>' + _("Total number votes") + '</th>\n', 3)

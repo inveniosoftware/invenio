@@ -33,14 +33,14 @@ from invenio.config import cdslang, \
                            alertengineemail,\
                            adminemail,\
                            weburl,\
-                           cfg_webcomment_allow_reviews,\
-                           cfg_webcomment_allow_comments,\
-                           cfg_webcomment_admin_notification_level,\
-                           cfg_webcomment_nb_reviews_in_detailed_view,\
-                           cfg_webcomment_nb_reports_before_send_email_to_admin,\
-                           cfg_webcomment_nb_comments_in_detailed_view,\
-                           cfg_webcomment_timelimit_processing_comments_in_seconds,\
-                           cfg_webcomment_timelimit_processing_reviews_in_seconds
+                           CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+                           CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+                           CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
+                           CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW,\
+                           CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
+                           CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW,\
+                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
+                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
 from invenio.webmessage_mailutils import email_quote_txt
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
@@ -112,7 +112,7 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     if nb_per_page < 0:
         nb_per_page = 100
         warnings.append(('WRN_WEBCOMMENT_INVALID_NB_RESULTS_PER_PAGE',))
-    if cfg_webcomment_allow_reviews and reviews:
+    if CFG_WEBCOMMENT_ALLOW_REVIEWS and reviews:
         if display_order not in ['od', 'nd', 'hh', 'lh', 'hs', 'ls']:
             display_order = 'hh'
             warnings.append(('WRN_WEBCOMMENT_INVALID_REVIEW_DISPLAY_ORDER',))
@@ -142,13 +142,13 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
 
     # Send to template
     avg_score = 0.0
-    if not cfg_webcomment_allow_comments and not cfg_webcomment_allow_reviews: # comments not allowed by admin
+    if not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS: # comments not allowed by admin
         errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
     if reported > 0:
         warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
     elif reported == 0:
         warnings.append(('WRN_WEBCOMMENT_ALREADY_REPORTED',))
-    if cfg_webcomment_allow_reviews and reviews:
+    if CFG_WEBCOMMENT_ALLOW_REVIEWS and reviews:
         avg_score = calculate_avg_score(res)
         if voted > 0:
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
@@ -158,7 +158,7 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
                                                   ln,
                                                   nb_per_page, page, last_page,
                                                   display_order, display_since,
-                                                  cfg_webcomment_allow_reviews,
+                                                  CFG_WEBCOMMENT_ALLOW_REVIEWS,
                                                   res, nb_res, avg_score,
                                                   warnings,
                                                   border=0,
@@ -190,7 +190,7 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
 
 def check_user_can_comment(recID, client_ip_address, uid=-1):
     """ Check if a user hasn't already commented within the last seconds
-    time limit: cfg_webcomment_timelimit_processing_comments_in_seconds
+    time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS
     @param recID: record id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
     @param uid: user id, as given by invenio.webuser.getUid(req)
@@ -198,7 +198,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     recID = wash_url_argument(recID, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
     uid = wash_url_argument(uid, 'int')
-    max_action_time = time.time() - cfg_webcomment_timelimit_processing_comments_in_seconds
+    max_action_time = time.time() - CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS
     max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_COMMENT']
     query = """SELECT id_bibrec
@@ -216,7 +216,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     
 def check_user_can_review(recID, client_ip_address, uid=-1):
     """ Check if a user hasn't already reviewed within the last seconds
-    time limit: cfg_webcomment_timelimit_processing_reviewss_in_seconds
+    time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
     @param cmt_id: comment id
     @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
     @param uid: user id, as given by invenio.webuser.getUid(req)
@@ -274,7 +274,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
                VALUES (%i, NULL, %i, inet_aton('%s'), '%s', '%s')"""
     query %= (cmt_id, uid, client_ip_address, action_date, action_code)
     run_sql(query)
-    if nb_abuse_reports % cfg_webcomment_nb_reports_before_send_email_to_admin == 0:
+    if nb_abuse_reports % CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN == 0:
         (cmt_id2,
          id_bibrec,
          id_user,
@@ -311,20 +311,20 @@ Comment:    comment_id      = %(cmt_id)s
 ---end body---
 
 Please go to the Comments Admin Panel %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
-                {   'cfg-report_max'        : cfg_webcomment_nb_reports_before_send_email_to_admin,
+                {   'cfg-report_max'        : CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,
                     'nickname'              : nickname,
                     'user_email'            : user_email,
                     'uid'                   : id_user,
                     'user_nb_abuse_reports' : user_nb_abuse_reports,
                     'user_votes'            : user_votes,
-                    'votes'                 : cfg_webcomment_allow_reviews and \
+                    'votes'                 : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "total number of positive votes\t= %s\n\t\t\t\ttotal number of negative votes\t= %s" % \
                                               (user_votes, (user_nb_votes_total - user_votes)) or "\n",
                     'cmt_id'                : cmt_id, 
                     'id_bibrec'             : id_bibrec,
                     'cmt_date'              : cmt_date,
                     'cmt_reported'          : cmt_reported,
-                    'review_stuff'          : cfg_webcomment_allow_reviews and \
+                    'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
                     'cmt_body'              : cmt_body,
                     'comment_admin_link'    : "http://%s/admin/webcomment/" % weburl, 
@@ -656,26 +656,26 @@ def get_first_comments_or_remarks(recID=-1,
     if type(recID) is not int:
         return ()
     if recID >= 1: #comment or review. NB: suppressed reference to basket (handled in webbasket)
-        if cfg_webcomment_allow_reviews:
+        if CFG_WEBCOMMENT_ALLOW_REVIEWS:
             res_reviews = query_retrieve_comments_or_remarks(recID=recID, display_order="hh", ranking=1) 
             nb_res_reviews = len(res_reviews)
             ## check nb argument
             if type(nb_reviews) is int and nb_reviews < len(res_reviews):
                 first_res_reviews = res_reviews[:nb_reviews]
             else:
-                if nb_res_reviews  > cfg_webcomment_nb_reviews_in_detailed_view:
-                    first_res_reviews = res_reviews[:cfg_webcomment_nb_reports_before_send_email_to_admin]
+                if nb_res_reviews  > CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW:
+                    first_res_reviews = res_reviews[:CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN]
                 else:
                     first_res_reviews = res_reviews
-        if cfg_webcomment_allow_comments:
+        if CFG_WEBCOMMENT_ALLOW_COMMENTS:
             res_comments = query_retrieve_comments_or_remarks(recID=recID, display_order="od", ranking=0)
             nb_res_comments = len(res_comments)
             ## check nb argument
             if type(nb_comments) is int and nb_comments < len(res_comments):
                 first_res_comments = res_comments[:nb_comments]
             else:
-                if nb_res_comments  > cfg_webcomment_nb_comments_in_detailed_view:
-                    first_res_comments = res_comments[:cfg_webcomment_nb_comments_in_detailed_view]
+                if nb_res_comments  > CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW:
+                    first_res_comments = res_comments[:CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW]
                 else:
                     first_res_comments = res_comments
     else: #error
@@ -688,9 +688,9 @@ def get_first_comments_or_remarks(recID=-1,
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
         elif reported == 0:
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-        if cfg_webcomment_allow_comments: # normal comments
+        if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
             comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings)
-        if cfg_webcomment_allow_reviews: # ranked comments
+        if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
             #calculate average score
             avg_score = calculate_avg_score(res_reviews)
             if voted > 0:
@@ -778,18 +778,18 @@ def perform_request_add_comment_or_remark(recID=0,
             nickname = user_contact_info[0]
     # show the form 
     if action == 'DISPLAY':
-        if reviews and cfg_webcomment_allow_reviews:
+        if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
-        elif not reviews and cfg_webcomment_allow_comments:
+        elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
     
     elif action == 'REPLY':
-        if reviews and cfg_webcomment_allow_reviews:
+        if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
-        elif not reviews and cfg_webcomment_allow_comments:
+        elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             if comID > 0:
                 comment = query_get_comment(comID)
                 if comment: 
@@ -805,7 +805,7 @@ def perform_request_add_comment_or_remark(recID=0,
 
     # check before submitting form
     elif action == 'SUBMIT':
-        if reviews and cfg_webcomment_allow_reviews:
+        if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             if note.strip() in ["", "None"]:
                 warnings.append(('WRN_WEBCOMMENT_ADD_NO_TITLE',))
             if score == 0 or score > 5:
@@ -831,20 +831,20 @@ def perform_request_add_comment_or_remark(recID=0,
                     warnings.append('WRN_WEBCOMMENT_TIMELIMIT')
                     success = 1
             if success > 0:
-                if cfg_webcomment_admin_notification_level > 0:
+                if CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL > 0:
                     notify_admin_of_new_comment(comID=success)
                 return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews, warnings), errors, warnings)
             else:
                 errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
         # if are warnings or if inserting comment failed, show user where warnings are
-        if reviews and cfg_webcomment_allow_reviews:
+        if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
         else:
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
     # unknown action send to display
     else:
         warnings.append(('WRN_WEBCOMMENT_ADD_UNKNOWN_ACTION',))
-        if reviews and cfg_webcomment_allow_reviews:
+        if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, ln, msg, score, note, warnings), errors, warnings)
         else:
             return (webcomment_templates.tmpl_add_comment_form(recID, uid, ln, msg, warnings), errors, warnings)

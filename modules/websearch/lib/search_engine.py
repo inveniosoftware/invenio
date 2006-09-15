@@ -2341,11 +2341,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     
                     # Get comments and reviews for this record if exist
                     # FIXME: templatize me
-                    if cfg_webcomment_allow_comments or cfg_webcomment_allow_reviews:
+                    if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
                         from invenio.webcomment import get_first_comments_or_remarks
                         (comments, reviews) = get_first_comments_or_remarks(recID=recIDs[irec], ln=ln, 
-                                                                            nb_comments=cfg_webcomment_nb_comments_in_detailed_view, 
-                                                                            nb_reviews=cfg_webcomment_nb_reviews_in_detailed_view)
+                                                                            nb_comments=CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW, 
+                                                                            nb_reviews=CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW)
                         temp['comments'] = comments
                         temp['reviews']  = reviews
 
