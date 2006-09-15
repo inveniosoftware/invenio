@@ -26,7 +26,8 @@ quotas, and some db related fields...
 
 __revision__ = "$Id$"
 
-# error messages. (should not happen, except in case of reload, or url altering) 
+# error messages. (should not happen, except in case of reload, or url
+# altering)
 CFG_WEBMESSAGE_ERROR_MESSAGES = \
 {   'ERR_WEBMESSAGE_NOTOWNER':  '_("This message is not in your mailbox")',
     'ERR_WEBMESSAGE_NONICKNAME':'_("No nickname or user for uid #%s")',

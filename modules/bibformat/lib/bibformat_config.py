@@ -19,6 +19,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0301
+
 """BibFormat configuration parameters."""
 
 __revision__ = "$Id$"
@@ -40,8 +42,6 @@ CFG_BIBFORMAT_OUTPUTS_PATH = "%s%sbibformat%soutput_formats" % (etcdir, os.sep, 
 #File extensions of formats
 CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION = "bft"
 CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION = "bfo"
-
-# pylint: disable-msg=C0301
 
 CFG_BIBFORMAT_ERROR_MESSAGES = \
 {   'ERR_BIBFORMAT_INVALID_TAG'                   :  '%s is an invalid tag.',

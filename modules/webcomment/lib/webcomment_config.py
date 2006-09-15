@@ -19,11 +19,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0301
+
 """WebComment configuration parameters."""
 
 __revision__ = "$Id$"
-
-# pylint: disable-msg=C0301
 
 CFG_WEBCOMMENT_ERROR_MESSAGES = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%s is an invalid record ID")',
