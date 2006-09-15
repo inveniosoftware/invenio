@@ -135,8 +135,8 @@ def get_nb_pychecker_warnings(filename):
        inside FILENAME.
     """
     nb_warnings_found = 0
-    filename_to_watch_for = sre.sub(r'^[\.\/]+', '', filename) # pychecker strips leading ../.. stuff
-    (dummy, pipe, dummy) = os.popen3("pychecker %s" % filename)
+    filename_to_watch_for = os.path.basename(filename) # pychecker strips leading path
+    (dummy, pipe, dummy) = os.popen3("pychecker --limit=10000 %s" % filename)
     pychecker_output_lines = pipe.readlines()
     for line in pychecker_output_lines:
         if line.find(filename_to_watch_for + ":") > -1:            
