@@ -29,17 +29,17 @@ from invenio.config import etcdir, pylibdir
 #True if old php format written in EL must be used by Invenio.
 #False if new python format must be used. If set to 'False' but
 #new format cannot be found, old format will be used.
-use_old_bibformat = False
+CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
 #Paths to main formats directories
-templates_path = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
-elements_import_path = "invenio.bibformat_elements"
-elements_path = "%s%sinvenio%sbibformat_elements" % (pylibdir, os.sep, os.sep)
-outputs_path = "%s%sbibformat%soutput_formats" % (etcdir, os.sep, os.sep)
+CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
+CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
+CFG_BIBFORMAT_ELEMENTS_PATH = "%s%sinvenio%sbibformat_elements" % (pylibdir, os.sep, os.sep)
+CFG_BIBFORMAT_OUTPUTS_PATH = "%s%sbibformat%soutput_formats" % (etcdir, os.sep, os.sep)
 
 #File extensions of formats
-format_template_extension = "bft"
-format_output_extension = "bfo"
+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION = "bft"
+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION = "bfo"
 
 # pylint: disable-msg=C0301
 

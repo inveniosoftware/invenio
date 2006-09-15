@@ -31,7 +31,7 @@ import stat
 import time
 
 from invenio.config import cdslang, weburl, etcdir
-from invenio.bibformat_config import templates_path, outputs_path, elements_path, format_template_extension
+from invenio.bibformat_config import CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_OUTPUTS_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
 from invenio.urlutils import wash_url_argument
 from invenio.errorlib import get_msgs_for_code_list
 from invenio.messages import gettext_set_language, wash_language, language_list_long
@@ -90,7 +90,7 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
         attrs = formats[filename]['attrs']
         attrs['filename'] = filename
         attrs['editable'] = can_write_format_template(filename)
-        path = templates_path + os.sep + filename
+        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
         attrs['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
         status = check_format_template(filename, checking)
         if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE'):
@@ -396,7 +396,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
     for filename in output_formats_list:
         output_format = output_formats_list[filename]
         code = output_format['attrs']['code']
-        path = outputs_path + os.sep + filename
+        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
         output_format['editable'] = can_write_output_format(code)
         output_format['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
         #Validate the output format
@@ -663,7 +663,7 @@ def add_format_template():
     (filename, name) = bibformat_engine.get_fresh_format_template_filename("Untitled")
     
     out = '<name>%(name)s</name><description></description>' % {'name':name}
-    path = templates_path + os.sep + filename
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
     format.close
@@ -681,7 +681,7 @@ def delete_format_template(filename):
     if not can_write_format_template(filename):
         return
     
-    path = templates_path + os.sep + filename
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     os.remove(path)
     bibformat_engine.clear_caches()
     
@@ -698,7 +698,7 @@ def update_format_template_code(filename, code=""):
 <description>%(description)s</description>
 %(code)s
     ''' % {'name':name, 'description':description, 'code':code}
-    path = templates_path + os.sep + filename
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
     format.close
@@ -731,7 +731,7 @@ def update_format_template_attributes(filename, name="", description="", duplica
     if format_template['attrs']['name'] != name:
         #name has changed, so update filename
         old_filename = filename
-        old_path = templates_path + os.sep + old_filename
+        old_path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + old_filename
         #Remove old one
         os.remove(old_path)
         
@@ -742,7 +742,7 @@ def update_format_template_attributes(filename, name="", description="", duplica
 
         for output_format_filename in output_formats:
             if can_read_output_format(output_format_filename) and can_write_output_format(output_format_filename):
-                output_path = outputs_path + os.sep + output_format_filename
+                output_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + output_format_filename
                 format = open(output_path, 'r')
                 output_text = format.read()
                 format.close
@@ -758,7 +758,7 @@ def update_format_template_attributes(filename, name="", description="", duplica
                                                                                            'description':description,
                                                                                            'code':code}
 
-    path = templates_path + os.sep + filename
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
     format.close
@@ -782,7 +782,7 @@ def add_output_format():
     
     #Add file 
     out = ""
-    path = outputs_path + os.sep + filename
+    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
     format.close
@@ -805,7 +805,7 @@ def delete_output_format(code):
 
     #Remove file
     filename = bibformat_engine.resolve_output_format_filename(code)
-    path = outputs_path + os.sep + filename
+    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
     os.remove(path)
 
     bibformat_engine.clear_caches()
@@ -832,7 +832,7 @@ def update_output_format_rules(code, rules=[], default=""):
 
     out += "default: %s" % default
     filename = bibformat_engine.resolve_output_format_filename(code)
-    path = outputs_path + os.sep + filename
+    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
     format.close
@@ -867,9 +867,9 @@ def update_output_format_attributes(code, name="", description="", new_code="", 
     if code != new_code:
         #If code has changed, we must update filename with a new unique code
         old_filename = bibformat_engine.resolve_output_format_filename(code)
-        old_path = outputs_path + os.sep + old_filename
+        old_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + old_filename
         (new_filename, new_code) = bibformat_engine.get_fresh_output_format_filename(new_code)
-        new_path = outputs_path + os.sep + new_filename
+        new_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + new_filename
         os.rename(old_path, new_path)
         bibformat_dblayer.change_output_format_code(code, new_code)    
     
@@ -957,7 +957,7 @@ def can_read_format_template(filename):
     Returns 0 if we have read permission on given format template, else
     returns other integer
     """
-    path = "%s%s%s" % (templates_path, os.sep, filename)
+    path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
    
 def can_read_output_format(bfo):
@@ -966,7 +966,7 @@ def can_read_output_format(bfo):
     returns other integer
     """
     filename = bibformat_engine.resolve_output_format_filename(bfo)
-    path = "%s%s%s" % (outputs_path, os.sep, filename)
+    path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
     
 def can_read_format_element(name):
@@ -976,7 +976,7 @@ def can_read_format_element(name):
     """
 
     filename = bibformat_engine.resolve_format_element_filename(name)
-    path = "%s%s%s" % (elements_path, os.sep, filename)
+    path = "%s%s%s" % (CFG_BIBFORMAT_ELEMENTS_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
     
 def can_write_format_template(bft):
@@ -987,7 +987,7 @@ def can_write_format_template(bft):
     if not can_read_format_template(bft):
         return False
 
-    path = "%s%s%s" % (templates_path, os.sep, bft)
+    path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, bft)
     return os.access(path, os.W_OK)
 
 def can_write_output_format(bfo):
@@ -999,7 +999,7 @@ def can_write_output_format(bfo):
         return False
     
     filename = bibformat_engine.resolve_output_format_filename(bfo)
-    path = "%s%s%s" % (outputs_path, os.sep, filename)
+    path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename)
     return os.access(path, os.W_OK)
 
 def can_write_etc_bibformat_dir():
@@ -1122,7 +1122,7 @@ def get_tags_used_by_element(filename):
         return tags
         
     filename = bibformat_engine.resolve_format_element_filename(filename)
-    path = elements_path + os.sep + filename
+    path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
     format = open(path, 'r')
     code = format.read()
     format.close
@@ -1159,9 +1159,9 @@ def get_templates_that_use_element(name):
     """
     format_templates = {}
     tags = []
-    files = os.listdir(templates_path) #Retrieve all templates
+    files = os.listdir(CFG_BIBFORMAT_TEMPLATES_PATH) #Retrieve all templates
     for file in files:
-        if file.endswith(format_template_extension):
+        if file.endswith(CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
             format_elements = get_elements_used_by_template(file) #Look for elements used in template
             format_elements = map(lambda x: x['name'].lower(), format_elements)
             try: #Look for element
@@ -1236,10 +1236,10 @@ def get_elements_that_use_kb(name):
     """
 
     format_elements = {}
-    files = os.listdir(elements_path) #Retrieve all elements in files
+    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH) #Retrieve all elements in files
     for filename in files:
         if filename.endswith(".py"):
-            path = elements_path + os.sep + filename
+            path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
             format = open(path, 'r')
             code = format.read()
             format.close
@@ -1314,7 +1314,7 @@ def check_output_format(code):
     errors = []
     filename = bibformat_engine.resolve_output_format_filename(code)
     if can_read_output_format(code):
-        path = outputs_path + os.sep + filename
+        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
         format = open(path)
         current_tag = ''
         i = 0
@@ -1357,7 +1357,7 @@ def check_output_format(code):
                 if len(words) != 2:
                     errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_CONDITION", line, i))
                 template = words[-1].strip()
-                path = templates_path + os.sep + template
+                path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + template
                 if not os.path.exists(path):
                     errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", template, i))
                               
@@ -1374,7 +1374,7 @@ def check_output_format(code):
                     #default was not lower case
                     errors.append(("ERR_BIBFORMAT_OUTPUT_WRONG_DEFAULT_CASE", line, i))
                 default = "".join(line.split(':')[1]).strip()
-                path = templates_path + os.sep + default
+                path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + default
                 if not os.path.exists(path):
                     errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", default, i))
                               
@@ -1399,7 +1399,7 @@ def check_format_template(filename, checking=0):
     errors = []
     if can_read_format_template(filename):#Can template be read?
         #format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-        format = open("%s%s%s" % (templates_path, os.sep, filename))
+        format = open("%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename))
         code = format.read()
         format.close()
         #Look for name

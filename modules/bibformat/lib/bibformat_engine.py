@@ -41,7 +41,7 @@ from invenio.bibrecord import create_record, record_get_field_instances, record_
 from invenio.dbquery import run_sql
 from invenio.messages import language_list_long, wash_language
 from invenio import bibformat_dblayer
-from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path, elements_import_path
+from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH, CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
 from bibformat_utils import record_get_xml
 
 from xml.dom import minidom #Remove when call_old_bibformat is removed
@@ -217,7 +217,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     template = decide_format_template(bfo, of)
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    path = "%s%s%s" % (templates_path, os.sep, template)
+    path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
     if template == None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
         if php:
@@ -649,7 +649,7 @@ def get_format_template(filename, with_attributes=False):
     #Get from cache whenever possible
     global format_templates_cache
 
-    if not filename.endswith("."+format_template_extension):
+    if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
             return None
         
     if format_templates_cache.has_key(filename):
@@ -661,7 +661,7 @@ def get_format_template(filename, with_attributes=False):
     format_template = {'code':""}
     try:
         
-        path = "%s%s%s" % (templates_path, os.sep, filename)
+        path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename)
 
         format_file = open(path)
         format_content = format_file.read()
@@ -704,10 +704,10 @@ def get_format_templates(with_attributes=False):
     @param with_attributes if True, fetch the attributes (names and description) for formats
     """
     format_templates = {}
-    files = os.listdir(templates_path)
+    files = os.listdir(CFG_BIBFORMAT_TEMPLATES_PATH)
     
     for filename in files:
-        if filename.endswith("."+format_template_extension):
+        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
             format_templates[filename] = get_format_template(filename, with_attributes)
                        
     return format_templates
@@ -725,7 +725,7 @@ def get_format_template_attrs(filename):
     attrs['name'] = ""
     attrs['description'] = ""
     try:
-        template_file = open("%s%s%s"%(templates_path, os.sep, filename))
+        template_file = open("%s%s%s"%(CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename))
         code = template_file.read()
         template_file.close()
 
@@ -808,12 +808,12 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             module_name = module_name[:-3]
          
         try:
-            module = __import__(elements_import_path+"."+module_name)
+            module = __import__(CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH+"."+module_name)
 
             #Load last module in import path
             #For eg. load bibformat_elements in invenio.elements.bibformat_element
             #Used to keep flexibility regarding where elements directory is (for eg. test cases)
-            components = elements_import_path.split(".")
+            components = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH.split(".")
             for comp in components[1:]:
                 module = getattr(module, comp) 
 
@@ -869,7 +869,7 @@ def get_format_elements(with_built_in_params=False):
     for name in mappings:
         format_elements[name.upper().replace(" ", "_").strip()] = get_format_element(name, with_built_in_params=with_built_in_params)
     
-    files = os.listdir(elements_path)
+    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
     for filename in files:
         filename_test = filename.upper().replace(" ", "_")
         if filename_test.endswith(".PY") and filename.upper() != "__INIT__.PY":
@@ -1125,7 +1125,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
         if with_attributes == True:
             output_format['attrs'] = get_output_format_attrs(code, verbose)
 
-        path = "%s%s%s" % (outputs_path, os.sep, filename )
+        path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename )
         format_file = open(path)
 
         current_tag = ''
@@ -1190,8 +1190,8 @@ def get_output_format_attrs(code, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return strucured content of output format attributes
     """
-    if code.endswith("."+format_output_extension):
-        code = code[:-(len(format_output_extension) + 1)]
+    if code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
+        code = code[:-(len(CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION) + 1)]
     attrs = {'names':{'generic':"",
                       'ln':{},
                       'sn':{}},
@@ -1237,10 +1237,10 @@ def get_output_formats(with_attributes=False):
     @return the list of output formats
     """
     output_formats = {}
-    files = os.listdir(outputs_path)
+    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
     
     for filename in files:
-        if filename.endswith("."+format_output_extension):
+        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
             code = "".join(filename.split(".")[:-1])
             output_formats[filename] = get_output_format(code, with_attributes)
 
@@ -1302,7 +1302,7 @@ def resolve_format_element_filename(string):
     else:
         name = string.replace(" ", "_").upper()
         
-    files = os.listdir(elements_path)
+    files = os.listdir(CFG_BIBFORMAT_ELEMENTS_PATH)
     for filename in files:
         test_filename = filename.replace(" ", "_").upper()
         
@@ -1331,11 +1331,11 @@ def resolve_output_format_filename(code, verbose=0):
     @return the corresponding filename, with right case, or None if not found
     """
     code = re.sub(r"[^.0-9a-zA-Z]", "", code) #Remove non alphanumeric chars (except .)
-    if not code.endswith("."+format_output_extension):
+    if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = re.sub(r"\W", "", code)
-        code += "."+format_output_extension
+        code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
 
-    files = os.listdir(outputs_path)
+    files = os.listdir(CFG_BIBFORMAT_OUTPUTS_PATH)
     for filename in files:
         if filename.upper() == code.upper():
             return filename
@@ -1367,19 +1367,19 @@ def get_fresh_format_template_filename(name):
     name = name.replace(" ", "_")
     filename = name
     filename = re.sub(r"[^.0-9a-zA-Z]", "", filename) #Remove non alphanumeric chars (except .)
-    path = templates_path + os.sep + filename + "." + format_template_extension
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
     index = 1
     while os.path.exists(path):
         index += 1
         filename = name + str(index)
-        path = templates_path + os.sep + filename + "." + format_template_extension
+        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
 
     if index > 1:
         returned_name = (name + str(index)).replace("_", " ")
     else:
         returned_name = name.replace("_", " ")
          
-    return (filename + "." + format_template_extension, returned_name) #filename.replace("_", " "))
+    return (filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, returned_name) #filename.replace("_", " "))
 
 def get_fresh_output_format_filename(code):
     """
@@ -1402,14 +1402,14 @@ def get_fresh_output_format_filename(code):
         code = code[:6]
     
     filename = code
-    path = outputs_path + os.sep + filename + "." + format_output_extension
+    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     index = 2
     while os.path.exists(path):
         filename = code + str(index)
         if len(filename) > 6:
             filename = code[:-(len(str(index)))]+str(index)
         index += 1
-        path = outputs_path + os.sep + filename + "." + format_output_extension
+        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
         #We should not try more than 99999... Well I don't see how we could get there.. Sanity check.
         if index >= 99999:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED", code)],
@@ -1417,7 +1417,7 @@ def get_fresh_output_format_filename(code):
             register_errors(errors, 'error')
             sys.exit("Output format cannot be named as %s"%code)
             
-    return (filename + "." + format_output_extension, filename)
+    return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
     
 def clear_caches():
     """

@@ -32,7 +32,7 @@ from invenio.config import *
 from invenio.bibformat_dblayer import *
 from invenio.bibformat_migration_kit_dblayer import *
 
-from invenio.bibformat_config import format_template_extension, format_output_extension, templates_path, elements_path, outputs_path
+from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH
 
 #from invenio.bibformat_migration_kit.bibformat_yacc import translate_format #TEMP DISABLED FIXME
 
@@ -169,14 +169,14 @@ def migrate_behaviours():
                 #    previous_tag = tag
         #Also add the default case, if there was not already here
         if add_default_case:
-            new_behaviour += "default: default." + format_template_extension + "\n"
+            new_behaviour += "default: default." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION + "\n"
         new_behaviours[filename] = new_behaviour
         
     
 
     for filename in new_behaviours:
         text = new_behaviours[filename]
-        path = outputs_path + os.sep + filename
+        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
         f = open(path, 'w')
         f.write(text)
         f.close
@@ -290,7 +290,7 @@ def migrate_formats():
         text += "<!--ORIGINAL CODE. DON'T FORGET TO REMOVE BEFORE GOING INTO PRODUCTION \n"+code+"-->"
         
         (filename, new_name) = get_fresh_format_template_filename(name)
-        path = templates_path + os.sep + filename
+        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
         f = open(path, 'w')
         f.write(text)
         f.close
@@ -311,7 +311,7 @@ def format(bfo, a_parameter="a default value"):
     return out
         '''%bfe_to_create[element]['field']
             
-        path = elements_path + os.sep + element + ".py"
+        path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + element + ".py"
         f = open(path, 'w')
         f.write(text)
         f.close

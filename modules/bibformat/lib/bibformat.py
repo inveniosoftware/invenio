@@ -41,7 +41,7 @@ from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio.config import cdslang, weburl, php
-from invenio.bibformat_config import use_old_bibformat
+from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 try:
     import invenio.template
     websearch_templates = invenio.template.load('websearch')
@@ -80,7 +80,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     @return formatted record
     """
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    if use_old_bibformat and php:
+    if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and php:
         return bibformat_engine.call_old_bibformat(recID, format=of)
     ############################# END ##################################
 

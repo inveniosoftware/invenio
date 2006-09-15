@@ -44,7 +44,7 @@ from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, get_output_format_content_type, create_excel
-from invenio.bibformat_config import use_old_bibformat
+from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 
@@ -2380,7 +2380,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     # Old procedure follows further below
     # We must still check some special formats, but these
     # should disappear when BibFormat improves.
-    if not use_old_bibformat \
+    if not CFG_BIBFORMAT_USE_OLD_BIBFORMAT \
            and not format.lower().startswith('t') \
            and not format.lower().startswith('hm') \
            and not str(format[0:3]).isdigit():
