@@ -67,9 +67,9 @@
           </bx:if>
           <fpage><bx:field name="first_page"/></fpage>
           <lpage><bx:field name="last_page"/></lpage>
-          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink/&quot;/&gt;"/>
           <bx:loop object="uri">
-            <self-uri xlink:href="[!uri]"/>
+            <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>  
         </article-meta>
         <abstract><bx:field name="abstract"/></abstract>
@@ -116,9 +116,9 @@
             </bx:if>              
             <year><bx:field name="year"/></year>
           </pub-date>
-          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink/&quot;/&gt;"/>
           <bx:loop object="uri">
-            <self-uri xlink:href="[!uri]"/>
+            <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>        
         </article-meta>
         <abstract><bx:field name="abstract"/></abstract>
@@ -147,9 +147,9 @@
           <pub-date pub-type="pub">
             <year><bx:field name="year"/></year>
           </pub-date>
-          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot;/&gt;"/>
+          <bx:text value="&lt;self-uri xlink:href=&quot;"/><bx:element name="server_info" var="recurl"/><bx:text value="&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink/&quot;/&gt;"/>
           <bx:loop object="uri">
-            <self-uri xlink:href="[!uri]"/>
+            <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>  
         </article-meta>
         <abstract><bx:field name="abstract"/></abstract>
