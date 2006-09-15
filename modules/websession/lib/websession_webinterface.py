@@ -421,10 +421,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 else:
                     return self.display(req, form)
             else:
-                mess = cfg_webaccess_warning_msgs[msgcode] % args['login_method']
+                mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % args['login_method']
                 if msgcode == 14:
                     if webuser.username_exists_p(args['p_un']):
-                        mess = cfg_webaccess_warning_msgs[15] % args['login_method']
+                        mess = CFG_WEBACCESS_WARNING_MSGS[15] % args['login_method']
                 act = "login"
                 return page(title=_("Login"),
                             body=webaccount.perform_back(mess, act, _("login"), args['ln']),

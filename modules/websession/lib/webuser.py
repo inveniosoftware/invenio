@@ -83,7 +83,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
     _ = gettext_set_language(ln)
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
-        title = cfg_webaccess_msgs[5]
+        title = CFG_WEBACCESS_MSGS[5]
         if not uid:
             uid = getUid(req)
         try:
@@ -93,28 +93,28 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
                 if text:
                     body = text
                 else:
-                    body = "%s %s" % (cfg_webaccess_warning_msgs[9] % res[0][0],
-                                      ("%s %s" % (cfg_webaccess_msgs[0] % referer, cfg_webaccess_msgs[1])))
+                    body = "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % res[0][0],
+                                      ("%s %s" % (CFG_WEBACCESS_MSGS[0] % referer, CFG_WEBACCESS_MSGS[1])))
             else:
                 if text:
                     body = text
                 else:
                     if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 1:
-                        body = cfg_webaccess_msgs[3]
+                        body = CFG_WEBACCESS_MSGS[3]
                     else:
-                        body = cfg_webaccess_warning_msgs[4] + cfg_webaccess_msgs[2]
+                        body = CFG_WEBACCESS_WARNING_MSGS[4] + CFG_WEBACCESS_MSGS[2]
 
         except OperationalError, e:
             body = _("Database problem") + ': ' + str(e)
 
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
-        title = cfg_webaccess_msgs[8]
-        body = "%s %s" % (cfg_webaccess_msgs[7], cfg_webaccess_msgs[2])
+        title = CFG_WEBACCESS_MSGS[8]
+        body = "%s %s" % (CFG_WEBACCESS_MSGS[7], CFG_WEBACCESS_MSGS[2])
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
-        title = cfg_webaccess_msgs[6]
-        body = "%s %s" % (cfg_webaccess_msgs[4], cfg_webaccess_msgs[2])
+        title = CFG_WEBACCESS_MSGS[6]
+        body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
 
     return page(title=title,
                 uid=getUid(req),

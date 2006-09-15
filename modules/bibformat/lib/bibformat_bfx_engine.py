@@ -29,8 +29,8 @@ from xml.dom import minidom, Node
 from xml.sax import saxutils
 
 from invenio.bibformat_engine import BibFormatObject, get_format_element, eval_format_element
-from invenio.bibformat_bfx_engine_config import cfg_bibformat_bfx_label_definitions, cfg_bibformat_bfx_templates_path 
-from invenio.bibformat_bfx_engine_config import cfg_bibformat_bfx_format_template_extension, cfg_bibformat_bfx_element_namespace
+from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH 
+from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_ERROR_MESSAGES, CFG_BIBFORMAT_BFX_WARNING_MESSAGES
 
 address_pattern = r'(?P<parent>[a-z_]*):?/?(?P<tag>[0-9_?\w]*)/?(?P<code>[\w_?]?)#?(?P<reg>.*)'
@@ -45,7 +45,7 @@ def format_with_bfx(recIDs, out_file, template_name, preprocess=None):
     @param template_name the file name of the BFX template without the path and the .bfx extension
     @param preprocess an optional function; every record is passed through this function for initial preprocessing before formatting
     '''
-    trans = MARCTranslator(cfg_bibformat_bfx_label_definitions)
+    trans = MARCTranslator(CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS)
     trans.set_record_ids(recIDs, preprocess)
     parser = BFXParser(trans)
     template_tree = parser.load_template(template_name)
@@ -103,7 +103,7 @@ class BFXParser:
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
-        template_file_name = cfg_bibformat_bfx_templates_path + '/' + template_name + '.' + cfg_bibformat_bfx_format_template_extension
+        template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + '/' + template_name + '.' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
         #load document
         doc = minidom.parse(template_file_name)
         #set exec flag to false and walk document to find templates and formats
@@ -174,7 +174,7 @@ class BFXParser:
                 #get values
                 name, attributes, element_namespace = get_node_name(node), get_node_attributes(node), get_node_namespace(node)
                 # write values
-                if element_namespace != cfg_bibformat_bfx_element_namespace:
+                if element_namespace != CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE:
                     #parse all the attributes
                     for key in attributes.keys():
                         attributes[key] = self.parse_attribute(attributes[key])
@@ -316,7 +316,7 @@ class BFXParser:
         else:
             #load a file and execute it
             pass
-            #template_file_name = cfg_bibformat_bfx_templates_path + name + '/' + cfg_bibformat_bfx_format_template_extension 
+            #template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + name + '/' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION 
             #try:
             #    node = minidom.parse(template_file_name)
             #except:
@@ -515,9 +515,9 @@ class BFXParser:
         #end of evaluation
         #=================
         #validate subnodes
-        then_node = get_node_subelement(node, 'then', cfg_bibformat_bfx_element_namespace)
-        else_node = get_node_subelement(node, 'else', cfg_bibformat_bfx_element_namespace)
-        elif_node = get_node_subelement(node, 'elif', cfg_bibformat_bfx_element_namespace)
+        then_node = get_node_subelement(node, 'then', CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE)
+        else_node = get_node_subelement(node, 'else', CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE)
+        elif_node = get_node_subelement(node, 'elif', CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE)
         #having else and elif siblings at the same time is a syntax error
         if (else_node is not None) and (elif_node is not None):
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']

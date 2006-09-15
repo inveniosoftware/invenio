@@ -116,7 +116,7 @@ DEF_AUTHS = (
              (SUPERADMINROLE,    'runbibedit',            -1,      0,       {}),
             )
 
-cfg_webaccess_msgs = {
+CFG_WEBACCESS_MSGS = {
                                 0: 'Try to <a href="%s/youraccount/login?referer=%s/admin/%s">login</a> with another account.' % (sweburl, sweburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
                                 2: '<br>If you have any questions, please write to <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
@@ -128,7 +128,7 @@ cfg_webaccess_msgs = {
                                 8: 'Functionality temporarily closed'
 		} 
 
-cfg_webaccess_warning_msgs = {
+CFG_WEBACCESS_WARNING_MSGS = {
            			0: 'Authorization granted',
            			1: 'Error(1): You are not authorized to perform this action.',
                                 2: 'Error(2): You are not authorized to perform any action.',

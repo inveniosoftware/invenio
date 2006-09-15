@@ -236,7 +236,7 @@ messaging error</p>
 <h5>webmessage&#95;config.py</h5>
 <pre>
 &#35; error messages. (should not happen, except in case of reload, or url altering) 
-cfg&#95;webmessage&#95;error&#95;messages = \
+CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES = \
 {   'ERR&#95;WEBMESSAGE&#95;NOTOWNER':  '&#95;("This message is not in your mailbox")',
     'ERR&#95;WEBMESSAGE&#95;NONICKNAME':'&#95;("No nickname or user for uid #%s")',
     'ERR&#95;WEBMESSAGE&#95;NOMESSAGE': '&#95;("This message doesn\'t exist")'

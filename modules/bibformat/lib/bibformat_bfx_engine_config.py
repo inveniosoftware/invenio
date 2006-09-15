@@ -26,11 +26,13 @@ __revision__ = "$Id$"
 import os
 from invenio.config import etcdir
 
-cfg_bibformat_bfx_templates_path = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
-cfg_bibformat_bfx_format_template_extension = "bfx"
-cfg_bibformat_bfx_element_namespace = "http://cdsware.cern.ch/invenio/"
-cfg_bibformat_bfx_label_definitions = {
+CFG_BIBFORMAT_BFX_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
 
+CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION = "bfx"
+
+CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE = "http://cdsware.cern.ch/invenio/"
+
+CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS = {
 #record is a reserved keyword, don't use it
 #define one or more addresses for each name or zero if you plan to define them later
 'controlfield':              [r'/???'],
@@ -86,8 +88,6 @@ cfg_bibformat_bfx_label_definitions = {
 'reference':                 []
 }
 
-
-#BFX error and warning messages
 CFG_BIBFORMAT_BFX_ERROR_MESSAGES = \
 {
     'ERR_BFX_TEMPLATE_REF_NO_NAME'                   :  'Error: Missing attribute "name" in TEMPLATE_REF.',

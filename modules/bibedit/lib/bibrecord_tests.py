@@ -99,7 +99,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
     def test_wrong_attribute(self):
         """bibrecord - bad input subfield \'cde\' instead of \'code\'"""
-        ws = bibrecord.cfg_bibrecord_warning_msgs
+        ws = bibrecord.CFG_BIBRECORD_WARNING_MSGS
         xml_error1 = """
         <record>
         <controlfield tag="001">33</controlfield>
@@ -124,7 +124,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
 
     def test_missing_attribute(self):
         """ bibrecord - bad input missing \"tag\" """
-        ws = bibrecord.cfg_bibrecord_warning_msgs
+        ws = bibrecord.CFG_BIBRECORD_WARNING_MSGS
         xml_error2 = """
         <record>
         <controlfield tag="001">33</controlfield>
@@ -149,7 +149,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
 
     def test_empty_datafield(self):
         """ bibrecord - bad input no subfield """
-        ws = bibrecord.cfg_bibrecord_warning_msgs
+        ws = bibrecord.CFG_BIBRECORD_WARNING_MSGS
         xml_error3 = """
         <record>
         <controlfield tag="001">33</controlfield>
@@ -173,7 +173,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
 
     def test_missing_tag(self):
         """bibrecord - bad input missing end \"tag\""""
-        ws = bibrecord.cfg_bibrecord_warning_msgs
+        ws = bibrecord.CFG_BIBRECORD_WARNING_MSGS
         xml_error4 = """
         <record>
         <controlfield tag="001">33</controlfield>

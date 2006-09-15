@@ -31,7 +31,7 @@ CFG_MARC21_DTD = "%s/bibedit/MARC21slim.dtd" % etcdir
 # pylint: disable-msg=C0301
 
 # internal dictionary of warning messages:
-cfg_bibrecord_warning_msgs = {
+CFG_BIBRECORD_WARNING_MSGS = {
     0: '' ,
     1: 'WARNING: tag missing for field(s)\nValue stored with tag \'000\'',
     2: 'WARNING: bad range for tags (tag must be in range 001-999)\nValue stored with tag \'000\'',

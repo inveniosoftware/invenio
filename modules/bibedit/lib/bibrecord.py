@@ -41,7 +41,7 @@ except ImportError:
     psycho_available = 0
     
 from invenio.bibrecord_config import CFG_MARC21_DTD, \
-                                     cfg_bibrecord_warning_msgs, \
+                                     CFG_BIBRECORD_WARNING_MSGS, \
                                      CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
                                      CFG_BIBRECORD_DEFAULT_CORRECT, \
                                      CFG_BIBRECORD_PARSERS_AVAILABLE
@@ -1069,7 +1069,7 @@ def warning(code):
         If code = (cd, str) it returns the warning message of code 'cd'
         and appends str at the end"""
     
-    ws = cfg_bibrecord_warning_msgs
+    ws = CFG_BIBRECORD_WARNING_MSGS
     s = ''
 
     if type(code).__name__ == 'str':

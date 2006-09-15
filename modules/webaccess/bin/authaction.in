@@ -28,7 +28,7 @@ try:
     import sys
     from invenio.config import *
     from invenio.access_control_engine import acc_authorize_action
-    from invenio.access_control_config import cfg_webaccess_warning_msgs
+    from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -68,8 +68,8 @@ def main():
         sys.stderr.write("%s\n" % __revision__)
         sys.exit(0)    
     if alen < 3 or alen % 2 == 0:
-        print "7 - %s" % cfg_webaccess_warning_msgs[7]
-        return "7 - %s" % cfg_webaccess_warning_msgs[7]
+        print "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
+        return "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
 
     # try to authorize
     else:
