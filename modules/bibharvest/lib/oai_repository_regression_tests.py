@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 import time
 
-from invenio.config import weburl, cfg_oai_sleep
+from invenio.config import weburl, CFG_OAI_SLEEP
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -55,7 +55,7 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
                 # some sleep required for verbs other than Identify
                 # and ListMetadataFormats, since oai2d refuses too
                 # frequent access:
-                time.sleep(cfg_oai_sleep) 
+                time.sleep(CFG_OAI_SLEEP) 
             error_messages.extend(test_web_page_content(url,
                                                         expected_text=
                                                         '</OAI-PMH>'))

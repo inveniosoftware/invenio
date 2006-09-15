@@ -196,7 +196,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
-        for id in get_fieldvalues(recID, cfg_oai_id_field):
+        for id in get_fieldvalues(recID, CFG_OAI_ID_FIELD):
             out += "    <identifier>%s</identifier>\n" % id
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
         out += "   </header>\n"
@@ -219,10 +219,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
             if record_exist_p == -1:
                 # deleted record, so display only OAI ID and 980:
-                oai_ids = get_fieldvalues(recID, cfg_oaiidtag)
+                oai_ids = get_fieldvalues(recID, CFG_OAI_ID_FIELD)
                 if oai_ids:
                     out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
-                           (cfg_oaiidtag[0:3], cfg_oaiidtag[3:4], cfg_oaiidtag[4:5], cfg_oaiidtag[5:6], oai_ids[0])
+                           (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
                 for digit1 in range(0, 10):

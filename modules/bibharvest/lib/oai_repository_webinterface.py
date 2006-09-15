@@ -30,7 +30,7 @@ from mod_python import apache
 from invenio.dbquery import run_sql
 from invenio.oai_repository_config import *
 from invenio import oai_repository
-from invenio.config import cachedir, cfg_oai_sleep
+from invenio.config import cachedir, CFG_OAI_SLEEP
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
@@ -62,14 +62,14 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         ## check availability (OAI requests for Identify and
         ## ListMetadataFormats are served immediately, otherwise we
-        ## shall wait for cfg_oai_sleep seconds between requests):
+        ## shall wait for CFG_OAI_SLEEP seconds between requests):
         if os.path.exists("%s/RTdata/RTdata" % cachedir) and (argd['verb'] not in ["Identify", "ListMetadataFormats"]):
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
-            if(time_gap < cfg_oai_sleep):
+            if(time_gap < CFG_OAI_SLEEP):
                 req.err_headers_out["Status-Code"] = "503"
-                req.err_headers_out["Retry-After"] = "%d" % (cfg_oai_sleep - time_gap)
+                req.err_headers_out["Retry-After"] = "%d" % (CFG_OAI_SLEEP - time_gap)
                 req.status = apache.HTTP_SERVICE_UNAVAILABLE
-                return "Retry after %d seconds" % (cfg_oai_sleep - time_gap)
+                return "Retry after %d seconds" % (CFG_OAI_SLEEP - time_gap)
         command = "touch %s/RTdata/RTdata" % cachedir   
         os.system(command)
 

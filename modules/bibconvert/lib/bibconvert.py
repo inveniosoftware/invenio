@@ -684,7 +684,7 @@ def generate(keyword):
         out = strftime(par[0],localtime())
         out = par[1] + out[:string.atoi(par[2])]
     if (fn == "OAI"):
-        out = "%s:%d" % (cfg_oai_id_prefix,tcounter + oai_identifier_from)
+        out = "%s:%d" % (CFG_OAI_ID_PREFIX,tcounter + oai_identifier_from)
 
     return out
 

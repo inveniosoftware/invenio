@@ -2417,7 +2417,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
-        for oai_id in get_fieldvalues(recID, cfg_oai_id_field):
+        for oai_id in get_fieldvalues(recID, CFG_OAI_ID_FIELD):
             out += "    <identifier>%s</identifier>\n" % oai_id
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
         out += "   </header>\n"
@@ -2440,10 +2440,10 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
             if record_exist_p == -1:
                 # deleted record, so display only OAI ID and 980:
-                oai_ids = get_fieldvalues(recID, cfg_oaiidtag)
+                oai_ids = get_fieldvalues(recID, CFG_OAI_ID_FIELD)
                 if oai_ids:
                     out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
-                           (cfg_oaiidtag[0:3], cfg_oaiidtag[3:4], cfg_oaiidtag[4:5], cfg_oaiidtag[5:6], oai_ids[0])
+                           (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
                 for digit1 in range(0,10):
@@ -2529,20 +2529,20 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     elif format.startswith('t'):
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"])
+            out += get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])
         else:
             out += get_fieldvalues_alephseq_like(recID, ot)
 
     elif format == "hm":
         if record_exist_p == -1:
-            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"])) + "</pre>"
+            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])) + "</pre>"
         else:
             out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ["001", cfg_oaiidtag, "980"]) + "</pre>"
+            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"]) + "</pre>"
         else:
             out += "<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
 
