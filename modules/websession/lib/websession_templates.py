@@ -255,7 +255,7 @@ class Template:
           }
         return out
 
-    def tmpl_account_info(self, ln, uid, guest, cfg_cern_site):
+    def tmpl_account_info(self, ln, uid, guest, CFG_CERN_SITE):
         """
         Displays the account information
 
@@ -267,7 +267,7 @@ class Template:
 
           - 'guest' *boolean* - If the user is guest
 
-          - 'cfg_cern_site' *boolean* - If the site is a CERN site
+          - 'CFG_CERN_SITE' *boolean* - If the site is a CERN site
         """
 
         # load the right message language
@@ -314,7 +314,7 @@ class Template:
         if guest:
             out += self.tmpl_warning_guest_user(type="alerts", ln = ln)
 
-        if cfg_cern_site:
+        if CFG_CERN_SITE:
             out += """
             <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">%(your_loans)s</A>
             <dd>%(explain_loans)s""" % {

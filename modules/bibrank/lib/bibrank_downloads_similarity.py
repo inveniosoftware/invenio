@@ -55,7 +55,7 @@ def record_exists(recID):
     if res:
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(recID, "980__%")
-        if ("DELETED" in dbcollids) or (cfg_cern_site and "DUMMY" in dbcollids):
+        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
             out = -1 # exists, but marked as deleted
         else:
             out = 1 # exists fine

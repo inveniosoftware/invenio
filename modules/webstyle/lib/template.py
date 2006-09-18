@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import cfg_template_skin
+from invenio.config import CFG_WEBSTYLE_TEMPLATE_SKIN
 
 def load(module=''):
     """ Load and returns a template class, given a module name (like
@@ -31,14 +31,14 @@ def load(module=''):
         not exist, it returns the default template for that module.
     """
     local = {}
-    # load the right template based on the cfg_template_skin and the specified module
-    if cfg_template_skin == "default":
+    # load the right template based on the CFG_WEBSTYLE_TEMPLATE_SKIN and the specified module
+    if CFG_WEBSTYLE_TEMPLATE_SKIN == "default":
         mymodule = __import__("invenio.%s_templates" % (module), local, local,
                               ["invenio.templates.%s" % (module)])
     else:    
         try:
-            mymodule = __import__("invenio.%s_templates_%s" % (module, cfg_template_skin), local, local,
-                                  ["invenio.templates.%s_%s" % (module, cfg_template_skin)])
+            mymodule = __import__("invenio.%s_templates_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN), local, local,
+                                  ["invenio.templates.%s_%s" % (module, CFG_WEBSTYLE_TEMPLATE_SKIN)])
         except ImportError:
             mymodule = __import__("invenio.%s_templates" % (module), local, local,
                                   ["invenio.templates.%s" % (module)])

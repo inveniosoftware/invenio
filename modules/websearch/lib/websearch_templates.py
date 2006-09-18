@@ -999,12 +999,12 @@ class Template:
                    }
         if authors:
             out += " / "
-            for author in authors[:cfg_author_et_al_threshold]:
+            for author in authors[:CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD]:
                 out += '%s; ' % \
                        a_href(cgi.escape(author), 
                               href=self.build_search_url(p=author, f='author', ln=ln))
                     
-            if len(authors) > cfg_author_et_al_threshold:
+            if len(authors) > CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD:
                 out += "<em>et al</em>"
         for date in dates:
             out += " %s." % cgi.escape(date)
@@ -1283,7 +1283,7 @@ class Template:
         if as == 1:
             # print Advanced Search form:
             google = ''
-            if cfg_google_box and (p1 or p2 or p3):
+            if CFG_WEBSEARCH_GOOGLE_BOX and (p1 or p2 or p3):
                 google = '<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>' % {
                      'search_smwhere' : _("Try your search on...")
                    }
@@ -1339,7 +1339,7 @@ class Template:
                                         href=self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg)),
                 
                 'leading' : leadingtext,
-                'sizepattern' : cfg_advancedsearch_pattern_box_width,
+                'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
                 'matchbox1' : self.tmpl_matchtype_box('m1', m1, ln=ln),
                 'p1' : cgi.escape(p1,1),
                 'searchwithin1' : self.tmpl_searchwithin_select(
@@ -1384,7 +1384,7 @@ class Template:
         else:
             # print Simple Search form:
             google = ''
-            if cfg_google_box and (p1 or p2 or p3):
+            if CFG_WEBSEARCH_GOOGLE_BOX and (p1 or p2 or p3):
                 google = '''<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>''' % {
                      'search_smwhere' : _("Try your search on...")
                    }
@@ -1425,7 +1425,7 @@ class Template:
                                                                    jrec=jrec, ln=ln, rg=rg)),
               
               'leading' : leadingtext,
-              'sizepattern' : cfg_advancedsearch_pattern_box_width,
+              'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
               'p' : cgi.escape(p, 1),
               'searchwithin' : self.tmpl_searchwithin_select(
                                   ln = ln,
@@ -1488,7 +1488,7 @@ class Template:
                        </tbody>
                       </table>""" % {
                         'limitto' : _("Limit to:"),
-                        'sizepattern' : cfg_advancedsearch_pattern_box_width,
+                        'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
                         'pl' : cgi.escape(pl, 1),
                       }
 
@@ -2315,7 +2315,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        if cfg_use_aleph_sysnos:
+        if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
             alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]

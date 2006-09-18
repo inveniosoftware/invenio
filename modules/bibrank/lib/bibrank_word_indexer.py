@@ -1012,7 +1012,7 @@ def word_index(row, run):
                 elif options["modified"]:
                     wordTable.add_recIDs_by_date(options["modified"])
                 else:
-                    wordTable.add_recIDs([[0,cfg_max_recID]])
+                    wordTable.add_recIDs([[0,CFG_MAX_RECID]])
             elif options["cmd"] == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])
@@ -1080,7 +1080,7 @@ def get_valid_range(rank_method_code):
     #else:
     #    recIDs = []
     
-    valid = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
+    valid = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
     #valid.addlist(recIDs)
     return valid
 

@@ -650,13 +650,13 @@ def main():
         usage(1)
 
     try:
-        from invenio.config import tmpdir, pdftotext, version
+        from invenio.config import tmpdir, CFG_PATH_PDFTOTEXT, version
         version_bibclassify = 0.1
         bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (version, version_bibclassify)
 
     except:
         tmpdir = TMPDIR_STANDALONE
-        pdftotext = PDFTOTEXT_STANDALONE
+        CFG_PATH_PDFTOTEXT = PDFTOTEXT_STANDALONE
 
     temp_text = tmpdir + '/bibclassify.pdftotext.' + str(os.getpid())
 
@@ -672,7 +672,7 @@ def main():
             elif opt[0] in [ "-f", "--file" ]:
                 if opt[1].find(".pdf")>-1:
                     # Treat as PDF
-                    cmd = "%s " % pdftotext + opt[1] + " " + temp_text
+                    cmd = "%s " % CFG_PATH_PDFTOTEXT + opt[1] + " " + temp_text
                     errcode = os.system(cmd)
                     if errcode == 0 and os.path.exists("%s" % temp_text):
                         input_file = temp_text

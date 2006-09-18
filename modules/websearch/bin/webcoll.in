@@ -396,7 +396,7 @@ class Collection:
         descendants = self.get_descendants(type)
 
         grandsons = []
-        if cfg_narrow_search_show_grandsons:
+        if CFG_WEBSEARCH_NARROW_SEARCH_SHOW_GRANDSONS:
             # load grandsons for each son
             for son in sons:
                 grandsons.append(son.get_sons())
@@ -409,7 +409,7 @@ class Collection:
                  father = self,
                  has_grandchildren = len(descendants)>len(sons),
                  sons = sons,
-                 display_grandsons = cfg_narrow_search_show_grandsons,
+                 display_grandsons = CFG_WEBSEARCH_NARROW_SEARCH_SHOW_GRANDSONS,
                  grandsons = grandsons
                )
 
@@ -422,7 +422,7 @@ class Collection:
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
-    def create_instant_browse(self, rg=cfg_instant_browse, as=0, ln=cdslang):
+    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
         
         if self.restricted_p():
@@ -595,7 +595,7 @@ class Collection:
             for row in res:
                 values.append({'value' : row[0], 'text' : row[1]})
         else:
-            if cfg_cern_site:
+            if CFG_CERN_SITE:
                 for tmp in ['title', 'author', 'abstract', 'report number', 'year']:
                     values.append({'value' : tmp.replace(' ', ''), 'text' : get_field_i18nname(tmp, ln)})
             else:

@@ -266,8 +266,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 else:
                     fi, pi = f, pi
                 # look also for old ALEPH field names:
-                if fi and cfg_fields_convert.has_key(string.lower(fi)):
-                    fi = cfg_fields_convert[string.lower(fi)]
+                if fi and CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(fi)):
+                    fi = CFG_WEBSEARCH_FIELDS_CONVERT[string.lower(fi)]
                 # wash 'pi' argument:
                 if sre_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
@@ -662,7 +662,7 @@ class HitSet:
         if init_set:
             self._set = init_set
         else:
-            self._set = Numeric.zeros(cfg_max_recID+1, Numeric.Int0)
+            self._set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
 
     def __repr__(self, join=string.join):
         return "%s(%s)" % (self.__class__.__name__, join(map(repr, self._set), ', '))
@@ -887,8 +887,8 @@ def wash_field(f):
     # get rid of unnecessary whitespace:
     f = string.strip(f)
     # wash old-style CDS Invenio/ALEPH 'f' field argument, e.g. replaces 'wau' and 'au' by 'author'
-    if cfg_fields_convert.has_key(string.lower(f)):
-        f = cfg_fields_convert[f]
+    if CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(f)):
+        f = CFG_WEBSEARCH_FIELDS_CONVERT[f]
     return f
 
 def wash_dates(d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0):
@@ -1283,8 +1283,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     hitset_empty._nbhits = 0
     # sanity check:
     if not p:
-        hitset_full = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
-        hitset_full._nbhits = cfg_max_recID
+        hitset_full = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
+        hitset_full._nbhits = CFG_MAX_RECID
         # no pattern, so return all universe
         return hitset_full
     # search stage 1: break up arguments into basic search units:
@@ -1359,7 +1359,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     # let the initial set be the complete universe:
-    hitset_in_any_collection = HitSet(Numeric.ones(cfg_max_recID+1, Numeric.Int0))
+    hitset_in_any_collection = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
     for idx_unit in range(0,len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
@@ -1490,8 +1490,8 @@ def search_unit_in_bibxxx(p, f, type):
         tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
         # convert old ALEPH tag names, if appropriate: (TODO: get rid of this before entering this function)
-        if cfg_fields_convert.has_key(string.lower(f)):
-            f = cfg_fields_convert[string.lower(f)]
+        if CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(f)):
+            f = CFG_WEBSEARCH_FIELDS_CONVERT[string.lower(f)]
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
         if not tl:
@@ -1623,7 +1623,7 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
        authors are found to exist.
     """
     # return nothing if not configured:
-    if cfg_create_similarly_named_authors_link_box == 0:
+    if CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX == 0:
         return ""
     # return empty box if there is no initial:
     if sre.match(r'[^ ,]+, [^ ]', author_name) is None:
@@ -2023,7 +2023,7 @@ def record_exists(recID):
     if res:
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(recID, "980__%")
-        if ("DELETED" in dbcollids) or (cfg_cern_site and "DUMMY" in dbcollids):
+        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
             out = -1 # exists, but marked as deleted
         else:
             out = 1 # exists fine
@@ -2153,9 +2153,9 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     ## check arguments:
     if not sort_field:
         return recIDs
-    if len(recIDs) > cfg_nb_records_to_sort:
+    if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
-            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % cfg_nb_records_to_sort, "Warning")
+            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning")
         return recIDs
 
     sort_fields = string.split(sort_field, ",")
@@ -2641,7 +2641,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 out += "%s" % decompress(res[0][0])
             else:
                 # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
-                if cfg_call_bibformat:
+                if CFG_WEBSEARCH_CALL_BIBFORMAT:
                     out_record_in_format = call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
                     if out_record_in_format:
                         out += out_record_in_format
@@ -3157,7 +3157,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 #             else:
 #                 results_final = search_pattern(req, p, f, colls_to_search)
 #                 search_cache[search_cache_key] = results_final
-#             if len(search_cache) > cfg_search_cache_size: # is the cache full? (sanity cleaning)
+#             if len(search_cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE: # is the cache full? (sanity cleaning)
 #                 search_cache.clear()
 
         # search stage 4: intersection with collection universe:

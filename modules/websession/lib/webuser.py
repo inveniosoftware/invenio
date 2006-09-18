@@ -637,7 +637,7 @@ def list_users_in_roles(role_list):
 
 ## --- follow some functions for Apache user/group authentication
 
-def auth_apache_user_p(user, password, apache_password_file=cfg_apache_password_file):
+def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
     """Check whether user-supplied credentials correspond to valid
     Apache password data file.  Return 0 in case of failure, 1 in case
     of success."""
@@ -655,7 +655,7 @@ def auth_apache_user_p(user, password, apache_password_file=cfg_apache_password_
     else:
         return 0
 
-def auth_apache_user_in_groups(user, apache_group_file=cfg_apache_group_file):
+def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
     """Return list of Apache groups to which Apache user belong."""
     out = []
     try:

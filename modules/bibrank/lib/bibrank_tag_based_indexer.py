@@ -145,7 +145,7 @@ def single_tag_rank(config):
     for (recids,recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id and id_bibrec >=%s and id_bibrec<=%s" % (tag[0:2], tag[0:2], tag, recids, recide))
-        valid = HitSet(Numeric.ones(cfg_max_recID + 1))
+        valid = HitSet(Numeric.ones(CFG_MAX_RECID + 1))
         for key in tags:
             newset = HitSet()
             newset.addlist(run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE id_bibxxx=id AND tag='%s' AND id_bibxxx=id and id_bibrec >=%s and id_bibrec<=%s" % (tag[0:2], tag[0:2], key, recids, recide)))

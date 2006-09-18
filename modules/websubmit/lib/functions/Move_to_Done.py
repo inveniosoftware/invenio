@@ -41,11 +41,11 @@ def Move_to_Done(parameters,curdir,form):
     namedir = "%s_%s" % (rn,time.strftime("%Y%m%d%H%M%S"))
     FINALDIR = "%s/%s" % (DONEDIR,namedir)
     os.rename(curdir,FINALDIR)
-    if tar != "" and gzip != "":
+    if CFG_PATH_TAR != "" and CFG_PATH_GZIP != "":
         os.chdir(DONEDIR)
-        tar_txt = "%s -cf - %s > %s.tar" % (tar,namedir,namedir)
+        tar_txt = "%s -cf - %s > %s.tar" % (CFG_PATH_TAR,namedir,namedir)
         os.system(tar_txt)
-        zip_txt = "%s %s.tar" % (gzip,namedir)
+        zip_txt = "%s %s.tar" % (CFG_PATH_GZIP,namedir)
         os.system(zip_txt) 
         rm_txt = "rm -R %s" % namedir
         os.system(rm_txt)

@@ -44,7 +44,7 @@ def perform_info(req, ln):
             ln = ln,
             uid = uid,
             guest = isGuestUser(uid),
-            cfg_cern_site = cfg_cern_site,
+            CFG_CERN_SITE = CFG_CERN_SITE,
            );
 
 

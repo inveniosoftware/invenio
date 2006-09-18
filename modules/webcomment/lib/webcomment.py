@@ -256,7 +256,7 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
 def perform_request_report(cmt_id, client_ip_address, uid=-1):
     """
     Report a comment/review for inappropriate content.
-    Will send an email to the administrator if number of reports is a multiple of config.py/cfg_comment_nb_reports_before_send_email_to_admin
+    Will send an email to the administrator if number of reports is a multiple of CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN
     @param cmt_id: comment id
     @return integer 1 if successful, integer 0 if not
     """

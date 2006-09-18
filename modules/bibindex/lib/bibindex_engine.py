@@ -826,7 +826,7 @@ class WordTable:
                         (serialize_via_numeric_array(set), word))
                 
         else: # the word is new, will create new set:
-            set = Numeric.zeros(cfg_max_recID+1, Numeric.Int0)
+            set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
             Numeric.put(set, self.value[word].keys(), 1)
             if options["verbose"] >= 9:
                 write_message("......... inserting hitlist for ``%s''" % word)

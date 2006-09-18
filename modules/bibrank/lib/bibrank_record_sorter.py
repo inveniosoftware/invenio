@@ -50,7 +50,7 @@ class HitSet:
         if init_set:
             self._set = init_set
         else:
-            self._set = Numeric.zeros(cfg_max_recID+1, Numeric.Int0)
+            self._set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
 
     def __repr__(self, join=string.join):
         return "%s(%s)" % (self.__class__.__name__, join(map(repr, self._set), ', '))
@@ -370,11 +370,11 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             lword = lwords[j][6:]
             if string.find(lword, "->") > -1:
                 lword = string.split(lword, "->")
-                if int(lword[0]) >= cfg_max_recID + 1 or int(lword[1]) >= cfg_max_recID + 1:        
+                if int(lword[0]) >= CFG_MAX_RECID + 1 or int(lword[1]) >= CFG_MAX_RECID + 1:        
                     return (None, "Warning: Given record IDs are out of range.", "", voutput)  
                 for i in range(int(lword[0]), int(lword[1])):
                     lwords_hitset.add(int(i))
-            elif lword < cfg_max_recID + 1:
+            elif lword < CFG_MAX_RECID + 1:
                 lwords_hitset.add(int(lword))
             else:
                 return (None, "Warning: Given record IDs are out of range.", "", voutput)  

@@ -220,7 +220,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
     if template == None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
-        if php:
+        if CFG_PATH_PHP:
             return call_old_bibformat(recID, format=of)
     ############################# END ##################################
      

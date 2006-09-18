@@ -222,28 +222,28 @@ def createRelatedFormats(fullpath):
     basedir = os.path.dirname(fullpath)
     if extension == "pdf":
         # Create PostScript
-        os.system("%s -toPostScript %s" % (acroread,fullpath))
+        os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD,fullpath))
         if os.path.exists("%s/%s.ps" % (basedir,filename)):
-            os.system("%s %s/%s.ps" % (gzip,basedir,filename))
+            os.system("%s %s/%s.ps" % (CFG_PATH_GZIP,basedir,filename))
             createdpaths.append("%s/%s.ps.gz" % (basedir,filename))
     if extension == "ps":
         # Create PDF
-        os.system("%s %s %s/%s.pdf" % (distiller,fullpath,basedir,filename))
+        os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER,fullpath,basedir,filename))
         if os.path.exists("%s/%s.pdf" % (basedir,filename)):
             createdpaths.append("%s/%s.pdf" % (basedir,filename))
     if extension == "ps.gz":
         #gunzip file
-        os.system("%s %s" % (gunzip,fullpath))
+        os.system("%s %s" % (CFG_PATH_GUNZIP,fullpath))
         # Create PDF
-        os.system("%s %s/%s.ps %s/%s.pdf" % (distiller,basedir,filename,basedir,filename))
+        os.system("%s %s/%s.ps %s/%s.pdf" % (CFG_PATH_DISTILLER,basedir,filename,basedir,filename))
         if os.path.exists("%s/%s.pdf" % (basedir,filename)):
             createdpaths.append("%s/%s.pdf" % (basedir,filename))
         #gzip file
-        os.system("%s %s/%s.ps" % (gzip,basedir,filename))
+        os.system("%s %s/%s.ps" % (CFG_PATH_GZIP,basedir,filename))
     return createdpaths
 
 def createIcon(fullpath,iconsize):
-    global convert
+    global CFG_PATH_CONVERT
     basedir = os.path.dirname(fullpath)
     filename = os.path.basename(fullpath)
     extension = re.sub("^[^\.]*\.","",filename)
@@ -251,7 +251,7 @@ def createIcon(fullpath,iconsize):
         extension == ""
     iconpath = "%s/icon-%s.gif" % (basedir,re.sub("\..*","",filename))
     if os.path.exists(fullpath) and extension.lower() in ['pdf','gif','jpg','jpeg','ps']:
-        os.system("%s -scale %s %s %s" % (convert,iconsize,fullpath,iconpath))
+        os.system("%s -scale %s %s %s" % (CFG_PATH_CONVERT,iconsize,fullpath,iconpath))
     if os.path.exists(iconpath):
         return iconpath
     else:

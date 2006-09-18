@@ -31,7 +31,7 @@ from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.config import weburl, sweburl
 from invenio.messages import language_list_long
-from invenio.config import php
+from invenio.config import CFG_PATH_PHP
 
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
@@ -62,7 +62,7 @@ class Template:
             ''' % {'warnings': '<br/>'.join(warnings)}
 
         comment_on_php_admin_interface = ''
-        if php:
+        if CFG_PATH_PHP:
             # If PHP enabled, old bibformat can still run
             comment_on_php_admin_interface = '''
             <p>For some time the old BibFormat will still run along the new one, so that you can transition smoothly (See old Admin Interface further below).</p>
@@ -116,7 +116,7 @@ class Template:
         </dl>
         '''% {'weburl':weburl, 'ln':ln}
         
-        if php:
+        if CFG_PATH_PHP:
             #Show PHP admin only if PHP is enabled
             out += '''
             <br/><br/><br/><br/>
@@ -1178,7 +1178,7 @@ class Template:
             selected = ''
             if rule['template'] == 'migration_in_progress':
                 selected = 'selected="selected"'
-            if php or selected != '':
+            if CFG_PATH_PHP or selected != '':
                 out += '''<option disabled="disabled">For Migration:</option>'''
                 out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
             ################               END FIXME             ####################
@@ -1235,7 +1235,7 @@ class Template:
         selected = ''
         if default == 'migration_in_progress':
             selected = 'selected="selected"'
-        if php or selected != '':
+        if CFG_PATH_PHP or selected != '':
             out += '''<option disabled="disabled">For Migration:</option>'''
             out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
         ################               END FIXME             ####################

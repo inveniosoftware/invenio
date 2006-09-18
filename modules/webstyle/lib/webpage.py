@@ -21,12 +21,7 @@
 
 __revision__ = "$Id$"
 
-import re
-import string
-import sys
 import time
-import traceback
-import urllib
 
 from invenio.config import *
 from invenio.messages import gettext_set_language
@@ -105,21 +100,21 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                                         navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                        
                                         uid = uid,
                                         secure_page_p = secure_page_p,
-                                        # pageheader = cdspageheader,
+                                        # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
                                         pageheaderadd = cdspageheaderadd,
-                                        boxlefttop = cdspageboxlefttop,
+                                        boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
                                         boxlefttopadd = cdspageboxlefttopadd,
                                         boxleftbottomadd = cdspageboxleftbottomadd,
-                                        boxleftbottom = cdspageboxleftbottom,
-                                        boxrighttop = cdspageboxrighttop,
+                                        boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
+                                        boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
                                         boxrighttopadd = cdspageboxrighttopadd,
                                         boxrightbottomadd = cdspageboxrightbottomadd,
-                                        boxrightbottom = cdspageboxrightbottom,
+                                        boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
                                         titleprologue = titleprologue,
                                         title = title,
                                         titleepilogue = titleepilogue,
                                         body = body,                                        
-                                        # pagefooter = cdspagefooter,
+                                        # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
                                         lastupdated = lastupdated,
                                         pagefooteradd = cdspagefooteradd)
 
@@ -136,7 +131,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspa
                                               navtrailbox = create_navtrailbox_body(title, navtrail, language=language),
                                               uid = uid,
                                               secure_page_p = secure_page_p,
-                                              # pageheader = cdspageheader,
+                                              # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
                                               pageheaderadd = cdspageheaderadd)
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, req=None, verbose=1):
