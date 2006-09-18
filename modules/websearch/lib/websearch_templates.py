@@ -18,6 +18,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0301
+
 __revision__ = "$Id$"
 
 import urllib
@@ -28,7 +30,15 @@ import string
 import locale
 import sre
 
-from invenio.config import *
+from invenio.config import \
+     CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
+     CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
+     CFG_WEBSEARCH_GOOGLE_BOX, \
+     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+     cdslang, \
+     cdsname, \
+     version, \
+     weburl
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -394,7 +404,7 @@ class Template:
 
         header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "","")
-	header += ':'
+        header += ':'
         ssearchurl = self.build_search_interface_url(c=collection_id, as=0, ln=ln)
 
         out += '''
@@ -632,7 +642,7 @@ class Template:
                 'any' : _("any day"),
                 'sel' : self.tmpl_is_selected(sd, 0)
               }
-        for day in range(1,32):
+        for day in range(1, 32):
             box += """<option value="%02d"%s>%02d""" % (day, self.tmpl_is_selected(sd, day), day)
         box += """</select>"""
         # month
@@ -644,9 +654,9 @@ class Template:
                  'any' : _("any month"),
                  'sel' : self.tmpl_is_selected(sm, 0)
                }
-        for mm, month in [(1,_("January")), (2,_("February")), (3,_("March")), (4,_("April")), \
-                          (5,_("May")), (6,_("June")), (7,_("July")), (8,_("August")), \
-                          (9,_("September")), (10,_("October")), (11,_("November")), (12,_("December"))]:
+        for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
+                          (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
+                          (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
             box += """<option value="%02d"%s>%s""" % (mm, self.tmpl_is_selected(sm, mm), month)
         box += """</select>"""
         # year
@@ -719,7 +729,7 @@ class Template:
         i = 0
         for son in sons:
             out += """<tr><td class="narrowsearchboxbody" valign="top">"""
-            if type=='r':
+            if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
                     out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
                 else:
@@ -1012,7 +1022,7 @@ class Template:
             out += """ <small class="quicknote">[%(rn)s]</small>""" % {'rn' : cgi.escape(rn)}
         for abstract in abstracts:
             out += "<br><small>%(abstract)s [...]</small>" % {'abstract' : cgi.escape(abstract[:1+string.find(abstract, '.')]) }
-        for idx in range(0,len(urls_u)):
+        for idx in range(0, len(urls_u)):
             out += """<br><small class="note"><a class="note" href="%(url)s">%(name)s</a></small>""" % {
                      'url' : urls_u[idx],
                      'name' : urls_u[idx]
@@ -2195,7 +2205,7 @@ class Template:
         prs_y = get_fieldvalues(recID, "909C4y")
         prs_n = get_fieldvalues(recID, "909C4n")
         prs_c = get_fieldvalues(recID, "909C4c")
-        for idx in range(0,len(prs_p)):
+        for idx in range(0, len(prs_p)):
             out += """<p style="margin-left: 15%%; width: 70%%">
                      <small><strong>Publ. in:</strong> %s"""  % prs_p[idx]
             if prs_v and prs_v[idx]:
@@ -2210,7 +2220,7 @@ class Template:
         # sixthly, fulltext link:
         urls_z = get_fieldvalues(recID, "8564_z")
         urls_u = get_fieldvalues(recID, "8564_u")
-        for idx in range(0,len(urls_u)):
+        for idx in range(0, len(urls_u)):
             link_text = "URL"
             try:
                 if urls_z[idx]:
@@ -2241,7 +2251,7 @@ class Template:
             nb_records_seen += 1
             if record_public_p(recID):            
                 nb_records_to_be_printed += 1
-                recID_score_list_to_be_printed.append([recID,score])
+                recID_score_list_to_be_printed.append([recID, score])
 
         # secondly print them:
         out = '''

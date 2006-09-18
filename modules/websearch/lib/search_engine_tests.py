@@ -21,7 +21,8 @@
 
 """Unit tests for the search engine."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 import unittest
 

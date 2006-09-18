@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 
 import sys
 import invenio.websearchadminlib as wsc
-#reload(wsc)
+from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl, sweburl, cdslang
 from invenio.dbquery import Error
@@ -40,7 +40,7 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfmtscore(colID=colID,
@@ -64,7 +64,7 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldscore(colID=colID,
@@ -88,7 +88,7 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdsla
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldvaluescore(colID=colID,
@@ -112,7 +112,7 @@ def runwebcoll(req, colID, ln=cdslang, confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                     body=wsc.perform_checkwebcollstatus(colID=colID,
@@ -134,7 +134,7 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchpbxscore(colID=colID,
@@ -158,7 +158,7 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifydbquery(colID=colID,
@@ -181,7 +181,7 @@ def showtree(req, colID, ln=cdslang):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection tree",
                     body=wsc.perform_showtree(colID=colID,
@@ -202,7 +202,7 @@ def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrestricted(colID=colID,
@@ -225,7 +225,7 @@ def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifytranslations(colID=colID,
@@ -249,7 +249,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
     except Error, e:
         return error_page(req)
   
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_addcollectiontotree(colID=colID,
@@ -275,7 +275,7 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
     except Error, e:
         return error_page(req)
     
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_addcollection(colID=colID,
@@ -301,7 +301,7 @@ def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrankmethods(colID=colID,
@@ -325,7 +325,7 @@ def deletecollection(req, colID, ln=cdslang, confirm=-1):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deletecollection(colID=colID,
@@ -347,7 +347,7 @@ def editcollection(req, colID=1, ln=cdslang, mtype=''):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_editcollection(colID=colID,
@@ -370,7 +370,7 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
         return error_page(req)
    
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addoutputformat(colID=colID,
@@ -395,7 +395,7 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showoutputformats(colID=colID,
@@ -418,7 +418,7 @@ def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', co
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingoutputformat(colID=colID,
@@ -442,7 +442,7 @@ def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deleteoutputformat(colID=colID,
@@ -466,7 +466,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removeoutputformat(colID=colID,
@@ -490,7 +490,7 @@ def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body = wsc.perform_update_external_collections(colID, ln, state, recurse),
@@ -510,7 +510,7 @@ def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', call
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removefieldvalue(colID=colID,
@@ -537,7 +537,7 @@ def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback=
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removefield(colID=colID,
@@ -563,7 +563,7 @@ def modifyfield(req, colID, fldID, fldvID='', ln=cdslang, callback='yes', confir
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
         	body=wsc.perform_modifyfield(colID=colID,
@@ -588,7 +588,7 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyoutputformat(colID=colID,
@@ -613,7 +613,7 @@ def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchoptions(colID=colID,
@@ -636,7 +636,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingfield(colID=colID,
@@ -668,7 +668,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_rearrangefield(colID=colID,
@@ -698,7 +698,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingfieldvalue(colID=colID,
@@ -728,7 +728,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_rearrangefieldvalue(colID=colID,
@@ -758,7 +758,7 @@ def addnewfieldvalue(req, colID, fldID, ln=cdslang, name='', value='', callback=
     except Error, e:
         return error_page(req)
     
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_addnewfieldvalue(colID=colID,
@@ -784,7 +784,7 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=cdslang, name='', value='', c
     except Error, e:
         return error_page(req)
     
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_modifyfieldvalue(colID=colID,
@@ -811,7 +811,7 @@ def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchfields(colID=colID,
@@ -834,7 +834,7 @@ def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsortoptions(colID=colID,
@@ -857,7 +857,7 @@ def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyportalbox(colID=colID,
@@ -886,7 +886,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removeportalbox(colID=colID,
@@ -911,7 +911,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingportalbox(colID=colID,
@@ -945,7 +945,7 @@ def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1
         return error_page(req)
 
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deleteportalbox(colID=colID,
@@ -971,7 +971,7 @@ def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
         return error_page(req)
 
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showportalboxes(colID=colID,
@@ -994,7 +994,7 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
     except Error, e:
         return error_page(req)
    
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addportalbox(colID=colID,
@@ -1019,7 +1019,7 @@ def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_modifycollectiontree(colID=colID,
@@ -1048,7 +1048,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = wsc.check_user(uid,'cfgwebsearch')
+    auth = check_user(uid,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_index(colID=colID,

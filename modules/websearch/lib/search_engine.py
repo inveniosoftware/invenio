@@ -18,6 +18,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0301
+
 """CDS Invenio Search Engine in mod_python."""
 
 __lastupdated__ = """$Date$"""
@@ -30,18 +32,32 @@ import copy
 import string
 import os
 import sre
-import sys
 import time
-import traceback
 import urllib
 import zlib
 import Numeric
-from xml.dom import minidom
 
 ## import CDS Invenio stuff:
-from invenio.config import *
+from invenio.config import \
+     CFG_CERN_SITE, \
+     CFG_MAX_RECID, \
+     CFG_OAI_ID_FIELD, \
+     CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW, \
+     CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW, \
+     CFG_WEBSEARCH_CALL_BIBFORMAT, \
+     CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
+     CFG_WEBSEARCH_FIELDS_CONVERT, \
+     CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
+     CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
+     cdslang, \
+     cdsname, \
+     cdsnameintl, \
+     logdir, \
+     weburl
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
-from invenio.bibrank_record_sorter import get_bibrank_methods,rank_records
+from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
@@ -61,7 +77,7 @@ try:
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
 
-from invenio.messages import gettext_set_language, wash_language
+from invenio.messages import gettext_set_language
 
 try:
     import invenio.template
@@ -197,47 +213,47 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         ## A - matching type is known; good!
         if m == 'e':
             # A1 - exact value:
-            opfts.append(['+',p,f,'a']) # '+' since we have only one unit
+            opfts.append(['+', p, f, 'a']) # '+' since we have only one unit
         elif m == 'p':
             # A2 - phrase/substring:
-            opfts.append(['+',"%"+p+"%",f,'a']) # '+' since we have only one unit
+            opfts.append(['+', "%" + p + "%", f, 'a']) # '+' since we have only one unit
         elif m == 'r':
             # A3 - regular expression:
-            opfts.append(['+',p,f,'r']) # '+' since we have only one unit
+            opfts.append(['+', p, f, 'r']) # '+' since we have only one unit
         elif m == 'a' or m == 'w':
             # A4 - all of the words:
             p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
-                opfts.append(['+',word,f,'w']) # '+' in all units
+                opfts.append(['+', word, f, 'w']) # '+' in all units
         elif m == 'o':
             # A5 - any of the words:
             p = strip_accents(p) # strip accents for 'w' mode, FIXME: delete when not needed
             for word in get_words_from_pattern(p):
                 if len(opfts)==0:
-                    opfts.append(['+',word,f,'w']) # '+' in the first unit
+                    opfts.append(['+', word, f, 'w']) # '+' in the first unit
                 else:
-                    opfts.append(['|',word,f,'w']) # '|' in further units
+                    opfts.append(['|', word, f, 'w']) # '|' in further units
         else:
             if of.startswith("h"):
                 print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
-            opfts.append(['+',"%"+p+"%",f,'a'])
+            opfts.append(['+', "%" + p + "%", f, 'a'])
     else:
         ## B - matching type is not known: let us try to determine it by some heuristics
-        if f and p[0]=='"' and p[-1]=='"':
+        if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
-            opfts.append(['+',p[1:-1],f,'a'])
-        elif f and p[0]=="'" and p[-1]=="'":
+            opfts.append(['+', p[1:-1], f, 'a'])
+        elif f and p[0] == "'" and p[-1] == "'":
             ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search
-            opfts.append(['+','%'+p[1:-1]+'%',f,'a'])
-        elif f and p[0]=="/" and p[-1]=="/":
+            opfts.append(['+', '%' + p[1:-1] + '%', f, 'a'])
+        elif f and p[0] == "/" and p[-1] == "/":
             ## B0ter - does 'p' start and end by a slash, and is 'f' defined? => doing regexp search
-            opfts.append(['+',p[1:-1],f,'r'])
+            opfts.append(['+', p[1:-1], f, 'r'])
         elif f and string.find(p, ',') >= 0:
             ## B1 - does 'p' contain comma, and is 'f' defined? => doing ACC search
-            opfts.append(['+',p,f,'a'])
+            opfts.append(['+', p, f, 'a'])
         elif f and str(f[0:2]).isdigit():
             ## B2 - does 'f' exist and starts by two digits?  => doing ACC search
-            opfts.append(['+',p,f,'a'])
+            opfts.append(['+', p, f, 'a'])
         else:
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
@@ -274,16 +290,16 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     if fi:
                         if pi[0] == '"' and pi[-1] == '"':
                             pi = string.replace(pi, '"', '') # remove quote signs
-                            opfts.append([oi,pi,fi,'a'])
+                            opfts.append([oi, pi, fi, 'a'])
                         elif pi[0] == "'" and pi[-1] == "'":
                             pi = string.replace(pi, "'", "") # remove quote signs
-                            opfts.append([oi,"%"+pi+"%",fi,'a'])
+                            opfts.append([oi, "%" + pi + "%", fi, 'a'])
                         else: # unbalanced quotes, so do WRD query:
-                            opfts.append([oi,pi,fi,'w'])                            
+                            opfts.append([oi, pi, fi, 'w'])                            
                     else:
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
-                        if pi[0]=='"' and pi[-1]=='"':
-                            opfts.append([oi,pi[1:-1],"anyfield",'a'])
+                        if pi[0] == '"' and pi[-1] == '"':
+                            opfts.append([oi, pi[1:-1], "anyfield", 'a'])
                             if of.startswith("h"):
                                 print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
                         else:
@@ -291,28 +307,28 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                             pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                             for pii in get_words_from_pattern(pi):
                                 # since there may be '-' and other chars that we do not index in WRD
-                                opfts.append([oi,pii,fi,'w'])
+                                opfts.append([oi, pii, fi, 'w'])
                             if of.startswith("h"):
                                 print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.")
                                 print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
                                 print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
-                    opfts.append([oi,pi,fi,'a'])
+                    opfts.append([oi, pi, fi, 'a'])
                 elif fi and not get_index_id(fi):
                     # B3c - fi exists but there is no words table for fi => try ACC search
-                    opfts.append([oi,pi,fi,'a'])
+                    opfts.append([oi, pi, fi, 'a'])
                 elif fi and pi.startswith('/') and pi.endswith('/'):
                     # B3d - fi exists and slashes found => try regexp search
-                    opfts.append([oi,pi[1:-1],fi,'r'])
+                    opfts.append([oi, pi[1:-1], fi, 'r'])
                 else:
                     # B3e - general case => do WRD search
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi):
-                        opfts.append([oi,pii,fi,'w'])
+                        opfts.append([oi, pii, fi, 'w'])
 
     ## sanity check:
-    for i in range(0,len(opfts)):
+    for i in range(0, len(opfts)):
         try:
             pi = opfts[i][1]
             if pi == '*':
@@ -402,15 +418,15 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
     # day
     box += """<select name="%sd">""" % name
     box += """<option value="">%s""" % _("any day")
-    for day in range(1,32):
+    for day in range(1, 32):
         box += """<option value="%02d"%s>%02d""" % (day, is_selected(day, selected_day), day)
     box += """</select>"""
     # month
     box += """<select name="%sm">""" % name
     box += """<option value="">%s""" % _("any month")
-    for mm, month in [(1,_("January")), (2,_("February")), (3,_("March")), (4,_("April")), \
-                      (5,_("May")), (6,_("June")), (7,_("July")), (8,_("August")), \
-                      (9,_("September")), (10,_("October")), (11,_("November")), (12,_("December"))]:
+    for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
+                      (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
+                      (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
         box += """<option value="%02d"%s>%s""" % (mm, is_selected(mm, selected_month), month)
     box += """</select>"""
     # year
@@ -495,7 +511,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                'value' : '',
                'text' : "- %s %s -" % (_("OR").lower (), _("rank by")),
              }]
-    for (code,name) in get_bibrank_methods(get_colID(cc), ln):
+    for (code, name) in get_bibrank_methods(get_colID(cc), ln):
         # propose found rank methods:
         ranks.append({
                        'value' : code,
@@ -580,7 +596,7 @@ def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
     res = run_sql(query)
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
-            out += """<option value="%s"%s>%s""" % (field_code, is_selected(field_code,value),
+            out += """<option value="%s"%s>%s""" % (field_code, is_selected(field_code, value),
                                                     get_field_i18nname(field_name, ln))
     if value and str(value[0]).isdigit():
         out += """<option value="%s" selected>%s MARC tag""" % (value, value)
@@ -900,7 +916,7 @@ def wash_dates(d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0):
     """    
     day1, day2 =  "", ""
     # sanity checking:
-    if d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0:
+    if d1y == 0 and d1m == 0 and d1d == 0 and d2y == 0 and d2m == 0 and d2d == 0:
         return ("", "") # nothing selected, so return empty values
     # construct day1 (from):
     if d1y:
@@ -1093,7 +1109,7 @@ def create_collection_reclist_cache():
         # database problems, set timestamp to zero and return empty cache
         collection_reclist_cache_timestamp = 0
         return collrecs    
-    for name,reclist in res:
+    for name, reclist in res:
         collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
     # update timestamp:
     try:
@@ -1122,7 +1138,7 @@ def create_collection_i18nname_cache():
         # database problems, set timestamp to zero and return empty cache
         collection_i18nname_cache_timestamp = 0
         return names
-    for c,ln,i18nname in res:
+    for c, ln, i18nname in res:
         if i18nname:
             if not names.has_key(c):
                 names[c] = {}
@@ -1154,7 +1170,7 @@ def create_field_i18nname_cache():
         # database problems, set timestamp to zero and return empty cache
         field_i18nname_cache_timestamp = 0
         return names
-    for f,ln,i18nname in res:
+    for f, ln, i18nname in res:
         if i18nname:
             if not names.has_key(f):
                 names[f] = {}
@@ -1299,12 +1315,12 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     basic_search_units_hitsets = []
-    for idx_unit in range(0,len(basic_search_units)):
+    for idx_unit in range(0, len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
-        if basic_search_unit_hitset._nbhits>0 or \
+        if basic_search_unit_hitset._nbhits > 0 or \
            ap==0 or \
            bsu_o=="|" or \
            ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
@@ -1322,7 +1338,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 else: # it is WRD query
                     bsu_pn = sre.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
-                    print_warning(req, "trying (%s,%s,%s)" % (bsu_pn,bsu_f,bsu_m))
+                    print_warning(req, "trying (%s,%s,%s)" % (bsu_pn, bsu_f, bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
@@ -1351,7 +1367,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 return hitset_empty
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        for idx_unit in range(0,len(basic_search_units)):
+        for idx_unit in range(0, len(basic_search_units)):
             print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
                           (basic_search_units[idx_unit][1:], basic_search_units_hitsets[idx_unit]._nbhits))
         print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
@@ -1360,7 +1376,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         t1 = os.times()[4]
     # let the initial set be the complete universe:
     hitset_in_any_collection = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
-    for idx_unit in range(0,len(basic_search_units)):
+    for idx_unit in range(0, len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
         if this_unit_operation == '+':
@@ -1377,7 +1393,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
             nearestterms = []
-            for idx_unit in range(0,len(basic_search_units)):
+            for idx_unit in range(0, len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
                 if bsu_p.startswith("%") and bsu_p.endswith("%"):
                     bsu_p = "'" + bsu_p[1:-1] + "'"
@@ -1455,7 +1471,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     # launch the query:
     res = run_sql(query)
     # fill the result set:
-    for word,hitlist in res:
+    for word, hitlist in res:
         hitset_bibwrd = HitSet(Numeric.loads(decompress(hitlist)))
         # add the results:
         if set_used:
@@ -1509,10 +1525,10 @@ def search_unit_in_bibxxx(p, f, type):
             query = "SELECT id FROM bibrec WHERE id %s" % pattern
         else:
             if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE '%s%%'" %\
+                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE '%s%%'" % \
                         (bx, bibx, pattern, t)
             else:
-                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag='%s'" %\
+                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag='%s'" % \
                         (bx, bibx, pattern, t)
         # launch the query:
         res = run_sql(query)
@@ -1706,7 +1722,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
         argd.update(urlargd)
 
         # check which fields contained the requested parameter, and replace it.
-        for (px, fx) in ('p', 'f'),('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
+        for (px, fx) in ('p', 'f'), ('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
             if px in argd:
                 if f == argd[fx] or f == "anyfield" or f == "":
                     if string.find(argd[px], p) > -1:
@@ -1773,7 +1789,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
     ## use MySQL 4.1.x or our own idxPHRASE in the future.
-    n_fetch = 2*max(n_below,n_above)
+    n_fetch = 2*max(n_below, n_above)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -1823,7 +1839,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     except:
         idx_p = len(phrases_out)/2
     # return n_above and n_below:
-    return phrases_out[max(0,idx_p-n_above):idx_p+n_below]
+    return phrases_out[max(0, idx_p-n_above):idx_p+n_below]
 
 def get_nbhits_in_bibwords(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
@@ -1879,7 +1895,7 @@ def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns DB's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
        Returns None in case of failure."""
     out = None
-    query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" %\
+    query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" % \
             (escape_string(sysno))
     res = run_sql(query, None, 1)
     if res:
@@ -1961,17 +1977,17 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
         # find out which tags to output:
         dict_of_tags_out = {}
         if not tags_in:
-            for i in range(0,10):
-                for j in range(0,10):
+            for i in range(0, 10):
+                for j in range(0, 10):
                     dict_of_tags_out["%d%d%%" % (i, j)] = 1
         else:
             for tag in tags_in:
                 if len(tag) == 0:
-                    for i in range(0,10):
-                        for j in range(0,10):
+                    for i in range(0, 10):
+                        for j in range(0, 10):
                             dict_of_tags_out["%d%d%%" % (i, j)] = 1
                 elif len(tag) == 1:
-                    for j in range(0,10):
+                    for j in range(0, 10):
                         dict_of_tags_out["%s%d%%" % (tag, j)] = 1
                 elif len(tag) < 5:
                     dict_of_tags_out["%s%%" % tag] = 1
@@ -2269,29 +2285,29 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
 
         if format.startswith('x'):
             # we are doing XML output:
-            for irec in range(irec_max,irec_min,-1):
+            for irec in range(irec_max, irec_min, -1):
                 req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid))
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
-            for irec in range(irec_max,irec_min,-1):
+            for irec in range(irec_max, irec_min, -1):
                 x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid)
                 req.write(x)
                 if x:
                     req.write('\n')
         elif format == 'excel':
-            recIDs_to_print = [recIDs[x] for x in range(irec_max,irec_min,-1)]
+            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
             create_excel(recIDs=recIDs_to_print, req=req, ln=ln)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 # portfolio and on-the-fly formats:
-                for irec in range(irec_max,irec_min,-1):
+                for irec in range(irec_max, irec_min, -1):
                     req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid))
             elif format.startswith("hb"):
                 # HTML brief format:
                 rows = []
-                for irec in range(irec_max,irec_min,-1):
+                for irec in range(irec_max, irec_min, -1):
                     temp = {
                              'number' : jrec+irec_max-irec,
                              'recid' : recIDs[irec],
@@ -2314,7 +2330,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 # print other formatting choices:
 
                 rows = []
-                for irec in range(irec_max,irec_min,-1):
+                for irec in range(irec_max, irec_min, -1):
                     temp = {
                              'record'      : print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid),
                              'recid'       : recIDs[irec],
@@ -2326,18 +2342,19 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         temp['modifydate'] = get_modification_date(recIDs[irec])
 
                     if CFG_EXPERIMENTAL_FEATURES:
-                       r = calculate_cited_by_list(recIDs[irec])
-                       if r:
-                           temp ['citinglist'] = r
-                           temp ['citationhistory'] = create_citation_history_graph_and_box(recIDs[irec], ln)
+                        r = calculate_cited_by_list(recIDs[irec])
+                        if r:
+                            temp ['citinglist'] = r
+                            temp ['citationhistory'] = create_citation_history_graph_and_box(recIDs[irec], ln)
 
-                       r = calculate_co_cited_with_list(recIDs[irec])
-                       if r: temp ['cociting'] = r
+                        r = calculate_co_cited_with_list(recIDs[irec])
+                        if r:
+                            temp ['cociting'] = r
 
-                       r = calculate_reading_similarity_list(recIDs[irec], "downloads")
-                       if r:
-                           temp ['downloadsimilarity'] = r
-                           temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
+                        r = calculate_reading_similarity_list(recIDs[irec], "downloads")
+                        if r:
+                            temp ['downloadsimilarity'] = r
+                            temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
                     
                     # Get comments and reviews for this record if exist
                     # FIXME: templatize me
@@ -2427,7 +2444,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         # look for detailed format existence:
         query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
         res = run_sql(query, None, 1)
-        if res and record_exist_p==1:
+        if res and record_exist_p == 1:
             # record 'recID' is formatted in 'format', so print it
             out += "%s" % decompress(res[0][0])
         else:
@@ -2446,8 +2463,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                            (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
-                for digit1 in range(0,10):
-                    for digit2 in range(0,10):
+                for digit1 in range(0, 10):
+                    for digit2 in range(0, 10):
                         bx = "bib%d%dx" % (digit1, digit2)
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
@@ -2965,7 +2982,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     if sysno: # ALEPH SYS number was passed, so deduce DB recID for the record:
         recid = get_mysql_recid_from_aleph_sysno(sysno)
     # deduce collection we are in (if applicable):
-    if recid>0:
+    if recid > 0:
         cc = guess_primary_collection_of_a_record(recid)
     # deduce user id (if applicable):
     try:
@@ -2973,7 +2990,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     except:
         uid = 0
     ## 0 - start output
-    if recid>0:
+    if recid > 0:
         ## 1 - detailed record display
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
@@ -3003,7 +3020,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
         try:
-            if as==1 or (p1 or p2 or p3):
+            if as == 1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg)
                 browse_pattern(req, colls_to_search, p2, f2, rg)
                 browse_pattern(req, colls_to_search, p3, f3, rg)
@@ -3336,7 +3353,8 @@ def perform_request_cache(req, action="show"):
     out += "<blockquote>"
     if len(search_cache):
         out += """<table border="=">"""
-        out += "<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("Pattern","Field","Collection","Number of Hits")
+        out += "<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % \
+               ("Pattern", "Field", "Collection", "Number of Hits")
         for search_cache_key in search_cache.keys():
             p, f, c = string.split(search_cache_key, "@", 2)
             # find out about length of cached data:
@@ -3384,9 +3402,9 @@ def perform_request_log(req, date=""):
         yyyymmdd = string.atoi(date)
         req.write("<p><big><strong>Date: %d</strong></big><p>" % yyyymmdd)
         req.write("""<table border="1">""")
-        req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("No.","Time", "Pattern","Field","Collection","Number of Hits"))
+        req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("No.", "Time", "Pattern", "Field", "Collection", "Number of Hits"))
         # read file:
-        p = os.popen("grep ^%d %s/search.log" % (yyyymmdd,logdir), 'r')
+        p = os.popen("grep ^%d %s/search.log" % (yyyymmdd, logdir), 'r')
         lines = p.readlines()
         p.close()
         # process lines:
@@ -3405,10 +3423,11 @@ def perform_request_log(req, date=""):
         yyyymmdd = int(time.strftime("%Y%m%d", time.localtime()))
         req.write("""<table border="1">""")
         req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></tr>" % ("Day", "Number of Queries"))
-        for day in range(yyyymm01,yyyymmdd+1):
-            p = os.popen("grep -c ^%d %s/search.log" % (day,logdir), 'r')
+        for day in range(yyyymm01, yyyymmdd + 1):
+            p = os.popen("grep -c ^%d %s/search.log" % (day, logdir), 'r')
             for line in p.readlines():
-                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % (day, weburl,day,line))
+                req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % \
+                          (day, weburl, day, line))
             p.close()
         req.write("</table>")
     req.write("</html>")
