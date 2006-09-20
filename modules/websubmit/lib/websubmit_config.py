@@ -21,6 +21,12 @@
 
 __revision__ = "$Id$"
 
+# FIXME: wildcard import is bad, but it seems needed for WebSubmit the
+# time being, because the MESS functions seem to have a rather funny
+# usage of config variables without importing anything, but via
+# execing and stuff!  WebSubmit should really get refactored one day.
+from invenio.config import *
+
 ## test:
 test = "FALSE"
 
