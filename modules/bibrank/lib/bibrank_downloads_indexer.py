@@ -24,10 +24,8 @@ __revision__ = "$Id$"
 import os
 import time
 import calendar
-import ConfigParser
 import string
 
-from invenio.config import *
 from invenio.dbquery import run_sql
 
 def append_to_file(path, content):
@@ -86,9 +84,9 @@ def filter_downloads_per_hour_with_docid (keys, last_updated):
             values = run_sql("""select  DATE_FORMAT(download_time,"%%Y-%%m-%%d %%H"), client_host from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time >=\"%s\";""" % (k, bibdoc[0], last_updated))
 	    			
             for val in values:
-	        date_res = val[0]
-            	date1 = "%s:00:00" % (date_res)
-	    	date2 = compute_next_hour(date_res)
+                date_res = val[0]
+                date1 = "%s:00:00" % (date_res)
+                date2 = compute_next_hour(date_res)
                 duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, bibdoc[0], date1, date2, val[1]))[0][0])-1
                 run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, bibdoc[0], date1, date2, val[1], duplicates))
                 
@@ -97,9 +95,9 @@ def filter_downloads_per_hour (keys, last_updated):
     for k in keys:
         values = run_sql("""select DATE_FORMAT(download_time,"%%Y-%%m-%%d %%H"), client_host from rnkDOWNLOADS where id_bibrec=%s and download_time >=\"%s\";""" % (k, last_updated))
         for val in values:
-	    date_res = val[0]
+            date_res = val[0]
             date1 = "%s:00:00" % (date_res)
-	    date2 = compute_next_hour(date_res)
+            date2 = compute_next_hour(date_res)
             duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, date1, date2, val[1]))[0][0])-1
             run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, date1, date2, val[1], duplicates))
                 
@@ -110,10 +108,10 @@ def compute_next_hour(date_res):
     date_hour = string.atoi(date_hour)	
 
     if date_hour == 23:
-	date_year, date_month, date_day = string.split(date_res, "-")
-	date_year = string.atoi(date_year)
-    	date_month = string.atoi(date_month)
-    	date_day = string.atoi(date_day)	
+        date_year, date_month, date_day = string.split(date_res, "-")
+        date_year = string.atoi(date_year)
+        date_month = string.atoi(date_month)
+        date_day = string.atoi(date_day)	
         if date_month == 12 and date_day == 31:
             next_date = "%s-%s-%s 00:00:00" % (date_year + 1, 01, 01)
         elif calendar.monthrange(date_year, date_month)[1] == date_day:

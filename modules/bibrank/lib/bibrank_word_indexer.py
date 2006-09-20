@@ -41,7 +41,11 @@ import math
 import re
 import ConfigParser
 
-from invenio.config import *
+from invenio.config import \
+     CFG_MAX_RECID, \
+     cdslang, \
+     etcdir, \
+     version
 from invenio.search_engine import perform_request_search, strip_accents, HitSet
 from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem

@@ -31,9 +31,13 @@ from zlib import compress,decompress
 import marshal
 from mod_python import apache
 
+from invenio.config import \
+     cdslang, \
+     etcdir, \
+     version, \
+     weburl
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
-from invenio.config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email

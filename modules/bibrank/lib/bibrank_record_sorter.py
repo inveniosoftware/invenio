@@ -34,7 +34,11 @@ import ConfigParser
 import traceback
 import copy
 
-from invenio.config import *
+from invenio.config import \
+     CFG_MAX_RECID, \
+     cdslang, \
+     etcdir, \
+     version
 from invenio.dbquery import run_sql, escape_string
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword

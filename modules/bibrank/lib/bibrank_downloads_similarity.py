@@ -19,9 +19,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+__revision__ = \
+   "$Id$"
 
-from invenio.config import *
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_CERN_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 
@@ -37,8 +40,10 @@ def get_fieldvalues(recID, tag):
         digit = tag[0:2]
         bx = "bib%sx" % digit
         bibx = "bibrec_bib%sx" % digit
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
+        query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
+                " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND " \
+                " bx.tag LIKE '%s' ORDER BY bibx.field_number, bx.tag ASC" % \
+                (bx, bibx, recID, tag)
         res = run_sql(query)
         for row in res:
             out.append(row[0])
@@ -69,10 +74,13 @@ def register_page_view_event(recid, uid, client_ip_address):
        To be called by the search engine.
     """
     if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-        # do not register access if we are in read-only access control site mode:
+        # do not register access if we are in read-only access control
+        # site mode:
         return []
-    return run_sql("INSERT INTO rnkPAGEVIEWS (id_bibrec,id_user,client_host,view_time) " \
-                   "VALUES (%s,%s,INET_ATON(%s),NOW())", (recid, uid, client_ip_address))    
+    return run_sql("INSERT INTO rnkPAGEVIEWS " \
+                   " (id_bibrec,id_user,client_host,view_time) " \
+                   " VALUES (%s,%s,INET_ATON(%s),NOW())", \
+                   (recid, uid, client_ip_address))    
 
 def calculate_reading_similarity_list(recid, type="pageviews"):
     """Calculate reading similarity data to use in reading similarity

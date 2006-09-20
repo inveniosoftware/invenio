@@ -44,7 +44,11 @@ import copy
 import types
 import ConfigParser
 
-from invenio.config import *
+from invenio.config import \
+     CFG_MAX_RECID, \
+     cdslang, \
+     etcdir, \
+     version
 from invenio.search_engine import perform_request_search, strip_accents
 from invenio.search_engine import HitSet, get_index_id, create_basic_search_units
 from invenio.bibrank_citation_indexer import get_citation_weight
