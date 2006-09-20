@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.90.1.20060822, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.90.1.20060822)
+AC_INIT(cds-invenio, 0.90.1.20060920, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.90.1.20060920)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -539,6 +539,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibsched/doc/Makefile \
 	  modules/bibsched/doc/admin/Makefile \
 	  modules/bibsched/doc/hacking/Makefile \
+	  modules/bibsched/lib/Makefile \
 	  modules/bibupload/Makefile \
 	  modules/bibupload/bin/Makefile \
 	  modules/bibupload/bin/bibupload \

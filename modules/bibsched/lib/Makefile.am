@@ -1,8 +1,5 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
-##
 ## $Id$
-##
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -20,16 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BibSched - task management, scheduling and executing system for CDS Invenio
-"""
+pylibdir = $(libdir)/python/invenio
 
-__revision__ = "$Id$"
+pylib_DATA = \
+	bibsched.py \
+	bibtaskex.py
 
-try:
-    from invenio.bibsched import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+EXTRA_DIST = $(pylib_DATA)
 
-main()
+CLEANFILES = *~ *.tmp *.pyc
