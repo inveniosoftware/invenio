@@ -33,10 +33,24 @@ import string
 import smtplib
 from mod_python import apache
 
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
+     CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
+     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION, \
+     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION, \
+     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+     cdslang, \
+     cdsname, \
+     supportemail, \
+     sweburl, \
+     version, \
+     weburl
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
-from invenio.config import *
 from invenio.access_control_config import * 
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly

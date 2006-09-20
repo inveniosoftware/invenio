@@ -42,7 +42,16 @@ import tempfile
 import traceback
 import cStringIO
 
-from invenio.config import *
+from invenio.config import \
+     CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
+     CFG_BIBINDEX_MIN_WORD_LENGTH, \
+     CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
+     CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
+     CFG_MAX_RECID, \
+     version, \
+     weburl
 from invenio.bibindex_engine_config import *
 from invenio.search_engine import perform_request_search, strip_accents
 from invenio.dbquery import run_sql, escape_string, DatabaseError

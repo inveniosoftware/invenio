@@ -25,11 +25,13 @@ __revision__ = "$Id$"
 
 from time import localtime
 from zlib import decompress
-from MySQLdb import escape_string
-from invenio.dbquery import run_sql
+
+from invenio.config import \
+     cdslang, \
+     version
+from invenio.dbquery import run_sql, escape_string
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
-from invenio.config import *
 
 def get_groups_by_user_status(uid, user_status):
     """Select all the groups the user is admin of

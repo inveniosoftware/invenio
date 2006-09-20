@@ -27,8 +27,10 @@ import os
 import StringIO
 import time
 
+from invenio.config import \
+     bibformat, \
+     version
 from invenio.errorlib import *
-from invenio.config import *
 from invenio.bibformat_dblayer import *
 from invenio.bibformat_migration_kit_dblayer import *
 

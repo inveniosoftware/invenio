@@ -35,7 +35,12 @@ import signal
 import traceback
 import calendar
 
-from invenio.config import *
+from invenio.config import \
+     bibconvert, \
+     bibupload, \
+     bindir, \
+     tmpdir, \
+     version
 from invenio.bibindex_engine_config import *
 from invenio.dbquery import run_sql, escape_string
 from invenio.access_control_engine import acc_authorize_action

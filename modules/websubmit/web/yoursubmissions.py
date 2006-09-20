@@ -29,7 +29,15 @@ import re
 import shutil
 import operator
 
-from invenio.config import *
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     cdslang, \
+     cdsname, \
+     images, \
+     storage, \
+     sweburl, \
+     version, \
+     weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *

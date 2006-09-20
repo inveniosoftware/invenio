@@ -35,9 +35,13 @@ import urllib
 import sre
 from mod_python import apache
 
+from invenio.config import \
+     cdslang, \
+     tmpdir, \
+     version, \
+     weburl
 import invenio.access_control_engine as access_manager
 from invenio.dbquery import run_sql, escape_string
-from invenio.config import *
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 

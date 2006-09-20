@@ -21,25 +21,19 @@
 
 __revision__ = "$Id$"
 
-try:
-    import fileinput
-    import string
-    import os
-    import sys
-    import getopt
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-try:
-    from invenio.search_engine import perform_request_search
-    from invenio.config import *
-    from invenio.bibrecord import *
-    from invenio import bibconvert
-    from invenio.dbquery import run_sql
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+import fileinput
+import string
+import os
+import sys
+import getopt
+
+from invenio.config import \
+     bibconvert, \
+     version
+from invenio.search_engine import perform_request_search
+from invenio.bibrecord import *
+from invenio import bibconvert
+from invenio.dbquery import run_sql
 
 def usage():
     """Print help"""

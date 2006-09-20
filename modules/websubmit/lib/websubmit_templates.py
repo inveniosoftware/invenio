@@ -29,7 +29,11 @@ import re
 import operator
 import os
 
-from invenio.config import *
+from invenio.config import \
+     accessurl, \
+     images, \
+     version, \
+     weburl
 from invenio.messages import gettext_set_language
 
 class Template:

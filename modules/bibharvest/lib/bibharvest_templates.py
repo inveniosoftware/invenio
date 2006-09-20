@@ -28,7 +28,9 @@ import sre
 import urllib
 import sys
 
-from invenio.config import *
+from invenio.config import \
+     version, \
+     weburl
 from invenio.messages import gettext_set_language, language_list_long
 
 class Template:

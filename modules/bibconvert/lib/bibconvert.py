@@ -21,28 +21,21 @@
 
 __revision__ = "$Id$"
 
-try:
-    import fileinput
-    import string
-    import os
-    import re
-    import sys
-    import time
-    import getopt
-    from time import gmtime, strftime, localtime
-    import os.path
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+import fileinput
+import string
+import os
+import re
+import sys
+import time
+import getopt
+from time import gmtime, strftime, localtime
+import os.path
 
-try:
-    from invenio.config import *
-    from invenio.search_engine import perform_request_search
-
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+from invenio.config import \
+     CFG_OAI_ID_PREFIX, \
+     bibconvert, \
+     version
+from invenio.search_engine import perform_request_search
 
 ### Matching records with database content
 

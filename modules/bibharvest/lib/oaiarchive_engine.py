@@ -22,24 +22,23 @@
 
 __revision__ = "$Id$"
 
-try:
-    import fileinput 
-    import string
-    import os
-    import sys
-    import getopt
-    import time
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-try:
-    from invenio.search_engine import perform_request_search
-    from invenio.config import *
-    from invenio.dbquery import run_sql
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+import fileinput 
+import string
+import os
+import sys
+import getopt
+import time
+
+from invenio.config import \
+     CFG_OAI_ID_FIELD, \
+     CFG_OAI_ID_PREFIX, \
+     CFG_OAI_SET_FIELD, \
+     bibupload, \
+     bindir, \
+     cdsname, \
+     version
+from invenio.search_engine import perform_request_search
+from invenio.dbquery import run_sql
 
 def printInfo():
     """Print help"""

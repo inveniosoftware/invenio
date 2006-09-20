@@ -42,11 +42,27 @@ import string
 import smtplib
 import sre
 
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
+     CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
+     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+     CFG_APACHE_GROUP_FILE, \
+     CFG_APACHE_PASSWORD_FILE, \
+     adminemail, \
+     cdslang, \
+     cdsname, \
+     supportemail, \
+     sweburl, \
+     tmpdir, \
+     version, \
+     weburl
 from invenio import session, websession
 from invenio.dbquery import run_sql, escape_string, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
-from invenio.config import *
 from invenio.access_control_config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions

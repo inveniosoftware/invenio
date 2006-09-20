@@ -35,8 +35,11 @@ __revision__ = "$Id$"
 
 import re
 import zlib
+
+from invenio.config import \
+     CFG_OAI_ID_FIELD, \
+     version
 from invenio.dbquery import run_sql
-from invenio.config import *
 
 def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     """

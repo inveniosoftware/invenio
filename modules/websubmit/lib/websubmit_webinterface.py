@@ -28,8 +28,16 @@ from mod_python import apache
 import sys
 from urllib import quote
 
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     cdslang, \
+     cdsname, \
+     images, \
+     storage, \
+     urlpath, \
+     version, \
+     weburl
 from invenio.dbquery import run_sql, Error
-from invenio.config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box

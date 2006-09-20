@@ -21,10 +21,13 @@
 
 __revision__ = "$Id$"
 
-from MySQLdb import escape_string
-from invenio.config import *
-from invenio.dbquery import run_sql
 import zlib
+
+from invenio.config import \
+     bibformat, \
+     cdslang, \
+     version
+from invenio.dbquery import run_sql, escape_string
 
 #Cache the mapping name -> id for each kb
 kb_id_name_cache = {}

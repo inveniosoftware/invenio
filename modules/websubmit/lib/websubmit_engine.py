@@ -29,7 +29,16 @@ import re
 import shutil
 from mod_python import apache
 
-from invenio.config import *
+from invenio.config import \
+     bibconvert, \
+     cdslang, \
+     cdsname, \
+     images, \
+     pylibdir, \
+     storage, \
+     urlpath, \
+     version, \
+     weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole

@@ -33,7 +33,14 @@ import urllib
 from xml.sax.saxutils import quoteattr
 from mod_python import apache
 
-from invenio.config import *
+from invenio.config import \
+     cdslang, \
+     filedir, \
+     filedirsize, \
+     images, \
+     storage, \
+     version, \
+     weburl
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box

@@ -35,8 +35,13 @@ import inspect
 import traceback
 import zlib
 
+from invenio.config import \
+     CFG_PATH_PHP, \
+     bibformat, \
+     bindir, \
+     cdslang, \
+     version
 from invenio.errorlib import register_errors, get_msgs_for_code_list
-from invenio.config import *
 from invenio.bibrecord import create_record, record_get_field_instances, record_get_field_value, record_get_field_values
 from invenio.dbquery import run_sql
 from invenio.messages import language_list_long, wash_language

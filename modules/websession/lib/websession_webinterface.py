@@ -28,8 +28,16 @@ import sys
 from mod_python import apache
 import smtplib
 
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+     cdsname, \
+     supportemail, \
+     sweburl, \
+     version, \
+     weburl
 from invenio import webuser
-from invenio.config import *
 from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket

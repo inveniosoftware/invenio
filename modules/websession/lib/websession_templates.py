@@ -26,7 +26,16 @@ import gettext
 import string
 import locale
 
-from invenio.config import *
+from invenio.config import \
+     CFG_CERN_SITE, \
+     bibformat, \
+     cdslang, \
+     cdsname, \
+     cdsnameintl, \
+     supportemail, \
+     sweburl, \
+     version, \
+     weburl
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY

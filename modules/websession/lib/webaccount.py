@@ -23,7 +23,15 @@ import sys
 import string
 import cgi
 
-from invenio.config import *
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_CERN_SITE, \
+     cdslang, \
+     cdsname, \
+     supportemail, \
+     sweburl, \
+     version, \
+     weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
 from invenio.webpage import page
 from invenio.dbquery import run_sql

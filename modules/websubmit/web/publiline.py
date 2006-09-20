@@ -28,7 +28,19 @@ import types
 import re
 import shutil
 
-from invenio.config import *
+from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     accessurl, \
+     adminemail, \
+     cdslang, \
+     cdsname, \
+     images, \
+     pylibdir, \
+     storage, \
+     supportemail, \
+     sweburl, \
+     urlpath, \
+     version
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
