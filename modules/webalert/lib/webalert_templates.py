@@ -22,7 +22,11 @@ __revision__ = "$Id$"
 import time
 import string
 
-from invenio.config import *
+from invenio.config import \
+     alertengineemail, \
+     cdsname, \
+     supportemail, \
+     weburl
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
 from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
@@ -109,7 +113,7 @@ class Template:
                  'alert_name' : _("alert name"),
                }
         for alert in alerts :
-                  out += """<option value="%(id)s">%(name)s</option>""" % alert
+            out += """<option value="%(id)s">%(name)s</option>""" % alert
         out += """</select>
                 &nbsp;<code class="blocknote">
                 <input class="formbutton" type="submit" name="action" value="%(show)s" /></code>
@@ -289,7 +293,7 @@ class Template:
                 'x_url2_close': '</a>',
                 }
         if len(alerts):
-              out += """<table class="alrtTable">
+            out += """<table class="alrtTable">
                           <tr class="pageboxlefttop" style="text-align: center;">
                             <td style="font-weight: bold">%(no)s</td>
                             <td style="font-weight: bold">%(name)s</td>
@@ -310,23 +314,23 @@ class Template:
                        'query' : _("Query"),
                        'action' : _("Action"),
                      }
-              i = 0
-              for alert in alerts:
-                  i += 1
-                  if alert['frequency'] == "day":
-                      frequency = _("daily"),
-                  else:
-                      if alert['frequency'] == "week":
-                          frequency = _("weekly")
-                      else:
-                          frequency = _("monthly")
+            i = 0
+            for alert in alerts:
+                i += 1
+                if alert['frequency'] == "day":
+                    frequency = _("daily"),
+                else:
+                    if alert['frequency'] == "week":
+                        frequency = _("weekly")
+                    else:
+                        frequency = _("monthly")
 
-                  if alert['notification'] == "y":
-                      notification = _("yes")
-                  else:
-                      notification = _("no")
+                if alert['notification'] == "y":
+                    notification = _("yes")
+                else:
+                    notification = _("no")
 
-                  out += """<tr>
+                out += """<tr>
                               <td style="font-style: italic">#%(index)d</td>
                               <td style="font-weight: bold; text-wrap:none;">%(alertname)s</td>
                               <td>%(frequency)s</td>
@@ -362,7 +366,7 @@ class Template:
                     'queryargs' : alert['queryargs']
                   }
 
-              out += '</table>'
+            out += '</table>'
               
         out += '<p>' + (_("You have defined %s alerts.") % ('<b>' + str(len(alerts)) + '</b>' )) + '</p>'
         if guest:
@@ -410,7 +414,7 @@ class Template:
         out = ''
         
         # display message: number of items in the list
-        if permanent=="n":
+        if permanent == "n":
             msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total, 
                                                                                                                                'x_nb2': nb_queries_distinct}
             out += '<p>' + msg + '</p>'
@@ -430,7 +434,7 @@ class Template:
                       'question' : _("Question"),
                       'action' : _("Action")
                     }
-        if permanent=="n":
+        if permanent == "n":
             out += '<td  style="font-weight: bold">%s</td>' % _("Last Run")
         out += "</tr>\n"
         i = 0
@@ -451,7 +455,7 @@ class Template:
                      'execute_query' : _("Execute search"),
                      'set_alert' : _("Set new alert")
                    }
-            if permanent=="n":
+            if permanent == "n":
                 out += '<td>%s</td>' % query['lastrun']
             out += """</tr>\n"""
         out += "</table><br />\n"

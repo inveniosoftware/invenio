@@ -37,7 +37,11 @@ from email.Header import Header
 from email.Message import Message
 from email.MIMEText import MIMEText
 
-from invenio.config import *
+from invenio.config import \
+     logdir, \
+     supportemail, \
+     version, \
+     weburl
 from invenio.search_engine import perform_request_search
 from invenio.alert_engine_config import *
 from invenio.webinterface_handler import wash_urlargd
