@@ -23,57 +23,41 @@
     navbar_name="admin" \
     navbar_select="bibupload-admin-guide"
 
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     WARNING: THIS ADMIN GUIDE IS NOT FULLY COMPLETED
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     This Admin Guide is not yet completed.  Moreover, some
-     admin-level functionality for this module exists only in the form of
-     manual recipes.  We are in the process of developing both the
-     guide as well as the web admin interface.  If you are interested
-     in seeing some specific things implemented with high priority,
-     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!     
-   </td>
-   </tr>
-   </tbody>
-   </table>
-
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <h2>Overview</h2>
 
-<p>BibUpload enables you to upload bibliographic data in XML MARC
-format into CDS Invenio bibliographic database.
+<p>BibUpload enables you to upload bibliographic data in MARCXML
+format into CDS Invenio bibliographic database.  It is also used
+internally by other CDS Invenio modules as the sole entrance of
+metadata into the bibliographic databases.
+
+<p><strong>HINT:</strong> before uploading a MARCXML file, you may
+want to run provided <code>xmlmarclint</code> on it in order to verify
+its correctness.
 
 <h2>Configuring BibUpload</h2>
 
-<p>There is nothing to be configured at the moment.  All the data
-upload configuration is usually done when transforming the data via <a
-href="../bibconvert/">BibConvert</a>.
+<p>BibUpload takes a MARCXML file as its input.  There is nothing to
+be configured for these files.  If the files have to be coverted into
+MARCXML from some other format, structured or not, this is usually
+done beforehand via <a href="../bibconvert/">BibConvert</a> module.
 
-<p><strong>NOTE</strong>: Please note that BibUpload currently assumes
-<code>037 $a</code> tag to be a "primary report number" that is unique
-throughout the system.  Therefore, if you upload two records with the
-same <code>037 $a</code> tag value, it will override the exising
-record with the new one.  See the beginning of the BibUpload file to
-know more.
-
-<p>More advanced BibUpload configuration functionality will be
-included later.
+<p><strong>NOTE</strong>: If you are using external system numbers for
+your records, such as when your records are being synchronized from an
+external system, then BibUpload knows about the tag 970 as the one
+containing external system number.  To change this tag into something
+else, you would have to edit BibUpload source file.
 
 <h2>Running BibUpload</h2>
 
-<p>Consider that you have an XML MARC file that is to be uploaded into
-the CDS Invenio.  (For example, it might have been produced by <a
-href="../bibconvert/">BibConvert</a>.)  To finish the upload, you
-would call the BibUpload script as follows:
+<h3>Inserting new recors</h3>
+
+<p>Consider that you have an MARCXML file containing new records that
+is to be uploaded into the CDS Invenio.  (For example, it might have
+been produced by <a href="../bibconvert/">BibConvert</a>.)  To finish
+the upload, you would call the BibUpload script in the insert mode as
+follows:
 
 <blockquote>
 <pre>
@@ -81,40 +65,115 @@ $ bibupload -i file.xml
 <pre>
 </blockquote>
 
-<p>For available command-line options, see <code>bibupload
---help</code>.  
+In the insert mode, all the records from the file will be treated as
+new.  This means that they should not contain neither 001 tags
+(holding record IDs) nor 970 tags (holding external system numbers).
+BibUpload would refuse to upload records having these tags, in order
+to prevent potential double uploading.  If your file does contain 001
+or 970, then chances are that you want to update existing records, not
+re-upload them as new, and so BibUpload will warn you about this and
+will refuse to continue.
 
-<h2>BibUpload Modes</h2>
-
-FIXME
+<p>For example, to insert a new record, your file should look like this:
 
 <pre>
+    &lt;record&gt;
+        &lt;controlfield tag="001"&gt;123&lt;/controlfield&gt;
+        &lt;datafield tag="100" ind1="" ind2=""&gt;
+            &lt;subfield code="a"&gt;Doe, John&lt;/subfield&gt;
+        &lt;/datafield&gt;
+        &lt;datafield tag="245" ind1="" ind2=""&gt;
+            &lt;subfield code="a"&gt;On The Foo And Bar&lt;/subfield&gt;
+        &lt;/datafield&gt;
+    &lt;/record&gt;
+</pre>
 
-    -i, --insertrecord  Insert records from XML MARC file as new into the system.
-                        Signals error if record already exists (see the -m matching 
-                        option below on how this is decided).
+<h3>Updating existing recors</h3>
 
-    -r, --replacerecord Replace existing records by those from the XML MARC file.
-                        The original content is wiped out and fully replaced.
-                        Signals error if record is not found via -m matching criteria.
+When you want to update existing recors, with the new content from
+your input MARCXML file, then your input file should contain either
+tags 001 (holding record IDs) or tag 970 (holding external system
+numbers).  BibUpload will try to match existing records via 001 and
+970 and if it finds a record in the database that corresponds to a
+record from the file, it will update its content.  Otherwise it will
+signal an error saying that it could not find the
+record-to-be-updated.
 
-                        Note also that `-r' can be combined with `-i' into an `-ir' option
-                        that would automatically either insert records as new if they are 
-                        not found in the system, or correct existing records if they 
-                        are found to exist.
+<p>For example, to update a title of record #123 via correct mode, your
+input file should contain record ID in the 001 tag and the title in
+245 tag as follows:
 
-    -a, --appendfield   Append fields from XML MARC file at the end of existing records.
-                        The original content is enriched only.
-                        Signals error if record is not found via -m matching criteria.
+<pre>
+    &lt;record&gt;
+        &lt;controlfield tag="001"&gt;123&lt;/controlfield&gt;
+        &lt;datafield tag="245" ind1="" ind2=""&gt;
+            &lt;subfield code="a"&gt;My Newly Updated Title&lt;/subfield&gt;
+        &lt;/datafield&gt;
+    &lt;/record&gt;
+</pre>
 
-    -c, --correctfield  Correct fields of existing records by those from XML MARC file.  
-                        The original record content is modified only in the fields 
-                        from the XML MARC file: the original fields are removed and replaced 
-                        by those from the XML MARC file.  Fields not present in XML MARC file 
-                        are not changed  (unlike the -r option).
-                        Signals error if record is not found via -m matching criteria.
+<p>There are several updating modes:
+<pre>
 
+    -r, --replacerecord Replace existing records by those from the XML
+                        MARC file.  The original content is wiped out
+                        and fully replaced.  Signals error if record
+                        is not found via matching record IDs or system
+                        numbers.
+
+                        Note also that `-r' can be combined with `-i'
+                        into an `-ir' option that would automatically
+                        either insert records as new if they are not
+                        found in the system, or correct existing
+                        records if they are found to exist.
+
+    -a, --appendfield Append fields from XML MARC file at the end of
+                        existing records.  The original content is
+                        enriched only.  Signals error if record is not
+                        found via matching record IDs or system
+                        numbers.
+
+    -c, --correctfield Correct fields of existing records by those
+                        from XML MARC file.  The original record
+                        content is modified only in the fields from
+                        the XML MARC file: the original fields are
+                        removed and replaced by those from the XML
+                        MARC file.  Fields not present in XML MARC
+                        file are not changed (unlike the -r option).
+                        Signals error if record is not found via
+                        matching record IDs or system numbers.
+</pre>
+
+<h3>Inserting and updating at the same time</h3>
+
+<p>Note that the insert/update modes can be combined together.  For
+example, if you have a file that contains a mixture of new records
+with possibly some records to be updated, then you can run:
+
+<blockquote>
+<pre>
+$ bibupload -i -r file.xml
+<pre>
+</blockquote>
+
+In this case BibUpload will try to do an update (for records having
+either 001 or 970 identifiers), or an insert (for the other ones).
+
+<h3>Updating formats</h3>
+
+BibFormat can use this special upload mode during which metadata will
+not be updated, only the preformatted output formats for records:
+
+<pre>
     -f, --format        Upload only the format (FMT) fields. 
                         The original content is not changed, and neither its modification date.
-
 </pre>
+
+<h3>Uploading fulltext files</h3>
+
+For the time being BibUpload manipulates only metadata and the
+formats.  You have to copy the files manually.
+
+<p>FIXME: We plan to extend BibUpload to <a
+href="https://savannah.cern.ch/task/index.php?func=detailitem&item_id=3234">upload
+also fulltext files</a>.
