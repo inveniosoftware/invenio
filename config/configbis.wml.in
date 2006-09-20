@@ -37,6 +37,9 @@
 <define-tag PYTHON whitespace=delete>
 @PYTHON@
 </define-tag>
+<define-tag PREFIX whitespace=delete>
+@prefix@
+</define-tag>
 <define-tag BINDIR whitespace=delete>
 @prefix@/bin
 </define-tag>
