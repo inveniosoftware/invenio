@@ -18,24 +18,30 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
-import urllib
 import time
 import cgi
-import gettext
 import traceback
-import sre
 import urllib
 import sys
 import string
 
-from invenio.config import *
+from invenio.config import \
+     cdslang, \
+     cdsnameintl, \
+     supportemail, \
+     sweburl, \
+     weburl, \
+     version
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import a_href, make_canonical_urlargd
 
 class Template:
-    def tmpl_navtrailbox_body(self, ln, title, previous_links, separator, prolog, epilog):
+
+    def tmpl_navtrailbox_body(self, ln, title, previous_links,
+                              separator, prolog, epilog):
         """Create navigation trail box body
 
            Parameters:
@@ -64,7 +70,8 @@ class Template:
 
         out = ""
         if title != cdsnameintl[ln]:
-            out += """<a class="navtrail" href="%(weburl)s?ln=%(ln)s">%(msg_home)s</a>""" % {
+            out += """<a class="navtrail"
+                         href="%(weburl)s?ln=%(ln)s">%(msg_home)s</a>""" % {
                       'weburl' : weburl,
                       'ln' : ln,
                       'msg_home' : _("Home")}
@@ -351,7 +358,8 @@ class Template:
         }
         return out
 
-    def tmpl_pagefooter(self, req=None, ln=cdslang, lastupdated=None, pagefooteradd=""):
+    def tmpl_pagefooter(self, req=None, ln=cdslang, lastupdated=None,
+                        pagefooteradd=""):
         """Creates a page footer
 
            Parameters:
@@ -463,11 +471,11 @@ class Template:
                 else:
                     args = ""
 
-                parts.append(a_href(lang_namelong, href=args, _class="langinfo"))
+                parts.append(a_href(lang_namelong, href=args,
+                                    _class="langinfo"))
 
-        return _("This site is also available in the following languages:") + "<br>" + \
-               ' &nbsp;'.join(parts)
-
+        return _("This site is also available in the following languages:") + \
+                 "<br>" + ' &nbsp;'.join(parts)
 
     def tmpl_error_box(self, ln, title, verbose, req, supportemail, errors):
         """Produces an error box.
@@ -521,12 +529,14 @@ class Template:
         traceback_s = ''
         if verbose >= 1:
             if sys.exc_info()[0]:
-                sys_error_s = _("System Error") + ': %s %s\n' % (sys.exc_info()[0], sys.exc_info()[1])
+                sys_error_s = _("System Error") + ': %s %s\n' % \
+                              (sys.exc_info()[0], sys.exc_info()[1])
             if errors:
                 errs = ''
                 for error_tuple in errors:
                     try:
-                        errs += "%s%s : %s\n " % (' '*6, error_tuple[0], error_tuple[1])
+                        errs += "%s%s : %s\n " % (' '*6, error_tuple[0],
+                                                  error_tuple[1])
                     except:
                         errs += "%s%s\n" % (' '*6, error_tuple)
                 errs = errs[6:-2] # get rid of trainling ','
@@ -534,7 +544,9 @@ class Template:
             else:
                 error_s = _("Error") + ': ' + info_not_available
         if verbose >= 9:
-            traceback_s = _("Traceback") + ': \n%s' % string.join(traceback.format_tb(sys.exc_info()[2]),"\n")
+            traceback_s = _("Traceback") + ': \n%s' % \
+                          string.join(traceback.format_tb(sys.exc_info()[2]),
+                                      "\n")
 
         out = """
               <table class="errorbox">
@@ -581,11 +593,15 @@ URI: http://%(host)s%(page)s
                 'title'     : title,
                 'time_label': _("Time"),
                 'client_label': _("Client"),
-                'send_error_label': _("Please send an error report to the Administrator."),
+                'send_error_label': \
+                       _("Please send an error report to the Administrator."),
                 'send_label': _("Send error report"),
                 'sys1'      : sys.exc_info()[0] or '',
                 'sys2'      : sys.exc_info()[1] or '',
-                'contact'   : _("Please contact %s quoting the following information:")  % '<a href="mailto:' + urllib.quote(supportemail) +'">' + supportemail + '</a>',
+                'contact'   : \
+                   _("Please contact %s quoting the following information:") % \
+                     '<a href="mailto:' + urllib.quote(supportemail) +'">' + \
+                       supportemail + '</a>',
                 'host'      : host_s,
                 'page'      : page_s,
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
@@ -595,7 +611,9 @@ URI: http://%(host)s%(page)s
                 'traceback' : traceback_s,
                 'sys_error' : sys_error_s,
                 'weburl'    : weburl,
-                'referer'   : page_s!=info_not_available and ("http://" + host_s + page_s) or info_not_available
+                'referer'   : page_s!=info_not_available and \
+                                 ("http://" + host_s + page_s) or \
+                                 info_not_available
               }
  
         return out

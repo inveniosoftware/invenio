@@ -21,9 +21,15 @@
 
 __revision__ = "$Id$"
 
-import time
-
-from invenio.config import *
+from invenio.config import \
+     CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM, \
+     CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP, \
+     CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
+     CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
+     CFG_WEBSTYLE_CDSPAGEFOOTER, \
+     CFG_WEBSTYLE_CDSPAGEHEADER, \
+     cdslang, \
+     supportemail
 from invenio.messages import gettext_set_language
 from invenio.webuser import create_userinfobox_body
 from invenio.errorlib import get_msgs_for_code_list, register_errors 
@@ -45,7 +51,8 @@ def create_navtrailbox_body(title,
 
     return webstyle_templates.tmpl_navtrailbox_body(ln = language,
                                                     title = title,
-                                                    previous_links = previous_links,
+                                                    previous_links = \
+                                                      previous_links,
                                                     separator = separator,
                                                     prolog = prolog,
                                                     epilog = epilog)
@@ -94,47 +101,52 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
         body = create_error_box(req, errors=errors, ln=language) 
 
     return webstyle_templates.tmpl_page(req, ln=language,
-                                        description = description,
-                                        keywords = keywords,                                        
-                                        userinfobox = create_userinfobox_body(req, uid, language),
-                                        navtrailbox = create_navtrailbox_body(title, navtrail, language=language),                                        
-                                        uid = uid,
-                                        secure_page_p = secure_page_p,
-                                        # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
-                                        pageheaderadd = cdspageheaderadd,
-                                        boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
-                                        boxlefttopadd = cdspageboxlefttopadd,
-                                        boxleftbottomadd = cdspageboxleftbottomadd,
-                                        boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
-                                        boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
-                                        boxrighttopadd = cdspageboxrighttopadd,
-                                        boxrightbottomadd = cdspageboxrightbottomadd,
-                                        boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
-                                        titleprologue = titleprologue,
-                                        title = title,
-                                        titleepilogue = titleepilogue,
-                                        body = body,                                        
-                                        # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
-                                        lastupdated = lastupdated,
-                                        pagefooteradd = cdspagefooteradd)
+                      description = description,
+                      keywords = keywords,
+                      userinfobox = create_userinfobox_body(req, uid, language),
+                      navtrailbox = create_navtrailbox_body(title, navtrail,
+                                                            language=language),
+                      uid = uid,
+                      secure_page_p = secure_page_p,
+                      # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
+                      pageheaderadd = cdspageheaderadd,
+                      boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
+                      boxlefttopadd = cdspageboxlefttopadd,
+                      boxleftbottomadd = cdspageboxleftbottomadd,
+                      boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
+                      boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
+                      boxrighttopadd = cdspageboxrighttopadd,
+                      boxrightbottomadd = cdspageboxrightbottomadd,
+                      boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
+                      titleprologue = titleprologue,
+                      title = title,
+                      titleepilogue = titleepilogue,
+                      body = body,                                        
+                      # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
+                      lastupdated = lastupdated,
+                      pagefooteradd = cdspagefooteradd)
 
-def pageheaderonly(title, navtrail="", description="", keywords="", uid=0, cdspageheaderadd="", language=cdslang, req=None, secure_page_p=0, verbose=1):
+def pageheaderonly(title, navtrail="", description="", keywords="",
+                   uid=0, cdspageheaderadd="", language=cdslang,
+                   req=None, secure_page_p=0, verbose=1):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
     return webstyle_templates.tmpl_pageheader(req,
-                                              ln = language,
-                                              headertitle = title,
-                                              description = description,
-                                              keywords = keywords,                                              
-                                              userinfobox = create_userinfobox_body(req, uid, language),
-                                              navtrailbox = create_navtrailbox_body(title, navtrail, language=language),
-                                              uid = uid,
-                                              secure_page_p = secure_page_p,
-                                              # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
-                                              pageheaderadd = cdspageheaderadd)
+                      ln = language,
+                      headertitle = title,
+                      description = description,
+                      keywords = keywords,
+                      userinfobox = create_userinfobox_body(req, uid, language),
+                      navtrailbox = create_navtrailbox_body(title, navtrail,
+                                                            language=language),
+                      uid = uid,
+                      secure_page_p = secure_page_p,
+                      # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
+                      pageheaderadd = cdspageheaderadd)
 
-def pagefooteronly(cdspagefooteradd="", lastupdated="", language=cdslang, req=None, verbose=1):
+def pagefooteronly(cdspagefooteradd="", lastupdated="",
+                   language=cdslang, req=None, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
 
