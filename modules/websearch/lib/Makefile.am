@@ -26,8 +26,9 @@ pylib_DATA = \
 	websearch_regression_tests.py \
 	search_engine.py \
 	search_engine_config.py \
-	search_engine_tests.py  \
-    	websearchadmin_regression_tests.py \
+	search_engine_tests.py \
+        websearch_webcoll.py \
+	websearchadmin_regression_tests.py \
 	websearch_external_collections.py \
 	websearch_external_collections_config.py \
 	websearch_external_collections_page_getter.py \
