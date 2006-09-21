@@ -38,7 +38,8 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      version, \
-     weburl
+     weburl, \
+     supportemail
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -2351,3 +2352,75 @@ class Template:
                           href=self.build_search_url(p="recid:%d" % recID, rm="cit", ln=ln))
                  
         return out
+
+    def tmpl_xml_rss_prologue(self):
+        """Creates XML RSS 2.0 prologue."""
+        out = """<rss version="2.0">
+      <channel>
+        <title>%(cdsname)s RSS 2.0 feed service.</title>
+        <link>%(weburl)s</link>
+        <description>%(cdsname)s</description>
+        <language>%(cdslang)s</language>
+        <pubDate>%(timestamp)s</pubDate>
+        <category></category>
+        <generator>CDS Invenio %(version)s</generator>
+        <webMaster>%(supportemail)s</webMaster>
+        <ttl>1440</ttl>
+        <image>
+            <url>http://cdsweb.cern.ch/img/cds.gif</url>
+            <title>%(cdsname)s</title>
+            <link>%(weburl)s</link>
+        </image>
+        <textInput>
+          <title>Search </title>
+          <description>Search this site:</description>
+          <name>p</name>
+          <link>%(weburl)s/search</link>
+        </textInput>
+        """ % {'cdsname': cdsname,
+               'weburl': weburl,
+               'cdslang': cdslang,
+               'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
+               'version': version,
+               'supportemail': supportemail,
+               }
+        return out
+
+    def tmpl_xml_rss_epilogue(self):
+        """Creates XML RSS 2.0 epilogue."""
+        out = """\
+      </channel>    
+</rss>\n"""
+        return out
+
+    def tmpl_xml_nlm_prologue(self):
+        """Creates XML NLM prologue."""
+        out = """<articles>\n"""
+        return out
+
+    def tmpl_xml_nlm_epilogue(self):
+        """Creates XML NLM epilogue."""
+        out = """\n</articles>"""
+        return out
+
+    def tmpl_xml_marc_prologue(self):
+        """Creates XML MARC prologue."""
+        out = """<collection xmlns="http://www.loc.gov/MARC21/slim">\n"""
+        return out
+
+    def tmpl_xml_marc_epilogue(self):
+        """Creates XML MARC epilogue."""
+        out = """\n</collection>"""
+        return out
+
+    def tmpl_xml_default_prologue(self):
+        """Creates XML default format prologue. (Sanity calls only.)"""
+        out = """<collection>\n"""
+        return out
+
+    def tmpl_xml_default_epilogue(self):
+        """Creates XML default format epilogue. (Sanity calls only."""
+        out = """\n</collection>"""
+        return out
+
+    
