@@ -59,7 +59,7 @@ from invenio.config import \
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
-from invenio.bibformat import format_record, get_output_format_content_type, create_excel
+from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
@@ -365,10 +365,6 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         req.content_type = "text/xml"
         req.send_http_header()
         req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
-        if of.startswith("xm"):
-            req.write("""<collection xmlns="http://www.loc.gov/MARC21/slim">\n""")
-        else:
-            req.write("""<collection>\n""")
     elif of.startswith('t') or str(of[0:3]).isdigit():
         # we are doing plain text output:
         req.content_type = "text/plain"
@@ -405,8 +401,6 @@ def page_end(req, of="hb", ln=cdslang):
     if of.startswith('h'):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
-    elif of.startswith('x'):
-        req.write("""</collection>\n""")
     return "\n"
 
 def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
@@ -2284,9 +2278,28 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
         #req.write("%s:%d-%d" % (recIDs, irec_min, irec_max))
 
         if format.startswith('x'):
-            # we are doing XML output:
-            for irec in range(irec_max, irec_min, -1):
-                req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid))
+            # we are doing XML output: first choose XML envelope:
+            if format.startswith('xm'):
+                format_prologue = websearch_templates.tmpl_xml_marc_prologue()
+                format_epilogue = websearch_templates.tmpl_xml_marc_epilogue()
+            elif format.startswith('xn'):
+                format_prologue = websearch_templates.tmpl_xml_nlm_prologue()
+                format_epilogue = websearch_templates.tmpl_xml_nlm_epilogue()
+            elif format.startswith('xr'):
+                format_prologue = websearch_templates.tmpl_xml_rss_prologue()
+                format_epilogue = websearch_templates.tmpl_xml_rss_epilogue()
+            else:
+                format_prologue = websearch_templates.tmpl_xml_default_prologue()
+                format_epilogue = websearch_templates.tmpl_xml_default_epilogue()
+            # now that XML envelope is chosen, do it:
+            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
+            req.write(format_records(recIDs_to_print,
+                                     format,
+                                     prologue=format_prologue,
+                                     epilogue=format_epilogue,
+                                     ln=ln,
+                                     search_pattern=search_pattern,
+                                     uid=uid))
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
