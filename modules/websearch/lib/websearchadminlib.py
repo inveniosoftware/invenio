@@ -2373,13 +2373,13 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     
     collection_table_update_time = get_table_update_time('collection')
     output += "Collection table last updated: %s<br>" % collection_table_update_time
+
     try:
-        file = open("%s/collections/1/last-updated-ln=en.html" % cachedir)
-        collection_web_update_time = string.strip(file.readline())
-        collection_web_update_time = re.sub(r'[A-Z ]+$', '', collection_web_update_time)
-        output += "Collection webpage last updated: %s<br>" % collection_web_update_time
+        file = open("%s/collections/last_updated" % cachedir)
+        collection_web_update_time = file.readline().strip()
+        output += "Collection cache last updated: %s<br>" % collection_web_update_time
         file.close()
-    except StandardError, e:
+    except:
         pass
 
     # reformat collection_web_update_time to the format suitable for comparisons
