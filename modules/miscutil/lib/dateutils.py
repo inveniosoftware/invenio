@@ -116,7 +116,7 @@ def convert_datecvs_to_datestruct(datecvs):
     try:
         # here we have to use '$' + 'Date...' here, otherwise the CVS
         # commit would erase this time format to put commit date:
-        return strptime(datecvs, '$' + 'Date: %Y/%m/%d %H:%M:%S' + '$')
+        return strptime(datecvs, '$' + 'Date: %Y/%m/%d %H:%M:%S $')
     except ValueError:
         return datestruct_default
 
