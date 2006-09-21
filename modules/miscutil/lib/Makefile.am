@@ -30,6 +30,7 @@ pylib_DATA = __init__.py \
              messages.py \
              textutils.py \
              dateutils.py \
+             dateutils_tests.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
 	     urlutils.py             
@@ -53,6 +54,7 @@ EXTRA_DIST = __init__.py \
              errorHandling.php.wml \
              textutils.py \
              dateutils.py \
+             dateutils_tests.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
              urlutils.py \
