@@ -42,10 +42,9 @@ Lexicon
 
 __revision__ = "$Id$"
 
-# External imports
 from time import strptime, strftime, localtime
+import sre
 
-# CDS Invenio imports
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 
@@ -106,6 +105,18 @@ def convert_datestruct_to_datetext(datestruct):
         return strftime(datetext_format, datestruct)
     except:
         return datetext_default
+
+def convert_datecvs_to_datestruct(datecvs):
+    """
+    Convert CVS $Date$ format into datestruct.  Useful for later
+    conversion of Last updated timestamps in the page footers.
+
+    Example: '$Date$' => (2006, 09, 20, 19, 27, 11, 0, 0)
+    """
+    try:
+        return strptime(datecvs, '$Date$')
+    except ValueError:
+        return datestruct_default
 
 def get_datetext(year, month, day):
     """
