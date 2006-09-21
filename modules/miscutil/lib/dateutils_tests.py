@@ -33,6 +33,8 @@ class ConvertDateCVSTest(unittest.TestCase):
     
     def test_convert_good_cvsdate(self):
         """dateutils - conversion of good CVS dates"""
+        # here we have to use '$' + 'Date...' here, otherwise the CVS
+        # commit would erase this time format to put commit date:
         datecvs = "$" + "Date: 2006/09/21 10:07:22" + "$"
         datestruct_beginning_expected = (2006, 9, 21, 10, 7, 22)
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
@@ -40,6 +42,8 @@ class ConvertDateCVSTest(unittest.TestCase):
 
     def test_convert_bad_cvsdate(self):
         """dateutils - conversion of bad CVS dates"""
+        # here we have to use '$' + 'Date...' here, otherwise the CVS
+        # commit would erase this time format to put commit date:
         datecvs = "$" + "Date: 2006/AA/21 10:07:22" + "$"
         datestruct_beginning_expected = (0, 0, 0, 0, 0, 0)
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
