@@ -3,7 +3,6 @@
              name="Dublin Core"
              description="A BFX template for the Dublin Core XML format."
              content="text/xml">
-  <collection>
     <bx:loop object="record">
       <dc xmlns="http://purl.org/dc/elements/1.1/"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -29,5 +28,4 @@
           <date><bx:element name="creation_date"/></date>
       </dc>
     </bx:loop>
-  </collection>
 </bx:template>

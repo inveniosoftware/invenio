@@ -2,7 +2,6 @@
 <bx:style xmlns:bx="http://cdsware.cern.ch/invenio/"
           xmlns:xlink="http://www.w3.org/1999/xlink/">
   <bx:format  name="NLM" description="The NLM output format." content-type="text/xml">
-    <articles>
       <bx:loop object="record">
 
         <bx:if name="doc_type" nin="ARTICLE REPORT THESIS">
@@ -23,7 +22,6 @@
         </bx:if>
         
       </bx:loop>
-    </articles>      
   </bx:format>
 
   <bx:template name="NLM_ARTICLE">
