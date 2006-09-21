@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     counters
+
    ## Description:   function Report_Number_Generation
    ##                This function creates a reference for the submitted 
    ##             document and saves it in the specified file.

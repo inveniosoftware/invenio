@@ -19,6 +19,13 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     accessurl, \
+     adminemail, \
+     cdsname, \
+     pylibdir, \
+     supportemail
+
    ## Description:   function Send_Modify_Mail
    ##                This function sends an email saying the document has been
    ##             correctly updated

@@ -26,7 +26,12 @@ from os.path import getmtime
 from shutil import copyfile
 from time import strftime, localtime, time, mktime, sleep
 
-from invenio.config import cdsname, supportemail, adminemail, counters
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     counters, \
+     pylibdir, \
+     supportemail
 
 max_sys_approaching_warning_point = 2000
 max_age_lockfile = 300  # (seconds)

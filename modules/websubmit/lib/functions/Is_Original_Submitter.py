@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     pylibdir
+
    ##
    ## Name:          Is_Original_Submitter
    ## Description:   function Is_Original_Submitter

@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     cdsname
+
    ## Description:   function Print_Success_MBI
    ##                This function displays a message telling the user the
    ##             modification has been taken into account

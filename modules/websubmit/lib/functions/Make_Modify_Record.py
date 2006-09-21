@@ -19,6 +19,10 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     bibconvert, \
+     bibconvertconf
+
    ## Description:   function Make_Modify_Record
    ##                This function creates the bibliographic record
    ##             using bibConvert and the configuration files passed as

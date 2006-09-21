@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     storage
+
    ## Description:   function Move_From_Pending
    ##                This function retrieves an old submisison directory which
    ##             had been saved in /pending and moves all the data files

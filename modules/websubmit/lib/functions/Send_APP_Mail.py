@@ -19,6 +19,13 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     pylibdir, \
+     supportemail
+
    ## Description:   function Send_APP_Mail
    ##                This function send an email informing the original 
    ##             submitter of a document that the referee has approved/

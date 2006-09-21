@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     pylibdir
+
    ##
    ## Name:          Get_Info.py
    ## Description:   function Get_Info

@@ -19,6 +19,13 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     pylibdir, \
+     supportemail
+
    ##
    ## Name:          Mail_Submitter.py
    ## Description:   function Mail_Submitter

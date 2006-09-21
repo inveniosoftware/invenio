@@ -18,6 +18,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     bibformat
+
 def Format_Record(parameters,curdir,form):
     os.system("%s < %s/recmysql > %s/recmysqlfmt" % (bibformat,curdir,curdir))
     return ""

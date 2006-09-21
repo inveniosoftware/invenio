@@ -19,6 +19,13 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     accessurl, \
+     adminemail, \
+     cdsname, \
+     pylibdir, \
+     supportemail
+
    ## Description:   function Send_SRV_Mail
    ##                This function sends an email confirming the revision
    ##             has been carried on with success

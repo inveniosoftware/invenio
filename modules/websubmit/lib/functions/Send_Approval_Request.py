@@ -19,6 +19,14 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     pylibdir, \
+     supportemail, \
+     urlpath
+
    ## Description:   function Send_Approval_Request
    ##                This function sends an email to the referee asking him/her
    ##             to approve/reject a document

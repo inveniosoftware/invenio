@@ -19,6 +19,11 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     CFG_PATH_GZIP, \
+     CFG_PATH_TAR, \
+     storage
+
    ## Description:   function Move_to_Done
    ##                This function move the current working directory to the 
    ##             /done directory and compress it

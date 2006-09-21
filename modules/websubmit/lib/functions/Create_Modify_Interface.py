@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     pylibdir
+
    ## Description:   function Create_Modify_Interface
    ##                This function creates the html form allowing the user to
    ##                some bibliographic fields

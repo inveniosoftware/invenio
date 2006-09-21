@@ -19,6 +19,10 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     bibupload, \
+     tmpdir
+
 def Insert_Modify_Record(parameters,curdir,form):
     global rn
     if os.path.exists("%s/recmysqlfmt" % curdir):

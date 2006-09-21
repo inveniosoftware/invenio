@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import \
+     supportemail
+
 def Is_Referee(parameters,curdir,form):
     global uid_email,sysno,rn,uid
     doctype = form['doctype']
