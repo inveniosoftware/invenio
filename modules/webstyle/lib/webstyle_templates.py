@@ -37,6 +37,8 @@ from invenio.config import \
      version
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import a_href, make_canonical_urlargd
+from invenio.dateutils import convert_datecvs_to_datestruct, \
+     convert_datestruct_to_dategui
 
 class Template:
 
@@ -161,6 +163,10 @@ class Template:
         _ = gettext_set_language(ln)
 
         if lastupdated:
+            if lastupdated.startswith("$Date: "):
+                lastupdated = convert_datestruct_to_dategui(\
+                                 convert_datecvs_to_datestruct(lastupdated),
+                                 ln=ln)
             msg_lastupdated = _("Last updated") + ": " + lastupdated
         else:
             msg_lastupdated = ""
@@ -389,6 +395,10 @@ class Template:
         _ = gettext_set_language(ln)
 
         if lastupdated:
+            if lastupdated.startswith("$Date: "):
+                lastupdated = convert_datestruct_to_dategui(\
+                                 convert_datecvs_to_datestruct(lastupdated),
+                                 ln=ln)
             msg_lastupdated = _("Last updated") + ": " + lastupdated
         else:
             msg_lastupdated = ""
