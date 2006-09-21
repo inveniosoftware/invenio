@@ -50,6 +50,7 @@ from invenio.search_engine import HitSet, search_pattern, get_creation_date, get
 from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
+from invenio.dateutils import convert_datestruct_to_dategui
 from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
@@ -342,7 +343,9 @@ class Collection:
             self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
             self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
             ## fourth, write 'last updated' information:
-            self.write_cache_file("last-updated-ln=%s" % lang, time.strftime("%d %b %Y %H:%M:%S %Z", time.localtime()))
+            self.write_cache_file("last-updated-ln=%s" % lang,
+                                  convert_datestruct_to_dategui(time.localtime(),
+                                                                ln=lang))
         return
 
     def create_navtrail_links(self, as=0, ln=cdslang):
