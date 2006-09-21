@@ -33,14 +33,14 @@ class ConvertDateCVSTest(unittest.TestCase):
     
     def test_convert_good_cvsdate(self):
         """dateutils - conversion of good CVS dates"""
-        datecvs = "$Date$"
-        datestruct_beginning_expected = (2006, 9, 20, 17, 27, 11)
+        datecvs = "$" + "Date: 2006/09/21 10:07:22" + "$"
+        datestruct_beginning_expected = (2006, 9, 21, 10, 7, 22)
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
     def test_convert_bad_cvsdate(self):
         """dateutils - conversion of bad CVS dates"""
-        datecvs = "$Date$"
+        datecvs = "$" + "Date: 2006/AA/21 10:07:22" + "$"
         datestruct_beginning_expected = (0, 0, 0, 0, 0, 0)
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
