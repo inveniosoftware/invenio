@@ -270,6 +270,7 @@ class Template:
  <title>%(sitename)s: %(headertitle)s</title>
  <link rev="made" href="mailto:%(supportemail)s">
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css">
+ <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(weburl)s/rss">
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
  <meta name="description" content="%(description)s">
  <meta name="keywords" content="%(keywords)s">

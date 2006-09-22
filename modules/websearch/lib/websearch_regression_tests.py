@@ -725,6 +725,16 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         # if we got here, things are broken:
         self.fail("Oops, Dr. Jekyll with wrong password should not be able to search Theses collection.")
 
+class WebSearchRSSFeedServiceTest(unittest.TestCase):
+    """Test of the RSS feed service."""
+
+    def test_rss_feed_service(self):
+        """websearch - RSS feed service"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/rss',
+                                               expected_text='<rss version="2.0">'))
+
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -736,7 +746,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAuthorQueryTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
-                             WebSearchRestrictedCollectionTest)
+                             WebSearchRestrictedCollectionTest,
+                             WebSearchRSSFeedServiceTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)

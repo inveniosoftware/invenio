@@ -170,7 +170,6 @@ legacy_collection_default_urlargd = {
     'verbose': (int, 0),
     'c': (str, cdsname)}
 
-
 class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
     """ Handling of collection navigation."""
@@ -366,3 +365,13 @@ def display_collection(req, c, as, verbose, ln):
                     req=req)
          
     return "\n"    
+
+class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
+    """RSS 2.0 feed service pages.""" 
+
+    def __call__(self, req, form):
+        """RSS 2.0 feed service."""
+        # FIXME: currently searching live, should put cache in place via webcoll
+        return search_engine.perform_request_search(req, of="xr")
+
+    index = __call__

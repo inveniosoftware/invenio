@@ -39,6 +39,7 @@
  <title><CDSNAME>: $(title)</title>
  <link rev="made" href="mailto:<SUPPORTEMAIL>">
  <link rel="stylesheet" href="<WEBURL>/img/cds.css">
+ <link rel="alternate" type="application/rss+xml" title="<CDSNAME> RSS" href="<WEBURL>/rss">
  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  <meta name="description" content="$(description)">
  <meta name="keywords" content="$(keywords)">

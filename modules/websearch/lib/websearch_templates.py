@@ -2357,9 +2357,9 @@ class Template:
         """Creates XML RSS 2.0 prologue."""
         out = """<rss version="2.0">
       <channel>
-        <title>%(cdsname)s RSS 2.0 feed service.</title>
+        <title>%(cdsname)s</title>
         <link>%(weburl)s</link>
-        <description>%(cdsname)s</description>
+        <description>%(cdsname)s latest documents</description>
         <language>%(cdslang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
@@ -2367,7 +2367,7 @@ class Template:
         <webMaster>%(supportemail)s</webMaster>
         <ttl>1440</ttl>
         <image>
-            <url>http://cdsweb.cern.ch/img/cds.gif</url>
+            <url>%(weburl)s/img/cds.png</url>
             <title>%(cdsname)s</title>
             <link>%(weburl)s</link>
         </image>
