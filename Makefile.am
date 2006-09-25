@@ -119,7 +119,7 @@ update-v0.7.1-tables: local-dbexec
 	@echo "** Please read the RELEASE-NOTES for details.           **"            
 	@echo "**********************************************************"	
 	exit 1
-# FIXME: add OAI, baskets migration, complete table changes
+# FIXME: still has to address OAI table migration && launch basket migration during the process
 	echo "DROP TABLE oaiHARVEST;" | ./modules/miscutil/bin/dbexec 
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
@@ -128,6 +128,7 @@ update-v0.7.1-tables: local-dbexec
 	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE user_query_basket CHANGE alert_name alert_name varchar(30) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "TRUNCATE TABLE session;" | ./modules/miscutil/bin/dbexec
 
 update-v0.90.0-tables: local-dbexec
@@ -137,6 +138,8 @@ update-v0.90.0-tables: local-dbexec
 
 update-v0.90.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ./modules/miscutil/bin/dbexec 
 
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
