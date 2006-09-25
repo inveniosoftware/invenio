@@ -3022,7 +3022,9 @@ CREATE TABLE IF NOT EXISTS schTASK (
   arguments longtext,
   status varchar(50),
   progress varchar(255),
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  KEY status (status),
+  KEY runtime (runtime)
 ) TYPE=MyISAM;
 
 -- External collections
