@@ -289,7 +289,7 @@ Then click on the "Manage Ouput Format" links. You will see the list of all outp
 The menu at the top of the page let you go to other admininistration pages.<br/>
 Click on the "Add New Output Format" button at the bottom of the page. You can then fill in some attributes
 for the output format. Choose "title" as code, "Only Title" as name and "Prints only title" as description:</p>
-<img src="guide_output_format_update_attributes_tutorial.png" alt="Screenshot of the Update Output Format Attributes page" />
+<img src="guide_output_format_attributes_tutorial.png" alt="Screenshot of the Update Output Format Attributes page" />
 <p>Leave other fields blank, and click on the button "Update Output format Attributes".<br/> You are then
 redirected to the rules editor. Notice the menu at the top which let you close the editor, change the attributes again
 and check the output format. However do not click on these links before saving your modification of rules!</p>
