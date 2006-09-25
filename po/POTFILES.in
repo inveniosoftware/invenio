@@ -21,7 +21,13 @@ modules/bibedit/lib/refextract.py
 modules/bibedit/web/admin/bibeditadmin.py
 modules/bibformat/bin/bibformat.in
 modules/bibformat/bin/bibreformat.in
+modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py
+modules/bibformat/lib/bibformat_templates.py
+modules/bibformat/lib/bibformatadminlib.py
+modules/bibformat/lib/elements/bfe_authors.py
 modules/bibformat/doc/admin/guide.html.wml
+modules/bibformat/web/admin/bibformat_migration_kit_assistant.py
+modules/bibformat/web/admin/bibformatadmin.py
 modules/bibformat/web/admin/BEH_ACTION_add.php.wml
 modules/bibformat/web/admin/BEH_ACTION_edit.php.wml
 modules/bibformat/web/admin/BEH_COND_edit.php.wml
@@ -201,6 +207,9 @@ modules/websearch/lib/search_engine_tests.py
 modules/websearch/lib/websearchadminlib.py
 modules/websearch/lib/websearch_templates.py
 modules/websearch/lib/websearch_webinterface.py
+modules/websearch/lib/websearch_external_collections.py
+modules/websearch/lib/websearch_external_collections_templates.py
+modules/websearch/lib/websearch_webcoll.py
 modules/websearch/web/admin/websearchadmin.py
 modules/websession/bin/sessiongc.in
 modules/websession/doc/admin/guide.html.wml
@@ -211,6 +220,9 @@ modules/websession/lib/websession.py
 modules/websession/lib/websession_templates.py
 modules/websession/lib/webuser.py
 modules/websession/lib/websession_webinterface.py
+modules/websession/lib/webgroup_dblayer.py 
+modules/websession/lib/webgroup.py
+modules/websession/lib/websession_config.py
 modules/webstat/bin/webstat.in
 modules/webstat/doc/admin/guide.html.wml
 modules/webstat/doc/admin/index.html.wml
@@ -301,6 +313,8 @@ modules/websubmit/lib/websubmit_config.py
 modules/websubmit/lib/websubmit_engine.py
 modules/websubmit/lib/websubmit_templates.py
 modules/websubmit/lib/websubmit_webinterface.py
+modules/websubmit/lib/websubmitadmin_config.py
+modules/websubmit/lib/websubmitadmin_engine.py
 modules/websubmit/web/admin/referees.py
 modules/websubmit/web/approve.py
 modules/websubmit/web/publiline.py
