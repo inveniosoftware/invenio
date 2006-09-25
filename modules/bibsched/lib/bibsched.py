@@ -46,6 +46,7 @@ import signal
 
 from invenio.config import \
      CFG_PREFIX, \
+     CFG_BIBSCHED_REFRESHTIME, \
      bindir, \
      logdir
 from invenio.dbquery import run_sql
@@ -372,7 +373,7 @@ class Manager:
             attr = curses.color_pair(5) + curses.A_BOLD
         elif row[5] == "STOPPED":
             attr = curses.color_pair(6) + curses.A_BOLD
-        elif sre.search("ERROR",row[5]):
+        elif row[5].find("ERROR") > -1:
             attr = curses.color_pair(4) + curses.A_BOLD
         elif row[5] == "WAITING":
             attr = curses.color_pair(3) + curses.A_BOLD
@@ -427,7 +428,7 @@ class Manager:
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
-            if sre.search("DONE", self.item_status) or self.item_status == "ERROR" or self.item_status == "STOPPED":
+            if self.item_status.find("DONE") > -1 or self.item_status == "ERROR" or self.item_status == "STOPPED":
                 footer2 += self.footer_stopped_item
             elif self.item_status == "RUNNING" or self.item_status == "CONTINUING":
                 footer2 += self.footer_running_item
@@ -563,7 +564,7 @@ class BibSched:
                 del self.running[task_id]
         elif status == "SUICIDED" and task_id in self.suicide_sent.keys():
             del self.suicide_sent[task_id]
-        elif sre.search("DONE", status) and task_id in self.running.keys():
+        elif status.find("DONE") > -1 and task_id in self.running.keys():
             del self.running[task_id]
         elif self.can_run(proc) and status == "WAITING" and runtime <= time.time():
             if proc in self.helper_modules:
@@ -593,7 +594,7 @@ class BibSched:
         while 1:
             for row in rows:
                 self.handle_row( row )
-            time.sleep(1)
+            time.sleep(CFG_BIBSCHED_REFRESHTIME)
             rows = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK ORDER BY runtime ASC")
 
 class TimedOutExc(Exception):
