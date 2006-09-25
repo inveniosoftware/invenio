@@ -32,7 +32,7 @@ from invenio.messages import gettext_set_language
 
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
+from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.websearch_external_collections_templates import print_results, print_timeout
 from invenio.websearch_external_collections_utils import get_collection_id, get_collection_descendants, escape_dictionary, \
     warning, get_verbose_print

@@ -48,7 +48,7 @@ from invenio import bibconvert_tests
 from invenio import errorlib_tests
 from invenio import elmsubmit_tests
 from invenio import bibformat_engine_tests
-from invenio import websearch_external_collections_page_getter_tests
+from invenio import websearch_external_collections_getter_tests
 from invenio import webuser_tests
 from invenio import dbquery_tests
 from invenio import dateutils_tests
@@ -79,7 +79,7 @@ def create_all_test_suites():
                                elmsubmit_tests.create_test_suite(),
                                webinterface_tests.create_test_suite(),
                                bibformat_engine_tests.create_test_suite(),
-                               websearch_external_collections_page_getter_tests.create_test_suite(),
+                               websearch_external_collections_getter_tests.create_test_suite(),
                                webuser_tests.create_test_suite(),
                                dbquery_tests.create_test_suite(),
                                dateutils_tests.create_test_suite(),

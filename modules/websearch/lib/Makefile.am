@@ -31,8 +31,8 @@ pylib_DATA = \
 	websearchadmin_regression_tests.py \
 	websearch_external_collections.py \
 	websearch_external_collections_config.py \
-	websearch_external_collections_page_getter.py \
-	websearch_external_collections_page_getter_tests.py \
+	websearch_external_collections_getter.py \
+	websearch_external_collections_getter_tests.py \
 	websearch_external_collections_parser.py \
 	websearch_external_collections_searcher.py \
 	websearch_external_collections_templates.py \

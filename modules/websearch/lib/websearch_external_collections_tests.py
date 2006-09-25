@@ -20,8 +20,8 @@
 
 """Testing functions for the external collections search.
 
-   More tests of the page_getter module can be done with 
-       websearch_external_collections_page_getter_tests.py
+   More tests of the page getter module can be done with 
+       websearch_external_collections_getter_tests.py
 """
 
 __revision__ = "$Id$"
@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
+from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 
 def download_and_parse():
     """Try to make a query that always return results on all search engines. 

@@ -26,13 +26,13 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.websearch_external_collections_page_getter import HTTPAsyncPageGetter, async_download
+from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 
 class AsyncDownloadTest(unittest.TestCase):
     """Test suite for websearch_external_collections_*"""
 
     def test_async_download(self):
-        """websearch_external_collections_page_getter - asynchronous download"""
+        """websearch_external_collections_getter - asynchronous download"""
 
         ## Test varius cases for the async_download function:
         ##   - test 2 workings pages : google, kernel.org

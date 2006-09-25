@@ -22,7 +22,7 @@
 
 Example 1, downloading a set of webpages :
 
-from websearch_external_collections_page_getter import *
+from websearch_external_collections_getter import *
 urls = ['http://www.google.fr', 'http://linuxfr.org']
 pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
 async_download(pagegetters)
@@ -37,7 +37,7 @@ Example 2, downloading a set of webpages but with callback function.
 def func(pagegetter, data, current_time):
     print "OK (%f): " % current_time + pagegetter.uri + " - " + data
 
-from websearch_external_collections_page_getter import *
+from websearch_external_collections_getter import *
 urls = ['http://www.google.fr', 'http://linuxfr.org']
 pagegetters = [HTTPAsyncPageGetter(url) for url in urls]
 async_download(pagegetters, func, ['info1', 'info2'], 10)
