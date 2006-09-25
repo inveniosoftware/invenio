@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-09-25 16:37+0200\n"
+"POT-Creation-Date: 2006-09-25 19:15+0200\n"
 "PO-Revision-Date: 2006-08-15 11:53+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
@@ -3191,7 +3191,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:108
 #, fuzzy, python-format
-msgid "%i results found"
+msgid "%s results found"
 msgstr "No se han encontrado valors."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:110
