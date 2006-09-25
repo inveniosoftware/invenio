@@ -273,7 +273,10 @@ Please see also config.wml for more fine configurations of the OAI Repository.
 
 <a name="3.2.2"></a><h4>3.2.2 Exposing entire metadata database</h4>
 
-In order to expose entire metadata database via the OAI Repostory gateway, a predefined <code>global</code> set can be used. To expose the global set with periodical updates on daily basis launch:
+In order to expose all public records (the entire content of the Home
+collection) via the OAI Repository gateway, a predefined
+<code>global</code> set can be used. To expose the global set with
+periodical updates on daily basis launch:
 
 <blockquote>
 <pre>
