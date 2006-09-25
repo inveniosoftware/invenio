@@ -760,7 +760,7 @@ class Template:
     def tmpl_searchalso(self, ln, engines_list, collection_id):
         _ = gettext_set_language(ln)
 
-        box_name = _("Search also :")
+        box_name = _("Search also:")
 
         html = """<table cellspacing="0" cellpadding="0" border="0">
             <tr><td valign="top"><table class="narrowsearchbox">

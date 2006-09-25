@@ -85,7 +85,7 @@ def format(bfo, limit, separator=' ; ',extension='[...]', print_links="yes", int
         }
         
         </script>
-        '''%{'show_less':_("Hide"), 'show_more':_("Show All %i Authors") % nb_authors, 'extension':extension}
+        '''%{'show_less':_("Hide"), 'show_more':_("Show all %i authors") % nb_authors, 'extension':extension}
         out += '<a name="show_hide" />'
         out += separator.join(authors[:int(limit)])
         out += '<span id="more" style="">'+separator.join(authors[int(limit):])+'</span>'

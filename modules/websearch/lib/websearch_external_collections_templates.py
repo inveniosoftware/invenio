@@ -105,11 +105,11 @@ def print_results(req, lang, pagegetter, infos, current_time):
 
     html2 = _("Time : %2.3f") % current_time
     if num:
-        num = _('%(num)s results found') % {'num': num}
+        num = _('%i results found') % num
     else:
         num = _('See results')
     if num == '0':
-        num = _('No result found')
+        num = _('No results found.')
     #if num:
     #    html2 += ", "
     #    html2 += _("Number of results : %(num_results)s") % {'num_results': num}

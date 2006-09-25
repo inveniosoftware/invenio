@@ -176,7 +176,7 @@ def get_users_by_status(grpID, status, ln=cdslang):
         for (mid, nickname) in res:
             nn = nickname
             if not nickname:
-                nn = _("user #%i" % mid)
+                nn = _("user") + "#%i" % mid
             users.append((mid, nn))
     return tuple(users)
 
