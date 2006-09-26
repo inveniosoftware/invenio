@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 import dateutils
 
-class ConvertDateCVSTest(unittest.TestCase):
+class ConvertFromDateCVSTest(unittest.TestCase):
     """
     Testing conversion of CVS dates.
     """
@@ -49,13 +49,51 @@ class ConvertDateCVSTest(unittest.TestCase):
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
+class ConvertIntoDateGUITest(unittest.TestCase):
+    """
+    Testing conversion into dategui with various languages.
+    """
+
+    def test_convert_good_to_dategui_en(self):
+        """dateutils - conversion of good text date into English GUI date"""
+        datetext = "2006-07-16 18:36:01"
+        dategui_en_expected = "16 Jul 2006, 18:36"
+        dategui_en = dateutils.convert_datetext_to_dategui(datetext,
+                                                           ln='en')
+        self.assertEqual(dategui_en, dategui_en_expected)
+
+    def test_convert_good_to_dategui_sk(self):
+        """dateutils - conversion of good text date into Slovak GUI date"""
+        datetext = "2006-07-16 18:36:01"
+        dategui_sk_expected = "16 júl 2006, 18:36"
+        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                           ln='sk')
+        self.assertEqual(dategui_sk, dategui_sk_expected)
+
+    def test_convert_bad_to_dategui_en(self):
+        """dateutils - conversion of bad text date into English GUI date"""
+        datetext = "2006-02-AA 18:36:01"
+        dategui_sk_expected = "N/A"
+        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                           ln='en')
+        self.assertEqual(dategui_sk, dategui_sk_expected)
+
+    def test_convert_bad_to_dategui_sk(self):
+        """dateutils - conversion of bad text date into Slovak GUI date"""
+        datetext = "2006-02-AA 18:36:01"
+        dategui_sk_expected = "nepríst."
+        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                           ln='sk')
+        self.assertEqual(dategui_sk, dategui_sk_expected)
+
 def create_test_suite():
     """
     Return test suite for the dateutils.
     """
-    return unittest.TestSuite((unittest.makeSuite(\
-        ConvertDateCVSTest, 'test'),
-                               ))
+    return unittest.TestSuite((unittest.makeSuite(ConvertFromDateCVSTest,
+                                                  'test'),
+                               unittest.makeSuite(ConvertIntoDateGUITest,
+                                                 'test')))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
