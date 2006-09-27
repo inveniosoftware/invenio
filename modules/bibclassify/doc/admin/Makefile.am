@@ -22,7 +22,7 @@ docdir=$(localstatedir)/www/admin/bibclassify
 doc_DATA=index.html guide.html guide_cloud.jpeg
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) guide_cloud.jpeg
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
