@@ -404,7 +404,7 @@ def parse_command():
 
         # Append mode option
         if opt in ["-a", "--append"]:
-            # We check if there is not just a special tag to correct
+            # We check if there is not just a special tag to append
             try:
                 if int(opt_value) > 0 and int(opt_value) < 999:
                     options['mode'] = 'append'
@@ -488,8 +488,8 @@ def bibupload(record):
         rec_id = create_new_record()
         write_message("   -Creation of a new record id (%d): DONE" % rec_id, verbose=2)
         
-        # we add the record Id control field to the record            
-        error = record_add_field(record, '001', '', '', rec_id)
+        # we add the record Id control field to the record
+        error = record_add_field(record, '001', '', '', rec_id, [], 0)
         if error == None:
             write_message("   Failed: " \
                                          "Error during adding the 001 controlfield "  \
@@ -827,7 +827,7 @@ def insert_bibfmt(id_bibrec, marc, format):
     pickled_marc =  compress(marc)
     # get the current time
     now = convert_datestruct_to_datetext(time.localtime())
-    query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s )"""
+    query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)"""
     try:
         row_id  = run_sql(query, (id_bibrec, format, now, pickled_marc))
         return row_id
@@ -840,23 +840,7 @@ def insert_record_bibxxx(tag, value):
     #determine into which table one should insert the record
     table_name = 'bib'+tag[0:2]+'x'
 
-    #check if the table exists in the database
-    query = """SHOW TABLES like %s"""
-    params = (table_name,)
-    try:
-        res = run_sql(query, params)
-    except Error, error:
-        write_message("   Error during the insert_record_bibxxx function : %s " % error, verbose=1, stream=sys.stderr) 
-
-    # if the table doesn't exist, please create it
-    if len(res):
-        pass
-    else:
-        if options['verbose'] >= 1:
-            print 'create table'
-
     # check if the tag, value combination exists in the table
-
     query = """SELECT id FROM %s """ % table_name
     query += """ WHERE tag=%s AND value=%s"""
     params = (tag, value)
@@ -885,20 +869,6 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx, field_number, id_bibrec):
     """Insert the record into bibrec_bibxxx"""
     #determine into which table one should insert the record
     full_table_name = 'bibrec_'+ table_name
-
-    #check if the table exists in the database
-    query = """SHOW TABLES like '%s'"""
-    params = (full_table_name)
-    try:
-        res = run_sql(query % params)
-    except Error, error:
-        write_message("   Error during the insert_record_bibrec_bibxxx function 1st query: %s " % error, verbose=1, stream=sys.stderr) 
-
-    # if the table doesn't exist, create it
-    if len(res):
-        pass
-    else:
-        print 'create table', full_table_name    
 
     # insert the proper row into the table
     query = """INSERT INTO %s """ % full_table_name
@@ -1106,7 +1076,10 @@ def update_database_with_metadata(record, rec_id):
                     tag_list.append(ind2)
                 datafield_number = single_tuple[4]
                 
-                if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS and tag != "001":
+                if tag in CFG_BIBUPLOAD_SPECIAL_TAGS:
+                    # nothing to do for special tags (FFT, FMT)
+                    pass
+                elif tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS and tag != "001":
                     value = single_tuple[3]
                     # get the full tag
                     full_tag = ''.join(tag_list)
@@ -1154,7 +1127,7 @@ def update_database_with_metadata(record, rec_id):
 def append_new_tag_to_old_record(record, rec_old):
     """Append new tags to a old record"""
     if options['tag'] != None:
-        tag = options['tag'] 
+        tag = options['tag']
         if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
             if tag == '001':
                 pass
@@ -1264,17 +1237,17 @@ def delete_bibrec_bibxxx(record, id_bibrec):
     """Delete the database record from the table bibxxx given in parameters"""
     # we clear all the rows from bibrec_bibxxx from the old record 
     for tag in record.keys():
-        # for each name construct the bibrec_bibxxx table name
-        table_name = 'bibrec_bib'+tag[0:2]+'x'
-        # delete all the records with proper id_bibrec
-        query = """DELETE FROM `%s` where id_bibrec = %s"""
-        params = (table_name, id_bibrec)
-        try:
-            run_sql(query % params)
-        except Error, error:
-            write_message("   Error during the delete_bibrec_bibxxx function : %s " % error, verbose=1, stream=sys.stderr) 
+        if tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:        
+            # for each name construct the bibrec_bibxxx table name
+            table_name = 'bibrec_bib'+tag[0:2]+'x'
+            # delete all the records with proper id_bibrec
+            query = """DELETE FROM `%s` where id_bibrec = %s"""
+            params = (table_name, id_bibrec)
+            try:
+                run_sql(query % params)
+            except Error, error:
+                write_message("   Error during the delete_bibrec_bibxxx function : %s " % error, verbose=1, stream=sys.stderr) 
         
-
 def delete_bibdoc(id_bibrec):
     """Delete document from bibdoc which correspond to the bibrec id given in parameter"""
     query = """UPDATE bibdoc SET status='deleted' WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s)"""
@@ -1322,6 +1295,6 @@ def main():
         else:
             sys.exit(1)
     return
-    
+
 if __name__ == "__main__":
     main()
