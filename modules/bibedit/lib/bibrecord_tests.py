@@ -493,6 +493,22 @@ class BibRecordAddFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
                          ['editor', 'editor'])
 
+    def test_add_controlfield_on_desired_position(self):
+        """bibrecord - adding controlfield on desired position"""
+        field_number_1 = bibrecord.record_add_field(self.rec, "005", "", "", "Foo", [], 0)
+        field_number_2 = bibrecord.record_add_field(self.rec, "006", "", "", "Bar", [], 0)
+        self.assertEqual(field_number_1, 0)
+        self.assertEqual(field_number_2, 7)
+
+    def test_add_datafield_on_desired_position(self):
+        """bibrecord - adding datafield on desired position"""
+        field_number_1 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+                                                    [('a', 'Doe3, John')], 0)
+        field_number_2 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+                                                    [('a', 'Doe4, John'), ('b', 'editor')], 0)
+        self.assertEqual(field_number_1, 0)
+        self.assertEqual(field_number_2, 7)
+
 class BibRecordDeleteFieldTest(unittest.TestCase):
     """ bibrecord - testing field deletion """
 
