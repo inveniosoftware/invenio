@@ -216,7 +216,10 @@ def record_has_field(rec, tag):
     """checks whether record 'rec' contains tag 'tag'"""
     return rec.has_key(tag)
         
-def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafield_subfield_code_value_tuples=[]):
+def record_add_field(rec, tag, ind1="", ind2="",
+                     controlfield_value="",
+                     datafield_subfield_code_value_tuples=[],
+                     desired_field_number=-1):
     """
     Add a new field TAG to record REC with the following values:
 
@@ -231,20 +234,24 @@ def record_add_field(rec, tag, ind1="", ind2="", controlfield_value="", datafiel
 
            datafield_subfield_code_value_tuples - list of subfield code and
              value tuples, e.g.: [('a', 'Ellis, J'), ('e', 'editor')]
+
+       The new field will have a field number DESIRED_FIELD_NUMBER, if
+       this one is positive and is not yet taken by some other already
+       existing field; otherwise the new field will be added at the
+       end of the record.
        
     Return the field number of newly created field.
     """
 
     # detect field number to be used for insertion:
-    vals = rec.values()
-    if vals != []:
+    existing_field_numbers = [len(fi)==5 and fi[4] or 0 for fis in rec.values() for fi in fis]
+    if desired_field_number == -1 or desired_field_number in existing_field_numbers:
         try:
-            newfield_number = 1 + max([f[4] for v in vals for f in v])
+            newfield_number = 1 + max(existing_field_numbers)
         except ValueError:
-            # vals could have been a list of empty lists, see test_add_delete_add_field_to_empty_record()
             newfield_number = 1
     else:
-        newfield_number = 1
+        newfield_number = desired_field_number
 
     # create new field object:
     if controlfield_value:        
