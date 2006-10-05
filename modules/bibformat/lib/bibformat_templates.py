@@ -1433,7 +1433,7 @@ class Template:
         </table><br/>
         <table width="90%%" class="admin_wvar" cellspacing="0"><tr>
 
-        <th class="adminheaderleft">Output Formats that use %(name)s</th>
+        <th class="adminheaderleft">Format Templates that use %(name)s</th>
         <th class="adminheaderleft">Format Elements used by %(name)s</th>
         <th class="adminheaderleft">Tags Called*</th>
         </tr>
