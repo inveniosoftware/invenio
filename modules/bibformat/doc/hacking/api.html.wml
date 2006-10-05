@@ -413,7 +413,7 @@ Here follows an sample documentation generated for the element
 +--------------------------------------------------------------------------------------------+
 |  TITLE                                                                                     |
 |  -----                                                                                     |
-|  &lt;BFE_TITLE separator="..." prefix="..." suffix="..." default="..." />                     |
+|  &lt;BFE_TITLE separator="..." prefix="..." suffix="..." default="..." />                  |
 |                                                                                            |
 |      Prints the title of a record.                                                         |
 |                                                                                            |
@@ -451,12 +451,13 @@ Knowledge bases cannot be managed through configuration files.
 You can very easily add new bases and mappings using the given web GUI.
 
 
-5. Python API (SUBJECT TO CHANGES)
+5. Python API
 
-The API of bibformat.py consists in this single function:       
+The APIs of bibformat.py consists in these functions:      
 
  def format_record(recID, of, ln=cdslang, verbose=0, 
-                   search_pattern=None, xml_record=None, uid=None):   
+                   search_pattern=None, xml_record=None, uid=None, 
+                   on_the_fly=False):   
      """
      Formats a record given its ID (or its XML representation) 
      and an output format.
@@ -508,6 +509,9 @@ The API of bibformat.py consists in this single function:
                         functions on a page depending on user's
                         priviledge.  Allows contextual formatting. 
                         Typically 'uid' is retrieved with webuser.getUid(req).
+                        
+          on_the_fly -  if False, try to return an already preformatted version 
+                        of the record in the database. 
 
      """        
 
@@ -517,12 +521,106 @@ The API of bibformat.py consists in this single function:
    >> format_record(5, "hb", "fr")
 
 
+ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, 
+                    xml_records=None, uid=None, record_prefix=None, 
+                    record_separator=None, record_suffix=None,
+                    prologue="", epilogue="", req=None, on_the_fly=False):
+     """
+     Returns a list of formatted records given by a list of record IDs or a 
+     list of records as xml.
+     Adds a prefix before each record, a suffix after each record, 
+     plus a separator between records.
+
+     Also add optional prologue and epilogue to the complete formatted list.
+    
+     You can either specify a list of record IDs to format, or a list of 
+     xml records, but not both (if both are specified recIDs is ignored).
+    
+     'record_separator' is a function that returns a string as separator between 
+     records. The function must take an integer as unique parameter, 
+     which is the index in recIDs (or xml_records) of the record that has
+     just been formatted. For example separator(i) must return the separator
+     between recID[i] and recID[i+1]. Alternatively separator can be a single 
+     string, which will be used to separate all formatted records.
+     The same applies to 'record_prefix' and 'record_suffix'.
+
+     'req' is an optional parameter on which the result of the function
+     are printed lively (prints records after records) if it is given.
+     Note that you should set 'req' content-type by yourself, and send 
+     http header before calling this function as it will not do it. 
+    
+     This function takes the same parameters as 'format_record' except for:
+     
+               recIDs -  a list of record IDs to format
+    
+          xml_records -  a list of xml string representions of the records to 
+                         format. If this list is specified, 'recIDs' is ignored.
+                      
+        record_prefix - a string or a function the takes the index of the record
+                        in 'recIDs' or 'xml_records' for which the function must
+                        return a string. 
+                        Printed before each formatted record.
+                     
+     record_separator - either a string or a function that returns string to 
+                        separate formatted records. The function takes the index 
+                        of the record in 'recIDs' or 'xml_records' that is being
+                        formatted.
+                        
+        record_prefix - a string or a function the takes the index of the record
+                        in 'recIDs' or 'xml_records' for which the function must
+                        return a string.
+                        Printed after each formatted record
+                         
+                  req - an optional request object on which formatted records 
+                        can be printed (for "live" output )
+                        
+             prologue - a string printed before all formatted records string
+     
+             epilogue - a string printed after all formatted records string
+             
+           on_the_fly - if False, try to return an already preformatted version 
+                        of the records in the database
+     """
+
+
+ def get_output_format_content_type(of):
+     """
+     Returns the content type (eg. 'text/html' or 'application/ms-excel') \
+     of the given output format.
+
+     The function takes this mandatory parameter:
+     
+     of - the code of output format for which we want to get the content type
+     """
+     
+     
+ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
+     """
+     Returns an XML string of the record given by recID.
+
+     The function builds the XML directly from the database,
+     without using the standard formatting process.
+
+     'format' allows to define the flavour of XML:
+        - 'xm' for standard XML
+        - 'marcxml' for MARC XML 
+        - 'oai_dc' for OAI Dublin Core
+        - 'xd' for XML Dublin Core
+
+     If record does not exist, returns empty string.
+
+     The function takes the following parameters:
+
+          recID - the id of the record to retrieve
+     
+         format - the XML flavor in which we want to get the record
+     
+     decompress _ a function used to decompress the record from the database
+    """
 
 The API of the BibFormat Object ('bfo') given as a parameter to
 format function of format elements consist in the following
 functions. This API is to be used only inside format elements.
-
-                  --- API SUBJECT TO CHANGES ---
 
  def control_field(self, tag):
     """
