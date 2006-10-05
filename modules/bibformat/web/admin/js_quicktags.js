@@ -116,11 +116,11 @@ edButtons.push(
 
 edButtons.push(
 	new edButton(
-		'ed_block'
-		,'B-QUOTE'
-		,'<blockquote>'
-		,'</blockquote>'
-		,'q'
+		'ed_p'
+		,'P'
+		,'<p>'
+		,'</p>\n\n'
+		,'p'
 	)
 );
 
@@ -170,11 +170,11 @@ edButtons.push(
 
 edButtons.push(
 	new edButton(
-		'ed_p'
-		,'P'
-		,'<p>'
-		,'</p>\n\n'
-		,'p'
+		'ed_block'
+		,'B-QUOTE'
+		,'<blockquote>'
+		,'</blockquote>'
+		,'q'
 	)
 );
 
