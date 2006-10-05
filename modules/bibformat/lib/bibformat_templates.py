@@ -513,8 +513,65 @@ class Template:
         out = ""
 
         out += '''
+        <style type="text/css">
+            <!--
+                .ed_button {
+                font-size: x-small;
+                }
+            -->
+        </style>
         <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
-        
+        <script type="text/javascript">
+ 
+        function getByID( id ) { 
+            if (document.getElementById) 
+                var returnVar = document.getElementById(id); 
+            else if (document.all) 
+                var returnVar = document.all[id]; 
+            else if (document.layers) 
+                var returnVar = document.layers[id]; 
+            
+            return returnVar; 
+        }
+
+        window.onresize= resizeViews;
+        window.onload= prepareLayout;
+    
+        function prepareLayout(){
+            resizeViews();
+            //getByID("shortDocFrame").style.height="91%%";
+            // TODO : Find a way to resize shortDocFrame
+        }
+    
+        function resizeViews(){
+            var myWidth = 0, myHeight = 0;
+            if( typeof( window.innerWidth ) == 'number' ) {
+                //Non-IE
+                myWidth = window.innerWidth;
+                myHeight = window.innerHeight;
+            } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+                //IE 6+ in 'standards compliant mode'
+                myWidth = document.documentElement.clientWidth;
+                myHeight = document.documentElement.clientHeight;
+            } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                //IE 4 compatible
+                myWidth = document.body.clientWidth;
+                myHeight = document.body.clientHeight;
+            }
+  
+            if (myHeight <= 400) {
+                getByID("code").style.height=10;
+                getByID("previewiframe").style.height=10;
+
+            } else{
+                getByID("code").style.height=((myHeight-400)/2);
+                getByID("previewiframe").style.height=((myHeight-400)/2);
+            }
+    
+            getByID("previewiframe").style.height=200;
+        }
+    
+        </script>
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
@@ -564,7 +621,7 @@ class Template:
         out += '''
         <table width="90%%" cellspacing="5">
         <tr>
-        <td>
+        <td valign="top">
         <form action="format_template_show_preview_or_save?ln=%(ln)s&amp;bft=%(filename)s" method="POST" target="previewiframe">
         <table width="100%%" id="mainTable"><tr>
         <th class="adminheaderleft"><div style="float:left;">Format template code</div>
@@ -573,7 +630,7 @@ class Template:
         </div>
         </th>
         </tr>
-        <tr><td colspan="2">
+        <tr><td colspan="2" id="codetd">
         %(toolbar)s
         <textarea name="code" id="code" rows="25" %(readonly)s
         style="width:100%%">%(code)s</textarea>
@@ -589,8 +646,9 @@ class Template:
         Preview
         </th>
         </tr>
-        <tr><td class="admintdright">
-        <label for="content_type_for_preview">Content-type (MIME):</label> <select id="content_type_for_preview" name="content_type_for_preview">
+        <tr><td align="right" valign="top" style="font-size: small;">
+        <nobr>
+        <label for="content_type_for_preview">Content-type (MIME):</label> <select id="content_type_for_preview" name="content_type_for_preview" style="font-size: x-small;">
         ''' %  {'ln':ln,
                 'weburl':weburl,
                 'filename':filename,
@@ -607,8 +665,8 @@ class Template:
                 out += '''<option value="%(content_type)s">%(content_type)s</option>''' % {'content_type':content_type}
 
         out += '''
-        </select>
-        <label for="ln_for_preview">Language:</label> <select id="ln_for_preview" name="ln_for_preview">
+        </select></nobr>
+        <nobr><label for="ln_for_preview">Language:</label> <select id="ln_for_preview" name="ln_for_preview" style="font-size: x-small;">
         '''
         
         for lang in language_list_long():
@@ -620,22 +678,20 @@ class Template:
        
 
         out += '''
-        </select>
+        </select></nobr>
         &nbsp;
-        <label for="pattern_for_preview">Search Pattern: </label><input type="text" value="%(pattern_for_preview)s" size="8" name="pattern_for_preview" id="pattern_for_preview"/>&nbsp;
+        <nobr><label for="pattern_for_preview">Search Pattern: </label><input type="text" value="%(pattern_for_preview)s" size="8" name="pattern_for_preview" id="pattern_for_preview" style="font-size: x-small;"/></nobr>&nbsp;
         
         <input type="submit" class="adminbutton" name="preview_action" value="Reload Preview"/>
         </td>
         </tr>
         <tr><td>
-        <iframe src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_preview_or_save?ln=%(ln)s&amp;ln_for_preview=%(ln_for_preview)s&amp;pattern_for_preview=%(pattern_for_preview)s&amp;bft=%(filename)s" name="previewiframe"
-        width="100%%" height="400"></iframe>
+        <iframe src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_preview_or_save?ln=%(ln)s&amp;ln_for_preview=%(ln_for_preview)s&amp;pattern_for_preview=%(pattern_for_preview)s&amp;bft=%(filename)s" name="previewiframe" id="previewiframe" width="100%%" height="400"></iframe>
    
         </td></tr>
         </table>
         </form>
         </td>
-
         ''' % {'code':code, 'ln':ln,
                'weburl':weburl, 'filename':filename,
                'ln_for_preview':ln_for_preview,
@@ -654,16 +710,13 @@ class Template:
         <table width="100%%"><tr>
         <td class="admintdright">
         <form action="format_template_show_short_doc?ln=%(ln)s" method="POST" target="shortDocFrame">
-        <label for="search_doc_pattern">Search for:&nbsp;</label><input type="text" size="20" name="search_doc_pattern" id="search_doc_pattern" value=""/> <input type="submit" class="adminbutton" name="search_in_doc" value="Search" />
+        <nobr><label for="search_doc_pattern">Search for:&nbsp;</label><input type="text" size="15" name="search_doc_pattern" id="search_doc_pattern" value=""/> <input type="submit" class="adminbutton" name="search_in_doc" value="Search" /></nobr>
         </form>
         </td>
         </tr>
         </table>
         
-        <iframe name="shortDocFrame"
-        src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_short_doc?ln=%(ln)s"
-        height="90%%" width="98%%">
-        </iframe>
+        <iframe name="shortDocFrame" id="shortDocFrame" src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_short_doc?ln=%(ln)s" height="90%%" width="98%%"></iframe>
 
         </td>
         </tr>
