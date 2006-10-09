@@ -621,13 +621,14 @@ def usage():
     
 def print_out_bibupload_statistics():
     """Print the statistics of the process"""
-    print "BibUpload stat:"
-    print "Input Records: ", stat['nb_records_to_upload']
-    print "Updated: ", stat['nb_records_updated']
-    print "Inserted: ", stat['nb_records_inserted']
-    print "Errors: ", stat['nb_errors']
-    print "Execution time: ", time.time() - time.mktime(stat['exectime'])
-    
+    out = "Task stats: %(nb_input)d input records, %(nb_updated)d updated, " \
+          "%(nb_inserted)d inserted, %(nb_errors)d errors.  Time %(nb_sec).2f sec." % { \
+              'nb_input': stat['nb_records_to_upload'],
+              'nb_updated': stat['nb_records_updated'],
+              'nb_inserted': stat['nb_records_inserted'],
+              'nb_errors': stat['nb_errors'],
+              'nb_sec': time.time() - time.mktime(stat['exectime']) }
+    write_message(out)    
     
 def open_marc_file(path):
     """Open a file and return the data"""
