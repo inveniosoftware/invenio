@@ -15,6 +15,7 @@ Contents
 2. Native Language Support information for translators
 3. Native Language Support information for programmers
 A. Introducing a new language
+B. Integrating translation contributions
 
 1. Native Language Support information for administrators
 =========================================================
@@ -270,12 +271,49 @@ be to translate some short static HTML pages:
    - modules/webhelp/web/index.html.wml
    - modules/websearch/doc/index.html.wml
 
-Thanks for helping to internationalize CDS Invenio.
+Thanks for helping us to internationalize CDS Invenio.
 
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+Appendix B. Integrating translation contributions
+=================================================
 
+This appendix contains some tips on integrating translated phrases
+that were prepared for different CDS Invenio releases.  It is mostly
+of interest to CDS Invenio developers or the release manager.
 
+Imagine that we have a working translation file sk.po and that we have
+received a contribution co-CONTRIB.po that was prepared for previous
+CDS Invenio release, so that the messages do not fully correspond.
+Moreover, another person might have had worked with the sk.po file in
+the meantime.  The goal is to integrate the contributions.
 
+Firstly, check whether the contributed file sk-CONTRIB.po was indeed
+prepared for different software release version:
+        
+   $ msgcmp sk-CONTRIB.po cds-invenio.pot
 
+If yes, then join its translations with the ones in the latest sk.po
+file:
+
+   $ msgcat sk-CONTRIB.po sk.po > sk-TMP.po
+
+and update the message references:
+
+   $ msgmerge sk-TMP.po cds-invenio.pot > sk-NEW.po
+
+This will give the new file sk-NEW.po that should now be msgcmp'rable
+to cds-invenio.pot.
+
+Lastly, we will have to go manually through sk-NEW.po in order to
+resolve potential translation conflicts (marked via ``#-#-#-#-#''
+fuzzy translations).  If the conflicts are evident and easy to
+resolve, for example corrected typos, we can fix them.  If the
+conflicts are of translational nature and cannot be resolved without
+consulting the translators, we should warn them about the conflicts.
+After the evident conflicts are resolved and the file validates okay,
+we can rename it to sk.po and we are done.
+
+(Note that we could have used ``--use-first'' option to msgcat if we
+were fully sure that the first translation file (sk-CONTRIB) could
+have been preferred as far as the quality of translation goes.)
+
+- end of file -
