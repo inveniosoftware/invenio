@@ -111,7 +111,8 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
         client_host_list = client_host_list.replace("]", "")
         res = run_sql("SELECT id_bibrec,COUNT(DISTINCT(client_host)) AS c" \
                       "  FROM " + tablename + \
-                      " WHERE client_host IN (%s) AND id_bibrec != %s" \
+                      " WHERE client_host IN (" + client_host_list + ")" + \
+                      "   AND id_bibrec != %s" \
                       " GROUP BY id_bibrec ORDER BY c DESC LIMIT 10",
-                      (client_host_list, recid))
+                      (recid,))
     return res
