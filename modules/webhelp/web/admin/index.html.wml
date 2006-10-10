@@ -68,13 +68,15 @@ data are uploaded in CDS Invenio, you may want to modify them via
   <strong>BibHarvest Admin</strong>
 </td>
 <td>
-  Enables you to configure OAI metadata harvestor for eventual periodical
-  batch upload of data.  For example, you can define from where to
-  harvest, with what periodicity, how to transform data before
-  uploading them into CDS Invenio, etc.
+
+  Enables you to configure OAI metadata harvestor for eventual
+  periodical batch upload of data.  For example, you can define from
+  where to harvest, with what periodicity, how to transform data
+  before uploading them into CDS Invenio, etc.  Also, enables you to
+  define your OAI sets in case you want to export your own data.
 </td>
 <td>
-  <a href="bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
+  <a href="bibharvest/">BibHarvest Admin Interface</a>
 </td>
 <td>
   <a href="bibharvest/guide.html">BibHarvest Admin Guide</a>
