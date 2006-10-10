@@ -114,22 +114,25 @@ update-v0.5.0-tables: local-dbexec
 	echo "UPDATE fieldname SET ln='sv' WHERE ln='se';" | ./modules/miscutil/bin/dbexec
 
 update-v0.7.1-tables: local-dbexec
-	@echo "**********************************************************"
-	@echo "** Upgrade from CDSware v0.7.1 is not recommended yet!  **"
-	@echo "** Please read the RELEASE-NOTES for details.           **"            
-	@echo "**********************************************************"	
-	exit 1
-# FIXME: still has to address OAI table migration && launch basket migration during the process
 	echo "DROP TABLE oaiHARVEST;" | ./modules/miscutil/bin/dbexec 
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgwebcomment','configure WebComment','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiarchive','run BibHarvest oaiarchive','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibedit','run BibEdit','','no');" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD nickname varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE user_query_basket CHANGE alert_name alert_name varchar(30) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "TRUNCATE TABLE session;" | ./modules/miscutil/bin/dbexec
+	@echo "**********************************************************"
+	@echo "** Do not forget to run the basket migration now:       **"
+	@echo "**    @PYTHON@ modules/webbasket/lib/webbasket_migration_kit.py "
+	@echo "** Please see the RELEASE-NOTES for details.           **"         
+	@echo "**********************************************************"
+# FIXME: OAI table migration
 
 update-v0.90.0-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
