@@ -32,7 +32,7 @@ from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
 class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
     """Check OAIArchive Admin web pages whether they are up or not."""
 
-    def test_oaiarchive_admin_interface_pages_availability(self):
+    def test_oaiarchiveadmin_interface_pages_availability(self):
         """oaiarchiveadmin - availability of OAIArchive Admin interface pages""" 
 
         baseurl = weburl + '/admin/bibharvest/oaiarchiveadmin.py/'
@@ -49,6 +49,26 @@ class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
             # then try as admin:
             error_messages.extend(test_web_page_content(url,
                                                         username='admin'))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_oaiarchiveadmin_edit_set(self):
+        """oaiarchiveadmin - edit set page"""
+        test_edit_url = weburl + \
+               "/admin/bibharvest/oaiarchiveadmin.py/editset?oai_set_id=1"
+        error_messages = test_web_page_content(test_edit_url,
+                                               username='admin')
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_oaiarchiveadmin_delete_set(self):
+        """oaiarchiveadmin - delete set page"""
+        test_edit_url = weburl + \
+               "/admin/bibharvest/oaiarchiveadmin.py/delset?oai_set_id=1"
+        error_messages = test_web_page_content(test_edit_url,
+                                               username='admin')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
