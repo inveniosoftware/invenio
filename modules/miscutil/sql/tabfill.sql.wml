@@ -1623,9 +1623,9 @@ INSERT INTO accACTION VALUES (14,'runbibrank','run BibRank','','no');
 INSERT INTO accACTION VALUES (15,'cfgbibrank','configure BibRank','','no');
 INSERT INTO accACTION VALUES (16,'cfgbibindex','configure BibIndex','','no');
 INSERT INTO accACTION VALUES (17,'cfgbibharvest','configure BibHarvest','','no');
-INSERT INTO accACTION VALUES (18,'runoaiharvest','run BibHarvest periodical harvesting','','no');
+INSERT INTO accACTION VALUES (18,'runoaiharvest','run BibHarvest oaiharvest','','no');
 INSERT INTO accACTION VALUES (19,'cfgwebcomment','configure WebComment','','no');
-INSERT INTO accACTION VALUES (20,'runoaiarchive','run OAI archive','','no');
+INSERT INTO accACTION VALUES (20,'runoaiarchive','run BibHarvest oaiarchive','','no');
 INSERT INTO accACTION VALUES (21,'runbibedit','run BibEdit','','no');
 
 
