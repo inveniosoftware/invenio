@@ -36,7 +36,8 @@ from invenio.config import \
      bibupload, \
      bindir, \
      cdsname, \
-     version
+     version, \
+     tmpdir
 from invenio.search_engine import perform_request_search
 from invenio.dbquery import run_sql
 
@@ -248,7 +249,7 @@ def oaiarchive_task(arg):
 
     else:
 
-        filename = "/tmp/oai_archive_%s" % time.strftime("%H%M%S",time.localtime())
+        filename = tmpdir + "/oai_archive_%s" % time.strftime("%H%M%S",time.localtime())
     
         oai_sets = get_set_descriptions(set)
         oai_out = open(filename,"w")
