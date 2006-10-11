@@ -176,7 +176,7 @@ class Template:
           'set_values' : _("Set new values"),
 
           'email' : email,
-          'email_disabled' : email_disabled and "disabled" or "",
+          'email_disabled' : email_disabled and "readonly" or "",
           'password' : password,
           'password_disabled' : password_disabled and "disabled" or "",
           'sweburl': sweburl,
