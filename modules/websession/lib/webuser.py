@@ -297,9 +297,14 @@ def email_valid_p(email):
             return 0
     return 1
 
-def registerUser(req, email, passw, nickname=""):
+def registerUser(req, email, passw, nickname="", nickname_required=True):
     """Register user with used-wished values of NICKNAME, EMAIL and
        PASSW.
+
+       If NICKNAME_REQUIRED is set to False, then ignore desired
+       NICKNAME and do not set any.  This is suitable for external
+       authentications so that people could login without having to
+       register an internal account first.
        
        Return 0 if the registration is successful, 1 if email is not
        valid, 2 if nickname is not valid, 3 if email is already in the
@@ -311,19 +316,23 @@ def registerUser(req, email, passw, nickname=""):
     if not email_valid_p(email):
         return 1
 
-    # is nickname valid?
-    if not nickname_valid_p(nickname):
-        return 2
-
     # is email already taken?
     res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
     if len(res) > 0:
         return 3
 
-    # is nickname already taken?
-    res = run_sql("SELECT * FROM user WHERE nickname=%s", (nickname,))
-    if len(res) > 0:
-        return 4
+    if nickname_required:
+        # is nickname valid?
+        if not nickname_valid_p(nickname):
+            return 2
+        # is nickname already taken?
+        res = run_sql("SELECT * FROM user WHERE nickname=%s", (nickname,))
+        if len(res) > 0:
+            return 4
+    else:
+        # nickname not required, so ignoring desired nick and using
+        # default empty string one:
+        nickname = ""
 
     # okay, go on and register the user:
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
@@ -382,7 +391,7 @@ def loginUser(req, p_un, p_pw, login_method):
             if not p_pw or p_pw < 0:
                 import random
                 p_pw = int(random.random() * 1000000)
-                if registerUser(req, p_email, p_pw) != 0:
+                if registerUser(req, p_email, p_pw, nickname_required=False) != 0:
                     return ([], p_email, p_pw, 13)
                 else:
                     query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email, p_pw,))
