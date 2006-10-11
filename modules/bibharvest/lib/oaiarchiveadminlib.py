@@ -422,6 +422,10 @@ def oai_table(ln=cdslang):
     
 def input_text(ln, title, name, value):
     """"""
+    if name is None:
+        name = ""
+    if value is None:
+        value = ""
     text = """<table><tr><td width=100><span class="adminlabel">%s</span></td>""" % title
     text += """<td align=left><input class="admin_w200" type="text" name="%s" value="%s" /></td></tr></table>""" % (cgi.escape(name,1), cgi.escape(value, 1))  
     return text
