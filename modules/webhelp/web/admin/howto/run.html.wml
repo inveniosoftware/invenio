@@ -109,7 +109,7 @@ bibsched daemon both faster and less memory hungry:
 
 <blockquote>
 <pre>
-$ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 1 MONTH);" | dbexec
+$ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 7 DAY);" | dbexec
 </pre>
 </blockquote>
 
@@ -185,9 +185,9 @@ uploaded.  For example:
 
 <blockquote>
 <pre>
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -size 0c -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -atime +28 -exec \rm -f {} \;
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*.xml" -atime +7 -exec gzip -9 {} \;
+$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -size 0c -exec \rm -f {} \;   
+$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -atime +28 -exec \rm -f {} \;
+$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -atime +7 -exec gzip -9 {} \;
 </pre>
 </blockquote>
 
@@ -199,7 +199,9 @@ uploaded.  For example:
 <pre>
 $ find /opt/cds-invenio/var/tmp -name "bibharvestadmin.*" -exec \rm -f {} \;   
 $ find /opt/cds-invenio/var/tmp -name "bibconvertrun*" -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -exec gzip -9 {} \;
+$ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -atime +7 -exec gzip -9 {} \;
+$ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -atime +28 -exec \rm -f {} \;
+$ find /opt/cds-invenio/var/tmp -name "oai_archive*" -atime +28 -exec \rm -f {} \;
 </pre>
 </blockquote>
 
