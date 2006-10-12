@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.90.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-09-25 19:15+0200\n"
-"PO-Revision-Date: 2006-07-21 18:38+0200\n"
+"PO-Revision-Date: 2006-10-12 16:03+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -3462,7 +3462,7 @@ msgstr "Skúste znovu"
 #: modules/websession/lib/websession_templates.py:511
 #, python-format
 msgid "Okay, password has been emailed to %s."
-msgstr "V pordiadku, heslo bolo poslané elektronickou poštou na %s."
+msgstr "V poriadku, heslo bolo poslané elektronickou poštou na %s."
 
 #: modules/websession/lib/websession_templates.py:526
 msgid "Deleting your account"
