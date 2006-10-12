@@ -21,11 +21,14 @@
 
 """WebSession Regression Test Suite."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 import unittest
 
-from invenio.config import sweburl 
+from mechanize import Browser
+
+from invenio.config import sweburl, adminemail
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -62,7 +65,34 @@ class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(WebSessionWebPagesAvailabilityTest)
+class WebSessionLostYourPasswordTest(unittest.TestCase):
+    """Test Lost Your Passwords functionality."""
+
+    def test_lost_your_password_for_internal_accounts(self):
+        """websession - sending lost password for internal admin account"""
+
+        try_with_account = adminemail
+
+        # click on "send lost password" for adminemail internal account
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/lost")
+        browser.select_form(nr=0)
+        browser['p_email'] = try_with_account
+        browser.submit()        
+
+        # verify the response:
+        expected_response = "Okay, password has been emailed to " + \
+                            try_with_account
+        lost_password_response_body = browser.response().read()
+        try:
+            lost_password_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, lost_password_response_body))
+
+
+test_suite = make_test_suite(WebSessionWebPagesAvailabilityTest,
+                             WebSessionLostYourPasswordTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
