@@ -55,8 +55,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         return _("If you have lost password for your CDS Invenio internal account, then please enter your email address below and the lost password will be emailed to you.") +\
-               "<br /><br />" +\
-               _("Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there.") +\
+               "<br /><br />" + \
+               _("Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there.") + " " + \
                _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }) +\
                "<br><br>"
 
