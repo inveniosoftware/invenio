@@ -249,6 +249,7 @@ class Template:
                 <tr>
               <td align="right"><strong>%(email)s:</strong></td>
               <td><input type="text" size="25" name="p_email" value=""></td>
+              <td><input type="hidden" name="ln" value="%(ln)s"></td>
               <td><input type="hidden" name="action" value="lost"></td>
             </tr>
             <tr><td></td>
@@ -259,6 +260,7 @@ class Template:
           </form>
           """ % {
             'msg' : msg,
+            'ln': ln,
             'email' : _("Email address"),
             'send' : _("Send lost password"),
           }
@@ -491,6 +493,47 @@ class Template:
             'msg' : msg,
             'try_again' : _("Try again")
           }
+        return out
+
+    def tmpl_account_lost_password_email_body(self, username, password, ln=cdslang):
+        """
+        The body of the email that sends lost internal account
+        passwords to users.
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """\
+%(hello)s:
+
+%(here_are_your_user_credentials_for)s %(cdsnameintl)s:
+
+   %(label_username)s: %(username)s
+   %(label_password)s: %(password)s
+
+%(you_can_login_at)s:
+
+   <%(login_url)s>
+
+%(best_regards)s
+--
+%(cdsnameintl)s <%(weburl)s>
+%(need_intervention_please_contact)s <%(supportemail)s>
+        """ % {
+            'hello': _("Hello"),
+            'here_are_your_user_credentials_for': _("Here are your user credentials for"),
+            'cdsnameintl': cdsnameintl[ln],
+            'label_username': _("username"),
+            'username': username,
+            'label_password': _("password"),
+            'password': password,
+            'you_can_login_at': _("You can login at"),
+            'login_url': "%s/youraccount/login?ln=%s" % (sweburl, ln),
+            'best_regards': _("Best regards"),
+            'weburl': weburl,
+            'need_intervention_please_contact': _("Need human intervention?  Contact"),
+            'supportemail': supportemail
+            }
         return out
 
     def tmpl_account_emailSent(self, ln, email):
