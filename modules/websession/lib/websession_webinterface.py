@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
 ##
@@ -257,15 +258,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         user_prefs = webuser.get_user_preferences(webuser.emailUnique(args['p_email']))
         if user_prefs:
-            if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) or CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] != None:
-                Msg = websession_templates.tmpl_lost_password_message(ln=args['ln'], supportemail = supportemail)
-
+            if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and \
+               CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] != None:
+                eMsg = _("Cannot send password by email since you are using external authentication system.")
                 return page(title=_("Your Account"),
-                            body=Msg,
+                            body=webaccount.perform_emailMessage(eMsg, args['ln']),
                             description="CDS Personalize, Main page",
                             keywords="CDS, personalize",
-                            uid=uid,
-                            req=req,
+                            uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__)
@@ -283,19 +283,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         lastupdated=__lastupdated__)
 
         fromaddr = "From: %s" % supportemail
-        toaddrs  = "To: " + args['p_email']
-        to = toaddrs + "\n"
-        sub = "Subject: %s %s\n\n" % (_("Credentials for"), cdsname)
-        body = "%s %s:\n\n" % (_("Here are your user credentials for"), cdsname)
-        body += "   %s: %s\n   %s: %s\n\n" % (_("username"), args['p_email'], _("password"), passw)
-        body += "%s %s/youraccount/login?ln=%s" % (_("You can login at"), sweburl, args['ln'])
-        msg = to + sub + body
+        toaddr  = "To: " + args['p_email']
+        subject = "Subject: %s %s" % (_("Credentials for"), cdsname)
+        body = websession_templates.tmpl_account_lost_password_email_body(args['p_email'],
+                                                                          passw,
+                                                                          args['ln'])
+        msg = toaddr + "\n" + subject + "\n\n" + body
 
         server = smtplib.SMTP('localhost')
         server.set_debuglevel(1)
 
         try:
-            server.sendmail(fromaddr, toaddrs, msg)
+            server.sendmail(fromaddr, toaddr, msg)
 
         except smtplib.SMTPRecipientsRefused,e:
             eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
@@ -491,7 +490,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
                 mess += _("A second email will be sent when the account has been activated and can be used.")
             else:
-                mess += _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
+                mess += " " + _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
                     {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">', 
                      'x_url_close': '</a>'}
         elif ruid == -2:
