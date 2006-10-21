@@ -734,6 +734,41 @@ class WebSearchRSSFeedServiceTest(unittest.TestCase):
                          test_web_page_content(weburl + '/rss',
                                                expected_text='<rss version="2.0">'))
 
+class WebSearchXSSVulnerabilityTest(unittest.TestCase):
+    """Test possible XSS vulnerabilities of the search engine."""
+
+    def test_xss_in_collection_interface_page(self):
+        """websearch - no XSS vulnerability in collection interface pages"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Collection &lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt; Not Found'))
+
+    def test_xss_in_simple_search(self):
+        """websearch - no XSS vulnerability in simple search"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
+
+    def test_xss_in_structured_search(self):
+        """websearch - no XSS vulnerability in structured search"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
+
+
+    def test_xss_in_advanced_search(self):
+        """websearch - no XSS vulnerability in advanced search"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?as=1&p1=ellis&f1=author&op1=a&p2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
+
+        
+
+    def test_xss_in_browse(self):
+        """websearch - no XSS vulnerability in browse"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&action_browse=Browse',
+                                               expected_text='&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;'))
 
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -747,7 +782,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
-                             WebSearchRSSFeedServiceTest)
+                             WebSearchRSSFeedServiceTest,
+                             WebSearchXSSVulnerabilityTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
