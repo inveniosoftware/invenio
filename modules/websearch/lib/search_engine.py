@@ -1736,11 +1736,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
     if intro_text_p: # add full leading introductory text
         if f:
             intro = _("Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:") % \
-                     {'x_term': "<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
-                      'x_index': "<em>" + get_field_i18nname(f, ln) + "</em>"}
+                     {'x_term': "<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
+                      'x_index': "<em>" + cgi.escape(get_field_i18nname(f, ln)) + "</em>"}
         else:
             intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
-                     ("<em>" + (p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
+                     ("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
 
     return websearch_templates.tmpl_nearest_term_box(p=p, ln=ln, f=f, terminfo=terminfo,
                                                      intro=intro)

@@ -1047,10 +1047,10 @@ class Template:
         _ = gettext_set_language(ln)
         out = '<p>'
         if f:
-            out += _("Words nearest to %(x_word)s inside %(x_field)s in any collection are:") % {'x_word': '<em>' + p + '</em>',
-                                                                                                 'x_field': '<em>' + f + '</em>'}
+            out += _("Words nearest to %(x_word)s inside %(x_field)s in any collection are:") % {'x_word': '<em>' + cgi.escape(p) + '</em>',
+                                                                                                 'x_field': '<em>' + cgi.escape(f) + '</em>'}
         else:
-            out += _("Words nearest to %(x_word)s in any collection are:") % {'x_word': '<em>' + p + '</em>'}
+            out += _("Words nearest to %(x_word)s in any collection are:") % {'x_word': '<em>' + cgi.escape(p) + '</em>'}
         out += '<br />' + nearest_box + '</p>'
         return out
 
@@ -1143,7 +1143,7 @@ class Template:
               </thead>
               <tbody>""" % {
                 'hits' : _("Hits"),
-                'f' : f
+                'f' : cgi.escape(f)
               }
 
         if len(browsed_phrases_in_colls) == 1:
@@ -1166,7 +1166,7 @@ class Template:
                         %(link)s
                        </td>
                       </tr>""" % {'nbhits': nbhits,
-                                  'link': a_href(phrase, href=self.build_search_url(query))}
+                                  'link': a_href(cgi.escape(phrase), href=self.build_search_url(query))}
                         
         elif len(browsed_phrases_in_colls) > 1:
             # first display what was found but the last one:
@@ -1187,7 +1187,7 @@ class Template:
                             %(link)s
                            </td>
                           </tr>""" % {'nbhits' : nbhits,
-                                      'link': a_href(phrase, href=self.build_search_url(query))}
+                                      'link': a_href(cgi.escape(phrase), href=self.build_search_url(query))}
                             
             # now display last hit as "next term":
             phrase, nbhits = browsed_phrases_in_colls[-1]
@@ -1235,7 +1235,7 @@ class Template:
 
           - 'action' *string* - the action demanded by the user
 
-          - 'fieldlist' *list* - the list of all fields available in CDSWare, for use in select within boxes in advanced search
+          - 'fieldlist' *list* - the list of all fields available, for use in select within boxes in advanced search
 
           - 'p, f, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, op3, rm' *strings* - the search parameters
 

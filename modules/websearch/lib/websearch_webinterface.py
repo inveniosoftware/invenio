@@ -19,6 +19,7 @@
 
 __revision__ = "$Id$"
 
+import cgi
 import sys
 import sre
 
@@ -301,9 +302,9 @@ def display_collection(req, c, as, verbose, ln):
     if type(colID) is not int:
 	page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
 	page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl[ln] + '</a>')) + '</p>'
-        return page(title=_("Collection %s Not Found") % c,
+        return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
-                    description=(cdsname + ' - ' + _("Not found") + ': ' + str(c)),
+                    description=(cdsname + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
                     keywords="%s, CDS Invenio" % cdsname,
                     uid=uid,
                     language=ln,
