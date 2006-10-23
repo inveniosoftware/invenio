@@ -1067,7 +1067,7 @@ class Template:
       <td>%s</td>
       <td style="text-align: center;" >%s</td>
       <td style="text-align: center;" >%s</td>
-    </tr>""" %(name, description, edit_link, members_link)
+    </tr>""" % (cgi.escape(name), cgi.escape(description), edit_link, members_link)
         out += """
     <tr class="mailboxfooter">
       <td colspan="2">
@@ -1125,7 +1125,7 @@ class Template:
     <tr class="mailboxrecord">
       <td>%s</td>
       <td>%s</td>
-    </tr>""" %(name, description)
+    </tr>""" % (cgi.escape(name), cgi.escape(description))
         group_text += """
     <tr>
     <tr class="mailboxfooter">
@@ -1184,7 +1184,7 @@ class Template:
             action = weburl + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
-            label = _('Edit group %s') % group_name
+            label = _('Edit group %s') % cgi.escape(group_name)
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
             delete_text %= (_("Delete group"),"delete")
             if grpID != "":
@@ -1260,8 +1260,8 @@ class Template:
                 'delete_text': delete_text,
                 'description_label': _("Group description:"),
                 'join_policy_label': _("Group join policy:"),
-                'group_name': group_name,
-                'group_description': group_description,
+                'group_name': cgi.escape(group_name, 1),
+                'group_description': cgi.escape(group_description, 1),
                 'button_label': button_label,
                 'button_name':button_name,
                 'cancel_label':_("Cancel"),
@@ -1365,7 +1365,7 @@ class Template:
         out %= {'action' : weburl + '/yourgroups/join',
                 'logo': weburl + '/img/webbasket_create.png',
                 'label': _("Join group"),
-                'group_name': group_name,
+                'group_name': cgi.escape(group_name, 1),
                 'label2':_("or find it") + ': ',
                 'list_label':_("Choose group:"),
                 'ln': ln,
