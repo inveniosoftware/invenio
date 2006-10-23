@@ -24,7 +24,8 @@
 
 __revision__ = "$Id$"
 
-# CDS imports
+import cgi
+
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
@@ -95,7 +96,7 @@ class Template:
                 subject = _("No subject")
             subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
                                                                                ln,
-                                                                               subject)
+                                                                               cgi.escape(subject))
             if user_from_nick:
                 from_link = '%s'% (user_from_nick)
             else:
@@ -319,18 +320,18 @@ class Template:
                 if to.isdigit():
                     (dummy, to, to_display) = get_user_info(int(to), ln)
                 sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
-                sent_to_link += '%s</a>%s '% (to_display, CFG_WEBMESSAGE_SEPARATOR)
+                sent_to_link += '%s</a>%s '% (cgi.escape(to_display), CFG_WEBMESSAGE_SEPARATOR)
             to_display = tos[-1]
             to = tos[-1]
             if to.isdigit():
                 (dummy, to, to_display) = get_user_info(int(to), ln)
-            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, to_display)
+            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, cgi.escape(to_display))
         group_to_link = ""
         groups = msg_sent_to_group.split(CFG_WEBMESSAGE_SEPARATOR)
         if (groups):
             for group in groups[0:-1]:
                 group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">'% (group, ln)
-                group_to_link += '%s</a>%s '% (group, CFG_WEBMESSAGE_SEPARATOR)
+                group_to_link += '%s</a>%s '% (cgi.escape(group), CFG_WEBMESSAGE_SEPARATOR)
             group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">%s</a>'% (groups[-1], ln, groups[-1])
         # format the msg so that the '>>' chars give vertical lines
         final_body = email_quoted_txt2html(msg_body)
@@ -412,8 +413,8 @@ class Template:
                      'received_date': convert_datetext_to_dategui(msg_received_date, ln),
                      'sent_to': sent_to_link,
                      'sent_to_group': group_to_link,
-                     'subject' : msg_subject,
-                     'body' : final_body,
+                     'subject' : cgi.escape(msg_subject),
+                     'body' : cgi.escape(final_body),
                      'reply_to': msg_from_id,
                      'msg_id': msg_id,
                      'ln': ln,
