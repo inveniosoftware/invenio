@@ -204,9 +204,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         try:
             html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
-                                            argd['idb'], argd['idq'], uid, ln=argd['ln'])
+                                              argd['idb'], argd['idq'], uid, ln=argd['ln'])
         except webalert.AlertError, e:
-            return self.input(req, form)
+            html = e 
+            #return self.input(req, form)
         return page(title=_("Display alerts"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {

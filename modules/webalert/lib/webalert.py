@@ -192,9 +192,8 @@ def perform_add_alert(alert_name, frequency, notification,
     #check if the alert can be created
     check_alert_name(alert_name, uid, ln)
     check_alert_is_unique(id_basket, id_query, uid, ln)
-    if not(check_user_owns_baskets(uid, id_basket)):
+    if id_basket != 0 and not check_user_owns_baskets(uid, id_basket):
         raise AlertError( _("You are not the owner of this basket.") )
-    
 
     # add a row to the alerts table: user_query_basket
     query = """INSERT INTO user_query_basket (id_user, id_query, id_basket,
@@ -206,7 +205,7 @@ def perform_add_alert(alert_name, frequency, notification,
               alert_name, notification)
     run_sql(query)
     out = _("The alert %s has been added to your profile.")
-    out %= '<b>' + alert_name + '</b>'
+    out %= '<b>' + cgi.escape(alert_name) + '</b>'
     out += perform_list_alerts(uid, ln=ln)
     return out
 
@@ -300,7 +299,13 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
             where id_user=%s
             and id_basket=%s
             and id_query=%s"""%( uid, old_id_basket, id_query )
-    old_alert_name = run_sql( sql )[0][0]
+    try:
+        old_alert_name = run_sql( sql )[0][0]
+    except IndexError:
+        # FIXME: I18N since this technique of the below raise message,
+        # since this technique (detecting old alert IDs) is not nice
+        # and should be replaced some day soon.
+        raise AlertError("Unable to detect old alert name.") 
     if old_alert_name.strip()!="" and old_alert_name != alert_name:
         check_alert_name( alert_name, uid, ln)
     if id_basket != old_id_basket:

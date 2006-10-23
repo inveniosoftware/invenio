@@ -19,6 +19,7 @@
 
 __revision__ = "$Id$"
 
+import cgi
 import time
 import string
 
@@ -113,7 +114,8 @@ class Template:
                  'alert_name' : _("alert name"),
                }
         for alert in alerts :
-            out += """<option value="%(id)s">%(name)s</option>""" % alert
+            out += """<option value="%(id)s">%(name)s</option>""" % \
+                   {'id': alert['id'], 'name': cgi.escape(alert['name'])}
         out += """</select>
                 &nbsp;<code class="blocknote">
                 <input class="formbutton" type="submit" name="action" value="%(show)s" /></code>
@@ -170,13 +172,13 @@ class Template:
         <table style="background-color:F1F1F1; border:thin groove grey; padding: 0px;">
           <tr>
             <td>
-              <table style="border: 0px; padding:10px;>
+              <table style="border: 0px; padding:10px;">
                 <tr>
                    <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s:</td>
                    <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s"></td>
                 </tr>
                 <tr>
-                  <td style="text-align: right; font-weight: bold;">%(freq)s:</td>
+                  <td style="text-align: right; font-weight: bold;">%(freq)s</td>
                   <td>
                     <select name="freq">
                       <option value="month" %(freq_month)s>%(monthly)s</option>
@@ -201,7 +203,7 @@ class Template:
                """ % {
                  'action': action,
                  'alert_name' : _("Alert identification name:"),
-                 'alert' : alert_name,
+                 'alert' : cgi.escape(alert_name, 1),
                  'freq' : _("Search-checking frequency:"),
                  'freq_month' : (frequency == 'month' and 'selected="selected"' or ""),
                  'freq_week' : (frequency == 'week' and 'selected="selected"' or ""),
@@ -318,7 +320,7 @@ class Template:
             for alert in alerts:
                 i += 1
                 if alert['frequency'] == "day":
-                    frequency = _("daily"),
+                    frequency = _("daily")
                 else:
                     if alert['frequency'] == "week":
                         frequency = _("weekly")
@@ -346,10 +348,11 @@ class Template:
                              </td>
                             </tr>""" % {
                     'index' : i,
-                    'alertname' : alert['alertname'],
+                    'alertname' : cgi.escape(alert['alertname']),
                     'frequency' : frequency,
                     'notification' : notification,
-                    'basketname' : alert['basketname'],
+                    'basketname' : alert['basketname'] and cgi.escape(alert['basketname']) \
+                                                       or "- " + _("no basket") + " -",  
                     'lastrun' : alert['lastrun'],
                     'created' : alert['created'],
                     'textargs' : alert['textargs'],
@@ -445,7 +448,7 @@ class Template:
                         <td style="font-style: italic;">#%(index)d</TD>
                         <td>%(textargs)s</td>
                         <td><a href="%(weburl)s/search?%(args)s">%(execute_query)s</a><br />
-                            <a href="./input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></td>""" % {
+                            <a href="%(weburl)s/youralerts/input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></td>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'weburl' : weburl,
