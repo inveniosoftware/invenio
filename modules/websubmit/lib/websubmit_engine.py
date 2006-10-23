@@ -739,7 +739,7 @@ def home(req, c=cdsname, ln=cdslang):
                req=req
                )
 
-def makeCataloguesTable(ln):
+def makeCataloguesTable(ln=cdslang):
     text = ""
     catalogues = []
     queryResult = run_sql("SELECT id_son FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_father=0 ORDER BY catalogue_order");
@@ -1029,7 +1029,7 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
             t = "<br /><br /><b>" + _("The chosen action is not supported by the document type.") + "</b>"
     return t
 
-def Propose_Next_Action (doctype, action_score, access, currentlevel, indir):
+def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=cdslang):
     global machine, storage, act, rn
     t=""
     res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype, currentlevel, action_score,))
