@@ -19,6 +19,8 @@
 
 __revision__ = "$Id$"
 
+import cgi
+
 from invenio.messages import gettext_set_language
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_SHARE_LEVELS, \
@@ -126,9 +128,9 @@ class Template:
                     topic_link = '%s/yourbaskets/display?category=%s&amp;topic=%i&amp;ln=%s'
                     topic_link %= (weburl, category, i, ln)
                     out += '<a href="%s">' % topic_link
-                    out += topic_label + '</a>'
+                    out += cgi.escape(topic_label) + '</a>'
                 else:
-                    out += topic_label
+                    out += cgi.escape(topic_label)
                 out += '</span> '    
                 i += 1
             out = """
@@ -188,7 +190,7 @@ class Template:
             basket_list += '<ul>\n'
             for (bskid, name, last_update) in basket_infos:
                 last_update = convert_datetext_to_dategui(last_update)
-                basket_list += '<li><a href="#bsk%i">%s</a> - ' % (bskid, name)
+                basket_list += '<li><a href="#bsk%i">%s</a> - ' % (bskid, cgi.escape(name))
                 basket_list += _("updated on") + ' ' + last_update + '</li>\n'
             basket_list += '</ul>'
         if len(basket_infos) < 2:
@@ -258,7 +260,7 @@ class Template:
 </table>""" % {'general_label': general_label,
                'weburl': weburl,
                'image_label': _("Public basket"),
-               'name': bsk_name,
+               'name': cgi.escape(bsk_name),
                'nb_items': len(bsk_items),
                'records_label': _("records"),
                'last_update_label': _("last update"),
@@ -285,15 +287,15 @@ class Template:
         base_url = weburl + '/yourbaskets/list_public_baskets?order=%i&asc=%i&amp;ln=' + ln
         asc_image = '<img src="' + weburl + '/img/webbasket_' + (asc and 'down.png' or 'up.png') + '" style="vertical-align: middle; border: 0px;" />'
         if order == 1:
-            name_label = '<a href="' + base_url % (1, int(not(asc))) + '">' + name_label + ' ' + asc_image + '</a>'
+            name_label = '<a href="' + base_url % (1, int(not(asc))) + '">' + cgi.escape(name_label) + ' ' + asc_image + '</a>'
             nb_views_label = '<a href="' + base_url % (2, 1) + '">' + nb_views_label + '</a>'
             owner_label = '<a href="' + base_url % (3, 1) + '">' + owner_label + '</a>'
         elif order == 2:
-            name_label = '<a href="' + base_url % (1, 1) + '">' + name_label + '</a>'
+            name_label = '<a href="' + base_url % (1, 1) + '">' + cgi.escape(name_label) + '</a>'
             nb_views_label = '<a href="' + base_url % (2, int(not(asc))) + '">' + nb_views_label + ' ' + asc_image + '</a>'
             owner_label = '<a href="' + base_url % (3, 1) + '">' + owner_label + '</a>'
         else:
-            name_label = '<a href="' + base_url % (1, 1) + '">' + name_label + '</a>'
+            name_label = '<a href="' + base_url % (1, 1) + '">' + cgi.escape(name_label) + '</a>'
             nb_views_label = '<a href="' + base_url % (2, 1) + '">' + nb_views_label + '</a>'
             owner_label = '<a href="' + base_url % (3, int(not(asc))) + '">' + owner_label + ' ' + asc_image + '</a>'
         baskets_html = ''
@@ -325,7 +327,7 @@ class Template:
             baskets_html += """
     <tr>
       <td>%s</td><td style="text-align:center">%i</td><td>%s</td><td style="vertical-align: middle; text-align:center;">%s</td><td style="vertical-align: middle">%s</td>
-    </tr>""" % (name, nb_views, messaging_link, form_view, form_subscribe)
+    </tr>""" % (cgi.escape(name), nb_views, messaging_link, form_view, form_subscribe)
         if not(len(baskets_html)):
             baskets_html = '<tr><td colspan="5">' + _("There is currently no publicly accessible basket") + '</td></tr>'
         change_page = '<a href="' + weburl + '/yourbaskets/list_public_baskets?inf_limit=%i&amp;order=' + str(order)
@@ -487,7 +489,7 @@ class Template:
   </tbody>
 </table>"""
         out %= {'actions': actions,
-                'name': name,
+                'name': cgi.escape(name),
                 'bskid': bskid,
                 'nb_items': nb_items,
                 'records_label': _('records'),
@@ -747,7 +749,7 @@ class Template:
                'topic': selected_topic,
                'group': selected_group_id,
                'ln': ln,
-               'name': bsk_name,
+               'name': cgi.escape(bsk_name),
                'nb_items': bsk_nb_records,
                'records_label': _("records"),
                'last_update_label': _("last update"),
@@ -1178,7 +1180,7 @@ class Template:
 <tr>
   <td class="bskcontentcol">%s</td>
   <td class="bskcontentcol"><input type="text" name="new_name" value="%s"/></td>
-</tr>""" % (_("Basket's name"), bsk_name)
+</tr>""" % (_("Basket's name"), cgi.escape(bsk_name,1))
             topics_selection = zip(range(len(topics)), topics)
             topics_selection.insert(0, (-1, _("Choose topic"))) 
             topics_body = """
@@ -1255,7 +1257,7 @@ class Template:
     </tr>
   </table>
       
-</form>""" % {'label': _('Editing basket') + ' ' + bsk_name,
+</form>""" % {'label': _('Editing basket') + ' ' + cgi.escape(bsk_name),
               'action': weburl + '/yourbaskets/edit',
               'ln': ln,
               'topic': topic,
@@ -1432,7 +1434,7 @@ class Template:
             selected = ''
             if key == selected_key:
                 selected = ' selected="selected"'
-            out += indent_text('<option value="%s"%s>%s</option>'% (key, selected, label), 1)
+            out += indent_text('<option value="%s"%s>%s</option>'% (key, selected, cgi.escape(label)), 1)
         out += '</select>'
         return out
      

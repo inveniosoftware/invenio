@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+import cgi
 from zlib import decompress
 
 from invenio.config import cdslang, weburl
@@ -723,7 +724,7 @@ def create_basket_navtrail(uid,
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
                     'category=' + category + '&amp;topic=' + str(topic) + '&amp;ln=' + ln,
-                    topics[topic])
+                    cgi.escape(topics[topic]))
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
@@ -732,7 +733,7 @@ def create_basket_navtrail(uid,
                     out %= (weburl,
                             'category=' + category + '&amp;topic=' + str(topic) + \
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
-                            basket[1])
+                            cgi.escape(basket[1]))
                 
     elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
@@ -745,7 +746,7 @@ def create_basket_navtrail(uid,
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
                     'category=' + category + '&amp;group=' + str(group) + '&amp;ln=' + ln,
-                    groups[0][1])
+                    cgi.escape(groups[0][1]))
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
@@ -754,7 +755,7 @@ def create_basket_navtrail(uid,
                     out %= (weburl,
                             'category=' + category + '&amp;group=' + str(group) + \
                             '&amp;ln=' + ln + '#bsk' + str(bskid),
-                            basket[1])
+                            cgi.escape(basket[1]))
     elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Others' baskets"))
@@ -765,7 +766,7 @@ def create_basket_navtrail(uid,
                 out += '<a class="navtrail" href="%s/yourbaskets/display?%s"">%s</a>'
                 out %= (weburl,
                         'category=' + category + '&amp;ln=' + ln + '#bsk' + str(bskid),
-                        basket[1])
+                        cgi.escape(basket[1]))
     return out
 
 def create_infobox(infos=[]):
