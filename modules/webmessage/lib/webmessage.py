@@ -23,6 +23,8 @@
 
 __revision__ = "$Id$"
 
+import cgi
+
 from invenio.webmessage_dblayer import *
 from invenio.webmessage_config import *
 from invenio.config import cdslang
@@ -358,7 +360,7 @@ def perform_request_send(uid,
     gids_to = []
     for (group_name, group_id) in groups_to:
         if not(group_id):
-            warnings.append(_("Group %s does not exist.")% (group_name))
+            warnings.append(_("Group %s does not exist.")% (cgi.escape(group_name)))
             problem = 1
         else:
             gids_to.append(group_id)
@@ -381,7 +383,7 @@ def perform_request_send(uid,
                     uids_from_group.append(user_nick)
                     tmp_dict[user_nick] = None
             else:                    
-                warnings.append(_("User %s does not exist.")% (user_nick))
+                warnings.append(_("User %s does not exist.")% (cgi.escape(user_nick)))
                 problem = 1
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
