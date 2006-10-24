@@ -41,7 +41,11 @@ except ImportError:
     _got_magic = False
 
 import gzip
-import bz2
+try:
+    import bz2
+    _got_bz2 = True
+except ImportError:
+    _got_bz2 = False
 
 from invenio.elmsubmit_misc import open_tempfile as _open_tempfile
 from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
@@ -162,6 +166,8 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
 
             try:
                 # Decompress the file:
+                if not _got_bz2:
+                    raise ImportError('Failed to import bz2 module.')
                 decomp_file = bz2.BZ2File(tf_name).read()
             except IOError:
                 # Couldn't decompress sucessfully, so just stick

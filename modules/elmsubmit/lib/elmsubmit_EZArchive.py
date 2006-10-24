@@ -21,8 +21,13 @@
 
 __revision__ = "$Id$"
 
+try:
+    import bz2
+    _got_bz2 = True
+except ImportError:
+    _got_bz2 = False
+
 import gzip
-import bz2
 import zipfile
 import tarfile
 import shutil
@@ -967,6 +972,8 @@ class bz2CompressTool(CompressTool):
             if os.path.exists(file_loc) and not allow_clobber:
                 raise ClobberError(file_loc)
 
+        if not _got_bz2:
+            raise ImportError('Failed to import bz2 module.')
         self._fh = bz2.BZ2File(file_loc, mode=mode+'b')
         self._filename = os.path.basename(file_loc)
         self._file_loc = file_loc
