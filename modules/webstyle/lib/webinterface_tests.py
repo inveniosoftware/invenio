@@ -42,6 +42,7 @@ class _FakeApache(object):
         self.config_tree = None
         self.server_root = None
         self.mpm_query = None
+        self.exists_config_define = None
 
     def parse_qs(self, *args, **kargs):
         return cgi.parse_qs(*args, **kargs)
