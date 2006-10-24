@@ -1952,8 +1952,10 @@ def get_fieldvalues(recID, tag):
         digit = tag[0:2]
         bx = "bib%sx" % digit
         bibx = "bibrec_bib%sx" % digit
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s'" \
-                "ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
+        query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
+                " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s' " \
+                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
+        print query
         res = run_sql(query)
         for row in res:
             out.append(row[0])
@@ -1962,10 +1964,13 @@ def get_fieldvalues(recID, tag):
 def get_fieldvalues_alephseq_like(recID, tags_in):
     """Return buffer of ALEPH sequential-like textual format with fields found in the list TAGS_IN for record RECID."""
     out = ""
+    if type(tags_in) is not list:
+        tags_in = [tags_in,]
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
         ##         (use with care: can false you if field has multiple occurrences)
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
+        print out
     else:
         ## case B: print our "text MARC" format; works safely all the time
         # find out which tags to output:
@@ -3476,8 +3481,9 @@ def profile(p="", f="", c=cdsname):
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
 #print create_collection_i18nname_cache()
-#print get_fieldvalues_alephseq_like(11,"980__a")
-#print get_fieldvalues_alephseq_like(11,["001", "980"])
+#print get_fieldvalues(40, "980__a")
+#print get_fieldvalues_alephseq_like(40,"980__a")
+#print get_fieldvalues_alephseq_like(40,["001", "980"])
 
 ## profiling:
 #profile("of the this")
