@@ -386,7 +386,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     if new_basket_name != '':
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
-            topic = new_topic_name
+            topic = new_topic_name 
         elif create_in_topic != -1:
             topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
             try:
@@ -566,7 +566,7 @@ def perform_request_create_basket(uid,
     @pram ln: language
     """
     if new_basket_name and (new_topic_name or create_in_topic != -1):
-        topics_infos = db.get_personal_topics_infos(uid)
+        topics_infos = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
             topic = new_topic_name
