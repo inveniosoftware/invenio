@@ -490,8 +490,8 @@ class Template:
             pattern = 'pattern: %s\n' % pattern
 
         frequency = {'day': 'daily',
-                     'month': 'monthly',
-                     'year': 'yearly'}[frequency]
+                     'week': 'weekly',
+                     'month': 'monthly'}[frequency]
 
         l = len(records)
         if l == 1:
