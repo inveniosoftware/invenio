@@ -1949,9 +1949,16 @@ def get_fieldvalues(recID, tag):
         out.append(str(recID))
     else:
         # we are going to look inside bibXXx tables
-        digit = tag[0:2]
-        bx = "bib%sx" % digit
-        bibx = "bibrec_bib%sx" % digit
+        digits = tag[0:2]
+        try:
+            intdigits = int(digits)
+            if intdigits < 0 or intdigits > 99:
+                raise ValueError
+        except ValueError:
+            # invalid tag value asked for
+            return []
+        bx = "bib%sx" % digits
+        bibx = "bibrec_bib%sx" % digits
         query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
                 " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s' " \
                 " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
@@ -1995,6 +2002,13 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
         # search all bibXXx tables as needed:
         for tag in tags_out:
             digits = tag[0:2]
+            try:
+                intdigits = int(digits)
+                if intdigits < 0 or intdigits > 99:
+                    raise ValueError
+            except ValueError:
+                # invalid tag value asked for
+                continue
             if tag.startswith("001") or tag.startswith("00%"):
                 if out:
                     out += "\n"
@@ -3480,9 +3494,13 @@ def profile(p="", f="", c=cdsname):
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
 #print create_collection_i18nname_cache()
-#print get_fieldvalues(40, "980__a")
-#print get_fieldvalues_alephseq_like(40,"980__a")
-#print get_fieldvalues_alephseq_like(40,["001", "980"])
+#print get_fieldvalues(10, "980__a")
+#print get_fieldvalues_alephseq_like(10,"001___")
+#print get_fieldvalues_alephseq_like(10,"980__a")
+#print get_fieldvalues_alephseq_like(10,"foo")
+#print get_fieldvalues_alephseq_like(10,"-1")
+#print get_fieldvalues_alephseq_like(10,"99")
+#print get_fieldvalues_alephseq_like(10,["001", "980"])
 
 ## profiling:
 #profile("of the this")
