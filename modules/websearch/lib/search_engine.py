@@ -1955,7 +1955,6 @@ def get_fieldvalues(recID, tag):
         query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
                 " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s' " \
                 " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-        print query
         res = run_sql(query)
         for row in res:
             out.append(row[0])
@@ -1970,7 +1969,6 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
         ## case A: one concrete subfield asked, so print its value if found
         ##         (use with care: can false you if field has multiple occurrences)
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
-        print out
     else:
         ## case B: print our "text MARC" format; works safely all the time
         # find out which tags to output:
