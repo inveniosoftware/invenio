@@ -2415,10 +2415,11 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     # Old procedure follows further below
     # We must still check some special formats, but these
     # should disappear when BibFormat improves.
-    if not CFG_BIBFORMAT_USE_OLD_BIBFORMAT \
-           and not format.lower().startswith('t') \
-           and not format.lower().startswith('hm') \
-           and not str(format[0:3]).isdigit():
+    if not (CFG_BIBFORMAT_USE_OLD_BIBFORMAT \
+            or format.lower().startswith('t') \
+            or format.lower().startswith('hm') \
+            or str(format[0:3]).isdigit() \
+            or ot != ''):
 
         #Unspecified format is hd
         if format == '':
