@@ -1720,7 +1720,7 @@ class Template:
                   <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
                   <strong><big>%(collection_link)s</big></strong></td>
                   ''' % {
-                    'collection_name': a_href('', name=collection),
+                    'collection_name': a_href('', name=urllib.quote(collection)),
                     'weburl' : weburl,
                     'collection_link': a_href(collection_name,
                                               href=self.build_search_interface_url(c=collection, as=as, ln=ln)),
