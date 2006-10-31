@@ -81,7 +81,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     """
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
-        return bibformat_engine.call_old_bibformat(recID, format=of)
+        return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
     ############################# END ##################################
 
     if on_the_fly == False:
