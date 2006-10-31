@@ -233,7 +233,7 @@ def iterate_over_new(list, weburl, fmt):
 
         ### bibformat external call
         ###
-        formatted_record = format_record(recID, fmt)
+        formatted_record = format_record(recID, fmt, on_the_fly=True)
         # Encapsulate record in xml tags that bibupload understands
         prologue = '''
     <record>
