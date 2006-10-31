@@ -28,8 +28,6 @@ __revision__ = "$Id$"
 ## import interesting modules:
 try:
     import sys
-    pylibdir = "@prefix@/lib/python"
-    sys.path.append('%s' % pylibdir)
     from invenio.dbquery import run_sql, escape_string
     from invenio.config import *
     from invenio.search_engine import perform_request_search
