@@ -147,27 +147,34 @@ pattern_format_element_seealso = re.compile('''@see\s*(?P<see>.*)''', re.VERBOSE
 ##      (?P=sep2)
 ##      ''', re.VERBOSE | re.MULTILINE)    
 
-def call_old_bibformat(recID, format="HD"):
+def call_old_bibformat(recID, format="HD", on_the_fly=False):
     """
     FIXME: REMOVE FUNCTION WHEN MIGRATION IS DONE
     Calls BibFormat for the record RECID in the desired output format FORMAT.
+
+    @param on_the_fly if False, try to return an already preformatted version of the record in the database
 
     Note: this functions always try to return HTML, so when
     bibformat returns XML with embedded HTML format inside the tag
     FMT $g, as is suitable for prestoring output formats, we
     perform un-XML-izing here in order to return HTML body only.
     """
-    # look for formatted notice existence:
-    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-    res = run_sql(query, None, 1)
+    res = []
+    if not on_the_fly:
+        # look for formatted notice existence:
+        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
+        res = run_sql(query, None, 1)
     if res:
         # record 'recID' is formatted in 'format', so print it
         decompress = zlib.decompress
         return "%s" % decompress(res[0][0])
     else:
-        # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
+        # record 'recID' is not formatted in 'format',
+        # so try to call BibFormat on the fly or use default format:
         out = ""
-        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir, "otype=%s" % format], 'rw')
+        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
+                                                         "otype=%s" % format],
+                                                        'rw')
         #pipe_input.write(print_record(recID, "xm"))
         pipe_input.write(record_get_xml(recID, "xm"))
         pipe_input.close()
@@ -226,7 +233,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     if template == None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
         if CFG_PATH_PHP:
-            return call_old_bibformat(recID, format=of)
+            return call_old_bibformat(recID, format=of, on_the_fly=True)
     ############################# END ##################################
      
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
