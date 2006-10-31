@@ -263,7 +263,7 @@ class Template:
         if headertitle == cdsnameintl[ln]:
             headertitle = _("Home")
 
-        out = """
+        out = """\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
