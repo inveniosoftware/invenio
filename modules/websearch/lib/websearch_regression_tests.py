@@ -770,6 +770,51 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&action_browse=Browse',
                                                expected_text='&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;'))
 
+class WebSearchResultsOverview(unittest.TestCase):
+    """Test of the search results page's Results overview box and links."""
+
+    def test_results_overview_split_off(self):
+        """websearch - results overview box when split by collection is off"""
+        browser = Browser()
+        browser.open(weburl + '/search?p=of&sc=0')
+        body = browser.response().read()
+        if body.find("Results overview") > -1:
+            self.fail("Oops, when split by collection is off, "
+                      "results overview should not be present.")
+        if body.find('<a name="Atlantis%20Institute%20of%20Fictive%20Science"></a>') == -1:
+            self.fail("Oops, when split by collection is off, "
+                      "Atlantis collection should be found.")
+        if body.find('<a name="Multimedia%20%26%20Arts"></a>') > -1:
+            self.fail("Oops, when split by collection is off, "
+                      "Multimedia & Arts should not be found.")
+        try:
+            browser.find_link(url='#Multimedia%20%26%20Arts')
+            self.fail("Oops, when split by collection is off, "
+                      "a link to Multimedia & Arts should not be found.")
+        except LinkNotFoundError:
+            pass
+
+    def test_results_overview_split_on(self):
+        """websearch - results overview box when split by collection is on"""
+        browser = Browser()
+        browser.open(weburl + '/search?p=of&sc=1')
+        body = browser.response().read()
+        if body.find("Results overview") == -1:
+            self.fail("Oops, when split by collection is on, "
+                      "results overview should be present.")
+        if body.find('<a name="Atlantis%20Institute%20of%20Fictive%20Science"></a>') > -1:
+            self.fail("Oops, when split by collection is on, "
+                      "Atlantis collection should not be found.")
+        if body.find('<a name="Multimedia%20%26%20Arts"></a>') == -1:
+            self.fail("Oops, when split by collection is on, "
+                      "Multimedia & Arts should be found.")
+        try:
+            browser.find_link(url='#Multimedia%20%26%20Arts')
+        except LinkNotFoundError:
+            self.fail("Oops, when split by collection is on, "
+                      "a link to Multimedia & Arts should be found.")
+
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -783,7 +828,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRSSFeedServiceTest,
-                             WebSearchXSSVulnerabilityTest)
+                             WebSearchXSSVulnerabilityTest,
+                             WebSearchResultsOverview)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
