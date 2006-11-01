@@ -38,20 +38,37 @@ class ApacheAuthenticationTests(unittest.TestCase):
 
     def test_auth_apache_user_p(self):
         """webuser - apache user password checking"""
+        # These should succeed:
         self.assertEqual(1,
-                         webuser.auth_apache_user_p('jekyll', 'jekyll',
+                         webuser.auth_apache_user_p('jekyll', 'j123ekyll',
                                                     self.apache_password_file))
         self.assertEqual(1,
-                         webuser.auth_apache_user_p('hyde', 'hyde',
+                         webuser.auth_apache_user_p('hyde', 'h123yde',
                                                     self.apache_password_file))
+        # Note: the following one should succeed even though the real
+        # password is different, because crypt() looks at first 8
+        # chars only:
+        self.assertEqual(1,
+                         webuser.auth_apache_user_p('jekyll', 'j123ekylx',
+                                                    self.apache_password_file))
+        # Now some attempts that should fail:
         self.assertEqual(0,
                          webuser.auth_apache_user_p('jekyll', '',
                                                     self.apache_password_file))
         self.assertEqual(0,
-                         webuser.auth_apache_user_p('jekyll', 'hyde',
+                         webuser.auth_apache_user_p('jekyll', 'h123yde',
                                                     self.apache_password_file))
         self.assertEqual(0,
-                         webuser.auth_apache_user_p('aoeui', 'hyde',
+                         webuser.auth_apache_user_p('jekyll', 'aoeuidhtns',
+                                                    self.apache_password_file))
+        self.assertEqual(0,
+                         webuser.auth_apache_user_p('aoeui', '',
+                                                    self.apache_password_file))
+        self.assertEqual(0,
+                         webuser.auth_apache_user_p('aoeui', 'h123yde',
+                                                    self.apache_password_file))
+        self.assertEqual(0,
+                         webuser.auth_apache_user_p('aoeui', 'dhtns',
                                                     self.apache_password_file))
 
     def test_auth_apache_user_in_groups(self):

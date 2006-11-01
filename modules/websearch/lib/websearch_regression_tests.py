@@ -688,7 +688,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         testurl = weburl + '/search?c=Theses'
         browser = Browser()
         # Dr. Jekyll should be able to connect:
-        browser.add_password(testurl, "jekyll", "jekyll")
+        browser.add_password(testurl, "jekyll", "j123ekyll")
         browser.open(testurl)
         if browser.response().read().find("records found") > -1:
             pass
@@ -700,7 +700,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         testurl = weburl + '/search?c=Theses'
         browser = Browser()
         # Mr. Hyde should not be able to connect:
-        browser.add_password(testurl, "hyde", "hyde")
+        browser.add_password(testurl, "hyde", "h123yde")
         try:
             browser.open(testurl)
         except HTTPError, errmsg:
@@ -715,7 +715,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         testurl = weburl + '/search?c=Theses'
         browser = Browser()
         # Dr. Jekyll with wrong password should not be able to connect:
-        browser.add_password(testurl, "jekyll", "hyde")
+        browser.add_password(testurl, "jekyll", "h123yde")
         try:
             browser.open(testurl)
         except HTTPError, errmsg:

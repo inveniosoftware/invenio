@@ -179,7 +179,7 @@ Contents
                     --with-dbhost=sqlserver.domain.com \
                     --with-dbname=cdsinvenio \
                     --with-dbuser=cdsinvenio \
-                    --with-dbpass=myp1ss \
+                    --with-dbpass=my123pass \
                     --with-python=/opt/python/bin/python2.3
       $ vi ./config/config.wml   ## optional, but strongly recommended
       $ make
