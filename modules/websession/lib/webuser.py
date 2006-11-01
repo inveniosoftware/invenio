@@ -437,8 +437,8 @@ def username_exists_p(username):
     if username == "":
         # return not exists if asked for guest users
         return 0
-    res = run_sql("SELECT email FROM user WHERE nickname=%s OR email=%s",
-                  (username, username,))
+    res = run_sql("SELECT email FROM user WHERE email=%s", (username,)) + \
+          run_sql("SELECT email FROM user WHERE nickname=%s", (username,))
     if len(res) > 0:
         return 1
     return 0
@@ -560,7 +560,8 @@ def get_email_from_username(username):
     matching entries.
     """
     out = username
-    res = run_sql("SELECT email FROM user WHERE email=%s OR nickname=%s", (username, username,), 1)
+    res = run_sql("SELECT email FROM user WHERE email=%s", (username,), 1) + \
+          run_sql("SELECT email FROM user WHERE nickname=%s", (username,), 1)
     if res and len(res) == 1:
         out = res[0][0]
     return out

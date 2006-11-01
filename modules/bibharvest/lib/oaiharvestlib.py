@@ -107,7 +107,8 @@ def authenticate(user, header="oaiharvest Task Submission", action="runoaiharves
     else:
         print >> sys.stdout, "\rUsername:", user        
     ## first check user pw:
-    res = run_sql("select id,password from user where email=%s or nickname=%s", (user, user,), 1)
+    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
+          run_sql("select id,password from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
         sys.exit(1)        

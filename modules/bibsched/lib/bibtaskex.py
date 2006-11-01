@@ -138,7 +138,8 @@ def authenticate(user, header="BibTaskEx Task Submission", action="runbibtaskex"
     else:
         print >> sys.stdout, "\rUsername:", user        
     ## first check user pw:
-    res = run_sql("select id,password from user where email=%s or nickname=%s", (user, user,), 1)
+    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
+          run_sql("select id,password from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
         sys.exit(1)        
