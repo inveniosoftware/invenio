@@ -21,16 +21,28 @@
 
 __revision__ = "$Id$"
 
+from invenio.bibformat_engine import parse_tag
+
 def format(bfo, tag, limit, separator=" "):
     """
     Prints the given field of a record.
+    If tag is in range [001, 010], this element assumes
+    that it accesses a control field. Else it considers it
+    accesses a data field.
 
     @param tag the tag code of the field that is to be printed
     @param separator a separator between values of the field.
     @param limit the maximum number of values to display.
     """
-    values = bfo.fields(tag)
+    # check if data or control field
+    p_tag = parse_tag(tag)
+    if p_tag[0].isdigit() and int(p_tag[0]) in range(0, 11):
+        return  bfo.control_field(tag)
+    else:
+        values = bfo.fields(tag)
+    
     out = ""
+    
     if limit == "" or (not limit.isdigit()) or limit > len(values):
         limit = len(values)
 
@@ -45,5 +57,5 @@ def format(bfo, tag, limit, separator=" "):
 
     else:
         out += separator.join(values[:int(limit)])
-
+    
     return out
