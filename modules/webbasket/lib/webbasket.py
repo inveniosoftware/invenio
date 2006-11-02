@@ -393,10 +393,14 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
                 topic = topics[create_in_topic]
             except IndexError:
                 topic = ''
+        #it may be useful to add a warning message when no topic is selected 
+        elif create_in_topic == -1:
+            topic = ''
         if topic:
             id_bsk = db.create_basket(uid, new_basket_name, topic)
             bskids.append(id_bsk)
-    if len(bskids):       
+    #it may be useful to add a warning message when no basket is selected : bskids != ['-1']
+    if len(bskids) and bskids != ['-1']:       
         # save
         nb_modified_baskets = db.add_to_basket(uid, recids, bskids)
         body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
