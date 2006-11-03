@@ -317,3 +317,77 @@ def encode_for_xml(s):
     s = s.replace('&', '&amp;')
     s = s.replace('<', '&lt;')
     return s
+
+def parse_tag(tag):
+    """
+    Parse a marc code and decompose it in a table with: 0-tag 1-indicator1 2-indicator2 3-subfield
+
+    The first 3 chars always correspond to tag.
+    The indicators are optional. However they must both be indicated, or both ommitted.
+    If indicators are ommitted or indicated with underscore '_', they mean "No indicator".
+    The subfield is optional. It can optionally be preceded by a dot '.' or '$$' or '$'
+
+    Any of the chars can be replaced by wildcard %
+
+    THE FUNCTION DOES NOT CHECK WELLFORMNESS OF 'tag'
+    
+    Any empty chars is not considered
+    
+    For example:
+    >> parse_tag('245COc') = ['245', 'C', 'O', 'c']
+    >> parse_tag('245C_c') = ['245', 'C', '', 'c']
+    >> parse_tag('245__c') = ['245', '', '', 'c']
+    >> parse_tag('245__$$c') = ['245', '', '', 'c']
+    >> parse_tag('245__$c') = ['245', '', '', 'c']
+    >> parse_tag('245  $c') = ['245', '', '', 'c']
+    >> parse_tag('245  $$c') = ['245', '', '', 'c']
+    >> parse_tag('245__.c') = ['245', '', '', 'c']
+    >> parse_tag('245  .c') = ['245', '', '', 'c']
+    >> parse_tag('245C_$c') = ['245', 'C', '', 'c']
+    >> parse_tag('245CO$$c') = ['245', 'C', 'O', 'c']
+    >> parse_tag('245C_.c') = ['245', 'C', '', 'c']
+    >> parse_tag('245$c') = ['245', '', '', 'c']
+    >> parse_tag('245.c') = ['245', '', '', 'c']
+    >> parse_tag('245$$c') = ['245', '', '', 'c']
+    >> parse_tag('245__%') = ['245', '', '', '']
+    >> parse_tag('245__$$%') = ['245', '', '', '']
+    >> parse_tag('245__$%') = ['245', '', '', '']
+    >> parse_tag('245  $%') = ['245', '', '', '']
+    >> parse_tag('245  $$%') = ['245', '', '', '']
+    >> parse_tag('245$%') = ['245', '', '', '']
+    >> parse_tag('245.%') = ['245', '', '', '']
+    >> parse_tag('245$$%') = ['245', '', '', '']
+    >> parse_tag('2%5$$a') = ['2%5', '', '', 'a']
+    """
+
+    p_tag =  ['', '', '', '']
+    tag = tag.replace(" ", "") # Remove empty characters
+    tag = tag.replace("$", "") # Remove $ characters
+    tag = tag.replace(".", "") # Remove . characters
+    #tag = tag.replace("_", "") # Remove _ characters
+    
+    p_tag[0] = tag[0:3] # tag
+    if len(tag) == 4:
+        p_tag[3] = tag[3] # subfield
+        
+    elif len(tag) == 5:
+        ind1 = tag[3] # indicator 1
+        if ind1 != "_":
+            p_tag[1] = ind1
+            
+        ind2 = tag[4] # indicator 2
+        if ind2 != "_":
+            p_tag[2] = ind2
+            
+    elif len(tag) == 6:
+        p_tag[3] = tag[5] # subfield
+        
+        ind1 = tag[3] # indicator 1
+        if ind1 != "_":
+            p_tag[1] = ind1
+            
+        ind2 = tag[4] # indicator 2
+        if ind2 != "_":
+            p_tag[2] = ind2
+            
+    return p_tag
