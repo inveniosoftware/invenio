@@ -19,6 +19,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Coordinator for the migration of old PHP BibFormat settings
+to new Pyhon BibFormat.
+
+SEE: bibformat_migration_kit.py, ../web/admin/bibformat_migration_kit_assistant.py
+"""
 __revision__ = "$Id$"
 
 import os
@@ -69,8 +75,8 @@ def perform_request_migration_kit_status(ln=cdslang):
         
         steps = []
         steps.append({'link':weburl+"/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_kb", 'label':"Migrate knowledge bases", 'status':status['kbs']})
-        steps.append({'link':weburl+"/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_behaviours",'label':"Migrate behaviours", 'status':status['behaviours']})
-        steps.append({'link':weburl+"/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_formats",'label':"Migrate formats", 'status':status['formats']})
+        steps.append({'link':weburl+"/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_behaviours", 'label':"Migrate behaviours", 'status':status['behaviours']})
+        steps.append({'link':weburl+"/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_formats", 'label':"Migrate formats", 'status':status['formats']})
     
         return migration_kit_templates.tmpl_admin_migration_status(ln, steps)
 
@@ -133,9 +139,9 @@ def save_status(step, status="Not migrated"):
     else:
         text = step+"---"+status +"\n"
     
-    file = open(status_filepath, 'w')
-    file.write(text)
-    file.close
+    status_file = open(status_filepath, 'w')
+    status_file.write(text)
+    status_file.close
 
 def read_status():
     """

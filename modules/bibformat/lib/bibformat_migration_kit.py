@@ -18,28 +18,34 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+Core module that translate old PHP BibFormat settings
+into new Python BibFormat configuration files.
+
+SEE: bibformat_migration_assistant_lib.py, bibformat_migration_kit_dblayer.py
+"""
 
 __revision__ = "$Id$"
 
 import re
-import sys
 import os
-import StringIO
-import time
 
-from invenio.config import \
-     bibformat, \
-     version
-from invenio.errorlib import *
-from invenio.bibformat_dblayer import *
-from invenio.bibformat_migration_kit_dblayer import *
+from invenio.bibformat_dblayer import add_output_format
+     
+from invenio.bibformat_migration_kit_dblayer import get_old_behaviour_action, \
+     get_old_kbs, \
+     get_old_behaviours, \
+     get_old_behaviour_condition, \
+     get_old_kb_mappings, \
+     get_old_formats, \
+     get_old_format
 
-from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH
+from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH
 
 #from invenio.bibformat_migration_kit.bibformat_yacc import translate_format #TEMP DISABLED FIXME
 
-#Regular expression for finding attribute in format_exist function in old behaviours
-#Used when parsing output formats
+# Regular expression for finding attribute in format_exist function in old behaviours
+# Used when parsing output formats
 pattern_parse_format_exist = re.compile('''
      format_exist\(          
      \s*
@@ -54,8 +60,8 @@ pattern_parse_format_exist = re.compile('''
      (?P=sep2))?
      ''', re.VERBOSE | re.MULTILINE)
 
-#Regular expression for finding conditions attributes of the kind $960.a = "14" || $960.a = "22" || $960.a = "41" 
-#Used when parsing output formats
+# Regular expression for finding conditions attributes of the kind $960.a = "14" || $960.a = "22" || $960.a = "41" 
+# Used when parsing output formats
 pattern_parse_cond_value = re.compile('''
      (\s|\|)*
      (?P<tag>\S*)
@@ -65,7 +71,7 @@ pattern_parse_cond_value = re.compile('''
      (?P=sep)
      ''', re.VERBOSE | re.MULTILINE)
 
-#Regular expression for finding format("a format") function calls in Behaviours actions 
+# Regular expression for finding format("a format") function calls in Behaviours actions 
 pattern_parse_format_call = re.compile('''
      format\(\s*
      ((?P<sep>[\'"])
@@ -105,10 +111,10 @@ def migrate_behaviours():
     
     old_behaviours = get_old_behaviours()
     new_behaviours = {}
-    #Get all behaviours
+    # Get all behaviours
     for behaviour_attr in old_behaviours:
         
-        #We consider the old name as code (code == of filename)
+        # We consider the old name as code (code == of filename)
         name = behaviour_attr[0] #get name
         (filename, code) = get_fresh_output_format_filename(name) #Get a fresh filename for given name
         print name, filename, code
@@ -120,24 +126,24 @@ def migrate_behaviours():
         
         
         behaviour_conditions = get_old_behaviour_condition(name)
-        #Get the associated conditions.
-        #The conditions on which we will iterate will maybe need to be split
-        #in many conditions, as the new format does not support conditions with
-        #multiple arguments
+        # Get the associated conditions.
+        # The conditions on which we will iterate will maybe need to be split
+        # in many conditions, as the new format does not support conditions with
+        # multiple arguments
         for cond in behaviour_conditions:
             previous_tag = ""
             add_default_case = True
             evaluation_order = cond[0]
             e_conditions =  extract_cond(cond[1])
             
-            #Get the action for these conditions
-            #We support only 1 action, and old behaviours usually have 1 action only, so limit to 1st one.
+            # Get the action for these conditions
+            # We support only 1 action, and old behaviours usually have 1 action only, so limit to 1st one.
             action = "FIXME"
             behaviour_actions = get_old_behaviour_action(name, evaluation_order)
             
             if len(behaviour_actions) > 0:
                 action = behaviour_actions[0]
-                evalutation_order = action[0]
+                evaluation_order = action[0]
                 action = extract_action(action[1])
                 if len(behaviour_actions) > 1:
                     warnings.append("Too much conditions in rule %s of behaviour %s. Only first one considered." % (evaluation_order, name))
@@ -169,7 +175,7 @@ def migrate_behaviours():
                 #        prefix = ""
                 #    new_behaviour += 'template("%(pre)s", "%(suf)s")\n'%{'pre': prefix, 'suf': suffix}
                 #    previous_tag = tag
-        #Also add the default case, if there was not already here
+        # Also add the default case, if there was not already here
         if add_default_case:
             new_behaviour += "default: default." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION + "\n"
         new_behaviours[filename] = new_behaviour
@@ -179,9 +185,9 @@ def migrate_behaviours():
     for filename in new_behaviours:
         text = new_behaviours[filename]
         path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
-        f = open(path, 'w')
-        f.write(text)
-        f.close
+        ouput_format_file = open(path, 'w')
+        ouput_format_file.write(text)
+        ouput_format_file.close
 
     if len(warnings)> 0:
         return '<span style="color: orange;">Migrated with some problems:</span>' + ", ".join(warnings)
@@ -253,7 +259,7 @@ def migrate_kbs():
         kb_table = table[1]
         kb_description = table[2]
         print "Migrating ", kb_name
-        #Note: kb_name was already unique. No risk of creating two tables with same name. (excepted if migration is done twice)
+        # Note: kb_name was already unique. No risk of creating two tables with same name. (excepted if migration is done twice)
         kb_id = bibformatadminlib.add_kb(kb_name)
         kb_name = get_kb_name(kb_id)
         update_kb_attributes(kb_name, kb_name, kb_description)
@@ -263,11 +269,11 @@ def migrate_kbs():
             value = mapping[1]
             add_kb_mapping(kb_name, key, value)
             #print "     "+key+" -> "+value
-        #This is where we would drop the old table
-        #delete_old_kb_table(kb_name)
+        # This is where we would drop the old table
+        # delete_old_kb_table(kb_name)
 
-    #Now this is where we would drop old tables list.
-    #delete_old_kbs_list()
+    # Now this is where we would drop old tables list.
+    # delete_old_kbs_list()
     
     return '<span style="color: green;">Migrated</span>'
     
@@ -284,21 +290,21 @@ def migrate_formats():
         description = format[1]
         code = get_old_format(name)
 
-        text = '<name>%s</name>'%name
-        text += '<description>%s</description>\n'%description
-        #(translated_code, bfe_to_create) = translate_format(code)  #TEMP DISABLED FIXME
+        text = '<name>%s</name>' % name
+        text += '<description>%s</description>\n' % description
+        # (translated_code, bfe_to_create) = translate_format(code)  #TEMP DISABLED FIXME
         bfe_to_create = [] # TEMP ENABLED FIXME
-        #text += translated_code  #TEMP DISABLED FIXME
-        text += "<!--ORIGINAL CODE. DON'T FORGET TO REMOVE BEFORE GOING INTO PRODUCTION \n"+code+"-->"
+        # text += translated_code  #TEMP DISABLED FIXME
+        text += "<!--ORIGINAL CODE. DON'T FORGET TO REMOVE BEFORE GOING INTO PRODUCTION \n" + code + "-->"
         
         (filename, new_name) = get_fresh_format_template_filename(name)
         path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
-        f = open(path, 'w')
-        f.write(text)
-        f.close
+        templates_file = open(path, 'w')
+        templates_file.write(text)
+        templates_file.close
         
     for element in bfe_to_create.keys():
-        #Create a predefined content for the element
+        # Create a predefined content for the element
         text = '''#!/usr/bin/python
 # -*- coding: utf-8 -*-
         
@@ -311,12 +317,12 @@ def format(bfo, a_parameter="a default value"):
     out = ""
     out += bfo.field('%s')
     return out
-        '''%bfe_to_create[element]['field']
+        ''' % bfe_to_create[element]['field']
             
         path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + element + ".py"
-        f = open(path, 'w')
-        f.write(text)
-        f.close
+        format_element_file = open(path, 'w')
+        format_element_file.write(text)
+        format_element_file.close
     
     return '<span style="color: red;">Formats Migrated with some problems.</span> Please check manually'
 
@@ -326,9 +332,7 @@ from invenio import bibformatadminlib
 from invenio.bibformatadminlib import add_kb_mapping, get_kb_name, update_kb_attributes
 
 if __name__ == "__main__":
-    adapt_tables()
+    # adapt_tables() # Tables are altered using makefile
     migrate_behaviours()
     migrate_kbs()
     migrate_formats()
-
-

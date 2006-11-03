@@ -19,6 +19,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Database access related functions for the migration of
+old PHP BibFormat settings to new Python BibFormat
+configuration files.
+
+SEE: bibformat_migration_kit.py
+"""
+
 __revision__ = "$Id$"
 
 from MySQLdb import escape_string

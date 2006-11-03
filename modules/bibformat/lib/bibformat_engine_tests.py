@@ -19,7 +19,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Test cases for the BibFormat engine."""
+"""Test cases for the BibFormat engine. Also test
+some utilities function in bibformat_utils module"""
 
 __revision__ = "$Id$"
 
@@ -30,6 +31,7 @@ import os
 import sys
 
 from invenio import bibformat_engine
+from invenio import bibformat_utils
 from invenio import bibformat_config
 from invenio import bibrecord
 from invenio.config import tmpdir
@@ -513,7 +515,7 @@ class MiscTest(unittest.TestCase):
                                 '2%%a',     ['2%%', '' , '' , 'a']]
         
         for i in range(0, len(tags_and_parsed_tags), 2):
-            parsed_tag = bibformat_engine.parse_tag(tags_and_parsed_tags[i])
+            parsed_tag = bibformat_utils.parse_tag(tags_and_parsed_tags[i])
             self.assertEqual(parsed_tag, tags_and_parsed_tags[i+1])
 
 class FormatTest(unittest.TestCase):

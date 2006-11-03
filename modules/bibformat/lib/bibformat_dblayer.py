@@ -19,17 +19,18 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Database access related functions for BibFormat engine and
+administration pages.
+"""
+
 __revision__ = "$Id$"
 
 import zlib
 
-from invenio.config import \
-     bibformat, \
-     cdslang, \
-     version
 from invenio.dbquery import run_sql, escape_string
 
-#Cache the mapping name -> id for each kb
+# Cache the mapping name -> id for each kb
 kb_id_name_cache = {}
 
 ## MARC-21 tag/field access functions
@@ -53,8 +54,8 @@ def get_kbs():
     query = "SELECT * FROM fmtKNOWLEDGEBASES ORDER BY name"
     res = run_sql(query)
     for row in res:
-        out.append({'id': row[0], 'name':row[1],'description': row[2]})
-        #out.append(row)
+        out.append({'id': row[0], 'name':row[1], 'description': row[2]})
+        # out.append(row)
     return out
 
 def get_kb_id(kb_name):
@@ -62,9 +63,9 @@ def get_kb_id(kb_name):
     if kb_id_name_cache.has_key(kb_name):
         return kb_id_name_cache[kb_name]
     
-    query = """SELECT id FROM fmtKNOWLEDGEBASES WHERE name LIKE '%s'"""%escape_string(kb_name)
+    query = """SELECT id FROM fmtKNOWLEDGEBASES WHERE name LIKE '%s'""" % escape_string(kb_name)
     res = run_sql(query)
-    if len(res)>0:
+    if len(res) > 0:
         kb_id_name_cache[kb_name] = res[0][0] 
         return res[0][0]
     else:
@@ -72,9 +73,9 @@ def get_kb_id(kb_name):
 
 def get_kb_name(kb_id):
     """Returns the name of the kb with given id"""
-    query = """SELECT name FROM fmtKNOWLEDGEBASES WHERE id='%s'"""%escape_string(str(kb_id))
+    query = """SELECT name FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % escape_string(str(kb_id))
     res = run_sql(query)
-    if len(res)>0:
+    if len(res) > 0:
         return res[0][0]
     else:
         return None
@@ -91,7 +92,9 @@ def get_kb_mappings(kb_name, sortby="to"):
     else:
         sort = "m_key"
         
-    query = """SELECT * FROM fmtKNOWLEDGEBASEMAPPINGS WHERE id_fmtKNOWLEDGEBASES = '%(k_id)s' ORDER BY %(sort)s"""%{'k_id':k_id, 'sort':sort}
+    query = """SELECT * FROM fmtKNOWLEDGEBASEMAPPINGS
+    WHERE id_fmtKNOWLEDGEBASES = '%(k_id)s' ORDER BY %(sort)s""" \
+    % {'k_id':k_id, 'sort':sort}
     res = run_sql(query)
     for row in res:
         out.append({'id':row[0], 'key':row[1], 'value': row[2]})
@@ -100,7 +103,7 @@ def get_kb_mappings(kb_name, sortby="to"):
 def get_kb_description(kb_name):
     """Returns the description of the given kb"""
     k_id = get_kb_id(kb_name)
-    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE id='%s'"""%k_id
+    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % k_id
     res = run_sql(query)
     return res[0][0]
     
@@ -116,29 +119,29 @@ def add_kb(kb_name, kb_description):
     @return the id of the newly created kb
     """
     query = """REPLACE INTO fmtKNOWLEDGEBASES (name, description)
-    VALUES('%s', '%s')"""%(escape_string(kb_name), escape_string(kb_description))
-    res = run_sql(query)
+    VALUES('%s', '%s')""" % (escape_string(kb_name), escape_string(kb_description))
+    run_sql(query)
 
     return get_kb_id(kb_name)
 
 def delete_kb(kb_name):
     """Deletes the given kb"""
     k_id = get_kb_id(kb_name)
-    query = """DELETE FROM fmtKNOWLEDGEBASEMAPPINGS WHERE id_fmtKNOWLEDGEBASES = '%s'"""%(k_id)
+    query = """DELETE FROM fmtKNOWLEDGEBASEMAPPINGS WHERE id_fmtKNOWLEDGEBASES = '%s'""" % (k_id)
     run_sql(query)
-    query = """DELETE FROM fmtKNOWLEDGEBASES WHERE id = '%s'"""%(k_id)
+    query = """DELETE FROM fmtKNOWLEDGEBASES WHERE id = '%s'""" % (k_id)
     run_sql(query)
 
-    #Update cache
+    # Update cache
     if kb_id_name_cache.has_key(kb_name):
-	del kb_id_name_cache[kb_name]
+        del kb_id_name_cache[kb_name]
     
     return True
 
 def kb_exists(kb_name):
     """Returns True if a kb with the given name exists"""
     query = """SELECT id FROM fmtKNOWLEDGEBASES
-    WHERE name = '%s'"""%(escape_string(kb_name))
+    WHERE name = '%s'""" % (escape_string(kb_name))
     rows = run_sql(query)
     if len(rows) > 0:
         return True
@@ -150,11 +153,12 @@ def update_kb(kb_name, new_name, new_description):
     k_id = get_kb_id(kb_name)
     query = """UPDATE fmtKNOWLEDGEBASES
     SET name = '%s' , description = '%s'
-    WHERE id = '%s'"""%(escape_string(new_name), escape_string(new_description), k_id)
+    WHERE id = '%s'""" % (escape_string(new_name), escape_string(new_description), k_id)
     run_sql(query)
-    #Update cache
+    # Update cache
     if kb_id_name_cache.has_key(kb_name):
-	del kb_id_name_cache[kb_name]
+        del kb_id_name_cache[kb_name]
+        
     kb_id_name_cache[new_name] = k_id
     return True
 
@@ -162,7 +166,7 @@ def add_kb_mapping(kb_name, key, value):
     """Adds new mapping key->value in given kb"""
     k_id = get_kb_id(kb_name)
     query = """REPLACE INTO fmtKNOWLEDGEBASEMAPPINGS (m_key, m_value, id_fmtKNOWLEDGEBASES)
-    VALUES('%s', '%s', '%s')"""%(escape_string(key), escape_string(value), k_id)
+    VALUES('%s', '%s', '%s')""" % (escape_string(key), escape_string(value), k_id)
     run_sql(query)
     
     return True
@@ -170,7 +174,9 @@ def add_kb_mapping(kb_name, key, value):
 def remove_kb_mapping(kb_name, key):
     """Removes mapping with given key from given kb"""
     k_id = get_kb_id(kb_name)
-    query = """DELETE FROM fmtKNOWLEDGEBASEMAPPINGS WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'"""%(escape_string(key), k_id)
+    query = """DELETE FROM fmtKNOWLEDGEBASEMAPPINGS
+    WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'""" \
+    % (escape_string(key), k_id)
     run_sql(query)
     return True
 
@@ -179,14 +185,14 @@ def kb_mapping_exists(kb_name, key):
     if kb_exists(kb_name):
         k_id = get_kb_id(kb_name)
         query = """SELECT id FROM fmtKNOWLEDGEBASEMAPPINGS
-        WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'"""%(escape_string(key), k_id)
+        WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'""" % (escape_string(key), k_id)
         rows = run_sql(query)
         if len(rows) > 0:
             return True
     
     return False
 
-def get_kb_mapping_value(kb_name, key):#, default=""):
+def get_kb_mapping_value(kb_name, key):
     """
     Returns a value of the given key from the given kb.
     If mapping not found, returns None #'default'
@@ -196,12 +202,13 @@ def get_kb_mapping_value(kb_name, key):#, default=""):
     #@param default a default value to return if mapping is not found
     """
     k_id = get_kb_id(kb_name)
-    query = """SELECT m_value FROM fmtKNOWLEDGEBASEMAPPINGS WHERE m_key LIKE '%s' AND id_fmtKNOWLEDGEBASES = '%s' LIMIT 1"""%(escape_string(key), k_id)
+    query = """SELECT m_value FROM fmtKNOWLEDGEBASEMAPPINGS
+    WHERE m_key LIKE '%s' AND id_fmtKNOWLEDGEBASES = '%s' LIMIT 1""" % (escape_string(key), k_id)
     res = run_sql(query)
     if len(res) > 0:
         return res[0][0]
     else:
-        return None #default
+        return None # default
 
 def update_kb_mapping(kb_name, key, new_key, new_value):
     """Updates the mapping given by key with new key and value"""
@@ -209,11 +216,17 @@ def update_kb_mapping(kb_name, key, new_key, new_value):
     query = """UPDATE fmtKNOWLEDGEBASEMAPPINGS
     SET m_key = '%s' , m_value = '%s'
     WHERE m_key = '%s'
-    AND id_fmtKNOWLEDGEBASES  = '%s'"""%(escape_string(new_key), escape_string(new_value),escape_string(key), k_id)
+    AND id_fmtKNOWLEDGEBASES  = '%s'""" % (escape_string(new_key),
+                                           escape_string(new_value),
+                                           escape_string(key),
+                                           k_id)
     run_sql(query)
     return True
 
 def create_knowledge_bases_table():
+    """
+    Create the table that holds knowledge bases
+    """
     # TO BE MOVED TO tabcreate.sql
     query = """
     CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
@@ -227,6 +240,9 @@ def create_knowledge_bases_table():
     return True
 
 def create_kb_mappings_table():
+    """
+    Create the table that holds all mappings of knowledge bases
+    """
     # TO BE MOVED TO tabcreate.sql
     query = """
     CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASEMAPPINGS (
@@ -239,11 +255,14 @@ def create_kb_mappings_table():
     ) TYPE=MyISAM;"""
     run_sql(query)
 
-    add_kb(marc_codes_mappings_kb_name, "Mapping from text label to marc codes. Used by bibformat in templates when calling <BFE_some_label /> for some_label that does not exist as element.")
-    bibformat_dblayer.add_kb_mapping("Marc tags", "date", "260$c")
+    # add_kb(marc_codes_mappings_kb_name, "Mapping from text label to marc codes. Used by bibformat in templates when calling <BFE_some_label /> for some_label that does not exist as element.")
+    # bibformat_dblayer.add_kb_mapping("Marc tags", "date", "260$c")
     return True
 
 def drop(): #TO BE REMOVED
+    """
+    Drop tables related to knowledge bases
+    """
     query = """DROP TABLE fmtKNOWLEDGEBASES"""
     run_sql(query)
     query = """DROP TABLE fmtKNOWLEDGEBASEMAPPINGS"""
@@ -254,7 +273,7 @@ def get_tag_from_name(name):
     """
     Returns the marc code corresponding the given name
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'"%escape_string(name))
+    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'" % escape_string(name))
     if len(res)>0:
         return res[0][0]
     else:
@@ -265,7 +284,7 @@ def get_tags_from_name(name):
     Returns the marc codes corresponding the given name,
     ordered by value
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'ORDER BY value"%escape_string(name))
+    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'ORDER BY value" % escape_string(name))
     if len(res)>0:
         return list(res[0])
     else:
@@ -275,7 +294,7 @@ def tag_exists_for_name(name):
     """
     Returns True if a tag exists for name in 'tag' table.
     """
-    query = "SELECT value FROM tag WHERE name LIKE '%s'"%escape_string(name)
+    query = "SELECT value FROM tag WHERE name LIKE '%s'" % escape_string(name)
     rows = run_sql(query)
     if len(rows) > 0:
         return True
@@ -285,7 +304,7 @@ def get_name_from_tag(tag):
     """
     Returns the name corresponding to a marc code
     """
-    res = run_sql("SELECT name FROM tag WHERE value LIKE '%s'"%escape_string(tag))
+    res = run_sql("SELECT name FROM tag WHERE value LIKE '%s'" % escape_string(tag))
     if len(res)>0:
         return res[0][0]
     else:
@@ -295,7 +314,7 @@ def name_exists_for_tag(tag):
     """
     Returns True if a name exists for tag in 'tag' table.
     """
-    query = "SELECT name FROM tag WHERE value LIKE '%s'"%escape_string(tag)
+    query = "SELECT name FROM tag WHERE value LIKE '%s'" % escape_string(tag)
     rows = run_sql(query)
     if len(rows) > 0:
         return True
@@ -317,8 +336,8 @@ def get_all_name_tag_mappings():
     for row in res:
         out[row[1]] = row[0]
     return out
-    
 
+    
 ## Output formats related functions
 
 def get_output_format_id(code):
@@ -333,7 +352,7 @@ def get_output_format_id(code):
     if len(code)>6:
         f_code = code[:6]
         
-    query = "SELECT id FROM format WHERE code='%s'"%escape_string(f_code.lower())
+    query = "SELECT id FROM format WHERE code='%s'" % escape_string(f_code.lower())
     res = run_sql(query)
 
     if len(res)>0:
@@ -352,8 +371,8 @@ def add_output_format(code, name="", description="", content_type="text/html"):
     @param description a description for the new format
     @param content_type the content_type (if applicable) of the new output format
     """
-    id = get_output_format_id(code);
-    if id == None:
+    output_format_id = get_output_format_id(code);
+    if output_format_id == None:
         query = "INSERT INTO format SET code=%s, description=%s, content_type=%s"
         params = (code.lower(), description, content_type)
         run_sql(query, params)
@@ -368,13 +387,13 @@ def remove_output_format(code):
     
     @param the code of the output format to remove
     """
-    id = get_output_format_id(code);
-    if id == None:
+    output_format_id = get_output_format_id(code);
+    if output_format_id == None:
         return
     
-    query = "DELETE FROM formatname WHERE id_format='%s'"%id
+    query = "DELETE FROM formatname WHERE id_format='%s'" % output_format_id
     run_sql(query)
-    query = "DELETE FROM format WHERE id='%s'"%id
+    query = "DELETE FROM format WHERE id='%s'" % output_format_id
     run_sql(query)
     
 def get_output_format_description(code):
@@ -389,7 +408,7 @@ def get_output_format_description(code):
     
     query = "SELECT description FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
-    if len(res)>0:
+    if len(res) > 0:
         res = res[0][0]
         if res != None:
             return res
@@ -403,9 +422,9 @@ def set_output_format_description(code, description):
     
     @param code the code of the output format to update
     """
-    id = get_output_format_id(code)
-    if id == None:
-        add_output_format(code,"", description)
+    output_format_id = get_output_format_id(code)
+    if output_format_id == None:
+        add_output_format(code, "", description)
         
     query = "UPDATE format SET description=%s WHERE code=%s"
     params = (description, code.lower())
@@ -442,7 +461,7 @@ def get_output_format_content_type(code):
     """
     query = "SELECT content_type FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
-    if len(res)>0:
+    if len(res) > 0:
         res = res[0][0]
         if res != None:
             return res
@@ -457,9 +476,10 @@ def set_output_format_content_type(code, content_type):
     @param code the code of the output format to update
     @param content_type the content type for the format
     """
-    id = get_output_format_id(code)
-    if id == None:
-        add_output_format(code,"", description, content_type)
+    output_format_id = get_output_format_id(code)
+    if output_format_id == None:
+        # add one if not exist (should not happen)
+        add_output_format(code, "", "", content_type)
         
     query = "UPDATE format SET content_type=%s WHERE code=%s"
     params = (content_type, code.lower())
@@ -487,16 +507,16 @@ def get_output_format_names(code):
     @return a dict containing output format names
     """
     out = {'sn':{}, 'ln':{}, 'generic':''}
-    id = get_output_format_id(code);
-    if id == None:
+    output_format_id = get_output_format_id(code);
+    if output_format_id == None:
         return out
 
-    query = "SELECT name FROM format WHERE code='%s'"%escape_string(code)
+    query = "SELECT name FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
-    if len(res)>0:
+    if len(res) > 0:
         out['generic'] = res[0][0]
 
-    query = "SELECT type, ln, value FROM formatname WHERE id_format='%s'"%id
+    query = "SELECT type, ln, value FROM formatname WHERE id_format='%s'" % output_format_id
     res = run_sql(query)
     for row in res:
         if row[0] == 'sn' or row[0] == 'ln':
@@ -523,21 +543,22 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
         name = name[:256]
     if type.lower() != "sn" and type.lower() != "ln":
         return
-    id = get_output_format_id(code);
-    if id == None and lang=="generic" and type.lower()=="ln":
-        #Create output format inside table if it did not exist
-        #Happens when the output format was added not through web interface
+    output_format_id = get_output_format_id(code);
+    if output_format_id == None and lang == "generic" and type.lower() == "ln":
+        # Create output format inside table if it did not exist
+        # Happens when the output format was added not through web interface
         add_output_format(code, name)
-        id = get_output_format_id(code)
+        output_format_id = get_output_format_id(code) # Reload id, because it was not found previously
         
-    if lang=="generic" and type.lower()=="ln":
-        #Save inside format table for main name
+    if lang =="generic" and type.lower()=="ln":
+        # Save inside format table for main name
         query = "UPDATE format SET name=%s WHERE code=%s"
         params = (name, code.lower())
         run_sql(query, params)
     else:
-        #Save inside formatname table for name variations
-        query = "REPLACE INTO formatname SET id_format='%s', ln='%s', type='%s', value='%s'"%(id, escape_string(lang), type.lower(), escape_string(name))
+        # Save inside formatname table for name variations
+        query = "REPLACE INTO formatname SET id_format='%s', ln='%s', type='%s', value='%s'" \
+                % (id, escape_string(lang), type.lower(), escape_string(name))
         run_sql(query)
 
 def change_output_format_code(old_code, new_code):
@@ -547,11 +568,11 @@ def change_output_format_code(old_code, new_code):
     @param old_code the code of the output format to change
     @param new_code the new code
     """
-    id = get_output_format_id(old_code);
-    if id == None:
+    output_format_id = get_output_format_id(old_code);
+    if output_format_id == None:
         return
     
-    query = "UPDATE format SET code='%s' WHERE id='%s'"%(new_code, id)
+    query = "UPDATE format SET code='%s' WHERE id='%s'" % (new_code, id)
     run_sql(query)
     
 def get_preformatted_record(recID, of, decompress=zlib.decompress):
@@ -571,9 +592,9 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     res = run_sql(query)
     if res:
 	# record 'recID' is formatted in 'of', so return it
-	return "%s" % decompress(res[0][0])
+        return "%s" % decompress(res[0][0])
     else:
-	return None
+        return None
     
 ## def keep_formats_in_db(output_formats):
 ##     """

@@ -23,10 +23,6 @@
 
 __revision__ = "$Id$"
 
-# non Invenio imports
-import string
-import cgi
-
 # Invenio imports                  
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
@@ -57,7 +53,11 @@ class Template:
             <tr>
             <td class="admintdleft">%(order)s. <a href="%(action_link)s?ln=%(ln)s">%(action_label)s</a></td>
             <td class="admintd">%(status)s&nbsp;</td>
-            </tr>'''%{'ln':ln, 'action_link': step['link'], 'action_label': step['label'], 'status':step['status'], 'order': i}
+            </tr>''' % {'ln': ln,
+                        'action_link': step['link'],
+                        'action_label': step['label'],
+                        'status': step['status'],
+                        'order': i}
             
         out += '</table>'
 
@@ -83,42 +83,50 @@ class Template:
         return out
 
     def tmpl_admin_migrate_knowledge_bases(self, ln):
+        """
+        Basic page to report the status of the migration of knowledge bases
+        """
         
-        _ = gettext_set_language(ln)    # load the right message language
+        _ = gettext_set_language(ln) # load the right message language
         
         out = '''
         <p>The migration of your knowledge bases has been done.</p>
         <p>You can continue with the <a href="%s/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_behaviours?ln=%s">
-        next step (Migration of behaviours) >>></a></p>'''%(weburl, ln)
+        next step (Migration of behaviours) >>></a></p>''' % (weburl, ln)
 
         return indent_text(out)
 
 
     def tmpl_admin_migrate_behaviours(self, ln, status):
-  
+        """
+        Basic page to report the status of the migration of behaviours to output formats
+        """
         _ = gettext_set_language(ln)    # load the right message language
 
         if status == '<span style="color: green;">Migrated</span>':
             out = '''<p>The migration of your behaviours has been done.</p>'''
         else:
-            out = '''<p>The result of the migration is: %s</p>'''%status
+            out = '''<p>The result of the migration is: %s</p>''' % status
             
-        out +='''
+        out += '''
         <p>The behaviours have been moved to a new kind
         of configuration file, called "<i>Output Format</i>". If you
         have not used particular syntax in your behaviours, the output
         formats should behave the same way. We advice you to check
         this point and modify the output formats if necessary.</p>'''
 
-        out +='''
+        out += '''
         <p>You can now proceed with the  <a href="%s/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_formats?ln=%s">
-        next step (Migration of formats) >>></a></p>'''%(weburl, ln)
+        next step (Migration of formats) >>></a></p>''' % (weburl, ln)
 
         return indent_text(out)
 
 
     def tmpl_admin_migrate_formats(self, ln):
-  
+        """
+        Basic page to warn user that migration of formats to format templates
+        is not straightforward
+        """
         _ = gettext_set_language(ln)    # load the right message language
         
         out = '''<p>The migration of format is not completely
@@ -166,13 +174,15 @@ class Template:
 
         out += '''
         <p><a href="%s/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_formats_do?ln=%s">Click here to migrate your format automatically</a>, despite the above recommendations.</p>
-        '''%(weburl, ln)
+        ''' % (weburl, ln)
         
         return indent_text(out)
 
     
     def tmpl_admin_migrate_formats_do(self, ln):
-  
+        """
+        Basic page to report the status of the migration of formats to format templates
+        """
         _ = gettext_set_language(ln)    # load the right message language
         
         out = '''<p>Migration of formats has been done.</p>'''
@@ -180,5 +190,5 @@ class Template:
         use the <a href="%s/admin/bibformat/format_templates_manage.py">Format template management console</a> or edit files directly in directory etc/bibformat/templates/ of your CDS Invenio installation base.</p>'''
         out += '''<p>To check and edit your format elements, open files in lib/python/invenio/bibformat_elements directory of your CDS Invenio installation base</p>'''
 
-        out += '''<a href="%s/admin/bibformat/">Click here to go back to main BibFormat administration page</a>'''%weburl
+        out += '''<a href="%s/admin/bibformat/">Click here to go back to main BibFormat administration page</a>''' % weburl
         return indent_text(out)
