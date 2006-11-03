@@ -143,6 +143,7 @@ update-v0.90.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ./modules/miscutil/bin/dbexec 
 	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE sbmCATEGORIES ADD COLUMN score TINYINT UNSIGNED NOT NULL DEFAULT 0;" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
