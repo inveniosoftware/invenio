@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibformat_engine import parse_tag
+from invenio.bibformat_utils import parse_tag
 
 def format(bfo, tag, limit, separator=" "):
     """

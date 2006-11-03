@@ -29,7 +29,7 @@ from zlib import decompress, compress
 from invenio.dbquery import run_sql, escape_string
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
-from invenio.bibformat_engine import parse_tag
+from invenio.bibformat_utils import parse_tag
 
 class memoise:
     def __init__(self, function):
