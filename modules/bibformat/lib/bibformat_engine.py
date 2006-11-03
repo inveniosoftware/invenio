@@ -37,17 +37,15 @@ import zlib
 
 from invenio.config import \
      CFG_PATH_PHP, \
-     bibformat, \
      bindir, \
-     cdslang, \
-     version
+     cdslang
 from invenio.errorlib import register_errors, get_msgs_for_code_list
 from invenio.bibrecord import create_record, record_get_field_instances, record_get_field_value, record_get_field_values
 from invenio.dbquery import run_sql
 from invenio.messages import language_list_long, wash_language
 from invenio import bibformat_dblayer
 from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH, CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-from bibformat_utils import record_get_xml
+from bibformat_utils import record_get_xml, parse_tag
 
 from xml.dom import minidom #Remove when call_old_bibformat is removed
 
@@ -568,81 +566,6 @@ def filter_languages(format_template, ln='en'):
     filtered_format_template = pattern_lang.sub(search_lang_tag, format_template)
     return filtered_format_template
 
-    
-def parse_tag(tag):
-    """
-    Parse a marc code and decompose it in a table with: 0-tag 1-indicator1 2-indicator2 3-subfield
-
-    The first 3 chars always correspond to tag.
-    The indicators are optional. However they must both be indicated, or both ommitted.
-    If indicators are ommitted or indicated with underscore '_', they mean "No indicator".
-    The subfield is optional. It can optionally be preceded by a dot '.' or '$$' or '$'
-
-    Any of the chars can be replaced by wildcard %
-
-    THE FUNCTION DOES NOT CHECK WELLFORMNESS OF 'tag'
-    
-    Any empty chars is not considered
-    
-    For example:
-    >> parse_tag('245COc') = ['245', 'C', 'O', 'c']
-    >> parse_tag('245C_c') = ['245', 'C', '', 'c']
-    >> parse_tag('245__c') = ['245', '', '', 'c']
-    >> parse_tag('245__$$c') = ['245', '', '', 'c']
-    >> parse_tag('245__$c') = ['245', '', '', 'c']
-    >> parse_tag('245  $c') = ['245', '', '', 'c']
-    >> parse_tag('245  $$c') = ['245', '', '', 'c']
-    >> parse_tag('245__.c') = ['245', '', '', 'c']
-    >> parse_tag('245  .c') = ['245', '', '', 'c']
-    >> parse_tag('245C_$c') = ['245', 'C', '', 'c']
-    >> parse_tag('245CO$$c') = ['245', 'C', 'O', 'c']
-    >> parse_tag('245C_.c') = ['245', 'C', '', 'c']
-    >> parse_tag('245$c') = ['245', '', '', 'c']
-    >> parse_tag('245.c') = ['245', '', '', 'c']
-    >> parse_tag('245$$c') = ['245', '', '', 'c']
-    >> parse_tag('245__%') = ['245', '', '', '']
-    >> parse_tag('245__$$%') = ['245', '', '', '']
-    >> parse_tag('245__$%') = ['245', '', '', '']
-    >> parse_tag('245  $%') = ['245', '', '', '']
-    >> parse_tag('245  $$%') = ['245', '', '', '']
-    >> parse_tag('245$%') = ['245', '', '', '']
-    >> parse_tag('245.%') = ['245', '', '', '']
-    >> parse_tag('245$$%') = ['245', '', '', '']
-    >> parse_tag('2%5$$a') = ['2%5', '', '', 'a']
-    """
-
-    p_tag =  ['', '', '', '']
-    tag = tag.replace(" ", "") #Remove empty characters
-    tag = tag.replace("$", "") #Remove $ characters
-    tag = tag.replace(".", "") #Remove . characters
-    #tag = tag.replace("_", "") #Remove _ characters
-    
-    p_tag[0] = tag[0:3] #tag
-    if len(tag) == 4:
-        p_tag[3] = tag[3] #subfield
-        
-    elif len(tag) == 5:
-        ind1 = tag[3]#indicator 1
-        if ind1 != "_":
-            p_tag[1] = ind1
-            
-        ind2 = tag[4]#indicator 2
-        if ind2 != "_":
-            p_tag[2] = ind2
-            
-    elif len(tag) == 6:
-        p_tag[3] = tag[5]#subfield
-        
-        ind1 = tag[3]#indicator 1
-        if ind1 != "_":
-            p_tag[1] = ind1
-            
-        ind2 = tag[4]#indicator 2
-        if ind2 != "_":
-            p_tag[2] = ind2
-            
-    return p_tag
-
 def get_format_template(filename, with_attributes=False):
     """
     Returns the structured content of the given formate template.
@@ -662,7 +585,7 @@ def get_format_template(filename, with_attributes=False):
     global format_templates_cache
 
     if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
-            return None
+        return None
         
     if format_templates_cache.has_key(filename):
         #If we must return with attributes and template exist in cache with attributes
