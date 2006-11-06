@@ -18,6 +18,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+Web based assistant for the migration old PHP BibFormat settings
+to new Python BibFormat configuration files
+"""
 
 __revision__ = "$Id$"
 
@@ -26,7 +30,7 @@ __lastupdated__ = """$Date$"""
 from invenio.bibformat_migration_kit_assistant_lib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import weburl, cdslang
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language

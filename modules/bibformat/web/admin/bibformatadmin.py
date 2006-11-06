@@ -492,7 +492,7 @@ def format_template_show_attributes(req, bft, ln=cdslang, new=0):
     if not auth_code:
         format_template = wash_url_argument(bft, 'str')
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
-	is_new = wash_url_argument(new, 'int')
+        is_new = wash_url_argument(new, 'int')
 
         if not can_read_format_template(bft): #No read permission
             return page(title=_("Restricted Format Template"),
@@ -523,7 +523,7 @@ def format_template_show_dependencies(req, bft, ln=cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>'''%(weburl, ln ,_("Manage Format Templates")))
+    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (weburl, ln , _("Manage Format Templates")))
     
     try:
         uid = getUid(req)
@@ -566,9 +566,9 @@ def format_template_update_attributes(req, bft, ln=cdslang, name = "", descripti
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-	
-	if duplicate != None:
-	    duplicate = wash_url_argument(duplicate, 'str')
+
+        if duplicate != None:
+            duplicate = wash_url_argument(duplicate, 'str')
         name = wash_url_argument(name, 'str')
         description = wash_url_argument(description, 'str')
         bft = update_format_template_attributes(bft, name, description, duplicate)
@@ -583,7 +583,7 @@ def format_template_delete(req, bft, ln=cdslang, chosen_option=""):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s'''%(weburl, ln ,_("Manage Format Templates"), _("Delete Format Template")))
+    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s''' % (weburl, ln , _("Manage Format Templates"), _("Delete Format Template")))
 
     try:
         uid = getUid(req)
@@ -599,7 +599,7 @@ def format_template_delete(req, bft, ln=cdslang, chosen_option=""):
             format_name = bibformat_engine.get_format_template_attrs(bft)['name']
             return dialog_box(req=req,
                               ln=ln,
-                              title="Delete %s"%format_name,
+                              title="Delete %s" % format_name,
                               message="Are you sure you want to delete format template <i>%s</i>?" % format_name,
                               navtrail=navtrail_previous_links,
                               options=[_("Cancel"), _("Delete")])
@@ -607,7 +607,7 @@ def format_template_delete(req, bft, ln=cdslang, chosen_option=""):
         elif chosen_option==_("Delete"):
             delete_format_template(bft)
             
-        redirect_to_url(req, "format_templates_manage?ln=%(ln)s"%{'ln':ln})
+        redirect_to_url(req, "format_templates_manage?ln=%(ln)s" % {'ln':ln})
     else:
         return page_not_authorized(req=req, text=auth_msg)
     
@@ -627,7 +627,7 @@ def format_template_add(req, ln=cdslang):
     if not auth_code:
 
         bft = add_format_template()
-        redirect_to_url(req, "format_template_show_attributes?ln=%(ln)s&bft=%(bft)s&new=1"%{'ln':ln, 'bft':bft})
+        redirect_to_url(req, "format_template_show_attributes?ln=%(ln)s&bft=%(bft)s&new=1" % {'ln':ln, 'bft':bft})
     else:
         return page_not_authorized(req=req, text=auth_msg)
     
@@ -657,7 +657,7 @@ def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None,
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         bft = wash_url_argument(bft, 'str')
-        if save_action!= None and code != None:
+        if save_action != None and code != None:
             #save
             update_format_template_code(bft, code=code)
         if code == None:
@@ -677,11 +677,11 @@ def format_template_show_preview_or_save(req, bft, ln=cdslang, code=None,
                             req=req)
             else:
                 recID = recIDs[0]
-                pattern_for_preview = "recid:%s"%recID
+                pattern_for_preview = "recid:%s" % recID
         else:
             recIDs = perform_request_search(p=pattern_for_preview)
             if len(recIDs) == 0:
-                return page(title="No Record Found for %s"%pattern_for_preview,
+                return page(title="No Record Found for %s" % pattern_for_preview,
                             body="",
                             uid=uid,
                             language=ln_for_preview,
@@ -772,7 +772,7 @@ def format_element_show_dependencies(req, bfe, ln=cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>'''%(weburl, ln ,_("Format Elements Documentation")))
+    navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (weburl, ln , _("Format Elements Documentation")))
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
@@ -781,7 +781,7 @@ def format_element_show_dependencies(req, bfe, ln=cdslang):
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
-        return page(title=_("Format Element %s Dependencies"%bfe),
+        return page(title=_("Format Element %s Dependencies" % bfe),
                 body=perform_request_format_element_show_dependencies(bfe=bfe, ln=ln),
                 uid=uid,
                 language=ln,
@@ -814,7 +814,7 @@ def format_element_test(req, bfe, ln=cdslang, param_values=None):
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
-        return page(title=_("Test Format Element %s"%bfe),
+        return page(title=_("Test Format Element %s" % bfe),
                 body=perform_request_format_element_test(bfe=bfe, ln=ln, param_values=param_values, uid=getUid(req)),
                 uid=uid,
                 language=ln,
@@ -888,7 +888,7 @@ def kb_show(req, kb, sortby="to", ln=cdslang):
                         req=req)
 
 
-        return page(title=_("Knowledge Base %s"%kb_name),
+        return page(title=_("Knowledge Base %s" % kb_name),
                 body=perform_request_knowledge_base_show(ln=ln, kb_id=kb_id, sortby=sortby),
                 uid=uid,
                 language=ln,
@@ -931,7 +931,7 @@ def kb_show_attributes(req, kb, ln=cdslang, sortby="to"):
                         req=req)
 
 
-        return page(title=_("Knowledge Base %s Attributes"%kb_name),
+        return page(title=_("Knowledge Base %s Attributes" % kb_name),
                 body=perform_request_knowledge_base_show_attributes(ln=ln, kb_id=kb_id, sortby=sortby),
                 uid=uid,
                 language=ln,
@@ -974,7 +974,7 @@ def kb_show_dependencies(req, kb, ln=cdslang, sortby="to"):
                         req=req)
 
 
-        return page(title=_("Knowledge Base %s Dependencies"%kb_name),
+        return page(title=_("Knowledge Base %s Dependencies" % kb_name),
                 body=perform_request_knowledge_base_show_dependencies(ln=ln, kb_id=kb_id, sortby=sortby),
                 uid=uid,
                 language=ln,
@@ -1022,7 +1022,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=cdslang):
         value = wash_url_argument(mapTo, 'str')
         
         add_kb_mapping(kb_name, key, value)
-        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -1072,7 +1072,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo, update="", delete="", sortby="
             new_value = wash_url_argument(mapTo, 'str')
             update_kb_mapping(kb_name, key, new_key, new_value)
 
-        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -1099,11 +1099,11 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to", ln=cd
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-	kb_id = wash_url_argument(kb, 'int')
-	if chosen_option != None:
+        kb_id = wash_url_argument(kb, 'int')
+        if chosen_option != None:
 	    # Update could not be performed.
 	    # Redirect to kb attributes page
-	    redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+            redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
 
        
         kb_name = get_kb_name(kb_id)
@@ -1118,10 +1118,10 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to", ln=cd
                         req=req)
 
         new_name = wash_url_argument(name, 'str')
-	if kb_name != new_name and kb_exists(new_name):
+        if kb_name != new_name and kb_exists(new_name):
 	    #A knowledge base with that name already exist
 	    #Do not update
-	    return dialog_box(req=req,
+            return dialog_box(req=req,
 			      ln=ln,
 			      title="Name already in use",
 			      message="<i>%s</i> cannot be renamed to %s: Another knowledge base already has that name. <br/>Please choose another name." % (kb_name, new_name),
@@ -1130,7 +1130,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to", ln=cd
 	    
         new_desc = wash_url_argument(description, 'str')
         update_kb_attributes(kb_name, new_name, new_desc)
-        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
     
@@ -1150,7 +1150,7 @@ def kb_add(req, ln=cdslang, sortby="to"):
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         kb_id = add_kb()
-        redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s"%{'ln':ln, 'kb':kb_id, 'sortby':sortby})
+        redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>'''%(weburl, ln, _("Manage Knowledge Bases")))
     
@@ -1190,7 +1190,7 @@ def kb_delete(req, kb, ln=cdslang, chosen_option="", sortby="to"):
         if chosen_option == "":
             return dialog_box(req=req,
                               ln=ln,
-                              title="Delete %s"%kb_name,
+                              title="Delete %s" % kb_name,
                               message="Are you sure you want to delete knowledge base <i>%s</i>?" % kb_name,
                               navtrail=navtrail_previous_links,
                               options=[_("Cancel"), _("Delete")])
@@ -1198,7 +1198,7 @@ def kb_delete(req, kb, ln=cdslang, chosen_option="", sortby="to"):
         elif chosen_option==_("Delete"):
             delete_kb(kb_name)
             
-        redirect_to_url(req, "kb_manage?ln=%(ln)s"%{'ln':ln})
+        redirect_to_url(req, "kb_manage?ln=%(ln)s" % {'ln':ln})
     else:
         navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage">%s</a>'''%(weburl, _("Manage Knowledge Bases")))
     
@@ -1245,7 +1245,7 @@ def validate_format(req, ln=cdslang, bfo=None, bft=None, bfe=None):
         
             output_format = bibformat_engine.get_output_format(code=bfo, with_attributes=True)
             name = output_format['attrs']['names']['generic']
-            title = _("Validation of Output Format %s"%name)
+            title = _("Validation of Output Format %s" % name)
             
         elif bft != None: #Format template validation
             bft = wash_url_argument(bft, 'str')
@@ -1260,11 +1260,11 @@ def validate_format(req, ln=cdslang, bfo=None, bft=None, bfe=None):
                             lastupdated=__lastupdated__,
                             req=req)
             name = bibformat_engine.get_format_template_attrs(bft)['name']
-            title = _("Validation of Format Template %s"%name)
+            title = _("Validation of Format Template %s" % name)
             
         elif bfe != None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
-            navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>'''%(weburl,ln , bfe.upper() ,_("Format Elements Documentation")))
+            navtrail_previous_links = getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (weburl, ln , bfe.upper() , _("Format Elements Documentation")))
             
             if not can_read_format_element(bfe) and not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
                 return page(title=_("Restricted Format Element"),
@@ -1274,7 +1274,7 @@ def validate_format(req, ln=cdslang, bfo=None, bft=None, bfe=None):
                             errors = [("ERR_BIBFORMAT_CANNOT_READ_ELEMENT_FILE", bfe ,"")],
                             lastupdated=__lastupdated__,
                             req=req)
-            title = _("Validation of Format Element %s"%bfe)
+            title = _("Validation of Format Element %s" % bfe)
 
         else: #No format specified
             return page(title=_("Format Validation"),
