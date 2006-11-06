@@ -84,6 +84,9 @@ def wash_list_of_python_files_for_pylinting(filenames):
     # take out test unloadable file:
     filenames = filter(lambda x: not x.endswith("test3.py"),
                                  filenames)
+    # take out test no docstring file:
+    filenames = filter(lambda x: not x.endswith("test_5.py"),
+                                 filenames)
     return filenames
 
 def get_list_of_python_unit_test_files(modulesdir, modulename):
