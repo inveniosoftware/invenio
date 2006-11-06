@@ -329,7 +329,6 @@ def generate_kwalitee_stats_for_some_files(filenames):
         }
     print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11
     files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
-    print files_for_pylinting
     for filename in files_for_pylinting:
         # calculate the kwalitee of the files:
         kwalitee[filename] = {'nb_loc': 0,
