@@ -329,6 +329,7 @@ def generate_kwalitee_stats_for_some_files(filenames):
         }
     print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11
     files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
+    print files_for_pylinting
     for filename in files_for_pylinting:
         # calculate the kwalitee of the files:
         kwalitee[filename] = {'nb_loc': 0,
@@ -398,7 +399,7 @@ def main():
             print "ERROR: %s does not seem to be CDS Invenio top source directory." % first_argument
             usage()
             sys.exit(0)
-    elif os.path.isfile(first_argument):
+    elif os.path.isfile(first_argument) and first_argument.endswith(".py"):
         generate_kwalitee_stats_for_some_files(sys.argv[1:])            
     else:
         print "ERROR: don't know what to do with %s." % first_argument
