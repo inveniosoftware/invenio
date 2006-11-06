@@ -162,14 +162,6 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if lastupdated:
-            if lastupdated.startswith("$Date: "):
-                lastupdated = convert_datestruct_to_dategui(\
-                                 convert_datecvs_to_datestruct(lastupdated),
-                                 ln=ln)
-            msg_lastupdated = _("Last updated") + ": " + lastupdated
-        else:
-            msg_lastupdated = ""
         out = self.tmpl_pageheader(req, 
                                    ln = ln,
                                    headertitle = title,
@@ -194,7 +186,9 @@ class Template:
     <div class="pageboxrightbottom">%(boxrightbottom)s</div>
   </div>
   <div class="pagebodystripemiddle">
+    %(titleprologue)s
     <h1 class="headline">%(title)s</h1>
+    %(titleepilogue)s
     %(body)s
   </div>
 </div>
@@ -211,7 +205,10 @@ class Template:
   'boxrightbottom' : boxrightbottom,
   'boxrightbottomadd' : boxrightbottomadd,
 
+  'titleprologue' : titleprologue,
   'title' : title,
+  'titleepilogue' : titleepilogue,
+  
   'body' : body,
 
   } + self.tmpl_pagefooter(req, ln = ln,
