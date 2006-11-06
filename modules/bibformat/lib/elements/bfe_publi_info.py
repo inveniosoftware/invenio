@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints publcation information and link to ejournal
+"""
 __revision__ = "$Id$"
 
 def format(bfo):
@@ -49,10 +50,10 @@ def format(bfo):
         page = pages.split('-')# get first page from range
         if len(page) > 0:
             out += page[0]
-        out += '">%(journal)s :%(volume)s %(year)s %(page)s</a>'%{'journal': journal,
-                                                                  'volume': volume,
-                                                                  'year': year,
-                                                                  'page': pages}
+        out += '">%(journal)s :%(volume)s %(year)s %(page)s</a>' % {'journal': journal,
+                                                                    'volume': volume,
+                                                                    'year': year,
+                                                                    'page': pages}
     else:
         out += publication_info.get('p') + ': '
         if volume != None:

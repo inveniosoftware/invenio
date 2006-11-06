@@ -16,7 +16,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Entry point for BibFormat XML engine
+"""
 __revision__ = "$Id$"
 
 from cStringIO import StringIO
@@ -32,8 +33,8 @@ def format(bfo, template='DC'):
     @param template the name of the template file without the bfx extension
     """
     output = ""
-    recIDs=[bfo.recID]
-    outFile=StringIO() # a virtual file-like object to write in
+    recIDs = [bfo.recID]
+    outFile = StringIO() # a virtual file-like object to write in
     format_with_bfx(recIDs, outFile, template)
-    output=outFile.getvalue()        
+    output = outFile.getvalue()        
     return output

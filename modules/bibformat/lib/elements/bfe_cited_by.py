@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints reference to documents citing this one
+"""
 __revision__ = "$Id$"
 
 def format(bfo, separator='; '):
@@ -33,8 +34,12 @@ def format(bfo, separator='; '):
     primary_report_numbers = bfo.fields('037__a')
     additional_report_numbers = bfo.fields('088__a')
 
-    primary_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', primary_report_numbers)
-    additional_citations = map(lambda x: '<a href="'+weburl+'/search?f=reference&p='+quote(x)+'">'+x+'</a>', additional_report_numbers)
+    primary_citations = map(lambda x: \
+                            '<a href="' + weburl + '/search?f=reference&p=' + quote(x) + '">' \
+                            + x + '</a>', primary_report_numbers)
+    additional_citations = map(lambda x: \
+                               '<a href="' + weburl + '/search?f=reference&p=' + quote(x)+'">' \
+                               + x + '</a>', additional_report_numbers)
 
     citations = primary_citations
     citations.extend(additional_citations)

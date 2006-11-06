@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints document imprint
+"""
 __revision__ = "$Id$"
 
 def format(bfo, place_label, publisher_label, date_label, separator=', ',):
@@ -40,13 +41,13 @@ def format(bfo, place_label, publisher_label, date_label, separator=', ',):
     
 
     if publisher != "sine nomine":
-        out += publisher_label, publisher,
-
+        out += publisher_label + ' ' + publisher + separator
+        
     if place != "sine loco":
-        out+= place_label, place,
+        out += place_label + ' ' + place + separator
 
     if len(date) > 0:
-        out+= date_label, date,
+        out += date_label + ' ' + date
 
 
 

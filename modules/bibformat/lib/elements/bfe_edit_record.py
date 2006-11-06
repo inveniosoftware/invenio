@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints a link to BibEdit
+"""
 __revision__ = "$Id$"
 
 def format(bfo, style):
@@ -28,7 +29,6 @@ def format(bfo, style):
     @param style the CSS style to be applied to the link.
     """
     from invenio.config import weburl
-    from invenio.webuser import getUid
     from invenio.access_control_engine import acc_authorize_action
     
     out = ""

@@ -16,7 +16,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints creation date
+"""
 __revision__ = "$Id$"
 
 from invenio.search_engine import get_creation_date
@@ -26,6 +27,6 @@ def format(bfo, format='%Y-%m-%d'):
     Get the record creation date.
     @param format The date format in MySQL syntax
     '''
-    recID=bfo.recID
-    out=get_creation_date(recID, format)
+    recID = bfo.recID
+    out = get_creation_date(recID, format)
     return out

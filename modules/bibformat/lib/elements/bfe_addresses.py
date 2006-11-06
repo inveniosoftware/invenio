@@ -18,6 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""BibFormat element - Prints list of addresses
+"""
 
 __revision__ = "$Id$"
 
@@ -26,15 +28,20 @@ def format(bfo, separator="; ", print_link="yes"):
     Prints a list of addresses linked to this report
     
     @param separator the separator between addresses.
-    @param print_link Link the addresses to search engine (HTML links) if 'yes'
+    @param print_link Links the addresses to search engine (HTML links) if 'yes'
     """
     from urllib import quote
     from invenio.config import weburl
 
     addresses = bfo.fields('270')
     list_addresses = []
-    for address in addresses:
-        list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ quote(address.get('p', "")) +'">'+address.get('p', "")+'</a>')
-        list_addresses.append(address.get('g', ""))
+    if print_link.lower() == 'yes':
+        for address in addresses:
+            list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ quote(address.get('p', "")) +'">'+address.get('p', "")+'</a>')
+            list_addresses.append(address.get('g', ""))
+    else:
+        for address in addresses:
+            list_addresses.append(address.get('p', ""))
+            list_addresses.append(address.get('g', ""))
 
     return separator.join(list_addresses)

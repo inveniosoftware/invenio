@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints references
+"""
 __revision__ = "$Id$"
 
 def format(bfo, reference_prefix, reference_suffix):
@@ -34,7 +35,10 @@ def format(bfo, reference_prefix, reference_suffix):
     out = ""
     
     for reference in references:
-
+        
+        if reference_prefix != None:
+            out += reference_prefix
+            
         if reference.has_key('o'):
             out += "<li><small>"+ reference['o']+ "</small> "
 
@@ -54,5 +58,6 @@ def format(bfo, reference_prefix, reference_suffix):
                 out += reference.get('p', "")+"</a> </small> <br/>"
             else:
                 out += " <small> "+reference['t']+ reference.get('v', "")+ reference.get('y',"")+ reference.get('p',"")+ " </small> <br/>"
-
+        if reference_suffix != None:
+            out += reference_suffix
     return out

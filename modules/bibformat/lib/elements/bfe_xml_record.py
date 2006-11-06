@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints record as XML
+"""
 __revision__ = "$Id$"
 
 def format(bfo, type='xml', encodeForXML='yes'):
@@ -29,15 +30,15 @@ def format(bfo, type='xml', encodeForXML='yes'):
     @param encodeForXML if 'yes', replace all < > and & with html corresponding escaped characters.
     """
     from invenio.bibformat_utils import record_get_xml, encode_for_xml
-    #This element is mainly a bridge between bibrecord xml formatting capabilities and
+    #This element is mainly a bridge between BibRecord XML formatting capabilities and
     #BibFormat templates.
     
     #Can be used to output various xml flavours.
     
     out = record_get_xml(bfo.recID, format=type)
 
-    if encodeForXML == 'yes':
-       return encode_for_xml(out)
+    if encodeForXML.lower() == 'yes':
+        return encode_for_xml(out)
     else:
-       return out
+        return out
  

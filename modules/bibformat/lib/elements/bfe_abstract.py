@@ -18,10 +18,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""BibFormat element - Prints English and French abstract.
+"""
 
 __revision__ = "$Id$"
 
-def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[...] ",extension_fr="[...] ", contextual="no", highlight='no'):
+from invenio import bibformat_utils
+
+def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, extension_en="[...] ",extension_fr="[...] ", contextual="no", highlight='no'):
     """
     Prints the abstract of a record in english and then french
     
@@ -46,7 +50,6 @@ def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[
     abstract_fr = "<br/>".join(abstract_fr)
 
     if contextual == 'yes' and limit != "" and limit.isdigit() and int(limit) > 0:
-        from invenio import bibformat_utils
         context_en = bibformat_utils.get_contextual_content(abstract_en,
                                                             bfo.search_pattern,
                                                             max_lines=int(limit))
@@ -77,7 +80,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[
                 out += sentence+ "."
 
             if print_extension:
-                out+= " "+extension_en
+                out += " "+extension_en
 
         else:
             out += abstract_en
@@ -108,7 +111,6 @@ def format(bfo, prefix_en, prefix_fr, suffix_en,suffix_fr, limit,extension_en="[
         out += suffix_fr
 
     if highlight == 'yes':
-        from invenio import bibformat_utils
         out = bibformat_utils.highlight(out, bfo.search_pattern)
 
     return out

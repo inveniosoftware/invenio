@@ -18,7 +18,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""BibFormat element - Prints BibTeX meta-data
+"""
 __revision__ = "$Id$"
 
 from invenio.config import cdslang
@@ -281,7 +282,7 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
         name_width = 6 + len(name)
     if value_width < 2:
         value_width = 2
-    if value == None or value =="":
+    if value == None or value == "":
         return ""
     
     #format name
