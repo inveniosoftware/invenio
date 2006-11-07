@@ -2838,6 +2838,8 @@ CREATE TABLE IF NOT EXISTS sbmCATEGORIES (
   doctype varchar(10) NOT NULL default '',
   sname varchar(75) NOT NULL default '',
   lname varchar(75) NOT NULL default '',
+  PRIMARY KEY (doctype, sname),
+  KEY doctype (doctype),
   KEY sname (sname)
 ) TYPE=MyISAM PACK_KEYS=1;
 
