@@ -1388,6 +1388,7 @@ class Template:
     def _tmpl_configure_doctype_overview_create_categories_view(self,
                                                                 doctype="",
                                                                 doctype_categories="",
+                                                                jumpcategout="",
                                                                 perform_act="doctypeconfigure"
                                                                ):
         """Display the details of the categories for a given document type"""
@@ -1408,36 +1409,142 @@ class Template:
           <td><br />""" % { 'doctype_id' : cgi.escape(doctype, 1) }
         modify_categ_txt = ""
         try:
-            categs_tableheader = ["Categ ID", "Description", "&nbsp;", "&nbsp;"]
+            categs_tableheader = ["Categ ID", "Description", "&nbsp;", "&nbsp;", "&nbsp;", "&nbsp;", "&nbsp;", "&nbsp;"]
             categs_tablebody = []
-            for categ in doctype_categories:
-                categs_tablebody.append( ("%s" % (cgi.escape(categ[0], 1),),
-                                          "%s" % (cgi.escape(categ[1], 1),),
-                                          """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(performaction)s">""" \
-                                          """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
-                                          """="hidden" />""" \
-                                          """<input class="hyperlinkformHiddenInput" name="categid" value="%(category)s" type""" \
-                                          """="hidden" />""" \
-                                          """<input type="submit" name="doctypecategoryedit" value="edit" """\
-                                          """class="hyperlinkformSubmitButton" />""" \
-                                          """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
-                                                            'category' : cgi.escape(str(categ[0]), 1),
-                                                            'performaction' : cgi.escape(perform_act, 1),
-                                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
-                                                          },
-                                          """<form class="hyperlinkform" method="get" action="%(websubadmin_url)s/%(performaction)s">""" \
-                                          """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
-                                          """="hidden" />""" \
-                                          """<input class="hyperlinkformHiddenInput" name="categid" value="%(category)s" type""" \
-                                          """="hidden" />""" \
-                                          """<input type="submit" name="doctypecategorydelete" value="delete" """\
-                                          """class="hyperlinkformSubmitButton" />""" \
-                                          """</form>""" % { 'doctype' : cgi.escape(doctype, 1),
-                                                            'category' : cgi.escape(str(categ[0]), 1),
-                                                            'performaction' : cgi.escape(perform_act, 1),
-                                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
-                                                          }
-                                         ) )
+
+            num_categs = len(doctype_categories)
+            for i in range(0, num_categs):
+                this_categname  = doctype_categories[i][0]
+                this_categdescr = doctype_categories[i][1]
+                this_categscore = doctype_categories[i][2]
+
+                t_row = ["""&nbsp;&nbsp;%s""" % cgi.escape(this_categname, 1),
+                         """&nbsp;&nbsp;%s""" % cgi.escape(this_categdescr, 1)]
+
+                ## up arrow:
+                if i != 0:
+                    t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&categid=%(categid)s&"""\
+                              """movecategup=1">"""\
+                              """<img border="0" src="%(weburl)s/img/smallup.gif" title="Move Category Up" /></a>""" \
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'performaction'   : cgi.escape(perform_act, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'categid'         : cgi.escape(str(this_categname), 1),
+                                }
+                             ]
+                else:
+                    ## this is the first category - don't provide an arrow to move it up
+                    t_row += ["&nbsp;"]
+
+                ## down arrow:
+                if i != num_categs - 1:
+                    t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&categid=%(categid)s&"""\
+                              """movecategdown=1">"""\
+                              """<img border="0" src="%(weburl)s/img/smalldown.gif" title="Move Category Down" /></a>""" \
+                              % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'performaction'   : cgi.escape(perform_act, 1),
+                                  'weburl'          : cgi.escape(weburl, 1),
+                                  'doctype'         : cgi.escape(doctype, 1),
+                                  'categid'         : cgi.escape(str(this_categname), 1),
+                                }
+                             ]
+                else:
+                    ## this is the first function - don't provide an arrow to move it up
+                    t_row += ["&nbsp;"]
+
+                ## 'jump-out' arrow:
+                if jumpcategout in ("", None):
+                    ## provide "move from" arrows for all categories:
+                    if num_categs > 1:
+                        t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s&jumpcategout=%(categid)s">"""\
+                                  """<img border="0" src="%(weburl)s/img/move_from.gif" title="Move category [%(categid)s] """\
+                                  """from score %(categscore)s" /></a>"""\
+                                  % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                      'performaction'   : cgi.escape(perform_act, 1),
+                                      'weburl'          : cgi.escape(weburl, 1),
+                                      'doctype'         : cgi.escape(doctype, 1),
+                                      'categid'         : cgi.escape(str(this_categname), 1),
+                                      'categscore'      : cgi.escape(str(this_categscore), 1),
+                                    }
+                                 ]
+                    else:
+                        t_row += ["&nbsp;"]
+                else:
+                    ## there is a value for "jumpcategout", so a "moveto" button must be provided
+                    if num_categs > 1:
+                        ## is this the categ that will be moved?
+                        if jumpcategout  == this_categname:
+                            ## yes it is - no "move-to" arrow here
+                            t_row += ["&nbsp;"]
+                        else:
+                            ## no it isn't - "move-to" arrow here
+                            t_row += ["""<a href="%(websubadmin_url)s/%(performaction)s?doctype=%(doctype)s"""\
+                                      """&jumpcategout=%(jumpcategout)s&jumpcategin=%(categid)s">"""\
+                                      """<img border="0" src="%(weburl)s/img/move_to.gif" title="Move category"""\
+                                      """ [%(jumpcategout)s] to this location" /></a>"""\
+                                      % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                          'performaction'   : cgi.escape(perform_act, 1),
+                                          'weburl'          : cgi.escape(weburl, 1),
+                                          'doctype'         : cgi.escape(doctype, 1),
+                                          'categid'         : cgi.escape(str(this_categname), 1),
+                                          'jumpcategout'    : cgi.escape(str(jumpcategout), 1),
+                                        }
+                                     ]
+                    else:
+                        ## there is only 1 category - cannot perform a "move"
+                        t_row += ["&nbsp;"]
+
+                ## 'edit' button:
+                t_row += ["""<form class="hyperlinkform" method="post" action="%(websubadmin_url)s/%(performaction)s">""" \
+                          """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
+                          """="hidden" />""" \
+                          """<input class="hyperlinkformHiddenInput" name="categid" value="%(category)s" type""" \
+                          """="hidden" />""" \
+                          """<input type="submit" name="doctypecategoryedit" value="edit" """\
+                          """class="hyperlinkformSubmitButton" />""" \
+                          """</form>""" % { 'doctype'         : cgi.escape(doctype, 1),
+                                            'category'        : cgi.escape(str(this_categname), 1),
+                                            'performaction'   : cgi.escape(perform_act, 1),
+                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                          }
+                         ]
+
+                ## 'delete' button:
+                t_row += ["""<form class="hyperlinkform" method="post" action="%(websubadmin_url)s/%(performaction)s">""" \
+                          """<input class="hyperlinkformHiddenInput" name="doctype" value="%(doctype)s" type""" \
+                          """="hidden" />""" \
+                          """<input class="hyperlinkformHiddenInput" name="categid" value="%(category)s" type""" \
+                          """="hidden" />""" \
+                          """<input type="submit" name="doctypecategorydelete" value="delete" """\
+                          """class="hyperlinkformSubmitButton" />""" \
+                          """</form>""" % { 'doctype'         : cgi.escape(doctype, 1),
+                                            'category'        : cgi.escape(str(this_categname), 1),
+                                            'performaction'   : cgi.escape(perform_act, 1),
+                                            'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                          }
+                         ]
+
+                ## 'jumping-out from' arrow:
+                if jumpcategout not in ("", None):
+                    if jumpcategout == this_categname and num_categs > 1:
+                        t_row += ["""<img border="0" src="%(weburl)s/img/move_from.gif" title="Moving category """\
+                                  """[%(categid)s] from this location (score %(categscore)s)" />"""\
+                                  % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                      'performaction'   : cgi.escape(perform_act, 1),
+                                      'weburl'          : cgi.escape(weburl, 1),
+                                      'categid'         : cgi.escape(str(this_categname), 1),
+                                      'categscore'      : cgi.escape(str(this_categscore), 1),
+                                    }
+                                 ]
+                    else:
+                        t_row += ["&nbsp;"]
+                else:
+                    t_row += ["&nbsp;"]
+
+                ## finally, append the newly created row to the tbody list:
+                categs_tablebody.append(t_row)
+                
             txt += create_html_table_from_tuple(tableheader=categs_tableheader, tablebody=categs_tablebody)
         except IndexError:
             ## categs tuple was not in expected format ((sname, lname), (sname, lname)[, ...])
@@ -1460,7 +1567,7 @@ class Template:
             <input style="margin: 5px 10px 5px 10px;" name="categid" type="text" size="10" />&nbsp;
             <small style="color: navy;">Description:&nbsp;</small>
             <input style="margin: 5px 10px 5px 10px;" name="categdescr" type="text" size="25" />&nbsp;
-            <input name="doctypecategoryadd" class="adminbutton" type="submit" value="Save Category" />
+            <input name="doctypecategoryadd" class="adminbutton" type="submit" value="Add Category" />
            </form>
           </td>
          </tr>
@@ -1662,8 +1769,8 @@ class Template:
         return txt
 
     def tmpl_configure_doctype_overview(self, doctype="", doctypename="", doctypedescr="", doctype_cdate="", doctype_mdate="", \
-                                        doctype_categories="", doctype_submissions="", doctype_referees="", user_msg="", \
-                                        add_actions_list=None, perform_act="doctypeconfigure"):
+                                        doctype_categories="", jumpcategout="", doctype_submissions="", \
+                                        doctype_referees="", user_msg="", add_actions_list=None, perform_act="doctypeconfigure"):
         """TODO : DOCSTRING"""
         ## sanity checking:
         if type(doctype_categories) not in (list, tuple):
@@ -1699,6 +1806,7 @@ class Template:
         ## table containing document type's categories:
         body_content += """<br />%s""" % (self._tmpl_configure_doctype_overview_create_categories_view(doctype=doctype,
                                                                                                        doctype_categories=doctype_categories,
+                                                                                                       jumpcategout=jumpcategout,
                                                                                                        perform_act=perform_act
                                                                                                       )
                                          )
