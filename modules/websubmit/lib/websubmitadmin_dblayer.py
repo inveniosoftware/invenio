@@ -1105,12 +1105,17 @@ def get_number_collection_doctype_entries_doctype(doctype):
     q = """SELECT COUNT(id_father) FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_son=%s"""
     return int(run_sql(q, (doctype,))[0][0])
 
-def get_all_categories_sname_lname_doctype(doctype):
-    """Return the short and long names of all CATEGORIES found for a given DOCUMENT TYPE.
-       @param doctype: unique ID of doctype for which submission categories are to be counted
-       @return a tuple of tuples: (sname, lname)
+def get_all_category_details_for_doctype(doctype):
+    """Return all details (short-name, long-name, position number) of all CATEGORIES found for a
+       given document type. If the position number is NULL, it will be assigned a value of zero.
+       Categories will be ordered primarily by ascending position number and then by ascending
+       alphabetical order of short-name.
+       @param doctype: (string) The document type for which categories are to be retrieved.
+       @return: (tuple) of tuples whereby each tuple is a row containing 3 items:
+                            (short-name, long-name, position)
     """
-    q = """SELECT sname, lname FROM sbmCATEGORIES where doctype=%s"""
+    q = """SELECT sname, lname, score FROM sbmCATEGORIES where doctype=%s ORDER BY score ASC,""" \
+        """ lname ASC"""
     return run_sql(q, (doctype,))
 
 def get_all_categories_sname_lname_for_doctype_categsname(doctype, categsname):
@@ -1152,6 +1157,173 @@ def get_submissiondetails_doctype_action(doctype, action):
     q = """SELECT subname, docname, actname, displayed, nbpg, cd, md, buttonorder, statustext, level, """ \
         """score, stpage, endtxt FROM sbmIMPLEMENT WHERE docname=%s AND actname=%s"""
     return run_sql(q, (doctype, action))
+
+def get_all_categories_of_doctype_ordered_by_score_lname(doctype):
+    """Return a tuple containing all categories of a given document type, ordered by
+       ascending order of score, and ascending order of category long-name.
+       @param doctype: (string) the document type ID.
+       @return: (tuple) or tuples, whereby each tuple is a row representing a category, with
+        the following structure:  (sname, lname, score)
+    """
+    qstr = """SELECT sname, lname, score FROM sbmCATEGORIES WHERE doctype=%s ORDER BY score ASC, lname ASC"""
+    res = run_sql(qstr, (doctype,))
+    return res
+
+def update_score_of_doctype_category(doctype, categid, newscore):
+    """Update the score of a given category of a given document type.
+       @param doctype:  (string) the document type id
+       @param categid:  (string) the category id
+       @param newscore: (integer) the score that the category is to be given
+       @return: (integer) - 0 on update of row; 1 on failure to update.
+    """
+    qstr = """UPDATE sbmCATEGORIES SET score=%s WHERE doctype=%s AND sname=%s"""
+    res = run_sql(qstr, (newscore, doctype, categid))
+    if int(res) > 0:
+        ## row(s) were updated
+        return 0
+    else:
+        ## no rows were updated
+        return 1
+
+def normalize_doctype_category_scores(doctype):
+    """Get details of all categories of a given document type, ordered by score and long name;
+       Loop through each category and check its score vs a counter in the result-set; if the score
+       does not match the counter number, update the score of that category to match that of the
+       counter. In this way, the category scores will be normalized sequentially. E.g.:
+       categories numbered [1,4,6,8,9] will be allocated normalized scores [1,2,3,4,5]. I.e. the
+       order won't change, but the scores will be corrected.
+       @param doctype: (string) the document type id
+       @return: (None)
+    """
+    all_categs = get_all_categories_of_doctype_ordered_by_score_lname(doctype)
+    num_categs = len(all_categs)
+    for row_idx in xrange(0, num_categs):
+        ## Get the details of the current categories:
+        cur_row_score   = row_idx + 1
+        cur_categ_id    = all_categs[row_idx][0]
+        cur_categ_lname = all_categs[row_idx][1]
+        cur_categ_score = int(all_categs[row_idx][2])
+
+        ## Check the score of the categ vs its position in the list:
+        if cur_categ_score != cur_row_score:
+            ## update this score:
+            update_score_of_doctype_category(doctype=doctype,
+                                             categid=cur_categ_id, newscore=cur_row_score)
+
+def move_category_to_new_score(doctype, sourcecateg, destinationcatg):
+    """Move a category of a document type from one score, to another.
+       @param doctype: (string) -the ID of the document type whose categories are to be moved.
+       @param sourcecateg: (string) - the category ID of the category to be moved.
+       @param destinationcatg: (string) - the category ID of the category to whose position sourcecateg
+        is to be moved.
+       @return: (integer) 0 - successfully moved category; 1 - failed to correctly move category.
+    """
+    qstr_increment_scores_from_scorex = """UPDATE sbmCATEGORIES SET score=score+1 WHERE doctype=%s AND score >= %s"""
+    move_categ_from_score = mave_categ_to_score = -1
+
+    ## get the (categid, lname, score) of all categories for this document type:
+    res_all_categs = get_all_categories_of_doctype_ordered_by_score_lname(doctype=doctype)
+    num_categs = len(res_all_categs)
+
+    ## if the category scores are not ordered properly (1,2,3,4,...), correct them.
+    ## Also, get the row-count (therefore score-position) of the categ to be moved, and the destination score:
+    for row_idx in xrange(0, num_categs):
+        current_row_score = row_idx + 1
+        current_categid = res_all_categs[row_idx][0]
+        current_categ_score = int(res_all_categs[row_idx][2])
+
+        ## Check the score of the categ vs its position in the list:
+        if current_categ_score != current_row_score:
+            ## bad score - fix it:
+            update_score_of_doctype_category(doctype=doctype,
+                                             categid=current_categid,
+                                             newscore=current_row_score)
+
+        if current_categid == sourcecateg:
+            ## this is the place from which the category is being jumped-out:
+            move_categ_from_score = current_row_score
+        elif current_categid == destinationcatg:
+            ## this is the place into which the categ is being jumped:
+            move_categ_to_score = current_row_score
+
+    ## If couldn't find the scores of both 'sourcecateg' and 'destinationcatg', return error:
+    if -1 in (move_categ_from_score, move_categ_to_score) or \
+           move_categ_from_score == mave_categ_to_score:
+        ## either trying to move a categ to the same place or can't find both the source and destination categs:
+        return 1
+
+    ## add 1 to score of all categories from the score position into which the sourcecateg is to be moved:
+    qres = run_sql(qstr_increment_scores_from_scorex, (doctype, move_categ_to_score))
+    ## update the score of the category to be moved:
+    update_score_of_doctype_category(doctype=doctype, categid=sourcecateg, newscore=move_categ_to_score)
+
+    ## now re-order all category scores correctly:
+    normalize_doctype_category_scores(doctype)
+    return 0 ## return success
+    
+def move_category_by_one_place_in_score(doctype, categsname, direction):
+    """Move a category up or down in score by one place.
+       @param doctype: (string) - the ID of the document type to which the category belongs.
+       @param categsname: (string) - the ID of the category to be moved.
+       @param direction: (string) - the direction in which to move the category ('up' or 'down').
+       @return: (integer) - 0 on successful move of category; 1 on failure to properly move category.
+    """
+    qstr_update_score = """UPDATE sbmCATEGORIES SET score=%s WHERE doctype=%s AND score=%s"""
+    move_categ_score  = -1
+
+    ## get the (categid, lname, score) of all categories for this document type:
+    res_all_categs = get_all_categories_of_doctype_ordered_by_score_lname(doctype=doctype)
+    num_categs = len(res_all_categs)
+    
+    ## if the category scores are not ordered properly (1,2,3,4,...), correct them
+    ## Also, get the row-count (therefore score-position) of the categ to be moved
+    for row_idx in xrange(0, num_categs):
+        current_row_score = row_idx + 1
+        current_categid = res_all_categs[row_idx][0]
+        current_categ_score = int(res_all_categs[row_idx][2])
+
+        ## Check the score of the categ vs its position in the list:
+        if current_categ_score != current_row_score:
+            ## bad score - fix it:
+            update_score_of_doctype_category(doctype=doctype,
+                                             categid=current_categid,
+                                             newscore=current_row_score)
+            
+        if current_categid == categsname:
+            ## this is the category to be moved:
+            move_categ_score = current_row_score
+
+    ## move the category:
+    if direction.lower() == "up":
+        ## Moving the category upwards (reducing its score):
+        if num_categs > 1 and move_categ_score > 1:
+            ## move the category above down by one place:
+            run_sql(qstr_update_score, (move_categ_score, doctype, (move_categ_score - 1)))
+            ## move the chosen category up:
+            update_score_of_doctype_category(doctype=doctype,
+                                             categid=categsname, newscore=(move_categ_score - 1))
+            ## return success
+            return 0
+        else:
+            ## return error - not enough categs, or categ already in first posn
+            return 1
+
+    elif direction.lower() == "down":
+        ## move the category downwards (increasing its score):
+        if num_categs > 1 and move_categ_score < num_categs:
+            ## move category below, up by one place:
+            run_sql(qstr_update_score, (move_categ_score, doctype, (move_categ_score + 1)))
+            ## move the chosen category down:
+            update_score_of_doctype_category(doctype=doctype,
+                                             categid=categsname, newscore=(move_categ_score + 1))
+            ## return success
+            return 0
+        else:
+            ## return error - not enough categs, or categ already in last posn
+            return 1
+    else:
+        ## invalid move direction - no action
+        return 1
 
 def update_submissiondetails_doctype_action(doctype, action, displayed, buttonorder,
                                             statustext, level, score, stpage, endtxt):
@@ -1573,7 +1745,8 @@ def clone_categories_fromdoctype_todoctype(fromdoctype, todoctype):
         ## first, count "fromdoctype"s categories:
         numcategs_fromdoctype = get_number_categories_doctype(fromdoctype)
         ## now perform the cloning:
-        q = """INSERT INTO sbmCATEGORIES (doctype, sname, lname) (SELECT %s, sname, lname FROM sbmCATEGORIES WHERE doctype=%s)"""
+        q = """INSERT INTO sbmCATEGORIES (doctype, sname, lname, score) (SELECT %s, sname, lname, score """\
+            """FROM sbmCATEGORIES WHERE doctype=%s)"""
         run_sql(q, (todoctype, fromdoctype))
         ## get number categories for "todoctype" (should be the same as "fromdoctype" if the cloning was successful):
         numcategs_todoctype = get_number_categories_doctype(todoctype)
@@ -1937,16 +2110,24 @@ def update_category_description_doctype_categ(doctype, categ, categdescr):
     else:
         return 1 ## Everything not OK: either no rows, or more than 1 row for category
 
-def insert_category_doctype(doctype, categ, categdescr):
-    q = """INSERT INTO sbmCATEGORIES (doctype, sname, lname) VALUES (%s, %s, %s)"""
-    ## get count of rows for "doctype"/"categ"
-    numrows_category_doctype = get_number_categories_doctype_category(doctype=doctype, categ=categ)
-    if numrows_category_doctype == 0:
-        ## "categ" does not exist for "doctype" - can insert:
-        run_sql(q, (doctype, categ, categdescr))
-        return 0  ## everything OK
+def insert_category_into_doctype(doctype, categ, categdescr):
+    """Insert a category for a document type. It will be inserted into the last position.
+       If the category already exists for that document type, the insert will fail.
+       @param doctype:    (string) - the document type ID.
+       @param categ:      (string) - the ID of the new category.
+       @param categdescr: (string) - the new category's description.
+       @return: (integer) An error code: 0 on successful insert; 1 on failure to insert.
+    """
+    qstr = """INSERT INTO sbmCATEGORIES (doctype, sname, lname, score) """\
+           """(SELECT %s, %s, %s, COUNT(sname)+1 FROM sbmCATEGORIES WHERE doctype=%s)"""
+    ## does this category already exist for this document type?
+    numrows_categ = get_number_categories_doctype_category(doctype=doctype, categ=categ)
+    if numrows_categ == 0:
+        ## it doesn't exist for this doctype - go ahead and insert it:
+        run_sql(qstr, (doctype, categ, categdescr, doctype))
+        return 0
     else:
-        ## category already exists - cannot insert
+        ## the category already existed for this doctype - cannot insert
         return 1
 
 def delete_category_doctype(doctype, categ):
@@ -1961,6 +2142,8 @@ def delete_category_doctype(doctype, categ):
     numrows_categorydoctype = get_number_categories_doctype_category(doctype=doctype, categ=categ)
     if numrows_categorydoctype == 0:
         ## Everything OK - category deleted
+        ## now re-order all category scores correctly:
+        normalize_doctype_category_scores(doctype)
         return 0
     else:
         ## Everything NOT OK - category still present
@@ -1969,6 +2152,8 @@ def delete_category_doctype(doctype, categ):
         ## check once more to see if category remains:
         if get_number_categories_doctype_category(doctype=doctype, categ=categ) == 0:
             ## Everything OK - category was deleted successfully this time
+            ## now re-order all category scores correctly:
+            normalize_doctype_category_scores(doctype)
             return 0
         else:
             ## still unable to recover - could not delete category
