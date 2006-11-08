@@ -1937,7 +1937,7 @@ def _create_edit_submission_form(errors, warnings, doctype, action, user_msg="")
             user_msg.append("The Submission '%s' of the Document Type '%s' doesn't seem to exist." \
                             % (action, doctype))
             ## TODO : LOG ERROR
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
 def _create_edit_category_form(errors, warnings, doctype, categid):
@@ -1958,7 +1958,7 @@ def _create_edit_category_form(errors, warnings, doctype, categid):
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
-def _create_configure_doctype_form(doctype, user_msg=""):
+def _create_configure_doctype_form(doctype, jumpcategout="", user_msg=""):
     title = "Configure Document Type"
     body = ""
     if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
@@ -1969,7 +1969,8 @@ def _create_configure_doctype_form(doctype, user_msg=""):
     docdescr = doctype_details[0][2]
     (cd, md) = (doctype_details[0][3], doctype_details[0][4])
     ## get categories for doctype:
-    doctype_categs = get_all_categories_sname_lname_doctype(doctype=doctype)
+    doctype_categs = get_all_category_details_for_doctype(doctype=doctype)
+
     ## get submissions for doctype:
     doctype_submissions = get_submissiondetails_all_submissions_doctype(doctype=doctype)
     ## get list of actions that this doctype doesn't have:
@@ -1979,38 +1980,11 @@ def _create_configure_doctype_form(doctype, user_msg=""):
     body = websubmitadmin_templates.tmpl_configure_doctype_overview(doctype=doctype, doctypename=docname,
                                                                     doctypedescr=docdescr, doctype_cdate=cd,
                                                                     doctype_mdate=md, doctype_categories=doctype_categs,
+                                                                    jumpcategout=jumpcategout,
                                                                     doctype_submissions=doctype_submissions,
                                                                     doctype_referees=referees_dets,
                                                                     add_actions_list=unlinked_actions,
-                                                                    user_msg=user_msg
-                                                                   )
-    return (title, body)
-
-def _delete_category_from_doctype(errors, warnings, doctype, categid):
-    """Delete a category (categid) from the document type identified by "doctype".
-       @param errors:  a list of errors encountered while deleting the category
-       @param warnings: a list of warnings encountered while deleting the category
-       @param doctype: the unique ID of the document type from which the category is to be deleted
-       @param categid: the unique category ID of the category to be deleted from doctype
-       @return: a tuple containing 2 strings: (page title, page body)
-    """
-    user_msg = []
-
-    if categid in ("", None):
-        ## cannot delete unknown category!
-        user_msg.append("Category ID is mandatory")
-        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-        return (title, body)
-
-    error_code = delete_category_doctype(doctype=doctype, categ=categid)
-    if error_code == 0:
-        ## successful delete
-        user_msg.append("""'%s' Category Successfully Deleted""" % (categid,))
-    else:
-        ## could not delete category
-        user_msg.append("""Unable to Delete '%s' Category""" % (categid,))
-        ## TODO : LOG ERROR
-    (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+                                                                    user_msg=user_msg)
     return (title, body)
 
 def _clone_submission_fromdoctype_todoctype(errors, warnings, user_msg, todoctype, action, clonefrom):
@@ -2269,13 +2243,89 @@ def _add_category_to_doctype(errors, warnings, doctype, categid, categdescr):
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body)
 
-    error_code = insert_category_doctype(doctype=doctype, categ=categid, categdescr=categdescr)
+    error_code = insert_category_into_doctype(doctype=doctype, categ=categid, categdescr=categdescr)
     if error_code == 0:
         ## successful insert
         user_msg.append("""'%s' Category Successfully Added""" % (categid,))
     else:
         ## could not insert category into doctype
         user_msg.append("""Unable to Add '%s' Category""" % (categid,))
+        ## TODO : LOG ERROR
+    (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+    return (title, body)
+
+def _delete_category_from_doctype(errors, warnings, doctype, categid):
+    """Delete a category (categid) from the document type identified by "doctype".
+       @param errors:  a list of errors encountered while deleting the category
+       @param warnings: a list of warnings encountered while deleting the category
+       @param doctype: the unique ID of the document type from which the category is to be deleted
+       @param categid: the unique category ID of the category to be deleted from doctype
+       @return: a tuple containing 2 strings: (page title, page body)
+    """
+    user_msg = []
+
+    if categid in ("", None):
+        ## cannot delete unknown category!
+        user_msg.append("Category ID is mandatory")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
+    error_code = delete_category_doctype(doctype=doctype, categ=categid)
+    if error_code == 0:
+        ## successful delete
+        user_msg.append("""'%s' Category Successfully Deleted""" % (categid,))
+    else:
+        ## could not delete category
+        user_msg.append("""Unable to Delete '%s' Category""" % (categid,))
+        ## TODO : LOG ERROR
+    (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+    return (title, body)
+
+def _jump_category_to_new_score(errors, warnings, doctype, jumpcategout, jumpcategin):
+    user_msg = []
+    if jumpcategout in ("", None) or jumpcategin in ("", None):
+        ## need both jumpcategout and jumpcategin to move a category:
+        user_msg.append("Unable to move category - unknown source and/or destination score(s)")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+    ## FIXME TODO:
+    error_code = move_category_to_new_score(doctype, jumpcategout, jumpcategin)
+
+    if error_code == 0:
+        ## successful jump of category
+        user_msg.append("""Successfully Moved [%s] Category""" % (jumpcategout,))
+    else:
+        ## could not delete category
+        user_msg.append("""Unable to Move [%s] Category""" % (jumpcategout,))
+        ## TODO : LOG ERROR
+    (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+    return (title, body)
+
+def _move_category(errors, warnings, doctype, categid, movecategup=""):
+    user_msg = []
+    if categid in ("", None):
+        ## cannot move unknown category!
+        user_msg.append("Cannot move an unknown category - category ID is mandatory")
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
+        return (title, body)
+
+    if movecategup not in ("", None):
+        ## move the category up in score:
+        error_code = move_category_by_one_place_in_score(doctype=doctype,
+                                                         categsname=categid,
+                                                         direction="up")
+    else:
+        ## move the category down in score:
+        error_code = move_category_by_one_place_in_score(doctype=doctype,
+                                                         categsname=categid,
+                                                         direction="down")
+    
+    if error_code == 0:
+        ## successful move of category
+        user_msg.append("""[%s] Category Successfully Moved""" % (categid,))
+    else:
+        ## could not delete category
+        user_msg.append("""Unable to Move [%s] Category""" % (categid,))
         ## TODO : LOG ERROR
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
@@ -2298,6 +2348,10 @@ def perform_request_configure_doctype(doctype,
                                       doctypesubmissioneditdetailscommit="",
                                       categid=None,
                                       categdescr=None,
+                                      movecategup=None,
+                                      movecategdown=None,
+                                      jumpcategout=None,
+                                      jumpcategin=None,
                                       action=None,
                                       doctype_cloneactionfrom=None,
                                       displayed=None,
@@ -2462,6 +2516,16 @@ def perform_request_configure_doctype(doctype,
         ## delete a category
         (title, body) = _delete_category_from_doctype(errors=errors, warnings=warnings,
                                                       doctype=doctype, categid=categid)
+    elif movecategup not in ("", None) or movecategdown not in ("", None):
+        ## move a category up or down in score:
+        (title, body) = _move_category(errors=errors, warnings=warnings,
+                                       doctype=doctype, categid=categid,
+                                       movecategup=movecategup)
+    elif jumpcategout not in ("", None) and jumpcategin not in ("", None):
+        ## jump a category from one score to another:
+        (title, body) = _jump_category_to_new_score(errors=errors, warnings=warnings,
+                                                    doctype=doctype, jumpcategout=jumpcategout,
+                                                    jumpcategin=jumpcategin)
     elif doctypesubmissionadd not in ("", None):
         ## form displaying option of adding doctype:
         (title, body) = _create_add_submission_choose_clonefrom_form(errors=errors, warnings=warnings, doctype=doctype, action=action)
@@ -2497,7 +2561,7 @@ def perform_request_configure_doctype(doctype,
                                                    level=level, score=score, stpage=stpage, endtxt=endtxt)
     else:
         ## default - display root of edit doctype
-        (title, body) = _create_configure_doctype_form(doctype)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, jumpcategout=jumpcategout)
     return (title, body, errors, warnings)
 
 def _create_configure_doctype_submission_functions_form(doctype,
@@ -2770,14 +2834,14 @@ def perform_request_configure_doctype_submissionfunctions_parameters(doctype,
         ## TODO : LOG ERROR
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
 
     if editfunctionparametervaluecommit not in ("", None):
@@ -2923,14 +2987,14 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         ## TODO : LOG ERROR
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
         
 
@@ -3286,14 +3350,14 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         ## TODO : LOG ERROR
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
 
     ## ensure that the page number for this submission is valid:
@@ -3702,14 +3766,14 @@ def perform_request_configure_doctype_submissionpages(doctype,
         ## TODO : LOG ERROR
         user_msg.append("""The Submission "%s" seems to exist multiple times for the Document Type "%s" - cannot configure at this time.""" \
                    % (action, doctype))
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
     elif numrows_submission == 0:
         ## this submission does not seem to exist for this doctype:
         user_msg.append("""The Submission "%s" doesn't exist for the "%s" Document Type - cannot configure at this time.""" \
                    % (action, doctype))
         ## TODO : LOG ERROR
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
 
     ## submission valid
@@ -3838,7 +3902,7 @@ def _configure_doctype_delete_submission_page(errors, warnings, doctype, action,
         user_msg.append("""Unable to determine number of Submission Pages for Submission "%s" - """\
                         """Cannot delete page %s"""\
                         % (action, pagenum))
-        (title, body) = _create_configure_doctype_form(doctype, user_msg=user_msg)
+        (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
     return (title, body)
 
 def _create_configure_doctype_submission_pages_form(doctype,
