@@ -168,20 +168,23 @@ class Template:
             if add == 1:
                 len_subfields += 1
                 type_table = "record"
-            result = """<td rowspan="%(len_subfields)s" class="bibEditCellTag">
-                          %(print_tag_field)s
-                          %(print_tag_form)s
-                        </td>
-                          %(subfield)s
-                          %(print_link_function)s
-                     """ % {'len_subfields'       : len_subfields,
-                            'print_tag_field'     : print_tag_field,
-                            'print_tag_form'      : print_tag_form,
-                            'subfield'            : self.tmpl_subfields(ln, recid,
-                                                                        subfields[0][0], subfields[0][1],
-                                                                        tag_field, format_tag, type_table,
-                                                                        0, num_field, len_subfields),
-                            'print_link_function' : print_link_function}
+            try:
+                result = """<td rowspan="%(len_subfields)s" class="bibEditCellTag">
+                              %(print_tag_field)s
+                              %(print_tag_form)s
+                            </td>
+                              %(subfield)s
+                              %(print_link_function)s
+                         """ % {'len_subfields'       : len_subfields,
+                                'print_tag_field'     : print_tag_field,
+                                'print_tag_form'      : print_tag_form,
+                                'subfield'            : self.tmpl_subfields(ln, recid,
+                                                                            subfields[0][0], subfields[0][1],
+                                                                            tag_field, format_tag, type_table,
+                                                                            0, num_field, len_subfields),
+                                'print_link_function' : print_link_function}
+            except IndexError:
+                raise "FIXME: BibEdit does not seem to be able to edit records with controlfields."
             if len_subfields != 1:
                 num_value = -1
                 for subfield in subfields:
