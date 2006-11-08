@@ -710,9 +710,9 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
         <option value="-1">- Select portalbox -</option>
         """
         for (id, t_title, t_body) in res:
-            if not col_pbx.has_key(id):
-                text += """<option value="%s" %s>%s - %s...</option>
-                """ % (id, id  == int(pbxID) and 'selected="selected"' or '', t_title, cgi.escape(t_body[0:25 - len(t_title)]))
+            text += """<option value="%s" %s>%s - %s...</option>""" % \
+                     (id, id  == int(pbxID) and 'selected="selected"' or '',
+                      t_title, cgi.escape(t_body[0:25 - len(t_title)]))
         text += """</select><br>
         <span class="adminlabel">Language</span>
         <select name="sel_ln" class="admin_w200">
