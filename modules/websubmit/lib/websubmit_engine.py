@@ -846,7 +846,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
         return errorMsg(e.value, req, ln)
     #parses database to get all data
     #first the list of categories
-    res = run_sql("SELECT * FROM sbmCATEGORIES WHERE  doctype=%s ORDER BY lname", (doctype,))
+    res = run_sql("SELECT * FROM sbmCATEGORIES WHERE  doctype=%s ORDER BY score ASC, lname ASC", (doctype,))
     if len(res) > 0:
         for arr in res:
             nbCateg = nbCateg+1
