@@ -25,9 +25,11 @@ __revision__ = "$Id$"
 
 from invenio import bibformat_utils
 
-def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, extension_en="[...] ",extension_fr="[...] ", contextual="no", highlight='no'):
-    """
-    Prints the abstract of a record in english and then french
+def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, 
+           extension_en="[...] ",extension_fr="[...] ", contextual="no",
+           highlight='no'):
+    """ Prints the abstract of a record in english
+    and then french
     
     @param prefix_en a prefix for english abstract (printed only if english abstract exists)
     @param prefix_fr a prefix for french abstract (printed only if french abstract exists)
@@ -49,7 +51,8 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, extension_en=
     abstract_fr.extend(bfo.fields('590__b'))
     abstract_fr = "<br/>".join(abstract_fr)
 
-    if contextual == 'yes' and limit != "" and limit.isdigit() and int(limit) > 0:
+    if contextual == 'yes' and limit != "" and \
+           limit.isdigit() and int(limit) > 0:
         context_en = bibformat_utils.get_contextual_content(abstract_en,
                                                             bfo.search_pattern,
                                                             max_lines=int(limit))
