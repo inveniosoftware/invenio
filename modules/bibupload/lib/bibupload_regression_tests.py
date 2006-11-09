@@ -395,9 +395,10 @@ class BibUploadFMTModeTest(unittest.TestCase):
          </datafield>
         </record>
         """
-        self.recid10_marcxml_with_fmt = """
+        self.recid3_marcxml_before_all_the_tests = print_record(3, 'xm')
+        self.recid3_marcxml_with_fmt = """
         <record>
-         <controlfield tag="001">10</controlfield>
+         <controlfield tag="001">3</controlfield>
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
@@ -412,18 +413,18 @@ class BibUploadFMTModeTest(unittest.TestCase):
          </datafield>
         </record>
         """
-        self.recid10_marcxml_with_fmt_only_first = """
+        self.recid3_marcxml_with_fmt_only_first = """
         <record>
-         <controlfield tag="001">10</controlfield>
+         <controlfield tag="001">3</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
           <subfield code="g">Let us see if this gets inserted well.</subfield>
          </datafield>
         </record>
         """
-        self.recid10_marcxml_with_fmt_only_second = """
+        self.recid3_marcxml_with_fmt_only_second = """
         <record>
-         <controlfield tag="001">10</controlfield>
+         <controlfield tag="001">3</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
           <subfield code="g">Yet another test, to be run after the first one.</subfield>
@@ -434,6 +435,19 @@ class BibUploadFMTModeTest(unittest.TestCase):
          </datafield>
         </record>
         """
+          
+    def restore_recid3(self):
+        """Helper function that restores recID 3 MARCXML, using the
+           value saved before all the tests started to execute.
+           (see self.recid3_marcxml_before_all_the_tests).
+           Does not restore HB and HD formats.
+        """
+        bibupload.options['mode'] = 'replace'
+        bibupload.options['verbose'] = 0
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_before_all_the_tests)
+        info = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(int(info[1]),'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml, self.recid3_marcxml_before_all_the_tests))
 
     def test_inserting_new_record_containing_fmt_tag(self):
         """bibupload - FMT tag, inserting new record containing FMT tag"""
@@ -451,80 +465,84 @@ class BibUploadFMTModeTest(unittest.TestCase):
         """bibupload - FMT tag, updating existing record via format mode"""
         bibupload.options['mode'] = 'format'
         bibupload.options['verbose'] = 0
-        marcxml_before = print_record(10, 'xm')
+        marcxml_before = print_record(3, 'xm')
         # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_first)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
-        hd_after = print_record(10, 'hd')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
+        hd_after = print_record(3, 'hd')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
-
+        # restore original record 3:
+        self.restore_recid3()
+        
     def test_updating_existing_record_formats_in_correct_mode(self):
         """bibupload - FMT tag, updating existing record via correct mode"""
         bibupload.options['mode'] = 'correct'
         bibupload.options['verbose'] = 0
-        marcxml_before = print_record(10, 'xm')
+        marcxml_before = print_record(3, 'xm')
         # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_first)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
-        hd_after = print_record(10, 'hd')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
+        hd_after = print_record(3, 'hd')
         self.assertEqual(marcxml_after, marcxml_before)
         self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        # restore original record 3:
+        self.restore_recid3()
 
     def test_updating_existing_record_formats_in_replace_mode(self):
         """bibupload - FMT tag, updating existing record via replace mode"""
         bibupload.options['mode'] = 'replace'
         bibupload.options['verbose'] = 0
         # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_first)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_first)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
         self.failUnless(compare_xmlbuffers(marcxml_after,
-                                           '<record><controlfield tag="001">10</controlfield></record>'), 0)
+                                           '<record><controlfield tag="001">3</controlfield></record>'), 0)
         self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
         # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt_only_second)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
-        hd_after = print_record(10, 'hd')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
+        hd_after = print_record(3, 'hd')
         self.failUnless(compare_xmlbuffers(marcxml_after, """
                                            <record>
-                                           <controlfield tag="001">10</controlfield>
+                                           <controlfield tag="001">3</controlfield>
                                            </record>""",
                                            0))
         self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
         # final insertion and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid10_marcxml_with_fmt)
+        recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt)
         bibupload.bibupload(recs[0])
-        marcxml_after = print_record(10, 'xm')
-        hb_after = print_record(10, 'hb')
-        hd_after = print_record(10, 'hd')
+        marcxml_after = print_record(3, 'xm')
+        hb_after = print_record(3, 'hb')
+        hd_after = print_record(3, 'hd')
         self.failUnless(compare_xmlbuffers(marcxml_after, """
                                            <record>
-                                           <controlfield tag="001">10</controlfield>
+                                           <controlfield tag="001">3</controlfield>
                                            <controlfield tag="003">SzGeCERN</controlfield>
                                            <datafield tag="100" ind1="" ind2="">
                                            <subfield code="a">Doe, John</subfield>
@@ -537,7 +555,9 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            """,
                                            0))
         self.failUnless(hb_after.startswith("Here is some format value."))
-        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))        
+        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        # restore original record 3:
+        self.restore_recid3()
 
 # FIXME: FFT tests wanted
 
