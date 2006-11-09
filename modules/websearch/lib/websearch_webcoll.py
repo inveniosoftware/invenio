@@ -51,6 +51,7 @@ from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
+from invenio.bibformat import format_record
 from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
@@ -132,50 +133,6 @@ def get_field(recID, tag):
     res = run_sql(query)
     for row in res:
         out.append(row[0])
-    return out
-
-def print_record(recID, format='hb', ln=cdslang):
-    "Prints record 'recID' formatted accoding to 'format'."
-
-    out = ""
-    # HTML brief format by default
-    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-    res = run_sql(query, None, 1)
-    if res:
-        # record 'recID' is formatted in 'format', so print it
-        out += "%s" % zlib.decompress(res[0][0])
-    else:
-        # record 'recID' does not exist in format 'format', so print some default format:
-        # firstly, title:
-        titles = get_field(recID, "245__a")
-        # secondly, authors:
-        authors = get_field(recID, "100__a") + get_field(recID, "700__a")
-        # thirdly, date of creation:
-        dates = get_field(recID, "260__c")
-        # thirdly bis, report numbers:
-        rns = get_field(recID, "037__a") + get_field(recID, "088__a")
-        # fourthly, beginning of abstract:
-        abstracts = get_field(recID, "520__a")
-        # fifthly, fulltext link:
-        urls_z = get_field(recID, "8564_z")
-        urls_u = get_field(recID, "8564_u")
-        out += websearch_templates.tmpl_record_body(
-                     weburl = weburl,
-                     titles = titles,
-                     authors = authors,
-                     dates = dates,
-                     rns = rns,
-                     abstracts = abstracts,
-                     urls_u = urls_u,
-                     urls_z = urls_z,
-                     ln=ln)
-
-    # at the end of HTML mode, print "Detailed record" and "Mark record" functions:
-    out += websearch_templates.tmpl_record_links(
-                                    weburl = weburl,
-                                    recid = recID,
-                                    ln = ln
-                                   )
     return out
 
 class Collection:
@@ -441,7 +398,10 @@ class Collection:
                     recid = recIDs[idx]
 
                     passIDs.append({'id': recid,
-                                    'body': print_record(recid, ln=ln),
+                                    'body': format_record(recid, "hb", ln=ln) + \
+                                            websearch_templates.tmpl_record_links(weburl=weburl,
+                                                                                  recid=recid,
+                                                                                  ln=ln),
                                     'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
                     
                 if self.nbrecs > rg:
