@@ -38,6 +38,7 @@ import string
 import sys
 import time
 import sre
+import marshal
 import getopt
 import curses
 import curses.panel
@@ -240,10 +241,17 @@ class Manager:
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
                 if sleeptime:
-                    next_runtime = get_datetime(sleeptime)
-                    run_sql("INSERT INTO schTASK (proc, user, runtime, sleeptime, arguments, status) "\
-                            " VALUES (%s,%s,%s,%s,%s,'WAITING')",
-                            (process, self.currentrow[2], next_runtime,sleeptime, self.currentrow[7]))
+                    new_runtime = get_datetime(sleeptime)
+                    new_task_arguments = marshal.loads(self.currentrow[7])
+                    new_task_arguments["runtime"] = new_runtime
+                    new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)"\
+                                          " VALUES (%s,%s,%s,%s,%s,'WAITING')",
+                                          (process, self.currentrow[2], new_runtime, sleeptime,
+                                           self.currentrow[7]))
+                    new_task_arguments["task"] = new_task_id
+                    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
+                            (marshal.dumps(new_task_arguments), new_task_id))
+
         else:
             self.display_in_footer("process status should be STOPPED or WAITING!")
         self.stdscr.refresh()
@@ -576,10 +584,15 @@ class BibSched:
                 Log("task #%d (%s) ended" % (task_id, proc))
                 self.running[task_id] = get_my_pid(proc, str(task_id))
             if sleeptime:
-                next_runtime = get_datetime(sleeptime)
-                run_sql("INSERT INTO schTASK (proc, user, runtime, sleeptime, arguments, status) "\
-                        " VALUES (%s,%s,%s,%s,%s,'WAITING')",
-                        (proc, user, next_runtime, sleeptime, arguments))
+                new_runtime = get_datetime(sleeptime)
+                new_task_arguments = marshal.loads(arguments)
+                new_task_arguments["runtime"] = new_runtime
+                new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)"\
+                                      " VALUES (%s,%s,%s,%s,%s,'WAITING')",
+                                      (proc, user, new_runtime, sleeptime, arguments))
+                new_task_arguments["task"] = new_task_id
+                run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
+                        (marshal.dumps(new_task_arguments), new_task_id))
                 
     def watch_loop(self):
         running_process = self.get_running_processes()
