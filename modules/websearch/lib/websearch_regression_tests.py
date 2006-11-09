@@ -814,6 +814,32 @@ class WebSearchResultsOverview(unittest.TestCase):
             self.fail("Oops, when split by collection is on, "
                       "a link to Multimedia & Arts should be found.")
 
+class WebSearchSortResultsTest(unittest.TestCase):
+    """Test of the search results page's sorting capability."""
+
+    def test_sort_results_default(self):
+        """websearch - search results sorting, default method"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=cern&rg=1',
+                                               expected_text="hep-th/0003295"))
+
+    def test_sort_results_ascending(self):
+        """websearch - search results sorting, ascending field"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=a',
+                                               expected_text="ISOLTRAP"))
+
+    def test_sort_results_descending(self):
+        """websearch - search results sorting, descending field"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d',
+                                               expected_text="SCAN-9605071"))
+
+    def test_sort_results_sort_pattern(self):
+        """websearch - search results sorting, preferential sort pattern"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d&sp=cern',
+                                               expected_text="CERN-TH-4036"))
 
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -829,7 +855,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRSSFeedServiceTest,
                              WebSearchXSSVulnerabilityTest,
-                             WebSearchResultsOverview)
+                             WebSearchResultsOverview,
+                             WebSearchSortResultsTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
