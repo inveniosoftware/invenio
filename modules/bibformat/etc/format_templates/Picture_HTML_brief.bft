@@ -12,7 +12,7 @@
 
 <BFE_ABSTRACT limit="1" prefix='<p>' prefix_en="<i>Abstract</i>: "  
 prefix_fr="<br/><i>Résumé</i>: " suffix="</p>"
-highlight="no"/>
+highlight="no" print_lang='en'/>
 
 <BFE_KEYWORDS separator=", " prefix="<br/> <i>Keyword</i>: "/>
 
