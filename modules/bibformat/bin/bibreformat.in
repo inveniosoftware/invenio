@@ -41,14 +41,12 @@ try:
     import getpass
     import marshal
     import signal
-    import string
     import sys
     import os
     import re
     import time
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 options = {} # global variable to hold task options
@@ -67,7 +65,9 @@ sched_time     = time.strftime(format_string) # scheduled execution time in the 
 ###
 
 def bibreformat_task(sql, sql_queries, cds_query, process_format):
-    
+    """
+    BibReformat main task
+    """
     global process, fmt
 
     t1 = os.times()[4]
@@ -160,7 +160,7 @@ def lhdiff(l1, l2):
     d = {}
     ld = []
     for e in l2:
-        d[e]=1
+        d[e] = 1
     for e in l1:
         if not d.has_key(e):
             ld.append(e)
@@ -179,25 +179,20 @@ def ldiff(l1, l2):
             ld.append(e)
     return ld
 
-
 ### Identify recIDs of records with missing format
 ###
 
 def without_fmt(sql):
     "List of record IDs to be reformated, not having the specified format yet"
 
-    global fmt
-
-    xm1, xm2, format1, format2 = [],[],[],[]
+    format2 = []
+    all_rec_ids = []
     
     q1 = sql['q1']
     q2 = sql['q2']
 
-    ## get complete recID list of xm formatted records
-    xm1 = run_sql(q1)
-
-    for item in xm1:
-        xm2.append(item[0])
+    ## get complete recID list
+    all_rec_ids = run_sql(q1)
 
     ## get complete recID list of formatted records
     format1 = run_sql(q2)
@@ -205,7 +200,9 @@ def without_fmt(sql):
     for item in format1:
         format2.append(item[0])
 
-    return lhdiff(xm2,format2)
+    all_rec_ids = map(lambda x: x[0], all_rec_ids)
+
+    return lhdiff(all_rec_ids, format2)
 
 
 ### Bibreformat all selected records (using new python bibformat)
@@ -221,7 +218,7 @@ def iterate_over_new(list, weburl, fmt):
     
     for recID in list:
 
-        n_rec +=1
+        n_rec += 1
         n_it_rec += 1
         
         message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
@@ -257,7 +254,7 @@ def iterate_over_new(list, weburl, fmt):
         if n_it_rec > n_it_max or n_rec == total_rec:
 
             #Save formatted records to disk for bibupload
-            finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
+            finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
             filehandle = open(finalfilename,"w")
             filehandle.write(formatted_records)
             filehandle.close()
@@ -317,7 +314,7 @@ def iterate_over_old(list, weburl, fmt):
 
             if n_rec >= n_max:
 
-    	        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
+                finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
                 filename = "%s/bibreformat.xml" % tmpdir
                 filehandle = open(filename ,"w")
                 filehandle.write(xml_content)
@@ -330,7 +327,7 @@ def iterate_over_old(list, weburl, fmt):
                 message = "START bibformat external call"
                 print message
 
-                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,finalfilename,tmpdir)
+                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -347,7 +344,7 @@ def iterate_over_old(list, weburl, fmt):
                 message = "START bibupload external call"
                 print message
 
-                command = "%s/bibupload -f %s" % (bindir,finalfilename)
+                command = "%s/bibupload -f %s" % (bindir, finalfilename)
                 os.system(command)
 		
                 t22 = os.times()[4]
@@ -366,7 +363,7 @@ def iterate_over_old(list, weburl, fmt):
 
         print "Processing last record set (%d)" % n_rec
 
-        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir,time.strftime('%Y%m%d_%H%M%S'))
+        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
         filename = "%s/bibreformat.xml" % tmpdir
         filehandle = open(filename ,"w")
         filehandle.write(xml_content)
@@ -379,11 +376,11 @@ def iterate_over_old(list, weburl, fmt):
         message = "START bibformat external call"
         print message
 
-        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir,string.upper(fmt),tmpdir,finalfilename,tmpdir)
+        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
-        message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
+        message = "END bibformat external call (time elapsed:%2f)" % (t22 - t11)
         print message
 
         tbibformat = tbibformat + (t22 - t11)
@@ -395,14 +392,14 @@ def iterate_over_old(list, weburl, fmt):
         message = "START bibupload external call"
         print message
 
-        command = "%s/bibupload -f %s" % (bindir,finalfilename)
+        command = "%s/bibupload -f %s" % (bindir, finalfilename)
         os.system(command)
 
         t22 = os.times()[4]
-        message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
+        message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
         print message
 
-        tbibupload = tbibupload + (t22- t11)
+        tbibupload = tbibupload + (t22 - t11)
 
     return
 
@@ -415,7 +412,7 @@ def get_date(var, format_string = "%Y-%m-%d %H:%M:%S"):
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re=re.compile("([-\+]{0,1})([\d]+)([dhms])")
+    shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
     m = shift_re.match(var)
     if m:
@@ -501,7 +498,7 @@ def authenticate(user, header="BibReformat Task Submission", action="runbibforma
     print "=" * len(header)
     if user == "":
         print >> sys.stdout, "\rUsername: ",
-        user = string.strip(string.lower(sys.stdin.readline()))
+        user = sys.stdin.readline().lower().strip()
     else:
         print >> sys.stdout, "\rUsername:", user        
     ## first check user pw:
@@ -539,10 +536,10 @@ def task_submit():
     ## submit task:
 
     task_id = run_sql("""INSERT INTO schTASK (id,proc,user,status,arguments,sleeptime,runtime) VALUES (NULL,'bibreformat',%s,'WAITING',%s,%s,%s)""",
-                      (user, marshal.dumps(options),sleeptime,escape_string(sched_time)))
+                      (user, marshal.dumps(options), sleeptime, escape_string(sched_time)))
     ## update task number:
     options["task"] = task_id
-    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options),task_id))
+    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), task_id))
     write_message("Task #%d submitted." % task_id)
     return task_id
 
@@ -603,9 +600,8 @@ def task_run(task_id, process_format):
 
         "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
         "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
-        "q1"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='xm'",
+        "q1"  : "select br.id from bibrec as br",
         "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
-
     }
 
     if options.has_key("all"):
@@ -617,7 +613,7 @@ def task_run(task_id, process_format):
         process = 0
 
     if options.has_key("last"):
-         sql_queries.append(sql['last'])
+        sql_queries.append(sql['last'])
     if options.has_key("collection"):
         cds_query['collection'] = options['collection']
     else:
@@ -700,7 +696,7 @@ def main():
         options = {} # will hold command-line options
         options["verbose"] = 1
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:ac:f:s:p:lo:nt:wl", ["help", "version", "verbose=","user=","all","collection=","field=","sleeptime=","pattern=","format=","noprocess","time=","without","last"])
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:ac:f:s:p:lo:nt:wl", ["help", "version", "verbose=","user=", "all", "collection=", "field=", "sleeptime=", "pattern=", "format=", "noprocess", "time=", "without", "last"])
         except getopt.GetoptError, err:
             usage(1, err)
 
@@ -723,7 +719,7 @@ def main():
                     options["without"]    = 1
                     clp = 1
                 elif opt[0] in ["-c", "--collection"]:
-                    options["collection"]=opt[1]
+                    options["collection"] = opt[1]
                     clp = 1
                 elif opt[0] in ["-n", "--noprocess"]:
                     options["noprocess"] = 1
