@@ -27,9 +27,10 @@ from invenio import bibformat_utils
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, 
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
-           highlight='no'):
-    """ Prints the abstract of a record in english
-    and then french
+           highlight='no', print_lang='en,fr'):
+    """ Prints the abstract of a record. By default prints English and French versions.
+
+    Printed languages can be chosen with the 'print_lang' parameter.
     
     @param prefix_en a prefix for english abstract (printed only if english abstract exists)
     @param prefix_fr a prefix for french abstract (printed only if french abstract exists)
@@ -40,8 +41,11 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
     @param suffix_fr a suffix for french abstract(printed only if french abstract exists)
     @parmm contextual if 'yes' prints sentences the most relative to user search keyword (if limit < abstract)
     @param highlight if 'yes' highlights words from user search keyword
+    @param print_lang the comma-separated list of languages to print. Now restricted to 'en' and 'fr'
     """
     out = ''
+
+    languages = print_lang.split(',')
     
     abstract_en = bfo.fields('520__a')
     abstract_en.extend(bfo.fields('520__b'))
@@ -67,7 +71,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
                                                             max_lines=int(limit))
         abstract_fr = "<br/>".join(context_fr)
     
-    if len(abstract_en) > 0 :
+    if len(abstract_en) > 0 and 'en' in languages:
 
         out += prefix_en
 
@@ -90,7 +94,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
 
         out += suffix_en
     
-    if len(abstract_fr) > 0 :
+    if len(abstract_fr) > 0 and 'fr' in languages:
 
         out += prefix_fr
 
