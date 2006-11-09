@@ -2225,7 +2225,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 # try to pick that tag value that corresponds to sort pattern
                 bingo = 0
                 for v in vals:
-                    if v.startswith(sort_pattern): # bingo!
+                    if v.lower().startswith(sort_pattern.lower()): # bingo!
                         bingo = 1
                         val = v
                         break
