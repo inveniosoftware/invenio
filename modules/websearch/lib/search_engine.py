@@ -3245,6 +3245,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 
 
         if pl:
+            pl = wash_pattern(pl)
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
