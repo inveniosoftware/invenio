@@ -56,6 +56,7 @@ cdsnameintl = {}
 <ca>cdsnameintl['ca'] = "<CDSNAMEINTL>"</ca>
 <pt>cdsnameintl['pt'] = "<CDSNAMEINTL>"</pt>
 <fr>cdsnameintl['fr'] = "<CDSNAMEINTL>"</fr>
+<lang:hr>cdsnameintl['hr'] = "<CDSNAMEINTL>"</lang:hr>
 <it>cdsnameintl['it'] = "<CDSNAMEINTL>"</it>
 <ru>cdsnameintl['ru'] = "<CDSNAMEINTL>"</ru>
 <sk>cdsnameintl['sk'] = "<CDSNAMEINTL>"</sk>

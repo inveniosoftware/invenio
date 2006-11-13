@@ -41,6 +41,7 @@
    <uk>Find out all about searching</uk>
    <ja>Find out all about searching</ja>
    <bg>Find out all about searching</bg>
+   <lang:hr>Find out all about searching</lang:hr>
    <CDSNAMEINTL>:
 
 <blockquote>
@@ -117,6 +118,10 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </bg>  
+    <lang:hr>
+      This page presents you with useful tips and techniques in order to
+      help you use the <CDSNAMEINTL> site to the full.
+    </lang:hr>  
 
 <dt><a href="<lang:star: guide.*.html>">
      <en>Search Guide</en>
@@ -136,6 +141,7 @@
      <uk>Search Guide</uk>
      <ja>Search Guide</ja>
      <bg>Search Guide</bg>
+     <lang:hr>Search Guide</lang:hr>
     </a>
 
 <dd><en>Full guide on how to search</en>
@@ -155,6 +161,7 @@
     <uk>Full guide on how to search</uk>
     <ja>Full guide on how to search</ja>
     <bg>Full guide on how to search</bg>
+    <lang:hr>Full guide on how to search</lang:hr>
     <CDSNAMEINTL>.
 
 </dl>

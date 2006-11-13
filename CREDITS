@@ -7,7 +7,7 @@ Several people outside the CDS Invenio Development Team
 contributed to the project:
 
   - Thierry Thomas <thierry@FreeBSD.org>
-    Patches for compiling CDS Invenio on FreeBSD.
+    Patches for compiling old CDSware sources on FreeBSD.
   
   - Guido Pelzer <guido.pelzer@web.de>
     Contributions to the German translation.
@@ -46,16 +46,13 @@ contributed to the project:
     Contributions to the Catalan translation.  Cleanup of the
     BibFormat Admin Guide.
 
+  - Alen Vodopijevec <alen@irb.hr>
+    Contributions to the Croatian translation.
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.
 <http://www.quixote.ca/>
-
-A thesaurus for cataloguing CERES (California Environmental Resources
-Evaluation System) resources, maintained by the Information Center for
-the Environment (University of California, Davis) is kindly used as an
-example ontology for automatic document classification.
-<http://cain.nbii.org/thesauri>
 
 Javascript Quicktags scripts from Alex King are used to provide
 additional capabilities to the edition of BibFormat templates through

@@ -85,6 +85,7 @@ Atlantis Institute of Fictive Science
  <ja>Fictive 科学のAtlantis の協会</ja>
  <pl>Instytut Fikcyjnej Nauki Atlantis</pl>
  <bg>Институт за фиктивни науки Атлантис</bg>
+ <lang:hr>Institut Fiktivnih Znanosti Atlantis</lang:hr>
 </define-tag>
 
 ## CDSLANG -- the default language of the interface:
@@ -101,10 +102,10 @@ en
 ## Italian, Japanese, Norwegian, Polish, Portuguese, Russian, Slovak,
 ## Swedish, and Ukrainian, so that the current eventual maximum you
 ## can currently select is
-## "bg,ca,cs,de,el,en,es,fr,it,ja,no,pl,pt,ru,sk,sv,uk".
+## "bg,ca,cs,de,el,en,es,fr,hr,it,ja,no,pl,pt,ru,sk,sv,uk".
 ##  (example: "de,en,fr,it")
 <define-tag CDSLANGS whitespace=delete>
-bg,ca,cs,de,el,en,es,fr,it,ja,no,pl,pt,ru,sk,sv,uk
+bg,ca,cs,de,el,en,es,fr,hr,it,ja,no,pl,pt,ru,sk,sv,uk
 </define-tag>
 
 ## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:

@@ -35,6 +35,7 @@ INSERT INTO collectionname VALUES (2,'el','ln','Προδημοσιεύσεις')
 INSERT INTO collectionname VALUES (2,'uk','ln','Препринти');
 INSERT INTO collectionname VALUES (2,'ja','ln','プレプリント');
 INSERT INTO collectionname VALUES (2,'bg','ln','Препринти');
+INSERT INTO collectionname VALUES (2,'hr','ln','Preprinti');
 
 INSERT INTO collectionname VALUES (3,'en','ln','Books');
 INSERT INTO collectionname VALUES (3,'fr','ln','Livres');
@@ -53,6 +54,7 @@ INSERT INTO collectionname VALUES (3,'el','ln','Βιβλία');
 INSERT INTO collectionname VALUES (3,'uk','ln','Книги');
 INSERT INTO collectionname VALUES (3,'ja','ln','本');
 INSERT INTO collectionname VALUES (3,'bg','ln','Книги');
+INSERT INTO collectionname VALUES (3,'hr','ln','Knjige');
 
 INSERT INTO collectionname VALUES (4,'en','ln','Theses');
 INSERT INTO collectionname VALUES (4,'fr','ln','Thèses');
@@ -71,6 +73,7 @@ INSERT INTO collectionname VALUES (4,'el','ln','Διατριβές');
 INSERT INTO collectionname VALUES (4,'uk','ln','Дисертації');
 INSERT INTO collectionname VALUES (4,'ja','ln','説');
 INSERT INTO collectionname VALUES (4,'bg','ln','Дисертации');
+INSERT INTO collectionname VALUES (4,'hr','ln','Disertacije');
 
 INSERT INTO collectionname VALUES (5,'en','ln','Reports');
 INSERT INTO collectionname VALUES (5,'fr','ln','Rapports');
@@ -89,6 +92,7 @@ INSERT INTO collectionname VALUES (5,'el','ln','Αναφορές');
 INSERT INTO collectionname VALUES (5,'uk','ln','Звіти');
 INSERT INTO collectionname VALUES (5,'ja','ln','レポート');
 INSERT INTO collectionname VALUES (5,'bg','ln','Доклади');
+INSERT INTO collectionname VALUES (5,'hr','ln','Izvještaji');
 
 INSERT INTO collectionname VALUES (6,'en','ln','Articles');
 INSERT INTO collectionname VALUES (6,'fr','ln','Articles');
@@ -107,6 +111,7 @@ INSERT INTO collectionname VALUES (6,'el','ln',"Άρθρα");
 INSERT INTO collectionname VALUES (6,'uk','ln','Статті');
 INSERT INTO collectionname VALUES (6,'ja','ln','記事');
 INSERT INTO collectionname VALUES (6,'bg','ln','Статии');
+INSERT INTO collectionname VALUES (6,'hr','ln','Članci');
 
 INSERT INTO collectionname VALUES (8,'en','ln','Pictures');
 INSERT INTO collectionname VALUES (8,'fr','ln','Photos');
@@ -125,6 +130,7 @@ INSERT INTO collectionname VALUES (8,'el','ln','Εικόνες');
 INSERT INTO collectionname VALUES (8,'uk','ln','Зображення');
 INSERT INTO collectionname VALUES (8,'ja','ln','映像');
 INSERT INTO collectionname VALUES (8,'bg','ln','Снимки');
+INSERT INTO collectionname VALUES (8,'hr','ln','Slike');
 
 INSERT INTO collectionname VALUES (9,'en','ln','CERN Divisions');
 INSERT INTO collectionname VALUES (9,'fr','ln','Divisions du CERN');
@@ -143,6 +149,7 @@ INSERT INTO collectionname VALUES (9,'el','ln','Τομείς του CERN');
 INSERT INTO collectionname VALUES (9,'uk','ln','Підрозділи CERN');
 INSERT INTO collectionname VALUES (9,'ja','ln','CERN 部');
 INSERT INTO collectionname VALUES (9,'bg','ln','Отдели в CERN');
+INSERT INTO collectionname VALUES (9,'hr','ln','Odjeli CERN-a');
 
 INSERT INTO collectionname VALUES (10,'en','ln','CERN Experiments');
 INSERT INTO collectionname VALUES (10,'fr','ln','Expériences du CERN');
@@ -161,6 +168,7 @@ INSERT INTO collectionname VALUES (10,'el','ln','Πειράματα του CERN'
 INSERT INTO collectionname VALUES (10,'uk','ln','Експерименти CERN');
 INSERT INTO collectionname VALUES (10,'ja','ln','CERN の実験');
 INSERT INTO collectionname VALUES (10,'bg','ln','Експерименти в CERN');
+INSERT INTO collectionname VALUES (10,'hr','ln','Eksperimenti CERN-a');
 
 INSERT INTO collectionname VALUES (11,'en','ln','Theoretical Physics (TH)');
 INSERT INTO collectionname VALUES (11,'fr','ln','Physique Théorique (TH)');
@@ -179,6 +187,7 @@ INSERT INTO collectionname VALUES (11,'el','ln','Θεωρητική Φυσική
 INSERT INTO collectionname VALUES (11,'uk','ln','Теоретична фізика (TH)');
 INSERT INTO collectionname VALUES (11,'ja','ln','理論的な物理学 (TH)');
 INSERT INTO collectionname VALUES (11,'bg','ln','Теоретична физика (TH)');
+INSERT INTO collectionname VALUES (11,'hr','ln','Teorijska fizika (TH)');
 
 INSERT INTO collectionname VALUES (12,'en','ln','Experimental Physics (EP)');
 INSERT INTO collectionname VALUES (12,'fr','ln','Physique Expérimentale (EP)');
@@ -197,6 +206,7 @@ INSERT INTO collectionname VALUES (12,'el','ln','Πειραματική Φυσι
 INSERT INTO collectionname VALUES (12,'uk','ln','Експериментальна фізика (EP)');
 INSERT INTO collectionname VALUES (12,'ja','ln','実験物理学 (EP)');
 INSERT INTO collectionname VALUES (12,'bg','ln','Експериментална физика (EP)');
+INSERT INTO collectionname VALUES (12,'hr','ln','Eksperimentalna fizika (EP)');
 
 INSERT INTO collectionname VALUES (13,'en','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'fr','ln','ISOLDE');
@@ -210,11 +220,12 @@ INSERT INTO collectionname VALUES (13,'ru','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'sk','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'cs','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'no','ln','ISOLDE');
-INSERT INTO collectionname VALUES (13,'sv','ln','');
+INSERT INTO collectionname VALUES (13,'sv','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'el','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'uk','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'ja','ln','ISOLDE');
 INSERT INTO collectionname VALUES (13,'bg','ln','');
+INSERT INTO collectionname VALUES (13,'hr','ln','ISOLDE');
 
 INSERT INTO collectionname VALUES (14,'en','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'fr','ln','ALEPH');
@@ -228,11 +239,12 @@ INSERT INTO collectionname VALUES (14,'ru','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'sk','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'cs','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'no','ln','ALEPH');
-INSERT INTO collectionname VALUES (14,'sv','ln','');
+INSERT INTO collectionname VALUES (14,'sv','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'el','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'uk','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'ja','ln','ALEPH');
 INSERT INTO collectionname VALUES (14,'bg','ln','');
+INSERT INTO collectionname VALUES (14,'hr','ln','ALEPH');
 
 INSERT INTO collectionname VALUES (15,'en','ln','Articles & Preprints');
 INSERT INTO collectionname VALUES (15,'fr','ln','Articles et Prétirages');
@@ -251,6 +263,7 @@ INSERT INTO collectionname VALUES (15,'el','ln',"Άρθρα & Προδημοσι
 INSERT INTO collectionname VALUES (15,'uk','ln','Статті та Препринти');
 INSERT INTO collectionname VALUES (15,'ja','ln','記事及びプレプリント');
 INSERT INTO collectionname VALUES (15,'bg','ln','Статии и Препринти');
+INSERT INTO collectionname VALUES (15,'hr','ln','Članci i Preprinti');
 
 INSERT INTO collectionname VALUES (16,'en','ln','Books & Reports');
 INSERT INTO collectionname VALUES (16,'fr','ln','Livres et Rapports');
@@ -269,6 +282,7 @@ INSERT INTO collectionname VALUES (16,'el','ln','Βιβλία & Αναφορές
 INSERT INTO collectionname VALUES (16,'uk','ln','Книги та Звіти');
 INSERT INTO collectionname VALUES (16,'ja','ln','本及びレポート');
 INSERT INTO collectionname VALUES (16,'bg','ln','Книги и Доклади');
+INSERT INTO collectionname VALUES (16,'hr','ln','Knjige i Izvještaji');
 
 INSERT INTO collectionname VALUES (17,'en','ln','Multimedia & Arts');
 INSERT INTO collectionname VALUES (17,'fr','ln','Multimédia et Arts');
@@ -287,6 +301,7 @@ INSERT INTO collectionname VALUES (17,'el','ln','Πολυμέσα & Τέχνες
 INSERT INTO collectionname VALUES (17,'uk','ln','Мультимедіа та Мистецтво');
 INSERT INTO collectionname VALUES (17,'ja','ln','マルチメディア及び芸術');
 INSERT INTO collectionname VALUES (17,'bg','ln','Мултимедия и Изкуства');
+INSERT INTO collectionname VALUES (17,'hr','ln','Multimedija i Umjetnost');
 
 INSERT INTO collectionname VALUES (18,'en','ln','Poetry');
 INSERT INTO collectionname VALUES (18,'fr','ln','Poésie');
@@ -305,6 +320,7 @@ INSERT INTO collectionname VALUES (18,'el','ln','Ποίηση');
 INSERT INTO collectionname VALUES (18,'uk','ln','Поезія');
 INSERT INTO collectionname VALUES (18,'ja','ln','詩歌');
 INSERT INTO collectionname VALUES (18,'bg','ln','Поезия');
+INSERT INTO collectionname VALUES (18,'hr','ln','Poezija');
 
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
@@ -589,6 +605,8 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,63,'pl','rt',90);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,64,'bg','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,65,'bg','rt',90);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,66,'hr','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,67,'hr','rt',90);
 
 INSERT INTO example VALUES (1,'author search','Search for <span class=example>Ellis, J</span> within <span class=example>author</span> field.');
 INSERT INTO example VALUES (2,'word search','Search for <span class=example>quantum</span> within <span class=example>any</span> field.');
@@ -706,6 +724,8 @@ INSERT INTO portalbox VALUES (62,'O TEJ STRONIE','Witamy w wersji demo systemu C
 INSERT INTO portalbox VALUES (63,'ZOBACZ TAKŻE','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (64,'ЗА САЙТА','Добре дошли на демонстрационния сайт на CDS Invenio, свободен софтуер за документни сървъри изработен в ЦЕРН. Чувствайте се свободни да изследвате всяка една от характеристиките на сайта.');
 INSERT INTO portalbox VALUES (65,'ВИЖ СЪЩО','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
+INSERT INTO portalbox VALUES (66,'O OVOM SITE-u','Dobrodošli na CDS Invenio demo site. CDS Invenio je slobodno dostupan poslužitelj dokumenata razvijen na CERN-u. Slobodno istražite sve mogućnosti ove aplikacije.');
+INSERT INTO portalbox VALUES (67,'TAKOĐER POGLEDAJTE','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br><a href=\"http://www.cern.ch/\">CERN</a><br><a href=\"http://google.com/\">Google</a>');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
@@ -1166,3 +1186,4 @@ INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'sv','ln','jour
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'uk','ln','journal impact factor');
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'ja','ln','journal impact factor');
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'bg','ln','journal impact factor');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'hr','ln','faktor utjecaja časopisa');

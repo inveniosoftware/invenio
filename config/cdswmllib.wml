@@ -28,7 +28,9 @@
 <lang:new id=es short>
 <lang:new id=pt short>
 <lang:new id=fr short>
+<lang:new id=hr>
 <lang:new id=it short>
+<lang:new id=ja short>
 <lang:new id=ru short>
 <lang:new id=sk short>
 <lang:new id=cs short>
@@ -36,7 +38,6 @@
 <lang:new id=sv short>
 <lang:new id=el short>
 <lang:new id=uk short>
-<lang:new id=ja short>
 <lang:new id=pl short>
 
 ## library of WML functions of general interest:
@@ -53,6 +54,7 @@
                       'es' => 'Español',
                       'ca' => 'Català',
                       'pt' => 'Português',
+                      'hr' => 'Hrvatski',
                       'it' => 'Italiano',
                       'ru' => 'Русский',
                       'sk' => 'Slovensky',
