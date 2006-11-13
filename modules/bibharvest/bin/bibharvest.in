@@ -170,9 +170,14 @@ def OAI_Request(server, script, params, method="POST"):
         status = "%d" % response.status
 
         if http_response_status_code.has_key(status):
-            sys.stderr.write("%s(%s) : %s : %s\n" % (status, http_response_status_code[status], response.reason, params))
+            sys.stderr.write("%s(%s) : %s : %s\n" % (status,
+                                                     http_response_status_code[status],
+                                                     response.reason,
+                                                     params))
         else:
-            sys.stderr.write("%s(%s) : %s : %s\n" % (status, http_response_status_code['000'], response.reason, params))
+            sys.stderr.write("%s(%s) : %s : %s\n" % (status,
+                                                     http_response_status_code['000'],
+                                                     response.reason, params))
 
         if response.status == 200:
             i = 10
