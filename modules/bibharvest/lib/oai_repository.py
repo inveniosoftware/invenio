@@ -48,6 +48,7 @@ from invenio.config import \
      weburl
 from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
+from invenio.search_engine import record_exists
 
 verbs = {
     "Identify"            : [""],
@@ -242,23 +243,19 @@ def check_date(date, dtime="T00:00:00Z"):
     
     return date
 
-def record_exists(sysno):
-    "Returns 1 if record with SYSNO 'sysno' exists.  Returns 0 otherwise."
-
-    out = 0
-    query = "SELECT id FROM bibrec WHERE id='%s'" % (sysno)
-
-    res = run_sql(query)
-    
-    for row in res:
-        if row[0] != "":
-            out = 1
-
-    return out
-
 def print_record(sysno, format='marcxml'):
-    "Prints record 'sysno' formatted accoding to 'format'."
+    """Prints record 'sysno' formatted according to 'format'.
 
+    - if record does not exist, return nothing.
+
+    - if record has been deleted and CFG_OAI_DELETED_POLICY is
+      'transient' or 'deleted', then return only header, with status
+      'deleted'.
+      
+    - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
+      then return nothing.
+    """
+    
     out = ""
 
     # sanity check:
@@ -272,8 +269,12 @@ def print_record(sysno, format='marcxml'):
     
     out = out + "  <record>\n"
 
-    if is_deleted(sysno) and CFG_OAI_DELETED_POLICY != "no":
-        out = out + "    <header status=\"deleted\">\n"
+    if record_exists(sysno) == -1: # Deleted?
+        if CFG_OAI_DELETED_POLICY == "persistent" or \
+               CFG_OAI_DELETED_POLICY == "transient":
+            out = out + "    <header status=\"deleted\">\n"
+        else:
+            return
     else:
         out = out + "   <header>\n"
 
@@ -284,7 +285,7 @@ def print_record(sysno, format='marcxml'):
         out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
     out = out + "   </header>\n"
 
-    if is_deleted(sysno) and CFG_OAI_DELETED_POLICY != "no":
+    if record_exists(sysno) == -1: # Deleted?
         pass
     else:
         out = out + "   <metadata>\n"
@@ -409,7 +410,8 @@ def oailistmetadataformats(args):
 
         sysno = oaigetsysno(arg['identifier'])
 
-        if record_exists(sysno):
+        if record_exists(sysno) == 1 or \
+               (record_exists(sysno) == -1 and CFG_OAI_DELETED_POLICY != "no"):
 
             flag = 1
 
@@ -468,7 +470,9 @@ def oailistrecords(args):
     i = 0
     for sysno_ in sysnos:
         if sysno_:
-            i = i + 1
+            if not (record_exists(sysno_) == -1 and CFG_OAI_DELETED_POLICY == "no"): 
+                i = i + 1 # Increment limit only if record is returned
+           
             if i > CFG_OAI_LOAD:          # cache or write?
                 if i == CFG_OAI_LOAD + 1: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
@@ -479,7 +483,9 @@ def oailistrecords(args):
                         out = "%s <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(sysno_)
             else:
-                out = out + print_record(sysno_, arg['metadataPrefix'])
+                res = print_record(sysno_, arg['metadataPrefix'])
+                if res:
+                    out += res
 
     if i > CFG_OAI_LOAD:
         oaicacheclean()
@@ -513,19 +519,30 @@ def oailistsets(args):
 
     
 def oaigetrecord(args):
-    """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting."""
+    """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting.
+    
+    - if record does not exist, return oai_error 'idDoesNotExist'.
+
+    - if record has been deleted and CFG_OAI_DELETED_POLICY is
+      'transient' or 'deleted', then return only header, with status
+      'deleted'.
+      
+    - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
+      then return oai_error 'idDoesNotExist'.
+    """
     
     arg = parse_args(args)
     out = ""
     sysno = oaigetsysno(arg['identifier'])
 
-    if record_exists(sysno):
+    if record_exists(sysno) == 1 or \
+           (record_exists(sysno) == -1 and CFG_OAI_DELETED_POLICY != 'no'):
         datestamp = get_modification_date(sysno)
-        out = out + print_record(sysno, arg['metadataPrefix'])
+        out += print_record(sysno, arg['metadataPrefix'])
     else:
         out = out + oai_error("idDoesNotExist", "invalid record Identifier")
         out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
-        return out
+    return out
 
     out = oai_header(args, "GetRecord") + out + oai_footer("GetRecord")
 
@@ -562,7 +579,9 @@ def oailistidentifiers(args):
     i = 0
     for sysno_ in sysnos:
         if sysno_:
-            i = i + 1
+            if not (record_exists(sysno_) == -1 and CFG_OAI_DELETED_POLICY == "no"): 
+                i = i + 1 # Increment limit only if record is returned
+                
             if i > CFG_OAI_LOAD:           # cache or write?
                 if i ==  CFG_OAI_LOAD + 1: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
@@ -574,8 +593,10 @@ def oailistidentifiers(args):
                 sysno.append(sysno_)
             else:
                 for ident in get_field(sysno_, CFG_OAI_ID_FIELD): 
-                    if is_deleted(sysno_) and CFG_OAI_DELETED_POLICY != "no":
-                        out = out + "    <header status=\"deleted\">\n"
+                    if record_exists(sysno_) == -1: #Deleted?
+                        if CFG_OAI_DELETED_POLICY == "persistent" \
+                               or CFG_OAI_DELETED_POLICY == "transient":
+                            out = out + "    <header status=\"deleted\">\n"
                     else:
                         out = out + "    <header>\n"
                     out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
@@ -676,19 +697,6 @@ def oaigetsysnolist(set, fromdate, untildate):
         out_dict[row[0]] = 1
          
     return out_dict.keys()
-
-def is_deleted(recid):
-    "Check if record with recid has been deleted. Return 1 if deleted."
-
-    query = "select a.id from bibrec as a left join bibrec_bib98x as b on a.id=b.id_bibrec left join bib98x as c on b.id_bibxxx=c.id where c.value='DELETED' and a.id=%s" % recid
-
-    res = run_sql(query)
-
-    for item in res:
-        if item == None:
-            return 0
-        else:
-            return 1
     
 def oaigenresumptionToken():
     "Generates unique ID for resumption token management."
