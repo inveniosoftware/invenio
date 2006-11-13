@@ -242,7 +242,7 @@ a typical workflow:</p>
     <td>A format element is written in Python. It acts as a bridge
     between the record in the database and the format
     template. Typically you will not have to write or read format
-    elements, juste call them from the templates. Each element outputs
+    elements, just call them from the templates. Each element outputs
     some text that is written in the template where it is called.<br/>
     Developers can add new elements by creating a new file, naming it
     with the name of element, and write a Python <code>format</code>
