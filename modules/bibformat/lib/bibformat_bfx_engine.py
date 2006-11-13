@@ -346,7 +346,7 @@ class BFXParser:
     
     def ctl_field(self, node, out_file):
         '''
-        Get the value of a field by it's name.
+        Get the value of a field by its name.
         '''
         #test mode
         if not self.flags['exec']: 
