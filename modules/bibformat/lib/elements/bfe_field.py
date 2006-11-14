@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.bibformat_utils import parse_tag
 
-def format(bfo, tag, limit, separator=" "):
+def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
     """
     Prints the given field of a record.
     If tag is in range [001, 010], this element assumes
@@ -32,7 +32,8 @@ def format(bfo, tag, limit, separator=" "):
     accesses a data field.
 
     @param tag the tag code of the field that is to be printed
-    @param separator a separator between values of the field.
+    @param instances_separator a separator between instances of field
+    @param subfields_separator a separator between subfields of an instance
     @param limit the maximum number of values to display.
     """
     # check if data or control field
@@ -43,20 +44,24 @@ def format(bfo, tag, limit, separator=" "):
         values = bfo.fields(tag)
     
     out = ""
-    
+
     if limit == "" or (not limit.isdigit()) or limit > len(values):
         limit = len(values)
 
 
-    if len(values)>0 and isinstance(values[0], dict):
+    if len(values) > 0 and isinstance(values[0], dict):
         x = 0
         for value in values:
             x += 1
-            out += separator.join(value.values())
+            out += subfields_separator.join(value.values())
             if x >= limit:
                 break
+            
+            # Print separator between instances
+            if x < len(values):
+                out += instances_separator
 
     else:
-        out += separator.join(values[:int(limit)])
+        out += subfields_separator.join(values[:int(limit)])
     
     return out
