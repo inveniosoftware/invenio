@@ -78,7 +78,6 @@ will refuse to continue.
 
 <pre>
     &lt;record&gt;
-        &lt;controlfield tag="001"&gt;123&lt;/controlfield&gt;
         &lt;datafield tag="100" ind1="" ind2=""&gt;
             &lt;subfield code="a"&gt;Doe, John&lt;/subfield&gt;
         &lt;/datafield&gt;
