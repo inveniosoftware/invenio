@@ -51,7 +51,7 @@ else, you would have to edit BibUpload source file.
 
 <h2>Running BibUpload</h2>
 
-<h3>Inserting new recors</h3>
+<h3>Inserting new records</h3>
 
 <p>Consider that you have an MARCXML file containing new records that
 is to be uploaded into the CDS Invenio.  (For example, it might have
@@ -87,9 +87,9 @@ will refuse to continue.
     &lt;/record&gt;
 </pre>
 
-<h3>Updating existing recors</h3>
+<h3>Updating existing records</h3>
 
-When you want to update existing recors, with the new content from
+When you want to update existing records, with the new content from
 your input MARCXML file, then your input file should contain either
 tags 001 (holding record IDs) or tag 970 (holding external system
 numbers).  BibUpload will try to match existing records via 001 and
