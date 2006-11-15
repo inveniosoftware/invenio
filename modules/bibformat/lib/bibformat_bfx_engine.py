@@ -77,7 +77,7 @@ class BFXParser:
     '''
     def __init__(self, translator):
         '''
-        Create an instance of the BFXParser class. Initialize with a transaltor.
+        Create an instance of the BFXParser class. Initialize with a translator.
         The BFXparser makes queries to the translator for the values of certain names.
         For the communication it uses the following translator methods:
             - is_defined(name)
@@ -99,7 +99,7 @@ class BFXParser:
             - it is a file with a single template. Root tag is 'template'.
               In an API call the single template element is 'executed'.
             - it is a 'style' file which contains exactly one format and zero or more templates. Root tag is 'style' with children 'format' and 'template'(s).
-              In this case only the format code is 'executed'. Naturaly, in it, it would have references to other templates in the document.
+              In this case only the format code is 'executed'. Naturally, in it, it would have references to other templates in the document.
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
@@ -704,7 +704,7 @@ class MARCTranslator:
     def iterator(self, name):
         '''
         An iterator over the values of a certain name.
-        The iterator changes state of interenal variables and objects.
+        The iterator changes state of internal variables and objects.
         When calling get_value in a loop, this will result each time in a different value.
         '''
         if name == 'record':
@@ -785,7 +785,7 @@ class MARCTranslator:
     
     def display_record(self, record, display_type='value'):
         '''
-        Deside what the final output value is according to the display_type.
+        Decide what the final output value is according to the display_type.
         @param record the record structure to display; this is most probably just a single subfield
         @param display_type a string specifying the desired output; can be one of: value, tag, ind1, ind2, code, fulltag
         @return a string to output
