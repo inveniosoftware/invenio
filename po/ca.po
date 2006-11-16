@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-10-12 17:38+0200\n"
+"POT-Creation-Date: 2006-11-16 15:30+0100\n"
 "PO-Revision-Date: 2006-10-12 17:50+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
@@ -30,24 +30,24 @@ msgstr ""
 # TODO:
 # settings = configuracio; parametres  = ?
 # delete = suprimir; remove = elimina
-#: config/cdswmllib.wml:92 modules/webstyle/lib/webstyle_templates.py:488
+#: config/cdswmllib.wml:94 modules/webstyle/lib/webstyle_templates.py:485
 msgid "This site is also available in the following languages:"
 msgstr "Aquest lloc està també disponible en els següents idiomes:"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
-#: modules/websearch/lib/websearch_templates.py:342
-#: modules/websearch/lib/websearch_templates.py:463
-#: modules/websearch/lib/websearch_templates.py:1289
-#: modules/websearch/lib/websearch_templates.py:1388
-#: modules/websearch/lib/websearch_templates.py:1447
-#: modules/webstyle/lib/webstyle_templates.py:359
-#: modules/webstyle/lib/webstyle_templates.py:435
+#: modules/websearch/lib/websearch_templates.py:343
+#: modules/websearch/lib/websearch_templates.py:464
+#: modules/websearch/lib/websearch_templates.py:1290
+#: modules/websearch/lib/websearch_templates.py:1389
+#: modules/websearch/lib/websearch_templates.py:1448
+#: modules/webstyle/lib/webstyle_templates.py:356
+#: modules/webstyle/lib/webstyle_templates.py:432
 msgid "Search"
 msgstr "Cercar"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
-#: modules/webstyle/lib/webstyle_templates.py:362
-#: modules/webstyle/lib/webstyle_templates.py:438
+#: modules/webstyle/lib/webstyle_templates.py:359
+#: modules/webstyle/lib/webstyle_templates.py:435
 msgid "Help"
 msgstr "Ajuda"
 
@@ -163,15 +163,14 @@ msgstr "Ajuda"
 #: modules/websubmit/web/admin/newDoctypeEDS.php.wml:24
 #: modules/websubmit/web/admin/veditFunDets.php.wml:24
 #: modules/websubmit/web/admin/actionFunctions.php.wml:24
-#: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:42
+#: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
 #: modules/bibformat/web/admin/bibformatadmin.py:71
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "Admin Area"
 msgstr "Àrea de l'admistrador"
 
-#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:170
-#: modules/webstyle/lib/webstyle_templates.py:403
+#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:400
 msgid "Last updated"
 msgstr "Darrera actualització"
 
@@ -239,8 +238,8 @@ msgstr "Convertir"
 
 #: config/cdspage.wml:55 config/cdspage.wml:141
 #: modules/bibedit/lib/bibedit_templates.py:104
-#: modules/webstyle/lib/webstyle_templates.py:360
-#: modules/webstyle/lib/webstyle_templates.py:436
+#: modules/webstyle/lib/webstyle_templates.py:357
+#: modules/webstyle/lib/webstyle_templates.py:433
 #: modules/websubmit/lib/websubmit_engine.py:454
 #: modules/websubmit/lib/websubmit_engine.py:696
 #: modules/websubmit/lib/websubmit_engine.py:732
@@ -249,8 +248,8 @@ msgid "Submit"
 msgstr "Lliurar"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
-#: modules/webstyle/lib/webstyle_templates.py:361
-#: modules/webstyle/lib/webstyle_templates.py:437
+#: modules/webstyle/lib/webstyle_templates.py:358
+#: modules/webstyle/lib/webstyle_templates.py:434
 msgid "Personalize"
 msgstr "Personalitzar"
 
@@ -263,6 +262,7 @@ msgstr "Personalitzar"
 #: modules/webhelp/web/index.html.wml:39 modules/webhelp/web/index.html.wml:40
 #: modules/webhelp/web/index.html.wml:41 modules/webhelp/web/index.html.wml:42
 #: modules/webhelp/web/index.html.wml:43 modules/webhelp/web/index.html.wml:44
+#: modules/webhelp/web/index.html.wml:45
 #: modules/websearch/doc/guide.html.wml:24
 #: modules/websearch/doc/index.html.wml:24
 #: modules/websearch/doc/tips.html.wml:24
@@ -285,7 +285,7 @@ msgstr "Personalitzar"
 msgid "Help Central"
 msgstr "Centre d'ajuda"
 
-#: modules/webhelp/web/index.html.wml:67
+#: modules/webhelp/web/index.html.wml:69
 #: modules/websubmit/doc/access.html.wml:23
 #: modules/websubmit/doc/actions.html.wml:23
 #: modules/websubmit/doc/approval.html.wml:23
@@ -341,12 +341,12 @@ msgstr "Biblioteca"
 msgid "Agenda"
 msgstr "Agenda"
 
-#: modules/websearch/doc/index.html.wml:49
+#: modules/websearch/doc/index.html.wml:50
 #: modules/websearch/doc/tips.html.wml:22
-#: modules/websearch/lib/websearch_templates.py:344
-#: modules/websearch/lib/websearch_templates.py:465
-#: modules/websearch/lib/websearch_templates.py:1392
-#: modules/websearch/lib/websearch_templates.py:1451
+#: modules/websearch/lib/websearch_templates.py:345
+#: modules/websearch/lib/websearch_templates.py:466
+#: modules/websearch/lib/websearch_templates.py:1393
+#: modules/websearch/lib/websearch_templates.py:1452
 msgid "Search Tips"
 msgstr "Consells de cerca"
 
@@ -357,11 +357,11 @@ msgstr "Webcast"
 #: config/cdspage.wml:65 config/cdspage.wml:67
 #: modules/webstyle/lib/webstyle_templates.py:79
 #: modules/webstyle/lib/webstyle_templates.py:88
-#: modules/webstyle/lib/webstyle_templates.py:264
+#: modules/webstyle/lib/webstyle_templates.py:261
 msgid "Home"
 msgstr "Pàgina inicial"
 
-#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:441
+#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:438
 msgid "Maintained by"
 msgstr "Mantingut per"
 
@@ -369,14 +369,14 @@ msgstr "Mantingut per"
 msgid "Bulletin"
 msgstr "Butlletí"
 
-#: modules/webhelp/web/index.html.wml:49
+#: modules/webhelp/web/index.html.wml:50
 #: modules/websearch/doc/guide.html.wml:24
 #: modules/websearch/doc/index.html.wml:22
 #: modules/websearch/doc/tips.html.wml:24
 msgid "Search Help"
 msgstr "Ajuda a la cerca"
 
-#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:440
+#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:437
 msgid "Powered by"
 msgstr "Powered by"
 
@@ -385,7 +385,7 @@ msgid "Add Subfield"
 msgstr "Afegir cubcamp"
 
 #: modules/bibedit/lib/bibedit_templates.py:63
-#: modules/webalert/lib/webalert_templates.py:75
+#: modules/webalert/lib/webalert_templates.py:76
 msgid "Field"
 msgstr "Camp"
 
@@ -401,9 +401,9 @@ msgstr "Verbós"
 #: modules/bibformat/web/admin/bibformatadmin.py:350
 #: modules/bibformat/web/admin/bibformatadmin.py:605
 #: modules/bibformat/web/admin/bibformatadmin.py:1196
-#: modules/webbasket/lib/webbasket_templates.py:1162
-#: modules/webbasket/lib/webbasket_templates.py:1267
-#: modules/webbasket/lib/webbasket_templates.py:1367
+#: modules/webbasket/lib/webbasket_templates.py:1236
+#: modules/webbasket/lib/webbasket_templates.py:1341
+#: modules/webbasket/lib/webbasket_templates.py:1441
 #: modules/websession/lib/websession_templates.py:1267
 #: modules/websession/lib/websession_templates.py:1373
 #: modules/websession/lib/websession_templates.py:1546
@@ -413,8 +413,8 @@ msgstr "Cancel·lar"
 
 # Suprimir? Temps verbal?
 #: modules/bibedit/lib/bibedit_templates.py:111
-#: modules/bibedit/lib/bibedit_templates.py:304
-#: modules/bibedit/lib/bibedit_templates.py:347
+#: modules/bibedit/lib/bibedit_templates.py:307
+#: modules/bibedit/lib/bibedit_templates.py:350
 #: modules/bibformat/lib/bibformat_templates.py:973
 #: modules/bibformat/web/admin/bibformatadmin.py:350
 #: modules/bibformat/web/admin/bibformatadmin.py:352
@@ -422,16 +422,16 @@ msgstr "Cancel·lar"
 #: modules/bibformat/web/admin/bibformatadmin.py:607
 #: modules/bibformat/web/admin/bibformatadmin.py:1196
 #: modules/bibformat/web/admin/bibformatadmin.py:1198
-#: modules/webmessage/lib/webmessage_templates.py:108
+#: modules/webmessage/lib/webmessage_templates.py:109
 msgid "Delete"
 msgstr "Suprimir"
 
 #: modules/bibedit/lib/bibedit_templates.py:122
 #: modules/bibformat/lib/bibformat_templates.py:916
 #: modules/bibformat/lib/bibformat_templates.py:1042
-#: modules/webalert/lib/webalert_templates.py:315
-#: modules/webalert/lib/webalert_templates.py:435
-#: modules/webmessage/lib/webmessage_templates.py:85
+#: modules/webalert/lib/webalert_templates.py:317
+#: modules/webalert/lib/webalert_templates.py:438
+#: modules/webmessage/lib/webmessage_templates.py:86
 #: modules/websubmit/lib/websubmit_templates.py:1404
 msgid "Action"
 msgstr "Acció"
@@ -441,8 +441,8 @@ msgstr "Acció"
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
-#: modules/websearch/lib/websearch_templates.py:182
-#: modules/websearch/lib/websearch_templates.py:184
+#: modules/websearch/lib/websearch_templates.py:183
+#: modules/websearch/lib/websearch_templates.py:185
 msgid "Record"
 msgstr "Registre"
 
@@ -450,52 +450,52 @@ msgstr "Registre"
 msgid "Display"
 msgstr "Mostrar"
 
-#: modules/bibedit/lib/bibedit_templates.py:238
+#: modules/bibedit/lib/bibedit_templates.py:241
 msgid "Save"
 msgstr "Desar"
 
-#: modules/bibedit/lib/bibedit_templates.py:240
+#: modules/bibedit/lib/bibedit_templates.py:243
 msgid "Return to Record"
 msgstr "Tornar al registre:"
 
-#: modules/bibedit/lib/bibedit_templates.py:339
-#: modules/bibedit/lib/bibedit_templates.py:440
+#: modules/bibedit/lib/bibedit_templates.py:342
+#: modules/bibedit/lib/bibedit_templates.py:443
 msgid "Edit"
 msgstr "Editar"
 
-#: modules/bibedit/lib/bibedit_templates.py:394
+#: modules/bibedit/lib/bibedit_templates.py:397
 msgid "Your changes are TEMPORARY."
 msgstr "Els vostres canvis són TEMPORALS."
 
-#: modules/bibedit/lib/bibedit_templates.py:395
+#: modules/bibedit/lib/bibedit_templates.py:398
 msgid "To save this record, please click on submit."
 msgstr "Per a desar aquest registre, feu clic a submit."
 
-#: modules/bibedit/lib/bibedit_templates.py:409
+#: modules/bibedit/lib/bibedit_templates.py:412
 msgid "This record does not exist."
 msgstr "Aquest registre no existeix."
 
-#: modules/bibedit/lib/bibedit_templates.py:410
+#: modules/bibedit/lib/bibedit_templates.py:413
 msgid "Please try another record ID."
 msgstr "Proveu un altre número de registre."
 
-#: modules/bibedit/lib/bibedit_templates.py:418
+#: modules/bibedit/lib/bibedit_templates.py:421
 msgid "This record is currently being edited by another user."
 msgstr "Aquest registre ara mateix l'està editant algú més."
 
-#: modules/bibedit/lib/bibedit_templates.py:419
+#: modules/bibedit/lib/bibedit_templates.py:422
 msgid "Please try again later."
 msgstr "Torneu-ho a provar més tard."
 
-#: modules/bibedit/lib/bibedit_templates.py:426
+#: modules/bibedit/lib/bibedit_templates.py:429
 msgid "Cannot edit deleted record."
 msgstr "No es pot editar un registre suprimit."
 
-#: modules/bibedit/lib/bibedit_templates.py:437
+#: modules/bibedit/lib/bibedit_templates.py:440
 msgid "Please enter the ID of the record you want to edit"
 msgstr "Entreu l'identificador del registre que voleu editar"
 
-#: modules/bibedit/lib/bibedit_templates.py:449
+#: modules/bibedit/lib/bibedit_templates.py:452
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
@@ -503,8 +503,8 @@ msgstr ""
 "Les vostres modificacions han estat lliurades. Es processaran tan aviat com "
 "la cua de tasques estigui buida"
 
-#: modules/bibedit/lib/bibedit_templates.py:451
-#: modules/bibedit/lib/bibedit_templates.py:483
+#: modules/bibedit/lib/bibedit_templates.py:454
+#: modules/bibedit/lib/bibedit_templates.py:486
 #, python-format
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
@@ -512,35 +512,35 @@ msgstr ""
 "Podeu tornar a %(x_url_open)sl'interfície d'administració de BibEdit%"
 "(x_url_close)s."
 
-#: modules/bibedit/lib/bibedit_templates.py:471
+#: modules/bibedit/lib/bibedit_templates.py:474
 msgid "Do you really want to delete this record?"
 msgstr "Esteu segur que voleu suprimir aquest cistell?"
 
-#: modules/bibedit/lib/bibedit_templates.py:475
-#: modules/webbasket/lib/webbasket_templates.py:1161
+#: modules/bibedit/lib/bibedit_templates.py:478
+#: modules/webbasket/lib/webbasket_templates.py:1235
 #: modules/webcomment/lib/webcomment_templates.py:215
 #: modules/webcomment/lib/webcomment_templates.py:471
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
-#: modules/webmessage/lib/webmessage_templates.py:478
+#: modules/webmessage/lib/webmessage_templates.py:479
 #: modules/websession/lib/websession_templates.py:1665
 #: modules/websession/lib/websession_templates.py:1704
 msgid "Yes"
 msgstr "Sí"
 
-#: modules/bibedit/lib/bibedit_templates.py:476
-#: modules/webalert/lib/webalert_templates.py:307
+#: modules/bibedit/lib/bibedit_templates.py:479
+#: modules/webalert/lib/webalert_templates.py:309
 #: modules/webcomment/lib/webcomment_templates.py:216
 #: modules/webcomment/lib/webcomment_templates.py:473
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
-#: modules/webmessage/lib/webmessage_templates.py:479
+#: modules/webmessage/lib/webmessage_templates.py:480
 #: modules/websession/lib/websession_templates.py:1666
 #: modules/websession/lib/websession_templates.py:1705
 msgid "No"
 msgstr "No"
 
-#: modules/bibedit/lib/bibedit_templates.py:481
+#: modules/bibedit/lib/bibedit_templates.py:484
 msgid "The record will be deleted as soon as the task queue is empty."
 msgstr ""
 "Aquest registre es suprimirà tan aviat com la cua de tasques estigui buida."
@@ -569,7 +569,7 @@ msgstr "Edició del registre %(x_recid)s, camp %(x_field)s - Afegir un subcamp"
 msgid "Submit and save record %s"
 msgstr "Lliurar i desar el registre %s"
 
-#: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:42
+#: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
 #: modules/bibformat/web/admin/bibformatadmin.py:73
 msgid "BibFormat Admin"
@@ -624,7 +624,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:395
 #: modules/bibformat/lib/bibformat_templates.py:911
 #: modules/bibformat/lib/bibformat_templates.py:1038
-#: modules/webalert/lib/webalert_templates.py:308
+#: modules/webalert/lib/webalert_templates.py:310
 msgid "Name"
 msgstr "Nom"
 
@@ -763,18 +763,18 @@ msgid "Modify Output Format Attributes"
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1258
-#: modules/bibformat/lib/bibformatadminlib.py:508
+#: modules/bibformat/lib/bibformatadminlib.py:527
 #, fuzzy
 msgid "Remove Rule"
 msgstr "Eliminar-lo"
 
 #: modules/bibformat/lib/bibformat_templates.py:1307
-#: modules/bibformat/lib/bibformatadminlib.py:515
+#: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Add New Rule"
 msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:1308
-#: modules/bibformat/lib/bibformatadminlib.py:512
+#: modules/bibformat/lib/bibformatadminlib.py:531
 #, fuzzy
 msgid "Save Changes"
 msgstr "Desar els canvis"
@@ -810,42 +810,42 @@ msgstr "S'ha enviat l'informe d'error."
 msgid "The following errors have been found"
 msgstr ""
 
-#: modules/bibformat/lib/bibformatadminlib.py:323
-#: modules/bibformat/lib/bibformatadminlib.py:362
-#: modules/bibformat/lib/bibformatadminlib.py:364
+#: modules/bibformat/lib/bibformatadminlib.py:330
+#: modules/bibformat/lib/bibformatadminlib.py:369
+#: modules/bibformat/lib/bibformatadminlib.py:371
 #, fuzzy
 msgid "Test with record:"
 msgstr "Registre complet"
 
-#: modules/bibformat/lib/bibformatadminlib.py:324
+#: modules/bibformat/lib/bibformatadminlib.py:331
 msgid "Enter a search query here."
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_authors.py:88
+#: modules/bibformat/lib/elements/bfe_authors.py:89
 #, fuzzy
 msgid "Hide"
 msgstr "id"
 
-#: modules/bibformat/lib/elements/bfe_authors.py:88
+#: modules/bibformat/lib/elements/bfe_authors.py:89
 #, python-format
 msgid "Show all %i authors"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:49
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:53
 #, fuzzy
 msgid "Migrate BibFormat Settings"
 msgstr "Configurar BibFormat"
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:75
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:79
 msgid "Migrate Knowledge Bases"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:101
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:105
 msgid "Migrate Behaviours"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:126
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:151
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:130
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:155
 #, fuzzy
 msgid "Migrate Formats"
 msgstr "Configurar BibFormat"
@@ -1019,10 +1019,10 @@ msgid "Downloads history"
 msgstr "Històric de baixades"
 
 #: modules/miscutil/lib/dateutils.py:70 modules/miscutil/lib/dateutils.py:97
-#: modules/webbasket/lib/webbasket.py:170
-#: modules/webbasket/lib/webbasket.py:613
+#: modules/webbasket/lib/webbasket.py:169
+#: modules/webbasket/lib/webbasket.py:630
 #: modules/websession/lib/webuser.py:222
-#: modules/webstyle/lib/webstyle_templates.py:513
+#: modules/webstyle/lib/webstyle_templates.py:510
 msgid "N/A"
 msgstr "N/D"
 
@@ -1104,7 +1104,7 @@ msgstr "abr"
 
 #: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "May"
 msgstr "mai"
 
@@ -1138,67 +1138,67 @@ msgstr "des"
 
 #: modules/miscutil/lib/dateutils.py:197
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "January"
 msgstr "gener"
 
 #: modules/miscutil/lib/dateutils.py:198
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "February"
 msgstr "febrer"
 
 #: modules/miscutil/lib/dateutils.py:199
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "March"
 msgstr "març"
 
 #: modules/miscutil/lib/dateutils.py:200
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "April"
 msgstr "abril"
 
 #: modules/miscutil/lib/dateutils.py:202
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "June"
 msgstr "juny"
 
 #: modules/miscutil/lib/dateutils.py:203
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "July"
 msgstr "juliol"
 
 #: modules/miscutil/lib/dateutils.py:204
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "August"
 msgstr "agost"
 
 #: modules/miscutil/lib/dateutils.py:205
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "September"
 msgstr "setembre"
 
 #: modules/miscutil/lib/dateutils.py:206
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "October"
 msgstr "octubre"
 
 #: modules/miscutil/lib/dateutils.py:207
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "November"
 msgstr "novembre"
 
 #: modules/miscutil/lib/dateutils.py:208
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "December"
 msgstr "desembre"
 
@@ -1256,7 +1256,7 @@ msgstr "desconeguda"
 msgid "You already have an alert defined for the specified query and basket."
 msgstr "Ja teniu una alerta definida per a aquesta cerca i cistell."
 
-#: modules/webalert/lib/webalert.py:191 modules/webalert/lib/webalert.py:295
+#: modules/webalert/lib/webalert.py:191 modules/webalert/lib/webalert.py:294
 msgid "The alert name cannot be empty."
 msgstr "El nom de l'alerta no pot estar buit"
 
@@ -1264,17 +1264,17 @@ msgstr "El nom de l'alerta no pot estar buit"
 msgid "You are not the owner of this basket."
 msgstr "No sou el propietari d'aquest cistell."
 
-#: modules/webalert/lib/webalert.py:208
+#: modules/webalert/lib/webalert.py:207
 #, python-format
 msgid "The alert %s has been added to your profile."
 msgstr "L'alerta %s ha estat afegida al vostre perfil"
 
-#: modules/webalert/lib/webalert.py:320
+#: modules/webalert/lib/webalert.py:325
 #, python-format
 msgid "The alert %s has been successfully updated."
 msgstr "L'alerta %s ha estat actualitzada correctament"
 
-#: modules/webalert/lib/webalert.py:372
+#: modules/webalert/lib/webalert.py:377
 #, python-format
 msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
@@ -1286,55 +1286,55 @@ msgstr ""
 "cerca i (b) subscriure-us per rebre notificacions per correu electrònic "
 "d'aquestes cerques."
 
-#: modules/webalert/lib/webalert_templates.py:73
+#: modules/webalert/lib/webalert_templates.py:74
 msgid "Pattern"
 msgstr "Patró"
 
-#: modules/webalert/lib/webalert_templates.py:77
+#: modules/webalert/lib/webalert_templates.py:78
 msgid "Pattern 1"
 msgstr "Patró 1"
 
-#: modules/webalert/lib/webalert_templates.py:79
+#: modules/webalert/lib/webalert_templates.py:80
 msgid "Field 1"
 msgstr "Camp 1"
 
-#: modules/webalert/lib/webalert_templates.py:81
+#: modules/webalert/lib/webalert_templates.py:82
 msgid "Pattern 2"
 msgstr "Patró 2"
 
-#: modules/webalert/lib/webalert_templates.py:83
+#: modules/webalert/lib/webalert_templates.py:84
 msgid "Field 2"
 msgstr "Camp 2"
 
-#: modules/webalert/lib/webalert_templates.py:85
+#: modules/webalert/lib/webalert_templates.py:86
 msgid "Pattern 3"
 msgstr "Patró 3"
 
-#: modules/webalert/lib/webalert_templates.py:87
+#: modules/webalert/lib/webalert_templates.py:88
 msgid "Field 3"
 msgstr "Camp 3"
 
-#: modules/webalert/lib/webalert_templates.py:89
+#: modules/webalert/lib/webalert_templates.py:90
 msgid "Collections"
 msgstr "Col·leccions"
 
-#: modules/webalert/lib/webalert_templates.py:91
+#: modules/webalert/lib/webalert_templates.py:92
 msgid "Collection"
 msgstr "Col·lecció"
 
-#: modules/webalert/lib/webalert_templates.py:112
+#: modules/webalert/lib/webalert_templates.py:113
 msgid "You own the following alerts:"
 msgstr "Heu definit les següents alertes:"
 
-#: modules/webalert/lib/webalert_templates.py:113
+#: modules/webalert/lib/webalert_templates.py:114
 msgid "alert name"
 msgstr "nom de l'alerta"
 
-#: modules/webalert/lib/webalert_templates.py:121
+#: modules/webalert/lib/webalert_templates.py:123
 msgid "SHOW"
 msgstr "MOSTRAR"
 
-#: modules/webalert/lib/webalert_templates.py:164
+#: modules/webalert/lib/webalert_templates.py:166
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
@@ -1342,65 +1342,65 @@ msgstr ""
 "Aquesta alerta us notificarà cada cop/només si un nou item satisfà la "
 "següent cerca:"
 
-#: modules/webalert/lib/webalert_templates.py:165
+#: modules/webalert/lib/webalert_templates.py:167
 msgid "QUERY"
 msgstr "CERCA"
 
-#: modules/webalert/lib/webalert_templates.py:203
+#: modules/webalert/lib/webalert_templates.py:205
 msgid "Alert identification name:"
 msgstr "Nom d'identificació de l'alerta"
 
-#: modules/webalert/lib/webalert_templates.py:205
+#: modules/webalert/lib/webalert_templates.py:207
 msgid "Search-checking frequency:"
 msgstr "Freqüència de comprovació de la cerca:"
 
-#: modules/webalert/lib/webalert_templates.py:209
-#: modules/webalert/lib/webalert_templates.py:326
+#: modules/webalert/lib/webalert_templates.py:211
+#: modules/webalert/lib/webalert_templates.py:328
 msgid "monthly"
 msgstr "mensual"
 
-#: modules/webalert/lib/webalert_templates.py:210
-#: modules/webalert/lib/webalert_templates.py:324
+#: modules/webalert/lib/webalert_templates.py:212
+#: modules/webalert/lib/webalert_templates.py:326
 msgid "weekly"
 msgstr "setmanal"
 
-#: modules/webalert/lib/webalert_templates.py:211
-#: modules/webalert/lib/webalert_templates.py:321
+#: modules/webalert/lib/webalert_templates.py:213
+#: modules/webalert/lib/webalert_templates.py:323
 msgid "daily"
 msgstr "diària"
 
-#: modules/webalert/lib/webalert_templates.py:212
+#: modules/webalert/lib/webalert_templates.py:214
 msgid "Send notification email?"
 msgstr "Enviar notificació per correu electrònic?"
 
-#: modules/webalert/lib/webalert_templates.py:215
-#: modules/webalert/lib/webalert_templates.py:329
+#: modules/webalert/lib/webalert_templates.py:217
+#: modules/webalert/lib/webalert_templates.py:331
 msgid "yes"
 msgstr "sí"
 
-#: modules/webalert/lib/webalert_templates.py:216
-#: modules/webalert/lib/webalert_templates.py:331
+#: modules/webalert/lib/webalert_templates.py:218
+#: modules/webalert/lib/webalert_templates.py:333
 msgid "no"
 msgstr "no"
 
-#: modules/webalert/lib/webalert_templates.py:217
+#: modules/webalert/lib/webalert_templates.py:219
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
 msgstr "si %(x_fmt_open)sno%(x_fmt_close)s cal que especifiqueu un cistell"
 
-#: modules/webalert/lib/webalert_templates.py:219
+#: modules/webalert/lib/webalert_templates.py:221
 msgid "Store results in basket?"
 msgstr "Guardar els resultats en un cistell?"
 
-#: modules/webalert/lib/webalert_templates.py:240
+#: modules/webalert/lib/webalert_templates.py:242
 msgid "SET ALERT"
 msgstr "ACTIVAR L'ALERTA"
 
-#: modules/webalert/lib/webalert_templates.py:241
+#: modules/webalert/lib/webalert_templates.py:243
 msgid "CLEAR DATA"
 msgstr "ESBORRAR DADES"
 
-#: modules/webalert/lib/webalert_templates.py:289
+#: modules/webalert/lib/webalert_templates.py:291
 #, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
@@ -1410,49 +1410,54 @@ msgstr ""
 "(x_url1_close)s, les %(x_url2_open)scerques més habituals%(x_url2_close)s, o "
 "el formulari de dades."
 
-#: modules/webalert/lib/webalert_templates.py:309
+#: modules/webalert/lib/webalert_templates.py:311
 msgid "Search checking frequency"
 msgstr "Freqüència de comprovació de la cerca"
 
-#: modules/webalert/lib/webalert_templates.py:310
+#: modules/webalert/lib/webalert_templates.py:312
 msgid "Notification by email"
 msgstr "Notificació per correu electrònic"
 
-#: modules/webalert/lib/webalert_templates.py:311
+#: modules/webalert/lib/webalert_templates.py:313
 msgid "Result in basket"
 msgstr "Resultats en cistell"
 
-#: modules/webalert/lib/webalert_templates.py:312
+#: modules/webalert/lib/webalert_templates.py:314
 msgid "Date last run"
 msgstr "Data d'última execució"
 
-#: modules/webalert/lib/webalert_templates.py:313
+#: modules/webalert/lib/webalert_templates.py:315
 msgid "Creation date"
 msgstr "Data de creació"
 
-#: modules/webalert/lib/webalert_templates.py:314
+#: modules/webalert/lib/webalert_templates.py:316
 msgid "Query"
 msgstr "Cerca"
 
-#: modules/webalert/lib/webalert_templates.py:362
+#: modules/webalert/lib/webalert_templates.py:355
+#: modules/webbasket/lib/webbasket_templates.py:1456
+msgid "no basket"
+msgstr "cap cistell"
+
+#: modules/webalert/lib/webalert_templates.py:365
 msgid "Remove"
 msgstr "Eliminar"
 
-#: modules/webalert/lib/webalert_templates.py:363
+#: modules/webalert/lib/webalert_templates.py:366
 msgid "Modify"
 msgstr "Modificar"
 
-#: modules/webalert/lib/webalert_templates.py:365
-#: modules/webalert/lib/webalert_templates.py:455
+#: modules/webalert/lib/webalert_templates.py:368
+#: modules/webalert/lib/webalert_templates.py:458
 msgid "Execute search"
 msgstr "Executar la cerca"
 
-#: modules/webalert/lib/webalert_templates.py:371
+#: modules/webalert/lib/webalert_templates.py:374
 #, python-format
 msgid "You have defined %s alerts."
 msgstr "Heu definit %s alertes."
 
-#: modules/webalert/lib/webalert_templates.py:409
+#: modules/webalert/lib/webalert_templates.py:412
 #, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
@@ -1461,7 +1466,7 @@ msgstr ""
 "Encara no heu executat cap cerca. Aneu primer a la %(x_url_open)sinterfície "
 "de cerca%(x_url_close)s."
 
-#: modules/webalert/lib/webalert_templates.py:418
+#: modules/webalert/lib/webalert_templates.py:421
 #, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
@@ -1470,20 +1475,20 @@ msgstr ""
 "Heu executat %(x_nb1)s cerques (%(x_nb2)s qüestions diferents) durant els "
 "darrers 30 dies aproximadament."
 
-#: modules/webalert/lib/webalert_templates.py:423
+#: modules/webalert/lib/webalert_templates.py:426
 #, python-format
 msgid "Here are the %s most popular searches."
 msgstr "Aquestes són les %s cerques més habituals"
 
-#: modules/webalert/lib/webalert_templates.py:434
+#: modules/webalert/lib/webalert_templates.py:437
 msgid "Question"
 msgstr "Qüestió"
 
-#: modules/webalert/lib/webalert_templates.py:438
+#: modules/webalert/lib/webalert_templates.py:441
 msgid "Last Run"
 msgstr "Darrera execució"
 
-#: modules/webalert/lib/webalert_templates.py:456
+#: modules/webalert/lib/webalert_templates.py:459
 msgid "Set new alert"
 msgstr "Definir una nova alerta"
 
@@ -1495,19 +1500,19 @@ msgstr "Mostrar les cerques"
 #: modules/webalert/lib/webalert_webinterface.py:112
 #: modules/webalert/lib/webalert_webinterface.py:153
 #: modules/webalert/lib/webalert_webinterface.py:179
-#: modules/webalert/lib/webalert_webinterface.py:215
-#: modules/webalert/lib/webalert_webinterface.py:252
-#: modules/webalert/lib/webalert_webinterface.py:283
-#: modules/webbasket/lib/webbasket_webinterface.py:72
-#: modules/webbasket/lib/webbasket_webinterface.py:114
-#: modules/webbasket/lib/webbasket_webinterface.py:155
-#: modules/webbasket/lib/webbasket_webinterface.py:205
-#: modules/webbasket/lib/webbasket_webinterface.py:298
-#: modules/webbasket/lib/webbasket_webinterface.py:337
-#: modules/webbasket/lib/webbasket_webinterface.py:398
-#: modules/webbasket/lib/webbasket_webinterface.py:481
-#: modules/webbasket/lib/webbasket_webinterface.py:531
-#: modules/webmessage/lib/webmessage_templates.py:445
+#: modules/webalert/lib/webalert_webinterface.py:216
+#: modules/webalert/lib/webalert_webinterface.py:253
+#: modules/webalert/lib/webalert_webinterface.py:284
+#: modules/webbasket/lib/webbasket_webinterface.py:76
+#: modules/webbasket/lib/webbasket_webinterface.py:121
+#: modules/webbasket/lib/webbasket_webinterface.py:165
+#: modules/webbasket/lib/webbasket_webinterface.py:219
+#: modules/webbasket/lib/webbasket_webinterface.py:319
+#: modules/webbasket/lib/webbasket_webinterface.py:360
+#: modules/webbasket/lib/webbasket_webinterface.py:422
+#: modules/webbasket/lib/webbasket_webinterface.py:515
+#: modules/webbasket/lib/webbasket_webinterface.py:570
+#: modules/webmessage/lib/webmessage_templates.py:446
 #: modules/websession/lib/websession_templates.py:450
 #: modules/websession/lib/websession_templates.py:1778
 #: modules/websession/lib/websession_webinterface.py:78
@@ -1539,34 +1544,34 @@ msgid "Modify alert settings"
 msgstr "Modificar l'alerta"
 
 #: modules/webalert/lib/webalert_webinterface.py:174
-#: modules/webalert/lib/webalert_webinterface.py:210
-#: modules/webalert/lib/webalert_webinterface.py:247
-#: modules/webalert/lib/webalert_webinterface.py:277
+#: modules/webalert/lib/webalert_webinterface.py:211
+#: modules/webalert/lib/webalert_webinterface.py:248
+#: modules/webalert/lib/webalert_webinterface.py:278
 msgid "Display alerts"
 msgstr "Mostrar les alertes"
 
 # Mirar com traduir 'posted'
-#: modules/webbasket/lib/webbasket.py:346
+#: modules/webbasket/lib/webbasket.py:343
 msgid "Your comment has been successfully posted"
 msgstr "El vostre comentari ha estat publicat"
 
-#: modules/webbasket/lib/webbasket.py:719
-#: modules/webbasket/lib/webbasket_templates.py:91
+#: modules/webbasket/lib/webbasket.py:742
+#: modules/webbasket/lib/webbasket_templates.py:98
 msgid "Personal baskets"
 msgstr "Cistells personals"
 
-#: modules/webbasket/lib/webbasket.py:739
-#: modules/webbasket/lib/webbasket_templates.py:98
+#: modules/webbasket/lib/webbasket.py:766
+#: modules/webbasket/lib/webbasket_templates.py:105
 msgid "Group baskets"
 msgstr "Cistells de grup"
 
 # 'altri' per 'tercers'?
-#: modules/webbasket/lib/webbasket.py:760
-#: modules/webbasket/lib/webbasket_templates.py:105
+#: modules/webbasket/lib/webbasket.py:792
+#: modules/webbasket/lib/webbasket_templates.py:112
 msgid "Others' baskets"
 msgstr "Cistells d'altri"
 
-#: modules/webbasket/lib/webbasket.py:795
+#: modules/webbasket/lib/webbasket.py:830
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
@@ -1575,21 +1580,21 @@ msgstr ""
 "Teniu %(x_nb_perso)s cistells personals, esteu subscrits a %(x_nb_group)s "
 "cistells de grup, i a %(x_nb_public)s cistells públics d'altres usuaris."
 
-#: modules/webbasket/lib/webbasket_templates.py:185
+#: modules/webbasket/lib/webbasket_templates.py:199
 #, python-format
 msgid "There are %i baskets"
 msgstr "Hi ha %i cistells"
 
-#: modules/webbasket/lib/webbasket_templates.py:192
+#: modules/webbasket/lib/webbasket_templates.py:207
 msgid "updated on"
 msgstr "actualitzat el"
 
-#: modules/webbasket/lib/webbasket_templates.py:225
-#: modules/webbasket/lib/webbasket_templates.py:422
+#: modules/webbasket/lib/webbasket_templates.py:242
+#: modules/webbasket/lib/webbasket_templates.py:475
 msgid "Basket is empty"
 msgstr "El cistell està buit"
 
-#: modules/webbasket/lib/webbasket_templates.py:235
+#: modules/webbasket/lib/webbasket_templates.py:255
 #, python-format
 msgid ""
 "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
@@ -1598,54 +1603,54 @@ msgstr ""
 "Aquest cistell pertany a %(x_name)s. Us hi podeu %(x_url_open)ssubscriure%"
 "(x_url_close)s lliurement"
 
-#: modules/webbasket/lib/webbasket_templates.py:260
-#: modules/webbasket/lib/webbasket_webinterface.py:567
+#: modules/webbasket/lib/webbasket_templates.py:282
+#: modules/webbasket/lib/webbasket_webinterface.py:624
 msgid "Public basket"
 msgstr "Cistell públic"
 
-#: modules/webbasket/lib/webbasket_templates.py:263
-#: modules/webbasket/lib/webbasket_templates.py:493
-#: modules/webbasket/lib/webbasket_templates.py:752
+#: modules/webbasket/lib/webbasket_templates.py:285
+#: modules/webbasket/lib/webbasket_templates.py:546
+#: modules/webbasket/lib/webbasket_templates.py:822
 msgid "records"
 msgstr "registres"
 
-#: modules/webbasket/lib/webbasket_templates.py:264
-#: modules/webbasket/lib/webbasket_templates.py:494
-#: modules/webbasket/lib/webbasket_templates.py:753
+#: modules/webbasket/lib/webbasket_templates.py:286
+#: modules/webbasket/lib/webbasket_templates.py:547
+#: modules/webbasket/lib/webbasket_templates.py:823
 msgid "last update"
 msgstr "darrera actualització"
 
-#: modules/webbasket/lib/webbasket_templates.py:269
+#: modules/webbasket/lib/webbasket_templates.py:292
 msgid "Subscribe to this basket"
 msgstr "Subscriure's a aquest cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:282
-#: modules/webbasket/lib/webbasket_templates.py:937
-#: modules/webbasket/lib/webbasket_templates.py:1181
+#: modules/webbasket/lib/webbasket_templates.py:310
+#: modules/webbasket/lib/webbasket_templates.py:1011
+#: modules/webbasket/lib/webbasket_templates.py:1255
 msgid "Basket's name"
 msgstr "Nom del cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:283
+#: modules/webbasket/lib/webbasket_templates.py:311
 msgid "Number of views"
 msgstr "Número de viualitzacions"
 
-#: modules/webbasket/lib/webbasket_templates.py:284
+#: modules/webbasket/lib/webbasket_templates.py:312
 msgid "Owner"
 msgstr "Propietari"
 
-#: modules/webbasket/lib/webbasket_templates.py:314
+#: modules/webbasket/lib/webbasket_templates.py:356
 msgid "View"
 msgstr "Visualitzar"
 
-#: modules/webbasket/lib/webbasket_templates.py:323
+#: modules/webbasket/lib/webbasket_templates.py:365
 msgid "Subscribe"
 msgstr "Subscriure's"
 
-#: modules/webbasket/lib/webbasket_templates.py:330
+#: modules/webbasket/lib/webbasket_templates.py:378
 msgid "There is currently no publicly accessible basket"
 msgstr "No hi ha ara mateix cap cistell públicament accessible"
 
-#: modules/webbasket/lib/webbasket_templates.py:338
+#: modules/webbasket/lib/webbasket_templates.py:390
 #, python-format
 msgid ""
 "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
@@ -1654,151 +1659,151 @@ msgstr ""
 "Llista dels cistells %(x_nb_begin)i-%(x_nb_end)i d'un total de %(x_nb_total)"
 "i cistells."
 
-#: modules/webbasket/lib/webbasket_templates.py:369
+#: modules/webbasket/lib/webbasket_templates.py:423
 msgid "Actions"
 msgstr "Accions"
 
-#: modules/webbasket/lib/webbasket_templates.py:400
-#: modules/webbasket/lib/webbasket_templates.py:705
+#: modules/webbasket/lib/webbasket_templates.py:454
+#: modules/webbasket/lib/webbasket_templates.py:775
 msgid "Non-shared basket"
 msgstr "Cistell no compartits"
 
-#: modules/webbasket/lib/webbasket_templates.py:403
-#: modules/webbasket/lib/webbasket_templates.py:707
+#: modules/webbasket/lib/webbasket_templates.py:457
+#: modules/webbasket/lib/webbasket_templates.py:777
 msgid "Shared basket"
 msgstr "Cistell compartit"
 
-#: modules/webbasket/lib/webbasket_templates.py:406
-#: modules/webbasket/lib/webbasket_templates.py:709
+#: modules/webbasket/lib/webbasket_templates.py:460
+#: modules/webbasket/lib/webbasket_templates.py:779
 msgid "Group-shared basket"
 msgstr "Cistell compartit en grup"
 
-#: modules/webbasket/lib/webbasket_templates.py:412
-#: modules/webbasket/lib/webbasket_webinterface.py:490
+#: modules/webbasket/lib/webbasket_templates.py:465
+#: modules/webbasket/lib/webbasket_webinterface.py:525
 msgid "Edit basket"
 msgstr "Editar cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:451
+#: modules/webbasket/lib/webbasket_templates.py:504
 msgid "You do not have sufficient rights to view this basket's content."
 msgstr "No teniu prou permisos per a veure el contingut d'aquest cistell."
 
 # Segur que és dessubscriure's?
-#: modules/webbasket/lib/webbasket_templates.py:456
-#: modules/webbasket/lib/webbasket_templates.py:714
+#: modules/webbasket/lib/webbasket_templates.py:509
+#: modules/webbasket/lib/webbasket_templates.py:784
 #, fuzzy
 msgid "Unsubscribe from this basket"
 msgstr "Desubscure's d'aquest cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:469
-#: modules/webbasket/lib/webbasket_templates.py:580
+#: modules/webbasket/lib/webbasket_templates.py:522
+#: modules/webbasket/lib/webbasket_templates.py:641
 msgid "comments"
 msgstr "comentaris"
 
 # Darrer o últim?
-#: modules/webbasket/lib/webbasket_templates.py:469
+#: modules/webbasket/lib/webbasket_templates.py:522
 msgid "last comment:"
 msgstr "darrer comentari:"
 
-#: modules/webbasket/lib/webbasket_templates.py:524
+#: modules/webbasket/lib/webbasket_templates.py:583
 msgid "Move item up"
 msgstr "Pujar-lo"
 
-#: modules/webbasket/lib/webbasket_templates.py:532
+#: modules/webbasket/lib/webbasket_templates.py:591
 msgid "Move item down"
 msgstr "Baixar-lo"
 
-#: modules/webbasket/lib/webbasket_templates.py:540
+#: modules/webbasket/lib/webbasket_templates.py:599
 msgid "Copy item"
 msgstr "Copiar-lo"
 
-#: modules/webbasket/lib/webbasket_templates.py:548
+#: modules/webbasket/lib/webbasket_templates.py:607
 msgid "Remove item"
 msgstr "Eliminar-lo"
 
-#: modules/webbasket/lib/webbasket_templates.py:551
+#: modules/webbasket/lib/webbasket_templates.py:610
 msgid "External record"
 msgstr "Registre extern"
 
 # Últim o darrer?
-#: modules/webbasket/lib/webbasket_templates.py:581
+#: modules/webbasket/lib/webbasket_templates.py:642
 msgid "last"
 msgstr "últim"
 
-#: modules/webbasket/lib/webbasket_templates.py:582
-#: modules/webbasket/lib/webbasket_webinterface.py:121
-#: modules/webbasket/lib/webbasket_webinterface.py:212
+#: modules/webbasket/lib/webbasket_templates.py:643
+#: modules/webbasket/lib/webbasket_webinterface.py:128
+#: modules/webbasket/lib/webbasket_webinterface.py:226
 msgid "Details and comments"
 msgstr "Detalls i comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:606
+#: modules/webbasket/lib/webbasket_templates.py:667
 msgid "This basket is publicly accessible at the following address:"
 msgstr "Aquest cistell és públicament accessible a aquesta adreça:"
 
-#: modules/webbasket/lib/webbasket_templates.py:636
-#: modules/websearch/lib/websearch_templates.py:534
-#: modules/websearch/lib/websearch_templates.py:1570
+#: modules/webbasket/lib/webbasket_templates.py:697
+#: modules/websearch/lib/websearch_templates.py:535
+#: modules/websearch/lib/websearch_templates.py:1571
 msgid "Sort by:"
 msgstr "Ordenar per:"
 
-#: modules/webbasket/lib/webbasket_templates.py:637
-#: modules/webbasket/lib/webbasket_templates.py:852
+#: modules/webbasket/lib/webbasket_templates.py:698
+#: modules/webbasket/lib/webbasket_templates.py:926
 msgid "Title"
 msgstr "Títol"
 
-#: modules/webbasket/lib/webbasket_templates.py:638
-#: modules/webmessage/lib/webmessage_templates.py:85
+#: modules/webbasket/lib/webbasket_templates.py:699
+#: modules/webmessage/lib/webmessage_templates.py:86
 msgid "Date"
 msgstr "Data"
 
-#: modules/webbasket/lib/webbasket_templates.py:699
+#: modules/webbasket/lib/webbasket_templates.py:769
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:172
 msgid "Comments"
 msgstr "Comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:700
+#: modules/webbasket/lib/webbasket_templates.py:770
 #, python-format
 msgid "There is a total of %i comments"
 msgstr "Hi ha un total de %i comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:702
-#: modules/webbasket/lib/webbasket_webinterface.py:162
+#: modules/webbasket/lib/webbasket_templates.py:772
+#: modules/webbasket/lib/webbasket_webinterface.py:172
 #: modules/webcomment/lib/webcomment_templates.py:95
 #: modules/webcomment/lib/webcomment_templates.py:579
 msgid "Write a comment"
 msgstr "Escriviu un comentari"
 
-#: modules/webbasket/lib/webbasket_templates.py:758
+#: modules/webbasket/lib/webbasket_templates.py:828
 msgid "Back to baskets"
 msgstr "Tornar als cistells"
 
-#: modules/webbasket/lib/webbasket_templates.py:783
-#: modules/webbasket/lib/webbasket_templates.py:811
+#: modules/webbasket/lib/webbasket_templates.py:857
+#: modules/webbasket/lib/webbasket_templates.py:885
 msgid "by"
 msgstr "per"
 
-#: modules/webbasket/lib/webbasket_templates.py:784
-#: modules/webbasket/lib/webbasket_templates.py:811
+#: modules/webbasket/lib/webbasket_templates.py:858
+#: modules/webbasket/lib/webbasket_templates.py:885
 msgid "on"
 msgstr "el"
 
-#: modules/webbasket/lib/webbasket_templates.py:796
+#: modules/webbasket/lib/webbasket_templates.py:870
 #: modules/webcomment/lib/webcomment_templates.py:330
-#: modules/webmessage/lib/webmessage_templates.py:105
+#: modules/webmessage/lib/webmessage_templates.py:106
 msgid "Reply"
 msgstr "Contestar"
 
-#: modules/webbasket/lib/webbasket_templates.py:797
+#: modules/webbasket/lib/webbasket_templates.py:871
 msgid "Delete comment"
 msgstr "Suprimir comentari"
 
-#: modules/webbasket/lib/webbasket_templates.py:851
-#: modules/webbasket/lib/webbasket_templates.py:856
+#: modules/webbasket/lib/webbasket_templates.py:925
+#: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webcomment/lib/webcomment_webinterface.py:215
 msgid "Add Comment"
 msgstr "Afegir comentari"
 
-#: modules/webbasket/lib/webbasket_templates.py:853
+#: modules/webbasket/lib/webbasket_templates.py:927
 #: modules/webcomment/lib/webcomment_templates.py:626
 #: modules/webcomment/lib/webcomment_templates.py:820
 #: modules/webcomment/lib/webcomment_templates.py:1173
@@ -1806,198 +1811,194 @@ msgstr "Afegir comentari"
 msgid "Comment"
 msgstr "Comentari"
 
-#: modules/webbasket/lib/webbasket_templates.py:872
-#: modules/webbasket/lib/webbasket_templates.py:968
+#: modules/webbasket/lib/webbasket_templates.py:946
+#: modules/webbasket/lib/webbasket_templates.py:1042
 msgid "Create new basket"
 msgstr "Crear un nou cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:922
+#: modules/webbasket/lib/webbasket_templates.py:996
 msgid "Select topic"
 msgstr "Seleccioneu el tema"
 
-#: modules/webbasket/lib/webbasket_templates.py:938
-#: modules/webbasket/lib/webbasket_templates.py:1183
-#: modules/webbasket/lib/webbasket_templates.py:1192
+#: modules/webbasket/lib/webbasket_templates.py:1012
+#: modules/webbasket/lib/webbasket_templates.py:1257
+#: modules/webbasket/lib/webbasket_templates.py:1266
 msgid "Choose topic"
 msgstr "Escolliu un tema"
 
-#: modules/webbasket/lib/webbasket_templates.py:939
-#: modules/webbasket/lib/webbasket_templates.py:1194
+#: modules/webbasket/lib/webbasket_templates.py:1013
+#: modules/webbasket/lib/webbasket_templates.py:1268
 msgid "or create a new one"
 msgstr "o creeu-ne un de nou"
 
-#: modules/webbasket/lib/webbasket_templates.py:939
+#: modules/webbasket/lib/webbasket_templates.py:1013
 msgid "Create new topic"
 msgstr "Creeu un nou tema"
 
-#: modules/webbasket/lib/webbasket_templates.py:941
+#: modules/webbasket/lib/webbasket_templates.py:1015
 msgid "Create a new basket"
 msgstr "Creeu un nou cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:1002
-#: modules/webbasket/lib/webbasket_templates.py:1023
-#: modules/webbasket/lib/webbasket_templates.py:1039
+#: modules/webbasket/lib/webbasket_templates.py:1076
+#: modules/webbasket/lib/webbasket_templates.py:1097
+#: modules/webbasket/lib/webbasket_templates.py:1113
 msgid "Select basket"
 msgstr "Seleccioneu el cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:1010
+#: modules/webbasket/lib/webbasket_templates.py:1084
 msgid "Add to a personal basket"
 msgstr "Afegir al cistell personal"
 
-#: modules/webbasket/lib/webbasket_templates.py:1011
-#: modules/webbasket/lib/webbasket_templates.py:1032
-#: modules/webbasket/lib/webbasket_templates.py:1050
+#: modules/webbasket/lib/webbasket_templates.py:1085
+#: modules/webbasket/lib/webbasket_templates.py:1106
+#: modules/webbasket/lib/webbasket_templates.py:1124
 #, python-format
 msgid "%i baskets"
 msgstr "%i cistells"
 
-#: modules/webbasket/lib/webbasket_templates.py:1031
+#: modules/webbasket/lib/webbasket_templates.py:1105
 msgid "Add to a group-shared basket"
 msgstr "Afegir a un cistell de grup"
 
-#: modules/webbasket/lib/webbasket_templates.py:1049
+#: modules/webbasket/lib/webbasket_templates.py:1123
 msgid "Add to a public basket"
 msgstr "Afegir a un cistell públic"
 
-#: modules/webbasket/lib/webbasket_templates.py:1082
+#: modules/webbasket/lib/webbasket_templates.py:1156
 #, python-format
 msgid "Adding %i records to these baskets"
 msgstr "Afegits %i registres a aquests cistells"
 
-#: modules/webbasket/lib/webbasket_templates.py:1087
+#: modules/webbasket/lib/webbasket_templates.py:1161
 msgid "Add to baskets"
 msgstr "Afegir als cistells"
 
-#: modules/webbasket/lib/webbasket_templates.py:1094
+#: modules/webbasket/lib/webbasket_templates.py:1168
 #, python-format
 msgid "The selected records have been successfully added to %i baskets."
 msgstr ""
 "Els registres seleccionats han estat afegits correctament a %i cistells."
 
-#: modules/webbasket/lib/webbasket_templates.py:1097
+#: modules/webbasket/lib/webbasket_templates.py:1171
 msgid "No records were added to the selected baskets."
 msgstr "No s'han afegit registres als cistells seleccionats."
 
-#: modules/webbasket/lib/webbasket_templates.py:1117
+#: modules/webbasket/lib/webbasket_templates.py:1191
 msgid "Are you sure you want to delete this basket?"
 msgstr "Esteu segur que voleu suprimir aquest cistell?"
 
-#: modules/webbasket/lib/webbasket_templates.py:1119
+#: modules/webbasket/lib/webbasket_templates.py:1193
 #, python-format
 msgid "%i users are subscribed to this basket."
 msgstr "%i usuaris s'han subscrit a aquest cistell."
 
-#: modules/webbasket/lib/webbasket_templates.py:1121
+#: modules/webbasket/lib/webbasket_templates.py:1195
 #, python-format
 msgid "%i user groups are subscribed to this basket."
 msgstr "%i grups d'usuaris s'han subscrit a aquest cistell."
 
-#: modules/webbasket/lib/webbasket_templates.py:1123
+#: modules/webbasket/lib/webbasket_templates.py:1197
 #, python-format
 msgid "You have set %i alerts on this basket."
 msgstr "Hi heu posat %i alertes en aquest cistell."
 
-#: modules/webbasket/lib/webbasket_templates.py:1197
+#: modules/webbasket/lib/webbasket_templates.py:1271
 msgid "General settings"
 msgstr "Paràmetres generals"
 
-#: modules/webbasket/lib/webbasket_templates.py:1212
-#: modules/webbasket/lib/webbasket_templates.py:1341
-#: modules/webbasket/lib/webbasket_templates.py:1368
+#: modules/webbasket/lib/webbasket_templates.py:1286
+#: modules/webbasket/lib/webbasket_templates.py:1415
+#: modules/webbasket/lib/webbasket_templates.py:1442
 msgid "Add group"
 msgstr "Afegir un grup"
 
-#: modules/webbasket/lib/webbasket_templates.py:1217
+#: modules/webbasket/lib/webbasket_templates.py:1291
 msgid "Manage group rights"
 msgstr "Gestionar permisos del grup"
 
 # Potser: 'per a compartir'?
-#: modules/webbasket/lib/webbasket_templates.py:1229
+#: modules/webbasket/lib/webbasket_templates.py:1303
 msgid "Manage global sharing rights"
 msgstr "Gestionar permisos globals de compartició"
 
-#: modules/webbasket/lib/webbasket_templates.py:1234
+#: modules/webbasket/lib/webbasket_templates.py:1308
 msgid "Delete basket"
 msgstr "Suprimir el cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:1258
+#: modules/webbasket/lib/webbasket_templates.py:1332
 msgid "Editing basket"
 msgstr "Editar cistell"
 
-#: modules/webbasket/lib/webbasket_templates.py:1266
+#: modules/webbasket/lib/webbasket_templates.py:1340
 msgid "Save changes"
 msgstr "Desar els canvis"
 
 # O 'permisos'?
-#: modules/webbasket/lib/webbasket_templates.py:1279
-#: modules/webbasket/lib/webbasket_templates.py:1303
+#: modules/webbasket/lib/webbasket_templates.py:1353
+#: modules/webbasket/lib/webbasket_templates.py:1377
 msgid "No rights"
 msgstr "Sense permís"
 
-#: modules/webbasket/lib/webbasket_templates.py:1281
-#: modules/webbasket/lib/webbasket_templates.py:1305
+#: modules/webbasket/lib/webbasket_templates.py:1355
+#: modules/webbasket/lib/webbasket_templates.py:1379
 msgid "View records"
 msgstr "Veure registres"
 
-#: modules/webbasket/lib/webbasket_templates.py:1283
-#: modules/webbasket/lib/webbasket_templates.py:1285
-#: modules/webbasket/lib/webbasket_templates.py:1287
-#: modules/webbasket/lib/webbasket_templates.py:1289
-#: modules/webbasket/lib/webbasket_templates.py:1291
-#: modules/webbasket/lib/webbasket_templates.py:1293
-#: modules/webbasket/lib/webbasket_templates.py:1307
-#: modules/webbasket/lib/webbasket_templates.py:1309
-#: modules/webbasket/lib/webbasket_templates.py:1311
-#: modules/webbasket/lib/webbasket_templates.py:1313
-#: modules/webbasket/lib/webbasket_templates.py:1315
-#: modules/webbasket/lib/webbasket_templates.py:1317
+#: modules/webbasket/lib/webbasket_templates.py:1357
+#: modules/webbasket/lib/webbasket_templates.py:1359
+#: modules/webbasket/lib/webbasket_templates.py:1361
+#: modules/webbasket/lib/webbasket_templates.py:1363
+#: modules/webbasket/lib/webbasket_templates.py:1365
+#: modules/webbasket/lib/webbasket_templates.py:1367
+#: modules/webbasket/lib/webbasket_templates.py:1381
+#: modules/webbasket/lib/webbasket_templates.py:1383
+#: modules/webbasket/lib/webbasket_templates.py:1385
+#: modules/webbasket/lib/webbasket_templates.py:1387
+#: modules/webbasket/lib/webbasket_templates.py:1389
+#: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "and"
 msgstr "i"
 
-#: modules/webbasket/lib/webbasket_templates.py:1283
-#: modules/webbasket/lib/webbasket_templates.py:1307
+#: modules/webbasket/lib/webbasket_templates.py:1357
+#: modules/webbasket/lib/webbasket_templates.py:1381
 msgid "view comments"
 msgstr "veure comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:1285
-#: modules/webbasket/lib/webbasket_templates.py:1309
+#: modules/webbasket/lib/webbasket_templates.py:1359
+#: modules/webbasket/lib/webbasket_templates.py:1383
 msgid "add comments"
 msgstr "afegir comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:1287
-#: modules/webbasket/lib/webbasket_templates.py:1311
+#: modules/webbasket/lib/webbasket_templates.py:1361
+#: modules/webbasket/lib/webbasket_templates.py:1385
 msgid "add records"
 msgstr "afegir registres"
 
-#: modules/webbasket/lib/webbasket_templates.py:1289
-#: modules/webbasket/lib/webbasket_templates.py:1313
+#: modules/webbasket/lib/webbasket_templates.py:1363
+#: modules/webbasket/lib/webbasket_templates.py:1387
 msgid "delete comments"
 msgstr "suprimir comentaris"
 
-#: modules/webbasket/lib/webbasket_templates.py:1291
-#: modules/webbasket/lib/webbasket_templates.py:1315
+#: modules/webbasket/lib/webbasket_templates.py:1365
+#: modules/webbasket/lib/webbasket_templates.py:1389
 msgid "remove records"
 msgstr "elimina registres"
 
-#: modules/webbasket/lib/webbasket_templates.py:1293
-#: modules/webbasket/lib/webbasket_templates.py:1317
+#: modules/webbasket/lib/webbasket_templates.py:1367
+#: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "manage sharing rights"
 msgstr "gestionar els permisos de compartició"
 
 # De cap?
-#: modules/webbasket/lib/webbasket_templates.py:1339
+#: modules/webbasket/lib/webbasket_templates.py:1413
 msgid "You are not a member of a group."
 msgstr "No sou membre d'un grup"
 
-#: modules/webbasket/lib/webbasket_templates.py:1361
+#: modules/webbasket/lib/webbasket_templates.py:1435
 msgid "Sharing basket to a new group"
 msgstr "Compartir cistell amb un nou grup"
 
-#: modules/webbasket/lib/webbasket_templates.py:1382
-msgid "no basket"
-msgstr "cap cistell"
-
-#: modules/webbasket/lib/webbasket_templates.py:1390
+#: modules/webbasket/lib/webbasket_templates.py:1464
 #: modules/websession/lib/websession_templates.py:356
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
@@ -2006,52 +2007,53 @@ msgstr ""
 "Ara esteu connectat com a usuari visitant, de manera que els vostres "
 "cistells desapareixeran al final d'aquesta sessió."
 
-#: modules/webbasket/lib/webbasket_templates.py:1391
-#: modules/webbasket/lib/webbasket_templates.py:1408
+#: modules/webbasket/lib/webbasket_templates.py:1465
+#: modules/webbasket/lib/webbasket_templates.py:1482
 #: modules/websession/lib/websession_templates.py:359
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr "Si voleu podeu %(x_url_open)slogin or register here%(x_url_close)s."
 
-#: modules/webbasket/lib/webbasket_templates.py:1407
+#: modules/webbasket/lib/webbasket_templates.py:1481
 #: modules/websession/lib/websession_webinterface.py:116
 msgid "This functionality is forbidden to guest users."
 msgstr "Aquesta funcionalitat no està permesa als usuaris visitants."
 
-#: modules/webbasket/lib/webbasket_templates.py:1468
+#: modules/webbasket/lib/webbasket_templates.py:1542
 #: modules/webcomment/lib/webcomment_templates.py:618
 msgid "Back to search results"
 msgstr "Tornar als resultats de la cerca"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:78
+#: modules/webbasket/lib/webbasket_webinterface.py:82
 msgid "Display baskets"
 msgstr "Visualitzar els cistells:"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:294
+#: modules/webbasket/lib/webbasket_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:313
 #: modules/websession/lib/websession_templates.py:452
 msgid "Your Baskets"
 msgstr "Els vostres cistells"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:296
+#: modules/webbasket/lib/webbasket_webinterface.py:316
 msgid "Add records to baskets"
 msgstr "Afegir registres als cistells"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:346
+#: modules/webbasket/lib/webbasket_webinterface.py:369
 msgid "Delete a basket"
 msgstr "Suprimir un cistell"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:384
+#: modules/webbasket/lib/webbasket_webinterface.py:407
 msgid "Copy record to basket"
 msgstr "Copiar el registre al cistell"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:534
+#: modules/webbasket/lib/webbasket_webinterface.py:573
 msgid "Create basket"
 msgstr "Crear un cistell"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:566
-#: modules/webbasket/lib/webbasket_webinterface.py:592
+#: modules/webbasket/lib/webbasket_webinterface.py:599
+#: modules/webbasket/lib/webbasket_webinterface.py:623
+#: modules/webbasket/lib/webbasket_webinterface.py:650
 msgid "List of public baskets"
 msgstr "Llista de cistells públics"
 
@@ -2442,10 +2444,10 @@ msgstr "eliminat correctament l'informa d'abús"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:167
-#: modules/websearch/lib/websearch_templates.py:974
-#: modules/websearch/lib/websearch_templates.py:2334
-#: modules/websearch/lib/websearch_templates.py:2338
-#: modules/websearch/lib/websearch_templates.py:2342
+#: modules/websearch/lib/websearch_templates.py:975
+#: modules/websearch/lib/websearch_templates.py:2335
+#: modules/websearch/lib/websearch_templates.py:2339
+#: modules/websearch/lib/websearch_templates.py:2343
 msgid "Detailed record"
 msgstr "Registre complet"
 
@@ -2487,11 +2489,11 @@ msgstr "Gestió de comentaris"
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:290
-#: modules/websearch/lib/websearch_webinterface.py:359
+#: modules/websearch/lib/websearch_webinterface.py:291
+#: modules/websearch/lib/websearch_webinterface.py:360
 #: modules/websearch/web/admin/websearchadmin.py:1070
 #: modules/websession/lib/websession_webinterface.py:528
-#: modules/webstyle/lib/webstyle_templates.py:519
+#: modules/webstyle/lib/webstyle_templates.py:516
 #: modules/websubmit/lib/websubmit_webinterface.py:396
 #: modules/websubmit/lib/websubmit_webinterface.py:405
 msgid "Internal Error"
@@ -2513,28 +2515,28 @@ msgstr "Suprimir comentaris"
 msgid "Suppress abuse reports"
 msgstr "Eliminar les denúncies d'abús"
 
-#: modules/webmessage/lib/webmessage.py:130
+#: modules/webmessage/lib/webmessage.py:132
 msgid "The message could not be deleted."
 msgstr "El missatge no s'ha pogut suprimir."
 
-#: modules/webmessage/lib/webmessage.py:132
+#: modules/webmessage/lib/webmessage.py:134
 msgid "The message was successfully deleted."
 msgstr "El missatge s'ha suprimit correctament."
 
-#: modules/webmessage/lib/webmessage.py:149
+#: modules/webmessage/lib/webmessage.py:151
 msgid "Your mailbox has been emptied."
 msgstr "S'ha buidat la vostra bústia."
 
-#: modules/webmessage/lib/webmessage.py:338
+#: modules/webmessage/lib/webmessage.py:340
 #, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
 msgstr "La data escollida (%(x_year)i-%(x_month)i-%(x_day)i) no és vàlida"
 
-#: modules/webmessage/lib/webmessage.py:347
+#: modules/webmessage/lib/webmessage.py:349
 msgid "Please enter a user name or a group name."
 msgstr "Entreu un nom d'usuari o de grup."
 
-#: modules/webmessage/lib/webmessage.py:351
+#: modules/webmessage/lib/webmessage.py:353
 #, python-format
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
@@ -2543,23 +2545,23 @@ msgstr ""
 "El vostre missatge és massa llarg, si us plau editeu-lo. El tamany màxim és "
 "de %i caràcters"
 
-#: modules/webmessage/lib/webmessage.py:361
+#: modules/webmessage/lib/webmessage.py:363
 #, python-format
 msgid "Group %s does not exist."
 msgstr "El grup %s no existeix"
 
-#: modules/webmessage/lib/webmessage.py:384
+#: modules/webmessage/lib/webmessage.py:386
 #, python-format
 msgid "User %s does not exist."
 msgstr "L'usuari %s no existeix"
 
-#: modules/webmessage/lib/webmessage.py:396
+#: modules/webmessage/lib/webmessage.py:398
 #: modules/webmessage/lib/webmessage_webinterface.py:103
 #: modules/webmessage/lib/webmessage_webinterface.py:166
 msgid "Write a message"
 msgstr "Escriviu un missatge"
 
-#: modules/webmessage/lib/webmessage.py:413
+#: modules/webmessage/lib/webmessage.py:415
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
@@ -2567,12 +2569,12 @@ msgstr ""
 "No s'ha pogut enviar el vostre missatge als següents destinataris degut a la "
 "seva quota:"
 
-#: modules/webmessage/lib/webmessage.py:417
+#: modules/webmessage/lib/webmessage.py:419
 msgid "Your message has been sent."
 msgstr "El vostre missatge s'ha enviat."
 
-#: modules/webmessage/lib/webmessage.py:421
-#: modules/webmessage/lib/webmessage_templates.py:443
+#: modules/webmessage/lib/webmessage.py:423
+#: modules/webmessage/lib/webmessage_templates.py:444
 #: modules/webmessage/lib/webmessage_webinterface.py:66
 #: modules/webmessage/lib/webmessage_webinterface.py:218
 #: modules/webmessage/lib/webmessage_webinterface.py:247
@@ -2580,135 +2582,135 @@ msgstr "El vostre missatge s'ha enviat."
 msgid "Your Messages"
 msgstr "Els vostres missatges"
 
-#: modules/webmessage/lib/webmessage_templates.py:85
+#: modules/webmessage/lib/webmessage_templates.py:86
 msgid "Subject"
 msgstr "Assumpte"
 
-#: modules/webmessage/lib/webmessage_templates.py:85
+#: modules/webmessage/lib/webmessage_templates.py:86
 msgid "Sender"
 msgstr "Remitent"
 
-#: modules/webmessage/lib/webmessage_templates.py:92
+#: modules/webmessage/lib/webmessage_templates.py:93
 msgid "No messages"
 msgstr "Sense missatges"
 
-#: modules/webmessage/lib/webmessage_templates.py:95
+#: modules/webmessage/lib/webmessage_templates.py:96
 msgid "No subject"
 msgstr "Sense assumpte"
 
-#: modules/webmessage/lib/webmessage_templates.py:136
+#: modules/webmessage/lib/webmessage_templates.py:137
 msgid "Write new message"
 msgstr "Escriviu el missatge"
 
-#: modules/webmessage/lib/webmessage_templates.py:137
+#: modules/webmessage/lib/webmessage_templates.py:138
 msgid "Delete All"
 msgstr "Suprimir-los tots"
 
-#: modules/webmessage/lib/webmessage_templates.py:183
+#: modules/webmessage/lib/webmessage_templates.py:184
 msgid "Re:"
 msgstr "Re:"
 
-#: modules/webmessage/lib/webmessage_templates.py:273
+#: modules/webmessage/lib/webmessage_templates.py:274
 msgid "Send later?"
 msgstr "Enviar-ho més tard?"
 
-#: modules/webmessage/lib/webmessage_templates.py:274
+#: modules/webmessage/lib/webmessage_templates.py:275
 msgid "To:"
 msgstr "A:"
 
-#: modules/webmessage/lib/webmessage_templates.py:275
+#: modules/webmessage/lib/webmessage_templates.py:276
 msgid "Users"
 msgstr "Usuaris"
 
-#: modules/webmessage/lib/webmessage_templates.py:276
+#: modules/webmessage/lib/webmessage_templates.py:277
 msgid "Groups"
 msgstr "Grups"
 
-#: modules/webmessage/lib/webmessage_templates.py:277
-#: modules/webmessage/lib/webmessage_templates.py:421
+#: modules/webmessage/lib/webmessage_templates.py:278
+#: modules/webmessage/lib/webmessage_templates.py:422
 msgid "Subject:"
 msgstr "Assumpte:"
 
-#: modules/webmessage/lib/webmessage_templates.py:278
+#: modules/webmessage/lib/webmessage_templates.py:279
 msgid "Message:"
 msgstr "Missatge:"
 
-#: modules/webmessage/lib/webmessage_templates.py:279
+#: modules/webmessage/lib/webmessage_templates.py:280
 msgid "SEND"
 msgstr "ENVIAR"
 
-#: modules/webmessage/lib/webmessage_templates.py:420
+#: modules/webmessage/lib/webmessage_templates.py:421
 msgid "From:"
 msgstr "De:"
 
-#: modules/webmessage/lib/webmessage_templates.py:422
+#: modules/webmessage/lib/webmessage_templates.py:423
 msgid "Sent on:"
 msgstr "Enviat el:"
 
-#: modules/webmessage/lib/webmessage_templates.py:423
+#: modules/webmessage/lib/webmessage_templates.py:424
 msgid "Received on:"
 msgstr "Rebut el:"
 
-#: modules/webmessage/lib/webmessage_templates.py:424
+#: modules/webmessage/lib/webmessage_templates.py:425
 msgid "Sent to:"
 msgstr "Enviat a:"
 
-#: modules/webmessage/lib/webmessage_templates.py:425
+#: modules/webmessage/lib/webmessage_templates.py:426
 msgid "Sent to groups:"
 msgstr "Enviat als grups:"
 
-#: modules/webmessage/lib/webmessage_templates.py:426
+#: modules/webmessage/lib/webmessage_templates.py:427
 msgid "REPLY"
 msgstr "CONTESTAR"
 
-#: modules/webmessage/lib/webmessage_templates.py:427
+#: modules/webmessage/lib/webmessage_templates.py:428
 msgid "DELETE"
 msgstr "SUPRIMIR"
 
-#: modules/webmessage/lib/webmessage_templates.py:476
+#: modules/webmessage/lib/webmessage_templates.py:477
 msgid "Are you sure you want to empty your whole mailbox?"
 msgstr "Esteu segur que voleu buidar tota la vostra bústia?"
 
-#: modules/webmessage/lib/webmessage_templates.py:538
+#: modules/webmessage/lib/webmessage_templates.py:539
 #, python-format
 msgid "Quota used: %i messages out of max. %i"
 msgstr "Quota usada: %i missatges d'un màxim de %i"
 
 # Una?
-#: modules/webmessage/lib/webmessage_templates.py:555
+#: modules/webmessage/lib/webmessage_templates.py:556
 msgid "Please select one or more:"
 msgstr "Seleccioneu-ne un o més:"
 
-#: modules/webmessage/lib/webmessage_templates.py:586
+#: modules/webmessage/lib/webmessage_templates.py:587
 msgid "Add to users"
 msgstr "Afegir als usuaris"
 
-#: modules/webmessage/lib/webmessage_templates.py:588
+#: modules/webmessage/lib/webmessage_templates.py:589
 msgid "Add to groups"
 msgstr "Afegir als grups"
 
-#: modules/webmessage/lib/webmessage_templates.py:591
+#: modules/webmessage/lib/webmessage_templates.py:592
 msgid "No matching user"
 msgstr "No s'ha trobat cap usuari que coincideixi"
 
-#: modules/webmessage/lib/webmessage_templates.py:593
+#: modules/webmessage/lib/webmessage_templates.py:594
 #: modules/websession/lib/websession_templates.py:1305
 msgid "No matching group"
 msgstr "No s'ha trobat cap grup que coincideixi"
 
-#: modules/webmessage/lib/webmessage_templates.py:627
+#: modules/webmessage/lib/webmessage_templates.py:628
 msgid "Find users or groups:"
 msgstr "Cercar usuaris o grups:"
 
-#: modules/webmessage/lib/webmessage_templates.py:628
+#: modules/webmessage/lib/webmessage_templates.py:629
 msgid "Find a user"
 msgstr "Cercar un usuari"
 
-#: modules/webmessage/lib/webmessage_templates.py:629
+#: modules/webmessage/lib/webmessage_templates.py:630
 msgid "Find a group"
 msgstr "Cercar un grup"
 
-#: modules/webmessage/lib/webmessage_templates.py:644
+#: modules/webmessage/lib/webmessage_templates.py:645
 #, fuzzy, python-format
 msgid "You have %s new messages out of %s messages"
 msgstr "Teniu %s missates nous d'un total de %s missatges"
@@ -2719,24 +2721,24 @@ msgstr "Llegir un missatge"
 
 #: modules/websearch/lib/search_engine.py:356
 #: modules/websearch/lib/search_engine.py:380
-#: modules/websearch/lib/search_engine.py:3049
-#: modules/websearch/lib/search_engine.py:3088
-#: modules/websearch/lib/search_engine.py:3122
+#: modules/websearch/lib/search_engine.py:3067
+#: modules/websearch/lib/search_engine.py:3106
+#: modules/websearch/lib/search_engine.py:3140
 msgid "Search Results"
 msgstr "Resultats de la cerca"
 
 #: modules/websearch/lib/search_engine.py:414
-#: modules/websearch/lib/websearch_templates.py:643
+#: modules/websearch/lib/websearch_templates.py:644
 msgid "any day"
 msgstr "qualsevol dia"
 
 #: modules/websearch/lib/search_engine.py:420
-#: modules/websearch/lib/websearch_templates.py:655
+#: modules/websearch/lib/websearch_templates.py:656
 msgid "any month"
 msgstr "qualsevol mes"
 
 #: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:669
+#: modules/websearch/lib/websearch_templates.py:670
 msgid "any year"
 msgstr "qualsevol any"
 
@@ -2750,19 +2752,19 @@ msgid "add another collection"
 msgstr "afegir una altra col·lecció"
 
 #: modules/websearch/lib/search_engine.py:491
-#: modules/websearch/lib/websearch_webcoll.py:495
+#: modules/websearch/lib/websearch_webcoll.py:455
 msgid "latest first"
 msgstr "el darrer primer"
 
 #: modules/websearch/lib/search_engine.py:506
 #: modules/websearch/lib/search_engine.py:628
-#: modules/websearch/lib/websearch_templates.py:620
-#: modules/websearch/lib/websearch_webcoll.py:525
+#: modules/websearch/lib/websearch_templates.py:621
+#: modules/websearch/lib/websearch_webcoll.py:485
 msgid "OR"
 msgstr "O"
 
 #: modules/websearch/lib/search_engine.py:506
-#: modules/websearch/lib/websearch_webcoll.py:525
+#: modules/websearch/lib/websearch_webcoll.py:485
 msgid "rank by"
 msgstr "prioritzar per"
 
@@ -2771,37 +2773,37 @@ msgid "HTML brief"
 msgstr "HTML breu"
 
 #: modules/websearch/lib/search_engine.py:627
-#: modules/websearch/lib/websearch_templates.py:619
+#: modules/websearch/lib/websearch_templates.py:620
 msgid "AND"
 msgstr "I"
 
 #: modules/websearch/lib/search_engine.py:629
-#: modules/websearch/lib/websearch_templates.py:621
+#: modules/websearch/lib/websearch_templates.py:622
 msgid "AND NOT"
 msgstr "I NO"
 
 #: modules/websearch/lib/search_engine.py:647
-#: modules/websearch/lib/websearch_templates.py:569
+#: modules/websearch/lib/websearch_templates.py:570
 msgid "All of the words:"
 msgstr "Totes les paraules:"
 
 #: modules/websearch/lib/search_engine.py:648
-#: modules/websearch/lib/websearch_templates.py:571
+#: modules/websearch/lib/websearch_templates.py:572
 msgid "Any of the words:"
 msgstr "Qualsevol de les paraules:"
 
 #: modules/websearch/lib/search_engine.py:649
-#: modules/websearch/lib/websearch_templates.py:573
+#: modules/websearch/lib/websearch_templates.py:574
 msgid "Exact phrase:"
 msgstr "Frase exacta:"
 
 #: modules/websearch/lib/search_engine.py:650
-#: modules/websearch/lib/websearch_templates.py:575
+#: modules/websearch/lib/websearch_templates.py:576
 msgid "Partial phrase:"
 msgstr "Part de la frase:"
 
 #: modules/websearch/lib/search_engine.py:651
-#: modules/websearch/lib/websearch_templates.py:577
+#: modules/websearch/lib/websearch_templates.py:578
 msgid "Regular expression:"
 msgstr "Expressió regular:"
 
@@ -2859,7 +2861,7 @@ msgstr ""
 "El terme de cerca %s no s'ha trobat en cap registre. Els termes aproximats, "
 "a qualsevol col·lecció, són:"
 
-#: modules/websearch/lib/search_engine.py:2168
+#: modules/websearch/lib/search_engine.py:2185
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -2868,244 +2870,244 @@ msgstr ""
 "Només es permet ordenar en conjunts de fins a %d registres.  Ordenat per "
 "defecte (\"primer els més recents\")."
 
-#: modules/websearch/lib/search_engine.py:2192
+#: modules/websearch/lib/search_engine.py:2209
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr "No és possible ordenar per %s.  Ha quedat ordenat per títol."
 
-#: modules/websearch/lib/search_engine.py:2395
+#: modules/websearch/lib/search_engine.py:2412
 msgid "Use different search terms."
 msgstr "Useu termes diferents de cerca."
 
-#: modules/websearch/lib/search_engine.py:2425
-#: modules/websearch/lib/search_engine.py:2582
-#: modules/websearch/lib/search_engine.py:2605
-#: modules/websearch/lib/search_engine.py:2612
-#: modules/websearch/lib/search_engine.py:2619
-#: modules/websearch/lib/search_engine.py:2665
+#: modules/websearch/lib/search_engine.py:2443
+#: modules/websearch/lib/search_engine.py:2600
+#: modules/websearch/lib/search_engine.py:2623
+#: modules/websearch/lib/search_engine.py:2630
+#: modules/websearch/lib/search_engine.py:2637
+#: modules/websearch/lib/search_engine.py:2683
 msgid "The record has been deleted."
 msgstr "El registre ha estat suprimit."
 
-#: modules/websearch/lib/search_engine.py:3031
-#: modules/websearch/lib/websearch_templates.py:343
-#: modules/websearch/lib/websearch_templates.py:464
-#: modules/websearch/lib/websearch_templates.py:1292
-#: modules/websearch/lib/websearch_templates.py:1389
-#: modules/websearch/lib/websearch_templates.py:1448
-#: modules/websearch/lib/websearch_templates.py:1484
-#: modules/websearch/lib/websearch_templates.py:1507
-#: modules/websearch/lib/websearch_templates.py:1537
+#: modules/websearch/lib/search_engine.py:3049
+#: modules/websearch/lib/websearch_templates.py:344
+#: modules/websearch/lib/websearch_templates.py:465
+#: modules/websearch/lib/websearch_templates.py:1293
+#: modules/websearch/lib/websearch_templates.py:1390
+#: modules/websearch/lib/websearch_templates.py:1449
+#: modules/websearch/lib/websearch_templates.py:1485
+#: modules/websearch/lib/websearch_templates.py:1508
+#: modules/websearch/lib/websearch_templates.py:1538
 msgid "Browse"
 msgstr "Llista"
 
-#: modules/websearch/lib/search_engine.py:3214
+#: modules/websearch/lib/search_engine.py:3232
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en l'intèrval de temps especificat. "
 "Descartant aquesta condició..."
 
-#: modules/websearch/lib/search_engine.py:3235
+#: modules/websearch/lib/search_engine.py:3254
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en les limitacions que heu especificat. "
 "Descartant aquesta condició..."
 
-#: modules/websearch/lib/websearch_templates.py:306
+#: modules/websearch/lib/websearch_templates.py:307
 #, python-format
 msgid "Search %s records for:"
 msgstr "Cercar en %s registres per:"
 
-#: modules/websearch/lib/websearch_templates.py:339
-#: modules/websearch/lib/websearch_templates.py:1433
+#: modules/websearch/lib/websearch_templates.py:340
+#: modules/websearch/lib/websearch_templates.py:1434
 msgid "Advanced Search"
 msgstr "Cerca avançada"
 
-#: modules/websearch/lib/websearch_templates.py:406
+#: modules/websearch/lib/websearch_templates.py:407
 #, python-format
 msgid "Search %s records for"
 msgstr "Cercar en %s registres"
 
-#: modules/websearch/lib/websearch_templates.py:449
-#: modules/websearch/lib/websearch_templates.py:1349
+#: modules/websearch/lib/websearch_templates.py:450
+#: modules/websearch/lib/websearch_templates.py:1350
 msgid "Simple Search"
 msgstr "Cerca simple"
 
-#: modules/websearch/lib/websearch_templates.py:482
+#: modules/websearch/lib/websearch_templates.py:483
 msgid "Search options:"
 msgstr "Opcions de cerca:"
 
-#: modules/websearch/lib/websearch_templates.py:529
-#: modules/websearch/lib/websearch_templates.py:1530
+#: modules/websearch/lib/websearch_templates.py:530
+#: modules/websearch/lib/websearch_templates.py:1531
 msgid "Added since:"
 msgstr "Afegit des de:"
 
-#: modules/websearch/lib/websearch_templates.py:530
-#: modules/websearch/lib/websearch_templates.py:1531
+#: modules/websearch/lib/websearch_templates.py:531
+#: modules/websearch/lib/websearch_templates.py:1532
 msgid "until:"
 msgstr "fins:"
 
-#: modules/websearch/lib/websearch_templates.py:535
-#: modules/websearch/lib/websearch_templates.py:1571
+#: modules/websearch/lib/websearch_templates.py:536
+#: modules/websearch/lib/websearch_templates.py:1572
 msgid "Display results:"
 msgstr "Mostrar els resultats:"
 
-#: modules/websearch/lib/websearch_templates.py:536
-#: modules/websearch/lib/websearch_templates.py:1572
+#: modules/websearch/lib/websearch_templates.py:537
+#: modules/websearch/lib/websearch_templates.py:1573
 msgid "Output format:"
 msgstr "Format de visualizació:"
 
-#: modules/websearch/lib/websearch_templates.py:709
+#: modules/websearch/lib/websearch_templates.py:710
 msgid "Narrow by collection:"
 msgstr "Limitar per col·lecció:"
 
-#: modules/websearch/lib/websearch_templates.py:710
+#: modules/websearch/lib/websearch_templates.py:711
 msgid "Focus on:"
 msgstr "Enfocat a:"
 
-#: modules/websearch/lib/websearch_templates.py:744
+#: modules/websearch/lib/websearch_templates.py:745
 msgid "restricted"
 msgstr "restringit"
 
-#: modules/websearch/lib/websearch_templates.py:763
+#: modules/websearch/lib/websearch_templates.py:764
 #, fuzzy
 msgid "Search also:"
 msgstr "Resultats de la cerca"
 
-#: modules/websearch/lib/websearch_templates.py:823
+#: modules/websearch/lib/websearch_templates.py:824
 msgid "The contents of this collection is restricted."
 msgstr "Els continguts d'aquesta col·lecció són restringits."
 
-#: modules/websearch/lib/websearch_templates.py:838
+#: modules/websearch/lib/websearch_templates.py:839
 msgid "This collection does not contain any document yet."
 msgstr "Aquesta col·lecció encara no conté cap document."
 
-#: modules/websearch/lib/websearch_templates.py:872
-#: modules/websearch/lib/websearch_templates.py:1986
-#: modules/websearch/lib/websearch_templates.py:2000
-#: modules/websearch/lib/websearch_templates.py:2017
+#: modules/websearch/lib/websearch_templates.py:873
+#: modules/websearch/lib/websearch_templates.py:1987
+#: modules/websearch/lib/websearch_templates.py:2001
+#: modules/websearch/lib/websearch_templates.py:2018
 msgid "more"
 msgstr "més"
 
-#: modules/websearch/lib/websearch_templates.py:887
+#: modules/websearch/lib/websearch_templates.py:888
 msgid "Latest additions:"
 msgstr "Darreres entrades:"
 
-#: modules/websearch/lib/websearch_templates.py:976
-#: modules/websearch/lib/websearch_templates.py:1968
-#: modules/websearch/lib/websearch_templates.py:2346
+#: modules/websearch/lib/websearch_templates.py:977
+#: modules/websearch/lib/websearch_templates.py:1969
+#: modules/websearch/lib/websearch_templates.py:2347
 msgid "Similar records"
 msgstr "Registres semblants"
 
-#: modules/websearch/lib/websearch_templates.py:981
-#: modules/websearch/lib/websearch_templates.py:2351
+#: modules/websearch/lib/websearch_templates.py:982
+#: modules/websearch/lib/websearch_templates.py:2352
 msgid "Cited by"
 msgstr "Citat per"
 
-#: modules/websearch/lib/websearch_templates.py:1050
+#: modules/websearch/lib/websearch_templates.py:1051
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
 "Les paraules més properes a %(x_word)s dins %(x_field)s, a qualsevol "
 "col·lecció, són:"
 
-#: modules/websearch/lib/websearch_templates.py:1053
+#: modules/websearch/lib/websearch_templates.py:1054
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "Les paraules més properes a %(x_word)s, a qualsevol col·lecció, són:"
 
-#: modules/websearch/lib/websearch_templates.py:1145
+#: modules/websearch/lib/websearch_templates.py:1146
 msgid "Hits"
 msgstr "Resultats"
 
-#: modules/websearch/lib/websearch_templates.py:1206
-#: modules/websearch/lib/websearch_templates.py:1780
+#: modules/websearch/lib/websearch_templates.py:1207
+#: modules/websearch/lib/websearch_templates.py:1781
 msgid "next"
 msgstr "següent"
 
-#: modules/websearch/lib/websearch_templates.py:1299
-#: modules/websearch/lib/websearch_templates.py:1400
+#: modules/websearch/lib/websearch_templates.py:1300
+#: modules/websearch/lib/websearch_templates.py:1401
 msgid "Try your search on..."
 msgstr "Proveu la vostra cerca a..."
 
-#: modules/websearch/lib/websearch_templates.py:1479
+#: modules/websearch/lib/websearch_templates.py:1480
 msgid "collections"
 msgstr "col·leccions"
 
-#: modules/websearch/lib/websearch_templates.py:1501
+#: modules/websearch/lib/websearch_templates.py:1502
 msgid "Limit to:"
 msgstr "Limitar a:"
 
-#: modules/websearch/lib/websearch_templates.py:1541
-#: modules/websearch/lib/websearch_webcoll.py:543
+#: modules/websearch/lib/websearch_templates.py:1542
+#: modules/websearch/lib/websearch_webcoll.py:503
 msgid "results"
 msgstr "resultats"
 
-#: modules/websearch/lib/websearch_templates.py:1576
-#: modules/websearch/lib/websearch_webcoll.py:513
+#: modules/websearch/lib/websearch_templates.py:1577
+#: modules/websearch/lib/websearch_webcoll.py:473
 msgid "asc."
 msgstr "asc."
 
-#: modules/websearch/lib/websearch_templates.py:1579
-#: modules/websearch/lib/websearch_webcoll.py:514
+#: modules/websearch/lib/websearch_templates.py:1580
+#: modules/websearch/lib/websearch_webcoll.py:474
 msgid "desc."
 msgstr "desc."
 
-#: modules/websearch/lib/websearch_templates.py:1585
-#: modules/websearch/lib/websearch_webcoll.py:557
+#: modules/websearch/lib/websearch_templates.py:1586
+#: modules/websearch/lib/websearch_webcoll.py:517
 msgid "single list"
 msgstr "llista única"
 
-#: modules/websearch/lib/websearch_templates.py:1588
-#: modules/websearch/lib/websearch_webcoll.py:556
+#: modules/websearch/lib/websearch_templates.py:1589
+#: modules/websearch/lib/websearch_webcoll.py:516
 msgid "split by collection"
 msgstr "dividit per col·lecció"
 
-#: modules/websearch/lib/websearch_templates.py:1623
+#: modules/websearch/lib/websearch_templates.py:1624
 msgid "MARC tag"
 msgstr "Etiqueta MARC"
 
-#: modules/websearch/lib/websearch_templates.py:1737
-#: modules/websearch/lib/websearch_templates.py:1742
-#: modules/websearch/lib/websearch_templates.py:2086
+#: modules/websearch/lib/websearch_templates.py:1738
+#: modules/websearch/lib/websearch_templates.py:1743
+#: modules/websearch/lib/websearch_templates.py:2087
 #, python-format
 msgid "%s records found"
 msgstr "%s registres trobats"
 
-#: modules/websearch/lib/websearch_templates.py:1767
+#: modules/websearch/lib/websearch_templates.py:1768
 msgid "begin"
 msgstr "inici"
 
-#: modules/websearch/lib/websearch_templates.py:1771
+#: modules/websearch/lib/websearch_templates.py:1772
 #: modules/websubmit/lib/websubmit_templates.py:1168
 msgid "previous"
 msgstr "anterior"
 
 # Final, últim?
-#: modules/websearch/lib/websearch_templates.py:1784
+#: modules/websearch/lib/websearch_templates.py:1785
 msgid "end"
 msgstr "final"
 
-#: modules/websearch/lib/websearch_templates.py:1804
+#: modules/websearch/lib/websearch_templates.py:1805
 msgid "jump to record:"
 msgstr "anar al registre:"
 
-#: modules/websearch/lib/websearch_templates.py:1817
+#: modules/websearch/lib/websearch_templates.py:1818
 #, python-format
 msgid "Search took %s seconds."
 msgstr "La cerca s'ha fet en %s segons."
 
-#: modules/websearch/lib/websearch_templates.py:1893
-#: modules/websearch/lib/websearch_templates.py:1970
+#: modules/websearch/lib/websearch_templates.py:1894
+#: modules/websearch/lib/websearch_templates.py:1971
 msgid "ADD TO BASKET"
 msgstr "AFEGIR AL CISTELL"
 
-#: modules/websearch/lib/websearch_templates.py:1925
+#: modules/websearch/lib/websearch_templates.py:1926
 msgid "Format:"
 msgstr "Format:"
 
-#: modules/websearch/lib/websearch_templates.py:1963
+#: modules/websearch/lib/websearch_templates.py:1964
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
@@ -3113,25 +3115,25 @@ msgstr ""
 "Registre creat el %(x_date_creation)s, última modificació el %"
 "(x_date_modification)s"
 
-#: modules/websearch/lib/websearch_templates.py:1979
+#: modules/websearch/lib/websearch_templates.py:1980
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Citat por: %s registres"
 
-#: modules/websearch/lib/websearch_templates.py:1994
+#: modules/websearch/lib/websearch_templates.py:1995
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Co-citat amb: %s registres"
 
-#: modules/websearch/lib/websearch_templates.py:2011
+#: modules/websearch/lib/websearch_templates.py:2012
 msgid "People who downloaded this document also downloaded:"
 msgstr "Els usuaris que han baixat aquest document també han baixat:"
 
-#: modules/websearch/lib/websearch_templates.py:2026
+#: modules/websearch/lib/websearch_templates.py:2027
 msgid "People who viewed this page also viewed:"
 msgstr "Els usuaris que han vist aquesta pàgina també han vist:"
 
-#: modules/websearch/lib/websearch_templates.py:2073
+#: modules/websearch/lib/websearch_templates.py:2074
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -3140,37 +3142,37 @@ msgstr ""
 "%(x_fmt_open)sResultats globals:%(x_fmt_close)s Trobats %(x_nb_records)s "
 "registres en %(x_nb_seconds)s segons."
 
-#: modules/websearch/lib/websearch_templates.py:2113
+#: modules/websearch/lib/websearch_templates.py:2114
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "La cerca booleana no ha donat cap resultat. Proveu de combinar els vostres "
 "termes de cerca d'una altra manera."
 
-#: modules/websearch/lib/websearch_templates.py:2144
+#: modules/websearch/lib/websearch_templates.py:2145
 msgid "See also: similar author names"
 msgstr "Vegeu també: autors amb noms similars"
 
-#: modules/websearch/lib/websearch_webinterface.py:302
+#: modules/websearch/lib/websearch_webinterface.py:303
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Sembla ser que la col·lecció %s no existeix."
 
-#: modules/websearch/lib/websearch_webinterface.py:303
+#: modules/websearch/lib/websearch_webinterface.py:304
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Podeu començar a cercar des de %s."
 
-#: modules/websearch/lib/websearch_webinterface.py:304
+#: modules/websearch/lib/websearch_webinterface.py:305
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "No s'ha trobat la col·lecció %s"
 
-#: modules/websearch/lib/websearch_webinterface.py:306
+#: modules/websearch/lib/websearch_webinterface.py:307
 msgid "Not found"
 msgstr "No s'ha trobat"
 
-#: modules/websearch/lib/websearch_external_collections.py:126
+#: modules/websearch/lib/websearch_external_collections.py:129
 msgid "in"
 msgstr "dins"
 
@@ -3216,7 +3218,7 @@ msgstr "resultats"
 msgid "No results found."
 msgstr "No s'han trobat valors."
 
-#: modules/websearch/lib/websearch_webcoll.py:577
+#: modules/websearch/lib/websearch_webcoll.py:537
 msgid "brief"
 msgstr "breu"
 
@@ -4177,43 +4179,43 @@ msgstr "Editar el grup"
 msgid "Edit group members"
 msgstr "Editar els membres del grup"
 
-#: modules/webstyle/lib/webstyle_templates.py:517
-#: modules/webstyle/lib/webstyle_templates.py:554
-#: modules/webstyle/lib/webstyle_templates.py:556
+#: modules/webstyle/lib/webstyle_templates.py:514
+#: modules/webstyle/lib/webstyle_templates.py:551
+#: modules/webstyle/lib/webstyle_templates.py:553
 #: modules/websubmit/lib/websubmit_engine.py:1084
 #: modules/websubmit/lib/websubmit_webinterface.py:394
 msgid "Error"
 msgstr "Error"
 
-#: modules/webstyle/lib/webstyle_templates.py:521
+#: modules/webstyle/lib/webstyle_templates.py:518
 msgid "Browser"
 msgstr "Navegador"
 
-#: modules/webstyle/lib/webstyle_templates.py:543
+#: modules/webstyle/lib/webstyle_templates.py:540
 msgid "System Error"
 msgstr "Error de sistema"
 
-#: modules/webstyle/lib/webstyle_templates.py:558
+#: modules/webstyle/lib/webstyle_templates.py:555
 msgid "Traceback"
 msgstr "Traceback"
 
-#: modules/webstyle/lib/webstyle_templates.py:605
+#: modules/webstyle/lib/webstyle_templates.py:602
 msgid "Time"
 msgstr "Hora"
 
-#: modules/webstyle/lib/webstyle_templates.py:606
+#: modules/webstyle/lib/webstyle_templates.py:603
 msgid "Client"
 msgstr "Client"
 
-#: modules/webstyle/lib/webstyle_templates.py:608
+#: modules/webstyle/lib/webstyle_templates.py:605
 msgid "Please send an error report to the Administrator."
 msgstr "Si us plau envieu l'informe d'error a l'Administrador."
 
-#: modules/webstyle/lib/webstyle_templates.py:609
+#: modules/webstyle/lib/webstyle_templates.py:606
 msgid "Send error report"
 msgstr "Enviar l'informe d'error"
 
-#: modules/webstyle/lib/webstyle_templates.py:613
+#: modules/webstyle/lib/webstyle_templates.py:610
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Si us plau contacteu amb %s indicant-li la següent informació:"
