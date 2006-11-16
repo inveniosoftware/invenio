@@ -33,9 +33,7 @@ from invenio.search_engine import print_record
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
-                                     CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_WARNING_MESSAGES, \
-                                     CFG_WEBBASKET_ERROR_MESSAGES, \
                                      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webuser import isGuestUser
                             
@@ -249,9 +247,7 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     basket = db.get_basket_general_infos(bskid)
     if not(len(basket)):
         errors.append('ERR_WEBBASKET_DB_ERROR')
-        return (body, errors, warnings)
-    basket = basket[0]
-    
+        return (body, errors, warnings)    
     item_html = webbasket_templates.tmpl_item(basket, 
                                               recid, record, comments,
                                               group_sharing_level, 
@@ -393,9 +389,11 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
                 topic = topics[create_in_topic]
             except IndexError:
                 topic = ''
-        #it may be useful to add a warning message when no topic is selected 
-        elif create_in_topic == -1:
+        else:
             topic = ''
+            warnings.append('WRN_WEBBASKET_NO_GIVEN_TOPIC')
+            body += webbasket_templates.tmpl_warnings(warnings, ln)
+            bskids = []
         if topic:
             id_bsk = db.create_basket(uid, new_basket_name, topic)
             bskids.append(id_bsk)
@@ -411,7 +409,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
         group_baskets = db.get_all_group_baskets_names(uid)
         external_baskets = db.get_all_external_baskets_names(uid)
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-        body = webbasket_templates.tmpl_add(recids=recids,
+        body += webbasket_templates.tmpl_add(recids=recids,
                                             personal_baskets=personal_baskets,
                                             group_baskets=group_baskets,
                                             external_baskets=external_baskets,
@@ -457,7 +455,9 @@ def delete_record(uid, bskid, recid):
     @param bskid: basket id
     @param recid: record id
     """
-    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELITM']):
+    if __check_user_can_perform_action(uid, 
+                                       bskid, 
+                                       CFG_WEBBASKET_SHARE_LEVELS['DELITM']):
         db.delete_item(bskid, recid)
 
 def move_record(uid, bskid, recid, direction):
@@ -467,21 +467,25 @@ def move_record(uid, bskid, recid, direction):
     @param recid: record we want to move
     @param direction: CFG_WEBBASKET_ACTIONS['UP'] or CFG_WEBBASKET_ACTIONS['DOWN']
     """
-    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']):
+    if __check_user_can_perform_action(uid, 
+                                       bskid, 
+                                       CFG_WEBBASKET_SHARE_LEVELS['MANAGE']):
         db.move_item(bskid, recid, direction)
 
 def perform_request_edit(uid, bskid, topic=0, new_name='', 
                          new_topic = '', new_topic_name='',
                          groups=[], external='', 
                          ln=cdslang):
-    """Interface for management of basket. If names, groups or external is provided, 
-    will save new rights into database, else will provide interface.
+    """Interface for management of basket. If names, groups or external is
+     provided, will save new rights into database, else will provide interface.
     @param uid: user id (user has to have sufficient rights on this basket
     @param bskid: basket id to change rights on
     @param topic: topic currently used (int)
     @param new_name: new name of basket
-    @param new_topic: topic in which to move basket (int), new_topic_name must be left blank
-    @param new_topic_name: new topic in which to move basket (will overwrite param new_topic)
+    @param new_topic: topic in which to move basket (int), 
+                      new_topic_name must be left blank
+    @param new_topic_name: new topic in which to move basket 
+                           (will overwrite param new_topic)
     @param groups: list of strings formed in this way: group_id + '_' + rights
     @param external: rights for everybody (can be 'NO')
     @param ln: language
@@ -510,9 +514,12 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
         else:
             display_sharing = 1
         body = webbasket_templates.tmpl_edit(bskid=bskid, bsk_name=bsk_name, 
-                                             display_general=display_general, topics=topics, topic=topic, 
-                                             display_delete=display_delete, display_sharing=display_sharing,
-                                             groups_rights=groups_rights, external_rights=external_rights, 
+                                             display_general=display_general,
+                                             topics=topics, topic=topic, 
+                                             display_delete=display_delete,
+                                             display_sharing=display_sharing,
+                                             groups_rights=groups_rights,
+                                             external_rights=external_rights, 
                                              ln=ln)
     else:
         out_groups = {}
@@ -541,7 +548,8 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
     return (body, errors, warnings)
     
 def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
-    """If group id is specified, share basket bskid to this group with READITM rights;
+    """If group id is specified, share basket bskid to this group with 
+    READITM rights;
     else return a page for selection of a group.
     @param uid: user id (selection only of groups user is member of)
     @param bskid: basket id
@@ -550,7 +558,9 @@ def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
     @param ln: language
     """
     if group_id:
-        db.share_basket_with_group(bskid, group_id, CFG_WEBBASKET_SHARE_LEVELS['READITM'])
+        db.share_basket_with_group(bskid, 
+                                   group_id, 
+                                   CFG_WEBBASKET_SHARE_LEVELS['READITM'])
     else:
         groups = db.get_groups_user_member_of(uid)
         body = webbasket_templates.tmpl_add_group(bskid, topic, groups, ln)
@@ -558,7 +568,8 @@ def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
 
 def perform_request_create_basket(uid,
                                   new_basket_name='',
-                                  new_topic_name='', create_in_topic=-1, topic_number=-1,
+                                  new_topic_name='', create_in_topic=-1,
+                                  topic_number=-1,
                                   ln=cdslang):
     """if new_basket_name and topic infos are given create a basket and return topic number,
     else return (body, errors, warnings) tuple of basket creation form.
@@ -590,7 +601,8 @@ def perform_request_create_basket(uid,
         if topic_number in range (0, len(topics)):
             create_in_topic = topics[topic_number]
         body = webbasket_templates.tmpl_create_basket(new_basket_name,
-                                                      new_topic_name, create_in_topic,
+                                                      new_topic_name,
+                                                      create_in_topic,
                                                       topics,
                                                       ln)
         return (body, [], [])
@@ -605,7 +617,7 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
     errors = []
     warnings = []
     basket = db.get_public_basket_infos(bskid)
-    if of[0]=='x':
+    if of[0] == 'x':
         items = []
         if len(basket) == 7:
             content = db.get_basket_content(bskid)
@@ -682,7 +694,8 @@ def __check_user_can_perform_action(uid, bskid, rights):
 def __check_sufficient_rights(rights_user_has, rights_needed):
     """Private function, check if the rights are sufficient."""
     try:
-        out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_needed)
+        out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= \
+              CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_needed)
     except ValueError:
         out = 0
     return out
@@ -702,13 +715,15 @@ def create_personal_baskets_selection_box(uid,
     @param ln: language
     """
     baskets = db.get_all_personal_baskets_names(uid)
-    return webbasket_templates.tmpl_personal_baskets_selection_box(baskets,
-                                                                   html_select_box_name,
-                                                                   selected_bskid,
-                                                                   ln)
+    return webbasket_templates.tmpl_personal_baskets_selection_box(
+                                        baskets,
+                                        html_select_box_name,
+                                        selected_bskid,
+                                        ln)
 
 def create_basket_navtrail(uid, 
-                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'], topic=0, group=0, 
+                           category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                           topic=0, group=0, 
                            bskid=0, ln=cdslang):
     """display navtrail for basket navigation.
     @param uid: user id (int)
@@ -720,61 +735,76 @@ def create_basket_navtrail(uid,
     _ = gettext_set_language(ln)
     out = ''
     if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
-        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Personal baskets"))
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
+               '%s</a>'
+        out %= (weburl, 
+                'category=' + category + '&amp;ln=' + ln, 
+                _("Personal baskets"))
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         if topic in range(0, len(topics)):
             out += ' &gt; '
-            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
+            out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
+                   '%s</a>'
             out %= (weburl,
-                    'category=' + category + '&amp;topic=' + str(topic) + '&amp;ln=' + ln,
+                    'category=' + category + '&amp;topic=' + \
+                                  str(topic) + '&amp;ln=' + ln,
                     cgi.escape(topics[topic]))
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
                     out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
+                    out += '<a class="navtrail" href="%s/yourbaskets/display'\
+                           '?%s">%s</a>'
                     out %= (weburl,
-                            'category=' + category + '&amp;topic=' + str(topic) + \
-                            '&amp;ln=' + ln + '#bsk' + str(bskid),
+                            'category=' + category + '&amp;topic=' + \
+                            str(topic) + '&amp;ln=' + ln + '#bsk' + str(bskid),
                             cgi.escape(basket[1]))
                 
     elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
+               '%s</a>'
         out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
         groups = db.get_group_infos(uid)
         if group:
-            groups = filter(lambda x: x[0]==group, groups)
+            groups = filter(lambda x: x[0] == group, groups)
         if len(groups):
             out += ' &gt; '
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
             out %= (weburl,
-                    'category=' + category + '&amp;group=' + str(group) + '&amp;ln=' + ln,
+                    'category=' + category + '&amp;group=' + \
+                              str(group) + '&amp;ln=' + ln,
                     cgi.escape(groups[0][1]))
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
                     out += ' &gt; '
-                    out += '<a class="navtrail" href="%s/yourbaskets/display?%s"">%s</a>'
+                    out += '<a class="navtrail" href="%s/yourbaskets/display?'\
+                           '%s">%s</a>'
                     out %= (weburl,
-                            'category=' + category + '&amp;group=' + str(group) + \
-                            '&amp;ln=' + ln + '#bsk' + str(bskid),
+                            'category=' + category + '&amp;group=' + \
+                            str(group) + '&amp;ln=' + ln + '#bsk' + str(bskid),
                             cgi.escape(basket[1]))
     elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
-        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
-        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Others' baskets"))
+        out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
+               '%s</a>'
+        out %= (weburl, 
+                'category=' + category + '&amp;ln=' + ln, 
+                _("Others' baskets"))
         if bskid:
             basket = db.get_public_basket_infos(bskid)
             if basket:
                 out += ' &gt; '
-                out += '<a class="navtrail" href="%s/yourbaskets/display?%s"">%s</a>'
+                out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
+                       '%s</a>'
                 out %= (weburl,
-                        'category=' + category + '&amp;ln=' + ln + '#bsk' + str(bskid),
+                        'category=' + category + '&amp;ln=' + ln + \
+                        '#bsk' + str(bskid),
                         cgi.escape(basket[1]))
     return out
 
 def create_infobox(infos=[]):
-    """Create an infos box. infos param should be a list of strings. Return formatted infos"""
+    """Create an infos box. infos param should be a list of strings. 
+    Return formatted infos"""
     return webbasket_templates.tmpl_create_infobox(infos)
 
 def account_list_baskets(uid, ln=cdslang):

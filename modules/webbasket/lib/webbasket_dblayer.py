@@ -689,7 +689,7 @@ def get_all_external_baskets_names(uid,
 def get_public_basket_infos(bskid):
     """return (id, name, date modification, nb of views, id of owner, nickname of owner, rights for public access) 
     for a given basket"""
-    basket = ()
+    basket = []
     query1 = """SELECT bsk.id,
                        bsk.name,
                        DATE_FORMAT(bsk.date_modification, '%%Y-%%m-%%d %%H:%%i:%%s'),
@@ -732,7 +732,7 @@ def get_basket_general_infos(bskid):
     if res:
         query2 = "UPDATE bskBASKET SET nb_views=nb_views+1 WHERE id=%i"
         run_sql(query2 % int(bskid))
-        return res
+        return res[0]
     return ()
 
 def count_public_baskets():
@@ -761,9 +761,9 @@ def get_public_baskets_list(inf_limit, max_number, order=1, asc=1):
                                     on bsk.id_owner=u.id
                WHERE ugbsk.id_usergroup=0
     """
-    if order==2:
+    if order == 2:
         query += 'ORDER BY bsk.nb_views'
-    elif order==3:
+    elif order == 3:
         query += 'ORDER BY u.nickname'
         if asc:
             query += ' ASC'
