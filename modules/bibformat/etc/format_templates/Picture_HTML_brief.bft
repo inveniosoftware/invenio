@@ -6,7 +6,7 @@
 <tr> 
 <td valign="top" align="left">
 <BFE_TITLE_BRIEF prefix="<b>" suffix="</b>" highlight="no"/>
-<BFE_FIELD tag="246_1$a" prefix="<br/><b><i>" suffix="</i></b>"/>
+<BFE_FIELD tag="246_1a" prefix="<br/><b><i>" suffix="</i></b>"/>
 
 <BFE_DATE prefix="<br/> " />
 
@@ -20,7 +20,7 @@ highlight="no" print_lang='en'/>
 
 <BFE_PRIMARY_REPORT_NUMBER prefix="<br/><i>Picture number</i>: " />
 
-<BFE_FIELD tag="909CP$t" prefix="<br/><I>Available picture(s)</i>: "/>
+<BFE_FIELD tag="909CPt" prefix="<br/><I>Available picture(s)</i>: "/>
 
 </td> <td valign="top" align="right">
 
