@@ -156,7 +156,7 @@ class HTMLWasher(HTMLParser):
                 for (attr, value) in attrs:
                     self.result += ' %s="%s"' % \
                                      (attr, cgi.escape(value, True))
-                result += ' /&gt;'
+                self.result += ' /&gt;'
                                 
     def handle_attribute_value(self, value):
         """Check attribute. Especially designed for avoiding URLs in the form:
