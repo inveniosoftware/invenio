@@ -21,44 +21,59 @@
 
 """External user authentication for CDS Invenio."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 import httplib
 import urllib
 import re
 
+from invenio.config import etcdir
+
 class external_auth_nice:
-    """External authentication example for a custom HTTPS-based
-    authentication service (CERN NICE)."""
+    """
+    External authentication example for a custom HTTPS-based
+    authentication service (CERN NICE).
+    """
     
     users = {}
     name = ""
 
     def __init__(self):
         """Initialize stuff here"""
-        pass
+        self._cern_nice_soap_auth = \
+          open(etcdir + "/webaccess/cern_nice_soap_credentials.txt",
+               "r").read().strip()
 
     def auth_user(self, username, password):
-        """Check USERNAME and PASSWORD against CERN NICE database.
+        """
+        Check USERNAME and PASSWORD against CERN NICE database.
         Return None if authentication failed, email address of the
-        person if authentication succeeded."""
-        params = urllib.urlencode({'Username': username, 'Password': password})
-        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        conn = httplib.HTTPSConnection("weba5.cern.ch") 
-        conn.request("POST", "/WinServices/Authentication/CDS/default.asp", params, headers)
+        person if authentication succeeded.
+        """
+        
+        params = urllib.urlencode({'UserName': username, 'Password': password})
+        headers = {"Content-type": "application/x-www-form-urlencoded",
+                   "Accept": "text/plain",
+                   "Authorization": "Basic " + self._cern_nice_soap_auth}
+        conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch") 
+        conn.request("POST",
+                "/winservices-soap/generic/Authentication.asmx/GetUserInfo",
+                params, headers)
         response = conn.getresponse()
         data = response.read()
         conn.close()
-        m = re.search('<CCID>\d+</CCID>', data)
-        if m:
-            m = m.group()
-            CCID = int(re.search('\d+', m).group())
-            if CCID > 0:
-                m = re.search('<EMAIL>.*?</EMAIL>', data)
-                if m:
-                    email = m.group()
-                    email = email.replace('<EMAIL>', '')   
-                    email = email.replace('</EMAIL>', '')  
+        
+        match = re.search('<ccid>\d+</ccid>', data)
+        if match:
+            match = match.group()
+            ccid = int(re.search('\d+', match).group())
+            if ccid > 0:
+                match = re.search('<email>.*?</email>', data)
+                if match:
+                    email = match.group()
+                    email = email.replace('<email>', '')   
+                    email = email.replace('</email>', '')  
                     return email 
         return None
 
