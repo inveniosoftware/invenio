@@ -183,15 +183,22 @@ Here are some tips for writing easily translatable output messages:
        not: _("This is <a href="%s">homepage</a>.")
        not: _("This is %(x_url_open)shomepage%(x_url_close)s.")
  
-  - Do not leave unnecessary things in messages, such as extraneous
-    spaces or colons before or after the translatable expressions.
-    Rather put them in the business logic:
+  - Do not leave unnecessary things in short commonly used
+    translatable expressions, such as extraneous spaces or colons
+    before or after them.  Rather put them in the business logic:
  
        not: _(" subject")
        but: " " + _("subject")
  
        not: _("Record %i:")
        but: _("Record") + "%i:" % recID
+
+    On the other hand, in long sentences when the trailing punctuation
+    has its meaning as an integral part of the label to be shown on
+    the interface, you should leave them:
+
+       not: _("Nearest terms in any collection are")
+       but: _("Nearest terms in any collection are:")
  
   - Last but not least: the best is to follow the style of existing
     messages as a model, so that the translators are presented with a
