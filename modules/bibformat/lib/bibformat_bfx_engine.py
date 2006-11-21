@@ -92,7 +92,7 @@ class BFXParser:
         self.start_template_name = None #the name of the template from which the 'execution' starts; 
                                         #this is usually a format or the only template found in a doc
 
-    def load_template(self, template_name):
+    def load_template(self, template_name, template_source=None):
         '''
         Load a BFX template file.
         A template file can have one of two forms:
@@ -100,12 +100,20 @@ class BFXParser:
               In an API call the single template element is 'executed'.
             - it is a 'style' file which contains exactly one format and zero or more templates. Root tag is 'style' with children 'format' and 'template'(s).
               In this case only the format code is 'executed'. Naturally, in it, it would have references to other templates in the document.
+
+        Template can be given by name (in that case search path is in
+        standard directory for bfx template) or directly using the template source.
+        If given, template_source overrides template_name
+        
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
-        template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + '/' + template_name + '.' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
-        #load document
-        doc = minidom.parse(template_file_name)
+        if template_source == None:
+            template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + '/' + template_name + '.' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
+            #load document
+            doc = minidom.parse(template_file_name)
+        else:
+            doc = minidom.parseString(template_source)
         #set exec flag to false and walk document to find templates and formats
         self.flags['exec'] = False
         self.walk(doc)
