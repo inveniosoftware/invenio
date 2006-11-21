@@ -61,7 +61,7 @@ if processor_type == -1:
 ##     except ImportError:
 ##         pass
 
-CFG_XSLT_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
+CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -84,7 +84,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         template = template_source
     elif template_filename:
         try:
-            path_to_templates = (CFG_XSLT_TEMPLATES_PATH + os.sep +
+            path_to_templates = (CFG_BIBCONVERT_XSL_PATH + os.sep +
                                  template_filename)
             if os.path.exists(path_to_templates):
                 template = file(path_to_templates).read()
