@@ -310,7 +310,7 @@ Comment:    comment_id      = %(cmt_id)s
 %(cmt_body)s
 ---end body---
 
-Please go to the Comments Admin Panel %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
+Please go to the WebComment Admin interface %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
                 {   'cfg-report_max'        : CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,
                     'nickname'              : nickname,
                     'user_email'            : user_email,
@@ -327,7 +327,7 @@ Please go to the Comments Admin Panel %(comment_admin_link)s to delete this mess
                     'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
                     'cmt_body'              : cmt_body,
-                    'comment_admin_link'    : "http://%s/admin/webcomment/" % weburl, 
+                    'comment_admin_link'    : weburl + "/admin/webcomment/",
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
 
