@@ -9,15 +9,9 @@
           
           <bx:elif name="doc_type" eq="ARTICLE">
             <bx:then><bx:template_ref name="NLM_ARTICLE"/></bx:then>
-            
-            <bx:elif name="doc_type" eq="REPORT">
-              <bx:then><bx:template_ref name="NLM_REPORT"/></bx:then>
-              
-              <bx:else name="doc_type" eq="THESIS">
-                 <bx:template_ref name="NLM_THESIS"/>
-                
-              </bx:else>    
-            </bx:elif>
+          </bx:elif>
+          <bx:elif name="doc_type" in="REPORT THESIS">
+            <bx:then><bx:template_ref name="NLM_REPORT"/></bx:then>
           </bx:elif>
         </bx:if>
         
@@ -29,17 +23,29 @@
       <front>
         <journal-meta>
           <journal-title><bx:field name="journal_name_long"/></journal-title>
-          <abbrev-journal-title><bx:field name="journal_name_short"/></abbrev-journal-title>
+          <bx:if name="journal_name_short">
+            <bx:then>  
+              <abbrev-journal-title><bx:field name="journal_name_short"/></abbrev-journal-title>
+            </bx:then>
+          </bx:if> 
           <issn><bx:field name="issn"/></issn>
-          <publisher>
-            <publisher-name><bx:field name="publisher"/></publisher-name>
-          </publisher>
+          <bx:if name="publisher">
+            <bx:then>
+              <publisher>
+                  <publisher-name><bx:field name="publisher"/></publisher-name>
+              </publisher>
+            </bx:then>
+          </bx:if>
         </journal-meta>
         <article-meta>
           <title-group>
             <article-title><bx:field name="title"/></article-title>
           </title-group>
-          <article-id pub-id-type="doi"><bx:field name="doi"/></article-id>
+          <bx:if name="doi">
+            <bx:then>
+              <article-id pub-id-type="doi"><bx:field name="doi"/></article-id>
+            </bx:then>
+          </bx:if>
           <contrib-group>
             <contrib contrib-type="author">
               <bx:loop object="author">
@@ -70,7 +76,9 @@
             <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>  
         </article-meta>
-        <abstract><bx:field name="abstract"/></abstract>
+        <bx:if name="abstract">
+          <bx:then><abstract><bx:field name="abstract"/></abstract></bx:then>
+        </bx:if>
       </front>
       <article-type>research-article</article-type>
       <ref>
@@ -88,13 +96,21 @@
       <front>
         <publisher>
             <publisher-name><bx:field name="publisher"/></publisher-name>
-            <publisher-loc><bx:field name="publisher_location"/></publisher-loc>
+            <bx:if name="abstract">
+              <bx:then>  
+                <publisher-loc><bx:field name="publisher_location"/></publisher-loc>
+              </bx:then>
+            </bx:if>
         </publisher>
         <article-meta>
           <title-group>
             <article-title><bx:field name="title"/></article-title>
           </title-group>
-          <article-id pub-id-type="publisher-id"><bx:field name="article_id"/></article-id>
+          <bx:if name="doi">
+            <bx:then>
+              <article-id pub-id-type="doi"><bx:field name="doi"/></article-id>
+            </bx:then>
+          </bx:if>
           <contrib-group>
             <contrib contrib-type="author">
               <bx:loop object="author">           
@@ -119,7 +135,9 @@
             <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>        
         </article-meta>
-        <abstract><bx:field name="abstract"/></abstract>
+        <bx:if name="abstract">
+          <bx:then><abstract><bx:field name="abstract"/></abstract></bx:then>
+        </bx:if>
       </front>
       <article-type>technical-report</article-type>
     </article>
@@ -150,16 +168,13 @@
             <self-uri xlink:href="[!uri]" xmlns:xlink="http://www.w3.org/1999/xlink/"/>
           </bx:loop>  
         </article-meta>
-        <abstract><bx:field name="abstract"/></abstract>
+        <bx:if name="abstract">
+          <bx:then><abstract><bx:field name="abstract"/></abstract></bx:then>
+        </bx:if>
       </front>
       <article-type>
         <bx:field name="doc_type"/>
       </article-type>
     </article>
   </bx:template>
-
-  <bx:template name="NLM_THESIS">
-  
-  </bx:template>
-
 </bx:style>
