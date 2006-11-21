@@ -36,6 +36,7 @@ Contents
           $ sudo apt-get install libapache2-mod-python2.3 \
               apache2-mpm-prefork mysql-server mysql-client \
               python2.3-mysqldb python2.3-numeric python2.3-4suite \
+              python2.3-libxml2 python2.3-libxslt1 \
               rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
 
@@ -79,9 +80,12 @@ Contents
              <http://sourceforge.net/projects/pystemmer/>
           - (recommended) PyRXP, for very fast XML MARC processing: 
              <http://www.reportlab.org/pyrxp.html>
+          - (recommended) libxml2-python, for XML/XLST processing:
+             <ftp://xmlsoft.org/libxml2/python/>
           - (recommended) Gnuplot.Py, for producing graphs:
              <http://gnuplot-py.sourceforge.net/>
-          - (optional) 4suite, slower alternative to PyRXP: 
+          - (optional) 4suite, slower alternative to PyRXP and
+             libxml2-python:
              <http://4suite.org/>
           - (optional) Psyco, to speed up the code at places:
              <http://psyco.sourceforge.net/>
