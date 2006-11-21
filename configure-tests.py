@@ -160,6 +160,42 @@ except ImportError, e:
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
+    import libxml2
+except ImportError, e:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that libxml2 is not really required but    **
+    ** we recommend it for fast XML parsing.           **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """ % e
+    wait_for_user("Press ENTER to continue the installation...")
+
+try:
+    import libxslt
+except ImportError, e:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that libxslt is not really required but    **
+    ** we recommend it for XML metadata conversions.   **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """ % e
+    wait_for_user("Press ENTER to continue the installation...")
+
+try:
     import Gnuplot
 except ImportError, e:
     print """
