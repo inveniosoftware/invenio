@@ -41,11 +41,52 @@ except ImportError, e:
 
 try:
     from invenio.search_engine import perform_request_search
+    from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
     from invenio.config import *
-    from invenio import bibconvert 
+    from invenio import bibconvert
+    from invenio import bibconvert_bfx_engine
+    from invenio import bibconvert_xslt_engine
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
+
+
+def printInfo():
+    "print out when not enough parmeters given"
+    
+    print """
+    BibConvert data convertor
+    Usage: bibconvert [options] -ctemplate.cfg < input.dat
+           bibconvert -ctemplate.bfx < input.dat
+           bibconvert -ctemplate.xsl < input.dat
+           
+           Options (excepted -c) are ignored when bfx or xsl templates are used.
+
+           BibConvert can convert:
+              - XML data using XSL or bfx templates.
+              - Textual (line-oriented) data using cfg templates files.
+              
+    Options:
+       -c'config'                 	configuration templates file
+       -d'directory'              	source_data fields are located in separated files in 'directory'one record)
+       -h                         	print this help
+       -V                         	print version number
+       -l'length'               	minimum line length (default = 1)
+       -o'value'               	        OAI identifier starts with specified value (default = 1)
+       -b'file header'            	insert file header
+       -e'file footer'            	insert file footer
+       -B'record header'            	insert record header
+       -E'record footer'            	insert record footer
+       -s'record separator'        	record separator, default empty line (EOLEOL)
+
+       -m0'query_string' 		match records using query string, output unmatched
+       -m1'query_string'                match records using query string, output matched
+       -m2'query_string'                match records using query string, output ambiguous
+     
+       -Cx'field extraction template'   alternative to -c when configuration is split to several files
+       -Cs'source data template'    	alternative to -c when configuration is split to several files
+       -Ct'target data template'    	alternative to -c when configuration is split to several files
+    """
 
 ### MAIN ###
 
@@ -65,7 +106,8 @@ begin_header         = ""
 ending_footer        = ""
 oai_identifier_from  = 1
 extract_tpl          = ""
-      
+config_template      = ""
+       
 opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
              [
                "config",
@@ -90,31 +132,42 @@ Xcount  = 0
 
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
+        if opt_value.endswith('.'+
+                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
+            pass
+        elif opt_value.endswith('.xsl'):
+            pass
+        else:
+            separator            = bibconvert.get_other_par("_RECSEP_", opt_value)
+            output_rec_sep       = ""
+            query_string         = bibconvert.get_other_par("_QRYSTR_", opt_value)
+            match_mode           = bibconvert.get_other_par("_MATCH_", opt_value)
+            begin_header         = bibconvert.get_other_par("_HEAD_", opt_value)
+            ending_footer        = bibconvert.get_other_par("_FOOT_", opt_value)
+            begin_record_header  = bibconvert.get_other_par("_RECHEAD_", opt_value)
+            ending_record_footer = bibconvert.get_other_par("_RECFOOT_", opt_value)
 
-        separator            = bibconvert.get_other_par("_RECSEP_", opt_value)
-        output_rec_sep       = ""
-        query_string         = bibconvert.get_other_par("_QRYSTR_", opt_value)
-        match_mode           = bibconvert.get_other_par("_MATCH_", opt_value)
-        begin_header         = bibconvert.get_other_par("_HEAD_", opt_value)
-        ending_footer        = bibconvert.get_other_par("_FOOT_", opt_value)
-        begin_record_header  = bibconvert.get_other_par("_RECHEAD_", opt_value)
-        ending_record_footer = bibconvert.get_other_par("_RECFOOT_", opt_value)
-
-        if(match_mode == ""):
-            match_mode = -1
+            if(match_mode == ""):
+                match_mode = -1
 
 
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
-
-        extract_tpl = opt_value
-        extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
-
-        source_tpl  = opt_value
-        source_tpl_parsed  = bibconvert.parse_common_template(source_tpl,2)
-
-        target_tpl  = opt_value 
-        target_tpl_parsed  = bibconvert.parse_common_template(target_tpl,3)
+        config_template = opt_value
+        if opt_value.endswith('.'+
+                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
+            pass
+        elif opt_value.endswith('.xsl'):
+            pass
+        else:
+            extract_tpl = opt_value
+            extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
+        
+            source_tpl  = opt_value
+            source_tpl_parsed  = bibconvert.parse_common_template(source_tpl,2)
+            
+            target_tpl  = opt_value 
+            target_tpl_parsed  = bibconvert.parse_common_template(target_tpl,3)
 
     elif opt in ["-d", "--directory"]:
         source_data       = opt_value
@@ -124,7 +177,7 @@ for opt, opt_value in opts:
         dirmode           = 1
 
     elif opt in ["-h", "--help"]:
-        bibconvert.printInfo()
+        printInfo()
         sys.exit(0)
 
     elif opt in ["-V", "--version"]:
@@ -177,37 +230,50 @@ for opt, opt_value in opts:
             source_tpl_parsed  = bibconvert.parse_template(source_tpl)
 
 
-if(extract_tpl == ""):
-    bibconvert.printInfo()
+# Check config is given in parameters
+if(config_template == ""):
+    printInfo()
     sys.exit(0)
 
 
-if(separator == "EOLEOL"):
-    separator = ""
+# Redirect to processor for given config file
+if opt_value.endswith('.'+
+                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
+    # BibConvert for bfx
+    source_xml = sys.stdin.read()
+    print bibconvert_bfx_engine.convert(source_xml, config_template)
+    
+elif opt_value.endswith('.xsl'):
+    # BibConvert for XSLT
+    source_xml = sys.stdin.read()
+    print bibconvert_xslt_engine.convert(source_xml, config_template)
+else:
+    # BibConvert for cfg
 
+    if(separator == "EOLEOL"):
+        separator = ""
 
-ar_.append(dirmode)
-ar_.append(Xcount)
-ar_.append(conv_setting)
-ar_.append(sysno)
-ar_.append(sysno500)
-ar_.append(separator)
-ar_.append(tcounter)
-ar_.append(source_data)
-ar_.append(query_string)
-ar_.append(match_mode)
-ar_.append(begin_record_header)
-ar_.append(ending_record_footer)
-ar_.append(output_rec_sep)
-ar_.append(begin_header)
-ar_.append(ending_footer)
-ar_.append(oai_identifier_from)
-ar_.append(source_tpl)
-ar_.append(source_tpl_parsed)
-ar_.append(target_tpl)
-ar_.append(target_tpl_parsed)
-ar_.append(extract_tpl)
-ar_.append(extract_tpl_parsed)
-
-bibconvert.convert(ar_)
-
+    ar_.append(dirmode)
+    ar_.append(Xcount)
+    ar_.append(conv_setting)
+    ar_.append(sysno)
+    ar_.append(sysno500)
+    ar_.append(separator)
+    ar_.append(tcounter)
+    ar_.append(source_data)
+    ar_.append(query_string)
+    ar_.append(match_mode)
+    ar_.append(begin_record_header)
+    ar_.append(ending_record_footer)
+    ar_.append(output_rec_sep)
+    ar_.append(begin_header)
+    ar_.append(ending_footer)
+    ar_.append(oai_identifier_from)
+    ar_.append(source_tpl)
+    ar_.append(source_tpl_parsed)
+    ar_.append(target_tpl)
+    ar_.append(target_tpl_parsed)
+    ar_.append(extract_tpl)
+    ar_.append(extract_tpl_parsed)
+    
+    bibconvert.convert(ar_)

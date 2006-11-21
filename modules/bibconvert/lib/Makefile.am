@@ -19,7 +19,9 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibconvert.py bibconvert_tests.py
+pylib_DATA = bibconvert.py bibconvert_tests.py	\
+	     bibconvert_bfx_engine.py \
+	     bibconvert_xslt_engine.py
 
 EXTRA_DIST = $(pylib_DATA)
 

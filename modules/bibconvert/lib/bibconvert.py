@@ -1670,36 +1670,6 @@ def format_field(value, fn):
 
     return out
 
-def printInfo():
-    "print out when not enough parmeters given"
-    
-    print """
-    BibConvert data convertor
-    Usage: bibconvert [options] -ctemplate.cfg < input.dat
-
-    Options:
-       -c'config'                 	configuration templates file
-       -d'directory'              	source_data fields are located in separated files in 'directory'one record)
-       -h                         	print this help
-       -V                         	print version number
-       -l'length'               	minimum line length (default = 1)
-       -o'value'               	        OAI identifier starts with specified value (default = 1)
-       -b'file header'            	insert file header
-       -e'file footer'            	insert file footer
-       -B'record header'            	insert record header
-       -E'record footer'            	insert record footer
-       -s'record separator'        	record separator, default empty line (EOLEOL)
-
-       -m0'query_string' 		match records using query string, output unmatched
-       -m1'query_string'                match records using query string, output matched
-       -m2'query_string'                match records using query string, output ambiguous
-     
-       -Cx'field extraction template'   alternative to -c when configuration is split to several files
-       -Cs'source data template'    	alternative to -c when configuration is split to several files
-       -Ct'target data template'    	alternative to -c when configuration is split to several files
-    """
-
-
 ## Match records with the database content
 ##
 

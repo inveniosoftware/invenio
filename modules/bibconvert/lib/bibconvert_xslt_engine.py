@@ -1,0 +1,146 @@
+# -*- coding: utf-8 -*-
+##
+## $Id$
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.  
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+bibconvert_xslt_engine - Wrapper for an XSLT engine
+
+Dependencies: Need one of the following XSLT processors:
+              - libxml2 & libxslt
+              - 4suite
+
+Used by: bibconvert.in
+"""
+
+__revision__ = "$Id$"
+
+import sys
+import os
+
+from invenio.config import etcdir
+
+# Import one XSLT processor
+processor_type = -1
+try:
+    # libxml2 & libxslt
+    processor_type = 0
+    import libxml2
+    import libxslt
+except ImportError:
+    pass
+if processor_type == -1:
+    try:
+        # 4suite
+        processor_type = 1
+        from Ft.Xml.Xslt import Processor
+        from Ft.Xml import InputSource
+    except ImportError:
+        pass
+## if processor_type == -1:
+##     try:
+##         # Pyana
+##         processor_type = 2
+##         import Pyana
+##     except ImportError:
+##         pass
+
+CFG_XSLT_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
+
+def convert(xmltext, template_filename=None, template_source=None):
+    """
+    Processes an XML text according to a template, and returns the result.
+
+    The template can be given either by name (or by path) or by source.
+    If source is given, name is ignored.
+
+    bibconvert_xslt_engine will look for template_filename in standard directories
+    for templates. If not found, template_filename will be assumed to be a path to
+    a template. If none can be found, return None.
+
+    @param xmltext The string representation of the XML to process
+    @param template_filename The name of the template to use for the processing
+    @param template_source The configuration describing the processing.
+    @return the transformed XML text.
+    """
+    # Retrieve template and read it
+    if template_source:
+        template = template_source
+    elif template_filename:
+        try:
+            path_to_templates = (CFG_XSLT_TEMPLATES_PATH + os.sep +
+                                 template_filename)
+            if os.path.exists(path_to_templates):
+                template = file(path_to_templates).read()
+            elif os.path.exists(template_filename):
+                template = file(template_filename).read()
+            else:
+                sys.stderr.write(template_filename +' does not exist.')
+                return None
+        except IOError:
+            sys.stderr.write(template_filename +' could not be read.')
+            return None
+    else:
+        sys.stderr.write(template_filename +' was not given.')
+        return None
+
+    result = ""
+    if processor_type == 0:
+        # libxml2 & libxslt
+        template_xml = libxml2.parseDoc(template)
+        processor = libxslt.parseStylesheetDoc(template_xml)
+        source = libxml2.parseDoc(xmltext)
+        result_object = processor.applyStylesheet(source, None)
+        result = processor.saveResultToString(result_object)
+        processor.freeStylesheet()
+        source.freeDoc()
+        result_object.freeDoc()
+    elif processor_type == 1:
+        # 4suite
+        processor = Processor.Processor()
+        transform = InputSource.DefaultFactory.fromString(template)
+        source = InputSource.DefaultFactory.fromString(xmltext)
+        processor.appendStylesheet(transform)
+        result = processor.run(source)
+##     elif processor_type == 2:
+##         # Pyana
+##         result = Pyana.transform2String(source=xmltext, style=template)
+    else:
+        sys.stderr.write("No XSLT processor could be found")
+        
+    return result
+
+def bf_profile():
+    """
+    Runs a benchmark
+    """
+    xmltext = file('/home/jcaffaro/Desktop/harvested_oai.xml').read()
+    convert(xmltext, 'oaidc2marcxml.xsl')
+    return
+
+if __name__ == "__main__":   
+    import profile
+    import pstats
+    from invenio import search_engine
+    processor_type = 0
+    bf_profile()
+    profile.run('bf_profile()', "bibconvert_xslt_profile")
+    p = pstats.Stats("bibconvert_xslt_profile")
+    p.strip_dirs().sort_stats("cumulative").print_stats()
+
