@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -25,29 +26,149 @@
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
-<h2>Compile-time Configuration of Page Layout</h2>
+<p>This document describes how to change the look and feel of your CDS
+Invenio installation.
 
-<p>The style of the CDS Invenio installation is defined largely also
-during the configuration time, as explained in the <a
-href="http://cdsware.cern.ch/download/INSTALL">INSTALL</a> guide.  You
-can modify page header, footer, general portalboxes, etc.  See the
-installation guide for more details.
+<h2>CSS Style Sheet and Images</h2>
 
-<h2>Run-time Configuration of Page Layout</h2>
+<p>The most obvious modification you may want to do is the
+modification of <a href="<WEBURL>/img/cds.css">CSS style sheet</a>.
+You may also customize default <a href="<WEBURL>/img/">images</a>.
 
-<p>During runtime you most probably want to modify mostly the <a
-href="<WEBURL>/img/cds.css">CDS style sheet</a> and <a
-href="<WEBURL>/img/">images</a>.
+<h2>HTML Page Layout</h2>
 
-<p>The look of the search interface pages may be modify to a very
-large extent in the <a href="<WEBURL>/admin/websearch">WebSearch Admin
-Interface</a> by adding portalboxes on various places on the page.
+The customization of the general page look and feel is currently
+different depending on whether you customize HTML-like static pages
+(produced by WML during compile-time) or dynamic Python pages
+(assembled during runtime).
 
-<h2>Advanced Page Layout Changes</h2>
+<h3>Layout of HTML Static Pages</h3>
 
-<p>More advanced changes to the web page layout have to be carried out
-on the programming level.  For example, most mod_python dynamic pages
-are using the <code>page()</code> function defined in the
-<code>webpage.py</code> file.
+<p>(Note: this step will disappear in the future as we plan to release
+the dependency on WML in early 2007.)
+
+<p>During the compile time, when you edit <code>config.wml</code>, you
+may alter the default page look and feel by editing page elements such
+as <code>CDSPAGEHEADER</code>, <code>CDSPAGEFOOTER</code>,
+<code>CDSPAGEBOXLEFTTOP</code>, <code>CDSPAGEBOXLEFTBOTTOM</code>,
+<code>CDSPAGEBOXRIGHTTOP</code>, <code>CDSPAGEBOXRIGHTBOTTOM</code>.
+
+<p>This will modify the look and feel of every WML-pregenerated page,
+such as HTML help guides.  However, this will not affect most of the
+pages because they are generated in a dynamic way during runtime,
+without using WML.
+
+<h3>Layout of Python Dynamic Pages</h3>
+
+<p>The dynamic Python-powered pages can be customized by making use of
+CDS Invenio templating system that uses a notion of a template skin.
+How this works?
+
+<p>During the compile time, when you edit <code>config.wml</code>, you
+may choose to use your own templates instead of the provided default
+ones by editing
+<code>CFG_TEMPLATE_SKIN</code> variable.  Let us say you
+put <code>ithaca</code> there in order to use your
+own <code>ithaca</code> style.  Now, when you start Apache, then
+instead of CDS Invenio's usual template files such
+as <code>webbasket_templates.py</code> the system will look for file
+named <code>webbasket_templates_ithaca.py</code> and will load the
+template functions from there instead, provided that they exist.
+(Otherwise it would fall back to the default ones.)  
+
+How do you create such an <code>ithaca</code> style templates file?
+We do not use one of many existing templating frameworks in Python but
+a very simple programmer-friendly templating system that enables you
+to use the full power of Python to inherit from the default templates
+the output generating functions you want to reuse and to write anew
+only the functions you would like to modify.
+
+<p>Let's show an example of how to modify the page footer.  Create a
+file named <code>webstyle_templates_ithaca.py</code> with the
+following content:
+
+<blockquote>
+<pre>
+from invenio.config import cdslang
+from invenio.webstyle_templates import Template as DefaultTemplate
+
+class Template(DefaultTemplate):
+    """Ithaca style templates."""
+
+    def tmpl_pagefooter(self, req=None, ln=cdslang, lastupdated=None,
+                        pagefooteradd=""):
+        """
+        Ithaca style page footer.  See the default function for
+        the meaning of parameters.
+        """
+        
+        return "&lt;hr>This site has no footer."
+</pre>
+</blockquote>
+
+After the file was created, restart Apache and lo, your new ithaca
+style footer will be seen in action.
+
+<p>Some further remarks on this templating system:
+
+<ul>
+
+<li>We have observed that in practice the HTML page designers were
+    ofter Python programmers, therefore we have adopted a
+    programmer-friendly templating system.
+
+<li>You have to know a bit of Python in order to use it.  If you don't
+    know Python, do not worry, because you can basically copy and
+    paste the original <code>tmpl_foo()</code> function definition "as
+    is" into the above-cited example and then you would only modify
+    its HTML snippets.  The important thing is to preserve the imports
+    (<code>from invenio.config import cdslang</code>) as in the original 
+    <code>webstyle_templates.py</code> file and to preserve the
+    leading whitespace Pythonic indentation.
+    <br>(Moreover, in the future, when we shall remove the WML
+    dependency, we shall provide an easy way to modify at least the
+    most commonly wanted things such as page header and footer.)
+
+<li>You do not have to learn "yet another templating language", you
+    can use the full power of Python. The <code>tmpl_foo()</code>
+    functions do not contain any business logic in them, their only
+    purpose is to make the HTML presentation of data supplied to them.
+    But, should you need to carry out a little data transformation,
+    you can do it within the <code>tmpl_foo()</code> function itself,
+    thanks to the full Python power.
+
+<li>If you feel like doing so, you can modify all
+    the <code>tmpl_foo()</code> functions across all CDS Invenio
+    modules in a way that will completely change the presentation of
+    elements including their content, position and order on the
+    screen.
+
+<li>We expect to provide possibly more than one skin with the default
+    distribution, so if you have modified CDS Invenio look and feel in
+    an interesting way, please consider donating us your templates.
+
+<li>When upgrading from one CDS Invenio release to another, you may
+    find out that the default templates have changed in a way that
+    requires changes to your templates (such as an addition of
+    parameters to cover the new functionality).  This is inevitable in
+    any templating system; unless you introduce new parameters, you
+    would not see them being printed.  Therefore, if you have
+    modified <code>tmpl_foo()</code> and <code>tmpl_bar()</code>, and
+    you are ugrading to a new release, you may at least briefly check
+    whether the function arguments are the same.  A quick check of the
+    body would be helpful too, in case the new release fixed some
+    display-related problems in these functions.
+    <br>(FIXME: provide some warning tool.)
+
+</ul>
+
+
+<h2>Specific Configurations</h2>
+
+<p>Note that the search interface pages may be modified to a large
+extent in the <a href="<WEBURL>/admin/websearch">WebSearch Admin
+Interface</a> by adding HTML portalboxes on various places on the page
+(right top, before/after page title, before/after narrow by collection
+boxes, etc).
 
 
