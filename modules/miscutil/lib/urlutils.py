@@ -26,11 +26,9 @@ argument washing, redirection, etc.
 __revision__ = "$Id$"
 
 import sre
-from urllib import urlencode, quote_plus
+from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
-from cgi import parse_qs
-
-from xml.sax.saxutils import quoteattr
+from cgi import parse_qs, escape
 
 try:
     from mod_python import apache
@@ -41,8 +39,10 @@ from invenio.config import cdslang
 
 def wash_url_argument(var, new_type):
     """
-    Wash argument into 'new_type', that can be 'list', 'str', 'int', 'tuple' or 'dict'.
-    If needed, the check 'type(var) is not None' should be done before calling this function.
+    Wash argument into 'new_type', that can be 'list', 'str', 
+                                               'int', 'tuple' or 'dict'.
+    If needed, the check 'type(var) is not None' should be done before 
+    calling this function.
     @param var: variable value
     @param new_type: variable type, 'list', 'str', 'int', 'tuple' or 'dict'
     @return as much as possible, value var as type new_type
@@ -104,14 +104,15 @@ def get_client_ip_address(req):
     """ Returns IP address as string from an apache request. """
     return str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
 
-def get_referer(req, replace_ampersands=1):
+def get_referer(req, replace_ampersands=False):
     """ Return the referring page of a request.
     Referer (wikipedia): Referer is a common misspelling of the word "referrer";
     so common, in fact, that it made it into the official specification of HTTP.
     When visiting a webpage, the referer or referring page is the URL of the
     previous webpage from which a link was followed.
     @param req: request
-    @param replace_ampersands: if 1, replace & by &amp; in url (correct HTML cannot contain & characters alone).
+    @param replace_ampersands: if 1, replace & by &amp; in url 
+                               (correct HTML cannot contain & characters alone).
     """
     try:
         referer = req.headers_in['Referer']
@@ -162,21 +163,55 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 
     return ''
 
-def a_href(text, **kargs):
-    """ Build a properly escaped <a href="...">...</a> fragment.
-
-    - text: content of the tag, already html-escaped
-    - all the other keyword arguments are quoteattr-escaped.
+def create_html_link(urlbase, urlargd, link_label, linkattrd={}, 
+                     escape_urlargd=True, escape_linkattrd=True):
+    """Creates a W3C compliant link.
+    @param urlbase: base url (e.g. invenio.config.weburl/search)
+    @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'})
+    @param link_label: text displayed in a browser (has to be already escaped)
+    @param linkattrd: dictionary of attributes (e.g. a={'class': 'img'})
+    @param escape_urlargd: boolean indicating if the function should escape
+                           arguments (e.g. < becomes &lt; or " becomes &quot;)
+    @param escape_linkattrd: boolean indicating if the function should escape
+                           attributes (e.g. < becomes &lt; or " becomes &quot;)
     """
+    attributes_separator = ' '
+    output = '<a href="' + create_url(urlbase, urlargd, escape_urlargd) + '"'
+    if linkattrd:
+        output += ' '
+        if escape_linkattrd:
+            attributes = [escape(str(key), quote=True) + '="' + \
+                          escape(str(linkattrd[key]), quote=True) + '"'
+                                for key in linkattrd.keys()]
+        else:
+            attributes = [str(key) + '="' + str(linkattrd[key]) + '"'
+                                for key in linkattrd.keys()]
+        output += attributes_separator.join(attributes)
+    output += '>' + link_label + '</a>'
+    return output    
     
-    if '_class' in kargs:
-        kargs['class'] = kargs['_class']
-        del kargs['_class']
-        
-    attrs = ['%s=%s' % (k, quoteattr(kargs[k])) for k in kargs.keys()]
-
-    return '<a %s>%s</a>' % (' '.join(attrs), text)
-
+def create_url(urlbase, urlargd, escape_urlargd=True):
+    """Creates a W3C compliant URL. Output will look like this:
+    'urlbase?param1=value1&amp;param2=value2'
+    @param urlbase: base url (e.g. invenio.config.weburl/search)
+    @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'}
+    @param escape_urlargd: boolean indicating if the function should escape
+                           arguments (e.g. < becomes &lt; or " becomes &quot;)
+    """
+    separator = '&amp;'
+    output = urlbase
+    if urlargd:
+        output += '?'
+        if escape_urlargd:
+            arguments = [escape(quote(str(key)), quote=True) + '=' + \
+                         escape(quote(str(urlargd[key])), quote=True)
+                                for key in urlargd.keys()]
+        else:
+            arguments = [str(key) + '=' + str(urlargd[key]) 
+                            for key in urlargd.keys()]
+        output += separator.join(arguments)
+    return output         
+            
 def same_urls_p(a, b):
     """ Compare two URLs, ignoring reorganizing of query arguments """
 
@@ -213,8 +248,8 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     # build new URL for this word:
     for key in urlargsdictnew.keys():
         for val in urlargsdictnew[key]:
-            out += "&" + key + "=" + quote_plus(val, '')
-    if out.startswith("&"):
-        out = out[1:]
+            out += "&amp;" + key + "=" + quote_plus(val, '')
+    if out.startswith("&amp;"):
+        out = out[5:]
     return out
 
