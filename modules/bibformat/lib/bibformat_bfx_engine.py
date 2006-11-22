@@ -25,6 +25,7 @@ For API: see format_with_bfx() docstring below.
 __revision__ = "$Id$"
 
 import re
+import copy as p_copy
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 
@@ -605,7 +606,7 @@ class MARCTranslator:
             self.memory[name]['object'] = None
             self.memory[name]['parent'] = ''
             self.memory[name]['children'] = []
-            self.memory[name]['addresses'] = labels[name]
+            self.memory[name]['addresses'] = p_copy.deepcopy(labels[name])
         for name in self.memory:
             for i in range(len(self.memory[name]['addresses'])):
                 address = self.memory[name]['addresses'][i]
