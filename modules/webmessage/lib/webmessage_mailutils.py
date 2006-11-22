@@ -22,6 +22,8 @@
 
 __revision__ = "$Id$"
 
+from invenio.htmlutils import HTMLWasher
+
 def email_quoted_txt2html(text,
                           tabs_before=0,
                           indent_txt='>>',
@@ -54,8 +56,8 @@ def email_quoted_txt2html(text,
         
     @param text: the text in quoted format
     @param tabs_before: number of tabulations before each line
-    @param indent_str: quote separator in email (default:'>>')
-    @param linebreak_str: line separator in email (default: '\n')
+    @param indent_txt: quote separator in email (default:'>>')
+    @param linebreak_txt: line separator in email (default: '\n')
     @param indent_html: tuple of (opening, closing) html tags.
                         default: ('<div class="commentbox">', "</div>")
     @param linebreak_html: line separator in html (default: '<br/>')
@@ -65,19 +67,27 @@ def email_quoted_txt2html(text,
     nb_indent = 0
     lines = text.split(linebreak_txt)
     for line in lines:
-        new_nb_indent = line.count(indent_txt)
+        new_nb_indent = 0
+        while True:
+            if line.startswith(indent_txt):
+                new_nb_indent += 1
+                line = line[len(indent_txt):]
+            else:
+                break        
         if (new_nb_indent > nb_indent):
-            for _ in range(nb_indent, new_nb_indent):
+            for dummy in range(nb_indent, new_nb_indent):
                 final_body += tabs_before*"\t" + indent_html[0] + "\n"
                 tabs_before += 1
         elif (new_nb_indent < nb_indent):
-            for _ in range(new_nb_indent, nb_indent):
+            for dummy in range(new_nb_indent, nb_indent):
                 tabs_before -= 1 
                 final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
-        final_body += tabs_before*"\t" + line.replace(indent_txt, '')
+        else:
+            final_body += (tabs_before)*"\t" + linebreak_html
+        final_body += tabs_before*"\t" + line
         final_body += linebreak_html + "\n"
         nb_indent = new_nb_indent
-    for _ in range(0, nb_indent):
+    for dummy in range(0, nb_indent):
         tabs_before -= 1
         final_body += (tabs_before)*"\t" + "</div>\n"
     return final_body
@@ -117,3 +127,40 @@ def email_quote_txt(text,
     for line in lines:
         text += indent_txt + line + linebreak_output
     return text
+    
+def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
+    """Escape text using an email-like indenting rule.
+    As an example, this text:
+    
+    >>Brave Sir Robin ran away... 
+    <img src="malicious_script />*No!* 
+    >>bravely ran away away... 
+    I didn't!*<script>malicious code</script> 
+    >>When danger reared its ugly head, he bravely turned his tail and fled. 
+    <form onload="malicious"></form>*I never did!* 
+    
+    will be escaped like this:
+    >>Brave Sir Robin ran away... 
+    &lt;img src="malicious_script /&gt;*No!* 
+    >>bravely ran away away... 
+    I didn't!*&lt;script&gt;malicious code&lt;/script&gt; 
+    >>When danger reared its ugly head, he bravely turned his tail and fled. 
+    &lt;form onload="malicious"&gt;&lt;/form&gt;*I never did!* 
+    """
+    washer = HTMLWasher()
+    lines = text.split(linebreak_txt)
+    print len(lines)
+    output = ''
+    for line in lines:
+        line = line.strip()
+        nb_indent = 0
+        while True:
+            if line.startswith(indent_txt):
+                print 'ici!!'
+                nb_indent += 1
+                line = line[len(indent_txt):]
+            else:
+                break
+        output += (nb_indent * indent_txt) + washer.wash(line) + linebreak_txt
+        nb_indent = 0
+    return output[:-1]

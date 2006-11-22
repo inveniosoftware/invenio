@@ -24,8 +24,6 @@
 
 __revision__ = "$Id$"
 
-import cgi
-
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
@@ -37,11 +35,15 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               create_day_selectbox, \
                               create_month_selectbox, \
                               create_year_selectbox
+from invenio.urlutils import create_html_link, create_url
+from invenio.htmlutils import escape_html
 from invenio.config import weburl, cdslang
 from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
 
 class Template:
+    """Templates for WebMessage module"""
+    
     def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, no_quota=0, ln=cdslang):
         """
         Displays a list of messages, with the appropriate links and buttons
@@ -83,7 +85,10 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" %(_("Subject"), _("Sender"), _("Date"), _("Action"))
+  <tbody class="mailboxbody">""" % (_("Subject"), 
+                                    _("Sender"), 
+                                    _("Date"), 
+                                    _("Action"))
         if len(messages) == 0:
             inbox += """
     <tr class="mailboxrecord" style="height: 100px;">
@@ -91,22 +96,25 @@ class Template:
         <b>%s</b>
       </td>
     </tr>""" %(_("No messages"),)
-        for (msgid, id_user_from, user_from_nick, subject, sent_date, status) in messages:
+        for (msgid, id_user_from, user_from_nick, 
+             subject, sent_date, status) in messages:
             if not(subject):
                 subject = _("No subject")
-            subject_link = '<a href="display_msg?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
-                                                                               ln,
-                                                                               cgi.escape(subject))
+            subject_link = create_html_link(
+                                weburl + '/yourmessages/display_msg',
+                                {'msgid': msgid, 'ln': ln},
+                                escape_html(subject))
             if user_from_nick:
                 from_link = '%s'% (user_from_nick)
             else:
                 from_link = get_user_info(id_user_from, ln)[2]
-            action_link = '<a href="write?msg_reply_id=%i&amp;ln=%s">%s</a> / '% (msgid,
-                                                                                 ln,
-                                                                                 _("Reply"))
-            action_link += '<a href="delete?msgid=%i&amp;ln=%s">%s</a>'% (msgid,
-                                                                            ln,
-                                                                            _("Delete"))
+            action_link = create_html_link(weburl + '/yourmessages/write',
+                                           {'msg_reply_id': msgid, 'ln': ln},
+                                           _("Reply"))
+            action_link += ' '
+            action_link += create_html_link(weburl + '/yourmessages/delete',
+                                            {'msgid': msgid, 'ln': ln},
+                                            _("Delete"))
             s_date = convert_datetext_to_dategui(sent_date, ln)
             stat_style = ''
             if (status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
@@ -121,32 +129,31 @@ class Template:
         inbox += """
     <tr class="mailboxfooter">
       <td colspan="2">
-        <form name="newMessage" action="write?ln=%(ln)s" method="post">
+        <form name="newMessage" action="%(url_new)s" method="post">
           <input type="submit" name="del_all" value="%(write_label)s" class="formbutton" />
         </form>
       </td>
       <td>&nbsp;</td>
       <td>
-        <form name="deleteAll" action="delete_all?ln=%(ln)s" method="post">
+        <form name="deleteAll" action="url_delete_all" method="post">
           <input type="submit" name="del_all" value="%(delete_all_label)s" class="formbutton" />
         </form>
       </td>
     </tr> 
   </tbody>
-</table>""" % {'ln': ln,
+</table>""" % {'url_new': create_url(weburl + '/yourmessages/write', 
+                                     {'ln': ln}),
+               'url_delete_all': create_url(weburl + '/yourmessages/delete_all', 
+                                            {'ln': ln}),                           
                'write_label': _("Write new message"),
                'delete_all_label': _("Delete All")}
         return indent_text(inbox, 2)
 
     def tmpl_write(self,
-                   msg_to="",
-                   msg_to_group="",
+                   msg_to="", msg_to_group="",
                    msg_id=0,
-                   msg_subject="",
-                   msg_body="",
-                   msg_send_year=0,
-                   msg_send_month=0,
-                   msg_send_day=0,
+                   msg_subject="", msg_body="",
+                   msg_send_year=0, msg_send_month=0, msg_send_day=0,
                    warnings=[],
                    search_results_list=[],
                    search_pattern="",
@@ -171,22 +178,20 @@ class Template:
         write_box = self.tmpl_warning(warnings)
 
         # escape forbidden character
-        msg_to = msg_to.replace('"', '&quot;')
-        msg_to_group = msg_to_group.replace('"', '&quot;')
-        msg_subject = msg_subject.replace('"', '&quot;')
-        search_pattern = search_pattern.replace('"','&quot;')
+        msg_to = escape_html(msg_to)
+        msg_to_group = escape_html(msg_to_group)
+        msg_subject = escape_html(msg_subject)
+        search_pattern = escape_html(search_pattern)
 
         to_select = self.tmpl_user_or_group_search(search_results_list,
                                                    search_pattern,
                                                    results_field,
                                                    ln)
-        if (msg_id != 0):
+        if msg_id:
             msg_subject = _("Re:") + " " + msg_subject
             msg_body = email_quote_txt(msg_body)
-            msg_body = msg_body.replace('>', '&gt;')
         write_box += """
-<form name="write_message" action="send" method="post">
-  <input type="hidden" name="ln" value="%(ln)s"/>
+<form name="write_message" action="%(url_form)s" method="post">
   <div style="float: left; vertical-align:text-top; margin-right: 10px;">
     <table class="mailbox">
       <thead class="mailboxheader">
@@ -259,10 +264,16 @@ class Template:
 """
         write_box_part2 = indent_text(write_box_part2, 2)
         write_box += "%(body)s" "</textarea>"+ write_box_part2
-        day_field = create_day_selectbox('msg_send_day', msg_send_day, ln)
-        month_field = create_month_selectbox('msg_send_month', msg_send_month, ln)
-        year_field = create_year_selectbox('msg_send_year', -1, 10, msg_send_year, ln)
-        write_box = write_box % {'to_users' : msg_to,
+        day_field = create_day_selectbox('msg_send_day', 
+                                          msg_send_day, ln)
+        month_field = create_month_selectbox('msg_send_month', 
+                                              msg_send_month, ln)
+        year_field = create_year_selectbox('msg_send_year', -1, 10, 
+                                            msg_send_year, ln)
+        write_box = write_box % {'url_form': create_url(
+                                                weburl + '/yourmessages/send',
+                                                {'ln': ln}),
+                                 'to_users' : msg_to,
                                  'to_groups': msg_to_group,
                                  'subject' : msg_subject,
                                  'body' : msg_body,
@@ -319,20 +330,30 @@ class Template:
                 to_display = to
                 if to.isdigit():
                     (dummy, to, to_display) = get_user_info(int(to), ln)
-                sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">'% (to, ln)
-                sent_to_link += '%s</a>%s '% (cgi.escape(to_display), CFG_WEBMESSAGE_SEPARATOR)
+                sent_to_link += create_html_link(weburl + '/yourmessages/write',
+                                                 {'msg_to': to, 'ln': ln},
+                                                 escape_html(to_display))
+                sent_to_link += CFG_WEBMESSAGE_SEPARATOR
             to_display = tos[-1]
             to = tos[-1]
             if to.isdigit():
                 (dummy, to, to_display) = get_user_info(int(to), ln)
-            sent_to_link += '<a href="write?msg_to=%s&amp;ln=%s">%s</a>'% (to, ln, cgi.escape(to_display))
+            sent_to_link += create_html_link(weburl + '/yourmessages/write',
+                                             {'msg_to': to, 'ln': ln},
+                                             escape_html(to_display))
         group_to_link = ""
         groups = msg_sent_to_group.split(CFG_WEBMESSAGE_SEPARATOR)
         if (groups):
             for group in groups[0:-1]:
-                group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">'% (group, ln)
-                group_to_link += '%s</a>%s '% (cgi.escape(group), CFG_WEBMESSAGE_SEPARATOR)
-            group_to_link += '<a href="write?msg_to_group=%s&amp;ln=%s">%s</a>'% (groups[-1], ln, groups[-1])
+                group_to_link += create_html_link(
+                                    weburl + '/yourmessages/write',
+                                    {'msg_to_group': group, 'ln': ln},
+                                    escape_html(group))
+                group_to_link += CFG_WEBMESSAGE_SEPARATOR
+            group_to_link += create_html_link(
+                                weburl + '/yourmessages/write',
+                                {'msg_to_group': groups[-1], 'ln': ln},
+                                escape_html(groups[-1]))
         # format the msg so that the '>>' chars give vertical lines
         final_body = email_quoted_txt2html(msg_body)
 
@@ -344,7 +365,7 @@ class Template:
         <table class="messageheader">
           <tr>
             <td class="mailboxlabel">%(from_label)s</td>
-            <td><a href="write?msg_to=%(from)s&amp;ln=%(ln)s">%(from_display)s</a></td>
+            <td>%(from_link)s</td>
           </tr>
           <tr>
             <td class="mailboxlabel">%(subject_label)s</td>
@@ -388,12 +409,12 @@ class Template:
     </tr>
     <tr class="mailboxfooter">
       <td>
-        <form name="reply" action="write?msg_reply_id=%(msg_id)s" method="post">
+        <form name="reply" action="%(reply_url)s" method="post">
           <input class="formbutton" name="reply" value="%(reply_but_label)s" type="submit" />
         </form>
       </td>
       <td>
-        <form name="deletemsg" action="delete?msgid=%(msg_id)s&amp;ln=%(ln)s" method="post">
+        <form name="deletemsg" action="%(delete_url)s" method="post">
           <input class="formbutton" name="delete" value="%(delete_but_label)s" type="submit" />
         </form>
       </td>
@@ -407,16 +428,24 @@ class Template:
             msg_from_display = get_user_info(msg_from_id, ln)[2]
             msg_from_nickname = msg_from_id
 
-        out = out % {'from' : msg_from_nickname,
-                     'from_display': msg_from_display,
+        out = out % {'from_link': create_html_link(
+                                        weburl + '/yourmessages/write',
+                                        {'msg_to': msg_from_nickname,
+                                         'ln': ln},
+                                        msg_from_display),
+                     'reply_url': create_url(weburl + '/yourmessages/write',
+                                             {'msg_reply_id': msg_id,
+                                             'ln':  ln}),
+                     'delete_url': create_url(weburl + '/yourmessages/delete',
+                                             {'msgid': msg_id,
+                                             'ln':  ln}),
                      'sent_date' : convert_datetext_to_dategui(msg_sent_date, ln),
                      'received_date': convert_datetext_to_dategui(msg_received_date, ln),
                      'sent_to': sent_to_link,
                      'sent_to_group': group_to_link,
-                     'subject' : cgi.escape(msg_subject),
-                     'body' : cgi.escape(final_body),
+                     'subject' : msg_subject,
+                     'body' : final_body,
                      'reply_to': msg_from_id,
-                     'msg_id': msg_id,
                      'ln': ln,
                      'from_label':_("From:"),
                      'subject_label':_("Subject:"),
@@ -437,13 +466,18 @@ class Template:
         return html formatted navtrail
         """
         _ = gettext_set_language(ln)
-        nav_h1 = '<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>'
+        nav_h1 = create_html_link(weburl + '/youraccount/display',
+                                  {'ln': ln},
+                                  _("Your Account"),
+                                  {'class': 'navtrail'})        
         nav_h2 = ""
         if (title != ""):
-            nav_h2 = ' &gt; <a class="navtrail" href="%s/yourmessages/display?ln=%s">%s</a>'
-            nav_h2 = nav_h2 % (weburl, ln, _("Your Messages"))
-
-        return nav_h1 % (weburl, ln, _("Your Account")) + nav_h2
+            nav_h2 += create_html_link(weburl + '/yourmessages/display',
+                                       {'ln': ln},
+                                       _("Your Messages"),
+                                       {'class': 'navtrail'})
+            return nav_h1 + ' &gt; ' + nav_h2
+        return nav_h1
     
     def tmpl_confirm_delete(self, ln=cdslang):
         """
@@ -625,13 +659,13 @@ class Template:
   </tbody>
 </table>
 """
-        out = out% {'title_label'        : _("Find users or groups:"),
-                    'search_user_label'  : _("Find a user"),
-                    'search_group_label' : _("Find a group"),
-                    'results_field'      : results_field,
-                    'search_pattern'     : search_pattern,
-                    'multiple_select'    : multiple_select,
-                    'add_button'         : add_button}
+        out = out % {'title_label'        : _("Find users or groups:"),
+                     'search_user_label'  : _("Find a user"),
+                     'search_group_label' : _("Find a group"),
+                     'results_field'      : results_field,
+                     'search_pattern'     : search_pattern,
+                     'multiple_select'    : multiple_select,
+                     'add_button'         : add_button}
         return out
 
     def tmpl_account_new_mail(self, nb_new_mail=0, total_mail=0, ln=cdslang):
@@ -644,8 +678,11 @@ class Template:
         _ = gettext_set_language(ln)
         out = _("You have %s new messages out of %s messages")
         out %= ('<b>' + str(nb_new_mail) + '</b>', 
-                '<a href="' + weburl + '/yourmessages/?ln=' + ln + '">' + str(total_mail))
-        out += '</a>.'
-        return out
+                create_html_link(weburl + '/yourmessages/', 
+                                 {'ln': ln}, 
+                                 str(total_mail), 
+                                 {}, 
+                                 False, False))
+        return out + '.'
 
     

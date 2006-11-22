@@ -23,23 +23,24 @@
 
 __revision__ = "$Id$"
 
-import cgi
-
-from invenio.webmessage_dblayer import *
-from invenio.webmessage_config import *
+import invenio.webmessage_dblayer as db
+from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
+                                      CFG_WEBMESSAGE_RESULTS_FIELD, \
+                                      CFG_WEBMESSAGE_SEPARATOR, \
+                                      CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE, \
+                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
+from invenio.htmlutils import escape_html
 from invenio.webuser import list_users_in_roles
-
-import invenio.template
-
 try:
+    import invenio.template
     webmessage_templates = invenio.template.load('webmessage')
 except:
     pass
-
-def perform_request_display_msg(uid, msgid, ln = cdslang):
+    
+def perform_request_display_msg(uid, msgid, ln=cdslang):
     """
     Displays a specific message
     @param uid:   user id
@@ -51,20 +52,16 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
     warnings = []
     body = ""
 
-    if (check_user_owns_message(uid, msgid) == 0):
+    if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
         errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
     else:
         (msg_id,
-         msg_from_id,
-         msg_from_nickname,
-         msg_sent_to,
-         msg_sent_to_group,
-         msg_subject,
-         msg_body,
-         msg_sent_date,
-         msg_received_date,
-         msg_status) = get_message(uid, msgid)
+         msg_from_id, msg_from_nickname,
+         msg_sent_to, msg_sent_to_group,
+         msg_subject, msg_body,
+         msg_sent_date, msg_received_date,
+         msg_status) = db.get_message(uid, msgid)
         
         if (msg_id == ""):
 	    # The message exists in table user_msgMESSAGE
@@ -72,17 +69,19 @@ def perform_request_display_msg(uid, msgid, ln = cdslang):
             errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
         else:
             if (msg_status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
-                set_message_status(uid, msgid, CFG_WEBMESSAGE_STATUS_CODE['READ'])
-            body = webmessage_templates.tmpl_display_msg(msg_id, 
-                                                         msg_from_id,
-                                                         msg_from_nickname,
-							 msg_sent_to,
-							 msg_sent_to_group,
-							 msg_subject, 
-							 msg_body,
-							 msg_sent_date,
-                                                         msg_received_date,
-                                                         ln)
+                db.set_message_status(uid, msgid, 
+                                      CFG_WEBMESSAGE_STATUS_CODE['READ'])
+            body = webmessage_templates.tmpl_display_msg(
+                                                msg_id, 
+                                                msg_from_id,
+                                                msg_from_nickname,
+							                    msg_sent_to,
+							                    msg_sent_to_group,
+							                    msg_subject,
+							                    msg_body,
+							                    msg_sent_date,
+							                    msg_received_date,
+							                    ln)
     return (body, errors, warnings)
             
 def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
@@ -94,14 +93,12 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=cdslang):
     """
     body = ""    
     rows = []
-    rows = get_all_messages_for_user(uid)
-    nb_messages = 0
-    nb_messages = count_nb_messages(uid)
+    rows = db.get_all_messages_for_user(uid)
+    nb_messages = db.count_nb_messages(uid)
     no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
-    no_quota = 0
+    no_quota = False
     if uid in no_quota_users:
-       no_quota = 1
-        
+        no_quota = True
     body = webmessage_templates.tmpl_display_inbox(messages=rows,
                                                    infos=infos,
                                                    warnings=warnings,
@@ -124,17 +121,17 @@ def perform_request_delete_msg(uid, msgid, ln=cdslang):
     warnings = []
     infos = []
 
-    if (check_user_owns_message(uid, msgid) == 0):
+    if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
         errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
     else:
-        if (delete_message_from_user_inbox(uid, msgid)==0):
+        if (db.delete_message_from_user_inbox(uid, msgid) == 0):
             warnings.append(_("The message could not be deleted."))
         else:
             infos.append(_("The message was successfully deleted."))
     return perform_request_display(uid, errors, warnings, infos, ln) 
 
-def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
+def perform_request_delete_all(uid, confirmed=False, ln=cdslang):
     """
     Delete every message for a given user
     @param uid: user id (int)
@@ -147,7 +144,7 @@ def perform_request_delete_all(uid, confirmed=0, ln=cdslang):
     errors = []
     _ = gettext_set_language(ln)
     if confirmed:
-        delete_all_messages(uid)
+        db.delete_all_messages(uid)
         infos = [_("Your mailbox has been emptied.")]
         return perform_request_display(uid, warnings, errors, infos, ln)
     else:
@@ -172,26 +169,19 @@ def perform_request_write(uid,
     warnings = []
     body = ""
 
-    msg_from_nickname = ""
-    msg_subject = ""
-    msg_body = ""
+    msg_from_nickname = msg_subject = msg_body = ""
     msg_id = 0
     if (msg_reply_id):
-        if (check_user_owns_message(uid, msg_reply_id) == 0):
+        if (db.check_user_owns_message(uid, msg_reply_id) == 0):
             # The user doesn't own this message
             errors.append(('ERR_WEBMESSAGE_NOTOWNER',))
         else:
             # dummy == variable name to make pylint and pychecker happy!
             (msg_id,
-             msg_from_id,
-             msg_from_nickname,
-             dummy,
-             dummy,
-             msg_subject,
-             msg_body,
-             dummy,
-             dummy,
-             dummy) = get_message(uid, msg_reply_id)    
+             msg_from_id, msg_from_nickname,
+             dummy, dummy,
+             msg_subject, msg_body,
+             dummy, dummy, dummy) = db.get_message(uid, msg_reply_id)    
             if (msg_id == ""):
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
@@ -208,19 +198,20 @@ def perform_request_write(uid,
                                            ln=ln)
     return (body, errors, warnings)
 
-def perform_request_write_with_search(uid,
-                                      msg_to_user="",
-                                      msg_to_group="",
-                                      msg_subject="",
-                                      msg_body="",
-                                      msg_send_year=0,
-                                      msg_send_month=0, 
-                                      msg_send_day=0,
-                                      names_selected=[],
-                                      search_pattern="",
-                                      results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
-                                      add_values=0,
-                                      ln=cdslang):
+def perform_request_write_with_search(
+                        uid,
+                        msg_to_user="",
+                        msg_to_group="",
+                        msg_subject="",
+                        msg_body="",
+                        msg_send_year=0,
+                        msg_send_month=0, 
+                        msg_send_day=0,
+                        names_selected=[],
+                        search_pattern="",
+                        results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
+                        add_values=0,
+                        ln=cdslang):
     """
     Display a write message page, with prefilled values
     @param msg_to_user: comma separated usernames (str)
@@ -254,10 +245,11 @@ def perform_request_write_with_search(uid,
             else:
                 msg_to_user = usernames_to_add
                 
-        users_found = get_nicknames_like(search_pattern)
+        users_found = db.get_nicknames_like(search_pattern)
         if users_found:
             for user_name in users_found:
-                search_results_list.append((user_name[0], user_name[0] in names_selected))
+                search_results_list.append((user_name[0], 
+                                            user_name[0] in names_selected))
         
     elif results_field == CFG_WEBMESSAGE_RESULTS_FIELD['GROUP']:
         if add_values and len(names_selected):
@@ -266,24 +258,26 @@ def perform_request_write_with_search(uid,
                 msg_to_group = cat_names(msg_to_group, groupnames_to_add)
             else:
                 msg_to_group = groupnames_to_add
-        groups_dict = get_groupnames_like(uid, search_pattern)
+        groups_dict = db.get_groupnames_like(uid, search_pattern)
         groups_found = groups_dict.values()
         if groups_found:
             for group_name in groups_found:
-                search_results_list.append((group_name, group_name in names_selected))
+                search_results_list.append((group_name, 
+                                            group_name in names_selected))
        
-    body = webmessage_templates.tmpl_write(msg_to=msg_to_user,
-                                           msg_to_group=msg_to_group,
-                                           msg_subject=msg_subject,
-                                           msg_body=msg_body, 
-                                           msg_send_year=msg_send_year,
-                                           msg_send_month=msg_send_month,
-                                           msg_send_day=msg_send_day,
-                                           warnings=warnings,
-                                           search_results_list=search_results_list,
-                                           search_pattern=search_pattern,
-                                           results_field=results_field, 
-                                           ln=ln)
+    body = webmessage_templates.tmpl_write(
+                            msg_to=msg_to_user,
+                            msg_to_group=msg_to_group,
+                            msg_subject=msg_subject,
+                            msg_body=msg_body, 
+                            msg_send_year=msg_send_year,
+                            msg_send_month=msg_send_month,
+                            msg_send_day=msg_send_day,
+                            warnings=warnings,
+                            search_results_list=search_results_list,
+                            search_pattern=search_pattern,
+                            results_field=results_field, 
+                            ln=ln)
     return (body, errors, warnings)
   
 def perform_request_send(uid,
@@ -310,9 +304,9 @@ def perform_request_send(uid,
     """
     _ = gettext_set_language(ln)
 
-    def strip_spaces(str):
+    def strip_spaces(text):
         """suppress spaces before and after x (str)"""
-        return str.strip()
+        return text.strip()
     # wash user input
     users_to = map(strip_spaces, msg_to_user.split(CFG_WEBMESSAGE_SEPARATOR))
     groups_to = map(strip_spaces, msg_to_group.split(CFG_WEBMESSAGE_SEPARATOR))
@@ -337,36 +331,39 @@ def perform_request_send(uid,
     else:
         status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
         if send_on_date == datetext_default:
-            warning = _("The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid.")
+            warning = \
+            _("The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid.")
             warning = warning % {'x_year': msg_send_year,
                                  'x_month': msg_send_month,
                                  'x_day': msg_send_day}
             warnings.append(warning)
-            problem = 1
+            problem = True
             
     if not(users_to_str or groups_to_str):
         # <=> not(users_to_str) AND not(groups_to_str)
         warnings.append(_("Please enter a user name or a group name."))
-        problem = 1
+        problem = True
         
     if len(msg_body) > CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE:
-        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.")%(CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))
-        problem = 1
+        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %i characters.") % \
+                            (CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))
+        problem = True
 
-    users_dict = get_uids_from_nicks(users_to)
+    users_dict = db.get_uids_from_nicks(users_to)
     users_to = users_dict.items() # users_to=[(nick, uid),(nick2, uid2)]
-    groups_dict = get_gids_from_groupnames(groups_to)
+    groups_dict = db.get_gids_from_groupnames(groups_to)
     groups_to = groups_dict.items()
     gids_to = []
     for (group_name, group_id) in groups_to:
         if not(group_id):
-            warnings.append(_("Group %s does not exist.")% (cgi.escape(group_name)))
+            warnings.append(_("Group %s does not exist.") % \
+                            (escape_html(group_name)))
             problem = 1
         else:
             gids_to.append(group_id)
         
     # Get uids from gids
-    uids_from_group = get_uids_members_of_groups(gids_to)
+    uids_from_group = db.get_uids_members_of_groups(gids_to)
     # Add the original uids, and make sure  there is no double values.
     tmp_dict = {}
     for uid_receiver in uids_from_group:
@@ -377,14 +374,16 @@ def perform_request_send(uid,
                 uids_from_group.append(user_id)
                 tmp_dict[user_id] = None
         else:
-            if type(user_nick) == int or type(user_nick) == str and user_nick.isdigit():
+            if type(user_nick) == int or \
+               type(user_nick) == str and user_nick.isdigit():
                 user_nick = int(user_nick)
-                if user_exists(user_nick) and user_nick not in tmp_dict:
+                if db.user_exists(user_nick) and user_nick not in tmp_dict:
                     uids_from_group.append(user_nick)
                     tmp_dict[user_nick] = None
             else:                    
-                warnings.append(_("User %s does not exist.")% (cgi.escape(user_nick)))
-                problem = 1
+                warnings.append(_("User %s does not exist.")% \
+                                (escape_html(user_nick)))
+                problem = True
     if problem:
         body = webmessage_templates.tmpl_write(msg_to=users_to_str,
                                                msg_to_group=groups_to_str,
@@ -399,15 +398,13 @@ def perform_request_send(uid,
         navtrail = get_navtrail(ln, title)
         return (body, errors, warnings, title, navtrail)
     else:
-        msg_id = create_message(uid,
-                                users_to_str,
-                                groups_to_str,
-                                msg_subject,
-                                msg_body,
-                                send_on_date)
-        uid_problem = send_message(uids_from_group, msg_id, status)
+        msg_id = db.create_message(uid,
+                                   users_to_str, groups_to_str,
+                                   msg_subject, msg_body,
+                                   send_on_date)
+        uid_problem = db.send_message(uids_from_group, msg_id, status)
         if len(uid_problem) > 0:
-            usernames_problem_dict = get_nicks_from_uids(uid_problem)
+            usernames_problem_dict = db.get_nicks_from_uids(uid_problem)
             usernames_problem = usernames_problem_dict.values()
             def listing(name1, name2):
                 """ name1, name2 => 'name1, name2' """
@@ -418,8 +415,11 @@ def perform_request_send(uid,
         if len(uids_from_group) != len(uid_problem):
             infos.append(_("Your message has been sent."))
         else:
-            check_if_need_to_delete_message_permanently([msg_id])
-        (body, errors, warnings) = perform_request_display(uid, errors, warnings, infos, ln)
+            db.check_if_need_to_delete_message_permanently([msg_id])
+        (body, errors, warnings) = perform_request_display(uid, 
+                                                           errors, 
+                                                           warnings, 
+                                                           infos, ln)
         title = _("Your Messages")
         return (body, errors, warnings, title, get_navtrail(ln))
 
@@ -430,9 +430,10 @@ def account_new_mail(uid, ln=cdslang):
     @param ln: language
     @return html body
     """
-    nb_new_mail = get_nb_new_messages_for_user(uid)
-    total_mail = get_nb_readable_messages_for_user(uid)
-    return webmessage_templates.tmpl_account_new_mail(nb_new_mail, total_mail, ln)
+    nb_new_mail = db.get_nb_new_messages_for_user(uid)
+    total_mail = db.get_nb_readable_messages_for_user(uid)
+    return webmessage_templates.tmpl_account_new_mail(nb_new_mail, 
+                                                      total_mail, ln)
 
 def get_navtrail(ln=cdslang, title=""):
     """

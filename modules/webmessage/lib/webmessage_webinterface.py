@@ -25,13 +25,22 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import weburl, cdslang, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import weburl, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
-from invenio.webmessage import *
+from invenio.webmessage import perform_request_display, \
+                               perform_request_display_msg, \
+                               perform_request_write, \
+                               perform_request_send, \
+                               perform_request_write_with_search, \
+                               perform_request_delete_msg, \
+                               perform_request_delete_all, \
+                               get_navtrail
 from invenio.webmessage_config import CFG_WEBMESSAGE_RESULTS_FIELD
+from invenio.webmessage_mailutils import escape_email_quoted_text
 from invenio.webpage import page
 from invenio.messages import gettext_set_language
 from invenio.urlutils import redirect_to_url
+from invenio.htmlutils import escape_html
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
@@ -56,7 +65,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
-            return page_not_authorized(req, "%s/yourmessages/display" % (weburl,))    
+            return page_not_authorized(req, "%s/yourmessages/display" % \
+                                            (weburl,))    
 
         _ = gettext_set_language(argd['ln'])
 
@@ -75,9 +85,10 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
     
     def write(self, req, form):
         """ write(): interface for message composing
-        @param msg_reply_id: if this message is a reply to another, id of the other
-        @param msg_to: if this message is not a reply, nickname of the user it must be
-                       delivered to.
+        @param msg_reply_id: if this message is a reply to another, id of the
+                             other
+        @param msg_to: if this message is not a reply, nickname of the user it
+                       must be delivered to.
         @param msg_to_group: name of group to send message to
         @param ln: language
         @return the compose page
@@ -95,11 +106,12 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         # Request the composing page
-        (body, errors, warnings) = perform_request_write(uid=uid,
-                                                         msg_reply_id=argd['msg_reply_id'],
-                                                         msg_to=argd['msg_to'],
-                                                         msg_to_group=argd['msg_to_group'],
-                                                         ln=argd['ln'])
+        (body, errors, warnings) = perform_request_write(
+                                        uid=uid,
+                                        msg_reply_id=argd['msg_reply_id'],
+                                        msg_to=argd['msg_to'],
+                                        msg_to_group=argd['msg_to_group'],
+                                        ln=argd['ln'])
         title = _("Write a message")
 
         return page(title       = title,
@@ -123,10 +135,13 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         @param_msg_send_month: month to send this message on (int)
         @param_msg_send_day: day to send this message on (int)
         @param results_field: value determining which results field to display. 
-                              See CFG_WEBMESSAGE_RESULTS_FIELD in webmessage_config.py
-        @param names_to_add: list of usernames ['str'] to add to msg_to_user / group
-        @param search_pattern: will search for users/groups with this pattern (str)
-        @param add_values: if 1 users_to_add will be added to msg_to_user field..
+                              See CFG_WEBMESSAGE_RESULTS_FIELD in
+                              webmessage_config.py
+        @param names_to_add: list of usernames ['str'] to add to 
+                             msg_to_user / group
+        @param search_pattern: will search for users/groups with this pattern
+        @param add_values: if 1 users_to_add will be added to msg_to_user 
+                           field..
         @param *button: which button was pressed
         @param ln: language
         @return a (body, errors, warnings) formed tuple.
@@ -138,7 +153,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                    'msg_send_year': (int, 0),
                                    'msg_send_month': (int, 0),
                                    'msg_send_day': (int, 0),
-                                   'results_field': (str, CFG_WEBMESSAGE_RESULTS_FIELD['NONE']),
+                                   'results_field': (str,
+                                        CFG_WEBMESSAGE_RESULTS_FIELD['NONE']),
                                    'names_selected': (list, []), 
                                    'search_pattern': (str, ""), 
                                    'send_button': (str, ""), 
@@ -153,15 +169,16 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
             return page_not_authorized(req, "%s/yourmessages/send" % (weburl,))
         _ = gettext_set_language(argd['ln'])
         if argd['send_button']:
-            (body, errors, warnings, title, navtrail) = perform_request_send(uid=uid,
-                                                                             msg_to_user=argd['msg_to_user'],
-                                                                             msg_to_group=argd['msg_to_group'],
-                                                                             msg_subject=argd['msg_subject'],
-                                                                             msg_body=argd['msg_body'],
-                                                                             msg_send_year=argd['msg_send_year'],
-                                                                             msg_send_month=argd['msg_send_month'],
-                                                                             msg_send_day=argd['msg_send_day'],
-                                                                             ln=argd['ln'])
+            (body, errors, warnings, title, navtrail) = perform_request_send(
+                            uid=uid,
+                            msg_to_user=argd['msg_to_user'],
+                            msg_to_group=argd['msg_to_group'],
+                            msg_subject=escape_html(argd['msg_subject']),
+                            msg_body=escape_email_quoted_text(argd['msg_body']),
+                            msg_send_year=argd['msg_send_year'],
+                            msg_send_month=argd['msg_send_month'],
+                            msg_send_day=argd['msg_send_day'],
+                            ln=argd['ln'])
         else:
             title = _('Write a message')
             navtrail = get_navtrail(argd['ln'], title)
@@ -172,20 +189,20 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
             add_values = 0
             if argd['add_group'] or argd['add_user']:
                 add_values = 1
-            
-            (body, errors, warnings) = perform_request_write_with_search(uid=uid,
-                                                                         msg_to_user=argd['msg_to_user'],
-                                                                         msg_to_group=argd['msg_to_group'],
-                                                                         msg_subject=argd['msg_subject'],
-                                                                         msg_body=argd['msg_body'],
-                                                                         msg_send_year=argd['msg_send_year'],
-                                                                         msg_send_month=argd['msg_send_month'],
-                                                                         msg_send_day=argd['msg_send_day'],
-                                                                         names_selected=argd['names_selected'],
-                                                                         search_pattern=argd['search_pattern'],
-                                                                         results_field=argd['results_field'],
-                                                                         add_values=add_values,
-                                                                         ln=argd['ln'])
+            (body, errors, warnings) = perform_request_write_with_search(
+                            uid=uid,
+                            msg_to_user=argd['msg_to_user'],
+                            msg_to_group=argd['msg_to_group'],
+                            msg_subject=escape_html(argd['msg_subject']),
+                            msg_body=escape_email_quoted_text(argd['msg_body']),
+                            msg_send_year=argd['msg_send_year'],
+                            msg_send_month=argd['msg_send_month'],
+                            msg_send_day=argd['msg_send_day'],
+                            names_selected=argd['names_selected'],
+                            search_pattern=argd['search_pattern'],
+                            results_field=argd['results_field'],
+                            add_values=add_values,
+                            ln=argd['ln'])
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -209,12 +226,16 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
-            return page_not_authorized(req, "%s/yourmessages/delete_msg" % (weburl,))
+            return page_not_authorized(req, 
+                                       "%s/yourmessages/delete_msg" % \
+                                       (weburl,))
 
         _ = gettext_set_language(argd['ln'])
 
         # Generate content
-        (body, errors, warnings) = perform_request_delete_msg(uid, argd['msgid'], argd['ln'])
+        (body, errors, warnings) = perform_request_delete_msg(uid, 
+                                                              argd['msgid'],
+                                                              argd['ln'])
         return page(title       = _("Your Messages"),
                     body        = body,
                     navtrail    = get_navtrail(argd['ln']),
@@ -238,12 +259,15 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
-            return page_not_authorized(req, "%s/yourmessages/delete_all" % (weburl,))
+            return page_not_authorized(req, "%s/yourmessages/delete_all" % \
+                                            (weburl,))
 
         _ = gettext_set_language(argd['ln'])
 
         # Generate content
-        (body, errors, warnings) = perform_request_delete_all(uid, argd['confirmed'], argd['ln'])
+        (body, errors, warnings) = perform_request_delete_all(uid, 
+                                                              argd['confirmed'],
+                                                              argd['ln'])
         return page(title       = _("Your Messages"),
                     body        = body,
                     navtrail    = get_navtrail(argd['ln']),
@@ -267,11 +291,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
-            return page_not_authorized(req, "%s/yourmessages/display_msg" % (weburl,))
+            return page_not_authorized(req, "%s/yourmessages/display_msg" % \
+                                             (weburl,))
 
         _ = gettext_set_language(argd['ln'])
         # Generate content
-        (body, errors, warnings) = perform_request_display_msg(uid, argd['msgid'], argd['ln'])
+        (body, errors, warnings) = perform_request_display_msg(uid, 
+                                                               argd['msgid'],
+                                                               argd['ln'])
         title = _("Read a message")
         return page(title       = title,
                     body        = body,
