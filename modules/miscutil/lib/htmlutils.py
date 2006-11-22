@@ -35,13 +35,30 @@ cfg_html_buffer_allowed_tag_whitelist = ['a',
 # <p style="background: url(myxss_suite.js)">
 cfg_html_buffer_allowed_attribute_whitelist = ['href', 'name']
 
+def escape_html(text, escape_quotes=False):
+    """Escape all HTML tags, avoiding XSS attacks.
+    < => &lt;
+    > => &gt;
+    & => &amp:
+    @param text: text to be escaped from HTML tags
+    @param escape_quotes: if True, escape any quote mark to its HTML entity:
+                          " => &quot;
+                          ' => &#34;
+    """
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
+    if escape_quotes:
+        text = text.replace('"', '&quot;')
+        text = text.replace("'", '&#34;')
+    return text
 
 class HTMLWasher(HTMLParser):
     """
     Creates a washer for HTML, avoiding XSS attacks. See wash function for 
     details on parameters.
     
-    Usage: from invenio import htmlutils
+    Usage: from inveniohtmlutils import HTMLWasher
            washer = HTMLWasher()
            escaped_text = washer.wash(unescaped_text)
            
