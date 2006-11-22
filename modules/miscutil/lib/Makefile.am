@@ -31,6 +31,7 @@ pylib_DATA = __init__.py \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
+             htmlutils.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
 	     urlutils.py             
@@ -55,6 +56,7 @@ EXTRA_DIST = __init__.py \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
+             htmlutils.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
              urlutils.py \
