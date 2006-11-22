@@ -36,9 +36,9 @@ from invenio.config import \
      weburl, \
      version
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.urlutils import a_href, make_canonical_urlargd
+from invenio.urlutils import create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
-     convert_datestruct_to_dategui
+                              convert_datestruct_to_dategui
 
 class Template:
 
@@ -72,11 +72,8 @@ class Template:
 
         out = ""
         if title != cdsnameintl[ln]:
-            out += """<a class="navtrail"
-                         href="%(weburl)s?ln=%(ln)s">%(msg_home)s</a>""" % {
-                      'weburl' : weburl,
-                      'ln' : ln,
-                      'msg_home' : _("Home")}
+            out += create_html_link(weburl, {'ln': ln}, 
+                                    _("Home"), {'class': 'navtrail'})
         if previous_links:
             if out:
                 out += separator
@@ -296,25 +293,25 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>
+             <a class="header" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
+             <a class="header" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
+             <a class="header" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody">
-             <a class=header href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
+             <a class="header" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -407,11 +404,11 @@ class Template:
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
   %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
-  <br>
+  <br />
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
-  <br>
+  <br />
   %(msg_maintainedby)s <a class="footer" href="mailto:%(supportemail)s">%(supportemail)s</a>
-  <br>
+  <br />
   %(msg_lastupdated)s
  </div>
  <div class="pagefooterstriperight">
@@ -475,15 +472,14 @@ class Template:
                 # Update the 'ln' argument in the initial request
                 argd['ln'] = lang
                 if req and req.uri:
-                    args = req.uri + make_canonical_urlargd(argd, {})
+                    parts.append(create_html_link(req.uri, argd, lang_namelong,
+                                                  {'class': "langinfo"}))
                 else:
-                    args = ""
-
-                parts.append(a_href(lang_namelong, href=args,
-                                    _class="langinfo"))
+                    parts.append(create_html_link('', {}, lang_namelong, 
+                                                  {'class': "langinfo"}))
 
         return _("This site is also available in the following languages:") + \
-                 "<br>" + ' &nbsp;'.join(parts)
+                 "<br />" + ' &nbsp;'.join(parts)
 
     def tmpl_error_box(self, ln, title, verbose, req, supportemail, errors):
         """Produces an error box.
