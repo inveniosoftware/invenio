@@ -859,14 +859,14 @@ def check_args(arguments):
 ## datestamp formats
 #
 #
-    if arguments['from'] != "" and arguments['from'] != "":
+    if arguments['from'] != "":
         from_length = len(arguments['from'])
         if check_date(arguments['from'], "T00:00:00Z") == "":
             out = out + oai_error("badArgument", "Bad datestamp format in from")
     else:
         from_length = 0
 
-    if arguments['until'] != "" and arguments['until'] != "":
+    if arguments['until'] != "":
         until_length = len(arguments['until'])
         if check_date(arguments['until'], "T23:59:59Z") == "":
             out = out + oai_error("badArgument", "Bad datestamp format in until")
