@@ -45,6 +45,7 @@ try:
     import libxslt
 except ImportError:
     pass
+
 if processor_type == -1:
     try:
         # 4suite
@@ -53,13 +54,12 @@ if processor_type == -1:
         from Ft.Xml import InputSource
     except ImportError:
         pass
-## if processor_type == -1:
-##     try:
-##         # Pyana
-##         processor_type = 2
-##         import Pyana
-##     except ImportError:
-##         pass
+    
+if processor_type == -1:
+    # No XSLT processor found
+    sys.stderr.write('No XSLT processor could be found.\n' \
+                     'No output produced.\n')
+    sys.exit(1)
 
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
 
@@ -79,6 +79,12 @@ def convert(xmltext, template_filename=None, template_source=None):
     @param template_source The configuration describing the processing.
     @return the transformed XML text.
     """
+    
+    if processor_type == -1:
+        # No XSLT processor found
+        sys.stderr.write('No XSLT processor could be found.')
+        sys.exit(1)
+
     # Retrieve template and read it
     if template_source:
         template = template_source
@@ -118,29 +124,36 @@ def convert(xmltext, template_filename=None, template_source=None):
         source = InputSource.DefaultFactory.fromString(xmltext)
         processor.appendStylesheet(transform)
         result = processor.run(source)
-##     elif processor_type == 2:
-##         # Pyana
-##         result = Pyana.transform2String(source=xmltext, style=template)
     else:
         sys.stderr.write("No XSLT processor could be found")
         
     return result
 
-def bf_profile():
+def bc_profile():
     """
     Runs a benchmark
     """
-    xmltext = file('/home/jcaffaro/Desktop/harvested_oai.xml').read()
+    global xmltext
+
     convert(xmltext, 'oaidc2marcxml.xsl')
     return
 
-if __name__ == "__main__":   
+def benchmark():
+    """
+    Benchmark the module, using profile and pstats
+    """
     import profile
     import pstats
-    from invenio import search_engine
-    processor_type = 0
-    bf_profile()
-    profile.run('bf_profile()', "bibconvert_xslt_profile")
+    from invenio.bibformat import record_get_xml
+
+    global xmltext
+    
+    xmltext = record_get_xml(10, 'oai_dc')
+    profile.run('bc_profile()', "bibconvert_xslt_profile")
     p = pstats.Stats("bibconvert_xslt_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
+    
+if __name__ == "__main__":
+    # FIXME: Implement command line options
+    pass
 

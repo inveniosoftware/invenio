@@ -252,19 +252,30 @@ def build_namespaces(dom):
                 namespaces[attr.prefix] = attr.namespaceURI
     return namespaces
 
-def bf_profile():
+def bc_profile():
     """
     Runs a benchmark
     """
-    xmltext = file('/home/jcaffaro/Desktop/harvested_oai.xml').read()
+    global xmltext
+    
     convert(xmltext, 'oaidc2marcxml.bfx')
     return
 
-if __name__ == "__main__":   
+def benchmark():
+    """
+    Benchmark the module, using profile and pstats
+    """
     import profile
     import pstats
-    bf_profile()
-    profile.run('bf_profile()', "bibconvert_bfx_profile")
-    p = pstats.Stats("bibconvert_bfx_profile")
+    from invenio.bibformat import record_get_xml
+
+    global xmltext
+    
+    xmltext = record_get_xml(10, 'oai_dc')
+    profile.run('bc_profile()', "bibconvert_xslt_profile")
+    p = pstats.Stats("bibconvert_xslt_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
 
+if __name__ == "__main__":
+    # FIXME: Implement command line options
+    pass
