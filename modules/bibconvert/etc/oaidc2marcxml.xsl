@@ -4,8 +4,8 @@
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:OAI-PMH="http://www.openarchives.org/OAI/2.0/"
 xmlns:oaidc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-xmlns:dc="http://purl.org/dc/elements/1.1/">
-
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+exclude-result-prefixes="OAI-PMH oaidc dc">
 <xsl:template match="/">
         <collection>
             <xsl:for-each select="//OAI-PMH:record">    
@@ -128,7 +128,8 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
                 
 		</xsl:if>
 		<xsl:if test='./OAI-PMH:header/OAI-PMH:identifier'>
-                
+                    <!-- CUSTOMIZE ME: Modify the datafield below with tag and indicators used 
+                         in your Invenio installation for the OAI identifier -->
                     <datafield tag="909" ind1="C" ind2="O">
                         <subfield code="u"><xsl:value-of select="./OAI-PMH:metadata/OAI-PMH:identifier"/></subfield>
                     </datafield>
