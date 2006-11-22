@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
+from invenio.urlutils import create_html_link
 
 class Template:
     """Template class for the external collection search. To be loaded with template.load()"""
@@ -34,7 +35,7 @@ class Template:
             prolog_start='<table class="externalcollectionsbox"><tr><th colspan="2" class="externalcollectionsboxheader">',
             prolog_end='</th></tr><tr><td class="externalcollectionsboxbody">',
             column_separator='</td><td class="externalcollectionsboxbody">',
-            link_separator= '<br>', epilog='</td></tr></table>'):
+            link_separator= '<br />', epilog='</td></tr></table>'):
         """Creates the box that proposes links to other useful search engines like Google.
         lang: string - The language to display in
         links: list of string - List of links to display in the box
@@ -44,8 +45,10 @@ class Template:
 
         out = ""
         if links:
-            out += """<a name="externalcollectionsbox"></a>"""
-            out += prolog_start + _("Haven't found what you were looking for? Try your search on other servers:") + prolog_end
+            out += '<a name="externalcollectionsbox"></a>'
+            out += prolog_start
+            out += _("Haven't found what you were looking for? Try your search on other servers:")
+            out += prolog_end
             nb_out_links_in_one_column = len(links)/2 + len(links) % 2
             out += link_separator.join(links[:nb_out_links_in_one_column])
             out += column_separator
@@ -63,21 +66,33 @@ class Template:
 
         _ = gettext_set_language(lang)
 
-        out = """<p><table class="externalcollectionsresultsbox">
-            <thead><tr><th class="externalcollectionsresultsboxheader"><strong>%(overview_title)s</strong></th></tr></thead>
-            <tbody><tr><td class="externalcollectionsresultsboxbody"> """ % {
-            'overview_title' : _("Results from external collections overview:") }
+        out = """
+<p>
+  <table class="externalcollectionsresultsbox">
+    <thead>
+      <tr>
+        <th class="externalcollectionsresultsboxheader"><strong>%s</strong></th>
+      </tr>
+    </thead>
+      <tbody>
+        <tr>
+          <td class="externalcollectionsresultsboxbody"> """ % _("Results from external collections overview:")
 
         for engine in engine_list:
             internal_name = get_link_name(engine.name)
             name = _(engine.name)
-            out += '''<strong><a href="#%(internal_name)s">%(name)s</a></strong><br>''' % locals()
-        out += "</td></tr></tbody></table>"
+            out += """<strong><a href="#%(internal_name)s">%(name)s</a></strong><br />""" % locals()
+        out += """
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</p>"""
         return out
 
 def print_info_line(req, html1, html2):
     """Print an information line on req."""
-    req.write('<table class="externalcollectionsresultsbox"><tr><td class="externalcollectionsresultsboxheader" align="left" width=50%><strong><big>')
+    req.write('<table class="externalcollectionsresultsbox"><tr><td class="externalcollectionsresultsboxheader" align="left" width="50%"><strong><big>')
     req.write(html1)
     req.write('</big></strong></td><td class="externalcollectionsresultsboxheader" align="center">')
     req.write(html2)
@@ -86,16 +101,19 @@ def print_info_line(req, html1, html2):
 def print_timeout(req, lang, engine, name, url):
     """Print info line for timeout."""
     _ = gettext_set_language(lang)
-    req.write('<a name="%s">' % get_link_name(engine.name))
-    print_info_line(req, '<a href="%(url)s">%(name)s</a>' % {'url': url, 'name': name}, _('Timeout'))
-    req.write(_('The external search engine has not responded in time. You can check results here : <a href="%(url)s">%(name)s</a>') % locals() + '<br>')
+    req.write('<a name="%s"></a>' % get_link_name(engine.name))
+    print_info_line(req, create_html_link(url, {}, name, {}, False, False), _('Timeout'))
+    message = _("The external search engine has not responded in time. You can check results here:")
+    req.write(message + ' ' + create_html_link(url, {}, name, {}, False, False) + '<br />')
 
 def get_link_name(name):
     """Return a hash string for the string name."""
     return hex(abs(name.__hash__()))
 
 def print_results(req, lang, pagegetter, infos, current_time):
-    """Print results of a given search engine."""
+    """Print results of a given search engine.
+    current_time is actually the duration, expressed in seconds of execution of request.
+    """
     _ = gettext_set_language(lang)
     url = infos[0]
     engine = infos[1]    
@@ -121,10 +139,10 @@ def print_results(req, lang, pagegetter, infos, current_time):
     print_info_line(req, make_url(name, base_url) + ', ' + make_url(num, url) , html2)
 
     for result in results:
-        req.write(result.html + '<br>')
+        req.write(result.html + '<br />')
 
     if not results:
-        req.write(_('No results found.') + '<br>')
+        req.write(_('No results found.') + '<br />')
 
 def make_url(name, url):
     if url:

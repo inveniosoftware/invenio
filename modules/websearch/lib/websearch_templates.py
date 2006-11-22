@@ -43,7 +43,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
-from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, a_href
+from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 
 from invenio.websearch_external_collections import external_collection_get_state
 
@@ -169,8 +169,7 @@ class Template:
             base = weburl + '/collection/' + urllib.quote(c)
         else:
             base = weburl
-        
-        return base + make_canonical_urlargd(parameters, self.search_results_default_urlargd)
+        return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
         
     def tmpl_record_page_header_content(self, req, recid, ln):
         """ Provide extra information in the header of /record pages """
@@ -209,7 +208,7 @@ class Template:
         """
         out = []
         for url, name in dads:
-            out.append(a_href(name, href=self.build_search_interface_url(c=url, as=as, ln=ln), _class='navtrail'))
+            out.append(create_html_link(self.build_search_interface_url(c=url, as=as, ln=ln), {}, name, {'class': 'navtrail'}))
             
         return ' &gt; '.join(out)
 
@@ -337,7 +336,7 @@ class Template:
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
                'weburl' : weburl,
-               'asearch' : a_href(_('Advanced Search'), href=asearchurl),
+               'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
                'middle_option' : middle_option,
                'msg_search' : _('Search'),
@@ -447,7 +446,7 @@ class Template:
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
                'weburl' : weburl,
-               'ssearch' : a_href(_("Simple Search"), href=ssearchurl),
+               'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
 
                'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
@@ -737,8 +736,8 @@ class Template:
                 else:
                     out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
             out += """<td valign="top">%(link)s%(recs)s """ % {
-                'link': a_href(style_prolog + son.get_name(ln) + style_epilog,
-                               href=self.build_search_interface_url(c=son.name, ln=ln, as=as)),
+                'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, as=as),
+                                         {}, style_prolog + son.get_name(ln) + style_epilog),
                 'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
 
             if son.restricted_p():
@@ -748,8 +747,9 @@ class Template:
                 out += """<br>"""
                 for grandson in grandsons[i]:
                     out += """ %(link)s%(nbrec)s """ % {
-                        'link': a_href(grandson.get_name(ln),
-                                       href=self.build_search_interface_url(c=grandson.name, ln=ln, as=as)),
+                        'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, as=as),
+                                                 {},
+                                                 grandson.get_name(ln)),
                         'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
 
             out += """</td></tr>"""
@@ -870,7 +870,7 @@ class Template:
         body += "</table>"
         if more_link:
             body += '<div align="right"><small>' + \
-                    a_href('[&gt;&gt; %s]' % _("more"), href=more_link) + \
+                    create_html_link(more_link, {}, '[&gt;&gt; %s]' % _("more")) + \
                     '</small></div>'
 
         return '''
@@ -972,15 +972,18 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = '''<br><span class="moreinfo">%(detailed)s - %(similar)s</span>''' % {
-            'detailed': a_href(_("Detailed record"), _class="moreinfo",
-                               href=self.build_search_url(recid=recid, ln=ln)),
-            'similar': a_href(_("Similar records"), _class="moreinfo",
-                              href=self.build_search_url(p="recid:%d" % recid, rm='wrd', ln=ln))}
+            'detailed': create_html_link(self.build_search_url(recid=recid, ln=ln),
+                                         {},
+                                         _("Detailed record"), {'class': "moreinfo"}),
+            'similar': create_html_link(self.build_search_url(p="recid:%d" % recid, rm='wrd', ln=ln),
+                                        {},
+                                        _("Similar records"), 
+                                        {'class': "moreinfo"})}
                  
         if CFG_EXPERIMENTAL_FEATURES:
             out += '''<span class="moreinfo"> - %s </span>''' % \
-                   a_href(_("Cited by"), _class="moreinfo",
-                          href=self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln))
+                   create_html_link(self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln),
+                                    {}, _("Cited by"), {'class': "moreinfo"})
                  
         return out
 
@@ -1013,8 +1016,8 @@ class Template:
             out += " / "
             for author in authors[:CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD]:
                 out += '%s; ' % \
-                       a_href(cgi.escape(author), 
-                              href=self.build_search_url(p=author, f='author', ln=ln))
+                       create_html_link(self.build_search_url(p=author, f='author', ln=ln),
+                                        {}, cgi.escape(author))
                     
             if len(authors) > CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD:
                 out += "<em>et al</em>"
@@ -1088,12 +1091,12 @@ class Template:
             if term == p: # print search word for orientation:
                 nearesttermsboxbody_class = "nearesttermsboxbodyselected"
                 if hits > 0:
-                    term = a_href(term, href=self.build_search_url(argd),
-                                  _class="nearesttermsselected")
+                    term = create_html_link(self.build_search_url(argd), {}, 
+                                            term, {'class': "nearesttermsselected"})
             else:
                 nearesttermsboxbody_class = "nearesttermsboxbody"
-                term = a_href(term, href=self.build_search_url(argd),
-                              _class="nearestterms")
+                term = create_html_link(self.build_search_url(argd), {},
+                                        term, {'class': "nearestterms"})
 
             out += '''\
             <tr>
@@ -1167,7 +1170,8 @@ class Template:
                         %(link)s
                        </td>
                       </tr>""" % {'nbhits': nbhits,
-                                  'link': a_href(cgi.escape(phrase), href=self.build_search_url(query))}
+                                  'link': create_html_link(self.build_search_url(query), 
+                                                           {}, cgi.escape(phrase))}
                         
         elif len(browsed_phrases_in_colls) > 1:
             # first display what was found but the last one:
@@ -1188,7 +1192,9 @@ class Template:
                             %(link)s
                            </td>
                           </tr>""" % {'nbhits' : nbhits,
-                                      'link': a_href(cgi.escape(phrase), href=self.build_search_url(query))}
+                                      'link': create_html_link(self.build_search_url(query),
+                                                               {},
+                                                               cgi.escape(phrase))}
                             
             # now display last hit as "next term":
             phrase, nbhits = browsed_phrases_in_colls[-1]
@@ -1204,8 +1210,8 @@ class Template:
                             <img src="%(weburl)s/img/sn.gif" alt="" border="0">
                             %(link)s
                           </td>
-                      </tr>""" % {'link': a_href(_("next"),
-                                                 href=self.build_search_url(query, action='browse')),
+                      </tr>""" % {'link': create_html_link(self.build_search_url(query, action='browse'),
+                                                           {}, _("next")),
                                   'weburl' : weburl}
         out += """</tbody>
             </table>"""
@@ -1347,8 +1353,8 @@ class Template:
              </tbody>
             </table>
             ''' % {
-                'simple_search': a_href(_("Simple Search"),
-                                        href=self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg)),
+                'simple_search': create_html_link(self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg),
+                                                  {}, _("Simple Search")),
                 
                 'leading' : leadingtext,
                 'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
@@ -1431,10 +1437,15 @@ class Template:
              </tbody>
             </table>
             ''' % {
-              'advanced_search': a_href(_("Advanced Search"),
-                                        href=self.build_search_url(p1=p,
-                                                                   f1=f, rm=rm, as=1, cc=cc,
-                                                                   jrec=jrec, ln=ln, rg=rg)),
+              'advanced_search': create_html_link(self.build_search_url(p1=p,
+                                                                        f1=f, 
+                                                                        rm=rm, 
+                                                                        as=1, 
+                                                                        cc=cc,
+                                                                        jrec=jrec, 
+                                                                        ln=ln, 
+                                                                        rg=rg),
+                                                  {}, _("Advanced Search")),
               
               'leading' : leadingtext,
               'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
@@ -1716,15 +1727,15 @@ class Template:
         # left table cells: print collection name
         if not middle_only:
             out += '''
-                  %(collection_name)s
+                  <a name="%(collection_name)s"></a>
                   <form action="%(weburl)s/search" method="get">
                   <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
                   <strong><big>%(collection_link)s</big></strong></td>
                   ''' % {
-                    'collection_name': a_href('', name=urllib.quote(collection)),
+                    'collection_name': urllib.quote(collection),
                     'weburl' : weburl,
-                    'collection_link': a_href(collection_name,
-                                              href=self.build_search_interface_url(c=collection, as=as, ln=ln)),
+                    'collection_link': create_html_link(self.build_search_interface_url(c=collection, as=as, ln=ln),
+                                                        {}, collection_name)
                   }
         else:
             out += """
@@ -1765,12 +1776,14 @@ class Template:
                     'txt': txt, 'gif': gif, 'weburl': weburl}
 
             if jrec-rg > 1:
-                out += a_href(img('sb', _("begin")), _class='img',
-                              href=self.build_search_url(query, jrec=1, rg=rg))
+                out += create_html_link(self.build_search_url(query, jrec=1, rg=rg),
+                                        {}, img('sb', _("begin")), 
+                                        {'class': 'img'})
                 
             if jrec > 1:
-                out += a_href(img('sp', _("previous")), _class='img',
-                              href=self.build_search_url(query, jrec=max(jrec-rg, 1), rg=rg))
+                out += create_html_link(self.build_search_url(query, jrec=max(jrec-rg, 1), rg=rg),
+                                        {}, img('sp', _("previous")), 
+                                        {'class': 'img'})
                 
             if jrec+rg-1 < nb_found:
                 out += "%d - %d" % (jrec, jrec+rg-1)
@@ -1778,12 +1791,18 @@ class Template:
                 out += "%d - %d" % (jrec, nb_found)
 
             if nb_found >= jrec+rg:
-                out += a_href(img('sn', _("next")), _class='img',
-                              href=self.build_search_url(query, jrec=jrec+rg, rg=rg))
+                out += create_html_link(self.build_search_url(query, 
+                                                              jrec=jrec+rg, 
+                                                              rg=rg),
+                                        {}, img('sn', _("next")), 
+                                        {'class':'img'})
 
             if nb_found >= jrec+rg+rg:
-                out += a_href(img('se', _("end")), _class='img',
-                              href=self.build_search_url(query, jrec=nb_found-rg+1, rg=rg))
+                out += create_html_link(self.build_search_url(query, 
+                                                            jrec=nb_found-rg+1, 
+                                                            rg=rg),
+                                        {}, img('se', _("end")), 
+                                        {'class': 'img'})
                 
 
             # still in the navigation part
@@ -1939,7 +1958,8 @@ class Template:
             if format == abbrev:
                 result.append(name)
             else:
-                result.append(a_href(name, href=self.build_search_url(url_argd, of=abbrev)))
+                result.append(create_html_link(self.build_search_url(url_argd, of=abbrev),
+                                               {}, name))
 
         out += " | ".join(result)
         
@@ -1961,13 +1981,19 @@ class Template:
                                 <input class="formbutton" type="submit" name="action" value="%(basket)s">
                               </form>
                            ''' % {
-                        'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % {'x_date_creation': row['creationdate'],
-                                                                                                                   'x_date_modification': row['modifydate']},
+                        'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
+                                {'x_date_creation': row['creationdate'],
+                                 'x_date_modification': row['modifydate']},
                         'weburl': weburl,
                         'recid': row['recid'],
                         'ln': ln,
-                        'similar': a_href(_("Similar records"), _class="moreinfo",
-                                          href=self.build_search_url(p='recid:%d' % row['recid'], rm='wrd', ln=ln)),
+                        'similar': create_html_link(
+                                    self.build_search_url(p='recid:%d' % \
+                                                            row['recid'], 
+                                                          rm='wrd',
+                                                          ln=ln),
+                                                    {}, _("Similar records"), 
+                                                    {'class': "moreinfo"}),
                         'basket' : _("ADD TO BASKET")
                         }
 
@@ -1984,8 +2010,11 @@ class Template:
                       %(similar)s&nbsp;%(more)s
                       <br><br>
                     </td></tr>''' % {
-                        'more': a_href(_("more"),
-                            href=self.build_search_url(p='recid:%d' % row['recid'], rm='cit', ln=ln)),
+                        'more': create_html_link(
+                                    self.build_search_url(p='recid:%d' % \
+                                                             row['recid'], 
+                                                          rm='cit', ln=ln),
+                                    {}, _("more")),
                         'similar': similar}
 
                 if row.has_key ('cociting'):
@@ -1998,8 +2027,8 @@ class Template:
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
                       <br>
-                    </td></tr>''' % { 'more': a_href(_("more"),
-                                            href=self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln)),
+                    </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln),
+                                                                {}, _("more")),
                                       'similar': similar}
 
                 if row.has_key ('citationhistory'):
@@ -2123,8 +2152,9 @@ class Template:
                 %(link)s
               </td>
             </tr>''' % {'hits' : hits,
-                        'link': a_href(cgi.escape(term), _class="nearestterms",
-                                       href=self.build_search_url(argd))}
+                        'link': create_html_link(self.build_search_url(argd),
+                                                 {}, cgi.escape(term), 
+                                                 {'class': "nearestterms"})}
         out += """</table></blockquote>"""
         return out
 
@@ -2149,8 +2179,11 @@ class Template:
             <tr>
               <td class="googleboxbody">%(nb)d</td>
               <td class="googleboxbody">%(link)s</td>
-            </tr>''' % {'link': a_href(cgi.escape(author), _class="google",
-                                       href=self.build_search_url(p=author, f='author', ln=ln)),
+            </tr>''' % {'link': create_html_link(
+                                    self.build_search_url(p=author,
+                                                          f='author', 
+                                                          ln=ln),
+                                    {}, cgi.escape(author), {'class':"google"}),
                         'nb' : hits}
             
         out += """</table>"""
@@ -2179,8 +2212,11 @@ class Template:
         if authors:
             out += "<p><p><center>"
             for author in authors:
-                out += '%s; ' % a_href(cgi.escape(author),
-                                       href=self.build_search_url(ln=ln, p=author, f='author'))
+                out += '%s; ' % create_html_link(self.build_search_url(
+                                                                ln=ln, 
+                                                                p=author, 
+                                                                f='author'),
+                                                 {}, cgi.escape(author))
             out += "</center>"
         # fourthly, date of creation:
         dates = get_fieldvalues(recID, "260__c")
@@ -2197,8 +2233,11 @@ class Template:
             out += """<p style="margin-left: 15%%; width: 70%%">
                      <small><strong>Keyword(s):</strong>"""
             for keyword in keywords:
-                out += '%s; ' % a_href(cgi.escape(keyword),
-                                       href=self.build_search_url(ln=ln, p=keyword, f='keyword'))
+                out += '%s; ' % create_html_link(
+                                    self.build_search_url(ln=ln, 
+                                                          p=keyword, 
+                                                          f='keyword'),
+                                    {}, cgi.escape(keyword))
                 
             out += '</small>'
         # fifthly bis bis, published in:
@@ -2332,25 +2371,36 @@ class Template:
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
                 out += '<br><span class="moreinfo">%s</span>' % \
-                    a_href(_("Detailed record"), _class="moreinfo",
-                           href=self.build_search_url(sysno=alephsysno, ln=ln))
+                    create_html_link(self.build_search_url(sysno=alephsysno, 
+                                                           ln=ln),
+                                     {}, _("Detailed record"), 
+                                     {'class': "moreinfo"})
             else:
                 out += '<br><span class="moreinfo">%s</span>' % \
-                    a_href(_("Detailed record"), _class="moreinfo",
-                           href=self.build_search_url(recid=recID, ln=ln))
+                    create_html_link(self.build_search_url(recid=recID, ln=ln),
+                                     {},
+                                     _("Detailed record"), 
+                                     {'class': "moreinfo"})
         else:
             out += '<br><span class="moreinfo">%s</span>' % \
-                   a_href(_("Detailed record"), _class="moreinfo",
-                          href=self.build_search_url(recid=recID, ln=ln))
+                   create_html_link(self.build_search_url(recid=recID, ln=ln),
+                                    {}, _("Detailed record"), 
+                                    {'class': "moreinfo"})
 
             out += '<span class="moreinfo"> - %s</span>' % \
-                   a_href(_("Similar records"), _class="moreinfo",
-                          href=self.build_search_url(p="recid:%d" % recID, rm="wrd", ln=ln))
+                   create_html_link(self.build_search_url(p="recid:%d" % recID, 
+                                                     rm="wrd", 
+                                                     ln=ln),
+                                    {}, _("Similar records"), 
+                                    {'class': "moreinfo"})
 
         if CFG_EXPERIMENTAL_FEATURES:
             out += '<span class="moreinfo"> - %s</span>' % \
-                   a_href(_("Cited by"), _class="moreinfo",
-                          href=self.build_search_url(p="recid:%d" % recID, rm="cit", ln=ln))
+                   create_html_link(self.build_search_url(p="recid:%d" % recID, 
+                                                     rm="cit", 
+                                                     ln=ln),
+                                    _("Cited by"), 
+                                    {'class': "moreinfo"})
                  
         return out
 
