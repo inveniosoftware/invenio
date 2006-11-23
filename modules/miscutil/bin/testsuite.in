@@ -52,6 +52,7 @@ from invenio import websearch_external_collections_getter_tests
 from invenio import webuser_tests
 from invenio import dbquery_tests
 from invenio import dateutils_tests
+from invenio import htmlutils_tests
 
 def usage():
     """Print usage info on standard error output."""
@@ -83,6 +84,7 @@ def create_all_test_suites():
                                webuser_tests.create_test_suite(),
                                dbquery_tests.create_test_suite(),
                                dateutils_tests.create_test_suite(),
+                               htmlutils_tests.create_test_suite(),
                                ))
 
 def print_info_line():
