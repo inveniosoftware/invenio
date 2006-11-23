@@ -2091,7 +2091,7 @@ class Template:
             out += "<p>&nbsp;"
         return out
 
-    def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls):
+    def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
         """Prints results overview box with links to particular collections below.
 
         Parameters:
@@ -2113,10 +2113,12 @@ class Template:
           - 'cpu_time' *string* - The time the query took
 
           - 'url_args' *string* - The rest of the search query
+
+          - 'ec' *array* - selected external collections
         """
 
-        if len(colls) == 1:
-            # if one collection only, print nothing:
+        if len(colls) == 1 and not ec:
+            # if one collection only and no external collections, print nothing:
             return ""
 
         # load the right message language

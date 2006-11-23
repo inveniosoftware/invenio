@@ -2149,7 +2149,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
              cpu_time = cpu_time,
            )
 
-def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang):
+def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang, ec=[]):
     "Prints results overview box with links to particular collections below."
     out = ""
     new_colls = []
@@ -2167,6 +2167,7 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              results_final_nb = results_final_nb,
              cpu_time = cpu_time,
              colls = new_colls,
+             ec = ec,
            )
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=cdslang):
@@ -3299,7 +3300,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                         recIDs = results_final_for_all_colls_rank_records_output[0]
                 return recIDs
             elif of.startswith("h"):
-                req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln))
+                req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec))
                 selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
             # print records:
             if len(colls_to_search)>1:
