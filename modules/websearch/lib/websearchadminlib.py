@@ -1778,10 +1778,10 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
 
     colID = int(colID)
 
-    subtitle = """<a name="11">11. Configuration of external collections.</a>"""
+    subtitle = """<a name="11">11. Configuration of related external collections</a>"""
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
-    table_header = ['External collection', 'Mode', 'Apply also on subcollection']
+    table_header = ['External collection', 'Mode', 'Apply also to daughter collections?']
     table_content = []
 
     external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
@@ -2296,7 +2296,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
     </tr><tr>
     <td>10.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
-    <td>11.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of external search engines</a></small></td>
+    <td>11.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
     </tr>
     </table>
     """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
