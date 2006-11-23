@@ -354,22 +354,13 @@ class KissForPreprintsSearchEngine(KissSearchEngine):
         self.base_url = "http://www-lib.kek.jp/KISS/kiss_prepri.html"
         self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_prepri?"
 
-class KissForBooksSearchEngine(KissSearchEngine):
-    """Interface for seaching on Kiss for Books"""
+class KissForBooksAndJournalsSearchEngine(KissSearchEngine):
+    """Interface for seaching on Kiss for Books and Journals"""
 
     def __init__(self, configuration):
-        super(KissForBooksSearchEngine, self).__init__(configuration)
+        super(KissForBooksAndJournalsSearchEngine, self).__init__(configuration)
         self.base_url = "http://www-lib.kek.jp/KISS/kiss_book.html"
         self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=1&"
-        self.parser = KISSBooksExternalCollectionResultsParser()
-
-class KissForJournalsSearchEngine(KissSearchEngine):
-    """Interface for seaching on Kiss for Journals."""
-
-    def __init__(self, configuration):
-        super(KissForJournalsSearchEngine, self).__init__(configuration)
-        self.base_url = "http://www-lib.kek.jp/KISS/kiss_book.html"
-        self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=2&"
         self.parser = KISSBooksExternalCollectionResultsParser()
 
 # Scirus
@@ -410,7 +401,7 @@ class SPIRESSearchEngine(ExternalSearchEngine):
 
     def __init__(self, configuration):
         super(SPIRESSearchEngine, self).__init__(configuration)
-        self.base_url = "http://www.slac.stanford.edu/spires/find/hep/"
+        self.base_url = "http://www.slac.stanford.edu/spires/hep/"
         self.search_url = "http://www.slac.stanford.edu/spires/find/hep/?rawcmd=find+"
         self.combiner = " and "
         self.parser = SPIRESExternalCollectionResultsParser()
@@ -441,7 +432,7 @@ class SPIRESBooksSearchEngine(SPIRESSearchEngine):
 
     def __init__(self, configuration):
         super(SPIRESBooksSearchEngine, self).__init__(configuration)
-        self.base_url = "http://www.slac.stanford.edu/spires/find/books/"
+        self.base_url = "http://www.slac.stanford.edu/library/catalog/"
         self.search_url = "http://www.slac.stanford.edu/spires/find/books/?rawcmd=find+"
         self.parser = None
 
