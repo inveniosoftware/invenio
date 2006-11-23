@@ -28,7 +28,6 @@ __revision__ = "$Id$"
 ## import interesting modules:
 try:
     from invenio.dbquery import run_sql, escape_string
-    #from invenio.config import *
     from invenio.config import \
          weburl,\
          tmpdir,\
