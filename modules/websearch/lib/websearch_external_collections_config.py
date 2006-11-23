@@ -32,7 +32,7 @@ CFG_EXTERNAL_COLLECTION_MAXRESULTS = 25
 CFG_EXTERNAL_COLLECTIONS = {
     'Amazon': 
         {'engine': 'Amazon'},
-    'CERN - CDS Indico': 
+    'CERN - Indico': 
         {'engine': 'CDSIndico'},
     'CERN - Intranet':
         {'base_url': "http://www.iso.org", 'search_url': "http://search.cern.ch/query.html?qt="},
