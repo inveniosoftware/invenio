@@ -772,14 +772,19 @@ class Template:
         for engine in engines_list:
             internal_name = engine.name
             name = _(internal_name)
+            base_url = engine.base_url
             if external_collection_get_state(engine, collection_id) == 3:
                 checked = ' checked'
             else:
                 checked = ''
 
             html += """<tr><td class="narrowsearchboxbody" valign="top">
-                <input type=checkbox name="ec" value="%(internal_name)s" %(checked)s>&nbsp;</td>
-                <td valign="top"><strong>%(name)s</strong></td></tr>""" % locals()
+                <input type="checkbox" name="ec" value="%(internal_name)s" %(checked)s>&nbsp;</td>
+                <td valign="top"><a href="%(base_url)s">%(name)s</a></td></tr>""" % \
+                                 { 'checked': checked,
+                                   'base_url': base_url,
+                                   'internal_name': internal_name,
+                                   'name': name, }
 
         html += """</tr></tbody></table></table>"""
         return html
@@ -1842,8 +1847,29 @@ class Template:
         out += "</form>"
         return out
 
-    def tmpl_nice_number(self, number, ln=cdslang):
-        "Returns nicely printed number NUM in language LN using the locale."
+    def tmpl_nice_number(self, number, ln=cdslang, thousands_separator=','):
+        """
+        Return nicely printed number NUMBER in language LN using
+        given THOUSANDS_SEPARATOR character.
+
+        This version does not pay attention to locale.  See
+        tmpl_nice_number_via_locale().
+        """    
+        chars_in = list(str(number))
+        number = len(chars_in)
+        chars_out = []
+        for i in range(0,number):
+            if i % 3 == 0 and i != 0:
+                chars_out.append(thousands_separator)
+            chars_out.append(chars_in[number-i-1])
+        chars_out.reverse()
+        return ''.join(chars_out)
+        
+    def tmpl_nice_number_via_locale(self, number, ln=cdslang):
+        """"
+        Return nicely printed number NUM in language LN using the locale.
+        See also version tmpl_nice_number().
+        """
         if number is None:
             return None
         # Temporarily switch the numeric locale to the requeted one, and format the number
