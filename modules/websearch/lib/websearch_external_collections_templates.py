@@ -61,7 +61,7 @@ class Template:
         lang: The language to display
         engine_list: The external engines to be used"""
 
-        if len(engine_list) <= 1:
+        if len(engine_list) < 1:
             return ""
 
         _ = gettext_set_language(lang)
@@ -76,7 +76,7 @@ class Template:
     </thead>
       <tbody>
         <tr>
-          <td class="externalcollectionsresultsboxbody"> """ % _("Results from external collections overview:")
+          <td class="externalcollectionsresultsboxbody"> """ % _("External collections results overview:")
 
         for engine in engine_list:
             internal_name = get_link_name(engine.name)
@@ -90,20 +90,34 @@ class Template:
 </p>"""
         return out
 
-def print_info_line(req, html1, html2):
-    """Print an information line on req."""
-    req.write('<table class="externalcollectionsresultsbox"><tr><td class="externalcollectionsresultsboxheader" align="left" width="50%"><strong><big>')
-    req.write(html1)
-    req.write('</big></strong></td><td class="externalcollectionsresultsboxheader" align="center">')
-    req.write(html2)
+def print_info_line(req,
+                    html_external_engine_name_box,
+                    html_external_engine_nb_results_box,
+                    html_external_engine_nb_seconds_box):
+    """Print on req an information line about results of an external collection search."""
+    
+    req.write('<table class="externalcollectionsresultsbox"><tr>')
+    req.write('<td class="externalcollectionsresultsboxheader">')
+    req.write('<big><strong>' + \
+               html_external_engine_name_box + \
+               '</strong></big>')
+    req.write('&nbsp;&nbsp;&nbsp;')
+    req.write(html_external_engine_nb_results_box)
+    req.write('</td><td class="externalcollectionsresultsboxheader" width="20%" align="right">')
+    req.write('<small>' + \
+              html_external_engine_nb_seconds_box + \
+              '</small>')
     req.write('</td></tr></table><br>')
 
 def print_timeout(req, lang, engine, name, url):
     """Print info line for timeout."""
     _ = gettext_set_language(lang)
     req.write('<a name="%s"></a>' % get_link_name(engine.name))
-    print_info_line(req, create_html_link(url, {}, name, {}, False, False), _('Timeout'))
-    message = _("The external search engine has not responded in time. You can check results here:")
+    print_info_line(req,
+                    create_html_link(url, {}, name, {}, False, False),
+                    '',
+                    _('Search timed out.'))
+    message = _("The external search engine has not responded in time. You can check its results here:")
     req.write(message + ' ' + create_html_link(url, {}, name, {}, False, False) + '<br />')
 
 def get_link_name(name):
@@ -117,26 +131,33 @@ def print_results(req, lang, pagegetter, infos, current_time):
     _ = gettext_set_language(lang)
     url = infos[0]
     engine = infos[1]    
-
-    results = engine.parser.parse_and_get_results(pagegetter.data)
-    num = format_number(engine.parser.parse_num_results())
-
-    html2 = _("Time : %2.3f") % current_time
-    if num:
-        num = _('%s results found') % num
-    else:
-        num = _('See results')
-    if num == '0':
-        num = _('No results found.')
-    #if num:
-    #    html2 += ", "
-    #    html2 += _("Number of results : %(num_results)s") % {'num_results': num}
-
     internal_name = get_link_name(engine.name)
     name = _(engine.name)
     base_url = engine.base_url
+
+    results = engine.parser.parse_and_get_results(pagegetter.data)
+
+    html_tit = make_url(name, base_url)
+
+    num = format_number(engine.parser.parse_num_results())
+    if num:
+        if num == '0':
+            html_num = _('No results found.')
+            html_sec = ''
+        else:
+            html_num = '<strong>' + \
+                       make_url(_('%s results found') % num, url) + \
+                       '</strong>'
+            html_sec = "(%s seconds)" % ('%2.2f' % current_time)
+    else:
+        html_num = _('No results found.')
+        html_sec = ''
+
     req.write('<a name="%(internal_name)s"></a>' % locals())
-    print_info_line(req, make_url(name, base_url) + ', ' + make_url(num, url) , html2)
+    print_info_line(req,
+                    html_tit,                   
+                    html_num,
+                    html_sec)
 
     for result in results:
         req.write(result.html + '<br />')
@@ -172,4 +193,3 @@ def format_number(num, separator=','):
         num = num / 1000
         result = "%03d" % part + separator + result
     return result.strip('0').strip(separator)
-
