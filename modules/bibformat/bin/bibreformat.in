@@ -20,23 +20,27 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Call BibFormat engine and create HTML brief (and other) formats for bibliographic records.
-   Upload formats via BibUpload."""
+"""Call BibFormat engine and create HTML brief (and other) formats for
+   bibliographic records.  Upload formats via BibUpload."""
 
 __revision__ = "$Id$"
 
 ## import interesting modules:
 try:
-    import sys
     from invenio.dbquery import run_sql, escape_string
-    from invenio.config import *
+    #from invenio.config import *
+    from invenio.config import \
+         weburl,\
+         tmpdir,\
+         bindir
+         
     from invenio.search_engine import perform_request_search
     from invenio.search_engine import print_record, encode_for_xml
     from invenio.access_control_engine import acc_authorize_action
     from invenio.bibformat import format_record
     from invenio.bibformat_utils import encode_for_xml
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-    from invenio.bibrecord import create_records
+    
     import getopt
     import getpass
     import marshal
@@ -210,6 +214,7 @@ def without_fmt(sql):
 
 def iterate_over_new(list, weburl, fmt):
     "Iterate odver list of IDs"
+    
     n_it_rec       = 0          # Number of records for current iteration
     n_it_max       = 10000      # Number of max records in one iteration
     n_rec          = 0          # Number of formatted records 
@@ -524,7 +529,8 @@ def authenticate(user, header="BibReformat Task Submission", action="runbibforma
     return user
 
 def task_submit():
-    """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+    """Submits task to the BibSched task queue.
+    This is what people will be invoking via command line."""
 
     global options, sched_time, sleep_time
 
@@ -696,7 +702,22 @@ def main():
         options = {} # will hold command-line options
         options["verbose"] = 1
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:ac:f:s:p:lo:nt:wl", ["help", "version", "verbose=","user=", "all", "collection=", "field=", "sleeptime=", "pattern=", "format=", "noprocess", "time=", "without", "last"])
+            opts, args = getopt.getopt(sys.argv[1:],
+                                       "hVv:u:ac:f:s:p:lo:nt:wl",
+                                       ["help",
+                                        "version",
+                                        "verbose=",
+                                        "user=",
+                                        "all",
+                                        "collection=",
+                                        "field=",
+                                        "sleeptime=",
+                                        "pattern=",
+                                        "format=",
+                                        "noprocess",
+                                        "time=",
+                                        "without",
+                                        "last"])
         except getopt.GetoptError, err:
             usage(1, err)
 
