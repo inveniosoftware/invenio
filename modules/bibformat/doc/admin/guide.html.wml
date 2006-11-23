@@ -1005,7 +1005,22 @@ basic format elements) are not shown in the format elements documentation pages.
 This is to reduce the number of elements shown in the documentation as the logical fields
 table contains a lot of not so useful fields to be used in templates.</p>
 
-
+<h3>How can I escape special HTML/XML chars like '&lt;', '&gt;' and '&amp;'? What is the default behaviour of BibFormat?</h3>
+<p>By default, BibFormat escapes no value at all. However, when calling a format element
+from a format template, you can set the special parameter <code>escape</code> of your element to '1' to
+make BibFormat understand that it has to escape values of the element. </br>
+For example <code>&lt;bfe_abstract /&gt;</code> will return:</br>
+<code>[...]We find that for spatially-flat cosmologies, background lensing</code></br>
+<code>clusters with reasonable mass-to-light ratios lying in the</code></br>
+<code>redshift range 0<span style="color:red;">&lt;</span>1 are strongly excluded, [...]</code></br><br/>
+while <code>&lt;bfe_abstract escape="1"/&gt;</code> will return:<br/>
+<code>[...]We find that for spatially-flat cosmologies, background lensing</code></br>
+<code>clusters with reasonable mass-to-light ratios lying in the</code></br>
+<code>redshift range 0<span style="color:red;">&amp;lt;</span>1 are strongly excluded, [...]</code></br><br/>
+In most cases, you will
+want to set <code>escape</code> to '1', but you have to make sure that the author of the element has not already
+escaped values for you. This might be the case when the element returns some HTML.<br/>
+Please note that values given in sepcial parameters <code>prefix</code>, <code>suffix</code>, <code>default</code> and <code>nbMax</code> are never escaped, whatever the value of <code>escape</code> is.</p>
 <a name="oldGuide"/>
 <h1>Old PHP BibFormat Aministration Guide</h1>
 <h2>Contents</h2>

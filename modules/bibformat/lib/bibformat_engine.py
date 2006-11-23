@@ -34,22 +34,39 @@ import os
 import inspect
 import traceback
 import zlib
+import cgi
 
 from invenio.config import \
      CFG_PATH_PHP, \
      bindir, \
      cdslang
-from invenio.errorlib import register_errors, get_msgs_for_code_list
-from invenio.bibrecord import create_record, record_get_field_instances, record_get_field_value, record_get_field_values
+from invenio.errorlib import \
+     register_errors, \
+     get_msgs_for_code_list
+from invenio.bibrecord import \
+     create_record, \
+     record_get_field_instances, \
+     record_get_field_value, \
+     record_get_field_values
 from invenio.dbquery import run_sql
-from invenio.messages import language_list_long, wash_language
+from invenio.messages import \
+     language_list_long, \
+     wash_language
 from invenio import bibformat_dblayer
-from invenio.bibformat_config import CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_OUTPUTS_PATH, CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-from bibformat_utils import record_get_xml, parse_tag
+from invenio.bibformat_config import \
+     CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
+     CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
+     CFG_BIBFORMAT_TEMPLATES_PATH, \
+     CFG_BIBFORMAT_ELEMENTS_PATH, \
+     CFG_BIBFORMAT_OUTPUTS_PATH, \
+     CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+from bibformat_utils import \
+     record_get_xml, \
+     parse_tag
 
 from xml.dom import minidom #Remove when call_old_bibformat is removed
 
-#Cache for data we have allready read and parsed
+# Cache for data we have already read and parsed
 format_templates_cache = {}
 format_elements_cache = {}
 format_outputs_cache = {}
@@ -57,7 +74,7 @@ kb_mappings_cache = {}
 
 cdslangs = language_list_long()
 
-#Regular expression for finding <lang>...</lang> tag in format templates
+# Regular expression for finding <lang>...</lang> tag in format templates
 pattern_lang = re.compile(r'''
     <lang              #<lang tag (no matter case)
     \s*                #any number of white spaces
@@ -66,7 +83,7 @@ pattern_lang = re.compile(r'''
     (</lang\s*>)       #end tag
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-#Builds regular expression for finding each known language in <lang> tags
+# Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<("
 for lang in cdslangs:
     ln_pattern_text += lang[0] +r"|"
@@ -76,7 +93,7 @@ ln_pattern_text += r")>(.*?)</\1>"
     
 ln_pattern =  re.compile(ln_pattern_text)
 
-#Regular expression for finding <name> tag in format templates
+# Regular expression for finding <name> tag in format templates
 pattern_format_template_name = re.compile(r'''
     <name              #<name tag (no matter case)
     \s*                #any number of white spaces
@@ -85,7 +102,7 @@ pattern_format_template_name = re.compile(r'''
     (</name\s*>)(\n)?  #end tag
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-#Regular expression for finding <description> tag in format templates
+# Regular expression for finding <description> tag in format templates
 pattern_format_template_desc = re.compile(r'''
     <description           #<decription tag (no matter case)
     \s*                    #any number of white spaces
@@ -94,7 +111,7 @@ pattern_format_template_desc = re.compile(r'''
     </description\s*>(\n)? #end tag
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-#Regular expression for finding <BFE_ > tags in format templates
+# Regular expression for finding <BFE_ > tags in format templates
 pattern_tag = re.compile(r'''
     <BFE_                        #every special tag starts with <BFE_ (no matter case)
     (?P<function_name>[^/\s]+)   #any char but a space or slash
@@ -110,7 +127,7 @@ pattern_tag = re.compile(r'''
     (/)?>                        #end of the tag
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-#Regular expression for finding params inside <BFE_ > tags in format templates
+# Regular expression for finding params inside <BFE_ > tags in format templates
 pattern_function_params = re.compile('''
     (?P<param>([^=\s])*)\s*  # Param name: any chars that is not a white space or equality. Followed by space(s)
     =\s*                     # Equality: = followed by any number of spaces
@@ -119,21 +136,25 @@ pattern_function_params = re.compile('''
     (?P=sep)                 # Same separator as starting one
     ''', re.VERBOSE | re.DOTALL )
 
-#Regular expression for finding format elements "params" attributes (defined by @param)
+# Regular expression for finding format elements "params" attributes
+# (defined by @param)
 pattern_format_element_params = re.compile('''
     @param\s*                          # Begins with @param keyword followed by space(s)
     (?P<name>[^\s=]*)\s*               # A single keyword, and then space(s)
-    #(=\s*(?P<sep>[\'"])                # Equality, space(s) and then one of the separators
-    #(?P<default>.*?)                   # Default value: any chars that is not a separator like previous one
-    #(?P=sep)                           # Same separator as starting one
-    #)?\s*                              # Default value for param is optional. Followed by space(s)
+    #(=\s*(?P<sep>[\'"])               # Equality, space(s) and then one of the separators
+    #(?P<default>.*?)                  # Default value: any chars that is not a separator like previous one
+    #(?P=sep)                          # Same separator as starting one
+    #)?\s*                             # Default value for param is optional. Followed by space(s)
     (?P<desc>.*)                       # Any text that is not end of line (thanks to MULTILINE parameter)
     ''', re.VERBOSE | re.MULTILINE)
 
-#Regular expression for finding format elements "see also" attribute (defined by @see)
-pattern_format_element_seealso = re.compile('''@see\s*(?P<see>.*)''', re.VERBOSE | re.MULTILINE)
+# Regular expression for finding format elements "see also" attribute
+# (defined by @see)
+pattern_format_element_seealso = re.compile('''@see\s*(?P<see>.*)''',
+                                            re.VERBOSE | re.MULTILINE)
 
-#Regular expression for finding 2 expressions in quotes, separated by comma (as in template("1st","2nd") )
+#Regular expression for finding 2 expressions in quotes, separated by
+#comma (as in template("1st","2nd") )
 #Used when parsing output formats
 ## pattern_parse_tuple_in_quotes = re.compile('''
 ##      (?P<sep1>[\'"])
@@ -160,7 +181,8 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False):
     res = []
     if not on_the_fly:
         # look for formatted notice existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
+        query = "SELECT value FROM bibfmt WHERE "\
+                "id_bibrec='%s' AND format='%s'" % (recID, format)
         res = run_sql(query, None, 1)
     if res:
         # record 'recID' is formatted in 'format', so print it
@@ -189,7 +211,8 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False):
             out = bibformat_output
         return out
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None):
+def format_record(recID, of, ln=cdslang, verbose=0,
+                  search_pattern=[], xml_record=None, uid=None):
     """
     Formats a record given output format. Main entry function of bibformat engine.
     
@@ -278,9 +301,10 @@ def decide_format_template(bfo, of):
     else:
         return None
     
-def format_with_format_template(format_template_filename, bfo, verbose=0, format_template_code=None):
-    """
-    Format a record given a format template. Also returns errors
+def format_with_format_template(format_template_filename, bfo,
+                                verbose=0, format_template_code=None):
+    """ Format a record given a
+    format template. Also returns errors
     
     Returns a formatted version of the record represented by bfo,
     in the language specified in bfo, and with the specified format template.
@@ -304,7 +328,9 @@ def format_with_format_template(format_template_filename, bfo, verbose=0, format
         format_content = get_format_template(format_template_filename)['code']
   
     localized_format = filter_languages(format_content, bfo.lang)
-    (evaluated_format, errors) = eval_format_template_elements(localized_format, bfo, verbose)
+    (evaluated_format, errors) = eval_format_template_elements(localized_format,
+                                                               bfo,
+                                                               verbose)
     errors_ = errors
  
     return (evaluated_format, errors)
@@ -329,7 +355,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
     """
     errors_ = []
     
-    #First define insert_element_code(match), used in re.sub() function
+    # First define insert_element_code(match), used in re.sub() function
     def insert_element_code(match):
         """
         Analyses 'match', interpret the corresponding code, and return the result of the evaluation.
@@ -343,7 +369,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
         
         format_element = get_format_element(function_name, verbose)
         params = {}
-        #look for function parameters given in format template code
+        # Look for function parameters given in format template code
         all_params = match.group('params')
         if all_params != None:
             function_params_iterator = pattern_function_params.finditer(all_params)
@@ -352,14 +378,17 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                 value = param_match.group('value')
                 params[name] = value
 
-        #Evaluate element with params and return (Do not return errors)
-        (result, errors) = eval_format_element(format_element, bfo, params, verbose)
+        # Evaluate element with params and return (Do not return errors)
+        (result, errors) = eval_format_element(format_element,
+                                               bfo,
+                                               params,
+                                               verbose)
         errors_ = errors
         return result
         
     
-    #Substitute special tags in the format by our own text.
-    #Special tags have the form <BNE_format_element_name [param="value"]* />
+    # Substitute special tags in the format by our own text.
+    # Special tags have the form <BNE_format_element_name [param="value"]* />
     format = pattern_tag.sub(insert_element_code, format_template)
     
     return (format, errors_)
@@ -387,30 +416,31 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     prefix = parameters.get('prefix', "")
     suffix = parameters.get('suffix', "")
     default_value = parameters.get('default', "")
+    escape = parameters.get('escape', "0")
     
-    #3 possible cases:
-    #a) format element file is found: we execute it
-    #b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
-    #c) format element is totally unknown. Do nothing or report error
+    # 3 possible cases:
+    # a) format element file is found: we execute it
+    # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
+    # c) format element is totally unknown. Do nothing or report error
     
     if format_element != None and format_element['type'] == "python":
-        #a)
-        #We found an element with the tag name, of type "python"
-        #Prepare a dict 'params' to pass as parameter to 'format' function of element
+        # a) We found an element with the tag name, of type "python"
+        # Prepare a dict 'params' to pass as parameter to 'format'
+        # function of element
         params = {}
 
-        #look for parameters defined in format element
-        #fill them with specified default values and values
-        #given as parameters
+        # Look for parameters defined in format element
+        # Fill them with specified default values and values
+        # given as parameters
         for param in format_element['attrs']['params']:
             name = param['name']
             default = param['default']
             params[name] = parameters.get(name, default)
             
-        #Add BibFormatObject
+        # Add BibFormatObject
         params['bfo'] = bfo
 
-        #execute function with given parameters and return result.
+        # Execute function with given parameters and return result.
         output_text = ""
         function = format_element['code']
         
@@ -425,45 +455,54 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 register_errors(errors, 'error')
             elif verbose >=5:
                 tb = sys.exc_info()[2]
-                error_string = get_msgs_for_code_list(error, stream='error', ln=cdslang)
+                error_string = get_msgs_for_code_list(error,
+                                                      stream='error',
+                                                      ln=cdslang)
                 stack = traceback.format_exception(Exception, e, tb, limit=None)
-                output_text = '<b><span style="color: rgb(255, 0, 0);">'+error_string[0][1] + "".join(stack) +'</span></b> '
+                output_text = '<b><span style="color: rgb(255, 0, 0);">'+ \
+                              error_string[0][1] + "".join(stack) +'</span></b> '
 
 
         if output_text == None:
             output_text = ""
         else:
             output_text = str(output_text)
+
+        # If escape is equal to 1, then escape all
+        # HTML reserved chars.
+        if escape == '1':
+            output_text = cgi.escape(output_text)
      
-        #Add prefix and suffix if they have been given as parameters and if
-        #the evaluation of element is not empty
+        # Add prefix and suffix if they have been given as parameters and if
+        # the evaluation of element is not empty
         if output_text.strip() != "":
             output_text = prefix + output_text + suffix
 
-        #Add the default value if output_text is empty
+        # Add the default value if output_text is empty
         if output_text == "":
             output_text = default_value
-
+           
         return (output_text, errors)
     
     elif format_element != None and format_element['type'] =="field":
-        #b)
-        #We have not found an element in files that has the tag name. Then look for it
-        #in the table "tag"
+        # b) We have not found an element in files that has the tag
+        # name. Then look for it in the table "tag"
         #
-        # <BFE_LABEL_IN_TAG prefix = "" suffix = "" separator = "" nbMax="" />
+        # <BFE_LABEL_IN_TAG prefix = "" suffix = "" separator = ""
+        #                   nbMax="" escape="0"/>
         #
 
-        #Load special values given as parameters
+        # Load special values given as parameters
         separator = parameters.get('separator ', "")
         nbMax = parameters.get('nbMax', "")
+        nbMax = parameters.get('escape', "0")
         
-        #Get the fields tags that have to be printed
+        # Get the fields tags that have to be printed
         tags = format_element['attrs']['tags']
 
         output_text = []
 
-        #Get values corresponding to tags
+        # Get values corresponding to tags
         for tag in tags:
             p_tag = parse_tag(tag)
             values = record_get_field_values(bfo.get_record(),
@@ -471,7 +510,8 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                                              p_tag[1],
                                              p_tag[2],
                                              p_tag[3])
-            if len(values)>0 and isinstance(values[0], dict):#flatten dict to its values only
+            if len(values)>0 and isinstance(values[0], dict):
+                #flatten dict to its values only
                 values_list = map(lambda x: x.values(), values)
                 #output_text.extend(values)
                 for values in values_list:
@@ -490,20 +530,33 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 if verbose < 5:
                     register_errors(error, 'error')
                 elif verbose >=5:
-                    error_string = get_msgs_for_code_list(error, stream='error', ln=cdslang)
+                    error_string = get_msgs_for_code_list(error,
+                                                          stream='error',
+                                                          ln=cdslang)
                     output_text = output_text.append(error_string[0][1])
 
 
-        #Add prefix and suffix if they have been given as parameters and if
-        #the evaluation of element is not empty.
-        #If evaluation is empty string, return default value if it exists. Else return empty string
+
+        # Add prefix and suffix if they have been given as parameters and if
+        # the evaluation of element is not empty.
+        # If evaluation is empty string, return default value if it exists.
+        # Else return empty string
         if ("".join(output_text)).strip() != "":
-            return (prefix + separator.join(output_text) + suffix, errors)
+            # If escape is equal to 1, then escape all
+            # HTML reserved chars.
+            if escape == '1':
+                output_text = cgi.escape(separator.join(output_text))
+            else:
+                output_text = separator.join(output_text)
+                
+            output_text = prefix + output_text + suffix
         else:
             #Return default value
-            return (default_value, errors)
+            output_text = default_value
+            
+        return (output_text, errors)
     else:
-        #c) Element is unknown
+        # c) Element is unknown
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", format_element)],
                                        stream='error', ln=cdslang)
         errors.append(error)
@@ -513,7 +566,8 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         elif verbose >=5:
             if verbose >= 9:
                 sys.exit(error[0][1])
-            return ('<b><span style="color: rgb(255, 0, 0);">'+error[0][1]+'</span></b>', errors)
+            return ('<b><span style="color: rgb(255, 0, 0);">' + \
+                    error[0][1]+'</span></b>', errors)
 
     
 def filter_languages(format_template, ln='en'):
@@ -524,8 +578,8 @@ def filter_languages(format_template, ln='en'):
     @param ln the language that is NOT filtered out from the template
     @return the format template with unnecessary languages filtered out
     """
-    #First define search_lang_tag(match) and clean_language_tag(match), used
-    #in re.sub() function
+    # First define search_lang_tag(match) and clean_language_tag(match), used
+    # in re.sub() function
     def search_lang_tag(match):
         """
         Searches for the <lang>...</lang> tag and remove inner localized tags
@@ -548,19 +602,21 @@ def filter_languages(format_template, ln='en'):
                 return match.group(2)
             else:
                 return ""
-            #End of clean_language_tag
+            # End of clean_language_tag
 
             
         lang_tag_content = match.group("langs")
-        #Try to find tag with current lang. If it does not exists, then current_lang
-        #becomes cdslang until the end of this replace
-        pattern_current_lang = re.compile(r"<"+current_lang+"\s*>(.*?)</"+current_lang+"\s*>")
+        # Try to find tag with current lang. If it does not exists,
+        # then current_lang becomes cdslang until the end of this
+        # replace
+        pattern_current_lang = re.compile(r"<"+current_lang+ \
+                                          "\s*>(.*?)</"+current_lang+"\s*>")
         if re.search(pattern_current_lang, lang_tag_content) == None:
             current_lang = cdslang
 
         cleaned_lang_tag = ln_pattern.sub(clean_language_tag, lang_tag_content)
         return cleaned_lang_tag
-        #End of search_lang_tag
+        # End of search_lang_tag
 
       
     filtered_format_template = pattern_lang.sub(search_lang_tag, format_template)
@@ -581,16 +637,18 @@ def get_format_template(filename, with_attributes=False):
     @param with_attributes if True, fetch the attributes (names and description) for format'
     @return strucured content of format template
     """
-    #Get from cache whenever possible
+    # Get from cache whenever possible
     global format_templates_cache
 
     if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
         return None
         
     if format_templates_cache.has_key(filename):
-        #If we must return with attributes and template exist in cache with attributes
-        #then return cache. Else reload with attributes
-        if with_attributes == True and format_templates_cache[filename].has_key('attrs'):
+        # If we must return with attributes and template exist in
+        # cache with attributes then return cache.
+        # Else reload with attributes
+        if with_attributes == True and \
+               format_templates_cache[filename].has_key('attrs'):
             return format_templates_cache[filename]
 
     format_template = {'code':""}
@@ -602,12 +660,14 @@ def get_format_template(filename, with_attributes=False):
         format_content = format_file.read()
         format_file.close()
 
-        #Load format template code
-        #Remove name and description
-        code_and_description = pattern_format_template_name.sub("", format_content)
+        # Load format template code
+        # Remove name and description
+        code_and_description = pattern_format_template_name.sub("",
+                                                                format_content)
         code = pattern_format_template_desc.sub("", code_and_description)
         
-        # Escape % chars in code (because we will use python formatting capabilities)
+        # Escape % chars in code (because we will use python
+        # formatting capabilities)
         format_template['code'] = code
 
     except Exception, e:
@@ -615,11 +675,11 @@ def get_format_template(filename, with_attributes=False):
                                         stream='error', ln=cdslang)
         register_errors(errors, 'error')
 
-    #Save attributes if necessary
+    # Save attributes if necessary
     if with_attributes:
         format_template['attrs'] = get_format_template_attrs(filename)
 
-    #cache and return 
+    # Cache and return 
     format_templates_cache[filename] = format_template
     return format_template
 
@@ -643,7 +703,8 @@ def get_format_templates(with_attributes=False):
     
     for filename in files:
         if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
-            format_templates[filename] = get_format_template(filename, with_attributes)
+            format_templates[filename] = get_format_template(filename,
+                                                             with_attributes)
                        
     return format_templates
 
@@ -660,7 +721,9 @@ def get_format_template_attrs(filename):
     attrs['name'] = ""
     attrs['description'] = ""
     try:
-        template_file = open("%s%s%s"%(CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename))
+        template_file = open("%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH,
+                                         os.sep,
+                                         filename))
         code = template_file.read()
         template_file.close()
 
@@ -701,10 +764,10 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     @param with_built_in_params if True, load the parameters built in all elements 
     @return a dictionary with format element attributes
     """
-    #Get from cache whenever possible
+    # Get from cache whenever possible
     global format_elements_cache
 
-    #Resolve filename and prepare 'name' as key for the cache
+    # Resolve filename and prepare 'name' as key for the cache
     filename = resolve_format_element_filename(element_name)
     if filename != None:
         name = filename.upper()
@@ -713,16 +776,20 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         
     if format_elements_cache.has_key(name):
         element = format_elements_cache[name]
-        if with_built_in_params == False or (with_built_in_params == True and element['attrs'].has_key('builtin_params') ):
+        if with_built_in_params == False or \
+               (with_built_in_params == True and \
+                element['attrs'].has_key('builtin_params') ):
             return element
 
     if filename == None:
-        #element is maybe in tag table
+        # Element is maybe in tag table
         if bibformat_dblayer.tag_exists_for_name(element_name):
-            format_element = {'attrs': get_format_element_attrs_from_table(element_name, with_built_in_params),
+            format_element = {'attrs': get_format_element_attrs_from_table( \
+                element_name,
+                with_built_in_params),
                               'code':None,
                               'type':"field"}
-            #Cache and returns
+            # Cache and returns
             format_elements_cache[name] = format_element
             return format_element
         
@@ -743,11 +810,14 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             module_name = module_name[:-3]
          
         try:
-            module = __import__(CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH+"."+module_name)
+            module = __import__(CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH + \
+                                "." + module_name)
 
-            #Load last module in import path
-            #For eg. load bibformat_elements in invenio.elements.bibformat_element
-            #Used to keep flexibility regarding where elements directory is (for eg. test cases)
+            # Load last module in import path
+            # For eg. load bibformat_elements in
+            # invenio.elements.bibformat_element
+            # Used to keep flexibility regarding where elements
+            # directory is (for eg. test cases)
             components = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH.split(".")
             for comp in components[1:]:
                 module = getattr(module, comp) 
@@ -756,12 +826,13 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
 
 
             format_element['code'] = function_format
-            format_element['attrs'] = get_format_element_attrs_from_function(function_format,
-                                                                             element_name,
-                                                                             with_built_in_params)
+            format_element['attrs'] = get_format_element_attrs_from_function( \
+                function_format,
+                element_name,
+                with_built_in_params)
             format_element['type'] = "python"
     
-            #cache and return
+            # Cache and return
             format_elements_cache[name] = format_element
             return format_element
         except Exception, e:
@@ -811,15 +882,17 @@ def get_format_elements(with_built_in_params=False):
             if filename_test.startswith("BFE_"):
                 filename_test = filename_test[4:]
             element_name = filename_test[:-3]
-            element = get_format_element(element_name, with_built_in_params=with_built_in_params)
+            element = get_format_element(element_name,
+                                         with_built_in_params=with_built_in_params)
             if element != None:
                 format_elements[element_name] = element
          
     return format_elements
 
-def get_format_element_attrs_from_function(function, element_name, with_built_in_params=False):
-    """
-    Returns the attributes of the function given as parameter.
+def get_format_element_attrs_from_function(function, element_name,
+                                           with_built_in_params=False):
+    """ Returns the attributes of the
+    function given as parameter.
     
     It looks for standard parameters of the function, default
     values and comments in the docstring.
@@ -848,13 +921,13 @@ def get_format_element_attrs_from_function(function, element_name, with_built_in
 
     docstring = function.__doc__
     if isinstance(docstring, str):
-        #Look for function description in docstring
+        # Look for function description in docstring
         #match = pattern_format_element_desc.search(docstring)
         description = docstring.split("@param")[0]
         description = description.split("@see")[0]
         attrs['description'] = description.strip().rstrip('.')
 
-        #Look for @see in docstring
+        # Look for @see in docstring
         match = pattern_format_element_seealso.search(docstring)
         if match != None:
             elements = match.group('see').rstrip('.').split(",")
@@ -862,10 +935,11 @@ def get_format_element_attrs_from_function(function, element_name, with_built_in
                 attrs['seealso'].append(element.strip())
 
     params = {}
-    #Look for parameters in function definition
+    # Look for parameters in function definition
     (args, varargs, varkw, defaults) = inspect.getargspec(function)
 
-    #Prepare args and defaults_list such that we can have a mapping from args to defaults
+    # Prepare args and defaults_list such that we can have a mapping
+    # from args to defaults
     args.reverse()
     if defaults != None:
         defaults_list = list(defaults)
@@ -875,11 +949,15 @@ def get_format_element_attrs_from_function(function, element_name, with_built_in
         
     for arg, default in map(None, args, defaults_list):
         if arg == "bfo":
-            continue #Don't keep this as parameter. It is hidden to users, and exists in all elements of this kind
+            #Don't keep this as parameter. It is hidden to users, and
+            #exists in all elements of this kind
+            continue 
         param = {}
         param['name'] = arg
         if default == None:
-            param['default'] = "" #In case no check is made inside element, we prefer to print "" (nothing) than None in output
+            #In case no check is made inside element, we prefer to
+            #print "" (nothing) than None in output
+            param['default'] = "" 
         else:
             param['default'] = default
         param['description'] = "(no description provided)"
@@ -887,8 +965,8 @@ def get_format_element_attrs_from_function(function, element_name, with_built_in
         params[arg] = param
 
     if isinstance(docstring, str):
-        #Look for @param descriptions in docstring.
-        #Add description to existing parameters in params dict
+        # Look for @param descriptions in docstring.
+        # Add description to existing parameters in params dict
         params_iterator = pattern_format_element_params.finditer(docstring)
         for match in params_iterator:
             name = match.group('name')
@@ -897,36 +975,49 @@ def get_format_element_attrs_from_function(function, element_name, with_built_in
 
     attrs['params'] = params.values()
     
-    #Load built-in parameters if necessary
+    # Load built-in parameters if necessary
     if with_built_in_params == True:
         
         builtin_params = []
-        #Add 'prefix' parameter
+        # Add 'prefix' parameter
         param_prefix = {}
         param_prefix['name'] = "prefix"
         param_prefix['default'] = ""
-        param_prefix['description'] = "A prefix printed only if the record has a value for this element"
+        param_prefix['description'] = """A prefix printed only if the
+                                         record has a value for this element"""
         builtin_params.append(param_prefix)
 
-        #Add 'suffix' parameter
+        # Add 'suffix' parameter
         param_suffix = {}
         param_suffix['name'] = "suffix"
         param_suffix['default'] = ""
-        param_suffix['description'] = "A suffix printed only if the record has a value for this element"
+        param_suffix['description'] = """A suffix printed only if the
+                                         record has a value for this element"""
         builtin_params.append(param_suffix)
 
-        #Add 'default' parameter
+        # Add 'default' parameter
         param_default = {}
         param_default['name'] = "default"
         param_default['default'] = ""
-        param_default['description'] = "A default value printed if the record has no value for this element"
+        param_default['description'] = """A default value printed if the
+                                          record has no value for this element"""
         builtin_params.append(param_default)
+
+        # Add 'escape' parameter
+        param_escape = {}
+        param_escape['name'] = "escape"
+        param_escape['default'] = "0"
+        param_escape['description'] = """If set to 1, replaces special
+                                         characters '&', '<' and '>' of this
+                                         element by SGML entities"""
+        builtin_params.append(param_escape)
 
         attrs['builtin_params'] = builtin_params
    
     return attrs
 
-def get_format_element_attrs_from_table(element_name, with_built_in_params=False):
+def get_format_element_attrs_from_table(element_name,
+                                        with_built_in_params=False):
     """
     Returns the attributes of the format element with given name in 'tag' table.
 
@@ -953,50 +1044,66 @@ def get_format_element_attrs_from_table(element_name, with_built_in_params=False
     if len(tags)>1:
         field_label = "fields"
 
-    attrs['description'] = "Prints %s %s of the record" % (field_label, ", ".join(tags))
+    attrs['description'] = "Prints %s %s of the record" % (field_label,
+                                                           ", ".join(tags))
     attrs['name'] = element_name.replace(" ", "_").upper()
     attrs['seealso'] = []
     attrs['params'] = []
     attrs['tags'] = tags
     
-    #Load built-in parameters if necessary
+    # Load built-in parameters if necessary
     if with_built_in_params == True:
         builtin_params = []
         
-        #Add 'prefix' parameter
+        # Add 'prefix' parameter
         param_prefix = {}
         param_prefix['name'] = "prefix"
         param_prefix['default'] = ""
-        param_prefix['description'] = "A prefix printed only if the record has a value for this element"
+        param_prefix['description'] = """A prefix printed only if the
+                                       record has a value for this element"""
         builtin_params.append(param_prefix)
 
-        #Add 'suffix' parameter
+        # Add 'suffix' parameter
         param_suffix = {}
         param_suffix['name'] = "suffix"
         param_suffix['default'] = ""
-        param_suffix['description'] = "A suffix printed only if the record has a value for this element"
+        param_suffix['description'] = """A suffix printed only if the
+                                         record has a value for this element"""
         builtin_params.append(param_suffix)
 
-        #Add 'separator' parameter
+        # Add 'separator' parameter
         param_separator = {}
         param_separator['name'] = "separator"
         param_separator['default'] = " "
-        param_separator['description'] = "A separator between elements of the field"
+        param_separator['description'] = """A separator between elements of
+                                            the field"""
         builtin_params.append(param_separator)
 
-        #Add 'nbMax' parameter
+        # Add 'nbMax' parameter
         param_nbMax = {}
         param_nbMax['name'] = "nbMax"
         param_nbMax['default'] = ""
-        param_nbMax['description'] = "The maximum number of values to print for this element. No limit if not specified"
+        param_nbMax['description'] = """The maximum number of values to
+                                      print for this element. No limit if not
+                                      specified"""
         builtin_params.append(param_nbMax)
 
-        #Add 'default' parameter
+        # Add 'default' parameter
         param_default = {}
         param_default['name'] = "default"
         param_default['default'] = ""
-        param_default['description'] = "A default value printed if the record has no value for this element"
+        param_default['description'] = """A default value printed if the
+                                          record has no value for this element"""
         builtin_params.append(param_default)
+
+        # Add 'escape' parameter
+        param_escape = {}
+        param_escape['name'] = "escape"
+        param_escape['default'] = "0"
+        param_escape['description'] = """If set to 1, replaces special
+                                         characters '&', '<' and '>' of this
+                                         element by SGML entities"""
+        builtin_params.append(param_escape)
 
         attrs['builtin_params'] = builtin_params
 
@@ -1047,11 +1154,13 @@ def get_output_format(code, with_attributes=False, verbose=0):
             output_format['attrs'] = get_output_format_attrs(code, verbose)
         return output_format
     
-    #Get from cache whenever possible
+    # Get from cache whenever possible
     global format_outputs_cache
     if format_outputs_cache.has_key(filename):
-        #If was must return with attributes but cache has not attributes, then load attributes
-        if with_attributes == True and not format_outputs_cache[filename].has_key('attrs'):
+        # If was must return with attributes but cache has not
+        # attributes, then load attributes
+        if with_attributes == True and not \
+               format_outputs_cache[filename].has_key('attrs'):
             format_outputs_cache[filename]['attrs'] = get_output_format_attrs(code, verbose)
 
         return format_outputs_cache[filename]
@@ -1067,12 +1176,15 @@ def get_output_format(code, with_attributes=False, verbose=0):
         for line in format_file:
             line = line.strip()
             if line == "":
-                #ignore blank lines
+                # Ignore blank lines
                 continue
             if line.endswith(":"):
-                #retrieve tag
-                clean_line = line.rstrip(": \n\r") #remove : spaces and eol at the end of line
-                current_tag = "".join(clean_line.split()[1:]).strip() #the tag starts at second position
+                # Retrieve tag
+
+                # Remove : spaces and eol at the end of line
+                clean_line = line.rstrip(": \n\r")
+                # The tag starts at second position
+                current_tag = "".join(clean_line.split()[1:]).strip() 
             elif line.find('---') != -1:
                 words = line.split('---')
                 template = words[-1].strip()
@@ -1085,7 +1197,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
                                                })
               
             elif line.find(':') != -1:
-                #Default case
+                # Default case
                 default = line.split(':')[1].strip()
                 output_format['default'] = default
 
@@ -1094,7 +1206,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
                                         stream='error', ln=cdslang)
         register_errors(errors, 'error')
              
-    #cache and return 
+    # Cache and return 
     format_outputs_cache[filename] = output_format
     return output_format
 
@@ -1205,7 +1317,7 @@ def get_kb_mapping(kb, string, default=""):
             else:
                 return value
     else:
-        #Precreate for caching this kb
+        # Precreate for caching this kb
         kb_mappings_cache[kb] = {}
         
     value = bibformat_dblayer.get_kb_mapping_value(kb, string)
@@ -1246,9 +1358,9 @@ def resolve_format_element_filename(string):
         "BFE_" + test_filename == name:
             return filename
 
-    #No element with that name found
-    #Do not log error, as it might be a normal execution case:
-    #element can be in database
+    # No element with that name found
+    # Do not log error, as it might be a normal execution case:
+    # element can be in database
     return None
 
 def resolve_output_format_filename(code, verbose=0):
@@ -1265,7 +1377,8 @@ def resolve_output_format_filename(code, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return the corresponding filename, with right case, or None if not found
     """
-    code = re.sub(r"[^.0-9a-zA-Z]", "", code) #Remove non alphanumeric chars (except .)
+    #Remove non alphanumeric chars (except .)
+    code = re.sub(r"[^.0-9a-zA-Z]", "", code) 
     if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = re.sub(r"\W", "", code)
         code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
@@ -1275,7 +1388,7 @@ def resolve_output_format_filename(code, verbose=0):
         if filename.upper() == code.upper():
             return filename
 
-    #No output format with that name found
+    # No output format with that name found
     errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME", code)],
                                     stream='error', ln=cdslang)
     if verbose == 0:
@@ -1301,20 +1414,24 @@ def get_fresh_format_template_filename(name):
     #name = re.sub(r"\W", "", name) #Remove non alphanumeric chars
     name = name.replace(" ", "_")
     filename = name
-    filename = re.sub(r"[^.0-9a-zA-Z]", "", filename) #Remove non alphanumeric chars (except .)
-    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
+    # Remove non alphanumeric chars (except .)
+    filename = re.sub(r"[^.0-9a-zA-Z]", "", filename) 
+    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename \
+           + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
     index = 1
     while os.path.exists(path):
         index += 1
         filename = name + str(index)
-        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
+        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename \
+               + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
 
     if index > 1:
         returned_name = (name + str(index)).replace("_", " ")
     else:
         returned_name = name.replace("_", " ")
          
-    return (filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, returned_name) #filename.replace("_", " "))
+    return (filename + "." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
+            returned_name) #filename.replace("_", " "))
 
 def get_fresh_output_format_filename(code):
     """
@@ -1332,20 +1449,24 @@ def get_fresh_output_format_filename(code):
     """
     #code = re.sub(r"\W", "", code) #Remove non alphanumeric chars
     code = code.upper().replace(" ", "_")
-    code = re.sub(r"[^.0-9a-zA-Z]", "", code) #Remove non alphanumeric chars (except .)
+    # Remove non alphanumeric chars (except .)
+    code = re.sub(r"[^.0-9a-zA-Z]", "", code) 
     if len(code) > 6:
         code = code[:6]
     
     filename = code
-    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
+    path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
+           + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
     index = 2
     while os.path.exists(path):
         filename = code + str(index)
         if len(filename) > 6:
             filename = code[:-(len(str(index)))]+str(index)
         index += 1
-        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-        #We should not try more than 99999... Well I don't see how we could get there.. Sanity check.
+        path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename \
+               + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
+        # We should not try more than 99999... Well I don't see how we
+        # could get there.. Sanity check.
         if index >= 99999:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED", code)],
                                             stream='error', ln=cdslang)
@@ -1359,7 +1480,8 @@ def clear_caches():
     Clear the caches (Output Format, Format Templates and Format Elements)
 
     """
-    global format_templates_cache, format_elements_cache , format_outputs_cache, kb_mappings_cache
+    global format_templates_cache, format_elements_cache , \
+           format_outputs_cache, kb_mappings_cache
     format_templates_cache = {}
     format_elements_cache = {}
     format_outputs_cache = {}
@@ -1375,25 +1497,27 @@ class BibFormatObject:
     The object provides basic accessors to the record. For full access, one can get
     the record with get_record() and then use BibRecord methods on the returned object.
     """
-    #The record
+    # The record
     record = None
 
-    #The language in which the formatting has to be done
+    # The language in which the formatting has to be done
     lang = cdslang
 
-    #A list of string describing the context in which the record has to be formatted.
-    #It represents the words of the user request in web interface search
+    # A list of string describing the context in which the record has
+    # to be formatted.
+    # It represents the words of the user request in web interface search
     search_pattern = []
 
-    #The id of the record
+    # The id of the record
     recID = 0
 
-    #The user id of the person who will view the formatted page (if applicable)
-    #This allows for example to print a "edit record" link for people
-    #who have right to edit a record.
+    # The user id of the person who will view the formatted page (if applicable)
+    # This allows for example to print a "edit record" link for people
+    # who have right to edit a record.
     uid = None
     
-    def __init__(self, recID, ln=cdslang, search_pattern=[], xml_record=None, uid=None):
+    def __init__(self, recID, ln=cdslang, search_pattern=[],
+                 xml_record=None, uid=None):
         """
         Creates a new bibformat object, with given record.
 
@@ -1410,7 +1534,7 @@ class BibFormatObject:
         @param uid the user id of the person who will view the formatted page
         """
         if xml_record != None:
-            #If record is given as parameter
+            # If record is given as parameter
             self.record = create_record(xml_record)[0]
             recID = record_get_field_value(self.record,"001")
 
@@ -1427,7 +1551,7 @@ class BibFormatObject:
         @return the record structure as returned by BibRecord
         """
         
-        #Create record if necessary
+        # Create record if necessary
         if self.record == None:
             record = create_record(record_get_xml(self.recID, 'xm'))
             self.record = record[0]
@@ -1442,7 +1566,8 @@ class BibFormatObject:
         @param tag the marc code of a field
         @return value of field tag in record
         """
-        if self.get_record() == None: #Case where BibRecord could not parse object
+        if self.get_record() == None:
+            #Case where BibRecord could not parse object
             return ''
         
         p_tag = parse_tag(tag)
@@ -1482,20 +1607,21 @@ class BibFormatObject:
         @param tag the marc code of a field
         @return values of field tag in record
         """
-        if self.get_record() == None: #Case where BibRecord could not parse object
+        if self.get_record() == None:
+            # Case where BibRecord could not parse object
             return []
         
         p_tag = parse_tag(tag)
         if p_tag[3] != "":
-            #Subcode has been defined. Simply returns list of values
+            # Subcode has been defined. Simply returns list of values
             return record_get_field_values(self.get_record(),
                                            p_tag[0],
                                            p_tag[1],
                                            p_tag[2],
                                            p_tag[3])
         else:
-            #Subcode is undefined. Returns list of dicts.
-            #However it might be the case of a control field.
+            # Subcode is undefined. Returns list of dicts.
+            # However it might be the case of a control field.
             list_of_dicts = []
 
             instances = record_get_field_instances(self.get_record(),
