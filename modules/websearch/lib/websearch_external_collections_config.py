@@ -25,22 +25,22 @@
 
 __revision__ = "$Id$"
 
-CFG_EXTERNAL_COLLECTION_TIMEOUT = 10
+CFG_EXTERNAL_COLLECTION_TIMEOUT = 5
 
-CFG_EXTERNAL_COLLECTION_MAXRESULTS = 25
+CFG_EXTERNAL_COLLECTION_MAXRESULTS = 10
 
 CFG_EXTERNAL_COLLECTIONS = {
     'Amazon': 
         {'engine': 'Amazon'},
-    'CERN - Indico': 
+    'CERN Indico': 
         {'engine': 'CDSIndico'},
-    'CERN - Intranet':
+    'CERN Intranet':
         {'base_url': "http://www.iso.org", 'search_url': "http://search.cern.ch/query.html?qt="},
-    'CERN - EDMS':
+    'CERN EDMS':
         {'engine': 'CERNEDMS'},
     'CiteSeer': 
         {'engine': 'Citeseer'},
-    'Google':
+    'Google Web':
         {'engine': 'Google'},
     'Google Books':
         {'engine': 'GoogleBooks'},
@@ -60,19 +60,17 @@ CFG_EXTERNAL_COLLECTIONS = {
             "scopeprogramme=PROGRAMME&scopewithdrawn=WITHDRAWN&scopedeleted=DELETED&sortOrder=ISO&keyword="},
     'INSPEC':
         {'engine': 'INSPEC'},
-    'KEK KISS Preprints':
+    'KISS Preprints':
         {'engine': 'KissForPreprints'},
-    'KEK Library Books':
-        {'engine': 'KissForBooks'},
-    'KEK Library Journals':
-        {'engine': 'KissForJournals'},
+    'KISS Books/Journals':
+        {'engine': 'KissForBooksAndJournals'},
     'NEBIS':
         {'engine': 'NEBIS'},
     'Scirus':
         {'engine': 'Scirus'},
-    'SLAC SPIRES HEP':
+    'SPIRES HEP':
         {'engine': 'SPIRES'},
-    'SLAC Library Books':
+    'SLAC Library Catalog':
         {'engine': 'SPIRESBooks'},
 }
 
