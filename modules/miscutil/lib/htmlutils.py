@@ -58,7 +58,7 @@ class HTMLWasher(HTMLParser):
     Creates a washer for HTML, avoiding XSS attacks. See wash function for 
     details on parameters.
     
-    Usage: from inveniohtmlutils import HTMLWasher
+    Usage: from invenio.htmlutils import HTMLWasher
            washer = HTMLWasher()
            escaped_text = washer.wash(unescaped_text)
            
@@ -85,26 +85,26 @@ class HTMLWasher(HTMLParser):
         self.allowed_attribute_whitelist = \
                 cfg_html_buffer_allowed_attribute_whitelist
         # javascript:
-        self.re_js = re.compile( ".*(j|&#106;)"\
-                                "\s*(a|&#97;)"\
-                                "\s*(v|&#118;)"\
-                                "\s*(a|&#97;)"\
-                                "\s*(s|&#115;)"\
-                                "\s*(c|&#99;)"\
-                                "\s*(r|&#114;)"\
-                                "\s*(i|&#195;)"\
-                                "\s*(p|&#112;)"\
-                                "\s*(t|&#112;)"\
+        self.re_js = re.compile( ".*(j|&#106;|&#74;)"\
+                                "\s*(a|&#97;|&#65;)"\
+                                "\s*(v|&#118;|&#86;)"\
+                                "\s*(a|&#97;|&#65;)"\
+                                "\s*(s|&#115;|&#83;)"\
+                                "\s*(c|&#99;|&#67;)"\
+                                "\s*(r|&#114;|&#82;)"\
+                                "\s*(i|&#195;|&#73;)"\
+                                "\s*(p|&#112;|&#80;)"\
+                                "\s*(t|&#112;|&#84)"\
                                 "\s*(:|&#58;).*", re.IGNORECASE | re.DOTALL)
         # vbscript:                           
-        self.re_vb = re.compile( ".*(v|&#118;)"\
-                                "\s*(b|&#98;)"\
-                                "\s*(s|&#115;)"\
-                                "\s*(c|&#99;)"\
-                                "\s*(r|&#114;)"\
-                                "\s*(i|&#195;)"\
-                                "\s*(p|&#112;)"\
-                                "\s*(t|&#112;)"\
+        self.re_vb = re.compile( ".*(v|&#118;|&#86;)"\
+                                "\s*(b|&#98;|&#66;)"\
+                                "\s*(s|&#115;|&#83;)"\
+                                "\s*(c|&#99;|&#67;)"\
+                                "\s*(r|&#114;|&#82;)"\
+                                "\s*(i|&#195;|&#73;)"\
+                                "\s*(p|&#112;|&#80;)"\
+                                "\s*(t|&#112;|&#84;)"\
                                 "\s*(:|&#58;).*", re.IGNORECASE | re.DOTALL)
 
     def wash(self, html_buffer, 
@@ -178,7 +178,6 @@ class HTMLWasher(HTMLParser):
     def handle_attribute_value(self, value):
         """Check attribute. Especially designed for avoiding URLs in the form:
         javascript:myXSSFunction();"""
-        value = cgi.escape(value, True)
         if self.re_js.match(value) or self.re_vb.match(value):
             return ''
         return value
