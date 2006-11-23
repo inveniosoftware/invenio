@@ -55,37 +55,45 @@ def printInfo():
     "print out when not enough parmeters given"
     
     print """
-    BibConvert data convertor
-    Usage: bibconvert [options] -ctemplate.cfg < input.dat
-           bibconvert -ctemplate.bfx < input.dat
-           bibconvert -ctemplate.xsl < input.dat
-           
-           Options (excepted -c) are ignored when bfx or xsl templates are used.
+BibConvert data convertor.
 
-           BibConvert can convert:
-              - XML data using XSL or bfx templates.
-              - Textual (line-oriented) data using cfg templates files.
-              
-    Options:
-       -c'config'                 	configuration templates file
-       -d'directory'              	source_data fields are located in separated files in 'directory'one record)
-       -h                         	print this help
-       -V                         	print version number
-       -l'length'               	minimum line length (default = 1)
-       -o'value'               	        OAI identifier starts with specified value (default = 1)
-       -b'file header'            	insert file header
-       -e'file footer'            	insert file footer
-       -B'record header'            	insert record header
-       -E'record footer'            	insert record footer
-       -s'record separator'        	record separator, default empty line (EOLEOL)
+Usage: [options] < input.dat
+Examples:
+       bibconvert -ctemplate.cfg < input.dat
+       bibconvert -ctemplate.bfx < input.xml
+       bibconvert -ctemplate.xsl < input.xml
 
-       -m0'query_string' 		match records using query string, output unmatched
-       -m1'query_string'                match records using query string, output matched
-       -m2'query_string'                match records using query string, output ambiguous
+ XSL and BFX options:
+ -c,  --config                 	    configuration templates file
+  
+ Text/line-oriented options:
+ -c,  --config             configuration templates file
+ -d,  --directory          source_data fields are located in separated files in 'directory'
+ -h,  --help               print this help
+ -V,  --version            print version number
+ -l,  --length             minimum line length (default = 1)
+ -o,  --oai                OAI identifier starts with specified value (default = 1)
+ -b,  --header             insert file header
+ -e,  --footer             insert file footer
+ -B,  --record-header      insert record header
+ -E,  --record-footer      insert record footer
+ -s,  --separator          record separator, default empty line (EOLEOL)
+ -t,  --output_separator
+ 
+ -m0,  		           match records using query string, output *unmatched*
+ -m1,                      match records using query string, output *matched*
+ -m2,                      match records using query string, output *ambiguous*
      
-       -Cx'field extraction template'   alternative to -c when configuration is split to several files
-       -Cs'source data template'    	alternative to -c when configuration is split to several files
-       -Ct'target data template'    	alternative to -c when configuration is split to several files
+ -Cx,                      alternative to -c when config split to several files, *extraction*
+ -Cs,                      alternative to -c when config split to several files, *target*
+ -Ct,                      alternative to -c when config split to several files, *source*
+
+ BibConvert can convert:
+  - XML data using XSL or bfx templates.
+  - Textual (line-oriented) data using cfg templates files.
+  
+ Text/line-oriented options are not available with .xsl and .bfx configuration files
+       
     """
 
 ### MAIN ###
@@ -106,7 +114,6 @@ begin_header         = ""
 ending_footer        = ""
 oai_identifier_from  = 1
 extract_tpl          = ""
-config_template      = ""
        
 opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
              [
@@ -146,21 +153,18 @@ for opt, opt_value in opts:
             ending_footer        = bibconvert.get_other_par("_FOOT_", opt_value)
             begin_record_header  = bibconvert.get_other_par("_RECHEAD_", opt_value)
             ending_record_footer = bibconvert.get_other_par("_RECFOOT_", opt_value)
-
             if(match_mode == ""):
                 match_mode = -1
 
-
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
-        config_template = opt_value
+        extract_tpl = opt_value
         if opt_value.endswith('.'+
                       CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
             pass
         elif opt_value.endswith('.xsl'):
             pass
         else:
-            extract_tpl = opt_value
             extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
         
             source_tpl  = opt_value
@@ -230,8 +234,9 @@ for opt, opt_value in opts:
             source_tpl_parsed  = bibconvert.parse_template(source_tpl)
 
 
-# Check config is given in parameters
-if(config_template == ""):
+
+# Check if required arguments were given
+if(extract_tpl == ""):
     printInfo()
     sys.exit(0)
 
@@ -241,12 +246,12 @@ if opt_value.endswith('.'+
                       CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
     # BibConvert for bfx
     source_xml = sys.stdin.read()
-    print bibconvert_bfx_engine.convert(source_xml, config_template)
+    print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
     
 elif opt_value.endswith('.xsl'):
     # BibConvert for XSLT
     source_xml = sys.stdin.read()
-    print bibconvert_xslt_engine.convert(source_xml, config_template)
+    print bibconvert_xslt_engine.convert(source_xml, extract_tpl)
 else:
     # BibConvert for cfg
 
