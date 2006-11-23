@@ -2427,7 +2427,7 @@ class Template:
                    create_html_link(self.build_search_url(p="recid:%d" % recID, 
                                                      rm="cit", 
                                                      ln=ln),
-                                    _("Cited by"), 
+                                    {}, _("Cited by"), 
                                     {'class': "moreinfo"})
                  
         return out
