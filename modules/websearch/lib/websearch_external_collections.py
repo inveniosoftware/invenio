@@ -72,13 +72,13 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     return (search_engines, seealso_engines, pattern, basic_search_units)
 
 def perform_external_collection_search(req, current_collection, pattern_list, field, 
-        external_collection, verbosity_level=0, lang=cdslang, selected_external_collections=None):
+        external_collection, verbosity_level=0, lang=cdslang, selected_external_collections_infos=None):
     """Search external collection and print the seealso box."""
     
     vprint = get_verbose_print(req, 'External collection: ', verbosity_level)
 
-    if selected_external_collections:
-        (search_engines, seealso_engines, pattern, basic_search_units) = selected_external_collections
+    if selected_external_collections_infos:
+        (search_engines, seealso_engines, pattern, basic_search_units) = selected_external_collections_infos
     else:
         (search_engines, seealso_engines, pattern, basic_search_units) = print_external_results_overview(req, 
             current_collection, pattern_list, field, external_collection, verbosity_level, lang)
