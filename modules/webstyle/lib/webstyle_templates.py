@@ -36,7 +36,7 @@ from invenio.config import \
      weburl, \
      version
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.urlutils import create_html_link
+from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 
@@ -472,11 +472,12 @@ class Template:
                 # Update the 'ln' argument in the initial request
                 argd['ln'] = lang
                 if req and req.uri:
-                    parts.append(create_html_link(req.uri, argd, lang_namelong,
-                                                  {'class': "langinfo"}))
+                    args = req.uri + make_canonical_urlargd(argd, {})
                 else:
-                    parts.append(create_html_link('', {}, lang_namelong, 
-                                                  {'class': "langinfo"}))
+                    args = ""                
+                parts.append(create_html_link(args,
+                                              {}, lang_namelong,
+                                              {'class': "langinfo"}))
 
         return _("This site is also available in the following languages:") + \
                  "<br />" + ' &nbsp;'.join(parts)
