@@ -91,7 +91,7 @@ of your CDS Invenio installation.<br/>
 <h4>Using BFX</h4>
 BFX (BibFormat for XML) uses a syntax similar to XSLT. Roughly they only
 differ in the name of the tags.<br/>
-More documentation about is to be added soon (FIXME).<br/>
+More documentation about it is to be added soon (FIXME).<br/>
 Have a look
 at the provided samples in <code>etc/bibconvert/config</code> directory
 of your CDS Invenio installation to learn more about it.
