@@ -106,7 +106,8 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 ### bibformat the records selected
 
     if process_format:
-        print "Records to be processed: %d" % (len(recIDs)+len(without_format))
+        print "Records to be processed: %d" % (len(recIDs) \
+                                               + len(without_format))
         print "Out of it records without created format: %d" % len(without_format)
     else:
         print "Records to be processed: %d" % (len(recIDs))
@@ -114,26 +115,40 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 ### Initialize main loop
 
     total_rec   = 0		# Total number of records
-    xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
 
 
 ### Iterate over all records prepared in lists I (option)
     if process:
-        if CFG_BIBFORMAT_USE_OLD_BIBFORMAT: # FIXME: remove this when migration from php to python bibformat is done
-            iterate_over_old(recIDs, weburl, fmt)
+        if CFG_BIBFORMAT_USE_OLD_BIBFORMAT: # FIXME: remove this
+                                            # when migration from php to
+                                            # python bibformat is done
+            (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_old(recIDs,
+                                                                         weburl,
+                                                                         fmt)
         else:
-            iterate_over_new(recIDs, weburl, fmt)
-
+            (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_new(recIDs,
+                                                                         fmt)
+        total_rec += total_rec_1
+        tbibformat += tbibformat_1
+        tbibupload += tbibupload_1
 
 ### Iterate over all records prepared in list II (no_format)
     if process_format and process:
-        if CFG_BIBFORMAT_USE_OLD_BIBFORMAT: # FIXME: remove this when migration from php to python bibformat is done
-            iterate_over_old(without_format, weburl, fmt)
+        if CFG_BIBFORMAT_USE_OLD_BIBFORMAT: # FIXME: remove this
+                                            # when migration from php to
+                                            # python bibformat is done
+            (total_rec_2, tbibformat_2, tbibupload_2) = iterate_over_old(without_format,
+                                                                         weburl,
+                                                                         fmt)
         else:
-            iterate_over_new(without_format, weburl, fmt)
-
+            (total_rec_2, tbibformat_2, tbibupload_2) = iterate_over_new(without_format,
+                                                                         fmt)
+        total_rec += total_rec_2
+        tbibformat += tbibformat_2
+        tbibupload += tbibupload_2
+        
 ### Final statistics
 
     t2 = os.times()[4]
@@ -211,30 +226,32 @@ def without_fmt(sql):
 ### Bibreformat all selected records (using new python bibformat)
 ### (see iterate_over_old further down)
 
-def iterate_over_new(list, weburl, fmt):
+def iterate_over_new(list, fmt):
     "Iterate odver list of IDs"
+    global options, total_rec
     
     n_it_rec       = 0          # Number of records for current iteration
     n_it_max       = 10000      # Number of max records in one iteration
-    n_rec          = 0          # Number of formatted records 
-    total_rec      = len(list)	# Total number of records
+    total_rec      = 0          # Number of formatted records 
     formatted_records = ''      # (string-)List of formatted record of an iteration
-    
+    tbibformat  = 0		# time taken up by external call
+    tbibupload  = 0		# time taken up by external call
+
     for recID in list:
-
-        n_rec += 1
+        total_rec += 1
         n_it_rec += 1
-        
-        message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
-        print message
 
-        t11 = os.times()[4]
-        message = "START bibformat external call"
-        print message
+        if options["verbose"] >= 9:
+            message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
+            print message
 
         ### bibformat external call
         ###
+        t1 = os.times()[4]
         formatted_record = format_record(recID, fmt, on_the_fly=True)
+        t2 = os.times()[4]
+        tbibformat = tbibformat + (t2 - t1)
+
         # Encapsulate record in xml tags that bibupload understands
         prologue = '''
     <record>
@@ -247,56 +264,61 @@ def iterate_over_new(list, weburl, fmt):
        </datafield>
     </record>'''
 
-        t22 = os.times()[4]
-        message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
-        print message
-        
         formatted_records += prologue + encode_for_xml(formatted_record) + epilogue
 
-        # every n_max record, upload all formatted records. 
+        # every n_it_max record, upload all formatted records. 
         # also upload if recID is last one
-        if n_it_rec > n_it_max or n_rec == total_rec:
+        if n_it_rec > n_it_max or total_rec == len(list):
 
             #Save formatted records to disk for bibupload
             finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
-            filehandle = open(finalfilename,"w")
-            filehandle.write(formatted_records)
+            filehandle = open(finalfilename, "w")
+            filehandle.write("<collection>" + \
+                             formatted_records + \
+                             "</collection>")
             filehandle.close()
 
             ### bibupload external call
             ###
-            t11 = os.times()[4]
-            message = "START bibupload external call"
-            print message
+            t1 = os.times()[4]
+            if options["verbose"] >= 9:
+                message = "START bibupload external call"
+                print message
 
             command = "%s/bibupload -f %s" % (bindir, finalfilename)
             os.system(command)
 
-            t22 = os.times()[4]
-            message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
-            print message
+            t2 = os.times()[4]
+            tbibupload = tbibupload + (t2 - t1)
+            if options["verbose"] >= 9:
+                message = "END bibupload external call (time elapsed:%2f)" % (t2-t1)
+                print message
 
             #Reset iteration state
             n_it_rec = 0
             xml_content = ''
+
+    return (total_rec, tbibformat, tbibupload)
     
 def iterate_over_old(list, weburl, fmt):
     "Iterate odver list of IDs"
-
+    global options
+    
     n_rec       = 0
     n_max       = 10000
-    total_rec   = 0		# Total number of records
     xml_content = ''		# hold the contents
     tbibformat  = 0		# time taken up by external call
     tbibupload  = 0		# time taken up by external call
-
+    total_rec      = 0          # Number of formatted records
+    
     for record in list:
 
         n_rec = n_rec + 1
         total_rec = total_rec + 1
-
-        message = "Processing record: %d" % (record)
-        print message
+        
+        if options["verbose"] >= 9:
+            message = "Processing record: %d" % (record)
+            print message
 
         query = "id=%d&of=xm" % (record)
 
@@ -328,15 +350,17 @@ def iterate_over_old(list, weburl, fmt):
 ###
 
                 t11 = os.times()[4]
-                message = "START bibformat external call"
-                print message
+                if options["verbose"] >= 9:
+                    message = "START bibformat external call"
+                    print message
 
                 command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
                 os.system(command)
 
                 t22 = os.times()[4]
-                message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
-                print message
+                if options["verbose"] >= 9:
+                    message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
+                    print message
 
                 tbibformat = tbibformat + (t22 - t11)
 
@@ -345,15 +369,17 @@ def iterate_over_old(list, weburl, fmt):
 ###
 
                 t11 = os.times()[4]
-                message = "START bibupload external call"
-                print message
+                if options["verbose"] >= 9:
+                    message = "START bibupload external call"
+                    print message
 
                 command = "%s/bibupload -f %s" % (bindir, finalfilename)
                 os.system(command)
 		
                 t22 = os.times()[4]
-                message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
-                print message
+                if options["verbose"] >= 9:
+                    message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
+                    print message
 
                 tbibupload = tbibupload + (t22- t11)
 
@@ -365,7 +391,8 @@ def iterate_over_old(list, weburl, fmt):
 
     if n_rec > 0:
 
-        print "Processing last record set (%d)" % n_rec
+        if options["verbose"] >= 9:
+            print "Processing last record set (%d)" % n_rec
 
         finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
         filename = "%s/bibreformat.xml" % tmpdir
@@ -377,15 +404,17 @@ def iterate_over_old(list, weburl, fmt):
 ###
 
         t11 = os.times()[4]
-        message = "START bibformat external call"
-        print message
+        if options["verbose"] >= 9:
+            message = "START bibformat external call"
+            print message
 
         command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
         os.system(command)
 
         t22 = os.times()[4]
-        message = "END bibformat external call (time elapsed:%2f)" % (t22 - t11)
-        print message
+        if options["verbose"] >= 9:
+            message = "END bibformat external call (time elapsed:%2f)" % (t22 - t11)
+            print message
 
         tbibformat = tbibformat + (t22 - t11)
 
@@ -393,19 +422,21 @@ def iterate_over_old(list, weburl, fmt):
 ###
 
         t11 = os.times()[4]
-        message = "START bibupload external call"
-        print message
+        if options["verbose"] >= 9:
+            message = "START bibupload external call"
+            print message
 
         command = "%s/bibupload -f %s" % (bindir, finalfilename)
         os.system(command)
 
         t22 = os.times()[4]
-        message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
-        print message
+        if options["verbose"] >= 9:
+            message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
+            print message
 
         tbibupload = tbibupload + (t22 - t11)
 
-    return
+    return (total_rec, tbibformat, tbibupload)
 
 
 ### Bibshed compatibility procedures
@@ -531,7 +562,7 @@ def task_submit():
     """Submits task to the BibSched task queue.
     This is what people will be invoking via command line."""
 
-    global options, sched_time, sleep_time
+    global options, sched_time, sleeptime
 
     ## sanity check: remove eventual "task" option:
     if options.has_key("task"):
