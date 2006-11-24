@@ -64,10 +64,10 @@ Examples:
        bibconvert -ctemplate.xsl < input.xml
 
  XSL and BFX options:
- -c,  --config                 	    configuration templates file
+ -c,  --config             transformation stylesheet file
   
- Text/line-oriented options:
- -c,  --config             configuration templates file
+ Plain text-oriented options:
+ -c,  --config             configuration template file
  -d,  --directory          source_data fields are located in separated files in 'directory'
  -h,  --help               print this help
  -V,  --version            print version number
@@ -90,9 +90,9 @@ Examples:
 
  BibConvert can convert:
   - XML data using XSL or bfx templates.
-  - Textual (line-oriented) data using cfg templates files.
+  - Plain text data using cfg templates files.
   
- Text/line-oriented options are not available with .xsl and .bfx configuration files
+ Plain text-oriented options are not available with .xsl and .bfx configuration files
        
     """
 

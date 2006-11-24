@@ -26,33 +26,90 @@
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <h2>Contents</h2>
-<strong>1. <a href="#1">Overview</a></strong><br>
-<strong>2. <a href="#2">Configuration Example</a></strong><br>
-<strong>3. <a href="#3">Running BibConvert</a></strong><br>
-<strong>4. <a href="#4">BibConvert Configuration Guide</a></strong><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#G">Conventions</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Step 1 Definition of Source Record</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2. <a href="#4.2">Step 2 Definition of Source Fields</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3. <a href="#4.3">Step 3 Definition of Target Record</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4. <a href="#4.4">Formatting in BibConvert</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4.1 <a href="#4.4.1">Definition of Formatting Functions</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4.2 <a href="#4.4.2">Generated Values</a><br>
+<strong>A. <a href="#A">Overview</a></strong><br>
+<strong>B. <a href="#B">XML-oriented mode</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>1 <a href="#B.1">Configuration File Examples</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>2 <a href="#B.2">Running BibConvert</a></strong><br>
+<strong>C. <a href="#C">Plain text-oriented mode</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>1 <a href="#C.1">Configuration File Examples</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>2 <a href="#C.2">Running BibConvert</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>3 <a href="#C.3">BibConvert Configuration Guide</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#G">Conventions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#C.3.1">Step 1 Definition of Source Record</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#C.3.2">Step 2 Definition of Source Fields</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#C.3.3">Step 3 Definition of Target Record</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#C.3.4">Formatting in BibConvert</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4.1 <a href="#C.3.4.1">Definition of Formatting Functions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4.2 <a href="#C.3.4.2">Generated Values</a><br>
 
-<a name="1"></a><h2>1. Overview</h2>
+<a name="A"></a><h2>A. Overview</h2>
 
 <p>BibConvert utility enables you to convert metadata records from
-various metadata formats into another metadata format supported by
-local database. It is designed to process metadata records harvested
-in XML converting them into MARC21 before they are finally uploaded
-into database. However, BibConvert is flexible enough to deal also
-with other structured metadata according to your needs and offers a
-way, how you actually can insert what you want into the database.
+various metadata formats into another metadata format supported by the
+CDS Invenio local database. It is designed to process XML harvested
+metadata records, converting them into MARC21 before they are uploaded
+into the database. However, BibConvert is flexible enough to deal also
+with other structured metadata according to your needs, and offers a
+way to actually insert what you want into the database.
 
-<p>It is suitable for tasks such as conversion of records received
-from multiple data sources or conversion of records from another
-system that may support a different metadata format.
+<p>BibConvert is suitable for tasks such as conversion of records
+received from multiple data sources, or conversion of records from
+another system that may support a different metadata format.</p>
 
-<a name="2"></a><h2>2. Configuration Example</h2>
+
+<p>In order to cover a wider range of possible conversions, BibConvert
+has 2 different modes, each dealing with different types of data, and
+each using different configuration files.<p>
+
+<dl>
+<dt><b>Plain text-oriented mode:</b></dt>
+<dd>Deals with source data being typically structured with line breaks,
+and character-based separators. You can use this mode when you need
+to process line-based data, such as comma/tab separated values.
+Still, this mode is powerful enough to convert
+complex structures, at the cost of a more complex configuration.</dd>
+<dt><b>XML-oriented mode</b></dt>
+<dd>Convert source data being encoded in XML. Provided you have installed
+a supported XSLT processor on your machine, BibConvert can make use of standard
+XSLT to interpret your XML data.
+</dd>
+</dl>
+<p>In addition to XSLT, we provide a home-made solution for converting
+XML source data. It uses our own BFX language as transformation language,
+extended with XPath for node selections.<br/>
+You should consider using this solution only in the case where you have not installed (or do not
+want to install) an XSLT processor on your machine.
+</p>
+
+
+<a name="B"></a><h2>B XML-Oriented Mode</h2>
+<a name="B.1"></a><h3>1 Configuration File Examples</h3>
+<h4>Using XSLT</h4>
+You can use standard XSL stylesheets to transform your source data. Have a look
+at the provided samples in <code>etc/bibconvert/config</code> directory
+of your CDS Invenio installation.<br/>
+<h4>Using BFX</h4>
+BFX (BibFormat for XML) uses a syntax similar to XSLT. Roughly they only
+differ in the name of the tags.<br/>
+More documentation about is to be added soon (FIXME).<br/>
+Have a look
+at the provided samples in <code>etc/bibconvert/config</code> directory
+of your CDS Invenio installation to learn more about it.
+<a name="B.2"></a><h3>2. Running BibConvert</h3>
+BibConvert in XML-oriented mode has only 1 parameter: <code>-c</code>.
+It is used to specify which transformation stylesheet to apply to the piped XML.
+<blockquote>
+<pre>
+$ bibconvert -coaidc2marcxml.xsl < sample.xml > /tmp/record.xml
+</pre>
+</blockquote>
+
+If the stylesheet you want to use is installed in the <code>etc/bibconvert/config</code>
+directory of your CDS Invenio installation, then you can just refer to it by its filename.
+Otherwise use the full path to the file.
+
+<a name="C"></a><h2>C Plain Text-Oriented Mode</h2>
+<a name="C.1"></a><h3>1 Configuration File Examples</h3>
 
 <p>OAI DublinCore into MARC21 and OAI MARC into MARC21
 configurations will be provided as default configuration, ensuring the
@@ -108,10 +165,11 @@ AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&
 <p>Having prepared a configuration, the BibConvert will convert the
 source data file according to it in a batch mode. The BibConvert is
 fully compatible with the Uploader1.x configuration language. For more
-information, have a look at the <a href="#4">BibConvert Configuration
+information, have a look at the <a href="#C">BibConvert Configuration
 Guide</a> section below.  
 
-<a name="3"></a><h2>3. Running BibConvert</h2>
+
+<a name="C.2"></a><h3>2. Running BibConvert</h3>
 
 <p>For a fully functional demo, consider the following sample input data:
 
@@ -125,7 +183,7 @@ Guide</a> section below.
 <blockquote>
 <pre>
 $ bibconvert -b'&lt;collection>' -csample.cfg -e'&lt;/collection>' < sample.dat > /tmp/sample.xml
-<pre>
+</pre>
 </blockquote>
 
 and see the XML MARC output file.  You would then continue the upload procedure by calling <a
@@ -146,16 +204,15 @@ href="../bibupload/">BibUpload</a>.
 <a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
 </blockquote>
 
-<a name="4"></a><h2>4. BibConvert Configuration Guide</h2>
+<a name="C.3"></a><h3>3 BibConvert Configuration Guide</h3>
 
-<h3><A NAME="G"></A>Conventions</h3>
+<h4><A NAME="G"></A>Conventions</h4>
 
 <br/>- comment line starts with '#' sign in the first column
 <br/>- each section is declared by a line starting with '===' (further characters on the line are ignored)
 <br/>- values are separated by '---'
 
-<h3>
-<A NAME="4.1"></A>4.1. Step 1 Definition of Source record</h3>
+<h4><A NAME="C.3.1"></A>3.1 Step 1 Definition of Source record</h4>
 <P>- Create/edit "data extraction configuration template" section of the configuration file.
 <BR>- Each line of this section stands for a definition of one source field:
 <P><strong>name---keyword---terminating string---separator---</strong>
@@ -177,8 +234,7 @@ fields:
 <BR>TI---TI_---EOL------
 </pre>
 
-<H3>
-<A NAME="4.2"></A>4.2. Step 2 Definition of Source fields</H3>
+<H4><A NAME="C.3.2"></A>3.2 Step 2 Definition of Source fields</H4>
 <I>Each field extracted from the source according to the definition done
 in the first step can have an internal structure, which is described in
 this section.</I>
@@ -199,8 +255,7 @@ TI---&lt;:TI:>
 AU---&lt;:FIRSTNAME:>-&lt;:SURNAME:>
 </pre>
 
-<H3>
-<A NAME="4.3"></A>4.3. Step 3 Definition of target record</H3>
+<H4><A NAME="C.3.3"></A>3.3 Step 3 Definition of target record</H4>
 <I>This definition describes the layout of the target record that is created by the conversion,
 together with the corresponcence to the source fields defined in step 2.</I>
 
@@ -211,8 +266,8 @@ together with the corresponcence to the source fields defined in step 2.</I>
 <P>- <strong>CODE</strong> stands for a tag for readability (optional)
 <BR>- "<strong>::</strong>"is a mandatory separator between the name and the subfield
 definition
-<BR>- optionally, you can apply the appropriate <A HREF="#51">formatting function(s)</A>
-and <A HREF="#4.4.2">generated values</A>
+<BR>- optionally, you can apply the appropriate <A HREF="#C.3.4.1">formatting function(s)</A>
+and <A HREF="#C.3.4.2">generated values</A>
 <BR>- "<strong>::</strong>"is a mandatory separator between the subfield definition and the function(s)
 <BR>- "<strong>---</strong>"is a mandatory separator between the tag and the output code definition
 <BR>- mark repetitive source fields with an asterisk (*)
@@ -225,9 +280,9 @@ and <A HREF="#4.4.2">generated values</A>
 </pre>
 </protect>
 
-<h3><A NAME="4.4"></a>4.4 Formatting in BibConvert</H3>
+<h4><A NAME="C.3.4"></a>3.4 Formatting in BibConvert</H4>
 
-<H3>&nbsp;<A NAME="4.4.1"></A>4.4.1 Definition of formatting functions</H3>
+<H5>&nbsp;<A NAME="C.3.4.1"></A>3.4.1 Definition of formatting functions</H5>
 
 <BLOCKQUOTE>Every field can be processed with a variety of functions that
 partially or entirely change the original value.
@@ -850,8 +905,8 @@ the AU field
 <H4><A NAME="DEFP"></A>DEFP() - default print</H4>
 <BLOCKQUOTE>The value is printed by default even if it does not contain any variable input from the source file.</BLOCKQUOTE>
 
-<H3>
-<A NAME="4.4.2"></A>4.4.2 Generated values</H3>
+<H4>
+<A NAME="C.3.4.2"></A>3.4.2 Generated values</H4>
 
 <BLOCKQUOTE>In the template configurations, values can be either taken from the source
 or generated in the process itself. This is mainly useful for evaluating constant values.
