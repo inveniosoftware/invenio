@@ -60,7 +60,7 @@ project.  In an approximate decreasing chronological order:
  - Eric Stahl <eric.stahl@utbm.fr>
      Rewrite of BibUpload in Python.
 
- - Krzysztof Jedrzejek <krzysztof.jedrzejek@cern.ch>
+ - Krzysztof Jedrzejek <krzysztof.jedrzejek@gmail.com>
      Improvements to ElmSubmit.  
 
  - Yohann Paris <paris.yohann@gmail.com>
