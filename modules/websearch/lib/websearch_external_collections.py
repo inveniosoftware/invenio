@@ -28,7 +28,7 @@ from copy import copy
 from sets import Set
 
 from invenio.config import cdslang
-from invenio.dbquery import run_sql 
+from invenio.dbquery import run_sql, OperationalError
 from invenio.messages import gettext_set_language
 
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
@@ -199,7 +199,10 @@ def external_collection_load_states():
     dico_collection_seealso = {}
 
     query = "SELECT collection_externalcollection.id_collection, collection_externalcollection.type, externalcollection.name FROM collection_externalcollection, externalcollection WHERE collection_externalcollection.id_externalcollection = externalcollection.id;"
-    results = run_sql(query)
+    try:
+        results = run_sql(query)
+    except OperationalError:
+        results = None
     if results:
         for result in results:
             collection_id = int(result[0])
