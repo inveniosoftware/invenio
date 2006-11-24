@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-11-16 15:30+0100\n"
+"POT-Creation-Date: 2006-11-24 11:47+0100\n"
 "PO-Revision-Date: 2006-10-12 17:50+0200\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
@@ -27,24 +27,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: config/cdswmllib.wml:94 modules/webstyle/lib/webstyle_templates.py:485
+#: config/cdswmllib.wml:94 modules/webstyle/lib/webstyle_templates.py:482
 msgid "This site is also available in the following languages:"
 msgstr "Η σελίδα αυτή είναι διαθέσιμη και στις εξής γλώσσες:"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
-#: modules/websearch/lib/websearch_templates.py:343
-#: modules/websearch/lib/websearch_templates.py:464
-#: modules/websearch/lib/websearch_templates.py:1290
-#: modules/websearch/lib/websearch_templates.py:1389
-#: modules/websearch/lib/websearch_templates.py:1448
-#: modules/webstyle/lib/webstyle_templates.py:356
-#: modules/webstyle/lib/webstyle_templates.py:432
+#: modules/websearch/lib/websearch_templates.py:342
+#: modules/websearch/lib/websearch_templates.py:463
+#: modules/websearch/lib/websearch_templates.py:1301
+#: modules/websearch/lib/websearch_templates.py:1400
+#: modules/websearch/lib/websearch_templates.py:1464
+#: modules/webstyle/lib/webstyle_templates.py:353
+#: modules/webstyle/lib/webstyle_templates.py:429
 msgid "Search"
 msgstr "Αναζήτηση"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
-#: modules/webstyle/lib/webstyle_templates.py:359
-#: modules/webstyle/lib/webstyle_templates.py:435
+#: modules/webstyle/lib/webstyle_templates.py:356
+#: modules/webstyle/lib/webstyle_templates.py:432
 msgid "Help"
 msgstr "Βοήθεια"
 
@@ -102,7 +102,7 @@ msgstr "Βοήθεια"
 #: modules/websession/doc/admin/index.html.wml:22
 #: modules/webstat/doc/admin/guide.html.wml:22
 #: modules/webstat/doc/admin/index.html.wml:22
-#: modules/webstyle/doc/admin/guide.html.wml:22
+#: modules/webstyle/doc/admin/guide.html.wml:23
 #: modules/webstyle/doc/admin/index.html.wml:22
 #: modules/websubmit/doc/admin/actionimplement.html.wml:23
 #: modules/websubmit/doc/admin/actionmodify.html.wml:23
@@ -162,12 +162,12 @@ msgstr "Βοήθεια"
 #: modules/websubmit/web/admin/actionFunctions.php.wml:24
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
-#: modules/bibformat/web/admin/bibformatadmin.py:71
+#: modules/bibformat/web/admin/bibformatadmin.py:79
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "Admin Area"
 msgstr "Περιοχή Διαχειριστή"
 
-#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:400
+#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:397
 msgid "Last updated"
 msgstr "Τελευταία ενημέρωση"
 
@@ -235,8 +235,8 @@ msgstr "Μετατροπή"
 
 #: config/cdspage.wml:55 config/cdspage.wml:141
 #: modules/bibedit/lib/bibedit_templates.py:104
-#: modules/webstyle/lib/webstyle_templates.py:357
-#: modules/webstyle/lib/webstyle_templates.py:433
+#: modules/webstyle/lib/webstyle_templates.py:354
+#: modules/webstyle/lib/webstyle_templates.py:430
 #: modules/websubmit/lib/websubmit_engine.py:454
 #: modules/websubmit/lib/websubmit_engine.py:696
 #: modules/websubmit/lib/websubmit_engine.py:732
@@ -245,8 +245,8 @@ msgid "Submit"
 msgstr "Υποβολή"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
-#: modules/webstyle/lib/webstyle_templates.py:358
-#: modules/webstyle/lib/webstyle_templates.py:434
+#: modules/webstyle/lib/webstyle_templates.py:355
+#: modules/webstyle/lib/webstyle_templates.py:431
 msgid "Personalize"
 msgstr "Ρυθμίσεις"
 
@@ -340,10 +340,10 @@ msgstr "Ατζέντα"
 
 #: modules/websearch/doc/index.html.wml:50
 #: modules/websearch/doc/tips.html.wml:22
-#: modules/websearch/lib/websearch_templates.py:345
-#: modules/websearch/lib/websearch_templates.py:466
-#: modules/websearch/lib/websearch_templates.py:1393
-#: modules/websearch/lib/websearch_templates.py:1452
+#: modules/websearch/lib/websearch_templates.py:344
+#: modules/websearch/lib/websearch_templates.py:465
+#: modules/websearch/lib/websearch_templates.py:1404
+#: modules/websearch/lib/websearch_templates.py:1468
 msgid "Search Tips"
 msgstr "Παραδείγματα αναζήτησης"
 
@@ -352,13 +352,13 @@ msgid "Webcast"
 msgstr "Webcast"
 
 #: config/cdspage.wml:65 config/cdspage.wml:67
-#: modules/webstyle/lib/webstyle_templates.py:79
-#: modules/webstyle/lib/webstyle_templates.py:88
-#: modules/webstyle/lib/webstyle_templates.py:261
+#: modules/webstyle/lib/webstyle_templates.py:76
+#: modules/webstyle/lib/webstyle_templates.py:85
+#: modules/webstyle/lib/webstyle_templates.py:258
 msgid "Home"
 msgstr "Αρχική Σελίδα"
 
-#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:438
+#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:435
 msgid "Maintained by"
 msgstr "Συντηρείται από"
 
@@ -373,7 +373,7 @@ msgstr "Πίνακας Ανακοινώσεων"
 msgid "Search Help"
 msgstr "Βοήθεια αναζήτησης"
 
-#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:437
+#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:434
 msgid "Powered by"
 msgstr "Βασίζεται στο"
 
@@ -395,9 +395,9 @@ msgid "Verbose"
 msgstr "Πιο Αναλυτικά"
 
 #: modules/bibedit/lib/bibedit_templates.py:110
-#: modules/bibformat/web/admin/bibformatadmin.py:350
-#: modules/bibformat/web/admin/bibformatadmin.py:605
-#: modules/bibformat/web/admin/bibformatadmin.py:1196
+#: modules/bibformat/web/admin/bibformatadmin.py:397
+#: modules/bibformat/web/admin/bibformatadmin.py:677
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
 #: modules/webbasket/lib/webbasket_templates.py:1236
 #: modules/webbasket/lib/webbasket_templates.py:1341
 #: modules/webbasket/lib/webbasket_templates.py:1441
@@ -412,13 +412,13 @@ msgstr "Ακύρωση"
 #: modules/bibedit/lib/bibedit_templates.py:307
 #: modules/bibedit/lib/bibedit_templates.py:350
 #: modules/bibformat/lib/bibformat_templates.py:973
-#: modules/bibformat/web/admin/bibformatadmin.py:350
-#: modules/bibformat/web/admin/bibformatadmin.py:352
-#: modules/bibformat/web/admin/bibformatadmin.py:605
-#: modules/bibformat/web/admin/bibformatadmin.py:607
-#: modules/bibformat/web/admin/bibformatadmin.py:1196
-#: modules/bibformat/web/admin/bibformatadmin.py:1198
-#: modules/webmessage/lib/webmessage_templates.py:109
+#: modules/bibformat/web/admin/bibformatadmin.py:397
+#: modules/bibformat/web/admin/bibformatadmin.py:399
+#: modules/bibformat/web/admin/bibformatadmin.py:677
+#: modules/bibformat/web/admin/bibformatadmin.py:679
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
+#: modules/bibformat/web/admin/bibformatadmin.py:1314
+#: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
 msgstr "Διαγραφή"
 
@@ -427,7 +427,7 @@ msgstr "Διαγραφή"
 #: modules/bibformat/lib/bibformat_templates.py:1042
 #: modules/webalert/lib/webalert_templates.py:317
 #: modules/webalert/lib/webalert_templates.py:438
-#: modules/webmessage/lib/webmessage_templates.py:86
+#: modules/webmessage/lib/webmessage_templates.py:91
 #: modules/websubmit/lib/websubmit_templates.py:1404
 msgid "Action"
 msgstr "Ενέργεια"
@@ -437,8 +437,8 @@ msgstr "Ενέργεια"
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
-#: modules/websearch/lib/websearch_templates.py:183
-#: modules/websearch/lib/websearch_templates.py:185
+#: modules/websearch/lib/websearch_templates.py:182
+#: modules/websearch/lib/websearch_templates.py:184
 msgid "Record"
 msgstr "Εγγραφή"
 
@@ -518,7 +518,7 @@ msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετ�
 #: modules/webcomment/lib/webcomment_templates.py:471
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
-#: modules/webmessage/lib/webmessage_templates.py:479
+#: modules/webmessage/lib/webmessage_templates.py:513
 #: modules/websession/lib/websession_templates.py:1665
 #: modules/websession/lib/websession_templates.py:1704
 msgid "Yes"
@@ -530,7 +530,7 @@ msgstr "Ναι"
 #: modules/webcomment/lib/webcomment_templates.py:473
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
-#: modules/webmessage/lib/webmessage_templates.py:480
+#: modules/webmessage/lib/webmessage_templates.py:514
 #: modules/websession/lib/websession_templates.py:1666
 #: modules/websession/lib/websession_templates.py:1705
 msgid "No"
@@ -567,7 +567,7 @@ msgstr "Υποβολή και αποθήκευση εγγραφής %s"
 
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
-#: modules/bibformat/web/admin/bibformatadmin.py:73
+#: modules/bibformat/web/admin/bibformatadmin.py:81
 #, fuzzy
 msgid "BibFormat Admin"
 msgstr "Διαχειριστής WebComment"
@@ -664,12 +664,12 @@ msgstr "Όνομα ειδοποίησης:"
 #: modules/bibformat/lib/bibformat_templates.py:1044
 #: modules/bibformat/lib/bibformat_templates.py:1508
 #: modules/bibformat/lib/bibformat_templates.py:1770
-#: modules/bibformat/web/admin/bibformatadmin.py:102
-#: modules/bibformat/web/admin/bibformatadmin.py:158
-#: modules/bibformat/web/admin/bibformatadmin.py:213
-#: modules/bibformat/web/admin/bibformatadmin.py:256
-#: modules/bibformat/web/admin/bibformatadmin.py:330
-#: modules/bibformat/web/admin/bibformatadmin.py:1235
+#: modules/bibformat/web/admin/bibformatadmin.py:110
+#: modules/bibformat/web/admin/bibformatadmin.py:171
+#: modules/bibformat/web/admin/bibformatadmin.py:242
+#: modules/bibformat/web/admin/bibformatadmin.py:287
+#: modules/bibformat/web/admin/bibformatadmin.py:376
+#: modules/bibformat/web/admin/bibformatadmin.py:1351
 #, fuzzy
 msgid "Manage Output Formats"
 msgstr "Μορφή αποτελεσμάτων:"
@@ -678,12 +678,12 @@ msgstr "Μορφή αποτελεσμάτων:"
 #: modules/bibformat/lib/bibformat_templates.py:1045
 #: modules/bibformat/lib/bibformat_templates.py:1509
 #: modules/bibformat/lib/bibformat_templates.py:1771
-#: modules/bibformat/web/admin/bibformatadmin.py:396
-#: modules/bibformat/web/admin/bibformatadmin.py:422
-#: modules/bibformat/web/admin/bibformatadmin.py:484
-#: modules/bibformat/web/admin/bibformatadmin.py:526
-#: modules/bibformat/web/admin/bibformatadmin.py:586
-#: modules/bibformat/web/admin/bibformatadmin.py:1252
+#: modules/bibformat/web/admin/bibformatadmin.py:443
+#: modules/bibformat/web/admin/bibformatadmin.py:476
+#: modules/bibformat/web/admin/bibformatadmin.py:546
+#: modules/bibformat/web/admin/bibformatadmin.py:591
+#: modules/bibformat/web/admin/bibformatadmin.py:657
+#: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
 msgstr ""
 
@@ -691,10 +691,10 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1046
 #: modules/bibformat/lib/bibformat_templates.py:1510
 #: modules/bibformat/lib/bibformat_templates.py:1772
-#: modules/bibformat/web/admin/bibformatadmin.py:756
-#: modules/bibformat/web/admin/bibformatadmin.py:775
-#: modules/bibformat/web/admin/bibformatadmin.py:808
-#: modules/bibformat/web/admin/bibformatadmin.py:1267
+#: modules/bibformat/web/admin/bibformatadmin.py:837
+#: modules/bibformat/web/admin/bibformatadmin.py:858
+#: modules/bibformat/web/admin/bibformatadmin.py:891
+#: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
 msgstr ""
 
@@ -702,17 +702,17 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1047
 #: modules/bibformat/lib/bibformat_templates.py:1511
 #: modules/bibformat/lib/bibformat_templates.py:1773
-#: modules/bibformat/web/admin/bibformatadmin.py:844
-#: modules/bibformat/web/admin/bibformatadmin.py:868
-#: modules/bibformat/web/admin/bibformatadmin.py:911
-#: modules/bibformat/web/admin/bibformatadmin.py:954
-#: modules/bibformat/web/admin/bibformatadmin.py:997
-#: modules/bibformat/web/admin/bibformatadmin.py:1043
-#: modules/bibformat/web/admin/bibformatadmin.py:1093
-#: modules/bibformat/web/admin/bibformatadmin.py:1143
-#: modules/bibformat/web/admin/bibformatadmin.py:1155
-#: modules/bibformat/web/admin/bibformatadmin.py:1168
-#: modules/bibformat/web/admin/bibformatadmin.py:1203
+#: modules/bibformat/web/admin/bibformatadmin.py:932
+#: modules/bibformat/web/admin/bibformatadmin.py:958
+#: modules/bibformat/web/admin/bibformatadmin.py:1005
+#: modules/bibformat/web/admin/bibformatadmin.py:1050
+#: modules/bibformat/web/admin/bibformatadmin.py:1097
+#: modules/bibformat/web/admin/bibformatadmin.py:1148
+#: modules/bibformat/web/admin/bibformatadmin.py:1201
+#: modules/bibformat/web/admin/bibformatadmin.py:1256
+#: modules/bibformat/web/admin/bibformatadmin.py:1268
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
+#: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
 msgstr ""
 
@@ -846,126 +846,126 @@ msgstr ""
 msgid "Migrate Formats"
 msgstr "Παραμετροποίηση BibFormat"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:173
-#: modules/bibformat/web/admin/bibformatadmin.py:225
-#: modules/bibformat/web/admin/bibformatadmin.py:268
-#: modules/bibformat/web/admin/bibformatadmin.py:1238
+#: modules/bibformat/web/admin/bibformatadmin.py:186
+#: modules/bibformat/web/admin/bibformatadmin.py:254
+#: modules/bibformat/web/admin/bibformatadmin.py:299
+#: modules/bibformat/web/admin/bibformatadmin.py:1354
 #, fuzzy
 msgid "Restricted Output Format"
 msgstr "Μορφή αποτελεσμάτων:"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:192
-#: modules/bibformat/web/admin/bibformatadmin.py:450
-#: modules/bibformat/web/admin/bibformatadmin.py:1129
+#: modules/bibformat/web/admin/bibformatadmin.py:212
+#: modules/bibformat/web/admin/bibformatadmin.py:510
+#: modules/bibformat/web/admin/bibformatadmin.py:1240
 msgid "Ok"
 msgstr "Εντάξει"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:194
+#: modules/bibformat/web/admin/bibformatadmin.py:214
 #, fuzzy, python-format
 msgid "Output Format %s Rules"
 msgstr "Μορφή αποτελεσμάτων:"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:236
+#: modules/bibformat/web/admin/bibformatadmin.py:267
 #, python-format
 msgid "Output Format %s Attributes"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:278
+#: modules/bibformat/web/admin/bibformatadmin.py:312
 #, python-format
 msgid "Output Format %s Dependencies"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:330
+#: modules/bibformat/web/admin/bibformatadmin.py:376
 #, fuzzy
 msgid "Delete Output Format"
 msgstr "Μορφή αποτελεσμάτων:"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:435
-#: modules/bibformat/web/admin/bibformatadmin.py:498
-#: modules/bibformat/web/admin/bibformatadmin.py:1255
+#: modules/bibformat/web/admin/bibformatadmin.py:489
+#: modules/bibformat/web/admin/bibformatadmin.py:560
+#: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:454
+#: modules/bibformat/web/admin/bibformatadmin.py:514
 #, python-format
 msgid "Format Template %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:506
+#: modules/bibformat/web/admin/bibformatadmin.py:571
 #, python-format
 msgid "Format Template %s Attributes"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:538
+#: modules/bibformat/web/admin/bibformatadmin.py:603
 #, python-format
 msgid "Format Template %s Dependencies"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:586
+#: modules/bibformat/web/admin/bibformatadmin.py:657
 #, fuzzy
 msgid "Delete Format Template"
 msgstr "Διαγραφή σχολίου"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:784
+#: modules/bibformat/web/admin/bibformatadmin.py:867
 #, python-format
 msgid "Format Element %s Dependencies"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:817
+#: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:882
-#: modules/bibformat/web/admin/bibformatadmin.py:925
-#: modules/bibformat/web/admin/bibformatadmin.py:968
-#: modules/bibformat/web/admin/bibformatadmin.py:1011
-#: modules/bibformat/web/admin/bibformatadmin.py:1056
-#: modules/bibformat/web/admin/bibformatadmin.py:1112
-#: modules/bibformat/web/admin/bibformatadmin.py:1180
+#: modules/bibformat/web/admin/bibformatadmin.py:972
+#: modules/bibformat/web/admin/bibformatadmin.py:1019
+#: modules/bibformat/web/admin/bibformatadmin.py:1064
+#: modules/bibformat/web/admin/bibformatadmin.py:1111
+#: modules/bibformat/web/admin/bibformatadmin.py:1161
+#: modules/bibformat/web/admin/bibformatadmin.py:1220
+#: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:891
+#: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:934
+#: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:977
+#: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1168
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
 #, fuzzy
 msgid "Delete Knowledge Base"
 msgstr "Διαγραφή καλαθιού"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1248
+#: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1263
+#: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1270
+#: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1277
+#: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1280
+#: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
 msgstr ""
 
@@ -1018,7 +1018,7 @@ msgstr "Ιστορικό downloads:"
 #: modules/webbasket/lib/webbasket.py:169
 #: modules/webbasket/lib/webbasket.py:630
 #: modules/websession/lib/webuser.py:222
-#: modules/webstyle/lib/webstyle_templates.py:510
+#: modules/webstyle/lib/webstyle_templates.py:507
 msgid "N/A"
 msgstr "Μη Διαθ."
 
@@ -1100,7 +1100,7 @@ msgstr "Απρ"
 
 #: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "May"
 msgstr "Μάιος"
 
@@ -1134,67 +1134,67 @@ msgstr "Δεκ"
 
 #: modules/miscutil/lib/dateutils.py:197
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "January"
 msgstr "Ιανουάριος"
 
 #: modules/miscutil/lib/dateutils.py:198
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "February"
 msgstr "Φεβρουάριος"
 
 #: modules/miscutil/lib/dateutils.py:199
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "March"
 msgstr "Μάρτιος"
 
 #: modules/miscutil/lib/dateutils.py:200
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "April"
 msgstr "Απρίλιος"
 
 #: modules/miscutil/lib/dateutils.py:202
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "June"
 msgstr "Ιούνιος"
 
 #: modules/miscutil/lib/dateutils.py:203
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "July"
 msgstr "Ιούλιος"
 
 #: modules/miscutil/lib/dateutils.py:204
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "August"
 msgstr "Άυγουστος"
 
 #: modules/miscutil/lib/dateutils.py:205
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:661
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "September"
 msgstr "Σεπτέμβριος"
 
 #: modules/miscutil/lib/dateutils.py:206
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:661
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "October"
 msgstr "Οκτώβριος"
 
 #: modules/miscutil/lib/dateutils.py:207
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:661
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "November"
 msgstr "Νοέμβριος"
 
 #: modules/miscutil/lib/dateutils.py:208
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:661
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "December"
 msgstr "Δεκέμβριος"
 
@@ -1509,7 +1509,7 @@ msgstr "Παρουσίαση ερευνών"
 #: modules/webbasket/lib/webbasket_webinterface.py:422
 #: modules/webbasket/lib/webbasket_webinterface.py:515
 #: modules/webbasket/lib/webbasket_webinterface.py:570
-#: modules/webmessage/lib/webmessage_templates.py:446
+#: modules/webmessage/lib/webmessage_templates.py:471
 #: modules/websession/lib/websession_templates.py:450
 #: modules/websession/lib/websession_templates.py:1778
 #: modules/websession/lib/websession_webinterface.py:78
@@ -1733,8 +1733,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "Το καλάθι αυτό είναι δημοσίως προσβάσιμο στην διεύθυνση:"
 
 #: modules/webbasket/lib/webbasket_templates.py:697
-#: modules/websearch/lib/websearch_templates.py:535
-#: modules/websearch/lib/websearch_templates.py:1571
+#: modules/websearch/lib/websearch_templates.py:534
+#: modules/websearch/lib/websearch_templates.py:1587
 msgid "Sort by:"
 msgstr "Ταξινόμηση με:"
 
@@ -1744,7 +1744,7 @@ msgid "Title"
 msgstr "Τίτλο"
 
 #: modules/webbasket/lib/webbasket_templates.py:699
-#: modules/webmessage/lib/webmessage_templates.py:86
+#: modules/webmessage/lib/webmessage_templates.py:90
 msgid "Date"
 msgstr "Ημ/νία"
 
@@ -1782,7 +1782,7 @@ msgstr "στις"
 
 #: modules/webbasket/lib/webbasket_templates.py:870
 #: modules/webcomment/lib/webcomment_templates.py:330
-#: modules/webmessage/lib/webmessage_templates.py:106
+#: modules/webmessage/lib/webmessage_templates.py:113
 msgid "Reply"
 msgstr "Απάντηση"
 
@@ -2425,10 +2425,10 @@ msgstr "προσβλητική αναφορά αποκρύφτηκε επιτυ�
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:167
-#: modules/websearch/lib/websearch_templates.py:975
-#: modules/websearch/lib/websearch_templates.py:2335
-#: modules/websearch/lib/websearch_templates.py:2339
-#: modules/websearch/lib/websearch_templates.py:2343
+#: modules/websearch/lib/websearch_templates.py:982
+#: modules/websearch/lib/websearch_templates.py:2404
+#: modules/websearch/lib/websearch_templates.py:2410
+#: modules/websearch/lib/websearch_templates.py:2415
 msgid "Detailed record"
 msgstr "Αναλυτική εγγραφή"
 
@@ -2473,7 +2473,7 @@ msgstr "Διαχείριση Σχολίων"
 #: modules/websearch/lib/websearch_webinterface.py:360
 #: modules/websearch/web/admin/websearchadmin.py:1070
 #: modules/websession/lib/websession_webinterface.py:528
-#: modules/webstyle/lib/webstyle_templates.py:516
+#: modules/webstyle/lib/webstyle_templates.py:513
 #: modules/websubmit/lib/websubmit_webinterface.py:396
 #: modules/websubmit/lib/websubmit_webinterface.py:405
 msgid "Internal Error"
@@ -2495,29 +2495,29 @@ msgstr "Διαγραφή σχολίων"
 msgid "Suppress abuse reports"
 msgstr "Απόκρυψη προσβλητικών αναφορών"
 
-#: modules/webmessage/lib/webmessage.py:132
+#: modules/webmessage/lib/webmessage.py:129
 msgid "The message could not be deleted."
 msgstr "Το μύνημα δεν μπόρεσε να διαγραφεί."
 
-#: modules/webmessage/lib/webmessage.py:134
+#: modules/webmessage/lib/webmessage.py:131
 msgid "The message was successfully deleted."
 msgstr "Το μύνημα διαγράφηκε επιτυχώς."
 
-#: modules/webmessage/lib/webmessage.py:151
+#: modules/webmessage/lib/webmessage.py:148
 msgid "Your mailbox has been emptied."
 msgstr "Το γραμματοκιβώτιο σας έχει αδειάσει."
 
-#: modules/webmessage/lib/webmessage.py:340
+#: modules/webmessage/lib/webmessage.py:335
 #, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
 msgstr ""
 "Η επιλεγμένη ημ/νία (%(x_year)i/%(x_month)i/%(x_day)i) είναι λανθασμένη."
 
-#: modules/webmessage/lib/webmessage.py:349
+#: modules/webmessage/lib/webmessage.py:344
 msgid "Please enter a user name or a group name."
 msgstr "Παρακαλώ εισάγετε όνομα χρήστη ή ομάδας."
 
-#: modules/webmessage/lib/webmessage.py:353
+#: modules/webmessage/lib/webmessage.py:348
 #, python-format
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
@@ -2526,23 +2526,23 @@ msgstr ""
 "Το μύνημά σας είναι πολύ μεγάλο, παρακαλώ διορθώστε το. Το μέγιστο "
 "επιτρεπόμενο μήκος είναι %i χαρακτήρες."
 
-#: modules/webmessage/lib/webmessage.py:363
+#: modules/webmessage/lib/webmessage.py:359
 #, python-format
 msgid "Group %s does not exist."
 msgstr "Η ομάδα %s δεν υπάρχει."
 
-#: modules/webmessage/lib/webmessage.py:386
+#: modules/webmessage/lib/webmessage.py:384
 #, python-format
 msgid "User %s does not exist."
 msgstr "Ο χρήστης %s δεν υπάρχει."
 
-#: modules/webmessage/lib/webmessage.py:398
-#: modules/webmessage/lib/webmessage_webinterface.py:103
-#: modules/webmessage/lib/webmessage_webinterface.py:166
+#: modules/webmessage/lib/webmessage.py:397
+#: modules/webmessage/lib/webmessage_webinterface.py:115
+#: modules/webmessage/lib/webmessage_webinterface.py:183
 msgid "Write a message"
 msgstr "Γράψτε ένα μύνημα"
 
-#: modules/webmessage/lib/webmessage.py:415
+#: modules/webmessage/lib/webmessage.py:412
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
@@ -2550,175 +2550,175 @@ msgstr ""
 "Το μύνημά σας δεν μπόρεσε να αποσταλεί στους παρακάτω παραλήπτες  εξαιτίας "
 "του ορίου τους:"
 
-#: modules/webmessage/lib/webmessage.py:419
+#: modules/webmessage/lib/webmessage.py:416
 msgid "Your message has been sent."
 msgstr "Το μύνημά σας έχει αποσταλεί."
 
 #: modules/webmessage/lib/webmessage.py:423
-#: modules/webmessage/lib/webmessage_templates.py:444
-#: modules/webmessage/lib/webmessage_webinterface.py:66
-#: modules/webmessage/lib/webmessage_webinterface.py:218
-#: modules/webmessage/lib/webmessage_webinterface.py:247
+#: modules/webmessage/lib/webmessage_templates.py:477
+#: modules/webmessage/lib/webmessage_webinterface.py:76
+#: modules/webmessage/lib/webmessage_webinterface.py:239
+#: modules/webmessage/lib/webmessage_webinterface.py:271
 #: modules/websession/lib/websession_templates.py:451
 msgid "Your Messages"
 msgstr "Τα Μυνήματά μου"
 
-#: modules/webmessage/lib/webmessage_templates.py:86
+#: modules/webmessage/lib/webmessage_templates.py:88
 msgid "Subject"
 msgstr "Θέμα"
 
-#: modules/webmessage/lib/webmessage_templates.py:86
+#: modules/webmessage/lib/webmessage_templates.py:89
 msgid "Sender"
 msgstr "Αποστολέας"
 
-#: modules/webmessage/lib/webmessage_templates.py:93
+#: modules/webmessage/lib/webmessage_templates.py:98
 msgid "No messages"
 msgstr "Δεν υπάρχουν μυνήματα"
 
-#: modules/webmessage/lib/webmessage_templates.py:96
+#: modules/webmessage/lib/webmessage_templates.py:102
 msgid "No subject"
 msgstr "[Χωρίς θέμα]"
 
-#: modules/webmessage/lib/webmessage_templates.py:137
+#: modules/webmessage/lib/webmessage_templates.py:148
 msgid "Write new message"
 msgstr "Σύνταξη νέου μυνήματος"
 
-#: modules/webmessage/lib/webmessage_templates.py:138
+#: modules/webmessage/lib/webmessage_templates.py:149
 msgid "Delete All"
 msgstr "Διαγραφή Όλων"
 
-#: modules/webmessage/lib/webmessage_templates.py:184
+#: modules/webmessage/lib/webmessage_templates.py:191
 msgid "Re:"
 msgstr "Re:"
 
-#: modules/webmessage/lib/webmessage_templates.py:274
+#: modules/webmessage/lib/webmessage_templates.py:285
 msgid "Send later?"
 msgstr "Να αποσταλεί αργότερα;"
 
-#: modules/webmessage/lib/webmessage_templates.py:275
+#: modules/webmessage/lib/webmessage_templates.py:286
 msgid "To:"
 msgstr "Προς:"
 
-#: modules/webmessage/lib/webmessage_templates.py:276
+#: modules/webmessage/lib/webmessage_templates.py:287
 msgid "Users"
 msgstr "Χρήστες"
 
-#: modules/webmessage/lib/webmessage_templates.py:277
+#: modules/webmessage/lib/webmessage_templates.py:288
 msgid "Groups"
 msgstr "Ομάδες"
 
-#: modules/webmessage/lib/webmessage_templates.py:278
-#: modules/webmessage/lib/webmessage_templates.py:422
+#: modules/webmessage/lib/webmessage_templates.py:289
+#: modules/webmessage/lib/webmessage_templates.py:451
 msgid "Subject:"
 msgstr "Θέμα"
 
-#: modules/webmessage/lib/webmessage_templates.py:279
+#: modules/webmessage/lib/webmessage_templates.py:290
 msgid "Message:"
 msgstr "Μύνημα:"
 
-#: modules/webmessage/lib/webmessage_templates.py:280
+#: modules/webmessage/lib/webmessage_templates.py:291
 msgid "SEND"
 msgstr "ΑΠΟΣΤΟΛΗ"
 
-#: modules/webmessage/lib/webmessage_templates.py:421
+#: modules/webmessage/lib/webmessage_templates.py:450
 msgid "From:"
 msgstr "Από:"
 
-#: modules/webmessage/lib/webmessage_templates.py:423
+#: modules/webmessage/lib/webmessage_templates.py:452
 msgid "Sent on:"
 msgstr "Απεστάλη στις:"
 
-#: modules/webmessage/lib/webmessage_templates.py:424
+#: modules/webmessage/lib/webmessage_templates.py:453
 msgid "Received on:"
 msgstr "Παρελήφθη στις:"
 
-#: modules/webmessage/lib/webmessage_templates.py:425
+#: modules/webmessage/lib/webmessage_templates.py:454
 msgid "Sent to:"
 msgstr "Απεστάλη στον/στην:"
 
-#: modules/webmessage/lib/webmessage_templates.py:426
+#: modules/webmessage/lib/webmessage_templates.py:455
 msgid "Sent to groups:"
 msgstr "Απεστάλη στις ομάδες:"
 
-#: modules/webmessage/lib/webmessage_templates.py:427
+#: modules/webmessage/lib/webmessage_templates.py:456
 msgid "REPLY"
 msgstr "ΑΠΑΝΤΗΣΗ"
 
-#: modules/webmessage/lib/webmessage_templates.py:428
+#: modules/webmessage/lib/webmessage_templates.py:457
 msgid "DELETE"
 msgstr "ΔΙΑΓΡΑΦΗ"
 
-#: modules/webmessage/lib/webmessage_templates.py:477
+#: modules/webmessage/lib/webmessage_templates.py:511
 msgid "Are you sure you want to empty your whole mailbox?"
 msgstr "Είστε σίγουρος οτι θέλετε να αδειάσετε εντελώς το γραμματοκιβώτιό σας;"
 
-#: modules/webmessage/lib/webmessage_templates.py:539
+#: modules/webmessage/lib/webmessage_templates.py:573
 #, python-format
 msgid "Quota used: %i messages out of max. %i"
 msgstr "Χώρος που χρησιμοποιήθηκε: %i μυνήματα από μέγιστο %i"
 
-#: modules/webmessage/lib/webmessage_templates.py:556
+#: modules/webmessage/lib/webmessage_templates.py:590
 msgid "Please select one or more:"
 msgstr "Παρακαλώ επιλέξτε ένα ή περισσότερα"
 
-#: modules/webmessage/lib/webmessage_templates.py:587
+#: modules/webmessage/lib/webmessage_templates.py:621
 msgid "Add to users"
 msgstr "Προσθήκη σε χρήστες"
 
-#: modules/webmessage/lib/webmessage_templates.py:589
+#: modules/webmessage/lib/webmessage_templates.py:623
 msgid "Add to groups"
 msgstr "Προσθήκη σε ομάδες"
 
-#: modules/webmessage/lib/webmessage_templates.py:592
+#: modules/webmessage/lib/webmessage_templates.py:626
 msgid "No matching user"
 msgstr "Δεν βρέθηκε χρήστης"
 
-#: modules/webmessage/lib/webmessage_templates.py:594
+#: modules/webmessage/lib/webmessage_templates.py:628
 #: modules/websession/lib/websession_templates.py:1305
 msgid "No matching group"
 msgstr "Δεν βρέθηκε ομάδα"
 
-#: modules/webmessage/lib/webmessage_templates.py:628
+#: modules/webmessage/lib/webmessage_templates.py:662
 msgid "Find users or groups:"
 msgstr "Εύρεση χρηστών ή ομάδων:"
 
-#: modules/webmessage/lib/webmessage_templates.py:629
+#: modules/webmessage/lib/webmessage_templates.py:663
 msgid "Find a user"
 msgstr "Εύρεση χρήστη"
 
-#: modules/webmessage/lib/webmessage_templates.py:630
+#: modules/webmessage/lib/webmessage_templates.py:664
 msgid "Find a group"
 msgstr "Εύρεση ομάδας"
 
-#: modules/webmessage/lib/webmessage_templates.py:645
+#: modules/webmessage/lib/webmessage_templates.py:679
 #, python-format
 msgid "You have %s new messages out of %s messages"
 msgstr "Έχετε %s νέα μυνήματα από συνόλου %s"
 
-#: modules/webmessage/lib/webmessage_webinterface.py:275
+#: modules/webmessage/lib/webmessage_webinterface.py:302
 msgid "Read a message"
 msgstr "Ανάγνωση μυνήματος"
 
 #: modules/websearch/lib/search_engine.py:356
 #: modules/websearch/lib/search_engine.py:380
-#: modules/websearch/lib/search_engine.py:3067
-#: modules/websearch/lib/search_engine.py:3106
-#: modules/websearch/lib/search_engine.py:3140
+#: modules/websearch/lib/search_engine.py:3068
+#: modules/websearch/lib/search_engine.py:3107
+#: modules/websearch/lib/search_engine.py:3141
 msgid "Search Results"
 msgstr "Αποτελέσματα αναζήτησης"
 
 #: modules/websearch/lib/search_engine.py:414
-#: modules/websearch/lib/websearch_templates.py:644
+#: modules/websearch/lib/websearch_templates.py:643
 msgid "any day"
 msgstr "οποιαδήποτε ημέρα"
 
 #: modules/websearch/lib/search_engine.py:420
-#: modules/websearch/lib/websearch_templates.py:656
+#: modules/websearch/lib/websearch_templates.py:655
 msgid "any month"
 msgstr "οποιουδήποτε μήνα"
 
 #: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:670
+#: modules/websearch/lib/websearch_templates.py:669
 msgid "any year"
 msgstr "οποιουδήποτε έτους"
 
@@ -2738,7 +2738,7 @@ msgstr "Το τελευταίο, πρώτο"
 
 #: modules/websearch/lib/search_engine.py:506
 #: modules/websearch/lib/search_engine.py:628
-#: modules/websearch/lib/websearch_templates.py:621
+#: modules/websearch/lib/websearch_templates.py:620
 #: modules/websearch/lib/websearch_webcoll.py:485
 msgid "OR"
 msgstr "Ή"
@@ -2753,37 +2753,37 @@ msgid "HTML brief"
 msgstr "σύντομη HTML"
 
 #: modules/websearch/lib/search_engine.py:627
-#: modules/websearch/lib/websearch_templates.py:620
+#: modules/websearch/lib/websearch_templates.py:619
 msgid "AND"
 msgstr "ΚΑΙ"
 
 #: modules/websearch/lib/search_engine.py:629
-#: modules/websearch/lib/websearch_templates.py:622
+#: modules/websearch/lib/websearch_templates.py:621
 msgid "AND NOT"
 msgstr "ΚΑΙ ΟΧΙ"
 
 #: modules/websearch/lib/search_engine.py:647
-#: modules/websearch/lib/websearch_templates.py:570
+#: modules/websearch/lib/websearch_templates.py:569
 msgid "All of the words:"
 msgstr "Όλες οι λέξεις"
 
 #: modules/websearch/lib/search_engine.py:648
-#: modules/websearch/lib/websearch_templates.py:572
+#: modules/websearch/lib/websearch_templates.py:571
 msgid "Any of the words:"
 msgstr "Οποιαδήποτε από τις λέξεις"
 
 #: modules/websearch/lib/search_engine.py:649
-#: modules/websearch/lib/websearch_templates.py:574
+#: modules/websearch/lib/websearch_templates.py:573
 msgid "Exact phrase:"
 msgstr "Ακριβής φράση:"
 
 #: modules/websearch/lib/search_engine.py:650
-#: modules/websearch/lib/websearch_templates.py:576
+#: modules/websearch/lib/websearch_templates.py:575
 msgid "Partial phrase:"
 msgstr "Επιμέρους φράση:"
 
 #: modules/websearch/lib/search_engine.py:651
-#: modules/websearch/lib/websearch_templates.py:578
+#: modules/websearch/lib/websearch_templates.py:577
 msgid "Regular expression:"
 msgstr "Regular expression:"
 
@@ -2840,7 +2840,7 @@ msgstr ""
 "Ο όρος %s δεν ταίριαξε σε κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις "
 "συλλογές:"
 
-#: modules/websearch/lib/search_engine.py:2185
+#: modules/websearch/lib/search_engine.py:2186
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -2849,7 +2849,7 @@ msgstr ""
 "Λυπάμαι, ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα γίνει "
 "χρήση της της εξ΄ορισμού ταξινόμησης."
 
-#: modules/websearch/lib/search_engine.py:2209
+#: modules/websearch/lib/search_engine.py:2210
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -2858,95 +2858,95 @@ msgstr ""
 "Λυπάμαι, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή της "
 "ταξινόμησης κατά τίτλο."
 
-#: modules/websearch/lib/search_engine.py:2412
+#: modules/websearch/lib/search_engine.py:2413
 msgid "Use different search terms."
 msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έρευνας."
 
-#: modules/websearch/lib/search_engine.py:2443
-#: modules/websearch/lib/search_engine.py:2600
-#: modules/websearch/lib/search_engine.py:2623
-#: modules/websearch/lib/search_engine.py:2630
-#: modules/websearch/lib/search_engine.py:2637
-#: modules/websearch/lib/search_engine.py:2683
+#: modules/websearch/lib/search_engine.py:2444
+#: modules/websearch/lib/search_engine.py:2601
+#: modules/websearch/lib/search_engine.py:2624
+#: modules/websearch/lib/search_engine.py:2631
+#: modules/websearch/lib/search_engine.py:2638
+#: modules/websearch/lib/search_engine.py:2684
 msgid "The record has been deleted."
 msgstr "Η εγγραφή έχει διαγραφεί."
 
-#: modules/websearch/lib/search_engine.py:3049
-#: modules/websearch/lib/websearch_templates.py:344
-#: modules/websearch/lib/websearch_templates.py:465
-#: modules/websearch/lib/websearch_templates.py:1293
-#: modules/websearch/lib/websearch_templates.py:1390
-#: modules/websearch/lib/websearch_templates.py:1449
-#: modules/websearch/lib/websearch_templates.py:1485
-#: modules/websearch/lib/websearch_templates.py:1508
-#: modules/websearch/lib/websearch_templates.py:1538
+#: modules/websearch/lib/search_engine.py:3050
+#: modules/websearch/lib/websearch_templates.py:343
+#: modules/websearch/lib/websearch_templates.py:464
+#: modules/websearch/lib/websearch_templates.py:1304
+#: modules/websearch/lib/websearch_templates.py:1401
+#: modules/websearch/lib/websearch_templates.py:1465
+#: modules/websearch/lib/websearch_templates.py:1501
+#: modules/websearch/lib/websearch_templates.py:1524
+#: modules/websearch/lib/websearch_templates.py:1554
 msgid "Browse"
 msgstr "Φυλλομέτρηση"
 
-#: modules/websearch/lib/search_engine.py:3232
+#: modules/websearch/lib/search_engine.py:3233
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου "
 "αυτού..."
 
-#: modules/websearch/lib/search_engine.py:3254
+#: modules/websearch/lib/search_engine.py:3255
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
 
-#: modules/websearch/lib/websearch_templates.py:307
+#: modules/websearch/lib/websearch_templates.py:306
 #, python-format
 msgid "Search %s records for:"
 msgstr "Αναζήτηση %s εγγραφών για:"
 
-#: modules/websearch/lib/websearch_templates.py:340
-#: modules/websearch/lib/websearch_templates.py:1434
+#: modules/websearch/lib/websearch_templates.py:339
+#: modules/websearch/lib/websearch_templates.py:1453
 msgid "Advanced Search"
 msgstr "Σύνθετη αναζήτηση"
 
-#: modules/websearch/lib/websearch_templates.py:407
+#: modules/websearch/lib/websearch_templates.py:406
 #, python-format
 msgid "Search %s records for"
 msgstr "Αναζήτηση %s εγγραφών για:"
 
-#: modules/websearch/lib/websearch_templates.py:450
-#: modules/websearch/lib/websearch_templates.py:1350
+#: modules/websearch/lib/websearch_templates.py:449
+#: modules/websearch/lib/websearch_templates.py:1362
 msgid "Simple Search"
 msgstr "Απλή αναζήτηση"
 
-#: modules/websearch/lib/websearch_templates.py:483
+#: modules/websearch/lib/websearch_templates.py:482
 msgid "Search options:"
 msgstr "Επιλογές αναζήτησης:"
 
-#: modules/websearch/lib/websearch_templates.py:530
-#: modules/websearch/lib/websearch_templates.py:1531
+#: modules/websearch/lib/websearch_templates.py:529
+#: modules/websearch/lib/websearch_templates.py:1547
 msgid "Added since:"
 msgstr "Προστέθηκαν από:"
 
-#: modules/websearch/lib/websearch_templates.py:531
-#: modules/websearch/lib/websearch_templates.py:1532
+#: modules/websearch/lib/websearch_templates.py:530
+#: modules/websearch/lib/websearch_templates.py:1548
 msgid "until:"
 msgstr "έως:"
 
-#: modules/websearch/lib/websearch_templates.py:536
-#: modules/websearch/lib/websearch_templates.py:1572
+#: modules/websearch/lib/websearch_templates.py:535
+#: modules/websearch/lib/websearch_templates.py:1588
 msgid "Display results:"
 msgstr "Παρουσίαση αποτελεσμάτων:"
 
-#: modules/websearch/lib/websearch_templates.py:537
-#: modules/websearch/lib/websearch_templates.py:1573
+#: modules/websearch/lib/websearch_templates.py:536
+#: modules/websearch/lib/websearch_templates.py:1589
 msgid "Output format:"
 msgstr "Μορφή αποτελεσμάτων:"
 
-#: modules/websearch/lib/websearch_templates.py:710
+#: modules/websearch/lib/websearch_templates.py:709
 msgid "Narrow by collection:"
 msgstr "Περιορισμός με συλλογή:"
 
-#: modules/websearch/lib/websearch_templates.py:711
+#: modules/websearch/lib/websearch_templates.py:710
 msgid "Focus on:"
 msgstr "Επικέντρωση σε:"
 
-#: modules/websearch/lib/websearch_templates.py:745
+#: modules/websearch/lib/websearch_templates.py:744
 msgid "restricted"
 msgstr "περιορισμένο"
 
@@ -2955,138 +2955,138 @@ msgstr "περιορισμένο"
 msgid "Search also:"
 msgstr "Αποτελέσματα αναζήτησης"
 
-#: modules/websearch/lib/websearch_templates.py:824
+#: modules/websearch/lib/websearch_templates.py:829
 msgid "The contents of this collection is restricted."
 msgstr "Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα"
 
-#: modules/websearch/lib/websearch_templates.py:839
+#: modules/websearch/lib/websearch_templates.py:844
 msgid "This collection does not contain any document yet."
 msgstr "Η συλλογή αυτή δεν περιέχει κάποιο έγγραφο ακόμη."
 
-#: modules/websearch/lib/websearch_templates.py:873
-#: modules/websearch/lib/websearch_templates.py:1987
-#: modules/websearch/lib/websearch_templates.py:2001
-#: modules/websearch/lib/websearch_templates.py:2018
+#: modules/websearch/lib/websearch_templates.py:878
+#: modules/websearch/lib/websearch_templates.py:2043
+#: modules/websearch/lib/websearch_templates.py:2057
+#: modules/websearch/lib/websearch_templates.py:2073
 msgid "more"
 msgstr "περισσότερα"
 
-#: modules/websearch/lib/websearch_templates.py:888
+#: modules/websearch/lib/websearch_templates.py:893
 msgid "Latest additions:"
 msgstr "Πρόσφατες προσθήκες:"
 
-#: modules/websearch/lib/websearch_templates.py:977
-#: modules/websearch/lib/websearch_templates.py:1969
-#: modules/websearch/lib/websearch_templates.py:2347
+#: modules/websearch/lib/websearch_templates.py:985
+#: modules/websearch/lib/websearch_templates.py:2021
+#: modules/websearch/lib/websearch_templates.py:2422
 msgid "Similar records"
 msgstr "Παρόμοιες εγγραφές"
 
-#: modules/websearch/lib/websearch_templates.py:982
-#: modules/websearch/lib/websearch_templates.py:2352
+#: modules/websearch/lib/websearch_templates.py:991
+#: modules/websearch/lib/websearch_templates.py:2430
 msgid "Cited by"
 msgstr "Παραπομπή από"
 
-#: modules/websearch/lib/websearch_templates.py:1051
+#: modules/websearch/lib/websearch_templates.py:1059
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
 "Οι πλησιέστερες λέξεις στο %(x_word)s στο πεδίο %(x_field)s, σε οποιαδήποτε "
 "συλλογή είναι:"
 
-#: modules/websearch/lib/websearch_templates.py:1054
+#: modules/websearch/lib/websearch_templates.py:1062
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "Οι πλησιέστερες λέξεις στο %(x_word)s, σε οποιαδήποτε συλλογή είναι:"
 
-#: modules/websearch/lib/websearch_templates.py:1146
+#: modules/websearch/lib/websearch_templates.py:1154
 msgid "Hits"
 msgstr "Hits"
 
-#: modules/websearch/lib/websearch_templates.py:1207
-#: modules/websearch/lib/websearch_templates.py:1781
+#: modules/websearch/lib/websearch_templates.py:1219
+#: modules/websearch/lib/websearch_templates.py:1802
 msgid "next"
 msgstr "επόμενο"
 
-#: modules/websearch/lib/websearch_templates.py:1300
-#: modules/websearch/lib/websearch_templates.py:1401
+#: modules/websearch/lib/websearch_templates.py:1311
+#: modules/websearch/lib/websearch_templates.py:1412
 msgid "Try your search on..."
 msgstr "Δοκιμάστε την έρευνά σας στο..."
 
-#: modules/websearch/lib/websearch_templates.py:1480
+#: modules/websearch/lib/websearch_templates.py:1496
 msgid "collections"
 msgstr "συλλογές"
 
-#: modules/websearch/lib/websearch_templates.py:1502
+#: modules/websearch/lib/websearch_templates.py:1518
 msgid "Limit to:"
 msgstr "Περιοσμός σε:"
 
-#: modules/websearch/lib/websearch_templates.py:1542
+#: modules/websearch/lib/websearch_templates.py:1558
 #: modules/websearch/lib/websearch_webcoll.py:503
 msgid "results"
 msgstr "αποτελέσματα"
 
-#: modules/websearch/lib/websearch_templates.py:1577
+#: modules/websearch/lib/websearch_templates.py:1593
 #: modules/websearch/lib/websearch_webcoll.py:473
 msgid "asc."
 msgstr "αύξ."
 
-#: modules/websearch/lib/websearch_templates.py:1580
+#: modules/websearch/lib/websearch_templates.py:1596
 #: modules/websearch/lib/websearch_webcoll.py:474
 msgid "desc."
 msgstr "φθίν."
 
-#: modules/websearch/lib/websearch_templates.py:1586
+#: modules/websearch/lib/websearch_templates.py:1602
 #: modules/websearch/lib/websearch_webcoll.py:517
 msgid "single list"
 msgstr "απλή λίστα"
 
-#: modules/websearch/lib/websearch_templates.py:1589
+#: modules/websearch/lib/websearch_templates.py:1605
 #: modules/websearch/lib/websearch_webcoll.py:516
 msgid "split by collection"
 msgstr "διαχωρισμός κατά συλλογή"
 
-#: modules/websearch/lib/websearch_templates.py:1624
+#: modules/websearch/lib/websearch_templates.py:1640
 msgid "MARC tag"
 msgstr "Πεδίο MARC"
 
-#: modules/websearch/lib/websearch_templates.py:1738
-#: modules/websearch/lib/websearch_templates.py:1743
-#: modules/websearch/lib/websearch_templates.py:2087
+#: modules/websearch/lib/websearch_templates.py:1754
+#: modules/websearch/lib/websearch_templates.py:1759
+#: modules/websearch/lib/websearch_templates.py:2144
 #, python-format
 msgid "%s records found"
 msgstr "%s εγγραφές βρέθηκαν"
 
-#: modules/websearch/lib/websearch_templates.py:1768
+#: modules/websearch/lib/websearch_templates.py:1785
 msgid "begin"
 msgstr "έναρξη"
 
-#: modules/websearch/lib/websearch_templates.py:1772
+#: modules/websearch/lib/websearch_templates.py:1790
 #: modules/websubmit/lib/websubmit_templates.py:1168
 msgid "previous"
 msgstr "προηγούμενο"
 
-#: modules/websearch/lib/websearch_templates.py:1785
+#: modules/websearch/lib/websearch_templates.py:1809
 msgid "end"
 msgstr "τέλος"
 
-#: modules/websearch/lib/websearch_templates.py:1805
+#: modules/websearch/lib/websearch_templates.py:1829
 msgid "jump to record:"
 msgstr "μετάβαση στην εγγραφή:"
 
-#: modules/websearch/lib/websearch_templates.py:1818
+#: modules/websearch/lib/websearch_templates.py:1842
 #, python-format
 msgid "Search took %s seconds."
 msgstr "Η έρευνα πήρε %s δευτερόλεπτα."
 
-#: modules/websearch/lib/websearch_templates.py:1894
-#: modules/websearch/lib/websearch_templates.py:1971
+#: modules/websearch/lib/websearch_templates.py:1939
+#: modules/websearch/lib/websearch_templates.py:2023
 msgid "ADD TO BASKET"
 msgstr "ΠΡΟΣΘΗΚΗ ΣΤΟ ΚΑΛΑΘΙ"
 
-#: modules/websearch/lib/websearch_templates.py:1926
+#: modules/websearch/lib/websearch_templates.py:1971
 msgid "Format:"
 msgstr "Μορφοποίηση:"
 
-#: modules/websearch/lib/websearch_templates.py:1964
+#: modules/websearch/lib/websearch_templates.py:2010
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
@@ -3094,25 +3094,25 @@ msgstr ""
 "Δημιουργία εγγραφής %(x_date_creation)s, τελευταία τροποποίηση %"
 "(x_date_modification)s"
 
-#: modules/websearch/lib/websearch_templates.py:1980
+#: modules/websearch/lib/websearch_templates.py:2032
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Παραπέμπεται από: %s εγγραφές"
 
-#: modules/websearch/lib/websearch_templates.py:1995
+#: modules/websearch/lib/websearch_templates.py:2050
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Παραπέμπεται σε συνδιασμό από: %s εγγραφές"
 
-#: modules/websearch/lib/websearch_templates.py:2012
+#: modules/websearch/lib/websearch_templates.py:2067
 msgid "People who downloaded this document also downloaded:"
 msgstr "Όσοι κατέβασαν το έγγραφο αυτό, κατέβασαν επίσης:"
 
-#: modules/websearch/lib/websearch_templates.py:2027
+#: modules/websearch/lib/websearch_templates.py:2082
 msgid "People who viewed this page also viewed:"
 msgstr "Όσοι είδαν την σελίδα αυτή, είδαν επίσης:"
 
-#: modules/websearch/lib/websearch_templates.py:2074
+#: modules/websearch/lib/websearch_templates.py:2131
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -3121,14 +3121,14 @@ msgstr ""
 "%(x_fmt_open)sΑποτελέσμα έρευνας:%(x_fmt_close)s Βρέθηκαν %(x_nb_records)s "
 "εγγραφές σε %(x_nb_seconds)s δευτερόλεπτα."
 
-#: modules/websearch/lib/websearch_templates.py:2114
+#: modules/websearch/lib/websearch_templates.py:2171
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Το ερώτημα δεν επέστρεψε αποτελέσματα. Παρακαλούμε δοκιμάστε διαφορετικό "
 "συνδιασμό των όρων."
 
-#: modules/websearch/lib/websearch_templates.py:2145
+#: modules/websearch/lib/websearch_templates.py:2203
 msgid "See also: similar author names"
 msgstr "Δείτε ακόμη: παρόμοια ονόματα συγγραφέων"
 
@@ -3155,49 +3155,44 @@ msgstr "Δεν βρέθηκε"
 msgid "in"
 msgstr "σε"
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:48
+#: modules/websearch/lib/websearch_external_collections_templates.py:50
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr ""
 "Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους "
 "servers:"
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:69
-msgid "Results from external collections overview:"
+#: modules/websearch/lib/websearch_external_collections_templates.py:79
+msgid "External collections results overview:"
 msgstr ""
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:90
+#: modules/websearch/lib/websearch_external_collections_templates.py:119
 #, fuzzy
-msgid "Timeout"
-msgstr "Ώρα"
+msgid "Search timed out."
+msgstr "Αποτελέσματα αναζήτησης"
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:91
-#, python-format
+#: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
-"The external search engine has not responded in time. You can check results "
-"here : <a href=\"%(url)s\">%(name)s</a>"
+"The external search engine has not responded in time. You can check its "
+"results here:"
 msgstr ""
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:106
-#, python-format
-msgid "Time : %2.3f"
-msgstr ""
+#: modules/websearch/lib/websearch_external_collections_templates.py:145
+#: modules/websearch/lib/websearch_external_collections_templates.py:153
+#: modules/websearch/lib/websearch_external_collections_templates.py:166
+#, fuzzy
+msgid "No results found."
+msgstr "Δεν βρέθηκαν τιμές."
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:108
+#: modules/websearch/lib/websearch_external_collections_templates.py:149
 #, fuzzy, python-format
 msgid "%s results found"
 msgstr "Δεν βρέθηκαν τιμές."
 
-#: modules/websearch/lib/websearch_external_collections_templates.py:110
-#, fuzzy
-msgid "See results"
-msgstr "αποτελέσματα"
-
-#: modules/websearch/lib/websearch_external_collections_templates.py:112
-#: modules/websearch/lib/websearch_external_collections_templates.py:127
-#, fuzzy
-msgid "No results found."
-msgstr "Δεν βρέθηκαν τιμές."
+#: modules/websearch/lib/websearch_external_collections_templates.py:151
+#, fuzzy, python-format
+msgid "%s seconds"
+msgstr "%s εγγραφές βρέθηκαν"
 
 #: modules/websearch/lib/websearch_webcoll.py:537
 msgid "brief"
@@ -4158,43 +4153,43 @@ msgstr "Τροποποίηση Ομάδας"
 msgid "Edit group members"
 msgstr "Τροποποίηση μελών ομάδας"
 
-#: modules/webstyle/lib/webstyle_templates.py:514
-#: modules/webstyle/lib/webstyle_templates.py:551
-#: modules/webstyle/lib/webstyle_templates.py:553
+#: modules/webstyle/lib/webstyle_templates.py:511
+#: modules/webstyle/lib/webstyle_templates.py:548
+#: modules/webstyle/lib/webstyle_templates.py:550
 #: modules/websubmit/lib/websubmit_engine.py:1084
 #: modules/websubmit/lib/websubmit_webinterface.py:394
 msgid "Error"
 msgstr "Σφάλμα"
 
-#: modules/webstyle/lib/webstyle_templates.py:518
+#: modules/webstyle/lib/webstyle_templates.py:515
 msgid "Browser"
 msgstr "Φυλλομετρητής"
 
-#: modules/webstyle/lib/webstyle_templates.py:540
+#: modules/webstyle/lib/webstyle_templates.py:537
 msgid "System Error"
 msgstr "Σφάλμα Συστήματος"
 
-#: modules/webstyle/lib/webstyle_templates.py:555
+#: modules/webstyle/lib/webstyle_templates.py:552
 msgid "Traceback"
 msgstr "Traceback"
 
-#: modules/webstyle/lib/webstyle_templates.py:602
+#: modules/webstyle/lib/webstyle_templates.py:599
 msgid "Time"
 msgstr "Ώρα"
 
-#: modules/webstyle/lib/webstyle_templates.py:603
+#: modules/webstyle/lib/webstyle_templates.py:600
 msgid "Client"
 msgstr "Πελάτης"
 
-#: modules/webstyle/lib/webstyle_templates.py:605
+#: modules/webstyle/lib/webstyle_templates.py:602
 msgid "Please send an error report to the Administrator."
 msgstr "Παρακαλώ αποστείλατε την αναφορά σφάλματος στον Διαχειριστή."
 
-#: modules/webstyle/lib/webstyle_templates.py:606
+#: modules/webstyle/lib/webstyle_templates.py:603
 msgid "Send error report"
 msgstr "Αποστολή αναφοράς σφάλματος"
 
-#: modules/webstyle/lib/webstyle_templates.py:610
+#: modules/webstyle/lib/webstyle_templates.py:607
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Παρακαλώ επικοινωνήστε με τον %s αναφέροντας τα παρακάτω στοιχεία:"
@@ -4676,6 +4671,14 @@ msgstr "Δεν έχει ζητηθεί ποτέ έγκριση για το έγ�
 #: modules/websubmit/web/publiline.py:196
 msgid "Unable to display document."
 msgstr "Δεν είναι δυνατή η απεικόνειση του εγγράφου."
+
+#, fuzzy
+#~ msgid "Timeout"
+#~ msgstr "Ώρα"
+
+#, fuzzy
+#~ msgid "See results"
+#~ msgstr "αποτελέσματα"
 
 #, fuzzy
 #~ msgid "%(num)s results found"
