@@ -5,3 +5,4 @@
 <bfe_test_5 param1="test me!" param2="<b>ok</b>" prefix="<br/>" />
 <bfe_test_5 param1="test me!" param2="<b>ok</b>" prefix="<br/>" escape="0"/>
 <bfe_test_5 param1="test me!" param2="<b>ok</b>" prefix="<br/>" escape="1"/>
+<bfe_additional_report_number />

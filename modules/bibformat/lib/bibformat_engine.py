@@ -484,7 +484,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
            
         return (output_text, errors)
     
-    elif format_element != None and format_element['type'] =="field":
+    elif format_element != None and format_element['type'] == "field":
         # b) We have not found an element in files that has the tag
         # name. Then look for it in the table "tag"
         #
@@ -495,7 +495,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         # Load special values given as parameters
         separator = parameters.get('separator ', "")
         nbMax = parameters.get('nbMax', "")
-        nbMax = parameters.get('escape', "0")
+        escape = parameters.get('escape', "0")
         
         # Get the fields tags that have to be printed
         tags = format_element['attrs']['tags']

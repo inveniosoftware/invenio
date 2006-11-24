@@ -544,6 +544,9 @@ class FormatTest(unittest.TestCase):
         <datafield tag="245" ind1="" ind2="2">
         <subfield code="a">On the foo and bar2</subfield>
         </datafield>
+        <datafield tag="088" ind1="" ind2="">
+        <subfield code="a">99999</subfield>
+        </datafield>
         </record>
         '''
 
@@ -651,7 +654,7 @@ class FormatTest(unittest.TestCase):
 
         #Default formatting
         result = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
-        self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor''')
+        self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
 
     def test_format_with_format_template(self):
         """ bibformat - correct formatting with given template"""
@@ -666,7 +669,7 @@ class FormatTest(unittest.TestCase):
                                                               format_template_code=template['code'])
 
         self.assert_(isinstance(result, tuple))
-        self.assertEqual(result[0],'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor''')
+        self.assertEqual(result[0],'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
         
 def create_test_suite():
     """Return test suite for the bibformat module"""

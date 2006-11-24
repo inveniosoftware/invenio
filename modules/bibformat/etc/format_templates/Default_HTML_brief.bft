@@ -14,4 +14,4 @@ suffix="]</small> " />
 <BFE_ABSTRACT limit="1" prefix="<br/><small>" suffix="</small>" 
 highlight="no" contextual="no"/>
 
-<BFE_FULLTEXT prefix='<br><small>' style="note" suffix="</small>"/>
+<BFE_FULLTEXT prefix='<br/><small>' style="note" suffix="</small>"/>
