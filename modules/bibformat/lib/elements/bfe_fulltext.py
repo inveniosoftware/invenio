@@ -22,6 +22,8 @@
 """
 __revision__ = "$Id$"
 
+from cgi import escape
+
 def format(bfo, style, separator='; '):
     """
     This is the default format for formatting full-text reference.
@@ -32,6 +34,9 @@ def format(bfo, style, separator='; '):
     urls_u = bfo.fields("8564_u")
     if style != "":
         style = 'class="'+style+'"'
-        
-    urls = map(lambda x: '<a '+style+'href="'+x+'">'+x+'</a>', urls_u)
+
+    # Build urls list.
+    # Escape special chars for <a> tag value.
+    urls = ['<a '+style+' href="'+escape(url)+'">'+escape(url)+'</a>'
+            for url in urls_u]
     return separator.join(urls)

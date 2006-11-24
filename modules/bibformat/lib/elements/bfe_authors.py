@@ -34,6 +34,7 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
     @param highlight highlights authors corresponding to search query if set to 'yes'
     """
     from urllib import quote
+    from cgi import escape
     from invenio.config import weburl
     from invenio.messages import gettext_set_language
     
@@ -55,7 +56,7 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
         authors = [bibformat_utils.highlight(x, bfo.search_pattern) for x in authors]
 
     if print_links.lower() == "yes":
-        authors = map(lambda x: '<a href="'+weburl+'/search?f=author&amp;p='+ quote(x) +'">'+x+'</a>', authors)
+        authors = map(lambda x: '<a href="'+weburl+'/search?f=author&amp;p='+ quote(x) +'">'+escape(x)+'</a>', authors)
 
     if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension

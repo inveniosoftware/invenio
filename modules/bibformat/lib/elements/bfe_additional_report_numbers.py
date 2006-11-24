@@ -23,9 +23,6 @@
 
 __revision__ = "$Id$"
 
-#numbers = fields("088$a")    
-#print separator.join(numbers)
-
 def format(bfo, separator):
     """
     Prints the additional report numbers of the record
