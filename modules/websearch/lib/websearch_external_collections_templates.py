@@ -148,7 +148,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
             html_num = '<strong>' + \
                        make_url(_('%s results found') % num, url) + \
                        '</strong>'
-            html_sec = "(%s seconds)" % ('%2.2f' % current_time)
+            html_sec = '(' + _('%s seconds') % ('%2.2f' % current_time) + ')'
     else:
         html_num = _('No results found.')
         html_sec = ''
