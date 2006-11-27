@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-11-24 11:47+0100\n"
+"POT-Creation-Date: 2006-11-27 11:47+0100\n"
 "PO-Revision-Date: 2006-10-12 17:50+0200\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
@@ -557,8 +557,7 @@ msgstr "Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_fiel
 #: modules/bibedit/web/admin/bibeditadmin.py:99
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-msgstr ""
-"Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_field)s - Προσθήκη υποπεδίου"
+msgstr "Επεξεργασία εγγραφής %(x_recid)s, πεδίο %(x_field)s - Προσθήκη υποπεδίου"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:127
 #, python-format
@@ -568,9 +567,8 @@ msgstr "Υποβολή και αποθήκευση εγγραφής %s"
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
 #: modules/bibformat/web/admin/bibformatadmin.py:81
-#, fuzzy
 msgid "BibFormat Admin"
-msgstr "Διαχειριστής WebComment"
+msgstr "Διαχείριση BibFormat"
 
 #: modules/bibformat/lib/bibformat_templates.py:340
 #: modules/bibformat/lib/bibformat_templates.py:452
@@ -595,19 +593,19 @@ msgstr "Μενού"
 #: modules/bibformat/lib/bibformat_templates.py:2014
 #: modules/bibformat/lib/bibformat_templates.py:2082
 msgid "Close Editor"
-msgstr ""
+msgstr "Έξοδος από Επεξεργασία Προτύπων"
 
 #: modules/bibformat/lib/bibformat_templates.py:343
 #: modules/bibformat/lib/bibformat_templates.py:454
 #: modules/bibformat/lib/bibformat_templates.py:606
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "Τροποποίηση Χαρακτηριστικών Προτύπων"
 
 #: modules/bibformat/lib/bibformat_templates.py:344
 #: modules/bibformat/lib/bibformat_templates.py:455
 #: modules/bibformat/lib/bibformat_templates.py:607
 msgid "Template Editor"
-msgstr ""
+msgstr "Επεξεργασία Προτύπων"
 
 #: modules/bibformat/lib/bibformat_templates.py:345
 #: modules/bibformat/lib/bibformat_templates.py:456
@@ -616,7 +614,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1348
 #: modules/bibformat/lib/bibformat_templates.py:1446
 msgid "Check Dependencies"
-msgstr ""
+msgstr "Έλεγχος Συσχετισμών"
 
 #: modules/bibformat/lib/bibformat_templates.py:395
 #: modules/bibformat/lib/bibformat_templates.py:911
@@ -635,18 +633,16 @@ msgstr "Περιγραφή"
 
 #: modules/bibformat/lib/bibformat_templates.py:415
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "Ενημέρωση Χαρακτηριστικών Μορφής"
 
 #: modules/bibformat/lib/bibformat_templates.py:603
-#, fuzzy
 msgid "Show Documentation"
-msgstr "Εμφάνιση λογαριασμού"
+msgstr "Εμφάνιση Αρχείων Βοήθειας"
 
 #: modules/bibformat/lib/bibformat_templates.py:604
 #: modules/bibformat/lib/bibformat_templates.py:655
-#, fuzzy
 msgid "Hide Documentation"
-msgstr "έγγραφο"
+msgstr "Απόκρυψη Αρχείων Βοήθειας"
 
 #: modules/bibformat/lib/bibformat_templates.py:914
 #: modules/bibformat/lib/bibformat_templates.py:1040
@@ -656,9 +652,8 @@ msgstr "Κατάσταση"
 
 #: modules/bibformat/lib/bibformat_templates.py:915
 #: modules/bibformat/lib/bibformat_templates.py:1041
-#, fuzzy
 msgid "Last Modification Date"
-msgstr "Όνομα ειδοποίησης:"
+msgstr "Ημερομηνία Τελευταίας Τροποποίησης"
 
 #: modules/bibformat/lib/bibformat_templates.py:918
 #: modules/bibformat/lib/bibformat_templates.py:1044
@@ -670,9 +665,8 @@ msgstr "Όνομα ειδοποίησης:"
 #: modules/bibformat/web/admin/bibformatadmin.py:287
 #: modules/bibformat/web/admin/bibformatadmin.py:376
 #: modules/bibformat/web/admin/bibformatadmin.py:1351
-#, fuzzy
 msgid "Manage Output Formats"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Διαχείριση Μορφής Αποτελεσμάτων"
 
 #: modules/bibformat/lib/bibformat_templates.py:919
 #: modules/bibformat/lib/bibformat_templates.py:1045
@@ -685,7 +679,7 @@ msgstr "Μορφή αποτελεσμάτων:"
 #: modules/bibformat/web/admin/bibformatadmin.py:657
 #: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "Διαχείριση Προτύπων Μορφής"
 
 #: modules/bibformat/lib/bibformat_templates.py:920
 #: modules/bibformat/lib/bibformat_templates.py:1046
@@ -696,7 +690,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:891
 #: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "Αρχείο Βοήθειας Στοιχείων Μορφής"
 
 #: modules/bibformat/lib/bibformat_templates.py:921
 #: modules/bibformat/lib/bibformat_templates.py:1047
@@ -714,145 +708,133 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
 #: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
-msgstr ""
+msgstr "Διαχείριση Γνωσιακών Βάσεων"
 
 #: modules/bibformat/lib/bibformat_templates.py:996
 msgid "Add New Format Template"
-msgstr ""
+msgstr "Προσθήκη Νέου Προτύπου Μορφής"
 
 #: modules/bibformat/lib/bibformat_templates.py:997
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "Εκτενής Έλεγχος Προτύπων Μορφής"
 
 #: modules/bibformat/lib/bibformat_templates.py:1037
 msgid "Code"
-msgstr ""
+msgstr "Κώδικας"
 
 #: modules/bibformat/lib/bibformat_templates.py:1121
-#, fuzzy
 msgid "Add New Output Format"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Προσθήκη Νέας Μορφής Εξόδου"
 
 #: modules/bibformat/lib/bibformat_templates.py:1159
-#, fuzzy
 msgid "menu"
 msgstr "Μενού"
 
 #: modules/bibformat/lib/bibformat_templates.py:1160
 #: modules/bibformat/lib/bibformat_templates.py:1345
 #: modules/bibformat/lib/bibformat_templates.py:1443
-#, fuzzy
 msgid "Close Output Format"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Κλείσιμο Μορφής Εξόδου"
 
 #: modules/bibformat/lib/bibformat_templates.py:1161
 #: modules/bibformat/lib/bibformat_templates.py:1346
 #: modules/bibformat/lib/bibformat_templates.py:1444
-#, fuzzy
 msgid "Rules"
-msgstr "επισκέπτης"
+msgstr "Κανόνες"
 
 #: modules/bibformat/lib/bibformat_templates.py:1162
 #: modules/bibformat/lib/bibformat_templates.py:1347
 #: modules/bibformat/lib/bibformat_templates.py:1445
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "Τροποποίηση Χαρακτηριστικών Μορφής Εξόδου"
 
 #: modules/bibformat/lib/bibformat_templates.py:1258
 #: modules/bibformat/lib/bibformatadminlib.py:527
-#, fuzzy
 msgid "Remove Rule"
-msgstr "Διαγραφή στοιχείου"
+msgstr "Διαγραφή Κανόνα"
 
 #: modules/bibformat/lib/bibformat_templates.py:1307
 #: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Add New Rule"
-msgstr ""
+msgstr "Προσθήκη Νέου Κανόνα"
 
 #: modules/bibformat/lib/bibformat_templates.py:1308
 #: modules/bibformat/lib/bibformatadminlib.py:531
-#, fuzzy
 msgid "Save Changes"
-msgstr "Αποθήκευση αλλαγών"
+msgstr "Αποθήκευση Αλλαγών"
 
 #: modules/bibformat/lib/bibformat_templates.py:1849
 #: modules/bibformat/lib/bibformat_templates.py:2016
 #: modules/bibformat/lib/bibformat_templates.py:2084
 msgid "Knowledge Base Mappings"
-msgstr ""
+msgstr "Αντιστοιχίες Γνωσιακής Βάσης"
 
 #: modules/bibformat/lib/bibformat_templates.py:1850
 #: modules/bibformat/lib/bibformat_templates.py:2017
 #: modules/bibformat/lib/bibformat_templates.py:2085
 msgid "Knowledge Base Attributes"
-msgstr ""
+msgstr "Χαρακτηριστικά Γνωσιακής Βάσης"
 
 #: modules/bibformat/lib/bibformat_templates.py:1851
 #: modules/bibformat/lib/bibformat_templates.py:2018
 #: modules/bibformat/lib/bibformat_templates.py:2086
 msgid "Knowledge Base Dependencies"
-msgstr ""
+msgstr "Συσχετισμοί Γνωσιακών Βάσεων"
 
 #: modules/bibformat/lib/bibformat_templates.py:2231
 msgid "No problem found with format"
-msgstr ""
+msgstr "Δεν βρέθηκε πρόβλημα στην μορφοποίηση"
 
 #: modules/bibformat/lib/bibformat_templates.py:2233
-#, fuzzy
 msgid "An error has been found"
-msgstr "Η αναφορά σφάλματος έχει σταλεί."
+msgstr "Εντοπίστηκε σφάλμα"
 
 #: modules/bibformat/lib/bibformat_templates.py:2235
 msgid "The following errors have been found"
-msgstr ""
+msgstr "Έχουν εντοπιστεί τα παρακάτω σφάλματα"
 
 #: modules/bibformat/lib/bibformatadminlib.py:330
 #: modules/bibformat/lib/bibformatadminlib.py:369
 #: modules/bibformat/lib/bibformatadminlib.py:371
-#, fuzzy
 msgid "Test with record:"
-msgstr "Αναλυτική εγγραφή"
+msgstr "Δοκιμή με εγγραφή:"
 
 #: modules/bibformat/lib/bibformatadminlib.py:331
 msgid "Enter a search query here."
-msgstr ""
+msgstr "Εισάγετε μια φράση αναζήτησης εδώ."
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
-#, fuzzy
 msgid "Hide"
-msgstr "Οδηγός"
+msgstr "Απόκρυψη"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
 #, python-format
 msgid "Show all %i authors"
-msgstr ""
+msgstr "Εμφάνιση και των %i συγγραφέων"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:53
-#, fuzzy
 msgid "Migrate BibFormat Settings"
-msgstr "Παραμετροποίηση BibFormat"
+msgstr "Μεταφορά Ρυθμίσεων BibFormat"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:79
 msgid "Migrate Knowledge Bases"
-msgstr ""
+msgstr "Μεταφορά Γνωσιακών Βάσεων"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:105
 msgid "Migrate Behaviours"
-msgstr ""
+msgstr "Μεταφορά Συμπεριφορών (Behaviours)"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:130
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:155
-#, fuzzy
 msgid "Migrate Formats"
-msgstr "Παραμετροποίηση BibFormat"
+msgstr "Μεταφορά Μορφών Εξόδου"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:254
 #: modules/bibformat/web/admin/bibformatadmin.py:299
 #: modules/bibformat/web/admin/bibformatadmin.py:1354
-#, fuzzy
 msgid "Restricted Output Format"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Περιορισμένη Μορφή Αποτελεσμάτων"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:212
 #: modules/bibformat/web/admin/bibformatadmin.py:510
@@ -861,60 +843,58 @@ msgid "Ok"
 msgstr "Εντάξει"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "Output Format %s Rules"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Κανόνες Μορφής Αποτελέσματος %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:267
 #, python-format
 msgid "Output Format %s Attributes"
-msgstr ""
+msgstr "Χαρακτηριστικά Μορφής Αποτελέσματος %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:312
 #, python-format
 msgid "Output Format %s Dependencies"
-msgstr ""
+msgstr "Συσχετισμοί Μορφής Εξόδου %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:376
-#, fuzzy
 msgid "Delete Output Format"
-msgstr "Μορφή αποτελεσμάτων:"
+msgstr "Διαγραφή Μορφής Αποτελέσματος"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:489
 #: modules/bibformat/web/admin/bibformatadmin.py:560
 #: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
-msgstr ""
+msgstr "Πρότυπο Περιορισμένης Μορφής"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:514
 #, python-format
 msgid "Format Template %s"
-msgstr ""
+msgstr "Πρότυπο Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:571
 #, python-format
 msgid "Format Template %s Attributes"
-msgstr ""
+msgstr "Χαρακτηριστικά Προτύπου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:603
 #, python-format
 msgid "Format Template %s Dependencies"
-msgstr ""
+msgstr "Συσχετισμοί Προτύπου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:657
-#, fuzzy
 msgid "Delete Format Template"
-msgstr "Διαγραφή σχολίου"
+msgstr "Διαγραφή Προτύπου Μορφής"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:867
 #, python-format
 msgid "Format Element %s Dependencies"
-msgstr ""
+msgstr "Συσχετισμοί Στοιχείου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
-msgstr ""
+msgstr "Δοκιμή Στοιχείου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:972
 #: modules/bibformat/web/admin/bibformatadmin.py:1019
@@ -924,50 +904,49 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1220
 #: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
-msgstr ""
+msgstr "Άγνωστη Γνωσιακή Βάση"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
-msgstr ""
+msgstr "Γνωσιακή Βάση %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
-msgstr ""
+msgstr "Χαρακτηριστικά Γνωσιακής Βάσης %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
-msgstr ""
+msgstr "Συσχετισμοί Σχεσιακής Βάσης Δεδομένων %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
-#, fuzzy
 msgid "Delete Knowledge Base"
-msgstr "Διαγραφή καλαθιού"
+msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
-msgstr ""
+msgstr "Επικύρωση Μορφής Εξόδου %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
-msgstr ""
+msgstr "Επικύρωση Προτύπου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
-msgstr ""
+msgstr "Περιορισμένο Στοιχείο Μορφής"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
-msgstr ""
+msgstr "Επικύρωση Στοιχείου Μορφής %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
-msgstr ""
+msgstr "Επικύρωση Μορφής"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:55
 #: modules/bibharvest/lib/bibharvest_templates.py:73
@@ -1906,11 +1885,11 @@ msgstr "Προσθήκη ομάδας"
 
 #: modules/webbasket/lib/webbasket_templates.py:1291
 msgid "Manage group rights"
-msgstr "Διαχείρηση δικαιωμάτων ομάδας"
+msgstr "Διαχείριση δικαιωμάτων ομάδας"
 
 #: modules/webbasket/lib/webbasket_templates.py:1303
 msgid "Manage global sharing rights"
-msgstr "Διαχείρηση συνολικών δικαιωμάτων διαμοιρασμού"
+msgstr "Διαχείριση συνολικών δικαιωμάτων διαμοιρασμού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1308
 msgid "Delete basket"
@@ -1977,7 +1956,7 @@ msgstr "διαγραφή εγγραφών"
 #: modules/webbasket/lib/webbasket_templates.py:1367
 #: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "manage sharing rights"
-msgstr "διαχείρηση δικαιωμάτων διαμοιρασμού"
+msgstr "διαχείριση δικαιωμάτων διαμοιρασμού"
 
 #: modules/webbasket/lib/webbasket_templates.py:1413
 msgid "You are not a member of a group."
@@ -2050,7 +2029,7 @@ msgstr "Λίστα δημόσιων καλαθιών"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
-msgstr "Διαχειριστής WebComment"
+msgstr "Διαχείριση WebComment"
 
 #: modules/webcomment/lib/webcomment.py:799
 #: modules/webcomment/lib/webcomment_templates.py:326
@@ -2443,11 +2422,11 @@ msgid "Record Not Found"
 msgstr "Η εγγραφή δεν βρέθηκε"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:189
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
-msgstr "Πριν προσθέσετε το σχόλιό σας, πρέπει να κάνετε login"
+msgstr "Πριν προσθέσετε το σχόλιό σας, πρέπει να κάνετε %(x_url_open)slogin%(x_url_close)s"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:193
 #: modules/websession/lib/websession_webinterface.py:405
@@ -2951,13 +2930,12 @@ msgid "restricted"
 msgstr "περιορισμένο"
 
 #: modules/websearch/lib/websearch_templates.py:764
-#, fuzzy
 msgid "Search also:"
-msgstr "Αποτελέσματα αναζήτησης"
+msgstr "Αναζήτηση Επίσης σε:"
 
 #: modules/websearch/lib/websearch_templates.py:829
 msgid "The contents of this collection is restricted."
-msgstr "Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα"
+msgstr "Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα."
 
 #: modules/websearch/lib/websearch_templates.py:844
 msgid "This collection does not contain any document yet."
@@ -3164,35 +3142,35 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:79
 msgid "External collections results overview:"
-msgstr ""
+msgstr "Προεπισκόπηση αποτελεσμάτων εξωτερικών συλλογών:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:119
-#, fuzzy
 msgid "Search timed out."
-msgstr "Αποτελέσματα αναζήτησης"
+msgstr "Έληξε ο χρόνος αναζήτησης."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
 "The external search engine has not responded in time. You can check its "
 "results here:"
 msgstr ""
+"Η εξωτερική μηχανή αναζήτησης δεν απάντησε εγκαίρως. Μπορείτε να "
+"ελέγξετε τα αποτελέσματα εδώ:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:145
 #: modules/websearch/lib/websearch_external_collections_templates.py:153
 #: modules/websearch/lib/websearch_external_collections_templates.py:166
-#, fuzzy
 msgid "No results found."
-msgstr "Δεν βρέθηκαν τιμές."
+msgstr "Δεν βρέθηκαν αποτελέσματα."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:149
-#, fuzzy, python-format
+#, python-format
 msgid "%s results found"
-msgstr "Δεν βρέθηκαν τιμές."
+msgstr "Βρέθηκαν %s αποτελέσματα"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:151
-#, fuzzy, python-format
+#, python-format
 msgid "%s seconds"
-msgstr "%s εγγραφές βρέθηκαν"
+msgstr "%s δευτερόλεπτα"
 
 #: modules/websearch/lib/websearch_webcoll.py:537
 msgid "brief"
@@ -3309,7 +3287,7 @@ msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr ""
-"Παρακαλώ επιλέξτε ποιόν τρόπο αυθεντικοποίησης θα επιθυμούσατε να "
+"Παρακαλώ επιλέξτε ποιόν τρόπο αυθεντικοποίησης επιθυμείτε να "
 "χρησιμοποιήσετε"
 
 #: modules/websession/lib/websession_templates.py:213
@@ -3470,9 +3448,8 @@ msgid "Try again"
 msgstr "Δοκιμάστε ξανά"
 
 #: modules/websession/lib/websession_templates.py:523
-#, fuzzy
 msgid "Hello"
-msgstr "Βοήθεια"
+msgstr "Χαίρετε"
 
 #: modules/websession/lib/websession_templates.py:524
 msgid "Here are your user credentials for"
@@ -3492,11 +3469,11 @@ msgstr "Μπορείτε να κάνετε login στο"
 
 #: modules/websession/lib/websession_templates.py:532
 msgid "Best regards"
-msgstr ""
+msgstr "Με εκτίμηση"
 
 #: modules/websession/lib/websession_templates.py:534
 msgid "Need human intervention?  Contact"
-msgstr ""
+msgstr "Εάν χρείαζεστε ανθρώπινη παρέμβαση, επικοινωνήστε με"
 
 #: modules/websession/lib/websession_templates.py:554
 #, python-format
@@ -3601,8 +3578,7 @@ msgid ""
 msgstr ""
 "Παρακαλώ μην χρησιμοποιείτε κωδικούς που έχετε και σε άλλα συστήματα. Το "
 "στοιχεία του email σας θα μείνουν εμπιστευτικά και δεν θα παραχωρηθούν σε "
-"κάποιο τρίτο φορέα. Το email σας θα χρησιμοποιείται μόνο για υπηρεσίες στο %"
-"s."
+"κάποιο τρίτο φορέα. Το email σας θα χρησιμοποιείται μόνο για υπηρεσίες στο %s."
 
 #: modules/websession/lib/websession_templates.py:798
 #, python-format
@@ -3615,7 +3591,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:804
 msgid "You are not authorized to access administrative functions."
-msgstr "Δεν έχετε πρόσβαση στις υπηρεσίες διαχείρησης."
+msgstr "Δεν έχετε πρόσβαση στις υπηρεσίες διαχείρισης."
 
 #: modules/websession/lib/websession_templates.py:807
 #, python-format
@@ -4052,6 +4028,8 @@ msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
 msgstr ""
+"Ο κωδικός σας δεν μπορεί να αποσταλεί μέσω email διότι χρησιμοποιείτε "
+"σύστημα εξωτερικής αυθεντικοποίησης."
 
 #: modules/websession/lib/websession_webinterface.py:275
 msgid "The entered email address does not exist in the database."
@@ -4321,8 +4299,7 @@ msgstr "Επόμενη σελίδα"
 #: modules/websubmit/lib/websubmit_templates.py:548
 #: modules/websubmit/lib/websubmit_templates.py:950
 msgid "Are you sure you want to quit this submission?"
-msgstr ""
-"Είστε σίγουροι πως θέλετε να εγκαταλείψετε την παρούσα διαδικασία υποβολής;"
+msgstr "Είστε σίγουροι πως θέλετε να εγκαταλείψετε την παρούσα διαδικασία υποβολής;"
 
 #: modules/websubmit/lib/websubmit_templates.py:549
 #: modules/websubmit/lib/websubmit_templates.py:957
@@ -4339,8 +4316,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:553
 msgid "Mandatory fields appear in red in the SUMMARY window."
-msgstr ""
-"Τα υποχρεωτικά πεδία εμφανίζονται στο παράθυρο της 'Περίληψης' με κόκκινο."
+msgstr "Τα υποχρεωτικά πεδία εμφανίζονται στο παράθυρο της 'Περίληψης' με κόκκινο."
 
 #: modules/websubmit/lib/websubmit_templates.py:693
 #, python-format
@@ -4651,9 +4627,8 @@ msgid "Unable to find file."
 msgstr "Δεν είναι δυνατό να βρεθεί το αρχείο."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:104
-#, fuzzy
 msgid "This file is restricted!"
-msgstr "Τα περιεχόμενα της παρούσας συλλογής είναι προστατευμένα"
+msgstr "Η πρόσβαση σε αυτό το αρχείο είναι περιορισμένη!"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:125
 #: modules/websubmit/lib/websubmit_webinterface.py:211
