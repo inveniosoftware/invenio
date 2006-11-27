@@ -222,7 +222,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
 
     def parse(self):
         """Parse buffer to extract records."""
-        elements = self.buffer.split("<p class=g>")
+        elements = self.buffer.split("<div class=g>")
         if len(elements) <= 1:
             return
 
@@ -260,7 +260,7 @@ class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResults
 
     def parse(self):
         """Parse buffer to extract records."""
-        elements = self.buffer.split('<table><tr><td class="covertd">')
+        elements = self.buffer.split('<table class=rsi><tr><td class="covertd">')
         if len(elements) <= 1:
             return
 
