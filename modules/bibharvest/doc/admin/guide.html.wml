@@ -73,19 +73,20 @@ Once the database has been set up thorugh the BibHarvest Admin Interface, run th
 (Note: the validation simply performs an 'Identify' query to the baseURL and parses the reply with crucial tags such as <code>OAI-PMH</code> and <code>Identify</code>).
 <br>Once the baseURL is validated, the administrator is required to fill into the following fields:
 <br><ul>
-<li><strong>Source name</strong>: this will be the (alphanumeric) name used to refer to this OAI repository.<br><br>
-<li><strong>Metadata prefix</strong>: upon validation the baseURL is checked for the available metadata formats. The administator can choose the desired format to harvest metadata in.<br><br>
-<li><strong>Frequency</strong>: how often do you intend to harvest from this repository? (Note: selecting "never" excludes this source from automatic periodical harvesting)<br><br>
-<li><strong>Starting date</strong>: on your first harvesting session, do you intend to harvest the whole repository (from beginning) or only newly added material (from today)? (WARNING: harvesting large collections of material may take very long!)<br><br>
-<li><strong>Postprocess</strong>: how is the harvested material be dealt with after harvesting? 
-<ul><li>h: harvest only - metadata will be gathered and saved locally<li>h-u: harvest and upload - metadata will be automatically queued for upload (this is useful when harvested metadata is already in marcxml format)<li>h-c: harvest and convert - harvested metadata will be converted and saved locally<li>h-c-u: harvest, convert and upload - harvested metadata will be converted and queued for upload - this is useful when harvested metadata is in a format different from marcxml (e.g. oai_dc)</ul><br>
-<li><strong>BibConvert configuration file</strong>: if postprocess involves conversion, the full path to a BibConvert configuration file is needed.
+<li><strong>Source name</strong>: this will be the (alphanumeric) name used to refer to this OAI repository.</li>
+<li><strong>Metadata prefix</strong>: upon validation the baseURL is checked for the available metadata formats. The administator can choose the desired format to harvest metadata in.</li>
+<li><strong>Sets</strong>: upon validation the baseURL is checked for the available sets of the repository. The administator can choose the desired sets to harvest. If none is checked, all records are harvested. Otherwise selective harvesting for checked sets is done.</li>
+<li><strong>Frequency</strong>: how often do you intend to harvest from this repository? (Note: selecting "never" excludes this source from automatic periodical harvesting)</li>
+<li><strong>Starting date</strong>: on your first harvesting session, do you intend to harvest the whole repository (from beginning) or only newly added material (from today)? (WARNING: harvesting large collections of material may take very long!)</li>
+<li><strong>Postprocess</strong>: how is the harvested material be dealt with after harvesting?
+<ul><li>h: harvest only - metadata will be gathered and saved locally<li>h-u: harvest and upload - metadata will be automatically queued for upload (this is useful when harvested metadata is already in marcxml format)</li><li>h-c: harvest and convert - harvested metadata will be converted and saved locally</li><li>h-c-u: harvest, convert and upload - harvested metadata will be converted and queued for upload - this is useful when harvested metadata is in a format different from marcxml (e.g. oai_dc)</li></ul></li>
+<li><strong>BibConvert configuration file</strong>: if postprocess involves conversion, the filename of an existing BibConvert configuration file (or its full path if file is not in standard BibConvert config directory) is needed.
 This file determines how the metadata conversion will take place (e.g. oai_dc to marcxml).
 In order to ensure that the configuration file performs the desired conversion, please test it in advance and follow the instruction contained in the <a href="../bibconvert/guide.html">BibConvert Admin Guide</a>.
 Please note that some conversion parameters previously input at the command line can now be handled by the BibConvert Configuration Language (namely record separator, file header and file footer). Please consult the <a href="../bibconvert/guide.html">BibConvert Admin Guide</a> for more information on this. 
-This allows fully automatised harvesting and conversion (and possibly upload) of records provided a valid, functioning, BibConvert template is provided.
+This allows fully automatised harvesting and conversion (and possibly upload) of records provided a valid, functioning, BibConvert template is provided.</li>
 </ul>
-<br>
+
 <b>Edit and delete OAI sources</b><br>
 <p>Once a source has been added to the database, it will be visible in the overview page, as shown below</p>
    <div class="pagebody">
