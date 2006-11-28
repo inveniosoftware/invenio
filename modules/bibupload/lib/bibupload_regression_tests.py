@@ -372,7 +372,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
-          <subfield code="g">Okay.</subfield>
+          <subfield code="g">Test. Okay.</subfield>
          </datafield>
          <datafield tag="100" ind1="" ind2="">
           <subfield code="a">Bar, Baz</subfield>
@@ -402,7 +402,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
-          <subfield code="g">Here is some format value.</subfield>
+          <subfield code="g">Test. Here is some format value.</subfield>
          </datafield>
          <datafield tag="100" ind1="" ind2="">
           <subfield code="a">Doe, John</subfield>
@@ -418,7 +418,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
          <controlfield tag="001">3</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
-          <subfield code="g">Let us see if this gets inserted well.</subfield>
+          <subfield code="g">Test. Let us see if this gets inserted well.</subfield>
          </datafield>
         </record>
         """
@@ -427,11 +427,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
          <controlfield tag="001">3</controlfield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HB</subfield>
-          <subfield code="g">Yet another test, to be run after the first one.</subfield>
+          <subfield code="g">Test. Yet another test, to be run after the first one.</subfield>
          </datafield>
          <datafield tag="FMT" ind1="" ind2="">
           <subfield code="f">HD</subfield>
-          <subfield code="g">Let's see what will be stored in the detailed format field.</subfield>
+          <subfield code="g">Test. Let's see what will be stored in the detailed format field.</subfield>
          </datafield>
         </record>
         """
@@ -459,7 +459,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hb_after = print_record(new_recid, 'hb')
         self.failUnless(compare_xmlbuffers(marcxml_after,
                                            self.expected_marcxml_after_inserting_new_marcxml_with_fmt))
-        self.failUnless(hb_after.startswith("Okay."))
+        self.failUnless(hb_after.startswith("Test. Okay."))
 
     def test_updating_existing_record_formats_in_format_mode(self):
         """bibupload - FMT tag, updating existing record via format mode"""
@@ -472,7 +472,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         marcxml_after = print_record(3, 'xm')
         hb_after = print_record(3, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
-        self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
+        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
@@ -480,8 +480,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hb_after = print_record(3, 'hb')
         hd_after = print_record(3, 'hd')
         self.assertEqual(marcxml_after, marcxml_before)
-        self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
+        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # restore original record 3:
         self.restore_recid3()
         
@@ -496,7 +496,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         marcxml_after = print_record(3, 'xm')
         hb_after = print_record(3, 'hb')
         self.assertEqual(marcxml_after, marcxml_before)
-        self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
+        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
@@ -504,8 +504,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hb_after = print_record(3, 'hb')
         hd_after = print_record(3, 'hd')
         self.assertEqual(marcxml_after, marcxml_before)
-        self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
+        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # restore original record 3:
         self.restore_recid3()
 
@@ -520,7 +520,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hb_after = print_record(3, 'hb')
         self.failUnless(compare_xmlbuffers(marcxml_after,
                                            '<record><controlfield tag="001">3</controlfield></record>'), 0)
-        self.failUnless(hb_after.startswith("Let us see if this gets inserted well."))
+        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt_only_second)
         bibupload.bibupload(recs[0])
@@ -532,8 +532,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            <controlfield tag="001">3</controlfield>
                                            </record>""",
                                            0))
-        self.failUnless(hb_after.startswith("Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
+        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # final insertion and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_marcxml_with_fmt)
         bibupload.bibupload(recs[0])
@@ -554,8 +554,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            </record>
                                            """,
                                            0))
-        self.failUnless(hb_after.startswith("Here is some format value."))
-        self.failUnless(hd_after.startswith("Let's see what will be stored in the detailed format field."))
+        self.failUnless(hb_after.startswith("Test. Here is some format value."))
+        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # restore original record 3:
         self.restore_recid3()
 
