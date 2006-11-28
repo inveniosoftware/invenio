@@ -88,8 +88,16 @@ def http_request_parameters(http_param_dict, method="POST"):
     
     return params
 
-def OAI_Session(server, script, http_param_dict ,method="POST",output="", stylesheet=""):
-    "Handle OAi session"
+def OAI_Session(server, script, http_param_dict ,method="POST",output="", stylesheet="", resume_request_nbr=0):
+    """Handle one OAI session (1 request, which might lead
+    to multiple answers)
+
+    If output filepath is given, each answer of the oai repository is saved
+    in corresponding filepath, with a unique number appended at the end. This number
+    starts at 'resume_request_nbr'.
+
+    Returns an int corresponding to the last created 'resume_request_nbr'.
+    """
 
     sys.stderr.write("Starting the harvesting session at %s" %  time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
     sys.stderr.write("%s - %s\n" % (server, http_request_parameters(http_param_dict)))
@@ -98,7 +106,7 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
 
     rt_obj = re.search('>.*</resumptionToken>',a)
 
-    i = 0
+    i = resume_request_nbr
 
     while rt_obj != None and rt_obj !="":
 
@@ -122,6 +130,27 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
     else:
         sys.stdout.write(a)
 
+    return i
+
+def harvest(server, script, http_param_dict ,method="POST",output="", stylesheet="", sets=[]):
+    """
+    Handle multiple OAI sessions (multiple requests, which might lead to multiple answers).
+
+    Needed for harvesting multiple sets in one row.
+
+    Returns the number of files created by the harvesting
+    """
+    if sets:
+        i = 0
+        for set in sets:
+            http_param_dict['set'] = set
+            i = OAI_Session(server, script, http_param_dict, method, output, stylesheet, i)
+            i += 1
+        return i
+    else:
+        OAI_Session(server, script, http_param_dict, method, output, stylesheet)
+        return 1
+
 def write_file(filename="harvest",a=""):
     "Writes a to filename"
 
@@ -140,14 +169,14 @@ def help():
     print "  -m<method>         http method (default POST)"
     print "  -p<metadataPrefix> metadata format"
     print "  -i<identifier>     OAI identifier"
-    print "  -s<set>            OAI set"
+    print "  -s<set(s)>         OAI set(s). Whitespace-separated list"
     print "  -r<resuptionToken> Resume previous harvest"
     print "  -f<from>           from date (datestamp)"
     print "  -u<until>          until date (datestamp)\n"
 
 
 def OAI_Request(server, script, params, method="POST"):
-    "Handle OAi request"
+    "Handle OAI request"
  
     headers = {"Content-type":"application/x-www-form-urlencoded", "Accept":"text/xml", "From": adminemail, "User-Agent":"CDS Invenio %s" % version}
 
@@ -237,7 +266,8 @@ def main():
     method                 = "POST"
     output                 = ""
     stylesheet             = ""
-    
+    sets = []
+
     # get options and arguments
     for opt, opt_value in opts:
         if   opt == "-v":
@@ -250,7 +280,7 @@ def main():
         elif opt == "-i":
             http_param_dict['identifier']       = opt_value
         elif opt == "-s":
-            http_param_dict['set']              = opt_value
+            sets                                = opt_value.split()
         elif opt == "-f":
             http_param_dict['from']             = opt_value
         elif opt == "-u":
@@ -269,9 +299,9 @@ def main():
             sys.exit()
 
     if len(args) > 0:
-        server    = args[0].split("/")[2]
+        server    = args[-1].split("/")[2]
         script    = "/" + string.join(args[0].split("/")[3:],"/")
-        OAI_Session(server, script, http_param_dict, method, output, stylesheet)
+        harvest(server, script, http_param_dict, method, output, stylesheet, sets)
         sys.stderr.write("Harvesting successfully completed at: %s\n\n" % time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
 
     else:

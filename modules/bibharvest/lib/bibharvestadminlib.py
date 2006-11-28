@@ -36,8 +36,30 @@ from invenio.config import \
      cdslang, \
      tmpdir, \
      version, \
-     weburl
-from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform,serialize_via_numeric_array_dumps,serialize_via_numeric_array_compr,serialize_via_numeric_array_escape,serialize_via_numeric_array,deserialize_via_numeric_array,serialize_via_marshal,deserialize_via_marshal
+     weburl,\
+     etcdir
+from invenio.bibrankadminlib import \
+     write_outcome,modify_translations,\
+     get_def_name,\
+     get_i8n_name,\
+     get_name,\
+     get_rnk_nametypes,\
+     get_languages,\
+     check_user,\
+     is_adminuser,\
+     adderrorbox,\
+     addadminbox,\
+     tupletotable,\
+     tupletotable_onlyselected,\
+     addcheckboxes,\
+     createhiddenform,\
+     serialize_via_numeric_array_dumps,\
+     serialize_via_numeric_array_compr,\
+     serialize_via_numeric_array_escape,\
+     serialize_via_numeric_array,\
+     deserialize_via_numeric_array,\
+     serialize_via_marshal,\
+     deserialize_via_marshal
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
@@ -67,7 +89,7 @@ def perform_request_index(ln=cdslang):
     upd_status = get_update_status()
 
     sources = []
-    for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post) in oai_src:
+    for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post, oai_src_setspecs) in oai_src:
         namelinked_args = []
         namelinked_args.append(["oai_src_id", str(oai_src_id)]) 
         namelinked_args.append(["ln", ln])
@@ -104,7 +126,7 @@ def perform_request_index(ln=cdslang):
     
     return output
 
-def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1):
+def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1, oai_src_sets=[]):
     """creates html form to edit a OAI source. this method is calling other methods which again is calling this and sending back the output of the method.
     confirm - determines the validation status of the data input into the form"""
 
@@ -122,14 +144,27 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         oai_src_frequency = oai_src[0][4]
         oai_src_config = oai_src[0][5]
         oai_src_post = oai_src[0][6]
-
+        oai_src_sets = oai_src[0][7]
+        
     text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Base URL", name = "oai_src_baseurl", value = oai_src_baseurl)
+    sets = findSets(oai_src_baseurl)
+    sets_specs = [set[0] for set in sets]
+    sets_names = [set[1] for set in sets]
+    sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
+                   for set in sets]
+    sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
+    text += bibharvest_templates.tmpl_admin_checkboxes(ln = cdslang,
+                                                       title = "Sets",
+                                                       names = sets_specs,
+                                                       labels = sets_labels,
+                                                       states = sets_states)
+    
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Bibconvert configuration file", name = "oai_src_config", value = oai_src_config)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibConvert configuration file", name = "oai_src_config", value = oai_src_config)
     text += bibharvest_templates.tmpl_print_brs(cdslang, 2)
 
     output += createhiddenform(action="editsource#1",
@@ -159,7 +194,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
             oai_src_config = "NULL"
         if not oai_src_post:
             oai_src_post = "h"
-        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post)
+        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets)
         output += write_outcome(res)
 
     lnargs = [["ln", ln]]
@@ -173,7 +208,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
 
     return addadminbox(subtitle, body)
 
-def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1):
+def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1, oai_src_sets=[]):
     """creates html form to add a new source"""
 
     if oai_src_name is None:
@@ -197,17 +232,30 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         text = bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
 
         metadatas = findMetadataFormats(oai_src_baseurl)
-
         prefixes = []
         for value in metadatas:
             prefixes.append([value, str(value)])
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", valuenil = "- select prefix -" , values = prefixes, lastval = oai_src_prefix)
+
+        sets = findSets(oai_src_baseurl)
+        sets_specs = [set[0] for set in sets]
+        sets_names = [set[1] for set in sets]
+        sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
+                      for set in sets]
+        sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
+        text += bibharvest_templates.tmpl_admin_checkboxes(ln = cdslang,
+                                                           title = "Sets",
+                                                           names = sets_specs,
+                                                           labels = sets_labels ,
+                                                           states=sets_states)
+        
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
         text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Bibconvert configuration file", name = "oai_src_config", value = oai_src_config)
         text += bibharvest_templates.tmpl_print_brs(cdslang, 2)
 
+        
         output += createhiddenform(action="addsource#1",
                                    text=text,
                                    button="Add OAI Source",
@@ -259,7 +307,8 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
             oai_src_config = "NULL"
         if not oai_src_post:
             oai_src_post = "h"
-        res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post)
+
+        res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets)
         output += write_outcome(res) 
 
         lnargs = [["ln", ln]]
@@ -326,7 +375,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
 
 def get_oai_src(oai_src_id=''):
     """Returns a row parameters for a given id"""
-    sql = "SELECT id,name,baseurl,metadataprefix,frequency,bibconvertcfgfile,postprocess FROM oaiHARVEST"
+    sql = "SELECT id,name,baseurl,metadataprefix,frequency,bibconvertcfgfile,postprocess, setspecs FROM oaiHARVEST"
     try:
         if oai_src_id:
             sql += " WHERE id=%s" % oai_src_id
@@ -336,7 +385,7 @@ def get_oai_src(oai_src_id=''):
     except StandardError, e:
         return ""
 
-def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post):
+def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[]):
     """Modifies a row's parameters"""
     
     try:
@@ -352,18 +401,20 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
         res = run_sql(sql)
         sql = "UPDATE oaiHARVEST SET postprocess='%s' WHERE id=%s" % (escape_string(oai_src_post), oai_src_id)
         res = run_sql(sql)
+        sql = "UPDATE oaiHARVEST SET setspecs='%s' WHERE id=%s" % (escape_string(' '.join(oai_src_sets)), oai_src_id)
+        res = run_sql(sql)
         return (1, "")
     except StandardError, e:
         return (0, e)
 
-def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post):
+def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets=[]):
     """Adds a new row to the database with the given parameters"""
     try:
         if oai_src_lastrun in [0, "0"]: lastrun_mode = 'NULL'
         else:
             lastrun_mode = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # lastrun_mode = "'"+lastrun_mode+"'"
-        sql = "insert into oaiHARVEST values (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post))
+        sql = "insert into oaiHARVEST values (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post), escape_string(" ".join(oai_src_sets)))
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:
@@ -439,6 +490,25 @@ def validatefile(oai_src_config):
      0 = okay
      1 = file non existing
      """
+
+    CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir,
+                                                          os.sep,
+                                                          os.sep)
+    path_to_config = (CFG_BIBCONVERT_XSL_PATH + os.sep +
+                      oai_src_config)
+    if os.path.exists(path_to_config):
+        # Try to read in config directory
+        try:
+            ftmp = open(path_to_config, 'r')
+            cfgstr= ftmp.read()
+            ftmp.close()
+            if cfgstr!="":
+                #print "Valid!"
+                return 0
+        except StandardError, e:
+            pass
+        
+    # Try to read as complete path
     try:
         ftmp = open(oai_src_config, 'r')
         cfgstr= ftmp.read()
@@ -451,6 +521,8 @@ def validatefile(oai_src_config):
             return 1
     except StandardError, e:
         return 1
+
+    return 1
 
 def findMetadataFormats(oai_src_baseurl):
     """This function finds the Metadata formats offered by a OAI repository by analysing the output of verb=ListMetadataFormats"""
@@ -467,3 +539,28 @@ def findMetadataFormats(oai_src_baseurl):
             formats.append(chunk.split('</metadataPrefix>')[0])
         count = count + 1
     return formats
+
+def findSets(oai_src_baseurl):
+    """This function finds the sets offered by a OAI repository
+    by analysing the output of verb=ListSets.
+    Returns list of tuples(SetSpec, SetName)"""
+    url = oai_src_baseurl + "?verb=ListSets"
+    urllib.urlretrieve(url, tmppath)
+    sets = []
+    ftmp = open(tmppath, 'r')
+    xmlstr= ftmp.read()
+    ftmp.close()
+    chunks = xmlstr.split('<set>')
+    count = 0 # first chunk is invalid
+    for chunk in chunks:
+        if count!=0:
+            chunks_set = chunk.split('<setSpec>')[1].split("</setSpec>")
+            set_spec = chunks_set[0]
+            #chunks_set[1].split('<setName>')
+            check_set_2 = chunks_set[1].split("<setName>")
+            set_name = None
+            if len(check_set_2) > 1:
+                set_name = check_set_2[1].split("</setName>")[0]
+            sets.append([set_spec, set_name])
+        count = count + 1
+    return sets

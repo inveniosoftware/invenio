@@ -60,10 +60,10 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         ## takes argd directly):
         args = urllib.urlencode(argd)
 
-        ## check availability (OAI requests for Identify and
+        ## check availability (OAI requests for Identify, ListSets and
         ## ListMetadataFormats are served immediately, otherwise we
         ## shall wait for CFG_OAI_SLEEP seconds between requests):
-        if os.path.exists("%s/RTdata/RTdata" % cachedir) and (argd['verb'] not in ["Identify", "ListMetadataFormats"]):
+        if os.path.exists("%s/RTdata/RTdata" % cachedir) and (argd['verb'] not in ["Identify", "ListMetadataFormats", "ListSets"]):
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % cachedir))
             if(time_gap < CFG_OAI_SLEEP):
                 req.err_headers_out["Status-Code"] = "503"

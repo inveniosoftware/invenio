@@ -28,7 +28,7 @@ Examples:
 
  Specific options:
  -r, --repository=NAME     name of the OAI repository to be harvested (default=all)
-
+ 
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat task (no)

@@ -157,7 +157,7 @@ def task_run(row):
     reposlist = []
     datelist = []
     dateflag = 0
-
+    
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
@@ -210,23 +210,41 @@ def task_run(row):
 
     for repos in reposlist:
         postmode = str(repos[0][9]) 
-
-        if postmode=="h" or postmode=="h-c" or postmode=="h-u" or postmode=="h-c-u":
+        setspecs = str(repos[0][10])
+        harvested_files = []
+        
+        if postmode == "h" or postmode == "h-c" or \
+               postmode == "h-u" or postmode == "h-c-u":
             harvestpath = tmpdir + "/oaiharvest" + str(os.getpid())
-            
+            harvest_dir, harvest_filename = os.path.split(harvestpath)
+             
             if dateflag == 1:
-                res = call_bibharvest(prefix=repos[0][2], baseurl=repos[0][1], harvestpath=harvestpath, fro=str(datelist[0]), until=str(datelist[1]))
-                if res==0 :
-                    write_message("source " + str(repos[0][6]) + " was harvested from " + str(datelist[0]) + " to " + str(datelist[1])) 
-                else :
-                    write_message("an error occurred while harvesting from source " + str(repos[0][6]) + " for the dates chosen")
+                res = call_bibharvest(prefix=repos[0][2],
+                                      baseurl=repos[0][1],
+                                      harvestpath=harvestpath,
+                                      fro=str(datelist[0]),
+                                      until=str(datelist[1]),
+                                      setspecs=setspecs)
+                if res[0] == 1 :
+                    write_message("source " + str(repos[0][6]) + \
+                                  " was harvested from " + str(datelist[0]) \
+                                  + " to " + str(datelist[1]))
+                    harvested_files = res[1]
+                else:
+                    write_message("an error occurred while harvesting from source " + \
+                                  str(repos[0][6]) + " for the dates chosen")
                     continue
 
             elif dateflag != 1 and repos[0][7] == None and repos[0][8] != 0:
-                write_message("source " + str(repos[0][6]) + " was never harvested before - harvesting whole repository")
-                res = call_bibharvest(prefix=repos[0][2], baseurl=repos[0][1], harvestpath=harvestpath)
-                if res==0 :
+                write_message("source " + str(repos[0][6]) + \
+                              " was never harvested before - harvesting whole repository")
+                res = call_bibharvest(prefix=repos[0][2],
+                                      baseurl=repos[0][1],
+                                      harvestpath=harvestpath,
+                                      setspecs=setspecs)
+                if res[0] == 1 :
                     update_lastrun(repos[0][0])
+                    harvested_files = res[1]
                 else :
                     write_message("an error occurred while harvesting from source " + str(repos[0][6]))
                     continue
@@ -238,13 +256,18 @@ def task_run(row):
                 timeinsec = int(repos[0][8])*60*60
                 updatedue = add_timestamp_and_timelag(lastrundate, timeinsec)
                 proceed = compare_timestamps_with_tolerance(updatedue, timenow)
-                if proceed==0 or proceed==-1 : #update needed!
+                if proceed == 0 or proceed == -1 : #update needed!
                     write_message("source " + str(repos[0][6]) + " is going to be updated")
                     fromdate = str(repos[0][7])
                     fromdate = fromdate.split()[0] # get rid of time of the day for the moment
-                    res = call_bibharvest(prefix=repos[0][2], baseurl=repos[0][1], harvestpath=harvestpath, fro=fromdate)
-                    if res==0 :
+                    res = call_bibharvest(prefix=repos[0][2],
+                                          baseurl=repos[0][1],
+                                          harvestpath=harvestpath,
+                                          fro=fromdate,
+                                          setspecs=setspecs)
+                    if res[0] == 1 :
                         update_lastrun(repos[0][0])
+                        harvested_files = res[1]
                     else :
                         write_message("an error occurred while harvesting from source " + str(repos[0][6]))
                         continue
@@ -256,32 +279,44 @@ def task_run(row):
                 write_message("source " + str(repos[0][6]) + " has frequency set to 'Never' so it will not be updated")
                 continue
 
-        if postmode=="h-u":
-            res = call_bibupload(convertpath=harvestpath)
-            if res==0 :
+        if postmode == "h-u":
+            for harvested_file in harvested_files:
+                res = call_bibupload(harvested_file)
+                if res == 0 :
+                    write_message("material harvested from source " + str(repos[0][6]) + " was successfully uploaded") 
+                else :
+                    write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
+                    continue                    
+
+        if postmode == "h-c" or postmode == "h-c-u":
+            convert_dir = tmpdir
+            convertpath = convert_dir + os.sep +"bibconvertrun" + str(os.getpid())
+            converted_files = []
+            i = 0
+            for harvested_file in harvested_files:
+                converted_file = convertpath+".%07d" % i
+                converted_files.append(converted_file)
+                res = call_bibconvert(config=str(repos[0][5]),
+                                      harvestpath=harvested_file,
+                                      convertpath=converted_file)
+                i += 1
+                
+                if res == 0 :
+                    write_message("material harvested from source " + str(repos[0][6]) + " was successfully converted") 
+                else :
+                    write_message("an error occurred while converting from " + str(repos[0][6]))
+                    continue
+
+        if postmode == "h-c-u":
+            for converted_file in converted_files:
+                res = call_bibupload(converted_file)
+            if res == 0 :
                 write_message("material harvested from source " + str(repos[0][6]) + " was successfully uploaded") 
             else :
                 write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
                 continue                    
 
-        if postmode=="h-c" or postmode=="h-c-u":
-            convertpath = tmpdir + "/bibconvertrun" + str(os.getpid())
-            res = call_bibconvert(config=str(repos[0][5]), harvestpath=harvestpath, convertpath=convertpath)
-            if res==0 :
-                write_message("material harvested from source " + str(repos[0][6]) + " was successfully converted") 
-            else :
-                write_message("an error occurred while converting from " + str(repos[0][6]))
-                continue
-
-        if postmode=="h-c-u":
-            res = call_bibupload(convertpath=convertpath)
-            if res==0 :
-                write_message("material harvested from source " + str(repos[0][6]) + " was successfully uploaded") 
-            else :
-                write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
-                continue                    
-
-        elif postmode not in ["h", "h-c", "h-u", "h-c-u"] : ### this should not happen
+        elif postmode not in ["h", "h-c", "h-u", "h-c-u"]: ### this should not happen
             write_message("invalid postprocess mode: " + postmode + " skipping repository")
             continue
 
@@ -313,38 +348,48 @@ def update_lastrun(index):
     except StandardError, e:
         return (0,e)
 
-def call_bibharvest(prefix, baseurl, harvestpath, fro="", until=""):
+def call_bibharvest(prefix, baseurl, harvestpath, fro="", until="", setspecs=""):
     """ A method that calls bibharvest and writes harvested output to disk """
     try:
-        command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (bindir, harvestpath, prefix)
-        if fro!="":
+        command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (bindir,
+                                                                 harvestpath,
+                                                                 prefix)
+                                                                
+        if fro != "":
             command += '-f %s ' % fro
         if until!="":
             command += '-u %s ' % until
+        if setspecs!="":
+            command += '-s "%s" ' % setspecs
         command += baseurl
+       
 	print "Start harvesting"
 	#print command
         ret = os.system(command)
-	print "Harvesting finished, merging files"
-	harvestdir, filename = os.path.split(harvestpath)
+	#print "Harvesting finished, merging files"
+	harvest_dir, harvest_filename = os.path.split(harvestpath)
 	#print "get files"
-	files = os.listdir(harvestdir)
+	files = os.listdir(harvest_dir)
 	#print "sort file"
 	files.sort()
+        harvested_files = [harvest_dir + os.sep + filename for \
+                           filename in files \
+                           if filename.startswith(harvest_filename)]
 	#print "open dest file"
-	hf = file(harvestpath, 'w')
-	for f in files:
-	    if f[:len(filename)] == filename:
-	        print "processing file %s"%f
-	        rf = file(os.path.join(harvestdir, f), 'r')
-	        hf.write(rf.read())
-		hf.write("\n")
-	        rf.close()
-	        #os.remove(os.path.join(harvestdir, f))
-	hf.close()
-	print "Files merged"
-        return 0
+	## hf = file(harvestpath, 'w')
+## 	for f in files:
+## 	    if f.startswith(filename)
+## 	        print "processing file %s"%f
+## 	        rf = file(os.path.join(harvestdir, f), 'r')
+## 	        hf.write(rf.read())
+## 		hf.write("\n")
+## 	        rf.close()
+## 	        #os.remove(os.path.join(harvestdir, f))
+## 	hf.close()
+## 	print "Files merged"
+        return (1, harvested_files)
     except StandardError, e:
+        print e
         return (0,e)
 
 def call_bibconvert(config, harvestpath, convertpath):
@@ -418,12 +463,11 @@ def command_line():
     long_flags =["repository=", "dates="
                  "user=","sleeptime=","time=",
                  "help", "version", "verbose="]
-    short_flags ="r:d:u:s:t:hVv:"
+    short_flags ="r:d:u:s:t:hVv:l"
     format_string = "%Y-%m-%d %H:%M:%S"
     repositories = None
     dates = None
     sleeptime = ""
-
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
     except getopt.GetoptError, err:
@@ -463,7 +507,7 @@ def command_line():
         write_message(e, sys.stderr)
         sys.exit(1)
 
-    options["repository"]=get_repository_names(repositories)
+    options["repository"] = get_repository_names(repositories)
     if dates != None:
         options["dates"]=get_dates(dates)
     if dates != None and options["dates"]==None:

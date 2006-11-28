@@ -55,7 +55,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1, oai_src_sets=[]):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
 
     try:
@@ -79,6 +79,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                                                         oai_src_frequency=oai_src_frequency,
                                                         oai_src_config=oai_src_config,
                                                         oai_src_post=oai_src_post,
+                                                        oai_src_sets=oai_src_sets,
                                                         ln=ln,
                                                         confirm=confirm),
                     uid=uid,
@@ -89,7 +90,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1):
+def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[]):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
     
     try:
@@ -106,13 +107,14 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
         return page(title="Add new OAI Source",
-                body=bhc.perform_request_addsource(oai_src_name=oai_src_name,
+                    body=bhc.perform_request_addsource(oai_src_name=oai_src_name,
                                            oai_src_baseurl=oai_src_baseurl,
                                            oai_src_prefix=oai_src_prefix,
                                            oai_src_frequency=oai_src_frequency,
                                            oai_src_lastrun=oai_src_lastrun,
                                            oai_src_config=oai_src_config,
                                            oai_src_post=oai_src_post,
+                                           oai_src_sets=oai_src_sets,
                                            ln=cdslang,
                                            confirm=confirm),
                 uid=uid,
