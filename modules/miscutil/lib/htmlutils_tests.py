@@ -36,7 +36,7 @@ class XSSEscapingTest(unittest.TestCase):
         unittest.TestCase.__init__(self, methodName)
     
     def test_forbidden_formatting_tags(self):
-        """htmlutils - washing of tags altering formatting of a page (e.g. </html>"""
+        """htmlutils - washing of tags altering formatting of a page (e.g. </html>)"""
         test_str = """</html></body></div></pre>"""
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '')
