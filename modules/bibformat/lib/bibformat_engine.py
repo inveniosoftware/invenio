@@ -647,7 +647,7 @@ def get_format_template(filename, with_attributes=False):
         # If we must return with attributes and template exist in
         # cache with attributes then return cache.
         # Else reload with attributes
-        if with_attributes == True and \
+        if with_attributes and \
                format_templates_cache[filename].has_key('attrs'):
             return format_templates_cache[filename]
 
@@ -776,9 +776,9 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         
     if format_elements_cache.has_key(name):
         element = format_elements_cache[name]
-        if with_built_in_params == False or \
-               (with_built_in_params == True and \
-                element['attrs'].has_key('builtin_params') ):
+        if not with_built_in_params or \
+               (with_built_in_params and \
+                element['attrs'].has_key('builtin_params')):
             return element
 
     if filename is None:
@@ -976,7 +976,7 @@ def get_format_element_attrs_from_function(function, element_name,
     attrs['params'] = params.values()
     
     # Load built-in parameters if necessary
-    if with_built_in_params == True:
+    if with_built_in_params:
         
         builtin_params = []
         # Add 'prefix' parameter
@@ -1052,7 +1052,7 @@ def get_format_element_attrs_from_table(element_name,
     attrs['tags'] = tags
     
     # Load built-in parameters if necessary
-    if with_built_in_params == True:
+    if with_built_in_params:
         builtin_params = []
         
         # Add 'prefix' parameter
@@ -1150,7 +1150,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_OUTPUT_FORMAT_CODE_UNKNOWN", code)],
                                         stream='error', ln=cdslang)
         register_errors(errors, 'error')
-        if with_attributes == True: #Create empty attrs if asked for attributes
+        if with_attributes: #Create empty attrs if asked for attributes
             output_format['attrs'] = get_output_format_attrs(code, verbose)
         return output_format
     
@@ -1159,14 +1159,14 @@ def get_output_format(code, with_attributes=False, verbose=0):
     if format_outputs_cache.has_key(filename):
         # If was must return with attributes but cache has not
         # attributes, then load attributes
-        if with_attributes == True and not \
+        if with_attributes and not \
                format_outputs_cache[filename].has_key('attrs'):
             format_outputs_cache[filename]['attrs'] = get_output_format_attrs(code, verbose)
 
         return format_outputs_cache[filename]
 
     try:
-        if with_attributes == True:
+        if with_attributes:
             output_format['attrs'] = get_output_format_attrs(code, verbose)
 
         path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename )

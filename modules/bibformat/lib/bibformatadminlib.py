@@ -198,7 +198,7 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
     @return the main page for format templates attributes edition
     """
     all_templates = []
-    if new == True:
+    if new:
         all_templates_attrs = bibformat_engine.get_format_templates(with_attributes=True)
         if all_templates_attrs.has_key(bft): # Sanity check. Should always be true at this stage
             del all_templates_attrs[bft] # Remove in order not to make a duplicate of self..
@@ -1066,7 +1066,7 @@ def get_outputs_that_use_template(filename):
 
         # Finally add dependency on template from rule (overwrite default dependency,
         # which is weaker in term of tag)
-        if found == True:
+        if found:
             output_formats_list[name] = {'filename':output_format,
                                          'names':output_formats[output_format]['attrs']['names'],
                                          'tags':tags}

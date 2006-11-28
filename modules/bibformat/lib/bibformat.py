@@ -84,7 +84,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
         return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
     ############################# END ##################################
 
-    if on_the_fly == False:
+    if not on_the_fly:
 	# Try to fetch preformatted record
         out = bibformat_dblayer.get_preformatted_record(recID, of)
         if out is not None:

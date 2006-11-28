@@ -161,7 +161,7 @@ def perform_set(email,password, ln):
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
-    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and  CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][1] != True:
+    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and not CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][1]:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
     out = websession_templates.tmpl_user_preferences(
@@ -216,7 +216,7 @@ def create_login_page_box(referer='', ln=cdslang):
     methods.sort()
     selected = ''
     for method in methods:
-        if CFG_EXTERNAL_AUTHENTICATION[method][1] == True:
+        if CFG_EXTERNAL_AUTHENTICATION[method][1]:
             selected = method
             break
 

@@ -86,7 +86,7 @@ def print_marc(marc_dict):
 
                 #we found a list of prefixes to join, build a field out of them
 
-                while (contains_elements(linked_prefix_list, prefix_dict.keys()) == True):
+                while contains_elements(linked_prefix_list, prefix_dict.keys()):
 
                     marc_text = marc_text + '<datafield tag ="' + tag + '" ind1="' + ind1 + '" ind2="' + ind2 + '">\n'
 
@@ -158,7 +158,7 @@ def generate_data_field(field, value, marc_dict):
 
         # field is a normal field
         
-        if isinstance(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field], list) == False:
+        if not isinstance(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field], list):
             
             for value_part in value:
                 (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field])

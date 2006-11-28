@@ -289,9 +289,9 @@ def tag_matches_pattern(tag, pattern):
     Both parameters must be 3 characters long strings.
     
     For e.g.
-    >> tag_matches_pattern("909", "909") == True
-    >> tag_matches_pattern("909", "9%9") == True
-    >> tag_matches_pattern("909", "9%8") == False
+    >> tag_matches_pattern("909", "909") -> True
+    >> tag_matches_pattern("909", "9%9") -> True
+    >> tag_matches_pattern("909", "9%8") -> False
     
     @param tag a 3 characters long string
     @param pattern a 3 characters long string

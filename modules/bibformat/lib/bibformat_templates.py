@@ -356,7 +356,7 @@ class Template:
 	''' % {'ln':ln,
 	       'filename':filename}
 	       
-	if new == True:
+	if new:
 	    #Offer the possibility to make a duplicate of existing format template code
 	    out += '''
 	     <table><tr>
@@ -942,7 +942,7 @@ class Template:
                 status = attrs['status']
                 
                 disabled = ""
-                if attrs['editable'] == False:
+                if not attrs['editable']:
                     disabled = 'disabled="disabled"'
                      
                 style = 'style="vertical-align: middle;'
@@ -1070,7 +1070,7 @@ class Template:
                 last_mod_date = output_format['last_mod_date']
                 status = output_format['status']
                 disabled = ""
-                if output_format['editable'] == False:
+                if not output_format['editable']:
                     disabled = 'disabled="disabled"'
    
                 style = "vertical-align: middle;"

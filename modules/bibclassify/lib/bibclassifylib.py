@@ -426,7 +426,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         if safe_keys.find(keylist[i][2])>-1:
             safe_mark = "*"
 
-        if idx == -1 and nkeywords > 0 and keylist[i][5] == False:
+        if idx == -1 and nkeywords > 0 and not keylist[i][5]:
             text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n" 
             if safe_mark == "*": html_out.append([keylist[i][0], keylist[i][2], 1])
             else: html_out.append([keylist[i][0], keylist[i][2], 0])
