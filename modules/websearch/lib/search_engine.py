@@ -1075,7 +1075,7 @@ def coll_restricted_p(coll):
         return 0
     query = "SELECT restricted FROM collection WHERE name='%s'" % escape_string(coll)
     res = run_sql(query, None, 1)
-    if res and res[0][0] != None:
+    if res and res[0][0] is not None:
         return 1
     else:
         return 0
@@ -2270,7 +2270,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     uid = getUid(req)
 
     # sanity checking:
-    if req == None:
+    if req is None:
         return
 
     if len(recIDs):
@@ -2738,7 +2738,7 @@ def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None
     """
     
     keywords = []
-    if search_pattern != None:
+    if search_pattern is not None:
         units = create_basic_search_units(None, str(search_pattern), None)
         keywords = [unit[1] for unit in units if unit[0] != '-']
 

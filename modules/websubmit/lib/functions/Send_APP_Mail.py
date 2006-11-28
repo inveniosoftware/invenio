@@ -80,7 +80,7 @@ def Send_APP_Mail (parameters,curdir,form):
     # retrieve category
     categformat = categformat.replace("<CATEG>","([^-]*)")
     categs = re.match(categformat,rn)
-    if categs != None:
+    if categs is not None:
         category = categs.group(1)
     else:
         category = "unknown"

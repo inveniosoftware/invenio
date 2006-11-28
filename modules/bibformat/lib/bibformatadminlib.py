@@ -64,7 +64,7 @@ def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
     @param is_admin indicate if user is authorized to use BibFormat
     @return the main admin page
     """
-    if warnings != None and len(warnings) > 0:
+    if warnings is not None and len(warnings) > 0:
         warnings = get_msgs_for_code_list(warnings, 'warning', ln)
         warnings = [x[1] for x in warnings] # Get only message, not code
 
@@ -134,7 +134,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
 
     # Either use code being edited, or the original code inside template
-    if code == None:
+    if code is None:
         code = format_template['code']#.replace('%%','%') #.replace("<","&lt;").replace(">","/&gt;").replace("&","&amp;")
 
     # Build a default pattern if it is empty
@@ -343,7 +343,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     # Load parameters values
     ##
     
-    if param_values == None: #First time the page is loaded
+    if param_values is None: #First time the page is loaded
         param_values = []
 
         # Propose an existing record id by default
@@ -742,7 +742,7 @@ def update_format_template_attributes(filename, name="", description="", duplica
     @return the filename of the modified format
     """
     format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-    if duplicate != None and duplicate != "":
+    if duplicate is not None and duplicate != "":
         format_template_to_copy = bibformat_engine.get_format_template(duplicate)
         code = format_template_to_copy['code']
     else:
@@ -1101,9 +1101,9 @@ def get_elements_used_by_template(filename):
     format_elements_iter = bibformat_engine.pattern_tag.finditer(code)
     for result in format_elements_iter:
         function_name = result.group("function_name").lower()
-        if function_name != None and not format_elements.has_key(function_name):
+        if function_name is not None and not format_elements.has_key(function_name):
             filename = bibformat_engine.resolve_format_element_filename("BFE_"+function_name)
-            if filename != None:
+            if filename is not None:
                 tags = get_tags_used_by_element(filename)
                 format_elements[function_name] = {'name':function_name.lower(),
                                                   'filename':filename,
@@ -1134,7 +1134,7 @@ def get_tags_used_by_element(filename):
     tags = {}
 
     format_element = bibformat_engine.get_format_element(filename)
-    if format_element == None:
+    if format_element is None:
         return []
     elif format_element['type']=="field":
         tags = format_element['attrs']['tags']
@@ -1273,7 +1273,7 @@ def get_elements_that_use_kb(name):
             ''' % name, re.VERBOSE | re.MULTILINE | re.IGNORECASE)
     
             result = kb_pattern.search(code)
-            if result != None:
+            if result is not None:
                 name = ("".join(filename.split(".")[:-1])).lower()
                 if name.startswith("bfe_"):
                     name = name[4:]
@@ -1303,17 +1303,17 @@ def perform_request_format_validate(ln=cdslang, bfo=None, bft=None, bfe=None):
     @param bfe a format element name
     """
 
-    if bfo != None:
+    if bfo is not None:
         errors = check_output_format(bfo)
         messages = get_msgs_for_code_list(code_list = errors, ln=ln)
-    elif bft != None:
+    elif bft is not None:
         errors = check_format_template(bft, checking=1)
         messages = get_msgs_for_code_list(code_list = errors, ln=ln)
-    elif bfe != None:
+    elif bfe is not None:
         errors = check_format_element(bfe)
         messages = get_msgs_for_code_list(code_list = errors, ln=ln)
 
-    if messages == None:
+    if messages is None:
         messages = []
 
     messages = map(lambda x: encode_for_xml(x[1]), messages)
@@ -1423,12 +1423,12 @@ def check_format_template(filename, checking=0):
         format.close()
         # Look for name
         match = bibformat_engine.pattern_format_template_name.search(code)
-        if match == None:#Is tag <name> defined in template?
+        if match is None:#Is tag <name> defined in template?
             errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_NAME", filename))
 
         # Look for description
         match = bibformat_engine.pattern_format_template_desc.search(code)
-        if match == None:#Is tag <description> defined in template?
+        if match is None:#Is tag <description> defined in template?
             errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_DESCRIPTION", filename))
         
         format_template = bibformat_engine.get_format_template(filename, with_attributes=False)
@@ -1439,11 +1439,11 @@ def check_format_template(filename, checking=0):
         for element_match in elements_call:
             element_name = element_match.group("function_name")
             filename = bibformat_engine.resolve_format_element_filename(element_name)
-            if filename == None and not bibformat_dblayer.tag_exists_for_name(element_name): #Is element defined?
+            if filename is None and not bibformat_dblayer.tag_exists_for_name(element_name): #Is element defined?
                 errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNDEFINED_ELEM", filename, element_name))
             else:
                 format_element = bibformat_engine.get_format_element(element_name, with_built_in_params=True)
-                if format_element == None:#Can element be loaded?
+                if format_element is None:#Can element be loaded?
                     if not can_read_format_element(element_name):
                         errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNREADABLE_ELEM", filename, element_name))
                     else:
@@ -1495,7 +1495,7 @@ def check_format_element(name):
     """
     errors = []
     filename = bibformat_engine.resolve_format_element_filename(name)
-    if filename != None:#Can element be found in files?
+    if filename is not None:#Can element be found in files?
         if can_read_format_element(name):#Can element be read?
             # Try to load
             try:

@@ -87,7 +87,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     if on_the_fly == False:
 	# Try to fetch preformatted record
         out = bibformat_dblayer.get_preformatted_record(recID, of)
-        if out != None:
+        if out is not None:
             # record 'recID' is formatted in 'of', so return it
             return out
 
@@ -176,13 +176,13 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
     @param req an optional request object where to print records
     @param on_the_fly if False, try to return an already preformatted version of the record in the database
     """
-    if req != None:
+    if req is not None:
         req.write(prologue)
     
     formatted_records = ''
 
     #Fill one of the lists with Nones
-    if xml_records != None:
+    if xml_records is not None:
         recIDs = map(lambda x:None, xml_records)
     else:
         xml_records = map(lambda x:None, recIDs)
@@ -194,48 +194,48 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
             last_iteration = True
        
         #Print prefix
-        if record_prefix != None:
+        if record_prefix is not None:
             if isinstance(record_prefix, str):
                 formatted_records += record_prefix
-                if req != None:
+                if req is not None:
                     req.write(record_prefix)
             else:
                 string_prefix = record_prefix(i)
                 formatted_records += string_prefix
-                if req != None:
+                if req is not None:
                     req.write(string_prefix)
 
         #Print formatted record
         formatted_record = format_record(recIDs[i], of, ln, verbose, search_pattern, xml_records[i], uid, on_the_fly)
         formatted_records += formatted_record
-        if req != None:
+        if req is not None:
             req.write(formatted_record)
             
         #Print suffix
-        if record_suffix != None:
+        if record_suffix is not None:
             if isinstance(record_suffix, str):
                 formatted_records += record_suffix
-                if req != None:
+                if req is not None:
                     req.write(record_suffix)
             else:
                 string_suffix = record_suffix(i)
                 formatted_records += string_suffix
-                if req != None:
+                if req is not None:
                     req.write(string_suffix)
                 
         #Print separator if needed
-        if record_separator != None and not last_iteration:
+        if record_separator is not None and not last_iteration:
             if isinstance(record_separator, str):
                 formatted_records += record_separator
-                if req != None:
+                if req is not None:
                     req.write(record_separator)
             else:
                 string_separator = record_separator(i)
                 formatted_records += string_separator
-                if req != None:
+                if req is not None:
                     req.write(string_separator)
 
-    if req != None:
+    if req is not None:
         req.write(epilogue)
   
     return prologue + formatted_records + epilogue
@@ -272,7 +272,7 @@ def create_excel(recIDs, req=None, ln=cdslang):
     footer = '</table>'
 
     #Apply content_type and print column headers
-    if req != None:
+    if req is not None:
         req.content_type = get_output_format_content_type('excel')
         req.headers_out["Content-Disposition"] = "inline; filename=%s" % 'results.xls'
         req.send_http_header()

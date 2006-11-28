@@ -244,11 +244,11 @@ def build_namespaces(dom):
     """
     namespaces = {}
     for elem in get_all_elements(dom):
-        if elem.prefix != None:
+        if elem.prefix is not None:
             namespaces[elem.prefix] = elem.namespaceURI
             
         for attr in elem.attributes.values():
-            if attr.prefix != None:
+            if attr.prefix is not None:
                 namespaces[attr.prefix] = attr.namespaceURI
     return namespaces
 

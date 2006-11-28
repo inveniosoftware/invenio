@@ -229,7 +229,7 @@ def external_collection_load_states():
             if search_type in [2, 3]:
                 dictionary = dico_collection_external_searches
 
-            if dictionary == None:
+            if dictionary is None:
                 continue
 
             if not dictionary.has_key(collection_id):

@@ -130,7 +130,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         if not self.header:
             self.header_data += data
             (self.status, self.header, data) = decode_header(self.header_data)
-            if self.status != None:
+            if self.status is not None:
                 if self.status[1] in ("301", "302"):
                     self.redirected = self.header["location"]
         self.data += data
@@ -210,7 +210,7 @@ def check_redirected(pagegetter_list):
 
     for i in range(len(pagegetter_list)):
         getter = pagegetter_list[i]
-        if getter and getter.redirected != None:
+        if getter and getter.redirected is not None:
             if getter.redirected.startswith('http://'):
                 getter = HTTPAsyncPageGetter(getter.redirected)
             else:

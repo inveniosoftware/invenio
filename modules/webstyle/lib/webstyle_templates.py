@@ -506,7 +506,7 @@ class Template:
         _ = gettext_set_language(ln)
         info_not_available = _("N/A")
 
-        if title == None:
+        if title is None:
             if errors: 
                 title = _("Error") + ': %s' % errors[0][1]
             else:    

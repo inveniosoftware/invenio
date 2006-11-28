@@ -240,7 +240,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         # We retrieve its HTML description
         res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name=%s", (arr[3],))
         arr3 = res3[0]
-        if arr3[8]==None:
+        if arr3[8] is None:
             val=""
         else:
             val=arr3[8]
@@ -278,17 +278,17 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
             # If the field is not user-defined, we try to determine its type
             # (select, radio, file upload...)
             # check whether it is a select field or not
-            if re.search("SELECT", text, re.IGNORECASE) != None:
+            if re.search("SELECT", text, re.IGNORECASE) is not None:
                 select.append(1)
             else:
                 select.append(0)
             # checks whether it is a radio field or not
-            if re.search(r"TYPE=[\"']?radio", text, re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?radio", text, re.IGNORECASE) is not None:
                 radio.append(1)
             else:
                 radio.append(0)
             # checks whether it is a file upload or not
-            if re.search(r"TYPE=[\"']?file", text, re.IGNORECASE) != None:
+            if re.search(r"TYPE=[\"']?file", text, re.IGNORECASE) is not None:
                 upload.append(1)
             else:
                 upload.append(0)
@@ -335,7 +335,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         # Or if a cookie is set
         # If a cookie is found corresponding to the name of the current
         # field, we set the value of the field to the cookie's value
-        elif getCookie(full_field['name'], uid) != None:
+        elif getCookie(full_field['name'], uid) is not None:
             value = getCookie(full_field['name'], uid)
             value = re.compile("\r").sub("", value)
             value = re.compile("\n").sub("\\n", value)
@@ -370,7 +370,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                     formfields = text.split(">")
                     for formfield in formfields:
                         match = re.match("name=([^ <>]+)", formfield, re.IGNORECASE)
-                        if match != None:
+                        if match is not None:
                             names = match.groups
                             for value in names:
                                 if value != "":
@@ -647,7 +647,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     except functionError,e:
         return errorMsg(e.value, req, c, ln)
     except functionStop,e:
-        if e.value != None:
+        if e.value is not None:
             function_content = e.value
         else:
             function_content = e
@@ -944,7 +944,7 @@ def Evaluate_Parameter (field, doctype):
     if len(res) == 0:
         return ""
     else:
-        if res[0][0] != None:
+        if res[0][0] is not None:
             return res[0][0]
         else:
             return ""

@@ -106,7 +106,7 @@ class ExternalCollectionResultsParser(object):
     def parse_num_results(self):
         """Parse the buffer with the num_results_regex to extract the number of records found.
         This will be returned as a formated string."""
-        if self.num_results_regex == None:
+        if self.num_results_regex is None:
             return None
         list_matchs = self.num_results_regex.finditer(self.buffer)
         for match in list_matchs:
@@ -304,7 +304,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
         for element in self.result_separator.finditer(data):
             data = element.group(1)
             parsed_line = self.result_decode.match(data)
-            if parsed_line != None:
+            if parsed_line is not None:
                 link = parsed_line.group(1)
                 date = parsed_line.group(2)
                 comments = parsed_line.group(3)

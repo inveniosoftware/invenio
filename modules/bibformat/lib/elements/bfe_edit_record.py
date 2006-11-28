@@ -34,7 +34,7 @@ def format(bfo, style):
     out = ""
     
     uid = bfo.uid
-    if uid != None:
+    if uid is not None:
         (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
         if auth_code == 0:
             print_style = ''

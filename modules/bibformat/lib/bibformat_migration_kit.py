@@ -169,9 +169,9 @@ def migrate_behaviours():
                 #    tag = condition["tag"]
                 #    if tag != previous_tag:
                 #        new_behaviour += "tag %s:\n"%tag
-                #    if suffix == None:
+                #    if suffix is None:
                 #        suffix = ""
-                #    if prefix == None:
+                #    if prefix is None:
                 #        prefix = ""
                 #    new_behaviour += 'template("%(pre)s", "%(suf)s")\n'%{'pre': prefix, 'suf': suffix}
                 #    previous_tag = tag
@@ -211,7 +211,7 @@ def extract_cond(old_cond):
         conditions_list.append(cond)
     #elif old_cond.startswith("format_exist("):
     #    match = pattern_parse_format_exist.search(old_cond)
-    #    if match != None:
+    #    if match is not None:
     #        cond['tag'] = translate_tag(match.group("tag"))
     #        cond['prefix'] = match.group("prefix")
     #        cond['suffix'] = match.group("suffix")
@@ -235,7 +235,7 @@ def extract_action(old_action):
     Then we only look for format("some_format") inside old_action
     """
     match = pattern_parse_format_call.search(old_action)
-    if match != None:
+    if match is not None:
         return get_fresh_format_template_filename(match.group("format"))[0] 
     else:
         return "FIXME"

@@ -36,7 +36,7 @@ def format(bfo, reference_prefix, reference_suffix):
     
     for reference in references:
         
-        if reference_prefix != None:
+        if reference_prefix is not None:
             out += reference_prefix
             
         if reference.has_key('o'):
@@ -58,6 +58,6 @@ def format(bfo, reference_prefix, reference_suffix):
                 out += reference.get('p', "")+"</a> </small> <br/>"
             else:
                 out += " <small> "+reference['t']+ reference.get('v', "")+ reference.get('y',"")+ reference.get('p',"")+ " </small> <br/>"
-        if reference_suffix != None:
+        if reference_suffix is not None:
             out += reference_suffix
     return out

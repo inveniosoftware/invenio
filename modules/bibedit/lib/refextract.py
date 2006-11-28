@@ -1185,7 +1185,7 @@ class TextDocument(Document):
                 curBreak = 1
                 #m_blankLineTest = p_wordSearch.search(self._content[(breakIndices[curBreak]+numHeadLns+1)])
                 m_blankLineTest = re.compile(u'\S',re.UNICODE).search(self._content[(breakIndices[curBreak]+numHeadLns+1)])
-                if m_blankLineTest == None:
+                if m_blankLineTest is None:
                     # Empty line in header:
                     emptyLine = 1
                 if (breakIndices[curBreak]+numHeadLns+1) == (breakIndices[(curBreak + 1)]):
@@ -1224,7 +1224,7 @@ class TextDocument(Document):
                 curBreak = 1
                 #m_blankLineTest = p_wordSearch.match(self._content[(breakIndices[curBreak]-numFootLns-1)])
                 m_blankLineTest = re.compile(u'\S',re.UNICODE).search(self._content[(breakIndices[curBreak] - numFootLns - 1)])
-                if m_blankLineTest == None:
+                if m_blankLineTest is None:
                     emptyLine = 1
                 grps_headLineWords = p_wordSearch.findall(self._content[(breakIndices[curBreak]-numFootLns-1)])
                 curBreak=curBreak + 1
@@ -1279,7 +1279,7 @@ class TextDocument(Document):
         for i in range(0,len(l_1)):
             m_int1 = p_int.match(l_1[i])
             m_int2 = p_int.match(l_2[i])
-            if(m_int1 != None) and (m_int2 != None):
+            if(m_int1 is not None) and (m_int2 is not None):
                 numMatches=numMatches+1
             else:
                 l1_str = l_1[i].lower()
@@ -1295,7 +1295,7 @@ class TextDocument(Document):
         pageBreaks = []
         p_break = re.compile(unicode(r'^\s*?\f\s*?$'), re.UNICODE)
         for i in range(len(self._content)):
-            if p_break.match(self._content[i]) != None:
+            if p_break.match(self._content[i]) is not None:
                 pageBreaks.append(i)
         return pageBreaks
     def documentContainsText(self):
@@ -1303,7 +1303,7 @@ class TextDocument(Document):
         foundWord = False
         p_word = re.compile(unicode(r'\S+'))
         for i in self._content:
-            if p_word.match(i) != None:
+            if p_word.match(i) is not None:
                 foundWord = True
                 break
         return foundWord
@@ -1373,7 +1373,7 @@ class Ps2asciiEncodedTextDocument(Document):
         posnxEst = 9999
         for line in self._content:
             curRawLine = self.getDataLine(line)
-            if curRawLine != None:
+            if curRawLine is not None:
                 # Find out if this a new line or a continuation of the last line
                 if curRawLine.isNewLine(oldRawLine):
                     # Append previous full line:
@@ -1398,7 +1398,7 @@ class Ps2asciiEncodedTextDocument(Document):
         """Take a raw line from ps2ascii, and put its components into a Ps2asciiOutputLine object"""
         idPattern = re.compile(r'^S\s(?P<posnX>\d+)\s(?P<posnY>\d+)\s\((?P<content>.*)\)\s(?P<diff_posnX>\d+)$')
         match = idPattern.search(rawLine)
-        if match != None:
+        if match is not None:
             return self.Ps2asciiOutputLine(match.group('posnX'), match.group('posnY'), match.group('content'), match.group('diff_posnX'))
         else:
             return None
@@ -1411,10 +1411,10 @@ class Ps2asciiEncodedTextDocument(Document):
         line = self.cleanLine(line)
         ep = re.compile('\S')
         em = ep.match(line)
-        if em == None:
+        if em is None:
             fp = re.compile('^ *\f *$')
             fm = fp.match(line)
-            if fm == None:
+            if fm is None:
                 line = ''
         return line
     def cleanLine(self, line):

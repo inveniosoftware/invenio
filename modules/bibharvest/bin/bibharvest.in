@@ -108,7 +108,7 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
 
     i = resume_request_nbr
 
-    while rt_obj != None and rt_obj !="":
+    while rt_obj is not None and rt_obj !="":
 
         if output:
             write_file( "%s.%07d" % (output,i), a)

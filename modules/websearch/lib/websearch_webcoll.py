@@ -917,7 +917,7 @@ def task_run(task_id):
         # firstly, decide which collections to do:
         if options.has_key("collection"):
             coll = get_collection(options["collection"])
-            if coll.id == None:
+            if coll.id is None:
                 usage(1, 'Collection %s does not exist' % coll.name)
             colls.append(coll)
         else:

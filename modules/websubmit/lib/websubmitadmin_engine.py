@@ -313,7 +313,7 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
     commit_error=0
 
     ## wash args:
-    if funcname != None:
+    if funcname is not None:
         try:
             funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="", maxstrlen=40, minstrlen=1)
             if function_name_is_valid(fname=funcname) == 0:
@@ -322,7 +322,7 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
             funcname = ""
     else:
         funcname = ""
-    if funcdescr != None:
+    if funcdescr is not None:
         try:
             funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -331,7 +331,7 @@ def perform_request_add_function(funcname=None, funcdescr=None, funcaddcommit=""
         funcdescr = ""
 
     ## process request:
-    if funcaddcommit != "" and funcaddcommit != None:
+    if funcaddcommit != "" and funcaddcommit is not None:
         if funcname == "":
             funcname = ""
             user_msg.append("""Function name is mandatory and must be a string with no more than 40 characters""")
@@ -387,7 +387,7 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
     commit_error=0
 
     ## wash args:
-    if actid != None:
+    if actid is not None:
         try:
             actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
             if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
@@ -396,21 +396,21 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
             actid = ""
     else:
         actid = ""
-    if actname != None:
+    if actname is not None:
         try:
             actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
         except ValueError, e:
             actname = ""
     else:
         actname = ""
-    if working_dir != None:
+    if working_dir is not None:
         try:
             working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
         except ValueError, e:
             working_dir = ""
     else:
         working_dir = ""
-    if status_text != None:
+    if status_text is not None:
         try:
             status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -419,7 +419,7 @@ def perform_request_add_action(actid=None, actname=None, working_dir=None, statu
         status_text = ""
 
     ## process request:
-    if actcommit != "" and actcommit != None:
+    if actcommit != "" and actcommit is not None:
         if actid in ("", None):
             actid = ""
             user_msg.append("""Action ID is mandatory and must be a 3 letter string""")
@@ -474,7 +474,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
     commit_error=0
 
     ## wash args:
-    if chname != None:
+    if chname is not None:
         try:
             chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if function_name_is_valid(fname=chname) == 0:
@@ -483,7 +483,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
             chname = ""
     else:
         chname = ""
-    if chdesc != None:
+    if chdesc is not None:
         try:
             chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -492,7 +492,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
         chdesc = ""
 
     ## process request:
-    if chcommit != "" and chcommit != None:
+    if chcommit != "" and chcommit is not None:
         if chname in ("", None):
             chname = ""
             user_msg.append("""Check name is mandatory and must be a string with no more than 15 characters""")
@@ -553,7 +553,7 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
     commit_error=0
 
     ## wash args:
-    if elname != None:
+    if elname is not None:
         try:
             elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
@@ -562,70 +562,70 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
             elname = ""
     else:
         elname = ""
-    if elmarccode != None:
+    if elmarccode is not None:
         try:
             elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
         except ValueError, e:
             elmarccode = ""
     else:
         elmarccode = ""
-    if eltype != None:
+    if eltype is not None:
         try:
             eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
         except ValueError, e:
             eltype = ""
     else:
         eltype = ""
-    if elsize != None:
+    if elsize is not None:
         try:
             elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
         except ValueError, e:
             elsize = ""
     else:
         elsize = ""
-    if elrows != None:
+    if elrows is not None:
         try:
             elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
         except ValueError, e:
             elrows = ""
     else:
         elrows = ""
-    if elcols != None:
+    if elcols is not None:
         try:
             elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
         except ValueError, e:
             elcols = ""
     else:
         elcols = ""
-    if elmaxlength != None:
+    if elmaxlength is not None:
         try:
             elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
         except ValueError, e:
             elmaxlength = ""
     else:
         elmaxlength = ""
-    if elval != None:
+    if elval is not None:
         try:
             elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
         except ValueError, e:
             elval = ""
     else:
         elval = ""
-    if elfidesc != None:
+    if elfidesc is not None:
         try:
             elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
         except ValueError, e:
             elfidesc = ""
     else:
         elfidesc = ""
-    if elmodifytext != None:
+    if elmodifytext is not None:
         try:
             elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
         except ValueError, e:
             elmodifytext = ""
     else:
         elmodifytext = ""
-    if elcookie != None:
+    if elcookie is not None:
         try:
             elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
         except ValueError, e:
@@ -634,7 +634,7 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
         elcookie = 0
 
     ## process request:
-    if elcommit != "" and elcommit != None:
+    if elcommit != "" and elcommit is not None:
         if elname == "":
             elname = ""
             user_msg.append("""The element name is mandatory and must be a string with no more than 15 characters""")
@@ -724,7 +724,7 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
     commit_error=0
 
     ## wash args:
-    if elname != None:
+    if elname is not None:
         try:
             elname = wash_single_urlarg(urlarg=elname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=elname) == 0:
@@ -733,70 +733,70 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             elname = ""
     else:
         elname = ""
-    if elmarccode != None:
+    if elmarccode is not None:
         try:
             elmarccode = wash_single_urlarg(urlarg=elmarccode, argreqdtype=str, argdefault="")
         except ValueError, e:
             elmarccode = ""
     else:
         elmarccode = ""
-    if eltype != None:
+    if eltype is not None:
         try:
             eltype = wash_single_urlarg(urlarg=eltype, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
         except ValueError, e:
             eltype = ""
     else:
         eltype = ""
-    if elsize != None:
+    if elsize is not None:
         try:
             elsize = wash_single_urlarg(urlarg=elsize, argreqdtype=int, argdefault="")
         except ValueError, e:
             elsize = ""
     else:
         elsize = ""
-    if elrows != None:
+    if elrows is not None:
         try:
             elrows = wash_single_urlarg(urlarg=elrows, argreqdtype=int, argdefault="")
         except ValueError, e:
             elrows = ""
     else:
         elrows = ""
-    if elcols != None:
+    if elcols is not None:
         try:
             elcols = wash_single_urlarg(urlarg=elcols, argreqdtype=int, argdefault="")
         except ValueError, e:
             elcols = ""
     else:
         elcols = ""
-    if elmaxlength != None:
+    if elmaxlength is not None:
         try:
             elmaxlength = wash_single_urlarg(urlarg=elmaxlength, argreqdtype=int, argdefault="")
         except ValueError, e:
             elmaxlength = ""
     else:
         elmaxlength = ""
-    if elval != None:
+    if elval is not None:
         try:
             elval = wash_single_urlarg(urlarg=elval, argreqdtype=str, argdefault="")
         except ValueError, e:
             elval = ""
     else:
         elval = ""
-    if elfidesc != None:
+    if elfidesc is not None:
         try:
             elfidesc = wash_single_urlarg(urlarg=elfidesc, argreqdtype=str, argdefault="")
         except ValueError, e:
             elfidesc = ""
     else:
         elfidesc = ""
-    if elmodifytext != None:
+    if elmodifytext is not None:
         try:
             elmodifytext = wash_single_urlarg(urlarg=elmodifytext, argreqdtype=str, argdefault="")
         except ValueError, e:
             elmodifytext = ""
     else:
         elmodifytext = ""
-    if elcookie != None:
+    if elcookie is not None:
         try:
             elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
         except ValueError, e:
@@ -805,7 +805,7 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
         elcookie = 0
 
     ## process request:
-    if elcommit != "" and elcommit != None:
+    if elcommit != "" and elcommit is not None:
         if elname == "":
             elname = ""
             user_msg.append("""Invalid Element Name!""")
@@ -964,7 +964,7 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
     commit_error=0
 
     ## wash args:
-    if chname != None:
+    if chname is not None:
         try:
             chname = wash_single_urlarg(urlarg=chname, argreqdtype=str, argdefault="", maxstrlen=15, minstrlen=1)
             if function_name_is_valid(fname=chname) == 0:
@@ -973,7 +973,7 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
             chname = ""
     else:
         chname = ""
-    if chdesc != None:
+    if chdesc is not None:
         try:
             chdesc = wash_single_urlarg(urlarg=chdesc, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -982,7 +982,7 @@ def perform_request_edit_jscheck(chname, chdesc=None, chcommit=""):
         chdesc = ""
     (chname, chdesc) = (str(chname), str(chdesc))
 
-    if chcommit != "" and chcommit != None:
+    if chcommit != "" and chcommit is not None:
         if chname in ("", None):
             chname = ""
             user_msg.append("""Check name is mandatory and must be a string with no more than 15 characters""")
@@ -1074,7 +1074,7 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
     commit_error = 0
 
     ## wash args:
-    if actid != None:
+    if actid is not None:
         try:
             actid = wash_single_urlarg(urlarg=actid, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=3)
             if string_is_alphanumeric_including_underscore(txtstring=actid) == 0:
@@ -1084,21 +1084,21 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
         actid = actid.upper()
     else:
         actid = ""
-    if actname != None:
+    if actname is not None:
         try:
             actname = wash_single_urlarg(urlarg=actname, argreqdtype=str, argdefault="")
         except ValueError, e:
             actname = ""
     else:
         actname = ""
-    if working_dir != None:
+    if working_dir is not None:
         try:
             working_dir = wash_single_urlarg(urlarg=working_dir, argreqdtype=str, argdefault="")
         except ValueError, e:
             working_dir = ""
     else:
         working_dir = ""
-    if status_text != None:
+    if status_text is not None:
         try:
             status_text = wash_single_urlarg(urlarg=status_text, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -1107,7 +1107,7 @@ def perform_request_edit_action(actid, actname=None, working_dir=None, status_te
         status_text = ""
 
     ## process request:
-    if actcommit != "" and actcommit != None:
+    if actcommit != "" and actcommit is not None:
         if actname in ("", None):
             actname = ""
             user_msg.append("""Action description is mandatory""")
@@ -1305,7 +1305,7 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
     commit_error = 0
 
     ## wash args:
-    if funcname != None:
+    if funcname is not None:
         try:
             funcname = wash_single_urlarg(urlarg=funcname, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funcname) == 0:
@@ -1314,14 +1314,14 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funcname = ""
     else:
         funcname = ""
-    if funcdescr != None:
+    if funcdescr is not None:
         try:
             funcdescr = wash_single_urlarg(urlarg=funcdescr, argreqdtype=str, argdefault="")
         except ValueError, e:
             funcdescr = ""
     else:
         funcdescr = ""
-    if funceditaddparam != None:
+    if funceditaddparam is not None:
         try:
             funceditaddparam = wash_single_urlarg(urlarg=funceditaddparam, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funceditaddparam) == 0:
@@ -1330,7 +1330,7 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funceditaddparam = ""
     else:
         funceditaddparam = ""
-    if funceditaddparamfree != None:
+    if funceditaddparamfree is not None:
         try:
             funceditaddparamfree = wash_single_urlarg(urlarg=funceditaddparamfree, argreqdtype=str, argdefault="")
             if string_is_alphanumeric_including_underscore(txtstring=funceditaddparamfree) == 0:
@@ -1339,7 +1339,7 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
             funceditaddparamfree = ""
     else:
         funceditaddparamfree = ""
-    if funceditdelparam != None:
+    if funceditdelparam is not None:
         try:
             funceditdelparam = wash_single_urlarg(urlarg=funceditdelparam, argreqdtype=str, argdefault="")
         except ValueError, e:
@@ -1351,14 +1351,14 @@ def perform_request_edit_function(funcname, funcdescr=None, funceditaddparam=Non
         (title, body) = _functionedit_display_function_details(errors=errors, warnings=warnings, funcname=funcname)
         return (title, body, errors, warnings)
 
-    if funcdescreditcommit != "" and funcdescreditcommit != None:
+    if funcdescreditcommit != "" and funcdescreditcommit is not None:
         ## Update the definition of a function:
         (title, body) = _functionedit_update_description(errors=errors, warnings=warnings, funcname=funcname, funcdescr=funcdescr)
-    elif funcparamaddcommit != "" and funcparamaddcommit != None:
+    elif funcparamaddcommit != "" and funcparamaddcommit is not None:
         ## Request to add a new parameter to a function
         (title, body) = _functionedit_add_parameter(errors=errors, warnings=warnings, funcname=funcname,
                                                     funceditaddparam=funceditaddparam, funceditaddparamfree=funceditaddparamfree)
-    elif funcparamdelcommit != "" and funcparamdelcommit != None:
+    elif funcparamdelcommit != "" and funcparamdelcommit is not None:
         ## Request to delete a parameter from a function
         (title, body) = _functionedit_delete_parameter(errors=errors, warnings=warnings, funcname=funcname, deleteparam=funceditdelparam)
     else:
@@ -1704,7 +1704,7 @@ def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=Non
     body = ""
 
     ## wash args:
-    if doctype != None:
+    if doctype is not None:
         try:
             doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
@@ -1713,21 +1713,21 @@ def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=Non
             doctype = ""
     else:
         doctype = ""
-    if doctypename != None:
+    if doctypename is not None:
         try:
             doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
         except ValueError, e:
             doctypename = ""
     else:
         doctypename = ""
-    if doctypedescr != None:
+    if doctypedescr is not None:
         try:
             doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
         except ValueError, e:
             doctypedescr = ""
     else:
         doctypedescr = ""
-    if clonefrom != None:
+    if clonefrom is not None:
         try:
             clonefrom = wash_single_urlarg(urlarg=clonefrom, argreqdtype=str, argdefault="None")
         except ValueError, e:
@@ -2367,7 +2367,7 @@ def perform_request_configure_doctype(doctype,
     warnings = []
     body = ""
 
-    if doctype != None:
+    if doctype is not None:
         try:
             doctype = wash_single_urlarg(urlarg=doctype, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype) == 0:
@@ -2376,7 +2376,7 @@ def perform_request_configure_doctype(doctype,
             doctype = ""
     else:
         doctype = ""
-    if action != None:
+    if action is not None:
         try:
             action = wash_single_urlarg(urlarg=action, argreqdtype=str, argdefault="", maxstrlen=3, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=action) == 0:
@@ -2385,35 +2385,35 @@ def perform_request_configure_doctype(doctype,
             action = ""
     else:
         action = ""
-    if doctypename != None:
+    if doctypename is not None:
         try:
             doctypename = wash_single_urlarg(urlarg=doctypename, argreqdtype=str, argdefault="")
         except ValueError, e:
             doctypename = ""
     else:
         doctypename = ""
-    if doctypedescr != None:
+    if doctypedescr is not None:
         try:
             doctypedescr = wash_single_urlarg(urlarg=doctypedescr, argreqdtype=str, argdefault="")
         except ValueError, e:
             doctypedescr = ""
     else:
         doctypedescr = ""
-    if categid != None:
+    if categid is not None:
         try:
             categid = wash_single_urlarg(urlarg=categid, argreqdtype=str, argdefault="")
         except ValueError, e:
             categid = ""
     else:
         categid = ""
-    if categdescr != None:
+    if categdescr is not None:
         try:
             categdescr = wash_single_urlarg(urlarg=categdescr, argreqdtype=str, argdefault="")
         except ValueError, e:
             categdescr = ""
     else:
         categdescr = ""
-    if doctype_cloneactionfrom != None:
+    if doctype_cloneactionfrom is not None:
         try:
             doctype_cloneactionfrom = wash_single_urlarg(urlarg=doctype_cloneactionfrom, argreqdtype=str, argdefault="", maxstrlen=10, minstrlen=1)
             if string_is_alphanumeric_including_underscore(txtstring=doctype_cloneactionfrom) == 0:
@@ -2422,49 +2422,49 @@ def perform_request_configure_doctype(doctype,
             doctype_cloneactionfrom = ""
     else:
         doctype_cloneactionfrom = ""
-    if displayed != None:
+    if displayed is not None:
         try:
             displayed = wash_single_urlarg(urlarg=displayed, argreqdtype=str, argdefault="Y", maxstrlen=1, minstrlen=1)
         except ValueError, e:
             displayed = "Y"
     else:
         displayed = "Y"
-    if buttonorder != None:
+    if buttonorder is not None:
         try:
             buttonorder = wash_single_urlarg(urlarg=buttonorder, argreqdtype=int, argdefault="")
         except ValueError, e:
             buttonorder = ""
     else:
         buttonorder = ""
-    if level != None:
+    if level is not None:
         try:
             level = wash_single_urlarg(urlarg=level, argreqdtype=str, argdefault="", maxstrlen=1, minstrlen=1)
         except ValueError, e:
             level = ""
     else:
         level = ""
-    if score != None:
+    if score is not None:
         try:
             score = wash_single_urlarg(urlarg=score, argreqdtype=int, argdefault="")
         except ValueError, e:
             score = ""
     else:
         score = ""
-    if stpage != None:
+    if stpage is not None:
         try:
             stpage = wash_single_urlarg(urlarg=stpage, argreqdtype=int, argdefault="")
         except ValueError, e:
             stpage = ""
     else:
         stpage = ""
-    if statustext != None:
+    if statustext is not None:
         try:
             statustext = wash_single_urlarg(urlarg=statustext, argreqdtype=str, argdefault="")
         except ValueError, e:
             statustext = ""
     else:
         statustext = ""
-    if endtxt != None:
+    if endtxt is not None:
         try:
             endtxt = wash_single_urlarg(urlarg=endtxt, argreqdtype=str, argdefault="")
         except ValueError, e:

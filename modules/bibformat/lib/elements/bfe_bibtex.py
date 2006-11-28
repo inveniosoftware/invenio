@@ -282,7 +282,7 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
         name_width = 6 + len(name)
     if value_width < 2:
         value_width = 2
-    if value == None or value == "":
+    if value is None or value == "":
         return ""
     
     #format name
@@ -361,7 +361,7 @@ def get_year(date, default=""):
     import re
     year_pattern = re.compile(r'\d\d\d\d')
     result = year_pattern.search(date)
-    if result != None:
+    if result is not None:
         return result.group()
     
     return default
@@ -386,7 +386,7 @@ def get_month(date, ln=cdslang, default=""):
     short_months = [get_i18n_month_name(month).lower() for month in range(1, 13)] # ["jan","feb","mar",...]
     short_months_pattern = re.compile(r'('+r'|'.join(short_months)+r')', re.IGNORECASE) # (jan|feb|mar|...)
     result = short_months_pattern.search(date)
-    if result != None:
+    if result is not None:
         try:
             month_nb = short_months.index(result.group().lower()) + 1
             return get_i18n_month_name(month_nb, "short", ln)
@@ -397,7 +397,7 @@ def get_month(date, ln=cdslang, default=""):
     #(always take second group of 2 or 1 digits separated by spaces or - etc.)
     month_pattern = re.compile(r'\d([\s]|[-/.,])+(?P<month>(\d){1,2})([\s]|[-/.,])')
     result = month_pattern.search(date)
-    if result != None:
+    if result is not None:
         try:
             month_nb = int(result.group("month"))
             return get_i18n_month_name(month_nb, "short", ln)
@@ -412,7 +412,7 @@ def get_month(date, ln=cdslang, default=""):
         short_months = [get_i18n_month_name(month, "short", lang).lower() for month in range(1, 13)] # ["jan","feb","mar",...]
         short_months_pattern = re.compile(r'('+r'|'.join(short_months)+r')', re.IGNORECASE) # (jan|feb|mar|...)
         result = short_months_pattern.search(date)
-        if result != None:
+        if result is not None:
             try:
                 month_nb = short_months.index(result.group().lower()) + 1
                 return get_i18n_month_name(month_nb, "short", ln)

@@ -634,7 +634,7 @@ def format_template_update_attributes(req, bft, ln=config.cdslang,
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
 
-        if duplicate != None:
+        if duplicate is not None:
             duplicate = wash_url_argument(duplicate, 'str')
         name = wash_url_argument(name, 'str')
         description = wash_url_argument(description, 'str')
@@ -731,10 +731,10 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         bft = wash_url_argument(bft, 'str')
-        if save_action != None and code != None:
+        if save_action is not None and code is not None:
             #save
             bibformatadminlib.update_format_template_code(bft, code=code)
-        if code == None:
+        if code is None:
             code = bibformat_engine.get_format_template(bft)['code']
 
         ln_for_preview = wash_language(ln_for_preview)
@@ -968,7 +968,7 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1015,7 +1015,7 @@ def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1060,7 +1060,7 @@ def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1107,7 +1107,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
    
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1157,7 +1157,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
    
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1208,7 +1208,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
-        if chosen_option != None:
+        if chosen_option is not None:
 	    # Update could not be performed.
 	    # Redirect to kb attributes page
             redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
@@ -1216,7 +1216,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
        
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1291,7 +1291,7 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
-        if kb_name == None:
+        if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
                         language=ln,
@@ -1346,7 +1346,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
-        if bfo != None: #Output format validation
+        if bfo is not None: #Output format validation
             bfo = wash_url_argument(bfo, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(config.weburl, ln, _("Manage Output Formats")))
             
@@ -1367,7 +1367,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
             name = output_format['attrs']['names']['generic']
             title = _("Validation of Output Format %s" % name)
             
-        elif bft != None: #Format template validation
+        elif bft is not None: #Format template validation
             bft = wash_url_argument(bft, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
             
@@ -1385,7 +1385,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
             name = bibformat_engine.get_format_template_attrs(bft)['name']
             title = _("Validation of Format Template %s" % name)
             
-        elif bfe != None: #Format element validation
+        elif bfe is not None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (config.weburl, ln , bfe.upper() , _("Format Elements Documentation")))
             

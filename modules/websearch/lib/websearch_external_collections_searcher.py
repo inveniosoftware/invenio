@@ -65,7 +65,7 @@ class ExternalSearchEngine(object):
         units = []
         for search_unit in basic_search_units:
             unit = self.build_search_unit_unit(search_unit)
-            if unit != None:
+            if unit is not None:
                 units.append(unit)
         return units
 

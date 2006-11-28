@@ -119,21 +119,21 @@ class BibRecDocs:
             else:
                 docname = docname + "_2"
         bibdoc = BibDoc(recid=self.id,type=type,docname=docname)
-        if bibdoc != None:
+        if bibdoc is not None:
             self.bibdocs.append(bibdoc)
         return bibdoc
 
     def addNewFile(self,fullpath,type="Main"):
         filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
         bibdoc = self.addBibDoc(type,filename)
-        if bibdoc != None:
+        if bibdoc is not None:
             bibdoc.addFilesNewVersion(files=[fullpath])
             return bibdoc
         return None
 
     def addNewVersion(self,fullpath,bibdocid):
         bibdoc = self.getBibDoc(bibdocid)
-        if bibdoc != None:
+        if bibdoc is not None:
             bibdoc.addFilesNewVersion(files=[fullpath])
             docname = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
             if docname != bibdoc.getDocName():
@@ -152,7 +152,7 @@ class BibRecDocs:
 
     def addNewFormat(self,fullpath,bibdocid):
         bibdoc = self.getBibDoc(bibdocid)
-        if bibdoc != None:
+        if bibdoc is not None:
             bibdoc.addFilesNewFormat(files=[fullpath])
             return bibdoc
         return None
@@ -240,7 +240,7 @@ class BibDoc:
                 self.docname = docname
 		self.status = 0
                 self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
-                if self.id != None:
+                if self.id is not None:
                     #we link the document to the record if a recid was specified
                     if self.recid != "":
                         run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (recid,self.id,self.type,))
@@ -296,12 +296,12 @@ class BibDoc:
         """link an icon with the bibdoc object"""
         #first check if an icon already exists
         existingIcon = self.getIcon()
-        if existingIcon != None:
+        if existingIcon is not None:
             existingIcon.delete()
         #then add the new one
         filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", file))
         newicon = BibDoc(type='Icon',docname=filename)
-        if newicon != None:
+        if newicon is not None:
             newicon.addFilesNewVersion(files=[file])
             run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')", (self.id,newicon.getId(),))
             if os.path.exists(newicon.getBaseDir()):
@@ -312,7 +312,7 @@ class BibDoc:
 
     def deleteIcon(self):
         existingIcon = self.getIcon()
-        if existingIcon != None:
+        if existingIcon is not None:
             existingIcon.delete()
         self.BuildRelatedFileList()
 
@@ -325,7 +325,7 @@ class BibDoc:
         else:
             docfiles = self.listLatestFiles()
         existingIcon = self.getIcon()
-        if existingIcon != None:
+        if existingIcon is not None:
             imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),urllib.quote(existingIcon.getDocName()))
         else:
             imagepath = "%s/smallfiles.gif" % images
@@ -496,7 +496,7 @@ class BibDocFile:
         else:
             self.fullname = "%s.%s" % (name,format)
             (self.mime,self.encoding) = mimetypes.guess_type(self.fullname)
-            if self.mime == None:
+            if self.mime is None:
                 self.mime = "text/plain"
 
     def display(self, ln = cdslang):

@@ -538,7 +538,7 @@ def clean_messages():
                      umsg.id_user_to=user.id"""
     res1 = run_sql(query1)
     # if there is no email, user has disappeared
-    users_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] == None, res1))
+    users_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] is None, res1))
     # find ids from messages in user's inbox
     query2 = """SELECT distinct(umsg.id_msgMESSAGE),
                        msg.id
@@ -547,7 +547,7 @@ def clean_messages():
                      umsg.id_msgMESSAGE=msg.id"""
     res2 = run_sql(query2)
     # if there is no id, message was deleted from table msgMESSAGE...
-    messages_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] == None, res2))
+    messages_deleted = map(lambda u: int(u[0]), filter(lambda x: x[1] is None, res2))
     def tuplize(el1, el2):
         return str(el1) + ',' + str(el2)
     if len(users_deleted) or len(messages_deleted):

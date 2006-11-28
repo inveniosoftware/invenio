@@ -259,7 +259,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         user_prefs = webuser.get_user_preferences(webuser.emailUnique(args['p_email']))
         if user_prefs:
             if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and \
-               CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] != None:
+               CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] is not None:
                 eMsg = _("Cannot send password by email since you are using external authentication system.")
                 return page(title=_("Your Account"),
                             body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -401,7 +401,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         #return action+_("login")
         if args['action'] == "login" or args['action'] == _("login"):
-            if args['p_un']==None or not args['login_method']:
+            if args['p_un'] is None or not args['login_method']:
                 return page(title=_("Login"),
                             body=webaccount.create_login_page_box(args['referer'], args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
@@ -463,7 +463,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(args['ln'])
 
-        if args['p_nickname']==None or args['p_email']==None:
+        if args['p_nickname'] is None or args['p_email'] is None:
             return  page(title=_("Register"),
                          body=webaccount.create_register_page_box(args['referer'], args['ln']),
                          navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",

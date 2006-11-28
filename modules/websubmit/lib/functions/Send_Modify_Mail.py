@@ -44,7 +44,7 @@ execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
 def Send_Modify_Mail (parameters,curdir,form):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     global sysno,rn
-    if parameters['emailFile']!= None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
+    if parameters['emailFile'] is not None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']),"r")
         sub = fp.read()
         fp.close()

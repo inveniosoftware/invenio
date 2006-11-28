@@ -175,7 +175,7 @@ def websubmit_legacy_getfile(req, form):
             doc = BibDoc(bibdocid=docid)
             docfile=doc.getFile(name,format,version)
             
-            if docfile == None:
+            if docfile is None:
                 return warningMsg(_("Unable to find file."),req, c, ln)
 
             # redirect to this specific file, possibly dropping
@@ -254,7 +254,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         params = re.sub("sub=[^&]*","",myQuery)
         # find existing access number
         result = re.search("access=([^&]*)",params)
-        if result != None:
+        if result is not None:
             access = result.group(1)
             params = re.sub("access=[^&]*","",params)
         else:

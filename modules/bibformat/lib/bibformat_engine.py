@@ -221,7 +221,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
     The function will define which format template must be applied.
 
     You can either specify an record ID to format, or give its xml representation.
-    if 'xml_record' != None, then use it instead of recID.
+    if 'xml_record' is not None, then use it instead of recID.
 
     'uid' allows to grant access to some functionalities on a page depending
     on the user's priviledges.    
@@ -251,7 +251,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
-    if template == None or not os.access(path, os.R_OK):  
+    if template is None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
         if CFG_PATH_PHP:
             return call_old_bibformat(recID, format=of, on_the_fly=True)
@@ -292,7 +292,7 @@ def decide_format_template(bfo, of):
     for rule in output_format['rules']:
         value = bfo.field(rule['field']).strip()#Remove spaces
         pattern = rule['value'].strip() #Remove spaces
-        if re.match(pattern, value, re.IGNORECASE) != None:
+        if re.match(pattern, value, re.IGNORECASE) is not None:
             return rule['template']
 
     template = output_format['default']
@@ -322,7 +322,7 @@ def format_with_format_template(format_template_filename, bfo,
     @return tuple (formatted text, errors)
     """
     errors_ = []
-    if format_template_code != None:
+    if format_template_code is not None:
         format_content = str(format_template_code)
     else:
         format_content = get_format_template(format_template_filename)['code']
@@ -371,7 +371,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
         params = {}
         # Look for function parameters given in format template code
         all_params = match.group('params')
-        if all_params != None:
+        if all_params is not None:
             function_params_iterator = pattern_function_params.finditer(all_params)
             for param_match in function_params_iterator:
                 name = param_match.group('param')
@@ -423,7 +423,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
     # c) format element is totally unknown. Do nothing or report error
     
-    if format_element != None and format_element['type'] == "python":
+    if format_element is not None and format_element['type'] == "python":
         # a) We found an element with the tag name, of type "python"
         # Prepare a dict 'params' to pass as parameter to 'format'
         # function of element
@@ -463,7 +463,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                               error_string[0][1] + "".join(stack) +'</span></b> '
 
 
-        if output_text == None:
+        if output_text is None:
             output_text = ""
         else:
             output_text = str(output_text)
@@ -484,7 +484,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
            
         return (output_text, errors)
     
-    elif format_element != None and format_element['type'] == "field":
+    elif format_element is not None and format_element['type'] == "field":
         # b) We have not found an element in files that has the tag
         # name. Then look for it in the table "tag"
         #
@@ -611,7 +611,7 @@ def filter_languages(format_template, ln='en'):
         # replace
         pattern_current_lang = re.compile(r"<"+current_lang+ \
                                           "\s*>(.*?)</"+current_lang+"\s*>")
-        if re.search(pattern_current_lang, lang_tag_content) == None:
+        if re.search(pattern_current_lang, lang_tag_content) is None:
             current_lang = cdslang
 
         cleaned_lang_tag = ln_pattern.sub(clean_language_tag, lang_tag_content)
@@ -728,13 +728,13 @@ def get_format_template_attrs(filename):
         template_file.close()
 
         match = pattern_format_template_name.search(code)
-        if match != None:
+        if match is not None:
             attrs['name'] = match.group('name')
         else:
             attrs['name'] = filename
         
         match = pattern_format_template_desc.search(code)
-        if match != None:
+        if match is not None:
             attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
@@ -769,7 +769,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
 
     # Resolve filename and prepare 'name' as key for the cache
     filename = resolve_format_element_filename(element_name)
-    if filename != None:
+    if filename is not None:
         name = filename.upper()
     else:
         name = element_name.upper()
@@ -781,7 +781,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 element['attrs'].has_key('builtin_params') ):
             return element
 
-    if filename == None:
+    if filename is None:
         # Element is maybe in tag table
         if bibformat_dblayer.tag_exists_for_name(element_name):
             format_element = {'attrs': get_format_element_attrs_from_table( \
@@ -884,7 +884,7 @@ def get_format_elements(with_built_in_params=False):
             element_name = filename_test[:-3]
             element = get_format_element(element_name,
                                          with_built_in_params=with_built_in_params)
-            if element != None:
+            if element is not None:
                 format_elements[element_name] = element
          
     return format_elements
@@ -929,7 +929,7 @@ def get_format_element_attrs_from_function(function, element_name,
 
         # Look for @see in docstring
         match = pattern_format_element_seealso.search(docstring)
-        if match != None:
+        if match is not None:
             elements = match.group('see').rstrip('.').split(",")
             for element in elements:
                 attrs['seealso'].append(element.strip())
@@ -941,7 +941,7 @@ def get_format_element_attrs_from_function(function, element_name,
     # Prepare args and defaults_list such that we can have a mapping
     # from args to defaults
     args.reverse()
-    if defaults != None:
+    if defaults is not None:
         defaults_list = list(defaults)
         defaults_list.reverse()
     else:
@@ -954,7 +954,7 @@ def get_format_element_attrs_from_function(function, element_name,
             continue 
         param = {}
         param['name'] = arg
-        if default == None:
+        if default is None:
             #In case no check is made inside element, we prefer to
             #print "" (nothing) than None in output
             param['default'] = "" 
@@ -1146,7 +1146,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
     output_format = {'rules':[], 'default':""}
     filename = resolve_output_format_filename(code, verbose)
     
-    if filename == None:
+    if filename is None:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_OUTPUT_FORMAT_CODE_UNKNOWN", code)],
                                         stream='error', ln=cdslang)
         register_errors(errors, 'error')
@@ -1247,7 +1247,7 @@ def get_output_format_attrs(code, verbose=0):
              'content_type':""}
     
     filename = resolve_output_format_filename(code, verbose)
-    if filename == None:
+    if filename is None:
         return attrs
      
     attrs['names'] = bibformat_dblayer.get_output_format_names(code)
@@ -1312,7 +1312,7 @@ def get_kb_mapping(kb, string, default=""):
         kb_cache = kb_mappings_cache[kb]
         if kb_cache.has_key(string):
             value = kb_mappings_cache[kb][string]
-            if value == None:
+            if value is None:
                 return default
             else:
                 return value
@@ -1323,7 +1323,7 @@ def get_kb_mapping(kb, string, default=""):
     value = bibformat_dblayer.get_kb_mapping_value(kb, string)
 
     kb_mappings_cache[kb][str(string)] = value
-    if value == None:
+    if value is None:
         return default
     else:
         return value
@@ -1522,7 +1522,7 @@ class BibFormatObject:
         Creates a new bibformat object, with given record.
 
         You can either specify an record ID to format, or give its xml representation.
-        if 'xml_record' != None, use 'xml_record' instead of recID for the record.
+        if 'xml_record' is not None, use 'xml_record' instead of recID for the record.
 
         'uid' allows to grant access to some functionalities on a page depending
         on the user's priviledges.
@@ -1533,7 +1533,7 @@ class BibFormatObject:
         @param xml_record a xml string of the record to format
         @param uid the user id of the person who will view the formatted page
         """
-        if xml_record != None:
+        if xml_record is not None:
             # If record is given as parameter
             self.record = create_record(xml_record)[0]
             recID = record_get_field_value(self.record,"001")
@@ -1552,7 +1552,7 @@ class BibFormatObject:
         """
         
         # Create record if necessary
-        if self.record == None:
+        if self.record is None:
             record = create_record(record_get_xml(self.recID, 'xm'))
             self.record = record[0]
 
@@ -1566,7 +1566,7 @@ class BibFormatObject:
         @param tag the marc code of a field
         @return value of field tag in record
         """
-        if self.get_record() == None:
+        if self.get_record() is None:
             #Case where BibRecord could not parse object
             return ''
         
@@ -1607,7 +1607,7 @@ class BibFormatObject:
         @param tag the marc code of a field
         @return values of field tag in record
         """
-        if self.get_record() == None:
+        if self.get_record() is None:
             # Case where BibRecord could not parse object
             return []
         
@@ -1645,12 +1645,12 @@ class BibFormatObject:
         @param string the string we want to translate
         @param default a default value returned if 'string' not found in 'kb'
         """
-        if string == None:
+        if string is None:
             return default
         
         val = get_kb_mapping(kb, string, default)
 
-        if val == None:
+        if val is None:
             return default
         else:
             return val

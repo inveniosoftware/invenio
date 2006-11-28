@@ -235,13 +235,13 @@ def __check_every_basket_has_one_owner():
     """"""
     query = "SELECT bsk.id, ubsk.id_user FROM basket bsk LEFT JOIN user_basket ubsk ON bsk.id=ubsk.id_basket"
     res = run_sql(query)
-    return filter(lambda x: x[1]==None, res)
+    return filter(lambda x: x[1] is None, res)
     
 def __check_baskets_exist():
     """"""
     query = "SELECT distinct ubsk.id_basket, bsk.id FROM user_basket ubsk LEFT JOIN basket bsk ON bsk.id=ubsk.id_basket"
     res = run_sql(query)
-    return filter(lambda x: x[1]==None, res)
+    return filter(lambda x: x[1] is None, res)
     
     
 def __update_baskets(default_topic_name="Imported baskets", 

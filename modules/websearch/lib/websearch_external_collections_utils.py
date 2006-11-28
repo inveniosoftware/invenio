@@ -57,7 +57,7 @@ def collections_id_load(force_reload=False):
 
     global collections_id
 
-    if not (force_reload or collections_id == None):
+    if not (force_reload or collections_id is None):
         return
 
     collections_id = {}

@@ -424,13 +424,13 @@ class Template:
                             % {'el_name' : cgi.escape(elname, 1)}
         body_content += """</td>
          </tr>"""
-        if elcd != "" and elcd != None:
+        if elcd != "" and elcd is not None:
             body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Creation Date:</span></td>
           <td width="80%%"><span class="info">%s</span></td>
          </tr>""" % (cgi.escape(str(elcd), 1),)
-        if elmd != "" and elmd != None:
+        if elmd != "" and elmd is not None:
                 body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>
@@ -592,13 +592,13 @@ class Template:
         body_content += """</td>
          </tr>"""
         if "" not in (cd, md):
-            if cd != None:
+            if cd is not None:
                 body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Creation Date:</span></td>
           <td width="80%%"><span class="info">%s</span></td>
          </tr>""" % (cgi.escape(str(cd), 1),)
-            if md != None:
+            if md is not None:
                 body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>
@@ -683,13 +683,13 @@ class Template:
         body_content += """</td>
          </tr>"""
         if "" not in (cd, md):
-            if cd != None:
+            if cd is not None:
                 body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Creation Date:</span></td>
           <td width="80%%"><span class="info">%s</span></td>
          </tr>""" % (cgi.escape(str(cd), 1),)
-            if md != None:
+            if md is not None:
                 body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>

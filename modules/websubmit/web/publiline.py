@@ -295,7 +295,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     categformat = res[0][0]
     categformat = re.sub("<CATEG>","([^-]*)",categformat)
     categs = re.match(categformat,RN)
-    if categs != None:
+    if categs is not None:
         categ = categs.group(1)
     else:
         categ = "unknown"

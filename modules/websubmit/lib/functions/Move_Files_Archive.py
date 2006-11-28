@@ -42,7 +42,7 @@ def Move_Files_Archive(parameters,curdir,form):
             # first delete all missing files
             bibarchive = BibRecDocs(sysno)
             existingBibdocs = bibarchive.listBibDocs(type)
-            if existingBibdocs != None:
+            if existingBibdocs is not None:
                 for existingBibdoc in existingBibdocs:
                     if not formats.has_key(existingBibdoc.getFileName()):
                         existingBibdoc.delete()

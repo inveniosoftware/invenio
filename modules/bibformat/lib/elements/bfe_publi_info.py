@@ -41,7 +41,7 @@ def format(bfo):
     number = publication_info.get('n')
     pages = publication_info.get('c')
 
-    if journal != '' and volume != None:
+    if journal != '' and volume is not None:
         out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
         out += quote(publication_info.get('p'))
         out += '&amp;volume=' + volume
@@ -56,13 +56,13 @@ def format(bfo):
                                                                     'page': pages}
     else:
         out += publication_info.get('p') + ': '
-        if volume != None:
+        if volume is not None:
             out +=  volume 
-        if year != None:
+        if year is not None:
             out += ' (' + year + ') '
-        if number != None:
+        if number is not None:
             out += 'no. ' + number + ', '
-        if pages != None:
+        if pages is not None:
             out += 'pp. ' + pages
          
     return out

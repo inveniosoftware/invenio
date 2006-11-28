@@ -152,7 +152,7 @@ def displayUserTable(doctype):
         role_id = role[0]
         if re.match("^referee_%s_" % doctype,role_name):
             # Try to retrieve the referee's email from the referee's database
-            if acc_getRoleUsers(role_id) != None:
+            if acc_getRoleUsers(role_id) is not None:
                 referees[role_name] = acc_getRoleUsers(role_id)
 
     if len(referees) == 0:

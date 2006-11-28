@@ -47,7 +47,7 @@ class AsyncDownloadTest(unittest.TestCase):
 
         def finished(pagegetter, check, current_time):
             """Function called when a page is received."""
-            is_ok = pagegetter.status != None
+            is_ok = pagegetter.status is not None
 
             if check.has_key('content') and is_ok:
                 is_ok = pagegetter.data.find(check['content']) > 0

@@ -61,10 +61,10 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                     if add == 3:
                         body = ''
 
-                    if edit_tag != None and dict_value != None:
+                    if edit_tag is not None and dict_value is not None:
                         record = edit_record(recid, uid, record, edit_tag, dict_value)
 
-                    if delete_tag != None and num_field != None:
+                    if delete_tag is not None and num_field is not None:
                         record = delete_field(recid, uid, record, delete_tag, num_field)
 
                     if add == 4:
@@ -125,7 +125,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
     
     (record, junk) = get_record(ln, recid, uid, temp)
     
-    if del_subfield != None:
+    if del_subfield is not None:
         record = delete_subfield(recid, uid, record, tag, num_field)
                 
     if add == 2:

@@ -109,7 +109,7 @@ class BFXParser:
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
-        if template_source == None:
+        if template_source is None:
             template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + '/' + template_name + '.' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
             #load document
             doc = minidom.parse(template_file_name)

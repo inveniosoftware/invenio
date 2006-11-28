@@ -44,7 +44,7 @@ def Is_Original_Submitter(parameters,curdir,form):
     email = re.sub("[\n\r ]+","",email)
     uid_email = re.sub("[\n\r ]+","",uid_email)
     (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
-    if re.search(uid_email,email,re.IGNORECASE) == None and auth_code != 0:
+    if re.search(uid_email,email,re.IGNORECASE) is None and auth_code != 0:
         raise functionStop("""
 <SCRIPT>
    document.forms[0].action="/submit";
@@ -53,7 +53,7 @@ def Is_Original_Submitter(parameters,curdir,form):
    document.forms[0].submit();
    alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).');
 </SCRIPT>""" % (uid_email,email))
-    elif re.search(uid_email,email,re.IGNORECASE) == None and auth_code == 0:
+    elif re.search(uid_email,email,re.IGNORECASE) is None and auth_code == 0:
         return ("""
 <SCRIPT>
 alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).\\n\\nAnyway, as you have a special authorization for this type of documents,\\nyou are allowed to proceed! Watch out your actions!');

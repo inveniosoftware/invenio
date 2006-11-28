@@ -449,7 +449,7 @@ class Template:
         _ = gettext_set_language(ln)
         items_html = ''
         actions = '<table class="bskbasketheaderactions"><tr>'
-        if group_sharing_level == None:
+        if group_sharing_level is None:
             group_img_name = 'webbasket_user.png'
             group_alt = _("Non-shared basket")
         elif group_sharing_level == 0:
@@ -771,7 +771,7 @@ class Template:
                 'action': action,
                 'button_label': _("Write a comment"),
                 'comments': comments}
-        if group_sharing_level == None:
+        if group_sharing_level is None:
             img = '<img src="%s/img/webbasket_user.png" alt="%s" />' % (weburl, _("Non-shared basket"))
         elif group_sharing_level == 0:
             img = '<img src="%s/img/webbasket_world.png" alt="%s" />' % (weburl, _("Shared basket"))

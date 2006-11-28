@@ -71,7 +71,7 @@ params = {
 def encode_for_xml(strxml):
     "Encode special chars in string for XML-compliancy."
 
-    if strxml == None:
+    if strxml is None:
         return strxml
     else:
         strxml = string.replace(strxml, '&', '&amp;')
@@ -789,7 +789,7 @@ def parse_args(args=""):
         "resumptionToken"  : ""
     }
 
-    if args == "" or args == None:
+    if args == "" or args is None:
         pass
     else:
 

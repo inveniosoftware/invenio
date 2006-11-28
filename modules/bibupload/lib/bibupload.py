@@ -287,11 +287,11 @@ def task_run(task_id):
     write_message("BibUpload Mode "+options['mode']+" has been choosen.", verbose=2)
     write_message("STAGE 0:", verbose=2)
     
-    if options['file_path'] != None: 
+    if options['file_path'] is not None: 
         recs = xml_marc_to_records(open_marc_file(options['file_path']))
         stat['nb_records_to_upload'] = len(recs)
         write_message("   -Open XML marc: DONE", verbose=2)
-        if recs != None:
+        if recs is not None:
             #We proceed each record by record
             for record in recs:
                 error = bibupload(record)
@@ -444,11 +444,11 @@ def parse_command():
             write_message(__revision__, verbose=1)
             return 2
 
-    if options['mode'] == None:
+    if options['mode'] is None:
         write_message("Please specify at least one update/insert mode!")
         return 1
 
-    if options['file_path'] == None:
+    if options['file_path'] is None:
         write_message("Missing filename! -h for help.")
         return 1
     return 0
@@ -462,7 +462,7 @@ def bibupload(record):
     """
     error = None
     #If there are special tags to proceed check if it exists in the record
-    if options['tag'] != None and not(record.has_key(options['tag'])):
+    if options['tag'] is not None and not(record.has_key(options['tag'])):
         write_message("    Failed: Tag not found, enter a valid tag to update.", verbose=1, stream=sys.stderr)
         return (1, -1)
     
@@ -477,7 +477,7 @@ def bibupload(record):
     # Reference mode check if there are reference tag 
     if options['mode'] == 'reference':
         error = extract_tag_from_record(record, CFG_BIBUPLOAD_REFERENCE_TAG)
-        if error == None:
+        if error is None:
             write_message("   Failed: No reference tags has been found...", verbose=1, stream=sys.stderr)
             return (1, -1)
         else:
@@ -491,7 +491,7 @@ def bibupload(record):
         
         # we add the record Id control field to the record
         error = record_add_field(record, '001', '', '', rec_id, [], 0)
-        if error == None:
+        if error is None:
             write_message("   Failed: " \
                                          "Error during adding the 001 controlfield "  \
                                          "to the record", verbose=1, stream=sys.stderr)
@@ -503,7 +503,7 @@ def bibupload(record):
         # Update Mode
         #Retrieve the old record to update
         rec_old = create_record(print_record(int(rec_id),'xm'), 2)[0]
-        if rec_old == None:
+        if rec_old is None:
             write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
             return (1, rec_id)
         else:
@@ -526,9 +526,9 @@ def bibupload(record):
     
     #Have a look if we have FMT tags
     write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record, 'FMT') != None:
+    if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record, 'FMT') is not None:
         record = insert_fmt_tags(record, rec_id)
-        if record == None:
+        if record is None:
             write_message("   Stage 1 failed: Error while inserting FMT tags", verbose=1, stream=sys.stderr)
             return (1, rec_id)
         elif record == 0:
@@ -541,7 +541,7 @@ def bibupload(record):
    
     #Have a look if we have FFT tags 
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record, 'FFT') != None:
+    if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record, 'FFT') is not None:
         
         if options['mode'] == 'insert' or options['mode'] == 'append':
             record = insert_fft_tags(record, rec_id)
@@ -654,7 +654,7 @@ def xml_marc_to_records(xml_marc):
         write_message("Exiting.", sys.stderr)
         task_update_status("ERROR")                                   
         sys.exit(1)        
-    elif recs[0][0] == None:
+    elif recs[0][0] is None:
         write_message("Error: MARCXML file has wrong format: %s" % recs[0][2], verbose=1, stream=sys.stderr)
         write_message("Exiting.", sys.stderr)
         task_update_status("ERROR")                                   
@@ -752,7 +752,7 @@ def retrieve_rec_id(record):
     
     #1st step: we look for the tag 001
     tag = extract_tag_from_record(record, '001')
-    if tag != None:
+    if tag is not None:
         #We exctract the record Id from the Tag
         rec_id = tag[0][3]        
         #if we are in insert mode => error
@@ -765,7 +765,7 @@ def retrieve_rec_id(record):
         #if we found the rec id and we are not in insert mode => continue
         elif options['mode'] != 'insert':
             #we try to find the rec_id in the table bibrec
-            if find_record_bibrec(rec_id) != None: 
+            if find_record_bibrec(rec_id) is not None: 
                 return rec_id
             else:
                 #The record doesn't exist yet. We will try to check the SYSNO id
@@ -773,21 +773,21 @@ def retrieve_rec_id(record):
     else:
         write_message("   -Tag 001 not found in the xml marc file.", verbose=9)
 
-    if rec_id == None:
+    if rec_id is None:
         #2nd step we look for the sysno code
         sysno = extract_tag_from_record(record, CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)
-        if sysno != None:
+        if sysno is not None:
             #retrieve the SYSNO code from the tuple SYSNO
             sysno = sysno[0][0][0][1]
             write_message("   Check if the SYSNO id "+sysno+" exist in the database", verbose=9)
             
             #Retrieve the rec id from the database
             rec_id = find_record_from_sysno(sysno)
-            if rec_id != None and options['mode'] == 'insert':
+            if rec_id is not None and options['mode'] == 'insert':
                 write_message("   Failed : Record id found in the database: Please choose another mode than insert. -h for help.",
                               verbose=1, stream=sys.stderr)
                 return -1
-            elif rec_id == None and options['mode'] != 'insert':
+            elif rec_id is None and options['mode'] != 'insert':
                 if options['mode'] != 'replace_insert':
                     write_message("   Failed : Record Id not found even with SYSNO id..."\
                                             "Please insert the file before updating it."\
@@ -797,7 +797,7 @@ def retrieve_rec_id(record):
                     options['mode'] = 'insert'
             else:
                 return rec_id
-        if sysno == None and options['mode'] != 'insert':
+        if sysno is None and options['mode'] != 'insert':
             if options['mode'] != 'replace_insert':
                 write_message("   Failed : SYSNO tag not found in the xml marc file."\
                                         "Please insert the file before updating it."\
@@ -887,7 +887,7 @@ def insert_fft_tags(record, rec_id):
     tuple_list = None
     tuple_list = extract_tag_from_record(record, 'FFT')
     #If there is a FFT TAG :)
-    if tuple_list != None:
+    if tuple_list is not None:
         for single_tuple in tuple_list:
             # Get the inside of the FFT file
             docpath = single_tuple[0][0][1]
@@ -900,7 +900,7 @@ def insert_fft_tags(record, rec_id):
             except Error, error:
                 write_message("   Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr) 
             
-            if bib_doc_id != None:
+            if bib_doc_id is not None:
                 #we link the document to the record if a rec_id was specified
                 if rec_id != "":
                     
@@ -908,7 +908,7 @@ def insert_fft_tags(record, rec_id):
                     doc_type = ""
                     try:
                         res = run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (rec_id, bib_doc_id, doc_type))
-                        if res == None:
+                        if res is None:
                             write_message("   Failed during creation of link between doc Id and rec Id).", verbose=1, stream=sys.stderr)
                         else:
                             write_message("   -Insert of the link bibrec bibdoc for %s : DONE" % docname, verbose=2)
@@ -953,7 +953,7 @@ def insert_fft_tags(record, rec_id):
                 #add tag 856 to the xml marc to proceed
                 subfield_list = [('u', url_path), ('z', 'Access to Fulltext')] 
                 newfield_number = record_add_field(record, "856", "4", "", "", subfield_list)
-                if newfield_number == None:
+                if newfield_number is None:
                     write_message("   Error when adding the field"+ single_tuple, verbose=1, stream=sys.stderr)
                 else:
                     write_message("   -Add the new tag 856 to the record for %s : DONE" % docname, verbose=2)
@@ -1030,7 +1030,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
         params = (now, pickled_format_value, id_bibrec, format_name)
         try:
             row_id  = run_sql(query, params)
-            if row_id == None:
+            if row_id is None:
                 write_message("   Failed: Error during update_bibfmt_format function", verbose=1, stream=sys.stderr)
                 return 1
             else:
@@ -1045,7 +1045,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
     else:
         # Insert the format information in BibFMT
         res = insert_bibfmt(id_bibrec, format_value, format_name)
-        if res == None:
+        if res is None:
             write_message("   Failed: Error during insert_bibfmt", verbose=1, stream=sys.stderr)
             return 1
         else:
@@ -1092,11 +1092,11 @@ def update_database_with_metadata(record, rec_id):
                         # insert the tag and value into into bibxxx
                         (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
                         #print 'tname, bibrow', table_name, bibxxx_row_id;
-                        if table_name == None or bibxxx_row_id == None:
+                        if table_name is None or bibxxx_row_id is None:
                             write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
                         # connect bibxxx and bibrec with the table bibrec_bibxxx
                         res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
-                        if res == None:
+                        if res is None:
                             write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
                 else:
                     # get the tag and value from the content of each subfield
@@ -1112,11 +1112,11 @@ def update_database_with_metadata(record, rec_id):
                             write_message("   insertion of the tag "+full_tag+" with the value "+value, verbose=9)
                             # insert the tag and value into into bibxxx
                             (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
-                            if table_name == None or bibxxx_row_id == None:
+                            if table_name is None or bibxxx_row_id is None:
                                 write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
                             # connect bibxxx and bibrec with the table bibrec_bibxxx
                             res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
-                            if res == None:
+                            if res is None:
                                 write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
                         # remove the subtag from the list
                         tag_list.pop()
@@ -1128,7 +1128,7 @@ def update_database_with_metadata(record, rec_id):
 
 def append_new_tag_to_old_record(record, rec_old):
     """Append new tags to a old record"""
-    if options['tag'] != None:
+    if options['tag'] is not None:
         tag = options['tag']
         if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
             if tag == '001':
@@ -1139,7 +1139,7 @@ def append_new_tag_to_old_record(record, rec_old):
                     controlfield_value = single_tuple[3]
                     # add the field to the old record
                     newfield_number = record_add_field(rec_old, tag, "", "", controlfield_value)
-                    if newfield_number == None:
+                    if newfield_number is None:
                         write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
         else:
             # For each tag there is a list of tuples representing datafields
@@ -1152,7 +1152,7 @@ def append_new_tag_to_old_record(record, rec_old):
                 if options['verbose'] == 9:
                     print "      Adding tag: ", tag, " ind1=", ind1, " ind2=", ind2, " code=", subfield_list
                 newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
-                if newfield_number == None:
+                if newfield_number is None:
                     write_message("Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     else:
         # Go through each tag in the appended record
@@ -1169,7 +1169,7 @@ def append_new_tag_to_old_record(record, rec_old):
                         if options['verbose'] == 9:
                             print "      Adding tag: ", tag, " ind1=", ind1, " ind2=", ind2, " code=", subfield_list
                         newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
-                        if newfield_number == None:
+                        if newfield_number is None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
             else:
                 if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
@@ -1181,7 +1181,7 @@ def append_new_tag_to_old_record(record, rec_old):
                             controlfield_value = single_tuple[3]
                             # add the field to the old record
                             newfield_number = record_add_field(rec_old, tag, "", "", controlfield_value)
-                            if newfield_number == None:
+                            if newfield_number is None:
                                 write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
                 else:
                     # For each tag there is a list of tuples representing datafields
@@ -1194,7 +1194,7 @@ def append_new_tag_to_old_record(record, rec_old):
                         if options['verbose'] == 9:
                             print "      Adding tag: ", tag, " ind1=", ind1, " ind2=", ind2, " code=", subfield_list
                         newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
-                        if newfield_number == None:
+                        if newfield_number is None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     return rec_old
 
@@ -1223,7 +1223,7 @@ def delete_tags_to_correct(record, rec_old):
     # Browse through all the tags from the marc file
     for tag in record.keys():
         #Do we have to delete only a special tag or all?
-        if options['tag'] == None:
+        if options['tag'] is None:
             # See if these tags exist in the old record
             if rec_old.has_key(tag) and tag != '001':
                 # Delete the tag found

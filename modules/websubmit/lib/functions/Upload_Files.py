@@ -86,14 +86,14 @@ def Upload_Files(parameters,curdir,form):
                 bibdoc = bibrecdocs.addNewFormat(fullpath,int(mybibdocid))
             if type == "fulltext" and fileAction != "AddMainFormat" and fileAction != "AddAdditionalFormat":
                 additionalformats = createRelatedFormats(fullpath)
-                if len(additionalformats) > 0 and bibdoc != None:
+                if len(additionalformats) > 0 and bibdoc is not None:
                     bibdoc.addFilesNewFormat(additionalformats)
             if type == "picture" and fileAction != "AddMainFormat" and fileAction != "AddAdditionalFormat":
                 iconpath = createIcon(fullpath,iconsize)
-                if iconpath != None and bibdoc != None:
+                if iconpath is not None and bibdoc is not None:
                     bibdoc.addIcon(iconpath)
                     os.unlink(iconpath)
-                elif bibdoc !=None:
+                elif bibdoc is not None:
                     bibdoc.deleteIcon()
                 bibrecdocs.buildBibDocList()
             os.unlink(fullpath)

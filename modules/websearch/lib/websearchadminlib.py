@@ -1657,7 +1657,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
 
     fld_type_list = fld_type.items()
     col_fld = list(get_col_fld(colID, 'seo', fldID))
-    if len(col_fld) == 1 and col_fld[0][1] == None:
+    if len(col_fld) == 1 and col_fld[0][1] is None:
         output += """<b><span class="info">No values added for this search option yet</span></b>"""
     else:
         j = 0
@@ -1673,9 +1673,9 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
             if j != len(col_fld):
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), weburl)   
 
-            if fieldvalue[0][1] != fieldvalue[0][2] and fldvID != None:
+            if fieldvalue[0][1] != fieldvalue[0][2] and fldvID is not None:
                 actions.append([move, "%s - %s" % (fieldvalue[0][1], fieldvalue[0][2])])
-            elif fldvID != None:
+            elif fldvID is not None:
                 actions.append([move, "%s" % fieldvalue[0][1]])            
      
             move = ''

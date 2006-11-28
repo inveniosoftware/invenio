@@ -633,18 +633,18 @@ def create_record_RXP(xmltext,
 
     # get childs of 'controlfield'
     childs_controlfield = []
-    if not root[2] == None:
+    if not root[2] is None:
         childs_controlfield = [t for t in root[CHILD_LIST] if type(t).__name__ == 'tuple' and t[TAG] == "controlfield"]
         
     # get childs of 'datafield'
     childs_datafield = []
-    if not root[CHILD_LIST] == None:
+    if not root[CHILD_LIST] is None:
         childs_datafield = [t for t in root[CHILD_LIST] if type(t).__name__ == 'tuple' and t[TAG] == "datafield"]
         
     for controlfield in childs_controlfield:
         s = controlfield[ATTRS]["tag"]
         value = ''
-        if not controlfield == None:
+        if not controlfield is None:
             value = ''.join([n for n in controlfield[CHILD_LIST] if type(n).__name__ == 'str'])
 
         name = type(value).__name__
@@ -674,12 +674,12 @@ def create_record_RXP(xmltext,
         subfields = []
 
         childs_subfield = []
-        if not datafield[CHILD_LIST] == None:
+        if not datafield[CHILD_LIST] is None:
             childs_subfield = [t for t in datafield[CHILD_LIST] if type(t).__name__ == 'tuple' and t[0] == "subfield"]
 
         for subfield in childs_subfield:
             value = ''
-            if not subfield == None:
+            if not subfield is None:
                 value = ''.join([n for n in subfield[CHILD_LIST] if type(n).__name__ == 'str'])
                                        #get_string_value(subfield)
             if subfield[ATTRS].has_key('code'):
@@ -932,7 +932,7 @@ def get_childs_by_tag_name_RXP(listofchilds, tag):
        listofchilds is a list returned by the RXP parser
     """
     l = []
-    if not listofchilds == None:
+    if not listofchilds is None:
         l = [t for t in listofchilds if type(t).__name__ == 'tuple' and t[0] == tag]
     return l
     
@@ -947,7 +947,7 @@ def getAttribute_RXP(root, attr):
 
 def get_string_value_RXP(node):
     """gets all child text nodes of node 'node' and returns them as a unicode string"""
-    if not node == None:
+    if not node is None:
         return ''.join([ n for n in node[2] if type(n).__name__ == 'str'])
     else:
         return ""

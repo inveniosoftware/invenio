@@ -54,14 +54,14 @@ class FormatTemplateTest(unittest.TestCase):
 
         #Test correct parsing and structure
         template_1 = bibformat_engine.get_format_template("Test1.bft", with_attributes=True)
-        self.assert_(template_1 != None)
+        self.assert_(template_1 is not None)
         self.assertEqual(template_1['code'],  "test")
         self.assertEqual(template_1['attrs']['name'], "name_test")
         self.assertEqual(template_1['attrs']['description'], "desc_test")
 
         #Test correct parsing and structure of file without description or name
         template_2 = bibformat_engine.get_format_template("Test_2.bft", with_attributes=True)
-        self.assert_(template_2 != None)
+        self.assert_(template_2 is not None)
         self.assertEqual(template_2['code'],  "test")
         self.assertEqual(template_2['attrs']['name'], "Test_2.bft")
         self.assertEqual(template_2['attrs']['description'], "")
@@ -129,7 +129,7 @@ class FormatElementTest(unittest.TestCase):
         
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
-            self.assert_(filename_1 != None)
+            self.assert_(filename_1 is not None)
 
             filename_2 = bibformat_engine.resolve_format_element_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)
@@ -145,7 +145,7 @@ class FormatElementTest(unittest.TestCase):
         
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
-            self.assert_(filename_1 != None)
+            self.assert_(filename_1 is not None)
 
             filename_2 = bibformat_engine.resolve_format_element_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)
@@ -162,13 +162,13 @@ class FormatElementTest(unittest.TestCase):
         
         #Test loading with different kind of names, for element with spaces in name, without bfe_
         element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
-        self.assert_(element_1 != None)
+        self.assert_(element_1 is not None)
         element_1_bis = bibformat_engine.get_format_element("bfe_tEst_1.py", with_built_in_params=True)
         self.assertEqual(element_1, element_1_bis)
 
         #Test loading with different kind of names, for element without spaces in name, wit bfe_
         element_2 = bibformat_engine.get_format_element("test 2", with_built_in_params=True)
-        self.assert_(element_2 != None)
+        self.assert_(element_2 is not None)
         element_2_bis = bibformat_engine.get_format_element("bfe_tEst_2.py", with_built_in_params=True)
         self.assertEqual(element_2, element_2_bis)
 
@@ -182,7 +182,7 @@ class FormatElementTest(unittest.TestCase):
 
         #Test element without docstring
         element_5 = bibformat_engine.get_format_element("test_5", with_built_in_params=True)
-        self.assert_(element_5 != None)
+        self.assert_(element_5 is not None)
         self.assertEqual(element_5['attrs']['description'], '')
         self.assert_({'name':"param1",
                      'description':"(no description provided)",
@@ -324,7 +324,7 @@ class OutputFormatTest(unittest.TestCase):
         filenames = ["test1", "test1.bfo", "TEST1", "TeST1", "TEST1.bfo", "<b>test1"]
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_output_format_filename(filenames[i])
-            self.assert_(filename_1 != None)
+            self.assert_(filename_1 is not None)
 
             filename_2 = bibformat_engine.resolve_output_format_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)

@@ -525,7 +525,7 @@ def _basic_email_info(msg):
     for header in basic_headers:
         value = basic_decoded_headers.get(header, None)
         
-        if value == None:
+        if value is None:
             value = msg.get(header, None)
 
         return_dict[header] = value

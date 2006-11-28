@@ -372,7 +372,7 @@ def add_output_format(code, name="", description="", content_type="text/html"):
     @param content_type the content_type (if applicable) of the new output format
     """
     output_format_id = get_output_format_id(code);
-    if output_format_id == None:
+    if output_format_id is None:
         query = "INSERT INTO format SET code=%s, description=%s, content_type=%s"
         params = (code.lower(), description, content_type)
         run_sql(query, params)
@@ -388,7 +388,7 @@ def remove_output_format(code):
     @param the code of the output format to remove
     """
     output_format_id = get_output_format_id(code);
-    if output_format_id == None:
+    if output_format_id is None:
         return
     
     query = "DELETE FROM formatname WHERE id_format='%s'" % output_format_id
@@ -410,7 +410,7 @@ def get_output_format_description(code):
     res = run_sql(query)
     if len(res) > 0:
         res = res[0][0]
-        if res != None:
+        if res is not None:
             return res
     return ""
     
@@ -423,7 +423,7 @@ def set_output_format_description(code, description):
     @param code the code of the output format to update
     """
     output_format_id = get_output_format_id(code)
-    if output_format_id == None:
+    if output_format_id is None:
         add_output_format(code, "", description)
         
     query = "UPDATE format SET description=%s WHERE code=%s"
@@ -442,7 +442,7 @@ def get_existing_content_types():
     query = "SELECT DISTINCT content_type FROM format GROUP BY content_type"
     res = run_sql(query)
     
-    if res != None:
+    if res is not None:
         res = [val[0] for val in res if len(val) > 0]
         if not 'text/html' in res:
             res.append('text/html')
@@ -463,7 +463,7 @@ def get_output_format_content_type(code):
     res = run_sql(query)
     if len(res) > 0:
         res = res[0][0]
-        if res != None:
+        if res is not None:
             return res
     return ""
     
@@ -477,7 +477,7 @@ def set_output_format_content_type(code, content_type):
     @param content_type the content type for the format
     """
     output_format_id = get_output_format_id(code)
-    if output_format_id == None:
+    if output_format_id is None:
         # add one if not exist (should not happen)
         add_output_format(code, "", "", content_type)
         
@@ -508,7 +508,7 @@ def get_output_format_names(code):
     """
     out = {'sn':{}, 'ln':{}, 'generic':''}
     output_format_id = get_output_format_id(code);
-    if output_format_id == None:
+    if output_format_id is None:
         return out
 
     query = "SELECT name FROM format WHERE code='%s'" % escape_string(code)
@@ -544,7 +544,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
     if type.lower() != "sn" and type.lower() != "ln":
         return
     output_format_id = get_output_format_id(code);
-    if output_format_id == None and lang == "generic" and type.lower() == "ln":
+    if output_format_id is None and lang == "generic" and type.lower() == "ln":
         # Create output format inside table if it did not exist
         # Happens when the output format was added not through web interface
         add_output_format(code, name)
@@ -569,7 +569,7 @@ def change_output_format_code(old_code, new_code):
     @param new_code the new code
     """
     output_format_id = get_output_format_id(old_code);
-    if output_format_id == None:
+    if output_format_id is None:
         return
     
     query = "UPDATE format SET code='%s' WHERE id='%s'" % (new_code, id)
@@ -613,7 +613,7 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
 ##     """
 ##     for output_format in output_format:
         
-##         if get_format_from_db(output_format) == None:
+##         if get_format_from_db(output_format) is None:
 ##             #Add new
 ##             query = "UPDATE TABLE format "
 ##         else:

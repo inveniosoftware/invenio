@@ -186,7 +186,7 @@ def task_run(row):
     signal.signal(signal.SIGINT, task_sig_unknown)
 
     ### go ahead: build up the reposlist
-    if options["repository"] != None:  
+    if options["repository"] is not None:  
         ### user requests harvesting from selected repositories
         write_message("harvesting from selected repositories")
         for reposname in options["repository"]:
@@ -235,7 +235,7 @@ def task_run(row):
                                   str(repos[0][6]) + " for the dates chosen")
                     continue
 
-            elif dateflag != 1 and repos[0][7] == None and repos[0][8] != 0:
+            elif dateflag != 1 and repos[0][7] is None and repos[0][8] != 0:
                 write_message("source " + str(repos[0][6]) + \
                               " was never harvested before - harvesting whole repository")
                 res = call_bibharvest(prefix=repos[0][2],
@@ -508,9 +508,9 @@ def command_line():
         sys.exit(1)
 
     options["repository"] = get_repository_names(repositories)
-    if dates != None:
+    if dates is not None:
         options["dates"]=get_dates(dates)
-    if dates != None and options["dates"]==None:
+    if dates is not None and options["dates"] is None:
         write_message("Date format not valid. Quitting task...")
         sys.exit(1)
         
