@@ -131,7 +131,7 @@ exclude-result-prefixes="OAI-PMH oaidc dc">
                     <!-- CUSTOMIZE ME: Modify the datafield below with tag and indicators used 
                          in your Invenio installation for the OAI identifier -->
                     <datafield tag="909" ind1="C" ind2="O">
-                        <subfield code="u"><xsl:value-of select="./OAI-PMH:metadata/OAI-PMH:identifier"/></subfield>
+                        <subfield code="u"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
                     </datafield>
                 
 		</xsl:if>
