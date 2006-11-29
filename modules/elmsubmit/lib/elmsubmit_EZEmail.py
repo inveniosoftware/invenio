@@ -1062,7 +1062,7 @@ def _get_flattened_payload(msg_part, with_mime_headers=False):
 
     flattened_data = msg_part.as_string(unixfrom=False)
 
-    # if with_mime_headers is False, then remove them:
+    # if with_mime_headers is false, then remove them:
     if not with_mime_headers:
         # Regex should remove from the start of the string up to the
         # first double newline '\n\n', with possibly space in-between

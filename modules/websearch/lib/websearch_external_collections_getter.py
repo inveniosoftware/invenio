@@ -116,7 +116,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
         try:
             self.send(self.request)
         except socket.error:
-            # do nothing because self.done is False by default
+            # do nothing because self.done is false by default
             pass
 
     def handle_expt(self):

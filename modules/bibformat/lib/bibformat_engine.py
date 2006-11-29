@@ -626,7 +626,7 @@ def get_format_template(filename, with_attributes=False):
     """
     Returns the structured content of the given formate template.
 
-    if 'with_attributes' is True, returns the name and description. Else 'attrs' is not
+    if 'with_attributes' is true, returns the name and description. Else 'attrs' is not
     returned as key in dictionary (it might, if it has already been loaded previously)
 
     {'code':"<b>Some template code</b>"
@@ -688,7 +688,7 @@ def get_format_templates(with_attributes=False):
     """
     Returns the list of all format templates, as dictionary with filenames as keys
 
-    if 'with_attributes' is True, returns the name and description. Else 'attrs' is not
+    if 'with_attributes' is true, returns the name and description. Else 'attrs' is not
     returned as key in each dictionary (it might, if it has already been loaded previously)
 
     [{'code':"<b>Some template code</b>"
@@ -1113,7 +1113,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
     """
     Returns the structured content of the given output format
 
-    If 'with_attributes' is True, also returns the names and description of the output formats,
+    If 'with_attributes' is true, also returns the names and description of the output formats,
     else 'attrs' is not returned in dict (it might, if it has already been loaded previously).
 
     if output format corresponding to 'code' is not found return an empty structure.
@@ -1260,7 +1260,7 @@ def get_output_formats(with_attributes=False):
     """
     Returns the list of all output format, as a dictionary with their filename as key
 
-    If 'with_attributes' is True, also returns the names and description of the output formats,
+    If 'with_attributes' is true, also returns the names and description of the output formats,
     else 'attrs' is not returned in dicts (it might, if it has already been loaded previously).
     
     See get_output_format_attrs() to learn more on the attributes
