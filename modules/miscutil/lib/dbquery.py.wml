@@ -175,13 +175,14 @@ def get_table_update_time(tablename):
     res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
     update_times = [] # store all update times
     for row in res:
-        if type(row[10]) is not long:
+        if type(row[10]) is datetime.datetime or \
+           type(row[10]) is str:
             # MySQL-4.0 has creation_time in 10th position, which is
             # of type datetime.datetime or str (depending on the
             # version of MySQLdb), so return next column:
             update_times.append(str(row[11]))
         else:
-            # MySQL-4.1 and 5.0 has creation_time in 11th position,
+            # MySQL-4.1 and 5.0 have creation_time in 11th position,
             # so return next column:
             update_times.append(str(row[12]))
     return max(update_times)
@@ -195,8 +196,11 @@ def get_table_status_info(tablename):
     res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
     table_status_info = {} # store all update times
     for row in res:
-        if type(row[10]) is not long:
-            # MySQL-4.0 has creation time in 10th position:
+        if type(row[10]) is datetime.datetime or \
+           type(row[10]) is str:
+            # MySQL-4.0 has creation_time in 10th position, which is
+            # of type datetime.datetime or str (depending on the
+            # version of MySQLdb):
             table_status_info['Name'] = row[0]
             table_status_info['Rows'] = row[3]
             table_status_info['Data_length'] = row[5]
