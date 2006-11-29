@@ -2265,13 +2265,13 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     
     # load the right message language
     _ = gettext_set_language(ln)
-    
-    # get user id (for formatting based on priviledge)
-    uid = getUid(req)
 
     # sanity checking:
     if req is None:
         return
+
+    # get user id (for formatting based on priviledge)
+    uid = getUid(req)
 
     if len(recIDs):
         nb_found = len(recIDs)
