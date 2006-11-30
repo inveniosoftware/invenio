@@ -28,7 +28,10 @@ __revision__ = "$Id$"
 import sre
 import unittest
 import time
+
+from invenio.config import CFG_OAI_ID_FIELD
 from invenio import bibupload
+from bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -559,6 +562,330 @@ class BibUploadFMTModeTest(unittest.TestCase):
         # restore original record 3:
         self.restore_recid3()
 
+class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
+    """Testing uploading of records that have external SYSNO present."""
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize the MARCXML test records."""
+        self.verbose = 0
+        # Note that SYSNO fields are repeated but with different
+        # subfields, this is to test whether bibupload would not
+        # mistakenly pick up wrong values.
+        self.marcxml_testrec1 = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 1</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="%(sysnosubfieldcode)s">sysno1</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="0">sysno2</subfield>
+         </datafield>
+        </record>
+        """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
+               'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+               'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+               'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
+               }
+        self.marcxml_testrec1_updated = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="%(sysnosubfieldcode)s">sysno1</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="0">sysno2</subfield>
+         </datafield>
+        </record>
+        """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
+               'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+               'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+               'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
+               }
+        self.marcxml_testrec2 = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 2</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="%(sysnosubfieldcode)s">sysno2</subfield>
+         </datafield>
+         <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
+          <subfield code="0">sysno1</subfield>
+         </datafield>
+        </record>
+        """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
+               'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+               'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+               'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
+               }
+
+    def test_insert_the_same_sysno_record(self):
+        """bibupload - SYSNO tag, refuse to insert the same SYSNO record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_insert_the_same_sysno_record() started"
+        # insert record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # insert record 2 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec2)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid2,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec2))        
+        # try to insert updated record 1, it should fail:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid1_updated)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+        if self.verbose:
+            print "test_insert_the_same_sysno_record() finished"
+
+    def test_insert_or_replace_the_same_sysno_record(self):
+        """bibupload - SYSNO tag, allow to insert or replace the same SYSNO record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_insert_or_replace_the_same_sysno_record() started"
+        # insert/replace record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # try to insert/replace updated record 1, it should be okay:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1_updated,'xm')
+        self.assertEqual(recid1, recid1_updated)
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1_updated))
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+        if self.verbose:
+            print "test_insert_or_replace_the_same_sysno_record() finished"
+
+    def test_replace_nonexisting_sysno_record(self):
+        """bibupload - SYSNO tag, refuse to replace non-existing SYSNO record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_replace_nonexisting_sysno_record() started"
+        # insert record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # try to replace record 2 it should fail:
+        bibupload.options['mode'] = 'replace'
+        bibupload.options['verbose'] = self.verbose
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec2)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid2)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+        if self.verbose:
+            print "test_replace_nonexisting_sysno_record() finished"
+
+class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
+    """Testing uploading of records that have OAI ID present."""
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize the MARCXML test records."""
+        self.verbose = 0
+        # Note that OAI fields are repeated but with different
+        # subfields, this is to test whether bibupload would not
+        # mistakenly pick up wrong values.
+        self.marcxml_testrec1 = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 1</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="%(oaisubfieldcode)s">oai:foo:1</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="0">oai:foo:2</subfield>
+         </datafield>
+        </record>
+        """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
+               'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
+                          CFG_OAI_ID_FIELD[3:4] or "",
+               'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
+                          CFG_OAI_ID_FIELD[4:5] or "",
+               'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
+               }
+        self.marcxml_testrec1_updated = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="%(oaisubfieldcode)s">oai:foo:1</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="0">oai:foo:2</subfield>
+         </datafield>
+        </record>
+        """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
+               'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
+                          CFG_OAI_ID_FIELD[3:4] or "",
+               'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
+                          CFG_OAI_ID_FIELD[4:5] or "",
+               'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
+               }
+        self.marcxml_testrec2 = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1="" ind2="">
+          <subfield code="a">On the quux and huux 2</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="%(oaisubfieldcode)s">oai:foo:2</subfield>
+         </datafield>
+         <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
+          <subfield code="0">oai:foo:1</subfield>
+         </datafield>
+        </record>
+        """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
+               'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
+                          CFG_OAI_ID_FIELD[3:4] or "",
+               'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
+                          CFG_OAI_ID_FIELD[4:5] or "",
+               'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
+               }
+
+    def test_insert_the_same_oai_record(self):
+        """bibupload - OAI tag, refuse to insert the same OAI record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = self.verbose
+        # insert record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # insert record 2 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec2)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid2,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec2))        
+        # try to insert updated record 1, it should fail:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid1_updated)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+
+    def test_insert_or_replace_the_same_oai_record(self):
+        """bibupload - OAI tag, allow to insert or replace the same OAI record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        # insert/replace record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # try to insert/replace updated record 1, it should be okay:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1_updated,'xm')
+        self.assertEqual(recid1, recid1_updated)
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1_updated))
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+
+    def test_replace_nonexisting_oai_record(self):
+        """bibupload - OAI tag, refuse to replace non-existing OAI record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['verbose'] = self.verbose
+        # insert record 1 first time:
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xml = print_record(recid1,'xm')
+        self.failUnless(compare_xmlbuffers(inserted_xml,
+                                           self.marcxml_testrec1))
+        # try to replace record 2 it should fail:
+        bibupload.options['mode'] = 'replace'
+        bibupload.options['verbose'] = self.verbose
+        recs = bibupload.xml_marc_to_records(self.marcxml_testrec2)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid2)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+
+# FIXME: SYSNO tests wanted
+
+# FIXME: "strong tags" tests wanted
+
 # FIXME: FFT tests wanted
 
 test_suite = make_test_suite(BibUploadInsertModeTest,
@@ -566,6 +893,8 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadCorrectModeTest,
                              BibUploadReplaceModeTest,
                              BibUploadReferencesModeTest,
+                             BibUploadRecordsWithSYSNOTest,
+                             BibUploadRecordsWithOAIIDTest,                             
                              BibUploadFMTModeTest)
 
 if __name__ == "__main__":
