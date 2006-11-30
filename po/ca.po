@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-11-24 11:47+0100\n"
-"PO-Revision-Date: 2006-10-12 17:50+0200\n"
+"PO-Revision-Date: 2006-11-29 22:29+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Aquest lloc està també disponible en els següents idiomes:"
 #: modules/webstyle/lib/webstyle_templates.py:353
 #: modules/webstyle/lib/webstyle_templates.py:429
 msgid "Search"
-msgstr "Cercar"
+msgstr "Cerca"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
 #: modules/webstyle/lib/webstyle_templates.py:356
@@ -234,7 +234,7 @@ msgstr "Administració de lliuraments"
 
 #: config/cdspage.wml:56
 msgid "Convert"
-msgstr "Convertir"
+msgstr "Converteix"
 
 #: config/cdspage.wml:55 config/cdspage.wml:141
 #: modules/bibedit/lib/bibedit_templates.py:104
@@ -245,13 +245,13 @@ msgstr "Convertir"
 #: modules/websubmit/lib/websubmit_engine.py:732
 #: modules/websubmit/lib/websubmit_engine.py:890
 msgid "Submit"
-msgstr "Lliurar"
+msgstr "Lliura"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
 #: modules/webstyle/lib/webstyle_templates.py:355
 #: modules/webstyle/lib/webstyle_templates.py:431
 msgid "Personalize"
-msgstr "Personalitzar"
+msgstr "Personalitza"
 
 #: modules/webhelp/web/index.html.wml:22 modules/webhelp/web/index.html.wml:28
 #: modules/webhelp/web/index.html.wml:29 modules/webhelp/web/index.html.wml:30
@@ -382,7 +382,7 @@ msgstr "Powered by"
 
 #: modules/bibedit/lib/bibedit_templates.py:52
 msgid "Add Subfield"
-msgstr "Afegir cubcamp"
+msgstr "Afegeix subcamp"
 
 #: modules/bibedit/lib/bibedit_templates.py:63
 #: modules/webalert/lib/webalert_templates.py:76
@@ -391,11 +391,11 @@ msgstr "Camp"
 
 #: modules/bibedit/lib/bibedit_templates.py:86
 msgid "Add Field"
-msgstr "Afegir camp"
+msgstr "Afegeix camp"
 
 #: modules/bibedit/lib/bibedit_templates.py:93
 msgid "Verbose"
-msgstr "Verbós"
+msgstr "Textual"
 
 #: modules/bibedit/lib/bibedit_templates.py:110
 #: modules/bibformat/web/admin/bibformatadmin.py:397
@@ -409,7 +409,7 @@ msgstr "Verbós"
 #: modules/websession/lib/websession_templates.py:1546
 #: modules/websession/lib/websession_templates.py:1626
 msgid "Cancel"
-msgstr "Cancel·lar"
+msgstr "Cancel·la"
 
 # Suprimir? Temps verbal?
 #: modules/bibedit/lib/bibedit_templates.py:111
@@ -424,7 +424,7 @@ msgstr "Cancel·lar"
 #: modules/bibformat/web/admin/bibformatadmin.py:1314
 #: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
-msgstr "Suprimir"
+msgstr "Suprimeix"
 
 #: modules/bibedit/lib/bibedit_templates.py:122
 #: modules/bibformat/lib/bibformat_templates.py:916
@@ -448,20 +448,20 @@ msgstr "Registre"
 
 #: modules/bibedit/lib/bibedit_templates.py:124
 msgid "Display"
-msgstr "Mostrar"
+msgstr "Mostra"
 
 #: modules/bibedit/lib/bibedit_templates.py:241
 msgid "Save"
-msgstr "Desar"
+msgstr "Desa"
 
 #: modules/bibedit/lib/bibedit_templates.py:243
 msgid "Return to Record"
-msgstr "Tornar al registre:"
+msgstr "Torna al registre"
 
 #: modules/bibedit/lib/bibedit_templates.py:342
 #: modules/bibedit/lib/bibedit_templates.py:443
 msgid "Edit"
-msgstr "Editar"
+msgstr "Edita"
 
 #: modules/bibedit/lib/bibedit_templates.py:397
 msgid "Your changes are TEMPORARY."
@@ -469,7 +469,7 @@ msgstr "Els vostres canvis són TEMPORALS."
 
 #: modules/bibedit/lib/bibedit_templates.py:398
 msgid "To save this record, please click on submit."
-msgstr "Per a desar aquest registre, feu clic a submit."
+msgstr "Per a desar aquest registre, feu clic a Lliura."
 
 #: modules/bibedit/lib/bibedit_templates.py:412
 msgid "This record does not exist."
@@ -481,7 +481,7 @@ msgstr "Proveu un altre número de registre."
 
 #: modules/bibedit/lib/bibedit_templates.py:421
 msgid "This record is currently being edited by another user."
-msgstr "Aquest registre ara mateix l'està editant algú més."
+msgstr "Aquest registre ara mateix l'està editant algú altre."
 
 #: modules/bibedit/lib/bibedit_templates.py:422
 msgid "Please try again later."
@@ -548,7 +548,7 @@ msgstr ""
 #: modules/bibedit/web/admin/bibeditadmin.py:62
 #, python-format
 msgid "Record %s - Add a field"
-msgstr "Registre %s - Afegir un camp"
+msgstr "Registre %s - Afegeix un camp"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:64
 msgid "BibEdit Admin Interface"
@@ -567,7 +567,7 @@ msgstr "Edició del registre %(x_recid)s, camp %(x_field)s - Afegir un subcamp"
 #: modules/bibedit/web/admin/bibeditadmin.py:127
 #, python-format
 msgid "Submit and save record %s"
-msgstr "Lliurar i desar el registre %s"
+msgstr "Lliura i desa el registre %s"
 
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
@@ -589,7 +589,7 @@ msgstr "Administració de BibFormat"
 #: modules/bibformat/lib/bibformat_templates.py:2083
 #: modules/webcomment/lib/webcomment_templates.py:1017
 msgid "Menu"
-msgstr "Menu"
+msgstr "Menú"
 
 #: modules/bibformat/lib/bibformat_templates.py:342
 #: modules/bibformat/lib/bibformat_templates.py:453
@@ -598,19 +598,19 @@ msgstr "Menu"
 #: modules/bibformat/lib/bibformat_templates.py:2014
 #: modules/bibformat/lib/bibformat_templates.py:2082
 msgid "Close Editor"
-msgstr ""
+msgstr "Tanca l'editor"
 
 #: modules/bibformat/lib/bibformat_templates.py:343
 #: modules/bibformat/lib/bibformat_templates.py:454
 #: modules/bibformat/lib/bibformat_templates.py:606
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "Modifica els atributs de la plantilla"
 
 #: modules/bibformat/lib/bibformat_templates.py:344
 #: modules/bibformat/lib/bibformat_templates.py:455
 #: modules/bibformat/lib/bibformat_templates.py:607
 msgid "Template Editor"
-msgstr ""
+msgstr "Editor de plantilles"
 
 #: modules/bibformat/lib/bibformat_templates.py:345
 #: modules/bibformat/lib/bibformat_templates.py:456
@@ -619,7 +619,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1348
 #: modules/bibformat/lib/bibformat_templates.py:1446
 msgid "Check Dependencies"
-msgstr ""
+msgstr "Comprova les dependències"
 
 #: modules/bibformat/lib/bibformat_templates.py:395
 #: modules/bibformat/lib/bibformat_templates.py:911
@@ -638,19 +638,16 @@ msgstr "Descripció"
 
 #: modules/bibformat/lib/bibformat_templates.py:415
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "Actualitza els atributs del format"
 
 #: modules/bibformat/lib/bibformat_templates.py:603
-#, fuzzy
 msgid "Show Documentation"
-msgstr "Mostrar el compte"
+msgstr "Mostra la documentació"
 
-# O núm?
 #: modules/bibformat/lib/bibformat_templates.py:604
 #: modules/bibformat/lib/bibformat_templates.py:655
-#, fuzzy
 msgid "Hide Documentation"
-msgstr " document #%s"
+msgstr "Amagar la documentació"
 
 #: modules/bibformat/lib/bibformat_templates.py:914
 #: modules/bibformat/lib/bibformat_templates.py:1040
@@ -660,9 +657,8 @@ msgstr "Estat"
 
 #: modules/bibformat/lib/bibformat_templates.py:915
 #: modules/bibformat/lib/bibformat_templates.py:1041
-#, fuzzy
 msgid "Last Modification Date"
-msgstr "Nom d'identificació de l'alerta"
+msgstr "Data de la darrera modificació"
 
 #: modules/bibformat/lib/bibformat_templates.py:918
 #: modules/bibformat/lib/bibformat_templates.py:1044
@@ -674,9 +670,8 @@ msgstr "Nom d'identificació de l'alerta"
 #: modules/bibformat/web/admin/bibformatadmin.py:287
 #: modules/bibformat/web/admin/bibformatadmin.py:376
 #: modules/bibformat/web/admin/bibformatadmin.py:1351
-#, fuzzy
 msgid "Manage Output Formats"
-msgstr "Format de visualizació:"
+msgstr "Gestiona els formats de sortida"
 
 #: modules/bibformat/lib/bibformat_templates.py:919
 #: modules/bibformat/lib/bibformat_templates.py:1045
@@ -689,7 +684,7 @@ msgstr "Format de visualizació:"
 #: modules/bibformat/web/admin/bibformatadmin.py:657
 #: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "Gestiona les plantilles dels formats"
 
 #: modules/bibformat/lib/bibformat_templates.py:920
 #: modules/bibformat/lib/bibformat_templates.py:1046
@@ -700,7 +695,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:891
 #: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "Documentació dels elements dels formats"
 
 #: modules/bibformat/lib/bibformat_templates.py:921
 #: modules/bibformat/lib/bibformat_templates.py:1047
@@ -718,145 +713,133 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
 #: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
-msgstr ""
+msgstr "Gestiona les bases de coneixement"
 
 #: modules/bibformat/lib/bibformat_templates.py:996
 msgid "Add New Format Template"
-msgstr ""
+msgstr "Afegeix una nova plantilla de format"
 
 #: modules/bibformat/lib/bibformat_templates.py:997
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "Comprova les plantilles de format extensivament"
 
 #: modules/bibformat/lib/bibformat_templates.py:1037
 msgid "Code"
-msgstr ""
+msgstr "Codi"
 
 #: modules/bibformat/lib/bibformat_templates.py:1121
-#, fuzzy
 msgid "Add New Output Format"
-msgstr "Format de visualizació:"
+msgstr "Afegeix un nou format de sortida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1159
-#, fuzzy
 msgid "menu"
-msgstr "Menu"
+msgstr "menú"
 
 #: modules/bibformat/lib/bibformat_templates.py:1160
 #: modules/bibformat/lib/bibformat_templates.py:1345
 #: modules/bibformat/lib/bibformat_templates.py:1443
-#, fuzzy
 msgid "Close Output Format"
-msgstr "Format de visualizació:"
+msgstr "Tancar format de sortida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1161
 #: modules/bibformat/lib/bibformat_templates.py:1346
 #: modules/bibformat/lib/bibformat_templates.py:1444
-#, fuzzy
 msgid "Rules"
-msgstr "visitant"
+msgstr "Regles"
 
 #: modules/bibformat/lib/bibformat_templates.py:1162
 #: modules/bibformat/lib/bibformat_templates.py:1347
 #: modules/bibformat/lib/bibformat_templates.py:1445
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "Modifica els atributs del format de sortida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1258
 #: modules/bibformat/lib/bibformatadminlib.py:527
-#, fuzzy
 msgid "Remove Rule"
-msgstr "Eliminar-lo"
+msgstr "Elimina la regla"
 
 #: modules/bibformat/lib/bibformat_templates.py:1307
 #: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Add New Rule"
-msgstr ""
+msgstr "Afegeix una nova regla"
 
 #: modules/bibformat/lib/bibformat_templates.py:1308
 #: modules/bibformat/lib/bibformatadminlib.py:531
-#, fuzzy
 msgid "Save Changes"
-msgstr "Desar els canvis"
+msgstr "Desa els canvis"
 
 #: modules/bibformat/lib/bibformat_templates.py:1849
 #: modules/bibformat/lib/bibformat_templates.py:2016
 #: modules/bibformat/lib/bibformat_templates.py:2084
 msgid "Knowledge Base Mappings"
-msgstr ""
+msgstr "Mapatge de la base de coneixement"
 
 #: modules/bibformat/lib/bibformat_templates.py:1850
 #: modules/bibformat/lib/bibformat_templates.py:2017
 #: modules/bibformat/lib/bibformat_templates.py:2085
 msgid "Knowledge Base Attributes"
-msgstr ""
+msgstr "Atributs de la base de coneixements"
 
 #: modules/bibformat/lib/bibformat_templates.py:1851
 #: modules/bibformat/lib/bibformat_templates.py:2018
 #: modules/bibformat/lib/bibformat_templates.py:2086
 msgid "Knowledge Base Dependencies"
-msgstr ""
+msgstr "Dependències de la base de coneixements"
 
 #: modules/bibformat/lib/bibformat_templates.py:2231
 msgid "No problem found with format"
-msgstr ""
+msgstr "No s'ha trobat cap problema amb el format"
 
 #: modules/bibformat/lib/bibformat_templates.py:2233
-#, fuzzy
 msgid "An error has been found"
-msgstr "S'ha enviat l'informe d'error."
+msgstr "S'ha trobat un error"
 
 #: modules/bibformat/lib/bibformat_templates.py:2235
 msgid "The following errors have been found"
-msgstr ""
+msgstr "S'han trobat els següents errors"
 
 #: modules/bibformat/lib/bibformatadminlib.py:330
 #: modules/bibformat/lib/bibformatadminlib.py:369
 #: modules/bibformat/lib/bibformatadminlib.py:371
-#, fuzzy
 msgid "Test with record:"
-msgstr "Registre complet"
+msgstr "Prova-ho amb el registre:"
 
 #: modules/bibformat/lib/bibformatadminlib.py:331
 msgid "Enter a search query here."
-msgstr ""
+msgstr "Entreu una cerca aquí."
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
-#, fuzzy
 msgid "Hide"
-msgstr "id"
+msgstr "Amaga"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
 #, python-format
 msgid "Show all %i authors"
-msgstr ""
+msgstr "Mostra tots els %i autors"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:53
-#, fuzzy
 msgid "Migrate BibFormat Settings"
-msgstr "Configurar BibFormat"
+msgstr "Migra els paràmetres de BibFormat"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:79
 msgid "Migrate Knowledge Bases"
-msgstr ""
+msgstr "Migra les bases de coneixement"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:105
 msgid "Migrate Behaviours"
-msgstr ""
+msgstr "Migra els comportaments"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:130
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:155
-#, fuzzy
 msgid "Migrate Formats"
-msgstr "Configurar BibFormat"
+msgstr "Migra els formats"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:254
 #: modules/bibformat/web/admin/bibformatadmin.py:299
 #: modules/bibformat/web/admin/bibformatadmin.py:1354
-#, fuzzy
 msgid "Restricted Output Format"
-msgstr "Format de visualizació:"
+msgstr "Format de sortida restringit"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:212
 #: modules/bibformat/web/admin/bibformatadmin.py:510
@@ -865,60 +848,58 @@ msgid "Ok"
 msgstr "D'acord"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "Output Format %s Rules"
-msgstr "Format de visualizació:"
+msgstr "Regles del format de sortida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:267
 #, python-format
 msgid "Output Format %s Attributes"
-msgstr ""
+msgstr "Atributs del format de sortida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:312
 #, python-format
 msgid "Output Format %s Dependencies"
-msgstr ""
+msgstr "Dependències del format de sortida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:376
-#, fuzzy
 msgid "Delete Output Format"
-msgstr "Format de visualizació:"
+msgstr "Suprimeix el format de sortida"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:489
 #: modules/bibformat/web/admin/bibformatadmin.py:560
 #: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
-msgstr ""
+msgstr "Plantilla de format restringit"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:514
 #, python-format
 msgid "Format Template %s"
-msgstr ""
+msgstr "Plantilla de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:571
 #, python-format
 msgid "Format Template %s Attributes"
-msgstr ""
+msgstr "Atributs de la plantilla de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:603
 #, python-format
 msgid "Format Template %s Dependencies"
-msgstr ""
+msgstr "Dependències de la plantilla de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:657
-#, fuzzy
 msgid "Delete Format Template"
-msgstr "Suprimir comentari"
+msgstr "Suprimeix la plantilla de format"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:867
 #, python-format
 msgid "Format Element %s Dependencies"
-msgstr ""
+msgstr "Dependències de l'element de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
-msgstr ""
+msgstr "Prova l'element de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:972
 #: modules/bibformat/web/admin/bibformatadmin.py:1019
@@ -928,50 +909,49 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1220
 #: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
-msgstr ""
+msgstr "Base de coneixement desconeguda"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
-msgstr ""
+msgstr "Base de coneixement %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
-msgstr ""
+msgstr "Atributs de la base de coneixement %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
-msgstr ""
+msgstr "Dependències de la base de coneixement %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
-#, fuzzy
 msgid "Delete Knowledge Base"
-msgstr "Suprimir un cistell"
+msgstr "Suprimeix la base de coneixement"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
-msgstr ""
+msgstr "Valida del format de sortida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
-msgstr ""
+msgstr "Valida de la plantilla de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
-msgstr ""
+msgstr "Element de format restringit"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
-msgstr ""
+msgstr "Valida de l'element de format %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
-msgstr ""
+msgstr "Validació del format"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:55
 #: modules/bibharvest/lib/bibharvest_templates.py:73
@@ -1231,12 +1211,13 @@ msgstr "S'ha enviat l'informe d'error."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Many thanks for helping us make CDS Invenio better."
-msgstr "Moltes gràcies per ajudar-nos a fer un CDS Invenio millor."
+msgstr "Moltes gràcies per ajudar-nos a millorar CDS Invenio."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Use the back button of your browser to return to the previous page."
 msgstr ""
-"Useu el botó d'enrera del vostre navegador per retornar a la pàgina anterior."
+"Useu el botó d'endarrere del vostre navegador per retornar a la pàgina "
+"anterior."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:105
 msgid "Thank you!"
@@ -1332,15 +1313,15 @@ msgstr "nom de l'alerta"
 
 #: modules/webalert/lib/webalert_templates.py:123
 msgid "SHOW"
-msgstr "MOSTRAR"
+msgstr "MOSTRA"
 
 #: modules/webalert/lib/webalert_templates.py:166
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
 msgstr ""
-"Aquesta alerta us notificarà cada cop/només si un nou item satisfà la "
-"següent cerca:"
+"Aquesta alerta us notificarà cada cop, i només si un nou item satisfà "
+"la següent cerca:"
 
 #: modules/webalert/lib/webalert_templates.py:167
 msgid "QUERY"
@@ -1394,11 +1375,11 @@ msgstr "Guardar els resultats en un cistell?"
 
 #: modules/webalert/lib/webalert_templates.py:242
 msgid "SET ALERT"
-msgstr "ACTIVAR L'ALERTA"
+msgstr "ACTIVA L'ALERTA"
 
 #: modules/webalert/lib/webalert_templates.py:243
 msgid "CLEAR DATA"
-msgstr "ESBORRAR DADES"
+msgstr "ESBORRA DADES"
 
 #: modules/webalert/lib/webalert_templates.py:291
 #, python-format
@@ -1407,8 +1388,8 @@ msgid ""
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
 msgstr ""
 "Definir una nova alerta a partir de %(x_url1_open)sles vostres cerques%"
-"(x_url1_close)s, les %(x_url2_open)scerques més habituals%(x_url2_close)s, o "
-"el formulari de dades."
+"(x_url1_close)s, les %(x_url2_open)scerques més habituals%(x_url2_close)s, "
+"o el formulari de dades."
 
 #: modules/webalert/lib/webalert_templates.py:311
 msgid "Search checking frequency"
@@ -1424,7 +1405,7 @@ msgstr "Resultats en cistell"
 
 #: modules/webalert/lib/webalert_templates.py:314
 msgid "Date last run"
-msgstr "Data d'última execució"
+msgstr "Data de la darrera execució"
 
 #: modules/webalert/lib/webalert_templates.py:315
 msgid "Creation date"
@@ -1441,16 +1422,16 @@ msgstr "cap cistell"
 
 #: modules/webalert/lib/webalert_templates.py:365
 msgid "Remove"
-msgstr "Eliminar"
+msgstr "Elimina"
 
 #: modules/webalert/lib/webalert_templates.py:366
 msgid "Modify"
-msgstr "Modificar"
+msgstr "Modifica"
 
 #: modules/webalert/lib/webalert_templates.py:368
 #: modules/webalert/lib/webalert_templates.py:458
 msgid "Execute search"
-msgstr "Executar la cerca"
+msgstr "Executa la cerca"
 
 #: modules/webalert/lib/webalert_templates.py:374
 #, python-format
@@ -1478,7 +1459,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:426
 #, python-format
 msgid "Here are the %s most popular searches."
-msgstr "Aquestes són les %s cerques més habituals"
+msgstr "Aquestes són les %s cerques més habituals."
 
 #: modules/webalert/lib/webalert_templates.py:437
 msgid "Question"
@@ -1490,11 +1471,11 @@ msgstr "Darrera execució"
 
 #: modules/webalert/lib/webalert_templates.py:459
 msgid "Set new alert"
-msgstr "Definir una nova alerta"
+msgstr "Defineix una nova alerta"
 
 #: modules/webalert/lib/webalert_webinterface.py:67
 msgid "Display searches"
-msgstr "Mostrar les cerques"
+msgstr "Mostra les cerques"
 
 #: modules/webalert/lib/webalert_webinterface.py:72
 #: modules/webalert/lib/webalert_webinterface.py:112
@@ -1537,20 +1518,19 @@ msgstr "El vostre compte"
 
 #: modules/webalert/lib/webalert_webinterface.py:107
 msgid "Set a new alert"
-msgstr "Definir una nova alerta"
+msgstr "Defineix una nova alerta"
 
 #: modules/webalert/lib/webalert_webinterface.py:148
 msgid "Modify alert settings"
-msgstr "Modificar l'alerta"
+msgstr "Modifica l'alerta"
 
 #: modules/webalert/lib/webalert_webinterface.py:174
 #: modules/webalert/lib/webalert_webinterface.py:211
 #: modules/webalert/lib/webalert_webinterface.py:248
 #: modules/webalert/lib/webalert_webinterface.py:278
 msgid "Display alerts"
-msgstr "Mostrar les alertes"
+msgstr "Mostra les alertes"
 
-# Mirar com traduir 'posted'
 #: modules/webbasket/lib/webbasket.py:343
 msgid "Your comment has been successfully posted"
 msgstr "El vostre comentari ha estat publicat"
@@ -1632,7 +1612,7 @@ msgstr "Nom del cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:311
 msgid "Number of views"
-msgstr "Número de viualitzacions"
+msgstr "Nombre de visualitzacions"
 
 #: modules/webbasket/lib/webbasket_templates.py:312
 msgid "Owner"
@@ -1648,7 +1628,7 @@ msgstr "Subscriure's"
 
 #: modules/webbasket/lib/webbasket_templates.py:378
 msgid "There is currently no publicly accessible basket"
-msgstr "No hi ha ara mateix cap cistell públicament accessible"
+msgstr "Ara mateix no hi ha cap cistell públicament accessible"
 
 #: modules/webbasket/lib/webbasket_templates.py:390
 #, python-format
@@ -1666,7 +1646,7 @@ msgstr "Accions"
 #: modules/webbasket/lib/webbasket_templates.py:454
 #: modules/webbasket/lib/webbasket_templates.py:775
 msgid "Non-shared basket"
-msgstr "Cistell no compartits"
+msgstr "Cistell no compartit"
 
 #: modules/webbasket/lib/webbasket_templates.py:457
 #: modules/webbasket/lib/webbasket_templates.py:777
@@ -1681,53 +1661,49 @@ msgstr "Cistell compartit en grup"
 #: modules/webbasket/lib/webbasket_templates.py:465
 #: modules/webbasket/lib/webbasket_webinterface.py:525
 msgid "Edit basket"
-msgstr "Editar cistell"
+msgstr "Edita el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:504
 msgid "You do not have sufficient rights to view this basket's content."
 msgstr "No teniu prou permisos per a veure el contingut d'aquest cistell."
 
-# Segur que és dessubscriure's?
 #: modules/webbasket/lib/webbasket_templates.py:509
 #: modules/webbasket/lib/webbasket_templates.py:784
-#, fuzzy
 msgid "Unsubscribe from this basket"
-msgstr "Desubscure's d'aquest cistell"
+msgstr "Donar-se de baixa d'aquest cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
 #: modules/webbasket/lib/webbasket_templates.py:641
 msgid "comments"
 msgstr "comentaris"
 
-# Darrer o últim?
 #: modules/webbasket/lib/webbasket_templates.py:522
 msgid "last comment:"
 msgstr "darrer comentari:"
 
 #: modules/webbasket/lib/webbasket_templates.py:583
 msgid "Move item up"
-msgstr "Pujar-lo"
+msgstr "Puja'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:591
 msgid "Move item down"
-msgstr "Baixar-lo"
+msgstr "Baixa'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:599
 msgid "Copy item"
-msgstr "Copiar-lo"
+msgstr "Copia'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:607
 msgid "Remove item"
-msgstr "Eliminar-lo"
+msgstr "Elimina'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:610
 msgid "External record"
 msgstr "Registre extern"
 
-# Últim o darrer?
 #: modules/webbasket/lib/webbasket_templates.py:642
 msgid "last"
-msgstr "últim"
+msgstr "darrer"
 
 #: modules/webbasket/lib/webbasket_templates.py:643
 #: modules/webbasket/lib/webbasket_webinterface.py:128
@@ -1743,7 +1719,7 @@ msgstr "Aquest cistell és públicament accessible a aquesta adreça:"
 #: modules/websearch/lib/websearch_templates.py:534
 #: modules/websearch/lib/websearch_templates.py:1587
 msgid "Sort by:"
-msgstr "Ordenar per:"
+msgstr "Ordena'ls per:"
 
 #: modules/webbasket/lib/webbasket_templates.py:698
 #: modules/webbasket/lib/webbasket_templates.py:926
@@ -1775,7 +1751,7 @@ msgstr "Escriviu un comentari"
 
 #: modules/webbasket/lib/webbasket_templates.py:828
 msgid "Back to baskets"
-msgstr "Tornar als cistells"
+msgstr "Torna als cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:857
 #: modules/webbasket/lib/webbasket_templates.py:885
@@ -1791,17 +1767,17 @@ msgstr "el"
 #: modules/webcomment/lib/webcomment_templates.py:330
 #: modules/webmessage/lib/webmessage_templates.py:113
 msgid "Reply"
-msgstr "Contestar"
+msgstr "Respon"
 
 #: modules/webbasket/lib/webbasket_templates.py:871
 msgid "Delete comment"
-msgstr "Suprimir comentari"
+msgstr "Suprimeix el comentari"
 
 #: modules/webbasket/lib/webbasket_templates.py:925
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webcomment/lib/webcomment_webinterface.py:215
 msgid "Add Comment"
-msgstr "Afegir comentari"
+msgstr "Afegeix un comentari"
 
 #: modules/webbasket/lib/webbasket_templates.py:927
 #: modules/webcomment/lib/webcomment_templates.py:626
@@ -1847,7 +1823,7 @@ msgstr "Seleccioneu el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1084
 msgid "Add to a personal basket"
-msgstr "Afegir al cistell personal"
+msgstr "Afegeix-lo al cistell personal"
 
 #: modules/webbasket/lib/webbasket_templates.py:1085
 #: modules/webbasket/lib/webbasket_templates.py:1106
@@ -1858,11 +1834,11 @@ msgstr "%i cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:1105
 msgid "Add to a group-shared basket"
-msgstr "Afegir a un cistell de grup"
+msgstr "Afegeix-lo a un cistell de grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1123
 msgid "Add to a public basket"
-msgstr "Afegir a un cistell públic"
+msgstr "Afegeix-lo a un cistell públic"
 
 #: modules/webbasket/lib/webbasket_templates.py:1156
 #, python-format
@@ -1871,7 +1847,7 @@ msgstr "Afegits %i registres a aquests cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:1161
 msgid "Add to baskets"
-msgstr "Afegir als cistells"
+msgstr "Afegeix-ho als cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:1168
 #, python-format
@@ -1910,11 +1886,11 @@ msgstr "Paràmetres generals"
 #: modules/webbasket/lib/webbasket_templates.py:1415
 #: modules/webbasket/lib/webbasket_templates.py:1442
 msgid "Add group"
-msgstr "Afegir un grup"
+msgstr "Afegeix un grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1291
 msgid "Manage group rights"
-msgstr "Gestionar permisos del grup"
+msgstr "Gestiona els permisos del grup"
 
 # Potser: 'per a compartir'?
 #: modules/webbasket/lib/webbasket_templates.py:1303
@@ -1923,11 +1899,11 @@ msgstr "Gestionar permisos globals de compartició"
 
 #: modules/webbasket/lib/webbasket_templates.py:1308
 msgid "Delete basket"
-msgstr "Suprimir el cistell"
+msgstr "Suprimeix el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1332
 msgid "Editing basket"
-msgstr "Editar cistell"
+msgstr "Edita el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1340
 msgid "Save changes"
@@ -1942,7 +1918,7 @@ msgstr "Sense permís"
 #: modules/webbasket/lib/webbasket_templates.py:1355
 #: modules/webbasket/lib/webbasket_templates.py:1379
 msgid "View records"
-msgstr "Veure registres"
+msgstr "Visualitza els registres"
 
 #: modules/webbasket/lib/webbasket_templates.py:1357
 #: modules/webbasket/lib/webbasket_templates.py:1359
@@ -1962,7 +1938,7 @@ msgstr "i"
 #: modules/webbasket/lib/webbasket_templates.py:1357
 #: modules/webbasket/lib/webbasket_templates.py:1381
 msgid "view comments"
-msgstr "veure comentaris"
+msgstr "visualitza els comentaris"
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
 #: modules/webbasket/lib/webbasket_templates.py:1383
@@ -1972,12 +1948,12 @@ msgstr "afegir comentaris"
 #: modules/webbasket/lib/webbasket_templates.py:1361
 #: modules/webbasket/lib/webbasket_templates.py:1385
 msgid "add records"
-msgstr "afegir registres"
+msgstr "afegeix registres"
 
 #: modules/webbasket/lib/webbasket_templates.py:1363
 #: modules/webbasket/lib/webbasket_templates.py:1387
 msgid "delete comments"
-msgstr "suprimir comentaris"
+msgstr "suprimeix comentaris"
 
 #: modules/webbasket/lib/webbasket_templates.py:1365
 #: modules/webbasket/lib/webbasket_templates.py:1389
@@ -1987,7 +1963,7 @@ msgstr "elimina registres"
 #: modules/webbasket/lib/webbasket_templates.py:1367
 #: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "manage sharing rights"
-msgstr "gestionar els permisos de compartició"
+msgstr "gestiona els permisos de compartició"
 
 # De cap?
 #: modules/webbasket/lib/webbasket_templates.py:1413
@@ -1996,7 +1972,7 @@ msgstr "No sou membre d'un grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1435
 msgid "Sharing basket to a new group"
-msgstr "Compartir cistell amb un nou grup"
+msgstr "Comparteix cistell amb un nou grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1464
 #: modules/websession/lib/websession_templates.py:356
@@ -2004,7 +1980,7 @@ msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
 msgstr ""
-"Ara esteu connectat com a usuari visitant, de manera que els vostres "
+"Ara esteu identificat com a usuari visitant, de manera que els vostres "
 "cistells desapareixeran al final d'aquesta sessió."
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
@@ -2013,7 +1989,9 @@ msgstr ""
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
-msgstr "Si voleu podeu %(x_url_open)slogin or register here%(x_url_close)s."
+msgstr ""
+"Si voleu podeu %(x_url_open)sidentificar o donar-vos d'alta "
+"aquí%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
 #: modules/websession/lib/websession_webinterface.py:116
@@ -2023,11 +2001,11 @@ msgstr "Aquesta funcionalitat no està permesa als usuaris visitants."
 #: modules/webbasket/lib/webbasket_templates.py:1542
 #: modules/webcomment/lib/webcomment_templates.py:618
 msgid "Back to search results"
-msgstr "Tornar als resultats de la cerca"
+msgstr "Torna als resultats de la cerca"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:82
 msgid "Display baskets"
-msgstr "Visualitzar els cistells:"
+msgstr "Visualitzar els cistells"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:313
@@ -2247,11 +2225,11 @@ msgstr "Escriviu la vostra ressenya"
 #: modules/webcomment/lib/webcomment_templates.py:903
 #: modules/webcomment/lib/webcomment_webinterface.py:213
 msgid "Add Review"
-msgstr "Afegiu la ressenya"
+msgstr "Afegiu una ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:922
 msgid "Your review was successfully added."
-msgstr "La vostra ressenya ha estat afegit correctament."
+msgstr "La vostra ressenya ha estat afegida correctament."
 
 #: modules/webcomment/lib/webcomment_templates.py:924
 msgid "Your comment was successfully added."
@@ -2259,16 +2237,16 @@ msgstr "El vostre comentari ha estat afegit correctament."
 
 #: modules/webcomment/lib/webcomment_templates.py:926
 msgid "Back to record"
-msgstr "Tornar al registre"
+msgstr "Torna al registre"
 
 #: modules/webcomment/lib/webcomment_templates.py:1002
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
-msgstr "Visualitzar tots els comentaris denunciats"
+msgstr "Visualitza tots els comentaris denunciats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1005
 msgid "View all reported reviews"
-msgstr "Visualitzar totes les ressenyes denunciades"
+msgstr "Visualitza totes les ressenyes denunciades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1010
 msgid "Delete a specific comment/review (by ID)"
@@ -2358,7 +2336,7 @@ msgstr "Nombre total de denúncies"
 
 #: modules/webcomment/lib/webcomment_templates.py:1128
 msgid "View all user's reported comments/reviews"
-msgstr "Visualitzar tots els comentaris/ressenyes denunciades d'aquest usuari"
+msgstr "Visualitza tots els comentaris/ressenyes denunciades d'aquest usuari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1161
 #, python-format
@@ -2385,16 +2363,16 @@ msgstr "Seleccioneu"
 
 #: modules/webcomment/lib/webcomment_templates.py:1256
 msgid "Delete selected reviews"
-msgstr "Suprimir les ressenyes seleccionades"
+msgstr "Suprimeix les ressenyes seleccionades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1257
 #: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Suppress selected abuse report"
-msgstr "Suprimir l'informe d'abús seleccionat"
+msgstr "Suprimeix l'informe d'abús seleccionat"
 
 #: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "Delete selected comments"
-msgstr "Suprimir els comentaris seleccionats"
+msgstr "Suprimeix els comentaris seleccionats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1270
 msgid "OK"
@@ -2462,11 +2440,13 @@ msgid "Record Not Found"
 msgstr "No s'ha trobat el registre"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:189
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
-msgstr "Abans d'afegir el vostre comentari, us heu d'identificar"
+msgstr ""
+"Abans d'afegir el vostre comentari, us heu "
+"d'%(x_url_open)sidentificar%(x_url_close)s."
 
 # Repassar. Softcatala en diu 'entrada'
 #: modules/webcomment/lib/webcomment_webinterface.py:193
@@ -2509,11 +2489,11 @@ msgstr "Visualitzar tots els usuaris denunciats"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:214
 msgid "Delete comments"
-msgstr "Suprimir comentaris"
+msgstr "Suprimeix els comentaris"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:217
 msgid "Suppress abuse reports"
-msgstr "Eliminar les denúncies d'abús"
+msgstr "Elimina les denúncies d'abús"
 
 #: modules/webmessage/lib/webmessage.py:129
 msgid "The message could not be deleted."
@@ -2604,7 +2584,7 @@ msgstr "Escriviu el missatge"
 
 #: modules/webmessage/lib/webmessage_templates.py:149
 msgid "Delete All"
-msgstr "Suprimir-los tots"
+msgstr "Suprimeix-los tots"
 
 #: modules/webmessage/lib/webmessage_templates.py:191
 msgid "Re:"
@@ -2711,7 +2691,7 @@ msgid "Find a group"
 msgstr "Cercar un grup"
 
 #: modules/webmessage/lib/webmessage_templates.py:679
-#, fuzzy, python-format
+#, python-format
 msgid "You have %s new messages out of %s messages"
 msgstr "Teniu %s missates nous d'un total de %s missatges"
 
@@ -2790,7 +2770,7 @@ msgstr "Totes les paraules:"
 #: modules/websearch/lib/search_engine.py:648
 #: modules/websearch/lib/websearch_templates.py:571
 msgid "Any of the words:"
-msgstr "Qualsevol de les paraules:"
+msgstr "Al menys una de les paraules:"
 
 #: modules/websearch/lib/search_engine.py:649
 #: modules/websearch/lib/websearch_templates.py:573
@@ -2800,7 +2780,7 @@ msgstr "Frase exacta:"
 #: modules/websearch/lib/search_engine.py:650
 #: modules/websearch/lib/websearch_templates.py:575
 msgid "Partial phrase:"
-msgstr "Part de la frase:"
+msgstr "Frase parcial:"
 
 #: modules/websearch/lib/search_engine.py:651
 #: modules/websearch/lib/websearch_templates.py:577
@@ -2971,9 +2951,8 @@ msgid "restricted"
 msgstr "restringit"
 
 #: modules/websearch/lib/websearch_templates.py:764
-#, fuzzy
 msgid "Search also:"
-msgstr "Resultats de la cerca"
+msgstr "Cerqueu també:"
 
 #: modules/websearch/lib/websearch_templates.py:829
 msgid "The contents of this collection is restricted."
@@ -3112,7 +3091,7 @@ msgstr "Format:"
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
-"Registre creat el %(x_date_creation)s, última modificació el %"
+"Registre creat el %(x_date_creation)s, darrera modificació el %"
 "(x_date_modification)s"
 
 #: modules/websearch/lib/websearch_templates.py:2032
@@ -3139,8 +3118,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sResultats globals:%(x_fmt_close)s Trobats %(x_nb_records)s "
-"registres en %(x_nb_seconds)s segons."
+"%(x_fmt_open)sResultats globals:%(x_fmt_close)s %(x_nb_records)s "
+"registres trobats en %(x_nb_seconds)s segons."
 
 #: modules/websearch/lib/websearch_templates.py:2171
 msgid ""
@@ -3183,35 +3162,35 @@ msgstr "No heu trobat el que estaveu cercant? Proveu la vostra cerca a:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:79
 msgid "External collections results overview:"
-msgstr ""
+msgstr "Resum dels resultats de col·leccions externes:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:119
-#, fuzzy
 msgid "Search timed out."
-msgstr "Resultats de la cerca"
+msgstr "Temps de cerca excedit."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
 "The external search engine has not responded in time. You can check its "
 "results here:"
 msgstr ""
+"El cercador extern no ha respòs a temps.  Podeu vere els seus "
+"resultats aquí:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:145
 #: modules/websearch/lib/websearch_external_collections_templates.py:153
 #: modules/websearch/lib/websearch_external_collections_templates.py:166
-#, fuzzy
 msgid "No results found."
-msgstr "No s'han trobat valors."
+msgstr "No s'han trobat resultats."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:149
-#, fuzzy, python-format
+#, python-format
 msgid "%s results found"
-msgstr "No s'han trobat valors."
+msgstr "S'han trobat %s resultats."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:151
-#, fuzzy, python-format
+#, python-format
 msgid "%s seconds"
-msgstr "%s registres trobats"
+msgstr "%s segons"
 
 #: modules/websearch/lib/websearch_webcoll.py:537
 msgid "brief"
@@ -3275,7 +3254,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:163
 msgid "Edit parameters"
-msgstr "Editar paràmetres"
+msgstr "Edita els paràmetres"
 
 #: modules/websession/lib/websession_templates.py:167
 #: modules/websession/lib/websession_templates.py:170
@@ -3350,7 +3329,7 @@ msgid ""
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
 msgstr ""
-"%s us ofereix la possibilitat de personalitzar la interfície, crear lavostra "
+"%s us ofereix la possibilitat de personalitzar la interfície, crear la vostra "
 "pròpia biblioteca de documents, o crear alertes automàtiques que s'executin "
 "periòdicament i us notifiquin del resultat de la cerca per correu electrònic."
 
@@ -3427,7 +3406,7 @@ msgid ""
 "s."
 msgstr ""
 "Esteu identificats com a %(x_user)s. Ara podeu a) %(x_url1_open)sdesconectar-"
-"vos%(x_url1_close)s; b) modificar les %(x_url2_open)spreferèncias del vostre "
+"vos%(x_url1_close)s; b) modificar les %(x_url2_open)spreferències del vostre "
 "compte%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:453
@@ -3487,9 +3466,8 @@ msgid "Try again"
 msgstr "Proveu-ho de nou"
 
 #: modules/websession/lib/websession_templates.py:523
-#, fuzzy
 msgid "Hello"
-msgstr "Ajuda"
+msgstr "Hola"
 
 #: modules/websession/lib/websession_templates.py:524
 msgid "Here are your user credentials for"
@@ -3509,11 +3487,11 @@ msgstr "Us hi podeu connectar a"
 
 #: modules/websession/lib/websession_templates.py:532
 msgid "Best regards"
-msgstr ""
+msgstr "A reveure"
 
 #: modules/websession/lib/websession_templates.py:534
 msgid "Need human intervention?  Contact"
-msgstr ""
+msgstr "Necesiteu intervenció humana?  Contacteu"
 
 #: modules/websession/lib/websession_templates.py:554
 #, python-format
@@ -3749,12 +3727,12 @@ msgstr "No sou administrador de cap grup."
 
 #: modules/websession/lib/websession_templates.py:1054
 msgid "Edit group"
-msgstr "Editar un grup"
+msgstr "Edita el grup"
 
 #: modules/websession/lib/websession_templates.py:1061
 #, python-format
 msgid "Edit %s members"
-msgstr "Editar %s membres"
+msgstr "Edita els %s membres del grup"
 
 #: modules/websession/lib/websession_templates.py:1084
 #: modules/websession/lib/websession_templates.py:1177
@@ -4021,7 +3999,7 @@ msgstr "Torneu-ho a provar."
 #: modules/websession/lib/websession_webinterface.py:207
 #: modules/websession/lib/websession_webinterface.py:212
 msgid "Edit settings"
-msgstr "Editar paràmetres"
+msgstr "Edita els paràmetres"
 
 # Fallida?  Impossible editar...
 #: modules/websession/lib/websession_webinterface.py:183
@@ -4071,6 +4049,8 @@ msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
 msgstr ""
+"No es pot enviar la contrasenya por correu electrònic ja que esteu "
+"usant un sistema de autenticació extern."
 
 #: modules/websession/lib/websession_webinterface.py:275
 msgid "The entered email address does not exist in the database."
@@ -4477,7 +4457,7 @@ msgstr "Primer accés"
 
 #: modules/websubmit/lib/websubmit_templates.py:1410
 msgid "Last access"
-msgstr "Últim accés"
+msgstr "Darrer accés"
 
 #: modules/websubmit/lib/websubmit_templates.py:1420
 msgid "Are you sure you want to delete this submission?"
@@ -4492,7 +4472,6 @@ msgstr "Suprimeix el lliurament %(x_id)s a %(x_docname)s"
 msgid "Reference not yet given"
 msgstr "Encara no se li ha assignat referència"
 
-# Refereed, Referee?
 #: modules/websubmit/lib/websubmit_templates.py:1508
 msgid "Refereed Documents"
 msgstr "Documents revisats"
@@ -4559,7 +4538,6 @@ msgstr "Ja aprovats"
 msgid "Some documents are pending."
 msgstr "Quedent alguns documents pendents"
 
-# Revisar
 #: modules/websubmit/lib/websubmit_templates.py:1742
 msgid "List of refereed documents"
 msgstr "Llista de documents revisats"
@@ -4674,9 +4652,8 @@ msgid "Unable to find file."
 msgstr "No s'ha pogut trobar el fitxer."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:104
-#, fuzzy
 msgid "This file is restricted!"
-msgstr "Els continguts d'aquesta col·lecció són restringits."
+msgstr "Este fichero es de acceso restringido."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:125
 #: modules/websubmit/lib/websubmit_webinterface.py:211
