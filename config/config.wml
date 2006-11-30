@@ -428,7 +428,7 @@ default
 ## CFG_USE_OLD_SYSNOS -- do we want to make old SYSNOs visible rather
 ## than MySQL's record IDs?  You may use this if you migrate from a
 ## different e-doc system, and you store your old system numbers into
-## 909C0o.  Put "1" for "yes" and "0" for "no". Usually you don't want
+## 970__a.  Put "1" for "yes" and "0" for "no". Usually you don't want
 ## to do that, though.
 ##  (example: "0")
 <define-tag CFG_USE_OLD_SYSNOS whitespace=delete>
