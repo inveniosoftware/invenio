@@ -1850,7 +1850,7 @@ class Template:
         return ''.join(chars_out)
         
     def tmpl_nice_number_via_locale(self, number, ln=cdslang):
-        """"
+        """
         Return nicely printed number NUM in language LN using the locale.
         See also version tmpl_nice_number().
         """
