@@ -33,7 +33,6 @@ import sre
 from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
-     CFG_WEBSEARCH_GOOGLE_BOX, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      cdslang, \
      cdsname, \
@@ -1305,11 +1304,6 @@ class Template:
 
         if as == 1:
             # print Advanced Search form:
-            google = ''
-            if CFG_WEBSEARCH_GOOGLE_BOX and (p1 or p2 or p3):
-                google = '<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>' % {
-                     'search_smwhere' : _("Try your search on...")
-                   }
 
             # define search box elements:
             out += '''
@@ -1352,7 +1346,6 @@ class Template:
                     <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
                     %(simple_search)s
                   </small>
-                  %(google)s
                 </td>
               </tr>
              </tbody>
@@ -1402,16 +1395,9 @@ class Template:
               'weburl' : weburl,
               'ln' : ln,
               'search_tips': _("Search Tips"),
-              'google' : google,
             }
         else:
             # print Simple Search form:
-            google = ''
-            if CFG_WEBSEARCH_GOOGLE_BOX and (p1 or p2 or p3):
-                google = '''<small> :: <a href="#googlebox">%(search_smwhere)s</a></small>''' % {
-                     'search_smwhere' : _("Try your search on...")
-                   }
-
             out += '''
             <table class="searchbox">
              <thead>
@@ -1436,7 +1422,6 @@ class Template:
                     <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
                     %(advanced_search)s
                   </small>
-                  %(google)s
                 </td>
               </tr>
              </tbody>
@@ -1466,7 +1451,6 @@ class Template:
               'weburl' : weburl,
               'ln' : ln,
               'search_tips': _("Search Tips"),
-              'google' : google,
             }
             
         ## secondly, print Collection(s) box:
