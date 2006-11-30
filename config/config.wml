@@ -108,13 +108,15 @@ en
 bg,ca,cs,de,el,en,es,fr,hr,it,ja,no,pl,pt,ru,sk,sv,uk
 </define-tag>
 
-## ALERTENGINEEMAIL -- the email address from which the alert emails will appear to be send:
+## ALERTENGINEEMAIL -- the email address from which the alert emails
+## will appear to be send:
 ##  (example: "cds.alert@cdsware.cern.ch")
 <define-tag ALERTENGINEEMAIL whitespace=delete>
 cds.alert@cdsdev.cern.ch
 </define-tag>
 
-## SUPPORTEMAIL -- the email address of the support team for this installation:
+## SUPPORTEMAIL -- the email address of the support team for this
+## installation:
 ##  (example: "cds.support@cern.ch")
 <define-tag SUPPORTEMAIL whitespace=delete>
 cds.support@cern.ch
@@ -360,34 +362,6 @@ default
 {}
 </define-tag>
 
-## CFG_GOOGLE_BOX -- on the search results page, do we want propose
-## links to other search engines like Google?  Put "1" for "yes" and
-## "0" for "no".
-##  (example: "1")
-<define-tag CFG_GOOGLE_BOX whitespace=delete>
-1
-</define-tag>
-
-
-## CFG_GOOGLE_BOX_SERVERS -- what servers should be proposed in the
-## above Google box?  See the list of available servers below and put
-## "1" for "yes" and "0" for "no" for each server.
-<define-tag CFG_GOOGLE_BOX_SERVERS whitespace=delete>
-{'Amazon' : 1,
- 'CERN Intranet' : 1,
- 'CERN Agenda' : 1,
- 'CiteSeer' : 1,
- 'Google Scholar' : 1,
- 'Google Web' : 1,
- 'IEC' : 1,
- 'IHC' : 1,
- 'INSPEC' : 1,
- 'ISO' : 1,
- 'KEK' : 1,
- 'NEBIS' : 1,
- 'SPIRES' : 1}
-</define-tag>
-
 ## CFG_SIMPLESEARCH_PATTERN_BOX_WIDTH -- width of the search pattern
 ## window in the simple search interface, in characters.
 ##  (example: "50")
@@ -498,7 +472,10 @@ oai
 909COp
 </define-tag>
 
-## CFG_OAI_DELETED_TAG -- OAI tag for deleted records mark. OAI record is considered deleted if the value of this field is set to "DELETED" and the OAI deleted records policy is set either to ``transient'' or ``persistent''.
+## CFG_OAI_DELETED_TAG -- OAI tag for deleted records mark. OAI record
+## is considered deleted if the value of this field is set to 
+## "DELETED" and the OAI deleted records policy is set either to
+## "transient" or "persistent".
 ##  (example: "980__c")
 <define-tag CFG_OAI_DELETED_TAG whitespace=delete>
 980__c
@@ -578,7 +555,8 @@ atlantis.cern.ch
 90000
 </define-tag>
 
-## CFG_OAI_SLEEP -- service unavailable between two consecutive requests for CFG_OAI_SLEEP seconds
+## CFG_OAI_SLEEP -- service unavailable between two consecutive 
+## requests for CFG_OAI_SLEEP seconds:
 ##  (example: "10")
 <define-tag CFG_OAI_SLEEP whitespace=delete>
 10
