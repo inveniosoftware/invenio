@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2006-11-24 11:47+0100\n"
-"PO-Revision-Date: 2006-10-12 17:49+0200\n"
+"PO-Revision-Date: 2006-11-29 07:13+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -392,7 +392,7 @@ msgstr "Añadir campo"
 
 #: modules/bibedit/lib/bibedit_templates.py:93
 msgid "Verbose"
-msgstr "Verboso"
+msgstr "Textual"
 
 #: modules/bibedit/lib/bibedit_templates.py:110
 #: modules/bibformat/web/admin/bibformatadmin.py:397
@@ -465,7 +465,7 @@ msgstr "Sus cambios son TEMPORALES."
 
 #: modules/bibedit/lib/bibedit_templates.py:398
 msgid "To save this record, please click on submit."
-msgstr "Para guardar este registro, haga clic en submit."
+msgstr "Para guardar este registro, haga clic en Enviar."
 
 #: modules/bibedit/lib/bibedit_templates.py:412
 msgid "This record does not exist."
@@ -569,9 +569,8 @@ msgstr "Enviar i guardar el registro %s"
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
 #: modules/bibformat/web/admin/bibformatadmin.py:81
-#, fuzzy
 msgid "BibFormat Admin"
-msgstr "Administración de WebComment"
+msgstr "Administración de BibFormat"
 
 #: modules/bibformat/lib/bibformat_templates.py:340
 #: modules/bibformat/lib/bibformat_templates.py:452
@@ -596,19 +595,19 @@ msgstr "Menu"
 #: modules/bibformat/lib/bibformat_templates.py:2014
 #: modules/bibformat/lib/bibformat_templates.py:2082
 msgid "Close Editor"
-msgstr ""
+msgstr "Cierra el editor"
 
 #: modules/bibformat/lib/bibformat_templates.py:343
 #: modules/bibformat/lib/bibformat_templates.py:454
 #: modules/bibformat/lib/bibformat_templates.py:606
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "Modifica los atributs de la plantilla"
 
 #: modules/bibformat/lib/bibformat_templates.py:344
 #: modules/bibformat/lib/bibformat_templates.py:455
 #: modules/bibformat/lib/bibformat_templates.py:607
 msgid "Template Editor"
-msgstr ""
+msgstr "Editor de plantillas"
 
 #: modules/bibformat/lib/bibformat_templates.py:345
 #: modules/bibformat/lib/bibformat_templates.py:456
@@ -617,7 +616,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1348
 #: modules/bibformat/lib/bibformat_templates.py:1446
 msgid "Check Dependencies"
-msgstr ""
+msgstr "Comprobar las dependencias"
 
 #: modules/bibformat/lib/bibformat_templates.py:395
 #: modules/bibformat/lib/bibformat_templates.py:911
@@ -636,18 +635,16 @@ msgstr "Descripción"
 
 #: modules/bibformat/lib/bibformat_templates.py:415
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "Actualitzar los atributos del formato"
 
 #: modules/bibformat/lib/bibformat_templates.py:603
-#, fuzzy
 msgid "Show Documentation"
-msgstr "Mostrar la cuenta"
+msgstr "Mostrar la documentación"
 
 #: modules/bibformat/lib/bibformat_templates.py:604
 #: modules/bibformat/lib/bibformat_templates.py:655
-#, fuzzy
 msgid "Hide Documentation"
-msgstr "comentario"
+msgstr "Esconder la documentación"
 
 #: modules/bibformat/lib/bibformat_templates.py:914
 #: modules/bibformat/lib/bibformat_templates.py:1040
@@ -657,9 +654,8 @@ msgstr "Estado"
 
 #: modules/bibformat/lib/bibformat_templates.py:915
 #: modules/bibformat/lib/bibformat_templates.py:1041
-#, fuzzy
 msgid "Last Modification Date"
-msgstr "Nombre de identificación de la alerta:"
+msgstr "Fecha de la última modificación"
 
 #: modules/bibformat/lib/bibformat_templates.py:918
 #: modules/bibformat/lib/bibformat_templates.py:1044
@@ -671,9 +667,8 @@ msgstr "Nombre de identificación de la alerta:"
 #: modules/bibformat/web/admin/bibformatadmin.py:287
 #: modules/bibformat/web/admin/bibformatadmin.py:376
 #: modules/bibformat/web/admin/bibformatadmin.py:1351
-#, fuzzy
 msgid "Manage Output Formats"
-msgstr "Formato de visualización:"
+msgstr "Gestionar los formatos de salida"
 
 #: modules/bibformat/lib/bibformat_templates.py:919
 #: modules/bibformat/lib/bibformat_templates.py:1045
@@ -686,7 +681,7 @@ msgstr "Formato de visualización:"
 #: modules/bibformat/web/admin/bibformatadmin.py:657
 #: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "Gestionar las plantillas de los formatos"
 
 #: modules/bibformat/lib/bibformat_templates.py:920
 #: modules/bibformat/lib/bibformat_templates.py:1046
@@ -697,7 +692,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:891
 #: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "Documentación de los elementos de los formatos"
 
 #: modules/bibformat/lib/bibformat_templates.py:921
 #: modules/bibformat/lib/bibformat_templates.py:1047
@@ -715,64 +710,58 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
 #: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
-msgstr ""
+msgstr "Gestionar las bases de conocimiento"
 
 #: modules/bibformat/lib/bibformat_templates.py:996
 msgid "Add New Format Template"
-msgstr ""
+msgstr "Añadir una nueva plantilla de formato"
 
 #: modules/bibformat/lib/bibformat_templates.py:997
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "Comprobar las plantillas de formato extensivamente"
 
 #: modules/bibformat/lib/bibformat_templates.py:1037
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: modules/bibformat/lib/bibformat_templates.py:1121
-#, fuzzy
 msgid "Add New Output Format"
-msgstr "Formato de visualización:"
+msgstr "Añadir un nuevo formato de salida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1159
-#, fuzzy
 msgid "menu"
-msgstr "Menu"
+msgstr "menu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1160
 #: modules/bibformat/lib/bibformat_templates.py:1345
 #: modules/bibformat/lib/bibformat_templates.py:1443
-#, fuzzy
 msgid "Close Output Format"
-msgstr "Formato de visualización:"
+msgstr "Cerrar formato de salida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1161
 #: modules/bibformat/lib/bibformat_templates.py:1346
 #: modules/bibformat/lib/bibformat_templates.py:1444
-#, fuzzy
 msgid "Rules"
-msgstr "visitante"
+msgstr "Reglas"
 
 #: modules/bibformat/lib/bibformat_templates.py:1162
 #: modules/bibformat/lib/bibformat_templates.py:1347
 #: modules/bibformat/lib/bibformat_templates.py:1445
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "Modificar los atributos del formato de salida"
 
 #: modules/bibformat/lib/bibformat_templates.py:1258
 #: modules/bibformat/lib/bibformatadminlib.py:527
-#, fuzzy
 msgid "Remove Rule"
-msgstr "Eliminarlo"
+msgstr "Eliminar regla"
 
 #: modules/bibformat/lib/bibformat_templates.py:1307
 #: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Add New Rule"
-msgstr ""
+msgstr "Añadir una nueva regla"
 
 #: modules/bibformat/lib/bibformat_templates.py:1308
 #: modules/bibformat/lib/bibformatadminlib.py:531
-#, fuzzy
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
@@ -780,80 +769,74 @@ msgstr "Guardar cambios"
 #: modules/bibformat/lib/bibformat_templates.py:2016
 #: modules/bibformat/lib/bibformat_templates.py:2084
 msgid "Knowledge Base Mappings"
-msgstr ""
+msgstr "Mapeados de la base de conocimientos"
 
 #: modules/bibformat/lib/bibformat_templates.py:1850
 #: modules/bibformat/lib/bibformat_templates.py:2017
 #: modules/bibformat/lib/bibformat_templates.py:2085
 msgid "Knowledge Base Attributes"
-msgstr ""
+msgstr "Atributos de la base de conocimientos"
 
 #: modules/bibformat/lib/bibformat_templates.py:1851
 #: modules/bibformat/lib/bibformat_templates.py:2018
 #: modules/bibformat/lib/bibformat_templates.py:2086
 msgid "Knowledge Base Dependencies"
-msgstr ""
+msgstr "Dependencias de la base de conocimiento"
 
 #: modules/bibformat/lib/bibformat_templates.py:2231
 msgid "No problem found with format"
-msgstr ""
+msgstr "No se ha encontrado ningún problema con el formato"
 
 #: modules/bibformat/lib/bibformat_templates.py:2233
-#, fuzzy
 msgid "An error has been found"
-msgstr "Se ha enviado el informe de error."
+msgstr "Se ha encontrado un error"
 
 #: modules/bibformat/lib/bibformat_templates.py:2235
 msgid "The following errors have been found"
-msgstr ""
+msgstr "Se han encontrado los siguentes errores"
 
 #: modules/bibformat/lib/bibformatadminlib.py:330
 #: modules/bibformat/lib/bibformatadminlib.py:369
 #: modules/bibformat/lib/bibformatadminlib.py:371
-#, fuzzy
 msgid "Test with record:"
-msgstr "Registro completo"
+msgstr "Probarlo con el registro:"
 
 #: modules/bibformat/lib/bibformatadminlib.py:331
 msgid "Enter a search query here."
-msgstr ""
+msgstr "Entre una búsqueda aquí."
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
-#, fuzzy
 msgid "Hide"
-msgstr "id"
+msgstr "Esconder"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:89
 #, python-format
 msgid "Show all %i authors"
-msgstr ""
+msgstr "Mostrar todos los %i autores"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:53
-#, fuzzy
 msgid "Migrate BibFormat Settings"
-msgstr "Configurar BibFormat"
+msgstr "Migrar los parámetros de BibFormat"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:79
 msgid "Migrate Knowledge Bases"
-msgstr ""
+msgstr "Migrar las bases de conocimiento"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:105
 msgid "Migrate Behaviours"
-msgstr ""
+msgstr "Migrar los comportamientos"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:130
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:155
-#, fuzzy
 msgid "Migrate Formats"
-msgstr "Configurar BibFormat"
+msgstr "Migrar los formatos"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:254
 #: modules/bibformat/web/admin/bibformatadmin.py:299
 #: modules/bibformat/web/admin/bibformatadmin.py:1354
-#, fuzzy
 msgid "Restricted Output Format"
-msgstr "Formato de visualización:"
+msgstr "Formato de salida restringido"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:212
 #: modules/bibformat/web/admin/bibformatadmin.py:510
@@ -862,60 +845,58 @@ msgid "Ok"
 msgstr "De acuerdo"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:214
-#, fuzzy, python-format
+#, python-format
 msgid "Output Format %s Rules"
-msgstr "Formato de visualización:"
+msgstr "Reglas del formato de salida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:267
 #, python-format
 msgid "Output Format %s Attributes"
-msgstr ""
+msgstr "Atributos del formato de salida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:312
 #, python-format
 msgid "Output Format %s Dependencies"
-msgstr ""
+msgstr "Dependencias del formato de salida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:376
-#, fuzzy
 msgid "Delete Output Format"
-msgstr "Formato de visualización:"
+msgstr "Suprimir el formato de salida"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:489
 #: modules/bibformat/web/admin/bibformatadmin.py:560
 #: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
-msgstr ""
+msgstr "Plantilla de formato restringido"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:514
 #, python-format
 msgid "Format Template %s"
-msgstr ""
+msgstr "Plantilla de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:571
 #, python-format
 msgid "Format Template %s Attributes"
-msgstr ""
+msgstr "Atributos de la plantilla de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:603
 #, python-format
 msgid "Format Template %s Dependencies"
-msgstr ""
+msgstr "Dependencias de la plantilla de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:657
-#, fuzzy
 msgid "Delete Format Template"
-msgstr "Suprimir comentario"
+msgstr "Suprimir la plantilla de formato"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:867
 #, python-format
 msgid "Format Element %s Dependencies"
-msgstr ""
+msgstr "Dependencies del elemento de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
-msgstr ""
+msgstr "Probar el elemento de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:972
 #: modules/bibformat/web/admin/bibformatadmin.py:1019
@@ -925,55 +906,54 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1220
 #: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
-msgstr ""
+msgstr "Base de conocimiento desconocida"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
-msgstr ""
+msgstr "Base de conocimiento %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
-msgstr ""
+msgstr "Atributos de la base de conocimiento %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
-msgstr ""
+msgstr "Dependencias de la base de conocimiento %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1283
-#, fuzzy
 msgid "Delete Knowledge Base"
-msgstr "Suprimir una cesta"
+msgstr "Suprimir la base de conocimiento"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
-msgstr ""
+msgstr "Validación del formato de salida %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
-msgstr ""
+msgstr "Validación de la plantilla de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
-msgstr ""
+msgstr "Elemento de formato restringido"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
-msgstr ""
+msgstr "Validación del elemento de formato %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
-msgstr ""
+msgstr "Validación del formato"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:55
 #: modules/bibharvest/lib/bibharvest_templates.py:73
 msgid "See Guide"
-msgstr "Vea la guía"
+msgstr "Véase la guía"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:110
 msgid "OAI sources currently present in the database"
@@ -1455,13 +1435,13 @@ msgid "You have defined %s alerts."
 msgstr "Usted ha definido %s alertas."
 
 #: modules/webalert/lib/webalert_templates.py:412
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
-"Todavía no ha ejecutado ninguna búsqueda. Vaya primero a la %(x_url_open)"
-"sinterfaz de búsqueda%(x_url_close)s."
+"Todavía no ha ejecutado ninguna búsqueda. Vaya primero a la "
+"%(x_url_open)sinterfaz de búsqueda%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:421
 #, python-format
@@ -1684,9 +1664,8 @@ msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:509
 #: modules/webbasket/lib/webbasket_templates.py:784
-#, fuzzy
 msgid "Unsubscribe from this basket"
-msgstr "Dessubscribirse de esta cesta"
+msgstr "Darse de baja de esta cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
 #: modules/webbasket/lib/webbasket_templates.py:641
@@ -2004,7 +1983,8 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Si lo desea, puede %(x_url_open)slogin or register here%(x_url_close)s."
+"Si lo desea, puede %(x_url_open)sidentificarse o darse de alta "
+"aquí%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
 #: modules/websession/lib/websession_webinterface.py:116
@@ -2448,11 +2428,13 @@ msgid "Record Not Found"
 msgstr "No se ha encontrado el registro"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:189
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
-msgstr "Antes de añadir su comentario, tiene que identificarse"
+msgstr ""
+"Antes de añadir su comentario, tiene que "
+"%(x_url_open)sidentificarse%(x_url_close)s"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:193
 #: modules/websession/lib/websession_webinterface.py:405
@@ -2787,7 +2769,7 @@ msgstr "Frase exacta:"
 #: modules/websearch/lib/search_engine.py:650
 #: modules/websearch/lib/websearch_templates.py:575
 msgid "Partial phrase:"
-msgstr "Parte de la frase:"
+msgstr "Frase parcial:"
 
 #: modules/websearch/lib/search_engine.py:651
 #: modules/websearch/lib/websearch_templates.py:577
@@ -2960,9 +2942,8 @@ msgid "restricted"
 msgstr "reservado"
 
 #: modules/websearch/lib/websearch_templates.py:764
-#, fuzzy
 msgid "Search also:"
-msgstr "Resultados de la búsqueda"
+msgstr "Busque también:"
 
 #: modules/websearch/lib/websearch_templates.py:829
 msgid "The contents of this collection is restricted."
@@ -3127,8 +3108,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sResultados globales:%(x_fmt_close)s Encontrados %(x_nb_records)"
-"s registros en %(x_nb_seconds)s segundos."
+"%(x_fmt_open)sResultados globales:%(x_fmt_close)s %(x_nb_records)s "
+"registros encontrados en %(x_nb_seconds)s segundos."
 
 #: modules/websearch/lib/websearch_templates.py:2171
 msgid ""
@@ -3171,35 +3152,35 @@ msgstr "¿No ha encontrado lo que estaba buscando? Intente su búsqueda en:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:79
 msgid "External collections results overview:"
-msgstr ""
+msgstr "Resumen de los resultados de las colecciones externas:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:119
-#, fuzzy
 msgid "Search timed out."
-msgstr "Resultados de la búsqueda"
+msgstr "Tiempo de búsqueda excedido."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
 "The external search engine has not responded in time. You can check its "
 "results here:"
 msgstr ""
+"El buscador externo no ha respondido a tiempo.  Puede ver los "
+"resultados aquí:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:145
 #: modules/websearch/lib/websearch_external_collections_templates.py:153
 #: modules/websearch/lib/websearch_external_collections_templates.py:166
-#, fuzzy
 msgid "No results found."
-msgstr "No se han encontrado valors."
+msgstr "No se han encontrado resultados."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:149
-#, fuzzy, python-format
+#, python-format
 msgid "%s results found"
-msgstr "No se han encontrado valors."
+msgstr "Se han encontrado %s resultados"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:151
-#, fuzzy, python-format
+#, python-format
 msgid "%s seconds"
-msgstr "Encontrados %s registros"
+msgstr "%s segundos"
 
 #: modules/websearch/lib/websearch_webcoll.py:537
 msgid "brief"
@@ -3474,9 +3455,8 @@ msgid "Try again"
 msgstr "Vuélvalo a intentar"
 
 #: modules/websession/lib/websession_templates.py:523
-#, fuzzy
 msgid "Hello"
-msgstr "Ayuda"
+msgstr "Hola"
 
 #: modules/websession/lib/websession_templates.py:524
 msgid "Here are your user credentials for"
@@ -3496,11 +3476,11 @@ msgstr "Puede identificarse en"
 
 #: modules/websession/lib/websession_templates.py:532
 msgid "Best regards"
-msgstr ""
+msgstr "Hasta la vista"
 
 #: modules/websession/lib/websession_templates.py:534
 msgid "Need human intervention?  Contact"
-msgstr ""
+msgstr "Necesita intervención humana?  Contacte"
 
 #: modules/websession/lib/websession_templates.py:554
 #, python-format
@@ -3737,7 +3717,7 @@ msgstr "Editar grupo"
 #: modules/websession/lib/websession_templates.py:1061
 #, python-format
 msgid "Edit %s members"
-msgstr "Editar %s miembros"
+msgstr "Editar los %s miembros del grupo"
 
 #: modules/websession/lib/websession_templates.py:1084
 #: modules/websession/lib/websession_templates.py:1177
@@ -4050,6 +4030,8 @@ msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
 msgstr ""
+"No se puede enviar la contraseña por correo electrónico ya que usted "
+"está usando un sistema de autenticación externo."
 
 #: modules/websession/lib/websession_webinterface.py:275
 msgid "The entered email address does not exist in the database."
@@ -4650,9 +4632,8 @@ msgid "Unable to find file."
 msgstr "No ha sido posible encontrar el fichero."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:104
-#, fuzzy
 msgid "This file is restricted!"
-msgstr "El contenido de esta colección es reservado."
+msgstr "Aquest fitxer és d'accés restringit."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:125
 #: modules/websubmit/lib/websubmit_webinterface.py:211
