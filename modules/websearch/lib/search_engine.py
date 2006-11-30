@@ -125,7 +125,7 @@ sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
 sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
 
-def get_alphabetically_ordered_collection_list(level=0):
+def get_alphabetically_ordered_collection_list(level=0, ln=cdslang):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
@@ -133,17 +133,17 @@ def get_alphabetically_ordered_collection_list(level=0):
     query = "SELECT id,name FROM collection ORDER BY name ASC"
     res = run_sql(query)
     for c_id, c_name in res:
-        # make a nice printable name (e.g. truncate c_printable for for long collection names):
-        if len(c_name)>30:
-            c_printable = c_name[:30] + "..."
-        else:
-            c_printable = c_name
+        # make a nice printable name (e.g. truncate c_printable for
+        # long collection names in given language):
+        c_printable = get_coll_i18nname(c_name, ln)
+        if len(c_printable)>30:
+            c_printable = c_printable[:30] + "..."
         if level:
             c_printable = " " + level * '-' + " " + c_printable
         out.append([c_name, c_printable])
     return out
 
-def get_nicely_ordered_collection_list(collid=1, level=0):
+def get_nicely_ordered_collection_list(collid=1, level=0, ln=cdslang):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
@@ -152,15 +152,15 @@ def get_nicely_ordered_collection_list(collid=1, level=0):
             " WHERE c.id=cc.id_son AND cc.id_dad='%s' ORDER BY score DESC" % collid
     res = run_sql(query)
     for c, cid in res:
-        # make a nice printable name (e.g. truncate c_printable for for long collection names):
-        if len(c)>30:
-            c_printable = c[:30] + "..."
-        else:
-            c_printable = c
+        # make a nice printable name (e.g. truncate c_printable for
+        # long collection names in given language):
+        c_printable = get_coll_i18nname(c, ln)
+        if len(c_printable)>30:
+            c_printable = c_printable[:30] + "..."
         if level:
             c_printable = " " + level * '-' + " " + c_printable
         colls_nicely_ordered.append([c, c_printable])
-        colls_nicely_ordered  = colls_nicely_ordered + get_nicely_ordered_collection_list(cid, level+1)
+        colls_nicely_ordered  = colls_nicely_ordered + get_nicely_ordered_collection_list(cid, level+1, ln=ln)
     return colls_nicely_ordered
 
 def get_index_id(field):
@@ -450,9 +450,9 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
 
     colls_nicely_ordered = []
     if cfg_nicely_ordered_collection_list:
-        colls_nicely_ordered = get_nicely_ordered_collection_list()
+        colls_nicely_ordered = get_nicely_ordered_collection_list(ln=ln)
     else:
-        colls_nicely_ordered = get_alphabetically_ordered_collection_list()
+        colls_nicely_ordered = get_alphabetically_ordered_collection_list(ln=ln)
 
     colls_nice = []
     for (cx, cx_printable) in colls_nicely_ordered:
