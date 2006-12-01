@@ -27,10 +27,11 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
+from invenio.dbquery import Error
 from invenio.bibformat_migration_kit_assistant_lib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, cdslang, cdsname
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language
@@ -45,8 +46,13 @@ def index(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
@@ -71,8 +77,13 @@ def migrate_kb(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
@@ -97,8 +108,13 @@ def migrate_behaviours(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
@@ -122,8 +138,13 @@ def migrate_formats(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
@@ -147,8 +168,13 @@ def migrate_formats_do(req, ln=cdslang):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % cdsname,
+                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    language=ln,
+                    req=req)
 
     (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
     if not auth_code:
