@@ -178,10 +178,9 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["1", 1]:
              output += """<b><span class="info">Please select a collection.</span></b>"""
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
+    
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mc">?</a>]</small>""" % weburl, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
@@ -257,10 +256,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
         if sel_type and len(trans) and confirm in ["2", 2]:
             output += write_outcome(finresult)
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
         
@@ -343,10 +339,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     elif not rnkcode and confirm not in [-1, "-1"]:
         output += """<b><span class="info">Sorry, could not add rank method, not enough data submitted.</span></b>"""
             
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#ar">?</a>]</small>""" % weburl, body)
       
@@ -519,10 +512,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                 text = """<b><span class="info">Sorry, could not delete rank method, most likely already deleted</span></b>"""
             output = text
             
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#dr">?</a>]</small>""" % weburl, body)
 
