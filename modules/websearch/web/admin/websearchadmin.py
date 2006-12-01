@@ -24,10 +24,11 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import sys
+
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl, sweburl, cdslang
+from invenio.config import weburl, sweburl, cdslang, cdsname
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
@@ -1064,7 +1065,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def error_page(req, ln = cdslang):
+def error_page(req, ln=cdslang, verbose=1):
     _ = gettext_set_language(ln)
     
     return page(title=_("Internal Error"),
