@@ -558,10 +558,7 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     output += "<br><b>Changing the settings:</b><br>"
     output += "Currently, all changes must be done using your favourite editor, and the webserver restarted for changes to take effect. For the settings to change, either look in the guide or in access_control_config.py ."
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_manageaccounts(req, "perform_accesspolicy", addadminbox(subtitle, body))
@@ -587,10 +584,7 @@ def perform_accountoverview(req, callback='yes', confirm=0):
     res = run_sql("SELECT COUNT(*) FROM user")
     output += "<br>Total nr of accounts: %s<br>" % res[0][0]
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_manageaccounts(req, "perform_accountoverview", addadminbox(subtitle, body))
@@ -639,10 +633,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     elif confirm in [1, "1"]:
         output += '<b><span class="info">Please specify an valid email-address.</span></b>'
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_manageaccounts(req, "perform_createaccount", addadminbox(subtitle, body))
@@ -657,6 +648,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     res = run_sql("SELECT id, email, note, password FROM user WHERE id=%s" % userID)
+    subtitle = ""
     output = ""
     if res:
         if res[0][2] in [0, "0", None]:
@@ -675,10 +667,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_modifyaccounts(req, email_user_pattern, limit_to, maxpage, page, content=output, callback='yes')
@@ -794,10 +783,7 @@ def perform_modifybasket(req, userID, callback='yes', confirm=0):
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_modifybasket', content=addadminbox(subtitle, body), callback='yes')
@@ -838,10 +824,7 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_modifylogindata', content=addadminbox(subtitle, body), callback='yes')
@@ -882,10 +865,7 @@ def perform_modifyalerts(req, userID, callback='yes', confirm=0):
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_modifyalerts', content=addadminbox(subtitle, body), callback='yes')
@@ -931,10 +911,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_modifypreferences', content=addadminbox(subtitle, body), callback='yes')
@@ -968,10 +945,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editaccount(req, userID, mtype='perform_deleteaccount', content=addadminbox(subtitle, body), callback='yes')
@@ -986,6 +960,7 @@ def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, pa
     
     res = run_sql("SELECT id, email, password, note FROM user WHERE id=%s" % userID)
     output = ""
+    subtitle = ""
     if res:
         res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
         output += '<b><span class="info">Account rejected and deleted.</span></b>'
@@ -1001,10 +976,7 @@ def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, pa
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_modifyaccounts(req, email_user_pattern, limit_to, maxpage, page, content=output, callback='yes')
@@ -1104,10 +1076,7 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
     if content:
         output += "<br>%s" % content
     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_manageaccounts(req, "perform_modifyaccounts", addadminbox(subtitle, body))
