@@ -117,10 +117,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
         if sel_type and len(trans) and confirm in ["2", 2]:
             output += write_outcome(finresult)
                     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
@@ -210,10 +207,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif confirm not in ["0", 0] and func in ["1", 1]:
             output += """<b><span class="info">Please select a rank method.</span></b>"""
                     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_modifyrankmethods", addadminbox(subtitle, body))
@@ -298,10 +292,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     output += output2
 
     #output += perform_showtree(colID, ln)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(colID, ln, mtype="perform_addcollectiontotree", content=addadminbox(subtitle, body))
@@ -334,10 +325,7 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', rest='', callback="
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the collection a name.</span></b>"""
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(colID, ln=ln, mtype="perform_addcollection", content=addadminbox(subtitle, body))
@@ -393,10 +381,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
                 text = """<b><span class="info">Sorry, could not change query.</span></b>"""
             output += text
           
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_editcollection(colID, ln, "perform_modifydbquery", addadminbox(subtitle, body))
@@ -442,10 +427,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
                 text = """<b><span class="info">Sorry, could not change the access restrictions.</span></b>"""
             output += text
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_editcollection(colID, ln, "perform_modifyrestricted", addadminbox(subtitle, body))
@@ -605,10 +587,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     </table>
     """
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(colID, ln, mtype="perform_modifycollectiontree", content=addadminbox(subtitle, body))
@@ -637,10 +616,8 @@ def perform_showtree(colID, ln):
     </tr>
     </table>
     """
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     return addadminbox(subtitle, body)
     
@@ -676,10 +653,7 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
         output  += """<b><span class="info">Body field must be filled.</span></b>
         """
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return perform_showportalboxes(colID, ln, content=addadminbox(subtitle, body))
 
@@ -751,10 +725,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
         output  += """<b><span class="info">All fields must be filled.</span></b>
         """
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
@@ -810,10 +781,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
         output  += """<b><span class="info">Choose a portalbox to delete.</span></b>
         """
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
@@ -905,10 +873,7 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
     else:
         output  = """No portalbox to modify."""
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
@@ -918,7 +883,7 @@ def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln):
     colID - the current collection
     id_1/id_2 - the id's to change the score for.
     sel_ln - the language of the portalbox"""
-
+    output = ""
     res = get_pbx()
     pbx_dict = dict(map(lambda x: (x[0], x[1]), res))
     res = switch_pbx_score(colID, id_1, id_2, sel_ln)
@@ -980,10 +945,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
         output += """No portalboxes exists for this collection"""
         
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_showportalboxes", addadminbox(subtitle, body))
@@ -1019,10 +981,8 @@ def perform_removeportalbox(colID, ln, pbxID='', sel_ln='', callback='yes', conf
         elif confirm in ["1", 1]:
             res = remove_pbx(colID, pbxID, sel_ln)
             output += write_outcome(res)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
@@ -1098,10 +1058,7 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
         output += """<b><span class="info">Please fill in name and value.</span></b>
         """
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
@@ -1157,10 +1114,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>"""
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
@@ -1206,10 +1160,8 @@ def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes'
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
             output += write_outcome(res)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
 
@@ -1253,10 +1205,8 @@ def perform_removefieldvalue(colID, ln, fldID='', fldvID='', fmeth='', callback=
         elif confirm in ["1", 1]:
             res = remove_fld(colID, fldID, fldvID)
             output += write_outcome(res)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
@@ -1283,10 +1233,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
     else:
         output += write_outcome((0, (0, "No values to order")))
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID, ln, content=output)
@@ -1311,10 +1258,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     else:
         output += write_outcome((0, (0, "No fields to order")))
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     if fmeth == "soo":
@@ -1371,10 +1315,8 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
         output += write_outcome(ares)
     elif confirm in [1, "1"]:
         output += """<b><span class="info">Select a value to add and try again.</span></b>"""
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID, ln, content=output)
@@ -1429,10 +1371,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
         output  += """<b><span class="info">Select a field.</span></b>
         """
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     if fmeth == "soo":
@@ -1495,10 +1434,8 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
         output += """No sort options exists for this collection"""
         
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_showsortoptions", addadminbox(subtitle, body))
@@ -1558,10 +1495,8 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
         output += """No search fields exists for this collection"""
         
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_showsearchfields", addadminbox(subtitle, body))
@@ -1621,10 +1556,8 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
         output += """No search options exists for this collection"""
 
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_showsearchoptions", addadminbox(subtitle, body))
@@ -1686,10 +1619,8 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
         output += tupletotable(header=header, tuple=actions)
 
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     if len(col_fld) == 0:
@@ -1742,10 +1673,8 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     else:
         output += """No output formats exists for this collection"""
     output += content
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_showoutputformats", addadminbox(subtitle, body))
@@ -1865,10 +1794,8 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
         output += write_outcome(ares)
     elif fmtID in [-1, "-1"] and confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Please select output format.</span></b>"""
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
@@ -1934,11 +1861,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a output format to delete.</span></b>
         """
-
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
@@ -1970,10 +1893,8 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
         elif confirm in ["1", 1]:
             res = remove_fmt(colID, fmtID)
             output += write_outcome(res)
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
@@ -2045,10 +1966,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     elif mtype == "perform_checkcollectionstatus" or mtype == "perform_showall":
         fin_output += perform_checkcollectionstatus(colID, ln, callback='')
 
-    try:
-        body = [fin_output, extra]
-    except NameError:
-        body = [fin_output]
+    body = [fin_output]
 
     return addadminbox('<b>Menu</b>', body)
     
@@ -2247,17 +2165,14 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
             elif confirm in ["1", 1]:
                 result = delete_col(colID)
                 if not result:
-                    raise StandardException
+                    raise Exception
         else:
             output = """<b><span class="info">Can not delete a collection that is a part of the collection tree, remove collection from the tree and try again.</span></b>"""
     else:
         subtitle = """4. Delete collection"""
         output = """<b><span class="info">Not possible to delete the root collection</span></b>"""
                     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_deletecollection", addadminbox(subtitle, body))
@@ -2444,10 +2359,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     if bibindex_future == "":
         output += """<br><b><span class="info">Warning: Bibindex is not scheduled for a future run by bibsched, any updates to the records will not be processed.</span></b><br>"""
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(colID, ln, "perform_checkwebcollstatus", addadminbox(subtitle, body))
@@ -2513,10 +2425,8 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     
     output += tupletotable(header=header, tuple=actions)
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
+    
     return addadminbox(subtitle, body)
 
     if callback:
