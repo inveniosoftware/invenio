@@ -84,7 +84,7 @@ def process_email(email_string):
     if not len(filter(lambda x: x in available_fields, elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)) == len(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS):
         response = elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_1'] + elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_2'] + "\n\n" + repr(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)
         _notify(msg=e, response=response)
-        raise elmsubmitSubmissionError("Submission does not contain the required fields for document type %s. Required fields: %s" % (doctype, elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS))
+        raise elmsubmitSubmissionError("Submission does not contain the required fields %s." % (elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS))
 
     # Check that the fields we have been given validate OK:
     
