@@ -27,7 +27,7 @@ import sys
 
 import invenio.bibindexadminlib as bic
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import weburl, cdslang, cdsname
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
@@ -635,7 +635,7 @@ def field(req, ln=cdslang, mtype='', content=''):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def error_page(req):
+def error_page(req, ln=cdslang, verbose=1):
     return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
                 description="%s - Internal Error" % cdsname, 
