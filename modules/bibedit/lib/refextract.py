@@ -545,7 +545,7 @@ class EscapeSequenceTransformer(TextLineTransformer):
             for x in self._patterns.keys():
                 try:
                     line = line.replace(x, self._patterns[x])
-                except UnicodedecodeError:
+                except UnicodeDecodeError:
                     sys.exit(0)
         except TypeError:
             pass
@@ -3221,7 +3221,7 @@ def main():
     done_coltags = False
 
     if len(converterList) < 1:
-        sys.stderr.write("E: No document converter tools available - cannot process reference extraction.\n" % (curitem,))
+        sys.stderr.write("E: No document converter tools available - cannot process reference extraction.\n")
         sys.exit(1)
 
     for curitem in recidfiles:
