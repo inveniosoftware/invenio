@@ -94,6 +94,7 @@ import mimetypes
 
 # Non email imports:
 
+import binascii
 import time
 import datetime
 import os
@@ -294,7 +295,7 @@ class ParseMessage(object):
             if remote_offset_from_utc_in_seconds is None: raise _ParseDateError()
         except (KeyError, _ParseDateError):
 
-            if strict: raise ParseDataError(msg)
+            if strict: raise ParseDateError(msg)
 
             else:
                 # Use local time on error.
@@ -475,8 +476,8 @@ def _basic_email_info(msg):
     # Get all header/value pairs for which the header is also in list
     # basic_headers (case insensitively):
 
-    f = lambda (k,v): k.lower() in basic_headers
-    basic_items = filter(f, msg.items())
+    basic_items = filter(lambda (k,v): k.lower() in basic_headers,
+                         msg.items())
 
     # Now attempt to decode the basic headers to unicode objects:
 
@@ -488,8 +489,8 @@ def _basic_email_info(msg):
     # basic_headers are all ones which _should_ only be appearing
     # once).
 
-    g = lambda (k,v): (k,v[0])
-    basic_decoded_headers = dict(map(g, basic_decoded_headers.items()))
+    basic_decoded_headers = dict(map(lambda (k,v): (k,v[0]),
+                                     basic_decoded_headers.items()))
 
     try:
         
@@ -576,8 +577,9 @@ def _native2unicode(value_nc, native_charset=None, strict=True):
 
 def _process_headers(msg, header_value_pairs, force_processing=False):
         
-        f = lambda headers, (header,value): _process_header(msg, headers, header, value, force_processing)
-        return reduce(f, header_value_pairs, {})
+        return reduce(lambda headers, (header,value): \
+                         _process_header(msg, headers, header, value, force_processing),
+                      header_value_pairs, {})
 
 def _decode_rfc2231_tuple(msg, value):
 
@@ -726,8 +728,9 @@ def _decode_rfc2047_header(msg, header, value, force_processing=False):
         # get one, then we catch it and raise public error
         # "HeaderCharsetError".
 
-        f = lambda (value, charset): _native2unicode(value, charset, not force_processing)
-        unicode_decoded_parts = map(f, decoded_parts)
+        unicode_decoded_parts = map(lambda (value, charset): \
+                                          _native2unicode(value, charset, not force_processing),
+                                    decoded_parts)
 
         # Since all members of decoded_parts are now in unicode we can
         # concatenate them into a single header value string.
