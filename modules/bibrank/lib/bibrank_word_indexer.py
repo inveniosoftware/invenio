@@ -184,12 +184,13 @@ def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
     limits = string.split(var, ",")
     if len(limits)==1:
-        low = get_date(limits[0])
+        low = get_datetime(limits[0])
         return low,None
     if len(limits)==2:
-        low = get_date(limits[0])
-        high = get_date(limits[1])
+        low = get_datetime(limits[0])
+        high = get_datetime(limits[1])
         return low,high
+    return None,None
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
