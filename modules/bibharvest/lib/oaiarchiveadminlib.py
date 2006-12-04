@@ -114,10 +114,7 @@ def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection=
         out += "<br><br>"
         out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
-    try:
-        body = [out, extra]
-    except NameError:
-        body = [out]
+    body = [out]
 
     return nice_box("", body)
 
@@ -193,10 +190,7 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
     out += "<br><br>"
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
-    try:
-        body = [out, extra]
-    except NameError:
-        body = [out]
+    body = [out]
 
     return nice_box("", body)
 
@@ -266,10 +260,7 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
     out += "<br><br>"
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
 
-    try:
-        body = [out, extra]
-    except NameError:
-        body = [out]
+    body = [out]
 
     return nice_box("", body)
 

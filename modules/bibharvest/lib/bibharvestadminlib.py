@@ -201,10 +201,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
     output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
     output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle, body)
 
@@ -315,10 +312,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
         output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle, body)
 
@@ -361,10 +355,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
     output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
     output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     return addadminbox(subtitle, body)
 
