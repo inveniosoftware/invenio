@@ -214,7 +214,7 @@ def del_recids(rank_method_code, range):
             for i in range(int(recids), int(recide)):
                 if rec_dict.has_key(i):
                     del rec_dict[i]  
-        write_messag("New size: %s" % len(rec_dict))
+        write_message("New size: %s" % len(rec_dict))
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, date, rank_method_code)
     else:
