@@ -19,6 +19,7 @@
 
 __revision__ = "$Id$"
 
+import time
 import smtplib
     
 def send_email(fromaddr, toaddr, body, attempt=0):
