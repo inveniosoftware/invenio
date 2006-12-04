@@ -732,7 +732,6 @@ try:
     psyco.bind(find_similar) 
     psyco.bind(rank_by_method)
     psyco.bind(calculate_record_relevance)
-    psyco.bind(post_calculate_record_relevance)
     psyco.bind(word_similarity)
     psyco.bind(sort_record_relevance)
     psyco.bind(serialize_via_numeric_array)
