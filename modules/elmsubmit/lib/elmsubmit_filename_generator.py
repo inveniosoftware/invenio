@@ -32,6 +32,7 @@ import tempfile
 import re
 import os
 import mimetypes
+import zlib
 
 try:
     import magic.magic as magic
