@@ -365,7 +365,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
                 raise OSError("Directory structure altered during processing: %s removed during processing" % (dir))
             elif e.errno == 13:
                 # race condition:
-                raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dirlist))
+                raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dir_list))
 
         if targets_current_owner_uid != os.geteuid():
             # We don't own this file and so can't chmod it: We
@@ -388,7 +388,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
         os.chmod(dir, perms | targets_current_perms)
     except OSError:
         # race condition:
-        raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dirlist))
+        raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dir_list))
 
     try:
         # Now permissions are open, exec our function:    
@@ -527,8 +527,7 @@ def _get_perms_on(dirlist, perms=0300):
         return [[dir, targets_current_perms]] + parents_old_states    
 
 def _safely_chmod_dirlist(dirlist):
-    f = lambda (dir, perms): os.chmod(dir, perms)
-    map(f, dirlist)    
+    return [os.chmod(dir, perms) for dir, perms in dirlist]
 
 def get_perms(path):
     return stat.S_IMODE(os.stat(path)[stat.ST_MODE])
