@@ -267,13 +267,10 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
                        lang)
     output += "</table>"
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
-        return perform_index(fldID, ln, "perform_showindexoverview", addadminbox(subtitle, body))
+        return perform_index(ln, "perform_showindexoverview", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body) 
 
@@ -304,10 +301,7 @@ def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
     else:
         output += """No indexes exists"""
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(ln, "perform_editindexes", addadminbox(subtitle, body))
@@ -342,10 +336,7 @@ def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
     else:
         output += """No logical fields exists"""
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_field(ln, "perform_editfields", addadminbox(subtitle, body))
@@ -374,10 +365,7 @@ def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
         output += """<b><span class="info">Please give the index a name.</span></b>
         """
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_index(ln, "perform_addindex", addadminbox(subtitle, body))
@@ -456,10 +444,7 @@ def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], co
             if confirm in ["2", 2]:
                 output += write_outcome(finresult)
                     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editindex(idxID, ln, "perform_modifyindextranslations", addadminbox(subtitle, body))
@@ -537,10 +522,7 @@ def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], co
             if confirm in ["2", 2]:
                 output += write_outcome(finresult)
                     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editfield(fldID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
@@ -579,10 +561,8 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confir
     for (id_field, id_tag) in res:
         if not exist.has_key(id_field):
             output += "%s, " % fld_dict[int(id_field)]
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+
+    body = [output]
 
     if callback:
         return perform_modifyfieldtags(fldID, ln, "perform_showdetailsfieldtag", addadminbox(subtitle, body))
@@ -619,10 +599,7 @@ def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
         output = "This field is not used by any collections."
     fin_output = addadminbox('Collections', [output])
         
-    try:
-        body = [fin_output, extra]
-    except NameError:
-        body = [fin_output]
+    body = [fin_output]
 
     if callback:
         return perform_editfield(ln, "perform_showdetailsfield", addadminbox(subtitle, body))
@@ -656,10 +633,7 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
         output += """<b><span class="info">Please give the logical field a name and code.</span></b>
         """
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_field(ln, "perform_addfield", addadminbox(subtitle, body))
@@ -698,10 +672,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
             else:
                 output += write_outcome(res)
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editfield(fldID, ln, "perform_deletefield", addadminbox(subtitle, body))
@@ -737,10 +708,7 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
             else:
                 output += write_outcome(res)
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editindex(idxID, ln, "perform_deleteindex", addadminbox(subtitle, body))
@@ -771,13 +739,10 @@ def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
         output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</A>""" % (weburl, field_id, ln, fld_dict[field_id]), field_tags, lang)
     output += "</table>"
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
-        return perform_field(fldID, ln, "perform_showfieldoverview", addadminbox(subtitle, body))
+        return perform_field(ln, "perform_showfieldoverview", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body) 
 
@@ -818,10 +783,7 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
     else:
         output  = """No index to modify."""
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editindex(idxID, ln, "perform_modifyindex", addadminbox(subtitle, body))
@@ -866,10 +828,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
         output  = """No field to modify.
         """
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editfield(fldID, ln, "perform_modifyfield", addadminbox(subtitle, body))
@@ -906,10 +865,7 @@ def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', con
 
     output += content
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editindex(idxID, ln, "perform_modifyindexfields", addadminbox(subtitle, body))
@@ -960,10 +916,7 @@ def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confi
         
     output += content
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_editfield(fldID, ln, "perform_modifyfieldtags", addadminbox(subtitle, body))
@@ -1015,10 +968,7 @@ def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", co
         output += """<b><span class="info">Please choose to add either a new or an existing MARC tag, but not both.</span></b>
         """
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_modifyfieldtags(fldID, ln, "perform_addtag", addadminbox(subtitle, body))
@@ -1063,10 +1013,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
         res = modify_tag(tagID, name, value)
         output += write_outcome(res)
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     if callback:
         return perform_modifyfieldtags(fldID, ln, "perform_modifytag", addadminbox(subtitle, body))
@@ -1099,10 +1046,7 @@ def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
             res = remove_fldtag(fldID, tagID)
             output += write_outcome(res)
  
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_modifyfieldtags(fldID, ln, "perform_removefieldtag", addadminbox(subtitle, body))
@@ -1141,10 +1085,7 @@ def perform_addindexfield(idxID, ln=cdslang, fldID='', callback="yes", confirm=-
     elif confirm in ["1", 1]:
         output += """<b><span class="info">Please select a field to add.</span></b>"""
         
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_modifyindexfields(idxID, ln, "perform_addindexfield", addadminbox(subtitle, body))
@@ -1176,10 +1117,7 @@ def perform_removeindexfield(idxID, fldID, ln=cdslang, callback='yes', confirm=0
             res = remove_idxfld(idxID, fldID)
             output += write_outcome(res)
     
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
         
     if callback:
         return perform_modifyindexfields(idxID, ln, "perform_removeindexfield", addadminbox(subtitle, body))
@@ -1260,10 +1198,7 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Choose a MARC tag to delete.</span></b>"""
 
-    try:
-        body = [output, extra]
-    except NameError:
-        body = [output]
+    body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_modifyfieldtags(fldID, ln, content=output)
