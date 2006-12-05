@@ -982,6 +982,8 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
     global htdocsdir,storage,access,pylibdir,dismode
+    # load the right message language
+    _ = gettext_set_language(ln)
     t=""
     # Get the list of functions to be called
     res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action, doctype, step,))
@@ -1064,18 +1066,6 @@ def Test_Reload(uid_email, doctype, act, access):
         return 1
     else:
         return 0
-
-class functionError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
-class functionStop(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 def errorMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
