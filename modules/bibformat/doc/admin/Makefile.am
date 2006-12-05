@@ -19,7 +19,7 @@
 docdir = $(localstatedir)/www/admin/bibformat
 gifsdir=$(localstatedir)/www/admin/bibformat
 
-doc_DATA = guide.html
+doc_DATA = index.html guide.html
 
 IMGS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
 

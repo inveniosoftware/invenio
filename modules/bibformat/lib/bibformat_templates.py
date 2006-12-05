@@ -88,7 +88,7 @@ class Template:
         
         if not is_admin:
             out += '''You need to
-            <a href="%(weburl)s/youraccount/login?referer=%(weburl)s/admin/bibformat/">login</a> to enter.
+            <a href="%(weburl)s/youraccount/login?referer=%(weburl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
          ''' % {'weburl':weburl}
         
         out += '''
