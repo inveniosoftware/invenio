@@ -338,18 +338,18 @@ def parse_command():
     """
     # FIXME: add treatment of `time'
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:r:c:a:z:s:f:u:hv:Vn",
+        opts, args = getopt.getopt(sys.argv[1:], "ircazs:fu:hv:Vn",
                  [
-                   "insert=",
-                   "replace=",
-                   "correct=",
-                   "append=",
-                   "reference=",
+                   "insert",
+                   "replace",
+                   "correct",
+                   "append",
+                   "reference",
                    "stage=",
-                   "format=",
+                   "format",
                    "user=",
                    "help",
-                   "verbose",
+                   "verbose=",
                    "version",
                    "notimechange",
                  ])
@@ -382,64 +382,41 @@ def parse_command():
 
         # Insert mode option
         if opt in ["-i", "--insert"]:
-            options['mode'] = 'insert'
-            options['file_path'] = os.path.abspath(opt_value)
+            if options['mode'] == 'replace':
+                # if also replace found, then set to replace_or_insert
+                options['mode'] = 'replace_or_insert'
+            else:
+                options['mode'] = 'insert'
+            options['file_path'] = os.path.abspath(args[0])
 
         # Replace mode option
         if opt in ["-r", "--replace"]:
-            # We check if there is not the mode insert after replace
-            if opt_value == '-i' or opt_value == '--insert':
-                options['replace_insert'] = 1
-                options['mode'] = 'replace_insert'
-                options['file_path'] = os.path.abspath(args[0])
+            if options['mode'] == 'insert':
+                # if also insert found, then set to replace_or_insert
+                options['mode'] = 'replace_or_insert'
             else:
-                # Creation of the records from the xml Marc in argument
                 options['mode'] = 'replace'
-                options['file_path'] = os.path.abspath(opt_value)
+            options['file_path'] = os.path.abspath(args[0])
                 
         # Correct mode option
         if opt in ["-c", "--correct"]:
-            # We check if there is not just a special tag to correct
-            try:
-                if int(opt_value) > 0 and int(opt_value) < 999:
-                    options['mode'] = 'correct'
-                    options['tag'] = opt_value
-                    options['file_path'] = os.path.abspath(args[0])
-            except ValueError:
-                if  opt_value == 'FMT' or opt_value == 'FFT':
-                    options['mode'] = 'correct'
-                    options['tag'] = opt_value
-                    options['file_path'] = os.path.abspath(args[0])
-                else:
-                    options['mode'] = 'correct'
-                    options['file_path'] = os.path.abspath(opt_value)
+            options['mode'] = 'correct'
+            options['file_path'] = os.path.abspath(args[0])
 
         # Append mode option
         if opt in ["-a", "--append"]:
-            # We check if there is not just a special tag to append
-            try:
-                if int(opt_value) > 0 and int(opt_value) < 999:
-                    options['mode'] = 'append'
-                    options['tag'] = opt_value
-                    options['file_path'] = os.path.abspath(args[0])
-            except ValueError:
-                if  opt_value == 'FMT' or opt_value == 'FFT':
-                    options['mode'] = 'append'
-                    options['tag'] = opt_value
-                    options['file_path'] = os.path.abspath(args[0])
-                else:
-                    options['mode'] = 'append'
-                    options['file_path'] = os.path.abspath(opt_value)
+            options['mode'] = 'append'
+            options['file_path'] = os.path.abspath(args[0])
 
         # Reference mode option
         if opt in ["-z", "--reference"]:
             options['mode'] = 'reference'
-            options['file_path'] = os.path.abspath(opt_value)
+            options['file_path'] = os.path.abspath(args[0])
 
         # Format mode option
         if opt in ["-f", "--format"]:
             options['mode'] = 'format'
-            options['file_path'] = os.path.abspath(opt_value)
+            options['file_path'] = os.path.abspath(args[0])
         
         # Detection of user
         if opt in ["-u", "--user"]:    
@@ -530,11 +507,13 @@ def bibupload(record):
             record = append_new_tag_to_old_record(record, rec_old)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
 
-        # now we clear all the rows from bibrec_bibxxx from the old record 
+        # now we clear all the rows from bibrec_bibxxx from the old
+        # record (they will be populated later (if needed) during
+        # stage 4 below):
         delete_bibrec_bibxxx(rec_old, rec_id)
         write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
     write_message("   -Stage COMPLETED", verbose=2)
-    
+
     # Have a look if we have FMT tags
     write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
     if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record, 'FMT') is not None:
@@ -578,7 +557,14 @@ def bibupload(record):
     # Update the database MetaData
     write_message("Stage 4: Start (Update the database with the metadata).", verbose=2)
     if options['stage_to_start_from'] <= 4:
-        update_database_with_metadata(record, rec_id)
+        if options['mode'] == 'insert' or \
+           options['mode'] == 'replace' or \
+           options['mode'] == 'replace_or_insert' or \
+           options['mode'] == 'append' or \
+           options['mode'] == 'correct':
+            update_database_with_metadata(record, rec_id)
+        else:
+            write_message("   -Stage NOT NEEDED in mode %s" % options['mode'], verbose=2)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -873,7 +859,7 @@ def retrieve_rec_id(record):
             return -1
     else:
         if options['mode'] != 'insert':
-            if options['mode'] != 'replace_insert':
+            if options['mode'] != 'replace_or_insert':
                 write_message("   Failed : Record not found in the database."\
                               " Please insert the file before updating it."\
                               " (-h for help)", verbose=1, stream=sys.stderr)
@@ -1129,7 +1115,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
 def update_database_with_metadata(record, rec_id):
     """Update the database tables with the record and the record id given in parameter"""
     for tag in record.keys():
-        # check if tag is not a control field : tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS and
+        # check if tag is not a special one:
         if tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:
             # for each tag there is a list of tuples representing datafields
             tuple_list = record[tag]
@@ -1160,18 +1146,17 @@ def update_database_with_metadata(record, rec_id):
                     # get the full tag
                     full_tag = ''.join(tag_list)
                     
-                    # Others modes : update all the tag
-                    if options['mode'] == 'insert' or options['mode'] == 'replace' or options['mode'] == 'append':
-                        write_message("   insertion of the tag "+full_tag+" with the value "+value, verbose=9)
-                        # insert the tag and value into into bibxxx
-                        (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
-                        #print 'tname, bibrow', table_name, bibxxx_row_id;
-                        if table_name is None or bibxxx_row_id is None:
-                            write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
-                        # connect bibxxx and bibrec with the table bibrec_bibxxx
-                        res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
-                        if res is None:
-                            write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
+                    # update the tables
+                    write_message("   insertion of the tag "+full_tag+" with the value "+value, verbose=9)
+                    # insert the tag and value into into bibxxx
+                    (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
+                    #print 'tname, bibrow', table_name, bibxxx_row_id;
+                    if table_name is None or bibxxx_row_id is None:
+                        write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
+                    # connect bibxxx and bibrec with the table bibrec_bibxxx
+                    res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
+                    if res is None:
+                        write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
                 else:
                     # get the tag and value from the content of each subfield
                     for subfield in subfield_list:
@@ -1180,25 +1165,22 @@ def update_database_with_metadata(record, rec_id):
                         tag_list.append(subtag)
                         # get the full tag
                         full_tag = ''.join(tag_list)
-                        
-                        # Others modes : update all the tag
-                        if options['mode'] == 'insert' or options['mode'] == 'replace' or options['mode'] == 'append':
-                            write_message("   insertion of the tag "+full_tag+" with the value "+value, verbose=9)
-                            # insert the tag and value into into bibxxx
-                            (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
-                            if table_name is None or bibxxx_row_id is None:
-                                write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
-                            # connect bibxxx and bibrec with the table bibrec_bibxxx
-                            res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
-                            if res is None:
-                                write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
+                        # update the tables
+                        write_message("   insertion of the tag "+full_tag+" with the value "+value, verbose=9)
+                        # insert the tag and value into into bibxxx
+                        (table_name, bibxxx_row_id) = insert_record_bibxxx(full_tag, value)
+                        if table_name is None or bibxxx_row_id is None:
+                            write_message("   Failed : during insert_record_bibxxx", verbose=1, stream=sys.stderr)
+                        # connect bibxxx and bibrec with the table bibrec_bibxxx
+                        res = insert_record_bibrec_bibxxx(table_name, bibxxx_row_id, datafield_number, rec_id)
+                        if res is None:
+                            write_message("   Failed : during insert_record_bibrec_bibxxx", verbose=1, stream=sys.stderr)
                         # remove the subtag from the list
                         tag_list.pop()
                 tag_list.pop()
                 tag_list.pop()
             tag_list.pop()
     write_message("   -Update the database with metadata : DONE", verbose=2)
-
 
 def append_new_tag_to_old_record(record, rec_old):
     """Append new tags to a old record"""
@@ -1303,12 +1285,12 @@ def delete_tags_to_correct(record, rec_old):
         if options['tag'] is None:
             # See if these tags exist in the old record
             if rec_old.has_key(tag) and tag != '001':
-                # Delete the tag found
+                # Delete the tag found (FIXME: only if indicators agree!)
                 write_message("      Delete tag: "+tag+" ind1= "+rec_old[tag][0][1]+" ind2= "+rec_old[tag][0][2], verbose=9)
                 record_delete_field(rec_old, tag, rec_old[tag][0][1], rec_old[tag][0][2])
         else:
             if rec_old.has_key(tag) and options['tag'] == tag:
-                # Delete the tag found
+                # Delete the tag found (FIXME: only if indicators agree!)
                 write_message("      Delete tag: "+tag+" ind1= "+rec_old[tag][0][1]+" ind2= "+rec_old[tag][0][2], verbose=9)
                 record_delete_field(rec_old, tag, rec_old[tag][0][1], rec_old[tag][0][2])
 
