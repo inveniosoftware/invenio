@@ -678,7 +678,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     def test_insert_or_replace_the_same_sysno_record(self):
         """bibupload - SYSNO tag, allow to insert or replace the same SYSNO record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         if self.verbose:
             print "test_insert_or_replace_the_same_sysno_record() started"
@@ -689,7 +689,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.failUnless(compare_xmlbuffers(inserted_xml,
                                            self.marcxml_testrec1))
         # try to insert/replace updated record 1, it should be okay:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0])
@@ -706,7 +706,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     def test_replace_nonexisting_sysno_record(self):
         """bibupload - SYSNO tag, refuse to replace non-existing SYSNO record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         if self.verbose:
             print "test_replace_nonexisting_sysno_record() started"
@@ -840,7 +840,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
     def test_insert_or_replace_the_same_oai_record(self):
         """bibupload - OAI tag, allow to insert or replace the same OAI record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         # insert/replace record 1 first time:
         recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
@@ -849,7 +849,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.failUnless(compare_xmlbuffers(inserted_xml,
                                            self.marcxml_testrec1))
         # try to insert/replace updated record 1, it should be okay:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         recs = bibupload.xml_marc_to_records(self.marcxml_testrec1_updated)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0])
@@ -864,7 +864,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
     def test_replace_nonexisting_oai_record(self):
         """bibupload - OAI tag, refuse to replace non-existing OAI record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_insert'
+        bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
         # insert record 1 first time:
         recs = bibupload.xml_marc_to_records(self.marcxml_testrec1)
