@@ -18,6 +18,12 @@
 
 __revision__ = "$Id$"
 
+import os
+
+from invenio.config import cdsname
+
+# FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
+
 def Print_Success(parameters,curdir,form): 
     t=""
     edsrn = parameters['edsrn']

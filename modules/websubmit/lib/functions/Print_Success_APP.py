@@ -25,6 +25,10 @@ __revision__ = "$Id$"
    ## Author:         T.Baron
    ## PARAMETERS:    -
 
+import os
+
+from invenio.websubmit_config import functionError
+
 def Print_Success_APP(parameters,curdir,form):
     global rn
     # the field containing the decision of the referee must be called "decision".

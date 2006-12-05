@@ -26,6 +26,12 @@ __revision__ = "$Id$"
    ## PARAMETERS:    categformatDAM: variable used to compute the category
    ##                                of the document from its reference
 
+import os
+import re
+import time
+
+from invenio.dbquery import run_sql
+
 def Update_Approval_DB(parameters,curdir,form):
     global rn
     doctype = form['doctype']

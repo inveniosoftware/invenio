@@ -19,6 +19,10 @@
 
 __revision__ = "$Id$"
 
+import os
+
+from invenio.dbquery import run_sql
+
 def Create_Recid(parameters,curdir,form):  
     global sysno
     if not os.path.exists("%s/SN" % curdir):

@@ -19,9 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     counters
-
    ## Description:   function Report_Number_Generation
    ##                This function creates a reference for the submitted 
    ##             document and saves it in the specified file.
@@ -37,6 +34,13 @@ from invenio.config import \
    ##             rnformat: format for the generated reference
    ##             yeargen: if "AUTO", current year, else the year is
    ##                         extracted from the file [yeargen]
+
+import os
+import re
+import time
+
+from invenio.config import counters
+from invenio.websubmit_config import functionError
 
 def Report_Number_Generation(parameters,curdir,form):
     global doctype,access,act,dir,rn

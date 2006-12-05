@@ -19,9 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     pylibdir
-
    ##
    ## Name:          Get_Info.py
    ## Description:   function Get_Info
@@ -35,7 +32,10 @@ from invenio.config import \
    ## OUTPUT: HTML
    ##
 
-execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
+import os
+
+from invenio.websubmit_config import functionStop
+from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 titlevalue = ""
 emailvalue = ""

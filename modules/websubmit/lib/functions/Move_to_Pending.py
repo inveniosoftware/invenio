@@ -19,15 +19,17 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     storage
-
    ## Description:   function Move_to_Pending
    ##                This function moves the current working directory to 
    ##             /pending (usually the document is then waiting for
    ##              approval)
    ## Author:         T.Baron
    ## PARAMETERS:    -
+
+import os
+
+from invenio.config import storage
+from invenio.websubmit_config import functionError
 
 def Move_to_Pending(parameters,curdir,form):
     global rn

@@ -19,14 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     adminemail, \
-     cdsname, \
-     htdocsurl, \
-     pylibdir, \
-     supportemail, \
-     urlpath
-
    ## Description:   function Send_Approval_Request
    ##                This function sends an email to the referee asking him/her
    ##             to approve/reject a document
@@ -39,10 +31,19 @@ from invenio.config import \
    ##             authorfile: name of the file containing the author list
    ##             titleFile: name of the file containing the title
 
+import os
+import re
+
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     supportemail, \
+     urlpath
+from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
+from invenio.websubmit_functions.mail import forge_email, send_email
 
 def Send_Approval_Request (parameters,curdir,form):
     global rn,sysno

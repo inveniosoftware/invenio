@@ -19,15 +19,17 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     storage
-
    ## Description:   function Move_From_Pending
    ##                This function retrieves an old submisison directory which
    ##             had been saved in /pending and moves all the data files
    ##             in the current working directory
    ## Author:         T.Baron
    ## PARAMETERS:    -
+
+import os
+
+from invenio.config import storage
+from invenio.websubmit_config import functionError
 
 def Move_From_Pending(parameters,curdir,form):
     global rn

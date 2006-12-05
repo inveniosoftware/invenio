@@ -29,8 +29,11 @@ __revision__ = "$Id$"
    ## OUTPUT: HTML
    ##
 
+import os
+
 from invenio.search_engine import search_pattern
-    
+from invenio.websubmit_config import functionStop
+
 def Get_Sysno(parameters,curdir,form):
     global rn,sysno
     # initialize sysno variable

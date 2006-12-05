@@ -19,13 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     accessurl, \
-     adminemail, \
-     cdsname, \
-     pylibdir, \
-     supportemail
-
    ## Description:   function Send_Modify_Mail
    ##                This function sends an email saying the document has been
    ##             correctly updated
@@ -37,9 +30,16 @@ from invenio.config import \
    ##             emailFile: name of the file containing the email of the
    ##                        user
 
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+import os
+import re
 
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
+from invenio.config import \
+     accessurl, \
+     adminemail, \
+     cdsname, \
+     supportemail
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.websubmit_functions.mail import forge_email, send_email
 
 def Send_Modify_Mail (parameters,curdir,form):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)

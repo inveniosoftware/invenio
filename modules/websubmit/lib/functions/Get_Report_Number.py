@@ -29,6 +29,9 @@ __revision__ = "$Id$"
    ## OUTPUT: HTML
    ##
 
+import os
+import re
+
 def Get_Report_Number (parameters,curdir,form): 
     global rn
 

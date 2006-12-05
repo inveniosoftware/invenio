@@ -26,6 +26,9 @@ __revision__ = "$Id$"
    ##
    ## PARAMETERS:    -
 
+from invenio.dbquery import run_sql
+from invenio.websubmit_config import functionStop
+
 def Test_Status(parameters,curdir,form):
     global rn
     res = run_sql("SELECT status, access FROM sbmAPPROVAL WHERE rn=%s", (rn,))

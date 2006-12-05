@@ -21,8 +21,8 @@ __revision__ = "$Id$"
 
 from os import system, access, R_OK
 
-from invenio.config import \
-     xmlmarc2textmarc
+from invenio.config import xmlmarc2textmarc
+from invenio.websubmit_config import functionError
 
 def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
     """Call "xmlmarc2textmarc" to convert an XML MARC record to an ALEPH MARC record, saving the ALEPH record

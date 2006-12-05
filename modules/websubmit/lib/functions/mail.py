@@ -21,6 +21,8 @@ __revision__ = "$Id$"
 
 import time
 import smtplib
+
+from invenio.websubmit_config import functionError
     
 def send_email(fromaddr, toaddr, body, attempt=0):
     if toaddr != "":
@@ -38,3 +40,4 @@ def send_email(fromaddr, toaddr, body, attempt=0):
 def forge_email(fromaddr, toaddr, bcc, subject, content):
     body = 'From: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\nSubject: %s\n%s' % (fromaddr, toaddr,subject, content)
     return body
+

@@ -29,6 +29,10 @@ __revision__ = "$Id$"
    ##                casesteps: comma-separated list of steps
    ##                casedefault: default step if no value is mapped
 
+import os
+
+from invenio.websubmit_config import functionStop, functionError
+
 def CaseEDS(parameters,curdir,form):
     casevariable = parameters['casevariable']
     casevalue = parameters['casevalues']

@@ -30,14 +30,13 @@ from invenio.config import \
      adminemail, \
      cdsname, \
      counters, \
-     pylibdir, \
      supportemail
+from invenio.websubmit_config import functionError
+from invenio.websubmit_functions.mail import forge_email, send_email
 
 max_sys_approaching_warning_point = 2000
 max_age_lockfile = 300  # (seconds)
 legal_aleph_dbs = ["CER", "IEX", "MAN", "MMD"]
-
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
 
 def Allocate_ALEPH_SYS(parameters, curdir, form):
     """Get the next available ALEPH SYS from the counter file, and allocate it as the

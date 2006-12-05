@@ -19,8 +19,10 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     supportemail
+from invenio.config import supportemail
+from invenio.dbquery import run_sql
+from invenio.access_control_engine import acc_authorize_action
+from invenio.websubmit_config import functionStop
 
 def Is_Referee(parameters,curdir,form):
     global uid_email,sysno,rn,uid

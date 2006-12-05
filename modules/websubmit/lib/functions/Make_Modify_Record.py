@@ -19,10 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     bibconvert, \
-     bibconvertconf
-
    ## Description:   function Make_Modify_Record
    ##                This function creates the bibliographic record
    ##             using bibConvert and the configuration files passed as
@@ -32,6 +28,13 @@ from invenio.config import \
    ## PARAMETERS:    sourceModify: source description file
    ##                mysqlModify: template description file
    ## OUTPUT: HTML
+
+import os
+
+from invenio.config import \
+     bibconvert, \
+     bibconvertconf
+from invenio.websubmit_config import functionError
 
 def Make_Modify_Record(parameters,curdir,form):
     # Get rid of "invisible" white spaces

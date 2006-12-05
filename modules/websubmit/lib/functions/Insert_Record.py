@@ -19,11 +19,14 @@
 
 __revision__ = "$Id$"
 
+import os
+import time
 import shutil
 
 from invenio.config import \
      bibupload, \
      tmpdir
+from invenio.websubmit_config import functionError
 
 def Insert_Record(parameters,curdir,form):
     global rn

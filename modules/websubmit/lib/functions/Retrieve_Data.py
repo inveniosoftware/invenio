@@ -27,6 +27,8 @@ __revision__ = "$Id$"
    ## PARAMETERS:    fieldname: marc21 code
    ##                bibrec: system number of the bibliographic record
 
+import string
+
 from invenio.search_engine import search_pattern, perform_request_search, print_record
 
 def Get_Field(fieldname,bibrec):

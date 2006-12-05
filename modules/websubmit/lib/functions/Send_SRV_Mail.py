@@ -19,13 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     accessurl, \
-     adminemail, \
-     cdsname, \
-     pylibdir, \
-     supportemail
-
    ## Description:   function Send_SRV_Mail
    ##                This function sends an email confirming the revision
    ##             has been carried on with success
@@ -37,10 +30,17 @@ from invenio.config import \
    ##             emailFile: name of the file in which the user's email is
    ##             noteFile: name of the file containing a note from the user
 
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+import os
+import re
 
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
-execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
+from invenio.config import \
+     accessurl, \
+     adminemail, \
+     cdsname, \
+     supportemail
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Send_SRV_Mail(parameters,curdir,form):
     global rn,doctype,sysno

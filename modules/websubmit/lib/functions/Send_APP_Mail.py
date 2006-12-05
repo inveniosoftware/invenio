@@ -19,13 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     adminemail, \
-     cdsname, \
-     htdocsurl, \
-     pylibdir, \
-     supportemail
-
    ## Description:   function Send_APP_Mail
    ##                This function send an email informing the original 
    ##             submitter of a document that the referee has approved/
@@ -39,10 +32,18 @@ from invenio.config import \
    ##             categformatAPP: variable needed to derive the addresses
    ##                    mentioned above
 
-from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+import os
+import re
 
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     supportemail
+from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
+from invenio.dbquery import run_sql
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.websubmit_functions.mail import forge_email, send_email
 
 def Send_APP_Mail (parameters,curdir,form):
     global emailvalue,titlevalue,authorvalue,sysno,rn

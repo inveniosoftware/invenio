@@ -19,9 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     pylibdir
-
    ##
    ## Name:          Is_Original_Submitter
    ## Description:   function Is_Original_Submitter
@@ -34,7 +31,12 @@ from invenio.config import \
    ## OUTPUT: HTML
    ##
 
-execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
+
+import re
+
+from invenio.access_control_engine import acc_authorize_action
+from invenio.websubmit_config import functionStop
+from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Is_Original_Submitter(parameters,curdir,form):
     global uid_email,sysno,uid

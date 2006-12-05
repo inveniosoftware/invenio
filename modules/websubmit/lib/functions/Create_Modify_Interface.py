@@ -19,9 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     pylibdir
-
    ## Description:   function Create_Modify_Interface
    ##                This function creates the html form allowing the user to
    ##                some bibliographic fields
@@ -29,8 +26,14 @@ from invenio.config import \
    ## PARAMETERS:    fieldnameMBI: name of the file containing the 
    ##                              "+"-separated list of fields to modify
 
-execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
-import re,os
+
+import os
+import re
+import time
+
+from invenio.dbquery import run_sql
+from invenio.websubmit_config import functionError
+from invenio.websubmit_funtions.Retrieve_Data import Get_Field
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.

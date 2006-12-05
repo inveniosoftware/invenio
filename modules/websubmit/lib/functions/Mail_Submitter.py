@@ -19,13 +19,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import \
-     adminemail, \
-     cdsname, \
-     htdocsurl, \
-     pylibdir, \
-     supportemail
-
    ##
    ## Name:          Mail_Submitter.py
    ## Description:   function Mail_Submitter
@@ -45,9 +38,17 @@ from invenio.config import \
    ## OUTPUT: HTML
    ##
 
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+import os
+import re
 
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
+from invenio.config import \
+     adminemail, \
+     cdsname, \
+     htdocsurl, \
+     supportemail
+
+from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.websubmit_functions.mail import forge_email, send_email
 
 def Mail_Submitter (parameters,curdir,form): 
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
@@ -60,7 +61,7 @@ def Mail_Submitter (parameters,curdir,form):
     rn = re.sub("[\n\r]+","",rn)
     if newrnin != "" and os.path.exists("%s/%s" % (curdir,newrnin)):
         fp = open("%s/%s" % (curdir,newrnin),"r")
-        additional_rn = read()
+        additional_rn = fp.read()
         fp.close()
         additional_rn = re.sub("[\n\r]+","",additional_rn)
         fullrn = "%s and %s" % (additional_rn,rn)
