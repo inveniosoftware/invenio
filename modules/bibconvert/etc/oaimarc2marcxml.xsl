@@ -6,15 +6,16 @@
 <xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:OAI-PMH="http://www.openarchives.org/OAI/2.0/"
+xmlns:marc="http://www.loc.gov/MARC21/slim"
 exclude-result-prefixes="OAI-PMH">
 <xsl:template match="/">
         <collection>
-            <xsl:for-each select="//OAI-PMH:record">    
+            <xsl:for-each select="//OAI-PMH:ListRecords/OAI-PMH:record">    
             <xsl:choose>
                 <xsl:when test="OAI-PMH:header[@status='deleted']">
                     <record>
                         <xsl:if test='./OAI-PMH:header/OAI-PMH:identifier | ./OAI-PMH:header/OAI-PMH:setSpec'>
-		            <datafield tag="909" ind1="C" ind2="O">
+        		            <datafield tag="909" ind1="C" ind2="O">
                                 <subfield code="o"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
                                 <subfield code="p"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:setSpec"/></subfield>
                              </datafield>
@@ -27,8 +28,16 @@ exclude-result-prefixes="OAI-PMH">
                 <xsl:otherwise>
                     <record>
                         <xsl:for-each select="./OAI-PMH:metadata/OAI-PMH:record/OAI-PMH:datafield">
-                            <xsl:if test="not(@tag='980' and @ind1='' and @ind2='' and ./OAI-PMH:subfield[@code='a'])"> 
-                                <xsl:copy-of select="." />
+                            <xsl:if test="not(@tag='980' and @ind1='' and @ind2='' and ./OAI-PMH:subfield[@code='a']) and ./OAI-PMH:subfield">
+                                 <xsl:element name="{local-name(.)}">
+                                    <xsl:copy-of select="@*"/>
+                                    <xsl:for-each select="./OAI-PMH:subfield">
+                                         <xsl:element name="{local-name(.)}">
+                                             <xsl:copy-of select="@*"/>
+                                             <xsl:value-of select="."/>
+                                         </xsl:element>
+                                    </xsl:for-each>
+                                 </xsl:element> 
                             </xsl:if>
                          </xsl:for-each> 
                         
