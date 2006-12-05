@@ -40,14 +40,15 @@ def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
     p_tag = parse_tag(tag)
     if p_tag[0].isdigit() and int(p_tag[0]) in range(0, 11):
         return  bfo.control_field(tag)
-    else:
+    elif p_tag[0].isdigit():
         values = bfo.fields(tag)
+    else:
+        return ''
     
     out = ""
-
+    
     if limit == "" or (not limit.isdigit()) or limit > len(values):
         limit = len(values)
-
 
     if len(values) > 0 and isinstance(values[0], dict):
         x = 0

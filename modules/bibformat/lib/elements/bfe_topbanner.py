@@ -36,7 +36,7 @@ def format(bfo):
     out = '<table border="0" width="100%"><tr class="blocknote">'
     out += '''<td valign="left">
     %s
-    <small>'''%collection_indicator
+    <small>''' % collection_indicator
 
     if subject != "XX":
         out += " / "+ subject
