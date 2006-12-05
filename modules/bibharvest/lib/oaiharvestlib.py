@@ -400,7 +400,7 @@ def call_bibconvert(config, harvestpath, convertpath):
 
 def call_bibupload(convertpath):
     """ A method that uploads a file to the database - calls bibUpload """
-    command = '%s/bibupload -ri %s ' % (bindir, convertpath)
+    command = '%s/bibupload -r -i %s ' % (bindir, convertpath)
     p=os.system(command)
     return p
 
