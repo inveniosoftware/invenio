@@ -96,3 +96,15 @@ CFG_KNOWN_FILE_EXTENSIONS = ["lis",
 			     "mp3",
 			     "wav",
 			     "mpg"]
+
+class functionError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+class functionStop(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
