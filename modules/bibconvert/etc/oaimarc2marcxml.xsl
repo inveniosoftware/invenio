@@ -12,7 +12,7 @@ exclude-result-prefixes="OAI-PMH">
         <collection>
             <xsl:for-each select="//OAI-PMH:ListRecords/OAI-PMH:record">    
             <xsl:choose>
-                <xsl:when test="OAI-PMH:header[@status='deleted']">
+                <xsl:when test="./OAI-PMH:header[@status='deleted']">
                     <record>
                         <xsl:if test='./OAI-PMH:header/OAI-PMH:identifier | ./OAI-PMH:header/OAI-PMH:setSpec'>
         		            <datafield tag="909" ind1="C" ind2="O">
@@ -45,7 +45,7 @@ exclude-result-prefixes="OAI-PMH">
                         <!-- CUSTOMIZE ME: Modify the datafield below with tag and indicators used 
                                  in your Invenio installation for the OAI identifier -->
                             <datafield tag="909" ind1="C" ind2="O">
-                                <subfield code="u"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
+                                <subfield code="o"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
                             </datafield>
 		        </xsl:if>
                     </record>
