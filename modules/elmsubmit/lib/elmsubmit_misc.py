@@ -226,14 +226,13 @@ def count_dotdot(path):
     return len(dotdots)
 
 def common_prefix(seq, default_empty=''):
-        try:
-            leng = 0
-            for tuple in zip(*seq):
-                if tuple[1:] != tuple[:-1]: break
-                leng += 1
-            return seq[0][:leng]
-        except TypeError: return default_empty
-
+    try:
+        leng = 0
+        for tuple in zip(*seq):
+            if tuple[1:] != tuple[:-1]: break
+            leng += 1
+        return seq[0][:leng]
+    except TypeError: return default_empty
 
 def split_common_path(thePaths):
     # sanitze paths:

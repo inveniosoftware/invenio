@@ -577,9 +577,9 @@ def _native2unicode(value_nc, native_charset=None, strict=True):
 
 def _process_headers(msg, header_value_pairs, force_processing=False):
         
-        return reduce(lambda headers, (header,value): \
-                         _process_header(msg, headers, header, value, force_processing),
-                      header_value_pairs, {})
+    return reduce(lambda headers, (header,value): \
+                     _process_header(msg, headers, header, value, force_processing),
+                  header_value_pairs, {})
 
 def _decode_rfc2231_tuple(msg, value):
 
@@ -680,25 +680,25 @@ def _decode_rfc2231_header(msg, header, value, force_processing=False):
 #     shortcomings.
 #     """
 
-     params = msg.get_params(None, header)
+    params = msg.get_params(None, header)
 
-     # param should never return failobj None since we have already
-     # verified the header we are requesting exists.
-     if params is None: raise _EmailPackageError
-     
-     try:
+    # param should never return failobj None since we have already
+    # verified the header we are requesting exists.
+    if params is None: raise _EmailPackageError
+    
+    try:
 
-         f = lambda (k,v): _decode_and_join_structured_header_pair(msg, k, v)
-         joined_pairs = map(f, params)
-         unicode_value = '; '.join(joined_pairs)
+        f = lambda (k,v): _decode_and_join_structured_header_pair(msg, k, v)
+        joined_pairs = map(f, params)
+        unicode_value = '; '.join(joined_pairs)
 
-     except _StructuredHeaderPairError, e:
-         if force_processing:
-             unicode_value = None
-         else:
-             raise HeaderRFC2231Error(msg, header, value, e.key, e.value)
+    except _StructuredHeaderPairError, e:
+        if force_processing:
+            unicode_value = None
+        else:
+            raise HeaderRFC2231Error(msg, header, value, e.key, e.value)
 
-     return unicode_value
+    return unicode_value
 
 def _decode_rfc2047_header(msg, header, value, force_processing=False):
     """

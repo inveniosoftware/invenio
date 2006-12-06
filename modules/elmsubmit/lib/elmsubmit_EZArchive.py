@@ -475,215 +475,215 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
         try:
             # Write input to a temp file if we are given a byte string.
             
-                # Work out where the output archive file is going to go:
-                if compress_to == 'my_file':
-                    if my_file is None:
-                        raise ValueError("if compress_to == 'my_file' then argument my_file must be specified. got None.")
-            
-                    # Make given file into a nice sane one:
-                    archive_fullname = os.path.abspath(os.path.expanduser(os.path.normpath(my_file)))
-            
-                    # Should we remember this file or not?  If we get an error in
-                    # the middle of processing, should we delete a user specified
-                    # archive file? The decision is not so clear cut as with
-                    # temporary files (see next). My choice is not to remember
-                    # (and so not to delete on error)
-            
-                else:
-                    # compress_to in ['temp_file', 'byte_string']
-                    (tf, tf_name) = _open_tempfile(mode='wb')
-            
-                    # close filehandle because we don't need it:
-                    tf.close()
-                    
-                    # delete the empty tempfile that open_tempfile
-                    # created, so we don't get ClobberError
-                    os.unlink(tf_name)
-                    del tf
-                    
-                    if compress_to == 'temp_file':
-                        _remember_write(tf_name, error_only=True)
-                    else:
-                        # compress_to == 'byte_string'
-                        _remember_write(tf_name, error_only=False)
-            
-                    archive_fullname = tf_name
-            
-                # Get an archive/compress tool:
-                tool_class = available_tools[compression]
-                archive = tool_class(file_loc=archive_fullname, mode='w', allow_clobber=allow_clobber)
-            
-                # Deal with the input:
-                # We do this as follows:
-            
-                # 1. Take anonymous byte strings and turn them into byte strings
-                # by generating a filename for each string, then set
-                # input=[new list of named byte strings]
-                # input_disposition='named_byte_strings'
+            # Work out where the output archive file is going to go:
+            if compress_to == 'my_file':
+                if my_file is None:
+                    raise ValueError("if compress_to == 'my_file' then argument my_file must be specified. got None.")
+        
+                # Make given file into a nice sane one:
+                archive_fullname = os.path.abspath(os.path.expanduser(os.path.normpath(my_file)))
+        
+                # Should we remember this file or not?  If we get an error in
+                # the middle of processing, should we delete a user specified
+                # archive file? The decision is not so clear cut as with
+                # temporary files (see next). My choice is not to remember
+                # (and so not to delete on error)
+        
+            else:
+                # compress_to in ['temp_file', 'byte_string']
+                (tf, tf_name) = _open_tempfile(mode='wb')
+        
+                # close filehandle because we don't need it:
+                tf.close()
                 
-                # 2. Take named byte strings and write them to a temporary
-                # directory, chdir to this directory and set:
-                # input = [glob of temp dir]
-                # input_diposition = 'file_locations'
+                # delete the empty tempfile that open_tempfile
+                # created, so we don't get ClobberError
+                os.unlink(tf_name)
+                del tf
+                
+                if compress_to == 'temp_file':
+                    _remember_write(tf_name, error_only=True)
+                else:
+                    # compress_to == 'byte_string'
+                    _remember_write(tf_name, error_only=False)
+        
+                archive_fullname = tf_name
+        
+            # Get an archive/compress tool:
+            tool_class = available_tools[compression]
+            archive = tool_class(file_loc=archive_fullname, mode='w', allow_clobber=allow_clobber)
+        
+            # Deal with the input:
+            # We do this as follows:
+        
+            # 1. Take anonymous byte strings and turn them into byte strings
+            # by generating a filename for each string, then set
+            # input=[new list of named byte strings]
+            # input_disposition='named_byte_strings'
             
-                if input_disposition == 'anonymous_byte_strings':
-                    # If input is anonymous byte strings, we need generate a filename
-                    # for each of the strings:
-                    seen_rand_names = []
-                    
-                    def f(bytstr):
+            # 2. Take named byte strings and write them to a temporary
+            # directory, chdir to this directory and set:
+            # input = [glob of temp dir]
+            # input_diposition = 'file_locations'
+        
+            if input_disposition == 'anonymous_byte_strings':
+                # If input is anonymous byte strings, we need generate a filename
+                # for each of the strings:
+                seen_rand_names = []
+                
+                def f(bytstr):
+                    rand_name = _random_alphanum_string(num_random_bits, chars=rename_from_set)
+                    tries = 1
+                    while rand_name in seen_rand_names:
                         rand_name = _random_alphanum_string(num_random_bits, chars=rename_from_set)
-                        tries = 1
-                        while rand_name in seen_rand_names:
-                            rand_name = _random_alphanum_string(num_random_bits, chars=rename_from_set)
-                            tries += 1
-                            if tries > 20:
-                                raise EZArchiveError('20 random filename selections collided: perhaps you need to increase num_rand_bits?')
-                        seen_rand_names.append(rand_name)
-                        return [rand_name, bytstr]
-            
-                    input = map(f, input)
-                    input_disposition = 'named_byte_strings'
-                
-                if input_disposition == 'named_byte_strings':
-                    # Write the byte strings out to the temporary directory.
-                    temp_dir = tempfile.mkdtemp()
-                    _remember_write(temp_dir, error_only=False)
-                    
-                    if this_root is not None:
-                        # santize:
-                        this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
-                        # chop off the root slashes:
-                        this_root = re.sub(r'^/+', '', string=this_root, count=1)
-                        # rejig the root dir to reflect the fact we've shoved
-                        # everything under a psuedo-root temp directory:
-                        this_root = os.path.join(temp_dir, this_root)
-            
-                    new_input = []
-                    seen_filenames = {}
-            
-                    for filename, bytestr in input:
-                        # Sanitize the filename we've been given:
-                        filename = os.path.abspath(os.path.expanduser(os.path.normpath(filename)))
-                        # chop off the root slashes:
-                        filename = re.sub(r'^/+', '', string=filename, count=1)
-                        
-                        dirname = os.path.dirname(filename)
-            
-                        # Use temp_dir as a 'fake_root': (There is some possible
-                        # dodginess here if the user names one of the files as if
-                        # it were inside the not yet existant temp directory:
-                        # unlikely scenario; should we work around it? I haven't.
-                        _mkdir_parents(os.path.join(temp_dir, dirname))
-            
-                        filename = _verify_filename(name=filename, seen_filenames=seen_filenames,
-                                                    filename_collision=filename_collision, num_random_bits=num_random_bits,
-                                                    rename_from_set=rename_from_set)
-                        if filename == ['skip']: continue
-            
-                        tempfile_fullname = os.path.join(temp_dir, filename)
-                        
-                        open(tempfile_fullname, 'wb').write(bytestr)
-                        new_input.append(tempfile_fullname)
-            
-                    input = new_input
-                    input_disposition='file_locations'
-            
-                # At this point, input_disposition='file_locations' and input contains a list of filenames.
-
-                # sanitize the list of filenames
-                f = lambda x: os.path.abspath(os.path.expanduser(os.path.normpath(x)))
+                        tries += 1
+                        if tries > 20:
+                            raise EZArchiveError('20 random filename selections collided: perhaps you need to increase num_rand_bits?')
+                    seen_rand_names.append(rand_name)
+                    return [rand_name, bytstr]
+        
                 input = map(f, input)
+                input_disposition = 'named_byte_strings'
             
-                # Expand any directories into filenames (excluding symlinks):
-                new_input = []
-                for item in input:
-                    if os.path.isdir(item):
-                        new_input.append(item)
-                        if recurse_dirs:
-                            new_input.extend(_recursive_dir_contents(item))
-                    else:
-                        new_input.append(item)
-                input = new_input
-                        
-                # calculate the compression root:
-                if use_compression_root == 'calculate_minimum':
-                    first_input = input[0]
-                    if input == filter(lambda x: x == first_input, input):
-                        # all of the filenames we've been given are the same:
-                        compression_root = os.path.dirname(first_input)
-                        files_to_compress = [os.path.basename(first_input)] * len(input)
-                    else:
-                        # find out the common root of the filenames:
-                        (compression_root, files_to_compress) = _split_common_path(input)
-                        # if compression_root was also specified in input, it will
-                        # have become a blank entry '' in files_to_compress:
-                        files_to_compress = filter(lambda x: (x != '' and True) or False, files_to_compress)
-                else:
-                    # use_compression_root == 'this_root':
-                    if this_root is None:
-                        raise EZArchiveError("if compression_root=='this_root' then argument this_root must be specified")
-            
-                    this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
-            
-                    # check that this_root is indeed a prefix of all of the input
-                    # files we've been given:
-                    if input != filter(lambda file: this_root in _dirtree(file), input):
-                        raise EZArchiveError('not all files specified in argument input are children of argument this_root')
-                    # get rid of the entries that are exactly this_root:
-                    input = filter(lambda file: file != this_root, input)
-            
-                    compression_root = this_root
-                    
-                    # Chop off this_root from input:
-                    if this_root == '/' or this_root == '//':
-                        this_root_len = len(this_root)
-                    else:
-                        this_root_len = len(this_root + '/')
-                    files_to_compress = map(lambda file: file[this_root_len:], input)
-                    
-                old_cwd = os.getcwd()
-                os.chdir(compression_root)
-            
-                seen_filenames = {}
-                for file_to_compress in files_to_compress:
-            
-                    if directory_structure == 'flatten':
-                        if os.path.isdir(file_to_compress):
-                            continue
-            
-                        archive_name = os.path.basename(file_to_compress)
-                        
-                        archive_name = _verify_filename(name=archive_name, seen_filenames=seen_filenames,
-                                                        filename_collision=filename_collision,
-                                                        num_random_bits=num_random_bits,
-                                                        rename_from_set=rename_from_set)
-                        if archive_name == ['skip']: continue
-            
-                        archive.add_member(file_loc=file_to_compress, archive_name=archive_name,
-                                           force_file_permissions=force_file_permissions,
-                                           force_dir_permissions=force_dir_permissions)
-                        
-                    else:
-                        # directory_structure == 'retain':
-                        archive.add_member(file_loc=file_to_compress, archive_name=None,
-                                           force_file_permissions=force_file_permissions,
-                                           force_dir_permissions=force_dir_permissions)
-
-                # get rid of the archive object, which has an open
-                # filehandle, mode 'wb' on the archive file:
-                # not closing this would prevent us from seeing what
-                # has been written to the files.
-                del archive
+            if input_disposition == 'named_byte_strings':
+                # Write the byte strings out to the temporary directory.
+                temp_dir = tempfile.mkdtemp()
+                _remember_write(temp_dir, error_only=False)
                 
-                # now see if we need to return anything:
-                if compress_to == 'my_file':
-                    return None
-                elif compress_to == 'temp_file':
-                    return tf_name
+                if this_root is not None:
+                    # santize:
+                    this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
+                    # chop off the root slashes:
+                    this_root = re.sub(r'^/+', '', string=this_root, count=1)
+                    # rejig the root dir to reflect the fact we've shoved
+                    # everything under a psuedo-root temp directory:
+                    this_root = os.path.join(temp_dir, this_root)
+        
+                new_input = []
+                seen_filenames = {}
+        
+                for filename, bytestr in input:
+                    # Sanitize the filename we've been given:
+                    filename = os.path.abspath(os.path.expanduser(os.path.normpath(filename)))
+                    # chop off the root slashes:
+                    filename = re.sub(r'^/+', '', string=filename, count=1)
+                    
+                    dirname = os.path.dirname(filename)
+        
+                    # Use temp_dir as a 'fake_root': (There is some possible
+                    # dodginess here if the user names one of the files as if
+                    # it were inside the not yet existant temp directory:
+                    # unlikely scenario; should we work around it? I haven't.
+                    _mkdir_parents(os.path.join(temp_dir, dirname))
+        
+                    filename = _verify_filename(name=filename, seen_filenames=seen_filenames,
+                                                filename_collision=filename_collision, num_random_bits=num_random_bits,
+                                                rename_from_set=rename_from_set)
+                    if filename == ['skip']: continue
+        
+                    tempfile_fullname = os.path.join(temp_dir, filename)
+                    
+                    open(tempfile_fullname, 'wb').write(bytestr)
+                    new_input.append(tempfile_fullname)
+        
+                input = new_input
+                input_disposition='file_locations'
+        
+            # At this point, input_disposition='file_locations' and input contains a list of filenames.
+
+            # sanitize the list of filenames
+            f = lambda x: os.path.abspath(os.path.expanduser(os.path.normpath(x)))
+            input = map(f, input)
+        
+            # Expand any directories into filenames (excluding symlinks):
+            new_input = []
+            for item in input:
+                if os.path.isdir(item):
+                    new_input.append(item)
+                    if recurse_dirs:
+                        new_input.extend(_recursive_dir_contents(item))
                 else:
-                    # compress_to == 'byte_string':
-                    return open(archive_fullname, 'rb').read()
+                    new_input.append(item)
+            input = new_input
+                    
+            # calculate the compression root:
+            if use_compression_root == 'calculate_minimum':
+                first_input = input[0]
+                if input == filter(lambda x: x == first_input, input):
+                    # all of the filenames we've been given are the same:
+                    compression_root = os.path.dirname(first_input)
+                    files_to_compress = [os.path.basename(first_input)] * len(input)
+                else:
+                    # find out the common root of the filenames:
+                    (compression_root, files_to_compress) = _split_common_path(input)
+                    # if compression_root was also specified in input, it will
+                    # have become a blank entry '' in files_to_compress:
+                    files_to_compress = filter(lambda x: (x != '' and True) or False, files_to_compress)
+            else:
+                # use_compression_root == 'this_root':
+                if this_root is None:
+                    raise EZArchiveError("if compression_root=='this_root' then argument this_root must be specified")
+        
+                this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
+        
+                # check that this_root is indeed a prefix of all of the input
+                # files we've been given:
+                if input != filter(lambda file: this_root in _dirtree(file), input):
+                    raise EZArchiveError('not all files specified in argument input are children of argument this_root')
+                # get rid of the entries that are exactly this_root:
+                input = filter(lambda file: file != this_root, input)
+        
+                compression_root = this_root
+                
+                # Chop off this_root from input:
+                if this_root == '/' or this_root == '//':
+                    this_root_len = len(this_root)
+                else:
+                    this_root_len = len(this_root + '/')
+                files_to_compress = map(lambda file: file[this_root_len:], input)
+                
+            old_cwd = os.getcwd()
+            os.chdir(compression_root)
+        
+            seen_filenames = {}
+            for file_to_compress in files_to_compress:
+        
+                if directory_structure == 'flatten':
+                    if os.path.isdir(file_to_compress):
+                        continue
+        
+                    archive_name = os.path.basename(file_to_compress)
+                    
+                    archive_name = _verify_filename(name=archive_name, seen_filenames=seen_filenames,
+                                                    filename_collision=filename_collision,
+                                                    num_random_bits=num_random_bits,
+                                                    rename_from_set=rename_from_set)
+                    if archive_name == ['skip']: continue
+        
+                    archive.add_member(file_loc=file_to_compress, archive_name=archive_name,
+                                       force_file_permissions=force_file_permissions,
+                                       force_dir_permissions=force_dir_permissions)
+                    
+                else:
+                    # directory_structure == 'retain':
+                    archive.add_member(file_loc=file_to_compress, archive_name=None,
+                                       force_file_permissions=force_file_permissions,
+                                       force_dir_permissions=force_dir_permissions)
+
+            # get rid of the archive object, which has an open
+            # filehandle, mode 'wb' on the archive file:
+            # not closing this would prevent us from seeing what
+            # has been written to the files.
+            del archive
+            
+            # now see if we need to return anything:
+            if compress_to == 'my_file':
+                return None
+            elif compress_to == 'temp_file':
+                return tf_name
+            else:
+                # compress_to == 'byte_string':
+                return open(archive_fullname, 'rb').read()
         except:
             # Clean up non-temporary file if we get an error:
             _delete_files(_remove_on_error)
