@@ -477,8 +477,8 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     for (t, tf) in tf_values: #t=term, tf=term frequency
         term_recs = deserialize_via_marshal(terms_recs[t])
         if len(tf_values) <= methods[rank_method_code]["max_nr_words_lower"] or (len(term_recs) >= methods[rank_method_code]["min_nr_words_docs"] and (((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) <=  methods[rank_method_code]["max_word_occurence"]) and ((float(len(term_recs)) / float(methods[rank_method_code]["col_size"])) >= methods[rank_method_code]["min_word_occurence"]))): #too complicated...something must be done
-             lwords.append((t, methods[rank_method_code]["rnkWORD_table"])) #list of terms used
-             (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") #true tells the function to not calculate all unimportant terms
+            lwords.append((t, methods[rank_method_code]["rnkWORD_table"])) #list of terms used
+            (recdict, rec_termcount) = calculate_record_relevance_findsimilar((t, round(tf, 4)) , term_recs, hitset, recdict, rec_termcount, verbose, "true") #true tells the function to not calculate all unimportant terms
         if len(tf_values) > methods[rank_method_code]["max_nr_words_lower"] and (len(lwords) ==  methods[rank_method_code]["max_nr_words_upper"] or tf < 0):
             break
 

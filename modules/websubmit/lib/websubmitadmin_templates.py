@@ -431,7 +431,7 @@ class Template:
           <td width="80%%"><span class="info">%s</span></td>
          </tr>""" % (cgi.escape(str(elcd), 1),)
         if elmd != "" and elmd is not None:
-                body_content += """
+            body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Last Modification Date:</span></td>
           <td width="80%%"><span class="info">%s</span></td>

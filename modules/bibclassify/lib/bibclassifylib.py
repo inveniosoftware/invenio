@@ -92,12 +92,12 @@ def generate_keywords(textfile, dictfile):
         if len(keyword)<=1: #whitespace or one char - get rid of
             continue
         else:
-           dictOUT = os.popen('grep -iwc "' +keyword.strip()+'" '+textfile).read()
-           try:
+            dictOUT = os.popen('grep -iwc "' +keyword.strip()+'" '+textfile).read()
+            try:
                 occur = int(dictOUT)
                 if occur != 0:
                     keylist.append([occur, keyword])
-           except ValueError:
+            except ValueError:
                 continue
     keylist.sort()
     keylist.reverse()
@@ -486,29 +486,29 @@ def makeTagCloud(entries):
     cloud += '<tr><div class="pagebox" align="top">'    
     # Generate some ad-hoc count distribution
     for i in range(0, len(entries)):
-            count = int(entries[i][0])
-            tag = str(entries[i][1])
-            color = int(entries[i][2])
-            if count < (max_occurrence/10):
-                cloud_list.append([tag,0,color])
-            elif count < (max_occurrence/7.5):
-                cloud_list.append([tag,1,color])
-            elif count < (max_occurrence/5):
-                cloud_list.append([tag,2,color])
-            elif count < (max_occurrence/4):
-                cloud_list.append([tag,3,color])
-            elif count < (max_occurrence/3):
-                cloud_list.append([tag,4,color])
-            elif count < (max_occurrence/2):
-                cloud_list.append([tag,5,color])
-            elif count < (max_occurrence/1.7):
-                cloud_list.append([tag,6,color])
-            elif count < (max_occurrence/1.5):
-                cloud_list.append([tag,7,color])
-            elif count < (max_occurrence/1.3):
-                cloud_list.append([tag,8,color])
-            else:
-                cloud_list.append([tag,9,color])
+        count = int(entries[i][0])
+        tag = str(entries[i][1])
+        color = int(entries[i][2])
+        if count < (max_occurrence/10):
+            cloud_list.append([tag,0,color])
+        elif count < (max_occurrence/7.5):
+            cloud_list.append([tag,1,color])
+        elif count < (max_occurrence/5):
+            cloud_list.append([tag,2,color])
+        elif count < (max_occurrence/4):
+            cloud_list.append([tag,3,color])
+        elif count < (max_occurrence/3):
+            cloud_list.append([tag,4,color])
+        elif count < (max_occurrence/2):
+            cloud_list.append([tag,5,color])
+        elif count < (max_occurrence/1.7):
+            cloud_list.append([tag,6,color])
+        elif count < (max_occurrence/1.5):
+            cloud_list.append([tag,7,color])
+        elif count < (max_occurrence/1.3):
+            cloud_list.append([tag,8,color])
+        else:
+            cloud_list.append([tag,9,color])
 
     cloud_list.sort()
     for i in range(0, len(cloud_list)):

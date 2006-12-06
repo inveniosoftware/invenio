@@ -612,20 +612,20 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # Get document name
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
     if len(res) > 0:
-       docname = res[0][0]
+        docname = res[0][0]
     else:
         return errorMsg(_("Unknown type of document"), req, cdsname, ln)
     # Get action name
     res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
     if len(res) > 0:
-       actname = res[0][0]
+        actname = res[0][0]
     else:
         return errorMsg(_("Unknown action"), req, cdsname, ln)
     # Get number of pages
     subname = "%s%s" % (act, doctype)
     res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
     if len(res) > 0:
-       nbpages = res[0][0]
+        nbpages = res[0][0]
     else:
         return errorMsg(_("This action does not exist for this document type."), req, cdsname, ln)
 
@@ -664,7 +664,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
             if len(res) == 0:
                 run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email, doctype, act, access, rn,))
             else:
-               run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn, doctype, act, access, uid_email,))
+                run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn, doctype, act, access, uid_email,))
 
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
@@ -901,12 +901,12 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
 
 
 def set_report_number (newrn):
-        global uid_email, doctype, access, rn
-        # First we save the value in the global object
-        rn = newrn
-        # then we save this value in the "journal of submissions"
-        if uid_email != "" and uid_email != "guest":
-            run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn, doctype, access, uid_email,))
+    global uid_email, doctype, access, rn
+    # First we save the value in the global object
+    rn = newrn
+    # then we save this value in the "journal of submissions"
+    if uid_email != "" and uid_email != "guest":
+        run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn, doctype, access, uid_email,))
 
 def get_report_number():
     global rn

@@ -723,7 +723,7 @@ def acc_deleteRoleActionArguments(id_role, id_action, arglistid=1, auths=[[]]):
     
     for pa in pas[1:]:
         if pa[0] == arglistid and pa[1:] not in auths:
-                keepauths.append(pa[1:])
+            keepauths.append(pa[1:])
 
     # delete everything
     run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT

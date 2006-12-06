@@ -287,7 +287,7 @@ def main():
                  ])
     
     except getopt.GetoptError, e:
-            usage()
+        usage()
     
     recs_out    = []
     recID_list  = []

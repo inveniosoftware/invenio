@@ -581,7 +581,7 @@ class Template:
         if reviews:
             total_label = _("There is a total of %s reviews")
         else:
-           total_label = _("There is a total of %s comments")
+            total_label = _("There is a total of %s comments")
         total_label %= total_nb_comments
         # do NOT remove the HTML comments below. Used for parsing
         body = """
@@ -971,12 +971,12 @@ class Template:
     <tr>
     <td style="text-align:right;">"""
         if type(action_display) is dict and len(action_display.keys()):
-           output += """
+            output += """
         <select name="%s">""" % action_field_name
-           for (key, value) in action_display.items():
-               output += """
+            for (key, value) in action_display.items():
+                output += """
           <option value="%s">%s</option>""" % (key, value)
-           output += """
+            output += """
         </select>"""
         output += """
       </td>

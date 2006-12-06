@@ -93,9 +93,9 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
 
         if func in ["0", 0] and confirm in ["1", 1]:
-                finresult = attach_col_rnk(rnkID, colID)
+            finresult = attach_col_rnk(rnkID, colID)
         elif func in ["1", 1] and confirm in ["1", 1]:
-                finresult = detach_col_rnk(rnkID, colID)
+            finresult = detach_col_rnk(rnkID, colID)
 
         if colID:
             colNAME = get_def_name(colID, "collection")[0][1]
@@ -152,7 +152,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             subtitle = "Step 3 - Result"
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["0", 0]:
-             output += """<b><span class="info">Please select a collection.</span></b>"""
+            output += """<b><span class="info">Please select a collection.</span></b>"""
         
         col_list = get_rnk_col(rnkID, ln)
         if col_list:
@@ -177,7 +177,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             subtitle = "Step 3 - Result"
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["1", 1]:
-             output += """<b><span class="info">Please select a collection.</span></b>"""
+            output += """<b><span class="info">Please select a collection.</span></b>"""
 
     body = [output]
     

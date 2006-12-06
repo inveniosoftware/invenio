@@ -1053,10 +1053,10 @@ class Template:
               }
         i = 0
         for action in actions:
-             if i > 0:
+            if i > 0:
                 out += " <b>" + _("or") + "</b> "
-             i += 1
-             out += """<LI><A HREF="" onClick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a>""" % action
+            i += 1
+            out += """<LI><A HREF="" onClick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a>""" % action
 
         out += "</ul>"
         return out

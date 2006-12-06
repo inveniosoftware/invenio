@@ -369,9 +369,9 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
         if confirm in [1, "1"]:
             res = acca.acc_reset_default_settings(superusers)
             if res:
-                  output += '<p>successfully reset default settings</p>'
+                output += '<p>successfully reset default settings</p>'
             else:
-                  output += '<p>sorry, could not reset default settings</p>'
+                output += '<p>sorry, could not reset default settings</p>'
     
     return index(req=req,
                  title='Reset Default Settings',
@@ -448,9 +448,9 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
         if confirm in [1, "1"]:
             res = acca.acc_add_default_settings(superusers)
             if res:
-                  output += '<p>successfully added default settings</p>'
+                output += '<p>successfully added default settings</p>'
             else:
-                  output += '<p>sorry, could not add default settings</p>'
+                output += '<p>sorry, could not add default settings</p>'
     
     return index(req=req,
                  title='Add Default Settings',
@@ -907,7 +907,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
             if login_method:
                 output += """<b><span class="info">The login method has been changed</span></b>"""
             else:
-                 output += """<b><span class="info">Nothing to update</span></b>"""
+                output += """<b><span class="info">Nothing to update</span></b>"""
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
   

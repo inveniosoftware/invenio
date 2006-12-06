@@ -123,7 +123,7 @@ def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
 
     fld_dict = dict(get_def_name('', "field"))
     if fldID in [-1, "-1"]:
-         return addadminbox("Edit logical field",  ["""<b><span class="info">Please go back and select a logical field</span></b>"""])
+        return addadminbox("Edit logical field",  ["""<b><span class="info">Please go back and select a logical field</span></b>"""])
         
     fin_output = """
     <table>
@@ -171,7 +171,7 @@ def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', c
     content - the output from that method."""
 
     if idxID in [-1, "-1"]:
-         return addadminbox("Edit index",  ["""<b><span class="info">Please go back and select a index</span></b>"""])
+        return addadminbox("Edit index",  ["""<b><span class="info">Please go back and select a index</span></b>"""])
         
     fin_output = """
     <table>
@@ -1080,8 +1080,8 @@ def perform_addindexfield(idxID, ln=cdslang, fldID='', callback="yes", confirm=-
                               confirm=1)
     
     if fldID and not fldID in [-1, "-1"] and confirm in ["1", 1]:
-            res = add_idx_fld(idxID, fldID)
-            output += write_outcome(res)
+        res = add_idx_fld(idxID, fldID)
+        output += write_outcome(res)
     elif confirm in ["1", 1]:
         output += """<b><span class="info">Please select a field to add.</span></b>"""
         

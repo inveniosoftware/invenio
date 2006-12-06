@@ -76,12 +76,12 @@ class BibRecDocs:
         self.bibdocs = []
         res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc where id=id_bibdoc and id_bibrec=%s", (self.id,))
         for row in res:
-	        if row[2] == "":
-		    status = 0
-		else:
-		    status = int(row[2])
-	        if status & 1 == 0:
-                    self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
+            if row[2] == "":
+                status = 0
+            else:
+                status = int(row[2])
+            if status & 1 == 0:
+                self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
 
     def listBibDocs(self,type=""):
         tmp=[]
@@ -192,7 +192,7 @@ class BibRecDocs:
                            }
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.getType():
-                         fulltype['content'].append(bibdoc.display(version, ln = ln))
+                        fulltype['content'].append(bibdoc.display(version, ln = ln))
                 fulltypes.append(fulltype)
 
             t = websubmit_templates.tmpl_bibrecdoc_filelist(
