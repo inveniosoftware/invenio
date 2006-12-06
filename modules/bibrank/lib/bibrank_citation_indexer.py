@@ -77,6 +77,7 @@ def get_bibrankmethod_lastupdate(rank_method_code):
     query = """select last_updated from rnkMETHOD where name ='%s'""" % rank_method_code
     last_update_time = run_sql(query)
     return last_update_time[0][0]
+
 def get_last_modified_rec(bibrank_method_lastupdate):
     """ return the list of recods which have been modified after the last execution
         of bibrank method. The result is expected to have ascending numerical order.
@@ -85,6 +86,7 @@ def get_last_modified_rec(bibrank_method_lastupdate):
     query += "order by id ASC"
     list = run_sql(query)
     return list
+
 def create_recordid_list(rec_ids):
     """Create a list of record ids out of RECIDS. The result is expected to have ascending numerical order.
     """
@@ -92,6 +94,7 @@ def create_recordid_list(rec_ids):
     for row in rec_ids:
         rec_list.append(row[0])
     return rec_list
+
 def create_record_tuple(list):
     """Creates a tuple of record id from a list of id.
        The result is expected to have ascending numerical order.
@@ -106,6 +109,7 @@ def create_record_tuple(list):
         rec_tuple += ')'
     else: rec_tuple = '()'
     return rec_tuple
+
 def last_updated_result(rank_method_code, recid_list):
     """ return the last value of dictionary in rnkMETHODDATA table if it exists and
         initialize the value of last updated records by zero,otherwise an initial dictionary
@@ -125,6 +129,7 @@ def last_updated_result(rank_method_code, recid_list):
         result = get_initial_result(dic, cit, ref, recid_list)
     else: result = make_initial_result()
     return result
+
 def get_initial_result(dic, cit, ref, recid_list):
     """initialieze the citation weights of the last updated record with zero for
        recalculating it later
@@ -135,14 +140,15 @@ def get_initial_result(dic, cit, ref, recid_list):
         if ref.has_key(recid) and ref[recid]:
             for id in ref[recid]:
                 if cit.has_key(id) and recid in cit[id]:
-                  cit[id].remove(recid)
-                  dic[id] -= 1
+                    cit[id].remove(recid)
+                    dic[id] -= 1
         if cit.has_key(recid) and cit[recid]:
             for id in cit[recid]:
                 if ref.has_key(id) and recid in ref[id]:
-                   ref[id].remove(recid)
+                    ref[id].remove(recid)
         ref[recid] = []
     return [dic, cit, ref]
+
 def make_initial_result():
     """return an initial dictinary with recID as key and zero as value
     """
@@ -156,6 +162,7 @@ def make_initial_result():
         cit[key[0]] = []
         ref[key[0]] = []
     return [dic, cit, ref]
+
 def get_citation_informations(recid_list, config):
     """return une dictionary that contains the citation information of cds records
     """
@@ -222,6 +229,7 @@ def get_citation_informations(recid_list, config):
     end_time = os.times()[4]
     print "Execution time for generating citation inforamtions by parsing xml contents: ", (end_time - begin_time)
     return citation_informations
+
 def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary
@@ -250,10 +258,10 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             f = 'publref'
             rec_id = get_recids_matching_query(p, f)
             if rec_id and not recid in citation_list[rec_id[0]]:
-                    result[rec_id[0]] += 1
-                    citation_list[rec_id[0]].append(recid)
+                result[rec_id[0]] += 1
+                citation_list[rec_id[0]].append(recid)
             if rec_id and not rec_id[0] in reference_list[recid]:
-                    reference_list[recid].append(rec_id[0])
+                reference_list[recid].append(rec_id[0])
     t3 = os.times()[4]
     for rec_id, recnumbers in d_reports_numbers.iteritems():
         for recnumber in recnumbers:
@@ -263,10 +271,10 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             if recid_list:
                 for recid in recid_list:
                     if not recid in citation_list[rec_id]:
-                            result[rec_id] += 1
-                            citation_list[rec_id].append(recid)
+                        result[rec_id] += 1
+                        citation_list[rec_id].append(recid)
                     if not rec_id in reference_list[recid]:
-                            reference_list[recid].append(rec_id)
+                        reference_list[recid].append(rec_id)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
         tmp = recs.find("-")
@@ -293,25 +301,28 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     print "checking rec ypvt: ", (t5-t4)
     print "total time of refAnalize: ", (t5-t1)
     return result
+
 def get_decompressed_xml(xml):
     """return a decompressed content of xml into a xml content
     """
     decompressed_xml = create_records(decompress(xml))
     return decompressed_xml
+
 def insert_cit_ref_list_intodb(citation_dic, reference_dic):
     """Insert the reference and citation list into the database"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     id = run_sql("SELECT * from rnkCITATIONDATA ")
     if id:
-            run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
-                    (get_compressed_dictionary(reference_dic)))
-            run_sql("update rnkCITATIONDATA set citation_data = '%s'" %
-                    (get_compressed_dictionary(citation_dic)))
-    else :
-            run_sql("INSERT INTO rnkCITATIONDATA VALUES ('%s', null)" %
-                          (get_compressed_dictionary(citation_dic)))
-            run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
-                                        (get_compressed_dictionary(reference_dic)))
+        run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
+                (get_compressed_dictionary(reference_dic)))
+        run_sql("update rnkCITATIONDATA set citation_data = '%s'" %
+                (get_compressed_dictionary(citation_dic)))
+    else:
+        run_sql("INSERT INTO rnkCITATIONDATA VALUES ('%s', null)" %
+                (get_compressed_dictionary(citation_dic)))
+        run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
+                (get_compressed_dictionary(reference_dic)))
+        
 def get_compressed_dictionary(dic):
     """Serialize Python object vi a marshal into a compressed string."""
     return escape_string(compress(dumps(dic)))
