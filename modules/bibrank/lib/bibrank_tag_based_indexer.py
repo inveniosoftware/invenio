@@ -56,12 +56,14 @@ from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, escape_string
 
 options = {}
+
 def citation_exec(rank_method_code, name, config):
     """Creating the rank method data for citation"""
     dict = get_citation_weight(rank_method_code, config)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if dict: intoDB(dict, date, rank_method_code)
     else: print "no need to update the indexes for citations"
+
 def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
@@ -71,12 +73,16 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
     intoDB(rnkset, date, rank_method_code)
+
 def download_weight_filtering_user(row,run):
     return bibrank_engine(row,run)
+
 def download_weight_total(row,run):
     return bibrank_engine(row,run)
+
 def file_similarity_by_times_downloaded(row,run):
     return bibrank_engine(row,run)
+
 def download_weight_filtering_user_exec (rank_method_code, name, config):
     """Ranking by number of downloads per User.
     Only one full Text Download is taken in account for one specific userIP address"""
@@ -90,6 +96,7 @@ def download_weight_filtering_user_exec (rank_method_code, name, config):
     intoDB(dic, date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
+
 def download_weight_total_exec(rank_method_code, name, config):
     """rankink by total number of downloads without check the user ip
     if users downloads 3 time the same full text document it has to be count as 3 downloads"""
@@ -103,6 +110,7 @@ def download_weight_total_exec(rank_method_code, name, config):
     intoDB(dic, date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
+
 def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
     """update dictionnary {recid:[(recid,nb page similarity),()..]}"""
     time1 = time.time()
@@ -115,6 +123,7 @@ def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
     intoDB(dic, date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
+
 def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
     startCreate = time.time()
@@ -259,15 +268,15 @@ def rank_method_code_statistics(rank_method_code):
     write_message("Highest value: %s - Number of records: %s" % (max, maxcount))
     write_message("Divided into 10 sets:")
     for i in range(1,11):
-         setcount = 0
-         distinct_values = {}
-         lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
-         upper = -1.0 + ((float(max + 1) / 10)) * i
-         for (recID, value) in method.iteritems():
-             if value >= lower and value <= upper:
-                 setcount += 1
-                 distinct_values[value] = 1
-         write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
+        setcount = 0
+        distinct_values = {}
+        lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
+        upper = -1.0 + ((float(max + 1) / 10)) * i
+        for (recID, value) in method.iteritems():
+            if value >= lower and value <= upper:
+                setcount += 1
+                distinct_values[value] = 1
+        write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
 
 def check_method(rank_method_code):
     write_message("Checking rank method...")
@@ -571,19 +580,25 @@ def single_tag_rank_method(row, run):
 
 def serialize_via_numeric_array_dumps(arr):
     return Numeric.dumps(arr)
+
 def serialize_via_numeric_array_compr(str):
     return compress(str)
+
 def serialize_via_numeric_array_escape(str):
     return escape_string(str)
+
 def serialize_via_numeric_array(arr):
     """Serialize Numeric array into a compressed string."""
     return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
+
 def deserialize_via_numeric_array(string):
     """Decompress and deserialize string into a Numeric array."""
     return Numeric.loads(decompress(string))
+
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
     return escape_string(compress(dumps(obj)))
+
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))
@@ -592,5 +607,6 @@ def showtime(timeused):
     """Show time used for method"""
     if options["verbose"] >= 9:
         write_message("Time used: %d second(s)." % timeused)
+
 def citation(row,run):
     return bibrank_engine(row, run)
