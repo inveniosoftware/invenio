@@ -46,7 +46,7 @@
   <navbar:button id=bibclassify txt="BibClassify Admin" url="<WEBURL>/admin/bibclassify/" hint="CDS Invenio BibClassify Admin" menu="admin-bibclassify">
   <navbar:button id=bibconvert txt="BibConvert Admin" url="<WEBURL>/admin/bibconvert/" hint="CDS Invenio BibConvert Admin" menu="admin-bibconvert">
   <navbar:button id=bibedit txt="BibEdit Admin" url="<WEBURL>/admin/bibedit/" hint="CDS Invenio BibEdit Admin" menu="admin-bibedit">
-  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/bibformatadmin.py" hint="CDS Invenio BibFormat Admin" menu="admin-bibformat">
+  <navbar:button id=bibformat txt="BibFormat Admin" url="<WEBURL>/admin/bibformat/" hint="CDS Invenio BibFormat Admin" menu="admin-bibformat">
   <navbar:button id=bibharvest txt="BibHarvest Admin" url="<WEBURL>/admin/bibharvest/" hint="CDS Invenio BibHarvest Admin" menu="admin-bibharvest">
   <navbar:button id=bibindex txt="BibIndex Admin" url="<WEBURL>/admin/bibindex/" hint="CDS Invenio BibIndex Admin" menu="admin-bibindex">
   <navbar:button id=bibmatch txt="BibMatch Admin" url="<WEBURL>/admin/bibmatch/" hint="CDS Invenio BibMatch Admin" menu="admin-bibmatch">
