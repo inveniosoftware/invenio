@@ -302,9 +302,7 @@ def task_run(task_id):
         if recs is not None:
             # We proceed each record by record
             for record in recs:
-                saved_mode = options['mode']
                 error = bibupload(record)
-                options['mode'] = saved_mode
                 if error[0] == 1:
                     stat['nb_errors'] += 1
                 task_update_progress("Done %d out of %d." % \
@@ -474,7 +472,9 @@ def bibupload(record):
             error = None
             write_message("   -Check if reference tags exist: DONE", verbose=2)
      
-    if options['mode'] == 'insert':
+    if options['mode'] == 'insert' or \
+       (options['mode'] == 'replace_or_insert' and rec_id is None):
+        insert_mode_p = True
         # Insert the record into the bibrec databases to have a recordId
         rec_id = create_new_record()
         write_message("   -Creation of a new record id (%d): DONE" % rec_id, verbose=2)
@@ -489,7 +489,8 @@ def bibupload(record):
         else:
             error = None
 
-    elif options['mode'] != 'insert' and options['mode'] != 'format' and options['stage_to_start_from'] != 5:    
+    elif options['mode'] != 'insert' and options['mode'] != 'format' and options['stage_to_start_from'] != 5:
+        insert_mode_p = False
         # Update Mode
         # Retrieve the old record to update
         rec_old = create_record(print_record(int(rec_id),'xm'), 2)[0]
@@ -535,7 +536,7 @@ def bibupload(record):
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
     if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record, 'FFT') is not None:
         
-        if options['mode'] == 'insert' or options['mode'] == 'append':
+        if insert_mode_p or options['mode'] == 'append':
             record = insert_fft_tags(record, rec_id)
         else:
             record = update_fft_tag(record, rec_id)
@@ -573,16 +574,18 @@ def bibupload(record):
     
     # Finally we update the bibrec table with the current date
     write_message("Stage 5: Start (Update bibrec table with current date).", verbose=2)
-    if options['stage_to_start_from'] <= 5 and options['mode'] != 'insert' and options['notimechange'] == 0:
+    if options['stage_to_start_from'] <= 5 and \
+       options['notimechange'] == 0 and \
+       not insert_mode_p:
         now = convert_datestruct_to_datetext(time.localtime())
-        write_message("   -Retrieve current localtime: DONE", verbose=2)
+        write_message("   -Retrieved current localtime: DONE", verbose=2)
         update_bibrec_modif_date(now, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
 
     # Increase statistics
-    if options['mode'] == 'insert':
+    if insert_mode_p:
         stat['nb_records_inserted'] += 1
     else:
         stat['nb_records_updated'] += 1
@@ -860,14 +863,12 @@ def retrieve_rec_id(record):
                           verbose=1, stream=sys.stderr)
             return -1
     else:
-        if options['mode'] != 'insert':
-            if options['mode'] != 'replace_or_insert':
+        if options['mode'] != 'insert' and \
+           options['mode'] != 'replace_or_insert':
                 write_message("   Failed : Record not found in the database."\
                               " Please insert the file before updating it."\
                               " (-h for help)", verbose=1, stream=sys.stderr)
                 return -1
-            else:
-                options['mode'] = 'insert'
 
     return rec_id
 
