@@ -47,7 +47,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_publiline_pages_availability(self):
-        """websubmit - availability of aprroval pages""" 
+        """websubmit - availability of approval pages""" 
 
         baseurl = weburl
 
