@@ -1328,9 +1328,10 @@ def wipe_out_record_from_all_tables(recid):
     # delete all unused bibxxx values:
     for i in range(0,10):
         for j in range(0, 10):
-            run_sql("DELETE b FROM %(bibxxx)s AS b " \
-                    " LEFT JOIN %(bibrec_bibxxx)s AS bb " \
-                    " ON b.id=bb.id_bibxxx WHERE bb.id_bibrec IS NULL" % \
+            run_sql("DELETE %(bibxxx)s FROM %(bibxxx)s " \
+                    " LEFT JOIN %(bibrec_bibxxx)s " \
+                    " ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx " \
+                    " WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL" % \
                     {'bibxxx': "bib%i%ix" % (i, j),
                      'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)})
     # delete from bibfmt:
