@@ -19,20 +19,8 @@
 
 webappdir = $(localstatedir)/www/admin/websubmit
 
-FILESWML = $(wildcard $(srcdir)/*.wml)
+webapp_DATA = referees.py websubmitadmin.py
 
-webapp_DATA = $(FILESWML:$(srcdir)/%.wml=%) referees.py websubmitadmin.py
+EXTRA_DIST = referees.py websubmitadmin.py
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) referees.py websubmitadmin.py
-
-CLEANFILES = $(FILESWML:$(srcdir)/%.wml=%) *~ *.tmp
-
-LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
-MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
-
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-           $(MO)
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	for lang in en; do \
-		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.php" ; \
-	done
+CLEANFILES = *~ *.tmp
