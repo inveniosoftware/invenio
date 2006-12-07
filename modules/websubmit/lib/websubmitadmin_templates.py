@@ -257,13 +257,13 @@ class Template:
          <tr>
           <td>6.&nbsp;<small><a href="%(adminurl)s/elementlist">Available Element descriptions</a></small></td>
           <td>&nbsp;7.&nbsp;<small><a href="%(adminurl)s/functionlist">Available Functions</a></small></td>
-          <td>&nbsp;8.&nbsp;<small><a href="%(oldadminurl)s/editCatalogues.php">Organise Main Page</a></small></td>
+          <td>&nbsp;8.&nbsp;<small><a href="%(adminurl)s/organisesubmissionpage">Organise Main Page</a></small></td>
           <td colspan=2>&nbsp;9.&nbsp;<small><a href="%(adminurl)s/">WebSubmit Admin Guide</a></small></td>
          </tr>
         </table>
         </div>
         <br />
-        """ % {'adminurl' : WEBSUBMITADMIN_WEBURL, 'oldadminurl' : WEBSUBMITADMIN_OLDWEBURL}
+        """ % { 'adminurl' : WEBSUBMITADMIN_WEBURL }
         return self._create_adminbox(header="Main Menu", datalist=[menu_body])
 
     def _element_display_preview_get_element(self,
@@ -551,6 +551,242 @@ class Template:
 
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Element Details:", datalist=[body_content])
+        return output
+
+    def tmpl_display_submission_page_organisation(self,
+                                                  submission_collection_tree,
+                                                  submission_collections,
+                                                  doctypes,
+                                                  user_msg=""):
+        def _build_collection_tree_display(branch, level=0):
+            outstr = ""
+            try:
+                level = int(level)
+            except TypeError:
+                level = 0
+
+            ## open a table in which collection and doctype children will be displayed:
+            outstr += """<table border ="0" cellspacing="0" cellpadding="0">\n<tr>"""
+
+            ## Display details of this collection:
+            if level != 0:
+                ## Button to allow deletion of collection from tree:
+                outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                          """&deletesbmcollection=1"><img border="0" src="%(weburl)s/img/iconcross.gif" """ \
+                          """title="Remove submission collection from tree"></a></td>""" \
+                          % { 'weburl'          : cgi.escape(weburl, 1),
+                              'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                              'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                            }
+                
+                ## does this collection have a collection brother above it?
+                if branch['has_brother_above'] == 1:
+                    ## Yes it does - add 'up' arrow:
+                    outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                              """&movesbmcollectionup=1"><img border="0" src="%(weburl)s/img/smallup.gif" """\
+                              """title="Move submission collection up"></a></td>""" \
+                              % { 'weburl'          : cgi.escape(weburl, 1),
+                                  'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                                }
+                else:
+                    ## No it doesn't - no 'up' arrow:
+                    outstr += """<td><img border="0" src="%(weburl)s/img/white_field.gif"></td>"""\
+                              % { 'weburl' : cgi.escape(weburl, 1), }
+
+                ## does this collection have a collection brother below it?
+                if branch['has_brother_below'] == 1:
+                    ## Yes it does - add 'down' arrow:
+                    outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                              """&movesbmcollectiondown=1"><img border="0" src="%(weburl)s/img/smalldown.gif" """\
+                              """title="Move submission collection down"></a></td>""" \
+                              % { 'weburl'          : cgi.escape(weburl, 1),
+                                  'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                                }
+                else:
+                    ## No it doesn't - no 'down' arrow:
+                    outstr += """<td><img border="0" src="%(weburl)s/img/white_field.gif"></td>"""\
+                              % { 'weburl' : cgi.escape(weburl, 1), }
+
+                ## Display the collection name:
+                outstr += """<td>&nbsp;<span style="color: green; font-weight: bold;">%s</span></td>""" \
+                          % branch['collection_name']
+            else:
+                outstr += "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+            outstr += "</tr>\n"
+
+            ## If there are doctype children attached to this collection, display them:
+            num_doctype_children = len(branch['doctype_children'])
+            if num_doctype_children > 0:
+                outstr += """<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>""" \
+                          """<table border ="0" cellspacing="0" cellpadding="0">\n"""
+            
+            for child_num in xrange(0, num_doctype_children):
+                outstr += """<tr>\n"""
+                ## Button to allow doctype to be detached from tree:
+                outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                          """&doctype=%(doctype)s&catscore=%(catalogueorder)s&deletedoctypefromsbmcollection=1"><img border="0" """\
+                          """src="%(weburl)s/img/iconcross.gif" title="Remove doctype from branch"></a></td>""" \
+                          % { 'weburl'          : cgi.escape(weburl, 1),
+                              'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                              'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                              'doctype'         : cgi.escape(branch['doctype_children'][child_num]['doctype_id']),
+                              'catalogueorder'  : cgi.escape(str(branch['doctype_children'][child_num]['catalogue_order']), 1),
+                            }
+
+                ## Does this doctype have a brother above it?
+                if child_num > 0:
+                    ## Yes it does - add an 'up' arrow:
+                    outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                              """&doctype=%(doctype)s&catscore=%(catalogueorder)s&movedoctypeupinsbmcollection=1"><img border="0" """ \
+                              """src="%(weburl)s/img/smallup.gif" title="Move doctype up"></a></td>""" \
+                              % { 'weburl'          : cgi.escape(weburl, 1),
+                                  'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                                  'doctype'         : cgi.escape(branch['doctype_children'][child_num]['doctype_id']),
+                                  'catalogueorder'  : cgi.escape(str(branch['doctype_children'][child_num]['catalogue_order']), 1),
+                                }
+                else:
+                    ## No it doesn't - no 'up' arrow:
+                    outstr += """<td><img border="0" src="%(weburl)s/img/white_field.gif"></td>"""\
+                              % { 'weburl' : cgi.escape(weburl, 1), }
+
+                ## Does this doctype have a brother below it?
+                if child_num < num_doctype_children - 1:
+                    ## Yes it does - add a 'down' arrow:
+                    outstr += """<td><a href="%(websubadmin_url)s/organisesubmissionpage?sbmcolid=%(collection_id)s""" \
+                              """&doctype=%(doctype)s&catscore=%(catalogueorder)s&movedoctypedowninsbmcollection=1"><img border="0" """ \
+                              """src="%(weburl)s/img/smalldown.gif" title="Move doctype down"></a></td>""" \
+                              % { 'weburl' : cgi.escape(weburl, 1),
+                                  'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                                  'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
+                                  'doctype'         : cgi.escape(branch['doctype_children'][child_num]['doctype_id']),
+                                  'catalogueorder'  : cgi.escape(str(branch['doctype_children'][child_num]['catalogue_order']), 1),
+                                }
+                else:
+                    ## No it doesn't - no 'down' arrow:
+                    outstr += """<td><img border="0" src="%(weburl)s/img/white_field.gif"></td>"""\
+                              % { 'weburl' : cgi.escape(weburl, 1), }
+
+                ## Display the document type details:
+                outstr += """<td>&nbsp;<small><a href="%(websubadmin_url)s/doctypeconfigure?doctype=%(doctype)s">"""\
+                          """%(doctype_name)s [%(doctype)s]</a></small></td>""" \
+                           % { 'websubadmin_url'       : WEBSUBMITADMIN_WEBURL,
+                               'doctype'               : cgi.escape(branch['doctype_children'][child_num]['doctype_id'], 1),
+                               'doctype_name'          : cgi.escape(branch['doctype_children'][child_num]['doctype_lname'], 1),
+                             }
+                outstr += "</tr>\n"
+
+            ## If there were doctype children attached to this collection, they have been displayed,
+            ## so close up the row:
+            if num_doctype_children > 0:
+                outstr += "</table>\n</td></tr>"
+
+            ## Display Lower branches of tree:
+            for lower_branch in branch['collection_children']:
+                outstr += "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>"
+                outstr += _build_collection_tree_display(branch=lower_branch, level=level+1)
+                outstr += "</td></tr>\n"
+
+            outstr += "</table>"
+            return outstr
+
+        ## begin display:
+        output = ""
+        body_content = """<br />
+        <table class="admin_wvar" width="100%%">
+         <thead>
+         <tr>
+         <th class="adminheaderleft">
+           Submission Page Organisational Hierarchy:
+          </th>
+         </tr>
+         </thead>
+         <tbody>
+         <tr>
+          <td><br />"""
+        
+        body_content += _build_collection_tree_display(submission_collection_tree)
+
+        body_content += """</td>
+         </tr>"""
+
+        body_content += """
+         <tr>
+          <td><br /></td>
+         </tr>
+         <tr>
+          <td><br />"""
+
+        ## Form to allow user to add a new submission-collection:
+        body_content += """
+           <form method="post" action="%(websubadmin_url)s/organisesubmissionpage">
+            <span class="adminlabel">You can add a new Submission-Collection:</span><br />
+            <small style="color: navy;">Name:</small>&nbsp;&nbsp;
+            <input type="text" name="addsbmcollection" style="margin: 5px 10px 5px 10px;" />
+            &nbsp;&nbsp;<small style="color: navy;">Attached to:</small>&nbsp;&nbsp;""" \
+           % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1), }
+
+        if len(submission_collections) > 0:
+            body_content += """
+            %(submission_collections)s""" \
+            % { 'submission_collections' : \
+                  create_html_select_list(select_name="addtosbmcollection",
+                                          option_list=submission_collections,
+                                          css_style="margin: 5px 10px 5px 10px;")
+              }
+        else:
+            body_content += """<input type="hidden" name="addtosbcollection" value="0" />
+            <span style="color: green;">Top Level</span>"""
+
+        body_content += """<input name="sbmcollectionadd" class="adminbutton" type="submit" """ \
+                        """value="Add" />
+           </form>"""
+
+        body_content += """</td>
+         </tr>
+         <tr>
+          <td><br /><br /></td>
+         </tr>"""
+
+        ## if there are doctypes in the system, provide a form to enable the user to
+        ## connect a document type to the submission-collection tree:
+        if len(submission_collections) > 1 and len(doctypes) > 0:
+            body_content += """<tr><td>
+               <form method="post" action="%(websubadmin_url)s/organisesubmissionpage">
+                <span class="adminlabel">You can attach a Document Type to a Submission-Collection:</span><br />
+                <small style="color: navy;">Document Type Name:</small><br />
+                %(doctypes)s
+                <br /><small style="color: navy;">Attached to:</small>&nbsp;&nbsp;""" \
+               % { 'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
+                   'doctypes'        : create_html_select_list(select_name="adddoctypes",
+                                                               option_list=doctypes,
+                                                               css_style="margin: 5px 10px 5px 10px;",
+                                                               multiple=1,
+                                                               list_size=5)
+                 }
+
+            body_content += """
+            %(submission_collections)s""" \
+            % { 'submission_collections' : \
+                  create_html_select_list(select_name="addtosbmcollection",
+                                          option_list=submission_collections[1:],
+                                          css_style="margin: 5px 10px 5px 10px;")
+              }
+
+            body_content += """<input name="submissioncollectionadd" class="adminbutton" type="submit" """ \
+                            """value="Add" />
+               </form></td>
+              </tr>"""
+
+
+        body_content += """</tbody>
+        </table>"""
+
+        output += self._create_user_message_string(user_msg)
+        output += self._create_websubmitadmin_main_menu_header()
+        output += self._create_adminbox(header="Submission-Collections of Submission Page:", datalist=[body_content])
         return output
 
     def tmpl_display_addactionform(self,
@@ -916,9 +1152,9 @@ class Template:
 """
         for doctype in doctypes:
             body_content += """<tr>
-<td align="left">&nbsp;&nbsp;<a href="%s/doctypeconfigure?doctype=%s">**%s**&nbsp;&nbsp;&nbsp;%s</a></td>
+<td align="left">&nbsp;&nbsp;<a href="%s/doctypeconfigure?doctype=%s">%s&nbsp;&nbsp;[%s]</a></td>
 </tr>
-""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(doctype[0], 1), cgi.escape(doctype[0], 1), cgi.escape(doctype[1], 1))
+""" % (WEBSUBMITADMIN_WEBURL, cgi.escape(doctype[0], 1), cgi.escape(doctype[1], 1), cgi.escape(doctype[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
         body_content += """<br><form action="%s/doctypeadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Doctype" /></form>""" \
