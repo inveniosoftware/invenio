@@ -920,3 +920,53 @@ def doctypeconfigure(req,
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
+
+def organisesubmissionpage(req,
+                           doctype="",
+                           sbmcolid="",
+                           catscore="",
+                           addsbmcollection="",
+                           deletesbmcollection="",
+                           addtosbmcollection="",
+                           adddoctypes="",
+                           movesbmcollectionup="",
+                           movesbmcollectiondown="",
+                           deletedoctypefromsbmcollection="",
+                           movedoctypeupinsbmcollection="",
+                           movedoctypedowninsbmcollection="",
+                           ln=cdslang):
+    """Entry point for organising the document types on a submission page.
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+
+    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    if not auth_code:
+        ## user is authorised to use WebSubmit Admin:
+        (title, body, errors, warnings) = \
+         perform_request_organise_submission_page(doctype=doctype,
+                                                  sbmcolid=sbmcolid,
+                                                  catscore=catscore,
+                                                  addsbmcollection=addsbmcollection,
+                                                  deletesbmcollection=deletesbmcollection,
+                                                  addtosbmcollection=addtosbmcollection,
+                                                  adddoctypes=adddoctypes,
+                                                  movesbmcollectionup=movesbmcollectionup,
+                                                  movesbmcollectiondown=movesbmcollectiondown,
+                                                  deletedoctypefromsbmcollection=deletedoctypefromsbmcollection,
+                                                  movedoctypeupinsbmcollection=movedoctypeupinsbmcollection,
+                                                  movedoctypedowninsbmcollection=movedoctypedowninsbmcollection)
+
+        return page(title       = title,
+                    body        = body,
+                    navtrail    = get_navtrail(ln),
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = ln,
+                    errors      = errors,
+                    warnings    = warnings)
+    else:
+        ## user is not authorised to use WebSubmit Admin:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
