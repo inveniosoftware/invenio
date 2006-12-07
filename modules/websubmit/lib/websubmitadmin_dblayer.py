@@ -24,6 +24,433 @@ from invenio.dbquery import run_sql
 from invenio.websubmitadmin_config import *
 from random import seed, randint
 
+## Functions related to the organisation of catalogues:
+
+def insert_submission_collection(collection_name):
+    qstr = """INSERT INTO sbmCOLLECTION (name) VALUES (%s)"""
+    qres = run_sql(qstr, (collection_name,))
+    return int(qres)
+
+def update_score_of_collection_child_of_submission_collection_at_scorex(id_father, old_score, new_score):
+    qstr = """UPDATE sbmCOLLECTION_sbmCOLLECTION """ \
+           """SET catalogue_order=%s WHERE id_father=%s AND catalogue_order=%s"""
+    qres = run_sql(qstr, (new_score, id_father, old_score))
+    return 0
+
+def update_score_of_collection_child_of_submission_collection_with_colid_and_scorex(id_father,
+                                                                                    id_son,
+                                                                                    old_score,
+                                                                                    new_score):
+    qstr = """UPDATE sbmCOLLECTION_sbmCOLLECTION """ \
+           """SET catalogue_order=%s """ \
+           """WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    qres = run_sql(qstr, (new_score, id_father, id_son, old_score))
+    return 0
+
+def update_score_of_doctype_child_of_submission_collection_at_scorex(id_father, old_score, new_score):
+    qstr = """UPDATE sbmCOLLECTION_sbmDOCTYPE """ \
+           """SET catalogue_order=%s WHERE id_father=%s AND catalogue_order=%s"""
+    qres = run_sql(qstr, (new_score, id_father, old_score))
+    return 0
+
+def update_score_of_doctype_child_of_submission_collection_with_doctypeid_and_scorex(id_father,
+                                                                                     id_son,
+                                                                                     old_score,
+                                                                                     new_score):
+    qstr = """UPDATE sbmCOLLECTION_sbmDOCTYPE """ \
+           """SET catalogue_order=%s """ \
+           """WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    qres = run_sql(qstr, (new_score, id_father, id_son, old_score))
+    return 0
+
+def get_id_father_of_collection(collection_id):
+    qstr = """SELECT id_father FROM sbmCOLLECTION_sbmCOLLECTION """ \
+           """WHERE id_son=%s """ \
+           """LIMIT 1"""
+    qres = run_sql(qstr, (collection_id,))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_maximum_catalogue_score_of_collection_children_of_submission_collection(collection_id):
+    qstr = """SELECT IFNULL(MAX(catalogue_order), 0) """ \
+           """FROM sbmCOLLECTION_sbmCOLLECTION """ \
+           """WHERE id_father=%s"""
+    qres = int(run_sql(qstr, (collection_id,))[0][0])
+    return qres
+
+def get_score_of_collection_child_of_submission_collection(id_father, id_son):
+    qstr = """SELECT catalogue_order FROM sbmCOLLECTION_sbmCOLLECTION """ \
+           """WHERE id_son=%s and id_father=%s """ \
+           """LIMIT 1"""
+    qres = run_sql(qstr, (id_son, id_father))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_score_of_previous_collection_child_above(id_father, score):
+    qstr = """SELECT MAX(catalogue_order) """ \
+           """FROM sbmCOLLECTION_sbmCOLLECTION """ \
+           """WHERE id_father=%s and catalogue_order < %s"""
+    qres = run_sql(qstr, (id_father, score))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_score_of_next_collection_child_below(id_father, score):
+    qstr = """SELECT MIN(catalogue_order) """ \
+           """FROM sbmCOLLECTION_sbmCOLLECTION """ \
+           """WHERE id_father=%s and catalogue_order > %s"""
+    qres = run_sql(qstr, (id_father, score))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_catalogue_score_of_doctype_child_of_submission_collection(id_father, id_son):
+    qstr = """SELECT catalogue_order FROM sbmCOLLECTION_sbmDOCTYPE """ \
+           """WHERE id_son=%s and id_father=%s """ \
+           """LIMIT 1"""
+    qres = run_sql(qstr, (id_son, id_father))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_score_of_previous_doctype_child_above(id_father, score):
+    qstr = """SELECT MAX(catalogue_order) """ \
+           """FROM sbmCOLLECTION_sbmDOCTYPE """ \
+           """WHERE id_father=%s and catalogue_order < %s"""
+    qres = run_sql(qstr, (id_father, score))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_score_of_next_doctype_child_below(id_father, score):
+    qstr = """SELECT MIN(catalogue_order) """ \
+           """FROM sbmCOLLECTION_sbmDOCTYPE """ \
+           """WHERE id_father=%s and catalogue_order > %s"""
+    qres = run_sql(qstr, (id_father, score))
+    try:
+        return int(qres[0][0])
+    except (TypeError, IndexError):
+        return None
+
+def get_maximum_catalogue_score_of_doctype_children_of_submission_collection(collection_id):
+    qstr = """SELECT IFNULL(MAX(catalogue_order), 0) """ \
+           """FROM sbmCOLLECTION_sbmDOCTYPE """ \
+           """WHERE id_father=%s"""
+    qres = int(run_sql(qstr, (collection_id,))[0][0])
+    return qres
+
+
+def insert_collection_child_for_submission_collection(id_father, id_son, score):
+    qstr = """INSERT INTO sbmCOLLECTION_sbmCOLLECTION (id_father, id_son, catalogue_order) """ \
+           """VALUES (%s, %s, %s)"""
+    qres = run_sql(qstr, (id_father, id_son, score))
+
+def insert_doctype_child_for_submission_collection(id_father, id_son, score):
+    qstr = """INSERT INTO sbmCOLLECTION_sbmDOCTYPE (id_father, id_son, catalogue_order) """ \
+           """VALUES (%s, %s, %s)"""
+    qres = run_sql(qstr, (id_father, id_son, score))
+
+def get_doctype_children_of_collection(id_father):
+    """Get details of all 'doctype' children of a given collection. For each doctype, get:
+         * doctype ID
+         * doctype long-name
+         * doctype catalogue-order
+       The document type children retrieved are ordered in ascending order of 'catalogue order'.
+       @param id_father: (integer) - the ID of the parent collection for which doctype children are
+        to be retrieved.
+       @return: (tuple) of tuples. Each tuple is a row giving the following details of a doctype:
+        (doctype_id, doctype_longname, doctype_catalogue_order)
+    """
+    ## query to retrieve details of doctypes attached to a given collection:
+    qstr_doctype_children = """SELECT col_doctype.id_son, doctype.ldocname, col_doctype.catalogue_order """ \
+                            """FROM sbmCOLLECTION_sbmDOCTYPE AS col_doctype """ \
+                            """INNER JOIN sbmDOCTYPE AS doctype """ \
+                            """ON col_doctype.id_son = doctype.sdocname """ \
+                            """WHERE id_father=%s ORDER BY catalogue_order ASC"""
+    res_doctype_children  = run_sql(qstr_doctype_children, (id_father,))
+    ## return the result of this query:
+    return res_doctype_children
+
+def get_collection_children_of_collection(id_father):
+    """Get the collection ids of all 'collection' children of a given collection.
+       @param id_father: (integer) the ID of the parent collection for which collection are to
+        be retrieved.
+       @return: (tuple) of tuples. Each tuple is a row containing the collection ID of a 'collection' child
+        of the given parent collection.
+    """
+    ## query to retrieve IDs of collections attached to a given collection:
+    qstr_collection_children = """SELECT id_son FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_father=%s ORDER BY catalogue_order ASC"""
+    res_collection_children  = run_sql(qstr_collection_children, (id_father,))
+    ## return the result of this query:
+    return res_collection_children
+
+def get_id_and_score_of_collection_children_of_collection(id_father):
+    """Get the collection ids and catalogue score positions of all 'collection' children of
+       a given collection.
+       @param id_father: (integer) the ID of the parent collection for which collection are to
+        be retrieved.
+       @return: (tuple) of tuples. Each tuple is a row containing the collection ID and the catalogue-score
+        position of a 'collection' child of the given parent collection: (id, catalogue-score)
+    """
+    ## query to retrieve IDs of collections attached to a given collection:
+    qstr_collection_children = """SELECT id_son, catalogue_order """ \
+                               """FROM sbmCOLLECTION_sbmCOLLECTION """ \
+                               """WHERE id_father=%s ORDER BY catalogue_order ASC"""
+    res_collection_children  = run_sql(qstr_collection_children, (id_father,))
+    ## return the result of this query:
+    return res_collection_children
+
+def get_number_of_rows_for_submission_collection_as_submission_tree_branch(collection_id):
+    """Get the number of rows found for a submission-collection as a branch of the
+       submission tree.
+       @param collection_id: (integer) - the id of the submission-collection.
+       @return: (integer) - number of rows found by the query.
+    """
+    qstr = """SELECT COUNT(*) FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_son=%s"""
+    return int(run_sql(qstr, (collection_id,))[0][0])
+
+def get_number_of_rows_for_submission_collection(collection_id):
+    """Get the number of rows found for a submission-collection.
+       @param collection_id: (integer) - the id of the submission-collection.
+       @return: (integer) - number of rows found by the query.
+    """
+    qstr = """SELECT COUNT(*) FROM sbmCOLLECTION WHERE id=%s"""
+    return int(run_sql(qstr, (collection_id,))[0][0])
+
+def delete_submission_collection_details(collection_id):
+    """Delete the details of a submission-collection from the database.
+       @param collection_id: (integer) - the ID of the submission-collection whose details
+        are to be deleted from the WebSubmit database.
+       @return: (integer) - error code: 0 on successful delete; 1 on failure to delete.
+    """
+    qstr = """DELETE FROM sbmCOLLECTION WHERE id=%s"""
+    run_sql(qstr, (collection_id,))
+    ## check to see if submission-collection details deleted:
+    numrows_submission_collection = get_number_of_rows_for_submission_collection(collection_id)
+    if numrows_submission_collection == 0:
+        ## everything OK - no doctype-children remain for this submission-collection
+        return 0
+    else:
+        ## everything NOT OK - still rows remaining for this submission-collection
+        ## make a last attempt to delete them:
+        run_sql(q, (collection_id,))
+        ## once more, check the number of rows remaining for this submission-collection:
+        numrows_submission_collection = get_number_rows_for_submission_collection(collection_id)
+        if numrows_submission_collection == 0:
+            ## Everything OK - submission-collection deleted
+            return 0
+        else:
+            ## still could not delete the submission-collection
+            return 1
+
+def delete_submission_collection_from_submission_tree(collection_id):
+    """Delete a submission-collection from the submission tree.
+       @param collection_id: (integer) - the ID of the submission-collection whose details
+        are to be deleted from the WebSubmit database.
+       @return: (integer) - error code: 0 on successful delete; 1 on failure to delete.
+    """
+    qstr = """DELETE FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_son=%s"""
+    run_sql(qstr, (collection_id,))
+    ## check to ensure that the submission-collection was deleted from the tree:
+    numrows_collection = \
+       get_number_of_rows_for_submission_collection_as_submission_tree_branch(collection_id)
+    if numrows_collection == 0:
+        ## everything OK - this submission-collection does not exist as a branch on the submission tree
+        return 0
+    else:
+        ## submission-collection still exists as a branch of the submission tree
+        ## try once more to delete it:
+        run_sql(q, (collection_id,))
+        numrows_collection = \
+                  get_number_of_rows_for_submission_collection_as_submission_tree_branch(collection_id)
+        if numrows_collection == 0:
+            ## deleted successfully this time:
+            return 0
+        else:
+            ## Still unable to delete
+            return 1
+
+def get_collection_name(collection_id):
+    """Get the name of a given collection.
+       @param collection_id: (integer) - the ID of the collection for which whose name is to be retrieved
+       @return: (string or None) the name of the collection if it exists, None if no rows were returned
+    """
+    collection_name = None
+    ## query to retrieve the name of a given collection:
+    qstr_collection_name = """SELECT name FROM sbmCOLLECTION WHERE id=%s"""
+    ## get the name of this collection:
+    res_collection_name  = run_sql(qstr_collection_name, (collection_id,))
+    try:
+        collection_name = res_collection_name[0][0]
+    except IndexError:
+        pass
+    ## return the collection name:
+    return collection_name
+
+def delete_doctype_children_from_submission_collection(collection_id):
+    """Delete all doctype-children of a submission-collection.
+       @param collection_id: (integer) - the ID of the submission-collection from which
+        the doctype-children are to be deleted.
+       @return: (integer) - error code: 0 on successful delete; 1 on failure to delete.
+    """
+    qstr = """DELETE FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_father=%s"""
+    run_sql(qstr, (collection_id,))
+    ## check to see if doctype-children still remain attached to submission-collection:
+    num_doctype_children = get_number_of_doctype_children_of_submission_collection(collection_id)
+    if num_doctype_children == 0:
+        ## everything OK - no doctype-children remain for this submission-collection
+        return 0
+    else:
+        ## everything NOT OK - still doctype-children remaining for this submission-collection
+        ## make a last attempt to delete them:
+        run_sql(q, (collection_id,))
+        ## once more, check the number of doctype-children remaining
+        num_doctype_children = get_number_of_doctype_children_of_submission_collection(collection_id)
+        if num_doctype_children == 0:
+            ## Everything OK - all doctype-children deleted this time
+            return 0
+        else:
+            ## still could not delete the doctype-children from this submission
+            return 1
+
+def get_details_of_all_submission_collections():
+    """Get the id and name of all submission-collections.
+       @return: (tuple) of tuples - (collection-id, collection-name)
+    """
+    qstr_collections = """SELECT id, name from sbmCOLLECTION order by id ASC"""
+    res_collections  = run_sql(qstr_collections)
+    return res_collections
+
+def get_count_of_doctype_instances_at_score_for_collection(doctypeid, id_father, catalogue_score):
+    """Get the number of rows found for a given doctype as attached to a given position on a query tree.
+       @param doctypeid: (string) - the identifier for the given document type.
+       @param id_father: (integer) - the id of the submission-collection to which the doctype is attached.
+       @param catalogue_posn: (integer) - the score of the document type for that catalogue connection.
+       @return: (integer) - number of rows found by the query.
+    """
+    qstr = """SELECT COUNT(*) FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    return int(run_sql(qstr, (id_father, doctypeid, catalogue_score))[0][0])
+
+def get_number_of_doctype_children_of_submission_collection(collection_id):
+    """Get the number of rows found for doctype-children as attached to a given submission-collection.
+       @param collection_id: (integer) - the id of the submission-collection to which the doctype-children are attached.
+       @return: (integer) - number of rows found by the query.
+    """
+    qstr = """SELECT COUNT(*) FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_father=%s"""
+    return int(run_sql(qstr, (collection_id,))[0][0])
+
+
+def delete_doctype_from_position_on_submission_page(doctypeid, id_father, catalogue_score):
+    """Delete a document type from a given score position of a given submission-collection.
+       @param doctypeid: (string) - the ID of the document type that is to be deleted from the submission-collection.
+       @param id_father: (integer) - the ID of the submission-collection from which the document type
+        is to be deleted.
+       @param catalogue_score: (integer) - the score of the submission-collection at which the
+        document type to be deleted is connected.
+       @return: (integer) - error code: 0 if delete was successful; 1 if delete failed;
+    """
+    qstr = """DELETE FROM sbmCOLLECTION_sbmDOCTYPE WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    run_sql(qstr, (id_father, doctypeid, catalogue_score))
+    ## check to see whether this doctype was deleted:
+    numrows_doctype = get_count_of_doctype_instances_at_score_for_collection(doctypeid, id_father, catalogue_score)
+    if numrows_doctype == 0:
+        ## delete successful
+        return 0
+    else:
+        ## unsuccessful delete - try again
+        run_sql(qstr, (id_father, doctypeid, catalogue_score))
+        numrows_doctype = get_count_of_doctype_instances_at_score_for_collection(doctypeid, id_father, catalogue_score)
+        if numrows_doctype == 0:
+            ## delete successful
+            return 0
+        else:
+            ## unable to delete
+            return 1
+
+def update_score_of_doctype_child_of_collection(id_father, id_son, old_catalogue_score, new_catalogue_score):
+    """Update the score of a given doctype child of a submission-collection.
+       @param id_father: (integer) - the ID of the submission-collection whose child's score is to be updated
+       @param id_son: (string) - the ID of the document type to be updated
+       @param old_catalogue_score: (integer) - the score of the submission-collection that the doctype is found
+        at before update
+       @param new_catalogue_score: (integer) - the new value of the doctype's score for the submission-collection
+       @return: (integer) - 0
+    """
+    qstr = """UPDATE sbmCOLLECTION_sbmDOCTYPE SET catalogue_order=%s """ \
+           """WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    run_sql(qstr, (new_catalogue_score, id_father, id_son, old_catalogue_score))
+    return 0
+
+def update_score_of_collection_child_of_collection(id_father, id_son, old_catalogue_score, new_catalogue_score):
+    """Update the score of a given collection child ofa submission-collection.
+       @param id_father: (integer) - the ID of the submission-collection whose child's score is to be updated
+       @param id_son: (integer) - the ID of the collection type to be updated
+       @param old_catalogue_score: (integer) - the score of the submission-collection that the collection is found
+        at before update
+       @param new_catalogue_score: (integer) - the new value of the collection's score for the submission-collection
+       @return: (integer) - 0
+    """
+    qstr = """UPDATE sbmCOLLECTION_sbmCOLLECTION SET catalogue_order=%s """ \
+           """WHERE id_father=%s AND id_son=%s AND catalogue_order=%s"""
+    run_sql(qstr, (new_catalogue_score, id_father, id_son, old_catalogue_score))
+    return 0
+
+
+def normalize_scores_of_doctype_children_for_submission_collection(collection_id):
+    """Normalize the scores of the doctype-children of a given submission-collection.
+       I.e. set them into the format (1, 2, 3, 4, 5, [...]).
+       @param collection_id: (integer) - the ID of the submission-collection whose
+        doctype-children's scores are to be normalized.
+       @return: None
+    """
+    ## Get all document types attached to the collection, ordered by score:
+    doctypes = get_doctype_children_of_collection(collection_id)
+
+    num_doctypes = len(doctypes)
+    normal_score = 1
+    ## for each document type, if score does not fit with counter, update it:
+    for idx in xrange(0, num_doctypes):
+        this_doctype_id    = doctypes[idx][0]
+        this_doctype_score = int(doctypes[idx][2])
+        if this_doctype_score != normal_score:
+            ## Score of doctype is not good - correct it:
+            update_score_of_doctype_child_of_collection(collection_id, this_doctype_id, \
+                                                        this_doctype_score, normal_score)
+        normal_score += 1
+    return
+
+def normalize_scores_of_collection_children_of_collection(collection_id):
+    """Normalize the scores of the collection-children of a given submission-collection.
+       I.e. set them into the format (1, 2, 3, 4, 5, [...]).
+       @param collection_id: (integer) - the ID of the submission-collection whose
+        collection-children's scores are to be normalized.
+       @return: None
+    """
+    ## Get all document types attached to the collection, ordered by score:
+    collections = get_id_and_score_of_collection_children_of_collection(collection_id)
+
+    num_collections = len(collections)
+    normal_score = 1
+    ## for each collection, if score does not fit with counter, update it:
+    for idx in xrange(0, num_collections):
+        this_collection_id    = collections[idx][0]
+        this_collection_score = int(collections[idx][1])
+        if this_collection_score != normal_score:
+            ## Score of collection is not good - correct it:
+            update_score_of_collection_child_of_collection(collection_id, this_collection_id, \
+                                                        this_collection_score, normal_score)
+        normal_score += 1
+    return
+
+
 ## Functions relating to WebSubmit ACTIONS, their addition, and their modification:
 
 def update_action_details(actid, actname, working_dir, status_text):

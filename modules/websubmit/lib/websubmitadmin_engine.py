@@ -291,6 +291,336 @@ def wash_single_urlarg(urlarg, argreqdtype, argdefault, maxstrlen=None, minstrle
 
 ## Internal Business-Logic functions
 
+## Functions for managing collection order, etc:
+
+def build_submission_collection_tree(collection_id, has_brother_above=0, has_brother_below=0):
+    ## get the name of this collection:
+    collection_name = get_collection_name(collection_id)
+    if collection_name is None:
+        collection_name = "Unknown Collection"
+
+    ## make a data-structure containing the details of the collection:
+    collection_node = { 'collection_id'       : collection_id,         ## collection ID
+                        'collection_name'     : collection_name,   ## collection Name
+                        'collection_children' : [],                ## list of 'collection' children nodes
+                        'doctype_children'    : [],                ## list of 'doctype' children
+                        'has_brother_above'   : has_brother_above, ## has a sibling collection above in score
+                        'has_brother_below'   : has_brother_below, ## has a sibling collection below in score
+                      }
+
+    ## get the IDs and names of all doctypes attached to this collection:
+    res_doctype_children = get_doctype_children_of_collection(collection_id)
+    ## for each child, add its details to the list of doctype children for this node:
+    for doctype in res_doctype_children:
+        doctype_node = { 'doctype_id'      : doctype[0],
+                         'doctype_lname'   : doctype[1],
+                         'catalogue_order' : doctype[2],
+                       }
+        collection_node['doctype_children'].append(doctype_node)
+
+    ## now get details of all collections attached to this one:
+    res_collection_children = get_collection_children_of_collection(collection_id)
+
+    num_collection_children = len(res_collection_children)
+    for child_num in xrange(0, num_collection_children):
+        brother_below = brother_above = 0
+        if child_num > 0:
+            ## this is not the first brother - it has a brother above
+            brother_above = 1
+        if child_num < num_collection_children - 1:
+            ## this is not the last brother - it has a brother below
+            brother_below = 1
+        collection_node['collection_children'].append(\
+            build_submission_collection_tree(collection_id=res_collection_children[child_num][0],
+                                  has_brother_above=brother_above,
+                                  has_brother_below=brother_below))
+        
+
+    ## return the built collection tree:
+    return collection_node
+
+def _organise_submission_page_display_submission_tree(errors, warnings, user_msg=""):
+    title = "Organise WebSubmit Main Page"
+    body = ""
+    if user_msg == "" or type(user_msg) not in (list, tuple, str, unicode):
+        user_msg = []
+    ## Get the submissions tree:
+    submission_collection_tree = build_submission_collection_tree(0)
+    ## Get all 'submission collections':
+    submission_collections = get_details_of_all_submission_collections()
+    sub_col = [('0', 'Top Level')]
+    for collection in submission_collections:
+        sub_col.append((str(collection[0]), str(collection[1])))
+    ## Get all document types:
+    doctypes = get_docid_docname_and_docid_alldoctypes()
+
+    ## build the page:
+    body = websubmitadmin_templates.tmpl_display_submission_page_organisation(submission_collection_tree=submission_collection_tree,
+                                                                              submission_collections=sub_col,
+                                                                              doctypes=doctypes,
+                                                                              user_msg=user_msg)
+    return (title, body)
+
+def _delete_submission_collection(sbmcolid):
+    """Recursively calls itself to delete a submission-collection and all of its
+       attached children (and their children, etc) from the submission-tree.
+       @param sbmcolid: (integer) - the ID of the submission-collection to be deleted.
+       @return: None
+       @Exceptions raised: InvenioWebSubmitAdminWarningDeleteFailed when it was not
+        possible to delete the submission-collection or some of its children.
+    """
+    ## Get the collection-children of this submission-collection:
+    collection_children = get_collection_children_of_collection(sbmcolid)
+
+    ## recursively move through each collection-child:
+    for collection_child in collection_children:
+        _delete_submission_collection(collection_child[0])
+
+    ## delete all document-types attached to this submission-collection:
+    error_code = delete_doctype_children_from_submission_collection(sbmcolid)
+    if error_code != 0:
+        ## Unable to delete all doctype-children:
+        err_msg = "Unable to delete doctype children of submission-collection [%s]" % sbmcolid
+        raise InvenioWebSubmitAdminWarningDeleteFailed(err_msg)
+
+    ## delete this submission-collection's entry from the sbmCOLLECTION_sbmCOLLECTION table:
+    error_code = delete_submission_collection_from_submission_tree(sbmcolid)
+    if error_code != 0:
+        ## Unable to delete submission-collection from the submission-tree:
+        err_msg = "Unable to delete submission-collection [%s] from submission-tree" % sbmcolid
+        raise InvenioWebSubmitAdminWarningDeleteFailed(err_msg)
+
+    ## Now delete this submission-collection's details:
+    error_code = delete_submission_collection_details(sbmcolid)
+    if error_code != 0:
+        ## Unable to delete the details of the submission-collection:
+        err_msg = "Unable to delete details of submission-collection [%s]" % sbmcolid
+        raise InvenioWebSubmitAdminWarningDeleteFailed(err_msg)
+
+    ## return
+    return
+
+
+def perform_request_organise_submission_page(doctype="",
+                                             sbmcolid="",
+                                             catscore="",
+                                             addsbmcollection="",
+                                             deletesbmcollection="",
+                                             addtosbmcollection="",
+                                             adddoctypes="",
+                                             movesbmcollectionup="",
+                                             movesbmcollectiondown="",
+                                             deletedoctypefromsbmcollection="",
+                                             movedoctypeupinsbmcollection="",
+                                             movedoctypedowninsbmcollection=""):
+    user_msg = []
+    errors = []
+    warnings = []
+    body = ""
+    if "" not in (deletedoctypefromsbmcollection, sbmcolid, catscore, doctype):
+        ## delete a document type from it's position in the tree
+        error_code = delete_doctype_from_position_on_submission_page(doctype, sbmcolid, catscore)
+        if error_code == 0:
+            ## doctype deleted - now normalize scores of remaining doctypes:
+            normalize_scores_of_doctype_children_for_submission_collection(sbmcolid)
+            user_msg.append("Document type successfully deleted from submissions tree")
+        else:
+            user_msg.append("Unable to delete document type from submission-collection")
+        ## display submission-collections:
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (deletesbmcollection, sbmcolid):
+        ## try to delete the submission-collection from the tree:
+        try:
+            _delete_submission_collection(sbmcolid)
+            user_msg.append("Submission-collection successfully deleted from submissions tree")
+        except InvenioWebSubmitAdminWarningDeleteFailed, excptn:
+            user_msg.append(str(excptn))
+        ## re-display submission-collections:
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (movedoctypedowninsbmcollection, sbmcolid, doctype, catscore):
+        ## move a doctype down in order for a submission-collection:
+        ## normalize scores of all doctype-children of the submission-collection:
+        normalize_scores_of_doctype_children_for_submission_collection(sbmcolid)
+        ## swap this doctype with that below it:
+        ## Get score of doctype to move:
+        score_doctype_to_move = get_catalogue_score_of_doctype_child_of_submission_collection(sbmcolid, doctype)
+        ## Get score of the doctype brother directly below the doctype to be moved:
+        score_brother_below = get_score_of_next_doctype_child_below(sbmcolid, score_doctype_to_move)
+        if None in (score_doctype_to_move, score_brother_below):
+            user_msg.append("Unable to move document type down")
+        else:
+            ## update the brother below the doctype to be moved to have a score the same as the doctype to be moved:
+            update_score_of_doctype_child_of_submission_collection_at_scorex(sbmcolid, score_brother_below, score_doctype_to_move)
+            ## Update the doctype to be moved to have a score of the brother directly below it:
+            update_score_of_doctype_child_of_submission_collection_with_doctypeid_and_scorex(sbmcolid,
+                                                                                             doctype,
+                                                                                             score_doctype_to_move,
+                                                                                             score_brother_below)
+            user_msg.append("Document type moved down")
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (movedoctypeupinsbmcollection, sbmcolid, doctype, catscore):
+        ## move a doctype up in order for a submission-collection:
+        ## normalize scores of all doctype-children of the submission-collection:
+        normalize_scores_of_doctype_children_for_submission_collection(sbmcolid)
+        ## swap this doctype with that above it:
+        ## Get score of doctype to move:
+        score_doctype_to_move = get_catalogue_score_of_doctype_child_of_submission_collection(sbmcolid, doctype)
+        ## Get score of the doctype brother directly above the doctype to be moved:
+        score_brother_above = get_score_of_previous_doctype_child_above(sbmcolid, score_doctype_to_move)
+        if None in (score_doctype_to_move, score_brother_above):
+            user_msg.append("Unable to move document type up")
+        else:
+            ## update the brother above the doctype to be moved to have a score the same as the doctype to be moved:
+            update_score_of_doctype_child_of_submission_collection_at_scorex(sbmcolid, score_brother_above, score_doctype_to_move)
+            ## Update the doctype to be moved to have a score of the brother directly above it:
+            update_score_of_doctype_child_of_submission_collection_with_doctypeid_and_scorex(sbmcolid,
+                                                                                             doctype,
+                                                                                             score_doctype_to_move,
+                                                                                             score_brother_above)
+            user_msg.append("Document type moved up")
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (movesbmcollectiondown, sbmcolid):
+        ## move a submission-collection down in order:
+        
+        ## Sanity checking:
+        try:
+            int(sbmcolid)
+        except ValueError:
+            sbmcolid = 0
+
+        if int(sbmcolid) != 0:
+            ## Get father ID of submission-collection:
+            sbmcolidfather = get_id_father_of_collection(sbmcolid)
+            if sbmcolidfather is None:
+                user_msg.append("Unable to move submission-collection downwards")
+            else:
+                ## normalize scores of all collection-children of the father submission-collection:
+                normalize_scores_of_collection_children_of_collection(sbmcolidfather)
+                ## swap this collection with the one above it:
+                ## get the score of the collection to move:
+                score_col_to_move = get_score_of_collection_child_of_submission_collection(sbmcolidfather, sbmcolid)
+                ## get the score of the collection brother directly below the collection to be moved:
+                score_brother_below = get_score_of_next_collection_child_below(sbmcolidfather, score_col_to_move)
+                if None in (score_col_to_move, score_brother_below):
+                    ## Invalid movement
+                    user_msg.append("Unable to move submission collection downwards")
+                else:
+                    ## update the brother below the collection to be moved to have a score the same as the collection to be moved:
+                    update_score_of_collection_child_of_submission_collection_at_scorex(sbmcolidfather,
+                                                                                        score_brother_below,
+                                                                                        score_col_to_move)
+                    ## Update the collection to be moved to have a score of the brother directly below it:
+                    update_score_of_collection_child_of_submission_collection_with_colid_and_scorex(sbmcolidfather,
+                                                                                                    sbmcolid,
+                                                                                                    score_col_to_move,
+                                                                                                    score_brother_below)
+                    user_msg.append("Submission-collection moved downwards")
+
+        else:
+            ## cannot move the master (0) collection
+            user_msg.append("Unable to move submission-collection downwards")
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (movesbmcollectionup, sbmcolid):
+        ## move a submission-collection up in order:
+
+        ## Sanity checking:
+        try:
+            int(sbmcolid)
+        except ValueError:
+            sbmcolid = 0
+
+        if int(sbmcolid) != 0:
+            ## Get father ID of submission-collection:
+            sbmcolidfather = get_id_father_of_collection(sbmcolid)
+            if sbmcolidfather is None:
+                user_msg.append("Unable to move submission-collection upwards")
+            else:
+                ## normalize scores of all collection-children of the father submission-collection:
+                normalize_scores_of_collection_children_of_collection(sbmcolidfather)
+                ## swap this collection with the one above it:
+                ## get the score of the collection to move:
+                score_col_to_move = get_score_of_collection_child_of_submission_collection(sbmcolidfather, sbmcolid)
+                ## get the score of the collection brother directly above the collection to be moved:
+                score_brother_above = get_score_of_previous_collection_child_above(sbmcolidfather, score_col_to_move)
+                if None in (score_col_to_move, score_brother_above):
+                    ## Invalid movement
+                    user_msg.append("Unable to move submission collection upwards")
+                else:
+                    ## update the brother above the collection to be moved to have a score the same as the collection to be moved:
+                    update_score_of_collection_child_of_submission_collection_at_scorex(sbmcolidfather,
+                                                                                        score_brother_above,
+                                                                                        score_col_to_move)
+                    ## Update the collection to be moved to have a score of the brother directly above it:
+                    update_score_of_collection_child_of_submission_collection_with_colid_and_scorex(sbmcolidfather,
+                                                                                                    sbmcolid,
+                                                                                                    score_col_to_move,
+                                                                                                    score_brother_above)
+                    user_msg.append("Submission-collection moved upwards")
+        else:
+            ## cannot move the master (0) collection
+            user_msg.append("Unable to move submission-collection upwards")
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (addsbmcollection, addtosbmcollection):
+        ## Add a submission-collection, attached to a submission-collection:
+        ## check that the collection to attach to exists:
+        parent_ok = 0
+        if int(addtosbmcollection) != 0:
+            parent_name = get_collection_name(addtosbmcollection)
+            if parent_name is not None:
+                parent_ok = 1
+        else:
+            parent_ok = 1
+        if parent_ok != 0:
+            ## create the new collection:
+            id_son = insert_submission_collection(addsbmcollection)
+            ## get the maximum catalogue score of the existing collection children:
+            max_child_score = \
+               get_maximum_catalogue_score_of_collection_children_of_submission_collection(addtosbmcollection)
+            ## add it to the collection, at a higher score than the others have:
+            new_score = max_child_score + 1
+            insert_collection_child_for_submission_collection(addtosbmcollection, id_son, new_score)
+            user_msg.append("Submission-collection added to submissions tree")
+        else:
+            ## Parent submission-collection does not exist:
+            user_msg.append("Unable to add submission-collection - parent unknown")
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    elif "" not in (adddoctypes, addtosbmcollection):
+        ## Add document type(s) to a submission-collection:
+        if type(adddoctypes) == str:
+            adddoctypes = [adddoctypes,]
+        ## Does submission-collection exist?
+        num_collections_sbmcolid = get_number_of_rows_for_submission_collection(addtosbmcollection)
+        if num_collections_sbmcolid > 0:
+            for doctypeid in adddoctypes:
+                ## Check that Doctype exists:
+                num_doctypes_doctypeid = get_number_doctypes_docid(doctypeid)
+
+                if num_doctypes_doctypeid < 1:
+                    ## Cannot connect an unknown doctype:
+                    user_msg.append("Unable to connect unknown document-type [%s] to a submission-collection" \
+                                    % doctypeid)
+                    continue
+                else:
+                    ## insert the submission-collection/doctype link:
+                    ## get the maximum catalogue score of the existing doctype children:
+                    max_child_score = \
+                       get_maximum_catalogue_score_of_doctype_children_of_submission_collection(addtosbmcollection)
+                    ## add it to the new doctype, at a higher score than the others have:
+                    new_score = max_child_score + 1
+                    insert_doctype_child_for_submission_collection(addtosbmcollection, doctypeid, new_score)
+                    user_msg.append("Document-type added to submissions tree")
+        else:
+            ## submission-collection didn't exist
+            user_msg.append("The selected submission-collection doesn't seem to exist")
+        ## Check that submission-collection exists:
+        ## insert
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    else:
+        ## default action - display submission-collections:
+        (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
+    return (title, body, errors, warnings)
+
+
 
 ## Functions for adding new catalgue to DB:
 def _add_new_action(actid,actname,working_dir,status_text):
