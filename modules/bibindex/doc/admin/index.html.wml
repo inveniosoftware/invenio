@@ -22,12 +22,6 @@
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a>" \
     navbar_name="admin" \
     navbar_select="bibindex" 
-     
-
-<p>
- This is the gate to the admin area for BibIndex. You need to
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibindex/">login</a> to enter.
-</p>
 
 <dl>
  <dt><a href="bibindexadmin.py/index">Manage indexes</a></dt>

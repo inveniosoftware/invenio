@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="bibedit"
 
-<p>
- This is the gate to the admin area for BibEdit. You need to 
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibedit/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="bibeditadmin.py">BibEdit Admin Interface</a></dt>
  <dd>Start area for BibEdit administration.</dd>

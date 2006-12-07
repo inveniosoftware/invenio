@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="bibharvest"
 
-<p>
- This is the gate to the admin area for BibHarvest. You need to
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibharvest/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="bibharvestadmin.py">BibHarvest Admin Interface</a></dt>
  <dd>Configure your OAI sources and harvesting periodicity.</dd>

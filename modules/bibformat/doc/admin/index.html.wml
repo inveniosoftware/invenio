@@ -24,10 +24,6 @@
     navbar_select="bibformat" 
      
 
-<p>
-   This is where you can edit the formatting styles available for the records.. You need to
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibformat/">login</a> to enter.
-</p>
 <dl>
 <dt><a href="<WEBURL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a></dt>
 <dd>Define how to format a record.</dd>

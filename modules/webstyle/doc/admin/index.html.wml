@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="webstyle"
 
-<p>
- This is the gate to the admin area for WebStyle. You need to 
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/webstyle/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="guide.html">WebStyle Admin Guide</a></dt>
  <dd>Everything you want to know about WebStyle administration</dd>

@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="bibrank"
 
-<p>
- This is the gate to the admin area for BibRank. You need to 
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/bibrank/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="bibrankadmin.py">BibRank Admin Interface</a></dt>
  <dd>Start area for BibRank administration.</dd>

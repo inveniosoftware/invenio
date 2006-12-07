@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="websearch" 
      
-<p>
- This is the gate to the admin area for WebSearch. You need to 
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/websearch/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="websearchadmin.py">WebSearch Admin Interface</a></dt>
  <dd>Start area for WebSearch administration.</dd>

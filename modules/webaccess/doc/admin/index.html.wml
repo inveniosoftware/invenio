@@ -23,11 +23,6 @@
     navbar_name="admin" \
     navbar_select="webaccess"
 
-<p>
- This is the gate to the admin area for WebAccess. You need to 
- <a href="<WEBURL>/youraccount/login?referer=<WEBURL>/admin/webaccess/">login</a> to enter.
-</p>
-
 <dl>
  <dt><a href="webaccessadmin.py">Manage WebAccess - Full Functionality</a>.</dt>
  <dd>Start area for WebAccess administration. Here you have <br>
