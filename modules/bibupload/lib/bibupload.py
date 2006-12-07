@@ -302,7 +302,9 @@ def task_run(task_id):
         if recs is not None:
             # We proceed each record by record
             for record in recs:
+                saved_mode = options['mode']
                 error = bibupload(record)
+                options['mode'] = saved_mode
                 if error[0] == 1:
                     stat['nb_errors'] += 1
                 task_update_progress("Done %d out of %d." % \
