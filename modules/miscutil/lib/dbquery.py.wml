@@ -168,23 +168,26 @@ def get_table_update_time(tablename):
     """
     # Note: in order to work with all of MySQL 4.0, 4.1, 5.0, this
     # function uses SHOW TABLE STATUS technique with a dirty column
-    # position lookup to return the correct value.  When we shall use
-    # solely MySQL-5.0, we can employ a much cleaner technique of
-    # using SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
+    # position lookup to return the correct value.  (Making use of
+    # Index_Length column that is either of type long (when there are
+    # some indexes defined) or of type None (when there are no indexes
+    # defined, e.g. table is empty).  When we shall use solely
+    # MySQL-5.0, we can employ a much cleaner technique of using
+    # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
     # table_name='collection'.
     res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
     update_times = [] # store all update times
     for row in res:
-        if type(row[10]) is datetime.datetime or \
-           type(row[10]) is str:
+        if type(row[10]) is long or \
+           row[10] is None:
+            # MySQL-4.1 and 5.0 have creation_time in 11th position,
+            # so return next column:
+            update_times.append(str(row[12]))
+        else:
             # MySQL-4.0 has creation_time in 10th position, which is
             # of type datetime.datetime or str (depending on the
             # version of MySQLdb), so return next column:
             update_times.append(str(row[11]))
-        else:
-            # MySQL-4.1 and 5.0 have creation_time in 11th position,
-            # so return next column:
-            update_times.append(str(row[12]))
     return max(update_times)
 
 def get_table_status_info(tablename):
@@ -196,8 +199,16 @@ def get_table_status_info(tablename):
     res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
     table_status_info = {} # store all update times
     for row in res:
-        if type(row[10]) is datetime.datetime or \
-           type(row[10]) is str:
+        if type(row[10]) is long or \
+           row[10] is None:
+            # MySQL-4.1 and 5.0 have creation time in 11th position:
+            table_status_info['Name'] = row[0]
+            table_status_info['Rows'] = row[4]
+            table_status_info['Data_length'] = row[6]
+            table_status_info['Max_data_length'] = row[8]
+            table_status_info['Create_time'] = row[11]
+            table_status_info['Update_time'] = row[12]
+        else:
             # MySQL-4.0 has creation_time in 10th position, which is
             # of type datetime.datetime or str (depending on the
             # version of MySQLdb):
@@ -207,12 +218,4 @@ def get_table_status_info(tablename):
             table_status_info['Max_data_length'] = row[7]
             table_status_info['Create_time'] = row[10]
             table_status_info['Update_time'] = row[11]
-        else:
-            # MySQL-4.1 and 5.0 have creation time in 11th position:
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[4]
-            table_status_info['Data_length'] = row[6]
-            table_status_info['Max_data_length'] = row[8]
-            table_status_info['Create_time'] = row[11]
-            table_status_info['Update_time'] = row[12]
     return table_status_info
