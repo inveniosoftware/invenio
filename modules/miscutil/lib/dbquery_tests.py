@@ -30,31 +30,48 @@ from invenio import dbquery
 class TableUpdateTimesTest(unittest.TestCase):
     """Test functions related to the update_times of MySQL tables."""
 
-    def test_single_table_update_time(self):
-        """dbquery - single table update time detection"""
-        test_table = "collection"
+    def _check_table_update_time(self, tablename):
+        """Helper function to check update time of TABLENAME."""
         # detect MySQL version number:
         res = dbquery.run_sql("SELECT VERSION()")
         mysql_server_version = res[0][0]
         if mysql_server_version.startswith("5."):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
-                        WHERE table_name='%s'""" % test_table
-            test_table_update_time = str(dbquery.run_sql(query)[0][0])
+                        WHERE table_name='%s'""" % tablename
+            tablename_update_time = str(dbquery.run_sql(query)[0][0])
         elif mysql_server_version.startswith("4.1"):
             # MySQL-4.1 has it on 12th position:
-            query = """SHOW TABLE STATUS LIKE '%s'""" % test_table
-            test_table_update_time = str(dbquery.run_sql(query)[0][12])
+            query = """SHOW TABLE STATUS LIKE '%s'""" % tablename
+            tablename_update_time = str(dbquery.run_sql(query)[0][12])
         elif mysql_server_version.startswith("4.0"):
             # MySQL-4.0 has it on 11th position:
-            query = """SHOW TABLE STATUS LIKE '%s'""" % test_table
-            test_table_update_time = str(dbquery.run_sql(query)[0][11])
+            query = """SHOW TABLE STATUS LIKE '%s'""" % tablename
+            tablename_update_time = str(dbquery.run_sql(query)[0][11])
         else:
-            test_table_update_time = "MYSQL SERVER VERSION NOT DETECTED"
+            tablename_update_time = "MYSQL SERVER VERSION NOT DETECTED"
         # compare it with the one detected by the function:
-        self.assertEqual(test_table_update_time,
-                         dbquery.get_table_update_time("collection"))
-        
+        self.assertEqual(tablename_update_time,
+                         dbquery.get_table_update_time(tablename))
+
+    def test_single_table_update_time(self):
+        """dbquery - single table (with indexes) update time detection"""
+        # NOTE: this tests usual "long" branch of
+        # get_table_update_time()
+        self._check_table_update_time("collection")
+
+    def test_empty_table_update_time(self):
+        """dbquery - empty table (no indexes) update time detection"""
+        # NOTE: this tests unusual "None" branch of
+        # get_table_update_time()
+        # create empty test table
+        test_table = "tmpTESTTABLE123"
+        dbquery.run_sql("CREATE TABLE IF NOT EXISTS %s (a INT)" % test_table)
+        # run the test:
+        self._check_table_update_time(test_table)        
+        # drop empty test table
+        dbquery.run_sql("DROP TABLE %s" % test_table)
+
 def create_test_suite():
     """Return test suite for the user handling."""
     return unittest.TestSuite((
