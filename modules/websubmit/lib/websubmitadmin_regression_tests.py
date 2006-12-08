@@ -58,7 +58,7 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_websubmit_admin_guide_availability(self):
         """websubmitadmin - availability of WebSubmit Admin guide pages"""
 
-        url = weburl + '/admin/websubmit/guide/'
+        url = weburl + '/admin/websubmit/guide.html'
         error_messages = test_web_page_content(url)
         if error_messages:
             self.fail(merge_error_messages(error_messages))
