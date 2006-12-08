@@ -17,59 +17,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "configbis.wml"
 #include "cdspage.wml" \
-    title="_(Guide)_" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/websubmit/>_(WebSubmit Administration)_</a>"  \
+    title="WebSubmit Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a>" \
     navbar_name="admin" \
-    navbar_select="websubmit-admin-guide"
+    navbar_select="websubmit" 
 
-<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
-
-        <h3>Table of Contents</STRONG></h3>
-
-        <UL>
-          <LI><B>Introduction</B>
-        <UL>
-          <LI><A HREF="introduction.<lang:star: *>.html">General Overview of the Manager Tool</A>
-          <LI><A HREF="example.<lang:star: *>.html">Using the manager through an example</A>
-          <LI><A HREF="philosophy.<lang:star: *>.html">Philosophy behind the document submission system</A>
-        </UL>
-        <LI><B>The Interface</B>
-        <UL>
-          <LI><A HREF="description.<lang:star: *>.html">Description</A>
-        </UL>
-          <LI><B><A HREF="documents.<lang:star: *>.html">Types of Document</A></B>
-          <UL>
-            <LI><A HREF="documentnew.<lang:star: *>.html">Add a New Type of Document</A>
-              <LI><A HREF="documentremove.<lang:star: *>.html">Remove a type of document</A>
-            <LI><A HREF="documentmodify.<lang:star: *>.html">Modify an Existing Type of Document</A>
-          </UL>
-        <LI><B><A HREF="actions.<lang:star: *>.html">Actions</A></B>
-        <UL>
-          <LI><A HREF="actionnew.<lang:star: *>.html">Add a New Action</A>
-          <LI><A HREF="actionremove.<lang:star: *>.html">Remove an Action</A>
-          <LI><A HREF="actionmodify.<lang:star: *>.html">Modify an Existing Action</A>
-          <LI><A HREF="actionimplement.<lang:star: *>.html">Implement an Action over a Document Type</A>
-             <UL>
-            <LI><A HREF="implementwebform.<lang:star: *>.html">Create and Maintain the Web Form</A>
-            <LI><A HREF="implementfunctions.<lang:star: *>.html">Create and Maintain the Data Treatment</A>
-             </UL>
-        </UL>
-        <LI><B><A HREF="functions.<lang:star: *>.html">Functions</A></B>
-        <UL>
-          <LI><A HREF="functionnew.<lang:star: *>.html">Create a New Function</A>
-          <LI><A HREF="functiondelete.<lang:star: *>.html">Remove a Function</A>
-          <LI><A HREF="functionedit.<lang:star: *>.html">Edit a Function</A>
-          <LI><A HREF="functiondescription.<lang:star: *>.html">All Functions Explained</A>
-        </UL>
-        <LI><B><A HREF="protection.<lang:star: *>.html">Protection</A></B>
-        <LI><B><A HREF="catalogues.<lang:star: *>.html">Catalogues Organisation</A></B>
-        <LI><B><A HREF="bibconvert.<lang:star: *>.html">bibConvert</A></B>
-          <LI><B>Notes</B>
-        <UL>
-        </UL>
-        <LI><B><A HREF="faq.<lang:star: *>.html">FAQ</a></B>
-        </UL>
-         
-
+<dl>
+ <dt><a href="websubmitadmin.py/">WebSubmit Admin Interface</a></dt>
+ <dd>Starting area for managing submissions.</dd>
+</dl>
+<dl>
+ <dt><a href="guide.html">WebSubmit Admin Guide</a></dt>
+ <dd>Everything you want to know about WebSubmit administration</dd>
+</dl>
