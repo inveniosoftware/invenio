@@ -36,7 +36,7 @@ Contents
           $ sudo apt-get install libapache2-mod-python2.3 \
               apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
               python2.3-mysqldb python2.3-numeric python2.3-4suite \
-              python2.3-libxml2 python2.3-libxslt1 \
+              python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
               rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
 
@@ -78,6 +78,8 @@ Contents
              <http://sourceforge.net/projects/numpy>
           - (recommended) PyStemmer, for indexing and ranking: 
              <http://sourceforge.net/projects/pystemmer/>
+          - (recommended) PyXML, for XML processing:
+             <http://pyxml.sourceforge.net/topics/download.html>
           - (recommended) PyRXP, for very fast XML MARC processing: 
              <http://www.reportlab.org/pyrxp.html>
           - (recommended) libxml2-python, for XML/XLST processing:
