@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.91.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-11-24 11:47+0100\n"
+"POT-Creation-Date: 2006-12-08 11:28+0100\n"
 "PO-Revision-Date: 2006-10-12 17:49+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: IT <cds.support@cern.ch>\n"
@@ -32,11 +32,11 @@ msgid "This site is also available in the following languages:"
 msgstr "Denne siden er også tilgjengelig på følgende språk:"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
-#: modules/websearch/lib/websearch_templates.py:342
-#: modules/websearch/lib/websearch_templates.py:463
-#: modules/websearch/lib/websearch_templates.py:1301
-#: modules/websearch/lib/websearch_templates.py:1400
-#: modules/websearch/lib/websearch_templates.py:1464
+#: modules/websearch/lib/websearch_templates.py:341
+#: modules/websearch/lib/websearch_templates.py:462
+#: modules/websearch/lib/websearch_templates.py:1300
+#: modules/websearch/lib/websearch_templates.py:1393
+#: modules/websearch/lib/websearch_templates.py:1449
 #: modules/webstyle/lib/webstyle_templates.py:353
 #: modules/webstyle/lib/webstyle_templates.py:429
 msgid "Search"
@@ -71,7 +71,6 @@ msgstr "Hjelp"
 #: modules/bibformat/web/admin/OAIER_SF_add.php.wml:25
 #: modules/bibformat/web/admin/OAIER_display.php.wml:24
 #: modules/bibformat/web/admin/UDF_display.php.wml:25
-#: modules/bibformat/web/admin/index.php.wml:29
 #: modules/bibformat/web/admin/test.php.wml:25
 #: modules/bibharvest/doc/admin/guide.html.wml:22
 #: modules/bibharvest/doc/admin/index.html.wml:22
@@ -104,62 +103,8 @@ msgstr "Hjelp"
 #: modules/webstat/doc/admin/index.html.wml:22
 #: modules/webstyle/doc/admin/guide.html.wml:23
 #: modules/webstyle/doc/admin/index.html.wml:22
-#: modules/websubmit/doc/admin/actionimplement.html.wml:23
-#: modules/websubmit/doc/admin/actionmodify.html.wml:23
-#: modules/websubmit/doc/admin/actionnew.html.wml:23
-#: modules/websubmit/doc/admin/actionremove.html.wml:23
-#: modules/websubmit/doc/admin/actions.html.wml:23
-#: modules/websubmit/doc/admin/bibconvert.html.wml:23
-#: modules/websubmit/doc/admin/catalogues.html.wml:23
-#: modules/websubmit/doc/admin/description.html.wml:23
-#: modules/websubmit/doc/admin/documentmodify.html.wml:23
-#: modules/websubmit/doc/admin/documentnew.html.wml:23
-#: modules/websubmit/doc/admin/documentremove.html.wml:23
-#: modules/websubmit/doc/admin/documents.html.wml:23
-#: modules/websubmit/doc/admin/example.html.wml:23
-#: modules/websubmit/doc/admin/faq.html.wml:23
-#: modules/websubmit/doc/admin/functiondelete.html.wml:23
-#: modules/websubmit/doc/admin/functiondescription.html.wml:23
-#: modules/websubmit/doc/admin/functionedit.html.wml:23
-#: modules/websubmit/doc/admin/functionnew.html.wml:23
-#: modules/websubmit/doc/admin/functions.html.wml:23
-#: modules/websubmit/doc/admin/implementfunctions.html.wml:23
-#: modules/websubmit/doc/admin/implementwebform.html.wml:23
-#: modules/websubmit/doc/admin/index.html.wml:23
-#: modules/websubmit/doc/admin/introduction.html.wml:23
-#: modules/websubmit/doc/admin/philosophy.html.wml:23
-#: modules/websubmit/doc/admin/protection.html.wml:23
-#: modules/websubmit/web/admin/func.php.wml:24
-#: modules/websubmit/web/admin/viewEditSubmissionEDS.php.wml:24
-#: modules/websubmit/web/admin/viewChecksEDS.php.wml:24
-#: modules/websubmit/web/admin/viewActionEDS.php.wml:24
-#: modules/websubmit/web/admin/removeDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/parameterUpdate.php.wml:24
-#: modules/websubmit/web/admin/newSubmissionEDS.php.wml:24
-#: modules/websubmit/web/admin/newFunc.php.wml:24
-#: modules/websubmit/web/admin/pageDetsEDS.php.wml:24
-#: modules/websubmit/web/admin/funcUsage.php.wml:24
-#: modules/websubmit/web/admin/index.php.wml:24
-#: modules/websubmit/web/admin/elementConfigDetsEDS.php.wml:24
-#: modules/websubmit/web/admin/editRecordFile.php.wml:24
-#: modules/websubmit/web/admin/editPageElementEDS.php.wml:24
-#: modules/websubmit/web/admin/editDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/editActionDets.php.wml:24
-#: modules/websubmit/web/admin/documentEDS.php.wml:24
-#: modules/websubmit/web/admin/doctypeCategoriesEDS.php.wml:24
-#: modules/websubmit/web/admin/allElementsEDS.php.wml:24
-#: modules/websubmit/web/admin/allChecksEDS.php.wml:24
-#: modules/websubmit/web/admin/allActionsEDS.php.wml:24
-#: modules/websubmit/web/admin/addFunctions.php.wml:24
-#: modules/websubmit/web/admin/addElement2PageEDS.php.wml:24
-#: modules/websubmit/web/admin/addCheckEDS.php.wml:24
-#: modules/websubmit/web/admin/addActionEDS.php.wml:24
-#: modules/websubmit/web/admin/addElementDescrEDS.php.wml:24
-#: modules/websubmit/web/admin/editCatalogues.php.wml:24
-#: modules/websubmit/web/admin/listFunctions.php.wml:24
-#: modules/websubmit/web/admin/newDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/veditFunDets.php.wml:24
-#: modules/websubmit/web/admin/actionFunctions.php.wml:24
+#: modules/websubmit/doc/admin/index.html.wml:22
+#: modules/websubmit/doc/admin/guide.html.wml:23
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:50
 #: modules/bibformat/web/admin/bibformatadmin.py:79
@@ -172,61 +117,7 @@ msgstr "Administratorområde"
 msgid "Last updated"
 msgstr "Sist oppdatert"
 
-#: modules/websubmit/doc/admin/actionimplement.html.wml:23
-#: modules/websubmit/doc/admin/actionmodify.html.wml:23
-#: modules/websubmit/doc/admin/actionnew.html.wml:23
-#: modules/websubmit/doc/admin/actionremove.html.wml:23
-#: modules/websubmit/doc/admin/actions.html.wml:23
-#: modules/websubmit/doc/admin/bibconvert.html.wml:23
-#: modules/websubmit/doc/admin/catalogues.html.wml:23
-#: modules/websubmit/doc/admin/description.html.wml:23
-#: modules/websubmit/doc/admin/documentmodify.html.wml:23
-#: modules/websubmit/doc/admin/documentnew.html.wml:23
-#: modules/websubmit/doc/admin/documentremove.html.wml:23
-#: modules/websubmit/doc/admin/documents.html.wml:23
-#: modules/websubmit/doc/admin/example.html.wml:23
-#: modules/websubmit/doc/admin/faq.html.wml:23
-#: modules/websubmit/doc/admin/functiondelete.html.wml:23
-#: modules/websubmit/doc/admin/functiondescription.html.wml:23
-#: modules/websubmit/doc/admin/functionedit.html.wml:23
-#: modules/websubmit/doc/admin/functionnew.html.wml:23
-#: modules/websubmit/doc/admin/functions.html.wml:23
-#: modules/websubmit/doc/admin/implementfunctions.html.wml:23
-#: modules/websubmit/doc/admin/implementwebform.html.wml:23
-#: modules/websubmit/doc/admin/index.html.wml:23
-#: modules/websubmit/doc/admin/introduction.html.wml:23
-#: modules/websubmit/doc/admin/philosophy.html.wml:23
-#: modules/websubmit/doc/admin/protection.html.wml:23
-#: modules/websubmit/web/admin/func.php.wml:24
-#: modules/websubmit/web/admin/viewEditSubmissionEDS.php.wml:24
-#: modules/websubmit/web/admin/viewChecksEDS.php.wml:24
-#: modules/websubmit/web/admin/viewActionEDS.php.wml:24
-#: modules/websubmit/web/admin/removeDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/parameterUpdate.php.wml:24
-#: modules/websubmit/web/admin/newSubmissionEDS.php.wml:24
-#: modules/websubmit/web/admin/newFunc.php.wml:24
-#: modules/websubmit/web/admin/pageDetsEDS.php.wml:24
-#: modules/websubmit/web/admin/funcUsage.php.wml:24
-#: modules/websubmit/web/admin/elementConfigDetsEDS.php.wml:24
-#: modules/websubmit/web/admin/editRecordFile.php.wml:24
-#: modules/websubmit/web/admin/editPageElementEDS.php.wml:24
-#: modules/websubmit/web/admin/editDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/editActionDets.php.wml:24
-#: modules/websubmit/web/admin/documentEDS.php.wml:24
-#: modules/websubmit/web/admin/doctypeCategoriesEDS.php.wml:24
-#: modules/websubmit/web/admin/allElementsEDS.php.wml:24
-#: modules/websubmit/web/admin/allChecksEDS.php.wml:24
-#: modules/websubmit/web/admin/allActionsEDS.php.wml:24
-#: modules/websubmit/web/admin/addFunctions.php.wml:24
-#: modules/websubmit/web/admin/addElement2PageEDS.php.wml:24
-#: modules/websubmit/web/admin/addCheckEDS.php.wml:24
-#: modules/websubmit/web/admin/addActionEDS.php.wml:24
-#: modules/websubmit/web/admin/addElementDescrEDS.php.wml:24
-#: modules/websubmit/web/admin/editCatalogues.php.wml:24
-#: modules/websubmit/web/admin/listFunctions.php.wml:24
-#: modules/websubmit/web/admin/newDoctypeEDS.php.wml:24
-#: modules/websubmit/web/admin/veditFunDets.php.wml:24
-#: modules/websubmit/web/admin/actionFunctions.php.wml:24
+#: modules/websubmit/doc/admin/guide.html.wml:23
 msgid "WebSubmit Administration"
 msgstr "Innsendingsadministrasjon"
 
@@ -303,31 +194,7 @@ msgstr "Hjelpesentral"
 msgid "Submit Help"
 msgstr "Innsendingshjelp"
 
-#: modules/websubmit/doc/admin/actionimplement.html.wml:23
-#: modules/websubmit/doc/admin/actionmodify.html.wml:23
-#: modules/websubmit/doc/admin/actionnew.html.wml:23
-#: modules/websubmit/doc/admin/actionremove.html.wml:23
-#: modules/websubmit/doc/admin/actions.html.wml:23
-#: modules/websubmit/doc/admin/bibconvert.html.wml:23
-#: modules/websubmit/doc/admin/catalogues.html.wml:23
-#: modules/websubmit/doc/admin/description.html.wml:23
-#: modules/websubmit/doc/admin/documentmodify.html.wml:23
-#: modules/websubmit/doc/admin/documentnew.html.wml:23
-#: modules/websubmit/doc/admin/documentremove.html.wml:23
-#: modules/websubmit/doc/admin/documents.html.wml:23
-#: modules/websubmit/doc/admin/example.html.wml:23
-#: modules/websubmit/doc/admin/faq.html.wml:23
-#: modules/websubmit/doc/admin/functiondelete.html.wml:23
-#: modules/websubmit/doc/admin/functiondescription.html.wml:23
-#: modules/websubmit/doc/admin/functionedit.html.wml:23
-#: modules/websubmit/doc/admin/functionnew.html.wml:23
-#: modules/websubmit/doc/admin/functions.html.wml:23
-#: modules/websubmit/doc/admin/implementfunctions.html.wml:23
-#: modules/websubmit/doc/admin/implementwebform.html.wml:23
-#: modules/websubmit/doc/admin/index.html.wml:22
-#: modules/websubmit/doc/admin/introduction.html.wml:23
-#: modules/websubmit/doc/admin/philosophy.html.wml:23
-#: modules/websubmit/doc/admin/protection.html.wml:23
+#: modules/websubmit/doc/admin/guide.html.wml:22
 msgid "Guide"
 msgstr "Guide"
 
@@ -343,10 +210,10 @@ msgstr "Agenda"
 
 #: modules/websearch/doc/index.html.wml:50
 #: modules/websearch/doc/tips.html.wml:22
-#: modules/websearch/lib/websearch_templates.py:344
-#: modules/websearch/lib/websearch_templates.py:465
-#: modules/websearch/lib/websearch_templates.py:1404
-#: modules/websearch/lib/websearch_templates.py:1468
+#: modules/websearch/lib/websearch_templates.py:343
+#: modules/websearch/lib/websearch_templates.py:464
+#: modules/websearch/lib/websearch_templates.py:1397
+#: modules/websearch/lib/websearch_templates.py:1453
 msgid "Search Tips"
 msgstr "Søketips"
 
@@ -443,8 +310,8 @@ msgstr "samlinger"
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
-#: modules/websearch/lib/websearch_templates.py:182
-#: modules/websearch/lib/websearch_templates.py:184
+#: modules/websearch/lib/websearch_templates.py:181
+#: modules/websearch/lib/websearch_templates.py:183
 msgid "Record"
 msgstr ""
 
@@ -817,30 +684,50 @@ msgstr "Full post"
 msgid "Enter a search query here."
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_authors.py:89
+#: modules/bibformat/lib/elements/bfe_authors.py:90
 #, fuzzy
 msgid "Hide"
 msgstr "Guide"
 
-#: modules/bibformat/lib/elements/bfe_authors.py:89
+#: modules/bibformat/lib/elements/bfe_authors.py:90
 #, python-format
 msgid "Show all %i authors"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:53
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:50
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:81
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:112
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:142
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:172
+#: modules/webcomment/web/admin/webcommentadmin.py:51
+#: modules/webcomment/web/admin/webcommentadmin.py:85
+#: modules/webcomment/web/admin/webcommentadmin.py:125
+#: modules/webcomment/web/admin/webcommentadmin.py:159
+#: modules/webcomment/web/admin/webcommentadmin.py:196
+#: modules/websearch/lib/websearch_webinterface.py:291
+#: modules/websearch/lib/websearch_webinterface.py:360
+#: modules/websearch/web/admin/websearchadmin.py:1071
+#: modules/websession/lib/websession_webinterface.py:528
+#: modules/webstyle/lib/webstyle_templates.py:513
+#: modules/websubmit/lib/websubmit_webinterface.py:396
+#: modules/websubmit/lib/websubmit_webinterface.py:405
+msgid "Internal Error"
+msgstr "Intern Feil"
+
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:59
 msgid "Migrate BibFormat Settings"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:79
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:90
 msgid "Migrate Knowledge Bases"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:105
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:121
 msgid "Migrate Behaviours"
 msgstr ""
 
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:130
-#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:155
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:151
+#: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:181
 msgid "Migrate Formats"
 msgstr ""
 
@@ -997,11 +884,11 @@ msgstr ""
 msgid "No oaiharvest task currently scheduled."
 msgstr ""
 
-#: modules/bibharvest/lib/bibharvest_templates.py:225
+#: modules/bibharvest/lib/bibharvest_templates.py:255
 msgid "successfully validated"
 msgstr ""
 
-#: modules/bibharvest/lib/bibharvest_templates.py:226
+#: modules/bibharvest/lib/bibharvest_templates.py:256
 msgid "does not seem to be a OAI-compliant baseURL"
 msgstr ""
 
@@ -1112,7 +999,7 @@ msgstr "april"
 
 #: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "May"
 msgstr "mai"
 
@@ -1150,67 +1037,67 @@ msgstr ""
 
 #: modules/miscutil/lib/dateutils.py:197
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:657
 msgid "January"
 msgstr "januar"
 
 #: modules/miscutil/lib/dateutils.py:198
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:657
 msgid "February"
 msgstr "februar"
 
 #: modules/miscutil/lib/dateutils.py:199
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:657
 msgid "March"
 msgstr "mars"
 
 #: modules/miscutil/lib/dateutils.py:200
 #: modules/websearch/lib/search_engine.py:421
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/websearch_templates.py:657
 msgid "April"
 msgstr "april"
 
 #: modules/miscutil/lib/dateutils.py:202
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "June"
 msgstr "juni"
 
 #: modules/miscutil/lib/dateutils.py:203
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "July"
 msgstr "juli"
 
 #: modules/miscutil/lib/dateutils.py:204
 #: modules/websearch/lib/search_engine.py:422
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/websearch_templates.py:658
 msgid "August"
 msgstr "august"
 
 #: modules/miscutil/lib/dateutils.py:205
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "September"
 msgstr "september"
 
 #: modules/miscutil/lib/dateutils.py:206
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "October"
 msgstr "oktober"
 
 #: modules/miscutil/lib/dateutils.py:207
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "November"
 msgstr "november"
 
 #: modules/miscutil/lib/dateutils.py:208
 #: modules/websearch/lib/search_engine.py:423
-#: modules/websearch/lib/websearch_templates.py:660
+#: modules/websearch/lib/websearch_templates.py:659
 msgid "December"
 msgstr "desember"
 
@@ -1542,7 +1429,7 @@ msgstr "Vis resultater:"
 #: modules/websession/lib/websession_webinterface.py:438
 #: modules/websession/lib/websession_webinterface.py:469
 #: modules/websession/lib/websession_webinterface.py:534
-#: modules/websubmit/web/publiline.py:86
+#: modules/websubmit/web/publiline.py:88
 #: modules/websubmit/web/yourapprovals.py:96
 #: modules/websubmit/web/yoursubmissions.py:177
 #, fuzzy
@@ -1764,8 +1651,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "Posten har blitt slettet."
 
 #: modules/webbasket/lib/webbasket_templates.py:697
-#: modules/websearch/lib/websearch_templates.py:534
-#: modules/websearch/lib/websearch_templates.py:1587
+#: modules/websearch/lib/websearch_templates.py:533
+#: modules/websearch/lib/websearch_templates.py:1571
 msgid "Sort by:"
 msgstr "Sorter etter:"
 
@@ -2478,10 +2365,10 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:167
-#: modules/websearch/lib/websearch_templates.py:982
-#: modules/websearch/lib/websearch_templates.py:2404
-#: modules/websearch/lib/websearch_templates.py:2410
-#: modules/websearch/lib/websearch_templates.py:2415
+#: modules/websearch/lib/websearch_templates.py:981
+#: modules/websearch/lib/websearch_templates.py:2388
+#: modules/websearch/lib/websearch_templates.py:2394
+#: modules/websearch/lib/websearch_templates.py:2399
 msgid "Detailed record"
 msgstr "Full post"
 
@@ -2519,21 +2406,6 @@ msgstr "logg inn"
 #: modules/webcomment/web/admin/webcommentadmin.py:191
 msgid "Comment Management"
 msgstr ""
-
-#: modules/webcomment/web/admin/webcommentadmin.py:51
-#: modules/webcomment/web/admin/webcommentadmin.py:85
-#: modules/webcomment/web/admin/webcommentadmin.py:125
-#: modules/webcomment/web/admin/webcommentadmin.py:159
-#: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:291
-#: modules/websearch/lib/websearch_webinterface.py:360
-#: modules/websearch/web/admin/websearchadmin.py:1070
-#: modules/websession/lib/websession_webinterface.py:528
-#: modules/webstyle/lib/webstyle_templates.py:513
-#: modules/websubmit/lib/websubmit_webinterface.py:396
-#: modules/websubmit/lib/websubmit_webinterface.py:405
-msgid "Internal Error"
-msgstr "Intern Feil"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:95
 #, fuzzy
@@ -2773,17 +2645,17 @@ msgid "Search Results"
 msgstr "Søkeresultater"
 
 #: modules/websearch/lib/search_engine.py:414
-#: modules/websearch/lib/websearch_templates.py:643
+#: modules/websearch/lib/websearch_templates.py:642
 msgid "any day"
 msgstr "alle dager"
 
 #: modules/websearch/lib/search_engine.py:420
-#: modules/websearch/lib/websearch_templates.py:655
+#: modules/websearch/lib/websearch_templates.py:654
 msgid "any month"
 msgstr "alle måneder"
 
 #: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:669
+#: modules/websearch/lib/websearch_templates.py:668
 msgid "any year"
 msgstr "alle år"
 
@@ -2803,7 +2675,7 @@ msgstr "siste først"
 
 #: modules/websearch/lib/search_engine.py:506
 #: modules/websearch/lib/search_engine.py:628
-#: modules/websearch/lib/websearch_templates.py:620
+#: modules/websearch/lib/websearch_templates.py:619
 #: modules/websearch/lib/websearch_webcoll.py:485
 msgid "OR"
 msgstr "ELLER"
@@ -2819,37 +2691,37 @@ msgid "HTML brief"
 msgstr "kort"
 
 #: modules/websearch/lib/search_engine.py:627
-#: modules/websearch/lib/websearch_templates.py:619
+#: modules/websearch/lib/websearch_templates.py:618
 msgid "AND"
 msgstr "OG"
 
 #: modules/websearch/lib/search_engine.py:629
-#: modules/websearch/lib/websearch_templates.py:621
+#: modules/websearch/lib/websearch_templates.py:620
 msgid "AND NOT"
 msgstr "OG IKKE"
 
 #: modules/websearch/lib/search_engine.py:647
-#: modules/websearch/lib/websearch_templates.py:569
+#: modules/websearch/lib/websearch_templates.py:568
 msgid "All of the words:"
 msgstr "Alle ordene:"
 
 #: modules/websearch/lib/search_engine.py:648
-#: modules/websearch/lib/websearch_templates.py:571
+#: modules/websearch/lib/websearch_templates.py:570
 msgid "Any of the words:"
 msgstr "Minst ett av ordene:"
 
 #: modules/websearch/lib/search_engine.py:649
-#: modules/websearch/lib/websearch_templates.py:573
+#: modules/websearch/lib/websearch_templates.py:572
 msgid "Exact phrase:"
 msgstr "Nøyaktig uttrykk:"
 
 #: modules/websearch/lib/search_engine.py:650
-#: modules/websearch/lib/websearch_templates.py:575
+#: modules/websearch/lib/websearch_templates.py:574
 msgid "Partial phrase:"
 msgstr "Delvis uttrykk:"
 
 #: modules/websearch/lib/search_engine.py:651
-#: modules/websearch/lib/websearch_templates.py:577
+#: modules/websearch/lib/websearch_templates.py:576
 msgid "Regular expression:"
 msgstr "Regulært uttrykk:"
 
@@ -2930,14 +2802,14 @@ msgid "The record has been deleted."
 msgstr "Posten har blitt slettet."
 
 #: modules/websearch/lib/search_engine.py:3050
-#: modules/websearch/lib/websearch_templates.py:343
-#: modules/websearch/lib/websearch_templates.py:464
-#: modules/websearch/lib/websearch_templates.py:1304
-#: modules/websearch/lib/websearch_templates.py:1401
-#: modules/websearch/lib/websearch_templates.py:1465
-#: modules/websearch/lib/websearch_templates.py:1501
-#: modules/websearch/lib/websearch_templates.py:1524
-#: modules/websearch/lib/websearch_templates.py:1554
+#: modules/websearch/lib/websearch_templates.py:342
+#: modules/websearch/lib/websearch_templates.py:463
+#: modules/websearch/lib/websearch_templates.py:1303
+#: modules/websearch/lib/websearch_templates.py:1394
+#: modules/websearch/lib/websearch_templates.py:1450
+#: modules/websearch/lib/websearch_templates.py:1485
+#: modules/websearch/lib/websearch_templates.py:1508
+#: modules/websearch/lib/websearch_templates.py:1538
 msgid "Browse"
 msgstr "Bla gjennom"
 
@@ -2949,234 +2821,229 @@ msgstr "Ingen treff innen angitt tidsbegrensning, forkaster dette kriteriet..."
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Ingen treff innen dine søkebegrensninger, forkaster dette kriteriet..."
 
-#: modules/websearch/lib/websearch_templates.py:306
+#: modules/websearch/lib/websearch_templates.py:305
 #, fuzzy, python-format
 msgid "Search %s records for:"
 msgstr "Søk i %s poster etter:"
 
-#: modules/websearch/lib/websearch_templates.py:339
-#: modules/websearch/lib/websearch_templates.py:1453
+#: modules/websearch/lib/websearch_templates.py:338
+#: modules/websearch/lib/websearch_templates.py:1438
 msgid "Advanced Search"
 msgstr "Avansert Søk"
 
-#: modules/websearch/lib/websearch_templates.py:406
+#: modules/websearch/lib/websearch_templates.py:405
 #, fuzzy, python-format
 msgid "Search %s records for"
 msgstr "Søk i %s poster etter:"
 
-#: modules/websearch/lib/websearch_templates.py:449
-#: modules/websearch/lib/websearch_templates.py:1362
+#: modules/websearch/lib/websearch_templates.py:448
+#: modules/websearch/lib/websearch_templates.py:1355
 msgid "Simple Search"
 msgstr "Enkelt Søk"
 
-#: modules/websearch/lib/websearch_templates.py:482
+#: modules/websearch/lib/websearch_templates.py:481
 #, fuzzy
 msgid "Search options:"
 msgstr "Søkevalg:"
 
-#: modules/websearch/lib/websearch_templates.py:529
-#: modules/websearch/lib/websearch_templates.py:1547
+#: modules/websearch/lib/websearch_templates.py:528
+#: modules/websearch/lib/websearch_templates.py:1531
 msgid "Added since:"
 msgstr "Lagt til fra:"
 
-#: modules/websearch/lib/websearch_templates.py:530
-#: modules/websearch/lib/websearch_templates.py:1548
+#: modules/websearch/lib/websearch_templates.py:529
+#: modules/websearch/lib/websearch_templates.py:1532
 #, fuzzy
 msgid "until:"
 msgstr "til:"
 
-#: modules/websearch/lib/websearch_templates.py:535
-#: modules/websearch/lib/websearch_templates.py:1588
+#: modules/websearch/lib/websearch_templates.py:534
+#: modules/websearch/lib/websearch_templates.py:1572
 #, fuzzy
 msgid "Display results:"
 msgstr "Vis resultater:"
 
-#: modules/websearch/lib/websearch_templates.py:536
-#: modules/websearch/lib/websearch_templates.py:1589
+#: modules/websearch/lib/websearch_templates.py:535
+#: modules/websearch/lib/websearch_templates.py:1573
 #, fuzzy
 msgid "Output format:"
 msgstr "Visningsformat:"
 
-#: modules/websearch/lib/websearch_templates.py:709
+#: modules/websearch/lib/websearch_templates.py:708
 #, fuzzy
 msgid "Narrow by collection:"
 msgstr "Begrens til samling:"
 
-#: modules/websearch/lib/websearch_templates.py:710
+#: modules/websearch/lib/websearch_templates.py:709
 #, fuzzy
 msgid "Focus on:"
 msgstr "Utvalgte samlinger:"
 
-#: modules/websearch/lib/websearch_templates.py:744
+#: modules/websearch/lib/websearch_templates.py:743
 msgid "restricted"
 msgstr "adgangsbegrenset"
 
-#: modules/websearch/lib/websearch_templates.py:764
+#: modules/websearch/lib/websearch_templates.py:763
 #, fuzzy
 msgid "Search also:"
 msgstr "Søkeresultater"
 
-#: modules/websearch/lib/websearch_templates.py:829
+#: modules/websearch/lib/websearch_templates.py:828
 msgid "The contents of this collection is restricted."
 msgstr "Innholdet i denne samlingen er adgangsbegrenset."
 
-#: modules/websearch/lib/websearch_templates.py:844
+#: modules/websearch/lib/websearch_templates.py:843
 msgid "This collection does not contain any document yet."
 msgstr "Denne samlingen inneholder fremdeles ingen dokumenter."
 
-#: modules/websearch/lib/websearch_templates.py:878
-#: modules/websearch/lib/websearch_templates.py:2043
+#: modules/websearch/lib/websearch_templates.py:877
+#: modules/websearch/lib/websearch_templates.py:2027
+#: modules/websearch/lib/websearch_templates.py:2041
 #: modules/websearch/lib/websearch_templates.py:2057
-#: modules/websearch/lib/websearch_templates.py:2073
 msgid "more"
 msgstr "mer"
 
-#: modules/websearch/lib/websearch_templates.py:893
+#: modules/websearch/lib/websearch_templates.py:892
 #, fuzzy
 msgid "Latest additions:"
 msgstr "Siste tillagte poster:"
 
-#: modules/websearch/lib/websearch_templates.py:985
-#: modules/websearch/lib/websearch_templates.py:2021
-#: modules/websearch/lib/websearch_templates.py:2422
+#: modules/websearch/lib/websearch_templates.py:984
+#: modules/websearch/lib/websearch_templates.py:2005
+#: modules/websearch/lib/websearch_templates.py:2406
 msgid "Similar records"
 msgstr "Lignende sider"
 
-#: modules/websearch/lib/websearch_templates.py:991
-#: modules/websearch/lib/websearch_templates.py:2430
+#: modules/websearch/lib/websearch_templates.py:990
+#: modules/websearch/lib/websearch_templates.py:2414
 msgid "Cited by"
 msgstr "Cited by"
 
-#: modules/websearch/lib/websearch_templates.py:1059
+#: modules/websearch/lib/websearch_templates.py:1058
 #, fuzzy, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr "alle samlinger"
 
-#: modules/websearch/lib/websearch_templates.py:1062
+#: modules/websearch/lib/websearch_templates.py:1061
 #, fuzzy, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "alle samlinger"
 
-#: modules/websearch/lib/websearch_templates.py:1154
+#: modules/websearch/lib/websearch_templates.py:1153
 msgid "Hits"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:1219
-#: modules/websearch/lib/websearch_templates.py:1802
+#: modules/websearch/lib/websearch_templates.py:1218
+#: modules/websearch/lib/websearch_templates.py:1786
 msgid "next"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:1311
-#: modules/websearch/lib/websearch_templates.py:1412
-msgid "Try your search on..."
-msgstr "Prøv søket på..."
-
-#: modules/websearch/lib/websearch_templates.py:1496
+#: modules/websearch/lib/websearch_templates.py:1480
 msgid "collections"
 msgstr "samlinger"
 
-#: modules/websearch/lib/websearch_templates.py:1518
+#: modules/websearch/lib/websearch_templates.py:1502
 msgid "Limit to:"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:1558
+#: modules/websearch/lib/websearch_templates.py:1542
 #: modules/websearch/lib/websearch_webcoll.py:503
 msgid "results"
 msgstr "resultater"
 
-#: modules/websearch/lib/websearch_templates.py:1593
+#: modules/websearch/lib/websearch_templates.py:1577
 #: modules/websearch/lib/websearch_webcoll.py:473
 msgid "asc."
 msgstr "stigende"
 
-#: modules/websearch/lib/websearch_templates.py:1596
+#: modules/websearch/lib/websearch_templates.py:1580
 #: modules/websearch/lib/websearch_webcoll.py:474
 msgid "desc."
 msgstr "synkende"
 
-#: modules/websearch/lib/websearch_templates.py:1602
+#: modules/websearch/lib/websearch_templates.py:1586
 #: modules/websearch/lib/websearch_webcoll.py:517
 msgid "single list"
 msgstr "enkel liste"
 
-#: modules/websearch/lib/websearch_templates.py:1605
+#: modules/websearch/lib/websearch_templates.py:1589
 #: modules/websearch/lib/websearch_webcoll.py:516
 msgid "split by collection"
 msgstr "oppdelt etter samling"
 
-#: modules/websearch/lib/websearch_templates.py:1640
+#: modules/websearch/lib/websearch_templates.py:1624
 msgid "MARC tag"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:1754
-#: modules/websearch/lib/websearch_templates.py:1759
-#: modules/websearch/lib/websearch_templates.py:2144
+#: modules/websearch/lib/websearch_templates.py:1738
+#: modules/websearch/lib/websearch_templates.py:1743
+#: modules/websearch/lib/websearch_templates.py:2128
 #, fuzzy, python-format
 msgid "%s records found"
 msgstr "Søk i %s poster etter:"
 
-#: modules/websearch/lib/websearch_templates.py:1785
+#: modules/websearch/lib/websearch_templates.py:1769
 #, fuzzy
 msgid "begin"
 msgstr "logg inn"
 
-#: modules/websearch/lib/websearch_templates.py:1790
+#: modules/websearch/lib/websearch_templates.py:1774
 #: modules/websubmit/lib/websubmit_templates.py:1168
 msgid "previous"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:1809
+#: modules/websearch/lib/websearch_templates.py:1793
 #, fuzzy
 msgid "end"
 msgstr "Agenda"
 
-#: modules/websearch/lib/websearch_templates.py:1829
+#: modules/websearch/lib/websearch_templates.py:1813
 #, fuzzy
 msgid "jump to record:"
 msgstr "gå til post:"
 
-#: modules/websearch/lib/websearch_templates.py:1842
+#: modules/websearch/lib/websearch_templates.py:1826
 #, fuzzy, python-format
 msgid "Search took %s seconds."
 msgstr "Søket tok %.2f sekunder."
 
-#: modules/websearch/lib/websearch_templates.py:1939
-#: modules/websearch/lib/websearch_templates.py:2023
+#: modules/websearch/lib/websearch_templates.py:1923
+#: modules/websearch/lib/websearch_templates.py:2007
 msgid "ADD TO BASKET"
 msgstr "LEGG TIL I KURV"
 
-#: modules/websearch/lib/websearch_templates.py:1971
+#: modules/websearch/lib/websearch_templates.py:1955
 #, fuzzy
 msgid "Format:"
 msgstr "mer"
 
-#: modules/websearch/lib/websearch_templates.py:2010
+#: modules/websearch/lib/websearch_templates.py:1994
 #, fuzzy, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr "Posten vart laget %s, sist endret %s"
 
-#: modules/websearch/lib/websearch_templates.py:2032
+#: modules/websearch/lib/websearch_templates.py:2016
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Cited by: %s records"
 
-#: modules/websearch/lib/websearch_templates.py:2050
+#: modules/websearch/lib/websearch_templates.py:2034
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Co-cited with: %s records"
 
-#: modules/websearch/lib/websearch_templates.py:2067
+#: modules/websearch/lib/websearch_templates.py:2051
 #, fuzzy
 msgid "People who downloaded this document also downloaded:"
 msgstr "People who downloaded this document also downloaded:"
 
-#: modules/websearch/lib/websearch_templates.py:2082
+#: modules/websearch/lib/websearch_templates.py:2066
 #, fuzzy
 msgid "People who viewed this page also viewed:"
 msgstr "People who viewed this page also viewed:"
 
-#: modules/websearch/lib/websearch_templates.py:2131
+#: modules/websearch/lib/websearch_templates.py:2115
 #, fuzzy, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -3185,14 +3052,14 @@ msgstr ""
 "<strong>Resultatoversikt:</strong> Fant <strong>%s</strong> poster på %.2f "
 "sekunder."
 
-#: modules/websearch/lib/websearch_templates.py:2171
+#: modules/websearch/lib/websearch_templates.py:2155
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Bolske søk returnerte ingen treff. Vennligst kombiner søketermenene dine "
 "annerledes."
 
-#: modules/websearch/lib/websearch_templates.py:2203
+#: modules/websearch/lib/websearch_templates.py:2187
 msgid "See also: similar author names"
 msgstr "Se også: lignende forfatternavn"
 
@@ -4182,7 +4049,7 @@ msgstr "kurver"
 #: modules/webstyle/lib/webstyle_templates.py:511
 #: modules/webstyle/lib/webstyle_templates.py:548
 #: modules/webstyle/lib/webstyle_templates.py:550
-#: modules/websubmit/lib/websubmit_engine.py:1084
+#: modules/websubmit/lib/websubmit_engine.py:1074
 #: modules/websubmit/lib/websubmit_webinterface.py:394
 msgid "Error"
 msgstr ""
@@ -4279,12 +4146,12 @@ msgstr "Denne samlingen inneholder fremdeles ingen dokumenter."
 msgid "Unable to find document type."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:1029
+#: modules/websubmit/lib/websubmit_engine.py:1031
 #, fuzzy
 msgid "The chosen action is not supported by the document type."
 msgstr "Denne samlingen inneholder fremdeles ingen dokumenter."
 
-#: modules/websubmit/lib/websubmit_engine.py:1095
+#: modules/websubmit/lib/websubmit_engine.py:1085
 #: modules/websubmit/lib/websubmit_webinterface.py:403
 msgid "Warning"
 msgstr ""
@@ -4639,7 +4506,7 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1912
-#: modules/websubmit/web/publiline.py:199
+#: modules/websubmit/web/publiline.py:201
 msgid "Send Again"
 msgstr ""
 
@@ -4702,13 +4569,16 @@ msgstr ""
 msgid "Parameter docid missing"
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:191
+#: modules/websubmit/web/publiline.py:193
 msgid "Approval has never been requested for this document."
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:196
+#: modules/websubmit/web/publiline.py:198
 msgid "Unable to display document."
 msgstr ""
+
+#~ msgid "Try your search on..."
+#~ msgstr "Prøv søket på..."
 
 #, fuzzy
 #~ msgid "See results"
