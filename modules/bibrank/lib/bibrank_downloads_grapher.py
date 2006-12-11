@@ -45,8 +45,8 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
        Called by Detailed record pages.
        Notes:
         if id_bibdoc=0 : its an oustide-stored document and it has no id_bibdoc --> only one line
-        if nb_id_bibdoc <= cfg_id_bibdoc_id_bibrec draw one line per id_bibdoc
-        if nb_id_bibdoc > cfg_id_bibdoc_id_bibrec draw only one line which hold simultaneously the downloads per id_bibdoc
+        if len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec draw one line per id_bibdoc
+        if len(id_bibdocs) > cfg_id_bibdoc_id_bibrec draw only one line which hold simultaneously the downloads for all id_bibdoc
         Each time this function is called, all the images older than 10 minutes are deleted.
     """
     _ = gettext_set_language(ln)
@@ -55,14 +55,12 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     html_content = ""
     users_analysis_text = ""
     if cfg_bibrank_print_download_split_by_id:
-        users_analysis_text = "and Users repartition"
+        users_analysis_text = "and Users Distribution"
         #remove images older than 10 minutes
         remove_old_img("download")
         #Users analysis graph
         ips = database_tuples_to_single_list(run_sql("select client_host from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec))
-        if ips == []:
-            pass
-        else :
+        if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
             graph_file_users = weburl + "/img/"  + users_analysis_results[0]
             file_to_close_users = users_analysis_results[1]      
@@ -74,12 +72,12 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     #Downloads history graph and return html code used by get_file or search_engine
     if cfg_bibrank_print_download_history:
         remove_old_img("download")
-        nb_id_bibdoc = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec)
+        id_bibdocs = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec)
         history_analysis_results = ()
-        if nb_id_bibdoc == ():
+        if id_bibdocs == ():
             pass
-        elif nb_id_bibdoc[0][0] <= cfg_id_bibdoc_id_bibrec and (0, ) not in nb_id_bibdoc:
-            history_analysis_results = draw_downloads_statistics(id_bibrec, list(nb_id_bibdoc))
+        elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and (0, ) not in id_bibdocs:
+            history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
         if history_analysis_results:
@@ -100,34 +98,44 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
     return out
     
 def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
-    """Create a graph about download history using a temporary file to store datas 
+    """Create a graph of download history using a temporary file to store datas 
     and a new png file for each id_bibrec to store the image of the graph which will
     be referenced by html code."""    
 
     intervals = []
     #used to name the different curves when len(id_bibdoc_list)>1
     docfile_name_list = []
-    #used to name the uniquecurve when len(id_bibdoc_list)=0 or > cfg_id_bibdoc_id_bibrec 
-    record_name = run_sql("select value from bibrec_bib24x,bib24x where id_bibrec=%s and id_bibxxx=id;" % id_bibrec)[0][0]
+    #used to name the uniquecurve when len(id_bibdoc_list)=0 or > cfg_id_bibdoc_id_bibrec
+    record_name = ""
+    record_name_query = run_sql("select value from bibrec_bib24x,bib24x where id_bibrec=%s and id_bibxxx=id;" % id_bibrec)
+    if record_name_query:
+        record_name = record_name_query[0][0]
     #list of lists of tuples: [[("09/2004",4),..],[(..,..)]..]
     #Each list element of the list is represented by a curve
     #each elem of each list is a point on the graph
     coordinates_list = []
+
     
-    #If the document is not stored in CdsWare it has id_bibrec 0 and no creation date
+    #If the document is not stored in internally it has id_bibrec 0 and no creation date
     #In this case the beginning date is the first time the document has been downloaded
-    creation_date_res = run_sql("""SELECT DATE_FORMAT(creation_date,"%%Y-%%m-%%d-%%H:%%i:%%s") FROM bibrec WHERE id=%s;""" % id_bibrec)
+    local_time = time.localtime()
+    local_month = local_time.tm_mon
+    local_year = local_time.tm_year
+
+    creation_date_res = run_sql("""SELECT DATE_FORMAT(creation_date,"%%Y-%%m") FROM bibrec WHERE id=%s;""" % id_bibrec)
     if creation_date_res == ():
-        creation_date_res = run_sql("""SELECT DATE_FORMAT(MIN(download_time),"%%Y-%%m-%%d-%%H:%%i:%%s") FROM rnkDOWNLOADS where id_bibrec=%s;""" % id_bibrec)
-    creation_date_year, creation_date_month, creation_date_day, creation_date_time = string.split(creation_date_res[0][0], "-")
-    creation_date_year = string.atoi(creation_date_year)
-    creation_date_month = string.atoi(creation_date_month)
-    creation_date_day = string.atoi(creation_date_day)
-    creation_date_time = str(creation_date_time)
+        creation_date_res = run_sql("""SELECT DATE_FORMAT(MIN(download_time),"%%Y-%%m") FROM rnkDOWNLOADS where id_bibrec=%s;""" % id_bibrec)
+    if creation_date_res == (('0000-00',),):
+        creation_date_year = local_year - 1
+        creation_date_month = local_month
+    else :
+        creation_date_year, creation_date_month = string.split(creation_date_res[0][0], "-")
+        creation_date_year = int(creation_date_year)
+        creation_date_month = int(creation_date_month)
+        
         
     #create intervals and corresponding values
-    local_time = time.localtime()
-    res = create_tic_intervals(local_time, creation_date_year, creation_date_month)
+    res = create_tic_intervals(local_year, local_month, creation_date_year, creation_date_month)
     intervals = res[1]
     tic_list = res[0]
 
@@ -138,7 +146,8 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
         for i in range(len(id_bibdoc_list)):
             datas = create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition="and id_bibdoc=%s" % id_bibdoc_list[i][0])
             coordinates_list.append(datas)
-            docfile_name_list.append(run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i][0])[0][0])
+            docname = run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i][0])
+            docfile_name_list.append(docname[0][0])
         #In case of multiple id_bibdocs datas_max will be used to draw a line which is the total of the others lines 
         if not (len(intervals)==1 or len(id_bibdoc_list)==1):
             datas_max = create_list_tuple_total(intervals, coordinates_list)
@@ -157,7 +166,7 @@ def create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition=""):
     list_tuple = []
     for elem in intervals:
         main_date_end = string.split(elem[1], '/')
-        end_of_month_end = calendar.monthrange(string.atoi(main_date_end[1]), string.atoi(main_date_end[0]))[1]
+        end_of_month_end = calendar.monthrange(int(main_date_end[1]), int(main_date_end[0]))[1]
         s0 = string.split(elem[0], "/")
         s1 = string.split(elem[1], "/")
         elem0 = s0[1] + "-" + s0[0]
@@ -196,7 +205,7 @@ def create_list_tuple_total(intervals, list_data):
         #list_tuple = sort_list_tuple_by_date(list_tuple)
     return list_tuple
 
-def create_tic_intervals(local_time, creation_date_year, creation_date_month):
+def create_tic_intervals(local_year, local_month, creation_date_year, creation_date_month):
     """Create intervals since document creation date until now
        Return a list of the tics for the graph of the form ["04/2004","05/2004"), ...]
        And a list of tuple(each tuple stands for a period) of the form [("04/2004", "04/2004"),.]
@@ -208,8 +217,6 @@ def create_tic_intervals(local_time, creation_date_year, creation_date_month):
     # okay, off we go
     tic_list = []
     interval_list = []
-    local_month = local_time.tm_mon
-    local_year = local_time.tm_year
     original_date = (creation_date_month, creation_date_year)
     
     while (creation_date_year, creation_date_month) <= (local_year, local_month) and creation_date_month <= 12:

@@ -54,7 +54,7 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     One set represents a curve in the graph.
     """
     max_y_datas = 0
-    tempfile.tempdir = webdir + "img" 
+    tempfile.tempdir = webdir + "/img" 
     fname = tempfile.mktemp() 
     file_dest = open(fname, 'a') 
     for list_elem in lists_coordinates: 

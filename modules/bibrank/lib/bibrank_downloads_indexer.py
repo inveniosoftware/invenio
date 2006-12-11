@@ -65,10 +65,8 @@ def uniq(alist):
 
 def database_tuples_to_single_list(tuples):
     """convert a tuple extracted from the database into a list""" 
-    list_result = []
-    for tup in range(len(tuples)):
-        list_result.append(tuples[tup][0])
-    return list_result
+    return [elem[0] for elem in tuples]
+    
 
 def new_downloads_to_index (last_updated):
     """id_bibrec of documents downloaded since the last run of bibrank """
