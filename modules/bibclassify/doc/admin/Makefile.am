@@ -17,14 +17,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir=$(localstatedir)/www/admin/bibclassify
+docdir = $(localstatedir)/www/admin/bibclassify
 
-doc_DATA=index.html guide.html guide_cloud.jpeg
+doc_DATA = index.html guide.html guide_cloud.jpeg
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) guide_cloud.jpeg
+EXTRA_DIST = index.html.wml guide.html.wml guide_cloud.jpeg
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES = index.html guide.html *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
