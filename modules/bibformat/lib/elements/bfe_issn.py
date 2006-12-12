@@ -67,6 +67,7 @@ def format(bfo):
                 'itbm-rbm news': '1297-9570',
                 'j. colloid interface sci.': '0021-9797',
                 'j. fluids struct.': '0889-9746',
+                'j. high energy phys.': '1126-6708',
                 'j. interlibr. loan doc. deliv. electron. reserve': '1072-303X',
                 'j. magn. reson.': '1090-7807',
                 'j. magn. reson. a': '1064-1858',
@@ -83,6 +84,7 @@ def format(bfo):
                 'mech. syst. signal process.': '0888-3270',
                 'netw. comput.': '1046-4468',
                 'nucl. eng. technol.': '1738-5733',
+                'nucl. instrum. methods phys. res., a': '0167-5087',
                 'nucl. phys. news': '1050-6896',
                 'nucl. tracks': '0191-278X',
                 'nucl. tracks radiat. meas.': '0191-278X',
@@ -91,8 +93,16 @@ def format(bfo):
                 'optik': '0030-4026',
                 'philips j. res.': '0165-5817',
                 'photonics nanostruct., fundam. appl.': '1569-4410',
+                'phys. lett., a': '0375-9601',
+                'phys. lett., b': '0370-2693',
                 'phys. life rev.': '1571-0645',
                 'phys. rev.': '0031-899X',
+                'phys. rev., a': '1050-2947;',
+                'phys. rev., b': '0163-1829',
+                'phys. rev., c': '0556-2813',
+                'phys. rev., d': '0556-2821',
+                'phys. rev., e': '1063-651x',
+                'phys. rev. lett.': '0031-9007',
                 'phys. rev. (ser. i)': '0031-899X',
                 'plasmas ions': '1288-3255',
                 'polym. gels netw.': '0966-7822',
@@ -109,18 +119,21 @@ def format(bfo):
                 'superlattices microstruct.': '0749-6036',
                 'tsinghua sci. technol.': '1007-0214',
                 'world pat. inf.': '0172-2190',
-                'z. phys.': '0044-3328'}
+                'z. phys.': '0044-3328',
+                'z. phys., c': '0170-9739'}
 
 
-    journal_name = bfo.field('210__%')
+    #journal_name = bfo.field('210__%') # CERN specific
+    journal_name = bfo.field('909C4p')
+    
     # Here you might want to process journal name
     # by doing the same operation that has been
     # done when saving the mappings
     journal_name = journal_name.lower().strip()
     if journal_name.endswith("[online]"):
         journal_name = journal_name[:-8].rstrip()
-
-    return issns.get(journal_name, 'def')
+    
+    return issns.get(journal_name, '')
 
 def build_distant_issns(url, limit=1000):
     """
