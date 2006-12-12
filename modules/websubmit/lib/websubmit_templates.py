@@ -597,7 +597,7 @@ class Template:
             text="<INPUT TYPE=file name=\"%s\" size=\"%s\" maxlength=\"%s\">" % (field['name'],field['size'], field['maxlength']);
         # If the field is a text input
         elif field['type'] == 'I':
-            text="<INPUT name=\"%s\" size=\"%s\" value=\"%s\">" % (field['name'],field['size'],field['val'])
+            text="<INPUT name=\"%s\" size=\"%s\" value=\"%s\" maxlength=\"%s\">" % (field['name'],field['size'],field['val'],field['maxlength'])
         # If the field is a hidden input
         elif field['type'] == 'H':
             text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field['name'],field['val'])
