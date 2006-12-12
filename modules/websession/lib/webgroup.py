@@ -166,7 +166,7 @@ def perform_request_create_group(uid,
                             group_name,
                             group_description,
                             join_policy)
-        infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_CREATED"])
+        infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["GROUP_CREATED"]))
         (body, errors, warnings) = perform_request_group_display(uid,
                                                                  infos=infos,
                                                                  errors=errors,
@@ -255,7 +255,7 @@ def perform_request_join_group(uid,
                                                                                  msg_subject=msg_subjet,
                                                                                  msg_body=msg_body,
                                                                                  ln=ln)
-                infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_REQUEST"])
+                infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["JOIN_REQUEST"]))
                             
                 
             elif group_type == CFG_WEBSESSION_GROUP_JOIN_POLICY["VISIBLEOPEN"]:
@@ -263,7 +263,7 @@ def perform_request_join_group(uid,
                                      grpID,
                                      CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
 
-                infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_GROUP"])
+                infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["JOIN_GROUP"]))
             (body, errors, warnings) = perform_request_group_display(uid,
                                                                      infos=infos,
                                                                      errors=errors,
@@ -320,7 +320,7 @@ def perform_request_leave_group(uid,
     if not grpID == "-1":
         if confirmed:
             db.leave_group(grpID, uid)
-            infos.append(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"])
+            infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"]))
             (body, errors, warnings) = perform_request_group_display(uid,
                                                                      infos=infos,
                                                                      errors=errors,
@@ -425,7 +425,7 @@ def perform_request_update_group(uid,
                                       group_name,
                                       group_description,
                                       join_policy)
-        infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_UPDATED"])
+        infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["GROUP_UPDATED"]))
         (body, errors, warnings) = perform_request_group_display(uid,
                                                                  infos=infos,
                                                                  errors=errors,
@@ -476,7 +476,7 @@ def  perform_request_delete_group(uid,
                                                                              msg_body=msg_body,
                                                                              ln=ln)
             db.delete_group_and_members(grpID)
-            infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_DELETED"])
+            infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["GROUP_DELETED"]))
             (body, errors, warnings) = perform_request_group_display(uid,
                                                                      infos=infos,
                                                                      errors=errors,
@@ -557,7 +557,7 @@ def perform_request_remove_member(uid,
 
     else:
         db.delete_member(grpID, member_id)
-        infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_DELETED"])
+        infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_DELETED"]))
         (body, errors, warnings) = perform_request_manage_member(uid,
                                                                  grpID,
                                                                  infos=infos,
@@ -608,7 +608,7 @@ def perform_request_add_member(uid,
                                   user_id,
                                   CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
         
-            infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_ADDED"])
+            infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_ADDED"]))
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
@@ -681,7 +681,7 @@ def perform_request_reject_member(uid,
                                                                              msg_subject=msg_subjet,
                                                                              msg_body=msg_body,
                                                                              ln=ln)
-            infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_REJECTED"])
+            infos.append(_(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_REJECTED"]))
             (body, errors, warnings) = perform_request_manage_member(uid,
                                                                      grpID,
                                                                      infos=infos,

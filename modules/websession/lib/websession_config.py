@@ -57,14 +57,14 @@ CFG_WEBSESSION_WARNING_MESSAGES = {
     'WRN_WEBSESSION_NO_USER_SELECTED_DEL': '_("Please choose a user from the list if you want him to be removed from waiting list.")'
 }
 
-CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": '_("You have successfully created a new group.")',
-                                "JOIN_GROUP": '_("You have successfully joined a new group.")',
-                                "GROUP_UPDATED": '_("You have successfully updated a group.")',
-                                "GROUP_DELETED": '_("You have successfully deleted a group.")',
-                                "MEMBER_DELETED": '_("You have successfully deleted a member.")',
-                                "MEMBER_ADDED": '_("You have successfully added a new member.")',
-                                "MEMBER_REJECTED": '_("You have successfully removed a waiting member from the list.")',
-                                "JOIN_REQUEST": '_("The group administrator has been notified of your request.")',
-                                "LEAVE_GROUP": '_("You have successfully left a group.")'
+CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created a new group.',
+                                "JOIN_GROUP": 'You have successfully joined a new group.',
+                                "GROUP_UPDATED": 'You have successfully updated a group.',
+                                "GROUP_DELETED": 'You have successfully deleted a group.',
+                                "MEMBER_DELETED": 'You have successfully deleted a member.',
+                                "MEMBER_ADDED": 'You have successfully added a new member.',
+                                "MEMBER_REJECTED": 'You have successfully removed a waiting member from the list.',
+                                "JOIN_REQUEST": 'The group administrator has been notified of your request.',
+                                "LEAVE_GROUP": 'You have successfully left a group.'
                                
 }
