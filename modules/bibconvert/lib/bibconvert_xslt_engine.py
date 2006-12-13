@@ -20,13 +20,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-bibconvert_xslt_engine - Wrapper for an XSLT engine
+bibconvert_xslt_engine - Wrapper for an XSLT engine.
+
+Customized to support BibConvert functions through the
+use of XPath 'format' function.
 
 Dependencies: Need one of the following XSLT processors:
               - libxml2 & libxslt
               - 4suite
 
 Used by: bibconvert.in
+
+FIXME: - find better namespace for functions
+       - find less bogus URI (given as param to processor)
+         for source and template
+       - Implement command-line options
 """
 
 __revision__ = "$Id$"
@@ -34,9 +42,20 @@ __revision__ = "$Id$"
 import sys
 import os
 
-from invenio.config import etcdir
+from invenio.config import \
+     etcdir, \
+     weburl
+from invenio.bibconvert import FormatField
+
+# The namespace used for BibConvert functions
+CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
 
 # Import one XSLT processor
+#
+# processor_type:
+#       -1 : No processor found
+#        0 : libxslt
+#        1 : 4suite
 processor_type = -1
 try:
     # libxml2 & libxslt
@@ -54,7 +73,7 @@ if processor_type == -1:
         from Ft.Xml import InputSource
     except ImportError:
         pass
-    
+
 if processor_type == -1:
     # No XSLT processor found
     sys.stderr.write('No XSLT processor could be found.\n' \
@@ -62,6 +81,19 @@ if processor_type == -1:
     sys.exit(1)
 
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
+
+def bibconvert_function(ctx, value, func):
+    """
+    libxslt extension function:
+    Bridge between BibConvert formatting functions and XSL stylesheets.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibconvert/fn" has been declared):
+    <xsl:value-of select="fn:format(string(.), 'ADD(mypref,mysuff)')"/>
+    (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
+    using BibConvert ADD function)
+    """
+    return FormatField(value, func)
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -109,51 +141,75 @@ def convert(xmltext, template_filename=None, template_source=None):
     result = ""
     if processor_type == 0:
         # libxml2 & libxslt
+        
+        # Register BibConvert functions for use in XSL
+        libxslt.registerExtModuleFunction("format",
+                                          CFG_BIBCONVERT_FUNCTION_NS,
+                                          bibconvert_function)
+
+        # Load template and source
         template_xml = libxml2.parseDoc(template)
         processor = libxslt.parseStylesheetDoc(template_xml)
         source = libxml2.parseDoc(xmltext)
+
+        # Transform
         result_object = processor.applyStylesheet(source, None)
         result = processor.saveResultToString(result_object)
+
+        # Deallocate
         processor.freeStylesheet()
         source.freeDoc()
         result_object.freeDoc()
+
     elif processor_type == 1:
         # 4suite
+
+        # Init
         processor = Processor.Processor()
-        transform = InputSource.DefaultFactory.fromString(template)
-        source = InputSource.DefaultFactory.fromString(xmltext)
+        
+        # Register BibConvert functions for use in XSL
+        processor.registerExtensionFunction(CFG_BIBCONVERT_FUNCTION_NS,
+                                            "format",
+                                            bibconvert_function)
+
+        # Load template and source
+        transform = InputSource.DefaultFactory.fromString(template,
+                                                       uri=weburl)
+        source = InputSource.DefaultFactory.fromString(xmltext,
+                                                       uri=weburl)
         processor.appendStylesheet(transform)
+
+        # Transform
         result = processor.run(source)
     else:
         sys.stderr.write("No XSLT processor could be found")
         
     return result
 
-def bc_profile():
-    """
-    Runs a benchmark
-    """
-    global xmltext
+## def bc_profile():
+##     """
+##     Runs a benchmark
+##     """
+##     global xmltext
 
-    convert(xmltext, 'oaidc2marcxml.xsl')
-    return
+##     convert(xmltext, 'oaidc2marcxml.xsl')
+##     return
 
-def benchmark():
-    """
-    Benchmark the module, using profile and pstats
-    """
-    import profile
-    import pstats
-    from invenio.bibformat import record_get_xml
+## def benchmark():
+##     """
+##     Benchmark the module, using profile and pstats
+##     """
+##     import profile
+##     import pstats
+##     from invenio.bibformat import record_get_xml
 
-    global xmltext
+##     global xmltext
     
-    xmltext = record_get_xml(10, 'oai_dc')
-    profile.run('bc_profile()', "bibconvert_xslt_profile")
-    p = pstats.Stats("bibconvert_xslt_profile")
-    p.strip_dirs().sort_stats("cumulative").print_stats()
+##     xmltext = record_get_xml(10, 'oai_dc')
+##     profile.run('bc_profile()', "bibconvert_xslt_profile")
+##     p = pstats.Stats("bibconvert_xslt_profile")
+##     p.strip_dirs().sort_stats("cumulative").print_stats()
     
 if __name__ == "__main__":
-    # FIXME: Implement command line options
     pass
 
