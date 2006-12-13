@@ -485,7 +485,7 @@ def bibupload(record):
             write_message("   Failed: " \
                                          "Error during adding the 001 controlfield "  \
                                          "to the record", verbose=1, stream=sys.stderr)
-            return (1, rec_id)
+            return (1, int(rec_id))
         else:
             error = None
 
@@ -493,10 +493,10 @@ def bibupload(record):
         insert_mode_p = False
         # Update Mode
         # Retrieve the old record to update
-        rec_old = create_record(print_record(int(rec_id),'xm'), 2)[0]
+        rec_old = create_record(print_record(int(rec_id), 'xm'), 2)[0]
         if rec_old is None:
             write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
-            return (1, rec_id)
+            return (1, int(rec_id))
         else:
             write_message("   -Retrieve the old record to update: DONE", verbose=2)
         
@@ -523,11 +523,11 @@ def bibupload(record):
         record = insert_fmt_tags(record, rec_id)
         if record is None:
             write_message("   Stage 1 failed: Error while inserting FMT tags", verbose=1, stream=sys.stderr)
-            return (1, rec_id)
+            return (1, int(rec_id))
         elif record == 0:
             # Mode format finished
             stat['nb_records_updated'] += 1
-            return (0, rec_id)
+            return (0, int(rec_id))
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -554,7 +554,7 @@ def bibupload(record):
             error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
         if error == 1:
             write_message("   Failed: error during update_bibfmt_format", verbose=1, stream=sys.stderr)
-            return (1, rec_id)
+            return (1, int(rec_id))
         write_message("   -Stage COMPLETED", verbose=2)
     
     # Update the database MetaData
@@ -564,7 +564,8 @@ def bibupload(record):
            options['mode'] == 'replace' or \
            options['mode'] == 'replace_or_insert' or \
            options['mode'] == 'append' or \
-           options['mode'] == 'correct':
+           options['mode'] == 'correct' or \
+           options['mode'] == 'reference':
             update_database_with_metadata(record, rec_id)
         else:
             write_message("   -Stage NOT NEEDED in mode %s" % options['mode'], verbose=2)
@@ -592,7 +593,7 @@ def bibupload(record):
     
     # Upload of this record finish
     write_message("Record "+str(rec_id)+" DONE", verbose=1)
-    return (0, rec_id)
+    return (0, int(rec_id))
 
 def usage():
     """Print help"""
