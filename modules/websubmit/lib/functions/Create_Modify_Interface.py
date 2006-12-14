@@ -33,7 +33,7 @@ import time
 
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import functionError
-from invenio.websubmit_funtions.Retrieve_Data import Get_Field
+from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.
