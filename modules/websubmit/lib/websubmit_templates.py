@@ -591,16 +591,24 @@ class Template:
 
         # If the field is a textarea
         if field['type'] == 'T':
-            text="<TEXTAREA name=\"%s\" rows=\"%s\" cols=\"%s\">%s</TEXTAREA>" % (field['name'],field['rows'],field['cols'],field['val'])
+            ## Field is a textarea:
+            text="<textarea name=\"%s\" rows=\"%s\" cols=\"%s\">%s</textarea>" \
+                  % (field['name'], field['rows'], field['cols'], cgi.escape(str(field['val']), 1))
         # If the field is a file upload
         elif field['type'] == 'F':
-            text="<INPUT TYPE=file name=\"%s\" size=\"%s\" maxlength=\"%s\">" % (field['name'],field['size'], field['maxlength']);
+            ## the field is a file input:
+            text = """<input type="file" name="%s" size="%s"%s>""" \
+                   % (field['name'], field['size'], "%s" \
+                      % ((field['maxlength'] in (0, None) and " ") or (""" maxlength="%s\"""" % field['maxlength'])) )
         # If the field is a text input
         elif field['type'] == 'I':
-            text="<INPUT name=\"%s\" size=\"%s\" value=\"%s\" maxlength=\"%s\">" % (field['name'],field['size'],field['val'],field['maxlength'])
+            ## Field is a text input:
+            text = """<input type="text" name="%s" size="%s" value="%s"%s>""" \
+                   % (field['name'], field['size'], field['val'], "%s" \
+                      % ((field['maxlength'] in (0, None) and " ") or (""" maxlength="%s\"""" % field['maxlength'])) )
         # If the field is a hidden input
         elif field['type'] == 'H':
-            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field['name'],field['val'])
+            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field['name'], field['val'])
         # If the field is user-defined
         elif field['type'] == 'D':
             text=field['htmlcode']
@@ -758,7 +766,7 @@ class Template:
                                 el.checked=true;
                               }""" % {
                                 'fieldname' : fieldname,
-                                'text' : text,
+                                'text' : re.escape(str(text)),
                               }
                 elif upload[i] == 0:
                     text = text.replace('"','\"')
@@ -769,7 +777,7 @@ class Template:
                                el.value="%(text)s";
                            """ % {
                              'fieldname' : fieldname,
-                             'text' : text,
+                             'text' : re.escape(str(text)),
                            }
         out += """<!--End Fill in section-->
                """
