@@ -33,9 +33,11 @@ import os.path
 
 from invenio.config import \
      CFG_OAI_ID_PREFIX, \
-     bibconvert, \
-     version
+     version,\
+     etcdir
 from invenio.search_engine import perform_request_search
+
+CFG_BIBCONVERT_KB_PATH = "%s%sbibconvert%sKB" % (etcdir, os.sep, os.sep)
 
 ### Matching records with database content
 
@@ -185,15 +187,18 @@ def check_split_on(data_item_split, sep, tpl_f):
 
         data_item_split_tmp = []
 
-        if ((FormatField(test_value, "SUP(" + par[1] + ",)") != "") or (len(test_value) < string.atoi(par[0]))):
+        if ((FormatField(test_value, "SUP(" + par[1] + ",)") != "") \
+            or (len(test_value) < string.atoi(par[0]))):
             data_item_split_tmp = data_item_split[1].split(sep, 1)
 
             if(len(data_item_split_tmp)==1):
                 done = 1
-                data_item_split[0] = data_item_split[0] + sep + data_item_split_tmp[0]
+                data_item_split[0] = data_item_split[0] + sep + \
+                                     data_item_split_tmp[0]
                 data_item_split[1] = ""
             else:
-                data_item_split[0] = data_item_split[0] + sep + data_item_split_tmp[0]
+                data_item_split[0] = data_item_split[0] + sep + \
+                                     data_item_split_tmp[0]
                 data_item_split[1] = data_item_split_tmp[1]
         else:
             done = 1
@@ -221,7 +226,9 @@ def get_subfields(data, subfield, src_tpl):
                     data_item = data_item_split[0]
                 else:
                     if (len(sep_in_list) > 1):
-                        data_item_split = check_split_on(data_item.split(sep, 1), sep_in_list[0], sep_in_list[1])
+                        data_item_split = check_split_on(data_item.split(sep, 1),
+                                                         sep_in_list[0],
+                                                         sep_in_list[1])
                     if(found == 1):
                         data_item = data_item_split[0]
                     else:
@@ -248,7 +255,9 @@ def exp_e(list):
 
     for item in list:
         item = exp_n(item)
-        if ((item != '\r\n' and item != '\r' and item != '\n' and item !="" and len(item)!=0)):
+        if ((item != '\r\n' and item != '\r' \
+             and item != '\n' and item !="" \
+             and len(item)!=0)):
             out.append(item)
     return out
 
@@ -390,7 +399,7 @@ def parse_input_data_f(source_data_open, source_tpl):
 
     global separator
 
-    out                   = [['',[]]]
+    out                   = [['', []]]
     count                 = 0
     values                = []
 
@@ -456,7 +465,7 @@ def parse_input_data_fx(source_tpl):
     count   = 0
     record  = ""
     field_data_1_in_list = []
-    out     = [['',[]]]
+    out     = [['', []]]
 
     while (count <10):
         line = sys.stdin.readline()
@@ -484,7 +493,8 @@ def parse_input_data_fx(source_tpl):
         field_data_1 =""
 
  
-        if ((field_defined[1][0][0:2] == '//') and (field_defined[1][0][-2:] == '//')):
+        if ((field_defined[1][0][0:2] == '//') and \
+            (field_defined[1][0][-2:] == '//')):
 
             field_defined_regexp = field_defined[1][0][2:-2]
 
@@ -526,7 +536,8 @@ def parse_input_data_fx(source_tpl):
                         spliton.append(item[1][0])
                     except IndexError, e:
                         spliton = spliton
-            elif (field_defined[1][1][0:2] == '//') and (field_defined[1][1][-2:] == '//'):
+            elif (field_defined[1][1][0:2] == '//') and \
+                     (field_defined[1][1][-2:] == '//'):
                 spliton = [field_defined[1][1][2:-2]]
                 
             else:
@@ -566,7 +577,8 @@ def parse_input_data_fx(source_tpl):
             if (len(field_defined[1])==3):
 	    
                 spliton  = [field_defined[1][2]]
-                if (field_defined[1][2][0:2] == '//') and (field_defined[1][2][-2:] == '//'):
+                if (field_defined[1][2][0:2] == '//') and \
+                       (field_defined[1][2][-2:] == '//'):
                     spliton = [field_defined[1][2][2:-2]]
 
 
@@ -661,7 +673,8 @@ def generate(keyword):
         out = sysno
     if (fn == "WEEK"):
         par = set_par_defaults(par, "0")
-        out = "%02d" % (string.atoi(strftime("%V", localtime())) + string.atoi(par[0]))
+        out = "%02d" % (string.atoi(strftime("%V", localtime())) \
+                        + string.atoi(par[0]))
         if (string.atoi(out)<0):
             out = "00"
 
@@ -670,18 +683,18 @@ def generate(keyword):
         out = par[0]
     if (fn == "DATE"):
         par = set_par_defaults(par, "%w%H%M%S," + "%d" % set_conv()[1])
-        out = strftime(par[0],localtime())
+        out = strftime(par[0], localtime())
         out = out[:string.atoi(par[1])]
     if (fn == "XDATE"):
         par = set_par_defaults(par,"%w%H%M%S," + ",%d" % set_conv()[1])
-        out = strftime(par[0],localtime())
+        out = strftime(par[0], localtime())
         out = par[1] + out[:string.atoi(par[2])]
     if (fn == "OAI"):
-        out = "%s:%d" % (CFG_OAI_ID_PREFIX,tcounter + oai_identifier_from)
+        out = "%s:%d" % (CFG_OAI_ID_PREFIX, tcounter + oai_identifier_from)
 
     return out
 
-def read_file(filename,exception):
+def read_file(filename, exception):
     "Read file into list"
 
     out = []
@@ -695,7 +708,7 @@ def read_file(filename,exception):
             exit_on_error("Cannot access file: %s" % filename)
     return out
     
-def crawl_KB(filename,value,mode):
+def crawl_KB(filename, value, mode):
     """
     bibconvert look-up value in KB_file in one of following modes:
     ===========================================================
@@ -712,60 +725,76 @@ def crawl_KB(filename,value,mode):
     """
 
     if (os.path.isfile(filename) != 1):
-        pathtmp = string.split(extract_tpl,"/")
-        pathtmp.pop()
-        path = string.join(pathtmp,"/")
-        filename = path + "/" + filename
-        
+        # Look for KB in same folder as extract_tpl, if exists
+        try:
+            pathtmp = string.split(extract_tpl,"/")
+            pathtmp.pop()
+            path = string.join(pathtmp,"/")
+            filename = path + "/" + filename
+        except NameError:
+            # File was not found. Try to look inside default KB
+            # directory
+            filename = CFG_BIBCONVERT_KB_PATH + os.sep + filename
+            
+    # FIXME: Remove \n from returned value?
     if (os.path.isfile(filename)):
        
         file_to_read = open(filename,"r")
    
         file_read = file_to_read.readlines()
         for line in file_read:
-            code = string.split(line,"---")
+            code = string.split(line, "---")
         
             if (mode == "2"):
                 value_to_cmp   = string.lower(value)
                 code[0]        = string.lower(code[0])
 
-                if ((len(string.split(value_to_cmp,code[0])) > 1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(value_to_cmp, code[0])) > 1) \
+                    or (code[0]=="_DEFAULT_")):
                     value = code[1]
                     return value
            
             elif ((mode == "3") or (mode == "0")):
-                if ((len(string.split(value,code[0])) > 1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(value, code[0])) > 1) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
 
             elif (mode == "4"):
                 value_to_cmp   = string.lower(value)
                 code[0]        = string.lower(code[0])
-                if ((code[0] == value_to_cmp)or(code[0]=="_DEFAULT_")):
+                if ((code[0] == value_to_cmp) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
 
             elif (mode == "5"):
-                if ((len(string.split(code[0],value)) > 1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(code[0], value)) > 1) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
             
             elif (mode == "6"):
                 value_to_cmp   = string.lower(value)
                 code[0]        = string.lower(code[0])
-                if ((len(string.split(code[0],value_to_cmp)) > 1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(code[0], value_to_cmp)) > 1) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
             
             elif (mode == "7"):
-                if ((len(string.split(code[0],value)) > 1)or(len(string.split(value,code[0])) > 1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(code[0], value)) > 1) or \
+                    (len(string.split(value,code[0])) > 1) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
            
             elif (mode == "8"):
                 value_to_cmp   = string.lower(value)
                 code[0]        = string.lower(code[0])
-                if ((len(string.split(code[0],value_to_cmp)) > 1)or(len(string.split(value_to_cmp,code[0]))>1)or(code[0]=="_DEFAULT_")):
+                if ((len(string.split(code[0], value_to_cmp)) > 1) or \
+                    (len(string.split(value_to_cmp, code[0])) > 1) or \
+                    (code[0] == "_DEFAULT_")):
                     value = code[1]
                     return value
             
@@ -777,14 +806,18 @@ def crawl_KB(filename,value,mode):
             elif (mode == "R"):
                 value_to_cmp   = string.lower(value)
                 code[0]        = string.lower(code[0])
-                if ((len(string.split(code[0],value_to_cmp)) > 1)or(len(string.split(value_to_cmp,code[0]))>1)or(code[0]=="_DEFAULT_")):
-                    value = value.replace(code[0],code[1])
+                if ((len(string.split(code[0], value_to_cmp)) > 1) or \
+                    (len(string.split(value_to_cmp, code[0])) > 1) or \
+                    (code[0] == "_DEFAULT_")):
+                    value = value.replace(code[0], code[1])
 
             else:
-                if ((code[0] == value)or(code[0]=="_DEFAULT_")):
+                if ((code[0] == value) or (code[0]=="_DEFAULT_")):
                     value = code[1]
                     return value
-      
+    else:
+        sys.stderr.write("Warning: given KB could not be found. \n")
+
     return value
 
 
@@ -858,7 +891,7 @@ def FormatField(value, fn):
         new_value = ""
         par = set_par_defaults(par,".*,0")
 
-        if (re.search(par[0],value) and (par[1] == "0")):
+        if (re.search(par[0], value) and (par[1] == "0")):
             new_value = value
 
         out = new_value
@@ -866,29 +899,29 @@ def FormatField(value, fn):
     if (fn == "KB"):
         new_value = ""
         
-        par = set_par_defaults(par,"KB,0")
+        par = set_par_defaults(par, "KB,0")
 
-        new_value = crawl_KB(par[0],value,par[1])
+        new_value = crawl_KB(par[0], value, par[1])
 
         out = new_value
 
     elif (fn == "ADD"):
         
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
         out = par[0] + value + par[1]
         
     elif (fn == "ABR"):
-        par = set_par_defaults(par,"1,.")       
+        par = set_par_defaults(par, "1,.")       
         out = value[:string.atoi(par[0])] + par[1]
 
     elif (fn == "ABRW"):
 
-        tmp = FormatField(value,"ABR(1,.)")
+        tmp = FormatField(value, "ABR(1,.)")
         tmp = tmp.upper()
         out = tmp
 
     elif (fn == "ABRX"):
-        par = set_par_defaults(par,",")       
+        par = set_par_defaults(par, ",")       
         toout = [] 
         tmp = value.split(" ")
         for wrd in tmp:
@@ -896,42 +929,42 @@ def FormatField(value, fn):
             if (len(wrd) > string.atoi(par[0])):
                 wrd = wrd[:string.atoi(par[0])] + par[1]
             toout.append(wrd)
-        out = string.join(toout," ")
+        out = string.join(toout, " ")
 
     elif (fn == "SUP"):
 
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
 
         if(par[0]=="NUM"):
-            out = re.sub('\d+',par[1],value)
+            out = re.sub('\d+', par[1], value)
             
         if(par[0]=="NNUM"):
-            out = re.sub('\D+',par[1],value)
+            out = re.sub('\D+', par[1], value)
 
         if(par[0]=="ALPHA"):
-            out = re.sub('[a-zA-Z]+',par[1],value)
+            out = re.sub('[a-zA-Z]+', par[1], value)
 
         if(par[0]=="NALPHA"):
-            out = re.sub('[^a-zA-Z]+',par[1],value)
+            out = re.sub('[^a-zA-Z]+', par[1], value)
 
-        if((par[0]=="ALNUM")or(par[0]=="NPUNCT")):
-            out = re.sub('\w+',par[1],value)
+        if((par[0]=="ALNUM") or (par[0] == "NPUNCT")):
+            out = re.sub('\w+', par[1], value)
 
         if(par[0]=="NALNUM"):
-            out = re.sub('\W+',par[1],value)
+            out = re.sub('\W+', par[1], value)
 
         if(par[0]=="PUNCT"):
-            out = re.sub('\W+',par[1],value)
+            out = re.sub('\W+', par[1], value)
 
            
         if(par[0]=="LOWER"):
-            out = re.sub('[a-z]+',par[1],value)
+            out = re.sub('[a-z]+', par[1], value)
 
         if(par[0]=="UPPER"):
-            out = re.sub('[A-Z]+',par[1],value)
+            out = re.sub('[A-Z]+', par[1], value)
 
         if(par[0]=="SPACE"):
-            out = re.sub('\s+',par[1],value)
+            out = re.sub('\s+', par[1], value)
         
     elif (fn == "LIM"):
         par = set_par_defaults(par,",")       
@@ -946,7 +979,7 @@ def FormatField(value, fn):
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                par[0] = re.search(par[0],value).group()
+                par[0] = re.search(par[0], value).group()
         tmp = value.split(par[0])
         if (par[1] == "L"):
             out = par[0] + tmp[1]
@@ -955,7 +988,7 @@ def FormatField(value, fn):
 
     elif (fn == "WORDS"):
         tmp2 = [value]
-        par = set_par_defaults(par,",")               
+        par = set_par_defaults(par, ",")               
         if (par[1] == "R"):
             tmp = value.split(" ")
             tmp2 = [] 
@@ -976,7 +1009,7 @@ def FormatField(value, fn):
 
     elif (fn == "MINL"):
         
-        par = set_par_defaults(par,"1")               
+        par = set_par_defaults(par, "1")               
 
         tmp = value.split(" ")
         tmp2 = []
@@ -987,14 +1020,14 @@ def FormatField(value, fn):
         out = string.join(tmp2, " ")
 
     elif (fn == "MINLW"):
-        par = set_par_defaults(par,"1")               
+        par = set_par_defaults(par, "1")               
         if (len(value) >= string.atoi(par[0])):
             out = value
         else:
             out = ""
 
     elif (fn == "MAXL"):
-        par = set_par_defaults(par,"4096")               
+        par = set_par_defaults(par, "4096")               
         tmp = value.split(" ")
         tmp2 = []
         i = 0
@@ -1004,13 +1037,13 @@ def FormatField(value, fn):
         out = string.join(tmp2, " ")
        
     elif (fn == "REP"):
-        set_par_defaults(par,",")
+        set_par_defaults(par, ",")
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                out = re.sub(par[0],value)
+                out = re.sub(par[0], value)
             else:
-                out = value.replace(par[0],par[1])
+                out = value.replace(par[0], par[1])
 
     elif (fn == "SHAPE"):
        
@@ -1029,16 +1062,16 @@ def FormatField(value, fn):
         for wrd in tmp:
             wrd2 = wrd.capitalize()
             out2.append(wrd2)
-        out = string.join(out2," ")
+        out = string.join(out2, " ")
 
     elif (fn == "IF"):
-        par = set_par_defaults(par,",,")
+        par = set_par_defaults(par, ",,")
 
         N = 0
         while N < 3:
             if (par[N][0:NRE] == regexp and par[N][-NRE:] == regexp):
                 par[N] = par[N][NRE:-NRE]
-                par[N] = re.search(par[N],value).group()
+                par[N] = re.search(par[N], value).group()
             N += 1
 
         if (value == par[0]):
@@ -1050,24 +1083,28 @@ def FormatField(value, fn):
 
     elif (fn == "EXP"):
 
-        par = set_par_defaults(par,",0")
+        par = set_par_defaults(par, ",0")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
-            par[0] = re.search(par[0],value).group()
+            par[0] = re.search(par[0], value).group()
 						     
         tmp = value.split(" ")
         out2 = []
         for wrd in tmp:
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                if ((re.search(par[0],wrd).group() == wrd) and (par[1]=="1")):
+                if ((re.search(par[0], wrd).group() == wrd) and \
+                    (par[1] == "1")):
                     out2.append(wrd)
-                if ((re.search(par[0],wrd).group() != wrd) and (par[1]=="0")):
+                if ((re.search(par[0], wrd).group() != wrd) and \
+                    (par[1] == "0")):
                     out2.append(wrd)
             else:
-                if ((len(wrd.split(par[0])) == 1)and(par[1]=="1")):
+                if ((len(wrd.split(par[0])) == 1) and \
+                    (par[1] == "1")):
                     out2.append(wrd)
-                if ((len(wrd.split(par[0])) != 1)and(par[1]=="0")):
+                if ((len(wrd.split(par[0])) != 1) and \
+                    (par[1] == "0")):
                     out2.append(wrd)                
         out = string.join(out2," ")
 
@@ -1078,16 +1115,18 @@ def FormatField(value, fn):
         tmp = value.split(" ")
         out2 = []
         for wrd in tmp:
-            if ((FormatField(wrd,"SUP(" + par[0] + ")") == wrd)and(par[1]=="1")):
+            if ((FormatField(wrd,"SUP(" + par[0] + ")") == wrd) and \
+                (par[1] == "1")):
                 out2.append(wrd)
-            if ((FormatField(wrd,"SUP(" + par[0] + ")") != wrd)and(par[1]=="0")):
+            if ((FormatField(wrd,"SUP(" + par[0] + ")") != wrd) and \
+                (par[1] == "0")):
                 out2.append(wrd)
                 
         out = string.join(out2," ")
         
 
     elif (fn == "SPLIT"):
-        par = set_par_defaults(par,"%d,0,,1" % conv_setting[1])
+        par = set_par_defaults(par, "%d,0,,1" % conv_setting[1])
 
         length = string.atoi(par[0]) + (string.atoi(par[1]))
         header = string.atoi(par[1])
@@ -1123,12 +1162,12 @@ def FormatField(value, fn):
                 tmp2.append(line)                            
 
         tmp3.append(line)
-        out = string.join(tmp3,"\n")
-        out = FormatField(out,"SHAPE()")
+        out = string.join(tmp3, "\n")
+        out = FormatField(out, "SHAPE()")
 
     elif (fn == "SPLITW"):
 
-        par = set_par_defaults(par,",0,,1")
+        par = set_par_defaults(par, ",0,,1")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
 
@@ -1140,7 +1179,7 @@ def FormatField(value, fn):
         counter = 1
         
         tmp2 = []
-        tmp = re.split(par[0],value)
+        tmp = re.split(par[0], value)
 
         last = tmp.pop()
         
@@ -1162,12 +1201,12 @@ def FormatField(value, fn):
 
     elif (fn == "CONF"):
 
-        par = set_par_defaults(par,",,1")
+        par = set_par_defaults(par, ",,1")
 
         found = 0
         par1  = ""
 
-        data = select_line(par[0],data_parsed)
+        data = select_line(par[0], data_parsed)
         
         for line in data:
             if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
@@ -1182,13 +1221,13 @@ def FormatField(value, fn):
             elif (len(re.split(par1,line)) > 1 ):
                 found = 1
 
-        if ((found == 1)and(string.atoi(par[2]) == 1)):
+        if ((found == 1) and (string.atoi(par[2]) == 1)):
             out = value
-        if ((found == 1)and(string.atoi(par[2]) == 0)):
+        if ((found == 1) and (string.atoi(par[2]) == 0)):
             out = ""
-        if ((found == 0)and(string.atoi(par[2]) == 1)):
+        if ((found == 0) and (string.atoi(par[2]) == 1)):
             out = ""
-        if ((found == 0)and(string.atoi(par[2]) == 0)):
+        if ((found == 0) and (string.atoi(par[2]) == 0)):
             out = value
               
         return out
@@ -1199,7 +1238,7 @@ def FormatField(value, fn):
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
 
-        if (re.search(par[0],value)):
+        if (re.search(par[0], value)):
             if (string.atoi(par[1]) == 1):           
                 out = value
             else:
@@ -1212,7 +1251,7 @@ def FormatField(value, fn):
         return out
 
     elif (fn == "CUT"):
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
         left  = value[:len(par[0])]
         right = value[-(len(par[1])):]
 
@@ -1224,8 +1263,8 @@ def FormatField(value, fn):
         return out
 
     elif (fn == "NUM"):
-        tmp = re.findall('\d',value)
-        out = string.join(tmp,"")
+        tmp = re.findall('\d', value)
+        out = string.join(tmp, "")
 
     return out
 
@@ -1297,9 +1336,9 @@ def format_field(value, fn):
     if (fn == "RE"):
 
         new_value = ""
-        par = set_par_defaults(par,".*,0")
+        par = set_par_defaults(par, ".*,0")
 
-        if (re.search(par[0],value) and (par[1] == "0")):
+        if (re.search(par[0], value) and (par[1] == "0")):
             new_value = value
 
         out = new_value
@@ -1307,19 +1346,19 @@ def format_field(value, fn):
     if (fn == "KB"):
         new_value = ""
         
-        par = set_par_defaults(par,"KB,0")
+        par = set_par_defaults(par, "KB,0")
 
-        new_value = crawl_KB(par[0],value,par[1])
+        new_value = crawl_KB(par[0], value, par[1])
 
         out = new_value
 
     elif (fn == "ADD"):
         
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
         out = par[0] + value + par[1]
         
     elif (fn == "ABR"):
-        par = set_par_defaults(par,"1,.")       
+        par = set_par_defaults(par, "1,.")       
         out = value[:string.atoi(par[0])] + par[1]
 
     elif (fn == "ABRW"):
@@ -1329,7 +1368,7 @@ def format_field(value, fn):
         out = tmp
 
     elif (fn == "ABRX"):
-        par = set_par_defaults(par,",")       
+        par = set_par_defaults(par, ",")       
         toout = [] 
         tmp = value.split(" ")
         for wrd in tmp:
@@ -1337,45 +1376,45 @@ def format_field(value, fn):
             if (len(wrd) > string.atoi(par[0])):
                 wrd = wrd[:string.atoi(par[0])] + par[1]
             toout.append(wrd)
-        out = string.join(toout," ")
+        out = string.join(toout, " ")
 
     elif (fn == "SUP"):
 
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
 
-        if(par[0]=="NUM"):
-            out = re.sub('\d+',par[1],value)
+        if(par[0] == "NUM"):
+            out = re.sub('\d+', par[1], value)
             
-        if(par[0]=="NNUM"):
-            out = re.sub('\D+',par[1],value)
+        if(par[0] == "NNUM"):
+            out = re.sub('\D+', par[1], value)
 
-        if(par[0]=="ALPHA"):
-            out = re.sub('[a-zA-Z]+',par[1],value)
+        if(par[0] == "ALPHA"):
+            out = re.sub('[a-zA-Z]+', par[1], value)
 
-        if(par[0]=="NALPHA"):
-            out = re.sub('[^a-zA-Z]+',par[1],value)
+        if(par[0] == "NALPHA"):
+            out = re.sub('[^a-zA-Z]+', par[1], value)
 
-        if((par[0]=="ALNUM")or(par[0]=="NPUNCT")):
-            out = re.sub('\w+',par[1],value)
+        if((par[0] == "ALNUM") or (par[0] == "NPUNCT")):
+            out = re.sub('\w+', par[1], value)
 
-        if(par[0]=="NALNUM"):
-            out = re.sub('\W+',par[1],value)
+        if(par[0] == "NALNUM"):
+            out = re.sub('\W+', par[1], value)
 
-        if(par[0]=="PUNCT"):
-            out = re.sub('\W+',par[1],value)
+        if(par[0] == "PUNCT"):
+            out = re.sub('\W+', par[1], value)
 
            
-        if(par[0]=="LOWER"):
-            out = re.sub('[a-z]+',par[1],value)
+        if(par[0] == "LOWER"):
+            out = re.sub('[a-z]+', par[1], value)
 
-        if(par[0]=="UPPER"):
-            out = re.sub('[A-Z]+',par[1],value)
+        if(par[0] == "UPPER"):
+            out = re.sub('[A-Z]+', par[1], value)
 
-        if(par[0]=="SPACE"):
-            out = re.sub('\s+',par[1],value)
+        if(par[0] == "SPACE"):
+            out = re.sub('\s+', par[1], value)
         
     elif (fn == "LIM"):
-        par = set_par_defaults(par,",")       
+        par = set_par_defaults(par, ",")       
 
         if (par[1] == "L"):
             out = value[(len(value) - string.atoi(par[0])):]           
@@ -1383,11 +1422,11 @@ def format_field(value, fn):
             out = value[:string.atoi(par[0])]
 
     elif (fn == "LIMW"):
-        par = set_par_defaults(par,",")       
+        par = set_par_defaults(par, ",")       
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                par[0] = re.search(par[0],value).group()
+                par[0] = re.search(par[0], value).group()
         tmp = value.split(par[0])
         if (par[1] == "L"):
             out = par[0] + tmp[1]
@@ -1396,7 +1435,7 @@ def format_field(value, fn):
 
     elif (fn == "WORDS"):
         tmp2 = [value]
-        par = set_par_defaults(par,",")               
+        par = set_par_defaults(par, ",")               
         if (par[1] == "R"):
             tmp = value.split(" ")
             tmp2 = [] 
@@ -1417,7 +1456,7 @@ def format_field(value, fn):
 
     elif (fn == "MINL"):
         
-        par = set_par_defaults(par,"1")               
+        par = set_par_defaults(par, "1")               
 
         tmp = value.split(" ")
         tmp2 = []
@@ -1428,14 +1467,14 @@ def format_field(value, fn):
         out = string.join(tmp2, " ")
 
     elif (fn == "MINLW"):
-        par = set_par_defaults(par,"1")               
+        par = set_par_defaults(par, "1")               
         if (len(value) >= string.atoi(par[0])):
             out = value
         else:
             out = ""
 
     elif (fn == "MAXL"):
-        par = set_par_defaults(par,"4096")               
+        par = set_par_defaults(par, "4096")               
         tmp = value.split(" ")
         tmp2 = []
         i = 0
@@ -1445,13 +1484,13 @@ def format_field(value, fn):
         out = string.join(tmp2, " ")
        
     elif (fn == "REP"):
-        set_par_defaults(par,",")
+        set_par_defaults(par, ",")
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                out = re.sub(par[0],value)
+                out = re.sub(par[0], value)
             else:
-                out = value.replace(par[0],par[1])
+                out = value.replace(par[0], par[1])
 
     elif (fn == "SHAPE"):
        
@@ -1479,7 +1518,7 @@ def format_field(value, fn):
         while N < 3:
             if (par[N][0:NRE] == regexp and par[N][-NRE:] == regexp):
                 par[N] = par[N][NRE:-NRE]
-                par[N] = re.search(par[N],value).group()
+                par[N] = re.search(par[N], value).group()
             N += 1
 
         if (value == par[0]):
@@ -1491,24 +1530,28 @@ def format_field(value, fn):
 
     elif (fn == "EXP"):
 
-        par = set_par_defaults(par,",0")
+        par = set_par_defaults(par, ",0")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
-            par[0] = re.search(par[0],value).group()
+            par[0] = re.search(par[0], value).group()
 						     
         tmp = value.split(" ")
         out2 = []
         for wrd in tmp:
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                if ((re.search(par[0],wrd).group() == wrd) and (par[1]=="1")):
+                if ((re.search(par[0], wrd).group() == wrd) and \
+                    (par[1] == "1")):
                     out2.append(wrd)
-                if ((re.search(par[0],wrd).group() != wrd) and (par[1]=="0")):
+                if ((re.search(par[0], wrd).group() != wrd) and \
+                    (par[1] == "0")):
                     out2.append(wrd)
             else:
-                if ((len(wrd.split(par[0])) == 1)and(par[1]=="1")):
+                if ((len(wrd.split(par[0])) == 1) and \
+                    (par[1] == "1")):
                     out2.append(wrd)
-                if ((len(wrd.split(par[0])) != 1)and(par[1]=="0")):
+                if ((len(wrd.split(par[0])) != 1) and \
+                    (par[1] == "0")):
                     out2.append(wrd)                
         out = string.join(out2," ")
 
@@ -1519,16 +1562,18 @@ def format_field(value, fn):
         tmp = value.split(" ")
         out2 = []
         for wrd in tmp:
-            if ((format_field(wrd,"SUP(" + par[0] + ")") == wrd)and(par[1]=="1")):
+            if ((format_field(wrd,"SUP(" + par[0] + ")") == wrd) and \
+                (par[1] == "1")):
                 out2.append(wrd)
-            if ((format_field(wrd,"SUP(" + par[0] + ")") != wrd)and(par[1]=="0")):
+            if ((format_field(wrd,"SUP(" + par[0] + ")") != wrd) and \
+                (par[1] == "0")):
                 out2.append(wrd)
                 
         out = string.join(out2," ")
         
 
     elif (fn == "SPLIT"):
-        par = set_par_defaults(par,"%d,0,,1" % conv_setting[1])
+        par = set_par_defaults(par, "%d,0,,1" % conv_setting[1])
 
         length = string.atoi(par[0]) + (string.atoi(par[1]))
         header = string.atoi(par[1])
@@ -1564,12 +1609,12 @@ def format_field(value, fn):
                 tmp2.append(line)                            
 
         tmp3.append(line)
-        out = string.join(tmp3,"\n")
-        out = format_field(out,"SHAPE()")
+        out = string.join(tmp3, "\n")
+        out = format_field(out, "SHAPE()")
 
     elif (fn == "SPLITW"):
 
-        par = set_par_defaults(par,",0,,1")
+        par = set_par_defaults(par, ",0,,1")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
 
@@ -1581,7 +1626,7 @@ def format_field(value, fn):
         counter = 1
         
         tmp2 = []
-        tmp = re.split(par[0],value)
+        tmp = re.split(par[0], value)
 
         last = tmp.pop()
         
@@ -1599,16 +1644,16 @@ def format_field(value, fn):
             else:
                 tmp2.append(value[:header] + last)
                 
-        out = string.join(tmp2,"\n")
+        out = string.join(tmp2, "\n")
 
     elif (fn == "CONF"):
 
-        par = set_par_defaults(par,",,1")
+        par = set_par_defaults(par, ",,1")
 
         found = 0
         par1  = ""
 
-        data = select_line(par[0],data_parsed)
+        data = select_line(par[0], data_parsed)
         
         for line in data:
             if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
@@ -1623,13 +1668,13 @@ def format_field(value, fn):
             elif (len(re.split(par1,line)) > 1 ):
                 found = 1
 
-        if ((found == 1)and(string.atoi(par[2]) == 1)):
+        if ((found == 1) and (string.atoi(par[2]) == 1)):
             out = value
-        if ((found == 1)and(string.atoi(par[2]) == 0)):
+        if ((found == 1) and (string.atoi(par[2]) == 0)):
             out = ""
-        if ((found == 0)and(string.atoi(par[2]) == 1)):
+        if ((found == 0) and (string.atoi(par[2]) == 1)):
             out = ""
-        if ((found == 0)and(string.atoi(par[2]) == 0)):
+        if ((found == 0) and (string.atoi(par[2]) == 0)):
             out = value
               
         return out
@@ -1640,7 +1685,7 @@ def format_field(value, fn):
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
 
-        if (re.search(par[0],value)):
+        if (re.search(par[0], value)):
             if (string.atoi(par[1]) == 1):           
                 out = value
             else:
@@ -1653,7 +1698,7 @@ def format_field(value, fn):
         return out
 
     elif (fn == "CUT"):
-        par = set_par_defaults(par,",")
+        par = set_par_defaults(par, ",")
         left  = value[:len(par[0])]
         right = value[-(len(par[1])):]
 
@@ -1665,8 +1710,8 @@ def format_field(value, fn):
         return out
 
     elif (fn == "NUM"):
-        tmp = re.findall('\d',value)
-        out = string.join(tmp,"")
+        tmp = re.findall('\d', value)
+        out = string.join(tmp, "")
 
     return out
 
@@ -1697,7 +1742,7 @@ def match_in_database(record, query_string):
         
         if len(record1) > 1:
   
-            matching_value = string.split(record1[1],"<")[0]
+            matching_value = string.split(record1[1], "<")[0]
 
             for fn in formatting:
                 matching_value = FormatField(matching_value, fn)
@@ -1713,7 +1758,12 @@ def match_in_database(record, query_string):
     search_pattern.append("")
     search_pattern.append("")
 
-    recID_list = perform_request_search(p1=search_pattern[0],f1=search_field[0],p2=search_pattern[1],f2=search_field[1],p3=search_pattern[2],f3=search_field[2])
+    recID_list = perform_request_search(p1=search_pattern[0],
+                                        f1=search_field[0],
+                                        p2=search_pattern[1],
+                                        f2=search_field[1],
+                                        p3=search_pattern[2],
+                                        f3=search_field[2])
 
 
     return recID_list
@@ -1748,7 +1798,11 @@ def exit_on_error(error_message):
     return 0
 
 
-def create_record(begin_record_header, ending_record_footer, query_string, match_mode, Xcount):
+def create_record(begin_record_header,
+                  ending_record_footer,
+                  query_string,
+                  match_mode,
+                  Xcount):
     "Create output record"
 
     global data_parsed
@@ -1783,29 +1837,29 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                     else:
                         repetitive = 0
                     if dirmode:
-                        DATA    = select_line(field,data_parsed)
+                        DATA    = select_line(field, data_parsed)
                     else:
-                        DATA    = select_line(field,data_parsed)
+                        DATA    = select_line(field, data_parsed)
                     if (repetitive == 0):
-                        DATA = [string.join(DATA," ")]
-                    SRC_TPL = select_line(field,source_tpl_parsed)
+                        DATA = [string.join(DATA, " ")]
+                    SRC_TPL = select_line(field, source_tpl_parsed)
                     try:
                         if (DATA[0] != ""):
-                            DATA = get_subfields(DATA,subfield,SRC_TPL)
+                            DATA = get_subfields(DATA, subfield, SRC_TPL)
                             FF = field_tpl_item_STRING.split("::")
                             if (len(FF) > 2):
                                 FF = FF[2:]
                                 for fn in FF:
 #                                    DATAFORMATTED = []
                                     if (len(DATA) != 0 and DATA[0] != ""):
-                                        DATA = get_subfields(DATA,subfield,SRC_TPL)
+                                        DATA = get_subfields(DATA, subfield, SRC_TPL)
                                         FF = field_tpl_item_STRING.split("::")
                                         if (len(FF) > 2):
                                             FF = FF[2:]
                                             for fn2 in FF:
                                                 DATAFORMATTED = []
                                     for item in DATA:
-                                        item = FormatField(item,fn)
+                                        item = FormatField(item, fn)
                                         DATAFORMATTED.append(item)
                                     DATA = DATAFORMATTED
                             if (len(DATA) > rows):
@@ -1822,8 +1876,8 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
         while (current < rows):
             line_to_print = []
             for item in to_output:
-                if (item==[]):
-                    item =['']
+                if (item == []):
+                    item = ['']
                 if (len(item) <= current):
                     printout = item[0]
                 else:
@@ -1844,7 +1898,7 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
                 elif (GFF[:4] == "DEFP"):
                     default_print = 1
                 else:
-                    output = FormatField(output,GFF)
+                    output = FormatField(output, GFF)
 
             if ((len(output) > set_conv()[0] and print_line == 1) or default_print):
                 out_to_print = out_to_print + output + "\n"
@@ -1883,9 +1937,9 @@ def create_record(begin_record_header, ending_record_footer, query_string, match
 
 def convert(ar_):
 
-    global dirmode, Xcount, conv_setting, sysno, sysno500, separator, tcounter, source_data, query_string, match_mode, begin_record_header ,ending_record_footer,output_rec_sep, begin_header, ending_footer, oai_identifier_from, source_tpl, source_tpl_parsed, target_tpl, target_tpl_parsed, extract_tpl, extract_tpl_parsed, data_parsed
+    global dirmode, Xcount, conv_setting, sysno, sysno500, separator, tcounter, source_data, query_string, match_mode, begin_record_header, ending_record_footer, output_rec_sep, begin_header, ending_footer, oai_identifier_from, source_tpl, source_tpl_parsed, target_tpl, target_tpl_parsed, extract_tpl, extract_tpl_parsed, data_parsed
 
-    dirmode, Xcount, conv_setting, sysno, sysno500, separator, tcounter, source_data, query_string, match_mode, begin_record_header ,ending_record_footer,output_rec_sep, begin_header, ending_footer, oai_identifier_from, source_tpl, source_tpl_parsed, target_tpl, target_tpl_parsed, extract_tpl, extract_tpl_parsed = ar_
+    dirmode, Xcount, conv_setting, sysno, sysno500, separator, tcounter, source_data, query_string, match_mode, begin_record_header, ending_record_footer, output_rec_sep, begin_header, ending_footer, oai_identifier_from, source_tpl, source_tpl_parsed, target_tpl, target_tpl_parsed, extract_tpl, extract_tpl_parsed = ar_
 #    separator = spt
 
     # Added by Alberto
@@ -1893,7 +1947,7 @@ def convert(ar_):
     
     if dirmode:
         if (os.path.isdir(source_data)):
-            data_parsed = parse_input_data_d(source_data,source_tpl)
+            data_parsed = parse_input_data_d(source_data, source_tpl)
     
             record = create_record(begin_record_header, ending_record_footer, query_string, match_mode, Xcount)
             if record != "":
