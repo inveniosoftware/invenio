@@ -72,11 +72,8 @@ Contents
      d) Python v2.3 or above:
          <http://python.org/>
         as well as the following Python modules:
-
-          - (mandatory) MySQLdb (if you happen to use 1.2.1_p2, please
-            apply the following patch): <>
-
-             <http://sourceforge.net/projects/mysql-python>
+          - (mandatory) MySQLdb 
+             <http://sourceforge.net/projects/mysql-python>                
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>
           - (recommended) PyStemmer, for indexing and ranking: 
@@ -98,6 +95,10 @@ Contents
              <http://rdflib.net/>
           - (optional) mechanize, to run regression web tests:
              <http://wwwsearch.sourceforge.net/mechanize/>
+
+        Note: If you happen to use MySQLdb 1.2.1_p2, please apply the
+              following patch:
+              <http://sourceforge.net/tracker/index.php?func=detail&group_id=22307&atid=374932>.
 
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
@@ -175,13 +176,13 @@ Contents
 =========================================================
 
       $ cd /usr/local/src/
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz.sig
-      $ md5sum -v -c cds-invenio-0.90.1.tar.gz.md5 
-      $ gpg --verify cds-invenio-0.90.1.tar.gz.sig cds-invenio-0.90.1.tar.gz
-      $ tar xvfz cds-invenio-0.90.1.tar.gz
-      $ cd cds-invenio-0.90.1
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.sig
+      $ md5sum -v -c cds-invenio-0.92.0.tar.gz.md5 
+      $ gpg --verify cds-invenio-0.92.0.tar.gz.sig cds-invenio-0.92.0.tar.gz
+      $ tar xvfz cds-invenio-0.92.0.tar.gz
+      $ cd cds-invenio-0.92.0
       $ ./configure --prefix=/opt/cds-invenio \
                     --with-weburl=http://webserver.domain.com \
                     --with-sweburl=https://webserver.domain.com \
@@ -223,20 +224,20 @@ Contents
           CDS Invenio.  (The built files will be installed into
           different "target" directories later.)
 
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.90.1.tar.gz.sig
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.sig
 
           Fetch CDS Invenio source tarball from the CDS Software
           Consortium distribution server, together with MD5 checksum
           and GnuPG cryptographic signature files useful for verifying
           the integrity of the tarball.
 
-      $ md5sum -v -c cds-invenio-0.90.1.tar.gz.md5
+      $ md5sum -v -c cds-invenio-0.92.0.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify cds-invenio-0.90.1.tar.gz.sig cds-invenio-0.90.1.tar.gz
+      $ gpg --verify cds-invenio-0.92.0.tar.gz.sig cds-invenio-0.92.0.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -248,11 +249,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz cds-invenio-0.90.1.tar.gz
+      $ tar xvfz cds-invenio-0.92.0.tar.gz
 
           Untar the distribution tarball.    
 
-      $ cd cds-invenio-0.90.1
+      $ cd cds-invenio-0.92.0
    
           Go to the source directory.
 
