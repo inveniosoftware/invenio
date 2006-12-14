@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.91.0\n"
+"Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-08 11:28+0100\n"
+"POT-Creation-Date: 2006-12-14 17:18+0100\n"
 "PO-Revision-Date: 2006-10-12 17:49+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: IT <cds.support@cern.ch>\n"
@@ -897,7 +897,7 @@ msgstr ""
 msgid "Citation history"
 msgstr "Citation history:"
 
-#: modules/bibrank/lib/bibrank_downloads_grapher.py:97
+#: modules/bibrank/lib/bibrank_downloads_grapher.py:95
 #, fuzzy
 msgid "Downloads history"
 msgstr "Downloads history:"

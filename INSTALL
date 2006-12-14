@@ -72,7 +72,10 @@ Contents
      d) Python v2.3 or above:
          <http://python.org/>
         as well as the following Python modules:
-          - (mandatory) MySQLdb (do *not* use 1.2.1_p2):
+
+          - (mandatory) MySQLdb (if you happen to use 1.2.1_p2, please
+            apply the following patch): <>
+
              <http://sourceforge.net/projects/mysql-python>
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>
