@@ -31,10 +31,12 @@ Dependencies: Need one of the following XSLT processors:
 
 Used by: bibconvert.in
 
-FIXME: - find better namespace for functions
-       - find less bogus URI (given as param to processor)
+FIXME: - Find better namespace for functions
+       - Find less bogus URI (given as param to processor)
          for source and template
        - Implement command-line options
+       - Think about better handling of 'value' parameter
+         in bibconvert_function_*
 """
 
 __revision__ = "$Id$"
@@ -71,6 +73,7 @@ if processor_type == -1:
         processor_type = 1
         from Ft.Xml.Xslt import Processor
         from Ft.Xml import InputSource
+        from xml.dom import Node
     except ImportError:
         pass
 
@@ -82,18 +85,68 @@ if processor_type == -1:
 
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
 
-def bibconvert_function(ctx, value, func):
+def bibconvert_function_libxslt(ctx, value, func):
     """
     libxslt extension function:
     Bridge between BibConvert formatting functions and XSL stylesheets.
 
     Can be used in that way in XSL stylesheet
     (provided xmlns:fn="http://cdsweb.cern.ch/bibconvert/fn" has been declared):
-    <xsl:value-of select="fn:format(string(.), 'ADD(mypref,mysuff)')"/>
+    <xsl:value-of select="fn:format(., 'ADD(mypref,mysuff)')"/>
     (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
     using BibConvert ADD function)
+    
+    if value is int, value is converted to string
+    if value is Node (PyCObj), first child node (text node) is taken as value
     """
-    return FormatField(value, func)
+    try:
+        if isinstance(value, str):
+            string_value = value
+        elif isinstance(value, int):
+            string_value = str(value)
+        else:
+            string_value = libxml2.xmlNode(_obj=value[0]).children.content
+
+        return FormatField(string_value, func).rstrip('\n')
+
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+        
+    return ''
+
+
+def bibconvert_function_4suite(ctx, value, func):
+    """
+    4suite extension function:
+    Bridge between BibConvert formatting functions and XSL stylesheets.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibconvert/fn" has been declared):
+    <xsl:value-of select="fn:format(., 'ADD(mypref,mysuff)')"/>
+    (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
+    using BibConvert ADD function)
+
+    if value is int, value is converted to string
+    if value is Node, first child node (text node) is taken as value
+    """
+    try:
+        if len(value) > 0 and isinstance(value[0], Node):
+            string_value = value[0].firstChild.nodeValue
+            if string_value is None:
+                string_value = ''
+        else:
+            string_value = str(value)
+
+        return FormatField(string_value, func).rstrip('\n')
+    
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+        
+    return ''
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -145,7 +198,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         # Register BibConvert functions for use in XSL
         libxslt.registerExtModuleFunction("format",
                                           CFG_BIBCONVERT_FUNCTION_NS,
-                                          bibconvert_function)
+                                          bibconvert_function_libxslt)
 
         # Load template and source
         template_xml = libxml2.parseDoc(template)
@@ -170,7 +223,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         # Register BibConvert functions for use in XSL
         processor.registerExtensionFunction(CFG_BIBCONVERT_FUNCTION_NS,
                                             "format",
-                                            bibconvert_function)
+                                            bibconvert_function_4suite)
 
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
