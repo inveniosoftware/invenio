@@ -31,6 +31,12 @@ import getopt
 from invenio.search_engine import \
      get_fieldvalues, \
      perform_request_search
+from invenio.config import CFG_CERN_SITE
+
+if CFG_CERN_SITE:
+    journal_name_tag = '773__p'
+else:
+    journal_name_tag = '909C4p'
 
 def format(bfo):
     """
@@ -121,11 +127,9 @@ def format(bfo):
                 'world pat. inf.': '0172-2190',
                 'z. phys.': '0044-3328',
                 'z. phys., c': '0170-9739'}
-
-
-    #journal_name = bfo.field('210__%') # CERN specific
-    journal_name = bfo.field('909C4p')
     
+    journal_name = bfo.field(journal_name_tag)
+        
     # Here you might want to process journal name
     # by doing the same operation that has been
     # done when saving the mappings
@@ -135,7 +139,7 @@ def format(bfo):
     
     return issns.get(journal_name, '')
 
-def build_distant_issns(url, limit=1000):
+def build_issns_from_distant_site(url, limit=1000):
     """
     Retrieves the ISSNs from a distant Invenio system.
     Store the "journal name -> issn" relation.
@@ -196,7 +200,7 @@ def build_distant_issns(url, limit=1000):
     prtyp = pprint.PrettyPrinter(indent=4)
     prtyp.pprint(issns)      
 
-def build_local_issns(limit=1000):
+def build_issns_from_local_site(limit=1000):
     """
     Retrieves the ISSNs from the local database.
     Store the "journal name -> issn" relation.
@@ -264,15 +268,15 @@ if __name__ == '__main__':
         print_info()
         sys.exit(0)
             
-    url = None
-    limit = 1000
+    url_arg = None
+    limit_arg = 1000
     for opt, opt_value in opts:
 
         if opt in ["-u", "--url"]:
-            url = opt_value
+            url_arg = opt_value
         elif opt in ["-l", "--limit"]:
             try:
-                limit = int(opt_value)
+                limit_arg = int(opt_value)
             except ValueError:
                 print "'limit' must be an integer"
                 print_info()
@@ -285,7 +289,7 @@ if __name__ == '__main__':
             print_info()
             sys.exit(0)
             
-    if url is not None:
-        build_distant_issns(url, limit)
+    if url_arg is not None:
+        build_issns_from_distant_site(url_arg, limit_arg)
     else:
-        build_local_issns(limit) 
+        build_issns_from_local_site(limit_arg) 
