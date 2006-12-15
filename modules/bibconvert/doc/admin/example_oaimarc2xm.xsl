@@ -21,8 +21,8 @@
 <!-- This transformation keeps the same source file, with the following exceptions:
      - OAI envelope is removed.
      - Records marked with status='deleted' are returned as deleted for Invenio.
-     - Records having fields 980a, not found in kb 'doctype.kb' are dropped.
-     - Subfield 980a is converted using kb 'doctype'.
+     - Records having fields 980a, not found in kb 'example_oaimarc2xm_collID.kb' are dropped.
+     - Subfield 980a is converted using kb 'example_oaimarc2xm_collID.kb'.
      - Adds OAI identifier in field 909CO
 
      This stylesheet is provided only as an example of transformation.
@@ -46,10 +46,10 @@ exclude-result-prefixes="OAI-PMH marc fn">
                               and which will be dropped  
 
                               Here only records with fields 980a
-                              with values existing in KB 'doctype.kb' are kept.
-                              (KBs return value 'TOBEREMOVED' when value does not exist)
+                              with values existing in KB 'example_oaimarc2xm_collID.kb' are kept.
+                              (KB return value '_DELETE_' when value does not exist)
              -->   
-           <xsl:for-each select="//OAI-PMH:record[OAI-PMH:metadata/marc:record/marc:datafield[@tag='980' and (@ind1='' or @ind1=' ') and (@ind2='' or @ind2=' ') and (marc:subfield[@code='a'] and fn:format(marc:subfield[@code='a'], 'KB(doctype.kb)')!='TOBEREMOVED')]">
+           <xsl:for-each select="//OAI-PMH:record[OAI-PMH:metadata/marc:record/marc:datafield[@tag='980' and (@ind1='' or @ind1=' ') and (@ind2='' or @ind2=' ') and (marc:subfield[@code='a'] and fn:format(marc:subfield[@code='a'], 'KB(example_oaimarc2xm_collID.kb)')!='_DELETE_')]">
 
             <xsl:choose>
                 <xsl:when test="./OAI-PMH:header[@status='deleted']">
@@ -72,7 +72,7 @@ exclude-result-prefixes="OAI-PMH marc fn">
                         <xsl:for-each select="./OAI-PMH:metadata/marc:record/marc:datafield">
                            <!-- CUSTOMIZEME: Modify below to choose how to process subfield
                                              values. 
-                                             Here 980a subfields are processed through KB 'doctype.kb'
+                                             Here 980a subfields are processed through KB 'example_oaimarc2xm_collID.kb'
                              -->   
                                  <xsl:element name="{local-name(.)}">
                                     <xsl:copy-of select="@*"/>
@@ -81,7 +81,7 @@ exclude-result-prefixes="OAI-PMH marc fn">
                                              <xsl:copy-of select="@*"/>
                                              <xsl:choose>
                                                 <xsl:when test="../@tag='980' and (../@ind1='' or ../@ind1=' ') and (../@ind2='' or ../@ind2=' ') and @code='a'">
-                                                   <xsl:value-of select="fn:format(., 'KB(doctype.kb)')"/>
+                                                   <xsl:value-of select="fn:format(., 'KB(example_oaimarc2xm_collID.kb)')"/>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                    <xsl:value-of select="."/>
