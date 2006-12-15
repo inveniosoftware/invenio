@@ -27,7 +27,7 @@ from os import access, F_OK, R_OK, W_OK, getpid, rename, unlink
 from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
-from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers
+from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers, acc_deleteUserRole
 from invenio.config import cdslang, bibconvertconf
 from invenio.access_control_engine import acc_authorize_action
 
@@ -1935,7 +1935,7 @@ def _clone_functions_foraction_doctype(errors, warnings, user_msg, fromdoctype, 
         ## TODO : LOG ERRORS
         user_msg.append("""Functions already existed for the "%s" action of the document type "%s" but they could not be """ \
                         """deleted. Unable to clone the functions of Document Type "%s" for action "%s".""" \
-                        % (actname, todoctype, fromdoctype, action))
+                        % (action, todoctype, fromdoctype, action))
         ## critical - return 1 to signal this
         return 1
     elif error_code == 2:
@@ -3508,7 +3508,7 @@ def _delete_submission_function(doctype, action, deletefunctionname, deletefunct
         ## couldnt delete the functions before reordering them
         user_msg.append("""Deleted function [%s] at step [%s], score [%s] from submission [%s], but could not re-order""" \
                         """ scores of remaining functions within step [%s]""" \
-                        % (deleterfunctionname, deletefunctionstep, deletefunctionscore,
+                        % (deletefunctionname, deletefunctionstep, deletefunctionscore,
                            "%s%s" % (action, doctype), deletefunctionstep))
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_submission_functions_form(doctype=doctype, action=action, user_msg=user_msg)
@@ -4140,6 +4140,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
     return (title, body, errors, warnings)
 
 def _configure_doctype_move_submission_page(errors, warnings, doctype, action, pagenum, direction):
+    user_msg = []
     ## Sanity checking:
     if direction.lower() not in ("up", "down"):
         ## invalid direction:
@@ -4148,7 +4149,7 @@ def _configure_doctype_move_submission_page(errors, warnings, doctype, action, p
                                                                         action=action,
                                                                         user_msg=user_msg)
         return (title, body)
-    user_msg = []
+
     ## swap the pages:
     if direction.lower() == "up":
         error_code = swap_elements_adjacent_pages_doctype_action(doctype=doctype, action=action,
@@ -4220,7 +4221,7 @@ def _configure_doctype_delete_submission_page(errors, warnings, doctype, action,
             (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
                                                                             action=action,
                                                                             user_msg=user_msg)
-    elif numpages == 0:
+    elif num_pages == 0:
         ## no pages to delete for this submission
         user_msg.append("""This Submission has no Pages - Cannot delete a Page!""")
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype,
