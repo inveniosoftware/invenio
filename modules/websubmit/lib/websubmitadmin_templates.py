@@ -418,7 +418,7 @@ class Template:
           <td width="80%%">"""
         if perform_act == "elementadd":
             body_content += """
-          <input type="text" size=30 name="elname" value="%(el_name)s" />""" % {'el_name' : cgi.escape(elname, 1)}
+          <input type="text" size="30" name="elname" value="%(el_name)s" />""" % {'el_name' : cgi.escape(elname, 1)}
         else:
             body_content += """<span class="info">%(el_name)s</span><input type="hidden" name="elname" value="%(el_name)s" />""" \
                             % {'el_name' : cgi.escape(elname, 1)}
@@ -439,7 +439,7 @@ class Template:
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Modification Text:</span></td>
-          <td width="80%%"><input type="text" size=90 name="elmodifytext" value="%(el_modifytext)s" /></td>
+          <td width="80%%"><input type="text" size="90" name="elmodifytext" value="%(el_modifytext)s" /></td>
          </tr>""" % {'el_modifytext' : cgi.escape(elmodifytext, 1)}
 
         body_content += """
@@ -456,43 +456,43 @@ class Template:
          </tr>
          <tr>
           <td width="20%%"><span class="adminlabel">Marc Code:</span></td>
-          <td width="80%%"><input type="text" size=15 name="elmarccode" value="%(el_marccode)s" /></td>
+          <td width="80%%"><input type="text" size="15" name="elmarccode" value="%(el_marccode)s" /></td>
          </tr>
         """ % {'el_marccode' : cgi.escape(elmarccode, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Size <i><small>(text elements)</small></i>:</span></td>
-          <td width="80%%"><input type="text" size=10 name="elsize" value="%(el_size)s" /></td>
+          <td width="80%%"><input type="text" size="10" name="elsize" value="%(el_size)s" /></td>
          </tr>
         """ % {'el_size' : cgi.escape(elsize, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">No. Rows <i><small>(textarea elements)</small></i>:</span></td>
-          <td width="80%%"><input type="text" size=6 name="elrows" value="%(el_rows)s" /></td>
+          <td width="80%%"><input type="text" size="6" name="elrows" value="%(el_rows)s" /></td>
          </tr>
         """ % {'el_rows' : cgi.escape(elrows, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">No. Columns <i><small>(textarea elements)</small></i>:</span></td>
-          <td width="80%%"><input type="text" size=6 name="elcols" value="%(el_cols)s" /></td>
+          <td width="80%%"><input type="text" size="6" name="elcols" value="%(el_cols)s" /></td>
          </tr>
         """ % {'el_cols' : cgi.escape(elcols, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Maximum Length <i><small>(text elements)</small></i>:</span></td>
-          <td width="80%%"><input type="text" size=6 name="elmaxlength" value="%(el_maxlength)s" /></td>
+          <td width="80%%"><input type="text" size="6" name="elmaxlength" value="%(el_maxlength)s" /></td>
          </tr>
         """ % {'el_maxlength' : cgi.escape(elmaxlength, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Value <i><small>(text/hidden elements)</small></i>:</span></td>
-          <td width="80%%"><input type="text" size=90 name="elval" value="%(el_val)s" /></td>
+          <td width="80%%"><input type="text" size="90" name="elval" value="%(el_val)s" /></td>
          </tr>
         """ % {'el_val' : cgi.escape(elval, 1)}
         body_content += """
          <tr>
           <td width="20%%"><span class="adminlabel">Element Description <i><small>(e.g. user-defined elements)</small></i>:</span></td>
-          <td width="80%%"><textarea cols=100 rows=30 name="elfidesc" wrap="nowarp">%(el_fidesc)s</textarea></td>
+          <td width="80%%"><textarea cols="100" rows="30" name="elfidesc" wrap="nowarp">%(el_fidesc)s</textarea></td>
          </tr>
         """ % {'el_fidesc' : cgi.escape(elfidesc, 1)}
         body_content += """
