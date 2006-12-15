@@ -23,7 +23,7 @@ doc_DATA=index.html guide.html
 
 sampledir=$(localstatedir)/www/admin/bibconvert
 sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
-	    oaimarc2marcxml_sample.xsl doctype.kb
+	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(sample_DATA)
