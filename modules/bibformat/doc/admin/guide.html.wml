@@ -1006,21 +1006,42 @@ This is to reduce the number of elements shown in the documentation as the logic
 table contains a lot of not so useful fields to be used in templates.</p>
 
 <h3>How can I escape special HTML/XML chars like '&lt;', '&gt;' and '&amp;'? What is the default behaviour of BibFormat?</h3>
-<p>By default, BibFormat escapes no value at all. However, when calling a format element
-from a format template, you can set the special parameter <code>escape</code> of your element to '1' to
-make BibFormat understand that it has to escape values of the element. </br>
+<h4>Format templates:</h4>
+<p>By default, BibFormat escapes all values returned by format elements. As a format template designer,
+you can assume in almost all cases that the values you get from a format element will be escaped for you. For special cases, you can set the parameter <code>escape</code> of the element to '0' when calling it, to
+make BibFormat understand that it must not escape the values of the element, or to '1' to force the escaping. <br/>
 For example <code>&lt;bfe_abstract /&gt;</code> will return:</br>
 <code>[...]We find that for spatially-flat cosmologies, background lensing</code></br>
 <code>clusters with reasonable mass-to-light ratios lying in the</code></br>
-<code>redshift range 0<span style="color:red;">&lt;</span>1 are strongly excluded, [...]</code></br><br/>
-while <code>&lt;bfe_abstract escape="1"/&gt;</code> will return:<br/>
-<code>[...]We find that for spatially-flat cosmologies, background lensing</code></br>
-<code>clusters with reasonable mass-to-light ratios lying in the</code></br>
-<code>redshift range 0<span style="color:red;">&amp;lt;</span>1 are strongly excluded, [...]</code></br><br/>
-In most cases, you will
-want to set <code>escape</code> to '1', but you have to make sure that the author of the element has not already
-escaped values for you. This might be the case when the element returns some HTML.<br/>
-Please note that values given in sepcial parameters <code>prefix</code>, <code>suffix</code>, <code>default</code> and <code>nbMax</code> are never escaped, whatever the value of <code>escape</code> is.</p>
+<code>redshift range 0<span style="color:red;">&amp;lt;</span>1 are strongly excluded, [...]</code><br/><br/>
+while <code>&lt;bfe_abstract escape="0"/&gt;</code> will return:<br/>
+<code>[...]We find that for spatially-flat cosmologies, background lensing</code><br/>
+<code>clusters with reasonable mass-to-light ratios lying in the</code><br/>
+<code>redshift range 0<span style="color:red;">&lt;</span>1 are strongly excluded, [...]</code><br/><br/>
+In most cases, you will not set <code>escape</code> to 1, nor 0, but just let the developer of the
+element take care of that for you.<br/>
+Please note that values given in special parameters <code>prefix</code>, <code>suffix</code>, <code>default</code> and <code>nbMax</code> are never escaped, whatever the value of <code>escape</code> is (but other parameters will). You have to take care of that in your format template, as well as all other values that are not returned by the format elements.</p>
+<p>If you are a format elements developer, please see below.</p>
+
+<h4>Format elements:</h4>
+<p>In most cases, that is cases where your element does not return HTML output, you do not have to take
+any particular action in order to escape values that you output: the BibFormat engine will take care of escaping
+the returned value for you. In cases where you want to return text that should not be escaped (for example
+when you return HTML links), you can make the formatting engine know that it should not escape your value. This is done
+by implementing the <code>escape_values(bfo)</code> function in your element, that will return (int) 0 when escape should
+not be done (or 1 when escaping should be done):
+<pre>def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
+</pre>Note that the function is given a <code>bfo</code> object as parameter, such that you can do additional testing
+if your element should really return 1 or 0 (for very special cases).<br/>
+Also note that the behavior defined by the <code>escape_values()</code> function will be overriden by the
+<code>escape</code> parameter used in the format template if it is specified.
+</p>
+<p>If you are a format templates designer, please see above.</p>
 <a name="oldGuide"/>
 <h1>Old PHP BibFormat Aministration Guide</h1>
 <h2>Contents</h2>

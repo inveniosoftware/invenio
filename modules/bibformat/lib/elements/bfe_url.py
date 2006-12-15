@@ -35,3 +35,10 @@ def format(bfo, style, separator='; '):
         
     urls = map(lambda x: '<a '+style+'href="'+x+'">'+x+'</a>', urls_u)
     return separator.join(urls)
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

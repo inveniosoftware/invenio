@@ -44,3 +44,10 @@ def format(bfo, style):
             out += '<a href="'+weburl + '/admin/bibedit/bibeditadmin.py/index?recid=' + str(bfo.recID) +'" ' + print_style + '>Edit This Record</a>'
             
     return out
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

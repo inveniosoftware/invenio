@@ -40,3 +40,10 @@ def format(bfo, style, separator='; '):
     urls = ['<a '+style+' href="'+escape(url)+'">'+escape(url)+'</a>'
             for url in urls_u]
     return separator.join(urls)
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

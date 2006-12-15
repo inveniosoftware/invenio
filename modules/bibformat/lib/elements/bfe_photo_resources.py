@@ -40,3 +40,10 @@ def format(bfo):
     out += "<br/><font size=-2><b>© CERN Geneva</b></font>" 
     out += '<br/> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>" 
     return out
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

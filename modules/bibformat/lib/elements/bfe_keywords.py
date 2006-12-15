@@ -44,3 +44,9 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
         keywords = map(lambda x: keyword_prefix+x+keyword_suffix, keywords)
         return separator.join(keywords)
 
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

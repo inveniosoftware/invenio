@@ -58,7 +58,7 @@ CFG_BIBFORMAT_ERROR_MESSAGES = \
     'ERR_BIBFORMAT_CANNOT_WRITE_TEMPLATE_FILE'    :  'BibFormat could not write to format template %s. %s',
     'ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE'       :  'Output format %s cannot not be read. %s',
     'ERR_BIBFORMAT_CANNOT_WRITE_OUTPUT_FILE'      :  'BibFormat could not write to output format %s. %s',
-    'ERR_BIBFORMAT_EVALUATING_ELEMENT'            :  'Error when evaluating format element %s with parameters. %s',
+    'ERR_BIBFORMAT_EVALUATING_ELEMENT'            :  'Error when evaluating format element %s with parameters %s',
     'ERR_BIBFORMAT_CANNOT_READ_ELEMENT_FILE'      :  'Output format %s cannot not be read. %s',
     'ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD'     :  'Should be "tag field_number:" at line %s.',
     'ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD_TAG' :  'Invalid tag "%s" at line %s.',
@@ -81,7 +81,8 @@ CFG_BIBFORMAT_ERROR_MESSAGES = \
     'ERR_BIBFORMAT_TEMPLATE_WRONG_ELEM_ARG'       :  'Format element %s uses unknown parameter "%s" in format template %s.',
     'ERR_BIBFORMAT_IN_FORMAT_ELEMENT'             :  'Error in format element %s. %s',
     'ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN'   :  'No Record Found for %s.',
-    'ERR_BIBFORMAT_NBMAX_NOT_INT'                 :  '"nbMax" parameter for %s must be an "int".'
+    'ERR_BIBFORMAT_NBMAX_NOT_INT'                 :  '"nbMax" parameter for %s must be an "int".',
+    'ERR_BIBFORMAT_EVALUATING_ELEMENT_ESCAPE'     :  'Escape mode for format element %s could not be retrieved. Using default mode instead.'
 }
 
 CFG_BIBFORMAT_WARNING_MESSAGES = \
@@ -90,6 +91,6 @@ CFG_BIBFORMAT_WARNING_MESSAGES = \
     'WRN_BIBFORMAT_KB_MAPPING_UNKNOWN'            : 'Cannot find a mapping with key %s in knowledge base %s.',
     'WRN_BIBFORMAT_CANNOT_WRITE_IN_ETC_BIBFORMAT' : 'Cannot write in etc/bibformat dir of your Invenio installation. Check directory permission.',
     'WRN_BIBFORMAT_CANNOT_WRITE_MIGRATION_STATUS' : 'Cannot write file migration_status.txt in etc/bibformat dir of your Invenio installation. Check file permission.',
-    'WRN_BIBFORMAT_CANNOT_EXECUTE_REQUEST'        : 'You request could not be executed.'
+    'WRN_BIBFORMAT_CANNOT_EXECUTE_REQUEST'        : 'Your request could not be executed.'
 }
 

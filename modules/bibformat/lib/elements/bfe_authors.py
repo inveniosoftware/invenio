@@ -98,3 +98,9 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
     elif nb_authors > 0:
         return separator.join(authors)
 
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

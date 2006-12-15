@@ -36,3 +36,10 @@ def format(bfo):
             out += '<a href="'+weburl+'/record/'+bfo.control_field("001")+'"><img src="' + resource.get("q", "").replace(" ","") + '" alt="" /></a>'
 
     return out 
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

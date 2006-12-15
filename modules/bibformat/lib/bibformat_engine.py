@@ -416,7 +416,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     prefix = parameters.get('prefix', "")
     suffix = parameters.get('suffix', "")
     default_value = parameters.get('default', "")
-    escape = parameters.get('escape', "0")
+    escape = parameters.get('escape', "")
     
     # 3 possible cases:
     # a) format element file is found: we execute it
@@ -441,13 +441,11 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         params['bfo'] = bfo
 
         # Execute function with given parameters and return result.
-        output_text = ""
         function = format_element['code']
         
         try:
             output_text = apply(function, (), params)
         except Exception, e:
-            output_text = ""
             name = format_element['attrs']['name']
             error = ("ERR_BIBFORMAT_EVALUATING_ELEMENT", name, str(params))
             errors.append(error)
@@ -460,17 +458,49 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                                                       ln=cdslang)
                 stack = traceback.format_exception(Exception, e, tb, limit=None)
                 output_text = '<b><span style="color: rgb(255, 0, 0);">'+ \
-                              error_string[0][1] + "".join(stack) +'</span></b> '
+                              str(error_string[0][1]) + "".join(stack) +'</span></b> '
 
-
+        # None can be returned when evaluating function
         if output_text is None:
             output_text = ""
         else:
             output_text = str(output_text)
 
-        # If escape is equal to 1, then escape all
+
+        # Escaping:
+        # (1) By default, everything is escaped in mode 1
+        # (2) If evaluated element has 'escape_values()' function, use
+        #     its returned value as escape mode, and override (1)
+        # (3) If template has a defined parameter (in allowed values),
+        #     use it, and override (1) and (2)
+
+        # (1)
+        escape_mode = 1
+
+        # (2)
+        escape_function = format_element['escape_function']
+        if escape_function is not None:
+            try:
+                escape_mode = apply(escape_function, (), {'bfo': bfo})
+            except Exception, e:
+                error = ("ERR_BIBFORMAT_EVALUATING_ELEMENT_ESCAPE", name)
+                errors.append(error)
+                if verbose == 0:
+                    register_errors(errors, 'error')
+                elif verbose >=5:
+                    tb = sys.exc_info()[2]
+                    error_string = get_msgs_for_code_list(error,
+                                                          stream='error',
+                                                          ln=cdslang)
+                    output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
+                                   str(error_string[0][1]) +'</span></b> '
+        # (3)
+        if escape in ['0', '1']:
+            escape_mode = int(escape)
+
+        #If escape is equal to 1, then escape all
         # HTML reserved chars.
-        if escape == '1':
+        if escape_mode == 1:
             output_text = cgi.escape(output_text)
      
         # Add prefix and suffix if they have been given as parameters and if
@@ -495,7 +525,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         # Load special values given as parameters
         separator = parameters.get('separator ', "")
         nbMax = parameters.get('nbMax', "")
-        escape = parameters.get('escape', "0")
+        escape = parameters.get('escape', "1") # By default, escape here
         
         # Get the fields tags that have to be printed
         tags = format_element['attrs']['tags']
@@ -754,7 +784,8 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
 
     The returned structure is {'attrs': {some attributes in dict. See get_format_element_attrs_from_*} 
                                'code': the_function_code,
-                               'type':"field" or "python" depending if element is defined in file or table}
+                               'type':"field" or "python" depending if element is defined in file or table,
+                               'escape_function': the function to call to know if element output must be escaped}
 
     @param element_name the name of the format element to load
     @param verbose the level of verbosity from 0 to 9 (O: silent,
@@ -788,6 +819,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 element_name,
                 with_built_in_params),
                               'code':None,
+                              'escape_function':None,
                               'type':"field"}
             # Cache and returns
             format_elements_cache[name] = format_element
@@ -823,9 +855,10 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 module = getattr(module, comp) 
 
             function_format  = module.__dict__[module_name].format
-
+            function_escape  = getattr(module.__dict__[module_name], 'escape_values', None)
 
             format_element['code'] = function_format
+            format_element['escape_function'] = function_escape
             format_element['attrs'] = get_format_element_attrs_from_function( \
                 function_format,
                 element_name,
@@ -1006,7 +1039,7 @@ def get_format_element_attrs_from_function(function, element_name,
         # Add 'escape' parameter
         param_escape = {}
         param_escape['name'] = "escape"
-        param_escape['default'] = "0"
+        param_escape['default'] = ""
         param_escape['description'] = """If set to 1, replaces special
                                          characters '&', '<' and '>' of this
                                          element by SGML entities"""
@@ -1099,7 +1132,7 @@ def get_format_element_attrs_from_table(element_name,
         # Add 'escape' parameter
         param_escape = {}
         param_escape['name'] = "escape"
-        param_escape['default'] = "0"
+        param_escape['default'] = ""
         param_escape['description'] = """If set to 1, replaces special
                                          characters '&', '<' and '>' of this
                                          element by SGML entities"""

@@ -23,12 +23,13 @@
 
 __revision__ = "$Id$"
 
+import cgi
 from invenio import bibformat_utils
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, 
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
            highlight='no', print_lang='en,fr'):
-    """ Prints the abstract of a record. By default prints English and French versions.
+    """ Prints the abstract of a record in HTML. By default prints English and French versions.
 
     Printed languages can be chosen with the 'print_lang' parameter.
     
@@ -49,10 +50,12 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
     
     abstract_en = bfo.fields('520__a')
     abstract_en.extend(bfo.fields('520__b'))
+    abstract_en = [cgi.escape(val) for val in abstract_en]
     abstract_en = "<br/>".join(abstract_en)
     
     abstract_fr = bfo.fields('590__a')
     abstract_fr.extend(bfo.fields('590__b'))
+    abstract_fr = [cgi.escape(val) for val in abstract_fr]
     abstract_fr = "<br/>".join(abstract_fr)
 
     if contextual == 'yes' and limit != "" and \
@@ -122,3 +125,9 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
 
     return out
 
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

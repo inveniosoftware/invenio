@@ -38,3 +38,10 @@ def format(bfo, template='DC'):
     format_with_bfx(recIDs, outFile, template)
     output = outFile.getvalue()        
     return output
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

@@ -22,12 +22,15 @@
 """
 __revision__ = "$Id$"
 
+from urllib import quote
+import cgi
+
 def format(bfo):
     """
     Displays inline publication information with html link to ejournal
     (when available).
     """
-    from urllib import quote
+    
     
     out = ''
     
@@ -35,15 +38,23 @@ def format(bfo):
     if publication_info == "":
         return ""
 
-    journal = bfo.kb('ejournals', publication_info.get('p'))
+    journal_source = publication_info.get('p')
+    journal = bfo.kb('ejournals', journal_source)
     volume = publication_info.get('v')
     year = publication_info.get('y')
     number = publication_info.get('n')
     pages = publication_info.get('c')
 
     if journal != '' and volume is not None:
+        
+        journal = cgi.escape(journal)
+        volume = cgi.escape(volume)
+        year = cgi.escape(year)
+        number = cgi.escape(number)
+        pages = cgi.escape(pages)
+        
         out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
-        out += quote(publication_info.get('p'))
+        out += quote(journal_source)
         out += '&amp;volume=' + volume
         out += '&amp;year=' + year
         out += '&amp;page='
@@ -55,7 +66,7 @@ def format(bfo):
                                                                     'year': year,
                                                                     'page': pages}
     else:
-        out += publication_info.get('p') + ': '
+        out += journal_source + ': '
         if volume is not None:
             out +=  volume 
         if year is not None:
@@ -67,6 +78,12 @@ def format(bfo):
          
     return out
       
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
 
 
 

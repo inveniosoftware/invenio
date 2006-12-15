@@ -227,7 +227,7 @@ def without_fmt(sql):
 ### (see iterate_over_old further down)
 
 def iterate_over_new(list, fmt):
-    "Iterate odver list of IDs"
+    "Iterate over list of IDs"
     global options, total_rec
     
     n_it_rec       = 0          # Number of records for current iteration
@@ -301,7 +301,7 @@ def iterate_over_new(list, fmt):
     return (total_rec, tbibformat, tbibupload)
     
 def iterate_over_old(list, weburl, fmt):
-    "Iterate odver list of IDs"
+    "Iterate over list of IDs"
     global options
     
     n_rec       = 0

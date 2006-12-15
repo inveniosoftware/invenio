@@ -28,3 +28,10 @@ def format(bfo, separator='<br/>'):
     out = map(lambda x: '<a href="'+x['d']+'">'+x['p']+'</a>', publications)
 
     return separator.join(out)
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

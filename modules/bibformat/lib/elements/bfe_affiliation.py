@@ -22,6 +22,8 @@
 """
 __revision__ = "$Id$"
 
+import cgi
+
 def format(bfo):
     """
     HTML Affiliation display
@@ -30,5 +32,12 @@ def format(bfo):
     if len(affiliations) > 0:
         out =  "<br/>"
         for affiliation in affiliations:
-            out += affiliation +"       " 
+            out += cgi.escape(affiliation) +"       " 
         return out
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
