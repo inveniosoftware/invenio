@@ -142,7 +142,7 @@ def create_record(xmltext,
                                 
     @param xmltext an XML string representation of the record to create
     @param verbose the level of verbosity: 0(silent) 1-2 (warnings) 3(strict:stop when errors)
-    @param correct 1 to enable correction on XML. Else 0.
+    @param correct 1 to enable correction of xmltext syntax. Else 0.
     @return a tuple (record, status_code, list_of_errors), where status_code is 0 where there are errors, 1 when no errors
     """
     global parser
@@ -192,6 +192,9 @@ def record_get_field_instances(rec, tag="", ind1="", ind2=""):
     @return a list of field tuples (Subfields, ind1, ind2, value) where subfields is list of (code, value)
     """
     out = []
+
+    (ind1, ind2) = wash_indicators(ind1, ind2)
+    
     if tag:
         if '%' in tag:
             #Wildcard in tag. Check all possible
@@ -242,7 +245,8 @@ def record_add_field(rec, tag, ind1="", ind2="",
        
     Return the field number of newly created field.
     """
-
+    (ind1, ind2) = wash_indicators(ind1, ind2)
+        
     # detect field number to be used for insertion:
     existing_field_numbers = [len(fi)==5 and fi[4] or 0 for fis in rec.values() for fi in fis]
     if desired_field_number == -1 or desired_field_number in existing_field_numbers:
@@ -273,6 +277,8 @@ def record_delete_field(rec, tag, ind1="", ind2=""):
     delete all fields defined with marc tag 'tag' and indicators 'ind1' and 'ind2'
     from record 'rec'
     """
+    (ind1, ind2) = wash_indicators(ind1, ind2)
+    
     newlist = []
     if rec.has_key(tag):
         for field in rec[tag]:
@@ -352,6 +358,8 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
     """
     ## Note: the code is quite redundant for speed reasons (avoid calling
     ## functions or doing tests inside loops)
+
+    (ind1, ind2) = wash_indicators(ind1, ind2)
     
     if '%' in tag:
         #Wild card in tag. Must find all corresponding fields
@@ -438,7 +446,9 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
     @return a list of strings
     """
     tmp = []
-    
+  
+    (ind1, ind2) = wash_indicators(ind1, ind2)
+
     if '%' in tag:
         # Wild card in tag. Must find all corresponding tags and fields
         keys = rec.keys()
@@ -659,7 +669,7 @@ def create_record_RXP(xmltext,
             st = "" # the type of value is not correct. (user insert something like a list...)
         
 
-        field = ([], "", "", st, ord) #field = (subfields, ind1, ind2,value,ord)
+        field = ([], " ", " ", st, ord) #field = (subfields, ind1, ind2,value,ord)
 
         if record.has_key(s):
             record[s].append(field)
@@ -696,11 +706,15 @@ def create_record_RXP(xmltext,
 
         if datafield[ATTRS].has_key('ind1'):
             ind1 = datafield[ATTRS]["ind1"]
+            (ind1, x) = wash_indicators(ind1, '')
+                
         else:
             ind1 = '!'
 
         if datafield[ATTRS].has_key('ind2'):
             ind2 = datafield[ATTRS]["ind2"]
+            (x, ind2) = wash_indicators(ind1, '')
+    
         else:
             ind2 = '!'
         
@@ -751,7 +765,7 @@ def create_record_minidom(xmltext,
             if verbose:
                 err.append((7, 'Type found: ' + name))
   
-            field = ([], "", "", "", ord)# the type of value is not correct. (user insert something like a list...)
+            field = ([], " ", " ", "", ord)# the type of value is not correct. (user insert something like a list...)
 
         if record.has_key(s):
             record[s].append(field)
@@ -776,9 +790,11 @@ def create_record_minidom(xmltext,
             s = '!'
             
         ind1 = datafield.getAttribute("ind1").encode("utf-8")
-        
+        if ind1 == '':
+            ind1 = ' '
         ind2 = datafield.getAttribute("ind2").encode("utf-8")         
-        
+        if ind2 == '':
+            ind2 = ' '
         if record.has_key(s):
             record[s].append((subfields, ind1, ind2, "", ord))
         else:
@@ -818,14 +834,14 @@ def create_record_4suite(xmltext,
 
         name = type(v).__name__
         if (name in ["int", "long"]) :
-            field = ([], "", "", str(v), ord) # field = (subfields, ind1, ind2,value)
+            field = ([], " ", " ", str(v), ord) # field = (subfields, ind1, ind2,value)
         elif name in ['str', 'unicode']:
-            field = ([], "", "", v, ord)
+            field = ([], " ", " ", v, ord)
         else:
             if verbose:
                 err.append((7, 'Type found: ' + name))
 
-            field = ([], "", "", "", ord)# the type of value is not correct. (user insert something like a list...)
+            field = ([], " ", " ", "", ord)# the type of value is not correct. (user insert something like a list...)
         
 
         if record.has_key(s):
@@ -852,9 +868,9 @@ def create_record_4suite(xmltext,
             s = '!'
             
         ind1 = datafield.getAttributeNS(None, "ind1").encode("utf-8")
-        
         ind2 = datafield.getAttributeNS(None, "ind2").encode("utf-8")
-                     
+        (ind1, ind2) = wash_indicators(ind1, ind2)
+        
         if record.has_key(s):
             record[s].append((subfields, ind1, ind2, "", ord))
         else:
@@ -964,6 +980,21 @@ def print_errors(alist):
     for l in alist:
         text = '%s\n%s'% (text, l)
     return text
+
+def wash_indicators(ind1, ind2):
+    """
+    Wash the values of the indicators.
+    
+    @return a tuple (whashed_ind_1, washed_ind_2)
+    """
+    
+    if ind1 == '' or ind1 == '_':
+        ind1 = ' '
+    
+    if ind2 == '' or ind2 == '_':
+        ind2 = ' '
+
+    return (ind1, ind2)
 
 def wash(xmltext, parser=2):
     """
