@@ -94,51 +94,51 @@ class BibUploadInsertModeTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """Initialise the MARCXML variable"""
         self.test = """<record>
-        <datafield tag ="245" ind1="" ind2="">
+        <datafield tag ="245" ind1=" " ind2=" ">
         <subfield code="a">something</subfield>
         </datafield>
-        <datafield tag ="700" ind1="" ind2="">
+        <datafield tag ="700" ind1=" " ind2=" ">
         <subfield code="a">Tester, J Y</subfield>
         <subfield code="u">MIT</subfield>
         </datafield>
-        <datafield tag ="700" ind1="" ind2="">
+        <datafield tag ="700" ind1=" " ind2=" ">
         <subfield code="a">Tester, K J</subfield>
         <subfield code="u">CERN2</subfield>
         </datafield>
-        <datafield tag ="700" ind1="" ind2="">
+        <datafield tag ="700" ind1=" " ind2=" ">
         <subfield code="a">Tester, G</subfield>
         <subfield code="u">CERN3</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="a">test11</subfield>
         <subfield code="c">test31</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="a">test12</subfield>
         <subfield code="c">test32</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="a">test13</subfield>
         <subfield code="c">test33</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="b">test21</subfield>
         <subfield code="d">test41</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="b">test22</subfield>
         <subfield code="d">test42</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="a">test14</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="e">test51</subfield>
         </datafield>
-        <datafield tag ="111" ind1="" ind2="">
+        <datafield tag ="111" ind1=" " ind2=" ">
         <subfield code="e">test52</subfield>
         </datafield>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
@@ -199,23 +199,23 @@ class BibUploadAppendModeTest(unittest.TestCase):
         """Initialize the MARCXML variable"""
         self.test_controfield001 = """<record>
         <controlfield tag ="001">002</controlfield>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
         </record>"""
         self.test_append = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
         </record>"""
         self.test_append_expected_xm = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
@@ -288,13 +288,13 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_correct = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
         </record>"""
         self.test_correct_expected_xm = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Test, T</subfield>
         <subfield code="u">TEST</subfield>
         </datafield>
@@ -335,13 +335,13 @@ class BibUploadReplaceModeTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_replace = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
         </record>"""
         self.test_replace_expected_xm = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Test, T</subfield>
         <subfield code="u">TEST</subfield>
         </datafield>
@@ -381,7 +381,7 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """Initialize the MARCXML variable"""
         self.test_insert = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
@@ -393,7 +393,7 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         </datafield>
         </record>"""
         self.test_reference_expected_xm = """<record>
-        <datafield tag ="100" ind1="" ind2="">
+        <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
@@ -440,15 +440,15 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.new_xm_with_fmt = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Test. Okay.</subfield>
          </datafield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux</subfield>
          </datafield>
         </record>
@@ -456,17 +456,17 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.expected_xm_after_inserting_new_xm_with_fmt = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux</subfield>
          </datafield>
         </record>
         """
         self.expected_hm_after_inserting_new_xm_with_fmt = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux
         """
@@ -476,15 +476,15 @@ class BibUploadFMTModeTest(unittest.TestCase):
         <record>
          <controlfield tag="001">3</controlfield>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Test. Here is some format value.</subfield>
          </datafield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Doe, John</subfield>
           <subfield code="u">CERN</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the foos and bars</subfield>
          </datafield>
         </record>
@@ -492,7 +492,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.recid3_xm_with_fmt_only_first = """
         <record>
          <controlfield tag="001">3</controlfield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Test. Let us see if this gets inserted well.</subfield>
          </datafield>
@@ -501,11 +501,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.recid3_xm_with_fmt_only_second = """
         <record>
          <controlfield tag="001">3</controlfield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Test. Yet another test, to be run after the first one.</subfield>
          </datafield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HD</subfield>
           <subfield code="g">Test. Let's see what will be stored in the detailed format field.</subfield>
          </datafield>
@@ -642,11 +642,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            <record>
                                            <controlfield tag="001">3</controlfield>
                                            <controlfield tag="003">SzGeCERN</controlfield>
-                                           <datafield tag="100" ind1="" ind2="">
+                                           <datafield tag="100" ind1=" " ind2=" ">
                                            <subfield code="a">Doe, John</subfield>
                                            <subfield code="u">CERN</subfield>
                                            </datafield>
-                                           <datafield tag="245" ind1="" ind2="">
+                                           <datafield tag="245" ind1=" " ind2=" ">
                                            <subfield code="a">On the foos and bars</subfield>
                                            </datafield>
                                            </record>
@@ -654,7 +654,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            0))
         self.failUnless(compare_hmbuffers(hm_after, """
                                            001__ 3
-                                           003__ $$_SzGeCERN
+                                           003__ SzGeCERN
                                            100__ $$aDoe, John$$uCERN
                                            245__ $$aOn the foos and bars
                                            """,
@@ -677,11 +677,11 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.xm_testrec1 = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 1</subfield>
          </datafield>
          <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
@@ -693,13 +693,13 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         </record>
         """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
                'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or " ",
                'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or " ",
                'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
                }
         self.hm_testrec1 = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1
         %(sysnotag)s%(sysnoind1)s%(sysnoind2)s $$%(sysnosubfieldcode)ssysno1
@@ -712,11 +712,11 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.xm_testrec1_updated = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 1 Updated</subfield>
          </datafield>
          <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
@@ -728,13 +728,13 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         </record>
         """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
                'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or " ",
                'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or " ",
                'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
                }
         self.hm_testrec1_updated = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1 Updated
         %(sysnotag)s%(sysnoind1)s%(sysnoind2)s $$%(sysnosubfieldcode)ssysno1
@@ -747,11 +747,11 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.xm_testrec2 = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 2</subfield>
          </datafield>
          <datafield tag="%(sysnotag)s" ind1="%(sysnoind1)s" ind2="%(sysnoind2)s">
@@ -763,13 +763,13 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         </record>
         """ % {'sysnotag': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
                'sysnoind1': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or " ",
                'sysnoind2': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
-                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
+                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or " ",
                'sysnosubfieldcode': CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6],
                }
         self.hm_testrec2 = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 2
         %(sysnotag)s%(sysnoind1)s%(sysnoind2)s $$%(sysnosubfieldcode)ssysno2
@@ -891,11 +891,11 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.xm_testrec1 = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 1</subfield>
          </datafield>
          <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
@@ -907,13 +907,13 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         </record>
         """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
                'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
-                          CFG_OAI_ID_FIELD[3:4] or "",
+                          CFG_OAI_ID_FIELD[3:4] or " ",
                'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
-                          CFG_OAI_ID_FIELD[4:5] or "",
+                          CFG_OAI_ID_FIELD[4:5] or " ",
                'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
                }
         self.hm_testrec1 = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1
         %(oaitag)s%(oaiind1)s%(oaiind2)s $$%(oaisubfieldcode)soai:foo:1
@@ -926,11 +926,11 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.xm_testrec1_updated = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 1 Updated</subfield>
          </datafield>
          <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
@@ -942,13 +942,13 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         </record>
         """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
                'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
-                          CFG_OAI_ID_FIELD[3:4] or "",
+                          CFG_OAI_ID_FIELD[3:4] or " ",
                'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
-                          CFG_OAI_ID_FIELD[4:5] or "",
+                          CFG_OAI_ID_FIELD[4:5] or " ",
                'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
                }
         self.hm_testrec1_updated = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1 Updated
         %(oaitag)s%(oaiind1)s%(oaiind2)s $$%(oaisubfieldcode)soai:foo:1
@@ -961,11 +961,11 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.xm_testrec2 = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1="" ind2="">
+         <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
           <subfield code="u">Foo</subfield>
          </datafield>
-         <datafield tag="245" ind1="" ind2="">
+         <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">On the quux and huux 2</subfield>
          </datafield>
          <datafield tag="%(oaitag)s" ind1="%(oaiind1)s" ind2="%(oaiind2)s">
@@ -977,13 +977,13 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         </record>
         """ % {'oaitag': CFG_OAI_ID_FIELD[0:3],
                'oaiind1': CFG_OAI_ID_FIELD[3:4] != "_" and \
-                          CFG_OAI_ID_FIELD[3:4] or "",
+                          CFG_OAI_ID_FIELD[3:4] or " ",
                'oaiind2': CFG_OAI_ID_FIELD[4:5] != "_" and \
-                          CFG_OAI_ID_FIELD[4:5] or "",
+                          CFG_OAI_ID_FIELD[4:5] or " ",
                'oaisubfieldcode': CFG_OAI_ID_FIELD[5:6],
                }
         self.hm_testrec2 = """
-        003__ $$_SzGeCERN
+        003__ SzGeCERN
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 2
         %(oaitag)s%(oaiind1)s%(oaiind2)s $$%(oaisubfieldcode)soai:foo:2
@@ -1080,6 +1080,66 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
 
+class BibUploadIndicatorsTest(unittest.TestCase):
+    """
+    Testing uploading of a MARCXML record with indicators having
+    either blank space (as per MARC schema) or empty string value (old
+    behaviour).
+    """
+    
+    def setUp(self):
+        """Initialize the MARCXML test record."""
+        self.testrec1_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec1_hm = """
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        """
+        self.testrec2_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec2_hm = """
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        """
+
+    def test_record_with_spaces_in_indicators(self):
+        """bibupload - inserting MARCXML with spaces in indicators"""
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm)
+        err, recid = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec1_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec1_hm))
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_record_with_no_spaces_in_indicators(self):
+        """bibupload - inserting MARCXML with no spaces in indicators"""
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
+        recs = bibupload.xml_marc_to_records(self.testrec2_xm)
+        err, recid = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec2_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec2_hm))
+        bibupload.wipe_out_record_from_all_tables(recid)
+
 # FIXME: "strong tags" tests wanted
 
 # FIXME: FFT tests wanted
@@ -1091,7 +1151,10 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadReferencesModeTest,
                              BibUploadRecordsWithSYSNOTest,
                              BibUploadRecordsWithOAIIDTest,                             
-                             BibUploadFMTModeTest)
+                             BibUploadFMTModeTest,
+                             BibUploadIndicatorsTest)
+
+#test_suite = make_test_suite(BibUploadRecordsWithSYSNOTest,)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
