@@ -187,7 +187,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
         return out
 
     #_ = gettext_set_language(ln)
-
+    
     out = ""
 
     # sanity check:
@@ -226,7 +226,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
                 if oai_ids:
                     out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
                            (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
-                out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
+                out += "<datafield tag=\"980\" ind1=\" \" ind2=\" \"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
                 for digit1 in range(0, 10):
                     for digit2 in range(0, 10):
@@ -241,10 +241,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
                         for row in res:
                             field, value, field_number = row[0], row[1], row[2]
                             ind1, ind2 = field[3], field[4]
-                            if ind1 == "_":
-                                ind1 = ""
-                            if ind2 == "_":
-                                ind2 = ""
+                            if ind1 == "_" or ind1 == "":
+                                ind1 = " "
+                            if ind2 == "_" or ind2 == "":
+                                ind2 = " "
                             # print field tag
                             if field_number != field_number_old or field[:-1] != field_old[:-1]:
                                 if format.startswith("xm") or format == "marcxml":
@@ -320,11 +320,13 @@ def encode_for_xml(s):
 
 def parse_tag(tag):
     """
-    Parse a marc code and decompose it in a table with: 0-tag 1-indicator1 2-indicator2 3-subfield
+    Parse a marc code and decompose it in a table with:
+    0-tag 1-indicator1 2-indicator2 3-subfield
 
     The first 3 chars always correspond to tag.
     The indicators are optional. However they must both be indicated, or both ommitted.
     If indicators are ommitted or indicated with underscore '_', they mean "No indicator".
+    "No indicator" is also equivalent indicator marked as whitespace.
     The subfield is optional. It can optionally be preceded by a dot '.' or '$$' or '$'
 
     Any of the chars can be replaced by wildcard %
@@ -360,7 +362,7 @@ def parse_tag(tag):
     >> parse_tag('2%5$$a') = ['2%5', '', '', 'a']
     """
 
-    p_tag =  ['', '', '', '']
+    p_tag =  ['', '', '', ''] # tag, ind1, ind2, code
     tag = tag.replace(" ", "") # Remove empty characters
     tag = tag.replace("$", "") # Remove $ characters
     tag = tag.replace(".", "") # Remove . characters
