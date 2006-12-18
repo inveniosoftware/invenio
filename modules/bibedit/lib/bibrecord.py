@@ -706,18 +706,15 @@ def create_record_RXP(xmltext,
 
         if datafield[ATTRS].has_key('ind1'):
             ind1 = datafield[ATTRS]["ind1"]
-            (ind1, x) = wash_indicators(ind1, '')
-                
         else:
             ind1 = '!'
 
         if datafield[ATTRS].has_key('ind2'):
             ind2 = datafield[ATTRS]["ind2"]
-            (x, ind2) = wash_indicators(ind1, '')
-    
         else:
             ind2 = '!'
         
+        (ind1, ind2) = wash_indicators(ind1, ind2)
         field = (subfields, ind1, ind2, "", ord)
             
         if record.has_key(s):
@@ -790,11 +787,9 @@ def create_record_minidom(xmltext,
             s = '!'
             
         ind1 = datafield.getAttribute("ind1").encode("utf-8")
-        if ind1 == '':
-            ind1 = ' '
         ind2 = datafield.getAttribute("ind2").encode("utf-8")         
-        if ind2 == '':
-            ind2 = ' '
+        (ind1, ind2) = wash_indicators(ind1, ind2)
+        
         if record.has_key(s):
             record[s].append((subfields, ind1, ind2, "", ord))
         else:
@@ -983,9 +978,10 @@ def print_errors(alist):
 
 def wash_indicators(ind1, ind2):
     """
-    Wash the values of the indicators.
+    Wash the values of the indicators.  An empty string or an
+    underscore is replaced by a blank space.
     
-    @return a tuple (whashed_ind_1, washed_ind_2)
+    @return a tuple (ind1_washed, ind2_washed)
     """
     
     if ind1 == '' or ind1 == '_':
@@ -1068,13 +1064,13 @@ def wash(xmltext, parser=2):
                     
             if field[1] == '!':
                 errors.append((4,'(field number: ' + field[4].__str__() + ')'))
-                ind1 = ""
+                ind1 = " "
             else:
                 ind1 = field[1]
 
             if field[2] == '!':
                 errors.append((5,'(field number: ' + field[4].__str__() + ')'))
-                ind2 = ""
+                ind2 = " "
             else:
                 ind2 = field[2]
                 
