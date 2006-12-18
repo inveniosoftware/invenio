@@ -2037,7 +2037,10 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
                     field_number_old = field_number
                     field_old = field
                 # print subfield value
-                out += "$$%s%s" % (field[-1:], value)
+                if field[0:2] == "00" and field[-1:] == "_":
+                    out += value
+                else:
+                    out += "$$%s%s" % (field[-1:], value)
     return out
 
 def record_exists(recID):
