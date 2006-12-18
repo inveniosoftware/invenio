@@ -103,13 +103,13 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         xml_error1 = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe, John</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="">
+        <datafield tag="245" ind1=" " ind2=" ">
         <subfield cde="a">On the foo and bar</subfield>
         </datafield>
         </record>
@@ -128,13 +128,13 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         xml_error2 = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield ind1="" ind2="">
+        <datafield ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe, John</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="">
+        <datafield tag="245" ind1=" " ind2=" ">
         <subfield code="a">On the foo and bar</subfield>
         </datafield>
         </record>
@@ -153,12 +153,12 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         xml_error3 = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe, John</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="">
+        <datafield tag="245" ind1=" " ind2=" ">
 	<subfield code="a">On the foo and bar</subfield>
         </datafield>
         </record>
@@ -177,13 +177,13 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         xml_error4 = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe, John</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="">
+        <datafield tag="245" ind1=" " ind2=" ">
         <subfield code="a">On the foo and bar</subfield>
         </record>
         """
@@ -203,20 +203,20 @@ class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
         """Initialize stuff"""
         self.xml_example_record = """<record>
   <controlfield tag="001">33</controlfield>
-  <datafield tag="041" ind1="" ind2="">
+  <datafield tag="041" ind1=" " ind2=" ">
     <subfield code="a">eng</subfield>
  </datafield>
-  <datafield tag="100" ind1="" ind2="">
+  <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Döè1, John</subfield>
  </datafield>
-  <datafield tag="100" ind1="" ind2="">
+  <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Doe2, J>ohn</subfield>
     <subfield code="b">editor</subfield>
  </datafield>
-  <datafield tag="245" ind1="" ind2="1">
+  <datafield tag="245" ind1=" " ind2="1">
     <subfield code="a">Пушкин</subfield>
  </datafield>
-  <datafield tag="245" ind1="" ind2="2">
+  <datafield tag="245" ind1=" " ind2="2">
     <subfield code="a">On the foo and bar2</subfield>
  </datafield>
 </record>"""
@@ -226,10 +226,10 @@ class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
         """bibrecord - accented Unicode letters"""
         self.assertEqual(self.xml_example_record,
                          bibrecord.record_xml_output(self.rec))
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
-                         [([('a', 'Döè1, John')], '', '', '', 3), ([('a', 'Doe2, J>ohn'), ('b', 'editor')], '', '', '', 4)])
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", "", "1"),
-                         [([('a', 'Пушкин')], '', '1', '', 5)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", " ", " "),
+                         [([('a', 'Döè1, John')], " ", " ", "", 3), ([('a', 'Doe2, J>ohn'), ('b', 'editor')], " ", " ", "", 4)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", " ", "1"),
+                         [([('a', 'Пушкин')], " ", '1', "", 5)])
 
 class BibRecordGettingFieldValuesTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values """
@@ -240,20 +240,20 @@ class BibRecordGettingFieldValuesTest(unittest.TestCase):
         xml_example_record = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe1, John</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe2, John</subfield>
         <subfield code="b">editor</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="1">
+        <datafield tag="245" ind1=" " ind2="1">
         <subfield code="a">On the foo and bar1</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="2">
+        <datafield tag="245" ind1=" " ind2="2">
         <subfield code="a">On the foo and bar2</subfield>
         </datafield>
         </record>
@@ -262,28 +262,28 @@ class BibRecordGettingFieldValuesTest(unittest.TestCase):
 
     def test_get_field_instances(self):
         """bibrecord - getting field instances"""
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
-                         [([('a', 'Doe1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)])
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "", "", ""),
-                        [('245', [([('a', 'On the foo and bar1')], '', '1', '', 5), ([('a', 'On the foo and bar2')], '', '2', '', 6)]), ('001', [([], '', '', '33', 1)]), ('100', [([('a', 'Doe1, John')], '', '', '', 3), ([('a', 'Doe2, John'), ('b', 'editor')], '', '', '', 4)]), ('041', [([('a', 'eng')], '', '', '', 2)])]) 
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", " ", " "),
+                         [([('a', 'Doe1, John')], " ", " ", "", 3), ([('a', 'Doe2, John'), ('b', 'editor')], " ", " ", "", 4)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "", " ", " "),
+                        [('245', [([('a', 'On the foo and bar1')], " ", '1', "", 5), ([('a', 'On the foo and bar2')], " ", '2', "", 6)]), ('001', [([], " ", " ", '33', 1)]), ('100', [([('a', 'Doe1, John')], " ", " ", "", 3), ([('a', 'Doe2, John'), ('b', 'editor')], " ", " ", "", 4)]), ('041', [([('a', 'eng')], " ", " ", "", 2)])]) 
 
     def test_get_field_values(self):
         """bibrecord - getting field values"""
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "a"),
                          ['Doe1, John', 'Doe2, John'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
                          ['editor'])
 
     def test_get_field_value(self):
         """bibrecord - getting first field value"""
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", "a"),
                          'Doe1, John')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", "b"),
                          'editor')
 
     def test_get_subfield_values(self):
         """bibrecord - getting subfield values"""
-        fi1, fi2 = bibrecord.record_get_field_instances(self.rec, "100", "", "")
+        fi1, fi2 = bibrecord.record_get_field_instances(self.rec, "100", " ", " ")
         self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
         self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
 
@@ -302,20 +302,20 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
         <datafield tag="555" ind1="A" ind2="B">
         <subfield code="a">val2</subfield>
         </datafield>
-        <datafield tag="555" ind1="A" ind2="">
+        <datafield tag="555" ind1="A" ind2=" ">
         <subfield code="a">val3</subfield>
         </datafield>
-        <datafield tag="555" ind1="" ind2="">
+        <datafield tag="555" ind1=" " ind2=" ">
         <subfield code="a">val4a</subfield>
         <subfield code="b">val4b</subfield>
         </datafield>
-        <datafield tag="555" ind1="" ind2="B">
+        <datafield tag="555" ind1=" " ind2="B">
         <subfield code="a">val5</subfield>
         </datafield>
         <datafield tag="556" ind1="A" ind2="C">
         <subfield code="a">val6</subfield>
         </datafield>
-        <datafield tag="556" ind1="A" ind2="">
+        <datafield tag="556" ind1="A" ind2=" ">
         <subfield code="a">val7a</subfield>
         <subfield code="b">val7b</subfield>
         </datafield>
@@ -325,40 +325,40 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
 
     def test_get_field_instances_via_wildcard(self):
         """bibrecord - getting field instances via wildcards"""
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "", ""),
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", " ", " "),
                          [])
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "%", ""),
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "%", " "),
                          [])
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", "%", "%"),
-                         [([('a', 'val1')], 'C', '5', '', 2)])
+                         [([('a', 'val1')], 'C', '5', "", 2)])
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "55%", "A", "%"),
-                         [([('a', 'val2')], 'A', 'B', '', 3),
-                          ([('a', 'val3')], 'A', '', '', 4),
-                          ([('a', 'val6')], 'A', 'C', '', 7),
-                          ([('a', 'val7a'), ('b', 'val7b')], 'A', '', '', 8)])
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "55%", "A", ""),
-                         [([('a', 'val3')], 'A', '', '', 4),
-                          ([('a', 'val7a'), ('b', 'val7b')], 'A', '', '', 8)])
-        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "556", "A", ""),
-                         [([('a', 'val7a'), ('b', 'val7b')], 'A', '', '', 8)])
+                         [([('a', 'val2')], 'A', 'B', "", 3),
+                          ([('a', 'val3')], 'A', " ", "", 4),
+                          ([('a', 'val6')], 'A', 'C', "", 7),
+                          ([('a', 'val7a'), ('b', 'val7b')], 'A', " ", "", 8)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "55%", "A", " "),
+                         [([('a', 'val3')], 'A', " ", "", 4),
+                          ([('a', 'val7a'), ('b', 'val7b')], 'A', " ", "", 8)])
+        self.assertEqual(bibrecord.record_get_field_instances(self.rec, "556", "A", " "),
+                         [([('a', 'val7a'), ('b', 'val7b')], 'A', " ", "", 8)])
 
     def test_get_field_values_via_wildcard(self):
         """bibrecord - getting field values via wildcards"""
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", " "),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", " ", " "),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "%", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", "%", " "),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", " "),
                          [])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", "z"),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "%"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "a"),
                         [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", " ", "a"),
                          [])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "%", "%", "a"),
                          ['val1'])
@@ -366,48 +366,48 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
                          ['val1'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "%", "a"),
                          ['val2', 'val3', 'val6', 'val7a'])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", " ", "a"),
                          ['val3', 'val7a'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "A", " ", "a"),
                          ['val7a'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", " ", " ", " "),
                          [])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", "z"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", " ", " ", "z"),
                          [])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", "", "", "%"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "555", " ", " ", "%"),
                          ['val4a', 'val4b'])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", " ", " ", "b"),
                          ['val4b'])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "b"),
                          ['val4b', 'val7b'])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", " ", "b"),
                          ['val7b'])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "%", "b"),
                          ['val7b'])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", " ", "a"),
                          ['val3', 'val7a'])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "A", "%", "a"),
                          ['val2', 'val3', 'val6', 'val7a'])                           
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "a"),
                          ['val2', 'val3', 'val4a', 'val5', 'val6', 'val7a'])                           
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", " ", " ", "a"),
                          ['val4a'])                           
 
     def test_get_field_value_via_wildcard(self):
         """bibrecord - getting first field value via wildcards"""
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", " "),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", "", ""),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", " ", " "),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "%", ""),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", "%", " "),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", "%", ""),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", "%", " "),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "", "%"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", "%"),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", "a"),
                          '')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", " ", "a"),
                          '')
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", "%", "%", "a"),
                          'val1')
@@ -415,29 +415,29 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
                          'val1')
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "%", "a"),
                          'val2')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", " ", "a"),
                          'val3')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "556", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "556", "A", " ", "a"),
                          'val7a')
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "555", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "555", " ", " ", " "),
                          '')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "555", "", "", "%"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "555", " ", " ", "%"),
                          'val4a')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", " ", " ", "b"),
                          'val4b')                           
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "%", "%", "b"),
                          'val4b')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", " ", "b"),
                          'val7b')                           
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "%", "b"),
                          'val7b')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", " ", "a"),
                          'val3')                           
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "A", "%", "a"),
                          'val2')                           
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "%", "%", "a"),
                          'val2')                           
-        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", " ", " ", "a"),
                          'val4a')                           
 
 class BibRecordAddFieldTest(unittest.TestCase):
@@ -449,20 +449,20 @@ class BibRecordAddFieldTest(unittest.TestCase):
         xml_example_record = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe1, John</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe2, John</subfield>
         <subfield code="b">editor</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="1">
+        <datafield tag="245" ind1=" " ind2="1">
         <subfield code="a">On the foo and bar1</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="2">
+        <datafield tag="245" ind1=" " ind2="2">
         <subfield code="a">On the foo and bar2</subfield>
         </datafield>
         </record>
@@ -471,40 +471,40 @@ class BibRecordAddFieldTest(unittest.TestCase):
 
     def test_add_controlfield(self):
         """bibrecord - adding controlfield"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "003", "", "", "SzGeCERN")
-        field_number_2 = bibrecord.record_add_field(self.rec, "004", "", "", "Test")
+        field_number_1 = bibrecord.record_add_field(self.rec, "003", " ", " ", "SzGeCERN")
+        field_number_2 = bibrecord.record_add_field(self.rec, "004", " ", " ", "Test")
         self.assertEqual(field_number_1, 7)
         self.assertEqual(field_number_2, 8)
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "003", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "003", " ", " ", ""),
                          ['SzGeCERN'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "004", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "004", " ", " ", ""),
                          ['Test'])
 
     def test_add_datafield(self):
         """bibrecord - adding datafield"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+        field_number_1 = bibrecord.record_add_field(self.rec, "100", " ", " ", "",
                                                     [('a', 'Doe3, John')])
-        field_number_2 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+        field_number_2 = bibrecord.record_add_field(self.rec, "100", " ", " ", "",
                                                     [('a', 'Doe4, John'), ('b', 'editor')])
         self.assertEqual(field_number_1, 7)
         self.assertEqual(field_number_2, 8)
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "a"),
                          ['Doe1, John', 'Doe2, John', 'Doe3, John', 'Doe4, John'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
                          ['editor', 'editor'])
 
     def test_add_controlfield_on_desired_position(self):
         """bibrecord - adding controlfield on desired position"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "005", "", "", "Foo", [], 0)
-        field_number_2 = bibrecord.record_add_field(self.rec, "006", "", "", "Bar", [], 0)
+        field_number_1 = bibrecord.record_add_field(self.rec, "005", " ", " ", "Foo", [], 0)
+        field_number_2 = bibrecord.record_add_field(self.rec, "006", " ", " ", "Bar", [], 0)
         self.assertEqual(field_number_1, 0)
         self.assertEqual(field_number_2, 7)
 
     def test_add_datafield_on_desired_position(self):
         """bibrecord - adding datafield on desired position"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+        field_number_1 = bibrecord.record_add_field(self.rec, "100", " ", " ", " ",
                                                     [('a', 'Doe3, John')], 0)
-        field_number_2 = bibrecord.record_add_field(self.rec, "100", "", "", "",
+        field_number_2 = bibrecord.record_add_field(self.rec, "100", " ", " ", " ",
                                                     [('a', 'Doe4, John'), ('b', 'editor')], 0)
         self.assertEqual(field_number_1, 0)
         self.assertEqual(field_number_2, 7)
@@ -518,20 +518,20 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
         xml_example_record = """
         <record>
         <controlfield tag="001">33</controlfield>
-        <datafield tag="041" ind1="" ind2="">
+        <datafield tag="041" ind1=" " ind2=" ">
         <subfield code="a">eng</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe1, John</subfield>
         </datafield>
-        <datafield tag="100" ind1="" ind2="">
+        <datafield tag="100" ind1=" " ind2=" ">
         <subfield code="a">Doe2, John</subfield>
         <subfield code="b">editor</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="1">
+        <datafield tag="245" ind1=" " ind2="1">
         <subfield code="a">On the foo and bar1</subfield>
         </datafield>
-        <datafield tag="245" ind1="" ind2="2">
+        <datafield tag="245" ind1=" " ind2="2">
         <subfield code="a">On the foo and bar2</subfield>
         </datafield>
         </record>
@@ -546,44 +546,44 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
 
     def test_delete_controlfield(self):
         """bibrecord - deleting controlfield"""
-        bibrecord.record_delete_field(self.rec, "001", "", "")
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", "", "", ""),
+        bibrecord.record_delete_field(self.rec, "001", " ", " ")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", " ", " ", " "),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
                          ['editor'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "2", "a"),
                          ['On the foo and bar2'])
 
     def test_delete_datafield(self):
         """bibrecord - deleting datafield"""
-        bibrecord.record_delete_field(self.rec, "100", "", "")
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", "", "", ""),
+        bibrecord.record_delete_field(self.rec, "100", " ", " ")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001", " ", " ", ""),
                          ['33'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", "", "", "b"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
                          [])
-        bibrecord.record_delete_field(self.rec, "245", "", "")
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "1", "a"),
+        bibrecord.record_delete_field(self.rec, "245", " ", " ")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "a"),
                          ['On the foo and bar1'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "2", "a"),
                          ['On the foo and bar2'])
-        bibrecord.record_delete_field(self.rec, "245", "", "2")
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "1", "a"),
+        bibrecord.record_delete_field(self.rec, "245", " ", "2")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "a"),
                          ['On the foo and bar1'])
-        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", "", "2", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "2", "a"),
                          [])
 
     def test_add_delete_add_field_to_empty_record(self):
         """bibrecord - adding, deleting, and adding back a field to an empty record"""
-        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", "", "", "SzGeCERN")
+        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", " ", " ", "SzGeCERN")
         self.assertEqual(field_number_1, 1)
-        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN'])        
-        bibrecord.record_delete_field(self.rec_empty, "003", "", "")
-        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+        bibrecord.record_delete_field(self.rec_empty, "003", " ", " ")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          [])        
-        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", "", "", "SzGeCERN2")        
+        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", " ", " ", "SzGeCERN2")        
         self.assertEqual(field_number_1, 1)
-        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", "", "", ""),
+        self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN2'])        
 
 class BibRecordSpecialTagParsingTest(unittest.TestCase):
@@ -595,10 +595,10 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         self.xml_example_record_with_fmt = """
         <record>
          <controlfield tag="001">33</controlfield>
-         <datafield tag="041" ind1="" ind2="">
+         <datafield tag="041" ind1=" " ind2=" ">
           <subfield code="a">eng</subfield>
          </datafield>
-         <datafield tag="FMT" ind1="" ind2="">
+         <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Let us see if this gets inserted well.</subfield>
          </datafield>
@@ -607,10 +607,10 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         self.xml_example_record_with_fft = """
         <record>
          <controlfield tag="001">33</controlfield>
-         <datafield tag="041" ind1="" ind2="">
+         <datafield tag="041" ind1=" " ind2=" ">
           <subfield code="a">eng</subfield>
          </datafield>
-         <datafield tag="FFT" ind1="" ind2="">
+         <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">file:///foo.pdf</subfield>
           <subfield code="a">http://bar.com/baz.ps.gz</subfield>
          </datafield>
@@ -619,10 +619,10 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         self.xml_example_record_with_xyz = """
         <record>
          <controlfield tag="001">33</controlfield>
-         <datafield tag="041" ind1="" ind2="">
+         <datafield tag="041" ind1=" " ind2=" ">
           <subfield code="a">eng</subfield>
          </datafield>
-         <datafield tag="XYZ" ind1="" ind2="">
+         <datafield tag="XYZ" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Let us see if this gets inserted well.</subfield>
          </datafield>
@@ -633,52 +633,52 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         """bibrecord - parsing special FMT tag, correcting on"""
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 1)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "f"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", " ", " ", "f"),
                          ['HB'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "g"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", " ", " ", "g"),
                          ['Let us see if this gets inserted well.'])
 
     def test_parsing_file_containing_fmt_special_tag_without_correcting(self):
         """bibrecord - parsing special FMT tag, correcting off"""
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 0)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "f"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", " ", " ", "f"),
                          ['HB'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", "", "", "g"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FMT", " ", " ", "g"),
                          ['Let us see if this gets inserted well.'])
 
     def test_parsing_file_containing_fft_special_tag_with_correcting(self):
         """bibrecord - parsing special FFT tag, correcting on"""
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 1)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", " ", " ", "a"),
                          ['file:///foo.pdf', 'http://bar.com/baz.ps.gz'])
 
     def test_parsing_file_containing_fft_special_tag_without_correcting(self):
         """bibrecord - parsing special FFT tag, correcting off"""
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 0)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", "", "", "a"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "FFT", " ", " ", "a"),
                          ['file:///foo.pdf', 'http://bar.com/baz.ps.gz'])
 
     def test_parsing_file_containing_xyz_special_tag_with_correcting(self):
@@ -686,18 +686,18 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         # XYZ should not get accepted when correcting is on; should get changed to 000
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 1)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          '000': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          '000': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", "", "", "f"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", " ", " ", "f"),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", "", "", "g"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", " ", " ", "g"),
                          [])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "000", "", "", "f"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "000", " ", " ", "f"),
                          ['HB'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "000", "", "", "g"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "000", " ", " ", "g"),
                          ['Let us see if this gets inserted well.'])
 
     def test_parsing_file_containing_xyz_special_tag_without_correcting(self):
@@ -705,14 +705,14 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
         # XYZ should get accepted without correcting
         rec, st, e = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 0)
         self.assertEqual(rec,
-                         {u'001': [([], '', '', '33', 1)],
-                          'XYZ': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], '', '', '', 3)],
-                          '041': [([('a', 'eng')], '', '', '', 2)]})
-        self.assertEqual(bibrecord.record_get_field_values(rec, "041", "", "", "a"),
+                         {u'001': [([], " ", " ", '33', 1)],
+                          'XYZ': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
+                          '041': [([('a', 'eng')], " ", " ", "", 2)]})
+        self.assertEqual(bibrecord.record_get_field_values(rec, "041", " ", " ", "a"),
                          ['eng'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", "", "", "f"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", " ", " ", "f"),
                          ['HB'])
-        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", "", "", "g"),
+        self.assertEqual(bibrecord.record_get_field_values(rec, "XYZ", " ", " ", "g"),
                          ['Let us see if this gets inserted well.'])
 
 
