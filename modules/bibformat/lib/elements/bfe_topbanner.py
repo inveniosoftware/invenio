@@ -22,16 +22,22 @@
 """
 __revision__ = "$Id$"
 
+import cgi
+
 def format(bfo):
     """
     HTML top page banner containing category, rep. number, etc
     """
     collection_indicator = bfo.kb("dbcollid2coll", bfo.field("980__a"))
-    subject = bfo.field("65017a") 
+    collection_indicator = cgi.escape(collection_indicator)
+    subject = bfo.field("65017a")
+    subject = cgi.escape(subject)
     subject_2 = bfo.field("65027a")
-
+    subject_2 = cgi.escape(subject_2)
     additional_report_numbers = bfo.fields("088__a")
+    
     source_of_aquisition = bfo.field("037__a")
+    source_of_aquisition = cgi.escape(source_of_aquisition)
 
     out = '<table border="0" width="100%"><tr class="blocknote">'
     out += '''<td valign="left">
@@ -45,7 +51,7 @@ def format(bfo):
     out += "</small></td>"
 
     for report_number in additional_report_numbers:
-        out += "<td><small><strong>" +report_number +" </strong></small></td>"
+        out += "<td><small><strong>" +cgi.escape(report_number) +" </strong></small></td>"
 
     if len(source_of_aquisition) > 0:
         out += '<td align="right"><strong>'+ source_of_aquisition + "</strong></td>"

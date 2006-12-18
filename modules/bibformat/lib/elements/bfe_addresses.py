@@ -23,6 +23,10 @@
 
 __revision__ = "$Id$"
 
+import cgi
+from urllib import quote
+from invenio.config import weburl
+
 def format(bfo, separator="; ", print_link="yes"):
     """
     Prints a list of addresses linked to this report
@@ -30,18 +34,26 @@ def format(bfo, separator="; ", print_link="yes"):
     @param separator the separator between addresses.
     @param print_link Links the addresses to search engine (HTML links) if 'yes'
     """
-    from urllib import quote
-    from invenio.config import weburl
 
     addresses = bfo.fields('270')
     list_addresses = []
     if print_link.lower() == 'yes':
         for address in addresses:
-            list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ quote(address.get('p', "")) +'">'+address.get('p', "")+'</a>')
-            list_addresses.append(address.get('g', ""))
+            list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ \
+                                  quote(address.get('p', "")) \
+                                  +'">'+cgi.escape(address.get('p', "")) \
+                                  +'</a>')
+            list_addresses.append(cgi.escape(address.get('g', "")))
     else:
         for address in addresses:
-            list_addresses.append(address.get('p', ""))
-            list_addresses.append(address.get('g', ""))
+            list_addresses.append(cgi.escape(address.get('p', "")))
+            list_addresses.append(cgi.escape(address.get('g', "")))
 
     return separator.join(list_addresses)
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
