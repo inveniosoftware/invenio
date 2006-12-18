@@ -1282,21 +1282,22 @@ def update_fft_tag(record, rec_id):
 ### Delete functions
 
 def delete_tags_to_correct(record, rec_old):
-    """Delete the tags which are existing in both records"""
-    # Browse through all the tags from the marc file
+    """
+    Delete tags from REC_OLD which are also existing in RECORD.  When
+    deleting, pay attention not only to tags, but also to indicators,
+    so that fields with the same tags but different indicators are not
+    deleted.
+    """
+    # browse through all the tags from the MARCXML file:
     for tag in record.keys():
-        # Do we have to delete only a special tag or all?
-        if options['tag'] is None:
-            # See if these tags exist in the old record
+        # do we have to delete only a special tag or any tag?
+        if options['tag'] is None or options['tag'] == tag:
+            # check if the tag exists in the old record too:
             if rec_old.has_key(tag) and tag != '001':
-                # Delete the tag found (FIXME: only if indicators agree!)
-                write_message("      Delete tag: "+tag+" ind1= "+rec_old[tag][0][1]+" ind2= "+rec_old[tag][0][2], verbose=9)
-                record_delete_field(rec_old, tag, rec_old[tag][0][1], rec_old[tag][0][2])
-        else:
-            if rec_old.has_key(tag) and options['tag'] == tag:
-                # Delete the tag found (FIXME: only if indicators agree!)
-                write_message("      Delete tag: "+tag+" ind1= "+rec_old[tag][0][1]+" ind2= "+rec_old[tag][0][2], verbose=9)
-                record_delete_field(rec_old, tag, rec_old[tag][0][1], rec_old[tag][0][2])
+                # the tag does exist, so delete all record's tag+ind1+ind2 combinations from rec_old
+                for dummy_sf_vals, ind1, ind2, dummy_cf, dummy_field_number in record[tag]:
+                    write_message("      Delete tag: " + tag + " ind1=" + ind1 + " ind2=" + ind2, verbose=9)
+                    record_delete_field(rec_old, tag, ind1, ind2)
 
 def delete_bibrec_bibxxx(record, id_bibrec):
     """Delete the database record from the table bibxxx given in parameters"""
