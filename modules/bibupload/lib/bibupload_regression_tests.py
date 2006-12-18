@@ -282,51 +282,106 @@ class BibUploadAppendModeTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(append_hm, self.test_append_expected_hm))
 
 class BibUploadCorrectModeTest(unittest.TestCase):
-    """Testing correct mode."""
+    """
+    Testing correcting a record containing similar tags (identical
+    tag, different indicators).  Currently CDS Invenio replaces only
+    those tags that have matching indicators too, unlike ALEPH500 that
+    does not pay attention to indicators, it corrects all fields with
+    the same tag, regardless of the indicator values.
+    """
     
     def setUp(self):
-        # pylint: disable-msg=C0103
-        """Initialize the MARCXML variable"""
-        self.test_correct = """<record>
-        <datafield tag ="100" ind1=" " ind2=" ">
-        <subfield code="a">Tester, T</subfield>
-        <subfield code="u">CERN</subfield>
-        </datafield>
-        </record>"""
-        self.test_correct_expected_xm = """<record>
-        <datafield tag ="100" ind1=" " ind2=" ">
-        <subfield code="a">Test, T</subfield>
-        <subfield code="u">TEST</subfield>
-        </datafield>
-        </record>"""
-        self.test_correct_expected_hm = """
-        100__ $$aTest, T$$uTEST
+        """Initialize the MARCXML test record."""
+        self.testrec1_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>        
+        </record>
         """
-    
-    def test_correct_complete_xml_marc(self):
-        """bibupload - correct mode, correcting complete MARCXML file"""
-        # Initialize the global variable
+        self.testrec1_hm = """
+        003__ SzGeCERN
+        100__ $$aTest, Jane$$uTest Institute
+        10047 $$aTest, John$$uTest University
+        10048 $$aCool
+        10047 $$aTest, Jim$$uTest Laboratory
+        """
+        self.testrec1_xm_to_correct = """
+        <record>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Joseph</subfield>
+          <subfield code="u">Test Academy</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test2, Joseph</subfield>
+          <subfield code="u">Test2 Academy</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec1_corrected_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Joseph</subfield>
+          <subfield code="u">Test Academy</subfield>
+         </datafield>        
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test2, Joseph</subfield>
+          <subfield code="u">Test2 Academy</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec1_corrected_hm = """
+        003__ SzGeCERN
+        100__ $$aTest, Jane$$uTest Institute
+        10048 $$aCool
+        10047 $$aTest, Joseph$$uTest Academy
+        10047 $$aTest2, Joseph$$uTest2 Academy
+        """
+
+    def test_record_correction(self):
+        """bibupload - correct mode, similar MARCXML tags/indicators"""
+        # insert original record
         bibupload.options['mode'] = 'insert'
         bibupload.options['verbose'] = 0
-        # We create create the record out of the xml marc
-        recs = bibupload.xml_marc_to_records(self.test_correct)
-        # We call the main function with the record as a parameter
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm)
         err, recid = bibupload.bibupload(recs[0])
-        # Now we append a datafield
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec1_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec1_hm))
+        # correct similar tags:
         bibupload.options['mode'] = 'correct'
-        # We add the controfield 001
-        xm_with_controlfield = self.test_correct_expected_xm.replace('<record>',
-                                                                   '<record>\n<controlfield tag ="001">'+str(recid)+'</controlfield>')
-        # We create create the record out of the xml marc
-        recs = bibupload.xml_marc_to_records(xm_with_controlfield)
-        # We call the main function with the record as a parameter
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_correct.replace('<record>',
+                                                                                 '<record>\n<controlfield tag ="001">'+str(recid)+'</controlfield>'))
         err, recid = bibupload.bibupload(recs[0])
-        # We retrieve the inserted xm
-        correct_xm = print_record(recid, 'xm')
-        correct_hm = print_record(recid, 'hm')
-        # Compare if the two MARCXML are the same
-        self.failUnless(compare_xmbuffers(correct_xm, self.test_correct_expected_xm))
-        self.failUnless(compare_hmbuffers(correct_hm, self.test_correct_expected_hm))
+        corrected_xm = print_record(recid, 'xm')
+        corrected_hm = print_record(recid, 'hm')
+        self.failUnless(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm))
+        self.failUnless(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm))
+        # clean up after ourselves:
+        bibupload.wipe_out_record_from_all_tables(recid)
+        return
 
 class BibUploadReplaceModeTest(unittest.TestCase):
     """Testing replace mode."""
@@ -1152,9 +1207,7 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadRecordsWithSYSNOTest,
                              BibUploadRecordsWithOAIIDTest,                             
                              BibUploadFMTModeTest,
-                             BibUploadIndicatorsTest)
-
-#test_suite = make_test_suite(BibUploadRecordsWithSYSNOTest,)
+                             BibUploadIndicatorsTest,)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
