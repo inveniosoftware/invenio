@@ -1132,11 +1132,11 @@ def update_database_with_metadata(record, rec_id):
                 ind1 = single_tuple[1]
                 ind2 = single_tuple[2]
                 # append the ind's to the full tag
-                if (ind1 == ''):
+                if ind1 == '' or ind1 == ' ':
                     tag_list.append('_')
                 else:
                     tag_list.append(ind1)
-                if (ind2 == ''):
+                if ind2 == '' or ind2 == ' ':
                     tag_list.append('_')
                 else:
                     tag_list.append(ind2)
