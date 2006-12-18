@@ -22,6 +22,8 @@
 """
 __revision__ = "$Id$"
 
+import cgi
+
 def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
     """
     Displays notes (various note fields)
@@ -58,6 +60,14 @@ def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
         notes.append(notes_group_4)
 
     if len(notes) > 0:
-        notes  = map(lambda x: note_prefix + x + note_suffix, notes)
+        
+        notes  = [note_prefix + cgi.escape(x) + note_suffix
+                  for x in notes]
         return "".join(notes)
 
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

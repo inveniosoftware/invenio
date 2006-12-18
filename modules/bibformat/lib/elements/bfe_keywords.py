@@ -22,6 +22,10 @@
 """
 __revision__ = "$Id$"
 
+import cgi
+from urllib import quote
+from invenio.config import weburl
+
 def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
     Display keywords of the record.
@@ -31,17 +35,20 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     @param separator a separator between keywords
     @param link links the keywords if 'yes' (HTML links)
     """
-    from urllib import quote
-    from invenio.config import weburl
     
     keywords = bfo.fields('6531_a')
-
+    
     if len(keywords) > 0:
-
         if link == 'yes':
-            keywords = map(lambda x: '<a href="'+weburl+'/search?f=keyword&p='+ quote(x)+'">'+x+'</a>', keywords)
-
-        keywords = map(lambda x: keyword_prefix+x+keyword_suffix, keywords)
+            keywords = ['<a href="' + weburl + '/search?f=keyword&p='+ \
+                        quote(keyword) + '">' + cgi.escape(keyword) + '</a>'
+                        for keyword in keywords]
+        else:
+            keywords = [cgi.escape(keyword)
+                        for keyword in keywords]
+            
+        keywords = [keyword_prefix + keyword + keyword_suffix
+                    for keyword in keywords]
         return separator.join(keywords)
 
 def escape_values(bfo):
