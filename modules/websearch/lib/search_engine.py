@@ -1577,7 +1577,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': string.join(colls, ','), 
+                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>', 
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': results_in_Home._nbhits,
                                'x_url_close': '</a>'})
