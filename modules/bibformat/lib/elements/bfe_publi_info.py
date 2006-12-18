@@ -45,13 +45,18 @@ def format(bfo):
     number = publication_info.get('n')
     pages = publication_info.get('c')
 
-    if journal != '' and volume is not None:
-        
+    if journal is not None:
         journal = cgi.escape(journal)
+    if volume is not None:
         volume = cgi.escape(volume)
+    if year is not None:
         year = cgi.escape(year)
+    if number is not None:
         number = cgi.escape(number)
+    if pages is not None:
         pages = cgi.escape(pages)
+        
+    if journal != '' and volume is not None:
         
         out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
         out += quote(journal_source)
