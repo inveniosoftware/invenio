@@ -1155,7 +1155,7 @@ INSERT INTO flxUDFPARAMS VALUES ('SPLIT_LINE','split_str',0);
 INSERT INTO flxUDFPARAMS VALUES ('SPLIT_LINE','str_len',1);
 INSERT INTO flxUSERS VALUES (1);
 
-INSERT INTO oaiARCHIVE VALUES (1,'','global','','','',NULL,'*','','','','','',NULL,NULL,NULL);
+INSERT INTO oaiARCHIVE VALUES (1,'','global','','','',NULL,'','','','','','','','','');
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');

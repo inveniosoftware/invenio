@@ -2175,18 +2175,18 @@ CREATE TABLE IF NOT EXISTS oaiARCHIVE (
   setName varchar(255) NOT NULL default '',
   setSpec varchar(255) NOT NULL default '',
   setCollection varchar(255) NOT NULL default '',
-  setDescription text,
+  setDescription text NOT NULL default '',
   setDefinition text NOT NULL default '',
   setRecList longblob,
-  p1 text,
-  f1 text,
-  m1 text,
-  p2 text,
-  f2 text,
-  m2 text,
-  p3 text,
-  f3 text,
-  m3 text,
+  p1 text NOT NULL default '',
+  f1 text NOT NULL default '',
+  m1 text NOT NULL default '',
+  p2 text NOT NULL default '',
+  f2 text NOT NULL default '',
+  m2 text NOT NULL default '',
+  p3 text NOT NULL default '',
+  f3 text NOT NULL default '',
+  m3 text NOT NULL default '',
   PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
@@ -2253,7 +2253,7 @@ CREATE TABLE IF NOT EXISTS format (
   name varchar(255) NOT NULL,
   code varchar(6) NOT NULL,
   description varchar(255) default '',
-  content_type varchar(255) default '', 
+  content_type varchar(255) default '',
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
 ) TYPE=MyISAM;
