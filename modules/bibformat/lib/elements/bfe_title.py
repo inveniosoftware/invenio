@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo, separator=" "):#, highlight='no'):
+def format(bfo, separator=" ", highlight='no'):
     """
     Prints the titles of a record.
 
@@ -59,18 +59,18 @@ def format(bfo, separator=" "):#, highlight='no'):
             
     titles = [cgi.escape(x) for x in titles]
     
-    #if highlight == 'yes':
-    #    from invenio import bibformat_utils
-    #    titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
+    if highlight == 'yes':
+        from invenio import bibformat_utils
+        titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
         
     return separator.join(titles)
 
-## def escape_values(bfo):
-##     """
-##     Called by BibFormat in order to check if output of this element
-##     should be escaped.
-##     """
-##     return 0
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
 
 
 
