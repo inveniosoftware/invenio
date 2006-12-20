@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-14 17:18+0100\n"
+"POT-Creation-Date: 2006-12-20 15:16+0100\n"
 "PO-Revision-Date: 2006-10-12 17:50+0200\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
@@ -295,7 +295,7 @@ msgstr "Διαγραφή"
 #: modules/webalert/lib/webalert_templates.py:317
 #: modules/webalert/lib/webalert_templates.py:438
 #: modules/webmessage/lib/webmessage_templates.py:91
-#: modules/websubmit/lib/websubmit_templates.py:1404
+#: modules/websubmit/lib/websubmit_templates.py:1412
 msgid "Action"
 msgstr "Ενέργεια"
 
@@ -514,7 +514,7 @@ msgstr "Απόκρυψη Αρχείων Βοήθειας"
 
 #: modules/bibformat/lib/bibformat_templates.py:914
 #: modules/bibformat/lib/bibformat_templates.py:1040
-#: modules/websubmit/lib/websubmit_templates.py:1405
+#: modules/websubmit/lib/websubmit_templates.py:1413
 msgid "Status"
 msgstr "Κατάσταση"
 
@@ -2555,9 +2555,9 @@ msgstr "Ανάγνωση μυνήματος"
 
 #: modules/websearch/lib/search_engine.py:356
 #: modules/websearch/lib/search_engine.py:380
-#: modules/websearch/lib/search_engine.py:3068
-#: modules/websearch/lib/search_engine.py:3107
-#: modules/websearch/lib/search_engine.py:3141
+#: modules/websearch/lib/search_engine.py:3071
+#: modules/websearch/lib/search_engine.py:3110
+#: modules/websearch/lib/search_engine.py:3144
 msgid "Search Results"
 msgstr "Αποτελέσματα αναζήτησης"
 
@@ -2694,7 +2694,7 @@ msgstr ""
 "Ο όρος %s δεν ταίριαξε σε κάποια εγγραφή. Παραπλήσιοι όροι σε όλες τις "
 "συλλογές:"
 
-#: modules/websearch/lib/search_engine.py:2186
+#: modules/websearch/lib/search_engine.py:2189
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -2703,7 +2703,7 @@ msgstr ""
 "Λυπάμαι, ταξινόμηση επιτρέπεται σε σετ των %d εγγραφών το πολύ. Θα γίνει "
 "χρήση της της εξ΄ορισμού ταξινόμησης."
 
-#: modules/websearch/lib/search_engine.py:2210
+#: modules/websearch/lib/search_engine.py:2213
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -2712,20 +2712,20 @@ msgstr ""
 "Λυπάμαι, η '%s' δεν είναι έγκυρη επιλογή ταξινόμησης. Έγινε επιλογή της "
 "ταξινόμησης κατά τίτλο."
 
-#: modules/websearch/lib/search_engine.py:2413
+#: modules/websearch/lib/search_engine.py:2416
 msgid "Use different search terms."
 msgstr "Χρησιμοποιήστε διαφορετικά κριτήρια έρευνας."
 
-#: modules/websearch/lib/search_engine.py:2444
-#: modules/websearch/lib/search_engine.py:2601
-#: modules/websearch/lib/search_engine.py:2624
-#: modules/websearch/lib/search_engine.py:2631
-#: modules/websearch/lib/search_engine.py:2638
-#: modules/websearch/lib/search_engine.py:2684
+#: modules/websearch/lib/search_engine.py:2447
+#: modules/websearch/lib/search_engine.py:2604
+#: modules/websearch/lib/search_engine.py:2627
+#: modules/websearch/lib/search_engine.py:2634
+#: modules/websearch/lib/search_engine.py:2641
+#: modules/websearch/lib/search_engine.py:2687
 msgid "The record has been deleted."
 msgstr "Η εγγραφή έχει διαγραφεί."
 
-#: modules/websearch/lib/search_engine.py:3050
+#: modules/websearch/lib/search_engine.py:3053
 #: modules/websearch/lib/websearch_templates.py:342
 #: modules/websearch/lib/websearch_templates.py:463
 #: modules/websearch/lib/websearch_templates.py:1303
@@ -2737,13 +2737,13 @@ msgstr "Η εγγραφή έχει διαγραφεί."
 msgid "Browse"
 msgstr "Φυλλομέτρηση"
 
-#: modules/websearch/lib/search_engine.py:3233
+#: modules/websearch/lib/search_engine.py:3236
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου "
 "αυτού..."
 
-#: modules/websearch/lib/search_engine.py:3255
+#: modules/websearch/lib/search_engine.py:3258
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
@@ -2908,7 +2908,7 @@ msgid "begin"
 msgstr "έναρξη"
 
 #: modules/websearch/lib/websearch_templates.py:1774
-#: modules/websubmit/lib/websubmit_templates.py:1168
+#: modules/websubmit/lib/websubmit_templates.py:1176
 msgid "previous"
 msgstr "προηγούμενο"
 
@@ -4150,7 +4150,7 @@ msgid "GO"
 msgstr "GO"
 
 #: modules/websubmit/lib/websubmit_templates.py:476
-#: modules/websubmit/lib/websubmit_templates.py:911
+#: modules/websubmit/lib/websubmit_templates.py:919
 msgid "SUMMARY"
 msgstr "ΠΕΡΙΛΗΨΗ"
 
@@ -4167,13 +4167,13 @@ msgid "Next page"
 msgstr "Επόμενη σελίδα"
 
 #: modules/websubmit/lib/websubmit_templates.py:548
-#: modules/websubmit/lib/websubmit_templates.py:950
+#: modules/websubmit/lib/websubmit_templates.py:958
 msgid "Are you sure you want to quit this submission?"
 msgstr ""
 "Είστε σίγουροι πως θέλετε να εγκαταλείψετε την παρούσα διαδικασία υποβολής;"
 
 #: modules/websubmit/lib/websubmit_templates.py:549
-#: modules/websubmit/lib/websubmit_templates.py:957
+#: modules/websubmit/lib/websubmit_templates.py:965
 msgid "Back to main menu"
 msgstr "Επιστροφή στο βασικό μενού"
 
@@ -4190,46 +4190,46 @@ msgid "Mandatory fields appear in red in the SUMMARY window."
 msgstr ""
 "Τα υποχρεωτικά πεδία εμφανίζονται στο παράθυρο της 'Περίληψης' με κόκκινο."
 
-#: modules/websubmit/lib/websubmit_templates.py:693
+#: modules/websubmit/lib/websubmit_templates.py:701
 #, python-format
 msgid "The field %s is mandatory."
 msgstr "Το πεδίο %s είναι υποχρεωτικό."
 
-#: modules/websubmit/lib/websubmit_templates.py:693
+#: modules/websubmit/lib/websubmit_templates.py:701
 msgid "Please make a choice in the select box"
 msgstr "Παρακαλώ επιλέξτε κάτι στο κουτί επιλογών"
 
-#: modules/websubmit/lib/websubmit_templates.py:707
+#: modules/websubmit/lib/websubmit_templates.py:715
 msgid "Please press a button."
 msgstr "Παρακαλώ πατήστε ένα κουμπί."
 
-#: modules/websubmit/lib/websubmit_templates.py:715
+#: modules/websubmit/lib/websubmit_templates.py:723
 #, python-format
 msgid "The field %s is mandatory. Please fill it in."
 msgstr "Το πεδίο %s είναι υποχρεωτικό. Πρακαλώ συμπληρώστε το."
 
-#: modules/websubmit/lib/websubmit_templates.py:791
+#: modules/websubmit/lib/websubmit_templates.py:799
 #, python-format
 msgid "The field %(field)s is mandatory."
 msgstr "Το πεδίο %(field)s είναι υποχρεωτικό."
 
-#: modules/websubmit/lib/websubmit_templates.py:791
+#: modules/websubmit/lib/websubmit_templates.py:799
 msgid "Going back to page"
 msgstr "Επιστροφή στην σελίδα"
 
-#: modules/websubmit/lib/websubmit_templates.py:902
+#: modules/websubmit/lib/websubmit_templates.py:910
 msgid "finished!"
 msgstr "τελος!"
 
-#: modules/websubmit/lib/websubmit_templates.py:910
+#: modules/websubmit/lib/websubmit_templates.py:918
 msgid "end of action"
 msgstr "τέλος ενέργειας"
 
-#: modules/websubmit/lib/websubmit_templates.py:934
+#: modules/websubmit/lib/websubmit_templates.py:942
 msgid "Submission no"
 msgstr "Αριθμός υποβολής"
 
-#: modules/websubmit/lib/websubmit_templates.py:1000
+#: modules/websubmit/lib/websubmit_templates.py:1008
 #, python-format
 msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
@@ -4238,209 +4238,209 @@ msgstr ""
 "Ορίστε η %(x_action)s λίστα ενεργειών για τα %(x_doctype)s έγγραφα στο "
 "επίπεδο %(x_step)s"
 
-#: modules/websubmit/lib/websubmit_templates.py:1005
+#: modules/websubmit/lib/websubmit_templates.py:1013
 msgid "Function"
 msgstr "Λειτουργία"
 
-#: modules/websubmit/lib/websubmit_templates.py:1006
+#: modules/websubmit/lib/websubmit_templates.py:1014
 msgid "Score"
 msgstr "Βαθμολογία"
 
-#: modules/websubmit/lib/websubmit_templates.py:1007
+#: modules/websubmit/lib/websubmit_templates.py:1015
 msgid "Running function"
 msgstr "Λειτουργία που εκτελείται"
 
-#: modules/websubmit/lib/websubmit_templates.py:1013
+#: modules/websubmit/lib/websubmit_templates.py:1021
 #, python-format
 msgid "Function %s does not exist."
 msgstr "Η λειτουργία %s δεν υπάρχει."
 
-#: modules/websubmit/lib/websubmit_templates.py:1052
+#: modules/websubmit/lib/websubmit_templates.py:1060
 msgid "You must now"
 msgstr "Πρέπει τώρα"
 
-#: modules/websubmit/lib/websubmit_templates.py:1057
+#: modules/websubmit/lib/websubmit_templates.py:1065
 msgid "or"
 msgstr "ή"
 
-#: modules/websubmit/lib/websubmit_templates.py:1084
+#: modules/websubmit/lib/websubmit_templates.py:1092
 msgid "record"
 msgstr "εγγραφή"
 
-#: modules/websubmit/lib/websubmit_templates.py:1086
+#: modules/websubmit/lib/websubmit_templates.py:1094
 msgid "document"
 msgstr "έγγραφο"
 
-#: modules/websubmit/lib/websubmit_templates.py:1088
-#: modules/websubmit/lib/websubmit_templates.py:1179
+#: modules/websubmit/lib/websubmit_templates.py:1096
+#: modules/websubmit/lib/websubmit_templates.py:1187
 msgid "version"
 msgstr "έκδοση"
 
-#: modules/websubmit/lib/websubmit_templates.py:1117
+#: modules/websubmit/lib/websubmit_templates.py:1125
 msgid "file(s)"
 msgstr "αρχείο(α)"
 
-#: modules/websubmit/lib/websubmit_templates.py:1165
+#: modules/websubmit/lib/websubmit_templates.py:1173
 msgid "see"
 msgstr "δείτε"
 
-#: modules/websubmit/lib/websubmit_templates.py:1351
+#: modules/websubmit/lib/websubmit_templates.py:1359
 msgid "For"
 msgstr "Για"
 
-#: modules/websubmit/lib/websubmit_templates.py:1352
+#: modules/websubmit/lib/websubmit_templates.py:1360
 msgid "all types of document"
 msgstr "έγγραφα όλων των ειδών"
 
-#: modules/websubmit/lib/websubmit_templates.py:1406
+#: modules/websubmit/lib/websubmit_templates.py:1414
 msgid "Id"
 msgstr "Id"
 
-#: modules/websubmit/lib/websubmit_templates.py:1407
+#: modules/websubmit/lib/websubmit_templates.py:1415
 msgid "Reference"
 msgstr "Αριθμός αναφοράς"
 
-#: modules/websubmit/lib/websubmit_templates.py:1409
+#: modules/websubmit/lib/websubmit_templates.py:1417
 msgid "First access"
 msgstr "Πρώτη προσπέλαση"
 
-#: modules/websubmit/lib/websubmit_templates.py:1410
+#: modules/websubmit/lib/websubmit_templates.py:1418
 msgid "Last access"
 msgstr "Τελευταία προσπέλαση"
 
-#: modules/websubmit/lib/websubmit_templates.py:1420
+#: modules/websubmit/lib/websubmit_templates.py:1428
 msgid "Are you sure you want to delete this submission?"
 msgstr "Είστε σίγουροι οτι θέλετε να διαγράψετε την υποβολή αυτή;"
 
-#: modules/websubmit/lib/websubmit_templates.py:1421
+#: modules/websubmit/lib/websubmit_templates.py:1429
 #, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
 msgstr "Διαγραφή υποβολής %(x_id)s στην κατηγορια %(x_docname)s"
 
-#: modules/websubmit/lib/websubmit_templates.py:1437
+#: modules/websubmit/lib/websubmit_templates.py:1445
 msgid "Reference not yet given"
 msgstr "Δεν έχει δοθεί ακόμη αριθμος αναφοράς"
 
-#: modules/websubmit/lib/websubmit_templates.py:1508
+#: modules/websubmit/lib/websubmit_templates.py:1516
 msgid "Refereed Documents"
 msgstr "Έγγραφα που εξετάζετε"
 
-#: modules/websubmit/lib/websubmit_templates.py:1518
+#: modules/websubmit/lib/websubmit_templates.py:1526
 msgid "You are a general referee"
 msgstr "Είστε γενικός εξεταστής"
 
-#: modules/websubmit/lib/websubmit_templates.py:1523
+#: modules/websubmit/lib/websubmit_templates.py:1531
 msgid "You are a referee for category:"
 msgstr "Είστε εξεταστής για την κατηγορία:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1560
+#: modules/websubmit/lib/websubmit_templates.py:1568
 msgid "List of refereed types of documents"
 msgstr "Λίστα από τύπους εγγράφων που εξετάζετε"
 
-#: modules/websubmit/lib/websubmit_templates.py:1561
+#: modules/websubmit/lib/websubmit_templates.py:1569
 msgid ""
 "Select one of the following types of documents to check the documents status."
 msgstr ""
 "Επιλέξτε έναν από τους παρακάτω τύπους εγγράφων για να ελέγξετε την "
 "κατάσταση του εγγράφου."
 
-#: modules/websubmit/lib/websubmit_templates.py:1619
+#: modules/websubmit/lib/websubmit_templates.py:1627
 msgid "List of refereed categories"
 msgstr "Λίστα από κατηγορίες που ελέγχετε"
 
-#: modules/websubmit/lib/websubmit_templates.py:1620
+#: modules/websubmit/lib/websubmit_templates.py:1628
 msgid "Please choose a category"
 msgstr "Παρακαλώ επιλέξτε μια κατηγορία"
 
-#: modules/websubmit/lib/websubmit_templates.py:1639
-#: modules/websubmit/lib/websubmit_templates.py:1680
-#: modules/websubmit/lib/websubmit_templates.py:1745
+#: modules/websubmit/lib/websubmit_templates.py:1647
+#: modules/websubmit/lib/websubmit_templates.py:1688
+#: modules/websubmit/lib/websubmit_templates.py:1753
 msgid "Pending"
 msgstr "Σε αναμονή"
 
-#: modules/websubmit/lib/websubmit_templates.py:1645
-#: modules/websubmit/lib/websubmit_templates.py:1683
-#: modules/websubmit/lib/websubmit_templates.py:1746
+#: modules/websubmit/lib/websubmit_templates.py:1653
+#: modules/websubmit/lib/websubmit_templates.py:1691
+#: modules/websubmit/lib/websubmit_templates.py:1754
 msgid "Approved"
 msgstr "Εγκεκριμένα"
 
-#: modules/websubmit/lib/websubmit_templates.py:1651
-#: modules/websubmit/lib/websubmit_templates.py:1685
-#: modules/websubmit/lib/websubmit_templates.py:1686
-#: modules/websubmit/lib/websubmit_templates.py:1747
+#: modules/websubmit/lib/websubmit_templates.py:1659
+#: modules/websubmit/lib/websubmit_templates.py:1693
+#: modules/websubmit/lib/websubmit_templates.py:1694
+#: modules/websubmit/lib/websubmit_templates.py:1755
 msgid "Rejected"
 msgstr "Απορριφθέντα"
 
-#: modules/websubmit/lib/websubmit_templates.py:1679
+#: modules/websubmit/lib/websubmit_templates.py:1687
 msgid "Key"
 msgstr "Κλειδί"
 
-#: modules/websubmit/lib/websubmit_templates.py:1682
+#: modules/websubmit/lib/websubmit_templates.py:1690
 msgid "Waiting for approval"
 msgstr "Αναμονή έγκρισης"
 
-#: modules/websubmit/lib/websubmit_templates.py:1684
+#: modules/websubmit/lib/websubmit_templates.py:1692
 msgid "Already approved"
 msgstr "Ήδη εγκεκριμένα"
 
-#: modules/websubmit/lib/websubmit_templates.py:1687
+#: modules/websubmit/lib/websubmit_templates.py:1695
 msgid "Some documents are pending."
 msgstr "Κάποια έγγραφα εκκρεμούν ακόμη"
 
-#: modules/websubmit/lib/websubmit_templates.py:1742
+#: modules/websubmit/lib/websubmit_templates.py:1750
 msgid "List of refereed documents"
 msgstr "Λίστα εγγράφων που ελεγχετε"
 
-#: modules/websubmit/lib/websubmit_templates.py:1743
+#: modules/websubmit/lib/websubmit_templates.py:1751
 msgid "Click on a report number for more information."
 msgstr "Κάντε κλικ στον αριθμό αναφοράς για να πάρετε επιπλέον πληροφορίες."
 
-#: modules/websubmit/lib/websubmit_templates.py:1744
+#: modules/websubmit/lib/websubmit_templates.py:1752
 msgid "Report Number"
 msgstr "Αριθμός αναφοράς"
 
-#: modules/websubmit/lib/websubmit_templates.py:1867
+#: modules/websubmit/lib/websubmit_templates.py:1875
 msgid "Your request has been sent to the referee."
 msgstr "Το αίτημά σας έχει αποσταλεί"
 
-#: modules/websubmit/lib/websubmit_templates.py:1881
+#: modules/websubmit/lib/websubmit_templates.py:1889
 msgid "Title:"
 msgstr "Τίτλος:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1887
+#: modules/websubmit/lib/websubmit_templates.py:1895
 msgid "Author:"
 msgstr "Συγγραφέας:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1895
+#: modules/websubmit/lib/websubmit_templates.py:1903
 msgid "More information:"
 msgstr "Περισσότερες πληροφορίες:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1896
+#: modules/websubmit/lib/websubmit_templates.py:1904
 msgid "Click here"
 msgstr "Κάντε κλικ εδώ"
 
-#: modules/websubmit/lib/websubmit_templates.py:1902
+#: modules/websubmit/lib/websubmit_templates.py:1910
 #, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr "Το έγγραφο αυτό %(x_fmt_open)sαναμένει έγκριση%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1905
-#: modules/websubmit/lib/websubmit_templates.py:1925
-#: modules/websubmit/lib/websubmit_templates.py:1935
+#: modules/websubmit/lib/websubmit_templates.py:1913
+#: modules/websubmit/lib/websubmit_templates.py:1933
+#: modules/websubmit/lib/websubmit_templates.py:1943
 msgid "It was first sent for approval on:"
 msgstr "Απεστάλη για έγκριση πρώτη φορά στις:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1907
-#: modules/websubmit/lib/websubmit_templates.py:1909
-#: modules/websubmit/lib/websubmit_templates.py:1927
-#: modules/websubmit/lib/websubmit_templates.py:1929
+#: modules/websubmit/lib/websubmit_templates.py:1915
+#: modules/websubmit/lib/websubmit_templates.py:1917
+#: modules/websubmit/lib/websubmit_templates.py:1935
 #: modules/websubmit/lib/websubmit_templates.py:1937
-#: modules/websubmit/lib/websubmit_templates.py:1939
+#: modules/websubmit/lib/websubmit_templates.py:1945
+#: modules/websubmit/lib/websubmit_templates.py:1947
 msgid "Last approval email was sent on:"
 msgstr "Το τελευταίο email για έγκριση εστάλη στις:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1910
+#: modules/websubmit/lib/websubmit_templates.py:1918
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
@@ -4448,17 +4448,17 @@ msgstr ""
 "Μπορείτε να στείλετε email για αίτημα έγκρισης κάνοντας κλικ στο παρακάτω "
 "κουμπί:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1912
+#: modules/websubmit/lib/websubmit_templates.py:1920
 #: modules/websubmit/web/publiline.py:201
 msgid "Send Again"
 msgstr "Αποστολή εκ νέου"
 
-#: modules/websubmit/lib/websubmit_templates.py:1913
+#: modules/websubmit/lib/websubmit_templates.py:1921
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr ""
 "ΠΡΟΕΙΔΟΠΟΙΗΣΗ! Μετά την επιβεβαίωση, θα αποσταλεί email στον ελεγκτή σας."
 
-#: modules/websubmit/lib/websubmit_templates.py:1916
+#: modules/websubmit/lib/websubmit_templates.py:1924
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
@@ -4466,29 +4466,29 @@ msgstr ""
 "Ώς ελεγκτής του εγγράφου αυτού, μπορείτε να κάνετε κλίκ στο κουμπί αυτό για "
 "να το αποδεχτείτε ή να το απορρίψετε."
 
-#: modules/websubmit/lib/websubmit_templates.py:1918
+#: modules/websubmit/lib/websubmit_templates.py:1926
 msgid "Approve/Reject"
 msgstr "Αποδοχή/Απόρριψη"
 
-#: modules/websubmit/lib/websubmit_templates.py:1922
+#: modules/websubmit/lib/websubmit_templates.py:1930
 #, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
 msgstr "Αυτό το έγγραφο έχει γίνει %(x_fmt_open)sαποδεκτό%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1924
+#: modules/websubmit/lib/websubmit_templates.py:1932
 msgid "Its approved reference is:"
 msgstr "Ο αριθμός έγκρισης είναι:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1930
+#: modules/websubmit/lib/websubmit_templates.py:1938
 msgid "It was approved on:"
 msgstr "Εγκρίθηκε στις:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1932
+#: modules/websubmit/lib/websubmit_templates.py:1940
 #, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
 msgstr "Αυτό το έγγραφο %(x_fmt_open)sαπορρίφθηκε%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1940
+#: modules/websubmit/lib/websubmit_templates.py:1948
 msgid "It was rejected on:"
 msgstr "Απορρίφθηκε στις:"
 

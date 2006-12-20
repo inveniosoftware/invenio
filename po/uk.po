@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-14 17:18+0100\n"
+"POT-Creation-Date: 2006-12-20 15:16+0100\n"
 "PO-Revision-Date: 2006-10-12 17:51+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: UK <cds.support@cern.ch>\n"
@@ -300,7 +300,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:317
 #: modules/webalert/lib/webalert_templates.py:438
 #: modules/webmessage/lib/webmessage_templates.py:91
-#: modules/websubmit/lib/websubmit_templates.py:1404
+#: modules/websubmit/lib/websubmit_templates.py:1412
 #, fuzzy
 msgid "Action"
 msgstr "розділи"
@@ -520,7 +520,7 @@ msgstr ""
 
 #: modules/bibformat/lib/bibformat_templates.py:914
 #: modules/bibformat/lib/bibformat_templates.py:1040
-#: modules/websubmit/lib/websubmit_templates.py:1405
+#: modules/websubmit/lib/websubmit_templates.py:1413
 msgid "Status"
 msgstr ""
 
@@ -2638,9 +2638,9 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:356
 #: modules/websearch/lib/search_engine.py:380
-#: modules/websearch/lib/search_engine.py:3068
-#: modules/websearch/lib/search_engine.py:3107
-#: modules/websearch/lib/search_engine.py:3141
+#: modules/websearch/lib/search_engine.py:3071
+#: modules/websearch/lib/search_engine.py:3110
+#: modules/websearch/lib/search_engine.py:3144
 msgid "Search Results"
 msgstr "Результати пошуку"
 
@@ -2775,34 +2775,34 @@ msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr "не знайдено. Найближчі терміни в розділі:"
 
-#: modules/websearch/lib/search_engine.py:2186
+#: modules/websearch/lib/search_engine.py:2189
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2210
+#: modules/websearch/lib/search_engine.py:2213
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2413
+#: modules/websearch/lib/search_engine.py:2416
 msgid "Use different search terms."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2444
-#: modules/websearch/lib/search_engine.py:2601
-#: modules/websearch/lib/search_engine.py:2624
-#: modules/websearch/lib/search_engine.py:2631
-#: modules/websearch/lib/search_engine.py:2638
-#: modules/websearch/lib/search_engine.py:2684
+#: modules/websearch/lib/search_engine.py:2447
+#: modules/websearch/lib/search_engine.py:2604
+#: modules/websearch/lib/search_engine.py:2627
+#: modules/websearch/lib/search_engine.py:2634
+#: modules/websearch/lib/search_engine.py:2641
+#: modules/websearch/lib/search_engine.py:2687
 msgid "The record has been deleted."
 msgstr "Запис видалено"
 
-#: modules/websearch/lib/search_engine.py:3050
+#: modules/websearch/lib/search_engine.py:3053
 #: modules/websearch/lib/websearch_templates.py:342
 #: modules/websearch/lib/websearch_templates.py:463
 #: modules/websearch/lib/websearch_templates.py:1303
@@ -2814,11 +2814,11 @@ msgstr "Запис видалено"
 msgid "Browse"
 msgstr "Переглянути"
 
-#: modules/websearch/lib/search_engine.py:3233
+#: modules/websearch/lib/search_engine.py:3236
 msgid "No match within your time limits, discarding this condition..."
 msgstr "За відведений час результатів не знайдено, умову скасовано"
 
-#: modules/websearch/lib/search_engine.py:3255
+#: modules/websearch/lib/search_engine.py:3258
 msgid "No match within your search limits, discarding this condition..."
 msgstr "За даних обмежень результатів не знайдено, умова скасовується"
 
@@ -2989,7 +2989,7 @@ msgid "begin"
 msgstr "увійти"
 
 #: modules/websearch/lib/websearch_templates.py:1774
-#: modules/websubmit/lib/websubmit_templates.py:1168
+#: modules/websubmit/lib/websubmit_templates.py:1176
 msgid "previous"
 msgstr ""
 
@@ -4201,7 +4201,7 @@ msgid "GO"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:476
-#: modules/websubmit/lib/websubmit_templates.py:911
+#: modules/websubmit/lib/websubmit_templates.py:919
 msgid "SUMMARY"
 msgstr ""
 
@@ -4219,12 +4219,12 @@ msgid "Next page"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:548
-#: modules/websubmit/lib/websubmit_templates.py:950
+#: modules/websubmit/lib/websubmit_templates.py:958
 msgid "Are you sure you want to quit this submission?"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:549
-#: modules/websubmit/lib/websubmit_templates.py:957
+#: modules/websubmit/lib/websubmit_templates.py:965
 #, fuzzy
 msgid "Back to main menu"
 msgstr "кошики"
@@ -4239,313 +4239,313 @@ msgstr ""
 msgid "Mandatory fields appear in red in the SUMMARY window."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:693
+#: modules/websubmit/lib/websubmit_templates.py:701
 #, python-format
 msgid "The field %s is mandatory."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:693
+#: modules/websubmit/lib/websubmit_templates.py:701
 msgid "Please make a choice in the select box"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:707
+#: modules/websubmit/lib/websubmit_templates.py:715
 msgid "Please press a button."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:715
+#: modules/websubmit/lib/websubmit_templates.py:723
 #, python-format
 msgid "The field %s is mandatory. Please fill it in."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:791
+#: modules/websubmit/lib/websubmit_templates.py:799
 #, python-format
 msgid "The field %(field)s is mandatory."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:791
+#: modules/websubmit/lib/websubmit_templates.py:799
 msgid "Going back to page"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:902
+#: modules/websubmit/lib/websubmit_templates.py:910
 msgid "finished!"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:910
+#: modules/websubmit/lib/websubmit_templates.py:918
 msgid "end of action"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:934
+#: modules/websubmit/lib/websubmit_templates.py:942
 #, fuzzy
 msgid "Submission no"
 msgstr "додане"
 
-#: modules/websubmit/lib/websubmit_templates.py:1000
+#: modules/websubmit/lib/websubmit_templates.py:1008
 #, python-format
 msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
 "(x_step)s"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1005
+#: modules/websubmit/lib/websubmit_templates.py:1013
 #, fuzzy
 msgid "Function"
 msgstr "сеанс"
 
-#: modules/websubmit/lib/websubmit_templates.py:1006
+#: modules/websubmit/lib/websubmit_templates.py:1014
 #, fuzzy
 msgid "Score"
 msgstr "далі"
 
-#: modules/websubmit/lib/websubmit_templates.py:1007
+#: modules/websubmit/lib/websubmit_templates.py:1015
 msgid "Running function"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1013
+#: modules/websubmit/lib/websubmit_templates.py:1021
 #, python-format
 msgid "Function %s does not exist."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1052
+#: modules/websubmit/lib/websubmit_templates.py:1060
 msgid "You must now"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1057
+#: modules/websubmit/lib/websubmit_templates.py:1065
 #, fuzzy
 msgid "or"
 msgstr "далі"
 
-#: modules/websubmit/lib/websubmit_templates.py:1084
+#: modules/websubmit/lib/websubmit_templates.py:1092
 #, fuzzy
 msgid "record"
 msgstr "Подібні записи"
 
-#: modules/websubmit/lib/websubmit_templates.py:1086
+#: modules/websubmit/lib/websubmit_templates.py:1094
 msgid "document"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1088
-#: modules/websubmit/lib/websubmit_templates.py:1179
+#: modules/websubmit/lib/websubmit_templates.py:1096
+#: modules/websubmit/lib/websubmit_templates.py:1187
 #, fuzzy
 msgid "version"
 msgstr "сеанс"
 
-#: modules/websubmit/lib/websubmit_templates.py:1117
+#: modules/websubmit/lib/websubmit_templates.py:1125
 msgid "file(s)"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1165
+#: modules/websubmit/lib/websubmit_templates.py:1173
 msgid "see"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1351
+#: modules/websubmit/lib/websubmit_templates.py:1359
 #, fuzzy
 msgid "For"
 msgstr "далі"
 
-#: modules/websubmit/lib/websubmit_templates.py:1352
+#: modules/websubmit/lib/websubmit_templates.py:1360
 msgid "all types of document"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1406
+#: modules/websubmit/lib/websubmit_templates.py:1414
 msgid "Id"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1407
+#: modules/websubmit/lib/websubmit_templates.py:1415
 msgid "Reference"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1409
+#: modules/websubmit/lib/websubmit_templates.py:1417
 msgid "First access"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1410
+#: modules/websubmit/lib/websubmit_templates.py:1418
 #, fuzzy
 msgid "Last access"
 msgstr "Останнє поновлення"
 
-#: modules/websubmit/lib/websubmit_templates.py:1420
+#: modules/websubmit/lib/websubmit_templates.py:1428
 msgid "Are you sure you want to delete this submission?"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1421
+#: modules/websubmit/lib/websubmit_templates.py:1429
 #, fuzzy, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
 msgstr "Cited by: %s records"
 
-#: modules/websubmit/lib/websubmit_templates.py:1437
+#: modules/websubmit/lib/websubmit_templates.py:1445
 msgid "Reference not yet given"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1508
+#: modules/websubmit/lib/websubmit_templates.py:1516
 msgid "Refereed Documents"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1518
+#: modules/websubmit/lib/websubmit_templates.py:1526
 msgid "You are a general referee"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1523
+#: modules/websubmit/lib/websubmit_templates.py:1531
 msgid "You are a referee for category:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1560
+#: modules/websubmit/lib/websubmit_templates.py:1568
 msgid "List of refereed types of documents"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1561
+#: modules/websubmit/lib/websubmit_templates.py:1569
 msgid ""
 "Select one of the following types of documents to check the documents status."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1619
+#: modules/websubmit/lib/websubmit_templates.py:1627
 msgid "List of refereed categories"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1620
+#: modules/websubmit/lib/websubmit_templates.py:1628
 msgid "Please choose a category"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1639
-#: modules/websubmit/lib/websubmit_templates.py:1680
-#: modules/websubmit/lib/websubmit_templates.py:1745
+#: modules/websubmit/lib/websubmit_templates.py:1647
+#: modules/websubmit/lib/websubmit_templates.py:1688
+#: modules/websubmit/lib/websubmit_templates.py:1753
 #, fuzzy
 msgid "Pending"
 msgstr "Оголошення"
 
-#: modules/websubmit/lib/websubmit_templates.py:1645
-#: modules/websubmit/lib/websubmit_templates.py:1683
-#: modules/websubmit/lib/websubmit_templates.py:1746
+#: modules/websubmit/lib/websubmit_templates.py:1653
+#: modules/websubmit/lib/websubmit_templates.py:1691
+#: modules/websubmit/lib/websubmit_templates.py:1754
 #, fuzzy
 msgid "Approved"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1651
-#: modules/websubmit/lib/websubmit_templates.py:1685
-#: modules/websubmit/lib/websubmit_templates.py:1686
-#: modules/websubmit/lib/websubmit_templates.py:1747
+#: modules/websubmit/lib/websubmit_templates.py:1659
+#: modules/websubmit/lib/websubmit_templates.py:1693
+#: modules/websubmit/lib/websubmit_templates.py:1694
+#: modules/websubmit/lib/websubmit_templates.py:1755
 #, fuzzy
 msgid "Rejected"
 msgstr "обмежено"
 
-#: modules/websubmit/lib/websubmit_templates.py:1679
+#: modules/websubmit/lib/websubmit_templates.py:1687
 msgid "Key"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1682
+#: modules/websubmit/lib/websubmit_templates.py:1690
 #, fuzzy
 msgid "Waiting for approval"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1684
+#: modules/websubmit/lib/websubmit_templates.py:1692
 #, fuzzy
 msgid "Already approved"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1687
+#: modules/websubmit/lib/websubmit_templates.py:1695
 msgid "Some documents are pending."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1742
+#: modules/websubmit/lib/websubmit_templates.py:1750
 msgid "List of refereed documents"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1743
+#: modules/websubmit/lib/websubmit_templates.py:1751
 msgid "Click on a report number for more information."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1744
+#: modules/websubmit/lib/websubmit_templates.py:1752
 #, fuzzy
 msgid "Report Number"
 msgstr "вересень"
 
-#: modules/websubmit/lib/websubmit_templates.py:1867
+#: modules/websubmit/lib/websubmit_templates.py:1875
 msgid "Your request has been sent to the referee."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1881
+#: modules/websubmit/lib/websubmit_templates.py:1889
 msgid "Title:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1887
+#: modules/websubmit/lib/websubmit_templates.py:1895
 msgid "Author:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1895
+#: modules/websubmit/lib/websubmit_templates.py:1903
 msgid "More information:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1896
+#: modules/websubmit/lib/websubmit_templates.py:1904
 msgid "Click here"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1902
+#: modules/websubmit/lib/websubmit_templates.py:1910
 #, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1905
-#: modules/websubmit/lib/websubmit_templates.py:1925
-#: modules/websubmit/lib/websubmit_templates.py:1935
+#: modules/websubmit/lib/websubmit_templates.py:1913
+#: modules/websubmit/lib/websubmit_templates.py:1933
+#: modules/websubmit/lib/websubmit_templates.py:1943
 #, fuzzy
 msgid "It was first sent for approval on:"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1907
-#: modules/websubmit/lib/websubmit_templates.py:1909
-#: modules/websubmit/lib/websubmit_templates.py:1927
-#: modules/websubmit/lib/websubmit_templates.py:1929
+#: modules/websubmit/lib/websubmit_templates.py:1915
+#: modules/websubmit/lib/websubmit_templates.py:1917
+#: modules/websubmit/lib/websubmit_templates.py:1935
 #: modules/websubmit/lib/websubmit_templates.py:1937
-#: modules/websubmit/lib/websubmit_templates.py:1939
+#: modules/websubmit/lib/websubmit_templates.py:1945
+#: modules/websubmit/lib/websubmit_templates.py:1947
 msgid "Last approval email was sent on:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1910
+#: modules/websubmit/lib/websubmit_templates.py:1918
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1912
+#: modules/websubmit/lib/websubmit_templates.py:1920
 #: modules/websubmit/web/publiline.py:201
 msgid "Send Again"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1913
+#: modules/websubmit/lib/websubmit_templates.py:1921
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1916
+#: modules/websubmit/lib/websubmit_templates.py:1924
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1918
+#: modules/websubmit/lib/websubmit_templates.py:1926
 msgid "Approve/Reject"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1922
+#: modules/websubmit/lib/websubmit_templates.py:1930
 #, fuzzy, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
 msgstr "Запис видалено"
 
-#: modules/websubmit/lib/websubmit_templates.py:1924
+#: modules/websubmit/lib/websubmit_templates.py:1932
 #, fuzzy
 msgid "Its approved reference is:"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1930
+#: modules/websubmit/lib/websubmit_templates.py:1938
 #, fuzzy
 msgid "It was approved on:"
 msgstr "підтвердження"
 
-#: modules/websubmit/lib/websubmit_templates.py:1932
+#: modules/websubmit/lib/websubmit_templates.py:1940
 #, fuzzy, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
 msgstr "Запис видалено"
 
-#: modules/websubmit/lib/websubmit_templates.py:1940
+#: modules/websubmit/lib/websubmit_templates.py:1948
 #, fuzzy
 msgid "It was rejected on:"
 msgstr "обмежено"
