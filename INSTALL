@@ -72,7 +72,7 @@ Contents
      d) Python v2.3 or above:
          <http://python.org/>
         as well as the following Python modules:
-          - (mandatory) MySQLdb 
+          - (mandatory) MySQLdb (do *not* use 1.2.1_p2; see below)
              <http://sourceforge.net/projects/mysql-python>                
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>
@@ -93,7 +93,7 @@ Contents
              <http://psyco.sourceforge.net/>
           - (optional) RDFLib, to use RDF ontologies and thesauri:
              <http://rdflib.net/>
-          - (optional) mechanize, to run regression web tests:
+          - (optional) mechanize, to run regression web test suite:
              <http://wwwsearch.sourceforge.net/mechanize/>
 
         Note: If you happen to use MySQLdb 1.2.1_p2, please apply the
@@ -193,20 +193,16 @@ Contents
                     --with-python=/opt/python/bin/python2.3
       $ vi ./config/config.wml   ## optional, but strongly recommended
       $ make
-      $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> CREATE DATABASE cdsinvenio;
-          mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* TO cdsinvenio@webserver.domain.com IDENTIFIED BY 'myp1ss';
+      $ make install
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
-      $ make create-tables       ## optional
-      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                   /usr/local/lib/python2.3/site-packages/invenio \
-                   ## optional
-      $ make install
-      $ make test                ## optional
-      $ sudo chown -R www-data /opt/cds-invenio/var
+      $ sudo chgrp -R www-data /opt/cds-invenio
+      $ sudo chmod -R g+r /opt/cds-invenio
+      $ sudo chmod -R g+rw /opt/cds-invenio/var
+      $ sudo find /opt/cds-invenio -type d -exec chmod g+rxw {} \;
       $ make create-demo-site    ## optional
       $ make load-demo-records   ## optional
+      $ make test                ## optional
       $ make regression-test     ## optional
       $ make remove-demo-records ## optional
       $ make drop-demo-site      ## optional
@@ -364,24 +360,73 @@ Contents
           pre-created and customized based on the config you have
           edited in the previous step.
 
-          Before proceeding further with the CDS Invenio installation, we
-          have to do some admin-level tasks on the MySQL and Apache
-          servers.
+      $ make install
 
-      $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> CREATE DATABASE cdsinvenio;
-          mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* TO cdsinvenio@webserver.domain.com IDENTIFIED BY 'myp1ss';
-        
-          You need to create a dedicated database on your MySQL server
-          that the CDS Invenio can use for its purposes.  Please
-          contact your MySQL administrator and ask him to execute the
-          above commands that will create the "cdsinvenio" database, a
-          user called "cdsinvenio" with password "myp1ss", and that
-          will grant all rights on the "cdsinvenio" database to the
-          "cdsinvenio" user.  The credential values are the ones you
-          have chosen in the configure line above.
+          Install the web pages, scripts, utilities and everything
+          needed for runtime into the respective directories, as
+          specified earlier by the configure command.
 
-      $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
+          Note that the "make install" step checks for potential
+          problems such as the database connection rights and may ask
+          you to perform some more administrative steps in case it
+          detects a problem.  Notably, it may ask you to:
+
+              a) Set up database access permissions, e.g.:
+
+                   $ mysql -h sqlserver.domain.com -u root -p mysql
+                   mysql> CREATE DATABASE cdsinvenio;
+                   mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* \
+                                TO cdsinvenio@webserver.domain.com \
+                                IDENTIFIED BY 'myp1ss';
+                 
+                 If you are installing CDS Invenio for the first time,
+                 you have to create a dedicated database on your MySQL
+                 server that the CDS Invenio can use for its purposes.
+                 Please contact your MySQL administrator and ask him
+                 to execute the above commands that create the
+                 "cdsinvenio" database, a user called "cdsinvenio"
+                 with password "myp1ss", and that will grant all
+                 rights on the "cdsinvenio" database to the
+                 "cdsinvenio" user.  The credential values should be
+                 the ones you have chosen during the configure command
+                 executed before.  
+
+                 Note that the "make install" process will hint you at
+                 the exact command to use based on the values you have
+                 used in the configure line.
+
+              b) Set up database tables:         
+
+                   $ make create-tables
+             
+                 If you are installing CDS Invenio for the first time,
+                 you have to create the database tables by launching
+                 the above command.
+
+              c) Set up symbolic Python "invenio" module link:
+
+                   $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                                /usr/local/lib/python2.3/site-packages/invenio
+             
+                 If you are installing CDS Invenio for the first time,
+                 you have to create a symbolic link from Python's
+                 site-packages directory that would indicate to Python
+                 where to find CDS Invenio's Python files.
+             
+                 Note that the exact symlink target location depends
+                 on the --prefix location (prefix/lib/python/invenio)
+                 and the exact symlink source location depends on the
+                 Python version you are using.
+             
+                 Note that the "make install" process will hint you at
+                 the exact command to use based on the values you have
+                 used in the configure line.
+
+          At this point you should now have successfully completed the
+          "make install" process.  We continue by setting up the
+          Apache web server.
+
+      $ sudo vi /path/to/apache/conf/httpd.conf
 
           Please ask your webserver administrator to put the following
           line in your "httpd.conf" configuration file:
@@ -467,78 +512,43 @@ Contents
           Please ask your webserver administrator to restart the
           Apache server after the above "httpd.conf" changes.
 
-          After these admin-level tasks to be performed as root, let's
-          now go back to finish the installation of the CDS Invenio
-          package.
+      $ sudo chgrp -R www-data /opt/cds-invenio
+      $ sudo chmod -R g+r /opt/cds-invenio
+      $ sudo chmod -R g+rw /opt/cds-invenio/var
+      $ sudo find /opt/cds-invenio -type d -exec chmod g+rxw {} \;
 
-      $ make create-tables     ## optional
+          One more superuser step, because we need to enable Apache
+          server to read files from the installation place and to
+          write some log information and to cache interesting entities
+          inside the "var" subdirectory of our CDS Invenio
+          installation directory.
 
-          If you are installing for the first time, you have to create
-          CDS Invenio tables in the database.
-
-          Note that the `make install' process will warn you in case
-          the tables were not created and will ask you to run this
-          step manually before completing the make install process.
-
-      $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                   /usr/local/lib/python2.3/site-packages/invenio \
-                   ## optional
-
-          If you are installing for the first time, you will have to
-          create a symbolic link from Python's site-packages directory
-          that would indicate to Python where to find CDS Invenio's
-          Python files.
-
-          Note that the exact symlink target location depends on the
-          --prefix location (prefix/lib/python/invenio) and the exact
-          symlink source location depends on the Python version you
-          are using.  (See also --with-python configuration option.)
-
-          Note that the `make install' process will warn you in case
-          the symbolic link was not created and it will indicate you
-          the command to use to create it manually before completing
-          the make install process.
-
-      $ make install
-
-          Install the web pages, scripts, utilities and everything
-          needed for runtime into the respective directories, as
-          specified earlier by the configure command.
-
-          After this step, you should be able to point your browser to
-          the chosen URL of your local CDS Invenio installation and see it
-          running!
-
-      $ make test
-
-          Optionally, you can run the unit test suite to verify the
-          unit behaviour of your local CDS Invenio installation.  Note
-          that this command should be run only after you have
-          installed the whole system via `make install'.
-
-      $ sudo chown -R www-data /opt/cds-invenio/var
-
-          One more superuser step, as we need to enable Apache server
-          to write some log information and to cache interesting
-          entities inside the "var" subdirectory of our CDS Invenio
-          general installation directory.
-
-          Here we assume that your Apache server processes are run
+          Here we assumed that your Apache server processes are run
           under "www-data" group.  Change this appropriately for your
           system.
+
+          After these admin-level tasks to be performed as root, let's
+          now go back to finish the installation of the CDS Invenio.
 
       $ make create-demo-site  ## optional
 
           This step is recommended to test your local CDS Invenio
           installation.  It should give you our "Atlantis Institute of
           Science" demo installation, exactly as you see it at
-          <http://cdsware.cern.ch/DEMO/>.
+          <http://cdsware.cern.ch:8000/>.
 
       $ make load-demo-records  ## optional
 
           Optionally, load some demo records to be able to test
-          indexing and searching of your local demo CDS Invenio
+          indexing and searching of your local CDS Invenio demo
           installation.
+
+      $ make test               ## optional
+
+          Optionally, you can run the unit test suite to verify the
+          unit behaviour of your local CDS Invenio installation.  Note
+          that this command should be run only after you have
+          installed the whole system via `make install'.
 
       $ make regression-test     ## optional
 
@@ -548,20 +558,20 @@ Contents
            created the demo site and loaded the demo records.  Note
            also that running the regression test suite may alter the
            database content with junk data, so that rebuilding the
-           demo site is stongly recommended afterwards.
+           demo site is strongly recommended afterwards.
 
       $ make remove-demo-records ## optional
 
           Optionally, remove the demo records loaded in the previous
-          step but otherwise keep the demo collection, submit, format
-          etc configurations that you may reuse and modify for
-          production purposes.
+          step, but keeping otherwise the demo collection, submission,
+          format, and other configurations that you may reuse and
+          modify for your own production purposes.
 
       $ make drop-demo-site ## optional
 
           Optionally, drop also all the demo configuration so that
-          you'll have a blank CDS Invenio system for your production
-          purposes.
+          you'll end up with a completely blank CDS Invenio system for
+          your own production purposes.
 
       $ firefox http://webserver.domain.com/admin/ ## optional
 
@@ -570,14 +580,12 @@ Contents
           types, document formats, word file tables, etc.
 
           This configuration step is optional but you will most
-          probably want to define specific data collections to your
-          setup, or to configure submit pages for fill your
+          probably want to define specific data collections suited to
+          your setup, or to configure submit pages for fill your
           collections, to define new output formats, etc.
 
           This configuration step uses MySQL configuration tables and
-          can be done anytime during the production of your system,
-          unlike the configure-time or compile-time configurations
-          presented above.
+          can be done anytime during the production of your system.
 
 Good luck, and thanks for choosing CDS Invenio.
   
