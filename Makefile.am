@@ -63,15 +63,16 @@ install-data-local:
 	@echo "** CDS Invenio has been successfully installed!           **"
 	@echo "**                                                        **"
 	@echo "** If you are installing CDS Invenio for the first time,  **"
-	@echo "** we recommend you to run 'make create-demo-site' now to **"
-	@echo "** to test your installation.                             **"
+	@echo "** please continue with the Apache httpd configuration    **"
+	@echo "** step, as described in the INSTALL file.                **"
+	@echo "** Afterwards you may want to run 'make create-demo-site' **"
+	@echo "** to test your new installation.                         **"
 	@echo "**                                                        **"
 	@echo "** If you are reinstalling CDS Invenio because you have   **"
 	@echo "** edited CDS Invenio sources or its WML configuration,   **"
 	@echo "** you may want to restart your Apache server now by      **"
 	@echo "** running 'sudo apachectl restart'.                      **"
 	@echo "************************************************************"
-
 
 create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
@@ -184,7 +185,7 @@ create-demo-site:
 	@echo "**                                                                   **"
 	@echo "** Please point your browser to @WEBURL@ "
 	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
-	@echo "** demo site that is available at <http://cdsware.cern.ch/demo/>,    **"
+	@echo "** demo site that is available at <http://cdsware.cern.ch:8000/>,    **"
 	@echo "** with the exception that no demo records have been loaded yet.     **"
 	@echo "**                                                                   **"
 	@echo "** To load demo records, you can run 'make load-demo-records'.       **"
@@ -209,7 +210,7 @@ load-demo-records:
 	@echo "**                                                                   **"
 	@echo "** Please point your browser to @WEBURL@ "
 	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
-	@echo "** demo site that is available at <http://cdsware.cern.ch/demo/>.    **"
+	@echo "** demo site that is available at <http://cdsware.cern.ch:8000/>.    **"
 	@echo "**                                                                   **"
 	@echo "** To remove demo records, you can run 'make remove-demo-records'.   **"
 	@echo "** To drop also the demo site collection etc configurations,         **"
