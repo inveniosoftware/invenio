@@ -362,21 +362,21 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
     (ind1, ind2) = wash_indicators(ind1, ind2)
     
     if '%' in tag:
-        #Wild card in tag. Must find all corresponding fields
-        #fields_for_tag = (rec[field_tag] for field_tag in rec.keys() if tag_matches_pattern(field_tag, tag))
+        # Wild card in tag. Must find all corresponding fields
+        # fields_for_tag = (rec[field_tag] for field_tag in rec.keys() if tag_matches_pattern(field_tag, tag))
         if code == '':
-            #Code not specified. 
+            # Code not specified. 
             for field_tag in rec.keys():
                 if tag_matches_pattern(field_tag, tag):
                     fields = rec[field_tag]
                     for field in fields:
                         if (ind1 == '%' or field[1] == ind1) and \
                                (ind2 == '%' or field[2] == ind2):
-                            #Return matching field value if not empty
+                            # Return matching field value if not empty
                             if field[3] != "":
                                 return field[3]
         elif code == '%':
-            #Code is wildcard. Take first subfield of first matching field
+            # Code is wildcard. Take first subfield of first matching field
             for field_tag in rec.keys():
                 if tag_matches_pattern(field_tag, tag):
                     fields = rec[field_tag]
@@ -386,7 +386,7 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
                                (len(field[0]) > 0):
                             return field[0][0][1]
         else:
-            #Code is specified. Take corresponding one
+            # Code is specified. Take corresponding one
             for field_tag in rec.keys():
                 if tag_matches_pattern(field_tag, tag):
                     fields = rec[field_tag]
@@ -398,35 +398,35 @@ def record_get_field_value(rec, tag, ind1="", ind2="", code=""):
                                     return subfield[1]
 
     else:
-        #Tag is completely specified. Use tag as dict key
+        # Tag is completely specified. Use tag as dict key
         if rec.has_key(tag):
             fields = rec[tag]
             if code == '':
-                #Code not specified. 
+                # Code not specified. 
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
-                        #Return matching field value if not empty
-                        #or return "" empty if not exist.
+                        # Return matching field value if not empty
+                        # or return "" empty if not exist.
                         if field[3] != "":
                             return field[3]
 
             elif code == '%':
-                #Code is wildcard. Take first subfield of first matching field
+                # Code is wildcard. Take first subfield of first matching field
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2) and \
                            (len(field[0]) > 0):
                         return field[0][0][1]
             else:
-                #Code is specified. Take corresponding one
+                # Code is specified. Take corresponding one
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
                         for subfield in field[0]:
                             if subfield[0] == code:
                                 return subfield[1]
-    #Nothing was found 
+    # Nothing was found 
     return ""
                
 def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
@@ -454,7 +454,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
         keys = rec.keys()
         tags = [k for k in keys if tag_matches_pattern(k, tag)]
         if code == '' :
-            #Code not specified. Consider field value (without subfields)
+            # Code not specified. Consider field value (without subfields)
             for tag in tags:
                 fields = rec[tag]
                 for field in fields:
@@ -462,7 +462,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                            (ind2 == '%' or field[2] == ind2) and field[3] != '':
                         tmp.append(field[3])
         elif code == '%':
-            #Code is wildcard. Consider all subfields
+            # Code is wildcard. Consider all subfields
             for tag in tags:
                 fields = rec[tag]
                 for field in fields:
@@ -471,7 +471,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                         for subfield in field[0]:
                             tmp.append(subfield[1])
         else:
-            #Code is specified. Consider all corresponding subfields
+            # Code is specified. Consider all corresponding subfields
             for tag in tags:
                 fields = rec[tag]
                 for field in fields:
@@ -481,24 +481,24 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                             if subfield[0] == code:
                                 tmp.append(subfield[1])
     else:
-        #Tag is completely specified. Use tag as dict key
-        if rec.has_key(tag):
+        # Tag is completely specified. Use tag as dict key
+        if rec and rec.has_key(tag):
             fields = rec[tag]
             if code == '' :
-                #Code not specified. Consider field value (without subfields)
+                # Code not specified. Consider field value (without subfields)
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2) and field[3] != '':
                         tmp.append(field[3])
             elif code == '%':
-                #Code is wildcard. Consider all subfields
+                # Code is wildcard. Consider all subfields
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
                         for subfield in field[0]:
                             tmp.append(subfield[1])
             else:
-                #Code is specified. Take corresponding one
+                # Code is specified. Take corresponding one
                 for field in fields:
                     if (ind1 == '%' or field[1] == ind1) and \
                            (ind2 == '%' or field[2] == ind2):
@@ -506,7 +506,7 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
                             if subfield[0] == code:
                                 tmp.append(subfield[1])
     
-    #Nothing was found 
+    # If tmp was not set, nothing was found 
     return tmp
 
 def print_rec(rec, format=1):
