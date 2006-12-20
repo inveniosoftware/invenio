@@ -86,14 +86,58 @@ def printInfo():
     return
 
 def all_sets():
-
+    """
+    Returns a list of sets.
+    Each set is [id, setName, setSpec, setCollection, 
+                 setDescription, setDefinition, setRecList, 
+                 p1, f1, m1, p2, f2, m2, p3, f3, m3]
+    """
     sets = []
     query = "select * from oaiARCHIVE"
     res = run_sql(query)
     for row in res:
         sets.append(list(row))
+
+        # Split setDefinition column in columns collection, p1, f1, m1,
+        # p2, f2, m2, p3, f3, m3
+        
+        # Mapping between argument name and column number in sql table
+        arg_to_col_number = {'c': 3,
+                             'p1': 7,
+                             'f1': 8,
+                             'm1': 9,
+                             'p2': 10,
+                             'f2': 11,
+                             'm2': 12,
+                             'p3': 13,
+                             'f3': 14,
+                             'm3': 15}
+
+        params = parse_set_definition(row[5])
+        for arg, value in params.iteritems():
+            if arg_to_col_number.has_key(arg):
+                sets[-1][arg_to_col_number[arg]] = value
+            
     return sets
 
+def parse_set_definition(set_definition):
+    """
+    Returns the parameters for the given set definition
+
+    The returned structure is a dictionary with keys being
+    c, p1, f1, m1, p2, f2, m2, p3, f3, m3 and corresponding values
+
+    @param set_definition a string as returned by the database for column 'setDefinition'
+    @return a dictionary
+    """
+    params = {}
+    definitions = set_definition.split(';')
+    for definition in definitions:
+        arguments = definition.split('=')
+        if len(arguments) == 2:
+            params[arguments[0]] = arguments[1]
+    return params
+                
 def repository_size():
     "Read repository size"
 
@@ -108,23 +152,33 @@ def get_set_descriptions(setSpec):
     res = run_sql(query)
 
     for row in res:
-
-        set_descriptions_item = []
-        set_descriptions_item.append(setSpec)
-        set_descriptions_item.append(setSpec)
-        set_descriptions_item.append(row[3])
-        query_box = []
-        query_box.append(row[4])
-        query_box.append(row[5])
-        query_box.append(row[6])
-        set_descriptions_item.append(query_box)        
-        query_box = []
-        query_box.append(row[7])
-        query_box.append(row[8])
-        query_box.append(row[9])
-        set_descriptions_item.append(query_box)
-        set_descriptions.append(set_descriptions_item)
-
+        params = parse_set_definition(row[5])
+        params['setSpec'] = setSpec
+        params['setName'] = row[1]
+        ## set_descriptions_item = []
+##         set_descriptions_item.append(setSpec)
+##         set_descriptions_item.append(setSpec)
+##         #set_descriptions_item.append(row[3])
+##         set_descriptions_item.append(params['c'])
+##         query_box = []
+##         #query_box.append(row[4])
+##         #query_box.append(row[5])
+##         #query_box.append(row[6])
+##         query_box.append(params['p1'])
+##         query_box.append(params['f1'])
+##         query_box.append(params['m1'])
+##         set_descriptions_item.append(query_box)        
+##         query_box = []
+##         #query_box.append(row[7])
+##         query_box.append(params['p1'])
+##         #query_box.append(row[8])
+##         query_box.append(params['f1'])
+##         #query_box.append(row[9])
+##         query_box.append(params['m1'])
+##         set_descriptions_item.append(query_box)
+        
+##        set_descriptions.append(set_descriptions_item)
+        set_descriptions.append(params)
     return set_descriptions
 
 def get_recID_list(oai_sets, set):
@@ -132,26 +186,37 @@ def get_recID_list(oai_sets, set):
     setSpec          = ""
     setName          = ""
     setCoverage      = ""
-    list_of_sets     = []
-    list_of_sets_1   = []
+    #list_of_sets     = []
+    processed_sets   = []
     recID_list       = []
 
     for oai in oai_sets:
 
-        if oai[1] in list_of_sets_1:
+        if oai['setSpec'] in processed_sets :
             pass
         else:
-            list_of_sets.append(oai)
-            list_of_sets_1.append(oai[1])
+            #list_of_sets.append(oai)
+            processed_sets.append(oai['setSpec'])
 
-        if(oai[1]==set):
+        if(oai['setSpec'] == set):
         
-            setSpec = oai[1]
-            setName = oai[0]
-            setCoverage += oai[2]
+            setSpec = oai['setSpec']
+            setName = oai['setName']
+            setCoverage += oai['c']
             setCoverage += " "
 
-            recID_list_ = perform_request_search(c=oai[2], p1=oai[3][0], f1=oai[3][1], m1=oai[3][2], op1='a', p2=oai[4][0], f2=oai[4][1], m2=oai[4][2])
+            recID_list_ = perform_request_search(c=oai['c'].split(','),
+                                                 p1=oai['p1'],
+                                                 f1=oai['f1'],
+                                                 m1=oai['m1'],
+                                                 op1='a',
+                                                 p2=oai['p2'],
+                                                 f2=oai['f2'],
+                                                 m2=oai['m2'],
+                                                 op2='a',
+                                                 p3=oai['p3'],
+                                                 f3=oai['f3'],
+                                                 m3=oai['m3'])
 
             for recID in recID_list_:
                 if recID in recID_list:

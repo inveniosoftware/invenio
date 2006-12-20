@@ -44,7 +44,7 @@ import invenio.access_control_engine as access_manager
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
-
+from invenio.oaiarchive_engine import parse_set_definition
 import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
 
@@ -68,7 +68,6 @@ def perform_request_index(ln=cdslang):
     header = ['id','setSpec','setName','setCollection','p1','f1','m1','p2','f2','m2','p3','f3','m3','','','']
 
     oai_set = get_oai_set()
-
     sets = []
     
     for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3) in oai_set:
@@ -85,7 +84,7 @@ def perform_request_index(ln=cdslang):
 
     out = transform_tuple(header=header, tuple=sets)
     
-    out += "<br><br>"
+    out += "<br /><br />"
 
     return out
 
@@ -98,20 +97,23 @@ def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection=
     if func in ["0", 0]:
         text   = input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, ln=cdslang)
         out = createform(action="addset",
-                                  text=text,
-                                  ln=ln,
-                                  button="Add new OAI set definition line",
-                                  func=1)
+                         text=text,
+                         ln=ln,
+                         button="Add new OAI set definition line",
+                         func=1)
         lnargs = [["ln", ln]]
 
     if func in ["1", 1]:
-        out += "<br><br>"
+        out += "<br />"
 
         res = add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3)
-
+        if res[0] == 1:
+            out += bibharvest_templates.tmpl_print_info(cdslang,
+                                                        "OAI set definition %s added." % oai_set_name)
+            out += "<br />"
 
         lnargs = [["ln", ln]]
-        out += "<br><br>"
+        out += "<br /><br />"
         out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     body = [out]
@@ -185,9 +187,15 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
                              oai_set_p3,
                              oai_set_f3,
                              oai_set_m3)
-
+        out += "<br />"
+        if res[0] == 1:
+            out += bibharvest_templates.tmpl_print_info(cdslang,
+                                                        "OAI set definition #%s edited." % oai_set_id)
+            out += "<br />"
+            
     lnargs = [["ln", ln]]
-    out += "<br><br>"
+    out += "<br />"
+       
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     body = [out]
@@ -227,7 +235,7 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
             if oai_set:
                 question = """Do you want to delete the OAI definition #%s?""" % oai_set_id
                 text = bibharvest_templates.tmpl_print_info(cdslang, question)
-                text += "<br><br><br>"
+                text += "<br /><br /><br />"
                 text += pagebody_text("%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s" % (oai_set_spec,
                                                                                oai_set_name,
                                                                                oai_set_collection,
@@ -252,12 +260,12 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
             res = delete_oai_set(oai_set_id)
             if res[0] == 1:
                 out += bibharvest_templates.tmpl_print_info(cdslang, "OAI set definition #%s deleted." % oai_set_id)
-                out += "<br>"
+                out += "<br />"
             else:
                 pass
                 
     lnargs = [["ln", ln]]
-    out += "<br><br>"
+    out += "<br /><br />"
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
 
     body = [out]
@@ -266,46 +274,83 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
 
 def get_oai_set(id=''):
     """Returns a row parameters for a given id"""
-    sql = "SELECT id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3 FROM oaiARCHIVE"
+    sets = []
+    sql = "SELECT id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, setDefinition FROM oaiARCHIVE"  
     try:
         if id:
             sql += " WHERE id=%s" % id
         sql += " ORDER BY setSpec asc"
         res = run_sql(sql)
-        return res
+        for row in res:
+            set = ['']*14
+            set[0] = row[0]
+            set[1] = row[1]
+            set[2] = row[2]
+            params = parse_set_definition(row[14])
+            set[3] = params.get('c', '')
+            set[5] = params.get('p1', '')
+            set[6] = params.get('f1', '')
+            set[7] = params.get('m1', '')
+            set[8] = params.get('p2', '')
+            set[9] = params.get('f2', '')
+            set[10] = params.get('m2', '')
+            set[11] = params.get('p3', '')
+            set[12] = params.get('f3', '')
+            set[13] = params.get('m3', '')
+            sets.append(set)
+        return sets
     except StandardError, e:
-        return ""
+        return str(e)
 
 def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3):
     """Modifies a row's parameters"""
     
     try:
-        sql = "UPDATE oaiARCHIVE SET setName='%s' WHERE id=%s" % (escape_string(oai_set_name), oai_set_id)
+        set_definition = 'c=' + oai_set_collection + ';' + \
+                         'p1=' + oai_set_p1 + ';' + \
+                         'f1=' + oai_set_f1 + ';' + \
+                         'm1=' + oai_set_m1 + ';' + \
+                         'p2=' + oai_set_p2 + ';' + \
+                         'f2=' + oai_set_f2 + ';' + \
+                         'm2=' + oai_set_m2 + ';' + \
+                         'p3=' + oai_set_p3 + ';' + \
+                         'f3=' + oai_set_f3 + ';' + \
+                         'm3=' + oai_set_m3 + ';'
+        sql = """UPDATE oaiARCHIVE SET
+        setName='%s',
+        setSpec='%s',
+        setCollection='%s',
+        setDescription='%s',
+        setDefinition='%s',
+        p1='%s',
+        f1='%s',
+        m1='%s',
+        p2='%s',
+        f2='%s',
+        m2='%s',
+        p3='%s',
+        f3='%s',
+        m3='%s'
+        WHERE id=%s""" % (
+            escape_string(oai_set_name), \
+            escape_string(oai_set_spec), \
+            escape_string(oai_set_collection), \
+            escape_string(oai_set_description), \
+            escape_string(set_definition), \
+            escape_string(oai_set_p1), \
+            escape_string(oai_set_f1), \
+            escape_string(oai_set_m1), \
+            escape_string(oai_set_p2), \
+            escape_string(oai_set_f2), \
+            escape_string(oai_set_m2), \
+            escape_string(oai_set_p3), \
+            escape_string(oai_set_f3), \
+            escape_string(oai_set_m3),  \
+            oai_set_id \
+            )
+            
         res = run_sql(sql)
-        sql = "UPDATE oaiARCHIVE SET setSpec='%s' WHERE id=%s" % (escape_string(oai_set_spec), oai_set_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiARCHIVE SET setCollection='%s' WHERE id=%s" % (escape_string(oai_set_collection), oai_set_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiARCHIVE SET setDescription='%s' WHERE id=%s" % (escape_string(oai_set_description), oai_set_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiARCHIVE SET p1='%s' WHERE id=%s" % (escape_string(oai_set_p1), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET f1='%s' WHERE id=%s" % (escape_string(oai_set_f1), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET m1='%s' WHERE id=%s" % (escape_string(oai_set_m1), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET p2='%s' WHERE id=%s" % (escape_string(oai_set_p2), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET f2='%s' WHERE id=%s" % (escape_string(oai_set_f2), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET m2='%s' WHERE id=%s" % (escape_string(oai_set_m2), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET p3='%s' WHERE id=%s" % (escape_string(oai_set_p3), oai_set_id)
-        res = run_sql(sql)                                                              
-        sql = "UPDATE oaiARCHIVE SET f3='%s' WHERE id=%s" % (escape_string(oai_set_f3), oai_set_id)
-        res = run_sql(sql)                                                                                 
-        sql = "UPDATE oaiARCHIVE SET m3='%s' WHERE id=%s" % (escape_string(oai_set_m3), oai_set_id)
-        res = run_sql(sql)
+
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -313,12 +358,22 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
 def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3):
     """Add a definition into the OAI archive"""
     try:
+        set_definition = 'c=' + oai_set_collection + ';' + \
+                         'p1=' + oai_set_p1 + ';' + \
+                         'f1=' + oai_set_f1 + ';' + \
+                         'm1=' + oai_set_m1 + ';' + \
+                         'p2=' + oai_set_p2 + ';' + \
+                         'f2=' + oai_set_f2 + ';' + \
+                         'm2=' + oai_set_m2 + ';' + \
+                         'p3=' + oai_set_p3 + ';' + \
+                         'f3=' + oai_set_f3 + ';' + \
+                         'm3=' + oai_set_m3 + ';'
         sql = "insert into oaiARCHIVE values (0, '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (
             escape_string(oai_set_name), \
             escape_string(oai_set_spec), \
             escape_string(oai_set_collection), \
             escape_string(oai_set_description), \
-            escape_string(oai_set_definition), \
+            escape_string(set_definition), \
             escape_string(oai_set_p1), \
             escape_string(oai_set_f1), \
             escape_string(oai_set_m1), \
@@ -407,7 +462,7 @@ def oai_table(ln=cdslang):
     sets.append(['',add_request,'','','','','','','','','','','',''])
     
     out = transform_tuple(header=header, tuple=sets)
-    out += "<br><br>"
+    out += "<br /><br />"
     
     return out
     
@@ -449,26 +504,28 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
                      ['y','',modes['y']],
                      ['','','']]
 
-    text = "<br>"
+    text = "<br />"
     text += "<table><tr><td>"
     text += input_text(ln = cdslang, title = "OAI Set spec:", name = "oai_set_spec", value = oai_set_spec)
     text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "OAI Set name:", name = "oai_set_name", value = oai_set_name)
 
-    text += "</td></tr><tr><td>"
+    text += "</td></tr><tr><td>&nbsp;</td></tr><tr><td>"
 #    text += input_text(ln = cdslang, title = "OAI Set description", name = "oai_set_description", value = oai_set_description)
-    text += "</td><td colspan=2>"
 
-    menu = create_drop_down_menu("SELECT distinct(name) from collection")
-    menu.append(['','',''])
+    #text += "</td><td colspan=2>"
 
-    if (oai_set_collection):
-        menu.append([oai_set_collection,'selected',oai_set_collection])
-    else:
-        menu.append(['','selected','Collection'])
+    #menu = create_drop_down_menu("SELECT distinct(name) from collection")
+    #menu.append(['','',''])
+
+    #if (oai_set_collection):
+    #    menu.append([oai_set_collection,'selected',oai_set_collection])
+    #else:
+    #    menu.append(['','selected','Collection'])
         
+    text += input_text(ln = cdslang, title = "Collection(s):", name="oai_set_collection", value=oai_set_collection)
 
-    text += drop_down_menu("oai_set_collection", menu)
+    #text += drop_down_menu("oai_set_collection", menu)
     
     text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p1", value = oai_set_p1)

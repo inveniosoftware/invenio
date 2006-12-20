@@ -216,7 +216,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
     if confirm <= -1:
         text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Enter the base url", name = "oai_src_baseurl", value = oai_src_baseurl)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Enter the base url", name = "oai_src_baseurl", value = oai_src_baseurl+'http://')
         output = createhiddenform(action="addsource",
                                   text=text,
                                   ln=ln,
