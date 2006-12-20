@@ -132,7 +132,7 @@ update-v0.7.1-tables: local-dbexec
 	@echo "**    @PYTHON@ modules/webbasket/lib/webbasket_migration_kit.py "
 	@echo "** Please see the RELEASE-NOTES for details.           **"         
 	@echo "**********************************************************"
-# FIXME: OAI table migration
+	@echo "INSERT INTO oaiARCHIVE (id, setName, setSpec, setDescription, setDefinition, setRecList) SELECT id, setName, setSpec, CONCAT_WS('', setDescription), setDefinition, setRecList FROM oaiSET;"
 
 update-v0.90.0-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
@@ -147,6 +147,16 @@ update-v0.90.1-tables: local-dbexec
 	echo "ALTER TABLE sbmCATEGORIES ADD PRIMARY KEY (doctype, sname);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE sbmCATEGORIES ADD KEY doctype (doctype);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN setspecs TEXT NOT NULL DEFAULT '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE setDescription setDescription text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE p1 p1 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE f1 f1 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE m1 m1 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE p2 p2 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE f2 f2 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE m2 m2 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE p3 p3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE f3 f3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE oaiARCHIVE CHANGE m3 m3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
