@@ -304,6 +304,10 @@ def task_run(task_id):
             for record in recs:
                 error = bibupload(record)
                 if error[0] == 1:
+                    if record:                        
+                        sys.stderr.write("\n"+record_xml_output(record)+"\n\n")
+                    else:
+                        sys.stderr.write("\nRecord could not have been parsed.\n\n")
                     stat['nb_errors'] += 1
                 task_update_progress("Done %d out of %d." % \
                                      (stat['nb_records_inserted'] + \
