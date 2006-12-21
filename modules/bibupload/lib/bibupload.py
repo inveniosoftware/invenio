@@ -870,10 +870,10 @@ def retrieve_rec_id(record):
     else:
         if options['mode'] != 'insert' and \
            options['mode'] != 'replace_or_insert':
-                write_message("   Failed : Record not found in the database."\
-                              " Please insert the file before updating it."\
-                              " (-h for help)", verbose=1, stream=sys.stderr)
-                return -1
+            write_message("   Failed : Record not found in the database."\
+                          " Please insert the file before updating it."\
+                          " (-h for help)", verbose=1, stream=sys.stderr)
+            return -1
 
     return rec_id
 
