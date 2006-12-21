@@ -58,6 +58,11 @@ def getnavtrail(previous = ''):
 def perform_request_index(ln=cdslang):
     """OAI archive admin index"""
 
+    out = '''<p>Define below the sets to expose through the OAI harvesting
+    protocol. <br /> You will have to run the
+    <a href="guide.html#3.2"><code>oaiarchive</code></a>
+    utility to apply the settings you have defined here.</p>'''
+
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang,
                                                        weburl = weburl,
                                                        title = "OAI repository",
@@ -82,7 +87,7 @@ def perform_request_index(ln=cdslang):
     
     sets.append(['',add_request,'','','','','','','','','','','',''])
 
-    out = transform_tuple(header=header, tuple=sets)
+    out += transform_tuple(header=header, tuple=sets)
     
     out += "<br /><br />"
 
