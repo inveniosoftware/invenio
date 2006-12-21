@@ -340,7 +340,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     Author(s): %s
 
     To access the document(s), select the file(s) from the location:
-    <%s/getfile.py?recid=%s>
+    <%s/record/%s/files/>
 
     To approve/reject the document, you should go to this URL:
     <%s/approve.py?%s>
