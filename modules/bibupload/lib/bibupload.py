@@ -291,8 +291,7 @@ def task_run(task_id):
 
     ## run the task:
     error = 0
-    write_message("BibUpload Mode "+options['mode']+" has been choosen.",
-                  verbose=2)
+    write_message("Input file '%s', input mode '%s'." % (options['file_path'], options['mode']))
     write_message("STAGE 0:", verbose=2)
     
     if options['file_path'] is not None: 
