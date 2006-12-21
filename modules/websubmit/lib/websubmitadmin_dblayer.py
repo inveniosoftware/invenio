@@ -241,9 +241,9 @@ def delete_submission_collection_details(collection_id):
     else:
         ## everything NOT OK - still rows remaining for this submission-collection
         ## make a last attempt to delete them:
-        run_sql(q, (collection_id,))
+        run_sql(qstr, (collection_id,))
         ## once more, check the number of rows remaining for this submission-collection:
-        numrows_submission_collection = get_number_rows_for_submission_collection(collection_id)
+        numrows_submission_collection = get_number_of_rows_for_submission_collection(collection_id)
         if numrows_submission_collection == 0:
             ## Everything OK - submission-collection deleted
             return 0
@@ -268,7 +268,7 @@ def delete_submission_collection_from_submission_tree(collection_id):
     else:
         ## submission-collection still exists as a branch of the submission tree
         ## try once more to delete it:
-        run_sql(q, (collection_id,))
+        run_sql(qstr, (collection_id,))
         numrows_collection = \
                   get_number_of_rows_for_submission_collection_as_submission_tree_branch(collection_id)
         if numrows_collection == 0:
@@ -311,7 +311,7 @@ def delete_doctype_children_from_submission_collection(collection_id):
     else:
         ## everything NOT OK - still doctype-children remaining for this submission-collection
         ## make a last attempt to delete them:
-        run_sql(q, (collection_id,))
+        run_sql(qstr, (collection_id,))
         ## once more, check the number of doctype-children remaining
         num_doctype_children = get_number_of_doctype_children_of_submission_collection(collection_id)
         if num_doctype_children == 0:
