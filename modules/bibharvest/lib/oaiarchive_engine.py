@@ -425,9 +425,8 @@ def oaiarchive_task(arg):
                     
         oai_out.close()
     
-    
-    if upload and oaisetentrycount  > 0:
-        if(mode==1):
+    if upload:
+        if(mode==1) and oaisetentrycount:
             command="%s/bibupload -a %s" % (bindir, filename)
             os.system(command)
         if(mode==2):
