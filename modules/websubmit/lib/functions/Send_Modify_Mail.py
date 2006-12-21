@@ -37,7 +37,8 @@ from invenio.config import \
      accessurl, \
      adminemail, \
      cdsname, \
-     supportemail
+     supportemail, \
+     weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.websubmit_functions.mail import forge_email, send_email
 
@@ -68,7 +69,7 @@ def Send_Modify_Mail (parameters,curdir,form):
     email_txt = "Dear Sir or Madam, \n%s %s has just been modified.\nModified fields: %s\n\n" % (type,rn,fields)
     if accessurl != "" and sysno != "":
         email_txt += "You can check the modified document here:\n"
-        email_txt += "<%s?id=%s>\n\n" % (accessurl,sysno)
+        email_txt += "<%s/record/%s>\n\n" % (weburl,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % cdsname
     # send the mail
     tostring = sub.strip()
