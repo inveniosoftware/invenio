@@ -891,13 +891,13 @@ class Template:
                      'groups' : _("groups"),
                    }
             if submitter:
-                out += """<a class="userinfo" href="%(weburl)s/yoursubmissions?ln=%(ln)s">%(submission)s</a> :: """ % {
+                out += """<a class="userinfo" href="%(weburl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
                          'weburl' : weburl,
                          'ln' : ln,
                          'submission' : _("submissions"),
                        }
             if referee:
-                out += """<a class="userinfo" href="%(weburl)s/yourapprovals?ln=%(ln)s">%(approvals)s</a> :: """ % {
+                out += """<a class="userinfo" href="%(weburl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
                          'weburl' : weburl,
                          'ln' : ln,
                          'approvals' : _("approvals"),
