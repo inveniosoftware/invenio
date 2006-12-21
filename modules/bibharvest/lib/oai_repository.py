@@ -216,7 +216,7 @@ def get_modification_date(sysno):
     "Returns the date of last modification for the record 'sysno'."
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
-    if res[0][0]:
+    if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
 
@@ -257,7 +257,7 @@ def print_record(sysno, format='marcxml'):
     """
     
     out = ""
-
+    
     # sanity check:
     if not record_exists(sysno):
         return
@@ -592,18 +592,19 @@ def oailistidentifiers(args):
                         out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
                 sysno.append(sysno_)
             else:
-                for ident in get_field(sysno_, CFG_OAI_ID_FIELD): 
-                    if record_exists(sysno_) == -1: #Deleted?
-                        if CFG_OAI_DELETED_POLICY == "persistent" \
-                               or CFG_OAI_DELETED_POLICY == "transient":
-                            out = out + "    <header status=\"deleted\">\n"
-                    else:
-                        out = out + "    <header>\n"
-                    out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
-                    out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
-                    for set in get_field(sysno_, CFG_OAI_SET_FIELD):
-                        out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
-                    out = out + "    </header>\n"
+                for ident in get_field(sysno_, CFG_OAI_ID_FIELD):
+                    if ident != '':
+                        if record_exists(sysno_) == -1: #Deleted?
+                            if CFG_OAI_DELETED_POLICY == "persistent" \
+                                   or CFG_OAI_DELETED_POLICY == "transient":
+                                out = out + "    <header status=\"deleted\">\n"
+                        else:
+                            out = out + "    <header>\n"
+                        out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
+                        out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
+                        for set in get_field(sysno_, CFG_OAI_SET_FIELD):
+                            out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
+                        out = out + "    </header>\n"
 
     if i > CFG_OAI_LOAD:
         oaicacheclean() # clean cache from expired resumptionTokens
