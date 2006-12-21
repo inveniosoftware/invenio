@@ -828,7 +828,7 @@ INSERT INTO sbmFIELD VALUES ('MBIPICT',1,2,'TEXTChange','<BR>Please select all t
 INSERT INTO sbmFIELD VALUES ('APPRPICT',1,4,'button_validate','<br><br>','O','','','2002-05-07','2002-05-28','','');
 
 INSERT INTO sbmFIELDDESC VALUES ('TI','TI','245__a','T',0,5,60,0,'','','1998-08-17','2002-06-11','<br>Please correct the title:<br>','',0);
-INSERT INTO sbmFIELDDESC VALUES ('AU','100__a','100__a','T',0,6,30,0,'','','1998-08-17','2002-02-08','<br>Please correct the list of authors:<br>','',0);
+INSERT INTO sbmFIELDDESC VALUES ('AU','100__a','100__a,700__a','T',0,6,30,0,'','','1998-08-17','2002-02-08','<br>Please correct the list of authors:<br>','',0);
 INSERT INTO sbmFIELDDESC VALUES ('AF','AF','','T',0,2,50,0,'','','1998-08-17','0000-00-00','','',0);
 INSERT INTO sbmFIELDDESC VALUES ('KW','KW','650__a','T',0,2,50,0,'','','1998-08-17','2002-05-06','<br>Please correct the keywords:<br>','',0);
 INSERT INTO sbmFIELDDESC VALUES ('NO','NO','500__a','T',0,3,60,0,'','','1998-08-17','2001-11-19','<br>Please correct the note:<br>','',0);
