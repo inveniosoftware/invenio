@@ -1591,12 +1591,12 @@ class BibFormatObject:
 
         return self.record
     
-    def control_field(self, tag):
+    def control_field(self, tag, escape=0):
         """
         Returns the value of control field given by tag in record
         
-        @param record the record to retrieve values from
         @param tag the marc code of a field
+        @param escape 1 if returned value should be escaped. Else 0.
         @return value of field tag in record
         """
         if self.get_record() is None:
@@ -1605,29 +1605,40 @@ class BibFormatObject:
         
         p_tag = parse_tag(tag)
 
-        return record_get_field_value(self.get_record(),
-                                      p_tag[0],
-                                      p_tag[1],
-                                      p_tag[2],
-                                      p_tag[3])
+        if escape == 1:
+            return cgi.escape(record_get_field_value(self.get_record(),
+                                                     p_tag[0],
+                                                     p_tag[1],
+                                                     p_tag[2],
+                                                     p_tag[3]))
+        else:
+            return record_get_field_value(self.get_record(),
+                                          p_tag[0],
+                                          p_tag[1],
+                                          p_tag[2],
+                                          p_tag[3])
 
-    def field(self, tag):
+    def field(self, tag, escape=0):
         """
         Returns the value of the field corresponding to tag in the
         current record.
 
         if the value does not exist, return empty string
-        @param record the record to retrieve values from
+
         @param tag the marc code of a field
+        @param escape 1 if returned value should be escaped. Else 0.
         @return value of field tag in record
         """
         list_of_fields = self.fields(tag)
         if len(list_of_fields) > 0:
-            return list_of_fields[0]
+            if escape == 1:
+                return cgi.escape(list_of_fields[0])
+            else:
+                return list_of_fields[0]
         else:
             return ""
 
-    def fields(self, tag):
+    def fields(self, tag, escape=0):
         """
         Returns the list of values corresonding to "tag".
 
@@ -1636,8 +1647,9 @@ class BibFormatObject:
         are the subcodes and the values are the values of tag.subcode.
         If the tag has a subcode, simply returns list of values
         corresponding to tag.
-        @param record the record to retrieve values from
+        
         @param tag the marc code of a field
+        @param escape 1 if returned values should be escaped. Else 0.
         @return values of field tag in record
         """
         if self.get_record() is None:
@@ -1647,25 +1659,29 @@ class BibFormatObject:
         p_tag = parse_tag(tag)
         if p_tag[3] != "":
             # Subcode has been defined. Simply returns list of values
-            return record_get_field_values(self.get_record(),
-                                           p_tag[0],
-                                           p_tag[1],
-                                           p_tag[2],
-                                           p_tag[3])
+            values = record_get_field_values(self.get_record(),
+                                             p_tag[0],
+                                             p_tag[1],
+                                             p_tag[2],
+                                             p_tag[3])
+            if escape == 1:
+                return [cgi.escape(value) for value in values]
+            else:
+                return values
         else:
             # Subcode is undefined. Returns list of dicts.
             # However it might be the case of a control field.
-            list_of_dicts = []
 
             instances = record_get_field_instances(self.get_record(),
                                                    p_tag[0],
                                                    p_tag[1],
                                                    p_tag[2])
-            for instance in instances:
-                instance_dict = dict(instance[0])
-                list_of_dicts.append(instance_dict)
-
-            return list_of_dicts
+            if escape == 1:
+                return [dict([ (subfield[0], cgi.escape(subfield[1])) \
+                               for subfield in instance[0] ]) \
+                        for instance in instances]
+            else:
+                return [dict(instance[0]) for instance in instances]
 
     def kb(self, kb, string, default=""):
         """
