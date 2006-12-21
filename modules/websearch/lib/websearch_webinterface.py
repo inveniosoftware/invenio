@@ -65,7 +65,6 @@ def wash_search_urlargd(form):
     
     return argd
 
-
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
@@ -88,6 +87,15 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if uid == -1:
             return page_not_authorized(req, "../")
         
+        # Check if the record belongs to a restricted primary
+        # collection.  If yes, redirect to the authenticated URL.
+        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
+        if search_engine.coll_restricted_p(record_primary_collection):
+            del argd['recid'] # not wanted argument for detailed record page
+            target = '/record-restricted/' + str(self.recid) + '/' + \
+                     make_canonical_urlargd(argd, search_results_default_urlargd)
+            return redirect_to_url(req, target)
+
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
         if out == []:
@@ -98,7 +106,54 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     # Return the same page wether we ask for /record/123 or /record/123/
     index = __call__
 
+class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
+    """ Handling of a /record-restricted/<recid> URL fragment """
+
+    _exports = ['', 'files']
+
+    def __init__(self, recid):
+        self.recid = recid
+        self.files = WebInterfaceFilesPages(self.recid)
+        return
     
+    def __call__(self, req, form):
+        argd = wash_search_urlargd(form)
+        argd['recid'] = self.recid
+
+        req.argd = argd
+
+        from invenio.webuser import getUid, page_not_authorized
+
+        uid = getUid(req)
+        if uid == -1:
+            return page_not_authorized(req, "../")
+        
+        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
+        def check_credentials(user, password):
+            from invenio.webuser import auth_apache_user_collection_p
+            
+            if not auth_apache_user_collection_p(user, password,
+                                                 record_primary_collection):
+                return False
+            return True
+
+        # this function only returns if the credentials are valid
+        http_check_credentials(req, record_primary_collection, check_credentials)
+
+        # Keep all the arguments, they might be reused in the
+        # record page itself to derivate other queries
+        req.argd = argd
+
+        # mod_python does not like to return [] in case when of=id:
+        out = search_engine.perform_request_search(req, **argd)
+        if out == []:
+            return str(out)
+        else:
+            return out                
+
+    # Return the same page wether we ask for /record/123 or /record/123/
+    index = __call__
+
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     """ Handling of the /search URL and its sub-pages. """
 
@@ -207,7 +262,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         
             return answer, []
 
-        elif component == 'record':
+        elif component == 'record' or component == 'record-restricted':
             try:
                 recid = int(path[0])
             except IndexError:
@@ -225,7 +280,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 # display page not found for URLs like /record/-5 or /record/0
                 return None, []
 
-            return WebInterfaceRecordPages(recid), path[1:]
+            if component == 'record-restricted':
+                return WebInterfaceRecordRestrictedPages(recid), path[1:]
+            else:
+                return WebInterfaceRecordPages(recid), path[1:]
 
         return None, []
 
