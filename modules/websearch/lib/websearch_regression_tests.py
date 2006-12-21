@@ -725,6 +725,59 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         # if we got here, things are broken:
         self.fail("Oops, Dr. Jekyll with wrong password should not be able to search Theses collection.")
 
+    def test_restricted_detailed_record_page_as_anonymous_guest(self):
+        """websearch - restricted detailed record page not accessible to guests"""
+        errmsgs = test_web_page_content(weburl + '/record/35')
+        if errmsgs[0].find("HTTP Error 401: Authorization Required") > -1:
+            pass
+        else:
+            self.fail("Oops, accessing restricted detailed record page without password should have returned HTTP Error 401.")
+        return
+
+    def test_restricted_detailed_record_page_as_authorized_person(self):
+        """websearch - restricted detailed record page accessible to authorized person"""
+        testurl = weburl + '/record/35'
+        browser = Browser()
+        # Dr. Jekyll should be able to connect
+        # (add the pw to the whole weburl because we shall be
+        # redirected to '/reordrestricted/'):
+        browser.add_password(weburl, "jekyll", "j123ekyll") 
+        browser.open(testurl)
+        if browser.response().read().find("A High-performance Video Browsing System") > -1:
+            pass
+        else:
+            self.fail("Oops, Dr. Jekyll should be able to access restricted detailed record page.")
+
+    def test_restricted_detailed_record_page_as_unauthorized_person(self):
+        """websearch - restricted detailed record page not accessible to unauthorized person"""
+        testurl = weburl + '/record/35'
+        browser = Browser()
+        # Mr. Hyde should not be able to connect:
+        browser.add_password(testurl, "hyde", "h123yde")
+        try:
+            browser.open(testurl)
+        except HTTPError, errmsg:
+            if str(errmsg) == "HTTP Error 401: Authorization Required":
+                # good, things worked
+                return
+        # if we got here, things are broken:
+        self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
+
+    def test_restricted_detailed_record_page_with_wrong_credentials(self):
+        """websearch - restricted detailed record page not accessible with wrong credentials"""
+        testurl = weburl + '/record/35'
+        browser = Browser()
+        # Dr. Jekyll with wrong password should not be able to connect:
+        browser.add_password(testurl, "jekyll", "h123yde")
+        try:
+            browser.open(testurl)
+        except HTTPError, errmsg:
+            if str(errmsg) == "HTTP Error 401: Authorization Required":
+                # good, things worked
+                return 
+        # if we got here, things are broken:
+        self.fail("Oops, Dr. Jekyll with wrong password should not be able to access restricted detailed record page.")
+
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
 
