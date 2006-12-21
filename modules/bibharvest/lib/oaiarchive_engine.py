@@ -130,7 +130,10 @@ def parse_set_definition(set_definition):
     @param set_definition a string as returned by the database for column 'setDefinition'
     @return a dictionary
     """
-    params = {}
+    params = {'c':'',
+              'p1':'', 'f1':'', 'm1':'',
+              'p2':'', 'f2':'', 'm2':'',
+              'p3':'', 'f3':'', 'm3':''}
     definitions = set_definition.split(';')
     for definition in definitions:
         arguments = definition.split('=')
