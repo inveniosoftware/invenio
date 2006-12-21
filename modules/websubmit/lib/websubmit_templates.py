@@ -1897,12 +1897,12 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(url)s?id=%(sysno)s">%(click)s</a>
+                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
-                     'url' : accessurl,
+                     'weburl' : weburl,
                      'sysno' : sysno,
                    }
 
