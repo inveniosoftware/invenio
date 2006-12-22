@@ -18,14 +18,11 @@ The CERN development group currently consists of:
      WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
      WebHelp, and more.
   
- - Martin Vesely <martin.vesely@cern.ch>
-     BibHarvest, BibConvert, BibMatch.
-
  - Nicholas Robinson <nicholas.robinson@cern.ch>
      WebSubmit, reference extraction for the BibEdit module.
 
- - Alberto Pepe <alberto.pepe@cern.ch>
-     BibClassify, BibHarvest Admin. 
+ - Martin Vesely <martin.vesely@cern.ch>
+     BibHarvest, BibConvert, BibMatch.
 
  - Diane Berkovits <diane.berkovits@cern.ch>
      Ranking by downloads, for the BibRank and WebSubmit
@@ -38,7 +35,8 @@ The CERN development group currently consists of:
      Multimedia and photo management.
 
  - Jerome Caffaro <jerome.caffaro@cern.ch>
-     BibFormat, redesign and rewrite in Python.
+     BibFormat, redesign and rewrite in Python.  BibConvert
+     XML-oriented mode.  OAI harvester improvements.
 
 The EPFL development group currently consists of:
 
@@ -50,6 +48,9 @@ The EPFL development group currently consists of:
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
+
+ - Alberto Pepe <alberto.pepe@cern.ch>
+     BibClassify, BibHarvest Admin. 
 
  - Nikolay Dyankov <ndyankov@gmail.com>
      XML-based formatting engine, for BibFormat.
