@@ -755,9 +755,9 @@ def create_record_minidom(xmltext,
 
         name = type(v).__name__
         if (name in ["int", "long"]) :
-            field = ([], "", "", str(v), ord) # field = (subfields, ind1, ind2,value)
+            field = ([], " ", " ", str(v), ord) # field = (subfields, ind1, ind2,value)
         elif name in ['str', 'unicode']:
-            field = ([], "", "", v, ord)
+            field = ([], " ", " ", v, ord)
         else:
             if verbose:
                 err.append((7, 'Type found: ' + name))
