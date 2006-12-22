@@ -687,7 +687,7 @@ class MARCTranslator:
     def get_num_elements(self, name):
         '''
         An API function to get the number of elements for a variable.
-        Don't use this function to build loops, Use iterator instead.
+        Do not use this function to build loops, Use iterator instead.
         '''
         if name == 'record':
             return len(self.recIDs)
@@ -822,10 +822,10 @@ class MARCTranslator:
         elif display_type == 'tag':
             output = tag
         elif display_type == 'ind1':
-            ind1 = ind1.replace('_', '')
+            ind1 = ind1.replace('_', ' ')
             output = ind1
         elif display_type=='ind2':
-            ind2 = ind2.replace('_', '')
+            ind2 = ind2.replace('_', ' ')
             output = ind2
         elif display_type == 'code':
             output = code
@@ -872,10 +872,10 @@ def convert_record(old_record):
             for i in range(num_fields):
                 old_field_instance = old_field_instances[i]
                 ind1 = old_field_instance[1]
-                if not ind1:
+                if not ind1 or ind1 == ' ':
                     ind1 = '_'
                 ind2 = old_field_instance[2]
-                if not ind2:
+                if not ind2 or ind2 == ' ':
                     ind2 = '_'
                 new_tag = old_tag + ind1 + ind2
                 new_field_instance = {}
