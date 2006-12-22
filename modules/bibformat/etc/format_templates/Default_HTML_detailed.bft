@@ -6,7 +6,7 @@ suffix='</div>'/>
 <BFE_TOPBANNER /> 
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
 <p><center>
-<BFE_AUTHORS suffix="<br/>" limit="25" interactive="yes"/>
+<BFE_AUTHORS suffix="<br/>" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
 <BFE_ADDRESSES />
 <BFE_AFFILIATION />
 <BFE_DATE prefix="<br/>" suffix="<br/>"/>

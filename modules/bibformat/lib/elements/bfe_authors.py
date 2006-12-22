@@ -22,7 +22,14 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", interactive="no", highlight="no"):
+def format(bfo, limit, separator=' ; ',
+           extension='[...]',
+           print_links="yes",
+           print_affiliations='no',
+           affiliation_prefix = ' (',
+           affiliation_suffix = ')',
+           interactive="no",
+           highlight="no"):
     """
     Prints the list of authors of a record.
     
@@ -30,6 +37,9 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
     @param separator the separator between authors.
     @param extension a text printed if more authors than 'limit' exist
     @param print_links if yes, prints the authors as HTML link to their publications
+    @param print_affiliations if yes, make each author name followed by its affiliation
+    @param affiliation_prefix prefix printed before each affiliation
+    @param affiliation_suffix suffix printed after each affiliation
     @param interactive if yes, enable user to show/hide authors when there are too many (html + javascript)
     @param highlight highlights authors corresponding to search query if set to 'yes'
     """
@@ -37,25 +47,45 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
     from cgi import escape
     from invenio.config import weburl
     from invenio.messages import gettext_set_language
-    
+
     _ = gettext_set_language(bfo.lang)    # load the right message language
     
     authors = []
-    authors_1 = bfo.fields('100__a')
-    authors_2 = bfo.fields('700__a')
+    authors_1 = bfo.fields('100__')
+    authors_2 = bfo.fields('700__')
     
     authors.extend(authors_1)
     authors.extend(authors_2)
     
     nb_authors = len(authors)
 
-    if highlight == 'yes':
-        from invenio import bibformat_utils
-        authors = [bibformat_utils.highlight(x, bfo.search_pattern) for x in authors]
+    # Process authors to add link, highlight and format affiliation
+    for author in authors:
 
-    if print_links.lower() == "yes":
-        authors = map(lambda x: '<a href="'+weburl+'/search?f=author&amp;p='+ quote(x) +'">'+escape(x)+'</a>', authors)
+        if author.has_key('a'):
+            if highlight == 'yes':
+                from invenio import bibformat_utils
+                author['a'] = bibformat_utils.highlight(author['a'],
+                                                        bfo.search_pattern)
 
+            if print_links.lower() == "yes":
+                author['a'] = '<a href="' + weburl + \
+                              '/search?f=author&amp;p='+ quote(author['a']) + \
+                              '">'+escape(author['a'])+'</a>'
+
+        if author.has_key('u'):
+            if print_affiliations == "yes":
+                author['u'] = affiliation_prefix + author['u'] + \
+                              affiliation_suffix
+
+    # Flatten author instances
+    if print_affiliations == 'yes':
+        authors = [author.get('a', '') + author.get('u', '')
+                   for author in authors]
+    else:
+        authors = [author.get('a', '')
+                   for author in authors]
+        
     if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
 
@@ -85,10 +115,14 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes", in
         }
         
         </script>
-        '''%{'show_less':_("Hide"), 'show_more':_("Show all %i authors") % nb_authors, 'extension':extension}
+        '''%{'show_less':_("Hide"),
+             'show_more':_("Show all %i authors") % nb_authors,
+             'extension':extension}
+            
         out += '<a name="show_hide" />'
         out += separator.join(authors[:int(limit)])
-        out += '<span id="more" style="">'+separator+separator.join(authors[int(limit):])+'</span>'
+        out += '<span id="more" style="">' + separator + \
+               separator.join(authors[int(limit):]) + '</span>'
         out += ' <span id="extension"></span>'
         out += ' <small><i><a id="link" href="#" onclick="toggle_authors_visibility()" style="color:rgb(204,0,0);"></a></i></small>'
         out += '<script>set_up()</script>'

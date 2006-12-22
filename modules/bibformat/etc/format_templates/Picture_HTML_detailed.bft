@@ -4,13 +4,20 @@
 prefix='<div style="text-align:right;font-size:small;">' 
 suffix='</div>'/>
 <BFE_TOPBANNER />
-<BFE_TITLE prefix="<center><big><big><strong>" separator="<br/><br/>" suffix="</strong></big></big></center>" /> 
+<BFE_TITLE prefix="<center><big><big><strong>" 
+separator="<br/><br/>" 
+suffix="</strong></big></big></center>" /> 
 
 <BFE_NOTES />
 <BFE_DATE prefix="<center>" suffix="</center>"/>
 <BFE_CONTACT />
 <center>
-<BFE_AUTHORS prefix="Photographer:<small> " suffix="</small>" print_links="yes" limit="10" interactive="yes"/>
+<BFE_AUTHORS prefix="Photographer:<small> " suffix="</small>" 
+print_links="yes" 
+print_affiliations="yes" 
+limit="10" 
+interactive="yes"/>
+
 <BFE_ADDRESSES prefix="<small>" suffix="</small>" print_link="yes"/>
 </center>
 <br/>

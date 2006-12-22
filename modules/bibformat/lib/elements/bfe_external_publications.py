@@ -25,8 +25,10 @@ def format(bfo, separator='<br/>'):
     Prints list of links to external publications.
     """
     publications = bfo.fields('909C4')
-    out = map(lambda x: '<a href="'+x['d']+'">'+x['p']+'</a>', publications)
 
+    out = ['<a href="'+pub['d']+'">'+pub['p']+'</a>'
+           for pub in publications
+           if pub.has_key('d') and pub.has_key('p')]
     return separator.join(out)
 
 def escape_values(bfo):
