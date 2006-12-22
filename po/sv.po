@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-20 15:16+0100\n"
+"POT-Creation-Date: 2006-12-22 12:07+0100\n"
 "PO-Revision-Date: 2006-10-12 17:48+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SV <cds.support@cern.ch>\n"
@@ -684,12 +684,12 @@ msgstr "Fullständig post"
 msgid "Enter a search query here."
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_authors.py:90
+#: modules/bibformat/lib/elements/bfe_authors.py:118
 #, fuzzy
 msgid "Hide"
 msgstr "Guide"
 
-#: modules/bibformat/lib/elements/bfe_authors.py:90
+#: modules/bibformat/lib/elements/bfe_authors.py:119
 #, python-format
 msgid "Show all %i authors"
 msgstr ""
@@ -704,8 +704,8 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:291
-#: modules/websearch/lib/websearch_webinterface.py:360
+#: modules/websearch/lib/websearch_webinterface.py:349
+#: modules/websearch/lib/websearch_webinterface.py:418
 #: modules/websearch/web/admin/websearchadmin.py:1071
 #: modules/websession/lib/websession_webinterface.py:528
 #: modules/webstyle/lib/webstyle_templates.py:513
@@ -3065,22 +3065,22 @@ msgstr ""
 msgid "See also: similar author names"
 msgstr "Se också: liknande författarnamn"
 
-#: modules/websearch/lib/websearch_webinterface.py:303
+#: modules/websearch/lib/websearch_webinterface.py:361
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:304
+#: modules/websearch/lib/websearch_webinterface.py:362
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:305
+#: modules/websearch/lib/websearch_webinterface.py:363
 #, fuzzy, python-format
 msgid "Collection %s Not Found"
 msgstr "Samlingen %s finns inte"
 
-#: modules/websearch/lib/websearch_webinterface.py:307
+#: modules/websearch/lib/websearch_webinterface.py:365
 #, fuzzy
 msgid "Not found"
 msgstr "Samlingen %s finns inte"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-20 15:16+0100\n"
+"POT-Creation-Date: 2006-12-22 12:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -655,11 +655,11 @@ msgstr ""
 msgid "Enter a search query here."
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_authors.py:90
+#: modules/bibformat/lib/elements/bfe_authors.py:118
 msgid "Hide"
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_authors.py:90
+#: modules/bibformat/lib/elements/bfe_authors.py:119
 #, python-format
 msgid "Show all %i authors"
 msgstr ""
@@ -674,8 +674,8 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:291
-#: modules/websearch/lib/websearch_webinterface.py:360
+#: modules/websearch/lib/websearch_webinterface.py:349
+#: modules/websearch/lib/websearch_webinterface.py:418
 #: modules/websearch/web/admin/websearchadmin.py:1071
 #: modules/websession/lib/websession_webinterface.py:528
 #: modules/webstyle/lib/webstyle_templates.py:513
@@ -2894,22 +2894,22 @@ msgstr ""
 msgid "See also: similar author names"
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:303
+#: modules/websearch/lib/websearch_webinterface.py:361
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:304
+#: modules/websearch/lib/websearch_webinterface.py:362
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:305
+#: modules/websearch/lib/websearch_webinterface.py:363
 #, python-format
 msgid "Collection %s Not Found"
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:307
+#: modules/websearch/lib/websearch_webinterface.py:365
 msgid "Not found"
 msgstr ""
 
