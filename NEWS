@@ -3,10 +3,66 @@ CDS Invenio NEWS
 
 Revision: $Id$
 
-Here is a short summary of the most notable changes in CDSware
+Here is a short summary of the most notable changes in CDS Invenio
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDS Invenio v0.92.0 -- released 2006-12-22
+------------------------------------------
+
+ *) previously experimental output formatter in Python improved and
+    made default (BibFormat)
+
+ *) previously experimental new submission admin interface in Python
+    improved and made default (WebSubmit)
+
+ *) new XML-oriented output formatting mode (BibFormat)
+
+ *) new export-oriented output formats: EndNote, NLM (BibFormat)
+
+ *) RSS 2.0 latest additions feed service (WebSearch, BibFormat)
+
+ *) new XML-oriented metadata converter mode (BibConvert)
+
+ *) new metadata uploader in Python (BibUpload)
+
+ *) new integrated parallel external collection searching (WebSearch)
+
+ *) improved document classifier: composite keywords, wildcards, cloud
+    output (BibClassify)
+
+ *) improved UTF-8 fulltext indexing (BibIndex)
+
+ *) improved external login authentication subsystem (WebAccess)
+
+ *) added possibility to order submission categories (WebSubmit)
+
+ *) improved handling of cached search interface page formats,
+    preferential sort pattern functionality, international collection
+    names (WebSearch)
+
+ *) improved behaviour of OAI harvester: sets, deleted records,
+    harvested metadata transformation (BibFormat)
+
+ *) improved MARCXML schema compatibility concerning indicators;
+    updates to the HTML MARC output format (BibEdit, BibUpload,
+    BibFormat, and other modules)
+
+ *) multiple minor bugs fixed thanks to the wider deployment of the
+    regression test suite (all modules)
+
+ *) new translation (Croatian) and several translation updates
+    (Catalan, Bulgarian, French, Greek, Spanish); thanks to Ferran
+    Jorba, Beatriu Piera, Alen Vodopijevec, Jasna Marković, Theodoros
+    Theodoropoulos, and Nikolay Dyankov (see also CREDITS file)
+
+ *) removed dependency on PHP; not needed anymore
+
+ *) full compatibility with MySQL 4.1 and 5.0; upgrade from MySQL 4.0
+    now recommended
+
+ *) full compatibility with FreeBSD and Mac OS X
+ 
 CDS Invenio v0.90.1 -- released 2006-07-23
 ------------------------------------------
 
@@ -104,7 +160,7 @@ CDSware v0.7.1 -- released 2005-05-04
  *) important bugfix for bibconvert's ``source data in a directory''
     mode, as invoked by the web submission system (BibConvert)
 
- *) minor bugfix in the search engine, thanks to Frédéric Gobry
+ *) minor bugfix in the search engine, thanks to FrÃ©dÃ©ric Gobry
     (WebSearch)
 
  *) minor bugfix in the WebSearch Admin interface (WebSearch)
@@ -117,7 +173,7 @@ CDSware v0.7.1 -- released 2005-05-04
  *) new Catalan translation, thanks to Ferran Jorba
 
  *) updated Greek and Portuguese translations, thanks to Theodoros
-    Theodoropoulos and Flávio C. Coelho
+    Theodoropoulos and FlÃ¡vio C. Coelho
 
  *) updated Spanish translation 
  
@@ -414,7 +470,7 @@ CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
 
  *) more internationalization of the search engine messages (WebSearch)
 
- *) new language: Norwegian (bokmål) 
+ *) new language: Norwegian (bokmÃ¥l) 
 
  *) simple example for converting BibTeX into XML MARC (BibConvert)
 
