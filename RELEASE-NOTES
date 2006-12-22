@@ -41,7 +41,7 @@ What's new:
     names (WebSearch)
 
  *) improved behaviour of OAI harvester: sets, deleted records,
-    harvested metadata transformation (BibFormat)
+    harvested metadata transformation (BibHarvest)
 
  *) improved MARCXML schema compatibility concerning indicators;
     updates to the HTML MARC output format (BibEdit, BibUpload,
