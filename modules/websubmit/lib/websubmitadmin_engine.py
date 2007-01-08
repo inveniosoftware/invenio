@@ -2061,9 +2061,9 @@ def perform_request_add_doctype(doctype=None, doctypename=None, doctypedescr=Non
         try:
             clonefrom = wash_single_urlarg(urlarg=clonefrom, argreqdtype=str, argdefault="None")
         except ValueError, e:
-            doctype = "None"
+            clonefrom = "None"
     else:
-        doctype = "None"
+        clonefrom = "None"
 
     if doctypedetailscommit not in ("", None):
         (title, body) = _add_doctype(errors=errors, warnings=warnings, doctype=doctype,
