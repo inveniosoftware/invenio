@@ -1529,7 +1529,7 @@ class Template:
           <td width="20%%"><span class="adminlabel">Document Type Description:</span></td>
           <td width="80%%"><textarea name="doctypedescr" cols="60" rows="8">%(doctype_description)s</textarea></td>
          </tr>"""  % { 'doctype_name' : cgi.escape(doctypename, 1),
-                       'doctype_description' : cgi.escape(doctypedescr, 1)
+                       'doctype_description' : "%s" % ((doctypedescr is not None and cgi.escape(str(doctypedescr), 1)) or ("")),
                      }
 
         if perform_act == "doctypeadd":
