@@ -25,6 +25,7 @@ etc_DATA = bibrankgkb.cfg \
            demo_jif.cfg \
            demo_jif.kb \
            stopwords.de.kb \
+           stopwords.el.kb \
            stopwords.kb \
            template_citation.cfg \
            template_combine_method.cfg \
@@ -41,6 +42,7 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              demo_jif.cfg.in \
              demo_jif.kb \
              stopwords.de.kb \
+             stopwords.el.kb \
              stopwords.kb \
              template_citation.cfg \
              template_combine_method.cfg \
