@@ -98,7 +98,8 @@ Contents
 
         Note: If you happen to use MySQLdb 1.2.1_p2, please apply the
               following patch:
-              <http://sourceforge.net/tracker/index.php?func=detail&group_id=22307&atid=374932>.
+              "[1521274] uncorrect handling of encoded strings in cursors.py"
+              <http://sourceforge.net/tracker/index.php?func=detail&aid=1521274&group_id=22307&atid=374932>.
 
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
