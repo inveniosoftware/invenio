@@ -73,22 +73,22 @@ def marc_to_split_tag(tag):
     """ The inverse of split_tag_to_marc function. """
     
     tag = get_tag_name(tag)
-    ind1 = ''
-    ind2 = ''
+    ind1 = ' '
+    ind2 = ' '
     subcode = ''
     len_tag = len(tag)
     
     if len_tag > 3:
         
         ind1 = tag[3]
-        if ind1 == '_':
-            ind1 = ''
+        if ind1 == '_' or ind1 == '':
+            ind1 = ' '
             
         if len_tag > 4:
             
             ind2 = tag[4]
-            if ind2 == '_':
-                ind2 = ''
+            if ind2 == '_' or ind2 == '':
+                ind2 = ' '
                 
             if len_tag > 5:
                 subcode = tag[5]
