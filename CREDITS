@@ -10,7 +10,7 @@ contributed to the project:
     Patches for compiling old CDSware 0.3.x sources on FreeBSD.
   
   - Guido Pelzer <guido.pelzer@web.de>
-    Contributions to the German translation.
+    Contributions to the German translation, German stopword list.
   
   - Valerio Gracco <valerio.gracco@cern.ch>
     Contributions to the Italian translation.
@@ -37,7 +37,7 @@ contributed to the project:
     Contributions to the French translation.
 
   - Theodoros Theodoropoulos <theod@physics.auth.gr>
-    Contributions to the Greek translation.   
+    Contributions to the Greek translation, Greek stopword list.
 
   - Vasyl Ostrovskyi <vo@imath.kiev.ua>
     Contributions to the Ukrainian translation.   
