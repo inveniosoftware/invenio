@@ -63,6 +63,7 @@ from invenio.bibformat_config import \
 from bibformat_utils import \
      record_get_xml, \
      parse_tag
+from invenio.htmlutils import HTMLWasher
 
 from xml.dom import minidom #Remove when call_old_bibformat is removed
 
@@ -73,6 +74,14 @@ format_outputs_cache = {}
 kb_mappings_cache = {}
 
 cdslangs = language_list_long()
+
+html_field = '<!--HTML-->' # String indicating that field should be
+                           # treated as HTML (and therefore no escaping of
+                           # HTML tags should occur.
+                           # Appears in some field values.
+
+washer = HTMLWasher()      # Used to remove dangerous tags from HTML
+                           # sources
 
 # Regular expression for finding <lang>...</lang> tag in format templates
 pattern_lang = re.compile(r'''
@@ -1604,37 +1613,41 @@ class BibFormatObject:
             return ''
         
         p_tag = parse_tag(tag)
-
-        if escape == 1:
-            return cgi.escape(record_get_field_value(self.get_record(),
-                                                     p_tag[0],
-                                                     p_tag[1],
-                                                     p_tag[2],
-                                                     p_tag[3]))
+        field_value = record_get_field_value(self.get_record(),
+                                             p_tag[0],
+                                             p_tag[1],
+                                             p_tag[2],
+                                             p_tag[3])
+        if escape == 0:
+            return field_value
         else:
-            return record_get_field_value(self.get_record(),
-                                          p_tag[0],
-                                          p_tag[1],
-                                          p_tag[2],
-                                          p_tag[3])
-
+            return escape_field(field_value, escape)
+        
     def field(self, tag, escape=0):
         """
         Returns the value of the field corresponding to tag in the
         current record.
 
-        if the value does not exist, return empty string
+        If the value does not exist, return empty string
+
+        'escape' parameter allows to escape special characters
+        of the field. The value of escape can be:
+                      0 - no escaping
+                      1 - escape all HTML characters
+                      2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+                          escape only unsafe characters, but leave basic HTML tags.
 
         @param tag the marc code of a field
-        @param escape 1 if returned value should be escaped. Else 0.
+        @param escape 1 if returned value should be escaped. Else 0. (see above for other modes)
         @return value of field tag in record
         """
         list_of_fields = self.fields(tag)
         if len(list_of_fields) > 0:
-            if escape == 1:
-                return cgi.escape(list_of_fields[0])
-            else:
+            # Escaping below
+            if escape == 0:
                 return list_of_fields[0]
+            else:
+                return escape_field(list_of_fields[0], escape)
         else:
             return ""
 
@@ -1647,6 +1660,13 @@ class BibFormatObject:
         are the subcodes and the values are the values of tag.subcode.
         If the tag has a subcode, simply returns list of values
         corresponding to tag.
+
+        'escape' parameter allows to escape special characters
+        of the fields. The value of escape can be:
+                      0 - no escaping
+                      1 - escape all HTML characters
+                      2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+                          escape only unsafe characters, but leave basic HTML tags.
         
         @param tag the marc code of a field
         @param escape 1 if returned values should be escaped. Else 0.
@@ -1664,10 +1684,11 @@ class BibFormatObject:
                                              p_tag[1],
                                              p_tag[2],
                                              p_tag[3])
-            if escape == 1:
-                return [cgi.escape(value) for value in values]
-            else:
+            if escape == 0:
                 return values
+            else:
+                return [escape_field(value, escape) for value in values]
+
         else:
             # Subcode is undefined. Returns list of dicts.
             # However it might be the case of a control field.
@@ -1676,12 +1697,12 @@ class BibFormatObject:
                                                    p_tag[0],
                                                    p_tag[1],
                                                    p_tag[2])
-            if escape == 1:
-                return [dict([ (subfield[0], cgi.escape(subfield[1])) \
+            if escape == 0:
+                return [dict(instance[0]) for instance in instances]
+            else:
+                return [dict([ (subfield[0], escape_field(subfield[1], escape)) \
                                for subfield in instance[0] ]) \
                         for instance in instances]
-            else:
-                return [dict(instance[0]) for instance in instances]
 
     def kb(self, kb, string, default=""):
         """
@@ -1703,7 +1724,38 @@ class BibFormatObject:
             return default
         else:
             return val
-        
+
+def escape_field(value, mode=0):
+    """
+    Utility function used to escape the value of a field in given mode.
+
+    - mode 0: no escaping
+    - mode 1: escaping all HTML/XML characters
+    - mode 2: escaping dangerous HTML tags to avoid XSS, but
+              keep basic one (such as <br />)
+    - mode 3: mix of mode 1 and mode 2. If field_value starts with <!--HTML-->,
+              then use mode 2. Else use mode 1.
+    """
+    if mode == 1:
+        return cgi.escape(value)
+    elif mode == 2:
+        return washer.wash(value,
+                           allowed_attribute_whitelist=['href',
+                                                        'name',
+                                                        'class']
+                           )
+    elif mode == 3:
+        if value.lstrip(' \n').startswith(html_field):
+            return washer.wash(value,
+                               allowed_attribute_whitelist=['href',
+                                                            'name',
+                                                            'class']
+                               )
+        else:
+            return cgi.escape(value)
+    else:
+        return value
+
 def bf_profile():
     """
     Runs a benchmark

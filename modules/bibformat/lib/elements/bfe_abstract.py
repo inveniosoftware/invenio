@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-import cgi
+#import cgi
 from invenio import bibformat_utils
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, 
@@ -48,14 +48,14 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
 
     languages = print_lang.split(',')
     
-    abstract_en = bfo.fields('520__a')
-    abstract_en.extend(bfo.fields('520__b'))
-    abstract_en = [cgi.escape(val) for val in abstract_en]
+    abstract_en = bfo.fields('520__a', escape=3)
+    abstract_en.extend(bfo.fields('520__b', escape=3))
+    #abstract_en = [cgi.escape(val) for val in abstract_en]
     abstract_en = "<br/>".join(abstract_en)
     
-    abstract_fr = bfo.fields('590__a')
-    abstract_fr.extend(bfo.fields('590__b'))
-    abstract_fr = [cgi.escape(val) for val in abstract_fr]
+    abstract_fr = bfo.fields('590__a', escape=3)
+    abstract_fr.extend(bfo.fields('590__b', escape=3))
+    #abstract_fr = [cgi.escape(val) for val in abstract_fr]
     abstract_fr = "<br/>".join(abstract_fr)
 
     if contextual == 'yes' and limit != "" and \
