@@ -134,15 +134,17 @@ class Template:
                        <th colspan="6">
                          %(record)s #%(recid)s
                          %(result)s
+                         %(num_field)s
                        </th>
                      </tr> """ % {'record' : _("Record"),
                                   'recid'  : str(recid),
-                                  'result' : result}
+                                  'result' : result,
+                                  'num_field': self.tmpl_input('hidden', str(num_field), 'num_field')}
 
         
     def tmpl_table_value(self, ln, recid, tag, field, format_tag, type_table, add, form_add=0):        
         """ Return a field to print in table. """
-
+        
         if form_add == 0:
             subfields = field[0]
             num_field = field[4]
@@ -168,6 +170,7 @@ class Template:
             if add == 1:
                 len_subfields += 1
                 type_table = "record"
+
             try:
                 result = """<td rowspan="%(len_subfields)s" class="bibEditCellTag">
                               %(print_tag_field)s

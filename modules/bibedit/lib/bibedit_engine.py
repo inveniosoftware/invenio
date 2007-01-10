@@ -33,7 +33,7 @@ bibedit_templates = invenio.template.load('bibedit')
 
 def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):    
-    """ This function return the body of main page. """
+    """Returns the body of main page. """
     
     errors   = []
     warnings = []
@@ -62,7 +62,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                         body = ''
 
                     if edit_tag is not None and dict_value is not None:
-                        record = edit_record(recid, uid, record, edit_tag, dict_value)
+                        record = edit_record(recid, uid, record, edit_tag, dict_value, num_field)
 
                     if delete_tag is not None and num_field is not None:
                         record = delete_field(recid, uid, record, delete_tag, num_field)
@@ -114,7 +114,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
 
 def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
-    """ This function return the body of edit page. """
+    """Returns the body of edit page. """
     
     errors = []
     warnings = []
@@ -124,10 +124,10 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
         return (body, errors, warnings)
     
     (record, junk) = get_record(ln, recid, uid, temp)
-    
+
     if del_subfield is not None:
         record = delete_subfield(recid, uid, record, tag, num_field)
-                
+    
     if add == 2:
         
         subcode = dict_value.get("add_subcode", "empty")
@@ -158,7 +158,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
     
     
 def perform_request_submit(ln, recid):    
-    """ This function submit record on database. """
+    """Submits record to the database. """
     
     save_xml_record(recid)
     
@@ -176,7 +176,7 @@ def get_file_path(recid):
 
 
 def save_xml_record(recid):    
-    """ Save XML Record File in database. """
+    """Saves XML record file to database. """
     
     file_path = get_file_path(recid)
     
@@ -196,7 +196,7 @@ def save_temp_record(record, uid, file_path):
 
 
 def get_temp_record(file_path):    
-    """ Load record dict from a temp file. """
+    """Loads record dict from a temp file. """
     
     file_temp = open(file_path)
     [uid, record] = cPickle.load(file_temp)
@@ -206,8 +206,7 @@ def get_temp_record(file_path):
 
 
 def get_record(ln, recid, uid, temp):    
-    """ This function return a record dict,
-        and warning message in case of. """
+    """Returns a record dict, and warning message in case of error. """
 
     file_path = get_file_path(recid)
     
@@ -243,8 +242,8 @@ def get_record(ln, recid, uid, temp):
 
 ######### EDIT #########
 
-def edit_record(recid, uid, record, edit_tag, dict_value):    
-    """ This function edit value in record. """
+def edit_record(recid, uid, record, edit_tag, dict_value, num_field):    
+    """Edits value of a record. """
     
     for subfield in range( len(dict_value.keys())/3 ):
         
@@ -259,44 +258,45 @@ def edit_record(recid, uid, record, edit_tag, dict_value):
                    subcode != old_subcode:
                 
                     edit_tag = edit_tag[:5]                
-                    record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value)
+                    record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value, num_field)
        
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
 
-def edit_subfield(record, tag, subcode, old_subcode, value, old_value):
-    """ This function edit the value of subfield. """
-
+def edit_subfield(record, tag, subcode, old_subcode, value, old_value, num_field):
+    """Edits the value of a subfield. """
+    
     value       = bibedit_templates.tmpl_clean_value(str(value),     "html")
     old_value   = bibedit_templates.tmpl_clean_value(str(old_value), "html")
     
     (tag, ind1, ind2, junk) = marc_to_split_tag(tag)
     
-    fields = record.get(str(tag), "empty")
+    fields = record.get(str(tag), None)
     
-    if fields != "empty":
+    if fields is not None:
         i = -1
         for field in fields:
             i += 1
-            if field[1] == ind1 and field[2] == ind2:
+            
+            if field[4] == int(num_field):
                 subfields = field[0] 
                 j = -1
                 for subfield in subfields:
                     j += 1
+                    
                     if subfield[0] == old_subcode and \
-                       subfield[1] == old_value:
+                           subfield[1] == old_value:
                         record[tag][i][0][j] = (subcode, value)
                         break
-                    
     return record
 
 
 ######### ADD ########
 
 def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
-    """ This function add a new field in record. """
+    """Adds a new field to the record. """
     
     tag = tag[:3]
 
@@ -309,7 +309,7 @@ def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
 
 
 def add_subfield(recid, uid, tag, record, num_field, subcode, value):
-    """ This function add a new subfield in a field. """
+    """Adds a new subfield to a field. """
 
     tag = tag[:3]
     fields = record.get(str(tag))
@@ -337,7 +337,7 @@ def add_subfield(recid, uid, tag, record, num_field, subcode, value):
 ######### DELETE ########
 
 def delete_field(recid, uid, record, tag, num_field):    
-    """ This function delete field in record. """
+    """Deletes field in record. """
     
     (tag, junk, junk, junk) = marc_to_split_tag(tag)
     tmp = []
@@ -358,18 +358,20 @@ def delete_field(recid, uid, record, tag, num_field):
 
 
 def delete_subfield(recid, uid, record, tag, num_field):    
-    """ This function delete subfield in field. """
+    """Deletes subfield of a field. """
     
     (tag, junk, junk, subcode) = marc_to_split_tag(tag)
     tmp = []
     i = -1
-    
+    deleted = False
     for field in record[tag]:
         i += 1
         if field[4] == int(num_field):
             for subfield in field[0]:
-                if subfield[0] != subcode:
+                if subfield[0] != subcode or deleted == True:
                     tmp.append((subfield[0], subfield[1]))
+                else:
+                    deleted = True
             break
                     
     record[tag][i] = (tmp, record[tag][i][1], record[tag][i][2], record[tag][i][3], record[tag][i][4])
