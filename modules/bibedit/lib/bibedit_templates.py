@@ -314,7 +314,8 @@ class Template:
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
-                                                 'del_subfield' : 1})           
+                                                 'del_subfield' : 1,
+                                                 'num_subfield' : num_value})           
                 
         else:
             print_value = value

@@ -113,7 +113,8 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
     return (body, errors, warnings)
 
 
-def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_subfield, add, dict_value):    
+def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
+                         format_tag, temp, del_subfield, add, dict_value):    
     """Returns the body of edit page. """
     
     errors = []
@@ -126,7 +127,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, format_tag, temp, del_s
     (record, junk) = get_record(ln, recid, uid, temp)
 
     if del_subfield is not None:
-        record = delete_subfield(recid, uid, record, tag, num_field)
+        record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
     
     if add == 2:
         
@@ -245,51 +246,55 @@ def get_record(ln, recid, uid, temp):
 def edit_record(recid, uid, record, edit_tag, dict_value, num_field):    
     """Edits value of a record. """
     
-    for subfield in range( len(dict_value.keys())/3 ):
+    for num_subfield in range( len(dict_value.keys())/3 ): # Iterate over subfield indices of field
         
-        subcode     = dict_value.get("subcode%s"     % int(subfield), "empty")
-        old_subcode = dict_value.get("old_subcode%s" % int(subfield), "empty")
-        value       = dict_value.get("value%s"       % int(subfield), "empty")
-        old_value   = dict_value.get("old_value%s"   % int(subfield), "empty")
+        new_subcode = dict_value.get("subcode%s"     % num_subfield, None)
+        old_subcode = dict_value.get("old_subcode%s" % num_subfield, None)
+        new_value   = dict_value.get("value%s"       % num_subfield, None)
+        old_value   = dict_value.get("old_value%s"   % num_subfield, None)
         
-        if value != "empty" and old_value != "empty" and subcode != "empty":
-            if value != '' and subcode != '':
-                if value != old_value or \
-                   subcode != old_subcode:
-                
+        if new_value is not None and old_value is not None \
+               and new_subcode is not None and old_subcode is not None: # Make sure we actually get these values
+            if new_value != '' and new_subcode != '': # Forbid empty values
+                if new_value != old_value or \
+                   new_subcode != old_subcode: # only change when necessary
+
                     edit_tag = edit_tag[:5]                
-                    record = edit_subfield(record, edit_tag, subcode, old_subcode, value, old_value, num_field)
+                    record = edit_subfield(record,
+                                           edit_tag,
+                                           new_subcode,
+                                           new_value,
+                                           num_field,
+                                           num_subfield)
        
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     
     return record
 
 
-def edit_subfield(record, tag, subcode, old_subcode, value, old_value, num_field):
+def edit_subfield(record, tag, new_subcode, new_value, num_field, num_subfield):
     """Edits the value of a subfield. """
     
-    value       = bibedit_templates.tmpl_clean_value(str(value),     "html")
-    old_value   = bibedit_templates.tmpl_clean_value(str(old_value), "html")
-    
+    new_value   = bibedit_templates.tmpl_clean_value(str(new_value),     "html")
+        
     (tag, ind1, ind2, junk) = marc_to_split_tag(tag)
     
     fields = record.get(str(tag), None)
-    
+
     if fields is not None:
         i = -1
         for field in fields:
             i += 1
-            
             if field[4] == int(num_field):
                 subfields = field[0] 
                 j = -1
                 for subfield in subfields:
                     j += 1
-                    
-                    if subfield[0] == old_subcode and \
-                           subfield[1] == old_value:
-                        record[tag][i][0][j] = (subcode, value)
+
+                    if j == num_subfield: # Rely on counted index to identify subfield to edit...
+                        record[tag][i][0][j] = (new_subcode, new_value)
                         break
+                break
     return record
 
 
@@ -357,7 +362,7 @@ def delete_field(recid, uid, record, tag, num_field):
     return record
 
 
-def delete_subfield(recid, uid, record, tag, num_field):    
+def delete_subfield(recid, uid, record, tag, num_field, num_subfield):    
     """Deletes subfield of a field. """
     
     (tag, junk, junk, subcode) = marc_to_split_tag(tag)
@@ -367,11 +372,14 @@ def delete_subfield(recid, uid, record, tag, num_field):
     for field in record[tag]:
         i += 1
         if field[4] == int(num_field):
+            j = 0
             for subfield in field[0]:
-                if subfield[0] != subcode or deleted == True:
+                if j != num_subfield:
+                #if subfield[0] != subcode or deleted == True:
                     tmp.append((subfield[0], subfield[1]))
-                else:
-                    deleted = True
+                #else:
+                #    deleted = True
+                j += 1
             break
                     
     record[tag][i] = (tmp, record[tag][i][1], record[tag][i][2], record[tag][i][3], record[tag][i][4])

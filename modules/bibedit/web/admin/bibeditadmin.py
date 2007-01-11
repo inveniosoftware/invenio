@@ -74,7 +74,7 @@ def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
                 req         = req) 
 
 
-def edit(req, recid=None, tag=None, num_field='0', format_tag='marc',
+def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='marc',
          del_subfield=None, temp="false", add=0, ln=cdslang, **args):    
     """ Edit Field page. """
     ln = wash_language(ln)
@@ -84,10 +84,12 @@ def edit(req, recid=None, tag=None, num_field='0', format_tag='marc',
     recid     = wash_url_argument(recid,     "int")
     num_field = wash_url_argument(num_field, "int")
     add       = wash_url_argument(add,       "int")
+    num_subfield = wash_url_argument(num_subfield, "int")
+    
     (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
     if (auth_code == 0):
         if (recid and tag and (record_exists(recid)>0)):
-            (body, errors, warnings) = perform_request_edit(ln, recid, uid, tag, num_field,
+            (body, errors, warnings) = perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
                                                             format_tag, temp, del_subfield, add, args)
         else:
             redirect_to_url(req, 'index?ln=' + ln)
