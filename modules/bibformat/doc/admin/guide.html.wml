@@ -57,6 +57,7 @@
     <li><a href="#elementsInFormatTemplate">Use Format Elements</a></li>
     <li><a href="#previewFormatTemplate">Preview a Format Template</a></li>
     <li><a href="#internationalizationTemplate">Internationalization (i18n)</a></li>
+    <li><a href="#escapeFormatTemplate">Escaping special HTML/XML characters</a></li>
     </ol>
     </li>
     <li><a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a></li>
@@ -71,6 +72,7 @@
     <li><a href="#codeFormatElement">Edit the Code of a Format Element</a></li>
     <li><a href="#previewFormatElement">Preview a Format Element</a></li>
     <li><a href="#internationalizationFormatElement">Internationalization (i18n)</a></li>
+    <li><a href="#escapeFormatElement">Escaping special HTML/XML characters</a></li>
     <li><a href="#attrsFormatElement">Edit the Attributes of a Format Element</a></li>
     <li><a href="#dependenciesFormatElement">Check the Dependencies of a Format Element</a></li>
     <li><a href="#validityFormatElement">Check the Validity of a Format Element</a></li>
@@ -560,6 +562,37 @@ However you must make sure that it is removed from the tables <code>format</code
 <p>For each &lt;lang&gt; group only the text in the user's language is displayed. If user's language is not
 available in the &lt;lang&gt; group, your default CDS Invenio language is used.</p>
 
+ <h4><a name="escapeFormatTemplate">Escaping special HTML/XML characters</a></h4>
+ 
+<p>By default, BibFormat escapes all values returned by format
+elements. As a format template designer, you can assume in almost all
+cases that the values you get from a format element will be escaped
+for you. For special cases, you can set the parameter
+<code>escape</code> of the element to '0' when calling it, to make
+BibFormat understand that it must not escape the values of the
+element, or to '1' to force the escaping. </p>
+<p>
+For example
+<code>&lt;bfe_abstract /&gt;</code> will return:<br/>
+
+<code>[...]We find that for spatially-flat cosmologies, background lensing</code><br/>
+<code>clusters with reasonable mass-to-light ratios lying in the</code><br/>
+<code>redshift range 0<span style="color:red;">&amp;lt;</span>1 are strongly excluded, [...]</code><br/><br/>
+while <code>&lt;bfe_abstract escape="0"/&gt;</code> will return:<br/>
+<code>[...]We find that for spatially-flat cosmologies, background lensing</code><br/>
+<code>clusters with reasonable mass-to-light ratios lying in the</code><br/>
+<code>redshift range 0<span style="color:red;">&lt;</span>1 are strongly excluded, [...]</code><br/><br/>
+</p>
+<p>In most cases, you will not set <code>escape</code> to 1, nor 0, but
+just let the developer of the element take care of that for you.</p>
+
+<p>Please note that values given in special parameters
+<code>prefix</code>, <code>suffix</code>, <code>default</code> and
+<code>nbMax</code> are never escaped, whatever the value of
+<code>escape</code> is (but other parameters will). You have to take
+care of that in your format template, as well as of all other values that
+are not returned by the format elements.</p>
+
     <h3><a name="attrsFormatTemplate">Edit the Attributes of a Format Template</a></h4>
     <p>To edit the attributes of a format template
     go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, click on
@@ -575,7 +608,7 @@ available in the &lt;lang&gt; group, your default CDS Invenio language is used.<
     <p>If the name you have chosen already exists for another template, you name will be suffixed with an integer so that the name is unique.</p>
     <p>You should also be aware that if you change the name of a format template, all output formats that were linking to this template will be changed to match the new name.</p>
      <strong>For developers and adventurers only:</strong>
-     <p>You can change the attriutes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
+     <p>You can change the attributes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
      <p>Also note that the admin web interface tries to keep the name of the template in sync with the filename of the template. If the name is changed through the web interface, the filename of the template is changed, and all output formats that use this template are updated. You have to do update output formats manually if you change the filename of the template without the web interface.</p>
      
     <h3><a name="dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></h3>
@@ -618,8 +651,8 @@ def format(bfo, separator=" "):
     """
     titles = []
    
-    title = bfo.field('245.a')
-    title_remainder = bfo.field('245.b')
+    title = bfo.field('245__a')
+    title_remainder = bfo.field('245__b')
 
     titles.append( title + title_remainder )
 
@@ -627,11 +660,11 @@ def format(bfo, separator=" "):
     if len(title) > 0:
         titles.append( title )
 
-    title = bfo.field('246.a')
+    title = bfo.field('246__a')
     if len(title) > 0:
         titles.append( title )
 
-    title = bfo.field('246_1.a')
+    title = bfo.field('246_1a')
     if len(title) > 0:
         titles.append( title )
 
@@ -668,11 +701,20 @@ Notice that the call uses (almost) the filename of your element. To find out whi
 </ul>
 </p>
         <p><b>Method 2: Use module <code>BibRecord</code></b>:<br/>
-        BibRecord is a module that provides advanced functionalities regarding access to the field of a record
-        <code>bfo.get_record()</code> returns a structure that can be understood by BibRecord's functions. Therefore you can import the module's functions to get access to the fields you want.
+
+        BibRecord is a module that provides advanced functionalities
+        regarding access to the field of a record
+        <code>bfo.get_record()</code> returns a structure that can be
+        understood by BibRecord's functions. Therefore you can import
+        the module's functions to get access to the fields you want.
         </p>
-    <h3><a name="internationalizationFormatElement">Internationalization (i18n)</a></h3>
-    <p>You can follow the standard internationalization procedure in use accross CDS Invenio sources. For example the following code will get you the translation for "Welcome" (assuming "Welcome" has been translated):
+        
+<h3><a name="internationalizationFormatElement">Internationalization (i18n)</a></h3>
+
+    <p>You can follow the standard internationalization procedure in
+    use accross CDS Invenio sources. For example the following code
+    will get you the translation for "Welcome" (assuming "Welcome" has
+    been translated):
 <pre>
 from invenio.messages import gettext_set_language
 
@@ -682,7 +724,74 @@ _ = gettext_set_language(ln)
 translated_welcome =  &#95;("Welcome")
 </pre>
 </p>
-    <p>Notice the access to <code>bfo.ln</code> to get access to the current language of the user. For simpler translations or behaviour depending on the language you can simply check the value <code>bfo.ln</code> to return your custom text.</p>
+
+    <p>Notice the access to <code>bfo.ln</code> to get access to the
+    current language of the user. For simpler translations or
+    behaviour depending on the language you can simply check the value
+    <code>bfo.ln</code> to return your custom text.</p>
+
+<h3><a name="escapeFormatElement">Escaping special HTML/XML characters</a></h3>
+     <p>In most cases, that is cases where your
+     element does not return HTML output, you do not have to take any
+     particular action in order to escape values that you output: the
+     BibFormat engine will take care of escaping the returned value of the element
+     for you. In cases where you want to return text that should not
+     be escaped (for example when you return HTML links), you can make
+     the formatting engine know that it should not escape your
+     value. This is done by implementing the
+     <code>escape_values(bfo)</code> function in your element, that
+     will return (int) 0 when escape should not be done (or 1 when
+     escaping should be done):
+
+
+<pre>def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
+</pre>
+
+     Note that the function is given a <code>bfo</code> object as
+     parameter, such that you can do additional testing if your element
+     should really return 1 or 0 (for very special cases).<br/> Also note
+     that the behavior defined by the <code>escape_values()</code> function
+     will be overriden by the <code>escape</code> parameter used in the
+     format template if it is specified.
+    </p>
+
+    <p> Finally, be cautious when you disable escaping: you will have
+     to take care of escaping values "manually" in your format element
+     code, in order to avoid non valid outputs or XSS
+     vulnerabilities. This can be done easily when using the
+     <code>field</code>, <code>fields</code> and
+     <code>controlfield</code> functions of bfo with <code>escape</code>
+     parameter:
+
+<pre>
+    title = bfo.field('245__a', escape="1")
+    abstract = bfo.field('520__a', escape="2")
+</pre>
+
+     The <code>escape</code> parameter can be one of the following values:
+          <ul><li>0 - no escaping</li>
+              <li>1 - escape all HTML characters</li>
+              <li>2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+              escape only unsafe characters, but leaves basic HTML tags.
+              This is particularly useful if you want to store HTML text in your
+              metadata but still want to escape some tags to prevent
+              XSS vulnerabilities. Note that this method is slower than
+              basic escaping of mode 1.
+              </li>
+           </ul>
+     These modes are the same for  <code>escape_values(bfo)</code> function, excepted '2' which
+     cannot (yet?) be returned as a valid mode with the function.
+     <p>      
+     You can also decide not to use the <code>escape</code> parameter and escape values
+     using any other Python function/library you want to use (such as <code>cgi.escape()</code>).
+     </p>
+    
+
     <h3><a name="attrsFormatElement">Edit the Attributes of a Format Element</a></h3>
     <p>A format element has mainly four kinds of attributes: <ul>
     <li>Name: it corresponds to the filename of the element.</li>
@@ -710,8 +819,18 @@ translated_welcome =  &#95;("Welcome")
     
     </ul></p>
     <h3><a name="previewFormatElement">Preview a Format Element</a></h3>
-    <p>You can play with a format element parameters and see the result of the element directly in the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>: for each element, under the section "See also", click on "Test this element". You are redirected to a page where you can enter a value for the parameters. A description is associated with each parameter as well as an indication of the default value of the parameter if you do not provide a custom value. Click on the "Test!" button to see the result of the element with your parameters.</p>
-    
+    <p>
+     You can play with a format element parameters and see the result
+     of the element directly in the
+     <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>:
+       for each element, under the section "See
+     also", click on "Test this element". You are redirected to a page
+     where you can enter a value for the parameters. A description is
+     associated with each parameter as well as an indication of the
+     default value of the parameter if you do not provide a custom
+     value. Click on the "Test!" button to see the result of the
+     element with your parameters.</p>
+
 <h2><a name="KBs">Knowledge Bases</a></h2>
    <p>Knowledge bases are a way to define easily extendable repositories of mappings. Their use is various, but their main purpose is to get, given a value, the normalized version of this value. For example you may use a knowledge base to hold a list of all ways to abbreviate the name of a journal, and map these abbreviations to the full journal name. This would be useful to get a normalized journal name accross all of your records.</p>
    <p>The knowledge base itself offers no method to do this normalization. It is limited to the archiving of this knowledge. To benefit from the normalization you need to use a format element which is knowledge-base-aware. The element will look by iteself into the knowledge base to format a record. In that way you can extend the formatting capabilities of this element without having to modify it.</p>
@@ -1005,43 +1124,6 @@ basic format elements) are not shown in the format elements documentation pages.
 This is to reduce the number of elements shown in the documentation as the logical fields
 table contains a lot of not so useful fields to be used in templates.</p>
 
-<h3>How can I escape special HTML/XML chars like '&lt;', '&gt;' and '&amp;'? What is the default behaviour of BibFormat?</h3>
-<h4>Format templates:</h4>
-<p>By default, BibFormat escapes all values returned by format elements. As a format template designer,
-you can assume in almost all cases that the values you get from a format element will be escaped for you. For special cases, you can set the parameter <code>escape</code> of the element to '0' when calling it, to
-make BibFormat understand that it must not escape the values of the element, or to '1' to force the escaping. <br/>
-For example <code>&lt;bfe_abstract /&gt;</code> will return:</br>
-<code>[...]We find that for spatially-flat cosmologies, background lensing</code></br>
-<code>clusters with reasonable mass-to-light ratios lying in the</code></br>
-<code>redshift range 0<span style="color:red;">&amp;lt;</span>1 are strongly excluded, [...]</code><br/><br/>
-while <code>&lt;bfe_abstract escape="0"/&gt;</code> will return:<br/>
-<code>[...]We find that for spatially-flat cosmologies, background lensing</code><br/>
-<code>clusters with reasonable mass-to-light ratios lying in the</code><br/>
-<code>redshift range 0<span style="color:red;">&lt;</span>1 are strongly excluded, [...]</code><br/><br/>
-In most cases, you will not set <code>escape</code> to 1, nor 0, but just let the developer of the
-element take care of that for you.<br/>
-Please note that values given in special parameters <code>prefix</code>, <code>suffix</code>, <code>default</code> and <code>nbMax</code> are never escaped, whatever the value of <code>escape</code> is (but other parameters will). You have to take care of that in your format template, as well as all other values that are not returned by the format elements.</p>
-<p>If you are a format elements developer, please see below.</p>
-
-<h4>Format elements:</h4>
-<p>In most cases, that is cases where your element does not return HTML output, you do not have to take
-any particular action in order to escape values that you output: the BibFormat engine will take care of escaping
-the returned value for you. In cases where you want to return text that should not be escaped (for example
-when you return HTML links), you can make the formatting engine know that it should not escape your value. This is done
-by implementing the <code>escape_values(bfo)</code> function in your element, that will return (int) 0 when escape should
-not be done (or 1 when escaping should be done):
-<pre>def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
-    return 0
-</pre>Note that the function is given a <code>bfo</code> object as parameter, such that you can do additional testing
-if your element should really return 1 or 0 (for very special cases).<br/>
-Also note that the behavior defined by the <code>escape_values()</code> function will be overriden by the
-<code>escape</code> parameter used in the format template if it is specified.
-</p>
-<p>If you are a format templates designer, please see above.</p>
 <a name="oldGuide"/>
 <h1>Old PHP BibFormat Aministration Guide</h1>
 <h2>Contents</h2>

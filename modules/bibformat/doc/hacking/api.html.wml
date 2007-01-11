@@ -28,13 +28,13 @@
 <protect>
 <pre>
 ****************************************************************************
-** IMPORTANT NOTE: The new BibFormat is not yet in production.  We expect **
-** to put into production in August 2006.  The APIs presented below are   **
-** still subject to change.                                               **
+** IMPORTANT NOTE: Note that this documentation is an updated version of  **
+** an earlier technical draft of BibFormat specifications. Please first   **
+** refer to the BibFormat admin guide.                                    **
 ****************************************************************************
 
-Technical Overview of the new BibFormat / DRAFT 20060609
-========================================================
+Technical Overview of the new BibFormat
+=======================================
 
 Contents:
 1. The philosophy behind BibFormat
@@ -441,8 +441,47 @@ Some remarks concerning format elements:
   in element documentation), and @see an_element.py, another_element.py
   (to link to other elements in the documentation). Similar to JavaDoc.
  -the following names cannot be used as parameters:
-  "default", "prefix" and "suffix". They can however always be
+  "default", "prefix", "suffix" and escape. They can however always be
   used in the format template for any element.
+
+Another important remark concerns the 'escaping' of output of format
+elements. In most cases, format elements output is to be used for
+HTML/XML. Therefore special characters such as < or & have to be
+'escaped', replaced by '&lt;' and '&amp;'. This is why all outputs
+produced by format elements are automatically escaped by BibFormat,
+unless specified otherwise.  This means that you do not have to care
+about meta-data that would break your HTML displaying or XML export
+such as a physics formula like 'a < b'. Please also note that value
+given in 'prefix', 'suffix' and 'default' parameters are not escaped,
+such that you can safely use HTML tags for these.
+
+There are always cases where the default 'escaping' behaviour of
+BibFormat is not desired. For example when you explicitely output HTML
+text, like links: you do not want to see them escaped.  The first way
+to avoid this is to modify the call to your format element in the
+format template, by setting the default 'escape' parameter to 0:
+
+ <BFE_ABSTRACT escape='0'>
+
+This is however inconvenient as you have to possibly need to modify a
+lot of templates. The other way of doing is to add another function to
+your format element, named 'escape':
+
+ def escape_values(bfo):
+     """
+     Called by BibFormat in order to check if output of this element
+     should be escaped.
+     """
+     return 0
+
+In that way all calls to your format element will produce unescaped
+output.  You will have to take care of escaping values "manually" in
+your format element code, in order to avoid non valid outputs or XSS
+vulnerabilities. There are methods to ease the escaping in your code
+described in section 5.
+Please also note that if you use this method, your element can still
+be escaped if a call to your element from a format template
+explicitely specifies to escape value using parameter 'escape'.
 
 
 4.4 Knowledge bases specifications
@@ -622,20 +661,32 @@ The API of the BibFormat Object ('bfo') given as a parameter to
 format function of format elements consist in the following
 functions. This API is to be used only inside format elements.
 
- def control_field(self, tag):
+ def control_field(self, tag, escape='0'):
     """
     Returns the value of control field given by tag in record.
 
     If the value does not exist, returns empty string
     The returned value is always a string.
 
-    The argument is:
+    'escape' parameter allows to escape special characters
+    of the field. The value of escape can be:
+          0 - no escaping
+          1 - escape all HTML characters
+          2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+              escape only unsafe characters, but leave basics HTML tags.
+              This is particularly useful if you want to store HTML text in your
+              metadata but still want to escape some tags to prevent
+              XSS vulnerabilities. Note that this method is slower than
+              basic escaping of mode 1.
+              
+    The arguments are:
 
-         tag  -  the marc code of a field
-
+         tag    -  the marc code of a field
+         escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
     """
 
- def field(self, tag):
+ def field(self, tag, escape='0'):
     """
     Returns the value of the field corresponding to tag in the
     current record.
@@ -643,14 +694,26 @@ functions. This API is to be used only inside format elements.
     If the value does not exist, returns empty string
     The returned value is always a string.
 
-    The argument is:
+    'escape' parameter allows to escape special characters
+    of the field. The value of escape can be:
+          0 - no escaping
+          1 - escape all HTML characters
+          2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+              escape only unsafe characters, but leaves basic HTML tags.
+              This is particularly useful if you want to store HTML text in your
+              metadata but still want to escape some tags to prevent
+              XSS vulnerabilities. Note that this method is slower than
+              basic escaping of mode 1.
+              
+    The arguments are:
 
          tag  -  the marc code of a field
-
+         escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
     """
 
 
- def fields(self, tag):
+ def fields(self, tag, escape='0'):
     """
     Returns the list of values corresonding to "tag".
 
@@ -661,10 +724,22 @@ functions. This API is to be used only inside format elements.
     corresponding to tag.
     The returned value is always a list.
 
-    The argument is:   
+    'escape' parameter allows to escape special characters
+    of the field. The value of escape can be:
+          0 - no escaping
+          1 - escape all HTML characters
+          2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+              escape only unsafe characters, but leaves basic HTML tags.
+              This is particularly useful if you want to store HTML text in your
+              metadata but still want to escape some tags to prevent
+              XSS vulnerabilities. Note that this method is slower than
+              basic escaping of mode 1.
+
+    The arguments are:   
 
           tag  -  the marc code of a field
-
+          escape -  1 if returned value should be escaped. Else 0.
+                   (see above for other modes)
     """
 
  def kb(self, kb, string, default=""):
