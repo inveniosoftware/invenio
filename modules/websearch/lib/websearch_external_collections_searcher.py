@@ -22,6 +22,7 @@
 
 __revision__ = "$Id$"
 
+import sys
 import urllib
 
 from invenio.config import cdslang
@@ -527,7 +528,7 @@ def build_external_collections_dictionary():
         if globals().has_key(engine_name):
             external_collections_dictionary[name] = globals()[engine_name](configuration)
         else:
-            print "Error : not found " + engine_name
+            sys.stderr.write("Error : not found " + engine_name + "\n")
 
 build_external_collections_dictionary()
 

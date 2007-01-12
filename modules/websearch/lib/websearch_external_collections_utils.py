@@ -23,6 +23,7 @@
 
 __revision__ = "$Id$"
 
+import sys
 from copy import copy
 
 from invenio.dbquery import run_sql, escape_string
@@ -39,7 +40,7 @@ def get_verbose_print(req, prefix, cur_verbosity_level):
 
 def warning(message):
     """Issue a warning alert."""
-    print "WARNING: %(message)s" % locals()
+    sys.stderr.write("WARNING: %(message)s\n" % locals())
 
 def escape_dictionary(dictionary):
     """Escape values of dictionary of type string with escape_string. Used for building sql query."""
