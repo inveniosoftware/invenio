@@ -223,7 +223,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                   button="Validate",
                                   confirm=0)
 
-    if confirm not in ["-1", -1] and validate(oai_src_baseurl) == 0:
+    if confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 0:
         output += bibharvest_templates.tmpl_output_validate_info(cdslang, 0, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
         text = bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
@@ -260,7 +260,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                    ln=ln,
                                    confirm=1)
 
-    elif confirm not in ["-1", -1] and validate(oai_src_baseurl) == 1:
+    elif confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 1:
         lnargs = [["ln", ln]]
         output += bibharvest_templates.tmpl_output_validate_info(cdslang, 1, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
@@ -272,7 +272,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
     elif confirm not in ["-1", -1]:
         lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_output_error_info(cdslang, str(oai_src_baseurl), str(validate(oai_src_baseurl)))
+        output += bibharvest_templates.tmpl_output_error_info(cdslang, str(oai_src_baseurl), validate(oai_src_baseurl)[1])
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
         output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
         output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
@@ -452,8 +452,15 @@ def get_next_schedule():
 
 def validate(oai_src_baseurl):
     """This function validates a baseURL by opening its URL and 'greping' for the <OAI-PMH> and <Identify> tags:
+
+    Codes:
      0 = okay
-     1 = baseURL non existing
+     1 = baseURL not valid
+     2 = baseURL not found/not existing
+     3 = tmp directoy is not writable
+     4 = Unknown error
+
+     Returns tuple (code, message)
      """
     try:
         url = oai_src_baseurl + "?verb=Identify"
@@ -468,13 +475,19 @@ def validate(oai_src_baseurl):
         grepOUT2 = os.popen('grep -iwc "<identify>" '+tmppath).read()
         if int(grepOUT2) > 0:
             #print "Valid!"
-            return 0
+            return (0, '')
         else:
             #print "Not valid!"
-            return 1
-        
+            return (1, '')
+    except IOError, (errno, strerror):
+        # Quick error handling for frequent error codes.
+        if errno == 13:
+            return (3, "Please check permission on %s and retry" % tmpdir)
+        elif errno == 2 or errno == 'socket error':
+            return (2, "Could not connect with URL %s. Check URL or retry when server is available." % url)
+        return (4, strerror)
     except StandardError, e:
-        return 1
+        return (4, "An unknown error has occured")
 
 def validatefile(oai_src_config):
     """This function checks whether the given path to text file exists or not
