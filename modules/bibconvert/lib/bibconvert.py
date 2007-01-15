@@ -1844,14 +1844,42 @@ def create_record(begin_record_header,
                         DATA = [string.join(DATA, " ")]
                     SRC_TPL = select_line(field, source_tpl_parsed)
                     try:
-                        if (DATA[0] != ""):
+                        ## Get the components that this field is composed of:
+                        field_components = field_tpl_item_STRING.split("::")
+                        num_field_components = len(field_components)
+                        ## Test the number of components. If it is greater that 2,
+                        ## some kind of functions must be called on the value of
+                        ## the field, and it should therefore be evaluated. If however,
+                        ## the field is made-up of only 2 components, (i.e. no functions
+                        ## are called on its value, AND the value is empty, do not bother
+                        ## to evaluate it.
+                        ##
+                        ## E.g. In the following line:
+                        ## 300---<Pages><:Num::Num:><:Num::Num::IF(,mult. p):></Pages>
+                        ##
+                        ## If we have a value "3" for page number (Num), we want the following result:
+                        ## <Pages>3 p</Pages>
+                        ## If however, we have no value for page number (Num), we want this result:
+                        ## <Pages>mult. p</Pages>
+                        ## The functions relating to the datafield must therefore be executed
+                        ##
+                        ## If however, the template contains this line:
+                        ## 300---<Pages><:Num::Num:></Pages>
+                        ##
+                        ## If we have a value "3" for page number (Num), we want the following result:
+                        ## <Pages>3</Pages>
+                        ## If however, we have no value for page number (Num), we do NOT want the line
+                        ## to be printed at all - we should SKIP the element and not return an empty
+                        ## value (<Pages></Pages> would be pointless.)
+
+                        if (DATA[0] != "" or num_field_components > 2):
                             DATA = get_subfields(DATA, subfield, SRC_TPL)
                             FF = field_tpl_item_STRING.split("::")
                             if (len(FF) > 2):
                                 FF = FF[2:]
                                 for fn in FF:
 #                                    DATAFORMATTED = []
-                                    if (len(DATA) != 0 and DATA[0] != ""):
+                                    if (len(DATA) != 0):
                                         DATA = get_subfields(DATA, subfield, SRC_TPL)
                                         FF = field_tpl_item_STRING.split("::")
                                         if (len(FF) > 2):
@@ -1860,11 +1888,12 @@ def create_record(begin_record_header,
                                                 DATAFORMATTED = []
                                     for item in DATA:
                                         item = FormatField(item, fn)
-                                        DATAFORMATTED.append(item)
+                                        if item != "":
+                                            DATAFORMATTED.append(item)
                                     DATA = DATAFORMATTED
                             if (len(DATA) > rows):
                                 rows = len(DATA)
-                            if DATA != "":
+                            if DATA[0] != "":
                                 print_line = 1
                             to_output.append(DATA)
                     except IndexError, e:
