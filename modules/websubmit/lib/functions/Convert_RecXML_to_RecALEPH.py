@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -19,22 +19,57 @@
 
 __revision__ = "$Id$"
 
-from os import system, access, R_OK
-
+import os
+from os import access, R_OK
 from invenio.config import xmlmarc2textmarc
 from invenio.websubmit_config import functionError
 
-def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
-    """Call "xmlmarc2textmarc" to convert an XML MARC record to an ALEPH MARC record, saving the ALEPH record
-       in the running directory for the submission.
+def Convert_RecXML_to_RecALEPH(parameters,curdir,form):
+    """Function to create an ALEPH 500 MARC record from a MARC XML record.
+       This function depends upon the following:
+         * "recmysql" already exists in the working submission directory. I.e.
+            "Make_Record" has already been called and the MARC XML record created.
+         * "recmysql" must contain an ALEPH 500 SYS in the field "970__a". That is to say,
+            the function "Allocate_ALEPH_SYS" should have been called and an ALEPH 500
+            SYS allocated to this record.
+
+       Given the valid "recmysql" in the working submission directory, this function will
+       use the "xmlmarc2textmarc" tool to convert that record into the ALEPH MARC record.
+       The record will then be written into the file "recaleph500" in the current working
+       submission directory.
+       @parameters: None
+       @return: (string) - Empty string.
     """
-    ## attempt to create ALEPH record:
-    call_xmlmarc2textmarc_text = """%(xmlmarc2textmarc)s --aleph-marc=r %(curdir)s/recmysql > %(curdir)s/recaleph"""\
-                                 % { 'xmlmarc2textmarc' : xmlmarc2textmarc, 'curdir' : curdir }
-    system(call_xmlmarc2textmarc_text)
-    ## test for ALEPH record:
-    rec_aleph_exists = access("%(curdir)s/recaleph" % { 'curdir' : curdir }, R_OK)
-    if not rec_aleph_exists:
-        ## recaleph doesn't exist!
-        raise functionError("Cannot create ALEPH record!")
+    ## If recmysql does not exist in the current working submission directory, or
+    ## it is not readable, fail by raising a functionError:
+    if not access("%s/recmysql" % curdir, R_OK|W_OK):
+        ## FAIL - recmysql cannot be accessed:
+        msg = """No recmysql in submission dir %s - Cannot create recaleph500!""" \
+              % curdir
+        raise functionError(msg)
+
+    ## Command to perform conversion of recmysql -> recaleph500:
+    convert_cmd = \
+        """%(xmlmarc2alephmarc)s --aleph-marc=r %(curdir)s/recmysql > %(curdir)s/recaleph500""" \
+        % { 'xmlmarc2alephmarc' : xmlmarc2textmarc,
+            'curdir'            : curdir,
+          }
+    ## Perform the conversion of MARC XML record to ALEPH500 record:
+    convert_status = os.system("%s" % convert_cmd)
+
+    ## Check that the conversion was performed without error:
+    if convert_status != 0:
+        ## It was not possible to successfully create the ALEPH500 record, quit:
+        msg = """An error was encountered when attempting to convert %s/recmysql into recaleph500 - stopping""" \
+              % curdir
+        raise functionError(msg)
+
+    ## Check for presence of recaleph500 in the current working submission directory:
+    if not access("%s/recaleph500" % curdir, R_OK|W_OK):
+        ## Either not present, or not readable - ERROR
+        msg = """An error was encountered when attempting to convert %s/recmysql into recaleph500.""" \
+              """ After the conversion, recaleph500 could not be accessed.""" % curdir
+        raise functionError(msg)
+
+    ## Everything went OK:
     return ""
