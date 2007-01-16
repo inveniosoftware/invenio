@@ -766,7 +766,7 @@ class Template:
                                 el.checked=true;
                               }""" % {
                                 'fieldname' : fieldname,
-                                'text' : re.escape(str(text)),
+                                'text' : cgi.escape(str(text)),
                               }
                 elif upload[i] == 0:
                     text = text.replace('"','\"')
@@ -777,7 +777,7 @@ class Template:
                                el.value="%(text)s";
                            """ % {
                              'fieldname' : fieldname,
-                             'text' : re.escape(str(text)),
+                             'text' : cgi.escape(str(text)),
                            }
         out += """<!--End Fill in section-->
                """
