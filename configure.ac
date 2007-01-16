@@ -21,7 +21,7 @@
 
 ## Initialize autoconf and automake:
 AC_INIT(cds-invenio, 0.92.0.20070116, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.92.0.20060716)
+AM_INIT_AUTOMAKE(cds-invenio, 0.92.0.20070116)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -31,7 +31,7 @@ AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files
 if test -z "$WEBURL"; then
    AC_MSG_ERROR([
    You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.  
-   Example: "--with-weburl=http://webserver.domain.com/doc/".])
+   Example: "--with-weburl=http://webserver.domain.com".])
 fi   
 
 AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://webserver.domain.com)]), SWEBURL=${withval})
