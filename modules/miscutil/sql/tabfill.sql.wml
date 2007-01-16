@@ -43,7 +43,7 @@ INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
 <uk>INSERT INTO collectionname VALUES (1,'uk','ln','<CDSNAMEINTL>');</uk>
 <bg>INSERT INTO collectionname VALUES (1,'bg','ln','<CDSNAMEINTL>');</bg>
 
-INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', NULL, NULL, 'admin', '');
+INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=author&p=\" urlencode($author)','EXT','','');
