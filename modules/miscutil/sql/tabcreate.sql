@@ -3023,7 +3023,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
   sleeptime varchar(20),
-  arguments longtext,
+  arguments mediumblob,
   status varchar(50),
   progress varchar(255),
   PRIMARY KEY  (id),
