@@ -159,6 +159,9 @@ update-v0.90.1-tables: local-dbexec
 	echo "ALTER TABLE oaiARCHIVE CHANGE f3 f3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiARCHIVE CHANGE m3 m3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 
+update-v0.92.0-tables: local-dbexec
+	echo "ALTER TABLE schTASK CHANGE arguments arguments longblob;" | ./modules/miscutil/bin/dbexec
+
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
