@@ -63,13 +63,13 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
        When the system allocates a new sys and there are 2000 or less free SYS remaining,
        the warning mails to ADMIN will be sent.
 
-       @param database: (string) the name of the ALEPH database for which a SYS is to be
+       @param alephdatabase: (string) the name of the ALEPH database for which a SYS is to be
         allocated.  E.g. "CER".  The he absence of this will cause the function to fail.
         Also, the absence of either of the 2 counter files "last_SYS_${database}" and
         "maximum_SYS_${database}" will cause the function to fail.
     """
     mailfrom_addr = '%s Submission Engine <%s>' % (cdsname, supportemail)
-    database = parameters['database'].strip()
+    database = parameters['alephdatabase'].strip()
     counter_lastsys = "last_SYS_%s" % database
     counter_maxsys = "maximum_SYS_%s" % database
 
