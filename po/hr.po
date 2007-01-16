@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-22 12:07+0100\n"
+"POT-Creation-Date: 2007-01-16 18:42+0100\n"
 "PO-Revision-Date: 2006-12-13 17:21+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
@@ -278,8 +278,8 @@ msgid "Cancel"
 msgstr "Odustani"
 
 #: modules/bibedit/lib/bibedit_templates.py:111
-#: modules/bibedit/lib/bibedit_templates.py:307
-#: modules/bibedit/lib/bibedit_templates.py:350
+#: modules/bibedit/lib/bibedit_templates.py:310
+#: modules/bibedit/lib/bibedit_templates.py:354
 #: modules/bibformat/lib/bibformat_templates.py:973
 #: modules/bibformat/web/admin/bibformatadmin.py:397
 #: modules/bibformat/web/admin/bibformatadmin.py:399
@@ -302,7 +302,7 @@ msgid "Action"
 msgstr "Akcija"
 
 #: modules/bibedit/lib/bibedit_templates.py:123
-#: modules/bibedit/lib/bibedit_templates.py:138
+#: modules/bibedit/lib/bibedit_templates.py:139
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
@@ -315,52 +315,52 @@ msgstr "Unos"
 msgid "Display"
 msgstr "Prikaži"
 
-#: modules/bibedit/lib/bibedit_templates.py:241
+#: modules/bibedit/lib/bibedit_templates.py:244
 msgid "Save"
 msgstr "Spremi"
 
-#: modules/bibedit/lib/bibedit_templates.py:243
+#: modules/bibedit/lib/bibedit_templates.py:246
 msgid "Return to Record"
 msgstr "Povratak na unos"
 
-#: modules/bibedit/lib/bibedit_templates.py:342
-#: modules/bibedit/lib/bibedit_templates.py:443
+#: modules/bibedit/lib/bibedit_templates.py:346
+#: modules/bibedit/lib/bibedit_templates.py:447
 msgid "Edit"
 msgstr "Uredi"
 
-#: modules/bibedit/lib/bibedit_templates.py:397
+#: modules/bibedit/lib/bibedit_templates.py:401
 msgid "Your changes are TEMPORARY."
 msgstr "Vaše  promjene su PRIVREMENE."
 
-#: modules/bibedit/lib/bibedit_templates.py:398
+#: modules/bibedit/lib/bibedit_templates.py:402
 msgid "To save this record, please click on submit."
 msgstr "Za spremanje unosa molimo pritisnite \"Prihvati\""
 
-#: modules/bibedit/lib/bibedit_templates.py:412
+#: modules/bibedit/lib/bibedit_templates.py:416
 msgid "This record does not exist."
 msgstr "Taj unos ne postoji"
 
-#: modules/bibedit/lib/bibedit_templates.py:413
+#: modules/bibedit/lib/bibedit_templates.py:417
 msgid "Please try another record ID."
 msgstr "Molimo pokušajte drugi ID unosa"
 
-#: modules/bibedit/lib/bibedit_templates.py:421
+#: modules/bibedit/lib/bibedit_templates.py:425
 msgid "This record is currently being edited by another user."
 msgstr "Taj unos trenutno uređuje drugi korisnik."
 
-#: modules/bibedit/lib/bibedit_templates.py:422
+#: modules/bibedit/lib/bibedit_templates.py:426
 msgid "Please try again later."
 msgstr "Molimo pokušajte kasnije iznova."
 
-#: modules/bibedit/lib/bibedit_templates.py:429
+#: modules/bibedit/lib/bibedit_templates.py:433
 msgid "Cannot edit deleted record."
 msgstr "Nije moguće uređivati izbrisano."
 
-#: modules/bibedit/lib/bibedit_templates.py:440
+#: modules/bibedit/lib/bibedit_templates.py:444
 msgid "Please enter the ID of the record you want to edit"
 msgstr "Molimo unesite "
 
-#: modules/bibedit/lib/bibedit_templates.py:452
+#: modules/bibedit/lib/bibedit_templates.py:456
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
@@ -368,8 +368,8 @@ msgstr ""
 "Vaše promjene su zaprimljene. Bit će obrađene čim se isprazni red čekanja "
 "zadataka."
 
-#: modules/bibedit/lib/bibedit_templates.py:454
-#: modules/bibedit/lib/bibedit_templates.py:486
+#: modules/bibedit/lib/bibedit_templates.py:458
+#: modules/bibedit/lib/bibedit_templates.py:490
 #, python-format
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
@@ -377,11 +377,11 @@ msgstr ""
 "Sada se možete vratiti na %(x_url_open)sadministracijsko sučelje%"
 "(x_url_close)s."
 
-#: modules/bibedit/lib/bibedit_templates.py:474
+#: modules/bibedit/lib/bibedit_templates.py:478
 msgid "Do you really want to delete this record?"
 msgstr "Želite li stvarno izbrisati ovaj zapis?"
 
-#: modules/bibedit/lib/bibedit_templates.py:478
+#: modules/bibedit/lib/bibedit_templates.py:482
 #: modules/webbasket/lib/webbasket_templates.py:1235
 #: modules/webcomment/lib/webcomment_templates.py:215
 #: modules/webcomment/lib/webcomment_templates.py:471
@@ -393,7 +393,7 @@ msgstr "Želite li stvarno izbrisati ovaj zapis?"
 msgid "Yes"
 msgstr "Da"
 
-#: modules/bibedit/lib/bibedit_templates.py:479
+#: modules/bibedit/lib/bibedit_templates.py:483
 #: modules/webalert/lib/webalert_templates.py:309
 #: modules/webcomment/lib/webcomment_templates.py:216
 #: modules/webcomment/lib/webcomment_templates.py:473
@@ -405,7 +405,7 @@ msgstr "Da"
 msgid "No"
 msgstr "Ne"
 
-#: modules/bibedit/lib/bibedit_templates.py:484
+#: modules/bibedit/lib/bibedit_templates.py:488
 msgid "The record will be deleted as soon as the task queue is empty."
 msgstr "Zapis će biti izbrisan čim se isprazni red čekanja zadataka."
 
@@ -418,17 +418,17 @@ msgstr "Zapis %s - Dodaj polje"
 msgid "BibEdit Admin Interface"
 msgstr "BibEdit Administracijsko sučelje"
 
-#: modules/bibedit/web/admin/bibeditadmin.py:96
+#: modules/bibedit/web/admin/bibeditadmin.py:98
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s"
 msgstr "Uredi unos %(x_recid)s, polje %(x_field)s"
 
-#: modules/bibedit/web/admin/bibeditadmin.py:99
+#: modules/bibedit/web/admin/bibeditadmin.py:101
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
 msgstr "Uredi unos %(x_recid)s, polje %(x_field)s - Dodaj potpolje"
 
-#: modules/bibedit/web/admin/bibeditadmin.py:127
+#: modules/bibedit/web/admin/bibeditadmin.py:129
 #, python-format
 msgid "Submit and save record %s"
 msgstr "Prihvati i spremi zapis %s"

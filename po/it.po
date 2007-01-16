@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2006-12-22 12:07+0100\n"
+"POT-Creation-Date: 2007-01-16 18:42+0100\n"
 "PO-Revision-Date: 2006-10-12 17:49+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: IT <cds.support@cern.ch>\n"
@@ -281,8 +281,8 @@ msgid "Cancel"
 msgstr ""
 
 #: modules/bibedit/lib/bibedit_templates.py:111
-#: modules/bibedit/lib/bibedit_templates.py:307
-#: modules/bibedit/lib/bibedit_templates.py:350
+#: modules/bibedit/lib/bibedit_templates.py:310
+#: modules/bibedit/lib/bibedit_templates.py:354
 #: modules/bibformat/lib/bibformat_templates.py:973
 #: modules/bibformat/web/admin/bibformatadmin.py:397
 #: modules/bibformat/web/admin/bibformatadmin.py:399
@@ -306,7 +306,7 @@ msgid "Action"
 msgstr "collezioni"
 
 #: modules/bibedit/lib/bibedit_templates.py:123
-#: modules/bibedit/lib/bibedit_templates.py:138
+#: modules/bibedit/lib/bibedit_templates.py:139
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
@@ -320,71 +320,71 @@ msgstr ""
 msgid "Display"
 msgstr "Visualizzare:"
 
-#: modules/bibedit/lib/bibedit_templates.py:241
+#: modules/bibedit/lib/bibedit_templates.py:244
 msgid "Save"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:243
+#: modules/bibedit/lib/bibedit_templates.py:246
 #, fuzzy
 msgid "Return to Record"
 msgstr "andare alla registrazione:"
 
-#: modules/bibedit/lib/bibedit_templates.py:342
-#: modules/bibedit/lib/bibedit_templates.py:443
+#: modules/bibedit/lib/bibedit_templates.py:346
+#: modules/bibedit/lib/bibedit_templates.py:447
 msgid "Edit"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:397
+#: modules/bibedit/lib/bibedit_templates.py:401
 msgid "Your changes are TEMPORARY."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:398
+#: modules/bibedit/lib/bibedit_templates.py:402
 msgid "To save this record, please click on submit."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:412
+#: modules/bibedit/lib/bibedit_templates.py:416
 #, fuzzy
 msgid "This record does not exist."
 msgstr "The record has been deleted."
 
-#: modules/bibedit/lib/bibedit_templates.py:413
+#: modules/bibedit/lib/bibedit_templates.py:417
 msgid "Please try another record ID."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:421
+#: modules/bibedit/lib/bibedit_templates.py:425
 msgid "This record is currently being edited by another user."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:422
+#: modules/bibedit/lib/bibedit_templates.py:426
 msgid "Please try again later."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:429
+#: modules/bibedit/lib/bibedit_templates.py:433
 msgid "Cannot edit deleted record."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:440
+#: modules/bibedit/lib/bibedit_templates.py:444
 msgid "Please enter the ID of the record you want to edit"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:452
+#: modules/bibedit/lib/bibedit_templates.py:456
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:454
-#: modules/bibedit/lib/bibedit_templates.py:486
+#: modules/bibedit/lib/bibedit_templates.py:458
+#: modules/bibedit/lib/bibedit_templates.py:490
 #, python-format
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:474
+#: modules/bibedit/lib/bibedit_templates.py:478
 msgid "Do you really want to delete this record?"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:478
+#: modules/bibedit/lib/bibedit_templates.py:482
 #: modules/webbasket/lib/webbasket_templates.py:1235
 #: modules/webcomment/lib/webcomment_templates.py:215
 #: modules/webcomment/lib/webcomment_templates.py:471
@@ -396,7 +396,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:479
+#: modules/bibedit/lib/bibedit_templates.py:483
 #: modules/webalert/lib/webalert_templates.py:309
 #: modules/webcomment/lib/webcomment_templates.py:216
 #: modules/webcomment/lib/webcomment_templates.py:473
@@ -408,7 +408,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_templates.py:484
+#: modules/bibedit/lib/bibedit_templates.py:488
 msgid "The record will be deleted as soon as the task queue is empty."
 msgstr ""
 
@@ -421,17 +421,17 @@ msgstr ""
 msgid "BibEdit Admin Interface"
 msgstr ""
 
-#: modules/bibedit/web/admin/bibeditadmin.py:96
+#: modules/bibedit/web/admin/bibeditadmin.py:98
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s"
 msgstr ""
 
-#: modules/bibedit/web/admin/bibeditadmin.py:99
+#: modules/bibedit/web/admin/bibeditadmin.py:101
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
 msgstr ""
 
-#: modules/bibedit/web/admin/bibeditadmin.py:127
+#: modules/bibedit/web/admin/bibeditadmin.py:129
 #, fuzzy, python-format
 msgid "Submit and save record %s"
 msgstr "Similar records"
