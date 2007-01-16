@@ -643,8 +643,6 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
                               confirm=1)
     
     if body and confirm in [1, "1"]:
-        title = cgi.escape(title)
-        body = cgi.escape(body)
         res = add_pbx(title, body)
         output += write_outcome(res)
         if res[1] == 1:
