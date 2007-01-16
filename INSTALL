@@ -522,11 +522,15 @@ Contents
           server to read files from the installation place and to
           write some log information and to cache interesting entities
           inside the "var" subdirectory of our CDS Invenio
-          installation directory.
+          installation directory.  
 
           Here we assumed that your Apache server processes are run
           under "www-data" group.  Change this appropriately for your
-          system.
+          system.  
+
+          Moreover, note that if you are using SELinux extensions
+          (e.g. on Fedora Core 6), you may have to check and enable
+          the write access of Apache user there too.
 
           After these admin-level tasks to be performed as root, let's
           now go back to finish the installation of the CDS Invenio.
