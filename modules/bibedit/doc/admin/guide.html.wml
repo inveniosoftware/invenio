@@ -130,7 +130,7 @@ MARC 980 $$c tag:
        <pre>
        $ emacs z.xml
        [...]
-        &lt;datafield tag="980" ind1="" ind2=""&gt;
+        &lt;datafield tag="980" ind1=" " ind2=" "&gt;
           &lt;subfield code="a"&gt;PREPRINT&lt;/subfield&gt;
           &lt;subfield code="c"&gt;DELETED&lt;/subfield&gt;
         &lt;/datafield&gt;
