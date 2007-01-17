@@ -113,11 +113,11 @@ class Template:
                                                                                         'temp' : temp})
                 
                 result = """ <div class="bibEditCellRight" style="font-weight: normal">
-                                 %(action)s : %(link_submit)s%(link_cancel)s
+                                 &nbsp;%(action)s: %(link_submit)s%(link_cancel)s
                                  
-                                 %(record)s : %(link_add_field)s%(link_delete)s
+                                 &nbsp;%(record)s: %(link_add_field)s%(link_delete)s
                                  
-                                 %(display)s : %(link_diplay_verbose)s | %(link_diplay_marc)s
+                                 &nbsp;%(display)s: %(link_diplay_verbose)s | %(link_diplay_marc)s
                                  
                              </div> """  % {'action'              : _("Action"),
                                             'record'              : _("Record"),
@@ -240,10 +240,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        if add == 1 or add == 3:
-            button  = _("Save")
-        else:
-            button  = _("Return to Record")
+        button  = _("Done")
             
         if type_table != "record" or add == 3:
             form = self.tmpl_input('submit', button, class_css='formbutton') + "</form>"
@@ -298,7 +295,7 @@ class Template:
                 
                 if len(value) < 75:
                     print_value = self.tmpl_input('text', value, 'value%s' % str(num_value),
-                                                  style="width:100%c;" % '%')
+                                                  style="width:100%;")
                 else:
                     print_value = '<textarea name="value%(num_value)s" cols="70" rows="5" style="width:100%%;">%(value)s</textarea>' 
                     print_value %= {'num_value'   : str(num_value),
@@ -506,7 +503,7 @@ class Template:
         if ancre != '':
             ancre = '#' + ancre
             
-        return  '<a href="%(url)s/%(dest)s%(args)s%(ancre)s"> %(text)s </a>' % {'text'  : text,
+        return  '<a href="%(url)s/%(dest)s%(args)s%(ancre)s">%(text)s</a>' % {'text'  : text,
                        'url'   : url,
                        'dest'  : dest,
                        'args'  : link_args,
