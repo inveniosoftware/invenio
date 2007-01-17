@@ -361,6 +361,9 @@ Contents
           pre-created and customized based on the config you have
           edited in the previous step.
 
+          Note that on systems such as FreeBSD or Mac OS X you have to
+          use GNU make ("gmake") instead of "make".
+
       $ make install
 
           Install the web pages, scripts, utilities and everything
