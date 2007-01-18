@@ -129,8 +129,9 @@ class Template:
         # out = "<pre>" + pprint.pformat(catalogs)
         out = ""
         for catalog in catalogs:
-            out += "<UL>"
+            out += "\n<ul>"
             out += self.tmpl_submit_home_catalogs_sub(ln, catalog)
+            out += "\n</ul>\n"
 
         return out
 
