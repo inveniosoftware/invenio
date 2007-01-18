@@ -362,7 +362,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
         text = """
         <span class="adminlabel">Query</span>
         <input class="admin_w200" type="text" name="dbquery" value="%s" /><br>
-        """ % dbquery
+        """ % cgi.escape(dbquery, 1)
         output += createhiddenform(action="modifydbquery",
                                    text=text,
                                    button="Modify",
