@@ -295,7 +295,7 @@ def migrate_formats():
         text = '<name>%s</name>' % name
         text += '<description>%s</description>\n' % description
         # (translated_code, bfe_to_create) = translate_format(code)  #TEMP DISABLED FIXME
-        bfe_to_create = [] # TEMP ENABLED FIXME
+        bfe_to_create = {} # TEMP ENABLED FIXME
         # text += translated_code  #TEMP DISABLED FIXME
         text += "<!--ORIGINAL CODE. DON'T FORGET TO REMOVE BEFORE GOING INTO PRODUCTION \n" + code + "-->"
         
