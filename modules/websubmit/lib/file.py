@@ -227,7 +227,7 @@ class BibDoc:
             self.recid = recid
             self.docname = res[0][2]
             self.id = bibdocid
-	    self.status = res[0][1]
+	    self.status = int(res[0][1])
             group = "g"+str(int(int(self.id)/archivesize))
             self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
         # else it is a new document
@@ -398,7 +398,7 @@ class BibDoc:
     def delete(self):
         """delete the current bibdoc instance"""
 	self.status = self.status | 1
-        run_sql("update bibdoc set status='" + self.status + "' where id=%s",(self.id,))
+        run_sql("update bibdoc set status='" + str(self.status) + "' where id=%s",(self.id,))
 
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
