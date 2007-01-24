@@ -463,6 +463,48 @@ a.footer:hover {
    background: #fff;
    padding: 3px;
 }
+.focusonsearchbox {
+   color: #000;
+   background: #f0f8ff;
+   padding: 1px;
+   margin: 20px 20px 5px 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c; 
+}
+.focusonsearchboxheader {
+   color: #000;
+   background: #e6e6fa;
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.focusonsearchboxbody {
+   color: #000;
+   background: #f0f8ff;
+   padding: 3px;
+}
+.searchalsosearchbox {
+   color: #000;
+   background: #fffbf5;
+   padding: 1px;
+   margin: 20px 20px 5px 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c; 
+}
+.searchalsosearchboxheader {
+   color: #000;
+   background: #ffeacc;
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.searchalsosearchboxbody {
+   color: #300;
+   background: #fffbf5;
+   padding: 3px;
+}
 .latestadditionsbox {
    color: #000;
    background: #fff;
@@ -1287,7 +1329,7 @@ input.hyperlinkformSubmitButton {
 /* externalcollections */
 .externalcollectionsbox {
    color: #333;
-   background: ##fffbf5;
+   background: #fffbf5;
    text-align: left;
    margin-left: auto;
    margin-right: auto;
