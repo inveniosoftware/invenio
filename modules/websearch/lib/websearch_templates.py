@@ -716,19 +716,24 @@ class Template:
             style_prolog = ""
             style_epilog = ""
 
-        out = """<table class="narrowsearchbox">
+        out = """<table class="%(narrowsearchbox)s">
                    <thead>
                     <tr>
-                     <th colspan="2" align="left" class="narrowsearchboxheader">
+                     <th colspan="2" align="left" class="%(narrowsearchbox)sheader">
                        %(title)s
                      </th>
                     </tr>
                    </thead>
-                   <tbody>""" % {'title' : title}
+                   <tbody>""" % {'title' : title,
+                                 'narrowsearchbox': {'r': 'narrowsearchbox',
+                                                     'v': 'focusonsearchbox'}[type]}
         # iterate through sons:
         i = 0
         for son in sons:
-            out += """<tr><td class="narrowsearchboxbody" valign="top">"""
+            out += """<tr><td class="%(narrowsearchbox)sbody" valign="top">""" % \
+                   { 'narrowsearchbox': {'r': 'narrowsearchbox',
+                                         'v': 'focusonsearchbox'}[type]}
+            
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
                     out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
@@ -763,8 +768,8 @@ class Template:
         box_name = _("Search also:")
 
         html = """<table cellspacing="0" cellpadding="0" border="0">
-            <tr><td valign="top"><table class="narrowsearchbox">
-            <thead><tr><th colspan="2" align="left" class="narrowsearchboxheader">%(box_name)s
+            <tr><td valign="top"><table class="searchalsosearchbox">
+            <thead><tr><th colspan="2" align="left" class="searchalsosearchboxheader">%(box_name)s
             </th></tr></thead><tbody>
         """ % locals()
 
@@ -777,7 +782,7 @@ class Template:
             else:
                 checked = ''
 
-            html += """<tr><td class="narrowsearchboxbody" valign="top">
+            html += """<tr><td class="searchalsosearchboxbody" valign="top">
                 <input type="checkbox" name="ec" value="%(internal_name)s" %(checked)s>&nbsp;</td>
                 <td valign="top"><a href="%(base_url)s">%(name)s</a></td></tr>""" % \
                                  { 'checked': checked,
