@@ -130,7 +130,7 @@ Contents
               <http://www.ice.ru/~vitus/catdoc/index.html>
               <http://sourceforge.net/projects/wvware>           
           - for MS PowerPoint files: pptHtml and html2text
-              <http://www.xlhtml.org/>
+              <http://packages.debian.org/stable/utils/ppthtml>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
           - for MS Excel files: xlhtml and html2text
               <http://chicago.sourceforge.net/xlhtml/>
