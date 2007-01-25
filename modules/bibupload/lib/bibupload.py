@@ -457,12 +457,25 @@ def bibupload(record):
         write_message("    Failed: Tag not found, enter a valid tag to update.", verbose=1, stream=sys.stderr)
         return (1, -1)
     
-    # Extraction of the Record Id
+    # Extraction of the Record Id from 001, SYSNO or OAIID tags:
     rec_id = retrieve_rec_id(record)
     if rec_id == -1:
         return (1, -1)
-    else:
-        write_message("   -Retrieve record Id (found %s): DONE." % rec_id, verbose=2)
+    elif rec_id > 0:
+        write_message("   -Retrieve record ID (found %s): DONE." % rec_id, verbose=2)
+        if not record.has_key('001'):
+            # Found record ID by means of SYSNO or OAIID, and the
+            # input MARCXML buffer does not have this 001 tag, so we
+            # should add it now:
+            error = record_add_field(record, '001', '', '', rec_id, [], 0)
+            if error is None:
+                write_message("   Failed: " \
+                                             "Error during adding the 001 controlfield "  \
+                                             "to the record", verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            else:
+                error = None
+            write_message("   -Added tag 001: DONE.", verbose=2)
     write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
     
     # Reference mode check if there are reference tag 
