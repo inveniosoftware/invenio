@@ -2320,6 +2320,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                      epilogue=format_epilogue,
                                      ln=ln,
                                      search_pattern=search_pattern,
+                                     record_separator="\n",
                                      uid=uid))
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
