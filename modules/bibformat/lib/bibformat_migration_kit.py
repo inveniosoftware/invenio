@@ -130,9 +130,9 @@ def migrate_behaviours():
         # The conditions on which we will iterate will maybe need to be split
         # in many conditions, as the new format does not support conditions with
         # multiple arguments
+        add_default_case = True
         for cond in behaviour_conditions:
             previous_tag = ""
-            add_default_case = True
             evaluation_order = cond[0]
             e_conditions =  extract_cond(cond[1])
             
