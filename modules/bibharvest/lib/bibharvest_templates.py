@@ -73,7 +73,7 @@ class Template:
         guidetitle = _("See Guide")
         
         titlebar = """<a name="%s">""" % title
-        titlebar += """ </a>%s&nbsp&nbsp&nbsp<small>""" % subtitle
+        titlebar += """ </a>%s&nbsp;&nbsp;&nbsp;<small>""" % subtitle
         titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, weburl, guideurl)
         return titlebar
 

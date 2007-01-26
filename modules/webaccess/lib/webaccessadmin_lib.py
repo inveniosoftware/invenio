@@ -524,7 +524,7 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="1"></a>1. Access policy.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="1"></a>1. Access policy.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     account_policy = {}
     account_policy[0] = "Users can register new accounts. New accounts automatically activated." 
@@ -571,7 +571,7 @@ def perform_accountoverview(req, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="2"></a>2. Account overview.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="2"></a>2. Account overview.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
     output = ""
     res = run_sql("SELECT COUNT(*) FROM user WHERE email=''")
     output += "Guest accounts: %s<br>" % res[0][0]
@@ -597,7 +597,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="3"></a>3. Create account.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Create account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     output = ""
 
@@ -755,7 +755,7 @@ def perform_modifybasket(req, userID, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="2"></a>2. Modify baskets.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
@@ -796,7 +796,7 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="1"></a>1. Edit login-data.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
@@ -838,7 +838,7 @@ def perform_modifyalerts(req, userID, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="3"></a>3. Modify alerts.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
@@ -878,7 +878,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="4"></a>4. Modify preferences.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="4"></a>4. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
@@ -924,7 +924,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
     
-    subtitle = """<a name="5"></a>5. Delete account.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="5"></a>5. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     output = ""
@@ -989,7 +989,7 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="4"></a>4. Edit accounts.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="4"></a>4. Edit accounts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
     output = ""
 

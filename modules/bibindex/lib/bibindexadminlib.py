@@ -277,7 +277,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
 def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
     """show a list of indexes that can be edited."""
     
-    subtitle = """<a name="2"></a>2. Edit index&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
+    subtitle = """<a name="2"></a>2. Edit index&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
 
     fin_output = ''
     idx = get_idx()
@@ -311,7 +311,7 @@ def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
 def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
     """show a list of all logical fields that can be edited."""
     
-    subtitle = """<a name="5"></a>5. Edit logical field&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
+    subtitle = """<a name="5"></a>5. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (weburl)
 
     fin_output = ''
 
@@ -385,7 +385,7 @@ def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], co
     idx_dict = dict(get_def_name('', "idxINDEX"))
     if idxID and idx_dict.has_key(int(idxID)):
         idxID = int(idxID)
-        subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+        subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
         
         if type(trans) is str:
             trans = [trans]
@@ -464,7 +464,7 @@ def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], co
     fld_dict = dict(get_def_name('', "field"))
     if fldID and fld_dict.has_key(int(fldID)):
         fldID = int(fldID)
-        subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[fldID], weburl)
+        subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[fldID], weburl)
         
         if type(trans) is str:
             trans = [trans]
@@ -649,7 +649,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     if not fld_dict.has_key(int(fldID)):
         return """<b><span class="info">Field does not exist</span></b>"""
 
-    subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output  = ""
 
     if fldID:
@@ -685,7 +685,7 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
     """
    
     if idxID:
-        subtitle = """<a name="4"></a>4. Delete the index.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+        subtitle = """<a name="4"></a>4. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
         output  = ""
 
         if confirm in ["0", 0]:
@@ -756,7 +756,7 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
     output  = ""
 
     if idxID not in [-1, "-1"]:
-        subtitle = """<a name="2"></a>1. Modify index name.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+        subtitle = """<a name="2"></a>1. Modify index name.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
         if confirm in [-1, "-1"]:
             idx = get_idx(idxID)
             idxNAME = idx[0][1]
@@ -806,7 +806,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
         else:
             code = str.replace("%s" % code, " ", "")
         fldID = int(fldID)
-        subtitle = """<a name="2"></a>1. Modify field code for logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+        subtitle = """<a name="2"></a>1. Modify field code for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
 
         text = """
         <span class="adminlabel">Field code</span>
@@ -839,7 +839,7 @@ def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', con
     """Modify which logical fields to use in this index.."""
     
     output = ''
-    subtitle = """<a name="3"></a>3. Modify index fields.&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Modify index fields.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % weburl
     
     output = """<dl>
      <dt>Menu</dt>
@@ -881,7 +881,7 @@ def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confi
     fld_type = get_fld_nametypes()
     fldID = int(fldID)
     
-    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp&nbsp&nbsp<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/bibindex/guide.html">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
     output = """<dl>
      <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addtag?fldID=%s&amp;ln=%s#4.1">Add MARC tag</a></dd>
