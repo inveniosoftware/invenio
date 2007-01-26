@@ -76,7 +76,7 @@ from invenio.bibrecord import create_records, \
                               record_get_field_values, \
                               field_get_subfield_values
 from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.search_engine import print_record
+from invenio.bibformat import format_record
 from invenio.config import filedir, \
                            filedirsize, \
                            htdocsurl
@@ -509,7 +509,7 @@ def bibupload(record):
         insert_mode_p = False
         # Update Mode
         # Retrieve the old record to update
-        rec_old = create_record(print_record(int(rec_id), 'xm'), 2)[0]
+        rec_old = create_record(format_record(int(rec_id), 'xm'), 2)[0]
         if rec_old is None:
             write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
