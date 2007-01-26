@@ -1455,19 +1455,19 @@ class Template:
             name = format_template['name']
             filename = format_template['filename']
             out += '''<tr><td><a href="format_template_show?bft=%(filename)s&amp;ln=%(ln)s">%(name)s</a></td>
-            <td>&nbsp</td><td>&nbsp</td></tr>''' % {'filename':filename,
-                                                    'name':name,
-                                                    'ln':ln}
+            <td>&nbsp;</td><td>&nbsp;</td></tr>''' % {'filename':filename,
+                                                      'name':name,
+                                                      'ln':ln}
             for format_element in format_template['elements']:
                 name = format_element['name']
                 filename = format_element['filename']
-                out += '''<tr><td>&nbsp</td>
+                out += '''<tr><td>&nbsp;</td>
                 <td><a href="format_elements_doc?ln=%(ln)s#%(anchor)s">%(name)s</a></td>
-                <td>&nbsp</td></tr>''' % {'anchor':name.upper(),
-                                          'name':name,
-                                          'ln':ln}
+                <td>&nbsp;</td></tr>''' % {'anchor':name.upper(),
+                                           'name':name,
+                                           'ln':ln}
                 for tag in format_element['tags']:
-                    out += '''<tr><td>&nbsp</td><td>&nbsp</td>
+                    out += '''<tr><td>&nbsp;</td><td>&nbsp;</td>
                     <td>%(tag)s</td></tr>''' % {'tag':tag}
         
         out += '''
