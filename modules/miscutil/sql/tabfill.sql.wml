@@ -24,26 +24,26 @@
 #include "configbis.wml"
 
 ## local defaults, i.e. WML config variables are to be used:
-INSERT INTO collection VALUES (1,'<CDSNAME>',NULL,NULL,NULL,NULL);
-<en>INSERT INTO collectionname VALUES (1,'en','ln','<CDSNAMEINTL>');</en>
-<fr>INSERT INTO collectionname VALUES (1,'fr','ln','<CDSNAMEINTL>');</fr>
-<de>INSERT INTO collectionname VALUES (1,'de','ln','<CDSNAMEINTL>');</de>
-<es>INSERT INTO collectionname VALUES (1,'es','ln','<CDSNAMEINTL>');</es>
-<ca>INSERT INTO collectionname VALUES (1,'ca','ln','<CDSNAMEINTL>');</ca>
-<pl>INSERT INTO collectionname VALUES (1,'pl','ln','<CDSNAMEINTL>');</pl>
-<pt>INSERT INTO collectionname VALUES (1,'pt','ln','<CDSNAMEINTL>');</pt>
-<it>INSERT INTO collectionname VALUES (1,'it','ln','<CDSNAMEINTL>');</it>
-<ja>INSERT INTO collectionname VALUES (1,'ja','ln','<CDSNAMEINTL>');</ja>
-<ru>INSERT INTO collectionname VALUES (1,'ru','ln','<CDSNAMEINTL>');</ru>
-<sk>INSERT INTO collectionname VALUES (1,'sk','ln','<CDSNAMEINTL>');</sk>
-<cs>INSERT INTO collectionname VALUES (1,'cs','ln','<CDSNAMEINTL>');</cs>
-<no>INSERT INTO collectionname VALUES (1,'no','ln','<CDSNAMEINTL>');</no>
-<sv>INSERT INTO collectionname VALUES (1,'sv','ln','<CDSNAMEINTL>');</sv>
-<el>INSERT INTO collectionname VALUES (1,'el','ln','<CDSNAMEINTL>');</el>
-<uk>INSERT INTO collectionname VALUES (1,'uk','ln','<CDSNAMEINTL>');</uk>
-<bg>INSERT INTO collectionname VALUES (1,'bg','ln','<CDSNAMEINTL>');</bg>
+INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
+<en>INSERT INTO collectionname VALUES (1,'en','ln',"<CDSNAMEINTL>");</en>
+<fr>INSERT INTO collectionname VALUES (1,'fr','ln',"<CDSNAMEINTL>");</fr>
+<de>INSERT INTO collectionname VALUES (1,'de','ln',"<CDSNAMEINTL>");</de>
+<es>INSERT INTO collectionname VALUES (1,'es','ln',"<CDSNAMEINTL>");</es>
+<ca>INSERT INTO collectionname VALUES (1,'ca','ln',"<CDSNAMEINTL>");</ca>
+<pl>INSERT INTO collectionname VALUES (1,'pl','ln',"<CDSNAMEINTL>");</pl>
+<pt>INSERT INTO collectionname VALUES (1,'pt','ln',"<CDSNAMEINTL>");</pt>
+<it>INSERT INTO collectionname VALUES (1,'it','ln',"<CDSNAMEINTL>");</it>
+<ja>INSERT INTO collectionname VALUES (1,'ja','ln',"<CDSNAMEINTL>");</ja>
+<ru>INSERT INTO collectionname VALUES (1,'ru','ln',"<CDSNAMEINTL>");</ru>
+<sk>INSERT INTO collectionname VALUES (1,'sk','ln',"<CDSNAMEINTL>");</sk>
+<cs>INSERT INTO collectionname VALUES (1,'cs','ln',"<CDSNAMEINTL>");</cs>
+<no>INSERT INTO collectionname VALUES (1,'no','ln',"<CDSNAMEINTL>");</no>
+<sv>INSERT INTO collectionname VALUES (1,'sv','ln',"<CDSNAMEINTL>");</sv>
+<el>INSERT INTO collectionname VALUES (1,'el','ln',"<CDSNAMEINTL>");</el>
+<uk>INSERT INTO collectionname VALUES (1,'uk','ln',"<CDSNAMEINTL>");</uk>
+<bg>INSERT INTO collectionname VALUES (1,'bg','ln',"<CDSNAMEINTL>");</bg>
 
-INSERT INTO user VALUES (1, '<ADMINEMAIL>', '', 1, NULL, 'admin', '');
+INSERT INTO user VALUES (1, "<ADMINEMAIL>", '', 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=author&p=\" urlencode($author)','EXT','','');
