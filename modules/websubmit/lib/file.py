@@ -558,10 +558,20 @@ class BibDocFile:
             return content
 
 def readfile(path):
-    if os.path.exists(path):
-        fp = open(path,"r")
-        content = fp.read()
-        fp.close()
+    """Read the contents of a text file and return them as a string.
+       Return an empty string if unable to access the file for reading.
+       @param path: (string) - path to the file
+       @return: (string) contents of file or empty string
+    """
+    content = ""
+    if os.access(path, os.F_OK|os.R_OK):
+        try:
+            fp = open(path, "r")
+        except IOError:
+            pass
+        else:
+            content = fp.read()
+            fp.close()
     return content
 
 def listTypesFromArray(bibdocs):
