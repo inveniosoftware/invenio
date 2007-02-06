@@ -60,8 +60,8 @@ def perform_request_index(ln=cdslang):
 
     out = '''<p>Define below the sets to expose through the OAI harvesting
     protocol. <br /> You will have to run the
-    <a href="guide.html#3.2"><code>oaiarchive</code></a>
-    utility to apply the settings you have defined here.</p>'''
+    <a href="%(weburl)s/admin/bibharvest/guide.html#3.2"><code>oaiarchive</code></a>
+    utility to apply the settings you have defined here.</p>''' % {'weburl': weburl}
 
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang,
                                                        weburl = weburl,
