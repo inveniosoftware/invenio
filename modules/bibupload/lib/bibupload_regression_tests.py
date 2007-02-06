@@ -1429,6 +1429,68 @@ class BibUploadIndicatorsTest(unittest.TestCase):
                                           self.testrec2_hm))
         bibupload.wipe_out_record_from_all_tables(recid)
 
+class BibUploadUpperLowerCaseTest(unittest.TestCase):    
+    """
+    Testing treatment of similar records with only upper and lower
+    case value differences in the bibxxx table.
+    """
+
+    def setUp(self):
+        """Initialize the MARCXML test records."""
+        self.testrec1_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec1_hm = """
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        """
+        self.testrec2_xm = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1="" ind2="">
+          <subfield code="a">TeSt, JoHn</subfield>
+          <subfield code="u">Test UniVeRsity</subfield>
+         </datafield>        
+        </record>
+        """
+        self.testrec2_hm = """
+        003__ SzGeCERN
+        100__ $$aTeSt, JoHn$$uTest UniVeRsity
+        """
+        
+    def test_record_with_upper_lower_case_letters(self):
+        """bibupload - inserting similar MARCXML records with upper/lower case"""
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = 0
+        # insert test record #1:
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        recid1_inserted_xm = print_record(recid1, 'xm')
+        recid1_inserted_hm = print_record(recid1, 'hm')
+        # insert test record #2:
+        recs = bibupload.xml_marc_to_records(self.testrec2_xm)
+        err1, recid2 = bibupload.bibupload(recs[0])
+        recid2_inserted_xm = print_record(recid2, 'xm')
+        recid2_inserted_hm = print_record(recid2, 'hm')
+        # let us compare stuff now:
+        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid1_inserted_xm),
+                                          self.testrec1_xm))
+        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid1_inserted_hm),
+                                          self.testrec1_hm))
+        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid2_inserted_xm),
+                                          self.testrec2_xm))
+        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid2_inserted_hm),
+                                          self.testrec2_hm))
+        # clean up after ourselves:
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+    
 # FIXME: "strong tags" tests wanted
 
 # FIXME: FFT tests wanted
@@ -1441,7 +1503,8 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadRecordsWithSYSNOTest,
                              BibUploadRecordsWithOAIIDTest,                             
                              BibUploadFMTModeTest,
-                             BibUploadIndicatorsTest,)
+                             BibUploadIndicatorsTest,
+                             BibUploadUpperLowerCaseTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
