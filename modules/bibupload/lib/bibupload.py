@@ -925,7 +925,7 @@ def insert_record_bibxxx(tag, value):
     table_name = 'bib'+tag[0:2]+'x'
 
     # check if the tag, value combination exists in the table
-    query = """SELECT id FROM %s """ % table_name
+    query = """SELECT id,value FROM %s """ % table_name
     query += """ WHERE tag=%s AND value=%s"""
     params = (tag, value)
     try:
@@ -933,21 +933,32 @@ def insert_record_bibxxx(tag, value):
     except Error, error:
         write_message("   Error during the insert_record_bibxxx function : %s " % error, verbose=1, stream=sys.stderr) 
     
-    if len(res):
-        # get the id of the row, if it exists
-        row_id = res[0][0]
-        return (table_name, row_id)
-    else:
-        # necessary to insert the tag, value into bibxxx table
-        query = """INSERT INTO %s """ % table_name
-        query += """ (tag, value) values (%s , %s)""" 
-        params = (tag, value)
-        try:
-            row_id = run_sql(query, params)
-        except Error, error:
-            write_message("   Error during the insert_record_bibxxx function : %s " % error, verbose=1, stream=sys.stderr) 
-        
-        return (table_name, row_id)
+    # Note: compare now the found values one by one and look for
+    # string binary equality (e.g. to respect lowercase/uppercase
+    # match), regardless of the charset etc settings.  Ideally we
+    # could use a BINARY operator in the above SELECT statement, but
+    # we would have to check compatibility on various MySQLdb versions
+    # etc; this approach checks all matched values in Python, not in
+    # MySQL, which is less cool, but more conservative, so it should
+    # work better on most setups.
+    for row in res:
+        row_id = row[0]
+        row_value = row[1]
+        if row_value == value:
+            return (table_name, row_id)
+
+    # We got here only when the tag,value combination was not found,
+    # so it is now necessary to insert the tag,value combination into
+    # bibxxx table as new.
+    query = """INSERT INTO %s """ % table_name
+    query += """ (tag, value) values (%s , %s)""" 
+    params = (tag, value)
+    try:
+        row_id = run_sql(query, params)
+    except Error, error:
+        write_message("   Error during the insert_record_bibxxx function : %s " % error,
+                      verbose=1, stream=sys.stderr) 
+    return (table_name, row_id)
 
 def insert_record_bibrec_bibxxx(table_name, id_bibxxx, field_number, id_bibrec):
     """Insert the record into bibrec_bibxxx"""
