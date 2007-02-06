@@ -765,16 +765,16 @@ def oaicachestatus(resumptionToken):
 def get_sets():
     "Returns list of sets."
 
-    out = []
+    out = {}
     row = ['', '']
 
     query = "SELECT setSpec,setName,setDescription FROM oaiARCHIVE"
     res = run_sql(query)
     for row in res:
         row_bis = [row[0], row[1], row[2]]
-        out.append(row_bis)
-            
-    return out
+        out[row[0]] = row_bis
+        
+    return out.values()
 
 
 def parse_args(args=""):

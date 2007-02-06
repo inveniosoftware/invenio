@@ -550,7 +550,7 @@ def findSets(oai_src_baseurl):
     Returns list of tuples(SetSpec, SetName)"""
     url = oai_src_baseurl + "?verb=ListSets"
     urllib.urlretrieve(url, tmppath)
-    sets = []
+    sets = {}
     ftmp = open(tmppath, 'r')
     xmlstr= ftmp.read()
     ftmp.close()
@@ -565,6 +565,6 @@ def findSets(oai_src_baseurl):
             set_name = None
             if len(check_set_2) > 1:
                 set_name = check_set_2[1].split("</setName>")[0]
-            sets.append([set_spec, set_name])
+            sets[set_spec] = [set_spec, set_name]
         count = count + 1
-    return sets
+    return sets.values()
