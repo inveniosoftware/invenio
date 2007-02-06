@@ -301,7 +301,9 @@ def decide_format_template(bfo, of):
     for rule in output_format['rules']:
         value = bfo.field(rule['field']).strip()#Remove spaces
         pattern = rule['value'].strip() #Remove spaces
-        if re.match(pattern, value, re.IGNORECASE) is not None:
+        match_obj = re.match(pattern, value, re.IGNORECASE)
+        if match_obj is not None and \
+               match_obj.start() == 0 and match_obj.end() == len(value):
             return rule['template']
 
     template = output_format['default']
