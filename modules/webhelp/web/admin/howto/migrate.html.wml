@@ -58,26 +58,40 @@ $ bibsched
 
 <dd><blockquote>Copy your old data into a text file or some other
 format of your choice.  Preferably, the data should be well
-structured.  (Anyhow, even a free text format may be attepmted to be
-matched!)</blockquote>
+structured, such as XML.  (Anyhow, even a free text format may be
+attepmted to be matched!)</blockquote>
 
 <dt><code>$ vi dump.cfg</code>
 
 <dd><blockquote>Describe the format of your data in the <a
-href="<WEBURL>/admin/bibconvert/">BibConvert</a> language.  This
-will enable you to transform them into XML MARC format that the
-CDS Invenio system internally uses for bibliographic data handling.  (If
-you have not chosen yet your MARC scheme, please read the <a
-href="marc.html">MARC HOWTO</a>.)</blockquote>
+href="<WEBURL>/admin/bibconvert/">BibConvert</a> language.  (You may
+also use XSLT if your dumped file is in the XML format.)
+
+<p>This step will enable you to transform your data into MARCXML format
+that the CDS Invenio system internally uses for bibliographic data
+handling.  (If you have not chosen yet your MARC scheme, please read
+the <a href="marc.html">MARC HOWTO</a>.)
+
+<p>When writing the transformation configuration file, you may want to
+add a collection identifier to your records so that they would belong
+to a particular collection; otherwise they would not be visible
+through the search interface.  You do this by enriching the output to
+contain the 980 MARC tags.  See the demo records on how to set up the
+980 tag.  (If your dumped file is in the XML MARC format, you can also
+consult the example oaimarc2marcxml.xsl stylesheet that is used to
+manipulate metadata harvested via OAI.)
+
+<p>You may also want to preserve any OAI identifiers of your old
+records you may have.
+</blockquote>
 
 <dt><code>$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml</code>
 
 <dd><blockquote>Convert the data from your own format into XML MARC,
-using the configuration you just wrote in the previous step.  FIXME:
-add a note about creating collection indicators (980) and OAI
-IDs.</blockquote>
+using the configuration you just wrote in the previous step.
+</blockquote>
 
-<dt><code>$ bibupload datadump.xml</code>
+<dt><code>$ bibupload -i datadump.xml</code>
 
 <dd><blockquote>Upload thusly converted metadata into CDS Invenio
 bibliographic databases.</blockquote>
