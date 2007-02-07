@@ -72,7 +72,7 @@ Contents
      d) Python v2.3 or above:
          <http://python.org/>
         as well as the following Python modules:
-          - (mandatory) MySQLdb (do *not* use 1.2.1_p2; see below)
+          - (mandatory) MySQLdb (do *not* use 1.2.1*; see below)
              <http://sourceforge.net/projects/mysql-python>                
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>
@@ -96,10 +96,12 @@ Contents
           - (optional) mechanize, to run regression web test suite:
              <http://wwwsearch.sourceforge.net/mechanize/>
 
-        Note: If you happen to use MySQLdb 1.2.1_p2, please apply the
-              following patch:
-              "[1521274] uncorrect handling of encoded strings in cursors.py"
-              <http://sourceforge.net/tracker/index.php?func=detail&aid=1521274&group_id=22307&atid=374932>.
+        Note: If you happen to use MySQLdb 1.2.1* and get into
+              problems with character encoding, please apply the
+              following patch: "[1521274] uncorrect handling of
+              encoded strings in cursors.py"
+              <http://sourceforge.net/tracker/index.php?func=detail&aid=1521274&group_id=22307&atid=374932>
+              or, alternatively, use MySQLdb 1.2.0.
 
      e) mod_python Apache module.  Tested mainly with versions
         3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
