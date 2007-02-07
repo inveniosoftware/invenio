@@ -74,15 +74,28 @@ the <a href="marc.html">MARC HOWTO</a>.)
 
 <p>When writing the transformation configuration file, you may want to
 add a collection identifier to your records so that they would belong
-to a particular collection; otherwise they would not be visible
-through the search interface.  You do this by enriching the output to
-contain the 980 MARC tags.  See the demo records on how to set up the
-980 tag.  (If your dumped file is in the XML MARC format, you can also
-consult the example oaimarc2marcxml.xsl stylesheet that is used to
-manipulate metadata harvested via OAI.)
+to a particular WebSearch collection; otherwise they might not be
+visible through the search interface.  You do this by enriching the
+metadata to contain the 980 MARC tags in the output, of the form:
 
-<p>You may also want to preserve any OAI identifiers of your old
-records you may have.
+<pre>
+   &lt;datafield tag="980" ind1=" " ind2=" ">
+     &lt;subfield code="a">ARTICLE&lt;/subfield>
+   &lt;/datafield>
+</pre>
+
+This will make your record to go to the Articles demo collection, for
+example.  You will be able to define your collections later via the <a
+href="<WEBURL>/admin/websearch/">WebSearch Admin</a>, the important
+point for now is only to create appropriate 980 collection identifier
+tags for records you are going to upload.
+
+<p>If your dumped file is in the XML format, you can also consult the
+example <code>oaimarc2marcxml.xsl</code> stylesheet that is used to
+manipulate metadata harvested via OAI.
+
+<p>You may also want to preserve any OAI identifiers in your old
+records, if you had any.
 </blockquote>
 
 <dt><code>$ bibconvert -cdatadump.cfg < datadump.txt > datadump.xml</code>
