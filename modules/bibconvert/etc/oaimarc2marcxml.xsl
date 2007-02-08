@@ -37,6 +37,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:OAI-PMH="http://www.openarchives.org/OAI/2.0/"
 xmlns:marc="http://www.loc.gov/MARC21/slim"
 exclude-result-prefixes="OAI-PMH marc">
+<xsl:output method="xml" encoding="UTF-8"/>
 <xsl:template match="/">
         <collection>
             <xsl:for-each select="//OAI-PMH:record">

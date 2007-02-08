@@ -39,6 +39,7 @@ xmlns:OAI-PMH="http://www.openarchives.org/OAI/2.0/"
 xmlns:marc="http://www.loc.gov/MARC21/slim"
 xmlns:fn="http://cdsweb.cern.ch/bibconvert/fn"
 exclude-result-prefixes="OAI-PMH marc fn">
+<xsl:output method="xml" encoding="UTF-8"/>
 <xsl:template match="/">
         <collection>
             <!-- CUSTOMIZEME: Modify below in order to choose which 
