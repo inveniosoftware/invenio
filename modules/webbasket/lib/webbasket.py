@@ -29,7 +29,7 @@ from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
-from invenio.search_engine import print_record
+from invenio.bibformat import format_record
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
@@ -184,6 +184,8 @@ def __display_basket(bskid, name, date_modification, nb_views,
         else:
             if int_val:
                 val = decompress(int_val)
+            else:
+                val = format_record(recid, 'hb', on_the_fly=True)
         records.append((recid, nb_cmt, last_cmt, val, score))
 
     if len(cmt_dates) > 0:
@@ -622,7 +624,7 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
         if len(basket) == 7:
             content = db.get_basket_content(bskid)
             for item in content:
-                items.append(print_record(item[0], of))
+                items.append(format_record(item[0], of)) 
         return webbasket_templates.tmpl_xml_basket(items)
     
     if len(basket) == 7:
@@ -639,7 +641,7 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
                     val = decompress(ext_val)
             else:
                 if int_val:
-                    val = print_record(recid)
+                    val = format_record(recid, 'hb')
             records.append((recid, nb_cmt, last_cmt, val, score))
         body = webbasket_templates.tmpl_display_public(basket, records, ln)        
     else:
