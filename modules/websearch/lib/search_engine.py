@@ -51,6 +51,7 @@ from invenio.config import \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
+     CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
      cdsname, \
      cdsnameintl, \
@@ -61,13 +62,14 @@ from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
+from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 
 if CFG_EXPERIMENTAL_FEATURES:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
     from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
-    from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
+
 from invenio.dbquery import run_sql, get_table_update_time, escape_string, Error
 try:
     from mod_python import apache
@@ -2386,6 +2388,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         if r:
                             temp ['cociting'] = r
 
+                    if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         if r:
                             temp ['downloadsimilarity'] = r
