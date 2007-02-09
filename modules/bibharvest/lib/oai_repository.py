@@ -23,11 +23,9 @@ __revision__ = "$Id$"
 
 import cPickle
 import string
-from string import split
 import os
 import re
 import urllib
-import sys
 import time
 import md5
 
@@ -40,12 +38,11 @@ from invenio.config import \
      CFG_OAI_LOAD, \
      CFG_OAI_SAMPLE_IDENTIFIER, \
      CFG_OAI_SET_FIELD, \
-     adminemail, \
      cachedir, \
      cdsname, \
      supportemail, \
-     version, \
      weburl
+
 from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists
@@ -243,7 +240,7 @@ def check_date(date, dtime="T00:00:00Z"):
     
     return date
 
-def print_record(sysno, format='marcxml'):
+def print_record(sysno, format='marcxml', record_exists_result=None):
     """Prints record 'sysno' formatted according to 'format'.
 
     - if record does not exist, return nothing.
@@ -254,12 +251,21 @@ def print_record(sysno, format='marcxml'):
       
     - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
       then return nothing.
+    
+    Optional parameter 'record_exists_result' has the value of the result
+    of the record_exists(sysno) function (in order not to call that function
+    again if already done.)
     """
     
     out = ""
-    
+
     # sanity check:
-    if not record_exists(sysno):
+    if record_exists_result is not None:
+        _record_exists = record_exists_result
+    else:
+        _record_exists = record_exists(sysno)
+        
+    if not _record_exists:
         return
 
     if (format == "dc") or (format == "oai_dc"):
@@ -269,7 +275,7 @@ def print_record(sysno, format='marcxml'):
     
     out = out + "  <record>\n"
 
-    if record_exists(sysno) == -1: # Deleted?
+    if _record_exists == -1: # Deleted?
         if CFG_OAI_DELETED_POLICY == "persistent" or \
                CFG_OAI_DELETED_POLICY == "transient":
             out = out + "    <header status=\"deleted\">\n"
@@ -285,7 +291,7 @@ def print_record(sysno, format='marcxml'):
         out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
     out = out + "   </header>\n"
 
-    if record_exists(sysno) == -1: # Deleted?
+    if _record_exists == -1: # Deleted?
         pass
     else:
         out = out + "   <metadata>\n"
@@ -409,9 +415,9 @@ def oailistmetadataformats(args):
         flag = 0
 
         sysno = oaigetsysno(arg['identifier'])
-
-        if record_exists(sysno) == 1 or \
-               (record_exists(sysno) == -1 and CFG_OAI_DELETED_POLICY != "no"):
+        _record_exists = record_exists(sysno)
+        if _record_exists == 1 or \
+               (_record_exists == -1 and CFG_OAI_DELETED_POLICY != "no"):
 
             flag = 1
 
@@ -441,12 +447,12 @@ def oailistrecords(args):
     "Generates response to oailistrecords verb."
 
     arg = parse_args(args)
-
+    
     out = ""
-
+    resumptionToken_printed = False
+    
     sysnos = []
     sysno  = []
-
     # check if the resumptionToken did not expire
     if arg['resumptionToken']:
         filename = "%s/RTdata/%s" % (cachedir, arg['resumptionToken'])
@@ -470,24 +476,26 @@ def oailistrecords(args):
     i = 0
     for sysno_ in sysnos:
         if sysno_:
-            if not (record_exists(sysno_) == -1 and CFG_OAI_DELETED_POLICY == "no"): 
-                i = i + 1 # Increment limit only if record is returned
-           
-            if i > CFG_OAI_LOAD:          # cache or write?
-                if i == CFG_OAI_LOAD + 1: # resumptionToken?
+            if i >= CFG_OAI_LOAD:          # cache or write?
+                if not resumptionToken_printed: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
                     extdate = oaigetresponsedate(CFG_OAI_EXPIRE)
                     if extdate:
                         out = "%s <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
                     else:
                         out = "%s <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
+                    resumptionToken_printed = True
                 sysno.append(sysno_)
             else:
-                res = print_record(sysno_, arg['metadataPrefix'])
-                if res:
-                    out += res
+                _record_exists = record_exists(sysno_)
+                if not (_record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"):
+                    #Produce output only if record exists and had to be printed
+                    i = i + 1 # Increment limit only if record is returned
+                    res = print_record(sysno_, arg['metadataPrefix'], _record_exists)
+                    if res:
+                        out += res
 
-    if i > CFG_OAI_LOAD:
+    if i >= CFG_OAI_LOAD:
         oaicacheclean()
         sysno.append(arg['metadataPrefix'])
         oaicachein(arg['resumptionToken'], sysno)
@@ -534,11 +542,11 @@ def oaigetrecord(args):
     arg = parse_args(args)
     out = ""
     sysno = oaigetsysno(arg['identifier'])
-
-    if record_exists(sysno) == 1 or \
-           (record_exists(sysno) == -1 and CFG_OAI_DELETED_POLICY != 'no'):
+    _record_exists = record_exists(sysno)
+    if _record_exists == 1 or \
+           (_record_exists == -1 and CFG_OAI_DELETED_POLICY != 'no'):
         datestamp = get_modification_date(sysno)
-        out += print_record(sysno, arg['metadataPrefix'])
+        out += print_record(sysno, arg['metadataPrefix'], _record_exists)
     else:
         out = out + oai_error("idDoesNotExist", "invalid record Identifier")
         out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
@@ -555,7 +563,8 @@ def oailistidentifiers(args):
     arg = parse_args(args)
 
     out = ""
-
+    resumptionToken_printed = False
+    
     sysno  = []
     sysnos = []
 
@@ -579,22 +588,23 @@ def oailistidentifiers(args):
     i = 0
     for sysno_ in sysnos:
         if sysno_:
-            if not (record_exists(sysno_) == -1 and CFG_OAI_DELETED_POLICY == "no"): 
-                i = i + 1 # Increment limit only if record is returned
-                
-            if i > CFG_OAI_LOAD:           # cache or write?
-                if i ==  CFG_OAI_LOAD + 1: # resumptionToken?
+            if i >= CFG_OAI_LOAD:           # cache or write?
+                if not resumptionToken_printed: # resumptionToken?
                     arg['resumptionToken'] = oaigenresumptionToken()
                     extdate = oaigetresponsedate(CFG_OAI_EXPIRE)
                     if extdate:
                         out = "%s  <resumptionToken expirationDate=\"%s\">%s</resumptionToken>\n" % (out, extdate, arg['resumptionToken'])
                     else:
                         out = "%s  <resumptionToken>%s</resumptionToken>\n" % (out, arg['resumptionToken'])
+                    resumptionToken_printed = True
                 sysno.append(sysno_)
             else:
+                _record_exists = record_exists(sysno_)
+                if (not _record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"): 
+                    i = i + 1 # Increment limit only if record is returned
                 for ident in get_field(sysno_, CFG_OAI_ID_FIELD):
                     if ident != '':
-                        if record_exists(sysno_) == -1: #Deleted?
+                        if _record_exists == -1: #Deleted?
                             if CFG_OAI_DELETED_POLICY == "persistent" \
                                    or CFG_OAI_DELETED_POLICY == "transient":
                                 out = out + "    <header status=\"deleted\">\n"
@@ -606,7 +616,7 @@ def oailistidentifiers(args):
                             out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
                         out = out + "    </header>\n"
 
-    if i > CFG_OAI_LOAD:
+    if i >= CFG_OAI_LOAD:
         oaicacheclean() # clean cache from expired resumptionTokens
         oaicachein(arg['resumptionToken'], sysno)
 
@@ -915,4 +925,19 @@ def check_args(arguments):
 
     return out
 
+def oai_profile():
+    """
+    Runs a benchmark
+    """
+    #oailistrecords('set=&from=&metadataPrefix=oai_dc&verb=ListRecords&resumptionToken=&identifier=&until=')
+    #oailistrecords('set=&from=&metadataPrefix=marcxml&verb=ListRecords&resumptionToken=&identifier=&until=')
+    oailistidentifiers('set=&from=&metadataPrefix=oai_dc&verb=ListIdentifiers&resumptionToken=&identifier=&until=')
 
+    return 
+
+if __name__ == "__main__":   
+    import profile
+    import pstats
+    profile.run('oai_profile()', "oai_profile")
+    p = pstats.Stats("oai_profile")
+    p.strip_dirs().sort_stats("cumulative").print_stats()
