@@ -29,73 +29,80 @@
 <a href="#oldGuide">further below</a>.</p>
 
 <h2>Contents</h2>
-<ol>
-<li><a href="#shortIntro">A Five minutes Introduction to BibFormat</a>
-     <ol>
-     <li><a href="#philosophy">How BibFormat works</a></li>
-     <li><a href="#tutorial">Short Tutorial</a></li>
-     <li><a href="#administerWebFile">Administer Through the Web Interface or Through the Configuration files</a></li>
-    </ol>
-</li>
-<li><a href="#outputFormats">Output Formats</a>
-    <ol>
-    <li><a href="#addOutputFormat">Add an Output Format</a></li>
-    <li><a href="#removeOutputFormat">Remove an Output Format</a></li>
-    <li><a href="#rulesOutputFormat">Edit the Rules of an Output Format</a></li>
-    <li><a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a></li>
-    <li><a href="#dependenciesOutputFormat">Check the Dependencies an Output Format</a></li>
-    <li><a href="#validityOutputFormat">Check the Validity an Output Format</a></li>
-    </ol>
-</li>
-<li><a href="#formatTemplates">Format Templates</a>
-    <ol>
-    <li><a href="#addFormatTemplate">Add a Format Template</a></li>
-    <li><a href="#removeFormatTemplate">Remove a Format Template</a></li>
-    <li><a href="#codeFormatTemplate">Edit the Code of a Format Template</a>
-    <ol>
-    <li><a href="#editFormatTemplate">Basic Editing</a></li>
-    <li><a href="#elementsInFormatTemplate">Use Format Elements</a></li>
-    <li><a href="#previewFormatTemplate">Preview a Format Template</a></li>
-    <li><a href="#internationalizationTemplate">Internationalization (i18n)</a></li>
-    <li><a href="#escapeFormatTemplate">Escaping special HTML/XML characters</a></li>
-    </ol>
-    </li>
-    <li><a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a></li>
-    <li><a href="#dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></li>
-    <li><a href="#validityFormatTemplate">Check the Validity a Format Template</a></li>
-    </ol>
-</li>
-<li><a href="#FormatElements">Format Elements</a>
-    <ol>
-    <li><a href="#addFormatElement">Add a Format Element</a></li>
-    <li><a href="#removeFormatElement">Remove a Format Element</a></li>
-    <li><a href="#codeFormatElement">Edit the Code of a Format Element</a></li>
-    <li><a href="#previewFormatElement">Preview a Format Element</a></li>
-    <li><a href="#internationalizationFormatElement">Internationalization (i18n)</a></li>
-    <li><a href="#escapeFormatElement">Escaping special HTML/XML characters</a></li>
-    <li><a href="#attrsFormatElement">Edit the Attributes of a Format Element</a></li>
-    <li><a href="#dependenciesFormatElement">Check the Dependencies of a Format Element</a></li>
-    <li><a href="#validityFormatElement">Check the Validity of a Format Element</a></li>
-    <li><a href="#browseDocFormatElement">Browse the Format Elements Documentation</a></li>
 
-    </ol>
+<ul style="list-style-type:None">
+<li><strong>1. <a href="#shortIntro">Overview</a></strong>
+     <ul style="list-style-type:None">
+     <li>1.1&nbsp;&nbsp;<a href="#philosophy">How BibFormat works</a></li>
+     <li>1.2&nbsp;&nbsp;<a href="#tutorial">Short Tutorial</a></li>
+     <li>1.3&nbsp;&nbsp;<a href="#administerWebFile">Administer Through the Web Interface or Through the Configuration files</a></li>
+    </ul>
 </li>
-<li><a href="#KBs">Knowledge Bases</a>
-    <ol>
-    <li><a href="#addKB">Add a Knowledge Base</a></li>
-    <li><a href="#removeKB">Remove a Knowledge Base</a></li>
-    <li><a href="#addMappingKB">Add a Mapping</a></li>
-    <li><a href="#removeMappingKB">Remove a Mapping</a></li>
-    <li><a href="#editMappingKB">Edit a Mapping</a></li>
-    <li><a href="#attrsKB">Edit the Attributes of a Knowledge Base</a></li>
-    <li><a href="#validityKB">Check the Dependencies a Knowledge Base</a></li>
-    </ol>
+<li><strong>2. <a href="#outputFormats">Configure Output Formats</a></strong>
+    <ul style="list-style-type:None">
+    <li>2.1&nbsp;&nbsp;<a href="#addOutputFormat">Add an Output Format</a></li>
+    <li>2.2&nbsp;&nbsp;<a href="#removeOutputFormat">Remove an Output Format</a></li>
+    <li>2.3&nbsp;&nbsp;<a href="#rulesOutputFormat">Edit the Rules of an Output Format</a></li>
+    <li>2.4&nbsp;&nbsp;<a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a></li>
+    <li>2.5&nbsp;&nbsp;<a href="#dependenciesOutputFormat">Check the Dependencies an Output Format</a></li>
+    <li>2.6&nbsp;&nbsp;<a href="#validityOutputFormat">Check the Validity an Output Format</a></li>
+    </ul>
 </li>
-<li><a href="#marcNotation">MARC Notation in Formats</a></li>
-<li><a href="#migration">Migrating from Previous BibFormat</a></li>
-<li><a href="#integrationDreamweaver">Intergrating BibFormat into Dreamweaver MX</a></li>
-<li><a href="#faq">FAQ</a></li>
-</ol>
+<li><strong>3. <a href="#formatTemplates">Configure Format Templates</a></strong>
+    <ul style="list-style-type:None">
+    <li>3.1&nbsp;&nbsp;<a href="#addFormatTemplate">Add a Format Template</a></li>
+    <li>3.2&nbsp;&nbsp;<a href="#removeFormatTemplate">Remove a Format Template</a></li>
+    <li>3.3&nbsp;&nbsp;<a href="#codeFormatTemplate">Edit the Code of a Format Template</a>
+    <li>3.4&nbsp;&nbsp;<a href="#editFormatTemplate">Basic Editing</a></li>
+    <li>3.5&nbsp;&nbsp;<a href="#elementsInFormatTemplate">Use Format Elements</a></li>
+    <li>3.6&nbsp;&nbsp;<a href="#previewFormatTemplate">Preview a Format Template</a></li>
+    <li>3.7&nbsp;&nbsp;<a href="#internationalizationTemplate">Internationalization (i18n)</a></li>
+    <li>3.8&nbsp;&nbsp;<a href="#escapeFormatTemplate">Escaping special HTML/XML characters</a></li>
+    <li>3.9&nbsp;&nbsp;<a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a></li>
+    <li>3.10&nbsp;<a href="#dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></li>
+    <li>3.11&nbsp;<a href="#validityFormatTemplate">Check the Validity a Format Template</a></li>
+    </ul>
+</li>
+<li><strong>4. <a href="#FormatElements">Configure Format Elements</a></strong>
+    <ul style="list-style-type:None">
+    <li>4.1&nbsp;&nbsp;<a href="#addFormatElement">Add a Format Element</a></li>
+    <li>4.2&nbsp;&nbsp;<a href="#removeFormatElement">Remove a Format Element</a></li>
+    <li>4.3&nbsp;&nbsp;<a href="#codeFormatElement">Edit the Code of a Format Element</a></li>
+    <li>4.4&nbsp;&nbsp;<a href="#previewFormatElement">Preview a Format Element</a></li>
+    <li>4.5&nbsp;&nbsp;<a href="#internationalizationFormatElement">Internationalization (i18n)</a></li>
+    <li>4.6&nbsp;&nbsp;<a href="#escapeFormatElement">Escaping special HTML/XML characters</a></li>
+    <li>4.7&nbsp;&nbsp;<a href="#attrsFormatElement">Edit the Attributes of a Format Element</a></li>
+    <li>4.8&nbsp;&nbsp;<a href="#dependenciesFormatElement">Check the Dependencies of a Format Element</a></li>
+    <li>4.9&nbsp;&nbsp;<a href="#validityFormatElement">Check the Validity of a Format Element</a></li>
+    <li>4.10&nbsp;<a href="#browseDocFormatElement">Browse the Format Elements Documentation</a></li>
+
+    </ul>
+</li>
+<li><strong>5. <a href="#KBs">Configure Knowledge Bases</a></strong>
+    <ul style="list-style-type:None">
+    <li>5.1&nbsp;&nbsp;<a href="#addKB">Add a Knowledge Base</a></li>
+    <li>5.2&nbsp;&nbsp;<a href="#removeKB">Remove a Knowledge Base</a></li>
+    <li>5.3&nbsp;&nbsp;<a href="#addMappingKB">Add a Mapping</a></li>
+    <li>5.4&nbsp;&nbsp;<a href="#removeMappingKB">Remove a Mapping</a></li>
+    <li>5.5&nbsp;&nbsp;<a href="#editMappingKB">Edit a Mapping</a></li>
+    <li>5.6&nbsp;&nbsp;<a href="#attrsKB">Edit the Attributes of a Knowledge Base</a></li>
+    <li>5.7&nbsp;&nbsp;<a href="#validityKB">Check the Dependencies a Knowledge Base</a></li>
+    </ul style="list-style-type:None">
+</li>
+<li><strong>6. <a href="#BibReformat">Run BibReformat</a></strong>
+    <ul style="list-style-type:None">
+    <li>6.1&nbsp;&nbsp;<a href="#runBibReformat">Run BibReformat</a></li>
+    </ul>
+</li>
+<li><strong>7. <a href="#Appendix">Appendix</a></strong>
+    <ul style="list-style-type:None">
+    <li>7.1&nbsp;&nbsp;<a href="#marcNotation">MARC Notation in Formats</a></li>
+    <li>7.2&nbsp;&nbsp;<a href="#migration">Migrating from Previous BibFormat</a></li>
+    <li>7.3&nbsp;&nbsp;<a href="#integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></li>
+    <li>7.4&nbsp;&nbsp;<a href="#faq">FAQ</a></li>
+    </ul>
+</li>
+</ul>
 
 <style type="text/css">
 <!--
@@ -142,8 +149,8 @@
 </style>
 
 
-<h2><a name="shortIntro">A Five Minutes Introduction to BibFormat</a></h2>
-<h3><a name="philosophy">How BibFormat Works</a></h3>
+<h2><a name="shortIntro">1. Overview</a></h2>
+<h3><a name="philosophy">1.1 How BibFormat Works</a></h3>
 <p>BibFormat is in charge of formatting the bibliographic records that
 are displayed to your users. It is called by the search engine when it has to
 format a record.</p>
@@ -279,7 +286,7 @@ the format elements layer.<p>
 </table>
 <p>You should now understand the philosophy behind BibFormat. </p>
 
-<h3><a name="tutorial">Short Tutorial</a></h3>
+<h3><a name="tutorial">1.2 Short Tutorial</a></h3>
 <p> Let's try to create our own format.
 This format will just print the title of a record.
 </p>
@@ -309,7 +316,7 @@ Click on the "Add New Format Template" button at the bottom of the page. As for 
 <p>When you are satisfied with your template, click on the save button, close the editor and go back to the "Only titles" output format rules editor. There select the template you have just created in the "Use by default" menu and save the ouput format and you are done. </p>
 <p>This tutorial does not cover all aspects of the management of formats (For example "Knowledge bases" or internationalization). It also does not show all the power of output formats, as the one we have created simply call a template. However you have seen enough to configure BibFormat trough the web interface. Read the sections below to learn more about it.</p>
 
-<h3><a name="administerWebFile">Administer Through the Web Interface or Through the Configuration files</a></h3>
+<h3><a name="administerWebFile">1.3 Administer Through the Web Interface or Through the Configuration files</a></h3>
 <p>BibFormat can be administered in two ways. The first way is to use the provided web interface. It should be the most
 convenient way of doing for most users. The web interface is simple to use and provides great tools to manage your formats. Its only limitation concerns the format elements, which cannot be modified using it (But the web interface provide a dynamically generated documentation of your elements). <br/>
 The other way to administer BibFormat is to directly modify the configuration files using your preferred text editor. This way of doing can bring much power to advanced users, but requires an access to the server's files. It also requires that the user double-check his modifications, or use the web interface to ensure the validity and correctness of his formats.</p>
@@ -318,7 +325,7 @@ The other way to administer BibFormat is to directly modify the configuration fi
 format elements.</p>
 
 
-<h2><a name="outputFormats">Output Formats</a></h2>
+<h2><a name="outputFormats">2. Output Formats</a></h2>
    <p>As you potentially have a huge amount of
 bibliographic records, you cannot specify manually for each of them
 how it should be formatted. This is why you can define rules that will
@@ -339,7 +346,7 @@ inclusion in a LaTeX document.</p>
 <p>To summarize, an output format groups similar kind of formats, specifying which kind
 of formatting has to be done, but not how it has to be done.</p>
 
-    <h3><a name="addOutputFormat">Add an Output Format</a></h3>
+    <h3><a name="addOutputFormat">2.1 Add an Output Format</a></h3>
     <p>To add a new output format, go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Add New Output Format" button at the bottom of the page. The format has been created. You can then specify the attributes of the output format. See <a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a> to learn more about it.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new output format file into the
@@ -348,13 +355,13 @@ of formatting has to be done, but not how it has to be done.</p>
   <p>You should also check that user <code>www-data</code> has read/write access to the file,
   if you want to be able to modify the rules through the web interface.</p>
 
-<h3><a name="removeOutputFormat">Remove an Output Format</a></h3>
+<h3><a name="removeOutputFormat">2.2 Remove an Output Format</a></h3>
 <p>To remove an output format, go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Delete" button facing the output format you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
 <p>You can directly remove an output format from the /etc/bibformat/outputs/ directory of your CDS Invenio installation.
 However you must make sure that it is removed from the tables <code>format</code> and <code>formatname</code> in the database, so that other modules know that it is not longer available.</p>
 
-<h3><a name="rulesOutputFormat">Edit the Rules of an Output Format</a></h3>
+<h3><a name="rulesOutputFormat">2.3 Edit the Rules of an Output Format</a></h3>
     <p>When you create a new output format, you can at first only specify the default template,
     that is the one which is used when all rules fail. In the case of a basic output format,
     this is enough. You can however add other rules, by clicking on the "Add New Rule" button.<br/>
@@ -418,7 +425,7 @@ However you must make sure that it is removed from the tables <code>format</code
     match any email address that ends with @cern.ch (the regular
     expression must be understandable by Python)
     </p>
-    <h3><a name="attrsOutputFormat">Edit the Attributes of an Output Format</a></h3>
+    <h3><a name="attrsOutputFormat">2.4 Edit the Attributes of an Output Format</a></h3>
     <p>An output format has the following attributes:
     <ul>
     <li><code>code</code>: a short identifier that is used to identify the output format. It must be unique and contain a maximum of 6 letters. Note that the <b>code is not case sensitive</b> ("HB" is equal to "hb").</li>
@@ -455,7 +462,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>Excepted for the code, output format attributes cannot be changed in the output format file. These
     attributes are saved in the database. As for the <code>code</code>, it is the name of the output format file,
     without its <code>.bfo</code> extension. If you change this name, do not forget to propagate the modification in the database.</p>
-    <h3><a name="dependenciesOutputFormat">Check the Dependencies an Output Format</a></h3>
+    <h3><a name="dependenciesOutputFormat">2.5 Check the Dependencies an Output Format</a></h3>
     <p>To check the dependencies of an output format on format templates, format elements and tags,
     go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, click on
     the output format you want to check, and then in the menu click on "Check Dependencies".</p>
@@ -466,14 +473,14 @@ However you must make sure that it is removed from the tables <code>format</code
     <li>the Marc tags involved in these elements</li>
     </ul>
     Note that some Marc tags might be omitted.</p>
-    <h3><a name="validityOutputFormat">Check the Validity an Output Format</a></h3>
+    <h3><a name="validityOutputFormat">2.6 Check the Validity an Output Format</a></h3>
     <p>To check the validity of an output format, simply go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, and look at the column 'status' for the output format you want to check. If message "Ok" is there,
     then no problem was found with the output format. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the output format.</p>
 
-<h2><a name="formatTemplates">Format Templates</a></h2>
+<h2><a name="formatTemplates">3. Format Templates</a></h2>
     <p>A format template defines the how a record should be formatted. For example it specifies which fields of the record are to be displayed, in which order and with which visual attributes. Basically the format template is written in HTML, so that it is easy for anyone to edit it.</p>
-    <h3><a name="addFormatTemplate">Add a Format Template</a></h3>
+    <h3><a name="addFormatTemplate">3.1 Add a Format Template</a></h3>
     <p>To add a new format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template, or ask to make a copy of an existing format.
  See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about editing the attributes.<p>
     <strong>For developers and adventurers only:</strong>
@@ -483,11 +490,11 @@ However you must make sure that it is removed from the tables <code>format</code
   <p>You should also check that user <code>www-data</code> has read/write access to the file,
   if you want to be able to modify the code and the attributes of the template through the web interface.</p>
 
-    <h3><a name="removeFormatTemplate">Remove a Format Template</a></h3>
+    <h3><a name="removeFormatTemplate">3.2 Remove a Format Template</a></h3>
     <p>To remove a format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Delete" button facing the format template you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
 <p>You can directly remove the format template from the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.</p>
-    <h3><a name="codeFormatTemplate">Edit the Code of a Format Template</a></h3>
+    <h3><a name="codeFormatTemplate">3.3 Edit the Code of a Format Template</a></h3>
     <p>You can change the formatting of records by modifying the code of a template.
     <p>To edit the code of a format template
     go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page. Click on
@@ -498,7 +505,7 @@ However you must make sure that it is removed from the tables <code>format</code
     on the "bricks" you can use in your format template code. The panel at the bottom of the page allows you to preview the template. </p>
      <img src="guide_template_editor.png" alt="Template Editor Page"/>
     <p>The following sections explain how to write the code that specifies the formatting.</p>
-    <h4><a name="editFormatTemplate">Basic Editing</a></h4>
+    <h4><a name="editFormatTemplate">3.4 Basic Editing</a></h4>
     <p>The first thing you have to know before editing the code is that everything you write in the
     code editor is printed as such by BibFormat. Well almost everything (as you will discover later).</p>
     <p>For example if you write "My Text", then for every record the output will be "My Text". Now let's say
@@ -513,7 +520,7 @@ However you must make sure that it is removed from the tables <code>format</code
   have to take care of the attributes of the template, which are saved in the same file as the code. See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about it.
   </p>
 
-    <h4><a name="elementsInFormatTemplate">Use Format Elements</a></h4>
+    <h4><a name="elementsInFormatTemplate">3.5 Use Format Elements</a></h4>
     <p>To add a dynamic behaviour to your format templates, that is display for example a different title
     for each record or a different background color depending on the type of record, you can use the format elements.</p>
     <p>Format elements are the smart bricks you can copy-paste in your code to get the attributes of template
@@ -542,7 +549,7 @@ However you must make sure that it is removed from the tables <code>format</code
         recommended because it would necessitate to revise all format
         templates if you did change the meaning of the MARC code schema.</p>
         
-    <h4><a name="previewFormatTemplate">Preview a Format Template</a></h4>
+    <h4><a name="previewFormatTemplate">3.6 Preview a Format Template</a></h4>
     <p>To preview a format template go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the format template you want to preview to open the template editor. The editor contains a preview panel at the bottom of the page.</p>
     <img src="guide_template_preview.png" alt="Preview Panel"/>
     <p>Simply click on " Reload Preview" button to preview the template (you do not need to save the code before previewing).<br/>
@@ -555,14 +562,14 @@ However you must make sure that it is removed from the tables <code>format</code
      <li><code>ln</code>: the language to use for the preview</li>
      <li><code>pattern_for_preview</code>: the search pattern to use for the preview</li>
      </ul></p>
-    <h4><a name="internationalizationTemplate">Internationalization (i18n)</a></h4>
+    <h4><a name="internationalizationTemplate">3.7 Internationalization (i18n)</a></h4>
     <p>You can add translations to your format templates. To do so enclose the text you want to localize
     with tags corresponding to the two letters of the language. For example if we want to localize "title", write <code>&lt;en&gt;Title&lt;/en&gt;</code>. Repeat this for each language in which you want to make "title" available: <code>&lt;en&gt;Title&lt;/en&gt;&lt;fr&gt;Titre&lt;/fr&gt;&lt;de&gt;Titel&lt;/de&gt;</code>.
     Finally enclose everything with <code>&lt;lang&gt; &lt;/lang&gt;</code> tags: <code>&lt;lang&gt;&lt;en&gt;Title&lt;/en&gt;&lt;fr&gt;Titre&lt;/fr&gt;&lt;de&gt;Titel&lt;/de&gt;&lt;/lang&gt;</code></p>
 <p>For each &lt;lang&gt; group only the text in the user's language is displayed. If user's language is not
 available in the &lt;lang&gt; group, your default CDS Invenio language is used.</p>
 
- <h4><a name="escapeFormatTemplate">Escaping special HTML/XML characters</a></h4>
+ <h4><a name="escapeFormatTemplate">3.8 Escaping special HTML/XML characters</a></h4>
  
 <p>By default, BibFormat escapes all values returned by format
 elements. As a format template designer, you can assume in almost all
@@ -593,7 +600,7 @@ just let the developer of the element take care of that for you.</p>
 care of that in your format template, as well as of all other values that
 are not returned by the format elements.</p>
 
-    <h3><a name="attrsFormatTemplate">Edit the Attributes of a Format Template</a></h4>
+    <h3><a name="attrsFormatTemplate">3.9 Edit the Attributes of a Format Template</a></h4>
     <p>To edit the attributes of a format template
     go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, click on
     the format template you want to edit, and then in the menu click on "Modify Template Attributes".</p>
@@ -611,7 +618,7 @@ are not returned by the format elements.</p>
      <p>You can change the attributes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
      <p>Also note that the admin web interface tries to keep the name of the template in sync with the filename of the template. If the name is changed through the web interface, the filename of the template is changed, and all output formats that use this template are updated. You have to do update output formats manually if you change the filename of the template without the web interface.</p>
      
-    <h3><a name="dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></h3>
+    <h3><a name="dependenciesFormatTemplate">3.10 Check the Dependencies of a Format Template</a></h3>
      <p>To check the dependencies of a format template
     go to the <a href="bibformatadmin.py/format_template_manage">Manage Format Template</a> page, click on
     the format template you want to check, and then in the menu click on "Check Dependencies".</p>
@@ -622,23 +629,23 @@ are not returned by the format elements.</p>
     <li>A summary of all the Marc tags involved in the elements of the template</li>
     </ul>
     Note that some Marc tags might be omitted.</p>
-    <h3><a name="validityFormatTemplate">Check the Validity a Format Template</a></h3>
+    <h3><a name="validityFormatTemplate">3.11 Check the Validity a Format Template</a></h3>
     <p>To check the validity of a format template, simply go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, and look at the column 'status' for the format template you want to check. If message "Ok" is there,
     then no problem was found with the template. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the template.</p>
     
-<h2><a name="FormatElements">Format Elements</a></h2>
+<h2><a name="FormatElements">4. Format Elements</a></h2>
  <p>Format elements are the bricks used in format templates to provide dynamic content to the formatting process.
  Their purpose is to allow non computer literate persons to easily integrate data from the records in the database into their templates. </p>
  <p>Format elements are typically written in Python (there is an exception to that point which is dicussed in <a href="#addFormatElement">Add a Format Element</a>). This brings great flexibily and power to the formatting process. This however restricts the creation of format elements to developers.</p>
     
-    <h3><a name="addFormatElement">Add a Format Element</a></h3>
+    <h3><a name="addFormatElement">4.1 Add a Format Element</a></h3>
     <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
     <p>The most simple way to add a format element is to add a en entry in the "<a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
-    <h3><a name="removeFormatElement">Remove a Format Element</a></h3>
+    <h3><a name="removeFormatElement">4.2 Remove a Format Element</a></h3>
     <p>To remove a Python format element simply remove the corresponding file from the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation.</p>
     <p>To remove a format element declared in the "<a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
-    <h3><a name="codeFormatElement">Edit the Code of a Format Element</a></h3>
+    <h3><a name="codeFormatElement">4.3 Edit the Code of a Format Element</a></h3>
     <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
     <p>A format element file is like any regular Python program. It has to implement a <code>format</code> function, which returns a <code>string</code> and takes at least <code>bfo</code> as first parameter (but can take as many others as needed).</p>
     <p>Here is for example the code of the "bfe_title.py" element:
@@ -708,8 +715,20 @@ Notice that the call uses (almost) the filename of your element. To find out whi
         understood by BibRecord's functions. Therefore you can import
         the module's functions to get access to the fields you want.
         </p>
-        
-<h3><a name="internationalizationFormatElement">Internationalization (i18n)</a></h3>
+<h3><a name="previewFormatElement">4.4 Preview a Format Element</a></h3>
+    <p>
+     You can play with a format element parameters and see the result
+     of the element directly in the
+     <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>:
+       for each element, under the section "See
+     also", click on "Test this element". You are redirected to a page
+     where you can enter a value for the parameters. A description is
+     associated with each parameter as well as an indication of the
+     default value of the parameter if you do not provide a custom
+     value. Click on the "Test!" button to see the result of the
+     element with your parameters.</p>
+     
+<h3><a name="internationalizationFormatElement">4.5 Internationalization (i18n)</a></h3>
 
     <p>You can follow the standard internationalization procedure in
     use accross CDS Invenio sources. For example the following code
@@ -730,7 +749,7 @@ translated_welcome =  &#95;("Welcome")
     behaviour depending on the language you can simply check the value
     <code>bfo.ln</code> to return your custom text.</p>
 
-<h3><a name="escapeFormatElement">Escaping special HTML/XML characters</a></h3>
+<h3><a name="escapeFormatElement">4.6 Escaping special HTML/XML characters</a></h3>
      <p>In most cases, that is cases where your
      element does not return HTML output, you do not have to take any
      particular action in order to escape values that you output: the
@@ -792,7 +811,7 @@ translated_welcome =  &#95;("Welcome")
      </p>
     
 
-    <h3><a name="attrsFormatElement">Edit the Attributes of a Format Element</a></h3>
+    <h3><a name="attrsFormatElement">4.7 Edit the Attributes of a Format Element</a></h3>
     <p>A format element has mainly four kinds of attributes: <ul>
     <li>Name: it corresponds to the filename of the element.</li>
     <li>Description: the description is in the <code>docstring</code> of the <code>format</code> function (excepted lines prefixed with <code>@param</code> and <code>@see</code>).</li>
@@ -800,13 +819,13 @@ translated_welcome =  &#95;("Welcome")
     <li>Reference to other elements: one line beginning with <code>@see</code> and followed by a list of comma-separated format elements filenames in the in the <code>docstring</code> of the <code>format</code> function provides a link to related elements.</li>
     </ul>
     </p>
-    <h3><a name="dependenciesFormatElement">Check the Dependencies of a Format Element</a></h3>
+    <h3><a name="dependenciesFormatElement">4.8 Check the Dependencies of a Format Element</a></h3>
     <p>There are two ways to check the dependencies of a format element. The simplest way is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Dependencies of this element" for the element you want to check.</p>
     <p>The second method to check the dependencies of an element is through regular unix tools: for example <code>$ grep -r -i 'bfe_<i>your_element_name</i>' .</code> inside the format templates directory will tell you which templates call your element.</p>
-    <h3><a name="validityFormatElement">Check the Validity of a Format Element</a></h3>
+    <h3><a name="validityFormatElement">4.9 Check the Validity of a Format Element</a></h3>
      <p>There are two ways to check the validity of an element. The simplest one is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Correctness of this element" for the element you want to check.</p>
      <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass as <code>bfo</code> parameter to the <code>format</code> function of your element.</p>
-    <h3><a name="browseDocFormatElement">Browse the Format Elements Documentation</a></h3>
+    <h3><a name="browseDocFormatElement">4.10 Browse the Format Elements Documentation</a></h3>
     <p>Go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
     <p>Each detailed documentation shows you:
     <ul>
@@ -818,43 +837,88 @@ translated_welcome =  &#95;("Welcome")
     <li>A link to a tool to test your element with custom parameters.</li>
     
     </ul></p>
-    <h3><a name="previewFormatElement">Preview a Format Element</a></h3>
-    <p>
-     You can play with a format element parameters and see the result
-     of the element directly in the
-     <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>:
-       for each element, under the section "See
-     also", click on "Test this element". You are redirected to a page
-     where you can enter a value for the parameters. A description is
-     associated with each parameter as well as an indication of the
-     default value of the parameter if you do not provide a custom
-     value. Click on the "Test!" button to see the result of the
-     element with your parameters.</p>
 
-<h2><a name="KBs">Knowledge Bases</a></h2>
+<h2><a name="KBs">5. Knowledge Bases</a></h2>
    <p>Knowledge bases are a way to define easily extendable repositories of mappings. Their use is various, but their main purpose is to get, given a value, the normalized version of this value. For example you may use a knowledge base to hold a list of all ways to abbreviate the name of a journal, and map these abbreviations to the full journal name. This would be useful to get a normalized journal name accross all of your records.</p>
    <p>The knowledge base itself offers no method to do this normalization. It is limited to the archiving of this knowledge. To benefit from the normalization you need to use a format element which is knowledge-base-aware. The element will look by iteself into the knowledge base to format a record. In that way you can extend the formatting capabilities of this element without having to modify it.</p>
-    <h3><a name="addKB">Add a Knowledge Base</a></h3>
+    <h3><a name="addKB">5.1 Add a Knowledge Base</a></h3>
     <p>To add a knowledge base go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page.
     At the bottom of the page click on the "Add New Knowledge Base" button. The knowledge base has been created and you are asked to fill in its attribute. See <a href="#attrsKB">Edit the Attributes of a Knowledge Base</a> to learn more about the attributes of knowledge bases.</p>
-    <h3><a name="removeKB">Remove a Knowledge Base</a></h3>
+    <h3><a name="removeKB">5.2 Remove a Knowledge Base</a></h3>
     <p>To remove a knowledge base go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page. Click on the "Delete" button facing the knowledge base you want to remove and confim. The knowledge base and all the mapping it includes are removed.</p>
-    <h3><a name="addMappingKB">Add a Mapping</a></h3>
+    <h3><a name="addMappingKB">5.3 Add a Mapping</a></h3>
     <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to add a mapping. Fill in the form of the "Add New Mapping" section on the left of the page with the new mapping, and click on "Add New Mapping". The mapping has been created. Alternatively you can create the mapping without its attributes, and fill them afterward (See <a href="#editMappingKB">Edit a Mapping</a>).<p/>
-    <h3><a name="removeMappingKB">Remove a Mapping</a></h3>
+    <h3><a name="removeMappingKB">5.4 Remove a Mapping</a></h3>
     <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to remove a mapping. Click on the "Delete" button facing the mapping you want to delete.
-    <h3><a name="editMappingKB">Edit a Mapping</a></h3>
+    <h3><a name="editMappingKB">5.5 Edit a Mapping</a></h3>
     <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to edit a mapping. Locate the mapping in the list. You can click on the column headers to order the list by <i>Map From</i> or by <i>Map To</i> to help you find it. Once you have edited the mapping click on the corresponding "Save" button.
-    <h3><a name="attrsKB">Edit the Attributes of a Knowledge Base</a></h3>
+    <h3><a name="attrsKB">5.6 Edit the Attributes of a Knowledge Base</a></h3>
     Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base you want to edit. In the top menu, click on "Knowledge Base Attributes". You can then give your knowledge base a name and a description. Finally click on the "Update Base Attributes" button.
-    <h3><a name="validityKB">Check the Dependencies a Knowledge Base</a></h3>
+    <h3><a name="validityKB">5.7 Check the Dependencies a Knowledge Base</a></h3>
     To check the dependencies of a knowledge base
     go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> page, click on
     the knowledge base you want to check, and then in the menu click on "Knowledge Base Dependencies".</p>
     <p>The next page shows you the list of format elements that use this knowledge base.</p>
     <p>Note that some format elements might be omitted.</p>
-    
-<h2><a name="marcNotation">MARC Notation in Formats</a></h2>
+
+<h2><a name="BibReformat">6. Run BibReformat</a></h2>
+<p>While records can be formatted on-the-fly using BibFormat, it is usually necessary to preformat the records
+in order to decrease the load of your server. To do so, use the <code>bibreformat</code> command line tool.</p>
+<h3><a name="runBibReformat">6.1 Run BibReformat</a></h3>
+<p>The following options are available for running <code>bibreformat</code>:<p>
+<blockquote>
+<pre> Usage: bibreformat [options]
+ -u, --user=USER         User name to submit the task as, password needed.
+ -h, --help              Print this help.
+ -V, --version           Print version information.
+ -v, --verbose=LEVEL     Verbose level (0=min,1=normal,9=max).
+ -s, --sleeptime=SLEEP   Time after which to repeat tasks (no)
+ -t, --time=DATE         Moment for the task to be active (now).
+ -a, --all               All records
+ -c, --collection        Select records by collection
+ -f, --field             Select records by field.
+ -p, --pattern           Select records by pattern.
+ -o, --format            Specify output format to be (re-)created. (default HB)
+ -n, --noprocess         Count records to be processed only (no processing done)
+ Example: bibreformat -n Show how many records are to be bibreformated.
+</pre>
+</blockquote>
+For example, to reformat all records in HB (=HTML brief) format, you'd launch:
+<blockquote>
+<pre>$ bibreformat -a -oHB
+</pre>
+</blockquote>
+and you watch the progress of the process via <code>bibsched</code>.
+<p>Note that BibReformat understands <code>-p</code>, <code>-f</code>,
+and <code>-c</code> arguments that enable you to easily reformat only
+the records you need. For example, to reformat the Pictures
+collection, launch:
+
+</p><blockquote>
+<p>
+<pre>$ bibreformat -cPictures -oHB
+</pre>
+</blockquote>
+or to reformat HD (=HTML detailed) format for records #10 to #20, you
+launch:
+<blockquote>
+<pre>$ bibreformat -p"recid:10-&gt;20" -oHD
+</pre>
+</blockquote>
+<p>Last but not least, if you launch bibreformat without arguments:
+</p><blockquote>
+<pre>$ bibreformat
+</pre>
+</blockquote>
+</p>
+it will process all the records that have been modified since the last
+run of BibReformat, as well as all newly inputted records. This is
+suitable for running BibReformat in a periodical daemon mode via
+BibSched. See our <a href="http://pcdh23.cern.ch/admin/howto/run.html">HOWTO Run
+Your CDS Invenio Installation</a> guide for more information.</p>
+
+<h2><a name="Appendix">7. Appendix</a></h2>
+<h3><a name="marcNotation">7.1 MARC Notation in Formats</a></h3>
 <p>The notation for accessing fields of a record are quite flexible. You can use a syntax strict regarding MARC 21, but also
   a shortcut syntax, or a syntax that can have a special meaning.</p>
   <p>The MARC syntax is the following one:
@@ -867,7 +931,7 @@ translated_welcome =  &#95;("Welcome")
       <li>Omit or use both indicators. You cannot specify only one indicator. If you need to use only one, use underscore <code>_</code> character for the other indicator.</li>
       <li>Use percent <code>%</code> instead of any character to specify all ("don'care" or wildcard character) for that character. </li>
       </ul></p>
-<h2><a name="migration">Migrating from Previous BibFormat</a></h2>
+<h3><a name="migration">7.2 Migrating from Previous BibFormat</a></h3>
 <p>The new Python BibFormat formats are not backward compatible with the previous formats. New concepts and capabilities have been introduced and some have been dropped. If you have not modified the "Formats" or modified only a
 little bit the "Behaviours" (or modified "Knowledge Bases"), then the transition will be painless and
 automatic. Otherwise you will have to manually rewrite some of the
@@ -881,7 +945,7 @@ migration is not so difficult, and because it will be much easier for
 you to customize how BibFormat formats your bibliographic data.</p>
 <p>The first thing you should do is to read the <a href="#shortIntro">Five Minutes Introduction to BibFormat</a> to understand how the new BibFormat works. We also assume that you are familiar with the concepts of the old BibFormat. As the new formats separate the presentation from the business logic (i.e. the bindings to the database), it is not possible to automatically handle the translation. This is why you should at least be able to read and understand the formats that you want to migrate.</p>
 
-<h3>Differences between old and new BibFormat</h3>
+<h4>Differences between old and new BibFormat</h4>
 <p>
 The most noticeable differences are:<br/>
 <br/>
@@ -924,7 +988,7 @@ The disadvantages are:<br/>
    no more use of statements such as if(), forall() inside templates,
    and this requires more work to put logic inside format elements.<br/>
 </p>
-<h3>Migrating <i>behaviours</i> to <i>output formats</i></h3>
+<h4>Migrating <i>behaviours</i> to <i>output formats</i></h4>
 <p>Behaviours were previously stored in the database and did require to use the evaluation language to
 provide the logic that choose which format to use for a record. They also let you enrich records
 with some custom data. Now their use has been simplified and rectricted to equivalence tests on the value of a field
@@ -995,19 +1059,19 @@ default: Default_HTML_brief.bft<br/>
 </p>
 <p>We suggest that you use the migration kit to produce initial output formats from
 your behaviours, but that you go through the created .bfo files in the /etc/bibformat/output_formats/ directory of your CDS Invenio installation to check that they correspond to your behaviours.</p>
-<h3>Migrating <i>formats</i> to <i>format templates</i> and <i>format elements</i></h3>
+<h4>Migrating <i>formats</i> to <i>format templates</i> and <i>format elements</i></h4>
 <p>The migration of formats is the most difficult part of the migration. You will need to separate the presentation code (HTML) from the business code (iterations, tests and calls to the database). Here are some tips on how you can do this:</p>
 <ul>
 <li>If you want to save the time of unescaping all HTML characters and understanding how the layout should look like, just go with your web browser to a formatted version of the format in your CDS Invenio installation, and copy the source of the web page. Identify the parts of the HTML code which are specific to the current record, and replace them with a call to the corresponding format element.</li>
 <li>If you have made small modifications to the old default provided formats, we suggest that you use the new provided ones and modify them according to your needs.</li>
 </ul>
 <p>We recommend that you do not use the migration kit for this part: it can help you create the initial files, but will never be able to provide a working implementation of the formats.</p>
-<h3>Migrating <i>Knowledge Bases</i></h3>
+<h4>Migrating <i>Knowledge Bases</i></h4>
 <p>We recomment yo use the migration kit to migrate your knowledge bases. It should have no problem to migrate this part of your configuration.</p>
-<h3>Migrating <i>UDFs</i> and <i>Link rules</i></h3>
+<h4>Migrating <i>UDFs</i> and <i>Link rules</i></h4>
 <p><i>User Defined Functions</i> and <i>Link rules</i> have been dropped in the new BibFormat. These concepts have no reasons to be as they can be fully implemented in the <i>format elements</i>. For example the <code>AUTHOR_SEARCH</code> link rule can directly be implemented in the <code>Authors.bfe</code> element.</p>
 <p>As for the UDFs, most of them are directly built-in functions of Python. Whenever a special function as to be implemented, it can be defined in a regular Python file and used in any element.</p>
-<h3>The Migration Kit</h3>
+<h4>The Migration Kit</h4>
 <p>The migration kit is available from the main BibFormat admin webpage or
 <a href="bibformat_migration_kit_assistant.py">directly here</a>. The migration
 kit has 3 steps, each migrating some part of your configuration. Just
@@ -1034,7 +1098,7 @@ will get cleaner code if you write format elements and format
 templates yourself.
 </p>
 
-<h3><a name="runSideBySide">Run old and new formats side by side</a></h3>
+<h4><a name="runSideBySide">Run old and new formats side by side</a></h4>
 <p>You might want to migrate your formats over a long period of time, making new formats available to your
 users once they have been migrated, while old formats are still being used if they have not been translated.
 BibFormat will do this almost automatically. This section tells you what you should be aware of if you want this to work seamlessly.</p>
@@ -1051,10 +1115,10 @@ to the old BibFormat, which will look for a behaviour with a name corresponding 
 PICTURE --- migration_in_progress<br/>
 default: Default_HTML_detailed.bft</code>
   </p>
-<h2><a name="integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></h2>
+<h3><a name="integrationDreamweaver">7.3 Integrating BibFormat into Dreamweaver MX</a></h3>
 <p>BibFormat templates have been thought to be editable in custom HTML editors. We propose in this section
 a way to extend one particular editor, Dreamweaver.</p>
-<h3>Make Dreamweaver Recognize Format Elements in Layout View</h3>
+<h4>Make Dreamweaver Recognize Format Elements in Layout View</h4>
 <p>To make Dreamweaver understand the format elements and display an icon for each of them in the layout editor, you must
 edit a Dreamweaver configuration file named <code>Tags.xml</code> located inside /Configuration/ThirdPartyTags directory
 of your Dreamweaver installation folder. At the end of this file, copy-paste the following lines:
@@ -1066,7 +1130,7 @@ of your Dreamweaver installation folder. At the end of this file, copy-paste the
   Also copy this icon <img src="bibformat.gif" alt="bibformat.gif"/> in the same directory as <code>Tags.xml</code> (right-click on icon, or ctrl-click on one-button mouse, and "Save Image As..."). Make sure the downloaded image is named "<code>bibformat.gif</code>".
   </p>
   <p>Note that Dreamweaver might not recognize Format Elements when complex formatting is involved due to these elements.</p>
-  <h3>Add a Format Elements Floating Panel</h3>
+  <h4>Add a Format Elements Floating Panel</h4>
   <p>You can add a floating panel that will you to insert Format Elements in your document and read the documentation
   of all available Format Elements.</p>
   <p>The first step is to declare in which menu of Dreamweaver this floating panel is going to be available.
@@ -1080,45 +1144,45 @@ of your Dreamweaver installation folder. At the end of this file, copy-paste the
   <p>Once this is done, you can <a href="bibformatadmin.py/download_dreamweaver_floater">download the floating palette</a> (if file opens in your browser instead of downloading, right-click on icon, or ctrl-click on one-button mouse, and "Save Target As...") and move the dowloaded file "<code>BibFormat_floater.html</code>" (do not rename it) into /Configuration/Floaters directory of your Dreamweaver application folder.</p>
   <p>To use the BibFormat floating panel, open Dreamweaver, and choose <code>Window &gt; Others &gt; BibFormat Elements</code>.</p>
   <p>Whenever a new version of the palette is available, you can skip the edition of file "<code>Menu.xml</code>" and just replace the old "<code>BibFormat_floater</code>" file with the new one.</p>
-<h2><a name="faq">FAQ</a></h2>
+<h3><a name="faq">7.4 FAQ</a></h3>
 
-<h3>Why do we need output formats? Wouldn't format templates be sufficient?</h3>
+<h4>Why do we need output formats? Wouldn't format templates be sufficient?</h4>
 <p>As you potentially have a lot of records, it is not conceivable to specify for each of them which
 format template they should use. This is why this rule-based decision layer has been introduced.</p>
 
-<h3>How can I protect a format?</h3>
+<h4>How can I protect a format?</h4>
 <p>As a web user, you cannot protect a format. If you are administrator of the
 system and have access to the format files, you can simply use the permission rights of your system, as BibFormat
 is aware of it.</p>
 
-<h3>Why cannot I edit/delete a format?</h3>
+<h4>Why cannot I edit/delete a format?</h4>
 <p>The format file has certainly been protected by the administrator of the server. You must ask the
 administrator to unprotect the file if you want to edit it.</p>
 
-<h3>How can I add a format element from the web interface?</h3>
+<h4>How can I add a format element from the web interface?</h4>
 <p>Format elements cannot be added, removed or edited through the web interface. This limitation
 has been introduced to limit the security risks caused by the upload of Pythonic files on the server. The only possibility to add a basic format element from the web interface is to add a en entry in the "<a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module (see <a href="#addFormatElement">Add a Format Element</a>)</p>
 
-<h3>Why are some Marc codes omitted in the "Check Dependencies" pages?</h3>
+<h4>Why are some Marc codes omitted in the "Check Dependencies" pages?</h4>
 <p>When you check the dependencies of a format, the page reminds you that
 some use of Marc codes might not be indicated. This is because it is not
 possible (or at least not trivial) to guess that the call to <code>field(str(5+4)+"80"+".a")</code>
 is equal to a call to <code>field("980.a")</code>. You should then not completely rely on this indication.</p>
 
-<h3>How are displayed deleted record?</h3>
+<h4>How are displayed deleted record?</h4>
 <p>By default, CDS Invenio displays a standard "The record has been deleted." message for all
 output formats with a 'text/html' content type. Your output format, format templates and format elements
 are bypassed by the engine. 
 However, for more advanced output formats, CDS Invenio
 goes through the regular formatting process and let your formats do the job. This allows you to customize how a record should be displayed once it has been deleted.</p>
 
-<h3>Why are some format elements omitted in the "Knowledge Base Dependencies" page?</h3>
+<h4>Why are some format elements omitted in the "Knowledge Base Dependencies" page?</h4>
 <p>When you check the dependencies of a knowledge base, the page reminds you that
 format elements using this knowledge base might not be indicated. This is because it is not
 possible (or at least not trivial) to guess that the call to <code>kb(e.upper()+"journal"+"s")</code> in a format element
 is equal to a call to <code>kb("Ejournals")</code>. You should then not completely rely on this indication.</p>
 
-<h3>Why are some format elements defined in field table omitted in the format element documentation?</h3>
+<h4>Why are some format elements defined in field table omitted in the format element documentation?</h4>
 <p>Some format elements defined in the "Logical Fields" management interface of the BibIndex module (the
 basic format elements) are not shown in the format elements documentation pages. We do not show such an element if its name starts with a number.
 This is to reduce the number of elements shown in the documentation as the logical fields
