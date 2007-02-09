@@ -89,7 +89,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
                         if fields != "empty":
                             for field in fields:
-                                if tag != '001':
+                                if field[0]: # Only display if has subfield(s)
                                     body += bibedit_templates.tmpl_table_value(ln, recid, tag,
                                                                                field, format_tag, "record", add)
 
