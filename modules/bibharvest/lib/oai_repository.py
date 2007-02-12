@@ -302,6 +302,7 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
             if formatted_record is not None:
                 ## MARCXML is already preformatted. Adapt it if needed
                 formatted_record = formatted_record.replace("<record>", "<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">\n     <marc:leader>00000coc  2200000uu 4500</marc:leader>")
+                formatted_record = formatted_record.replace("<record xmlns=\"http://www.loc.gov/MARC21/slim\">", "<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">\n     <marc:leader>00000coc  2200000uu 4500</marc:leader>")
                 formatted_record = formatted_record.replace("</record", "</marc:record")
                 formatted_record = formatted_record.replace("<controlfield", "<marc:controlfield")
                 formatted_record = formatted_record.replace("</controlfield", "</marc:controlfield")
