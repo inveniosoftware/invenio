@@ -62,6 +62,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5 <a href="#3.5">Configure Word Length</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8 <a href="#3.8">Configure Fulltext Indexing</a></br>
 <strong>4. <a href="#4">Run BibIndex Daemon</a></strong></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a></br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a></br>
@@ -145,6 +146,33 @@ from documents before indexing, and index only the text left.  (HTML
 code is defined as everything between '<' and '>' in a text.)
 
 <a name="3.7"></a><h3>3.7 Configure Accent Stripping</h3>
+
+
+<a name="3.8"></a><h3>3.8 Configure Fulltext Indexing</h3>
+
+<p>The metadata tags are usually indexed by its content.  There are
+special cases however, such as the fulltext indexing.  In this case
+the tag contains an URL to the fulltext material and we would like to
+fetch this material and index words found in this material rather than
+in the metadata itself.  This is possible via special tag assignement
+via <code>tagToWordsFunctions</code> variable.
+
+<p>The default setup is configured in the way that if the indexer sees
+that it has to index tag <code>8564_u</code>, it switches into the
+fulltext indexing mode described above.  It can index locally stored
+files or even fetch them from external URLs, depending on the value of
+the <b>CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY</b> configuration
+variable.  When fetching files from remote URLs, when it ends on a
+splash page (an intermediate page before getting to fulltext file
+itself), it can find and follow any further links to fulltext files.
+
+<p>The default setup also differentiate between metadata and fulltext
+indexing, so that <code>any field</code> index does process only
+metadata, not fulltext.  If you want to have the fulltext indexed
+together with the metadata, so that both are searched by default, you
+can go to BibIndex Admin interface and in the Manage Logical Fields
+explicitly add the tag <code>8564_u</code> under <code>any
+field</code> field.
 
 <a name="4"></a><h2>4. Run BibIndex Daemon</h2>
 
