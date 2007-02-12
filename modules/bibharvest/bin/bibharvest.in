@@ -104,7 +104,7 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
 
     a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
 
-    rt_obj = re.search('>.*</resumptionToken>',a)
+    rt_obj = re.search('>[^<]*</resumptionToken>',a)
 
     i = resume_request_nbr
 
@@ -123,7 +123,7 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
 
         a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
 
-        rt_obj = re.search('>.*</resumptionToken>',a)
+        rt_obj = re.search('>[^<]*</resumptionToken>',a)
 
     if output:
         write_file("%s.%07d" % (output,i),a)
