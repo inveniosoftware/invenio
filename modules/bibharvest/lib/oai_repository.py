@@ -46,6 +46,7 @@ from invenio.config import \
 from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists
+from invenio.bibformat_dblayer import get_preformatted_record
 
 verbs = {
     "Identify"            : [""],
@@ -297,68 +298,78 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
         out = out + "   <metadata>\n"
 
         if format == "marcxml":
-            out = out + "    <marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
-            out = out + "     <marc:leader>00000coc  2200000uu 4500</marc:leader>"
-            ## MARC21 and XML formats, possibley OAI -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
-
-            if format == "marcxml":
-
+            formatted_record = get_preformatted_record(sysno, 'xm')
+            if formatted_record is not None:
+                ## MARCXML is already preformatted. Adapt it if needed
+                formatted_record = formatted_record.replace("<record>", "<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">\n     <marc:leader>00000coc  2200000uu 4500</marc:leader>")
+                formatted_record = formatted_record.replace("</record", "</marc:record")
+                formatted_record = formatted_record.replace("<controlfield", "<marc:controlfield")
+                formatted_record = formatted_record.replace("</controlfield", "</marc:controlfield")
+                formatted_record = formatted_record.replace("<datafield", "<marc:datafield")
+                formatted_record = formatted_record.replace("</datafield", "</marc:datafield")
+                formatted_record = formatted_record.replace("<subfield", "<marc:subfield")
+                formatted_record = formatted_record.replace("</subfield", "</marc:subfield")
+                out += formatted_record
+            else:
+                ## MARCXML is not formatted in the database, so produce it.
+                out = out + "    <marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\" type=\"Bibliographic\">"
+                out = out + "     <marc:leader>00000coc  2200000uu 4500</marc:leader>"
                 out = "%s     <marc:controlfield tag=\"001\">%d</marc:controlfield>\n" % (out, int(sysno))
 
-            for digit1 in range(0, 10):
-                for digit2 in range(0, 10):
-                    bibbx = "bib%d%dx" % (digit1, digit2)
-                    bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-                    query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                            "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                            "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx, sysno, str(digit1)+str(digit2))
-                    res = run_sql(query)
-                    field_number_old = -999
-                    field_old = ""
-                    for row in res:
-                        field, value, field_number = row[0], row[1], row[2]
-                        ind1, ind2 = field[3], field[4]
-                        if ind1 == "_":
-                            ind1 = " "
-                        if ind2 == "_":
-                            ind2 = " "                        
-                        # print field tag
-                        if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                            if format == "marcxml":
+                for digit1 in range(0, 10):
+                    for digit2 in range(0, 10):
+                        bibbx = "bib%d%dx" % (digit1, digit2)
+                        bibx = "bibrec_bib%d%dx" % (digit1, digit2)
+                        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                                "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
+                                "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx, sysno, str(digit1)+str(digit2))
+                        res = run_sql(query)
+                        field_number_old = -999
+                        field_old = ""
+                        for row in res:
+                            field, value, field_number = row[0], row[1], row[2]
+                            ind1, ind2 = field[3], field[4]
+                            if ind1 == "_":
+                                ind1 = " "
+                            if ind2 == "_":
+                                ind2 = " "                        
+                            # print field tag
+                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                                if format == "marcxml":
 
-                                if field_number_old != -999:
-                                    if field_old[0:2] == "00":
-                                        out = out + "     </marc:controlfield>\n"
+                                    if field_number_old != -999:
+                                        if field_old[0:2] == "00":
+                                            out = out + "     </marc:controlfield>\n"
+                                        else:
+                                            out = out + "     </marc:datafield>\n"
+
+                                    if field[0:2] == "00":
+                                        out = "%s     <marc:controlfield tag=\"%s\">\n" % (out, encode_for_xml(field[0:3]))
                                     else:
-                                        out = out + "     </marc:datafield>\n"
+                                        out = "%s     <marc:datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
 
-                                if field[0:2] == "00":
-                                    out = "%s     <marc:controlfield tag=\"%s\">\n" % (out, encode_for_xml(field[0:3]))
+
+                                field_number_old = field_number
+                                field_old = field
+                            # print subfield value
+                            if format == "marcxml":
+                                value = encode_for_xml(value)
+
+                                if(field[0:2] == "00"):
+                                    out = "%s      %s\n" % (out, value)
                                 else:
-                                    out = "%s     <marc:datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (out, encode_for_xml(field[0:3]), encode_for_xml(ind1).lower(), encode_for_xml(ind2).lower())
+                                    out = "%s      <marc:subfield code=\"%s\">%s</marc:subfield>\n" % (out, encode_for_xml(field[-1:]), value)
 
 
-                            field_number_old = field_number
-                            field_old = field
-                        # print subfield value
-                        if format == "marcxml":
-                            value = encode_for_xml(value)
-
-                            if(field[0:2] == "00"):
-                                out = "%s      %s\n" % (out, value)
+                            # fetch next subfield
+                        # all fields/subfields printed in this run, so close the tag:
+                        if (format == "marcxml") and field_number_old != -999:
+                            if field_old[0:2] == "00":
+                                out = out + "     </marc:controlfield>\n"
                             else:
-                                out = "%s      <marc:subfield code=\"%s\">%s</marc:subfield>\n" % (out, encode_for_xml(field[-1:]), value)
+                                out = out + "     </marc:datafield>\n"
 
-                               
-                        # fetch next subfield
-                    # all fields/subfields printed in this run, so close the tag:
-                    if (format == "marcxml") and field_number_old != -999:
-                        if field_old[0:2] == "00":
-                            out = out + "     </marc:controlfield>\n"
-                        else:
-                            out = out + "     </marc:datafield>\n"
-                        
-            out = out + "    </marc:record>\n"
+                out = out + "    </marc:record>\n"
 
         elif format == "xd":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
@@ -608,6 +619,9 @@ def oailistidentifiers(args):
                             if CFG_OAI_DELETED_POLICY == "persistent" \
                                    or CFG_OAI_DELETED_POLICY == "transient":
                                 out = out + "    <header status=\"deleted\">\n"
+                            else:
+                                # In that case, print nothing (do not go further)
+                                break
                         else:
                             out = out + "    <header>\n"
                         out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
