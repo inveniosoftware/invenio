@@ -633,7 +633,8 @@ class Collection:
                 reclist_with_nonpublic_subcolls.union(coll_reclist_with_nonpublic_subcolls)
         else:
             # B - collection does have dbquery, so compute it:
-            reclist = search_pattern(None, self.dbquery)
+            #     (note: explicitly remove DELETED records)
+            reclist = search_pattern(None, self.dbquery + ' -collection:"DELETED"')
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
         # deduce the number of records:
         reclist.calculate_nbhits()
