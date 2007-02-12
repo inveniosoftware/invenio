@@ -273,8 +273,8 @@ def rename_topic(uid, old_topic, new_topic):
     
 def move_baskets_to_topic(uid, bskids, new_topic):
     """Move given baskets to another topic"""
-    if not(type(bskids) is list or type(bskids is tuple)):
-        bskids = [bskids]
+    if not((type(bskids) is list) or (type(bskids) is tuple)):
+        bskids = [bskids]        
     query = "UPDATE user_bskBASKET SET topic='%s' WHERE id_user=%i AND (%s)"
     sep = ' OR '
     where_clause = sep.join(map(lambda x: 'id_bskBASKET=%i' % int(x), bskids))
