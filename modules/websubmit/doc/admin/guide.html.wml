@@ -1025,6 +1025,7 @@ def Get_Report_Number (parameters,curdir,form):
                 <a HREF="#Create_Recid">Create_Recid</A><br>
                 <a HREF="#Finish_Submission">Finish_Submission</A><br>
                 <a HREF="#Get_Info">Get_Info</A><br>
+                <a HREF="#Get_Recid">Get_Recid</A><br>
                 <a HREF="#Get_Report_Number">Get_Report_Number</A><br>
                 <a HREF="#Get_Sysno">Get_Sysno</A><br>
                 <a HREF="#Get_TFU_Files">Get_TFU_Files</A><br>
@@ -1042,9 +1043,9 @@ def Get_Report_Number (parameters,curdir,form):
                 <a HREF="#Move_to_Pending">Move_to_Pending</A><br>
                 <a HREF="#Print_Success">Print_Success</A><br>
                 <a HREF="#Print_Success_APP">Print_Success_APP</A><br>
+                <a HREF="#Print_Success_MBI">Print_Success_MBI</A><br>
             </td>
             <td valign="top">
-                <a HREF="#Print_Success_MBI">Print_Success_MBI</A><br>
                 <a HREF="#Print_Success_SRV">Print_Success_SRV</A><br>
                 <a HREF="#Report_Number_Generation">Report_Number_Generation</A><br>
                 <a HREF="#Send_Approval_Request">Send_Approval_Request</A><br>
@@ -1227,6 +1228,30 @@ def Get_Report_Number (parameters,curdir,form):
 
 
 
+
+        <br><br><A NAME="Get_Recid">
+        <table border="1" width="80%">
+        <TR><TD colspan="2" bgcolor="#ddddff"><SMALL><b>Get_Recid</b></SMALL></TD></TR>
+        <TR><TD colspan="2" bgcolor="#eeeeff" align="center"><SMALL>description</SMALL></TD></TR>
+        <TR>
+            <TD colspan="2">
+                <SMALL>
+                This function searches for the document in the database and stores the recid of this document in the "SN" file and in a global variable "sysno".<br>
+                The function conducts the search based upon the document's report-number (and relies upon the global variable "rn") so the "Get_Report_Number" function should be called before this one.<br>
+                <i>This function replaces the older function "Get_Sysno".</i><br>
+                </SMALL>
+            </TD>
+        </TR>
+        <TR><TD colspan="2" bgcolor="#eeeeff" align="center"><SMALL>parameters</SMALL></TD></TR>
+        <TR>
+            <TD valign="top" colspan="2"><SMALL>none</TD>
+        </TR>
+        </TABLE>
+
+
+
+
+
         <br><br><A NAME="Get_Report_Number">
         <table border="1" width="80%">
         <TR><TD colspan="2" bgcolor="#ddddff"><SMALL><b>Get_Report_Number</b></SMALL></TD></TR>
@@ -1259,8 +1284,9 @@ def Get_Report_Number (parameters,curdir,form):
         <TR>
             <TD colspan="2">
                 <SMALL>
-                This functions searches for the document in the database and stores the system number of this document in the "SN" file and in a global variable.<br>
-                "Get_Report_Number" should be called before.
+                This function searches for the document in the database and stores the system number of this document in the "SN" file and in a global variable.<br>
+                "Get_Report_Number" should be called before.<br>
+                <span style="color: red; font-style: italic;">Deprecated: Use Get_Recid instead.</span>
                 </SMALL>
             </TD>
         </TR>
