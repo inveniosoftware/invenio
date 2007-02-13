@@ -17,6 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Get the recid of a record based upon report-number, as stored
+   in the global variable 'rn'.
+
+   **Deprecated - Use Get_Recid Instead**
+"""
+
 __revision__ = "$Id$"
 
    ##
@@ -35,6 +41,12 @@ from invenio.search_engine import search_pattern
 from invenio.websubmit_config import functionStop
 
 def Get_Sysno(parameters,curdir,form):
+    """Get the recid of a record based upon report-number, as stored
+       in the global variable 'rn'. Store the recid in the global variable
+       'sysno' and in the file 'SN' in the current submission directory.
+       
+       **Deprecated - Use Get_Recid Instead**
+    """
     global rn,sysno
     # initialize sysno variable
     sysno = ""
