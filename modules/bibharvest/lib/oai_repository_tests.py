@@ -26,8 +26,12 @@ __revision__ = "$Id$"
 
 import unittest
 import re
+import time
 
 from invenio import oai_repository
+
+from invenio.config import \
+     CFG_OAI_LOAD
 
 class TestVerbs(unittest.TestCase):
     """Test for OAI verb functionality."""
@@ -69,13 +73,45 @@ class TestEncodings(unittest.TestCase):
         self.assertEqual("%20", oai_repository.escape_space(" "))
         self.assertEqual("%25%20%3F%23%3D%26%2F%3A%3B%2B", oai_repository.encode_for_url("% ?#=&/:;+"))
 
+class TestPerformance(unittest.TestCase):
+    """Test performance of the repository """
+
+    def test_response_speed(self):
+        """bibharvest oai repository - speed of response"""
+        allowed_seconds_per_record_oai = 0.02
+        allowed_seconds_per_record_marcxml = 0.05
+        
+        # Determine how many records are served
+        number_of_records = oai_repository.oaigetsysnolist("", "", "")
+        if CFG_OAI_LOAD < number_of_records:
+            number_of_records = CFG_OAI_LOAD
+                
+        # Test oai ListRecords performance
+        t0 = time.time()
+        oai_repository.oailistrecords('metadataPrefix=oai_dc&verb=ListRecords')
+        t = time.time() - t0
+        if t > number_of_records * allowed_seconds_per_record_oai:
+            self.fail("""Response for ListRecords with metadataPrefix=oai_dc took too much time:
+%s seconds.
+Limit: %s seconds""" % (t, number_of_records * allowed_seconds_per_record_oai))
+         
+        # Test marcxml ListRecords performance
+        t0 = time.time()            
+        oai_repository.oailistrecords('metadataPrefix=marcxml&verb=ListRecords')
+        t = time.time() - t0
+        if t > number_of_records * allowed_seconds_per_record_marcxml:
+            self.fail("""Response for ListRecords with metadataPrefix=marcxml took too much time:\n
+%s seconds.
+Limit: %s seconds""" % (t, number_of_records * allowed_seconds_per_record_marcxml))
+        
 def create_test_suite():
     """Return test suite for the oai repository."""
 
 
     return unittest.TestSuite((unittest.makeSuite(TestVerbs, 'test'),
                                unittest.makeSuite(TestErrorCodes, 'test'),
-                               unittest.makeSuite(TestEncodings, 'test')))
+                               unittest.makeSuite(TestEncodings, 'test'),
+                               unittest.makeSuite(TestPerformance, 'test')))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
