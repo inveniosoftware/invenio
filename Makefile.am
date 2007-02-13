@@ -163,6 +163,7 @@ update-v0.90.1-tables: local-dbexec
 update-v0.92.0-tables: local-dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments longblob;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
