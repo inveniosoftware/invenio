@@ -1167,6 +1167,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Modify_Interface',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Recid',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Finish_Submission','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Info','');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Report_Number',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Sysno',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Insert_Modify_Record','');
