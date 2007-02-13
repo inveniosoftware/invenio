@@ -381,13 +381,17 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
 
             for field_ in get_field(sysno, "100__a"):
                 out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
- 
-            for field_ in get_field(sysno, "700__a"):
-                out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
 
+            # Generate additional authors in reverse order, to get correct order
+            authors = ""
+            for field_ in get_field(sysno, "700__a"):
+                authors =  "         <dc:creator>%s</dc:creator>\n%s" % (encode_for_xml(field_),
+                                                                         authors)
+            out += authors
+            
             for field_ in get_field(sysno, "245__a"):
                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
-
+                               
             for field_ in get_field(sysno, "111__a"):
                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
 
