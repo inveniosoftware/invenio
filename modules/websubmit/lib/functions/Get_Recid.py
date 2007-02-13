@@ -1,0 +1,160 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Get the recid of a record with a given report-number (from the global 'rn'),
+   and store it into the global 'sysno'.
+"""
+__revision__ = "$Id$"
+
+from os import access, F_OK, R_OK
+from invenio.search_engine import record_exists, search_pattern
+from invenio.websubmit_config import functionStop, functionError
+
+
+## JavaScript action and message to be passed to "functionStop" when
+## a document recid for the given report-number cannot be found:
+CFG_ALERT_DOCUMENT_NOT_FOUND = """
+<script type="text/javascript">
+document.forms[0].action="/submit";
+document.forms[0].curpage.value=1;
+document.forms[0].step.value=0;
+document.forms[0].submit();
+alert('The document with report-number [%s] cannot be found in our database.\\n""" \
+"""Perhaps it has not yet been integrated?\\n""" \
+"""You can choose another report number or retry this action in a few minutes.');""" \
+"""</script>"""
+
+## JavaScript action and message to be passed to "functionStop" when
+## multiple document recids for the given report-number are found found:
+CFG_ALERT_MULTIPLE_DOCUMENTS_FOUND = """
+<script type="text/javascript">
+document.forms[0].action="/submit";
+document.forms[0].curpage.value=1;
+document.forms[0].step.value=0;
+document.forms[0].submit();
+alert('Multiple documents with the report number [%s] have been found.\\n""" \
+"""You can choose another report number or retry this action in a few minutes.');""" \
+"""</script>"""
+
+
+def Get_Recid(parameters, curdir, form):
+    """Given the report number of a notice (the global "rn"), retrieve the
+       "recid" (001).
+       The function first of all checks for the existence of the file "SN" in
+       the current submission's working directory. If it exists, it is read in
+       and used as the "recid".
+       Otherwise, this function will contact the database in order to obtain the
+       recid of a record.
+
+       The function depends upon the global value "rn" having been set. It will
+       use this value when searching for a record. Note: If "rn" is empty, the
+       search for the document will not be conducted.
+       Exceptions raised:
+        + functionError:
+                          - if unable to open curdir/SN for reading;
+                          - if unable to open curdir/SN for writing;
+        + functionStop:
+                          - if the global 'rn' is empty (no rn to search with);
+                          - if no recid found for 'rn' value;
+                          - if multiple recids found for 'rn' value;
+    """
+    global rn, sysno
+    ## initialize sysno
+    sysno = ""
+    
+    if access("%s/SN" % curdir, F_OK|R_OK):
+        ## SN exists and should contain the recid; get it from there.
+        try:
+            fptr = open("%s/SN" % curdir, "r")
+        except IOError:
+            ## Unable to read the SN file's contents
+            msg = """Unable to correctly read the current submission's recid"""
+            raise functionError(msg)
+        else:
+            ## read in the submission details:
+            sysno = fptr.read().strip()
+            fptr.close()
+    else:
+        ## SN doesn't exist; Check the DB for a record with this reportnumber.
+
+        ## First, if rn is empty, don't conduct the search:
+        if rn.strip() in ("", None):
+            ## No report-numer provided:
+            raise functionStop(CFG_ALERT_DOCUMENT_NOT_FOUND % "NO REPORT NUMBER PROVIDED")
+
+        ## Get a list of recids of LIVE records associated with the report-numberL
+        recids = get_existing_records_for_reportnumber(rn)
+
+        ## There should only be 1 _existing_ record for the report-number:
+        if len(recids) == 1:
+            ## Only one record found - save it to a text file called SN in the current
+            ## submission's working directory:
+            try:
+                fptr = open("%s/SN" % curdir, "w")
+            except IOError:
+                ## Unable to read the SN file's contents
+                msg = """Unable to save the recid for report [%s]""" \
+                         % rn
+                raise functionError(msg)
+            else:
+                ## Save recid to SN and to the global scope:
+                sysno = recids[0]
+                fptr.write("%s" % sysno)
+                fptr.flush()
+                fptr.close()
+        elif len(recids) < 1:
+            ## No recid found for this report number:
+            msg = CFG_ALERT_DOCUMENT_NOT_FOUND % rn
+            raise functionStop(msg)
+        else:
+            ## Multiple recids found for this report-number:
+            msg = CFG_ALERT_MULTIPLE_DOCUMENTS_FOUND % rn
+            raise functionStop(msg)
+
+    ## Everything seems to have run smoothly:
+    return ""
+
+def get_existing_records_for_reportnumber(reportnum):
+    """Given a report number, return a list of recids of real (live) records
+       that are associated with it.
+       That's to say if the record does not exist (prehaps deleted, for example),
+       it's recid will now be returned in the list.
+       @param reportnum: (string) - the report number for which recids are to
+        be returned.
+       @return: (list) of recids.
+    """
+    existing_records = []  ## List of the report numbers of existing records
+
+    ## Get list of records with the report-number rn:
+    reclist = \
+       search_pattern(req=None, p=reportnum, f="reportnumber", m="e").items().tolist()
+
+    ## Loop through all recids retrieved and testing to see whether the record
+    ## actually exists or not. If none of the records exist, there is no record
+    ## with this reportnumber; If more than one of the records exists, then there
+    ## are multiple records with the report-number; If only one record exists,
+    ## then everything is OK,
+    for rec in reclist:
+        rec_exists = record_exists(rec)
+        if rec_exists == 1:
+            ## This is a live record record the recid and augment the counter of
+            ## records found:
+            existing_records.append(rec)
+    return existing_records
+    
