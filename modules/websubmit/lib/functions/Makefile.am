@@ -29,6 +29,7 @@ pylib_DATA = __init__.py \
              Finish_Submission.py \
              Format_Record.py \
              Get_Info.py \
+             Get_Recid.py \
              Get_Report_Number.py \
              Get_Sysno.py \
              Insert_Modify_Record.py \
