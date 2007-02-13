@@ -40,9 +40,10 @@ def format(bfo, separator="; ", print_link="yes"):
     if print_link.lower() == 'yes':
         for address in addresses:
             list_addresses.append('<a href="'+weburl+'/search?f=author&p='+ \
-                                  quote(address.get('p', "")) \
-                                  +'">'+cgi.escape(address.get('p', "")) \
-                                  +'</a>')
+                                  quote(address.get('p', "")) + \
+                                  '&amp;ln=' + bfo.lang + \
+                                  '">'+cgi.escape(address.get('p', "")) + \
+                                  '</a>')
             list_addresses.append(cgi.escape(address.get('g', "")))
     else:
         for address in addresses:

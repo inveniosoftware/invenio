@@ -41,7 +41,11 @@ def format(bfo, style):
             if style != '':
                 print_style = 'style="' + style + '"'
             
-            out += '<a href="'+weburl + '/admin/bibedit/bibeditadmin.py/index?recid=' + str(bfo.recID) +'" ' + print_style + '>Edit This Record</a>'
+            out += '<a href="'+weburl + \
+                   '/admin/bibedit/bibeditadmin.py/index?recid=' + \
+                   str(bfo.recID) + '&amp;ln=' + bfo.lang +'" ' + \
+                   print_style + \
+                   '>Edit This Record</a>'
             
     return out
 

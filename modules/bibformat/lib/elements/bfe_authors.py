@@ -71,6 +71,7 @@ def format(bfo, limit, separator=' ; ',
             if print_links.lower() == "yes":
                 author['a'] = '<a href="' + weburl + \
                               '/search?f=author&amp;p='+ quote(author['a']) + \
+                              '&amp;ln='+ bfo.lang + \
                               '">'+escape(author['a'])+'</a>'
 
         if author.has_key('u'):

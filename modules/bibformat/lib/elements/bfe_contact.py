@@ -34,8 +34,11 @@ def format(bfo, separator='; ', link="yes"):
 
     addresses = bfo.fields('270__p')
 
-    addresses = map(lambda x: '<a href="'+weburl+'/search?f=author&p='+ quote(x) +'">'+x+'</a>', addresses)
-
+    if link == "yes":
+        addresses = ['<a href="'+weburl+'/search?f=author&p='+ \
+                     quote(address) +'&amp;ln=' + bfo.lang + '">' + \
+                     address +'</a>' for address in addresses]
+        
     return separator.join(addresses)
 
 

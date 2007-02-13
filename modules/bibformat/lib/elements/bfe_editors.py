@@ -37,10 +37,15 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
     
-    editors = [bibrecord.field_get_subfield_values(author, 'a')[0] for author in authors if len(bibrecord.field_get_subfield_values(author, "e")) > 0 and bibrecord.field_get_subfield_values(author, "e")[0]=="ed." ]
+    editors = [bibrecord.field_get_subfield_values(author, 'a')[0]
+               for author in authors if len(bibrecord.field_get_subfield_values(author, "e")) > 0 and bibrecord.field_get_subfield_values(author, "e")[0]=="ed." ]
 
     if print_links.lower() == "yes":
-        editors = map(lambda x: '<a href="'+weburl+'/search?f=author&p='+ quote(x) +'">'+x+'</a>', editors)
+        editors = ['<a href="' + weburl + '/search?f=author&p=' + \
+                   quote(editor) + \
+                   '&amp;ln='+ bfo.lang + \
+                   '">' + editor + '</a>'
+                   for editor in editors]
 
     if limit.isdigit() and len(editors) > int(limit):
         return separator.join(editors[:int(limit)]) + extension

@@ -33,7 +33,9 @@ def format(bfo, style, separator='; '):
     if style != "":
         style = 'class="'+style+'"'
         
-    urls = map(lambda x: '<a '+style+'href="'+x+'">'+x+'</a>', urls_u)
+    urls = ['<a '+ style + \
+            'href="' + url + '">' + url +'</a>'
+            for url in urls_u]
     return separator.join(urls)
 
 def escape_values(bfo):
