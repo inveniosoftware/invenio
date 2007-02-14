@@ -201,7 +201,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
         """Prepare some ideal outputs"""
 
         self.record_76_hb = '''<strong>Ιθάκη</strong> 
- / <a href="%s/search?f=author&amp;p=%%CE%%9A%%CE%%B1%%CE%%B2%%CE%%AC%%CF%%86%%CE%%B7%%CF%%82%%2C%%20%%CE%%9A%%20%%CE%%A0">Καβάφης, Κ Π</a>
+ / <a href="%s/search?f=author&amp;p=%%CE%%9A%%CE%%B1%%CE%%B2%%CE%%AC%%CF%%86%%CE%%B7%%CF%%82%%2C%%20%%CE%%9A%%20%%CE%%A0&amp;ln=%s">Καβάφης, Κ Π</a>
 
 
 
@@ -210,7 +210,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
 <br/><small>
 Σα βγεις στον πηγαιμό για την Ιθάκη,<br />
 να εύχεσαι νάναι μακρύς ο δρόμος,<br />
-γεμάτος περιπέτειες, γεμάτος γνώσεις. [...] </small>''' % weburl
+γεμάτος περιπέτειες, γεμάτος γνώσεις. [...] </small>''' % (weburl, cdslang)
 
     def test_brief_html_output(self):
         """bibformat - Brief HTML output"""
