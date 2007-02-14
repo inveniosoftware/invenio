@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,9 +23,12 @@ pylib_DATA = access_control_engine.py \
              access_control_config.py \
              access_control_admin.py \
              webaccessadmin_lib.py \
+             external_authentication_cern.py \
              external_authentication.py \
+             external_authentication_cern_wrapper.py \
+             external_authentication_cern_tests.py \
              webaccess_regression_tests.py
 
-EXTRA_DIST = $(pylib_DATA) 
+EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

@@ -67,6 +67,7 @@ from invenio.access_control_config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.messages import gettext_set_language
+from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -84,7 +85,7 @@ def createGuestUser():
             return run_sql("insert into user (email, note) values ('', '1')")
         except OperationalError:
             return None
-            
+
     elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
         try:
             return run_sql("insert into user (email, note) values ('', '0')")
@@ -271,7 +272,7 @@ def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
        At the moment we just check whether it is not empty, does not
        contain blanks or @, is not equal to `guest', etc.
-      
+
        This check relies on sre_invalid_nickname regexp (see above)
        Return 1 if nickname is okay, return 0 if it is not.
     """
@@ -305,7 +306,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
        desired NICKNAME and do not set any.  This is suitable for
        external authentications so that people can login without
        having to register an internal account first.
-       
+
        Return 0 if the registration is successful, 1 if email is not
        valid, 2 if nickname is not valid, 3 if email is already in the
        database, 4 if nickname is already in the database, 5 when
@@ -366,6 +367,9 @@ def updateDataUser(uid, email, password, nickname):
         run_sql("update user set nickname=%s where id=%s", (nickname, uid))
     return 1
 
+
+
+
 def loginUser(req, p_un, p_pw, login_method):
     """It is a first simple version for the authentication of user. It returns the id of the user,
        for checking afterwards if the login is correct
@@ -375,42 +379,69 @@ def loginUser(req, p_un, p_pw, login_method):
     p_email = get_email_from_username(p_un)
 
     # go on with the old stuff based on p_email:
-    user_prefs = get_user_preferences(emailUnique(p_email))
-    if user_prefs and login_method != user_prefs["login_method"]:
-        if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs["login_method"]):
-            return ([], p_email, p_pw, 11)
 
     if not CFG_EXTERNAL_AUTHENTICATION.has_key(login_method):
         return ([], p_email, p_pw, 12)
 
-    if CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
-        p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw)
-        if p_email:
-            p_pw = givePassword(p_email)
-            if not p_pw or p_pw < 0:
+    if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
+        try:
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_un, p_pw)
+        except WebAccessExternalAuthError:
+            return([], p_email, p_pw, 16)
+        if p_email: # Authenthicated externally
+            query_result = run_sql("SELECT id from user where email=%s", (p_email,))
+            if not query_result:
                 import random
-                p_pw = int(random.random() * 1000000)
-                if registerUser(req, p_email, p_pw, "", register_without_nickname=True) != 0:
-                    return ([], p_email, p_pw, 13)
+                p_pw_local = int(random.random() * 1000000)
+                if registerUser(req, p_email, p_pw_local, "", register_without_nickname=True) == 0:
+                    query_result = run_sql("SELECT id from user where email=%s", (p_email,))
                 else:
-                    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email, p_pw,))
-                    user_prefs = get_user_preferences(query_result[0][0])
-                    user_prefs["login_method"] = login_method
-                    set_user_preferences(query_result[0][0], user_prefs)
+                    return([], p_email, p_pw_local, 13)
+            try:
+                groups = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_groups_membership(p_email, p_pw)
+                # groups is a dictionary {group_name : group_description,}
+            except AttributeError:
+                pass
+            except WebAccessExternalAuthError:
+                return([], p_email, p_pw, 16)
+            else: # Groups synchronization
+                if groups != 0:
+                    userid = query_result[0][0]
+                    from invenio.webgroup import synchronize_external_groups
+                    synchronize_external_groups(userid, groups, login_method)
+
+            user_prefs = get_user_preferences(query_result[0][0])
+            user_prefs["login_method"] = login_method
+            for key in user_prefs.keys():
+                if key.startswith('EXTERNAL_'):
+                    del user_prefs[key]
+            try:
+                new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw)
+                for key, value in new_prefs.items():
+                    user_prefs['EXTERNAL_' + key] = value
+            except AttributeError:
+                pass
+            except WebAccessExternalAuthError:
+                return([], p_email, p_pw, 16)
+            set_user_preferences(query_result[0][0], user_prefs)
         else:
-            return ([], p_email, p_pw, 10)
-
-    query_result = run_sql("SELECT id from user where email=%s and password=%s", (p_email, p_pw,))
-    if query_result:
-        prefered_login_method = get_user_preferences(query_result[0][0])['login_method']
-    else:
-        return ([], p_email, p_pw, 14)
-
-    if login_method != prefered_login_method:
-        if CFG_EXTERNAL_AUTHENTICATION.has_key(prefered_login_method):
-            return ([], p_email, p_pw, 11)
-
+            return ([], p_un, p_pw, 10)
+    else: # Internal Authenthication
+        query_result = run_sql("SELECT id,email from user where email=%s and password=%s", (p_email, p_pw,))
+        if query_result:
+            #FIXME drop external groups and settings
+            prefered_login_method = get_user_preferences(query_result[0][0])['login_method']
+            p_email = query_result[0][1]
+            if login_method != prefered_login_method:
+                if CFG_EXTERNAL_AUTHENTICATION.has_key(prefered_login_method):
+                    return ([], p_email, p_pw, 11)
+        else:
+            return ([], p_email, p_pw, 14)
+    # Login successful! Updating the last access time
+    run_sql("UPDATE user SET last_login=NOW() WHERE email=%s", (p_email, ))
     return (query_result, p_email, p_pw, 0)
+
+
 
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
@@ -430,8 +461,8 @@ def logoutUser(req):
 def username_exists_p(username):
     """Check if USERNAME exists in the system.  Username may be either
     nickname or email.
-    
-    Return 1 if it does exist, 0 if it does not. 
+
+    Return 1 if it does exist, 0 if it does not.
     """
 
     if username == "":
@@ -465,12 +496,13 @@ def nicknameUnique(p_nickname):
         return 0
     return -1
 
-def update_Uid(req, p_email, p_pw):
+def update_Uid(req, p_email):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system
     with a given email and password
     """
-    query_ID = int(run_sql("select id from user where email=%s and password=%s",
-                           (p_email, p_pw))[0][0])
+    query_ID = int(run_sql("select id from user where email=%s",
+                           (p_email,))[0][0])
+
     setUid(req, query_ID)
     return query_ID
 
@@ -607,7 +639,7 @@ def create_userinfobox_body(req, uid, language="en"):
             url_referer = weburl + req.unparsed_uri
     else:
         url_referer = weburl
-        
+
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
@@ -719,7 +751,9 @@ def get_user_preferences(uid):
     return None
 
 def set_user_preferences(uid, pref):
-    run_sql("UPDATE user SET settings='%s' WHERE id=%s" % (serialize_via_marshal(pref), uid))
+    assert(type(pref) == type({}))
+    run_sql("UPDATE user SET settings=%s WHERE id=%s",
+            (serialize_via_marshal(pref), uid))
 
 def get_default_user_preferences():
     user_preference = {
@@ -733,7 +767,7 @@ def get_default_user_preferences():
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(dumps(obj)))
+    return compress(dumps(obj))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
     return loads(decompress(string))

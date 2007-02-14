@@ -10,7 +10,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,7 +20,7 @@
     title="WebAccess Admin Guide" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>  &gt; <a class=navtrail href=<WEBURL>/admin/webaccess/>WebAccess Admin</a> " \
     navbar_name="admin" \
-    navbar_select="webaccess-admin-guide" 
+    navbar_select="webaccess-admin-guide"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
@@ -39,18 +39,18 @@
   different areas of access. I.e <em>administrator of the photo
   collection</em> or <em>system librarian</em>. Users can be active in
   different areas and of course connected to as many roles as needed.
-  
+
   The roles are connected to actions. An action identifies a task you
   can perform in CDS Invenio. It can be defined to take any number of
   arguments in order to more clearly describe what you are allowing
   connected users to do.
-  
+
   For example the system librarian can be allowed to run bibwords on
   the different indexes. To allow system librarians to run the
   bibwords indexing on the field author we connect role <em>system
   librarian</em> with action <em>runbibwords</em> using the argument
   <em>index='author'</em>.
-  
+
   WebAccess is based on allowing users to perform actions. This means
   that only allowed actions are stored in the access control engine's
   database.
@@ -67,7 +67,7 @@ features/design choices in common
   stepwise. The subtitle contains information about wich step you are
   on and what you are supposed to do.
 
-- Restart from any wanted step 
+- Restart from any wanted step
 
   You can always start from an earlier step by simply clicking the
   wanted button. This is not a way to undo changes! No information
@@ -107,19 +107,19 @@ I. Role area</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
       <a class="navtrail" href="">Manage WebAccess</a>  &gt; Role Administration
      </td>
-   
+
     </tr>
    </table>
    </div>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
       <td class="pagebodystripemiddle" align="left">
-      
+
        <h1 class="headline">Role Administration</h1>
        <table class="admin_wvar" width="100%" summary="">
         <thead>
@@ -139,7 +139,7 @@ I. Role area</a>
             <dt>Roles:</dt>
             <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
            </dl>
-   
+
            <table class="admin_wvar_nomargin" summary="">
             <tr>
              <th class="adminheader">id</th>
@@ -151,25 +151,25 @@ I. Role area</a>
              <th class="adminheader"></th>
              <th class="adminheader"></th>
             </tr>
-       
+
             <tr>
              <td class="admintdright">2</td>
              <td class="admintdleft">photoadmin</td>
              <td class="admintdleft">administrator of the photo col...</td>
              <td class="admintdleft">
-              <a href="">add</a> / 
+              <a href="">add</a> /
               <a href="">remove</a>
              </td>
              <td class="admintdleft">
-              <a href="">add</a> / 
-              <a href="">modify</a> / 
+              <a href="">add</a> /
+              <a href="">modify</a> /
               <a href="">remove</a>
              </td>
-             
+
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
              <td rowspan="4" style="vertical-align: bottom">
-             
+
              </td>
             </tr>
              <tr>
@@ -177,65 +177,65 @@ I. Role area</a>
              <td class="admintdleft">submitter</td>
              <td class="admintdleft"></td>
              <td class="admintdleft">
-              <a href="">add</a> / 
+              <a href="">add</a> /
               <a href="">remove</a>
              </td>
-             
-             <td class="admintdleft"><a href="">add</a> / 
-              <a href="">modify</a> / 
+
+             <td class="admintdleft"><a href="">add</a> /
+              <a href="">modify</a> /
               <a href="">remove</a>
              </td>
-             
+
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
-            </tr> 
-            
+            </tr>
+
             <tr>
              <td class="admintdright">1</td>
              <td class="admintdleft">superadmin</td>
              <td class="admintdleft">all rights</td>
              <td class="admintdleft"><a href="">add</a> / <a href="">remove</a></td>
-             <td class="admintdleft"><a href="">add</a> / 
-              <a href="">modify</a> / 
+             <td class="admintdleft"><a href="">add</a> /
+              <a href="">modify</a> /
               <a href="">remove</a>
              </td>
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
-            </tr> 
-            
+            </tr>
+
             <tr>
              <td class="admintdright">4</td>
              <td class="admintdleft">systemlibrarian</td>
              <td class="admintdleft">system librarian</td>
              <td class="admintdleft">
-              <a href="">add</a> / 
+              <a href="">add</a> /
               <a href="">remove</a>
              </td>
-             <td class="admintdleft"><a href="">add</a> / 
-              <a href="">modify</a> / 
+             <td class="admintdleft"><a href="">add</a> /
+              <a href="">modify</a> /
               <a href="">remove</a>
              </td>
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
-            </tr> 
+            </tr>
 
             <tr>
              <td class="admintdright">3</td>
              <td class="admintdleft">webaccessadmin</td>
              <td class="admintdleft">access to web administrator in...</td>
              <td class="admintdleft">
-              <a href="">add</a> / 
+              <a href="">add</a> /
               <a href="">remove</a>
              </td>
-             <td class="admintdleft"><a href="">add</a> / 
-              <a href="">modify</a> / 
+             <td class="admintdleft"><a href="">add</a> /
+              <a href="">modify</a> /
               <a href="">remove</a>
              </td>
              <td class="admintdleft"><a href="">delete</a></td>
              <td class="admintdleft"><a href="">show details</a></td>
-            </tr> 
+            </tr>
 
-           </table> 
+           </table>
           </td>
           <td style="vertical-align: top; margin-top: 5px; width: 25%;">
            <dl>
@@ -252,25 +252,25 @@ I. Role area</a>
      </tr>
     </table>
    </div>
-   
+
 </div>
 
 <pre>
 
 II. Example - connecting role and user</a>
-  
+
   One of the important tasks that can be handled via the WebAccess Admin Web Interface
-  is the delegation of access rights to users. This is done by connecting them to the 
+  is the delegation of access rights to users. This is done by connecting them to the
   different roles offered.
 
-  The task is divided into 5 simple and comprehensive steps. Below follows the pages from 
+  The task is divided into 5 simple and comprehensive steps. Below follows the pages from
   the different steps with comments on the ongoing procedure.
 
 - step 1 - select a role
 
   You must first select the role you want to connect users to. All the available roles are
   listed alfabetically in a select box. Just find the wanted role and select it. Then click on
-  the button saying &quot;select role&quot;. 
+  the button saying &quot;select role&quot;.
 
   If you start from the Role Area, this step is already done, and you start directly on step 2.
 
@@ -281,13 +281,13 @@ II. Example - connecting role and user</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
-      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
+      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role
      </td>
-   
+
     </tr>
    </table>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
@@ -330,7 +330,7 @@ II. Example - connecting role and user</a>
      </tr>
     </table>
    </div>
-   
+
 </div>
 
 <pre>
@@ -341,7 +341,7 @@ II. Example - connecting role and user</a>
   which step you are on and what your current task is.
 
   There can be possibly thousands of users using your online library, therefore it is important
-  to make it easier to identify the user you are looking for. Give part of, or the entire search 
+  to make it easier to identify the user you are looking for. Give part of, or the entire search
   string and all users with partly matching e-mails will be listed on the next step.
 
   You can also see that the right hand menu has changed. This area is always updated with links
@@ -354,13 +354,13 @@ II. Example - connecting role and user</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
-      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
+      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role
      </td>
-   
+
     </tr>
    </table>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
@@ -395,7 +395,7 @@ II. Example - connecting role and user</a>
                <input class="admin_wvar" type="text" name="email_user_pattern" value="">
                <input type="hidden" name="id_role" value="1">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="search for users">
               </td>
              </tr>
@@ -427,7 +427,7 @@ II. Example - connecting role and user</a>
      </tr>
     </table>
    </div>
-   
+
 </div>
 
 <pre>
@@ -438,7 +438,7 @@ II. Example - connecting role and user</a>
   you want to connect to the role and continue.
 
   Notice the navigation trail that tells you were on the Administrator pages you are currently
-  working. 
+  working.
 
 </pre>
 
@@ -447,13 +447,13 @@ II. Example - connecting role and user</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
-      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
+      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role
      </td>
-   
+
     </tr>
    </table>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
@@ -480,22 +480,22 @@ II. Example - connecting role and user</a>
             </select>
             <input class="adminbutton" type="submit" value="select role">
            </form>
-   
+
            <form action="" method="POST">
             <table summary="">
              <tr>
-              <td> 
+              <td>
                <span class="adminlabel">2. search pattern </span>
                <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
                <input type="hidden" name="id_role" value="1">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="search for users">
               </td>
              </tr>
             </table>
            </form>
-   
+
            <form action="" method="POST">
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
@@ -535,7 +535,7 @@ II. Example - connecting role and user</a>
      </tr>
     </table>
    </div>
-   
+
 </div>
 
 <pre>
@@ -555,13 +555,13 @@ II. Example - connecting role and user</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
-      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
+      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role
      </td>
-   
+
     </tr>
    </table>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
@@ -588,22 +588,22 @@ II. Example - connecting role and user</a>
             </select>
             <input class="adminbutton" type="submit" value="select role">
            </form>
-   
+
            <form action="" method="POST">
             <table summary="">
              <tr>
-              <td> 
+              <td>
                <span class="adminlabel">2. search pattern </span>
                <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
                <input type="hidden" name="id_role" value="1">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="search for users">
               </td>
              </tr>
             </table>
            </form>
-   
+
            <form action="" method="POST">
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
@@ -617,17 +617,17 @@ II. Example - connecting role and user</a>
             <input type="hidden" name="email_user_pattern" value="k">
             <input class="adminbutton" type="submit" value="add this user">
            </form>
-   
+
            <form action="" method="POST">
             <table summary="">
              <tr>
-              <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>? 
+              <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>?
                <input type="hidden" name="confirm" value="1">
                <input type="hidden" name="id_user" value="100">
                <input type="hidden" name="id_role" value="1">
                <input type="hidden" name="email_user_pattern" value="k">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="confirm">
               </td>
              </tr>
@@ -659,14 +659,14 @@ II. Example - connecting role and user</a>
      </tr>
     </table>
    </div>
-   
+
 </div>
 
 <pre>
 
 - step 5 - confirm user added.
 
-  The user has now been added to this role. You can easily continue adding more users to this 
+  The user has now been added to this role. You can easily continue adding more users to this
   role be restarting from step 2 or 3. You can also go directly to another area and keep working
   on the same role.
 
@@ -677,13 +677,13 @@ II. Example - connecting role and user</a>
    <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
     <tr>
      <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt; 
-      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role 
+      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
+      <a class="navtrail" href="">Manage WebAccess</a> &gt; <a class="navtrail" href="">Role Administration</a>  &gt; Connect user to role
      </td>
-   
+
     </tr>
    </table>
-   
+
    <div class="pagebody">
     <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
      <tr valign="top">
@@ -710,22 +710,22 @@ II. Example - connecting role and user</a>
             </select>
             <input class="adminbutton" type="submit" value="select role">
            </form>
-   
+
            <form action="" method="POST">
             <table summary="">
              <tr>
-              <td> 
+              <td>
                <span class="adminlabel">2. search pattern </span>
                <input class="admin_wvar" type="text" name="email_user_pattern" value="k">
                <input type="hidden" name="id_role" value="1">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="search for users">
               </td>
              </tr>
             </table>
            </form>
-   
+
            <form action="" method="POST">
             <span class="adminlabel">3. select user</span>
             <select name="id_user" class="admin_w200">
@@ -739,25 +739,25 @@ II. Example - connecting role and user</a>
             <input type="hidden" name="email_user_pattern" value="k">
             <input class="adminbutton" type="submit" value="add this user">
            </form>
-   
+
            <form action="" method="POST">
             <table summary="">
              <tr>
-              <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>? 
+              <td>add user <strong>mikael.vik@cern.ch</strong> to role <strong>superadmin</strong>?
                <input type="hidden" name="confirm" value="1">
                <input type="hidden" name="id_user" value="100">
                <input type="hidden" name="id_role" value="1">
                <input type="hidden" name="email_user_pattern" value="k">
               </td>
-              <td style="vertical-align: bottom"> 
+              <td style="vertical-align: bottom">
                <input class="adminbutton" type="submit" value="confirm">
               </td>
              </tr>
             </table>
            </form>
-   
+
            <p>confirm: user <strong>mikael.vik@cern.ch</strong> added to role <strong>superadmin</strong>.</p>
-   
+
           </td>
           <td style="vertical-align: top; margin-top: 5px; width: 25%;">
            <dl>
@@ -784,9 +784,9 @@ II. Example - connecting role and user</a>
      </tr>
     </table>
    </div>
-    
+
 </div>
- 
+
 <pre>
 
 - we are done
@@ -834,7 +834,7 @@ II. Example - connecting role and user</a>
 
     Define how open the site is:
       0 = normal operation of the site
-      1 = read-only site, all write operations temporarily closed 
+      1 = read-only site, all write operations temporarily closed
       2 = site fully closed
       CFG_ACCESS_CONTROL_LEVEL_SITE = 0
     Access policy for guests:
@@ -848,7 +848,7 @@ II. Example - connecting role and user</a>
       3 = Users cannot register or update email address or password, only admin can register accounts.
       4 = Same as 3, but user cannot change login method.
       CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS = 0
-      
+
     Limit email addresses available to use when register a new account (example: cern.ch):
       CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = ""
 
@@ -862,14 +862,14 @@ II. Example - connecting role and user</a>
       CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION = 0
 
     Send an email to the user notifying when the account is deleted/rejected:
-      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0 
+      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION = 0
 
   - Account overview:
     Here you find an overview of the number of guest accounts, registered accounts and accounts
     awaiting activation, with a link to the activation page.
 
   - Create account:
-    For creating new accounts, the email address must be unique. If configured to do so, an email 
+    For creating new accounts, the email address must be unique. If configured to do so, an email
     will be sent to the given address when an account is created.
 
   - Edit accounts:
@@ -882,8 +882,8 @@ II. Example - connecting role and user</a>
   - Edit account:
     When editing one account, you can change the email address, password, delete the account, or modify
     the baskets or alerts belonging to one account. Which login method should be the default for this
-    account can also be selected. To modify baskets or alerts, you need to login as the user, and 
-    modify the desired data as a normal user. Remember to log out as the user when you are finished 
+    account can also be selected. To modify baskets or alerts, you need to login as the user, and
+    modify the desired data as a normal user. Remember to log out as the user when you are finished
     editing.
 
 </pre>
@@ -891,10 +891,10 @@ II. Example - connecting role and user</a>
 <h2><a name="5">V. Managing login methods</a></h2>
 <pre>
    CDS Invenio supports using external login systems to authenticate users.
- 
-   When a user wants to login, the username and password given by the user is checked against the selected 
+
+   When a user wants to login, the username and password given by the user is checked against the selected
    system, if the user is authenticated by the external system, a valid email-address is returned to
-   CDS Invenio and used to recognize the user within CDS Invenio. 
+   CDS Invenio and used to recognize the user within CDS Invenio.
 
    If a new user is trying to login without having an account, using an external login system, an account
    is automatically created in CDS Invenio to recognize and store the users settings. The password for the
@@ -904,41 +904,91 @@ II. Example - connecting role and user</a>
    of certain external systems, set CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS to 4 as mentioned in the last paragraph.
 
    If a user is changing login method from an external one to the internal, he also need to either change the
-   password before logging out, or ask to get the password sent by email, since the password is randomly 
+   password before logging out, or ask to get the password sent by email, since the password is randomly
    generated for the local account when using an external login method.
 
    If a external login system is used, you may want to protect the users username / password using HTTPS.
 
-   To add new system, two changes must be made:
+   To add new system, two changes must be made (for the time being):
    - The name of the method, if it is default or not, and the classname must be added to the variable
      CFG_EXTERNAL_AUTHENTICATION in access_control_config.py. Atleast one method must be marked as the
      default one. The internal login method should be given with None as classname.
 
      Example:
-      CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)": 
-                                     (external_auth_nice(), False)}
+      CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)":
+                                                        (AuthCernWrapper(), False)}
 
-   - A class must be added in the file external_authentication.py. This class must include the 
+   - A class must be created derived from the class external_authentication inside file
+     external_authentication.py. This class must include at least the
      function auth_user. This function returns a valid email-address in CDS Invenio if the user
      is authenticated, not necessarily the same entered by the user as username. If the user
      is not authenticated, return None.
+     The class could also provide three more methods: fetch_user_preferences, fetch_user_groups_membership
+     and fetch_all_users_groups_membership.
+     The first should take an email and eventually a password and should return a dictionary of keys
+     and value representing external preferences, infos or settings. If, for some reasons, you like
+     to force some kind of hiding for some particular field you should export the related key
+     prefixed by "HIDDEN_". Those fields won't be displayed in tables and pages regarding external
+     settings.
+     The second method should take an email and (if necessary) a password
+     and should return a dictionary of external_groups_names toghether with their description, for which
+     the user has a membership. Those groups will be merged into the groups system.
+     The user will be a member of those groups and will be able to use them in any place
+     where groups are useful, but won't be able to unsubscribe or to administrate them.
+     The third method should just return a dictionary of external groups as keys and touples containing
+     a group description and a list of email of users belonging to each groups. Those memberships
+     will be merged into the database in the way done by the previous method, but could
+     provide batch synchronization of groups.
 
      Example template:
 
-      class external_auth_template:
-          """External authentication template example."""
-          
-          def __init__ (self):
-              """Initialize stuff here"""
-              pass
-      
-          def auth_user(self, username, password):
-              """Authenticate user-supplied USERNAME and PASSWORD.  Return
-              None if authentication failed, or the email address of the
-              person if the authentication was successful.  In order to do
-              this you may perhaps have to keep a translation table between
-              usernames and email addresses."""
-              return None
-      
+     from invenio.external_authentication import ExternalAuth, WebAccessExternalAuthError
+
+     class ExternalAuthFoo(ExternalAuth):
+         """External authentication template example."""
+
+         def __init__(self):
+             """Initialize stuff here."""
+             self.name = None
+             pass
+
+         def auth_user(self, username, password):
+             """Authenticate user-supplied USERNAME and PASSWORD.
+             Return None if authentication failed, or the email address of the
+             person if the authentication was successful.  In order to do
+             this you may perhaps have to keep a translation table between
+             usernames and email addresses.
+             Raise WebAccessExternalAuthError in case of external troubles.
+             """
+             raise NotImplementedError
+             #return None
+
+         def fetch_user_groups_membership(self, username, password=None):
+             """Given a username, returns a dictionary of groups
+             and their description to which the user is subscribed.
+             Raise WebAccessExternalAuthError in case of troubles.
+             """
+             raise NotImplementedError
+             #return {}
+
+         def fetch_user_preferences(self, username, password=None):
+             """Given a username and a password, returns a dictionary of keys and
+             values, corresponding to external infos and settings.
+
+             userprefs = {"telephone": "2392489",
+             "address": "10th Downing Street"}
+             """
+             raise NotImplementedError
+            #return {}
+
+         def fetch_all_users_groups_membership(self):
+             """Fetch all the groups with a description, and users who belong to
+             each groups.
+             @return {'mygroup': ('description', ['email1', 'email2', ...]), ...}
+             """
+             raise NotImplementedError
+
+
+
 - end of file -
 </pre>

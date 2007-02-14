@@ -28,13 +28,15 @@ __revision__ = "$Id$"
 CFG_WEBSESSION_GROUP_JOIN_POLICY = {'VISIBLEOPEN': 'VO',
                                     'VISIBLEMAIL': 'VM',
                                     'INVISIBLEOPEN': 'IO',
-                                    'INVISIBLEMAIL': 'IM'  
+                                    'INVISIBLEMAIL': 'IM',
+                                    'VISIBLEEXTERNAL' : 'VE'
                                     }
 
 CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'MEMBER':'M',
                                    'PENDING':'P'
                                    }
+
 
 CFG_WEBSESSION_ERROR_MESSAGES = {
     'ERR_WEBSESSION_DB_ERROR': '_("Sorry there was an error with the database.")',
@@ -53,7 +55,7 @@ CFG_WEBSESSION_WARNING_MESSAGES = {
     'WRN_WEBSESSION_NO_MEMBER_SELECTED': '_("Please choose a member if you want to remove him from the group.")',
     'WRN_WEBSESSION_NO_USER_SELECTED_ADD': '_("Please choose a user from the list if you want him to be added to the group.")',
     'WRN_WEBSESSION_ALREADY_MEMBER_ADD': '_("The user is already member of the group.")',
-    'WRN_WEBSESSION_ALREADY_MEMBER_REJECT': '_("The user request for joining group has already been rejected.")', 
+    'WRN_WEBSESSION_ALREADY_MEMBER_REJECT': '_("The user request for joining group has already been rejected.")',
     'WRN_WEBSESSION_NO_USER_SELECTED_DEL': '_("Please choose a user from the list if you want him to be removed from waiting list.")'
 }
 
@@ -66,5 +68,5 @@ CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created 
                                 "MEMBER_REJECTED": 'You have successfully removed a waiting member from the list.',
                                 "JOIN_REQUEST": 'The group administrator has been notified of your request.',
                                 "LEAVE_GROUP": 'You have successfully left a group.'
-                               
+
 }

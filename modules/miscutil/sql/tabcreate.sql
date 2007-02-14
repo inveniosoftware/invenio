@@ -2373,7 +2373,7 @@ CREATE TABLE IF NOT EXISTS user (
   email varchar(255) NOT NULL default '',
   password varchar(20) default NULL,
   note varchar(255) default NULL,
-  settings varchar(255) default NULL,
+  settings blob default NULL,
   nickname varchar(255) NOT NULL default '',
   last_login datetime NOT NULL default '0000-00-00 00:00:00',
   UNIQUE KEY id (id),
@@ -2388,7 +2388,9 @@ CREATE TABLE IF NOT EXISTS usergroup (
   name varchar(50) NOT NULL default '',
   description text default '',
   join_policy char(2) NOT NULL default '',
+  login_method varchar(255) NOT NULL default 'INTERNAL',
   PRIMARY KEY  (id),
+  UNIQUE KEY login_method_name (login_method, name),
   KEY name (name)
 ) TYPE=MyISAM;
 

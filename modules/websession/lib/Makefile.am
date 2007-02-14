@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,9 +20,11 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
-             websession_templates.py websession_webinterface.py	\
-	     webgroup.py webgroup_dblayer.py websession_config.py \
-             webaccount.py websession_regression_tests.py
+	websession_templates.py websession_webinterface.py \
+	webgroup.py webgroup_dblayer.py websession_config.py \
+	webaccount.py websession_regression_tests.py \
+	webgroup_regression_tests.py webuser_regression_tests.py \
+	webgroup_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

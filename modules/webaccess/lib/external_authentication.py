@@ -24,64 +24,18 @@
 __revision__ = \
     "$Id$"
 
-import httplib
-import urllib
-import re
 
-from invenio.config import etcdir
+class WebAccessExternalAuthError(Exception):
+    """Exception to signaling general external trouble."""
+    pass
 
-class external_auth_nice:
-    """
-    External authentication example for a custom HTTPS-based
-    authentication service (CERN NICE).
-    """
-    
-    users = {}
-    name = ""
 
-    def __init__(self):
-        """Initialize stuff here"""
-        self._cern_nice_soap_auth = \
-          open(etcdir + "/webaccess/cern_nice_soap_credentials.txt",
-               "r").read().strip()
-
-    def auth_user(self, username, password):
-        """
-        Check USERNAME and PASSWORD against CERN NICE database.
-        Return None if authentication failed, email address of the
-        person if authentication succeeded.
-        """
-        
-        params = urllib.urlencode({'UserName': username, 'Password': password})
-        headers = {"Content-type": "application/x-www-form-urlencoded",
-                   "Accept": "text/plain",
-                   "Authorization": "Basic " + self._cern_nice_soap_auth}
-        conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch") 
-        conn.request("POST",
-                "/winservices-soap/generic/Authentication.asmx/GetUserInfo",
-                params, headers)
-        response = conn.getresponse()
-        data = response.read()
-        conn.close()
-        
-        match = re.search('<ccid>\d+</ccid>', data)
-        if match:
-            match = match.group()
-            ccid = int(re.search('\d+', match).group())
-            if ccid > 0:
-                match = re.search('<email>.*?</email>', data)
-                if match:
-                    email = match.group()
-                    email = email.replace('<email>', '')   
-                    email = email.replace('</email>', '')  
-                    return email 
-        return None
-
-class external_auth_template:
+class ExternalAuth:
     """External authentication template example."""
-    
+
     def __init__(self):
         """Initialize stuff here"""
+        self.name = None
         pass
 
     def auth_user(self, username, password):
@@ -89,5 +43,38 @@ class external_auth_template:
         None if authentication failed, or the email address of the
         person if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
-        usernames and email addresses."""
-        return None
+        usernames and email addresses.
+        Raise WebAccessExternalAuthError in case of external troubles.
+        """
+        raise NotImplementedError
+        #return None
+
+    def fetch_user_groups_membership(self, username, password=None):
+        """Given a username, returns a dictionary of groups
+        and their description to which the user is subscribed.
+        Raise WebAccessExternalAuthError in case of troubles.
+        """
+        raise NotImplementedError
+        #return {}
+
+    def fetch_user_preferences(self, username, password=None):
+        """Given a username and a password, returns a dictionary of keys and
+        values, corresponding to external infos and settings.
+
+        userprefs = {"telephone": "2392489",
+                     "address": "10th Downing Street"}
+
+        (WEBUSER WILL erase all prefs that starts by EXTERNAL_ and will
+        store: "EXTERNAL_telephone"; all internal preferences can use whatever
+        name but starting with EXTERNAL). If a pref begins with HIDDEN_ it will
+        be ignored.
+        """
+        raise NotImplementedError
+        #return {}
+
+    def fetch_all_users_groups_membership(self):
+        """Fetch all the groups with a description, and users who belong to
+        each groups.
+        @return {'mygroup': ('description', ['email1', 'email2', ...]), ...}
+        """
+        raise NotImplementedError

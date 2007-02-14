@@ -63,7 +63,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     def index(self, req, form):
         redirect_to_url(req, '%s/youraccount/display' % sweburl)
-        
+
     def display(self, req, form):
         args = wash_urlargd(form, {})
         uid = webuser.getUid(req)
@@ -103,7 +103,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
 
     def edit(self, req, form):
-        args = wash_urlargd(form, {})
+        args = wash_urlargd(form, {"verbose" : (int, 0)})
         uid = webuser.getUid(req)
 
         # load the right message language
@@ -118,7 +118,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title= _("Your Settings"),
                     body=webaccount.perform_set(webuser.get_email(uid),
                                                 webuser.get_password(uid),
-                                                args['ln']),
+                                                args['ln'], verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Your Settings",
                     keywords="CDS, personalize",
@@ -134,14 +134,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'email': (str, None),
             'password': (str, None),
             'password2': (str, None),
-            'login_method': (str, "")
+            'login_method': (str, ""),
+            'group_records' : (int, None),
+            'latestbox' : (int, None),
+            'helpbox' : (int, None),
             })
-        
+
         uid = webuser.getUid(req)
 
         # load the right message language
         _ = gettext_set_language(args['ln'])
-	
+
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/change")
 
@@ -157,7 +160,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../youraccount/change")
         elif args['email']:
             uid2 = webuser.emailUnique(args['email'])
-            uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname']) 
+            uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname'])
             if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
                                                            webuser.email_valid_p(args['email']))) \
                and (args['nickname'] is None or webuser.nickname_valid_p(args['nickname'])) \
@@ -206,6 +209,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 act = "edit"
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
+        elif args['group_records']:
+            prefs = webuser.get_user_preferences(uid)
+            prefs['websearch_group_records'] = args['group_records']
+            prefs['websearch_latestbox'] = args['latestbox']
+            prefs['websearch_helpbox'] = args['helpbox']
+            webuser.set_user_preferences(uid, prefs)
+            title = _("Settings edited")
+            act = "display"
+            linkname = _("Show account")
+            mess = _("User settings stored correctly.")
         else:
             mess = _("Could not update settings.")
             act = "edit"
@@ -414,8 +427,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             lastupdated=__lastupdated__)
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
             if len(iden)>0:
-
-                uid = webuser.update_Uid(req,args['p_un'], args['p_pw'])
+                uid = webuser.update_Uid(req,args['p_un'])
                 uid2 = webuser.getUid(req)
                 if uid2 == -1:
                     webuser.logoutUser(req)
@@ -482,7 +494,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         else:
             ruid = -2
         if ruid == 0:
-            uid = webuser.update_Uid(req,args['p_email'],args['p_pw'])
+            uid = webuser.update_Uid(req,args['p_email'])
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
@@ -491,7 +503,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 mess += _("A second email will be sent when the account has been activated and can be used.")
             else:
                 mess += " " + _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
-                    {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">', 
+                    {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">',
                      'x_url_close': '</a>'}
         elif ruid == -2:
             mess = _("Both passwords must match.")
@@ -542,12 +554,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
 
 class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
-    
+
     _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
-    
+
     def index(self, req, form):
         redirect_to_url(req, '/yourgroups/display')
-        
+
     def display(self, req, form):
         """
         Displays groups the user is admin of
@@ -564,9 +576,9 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/display")
 
-        (body, errors, warnings) = webgroup.perform_request_group_display(uid=uid,
+        (body, errors, warnings) = webgroup.perform_request_groups_display(uid=uid,
                                                                           ln=argd['ln'])
-        
+
         return page(title         = _("Your Groups"),
                     body          = body,
                     navtrail      = webgroup.get_navtrail(argd['ln']),
@@ -576,9 +588,9 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings)
-    
 
-    
+
+
     def create(self, req, form):
         """create(): interface for creating a new group
         @param group_name : name of the new webgroup.Must be filled
@@ -588,7 +600,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         @param ln: language
         @return the compose page Create group
         """
-        
+
         argd = wash_urlargd(form, {'group_name': (str, ""),
                                    'group_description': (str, ""),
                                    'join_policy': (str, ""),
@@ -601,28 +613,28 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/create")
-        
+
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
-            
+
         if argd['create_button'] :
             (body, errors, warnings)= webgroup.perform_request_create_group(uid=uid,
                                                                             group_name=argd['group_name'],
                                                                             group_description=argd['group_description'],
                                                                             join_policy=argd['join_policy'],
                                                                             ln = argd['ln'])
-            
-            
-        else: 
+
+
+        else:
             (body, errors, warnings) = webgroup.perform_request_input_create_group(group_name=argd['group_name'],
                                                                                    group_description=argd['group_description'],
                                                                                    join_policy=argd['join_policy'],
                                                                                    ln=argd['ln'])
         title = _("Create new group")
 
-        
+
         return page(title         = title,
                     body          = body,
                     navtrail      = webgroup.get_navtrail(argd['ln'], title),
@@ -632,17 +644,17 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings)
-    
+
     def join(self, req, form):
         """join(): interface for joining a new group
         @param grpID : list of the group the user wants to become a member.
         The user must select only one group.
-        @param group_name :  will search for groups matching group_name 
+        @param group_name :  will search for groups matching group_name
         @param *button: which button was pressed
         @param ln: language
         @return the compose page Join group
         """
-        
+
         argd = wash_urlargd(form, {'grpID':(list, []),
                                    'group_name':(str, ""),
                                    'find_button':(str, ""),
@@ -655,12 +667,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/join")
-        
+
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
-            
+
         if argd['join_button']:
             search = 0
             if argd['group_name']:
@@ -678,7 +690,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                                                  argd['group_name'],
                                                                                  search,
                                                                                  ln=argd['ln'])
-            
+
         title = _("Join New Group")
         return page(title         = title,
                     body          = body,
@@ -693,13 +705,13 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
     def leave(self, req, form):
         """leave(): interface for leaving a group
         @param grpID : group the user wants to leave.
-        @param group_name :  name of the group the user wants to leave 
+        @param group_name :  name of the group the user wants to leave
         @param *button: which button was pressed
         @param confirmed : the user is first asked to confirm
         @param ln: language
         @return the compose page Leave group
         """
-        
+
         argd = wash_urlargd(form, {'grpID':(str, ""),
                                    'group_name':(str, ""),
                                    'leave_button':(str, ""),
@@ -712,12 +724,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/leave")
-        
+
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
-            
+
         if argd['leave_button']:
             (body, errors, warnings) = webgroup.perform_request_leave_group(uid,
                                                                             argd['grpID'],
@@ -736,7 +748,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings)
-        
+
     def edit(self, req, form):
         """edit(): interface for editing group
         @param grpID : group ID
@@ -763,32 +775,32 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(argd['ln'])
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/display")               
-        
+            return webuser.page_not_authorized(req, "../yourgroups/display")
+
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
-            
+
         elif argd['delete']:
             (body, errors, warnings) = webgroup.perform_request_delete_group(uid=uid,
                                                                              grpID=argd['grpID'],
                                                                              confirmed=argd['confirmed'])
-            
+
         elif argd['update']:
-            
+
             (body, errors, warnings) = webgroup.perform_request_update_group(uid= uid,
                                                                              grpID=argd['grpID'],
                                                                              group_name=argd['group_name'],
                                                                              group_description=argd['group_description'],
                                                                              join_policy=argd['join_policy'],
                                                                              ln=argd['ln'])
-            
+
         else :
             (body, errors, warnings)= webgroup.perform_request_edit_group(uid=uid,
                                                                           grpID=argd['grpID'],
                                                                           ln=argd['ln'])
-                                                                 
+
 
 
         title = _("Edit Group")
@@ -801,7 +813,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings)
-    
+
 
     def members(self, req, form):
         """member(): interface for managing members of a group
@@ -813,7 +825,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         @param member_id : ID of the existing member selected
         @param pending_member_id : ID of the pending member selected
         @param cancel: button cancel pressed
-        @param info : info about last user action 
+        @param info : info about last user action
         @param ln: language
         @return the same page with data updated
         """
@@ -835,26 +847,26 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             url = weburl + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
-            
+
         if argd['remove_member']:
             (body, errors, warnings) = webgroup.perform_request_remove_member(uid=uid,
                                                                               grpID=argd['grpID'],
                                                                               member_id=argd['member_id'],
-                                                                              ln=argd['ln'])    
-            
+                                                                              ln=argd['ln'])
+
         elif argd['reject_member']:
             (body, errors, warnings) = webgroup.perform_request_reject_member(uid=uid,
                                                                               grpID=argd['grpID'],
                                                                               user_id=argd['pending_member_id'],
-                                                                              ln=argd['ln']) 
-        
+                                                                              ln=argd['ln'])
+
         elif argd['add_member']:
             (body, errors, warnings) = webgroup.perform_request_add_member(uid=uid,
                                                                            grpID=argd['grpID'],
                                                                            user_id=argd['pending_member_id'],
                                                                            ln=argd['ln'])
 
-        else: 
+        else:
             (body, errors, warnings)= webgroup.perform_request_manage_member(uid=uid,
                                                                              grpID=argd['grpID'],
                                                                              ln=argd['ln'])
@@ -869,4 +881,4 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     errors        = errors,
                     warnings      = warnings)
 
-    
+

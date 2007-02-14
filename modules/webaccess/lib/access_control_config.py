@@ -24,8 +24,8 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
+import external_authentication_cern
 from invenio.config import cdsname, sweburl, supportemail
-from invenio.external_authentication import *
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -49,12 +49,17 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
+
 # Use external source for access control?
 # Atleast one must be added
 # Adviced not to change the name, since it is used to identify the account
-# Format is:   System name: (System class, Default True/Flase), atleast one must be default
+# Format is:   System name: (System class, Default True/Flase), atleast one
+# must be default
 CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
-#CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)": (external_auth_nice(), False)}
+#CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), \
+#    "CERN (external)": (external_authentication_cern.ExternalAuthCern(), False)}
+
+
 
 # default data for the add_default_settings function
 
@@ -101,7 +106,7 @@ DEF_AUTHS = (
              (SUPERADMINROLE,    'runbibindex',          -1,      0,       {}),
              (SUPERADMINROLE,    'runbibupload',         -1,      0,       {}),
              (SUPERADMINROLE,    'runbibformat',         -1,      1,       {}),
-             (SUPERADMINROLE,    WEBACCESSACTION,        -1,      0,       {}), 
+             (SUPERADMINROLE,    WEBACCESSACTION,        -1,      0,       {}),
              ('photoadmin',      'runwebcoll',           -1,      0,       {'collection': 'Pictures'}),
              (WEBACCESSADMINROLE,WEBACCESSACTION,        -1,      0,       {}),
              (SUPERADMINROLE,    'runtaskex',            -1,      0,       {}),
@@ -120,30 +125,31 @@ CFG_WEBACCESS_MSGS = {
                                 0: 'Try to <a href="%s/youraccount/login?referer=%s/admin/%s">login</a> with another account.' % (sweburl, sweburl, "%s"),
                                 1: '<br>If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
                                 2: '<br>If you have any questions, please write to <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
-				3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % sweburl,
-				4: 'The site is temporarily closed for maintenance.  Please come back soon.',
- 				5: 'Authorization failure',
+                                3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % sweburl,
+                                4: 'The site is temporarily closed for maintenance.  Please come back soon.',
+                                5: 'Authorization failure',
                                 6: '%s temporarily closed' % cdsname,
                                 7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
                                 8: 'Functionality temporarily closed'
-		} 
+        }
 
 CFG_WEBACCESS_WARNING_MSGS = {
-           			0: 'Authorization granted',
-           			1: 'Error(1): You are not authorized to perform this action.',
+                                0: 'Authorization granted',
+                                1: 'Error(1): You are not authorized to perform this action.',
                                 2: 'Error(2): You are not authorized to perform any action.',
-           			3: 'Error(3): The action %s does not exist.',
+                                3: 'Error(3): The action %s does not exist.',
                                 4: 'Error(4): Unexpected error occurred.',
                                 5: 'Error(5): Missing mandatory keyword argument(s) for this action.',
                                 6: 'Error(6): Guest accounts are not authorized to perform this action.',
                                 7: 'Error(7): Not enough arguments, user ID and action name required.',
                                 8: 'Error(8): Incorrect keyword argument(s) for this action.',
-                                9: """Error(9): Account '%s' is not yet activated.""", 
+                                9: """Error(9): Account '%s' is not yet activated.""",
                                10: """Error(10): You were not authorized by the authentication method '%s'.""",
                                11: """Error(11): The selected login method '%s' is not the default method for this account, please try another one.""",
                                12: """Error(12): Selected login method '%s' does not exist.""",
                                13: """Error(13): Could not register '%s' account.""",
-                               14: """Error(14): Could not login using '%s', because this user is unknown.""", 
-                               15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password."""
-		} 
+                               14: """Error(14): Could not login using '%s', because this user is unknown.""",
+                               15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password.""",
+                               16: """Error(16): External authentication troubles (maybe temporary network problems)."""
+        }
 

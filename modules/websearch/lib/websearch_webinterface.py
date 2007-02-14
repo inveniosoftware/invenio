@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,7 +29,7 @@ from invenio.config import weburl, cdsname, cdslang, cachedir, cdsnameintl
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, http_check_credentials
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, get_user_preferences
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 
@@ -56,13 +56,13 @@ def wash_search_urlargd(form):
         argd['action'] = 'browse'
     elif argd['action_search']:
         argd['action'] = 'search'
-    else:    
+    else:
         if argd['action'] not in ('browse', 'search'):
             argd['action'] = 'search'
 
     del argd['action_browse']
     del argd['action_search']
-    
+
     return argd
 
 class WebInterfaceRecordPages(WebInterfaceDirectory):
@@ -74,19 +74,26 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.recid = recid
         self.files = WebInterfaceFilesPages(self.recid)
         return
-    
+
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
 
         req.argd = argd
 
-        from invenio.webuser import getUid, page_not_authorized
+        from invenio.webuser import getUid, page_not_authorized, get_user_preferences
 
         uid = getUid(req)
         if uid == -1:
             return page_not_authorized(req, "../")
-        
+        elif uid > 0:
+            pref = get_user_preferences(uid)
+            try:
+                argd['rg'] = int(pref['websearch_group_records'])
+            except KeyError, ValueError:
+                pass
+
+
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
@@ -115,7 +122,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.recid = recid
         self.files = WebInterfaceFilesPages(self.recid)
         return
-    
+
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
@@ -127,11 +134,17 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         uid = getUid(req)
         if uid == -1:
             return page_not_authorized(req, "../")
-        
+        elif uid > 0:
+            pref = get_user_preferences(uid)
+            try:
+                argd['rg'] = int(pref['websearch_group_records'])
+            except KeyError, ValueError:
+                pass
+
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
         def check_credentials(user, password):
             from invenio.webuser import auth_apache_user_collection_p
-            
+
             if not auth_apache_user_collection_p(user, password,
                                                  record_primary_collection):
                 return False
@@ -149,7 +162,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         if out == []:
             return str(out)
         else:
-            return out                
+            return out
 
     # Return the same page wether we ask for /record/123 or /record/123/
     index = __call__
@@ -164,8 +177,14 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         argd = wash_search_urlargd(form)
 
         uid = getUid(req)
-        if uid == -1: 
+        if uid == -1:
             return page_not_authorized(req, "../search")
+        elif uid > 0:
+            pref = get_user_preferences(uid)
+            try:
+                argd['rg'] = int(pref['websearch_group_records'])
+            except KeyError, ValueError:
+                pass
 
         # If any of the collection requires authentication, redirect
         # to the authentication form.
@@ -185,11 +204,11 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             return str(out)
         else:
             return out
-        
+
     def cache(self, req, form):
         argd = wash_urlargd(form, {'action': (str, 'show')})
         return search_engine.perform_request_cache(req, action=argd['action'])
-    
+
     def log(self, req, form):
         argd = wash_urlargd(form, {'date': (str, '')})
         return search_engine.perform_request_log(req, date=argd['date'])
@@ -200,7 +219,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
         def check_credentials(user, password):
             from invenio.webuser import auth_apache_user_collection_p
-            
+
             for coll in argd['c'] + [argd['cc']]:
                 if not auth_apache_user_collection_p(user, password, coll):
                     return False
@@ -213,12 +232,21 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # search_engine itself to derivate other queries
         req.argd = argd
 
+        uid = getUid(req)
+        if uid > 0:
+            pref = get_user_preferences(uid)
+            try:
+                argd['rg'] = int(pref['websearch_group_records'])
+            except KeyError, ValueError:
+                pass
+
+
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:
-            return out                
+            return out
 
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
@@ -243,7 +271,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         if component == 'collection':
             c = '/'.join(path)
-        
+
             def answer(req, form):
                 # Accessing collections: this is for accessing the
                 # cached page on top of each collection.
@@ -257,9 +285,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # collection argument not present; display
                     # home collection by default
                     argd['c'] = cdsname
-                    
+
                 return display_collection(req, **argd)
-        
+
             return answer, []
 
         elif component == 'record' or component == 'record-restricted':
@@ -287,7 +315,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         return None, []
 
-    
+
     def legacy_collection(self, req, form):
         argd = wash_urlargd(form, legacy_collection_default_urlargd)
 
@@ -296,7 +324,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         # default collection.
         if not form.has_key('c'):
             return display_collection(req, **argd)
-        
+
         # make the collection an element of the path, and keep the
         # other query elements as is. If the collection is cdsname,
         # however, redirect to the main URL.
@@ -320,13 +348,13 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         if argd['recid'] != -1:
             target = '/record/%d' % argd['recid']
             del argd['recid']
-            
+
         else:
             target = '/search'
 
         target += make_canonical_urlargd(argd, search_results_default_urlargd)
         return redirect_to_url(req, target)
-        
+
 
 def display_collection(req, c, as, verbose, ln):
     "Display search interface page for collection c by looking in the collection cache."
@@ -339,7 +367,7 @@ def display_collection(req, c, as, verbose, ln):
 
     req.argd = drop_default_urlargd({'as': as, 'verbose': verbose, 'ln': ln},
                                     search_interface_default_urlargd)
-    
+
     # get user ID:
     try:
         uid = getUid(req)
@@ -348,7 +376,7 @@ def display_collection(req, c, as, verbose, ln):
     except Error, e:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
+                    description="%s - Internal Error" % cdsname,
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
                     req=req)
@@ -394,7 +422,7 @@ def display_collection(req, c, as, verbose, ln):
             title = cdsnameintl[ln]
         else:
             title = get_coll_i18nname(c, ln)
-            
+
         return page(title=title,
                     body=c_body,
                     navtrail=c_navtrail,
@@ -407,26 +435,26 @@ def display_collection(req, c, as, verbose, ln):
                     cdspageboxrighttopadd=c_portalbox_rt,
                     titleprologue=c_portalbox_tp,
                     titleepilogue=c_portalbox_te,
-                    lastupdated=c_last_updated)                    
-    except:        
+                    lastupdated=c_last_updated)
+    except:
         if verbose >= 9:
             req.write("<br>c=%s" % c)
-            req.write("<br>as=%s" % as)        
-            req.write("<br>ln=%s" % ln)        
+            req.write("<br>as=%s" % as)
+            req.write("<br>ln=%s" % ln)
             req.write("<br>colID=%s" % colID)
             req.write("<br>uid=%s" % uid)
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
-                    description="%s - Internal Error" % cdsname, 
+                    description="%s - Internal Error" % cdsname,
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     uid=uid,
                     language=ln,
                     req=req)
-         
-    return "\n"    
+
+    return "\n"
 
 class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
-    """RSS 2.0 feed service pages.""" 
+    """RSS 2.0 feed service pages."""
 
     def __call__(self, req, form):
         """RSS 2.0 feed service."""

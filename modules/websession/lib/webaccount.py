@@ -37,7 +37,6 @@ from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
 from invenio.access_control_admin import acc_findUserRoleActions
-
 from invenio.messages import gettext_set_language
 
 import invenio.template
@@ -55,6 +54,17 @@ def perform_info(req, ln):
             CFG_CERN_SITE = CFG_CERN_SITE,
            );
 
+def perform_display_external_user_settings(settings, ln):
+    """show external user settings witch is a dictionary."""
+    _ = gettext_set_language(ln)
+    html_settings = ""
+    print_settings = False
+    for key,value in settings.iteritems():
+        if key.startswith("EXTERNAL_") and not "HIDDEN_" in key:
+            print_settings = True
+            key = key[9:].capitalize()
+            html_settings += websession_templates.tmpl_external_setting(ln, key, value)
+    return print_settings and websession_templates.tmpl_external_user_settings(ln, html_settings) or ""
 
 def perform_youradminactivities(uid, ln):
     """Return text for the `Your Admin Activities' box.  Analyze
@@ -97,11 +107,11 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
         user = "guest"
         login = "%s/youraccount/login?ln=%s" % (sweburl, ln)
         accBody = _("You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user.") %\
-            {'x_url_open': '<a href="' + login + '">', 
+            {'x_url_open': '<a href="' + login + '">',
              'x_url_close': '</a>'}
-	accBody += "<br /><br />"
+        accBody += "<br /><br />"
         bask=aler=msgs= _("The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first") %\
-            {'x_fmt_open': '<strong class="headline">', 
+            {'x_fmt_open': '<strong class="headline">',
              'x_fmt_close': '</strong>',
              'x_url_open': '<a href="' + login + '">',
              'x_url_close': '</a>'}
@@ -149,7 +159,7 @@ def perform_delete(ln):
     return websession_templates.tmpl_account_delete(ln = ln)
 
 ## perform_set(email,password): edit your account parameters, email and password.
-def perform_set(email,password, ln):
+def perform_set(email,password, ln, verbose=0):
 
     try:
         res = run_sql("SELECT id, nickname FROM user WHERE email=%s", (email,))
@@ -172,14 +182,12 @@ def perform_set(email,password, ln):
              password_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3),
              nickname = nickname,
            )
-
-    if len(CFG_EXTERNAL_AUTHENTICATION) >= 1:
+    if len(CFG_EXTERNAL_AUTHENTICATION) > 1:
         try:
             uid = run_sql("SELECT id FROM user where email=%s", (email,))
             uid = uid[0][0]
         except:
             uid = 0
-        prefs = get_user_preferences(uid)
         current_login_method = prefs['login_method']
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
         methods.sort()
@@ -190,6 +198,28 @@ def perform_set(email,password, ln):
                  current = current_login_method,
                  method_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4)
                )
+    try:
+        current_group_records = prefs['websearch_group_records']
+    except KeyError:
+        current_group_records = 10
+    try:
+        show_latestbox = prefs['websearch_latestbox']
+    except KeyError:
+        show_latestbox = True
+    try:
+        show_helpbox = prefs['websearch_helpbox']
+    except KeyError:
+        show_helpbox = True
+    out += websession_templates.tmpl_user_websearch_edit(
+                ln = ln,
+                current = current_group_records,
+                show_latestbox = show_latestbox,
+                show_helpbox = show_helpbox,
+                )
+    if verbose >= 9:
+        for key, value in prefs.items():
+            out += "<b>%s</b>:%s<br>" % (key, value)
+    out += perform_display_external_user_settings(prefs, ln)
     return out
 
 ##  create_register_page_box(): register a new account
