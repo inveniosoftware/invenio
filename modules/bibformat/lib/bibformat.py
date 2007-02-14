@@ -84,8 +84,9 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
         return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
     ############################# END ##################################
 
-    if not on_the_fly:
+    if not on_the_fly and ln==cdslang:
 	# Try to fetch preformatted record
+        # Only possible for records formatted in cdslang language (other are never stored)
         out = bibformat_dblayer.get_preformatted_record(recID, of)
         if out is not None:
             # record 'recID' is formatted in 'of', so return it
@@ -103,7 +104,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
         return out
     except:
         #Failsafe execution mode
-        if of == 'hd':
+        if of.lower() == 'hd':
             return websearch_templates.tmpl_print_record_detailed(
                 ln = ln,
                 recID = recID,
