@@ -1138,13 +1138,17 @@ def identify_and_tag_URLs(line):
     ## Now that all URLs have been identified, insert them back into the line, tagged:
     found_url_positions = found_url_urlstring.keys()
     found_url_positions.sort()
+    extras_from_previous_url = 0
     for url_position in found_url_positions:
-        line = line[0:url_position] \
+        line = line[0:url_position + extras_from_previous_url] \
                + """<cds.URL description="%(url-description)s">%(url)s</cds.URL>""" \
                % { 'url-description' : found_url_urldescr[url_position],
                    'url'             : found_url_urlstring[url_position],
                  } \
-               + line[url_position+found_url_full_matchlen[url_position]:]
+               + line[url_position+found_url_full_matchlen[url_position]+extras_from_previous_url:]
+        extras_from_previous_url += len("""<cds.URL description=""></cds.URL>""") \
+                                    + len(found_url_urldescr[url_position])
+
     ## return the line containing the tagged URLs:
     return line
 
