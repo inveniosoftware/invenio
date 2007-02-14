@@ -150,7 +150,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
 <tr><td colspan="2" class="blocknote">
  <strong>© CERN Geneva: </strong>
-<small>The use of photos requires prior authorization (from <a href="http://wpedb.cern.ch/databases/Copyright/">CERN copyright</a>). 
+<small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>). 
 The words CERN Photo must be quoted for each use. </small>
 </td>
 </tr>
