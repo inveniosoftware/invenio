@@ -1792,7 +1792,8 @@ def convert_processed_reference_line_to_marc_xml(line):
     ## 1. Extract reference line marker (e.g. [1]) from start of line and tag it:
     ## get patterns to identify numeration markers at the start of lines:
     marker_patterns = get_reference_line_numeration_marker_patterns()
-    marker_match = perform_regex_search_upon_line_with_pattern_list(processed_line, marker_patterns)
+    marker_match = perform_regex_match_upon_line_with_pattern_list(processed_line, marker_patterns)
+
     if marker_match is not None:
         ## found a marker:
         marker_val = marker_match.group(u'mark')
@@ -1870,8 +1871,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                                                                                          prev_report_num,
                                                                                          prev_misc_txt)
                         ## Increment the stats counters:
-                        if len(prev_misc_txt) > 0:
-                            count_misc += 1
+##                         if len(prev_misc_txt) > 0:
+##                             count_misc += 1
                         count_title += 1
                         count_reportnum += 1
 
@@ -1894,8 +1895,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                             xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
                                                                                    prev_misc_txt)
                             ## Increment the stats counters:
-                            if len(prev_misc_txt) > 0:
-                                count_misc += 1
+##                             if len(prev_misc_txt) > 0:
+##                                 count_misc += 1
                             count_reportnum += 1
                         elif previously_cited_item['type'] == "TITLE":
                             ## previously cited item was a TITLE.
@@ -1908,8 +1909,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                             xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
                                                                             prev_year, prev_page, prev_misc_txt)
                             ## Increment the stats counters:
-                            if len(prev_misc_txt) > 0:
-                                count_misc += 1
+##                             if len(prev_misc_txt) > 0:
+##                                 count_misc += 1
                             count_title += 1
 
                         ## Now add the current cited item into the previously cited item marker
@@ -1978,8 +1979,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                                                                                     report_num,
                                                                                     prev_misc_txt)
                     ## Increment the stats counters:
-                    if len(prev_misc_txt) > 0:
-                        count_misc += 1
+##                     if len(prev_misc_txt) > 0:
+##                         count_misc += 1
                     count_title += 1
                     count_reportnum += 1
 
@@ -1998,8 +1999,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                         xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
                                                                                prev_misc_txt)
                         ## Increment the stats counters:
-                        if len(prev_misc_txt) > 0:
-                            count_misc += 1
+##                         if len(prev_misc_txt) > 0:
+##                             count_misc += 1
                         count_reportnum += 1
                     elif previously_cited_item['type'] == "TITLE":
                         ## previously cited item was a TITLE.
@@ -2012,8 +2013,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                         xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
                                                                         prev_year, prev_page, prev_misc_txt)
                         ## Increment the stats counters:
-                        if len(prev_misc_txt) > 0:
-                            count_misc += 1
+##                         if len(prev_misc_txt) > 0:
+##                             count_misc += 1
                         count_title += 1
                     ## Now add the current cited item into the previously cited item marker
                     previously_cited_item = { 'type'       : "REPORTNUMBER",
@@ -2065,8 +2066,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                         xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
                                                                                prev_misc_txt)
                         ## Increment the stats counters:
-                        if len(prev_misc_txt) > 0:
-                            count_misc += 1
+##                         if len(prev_misc_txt) > 0:
+##                             count_misc += 1
                         count_reportnum += 1
                     elif previously_cited_item['type'] == "TITLE":
                         ## previously cited item was a TITLE.
@@ -2079,8 +2080,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                         xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
                                                                         prev_year, prev_page, prev_misc_txt)
                         ## Increment the stats counters:
-                        if len(prev_misc_txt) > 0:
-                            count_misc += 1
+##                         if len(prev_misc_txt) > 0:
+##                             count_misc += 1
                         count_title += 1
                     ## Empty the previously-cited item place-holder:
                     previously_cited_item = None
@@ -2097,8 +2098,8 @@ def convert_processed_reference_line_to_marc_xml(line):
                 xml_line += \
                           _refextract_markup_url_as_marcxml(url_string, url_descr, cur_misc_txt)
                 ## Increment the stats counters:
-                if len(cur_misc_txt) > 0:
-                    count_misc += 1
+##                 if len(cur_misc_txt) > 0:
+##                     count_misc += 1
                 count_url += 1
                 cur_misc_txt = u""
 
@@ -2152,8 +2153,8 @@ def convert_processed_reference_line_to_marc_xml(line):
             xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
                                                                    prev_misc_txt)
             ## Increment the stats counters:
-            if len(prev_misc_txt) > 0:
-                count_misc += 1
+##             if len(prev_misc_txt) > 0:
+##                 count_misc += 1
             count_reportnum += 1
         elif previously_cited_item['type'] == "TITLE":
             ## previously cited item was a TITLE.
@@ -2166,8 +2167,8 @@ def convert_processed_reference_line_to_marc_xml(line):
             xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
                                                             prev_year, prev_page, prev_misc_txt)
             ## Increment the stats counters:
-            if len(prev_misc_txt) > 0:
-                count_misc += 1
+##             if len(prev_misc_txt) > 0:
+##                 count_misc += 1
             count_title += 1
         ## free up previously_cited_item:
         previously_cited_item = None
@@ -2482,6 +2483,7 @@ def create_marc_xml_reference_section(ref_sect,
                                     identify_preprint_report_numbers(working_line2,
                                                                      preprint_repnum_search_kb,
                                                                      preprint_repnum_standardised_categs)
+
         ## Identify and record coordinates of non-standard journal titles:
         (found_title_len, found_title_matchtext, working_line2) = \
                           identify_periodical_titles(working_line2,
