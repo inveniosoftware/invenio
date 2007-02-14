@@ -716,6 +716,89 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
                          ['Let us see if this gets inserted well.'])
 
 
+class BibRecordPrintingTest(unittest.TestCase):
+    """ bibrecord - testing for printing record """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        self.xml_example_record = """
+        <record>
+        <controlfield tag="001">81</controlfield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">TEST-ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">Test ti</subfield>
+        </datafield>
+        </record>"""
+        
+        self.xml_example_record_short = """
+        <record>
+        <controlfield tag="001">81</controlfield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">TEST-ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE-2006-001</subfield>
+        </datafield>
+        </record>"""
+
+        self.xml_example_multi_records = """
+        <record>
+        <controlfield tag="001">81</controlfield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">TEST-ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">Test ti</subfield>
+        </datafield>
+        </record>
+        <record>
+        <controlfield tag="001">82</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Author, t</subfield>
+        </datafield>
+        </record>"""
+
+        self.xml_example_multi_records_short = """
+        <record>
+        <controlfield tag="001">81</controlfield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">TEST-ARTICLE-2006-001</subfield>
+        </datafield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">ARTICLE-2006-001</subfield>
+        </datafield>
+        </record>
+        <record>
+        <controlfield tag="001">82</controlfield>
+        </record>"""
+        
+    def test_print_rec(self):
+        """bibrecord - print rec"""
+        rec, st, e = bibrecord.create_record(self.xml_example_record, 1, 1)
+        rec_short, st_short, e_short = bibrecord.create_record(self.xml_example_record_short, 1, 1)
+        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=[]), 1, 1)[0], rec)
+        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
+        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=["037"]), 1, 1)[0], rec_short)
+
+    def test_print_recs(self):
+        """bibrecord - print multiple recs"""
+        list_of_recs = bibrecord.create_records(self.xml_example_multi_records, 1, 1)
+        list_of_recs_elems = [elem[0] for elem in list_of_recs]
+        list_of_recs_short = bibrecord.create_records(self.xml_example_multi_records_short, 1, 1)
+        list_of_recs_short_elems = [elem[0] for elem in list_of_recs_short]
+        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=[]), 1, 1), list_of_recs)
+        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["001", "037"]), 1, 1), list_of_recs_short)
+        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["037"]), 1, 1), list_of_recs_short)
+        
 def create_test_suite():
     """Return test suite for the bibrecord module"""
     return unittest.TestSuite((unittest.makeSuite(BibRecordSanityTest, 'test'),
@@ -727,6 +810,7 @@ def create_test_suite():
                                unittest.makeSuite(BibRecordDeleteFieldTest, 'test'),
                                unittest.makeSuite(BibRecordAccentedUnicodeLettersTest, 'test'),
                                unittest.makeSuite(BibRecordSpecialTagParsingTest, 'test'),
+                               unittest.makeSuite(BibRecordPrintingTest, 'test'),
                                ))
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())

@@ -509,23 +509,25 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
     # If tmp was not set, nothing was found 
     return tmp
 
-def print_rec(rec, format=1):
+def print_rec(rec, format=1, tags=[]):
     """prints a record
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
+       @tags: list of tags to be printed
       """
 
     if format == 1:
-        text = record_xml_output(rec)
+        text = record_xml_output(rec, tags)
     else:
         return ''
 
     return text
 
-def print_recs(listofrec, format=1):
+def print_recs(listofrec, format=1, tags=[]):
     """prints a list of records
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
+       @tags: list of tags to be printed
        if 'listofrec' is not a list it returns empty string
     """
     text = ""
@@ -534,18 +536,24 @@ def print_recs(listofrec, format=1):
         return ""
     else:
         for rec in listofrec:
-            text = "%s\n%s" % (text, print_rec(rec, format))
+            text = "%s\n%s" % (text, print_rec(rec, format, tags))
     return text
 
-def record_xml_output(rec):
-    """generates the XML for record 'rec' and returns it as a string"""
+def record_xml_output(rec, tags=[]):
+    """generates the XML for record 'rec' and returns it as a string
+    @rec: record
+    @tags: list of tags to be printed
+    """
     xmltext = "<record>\n"
+    if tags and "001" not in tags:
+        tags.append("001")
     if rec:
         # add the tag 'tag' to each field in rec[tag]
         fields = []
         for tag in rec.keys():
-            for field in rec[tag]:
-                fields.append((tag, field))
+            if not tags or tag in tags:
+                for field in rec[tag]:
+                    fields.append((tag, field))
         record_order_fields(fields)    
         for field in fields:
             xmltext += str(field_xml_output(field[1], field[0]))
