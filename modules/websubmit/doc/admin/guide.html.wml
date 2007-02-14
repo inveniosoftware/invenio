@@ -1706,7 +1706,10 @@ def Get_Report_Number (parameters,curdir,form):
                 "<b>&lt;PA&gt;categ&lt;/PA&gt;</b>": in this case this string is replaced with the content of the file [altrnin]<br>
                 "<b>&lt;PA&gt;yy&lt;/PA&gt;</b>": in this case this string is replaced by the current year (4 digits) if [altyeargen] 
                 is set to "AUTO", or by the content of the [altyeargen] file in any other case. (this content should be formatted 
-                as a date (dd/mm/yyyy).
+                as a date (dd/mm/yyyy).<br>
+                "<b>&lt;PA&gt;file:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by the first line of the given file<br />
+                "<b>&lt;PA&gt;file*:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by all the lines of the given file, separated by a dash ('-') character.
+
             </SMALL></TD>
         </TR>
         <TR>
@@ -1719,6 +1722,10 @@ def Get_Report_Number (parameters,curdir,form):
                 "<b>&lt;PA&gt;yy&lt;/PA&gt;</b>": in this case this string is replaced by the current year (4 digits) if [altyeargen] 
                 is set to "AUTO", or by the content of the [altyeargen] file in any other case. (this content should be formatted 
                 as a date (dd/mm/yyyy).
+                <br>
+                "<b>&lt;PA&gt;file:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by the first line of the given file<br />
+                "<b>&lt;PA&gt;file*:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by all the lines of the given file, separated by a dash ('-') character.
+
             </SMALL></TD>
         </TR>
         <TR>
