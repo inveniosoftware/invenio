@@ -76,34 +76,39 @@ class TestEncodings(unittest.TestCase):
 class TestPerformance(unittest.TestCase):
     """Test performance of the repository """
 
-    def test_response_speed(self):
-        """bibharvest oai repository - speed of response"""
-        allowed_seconds_per_record_oai = 0.02
-        allowed_seconds_per_record_marcxml = 0.05
-        
+    def setUp(self):
+        """Setting up some variables"""
         # Determine how many records are served
-        number_of_records = oai_repository.oaigetsysnolist("", "", "")
-        if CFG_OAI_LOAD < number_of_records:
-            number_of_records = CFG_OAI_LOAD
+        self.number_of_records = oai_repository.oaigetsysnolist("", "", "")
+        if CFG_OAI_LOAD < self.number_of_records:
+            self.number_of_records = CFG_OAI_LOAD
                 
+    def test_response_speed_oai(self):
+        """bibharvest oai repository - speed of response for oai_dc output"""
+        allowed_seconds_per_record_oai = 0.02
+                        
         # Test oai ListRecords performance
         t0 = time.time()
         oai_repository.oailistrecords('metadataPrefix=oai_dc&verb=ListRecords')
         t = time.time() - t0
-        if t > number_of_records * allowed_seconds_per_record_oai:
+        if t > self.number_of_records * allowed_seconds_per_record_oai:
             self.fail("""Response for ListRecords with metadataPrefix=oai_dc took too much time:
 %s seconds.
-Limit: %s seconds""" % (t, number_of_records * allowed_seconds_per_record_oai))
+Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_oai))
          
+    def test_response_speed_marcxml(self):
+        """bibharvest oai repository - speed of response for marcxml output"""
+        allowed_seconds_per_record_marcxml = 0.05
+                 
         # Test marcxml ListRecords performance
         t0 = time.time()            
         oai_repository.oailistrecords('metadataPrefix=marcxml&verb=ListRecords')
         t = time.time() - t0
-        if t > number_of_records * allowed_seconds_per_record_marcxml:
+        if t > self.number_of_records * allowed_seconds_per_record_marcxml:
             self.fail("""Response for ListRecords with metadataPrefix=marcxml took too much time:\n
 %s seconds.
-Limit: %s seconds""" % (t, number_of_records * allowed_seconds_per_record_marcxml))
-        
+Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_marcxml))
+            
 def create_test_suite():
     """Return test suite for the oai repository."""
 
