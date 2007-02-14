@@ -1014,7 +1014,7 @@ def Get_Report_Number (parameters,curdir,form):
         <h3>Description:</h3>
         <BLOCKQUOTE>
             &nbsp;<span class="guideheader">T</span>his page lists and explains all the functions used in the demo 
-            provided with CDSWare package. This list is not exhaustive since you can add any new function you need.<br>
+            provided with the CDS Invenio package. This list is not exhaustive since you can add any new function you need.<br>
             &nbsp;<span class="guideheader">C</span>lick on one function name to get its description.<br>
             &nbsp;<span class="guideheader">P</span>lease note in this page when we refer to [param] this means the 
             value of the parameter 'param' for a given document type.<br><br>

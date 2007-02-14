@@ -458,8 +458,8 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     return page(title= actname,
                 body = t,
                 navtrail = p_navtrail,
-                description = "submit documents in CDSWare",
-                keywords = "submit, CDSWare",
+                description = "submit documents",
+                keywords = "submit",
                 uid = uid,
                 language = ln,
                 req = req)
@@ -701,8 +701,8 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     return page(title= actname,
                 body = t,
                 navtrail = p_navtrail,
-                description="submit documents in CDSWare",
-                keywords="submit, CDSWare",
+                description="submit documents",
+                keywords="submit",
                 uid = uid,
                 language = ln,
                 req = req)
@@ -732,8 +732,8 @@ def home(req, c=cdsname, ln=cdslang):
     return page(title=_("Submit"),
                body=finaltext,
                navtrail=[],
-               description="submit documents in CDSWare",
-               keywords="submit, CDSWare",
+               description="submit documents",
+               keywords="submit",
                uid=uid,
                language=ln,
                req=req
@@ -892,8 +892,8 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
     return page(title = docFullDesc,
                 body=t,
                 navtrail=p_navtrail,
-                description="submit documents in CDSWare",
-                keywords="submit, CDSWare",
+                description="submit documents",
+                keywords="submit",
                 uid=uid,
                 language=ln,
                 req=req

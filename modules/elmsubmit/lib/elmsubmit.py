@@ -254,7 +254,7 @@ def _notify_admin(response):
     response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                message=response,
-                                               subject="CDSWare / elmsubmit problem.",
+                                               subject="CDS Invenio / elmsubmit problem.",
                                                wrap_message=False)
     _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], msg=response)
 

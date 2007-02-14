@@ -135,11 +135,11 @@ class Template:
         staightforward. Here are some advice for the migration:</p>
         <ol>
         <li>If you do not have modified original formats provided by
-        default in CDS Invenio (formerly CDSWare), then you should not
+        default in CDS Invenio (formerly CDSware), then you should not
         proceed with this step.</li>
         <li>If you have only made small
         changes to the original formats provided by default in CDS
-        Invenio (formerly CDSWare), then you should not proceed with
+        Invenio (formerly CDSware), then you should not proceed with
         this step, but compare your modified files with the new
         provided files and make changes manually.</li>
         <li>If you have
