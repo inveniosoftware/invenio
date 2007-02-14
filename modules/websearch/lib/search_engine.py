@@ -91,6 +91,9 @@ except:
 search_cache = {} # will cache results of previous searches
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
+collection_reclist_cache_timestamp = 0
+field_i18nname_cache_timestamp = 0
+collection_i18nname_cache_timestamp = 0
 
 ## precompile some often-used regexp for speed reasons:
 sre_word = sre.compile('[\s]')
@@ -2425,6 +2428,8 @@ def print_records_header(req, format):
         header = websearch_templates.tmpl_xml_nlm_prologue()
     elif format.startswith('xr'):
         header = websearch_templates.tmpl_xml_rss_prologue()
+    elif format.startswith('t'):
+        header = "" # no header for text output
     else:
         header = websearch_templates.tmpl_xml_default_prologue()
 
@@ -2443,6 +2448,8 @@ def print_records_footer(req, format):
         footer = websearch_templates.tmpl_xml_nlm_epilogue()
     elif format.startswith('xr'):
         footer = websearch_templates.tmpl_xml_rss_epilogue()
+    elif format.startswith('t'):
+        footer = "" # no footer for text output
     else:
         footer = websearch_templates.tmpl_xml_default_epilogue()
 
