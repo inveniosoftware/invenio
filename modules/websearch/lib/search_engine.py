@@ -2455,12 +2455,12 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     _ = gettext_set_language(ln)
 
     out = ""
-
+    
     # sanity check:
     record_exist_p = record_exists(recID)
     if record_exist_p == 0: # doesn't exist
         return out
-
+    
     # New Python BibFormat procedure for formatting
     # Old procedure follows further below
     # We must still check some special formats, but these
@@ -2469,35 +2469,29 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             or format.lower().startswith('t') \
             or format.lower().startswith('hm') \
             or str(format[0:3]).isdigit() \
-            or ot != ''):
-
-        #Unspecified format is hd
+            or ot):
+        
+        # Unspecified format is hd
         if format == '':
             format = 'hd'
         
         if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
-            #HTML output displays a default value for deleted records.
-            #Other format have to deal with it.
+            # HTML output displays a default value for deleted records.
+            # Other format have to deal with it.
             out += _("The record has been deleted.")
         else:
-            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-            res = run_sql(query)
-            if res and not record_exist_p == -1:
-                # record 'recID' is formatted in 'format', so print it
-                out += "%s" % decompress(res[0][0])
-            else:
-                # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
-                out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
-    
+            
+            out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
+                
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format.lower().startswith('hb'):
                 out += websearch_templates.tmpl_print_record_brief_links(
                     ln = ln,
                     recID = recID,
-                    weburl = weburl,
-                        )
+                    weburl = weburl
+                    )
         return out
-
+    
     # Old PHP BibFormat procedure for formatting
     # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -3065,6 +3059,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
         
         page_start(req, of, cc, as, ln, uid, title, description, keywords)
+        # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"
         if record_exists(recid):
