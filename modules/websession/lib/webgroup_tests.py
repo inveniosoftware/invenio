@@ -25,12 +25,15 @@ __revision__ = "$Id$"
 
 import unittest
 
+# Compatibility stuff for python 2.3. Warning: don't use fancy methods!
+try:
+    set
+except NameError:
+    from sets import Set
+    set = Set
+
 class WebGroupTests(unittest.TestCase):
     """Test functions related to the WebGroup usage."""
-
-    def setUp(self):
-        """Nothing yet."""
-        pass
 
     def test_set(self):
         """webgroup - test fancy usage of set (differences among Python versions)"""
