@@ -58,3 +58,42 @@ CFG_REFEXTRACT_GS = "/usr/bin/gs"
 #   standardised and corrected, BUT, there is a risk that the line could also be corrupted by
 #   partial title identification for example.
 CFG_REFEXTRACT_NO_CITATION_TREATMENT = 0
+
+## MARC Fields and subfields used by refextract:
+
+## reference fields:
+CFG_REFEXTRACT_CTRL_FIELD_RECID          = "001" ## control-field recid
+CFG_REFEXTRACT_TAG_ID_REFERENCE          = "999" ## ref field tag
+CFG_REFEXTRACT_IND1_REFERENCE            = "C"   ## ref field ind1
+CFG_REFEXTRACT_IND2_REFERENCE            = "5"   ## ref field ind2
+CFG_REFEXTRACT_SUBFIELD_MARKER           = "o"   ## ref marker subfield
+CFG_REFEXTRACT_SUBFIELD_MISC             = "m"   ## ref misc subfield
+CFG_REFEXTRACT_SUBFIELD_REPORT_NUM       = "r"   ## ref reportnum subfield
+CFG_REFEXTRACT_SUBFIELD_TITLE            = "s"   ## ref title subfield
+CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield
+CFG_REFEXTRACT_SUBFIELD_URL_DESCR        = "z"   ## ref url-text subfield
+
+## refextract statisticts fields:
+CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999" ## ref-stats tag
+CFG_REFEXTRACT_IND1_EXTRACTION_STATS     = "C"   ## ref-stats ind1
+CFG_REFEXTRACT_IND2_EXTRACTION_STATS     = "6"   ## ref-stats ind2
+CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
+
+
+## Internal tags are used by refextract to mark-up recognised citation
+## information. These are the "closing tags:
+CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
+CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
+CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
+CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
+CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
+CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
+CFG_REFEXTRACT_MARKER_CLOSING_URL        = r"</cds.URL>"
+
+
+## XML Record and collection opening/closing tags:
+CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
+CFG_REFEXTRACT_XML_COLLECTION_OPEN  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
+CFG_REFEXTRACT_XML_COLLECTION_CLOSE = u"""</collection>\n"""
+CFG_REFEXTRACT_XML_RECORD_OPEN      = u"<record>"
+CFG_REFEXTRACT_XML_RECORD_CLOSE     = u"</record>"
