@@ -923,22 +923,27 @@ II. Example - connecting role and user</a>
      function auth_user. This function returns a valid email-address in CDS Invenio if the user
      is authenticated, not necessarily the same entered by the user as username. If the user
      is not authenticated, return None.
-     The class could also provide three more methods: fetch_user_preferences, fetch_user_groups_membership
-     and fetch_all_users_groups_membership.
+     The class could also provide four more methods: fetch_user_preferences, user_exists,
+     fetch_user_groups_membership and fetch_all_users_groups_membership.
      The first should take an email and eventually a password and should return a dictionary of keys
      and value representing external preferences, infos or settings. If, for some reasons, you like
      to force some kind of hiding for some particular field you should export the related key
      prefixed by "HIDDEN_". Those fields won't be displayed in tables and pages regarding external
      settings.
-     The second method should take an email and (if necessary) a password
+     The second method should check through the external system if a particular email exists. If you
+     provide such a method then a user will be able to switch from and to this authorization method.
+     The third method should take an email and (if necessary) a password
      and should return a dictionary of external_groups_names toghether with their description, for which
      the user has a membership. Those groups will be merged into the groups system.
      The user will be a member of those groups and will be able to use them in any place
      where groups are useful, but won't be able to unsubscribe or to administrate them.
-     The third method should just return a dictionary of external groups as keys and touples containing
+     The fourth method should just return a dictionary of external groups as keys and touples containing
      a group description and a list of email of users belonging to each groups. Those memberships
      will be merged into the database in the way done by the previous method, but could
      provide batch synchronization of groups.
+     Note: if your system has more than one external login methods then incoherence in the groups
+     memberships could happen when a user switch his login method. This will be fixed some times in the
+     future.
 
      Example template:
 
@@ -962,6 +967,12 @@ II. Example - connecting role and user</a>
              """
              raise NotImplementedError
              #return None
+
+         def user_exists(self, email):
+             """Checks against external_authentication for existance of email.
+             @return True if the user exists, False otherwise
+             """
+             raise NotImplementedError
 
          def fetch_user_groups_membership(self, username, password=None):
              """Given a username, returns a dictionary of groups

@@ -44,6 +44,7 @@ from invenio import webaccount
 from invenio import webbasket
 from invenio import webalert
 from invenio import webuser
+from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -148,14 +149,44 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/change")
 
-        if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4:
+        if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
+                and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
             title = _("Settings edited")
             act = "display"
             linkname = _("Show account")
             prefs = webuser.get_user_preferences(uid)
-            prefs['login_method'] = args['login_method']
-            webuser.set_user_preferences(uid, prefs)
-            mess = _("Login method successfully selected.")
+
+            if prefs['login_method'] != args['login_method']:
+                if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
+                    # Switching to internal authentication: we drop any external datas
+                    from invenio.webuser import drop_external_settings
+                    from invenio.webgroup_dblayer import drop_external_groups
+                    drop_external_settings(uid)
+                    drop_external_groups(uid)
+                    prefs['login_method'] = args['login_method']
+                    webuser.set_user_preferences(uid, prefs)
+                    mess = _("Switching to internal authentication.")
+                else:
+                    query = """SELECT email FROM user
+                            WHERE id = %i"""
+                    res = run_sql(query % uid)
+                    if res:
+                        email = res[0][0]
+                    else:
+                        email = None
+                    if not email:
+                        mess = _("Could not switch to external login '%s', because the email of the user is unknown.") % args['login_method']
+                    else:
+                        try:
+                            if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0].user_exists(email):
+                                mess = _("Could not switch to external login '%s', because this user is unknown to this external login system.") % args['login_method']
+                            else:
+                                prefs['login_method'] = args['login_method']
+                                webuser.set_user_preferences(uid, prefs)
+                                mess = _("Login method successfully selected.")
+                        except AttributeError:
+                            mess = _("Could not switch to external login '%s', because this method doesn't provide a way for checking if the user is inserted.") % args['login_method']
+
         elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
             return webuser.page_not_authorized(req, "../youraccount/change")
         elif args['email']:

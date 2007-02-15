@@ -342,6 +342,14 @@ def leave_group(grpID, uid):
     res = run_sql(query% (grpID, uid))
     return res
 
+def drop_external_groups(userId):
+    """Drops all the external groups memberships of userid."""
+    query = """DELETE user_usergroup FROM user_usergroup, usergroup
+               WHERE user_usergroup.id_user=%i
+               AND usergroup.id = user_usergroup.id_usergroup
+               AND usergroup.login_method <> 'INTERNAL'"""
+    return run_sql(query % (userId,))
+
 def group_name_exist(group_name, login_method='INTERNAL'):
     """Get all group id whose name like group_name and login_method."""
     query = """SELECT id

@@ -31,6 +31,8 @@ from invenio.external_authentication import ExternalAuth, \
         WebAccessExternalAuthError
 from invenio.external_authentication_cern_wrapper import AuthCernWrapper
 
+_managed_exceptions = (httplib.CannotSendRequest,
+                        socket.error)
 
 class ExternalAuthCern(ExternalAuth):
     """
@@ -42,11 +44,30 @@ class ExternalAuthCern(ExternalAuth):
     def __init__(self):
         """Initialize stuff here"""
         ExternalAuth.__init__(self)
-        self.connection = AuthCernWrapper()
-        #self.name = "CERN NICE (external)"
-        self.last_username = None
-        self.last_password = None
-        self.last_prefs = None
+        try:
+            self.connection = AuthCernWrapper()
+        except: # Let the user note that no connection is available
+            self.connection = None
+
+
+    def _try_twice(self, funct, *params):
+        try:
+
+            ret = eval("self.connection." + funct+str(params))
+        except Exception, e:
+            if isinstance(e, _managed_exceptions):
+                self.connection = AuthCernWrapper()
+                try:
+                    ret = eval("self.connection." + funct+str(params))
+                except Exception, e:
+                    if isinstance(e, _managed_exceptions):
+                        raise WebAccessExternalAuthError
+                    else:
+                        raise e
+            else:
+                raise e
+        return ret
+
 
     def auth_user(self, username, password):
         """
@@ -55,14 +76,7 @@ class ExternalAuthCern(ExternalAuth):
         person if authentication succeeded.
         """
 
-        try:
-            infos = self.connection.get_user_info(username, password)
-        except socket.error, httplib.CannotSendRequest:
-            self.connection = AuthCernWrapper()
-            try:
-                infos = self.connection.get_user_info(username, password)
-            except socket.error, httplib.CannotSendRequest:
-                raise WebAccessExternalAuthError
+        infos = self._try_twice('get_user_info', username, password)
         if "email" in infos:
             self.last_username = username
             self.last_password = password
@@ -71,18 +85,19 @@ class ExternalAuthCern(ExternalAuth):
         else:
             return None
 
+    def user_exists(self, email):
+        """Checks against CERN NICE/CRA for existance of email.
+        @return True if the user exists, False otherwise
+        """
+        users = self._try_twice('list_users', email)
+        return email.upper() in [user['email'].upper() for user in users]
+
+
     def fetch_user_groups_membership(self, email, password=None):
         """Fetch user groups membership from the CERN NICE/CRA account.
         @return a dictionary of groupname, group description
         """
-        try:
-            groups = self.connection.get_groups_for_user(email)
-        except socket.error, httplib.CannotSendRequest:
-            self.connection = AuthCernWrapper()
-            try:
-                groups = self.connection.get_groups_for_user(email)
-            except socket.error, httplib.CannotSendRequest:
-                raise WebAccessExternalAuthError
+        groups = self._try_twice('get_groups_for_user', email)
         return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                         or x + ' (Group)'), groups))
 
@@ -93,19 +108,9 @@ class ExternalAuthCern(ExternalAuth):
         otherwise 0
         @return a dictionary. Note: auth and respccid are hidden
         """
-        if username == self.last_username and password == self.last_password:
-            prefs = self.last_prefs
-        else:
-            try:
-                prefs = self.connection.get_user_info(username, password).items()
-            except socket.error, httplib.CannotSendRequest:
-                self.connection = AuthCernWrapper()
-                try:
-                    prefs = self.connection.get_user_info(username, password).items()
-                except socket.error, httplib.CannotSendRequest:
-                    raise WebAccessExternalAuthError
+        prefs = self._try_twice('get_user_info', username, password)
         ret = {}
-        for key, value in prefs:
+        for key, value in prefs.items():
             if key in ['auth', 'respccid', 'ccid']:
                 ret['HIDDEN_' + key] = value
             else:
@@ -117,6 +122,4 @@ class ExternalAuthCern(ExternalAuth):
         else:
             ret['external'] = '0'
         return ret
-
-
 

@@ -49,6 +49,13 @@ class ExternalAuth:
         raise NotImplementedError
         #return None
 
+    def user_exists(self, email):
+        """Check the external authentication system for existance of email.
+        @return True if the user exists, False otherwise
+        """
+        raise NotImplementedError
+
+
     def fetch_user_groups_membership(self, username, password=None):
         """Given a username, returns a dictionary of groups
         and their description to which the user is subscribed.

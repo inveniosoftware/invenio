@@ -150,6 +150,6 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                13: """Error(13): Could not register '%s' account.""",
                                14: """Error(14): Could not login using '%s', because this user is unknown.""",
                                15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password.""",
-                               16: """Error(16): External authentication troubles (maybe temporary network problems)."""
+                               16: """Error(16): External authentication troubles (maybe temporary network problems).""",
         }
 

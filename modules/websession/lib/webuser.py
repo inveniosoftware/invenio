@@ -430,10 +430,10 @@ def loginUser(req, p_un, p_pw, login_method):
         query_result = run_sql("SELECT id,email from user where email=%s and password=%s", (p_email, p_pw,))
         if query_result:
             #FIXME drop external groups and settings
-            prefered_login_method = get_user_preferences(query_result[0][0])['login_method']
+            preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
             p_email = query_result[0][1]
-            if login_method != prefered_login_method:
-                if CFG_EXTERNAL_AUTHENTICATION.has_key(prefered_login_method):
+            if login_method != preferred_login_method:
+                if CFG_EXTERNAL_AUTHENTICATION.has_key(preferred_login_method):
                     return ([], p_email, p_pw, 11)
         else:
             return ([], p_email, p_pw, 14)
@@ -441,6 +441,14 @@ def loginUser(req, p_un, p_pw, login_method):
     run_sql("UPDATE user SET last_login=NOW() WHERE email=%s", (p_email, ))
     return (query_result, p_email, p_pw, 0)
 
+
+def drop_external_settings(userId):
+    """Drop the external (EXTERNAL_) settings of userid."""
+    prefs = get_user_preferences(userId)
+    for key in prefs.keys():
+        if key.startswith('EXTERNAL_'):
+            del prefs[key]
+    set_user_preferences(userId, prefs)
 
 
 def logoutUser(req):

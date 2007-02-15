@@ -190,14 +190,27 @@ def perform_set(email,password, ln, verbose=0):
             uid = 0
         current_login_method = prefs['login_method']
         methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+
+        # Filtering out methods that don't provide user_exists to check if
+        # a user exists in the external auth method before letting him/her
+        # to switch.
+
+        for method in methods:
+            try:
+                if not CFG_EXTERNAL_AUTHENTICATION[method][0].user_exists(email):
+                    methods.remove(method)
+            except AttributeError:
+                if CFG_EXTERNAL_AUTHENTICATION[method][0]: # We don't delete Internal method
+                    methods.remove(method)
         methods.sort()
 
-        out += websession_templates.tmpl_user_external_auth(
-                 ln = ln,
-                 methods = methods,
-                 current = current_login_method,
-                 method_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4)
-               )
+        if len(methods) > 1:
+            out += websession_templates.tmpl_user_external_auth(
+                    ln = ln,
+                    methods = methods,
+                    current = current_login_method,
+                    method_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4)
+                )
     try:
         current_group_records = prefs['websearch_group_records']
     except KeyError:
