@@ -21,7 +21,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-   "bibrefextract" is used to extract and process the "references"
+   "refextract" is used to extract and process the "references"
    or "citations" made to other documents from within a document.
    A document's "references" section is usually found at the end of
    the document, and generally consists of a list of the works
