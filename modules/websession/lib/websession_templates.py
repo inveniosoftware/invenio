@@ -207,7 +207,7 @@ class Template:
     def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
         _ = gettext_set_language(ln)
         out = """
-            <form method="post" action="%(sweburl)s/youraccount/change">
+            <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch">
               <big><strong class="headline">%(edit_websearch)s</strong></big>
               <table>
                 <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value=1 name="latestbox"/></td>
