@@ -163,6 +163,7 @@ update-v0.90.1-tables: local-dbexec
 update-v0.92.0-tables: local-dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE usergroup CHANGE name name varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE usergroup ADD login_method varchar(255) NOT NULL default 'INTERNAL';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE usergroup ADD UNIQUE KEY login_method_name (login_method, name);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user CHANGE settings settings blob default NULL;" | ./modules/miscutil/bin/dbexec
