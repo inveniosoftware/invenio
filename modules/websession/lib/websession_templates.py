@@ -105,7 +105,7 @@ class Template:
         <table>
             %(html_settings)s
         </table>""" % {
-            'external_user_settings' : _('External user settings'),
+            'external_user_settings' : _('External account settings'),
             'html_settings' : html_settings,
         }
         return out
@@ -181,7 +181,7 @@ class Template:
               </form>
         """ % {
           'change_user_pass' : _("If you want to change your email address or password, please set new values in the form below."),
-          'edit_params' : _("Edit parameters"),
+          'edit_params' : _("Edit login credentials"),
           'nickname_label' : _("Nickname"),
           'nickname' : nickname,
           'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
