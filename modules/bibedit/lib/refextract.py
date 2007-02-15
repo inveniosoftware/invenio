@@ -29,12 +29,44 @@ try:
     import sys, sre
     import os, getopt
     from time import mktime, localtime
-    from invenio.refextract_config import *
+    from invenio.refextract_config \
+           import CFG_REFEXTRACT_VERSION, \
+                  CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
+                  CFG_REFEXTRACT_KB_REPORT_NUMBERS, \
+                  CFG_REFEXTRACT_CTRL_FIELD_RECID, \
+                  CFG_REFEXTRACT_TAG_ID_REFERENCE, \
+                  CFG_REFEXTRACT_IND1_REFERENCE, \
+                  CFG_REFEXTRACT_IND2_REFERENCE, \
+                  CFG_REFEXTRACT_SUBFIELD_MARKER, \
+                  CFG_REFEXTRACT_SUBFIELD_MISC, \
+                  CFG_REFEXTRACT_SUBFIELD_REPORT_NUM, \
+                  CFG_REFEXTRACT_SUBFIELD_TITLE, \
+                  CFG_REFEXTRACT_SUBFIELD_URL, \
+                  CFG_REFEXTRACT_SUBFIELD_URL_DESCR, \
+                  CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS, \
+                  CFG_REFEXTRACT_IND1_EXTRACTION_STATS, \
+                  CFG_REFEXTRACT_IND2_EXTRACTION_STATS, \
+                  CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_SERIES, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_VOLUME, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_YEAR, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_PAGE, \
+                  CFG_REFEXTRACT_MARKER_CLOSING_URL, \
+                  CFG_REFEXTRACT_XML_VERSION, \
+                  CFG_REFEXTRACT_XML_COLLECTION_OPEN, \
+                  CFG_REFEXTRACT_XML_COLLECTION_CLOSE, \
+                  CFG_REFEXTRACT_XML_RECORD_OPEN, \
+                  CFG_REFEXTRACT_XML_RECORD_CLOSE
+
     from invenio.config import CFG_PATH_GFILE, CFG_PATH_PDFTOTEXT
     from invenio.search_engine import encode_for_xml
-except ImportError, err:
-    raise ImportError(err)
-
+except ImportError, importerror:
+    import sys
+    sys.stderr.write("Error: %s" % importerror)
+    sys.stderr.flush()
+    sys.exit(1)
 
 def get_url_repair_patterns():
     """Initialise and return a list of precompiled regexp patterns that are used to
@@ -623,6 +655,8 @@ def repair_broken_urls(line):
        @return: (string) the line after any broken URLs have (hopefully!) been repaired.
     """
     def _chop_spaces_in_url_match(m):
+        """Suppresses spaces in a matched URL.
+        """
         return m.group(1).replace(" ", "")
     for ptn in sre_list_url_repair_patterns:
         line = ptn.sub(_chop_spaces_in_url_match, line)
@@ -689,6 +723,8 @@ def _order_institute_preprint_reference_numeration_patterns_by_length(numeration
        @return: (list) of tuples, where each tuple contains a pattern and its length.
     """
     def _compfunc_bylen(a, b):
+        """Compares regexp patterns by the length of the pattern-text.
+        """
         if a[0] < b[0]:
             return 1
         elif a[0] == b[0]:
@@ -856,7 +892,6 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
             m_institute_name = sre_institute_name.search(rawline)
             if m_institute_name is not None:
                 ## This KB line is the name of an institute
-                institute_name = m_institute_name.group(1)
                 ## append the last institute's pattern list to the list of institutes:
                 _add_institute_preprint_patterns(current_institute_preprint_classifications,\
                                                  current_institute_numerations,\
@@ -2189,7 +2224,15 @@ def convert_processed_reference_line_to_marc_xml(line):
     return (xml_line, count_misc, count_title, count_reportnum, count_url)
 
 def move_tagged_series_into_tagged_title(line):
-    ## TODO: TEST ME!
+    """Moves a marked-up series item into a marked-up title.
+       E.g.: should change <cds.TITLE>Blah</cds.TITLE> <cds.SER>A</cds.SER>
+        into:
+       <cds.TITLE>Blah., A</cds.TITLE>
+       @param line: (string) - the line in which a series tagged item is to be
+        moved into title tags.
+       @return: (string) - the line after the series items have been moved
+        into the title tags.
+    """
     ## Seek a marked-up series occurrence in line:
     m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
     while m_tagged_series is not None:
@@ -2200,12 +2243,16 @@ def move_tagged_series_into_tagged_title(line):
         corrected_title_text = title_match
         ## If there is no comma in the matched title, add one to the end of it before the series info is
         ## added. If there is already a comma present, discard the series info (as there is already a series)
-        if corrected_title_text.find(",") != -1:
+        if corrected_title_text.find(",") == -1:
             corrected_title_text = corrected_title_text.rstrip()
             if corrected_title_text[-1] == ".":
                 corrected_title_text += ", %s" % series_match
             else:
                 corrected_title_text += "., %s" % series_match
+        elif corrected_title_text.rstrip()[-1:] == ",":
+            ## There is a "," at the end of the title, but no series present.
+            ## add it:
+            corrected_title_text = corrected_title_text.rstrip() + " %s" % series_match
         line = sre.sub("%s" % sre.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
         m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
     return line
@@ -2447,8 +2494,6 @@ def create_marc_xml_reference_section(ref_sect,
     ## process references line-by-line:
     for ref_line in ref_sect:
         ## initialise some variables:
-        found_item = 0
-        citation_match = 0
         ## dictionaries to record information about, and coordinates of, matched IBID items:
         found_ibids_len = {}
         found_ibids_matchtext = {}
@@ -2552,7 +2597,7 @@ def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, 
         for i in xrange(0, len(page_break_posns)):
             ## Unless this is the last page break, chop headers
             if not first:
-                for j in xrange(1, num_head_lines + 1):
+                for dummy in xrange(1, num_head_lines + 1):
                     docbody[page_break_posns[i] + 1:page_break_posns[i] + 2] = []
             else:
                 first = 0
@@ -2560,7 +2605,7 @@ def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, 
             docbody[page_break_posns[i]:page_break_posns[i] + 1] = []
             ## Chop footers (unless this is the first page break)
             if i != len(page_break_posns) - 1:
-                for k in xrange(1, num_foot_lines + 1):
+                for dummy in xrange(1, num_foot_lines + 1):
                     docbody[page_break_posns[i] - num_foot_lines:page_break_posns[i] - num_foot_lines + 1] = []
     return docbody
 
@@ -3545,8 +3590,6 @@ def _pdftotext_conversion_is_bad(txtlines):
     """
     ## Numbers of 'words' and 'whitespaces' found in document:
     numWords = numSpaces = 0
-    ## whitespace line pattern:
-    ws_patt = sre.compile(unicode(r'^\s+$'), sre.UNICODE)
     ## whitespace character pattern:
     p_space = sre.compile(unicode(r'(\s)'), sre.UNICODE)
     ## non-whitespace 'word' pattern:
@@ -3649,16 +3692,15 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
         standard error stream (sys.stderr) will be used by default.
        @return: None.
     """
-    if strm is None:
-        ## no stream supplied - write to sys.stderr
+    if strm is None or type(strm) is not file:
+        ## invalid stream supplied - write to sys.stderr
         strm = sys.stderr
-    try:
-        ## check that stream is open:
-        strm.flush()
-    except:
-        ## it isn't - default to sys.stderr
+    elif strm.closed:
+        ## The stream was closed - use stderr:
         strm = sys.stderr
-    strm.writelines(map(lambda x: "%(recid)s:%(refline)s\n" % { 'recid' : recid, 'refline' : x.encode("utf-8") }, raw_refs))
+    ## write the reference lines to the stream:
+    strm.writelines(map(lambda x: "%(recid)s:%(refline)s\n" \
+                        % { 'recid' : recid, 'refline' : x.encode("utf-8") }, raw_refs))
     strm.flush()
 
 def usage(wmsg="", err_code=0):
