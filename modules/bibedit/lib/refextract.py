@@ -26,12 +26,12 @@
 __revision__ = "$Id$"
 
 try:
-    import sys, re, sre
-    import os, getopt, cgi
-    from cStringIO import StringIO
+    import sys, sre
+    import os, getopt
     from time import mktime, localtime
     from invenio.refextract_config import *
-    from invenio.config import CFG_PATH_GFILE
+    from invenio.config import CFG_PATH_GFILE, CFG_PATH_PDFTOTEXT
+    from invenio.search_engine import encode_for_xml
 except ImportError, err:
     raise ImportError(err)
 
@@ -560,18 +560,18 @@ sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?'
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 ## <[FS]?, v, y, p>
 sre_numeration_nucphys_vol_yr_page = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', re.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
 sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                                 r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', re.UNICODE),\
+                                 r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
 sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', re.UNICODE),\
+                      r'[,;:\s]?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 
 
@@ -579,12 +579,12 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
 sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', re.UNICODE),\
+                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 ## <v, [FS]?, s, p, y>
 sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', re.UNICODE),\
+                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
@@ -1479,7 +1479,7 @@ def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text="")
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : cgi.escape(misc_text, 1),
+                    'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
         ## the misc subfield is not needed
@@ -1494,10 +1494,10 @@ def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text="")
                       'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
                       'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
                       'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : cgi.escape(title, 1),
-                      'volume'                 : cgi.escape(volume, 1),
-                      'year'                   : cgi.escape(year, 1),
-                      'page'                   : cgi.escape(page, 1),
+                      'title'                  : encode_for_xml(title),
+                      'volume'                 : encode_for_xml(volume),
+                      'year'                   : encode_for_xml(year),
+                      'page'                   : encode_for_xml(page),
                     }
     return xml_line
 
@@ -1531,7 +1531,7 @@ def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume,
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : cgi.escape(misc_text, 1),
+                    'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
         ## the misc subfield is not needed
@@ -1548,11 +1548,11 @@ def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume,
                       'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
                       'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
                       'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : cgi.escape(title, 1),
-                      'volume'                 : cgi.escape(volume, 1),
-                      'year'                   : cgi.escape(year, 1),
-                      'page'                   : cgi.escape(page, 1),
-                      'report-number'          : cgi.escape(report_number, 1),
+                      'title'                  : encode_for_xml(title),
+                      'volume'                 : encode_for_xml(volume),
+                      'year'                   : encode_for_xml(year),
+                      'page'                   : encode_for_xml(page),
+                      'report-number'          : encode_for_xml(report_number),
                     }
     return xml_line
 
@@ -1586,7 +1586,7 @@ def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume,
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : cgi.escape(misc_text, 1),
+                    'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
         ## the misc subfield is not needed
@@ -1603,11 +1603,11 @@ def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume,
                       'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
                       'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
                       'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : cgi.escape(title, 1),
-                      'volume'                 : cgi.escape(volume, 1),
-                      'year'                   : cgi.escape(year, 1),
-                      'page'                   : cgi.escape(page, 1),
-                      'report-number'          : cgi.escape(report_number, 1),
+                      'title'                  : encode_for_xml(title),
+                      'volume'                 : encode_for_xml(volume),
+                      'year'                   : encode_for_xml(year),
+                      'page'                   : encode_for_xml(page),
+                      'report-number'          : encode_for_xml(report_number),
                     }
     return xml_line
 
@@ -1633,7 +1633,7 @@ def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : cgi.escape(misc_text, 1),
+                    'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
         ## the misc subfield is not needed
@@ -1648,7 +1648,7 @@ def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
                       'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
                       'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
                       'misc-subfield'          : xml_misc_subfield,
-                      'report-number'          : cgi.escape(report_number, 1),
+                      'report-number'          : encode_for_xml(report_number),
                     }
     return xml_line
 
@@ -1676,7 +1676,7 @@ def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text="")
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : cgi.escape(misc_text, 1),
+                    'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
         ## the misc subfield is not needed
@@ -1693,8 +1693,8 @@ def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text="")
                       'sf-code-ref-url'        : CFG_REFEXTRACT_SUBFIELD_URL,
                       'sf-code-ref-url-descr'  : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
                       'misc-subfield'          : xml_misc_subfield,
-                      'url'                    : cgi.escape(url_string, 1),
-                      'url-descr'              : cgi.escape(url_description, 1),
+                      'url'                    : encode_for_xml(url_string),
+                      'url-descr'              : encode_for_xml(url_description),
                     }
     return xml_line
 
@@ -1715,7 +1715,7 @@ def _refextract_markup_reference_line_marker_as_marcxml(marker_text):
         'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
         'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
         'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
-        'marker-val'         : cgi.escape(marker_text, 1),
+        'marker-val'         : encode_for_xml(marker_text),
       }
     return xml_line
 
@@ -1736,7 +1736,7 @@ def _refextract_markup_miscellaneous_text_as_marcxml(misc_text):
                   'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
                   'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
                   'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                  'misc-val'               : cgi.escape(misc_text, 1),
+                  'misc-val'               : encode_for_xml(misc_text),
                 }
     return xml_line
 
@@ -2206,7 +2206,7 @@ def move_tagged_series_into_tagged_title(line):
                 corrected_title_text += ", %s" % series_match
             else:
                 corrected_title_text += "., %s" % series_match
-        line = re.sub("%s" % re.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
+        line = sre.sub("%s" % sre.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
         m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
     return line
 
@@ -2602,7 +2602,7 @@ def get_number_header_lines(docbody, page_break_posns):
     remaining_breaks = (len(page_break_posns) - 1)
     num_header_lines = empty_line = 0
     ## pattern to search for a word in a line:
-    p_wordSearch = re.compile(unicode(r'([A-Za-z0-9-]+)'), re.UNICODE)
+    p_wordSearch = sre.compile(unicode(r'([A-Za-z0-9-]+)'), sre.UNICODE)
     if remaining_breaks > 2:
         if remaining_breaks > 3:
             # Only check odd page headers
@@ -2656,7 +2656,7 @@ def get_number_footer_lines(docbody, page_break_posns):
     num_footer_lines = 0
     empty_line = 0
     keep_checking = 1
-    p_wordSearch = re.compile(unicode(r'([A-Za-z0-9-]+)'), re.UNICODE)
+    p_wordSearch = sre.compile(unicode(r'([A-Za-z0-9-]+)'), sre.UNICODE)
     if num_breaks > 2:
         while keep_checking:
             cur_break = 1
@@ -2692,7 +2692,7 @@ def get_page_break_positions(docbody):
         the document body) of a page-break.
     """
     page_break_posns = []
-    p_break = re.compile(unicode(r'^\s*?\f\s*?$'), re.UNICODE)
+    p_break = sre.compile(unicode(r'^\s*?\f\s*?$'), sre.UNICODE)
     num_document_lines = len(docbody)
     for i in xrange(num_document_lines):
         if p_break.match(docbody[i]) != None:
@@ -2818,7 +2818,7 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
                  space + title + g_name + unicode(r'\[\s*?\]') + g_close,
                  space + title + g_name + unicode(r'\*') + g_close ]
     for p in patterns:
-        compiled_ptns.append(re.compile(p, re.I|re.UNICODE))
+        compiled_ptns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_ptns
 
 def get_first_reference_line_numeration_marker_patterns():
@@ -2833,7 +2833,7 @@ def get_first_reference_line_numeration_marker_patterns():
     patterns = [ g_name + unicode(r'(?P<left>\[)\s*?(?P<num>\d+)\s*?(?P<right>\])') + g_close,
                  g_name + unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})') + g_close ]
     for p in patterns:
-        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_patterns
 
 def get_post_reference_section_title_patterns():
@@ -2863,7 +2863,7 @@ def get_post_reference_section_title_patterns():
                  r'^\s*?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'tab') + unicode(r'\.\s*?') + numatn,
                  r'^\s*?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'tab') + unicode(r'\.?\s*?\d\w?\b') ]
     for p in patterns:
-        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_patterns
 
 def get_post_reference_section_keyword_patterns():
@@ -2881,16 +2881,16 @@ def get_post_reference_section_keyword_patterns():
                                  _create_regex_pattern_add_optional_spaces_to_word_characters(u'This article was processed by the author using Springer-Verlag') + \
                                  u' LATEX' ]
     for p in patterns:
-        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_patterns
 
 def perform_regex_match_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "re.match" operation on the line for every pattern.
+    """Given a list of COMPILED regex patters, perform the "sre.match" operation on the line for every pattern.
        Break from searching at the first match, returning the match object.  In the case that no patterns match,
        the None type will be returned.
        @param line: (unicode string) to be searched in.
        @param patterns: (list) of compiled regex patterns to search  "line" with.
-       @return: (None or an re.match object), depending upon whether one of the patterns matched within line
+       @return: (None or an sre.match object), depending upon whether one of the patterns matched within line
         or not.
     """
     if type(patterns) not in (list, tuple):
@@ -2906,12 +2906,12 @@ def perform_regex_match_upon_line_with_pattern_list(line, patterns):
     return m
 
 def perform_regex_search_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "re.search" operation on the line for every pattern.
+    """Given a list of COMPILED regex patters, perform the "sre.search" operation on the line for every pattern.
        Break from searching at the first match, returning the match object.  In the case that no patterns match,
        the None type will be returned.
        @param line: (unicode string) to be searched in.
        @param patterns: (list) of compiled regex patterns to search  "line" with.
-       @return: (None or an re.match object), depending upon whether one of the patterns matched within line
+       @return: (None or an sre.match object), depending upon whether one of the patterns matched within line
         or not.
     """
     if type(patterns) not in (list, tuple):
@@ -2954,7 +2954,7 @@ def find_reference_section(docbody):
     if len(docbody) > 0:
         title_patterns = get_reference_section_title_patterns()
         marker_patterns = get_reference_line_numeration_marker_patterns()
-        p_num = re.compile(unicode(r'(\d+)'))
+        p_num = sre.compile(unicode(r'(\d+)'))
         
         ## Try to find refs section title:
         x = len(docbody) - 1
@@ -3223,7 +3223,7 @@ def remove_leading_garbage_lines_from_reference_section(ref_sectn):
        @param ref_sectn: (list) of strings - the reference section lines
        @return: (list) of strings - the reference section without leading blank lines or email addresses.
     """
-    p_email = re.compile(unicode(r'^\s*e\-?mail'), re.UNICODE)
+    p_email = sre.compile(unicode(r'^\s*e\-?mail'), sre.UNICODE)
     while (len(ref_sectn) > 0) and (ref_sectn[0].isspace() or p_email.match(ref_sectn[0]) is not None):
         ref_sectn[0:1] = []
     return ref_sectn
@@ -3320,7 +3320,7 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         ##
                         ## as that would be unsafe.
                         m_test_nxt_mark_not_eol = \
-                          re.search(re.escape(m_fix.group()) + '\s*[A-Za-z]', rebuilt_lines[x])
+                          sre.search(sre.escape(m_fix.group()) + '\s*[A-Za-z]', rebuilt_lines[x])
                         if m_test_nxt_mark_not_eol is not None:
                             ## move this section back to its real line:
 
@@ -3417,7 +3417,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
         else:
             ## No ref line dividers: unmatchable pattern
             ref_line_marker_ptn = unicode(r'^A$^A$$')
-    p_ref_line_marker = re.compile(ref_line_marker_ptn, re.I|re.UNICODE)
+    p_ref_line_marker = sre.compile(ref_line_marker_ptn, sre.I|sre.UNICODE)
 
     for x in xrange(len_ref_sectn - 1, -1, -1):
         current_string = ref_sectn[x].strip()
@@ -3546,11 +3546,11 @@ def _pdftotext_conversion_is_bad(txtlines):
     ## Numbers of 'words' and 'whitespaces' found in document:
     numWords = numSpaces = 0
     ## whitespace line pattern:
-    ws_patt = re.compile(unicode(r'^\s+$'), re.UNICODE)
+    ws_patt = sre.compile(unicode(r'^\s+$'), sre.UNICODE)
     ## whitespace character pattern:
-    p_space = re.compile(unicode(r'(\s)'), re.UNICODE)
+    p_space = sre.compile(unicode(r'(\s)'), sre.UNICODE)
     ## non-whitespace 'word' pattern:
-    p_noSpace = re.compile(unicode(r'(\S+)'), re.UNICODE)
+    p_noSpace = sre.compile(unicode(r'(\S+)'), sre.UNICODE)
     for txtline in txtlines:
         numWords = numWords + len(p_noSpace.findall(txtline))
         numSpaces = numSpaces + len(p_space.findall(txtline))
@@ -3791,7 +3791,7 @@ def display_xml_record(status_code, count_reportnum,
     ## Display the record-id controlfield:
     out += u"""   <controlfield tag="%(cf-tag-recid)s">%(recid)s</controlfield>\n""" \
             % { 'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
-                'recid'        : cgi.escape(recid, 1),
+                'recid'        : encode_for_xml(recid),
               }
 
     ## Loop through all xml lines and add them to the output string:
