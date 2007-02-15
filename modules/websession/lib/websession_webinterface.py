@@ -218,7 +218,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             title = _("Settings edited")
             act = "display"
             linkname = _("Show account")
-            mess = _("User settings stored correctly.")
+            mess = _("User settings saved correctly.")
         else:
             mess = _("Could not update settings.")
             act = "edit"
