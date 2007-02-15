@@ -161,11 +161,11 @@ update-v0.90.1-tables: local-dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 
 update-v0.92.0-tables: local-dbexec
-	echo "ALTER TABLE schTASK CHANGE arguments arguments longblob;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE usergroup ADD login_method VARCHAR(255) NOT NULL DEFAULT 'INTERNAL';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE usergroup ADD login_method varchar(255) NOT NULL default 'INTERNAL';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE usergroup ADD UNIQUE KEY login_method_name (login_method, name);" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user CHANGE settings settings BLOB NULL DEFAULT NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user CHANGE settings settings blob default NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
