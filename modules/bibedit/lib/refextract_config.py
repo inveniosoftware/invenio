@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import version, etcdir, CFG_PATH_PDFTOTEXT
+from invenio.config import version, etcdir
 
 # pylint: disable-msg=C0301
 
@@ -35,19 +35,6 @@ CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % e
 # report numbers knowledge base:
 CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % etcdir
 
-# path to pdftotext executable:
-CFG_REFEXTRACT_PDFTOTEXT = CFG_PATH_PDFTOTEXT
-
-### FIXME.  The following are not used in this early release. Do not change them.
-
-# Not important in this version:
-CFG_REFEXTRACT_CAT = "LD_LIBRARY_PATH='/opt/SUNWspro/lib:/usr/openwin/lib:/usr/dt/lib:/usr/local/lib'; export LD_LIBRARY_PATH; /bin/cat"
-
-# Again, not important in this version: (FIXME: can use CFG_PATH_GUNZIP)
-CFG_REFEXTRACT_GUNZIP = "LD_LIBRARY_PATH='/opt/SUNWspro/lib:/usr/openwin/lib:/usr/dt/lib:/usr/local/lib'; export LD_LIBRARY_PATH; /bin/gunzip"
-
-# Again not important in this version:
-CFG_REFEXTRACT_GS = "/usr/bin/gs" 
 
 # CFG_REFEXTRACT_NO_CITATION_TREATMENT:
 #   If no usable citations are found in a line, there are 2 options:
