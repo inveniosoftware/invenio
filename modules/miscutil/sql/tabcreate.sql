@@ -2385,7 +2385,7 @@ CREATE TABLE IF NOT EXISTS user (
 
 CREATE TABLE IF NOT EXISTS usergroup (
   id int(15) unsigned NOT NULL auto_increment,
-  name varchar(50) NOT NULL default '',
+  name varchar(255) NOT NULL default '',
   description text default '',
   join_policy char(2) NOT NULL default '',
   login_method varchar(255) NOT NULL default 'INTERNAL',
