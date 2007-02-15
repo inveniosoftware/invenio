@@ -36,16 +36,6 @@ CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % e
 CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % etcdir
 
 
-# CFG_REFEXTRACT_NO_CITATION_TREATMENT:
-#   If no usable citations are found in a line, there are 2 options:
-#   1) If this flag is set to 0, DO NOT use the standardised version of the line.  Instead, strip off the line marker and
-#   mark up the original UNTOUCHED line as miscellaneous text.
-#   2) If this flag is set to 1, mark up the "standardised" version of the line
-#   as Miscellaneous text.  This could result in a better formed reference line as titles could be
-#   standardised and corrected, BUT, there is a risk that the line could also be corrupted by
-#   partial title identification for example.
-CFG_REFEXTRACT_NO_CITATION_TREATMENT = 0
-
 ## MARC Fields and subfields used by refextract:
 
 ## reference fields:
