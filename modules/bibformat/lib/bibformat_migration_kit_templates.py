@@ -91,7 +91,7 @@ class Template:
         
         out = '''
         <p>The migration of your knowledge bases has been done.</p>
-        <p>You can go back to the main <a href="%s/admin/bibformat/index.%s.html">BibFormat administration page</a> or 
+        <p>You can go back to the main <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">BibFormat administration page</a> or 
         continue with the <a href="%s/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_behaviours?ln=%s">
         next step (Migration of behaviours) >>></a></p>''' % (weburl, ln, weburl, ln)
 
@@ -117,7 +117,7 @@ class Template:
         this point and modify the output formats if necessary.</p>'''
 
         out += '''
-        <p>You can go back to the main <a href="%s/admin/bibformat/index.%s.html">BibFormat administration page</a> or 
+        <p>You can go back to the main <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">BibFormat administration page</a> or 
         proceed with the  <a href="%s/admin/bibformat/bibformat_migration_kit_assistant.py/migrate_formats?ln=%s">
         next step (Migration of formats) >>></a></p>''' % (weburl, ln, weburl, ln)
 
