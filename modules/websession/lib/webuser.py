@@ -385,7 +385,7 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_un, p_pw)
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw)
         except WebAccessExternalAuthError:
             return([], p_email, p_pw, 16)
         if p_email: # Authenthicated externally
