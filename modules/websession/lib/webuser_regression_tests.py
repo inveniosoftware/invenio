@@ -56,7 +56,7 @@ class WebSessionYorSettingsTest(unittest.TestCase):
 
         # Going to edit page and setting records per group to 20
         browser.open(sweburl + "/youraccount/edit")
-        browser.select_form(name="edit_websearch")
+        browser.select_form(name="edit_websearch_settings")
         browser['group_records'] = ["20"]
         browser.submit()
 
@@ -82,7 +82,7 @@ class WebSessionYorSettingsTest(unittest.TestCase):
 
         # Going again to edit and setting records per group back to 10
         browser.open(sweburl + "/youraccount/edit")
-        browser.select_form(name="edit_websearch")
+        browser.select_form(name="edit_websearch_settings")
         browser['group_records'] = ["10"]
         browser.submit()
 

@@ -207,8 +207,8 @@ class Template:
     def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
         _ = gettext_set_language(ln)
         out = """
-            <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch">
-              <big><strong class="headline">%(edit_websearch)s</strong></big>
+            <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch_settings">
+              <big><strong class="headline">%(edit_websearch_settings)s</strong></big>
               <table>
                 <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value=1 name="latestbox"/></td>
                 <td valign="top"><b>%(show_latestbox)s</b></td></tr>
@@ -217,7 +217,7 @@ class Template:
                 <tr><td align="right"><select name="group_records">
         """ % {
           'sweburl' : sweburl,
-          'edit_websearch' : _("Edit search-related settings"),
+          'edit_websearch_settings' : _("Edit search-related settings"),
           'show_latestbox' : _("Show the latest additions box"),
           'checked_latestbox' : show_latestbox and 'checked' or '',
           'show_helpbox' : _("Show collection help boxes"),
