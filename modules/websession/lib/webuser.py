@@ -400,6 +400,10 @@ def loginUser(req, p_un, p_pw, login_method):
             try:
                 groups = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_groups_membership(p_email, p_pw)
                 # groups is a dictionary {group_name : group_description,}
+                new_groups = {}
+                for key, value in groups.items():
+                    new_groups[key + " [" + str(login_method) + "]"] = value
+                groups = new_groups
             except AttributeError:
                 pass
             except WebAccessExternalAuthError:
