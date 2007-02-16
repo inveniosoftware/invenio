@@ -86,7 +86,7 @@ class WebSessionYorSettingsTest(unittest.TestCase):
         browser['group_records'] = ["10"]
         browser.submit()
 
-        expected_response = "User settings stored correctly"
+        expected_response = "User settings saved correctly"
         changed_settings_body = browser.response().read()
         try:
             changed_settings_body.index(expected_response)
