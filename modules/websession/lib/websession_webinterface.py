@@ -165,7 +165,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
-                    mess = _("Switching to internal authentication.")
+                    mess = _("Switching to internal login method.")
                 else:
                     query = """SELECT email FROM user
                             WHERE id = %i"""
@@ -175,17 +175,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     else:
                         email = None
                     if not email:
-                        mess = _("Could not switch to external login '%s', because the email of the user is unknown.") % args['login_method']
+                        mess = _("Unable to switch to external login method %s, because your email address is unknown.") % args['login_method']
                     else:
                         try:
                             if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0].user_exists(email):
-                                mess = _("Could not switch to external login '%s', because this user is unknown to this external login system.") % args['login_method']
+                                mess = _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % args['login_method']
                             else:
                                 prefs['login_method'] = args['login_method']
                                 webuser.set_user_preferences(uid, prefs)
                                 mess = _("Login method successfully selected.")
                         except AttributeError:
-                            mess = _("Could not switch to external login '%s', because this method doesn't provide a way for checking if the user is inserted.") % args['login_method']
+                            mess = _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % args['login_method']
 
         elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
             return webuser.page_not_authorized(req, "../youraccount/change")
@@ -251,7 +251,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
         else:
-            mess = _("Could not update settings.")
+            mess = _("Unable to update settings.")
             act = "edit"
             linkname = _("Edit settings")
             title = _("Editing settings failed")
