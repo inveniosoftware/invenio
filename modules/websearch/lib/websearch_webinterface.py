@@ -90,7 +90,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             pref = get_user_preferences(uid)
             try:
                 argd['rg'] = int(pref['websearch_group_records'])
-            except KeyError, ValueError:
+            except (KeyError, ValueError):
                 pass
 
 
@@ -138,7 +138,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
             pref = get_user_preferences(uid)
             try:
                 argd['rg'] = int(pref['websearch_group_records'])
-            except KeyError, ValueError:
+            except (KeyError, ValueError):
                 pass
 
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
@@ -183,7 +183,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             pref = get_user_preferences(uid)
             try:
                 argd['rg'] = int(pref['websearch_group_records'])
-            except KeyError, ValueError:
+            except (KeyError, ValueError):
                 pass
 
         # If any of the collection requires authentication, redirect
@@ -237,7 +237,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             pref = get_user_preferences(uid)
             try:
                 argd['rg'] = int(pref['websearch_group_records'])
-            except KeyError, ValueError:
+            except (KeyError, ValueError):
                 pass
 
 
