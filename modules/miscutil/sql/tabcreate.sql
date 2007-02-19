@@ -2390,7 +2390,7 @@ CREATE TABLE IF NOT EXISTS usergroup (
   join_policy char(2) NOT NULL default '',
   login_method varchar(255) NOT NULL default 'INTERNAL',
   PRIMARY KEY  (id),
-  UNIQUE KEY login_method_name (login_method(244), name),
+  UNIQUE KEY login_method_name (login_method(70), name),
   KEY name (name)
 ) TYPE=MyISAM;
 
