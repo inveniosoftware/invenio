@@ -2264,12 +2264,23 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_header_p=True, print_footer_p=True):
-    """Prints list of records 'recIDs' formatted accoding to 'format' in groups of 'rg' starting from 'jrec'.
-    Assumes that the input list 'recIDs' is sorted in reverse order, so it counts records from tail to head.
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True):
+
+    """
+    Prints list of records 'recIDs' formatted accoding to 'format' in
+    groups of 'rg' starting from 'jrec'.
+
+    Assumes that the input list 'recIDs' is sorted in reverse order,
+    so it counts records from tail to head.
+
     A value of 'rg=-9999' means to print all records: to be used with care.
-    Print also list of RELEVANCES for each record (if defined), in between RELEVANCE_PROLOGUE and RELEVANCE_EPILOGUE.
-    Print header and/or footer specific to 'format' if 'print_header_p' and/or print_footer_p' are True. 
+
+    Print also list of RELEVANCES for each record (if defined), in
+    between RELEVANCE_PROLOGUE and RELEVANCE_EPILOGUE.
+
+    Print prologue and/or epilogue specific to 'format' if
+    'print_records_prologue_p' and/or print_records_epilogue_p' are
+    True.
     """
     
     # load the right message language
@@ -2307,8 +2318,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
         if format.startswith('x'):
 
             # print header if needed
-            if print_header_p:
-                print_records_header(req, format)
+            if print_records_prologue_p:
+                print_records_prologue(req, format)
  
             # print records
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
@@ -2319,8 +2330,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                      record_separator="\n",
                                      uid=uid))
             # print footer if needed
-            if print_footer_p:
-                print_records_footer(req, format)
+            if print_records_epilogue_p:
+                print_records_epilogue(req, format)
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
@@ -2416,45 +2427,37 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     else:
         print_warning(req, _("Use different search terms."))
 
-def print_records_header(req, format):
+def print_records_prologue(req, format):
     """
-    Prints the header for a list of records in the given format
+    Print the appropriate prologue for list of records in the given
+    format.
     """
-    header = ""
-    
+    prologue = "" # no prologue needed for HTML or Text formats
     if format.startswith('xm'):
-        header = websearch_templates.tmpl_xml_marc_prologue()
+        prologue = websearch_templates.tmpl_xml_marc_prologue()
     elif format.startswith('xn'):
-        header = websearch_templates.tmpl_xml_nlm_prologue()
+        prologue = websearch_templates.tmpl_xml_nlm_prologue()
     elif format.startswith('xr'):
-        header = websearch_templates.tmpl_xml_rss_prologue()
-    elif format.startswith('t'):
-        header = "" # no header for text output
-    else:
-        header = websearch_templates.tmpl_xml_default_prologue()
+        prologue = websearch_templates.tmpl_xml_rss_prologue()
+    elif format.startswith('x'):
+        prologue = websearch_templates.tmpl_xml_default_prologue()
+    req.write(prologue)
 
-    if header != "":
-        req.write(header)
-
-def print_records_footer(req, format):
+def print_records_epilogue(req, format):
     """
-    Prints the footer for a list of records in the given format
+    Print the appropriate epilogue for list of records in the given
+    format.
     """
-    footer = ""
-    
+    epilogue = "" # no epilogue needed for HTML or Text formats
     if format.startswith('xm'):
-        footer = websearch_templates.tmpl_xml_marc_epilogue()
+        epilogue = websearch_templates.tmpl_xml_marc_epilogue()
     elif format.startswith('xn'):
-        footer = websearch_templates.tmpl_xml_nlm_epilogue()
+        epilogue = websearch_templates.tmpl_xml_nlm_epilogue()
     elif format.startswith('xr'):
-        footer = websearch_templates.tmpl_xml_rss_epilogue()
-    elif format.startswith('t'):
-        footer = "" # no footer for text output
-    else:
-        footer = websearch_templates.tmpl_xml_default_epilogue()
-
-    if footer != "":
-        req.write(footer)
+        epilogue = websearch_templates.tmpl_xml_rss_epilogue()
+    elif format.startswith('x'):
+        epilogue = websearch_templates.tmpl_xml_default_epilogue()
+    req.write(epilogue)
         
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
                  search_pattern=None, uid=None):
@@ -3345,7 +3348,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
 
-            print_records_header(req, of)
+            print_records_prologue(req, of)
             for coll in colls_to_search:
                 if results_final.has_key(coll) and results_final[coll]._nbhits:
                     if of.startswith("h"):
@@ -3377,14 +3380,14 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                                   results_final_relevances_prologue,
                                   results_final_relevances_epilogue,
                                   search_pattern=p,
-                                  print_header_p=False,
-                                  print_footer_p=False)
+                                  print_records_prologue_p=False,
+                                  print_records_epilogue_p=False)
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
-            print_records_footer(req, of)
+            print_records_epilogue(req, of)
             if f == "author" and of.startswith("h"):
                 req.write(create_similarly_named_authors_link_box(p, ln))
             # log query:
