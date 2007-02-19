@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2007-02-14 18:51+0100\n"
+"POT-Creation-Date: 2007-02-19 16:54+0100\n"
 "PO-Revision-Date: 2006-12-13 17:21+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
@@ -692,7 +692,7 @@ msgstr "Prikaži svih %i autora"
 #: modules/websearch/lib/websearch_webinterface.py:377
 #: modules/websearch/lib/websearch_webinterface.py:446
 #: modules/websearch/web/admin/websearchadmin.py:1071
-#: modules/websession/lib/websession_webinterface.py:540
+#: modules/websession/lib/websession_webinterface.py:571
 #: modules/webstyle/lib/webstyle_templates.py:513
 #: modules/websubmit/lib/websubmit_webinterface.py:396
 #: modules/websubmit/lib/websubmit_webinterface.py:405
@@ -1375,20 +1375,20 @@ msgstr "Prikaži pretraživanja"
 #: modules/webmessage/lib/webmessage_templates.py:471
 #: modules/websession/lib/websession_templates.py:506
 #: modules/websession/lib/websession_templates.py:1901
-#: modules/websession/lib/websession_webinterface.py:78
-#: modules/websession/lib/websession_webinterface.py:94
-#: modules/websession/lib/websession_webinterface.py:122
-#: modules/websession/lib/websession_webinterface.py:230
-#: modules/websession/lib/websession_webinterface.py:251
-#: modules/websession/lib/websession_webinterface.py:277
-#: modules/websession/lib/websession_webinterface.py:289
-#: modules/websession/lib/websession_webinterface.py:346
-#: modules/websession/lib/websession_webinterface.py:367
-#: modules/websession/lib/websession_webinterface.py:388
-#: modules/websession/lib/websession_webinterface.py:420
-#: modules/websession/lib/websession_webinterface.py:450
+#: modules/websession/lib/websession_webinterface.py:79
+#: modules/websession/lib/websession_webinterface.py:95
+#: modules/websession/lib/websession_webinterface.py:123
+#: modules/websession/lib/websession_webinterface.py:261
+#: modules/websession/lib/websession_webinterface.py:282
+#: modules/websession/lib/websession_webinterface.py:308
+#: modules/websession/lib/websession_webinterface.py:320
+#: modules/websession/lib/websession_webinterface.py:377
+#: modules/websession/lib/websession_webinterface.py:398
+#: modules/websession/lib/websession_webinterface.py:419
+#: modules/websession/lib/websession_webinterface.py:451
 #: modules/websession/lib/websession_webinterface.py:481
-#: modules/websession/lib/websession_webinterface.py:546
+#: modules/websession/lib/websession_webinterface.py:512
+#: modules/websession/lib/websession_webinterface.py:577
 #: modules/websubmit/web/publiline.py:88
 #: modules/websubmit/web/yourapprovals.py:96
 #: modules/websubmit/web/yoursubmissions.py:177
@@ -1867,7 +1867,7 @@ msgstr ""
 "(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
-#: modules/websession/lib/websession_webinterface.py:116
+#: modules/websession/lib/websession_webinterface.py:117
 msgid "This functionality is forbidden to guest users."
 msgstr "Ova funkcionalnost nije dostupna za goste."
 
@@ -2313,8 +2313,8 @@ msgstr ""
 "Prije dodavanja komentara, trebate se %(x_url_open)sprijaviti%(x_url_close)s."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:193
-#: modules/websession/lib/websession_webinterface.py:418
-#: modules/websession/lib/websession_webinterface.py:448
+#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:479
 msgid "Login"
 msgstr "Prijava"
 
@@ -2546,9 +2546,9 @@ msgstr "Prikaži poruku"
 
 #: modules/websearch/lib/search_engine.py:361
 #: modules/websearch/lib/search_engine.py:385
-#: modules/websearch/lib/search_engine.py:3107
-#: modules/websearch/lib/search_engine.py:3146
-#: modules/websearch/lib/search_engine.py:3180
+#: modules/websearch/lib/search_engine.py:3110
+#: modules/websearch/lib/search_engine.py:3149
+#: modules/websearch/lib/search_engine.py:3183
 msgid "Search Results"
 msgstr "Pretraži rezultate"
 
@@ -2702,20 +2702,20 @@ msgstr ""
 "Nažalost, %s nije valjana opcija za sortiranje. Umjesto toga, izabrano je "
 "sortiranje prema naslovu."
 
-#: modules/websearch/lib/search_engine.py:2417
+#: modules/websearch/lib/search_engine.py:2428
 msgid "Use different search terms."
 msgstr "Koristite druge pojmove za pretragu."
 
-#: modules/websearch/lib/search_engine.py:2488
-#: modules/websearch/lib/search_engine.py:2639
-#: modules/websearch/lib/search_engine.py:2662
-#: modules/websearch/lib/search_engine.py:2669
-#: modules/websearch/lib/search_engine.py:2676
-#: modules/websearch/lib/search_engine.py:2722
+#: modules/websearch/lib/search_engine.py:2491
+#: modules/websearch/lib/search_engine.py:2642
+#: modules/websearch/lib/search_engine.py:2665
+#: modules/websearch/lib/search_engine.py:2672
+#: modules/websearch/lib/search_engine.py:2679
+#: modules/websearch/lib/search_engine.py:2725
 msgid "The record has been deleted."
 msgstr "Zapis je obrisan."
 
-#: modules/websearch/lib/search_engine.py:3089
+#: modules/websearch/lib/search_engine.py:3092
 #: modules/websearch/lib/websearch_templates.py:342
 #: modules/websearch/lib/websearch_templates.py:463
 #: modules/websearch/lib/websearch_templates.py:1308
@@ -2727,12 +2727,12 @@ msgstr "Zapis je obrisan."
 msgid "Browse"
 msgstr "Pregledaj"
 
-#: modules/websearch/lib/search_engine.py:3272
+#: modules/websearch/lib/search_engine.py:3275
 #, fuzzy
 msgid "No match within your time limits, discarding this condition..."
 msgstr "Nema rezultata u traženim vremenskim okvirima, zahtjev je odbačen..."
 
-#: modules/websearch/lib/search_engine.py:3294
+#: modules/websearch/lib/search_engine.py:3297
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Nema rezultata u traženim okvirima, zahtjev je odbačen..."
 
@@ -3031,7 +3031,7 @@ msgstr "%s sekundi"
 msgid "brief"
 msgstr "sažeto"
 
-#: modules/websession/lib/webaccount.py:109
+#: modules/websession/lib/webaccount.py:110
 #, python-format
 msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
@@ -3040,7 +3040,7 @@ msgstr ""
 "Prijavljeni ste kao gost. Možda se želite %(x_url_open)sprijaviti%"
 "(x_url_close)s kao redoviti korisnik."
 
-#: modules/websession/lib/webaccount.py:113
+#: modules/websession/lib/webaccount.py:114
 #, python-format
 msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
@@ -3049,7 +3049,7 @@ msgstr ""
 "%(x_fmt_open)sGosti%(x_fmt_close)s se prvo trebaju %(x_url_open)sregistrirati"
 "%(x_url_close)s"
 
-#: modules/websession/lib/webaccount.py:118
+#: modules/websession/lib/webaccount.py:119
 msgid "No queries found"
 msgstr "Upiti nisu pronađeni"
 
@@ -3080,7 +3080,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:108
 #, fuzzy
-msgid "External user settings"
+msgid "External account settings"
 msgstr "Postavke"
 
 #: modules/websession/lib/websession_templates.py:183
@@ -3092,8 +3092,9 @@ msgstr ""
 "vrijednosti dolje."
 
 #: modules/websession/lib/websession_templates.py:184
-msgid "Edit parameters"
-msgstr "Uredi parametre"
+#, fuzzy
+msgid "Edit login credentials"
+msgstr "Uredi način prijave"
 
 #: modules/websession/lib/websession_templates.py:188
 #: modules/websession/lib/websession_templates.py:191
@@ -3197,7 +3198,7 @@ msgstr ""
 "periodički izvještavajući Vas o rezultatima pretrage putem email-a."
 
 #: modules/websession/lib/websession_templates.py:356
-#: modules/websession/lib/websession_webinterface.py:118
+#: modules/websession/lib/websession_webinterface.py:119
 msgid "Your Settings"
 msgstr "Vaše postavke"
 
@@ -3285,7 +3286,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:514
 #: modules/websession/lib/websession_templates.py:1899
-#: modules/websession/lib/websession_webinterface.py:582
+#: modules/websession/lib/websession_webinterface.py:613
 msgid "Your Groups"
 msgstr "Vaše grupe"
 
@@ -3319,7 +3320,7 @@ msgid "Your Approvals"
 msgstr "Vaša odobrenja"
 
 #: modules/websession/lib/websession_templates.py:523
-#: modules/websession/lib/websession_webinterface.py:344
+#: modules/websession/lib/websession_webinterface.py:375
 msgid "Your Administrative Activities"
 msgstr "Vaše administracijske aktivnosti"
 
@@ -3413,13 +3414,13 @@ msgstr "Lozinka"
 
 #: modules/websession/lib/websession_templates.py:725
 #: modules/websession/lib/websession_templates.py:930
-#: modules/websession/lib/websession_webinterface.py:416
-#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:447
+#: modules/websession/lib/websession_webinterface.py:480
 msgid "login"
 msgstr "prijava"
 
 #: modules/websession/lib/websession_templates.py:730
-#: modules/websession/lib/websession_webinterface.py:249
+#: modules/websession/lib/websession_webinterface.py:280
 msgid "Lost your password?"
 msgstr "Zaboravili ste lozinku?"
 
@@ -3439,7 +3440,7 @@ msgid "Retype Password"
 msgstr "Lozinka ponovno"
 
 #: modules/websession/lib/websession_templates.py:824
-#: modules/websession/lib/websession_webinterface.py:545
+#: modules/websession/lib/websession_webinterface.py:576
 msgid "register"
 msgstr "registriraj se"
 
@@ -3600,7 +3601,7 @@ msgstr "Uredi %s članove"
 #: modules/websession/lib/websession_templates.py:1159
 #: modules/websession/lib/websession_templates.py:1300
 #: modules/websession/lib/websession_templates.py:1302
-#: modules/websession/lib/websession_webinterface.py:635
+#: modules/websession/lib/websession_webinterface.py:666
 msgid "Create new group"
 msgstr "Kreiraj novu grupu"
 
@@ -3826,101 +3827,127 @@ msgstr "Problem sa bazom podataka"
 msgid "user"
 msgstr "korisnik"
 
-#: modules/websession/lib/websession_webinterface.py:152
-#: modules/websession/lib/websession_webinterface.py:180
-#: modules/websession/lib/websession_webinterface.py:218
+#: modules/websession/lib/websession_webinterface.py:154
+#: modules/websession/lib/websession_webinterface.py:211
+#: modules/websession/lib/websession_webinterface.py:249
 msgid "Settings edited"
 msgstr "Postavke su promijenjene"
 
-#: modules/websession/lib/websession_webinterface.py:154
-#: modules/websession/lib/websession_webinterface.py:179
-#: modules/websession/lib/websession_webinterface.py:220
+#: modules/websession/lib/websession_webinterface.py:156
+#: modules/websession/lib/websession_webinterface.py:210
+#: modules/websession/lib/websession_webinterface.py:251
 msgid "Show account"
 msgstr "Prikažikorisnički račun"
 
-#: modules/websession/lib/websession_webinterface.py:158
+#: modules/websession/lib/websession_webinterface.py:168
+msgid "Switching to internal login method."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:178
+#, python-format
+msgid ""
+"Unable to switch to external login method %s, because your email address is "
+"unknown."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:182
+#, python-format
+msgid ""
+"Unable to switch to external login method %s, because your email address is "
+"unknown to the external login system."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:186
 msgid "Login method successfully selected."
 msgstr "Uspješno je izabran način prijave."
 
-#: modules/websession/lib/websession_webinterface.py:175
+#: modules/websession/lib/websession_webinterface.py:188
+#, python-format
+msgid ""
+"The external login method %s does not support email address based logins.  "
+"Please contact the site administrators."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:206
 msgid "Password successfully edited."
 msgstr "Lozinka je uspješno promijenjena."
 
-#: modules/websession/lib/websession_webinterface.py:177
+#: modules/websession/lib/websession_webinterface.py:208
 msgid "Settings successfully edited."
 msgstr "Postavke su uspješno promijenjene."
 
-#: modules/websession/lib/websession_webinterface.py:182
-#: modules/websession/lib/websession_webinterface.py:519
+#: modules/websession/lib/websession_webinterface.py:213
+#: modules/websession/lib/websession_webinterface.py:550
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Uneseni nadimak %s nije valjan."
 
-#: modules/websession/lib/websession_webinterface.py:183
-#: modules/websession/lib/websession_webinterface.py:189
-#: modules/websession/lib/websession_webinterface.py:202
-#: modules/websession/lib/websession_webinterface.py:208
-#: modules/websession/lib/websession_webinterface.py:510
-#: modules/websession/lib/websession_webinterface.py:515
-#: modules/websession/lib/websession_webinterface.py:520
-#: modules/websession/lib/websession_webinterface.py:531
+#: modules/websession/lib/websession_webinterface.py:214
+#: modules/websession/lib/websession_webinterface.py:220
+#: modules/websession/lib/websession_webinterface.py:233
+#: modules/websession/lib/websession_webinterface.py:239
+#: modules/websession/lib/websession_webinterface.py:541
+#: modules/websession/lib/websession_webinterface.py:546
+#: modules/websession/lib/websession_webinterface.py:551
+#: modules/websession/lib/websession_webinterface.py:562
 msgid "Please try again."
 msgstr "Molimo pokušajte ponovno."
 
-#: modules/websession/lib/websession_webinterface.py:185
-#: modules/websession/lib/websession_webinterface.py:191
-#: modules/websession/lib/websession_webinterface.py:198
-#: modules/websession/lib/websession_webinterface.py:204
-#: modules/websession/lib/websession_webinterface.py:210
-#: modules/websession/lib/websession_webinterface.py:225
+#: modules/websession/lib/websession_webinterface.py:216
+#: modules/websession/lib/websession_webinterface.py:222
+#: modules/websession/lib/websession_webinterface.py:229
+#: modules/websession/lib/websession_webinterface.py:235
+#: modules/websession/lib/websession_webinterface.py:241
+#: modules/websession/lib/websession_webinterface.py:256
 msgid "Edit settings"
 msgstr "Uredi postavke"
 
-#: modules/websession/lib/websession_webinterface.py:186
-#: modules/websession/lib/websession_webinterface.py:192
-#: modules/websession/lib/websession_webinterface.py:199
-#: modules/websession/lib/websession_webinterface.py:205
-#: modules/websession/lib/websession_webinterface.py:211
-#: modules/websession/lib/websession_webinterface.py:226
+#: modules/websession/lib/websession_webinterface.py:217
+#: modules/websession/lib/websession_webinterface.py:223
+#: modules/websession/lib/websession_webinterface.py:230
+#: modules/websession/lib/websession_webinterface.py:236
+#: modules/websession/lib/websession_webinterface.py:242
+#: modules/websession/lib/websession_webinterface.py:257
 msgid "Editing settings failed"
 msgstr "Uređivanje postavki nije uspjelo"
 
-#: modules/websession/lib/websession_webinterface.py:188
-#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:219
+#: modules/websession/lib/websession_webinterface.py:545
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "Unesena email adresa %s nije važeća."
 
-#: modules/websession/lib/websession_webinterface.py:194
-#: modules/websession/lib/websession_webinterface.py:524
+#: modules/websession/lib/websession_webinterface.py:225
+#: modules/websession/lib/websession_webinterface.py:555
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "Unesena email adresa %s već postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:196
-#: modules/websession/lib/websession_webinterface.py:526
+#: modules/websession/lib/websession_webinterface.py:227
+#: modules/websession/lib/websession_webinterface.py:557
 msgid "Or please try again."
 msgstr "Ili pokušajte ponovno."
 
-#: modules/websession/lib/websession_webinterface.py:201
+#: modules/websession/lib/websession_webinterface.py:232
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "Uneseni nadimak %s već je u upotrebi."
 
-#: modules/websession/lib/websession_webinterface.py:207
-#: modules/websession/lib/websession_webinterface.py:509
+#: modules/websession/lib/websession_webinterface.py:238
+#: modules/websession/lib/websession_webinterface.py:540
 msgid "Both passwords must match."
 msgstr "Lozinke se moraju podudarati."
 
-#: modules/websession/lib/websession_webinterface.py:221
-msgid "User settings stored correctly."
+#: modules/websession/lib/websession_webinterface.py:252
+msgid "User settings saved correctly."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:223
-msgid "Could not update settings."
+#: modules/websession/lib/websession_webinterface.py:254
+#, fuzzy
+msgid "Unable to update settings."
 msgstr "Nije moguće ažurirati postavke."
 
-#: modules/websession/lib/websession_webinterface.py:276
+#: modules/websession/lib/websession_webinterface.py:307
 msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
@@ -3928,15 +3955,15 @@ msgstr ""
 "Nismou mogućnosti poslati lozinku putem email-a jer koristite vanjski sistem "
 "autentifikacije."
 
-#: modules/websession/lib/websession_webinterface.py:288
+#: modules/websession/lib/websession_webinterface.py:319
 msgid "The entered email address does not exist in the database."
 msgstr "Unesena email adresa ne postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:300
+#: modules/websession/lib/websession_webinterface.py:331
 msgid "Credentials for"
 msgstr "Korisnički podaci za"
 
-#: modules/websession/lib/websession_webinterface.py:313
+#: modules/websession/lib/websession_webinterface.py:344
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -3944,40 +3971,40 @@ msgstr ""
 "Unesena email adresa nije ispravna, molimo provjerite jeste li ju dobro "
 "upisali (npr. ivanhorvat@primjer.com)."
 
-#: modules/websession/lib/websession_webinterface.py:314
+#: modules/websession/lib/websession_webinterface.py:345
 msgid "Incorrect email address"
 msgstr "Netočna email adresa"
 
-#: modules/websession/lib/websession_webinterface.py:325
+#: modules/websession/lib/websession_webinterface.py:356
 msgid "Lost password sent"
 msgstr "Lozinka je poslana"
 
-#: modules/websession/lib/websession_webinterface.py:365
+#: modules/websession/lib/websession_webinterface.py:396
 msgid "Delete Account"
 msgstr "Obriši korisnički račun"
 
-#: modules/websession/lib/websession_webinterface.py:386
+#: modules/websession/lib/websession_webinterface.py:417
 msgid "Logout"
 msgstr "Odjavi se"
 
-#: modules/websession/lib/websession_webinterface.py:479
+#: modules/websession/lib/websession_webinterface.py:510
 msgid "Register"
 msgstr "Registriraj se"
 
-#: modules/websession/lib/websession_webinterface.py:498
+#: modules/websession/lib/websession_webinterface.py:529
 msgid "Your account has been successfully created."
 msgstr "Vaš korisnički račun je uspješno kreiran."
 
-#: modules/websession/lib/websession_webinterface.py:499
+#: modules/websession/lib/websession_webinterface.py:530
 msgid "Account created"
 msgstr "Korisnički račun je kreiran"
 
-#: modules/websession/lib/websession_webinterface.py:501
+#: modules/websession/lib/websession_webinterface.py:532
 msgid ""
 "An email has been sent to the given address with the account information."
 msgstr "Na unesenu adresu je poslan email sa korisničkim podacima."
 
-#: modules/websession/lib/websession_webinterface.py:503
+#: modules/websession/lib/websession_webinterface.py:534
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -3985,44 +4012,44 @@ msgstr ""
 "Drugi email biti će poslan kad se korisnički račun aktivira i bude spreman "
 "za uporabu."
 
-#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:536
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr ""
 "Sada možete pristupiti %(x_url_open)sVašem korisničkom računu%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:512
-#: modules/websession/lib/websession_webinterface.py:517
-#: modules/websession/lib/websession_webinterface.py:522
-#: modules/websession/lib/websession_webinterface.py:528
-#: modules/websession/lib/websession_webinterface.py:533
-#: modules/websession/lib/websession_webinterface.py:537
-#: modules/websession/lib/websession_webinterface.py:542
+#: modules/websession/lib/websession_webinterface.py:543
+#: modules/websession/lib/websession_webinterface.py:548
+#: modules/websession/lib/websession_webinterface.py:553
+#: modules/websession/lib/websession_webinterface.py:559
+#: modules/websession/lib/websession_webinterface.py:564
+#: modules/websession/lib/websession_webinterface.py:568
+#: modules/websession/lib/websession_webinterface.py:573
 msgid "Registration failure"
 msgstr "Registracija nije uspjela"
 
-#: modules/websession/lib/websession_webinterface.py:530
+#: modules/websession/lib/websession_webinterface.py:561
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Uneseni nadimak %s već postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:535
+#: modules/websession/lib/websession_webinterface.py:566
 msgid "Users cannot register themselves, only admin can register them."
 msgstr "Korisnici se ne mogu sami registrirati, to mora učiniti administrator."
 
-#: modules/websession/lib/websession_webinterface.py:694
+#: modules/websession/lib/websession_webinterface.py:725
 msgid "Join New Group"
 msgstr "Pridruži se novoj grupi"
 
-#: modules/websession/lib/websession_webinterface.py:741
+#: modules/websession/lib/websession_webinterface.py:772
 msgid "Leave Group"
 msgstr "Napusti grupu"
 
-#: modules/websession/lib/websession_webinterface.py:806
+#: modules/websession/lib/websession_webinterface.py:837
 msgid "Edit Group"
 msgstr "Uredi grupu"
 
-#: modules/websession/lib/websession_webinterface.py:873
+#: modules/websession/lib/websession_webinterface.py:904
 msgid "Edit group members"
 msgstr "Uredi članove grupe"
 
@@ -4544,6 +4571,9 @@ msgstr "Za ovaj dokument nije zatraženo odobrenje."
 #: modules/websubmit/web/publiline.py:198
 msgid "Unable to display document."
 msgstr "Dokument se ne može prikazati."
+
+#~ msgid "Edit parameters"
+#~ msgstr "Uredi parametre"
 
 #~ msgid "Save"
 #~ msgstr "Spremi"

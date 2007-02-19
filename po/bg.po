@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2007-02-14 18:51+0100\n"
+"POT-Creation-Date: 2007-02-19 16:54+0100\n"
 "PO-Revision-Date: 2006-11-27 22:41+0200\n"
 "Last-Translator: Nikolay Dyankov <ndyankov@gmail.com>\n"
 "Language-Team: BG <cds.support@cern.ch>\n"
@@ -690,7 +690,7 @@ msgstr "Покажи всичките %i автора"
 #: modules/websearch/lib/websearch_webinterface.py:377
 #: modules/websearch/lib/websearch_webinterface.py:446
 #: modules/websearch/web/admin/websearchadmin.py:1071
-#: modules/websession/lib/websession_webinterface.py:540
+#: modules/websession/lib/websession_webinterface.py:571
 #: modules/webstyle/lib/webstyle_templates.py:513
 #: modules/websubmit/lib/websubmit_webinterface.py:396
 #: modules/websubmit/lib/websubmit_webinterface.py:405
@@ -1374,20 +1374,20 @@ msgstr "Покажи резултати"
 #: modules/webmessage/lib/webmessage_templates.py:471
 #: modules/websession/lib/websession_templates.py:506
 #: modules/websession/lib/websession_templates.py:1901
-#: modules/websession/lib/websession_webinterface.py:78
-#: modules/websession/lib/websession_webinterface.py:94
-#: modules/websession/lib/websession_webinterface.py:122
-#: modules/websession/lib/websession_webinterface.py:230
-#: modules/websession/lib/websession_webinterface.py:251
-#: modules/websession/lib/websession_webinterface.py:277
-#: modules/websession/lib/websession_webinterface.py:289
-#: modules/websession/lib/websession_webinterface.py:346
-#: modules/websession/lib/websession_webinterface.py:367
-#: modules/websession/lib/websession_webinterface.py:388
-#: modules/websession/lib/websession_webinterface.py:420
-#: modules/websession/lib/websession_webinterface.py:450
+#: modules/websession/lib/websession_webinterface.py:79
+#: modules/websession/lib/websession_webinterface.py:95
+#: modules/websession/lib/websession_webinterface.py:123
+#: modules/websession/lib/websession_webinterface.py:261
+#: modules/websession/lib/websession_webinterface.py:282
+#: modules/websession/lib/websession_webinterface.py:308
+#: modules/websession/lib/websession_webinterface.py:320
+#: modules/websession/lib/websession_webinterface.py:377
+#: modules/websession/lib/websession_webinterface.py:398
+#: modules/websession/lib/websession_webinterface.py:419
+#: modules/websession/lib/websession_webinterface.py:451
 #: modules/websession/lib/websession_webinterface.py:481
-#: modules/websession/lib/websession_webinterface.py:546
+#: modules/websession/lib/websession_webinterface.py:512
+#: modules/websession/lib/websession_webinterface.py:577
 #: modules/websubmit/web/publiline.py:88
 #: modules/websubmit/web/yourapprovals.py:96
 #: modules/websubmit/web/yoursubmissions.py:177
@@ -1867,7 +1867,7 @@ msgstr ""
 "(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
-#: modules/websession/lib/websession_webinterface.py:116
+#: modules/websession/lib/websession_webinterface.py:117
 msgid "This functionality is forbidden to guest users."
 msgstr "Тази функционалност е забранена за посетители гости."
 
@@ -2317,8 +2317,8 @@ msgstr ""
 "(x_url_close)s first"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:193
-#: modules/websession/lib/websession_webinterface.py:418
-#: modules/websession/lib/websession_webinterface.py:448
+#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:479
 msgid "Login"
 msgstr "Вход"
 
@@ -2552,9 +2552,9 @@ msgstr "Прочети писмо"
 
 #: modules/websearch/lib/search_engine.py:361
 #: modules/websearch/lib/search_engine.py:385
-#: modules/websearch/lib/search_engine.py:3107
-#: modules/websearch/lib/search_engine.py:3146
-#: modules/websearch/lib/search_engine.py:3180
+#: modules/websearch/lib/search_engine.py:3110
+#: modules/websearch/lib/search_engine.py:3149
+#: modules/websearch/lib/search_engine.py:3183
 msgid "Search Results"
 msgstr "Резултати от търсенето"
 
@@ -2709,20 +2709,20 @@ msgstr ""
 "Съжаляваме, %s не е валидна опция за сортиране. Използваме сортиране по "
 "заглавие."
 
-#: modules/websearch/lib/search_engine.py:2417
+#: modules/websearch/lib/search_engine.py:2428
 msgid "Use different search terms."
 msgstr "Използвайте други думи за търсене."
 
-#: modules/websearch/lib/search_engine.py:2488
-#: modules/websearch/lib/search_engine.py:2639
-#: modules/websearch/lib/search_engine.py:2662
-#: modules/websearch/lib/search_engine.py:2669
-#: modules/websearch/lib/search_engine.py:2676
-#: modules/websearch/lib/search_engine.py:2722
+#: modules/websearch/lib/search_engine.py:2491
+#: modules/websearch/lib/search_engine.py:2642
+#: modules/websearch/lib/search_engine.py:2665
+#: modules/websearch/lib/search_engine.py:2672
+#: modules/websearch/lib/search_engine.py:2679
+#: modules/websearch/lib/search_engine.py:2725
 msgid "The record has been deleted."
 msgstr "Записът беше изтрит."
 
-#: modules/websearch/lib/search_engine.py:3089
+#: modules/websearch/lib/search_engine.py:3092
 #: modules/websearch/lib/websearch_templates.py:342
 #: modules/websearch/lib/websearch_templates.py:463
 #: modules/websearch/lib/websearch_templates.py:1308
@@ -2734,13 +2734,13 @@ msgstr "Записът беше изтрит."
 msgid "Browse"
 msgstr "Прегледай"
 
-#: modules/websearch/lib/search_engine.py:3272
+#: modules/websearch/lib/search_engine.py:3275
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Нямаше съвпадение, удовлетворяващо вашите времеви критерии, премахване на "
 "това условие..."
 
-#: modules/websearch/lib/search_engine.py:3294
+#: modules/websearch/lib/search_engine.py:3297
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Нямаше съвпадения, удовлетворявщо вашите граници за търсене, премахване на "
@@ -3041,7 +3041,7 @@ msgstr "%s секунди"
 msgid "brief"
 msgstr "кратко"
 
-#: modules/websession/lib/webaccount.py:109
+#: modules/websession/lib/webaccount.py:110
 #, python-format
 msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
@@ -3050,7 +3050,7 @@ msgstr ""
 "Вие сте влязъл като гост. Може да %(x_url_open)sвлезете%(x_url_close)s като "
 "редовен потребител."
 
-#: modules/websession/lib/webaccount.py:113
+#: modules/websession/lib/webaccount.py:114
 #, python-format
 msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
@@ -3059,7 +3059,7 @@ msgstr ""
 "Потребителите %(x_fmt_open)sгости%(x_fmt_close)s трябва първо да се %"
 "(x_url_open)sрегистрират%(x_url_close)s"
 
-#: modules/websession/lib/webaccount.py:118
+#: modules/websession/lib/webaccount.py:119
 msgid "No queries found"
 msgstr "Не бяха намерени заявки"
 
@@ -3091,7 +3091,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:108
 #, fuzzy
-msgid "External user settings"
+msgid "External account settings"
 msgstr "Общи настройки"
 
 #: modules/websession/lib/websession_templates.py:183
@@ -3103,8 +3103,9 @@ msgstr ""
 "новите стойности във формуляра отдолу."
 
 #: modules/websession/lib/websession_templates.py:184
-msgid "Edit parameters"
-msgstr "Редактирай параметрите"
+#, fuzzy
+msgid "Edit login credentials"
+msgstr "Промяна на метода за идентификация"
 
 #: modules/websession/lib/websession_templates.py:188
 #: modules/websession/lib/websession_templates.py:191
@@ -3208,7 +3209,7 @@ msgstr ""
 "което ще се извършва периодично и ще ви уведомява за резултатите по e-mail."
 
 #: modules/websession/lib/websession_templates.py:356
-#: modules/websession/lib/websession_webinterface.py:118
+#: modules/websession/lib/websession_webinterface.py:119
 msgid "Your Settings"
 msgstr "Вашите настройки"
 
@@ -3296,7 +3297,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:514
 #: modules/websession/lib/websession_templates.py:1899
-#: modules/websession/lib/websession_webinterface.py:582
+#: modules/websession/lib/websession_webinterface.py:613
 msgid "Your Groups"
 msgstr "Вашите групи"
 
@@ -3329,7 +3330,7 @@ msgid "Your Approvals"
 msgstr "Вашите одобрения"
 
 #: modules/websession/lib/websession_templates.py:523
-#: modules/websession/lib/websession_webinterface.py:344
+#: modules/websession/lib/websession_webinterface.py:375
 msgid "Your Administrative Activities"
 msgstr "Вашите действия за администриране"
 
@@ -3422,13 +3423,13 @@ msgstr "Парола"
 
 #: modules/websession/lib/websession_templates.py:725
 #: modules/websession/lib/websession_templates.py:930
-#: modules/websession/lib/websession_webinterface.py:416
-#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:447
+#: modules/websession/lib/websession_webinterface.py:480
 msgid "login"
 msgstr "вход"
 
 #: modules/websession/lib/websession_templates.py:730
-#: modules/websession/lib/websession_webinterface.py:249
+#: modules/websession/lib/websession_webinterface.py:280
 msgid "Lost your password?"
 msgstr "Забравена парола?"
 
@@ -3448,7 +3449,7 @@ msgid "Retype Password"
 msgstr "Въведете отново паролата"
 
 #: modules/websession/lib/websession_templates.py:824
-#: modules/websession/lib/websession_webinterface.py:545
+#: modules/websession/lib/websession_webinterface.py:576
 msgid "register"
 msgstr "регистриране"
 
@@ -3608,7 +3609,7 @@ msgstr "Редактирай %s членове"
 #: modules/websession/lib/websession_templates.py:1159
 #: modules/websession/lib/websession_templates.py:1300
 #: modules/websession/lib/websession_templates.py:1302
-#: modules/websession/lib/websession_webinterface.py:635
+#: modules/websession/lib/websession_webinterface.py:666
 msgid "Create new group"
 msgstr "Създаване на нова група"
 
@@ -3835,101 +3836,127 @@ msgstr "Проблем с базата данни"
 msgid "user"
 msgstr "потребител"
 
-#: modules/websession/lib/websession_webinterface.py:152
-#: modules/websession/lib/websession_webinterface.py:180
-#: modules/websession/lib/websession_webinterface.py:218
+#: modules/websession/lib/websession_webinterface.py:154
+#: modules/websession/lib/websession_webinterface.py:211
+#: modules/websession/lib/websession_webinterface.py:249
 msgid "Settings edited"
 msgstr "Настройките бяха редактирани"
 
-#: modules/websession/lib/websession_webinterface.py:154
-#: modules/websession/lib/websession_webinterface.py:179
-#: modules/websession/lib/websession_webinterface.py:220
+#: modules/websession/lib/websession_webinterface.py:156
+#: modules/websession/lib/websession_webinterface.py:210
+#: modules/websession/lib/websession_webinterface.py:251
 msgid "Show account"
 msgstr "Покажи сметката"
 
-#: modules/websession/lib/websession_webinterface.py:158
+#: modules/websession/lib/websession_webinterface.py:168
+msgid "Switching to internal login method."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:178
+#, python-format
+msgid ""
+"Unable to switch to external login method %s, because your email address is "
+"unknown."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:182
+#, python-format
+msgid ""
+"Unable to switch to external login method %s, because your email address is "
+"unknown to the external login system."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:186
 msgid "Login method successfully selected."
 msgstr "Методът за вход беше успешно избран."
 
-#: modules/websession/lib/websession_webinterface.py:175
+#: modules/websession/lib/websession_webinterface.py:188
+#, python-format
+msgid ""
+"The external login method %s does not support email address based logins.  "
+"Please contact the site administrators."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:206
 msgid "Password successfully edited."
 msgstr "Паролата беше успешно редактирана."
 
-#: modules/websession/lib/websession_webinterface.py:177
+#: modules/websession/lib/websession_webinterface.py:208
 msgid "Settings successfully edited."
 msgstr "Настройките бяха успешно редактирани."
 
-#: modules/websession/lib/websession_webinterface.py:182
-#: modules/websession/lib/websession_webinterface.py:519
+#: modules/websession/lib/websession_webinterface.py:213
+#: modules/websession/lib/websession_webinterface.py:550
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Желаният псевдоним %s не е валиден."
 
-#: modules/websession/lib/websession_webinterface.py:183
-#: modules/websession/lib/websession_webinterface.py:189
-#: modules/websession/lib/websession_webinterface.py:202
-#: modules/websession/lib/websession_webinterface.py:208
-#: modules/websession/lib/websession_webinterface.py:510
-#: modules/websession/lib/websession_webinterface.py:515
-#: modules/websession/lib/websession_webinterface.py:520
-#: modules/websession/lib/websession_webinterface.py:531
+#: modules/websession/lib/websession_webinterface.py:214
+#: modules/websession/lib/websession_webinterface.py:220
+#: modules/websession/lib/websession_webinterface.py:233
+#: modules/websession/lib/websession_webinterface.py:239
+#: modules/websession/lib/websession_webinterface.py:541
+#: modules/websession/lib/websession_webinterface.py:546
+#: modules/websession/lib/websession_webinterface.py:551
+#: modules/websession/lib/websession_webinterface.py:562
 msgid "Please try again."
 msgstr "Моля, опитайте отново."
 
-#: modules/websession/lib/websession_webinterface.py:185
-#: modules/websession/lib/websession_webinterface.py:191
-#: modules/websession/lib/websession_webinterface.py:198
-#: modules/websession/lib/websession_webinterface.py:204
-#: modules/websession/lib/websession_webinterface.py:210
-#: modules/websession/lib/websession_webinterface.py:225
+#: modules/websession/lib/websession_webinterface.py:216
+#: modules/websession/lib/websession_webinterface.py:222
+#: modules/websession/lib/websession_webinterface.py:229
+#: modules/websession/lib/websession_webinterface.py:235
+#: modules/websession/lib/websession_webinterface.py:241
+#: modules/websession/lib/websession_webinterface.py:256
 msgid "Edit settings"
 msgstr "Редактирай настройките"
 
-#: modules/websession/lib/websession_webinterface.py:186
-#: modules/websession/lib/websession_webinterface.py:192
-#: modules/websession/lib/websession_webinterface.py:199
-#: modules/websession/lib/websession_webinterface.py:205
-#: modules/websession/lib/websession_webinterface.py:211
-#: modules/websession/lib/websession_webinterface.py:226
+#: modules/websession/lib/websession_webinterface.py:217
+#: modules/websession/lib/websession_webinterface.py:223
+#: modules/websession/lib/websession_webinterface.py:230
+#: modules/websession/lib/websession_webinterface.py:236
+#: modules/websession/lib/websession_webinterface.py:242
+#: modules/websession/lib/websession_webinterface.py:257
 msgid "Editing settings failed"
 msgstr "Промяната на настройките е неуспешна"
 
-#: modules/websession/lib/websession_webinterface.py:188
-#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:219
+#: modules/websession/lib/websession_webinterface.py:545
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "Посоченият e-mail %s не е валиден."
 
-#: modules/websession/lib/websession_webinterface.py:194
-#: modules/websession/lib/websession_webinterface.py:524
+#: modules/websession/lib/websession_webinterface.py:225
+#: modules/websession/lib/websession_webinterface.py:555
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "Посоченият e-mail %s вече съществува в базата данни."
 
-#: modules/websession/lib/websession_webinterface.py:196
-#: modules/websession/lib/websession_webinterface.py:526
+#: modules/websession/lib/websession_webinterface.py:227
+#: modules/websession/lib/websession_webinterface.py:557
 msgid "Or please try again."
 msgstr "Или опитайте отново."
 
-#: modules/websession/lib/websession_webinterface.py:201
+#: modules/websession/lib/websession_webinterface.py:232
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "Желаното име %s вече съществува."
 
-#: modules/websession/lib/websession_webinterface.py:207
-#: modules/websession/lib/websession_webinterface.py:509
+#: modules/websession/lib/websession_webinterface.py:238
+#: modules/websession/lib/websession_webinterface.py:540
 msgid "Both passwords must match."
 msgstr "Двете пароли трябва да съвпадат."
 
-#: modules/websession/lib/websession_webinterface.py:221
-msgid "User settings stored correctly."
+#: modules/websession/lib/websession_webinterface.py:252
+msgid "User settings saved correctly."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:223
-msgid "Could not update settings."
+#: modules/websession/lib/websession_webinterface.py:254
+#, fuzzy
+msgid "Unable to update settings."
 msgstr "Настройките не можаха да бъдат обновени."
 
-#: modules/websession/lib/websession_webinterface.py:276
+#: modules/websession/lib/websession_webinterface.py:307
 msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
@@ -3937,15 +3964,15 @@ msgstr ""
 "Паролата не може да бъде изпратена по e-mail, тъй като вие използвате външно "
 "удостоверяване."
 
-#: modules/websession/lib/websession_webinterface.py:288
+#: modules/websession/lib/websession_webinterface.py:319
 msgid "The entered email address does not exist in the database."
 msgstr "Въведеният e-mail не съществува в базата от данни."
 
-#: modules/websession/lib/websession_webinterface.py:300
+#: modules/websession/lib/websession_webinterface.py:331
 msgid "Credentials for"
 msgstr "Акредитации за"
 
-#: modules/websession/lib/websession_webinterface.py:313
+#: modules/websession/lib/websession_webinterface.py:344
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -3953,40 +3980,40 @@ msgstr ""
 "Въведеният e-mail не е валиден, моля проверете дали е написан правилно (пр. "
 "johndoe@example.com)."
 
-#: modules/websession/lib/websession_webinterface.py:314
+#: modules/websession/lib/websession_webinterface.py:345
 msgid "Incorrect email address"
 msgstr "Невалиден e-mail адрес"
 
-#: modules/websession/lib/websession_webinterface.py:325
+#: modules/websession/lib/websession_webinterface.py:356
 msgid "Lost password sent"
 msgstr "Забравената парола е изпратена"
 
-#: modules/websession/lib/websession_webinterface.py:365
+#: modules/websession/lib/websession_webinterface.py:396
 msgid "Delete Account"
 msgstr "Изтриване на сметка"
 
-#: modules/websession/lib/websession_webinterface.py:386
+#: modules/websession/lib/websession_webinterface.py:417
 msgid "Logout"
 msgstr "Изход"
 
-#: modules/websession/lib/websession_webinterface.py:479
+#: modules/websession/lib/websession_webinterface.py:510
 msgid "Register"
 msgstr "Регистрация"
 
-#: modules/websession/lib/websession_webinterface.py:498
+#: modules/websession/lib/websession_webinterface.py:529
 msgid "Your account has been successfully created."
 msgstr "Вашата сметка беше успешно създадена."
 
-#: modules/websession/lib/websession_webinterface.py:499
+#: modules/websession/lib/websession_webinterface.py:530
 msgid "Account created"
 msgstr "Сметката беше създадена"
 
-#: modules/websession/lib/websession_webinterface.py:501
+#: modules/websession/lib/websession_webinterface.py:532
 msgid ""
 "An email has been sent to the given address with the account information."
 msgstr "На посочения адрес беше изпратен e-mail с информация за сметката."
 
-#: modules/websession/lib/websession_webinterface.py:503
+#: modules/websession/lib/websession_webinterface.py:534
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -3994,45 +4021,45 @@ msgstr ""
 "Втори e-mail ще бъде изпратен, когато сметката е активирана и може да бъде "
 "използвана."
 
-#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:536
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr "Сега може да влезете във вашата %(x_url_open)sсметка%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:512
-#: modules/websession/lib/websession_webinterface.py:517
-#: modules/websession/lib/websession_webinterface.py:522
-#: modules/websession/lib/websession_webinterface.py:528
-#: modules/websession/lib/websession_webinterface.py:533
-#: modules/websession/lib/websession_webinterface.py:537
-#: modules/websession/lib/websession_webinterface.py:542
+#: modules/websession/lib/websession_webinterface.py:543
+#: modules/websession/lib/websession_webinterface.py:548
+#: modules/websession/lib/websession_webinterface.py:553
+#: modules/websession/lib/websession_webinterface.py:559
+#: modules/websession/lib/websession_webinterface.py:564
+#: modules/websession/lib/websession_webinterface.py:568
+#: modules/websession/lib/websession_webinterface.py:573
 msgid "Registration failure"
 msgstr "Грешка при регистрация"
 
-#: modules/websession/lib/websession_webinterface.py:530
+#: modules/websession/lib/websession_webinterface.py:561
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Желаният псевдоним %s вече съществува в базата от данни."
 
-#: modules/websession/lib/websession_webinterface.py:535
+#: modules/websession/lib/websession_webinterface.py:566
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "Потребителите не могат да се регистрират сами, само администратор може да ги "
 "регистрира."
 
-#: modules/websession/lib/websession_webinterface.py:694
+#: modules/websession/lib/websession_webinterface.py:725
 msgid "Join New Group"
 msgstr "Присъедини се към група"
 
-#: modules/websession/lib/websession_webinterface.py:741
+#: modules/websession/lib/websession_webinterface.py:772
 msgid "Leave Group"
 msgstr "Напусни група"
 
-#: modules/websession/lib/websession_webinterface.py:806
+#: modules/websession/lib/websession_webinterface.py:837
 msgid "Edit Group"
 msgstr "Редактирай група"
 
-#: modules/websession/lib/websession_webinterface.py:873
+#: modules/websession/lib/websession_webinterface.py:904
 msgid "Edit group members"
 msgstr "Редактирай членове на група"
 
@@ -4549,6 +4576,9 @@ msgstr "Този документ никога не е заявяван за о�
 #: modules/websubmit/web/publiline.py:198
 msgid "Unable to display document."
 msgstr "Документът не може да бъде показан."
+
+#~ msgid "Edit parameters"
+#~ msgstr "Редактирай параметрите"
 
 #~ msgid "Save"
 #~ msgstr "Запази"
