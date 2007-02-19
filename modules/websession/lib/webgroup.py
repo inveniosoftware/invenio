@@ -794,15 +794,15 @@ def synchronize_groups_with_login_method():
     for login_method, authorizer in CFG_EXTERNAL_AUTHENTICATION.items():
         if authorizer[0]:
             try:
-                usersgroups = authorizer[0].fetch_all_users_groups_membership()
-                synchronize_all_external_groups(usersgroups, login_method)
-            except NameError, NotImplementedError:
+                    usersgroups = authorizer[0].fetch_all_users_groups_membership()
+                    synchronize_all_external_groups(usersgroups, login_method)
+            except (NotImplementedError, NameError):
                 users = db.get_all_users_with_groups_with_login_method(login_method)
                 for email, uid in users.items():
                     try:
                         groups = authorizer[0].fetch_user_groups_membership(email)
                         synchronize_external_groups(uid, groups, login_method)
-                    except NameError, NotImplementedError:
+                    except (NotImplementedError, NameError):
                         pass
 
 

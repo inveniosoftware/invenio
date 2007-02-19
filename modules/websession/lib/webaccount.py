@@ -38,6 +38,7 @@ from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
 from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.messages import gettext_set_language
+from invenio.external_authentication import WebAccessExternalAuthError
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -196,11 +197,11 @@ def perform_set(email,password, ln, verbose=0):
         # to switch.
 
         for method in methods:
-            try:
-                if not CFG_EXTERNAL_AUTHENTICATION[method][0].user_exists(email):
-                    methods.remove(method)
-            except AttributeError:
-                if CFG_EXTERNAL_AUTHENTICATION[method][0]: # We don't delete Internal method
+            if CFG_EXTERNAL_AUTHENTICATION[method][0]:
+                try:
+                    if not CFG_EXTERNAL_AUTHENTICATION[method][0].user_exists(email):
+                        methods.remove(method)
+                except (AttributeError, WebAccessExternalAuthError):
                     methods.remove(method)
         methods.sort()
 

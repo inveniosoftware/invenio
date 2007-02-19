@@ -31,9 +31,6 @@ from invenio.external_authentication import ExternalAuth, \
         WebAccessExternalAuthError
 from invenio.external_authentication_cern_wrapper import AuthCernWrapper
 
-_managed_exceptions = (httplib.CannotSendRequest,
-                        socket.error)
-
 class ExternalAuthCern(ExternalAuth):
     """
     External authentication example for a custom HTTPS-based
@@ -50,22 +47,18 @@ class ExternalAuthCern(ExternalAuth):
             self.connection = None
 
 
-    def _try_twice(self, funct, *params):
+    def _try_twice(self, funct, params):
+        """Try twice to execute funct on self.connection passing it params.
+        If for various reason the connection doesn't work it's restarted
+        """
         try:
-
-            ret = eval("self.connection." + funct+str(params))
-        except Exception, e:
-            if isinstance(e, _managed_exceptions):
-                self.connection = AuthCernWrapper()
-                try:
-                    ret = eval("self.connection." + funct+str(params))
-                except Exception, e:
-                    if isinstance(e, _managed_exceptions):
-                        raise WebAccessExternalAuthError
-                    else:
-                        raise e
-            else:
-                raise e
+            ret = funct(self.connection, **params)
+        except (httplib.CannotSendRequest, socket.error, AttributeError):
+            self.connection = AuthCernWrapper()
+            try:
+                ret = funct(self.connection, **params)
+            except (httplib.CannotSendRequest, socket.error, AttributeError):
+                raise WebAccessExternalAuthError
         return ret
 
 
@@ -76,11 +69,9 @@ class ExternalAuthCern(ExternalAuth):
         person if authentication succeeded.
         """
 
-        infos = self._try_twice('get_user_info', username, password)
+        infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \
+                params={"user_name":username, "password":password})
         if "email" in infos:
-            self.last_username = username
-            self.last_password = password
-            self.last_prefs = infos
             return infos["email"]
         else:
             return None
@@ -89,7 +80,8 @@ class ExternalAuthCern(ExternalAuth):
         """Checks against CERN NICE/CRA for existance of email.
         @return True if the user exists, False otherwise
         """
-        users = self._try_twice('list_users', email)
+        users = self._try_twice(funct=AuthCernWrapper.list_users, \
+                params={"display_name":email})
         return email.upper() in [user['email'].upper() for user in users]
 
 
@@ -97,7 +89,8 @@ class ExternalAuthCern(ExternalAuth):
         """Fetch user groups membership from the CERN NICE/CRA account.
         @return a dictionary of groupname, group description
         """
-        groups = self._try_twice('get_groups_for_user', email)
+        groups = self._try_twice(funct=AuthCernWrapper.get_groups_for_user, \
+                params={"user_name":email})
         return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                         or x + ' (Group)'), groups))
 
@@ -108,7 +101,8 @@ class ExternalAuthCern(ExternalAuth):
         otherwise 0
         @return a dictionary. Note: auth and respccid are hidden
         """
-        prefs = self._try_twice('get_user_info', username, password)
+        prefs = self._try_twice(funct=AuthCernWrapper.get_user_info, \
+                params={"user_name":username, "password":password})
         ret = {}
         for key, value in prefs.items():
             if key in ['auth', 'respccid', 'ccid']:
