@@ -142,6 +142,25 @@ except ImportError, e:
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
+    import rdflib
+except ImportError, e:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that rdflib is needed only if you plan     **
+    ** to work with the automatic classification of    **
+    ** documents based on RDF-based taxonomies.        **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """ % e
+    wait_for_user("Press ENTER to continue the installation...")
+
+try:
     import pyRXP
 except ImportError, e:
     print """
