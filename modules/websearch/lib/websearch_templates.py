@@ -2487,7 +2487,7 @@ class Template:
         return out
 
     def tmpl_xml_default_epilogue(self):
-        """Creates XML default format epilogue. (Sanity calls only."""
+        """Creates XML default format epilogue. (Sanity calls only.)"""
         out = """\n</collection>"""
         return out
 
