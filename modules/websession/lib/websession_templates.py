@@ -690,7 +690,7 @@ class Template:
             login_select += "</select>"
             out += """
                    <tr>
-                      <td align="right">%(login_title)s</td>
+                      <td align="right"><strong>%(login_title)s</strong></td>
                       <td>%(login_select)s</td>
                       <td></td>
                    </tr>""" % {
