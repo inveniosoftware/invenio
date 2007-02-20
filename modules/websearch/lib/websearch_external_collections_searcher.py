@@ -353,7 +353,7 @@ class KissForPreprintsSearchEngine(KissSearchEngine):
     def __init__(self, configuration):
         super(KissForPreprintsSearchEngine, self).__init__(configuration)
         self.base_url = "http://www-lib.kek.jp/KISS/kiss_prepri.html"
-        self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_prepri?"
+        self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_prepri.v8?"
 
 class KissForBooksAndJournalsSearchEngine(KissSearchEngine):
     """Interface for seaching on Kiss for Books and Journals"""
@@ -361,7 +361,7 @@ class KissForBooksAndJournalsSearchEngine(KissSearchEngine):
     def __init__(self, configuration):
         super(KissForBooksAndJournalsSearchEngine, self).__init__(configuration)
         self.base_url = "http://www-lib.kek.jp/KISS/kiss_book.html"
-        self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_book?DSP=1&"
+        self.search_url = "http://www-lib.kek.jp/cgi-bin/kiss_book.v8?DSP=1&"
         self.parser = KISSBooksExternalCollectionResultsParser()
 
 # Scirus
