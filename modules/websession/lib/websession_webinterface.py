@@ -147,12 +147,13 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/change")
 
+        prefs = webuser.get_user_preferences(uid)
+
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
             title = _("Settings edited")
             act = "display"
             linkname = _("Show account")
-            prefs = webuser.get_user_preferences(uid)
 
             if prefs['login_method'] != args['login_method']:
                 if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
@@ -186,6 +187,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
             return webuser.page_not_authorized(req, "../youraccount/change")
         elif args['email']:
+            # We should ignore the password if the authentication method is an
+            # external one.
+            ignore_password_p = CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][0] != None
             uid2 = webuser.emailUnique(args['email'])
             uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname'])
             if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
@@ -198,7 +202,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     change = webuser.updateDataUser(uid,
                                                     args['email'],
                                                     args['password'],
-                                                    args['nickname'],)
+                                                    args['nickname'],
+                                                    ignore_password_p)
                 else:
                     return webuser.page_not_authorized(req, "../youraccount/change")
                 if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:

@@ -162,8 +162,10 @@ def warning_guest_user(type, ln=cdslang):
 def perform_delete(ln):
     return websession_templates.tmpl_account_delete(ln = ln)
 
-## perform_set(email,password): edit your account parameters, email and password.
 def perform_set(email,password, ln, verbose=0):
+    """Perform_set(email,password): edit your account parameters, email and 
+    password.
+    """
 
     try:
         res = run_sql("SELECT id, nickname FROM user WHERE email=%s", (email,))

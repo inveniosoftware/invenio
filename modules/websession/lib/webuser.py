@@ -353,19 +353,28 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
         sendNewAdminAccountWarning(email, adminemail)
     return 0
 
-def updateDataUser(uid, email, password, nickname):
+def updateDataUser(uid, email, password, nickname, ignore_password_p=False):
     """Update user data.  Used when a user changed his email or password or nickname.
     """
     if email == 'guest':
         return 0
-
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-        run_sql("update user set password=%s where id=%s", (password, uid))
+    
+    
+    if ignore_password_p:
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 2:
+            run_sql("update user set email=%s where id=%s", (email, uid))
+        if nickname and nickname != '':
+            run_sql("update user set nickname=%s where id=%s", (nickname, uid))
+        return 1
     else:
-        run_sql("update user set email=%s,password=%s where id=%s", (email, password, uid))
-    if nickname and nickname != '':
-        run_sql("update user set nickname=%s where id=%s", (nickname, uid))
-    return 1
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+            run_sql("update user set password=%s where id=%s", (password, uid))
+        else:
+            run_sql("update user set email=%s,password=%s where id=%s", (email, password, uid))
+        if nickname and nickname != '':
+            run_sql("update user set nickname=%s where id=%s", (nickname, uid))
+        return 1
+
 
 
 
