@@ -38,12 +38,9 @@ The CERN development group currently consists of:
      BibFormat, redesign and rewrite in Python.  BibConvert
      XML-oriented mode.  OAI harvester improvements.
 
-The EPFL development group currently consists of:
-
- - Frédéric Gobry <frederic.gobry@gmail.com>
-     Contributions to the templating system, the URL handler, the
-     gettext infrastructure, the regression test suite infrastructure,
-     numerous patches for many modules.
+ - Samuele Kaplun <samuele.kaplun@cern.ch>
+     External authentication rewrite, user preferences and external
+     groups management.
 
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
@@ -60,6 +57,11 @@ project.  In an approximate decreasing chronological order:
 
  - Eric Stahl <eric.stahl@utbm.fr>
      Rewrite of BibUpload in Python.
+
+ - Frédéric Gobry <frederic.gobry@gmail.com>
+     Contributions to the templating system, the URL handler, the
+     gettext infrastructure, the regression test suite infrastructure,
+     numerous patches for many modules.
 
  - Krzysztof Jedrzejek <krzysztof.jedrzejek@gmail.com>
      Improvements to ElmSubmit.  
