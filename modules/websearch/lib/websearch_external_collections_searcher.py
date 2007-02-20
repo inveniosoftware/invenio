@@ -149,7 +149,7 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
     def __init__(self, configuration):
         super(CDSIndicoSearchEngine, self).__init__(configuration)
         self.base_url = 'http://indicosearch.cern.ch/'
-        self.search_url = 'http://indicosearch.cern.ch/search.py?sc=0&f=&action=Search&d1d=&d1m=&d1y=&d2d=&d2m=&d2y=&cc=Indico+Search&c=Conference+Contributions&c=Conference+Announcements&p='
+        self.search_url = 'http://indicosearch.cern.ch/search?p='
         self.parser = CDSIndicoCollectionResutsParser()
 
     def build_search_unit_unit(self, basic):
