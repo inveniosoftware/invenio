@@ -694,7 +694,7 @@ class Template:
                       <td>%(login_select)s</td>
                       <td></td>
                    </tr>""" % {
-                     'login_title' : _("Login via:"),
+                     'login_title' : _("Login method:"),
                      'login_select' : login_select,
                    }
         else:
@@ -732,6 +732,11 @@ class Template:
         out += """</td><td></td>
                     </tr>
                   </table></form>"""
+
+        out += """<p><strong>%(note)s:</strong> %(note_text)s""" % {
+               'note' : _("Note"),
+               'note_text': _("You can use your nickname or your email address to login.")}
+
         return out
 
     def tmpl_lost_your_password_teaser(self, ln=cdslang):
