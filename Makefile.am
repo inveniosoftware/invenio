@@ -161,6 +161,7 @@ update-v0.90.1-tables: local-dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 
 update-v0.92.0-tables: local-dbexec
+	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE usergroup CHANGE name name varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
