@@ -17,21 +17,24 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebSearch URL handler."""
+
 __revision__ = "$Id$"
 
 import cgi
-import sys
-import sre
-
 from urllib import quote
 
-from invenio.config import weburl, cdsname, cdslang, cachedir, cdsnameintl
+from invenio.config import weburl, cdsname, cachedir, cdsnameintl
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, http_check_credentials
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
-from invenio.webuser import getUid, page_not_authorized, get_user_preferences
+from invenio.webuser import getUid, page_not_authorized, \
+     get_user_preferences, auth_apache_user_collection_p
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
+from invenio.webpage import page, create_error_box
+from invenio.messages import gettext_set_language
+from invenio.search_engine import get_colID, get_coll_i18nname
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -40,6 +43,10 @@ search_results_default_urlargd = websearch_templates.search_results_default_urla
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
 
 def wash_search_urlargd(form):
+    """
+    Create canonical search arguments from those passed via web form.
+    """
+    
     argd = wash_urlargd(form, search_results_default_urlargd)
 
     # Sometimes, users pass ot=245,700 instead of
@@ -80,8 +87,6 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         argd['recid'] = self.recid
 
         req.argd = argd
-
-        from invenio.webuser import getUid, page_not_authorized, get_user_preferences
 
         uid = getUid(req)
         if uid == -1:
@@ -129,8 +134,6 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         req.argd = argd
 
-        from invenio.webuser import getUid, page_not_authorized
-
         uid = getUid(req)
         if uid == -1:
             return page_not_authorized(req, "../")
@@ -143,8 +146,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
         def check_credentials(user, password):
-            from invenio.webuser import auth_apache_user_collection_p
-
+            """Validate user and password against Apache user database."""
             if not auth_apache_user_collection_p(user, password,
                                                  record_primary_collection):
                 return False
@@ -206,20 +208,21 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             return out
 
     def cache(self, req, form):
+        """Search cache page."""
         argd = wash_urlargd(form, {'action': (str, 'show')})
         return search_engine.perform_request_cache(req, action=argd['action'])
 
     def log(self, req, form):
+        """Search log page."""
         argd = wash_urlargd(form, {'date': (str, '')})
         return search_engine.perform_request_log(req, date=argd['date'])
 
-
     def authenticate(self, req, form):
+        """Restricted search results pages."""
         argd = wash_search_urlargd(form)
 
         def check_credentials(user, password):
-            from invenio.webuser import auth_apache_user_collection_p
-
+            """Validate user and password against Apache user database."""
             for coll in argd['c'] + [argd['cc']]:
                 if not auth_apache_user_collection_p(user, password, coll):
                     return False
@@ -273,6 +276,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             c = '/'.join(path)
 
             def answer(req, form):
+                """Accessing collections cached pages."""
                 # Accessing collections: this is for accessing the
                 # cached page on top of each collection.
 
@@ -317,6 +321,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
 
     def legacy_collection(self, req, form):
+        """Collection URL backward compatibility handling."""
         argd = wash_urlargd(form, legacy_collection_default_urlargd)
 
         # If we specify no collection, then we don't need to redirect
@@ -341,6 +346,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
 
     def legacy_search(self, req, form):
+        """Search URL backward compatibility handling."""
         argd = wash_search_urlargd(form)
 
         # We either jump into the generic search form, or the specific
@@ -358,10 +364,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
 def display_collection(req, c, as, verbose, ln):
     "Display search interface page for collection c by looking in the collection cache."
-    from invenio.webpage import page, create_error_box
-    from invenio.webuser import getUid, page_not_authorized
-    from invenio.messages import wash_language, gettext_set_language
-    from invenio.search_engine import get_colID, get_coll_i18nname
 
     _ = gettext_set_language(ln)
 
@@ -371,9 +373,12 @@ def display_collection(req, c, as, verbose, ln):
     # get user ID:
     try:
         uid = getUid(req)
+        user_preferences = {}
         if uid == -1:
             return page_not_authorized(req, "../")
-    except Error, e:
+        elif uid > 0:
+            user_preferences = get_user_preferences(uid)
+    except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname,
@@ -386,8 +391,8 @@ def display_collection(req, c, as, verbose, ln):
     # deduce collection id:
     colID = get_colID(c)
     if type(colID) is not int:
-	page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-	page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl[ln] + '</a>')) + '</p>'
+        page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl[ln] + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
                     description=(cdsname + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
@@ -397,27 +402,31 @@ def display_collection(req, c, as, verbose, ln):
                     req=req)
     # display collection interface page:
     try:
-        fp = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
-        c_navtrail = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
-        c_body = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_tp = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/portalbox-te-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_te = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_lt = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_portalbox_rt = fp.read()
-        fp.close()
-        fp = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
-        c_last_updated = fp.read()
-        fp.close()
+        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
+        c_navtrail = filedesc.read()
+        filedesc.close()
+        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
+        c_body = filedesc.read()
+        filedesc.close()
+        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_portalbox_tp = filedesc.read()
+        filedesc.close()
+        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_portalbox_te = filedesc.read()
+        filedesc.close()
+        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_portalbox_lt = filedesc.read()
+        filedesc.close()
+        # show help boxes (usually located in "tr", "top right") 
+        # if users have not banned them in their preferences:
+        c_portalbox_rt = ""
+        if user_preferences.get('websearch_helpbox', 1) > 0:
+            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, colID, ln), "r")
+            c_portalbox_rt = filedesc.read()
+            filedesc.close()
+        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
+        c_last_updated = filedesc.read()
+        filedesc.close()
         if c == cdsname:
             title = cdsnameintl[ln]
         else:
