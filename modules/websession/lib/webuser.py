@@ -759,8 +759,7 @@ def get_user_preferences(uid):
             return deserialize_via_marshal(pref[0][1])
         except:
             return get_default_user_preferences()
-
-    return None
+    return {} # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
     assert(type(pref) == type({}))
