@@ -56,11 +56,14 @@ def perform_info(req, ln):
            );
 
 def perform_display_external_user_settings(settings, ln):
-    """show external user settings witch is a dictionary."""
+    """show external user settings which is a dictionary."""
     _ = gettext_set_language(ln)
     html_settings = ""
     print_settings = False
-    for key,value in settings.iteritems():
+    settings_keys = settings.keys()
+    settings_keys.sort()
+    for key in settings_keys:
+        value = settings[key]
         if key.startswith("EXTERNAL_") and not "HIDDEN_" in key:
             print_settings = True
             key = key[9:].capitalize()
