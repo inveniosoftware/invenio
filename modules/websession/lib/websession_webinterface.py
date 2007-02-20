@@ -213,7 +213,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 act = "display"
                 linkname = _("Show account")
                 title = _("Settings edited")
-            elif not webuser.nickname_valid_p(args['nickname']):
+            elif args['nickname'] is not None and not webuser.nickname_valid_p(args['nickname']):
                 mess = _("Desired nickname %s is invalid.") % args['nickname']
                 mess += " " + _("Please try again.")
                 act = "edit"
