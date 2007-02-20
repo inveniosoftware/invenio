@@ -1,73 +1,91 @@
 --------------------------------------------------------------------
-CDS Invenio v0.92.0 is released
-December 22, 2006
+CDS Invenio v0.92.1 is released
+February 20, 2007
 http://cdsware.cern.ch/invenio/news.html
 --------------------------------------------------------------------
 
-CDS Invenio v0.92.0 was released on December 22, 2006.
+CDS Invenio v0.92.1 was released on February 20, 2007.
 
 What's new:
 -----------
 
- *) previously experimental output formatter in Python improved and
-    made default (BibFormat)
+ *) new support for external authentication systems (WebSession,
+    WebAccess)
 
- *) previously experimental new submission admin interface in Python
-    improved and made default (WebSubmit)
+ *) new support for external user groups (WebSession)
 
- *) new XML-oriented output formatting mode (BibFormat)
+ *) new experimental version of the reference extraction program
+    (BibEdit)
 
- *) new export-oriented output formats: EndNote, NLM (BibFormat)
+ *) new optional Greek stopwords list, thanks to Theodoropoulos
+    Theodoros (BibIndex)
 
- *) RSS 2.0 latest additions feed service (WebSearch, BibFormat)
+ *) new Get_Recid submission function (WebSubmit)
 
- *) new XML-oriented metadata converter mode (BibConvert)
+ *) new config variable governing the display of the download history
+    graph (BibRank)
 
- *) new metadata uploader in Python (BibUpload)
+ *) started deployment of user preferences (WebSession, WebSearch)
 
- *) new integrated parallel external collection searching (WebSearch)
+ *) split presentation style for "Narrow search", "Focus on" and
+    "Search also" search interface boxes (WebSearch, WebStyle)
 
- *) improved document classifier: composite keywords, wildcards, cloud
-    output (BibClassify)
+ *) updated CERN Indico and KEK external collection searching facility
+    (WebSearch)
 
- *) improved UTF-8 fulltext indexing (BibIndex)
+ *) fixed search interface portalbox and collection definition
+    escaping behaviour (WebSearch Admin)
 
- *) improved external login authentication subsystem (WebAccess)
+ *) fixed problems with external system number and OAI ID matching
+    (BibUpload)
 
- *) added possibility to order submission categories (WebSubmit)
+ *) fixed problem with case matching behaviour (BibUpload)
 
- *) improved handling of cached search interface page formats,
-    preferential sort pattern functionality, international collection
-    names (WebSearch)
+ *) fixed problems with basket record display and basket topic change
+    (WebBasket)
 
- *) improved behaviour of OAI harvester: sets, deleted records,
-    harvested metadata transformation (BibHarvest)
+ *) fixed output format template attribution behaviour (BibFormat)
 
- *) improved MARCXML schema compatibility concerning indicators;
-    updates to the HTML MARC output format (BibEdit, BibUpload,
-    BibFormat, and other modules)
+ *) improved language context propagation in output formats
+    (BibFormat)
 
- *) multiple minor bugs fixed thanks to the wider deployment of the
-    regression test suite (all modules)
+ *) improved output format treatment of HTML-aware fields (BibFormat)
 
- *) new translation (Croatian) and several translation updates
-    (Catalan, Bulgarian, French, Greek, Spanish); thanks to Ferran
-    Jorba, Beatriu Piera, Alen Vodopijevec, Jasna Marković, Theodoros
-    Theodoropoulos, and Nikolay Dyankov (see also CREDITS file)
+ *) improved BibFormat migration kit (BibFormat)
 
- *) removed dependency on PHP; not needed anymore
+ *) improved speed and eliminated set duplication of the OAI
+    repository gateway (BibHarvest)
 
- *) full compatibility with MySQL 4.1 and 5.0; upgrade from MySQL 4.0
-    now recommended
+ *) fixed resumption token handling (BibHarvest)
 
- *) full compatibility with FreeBSD and Mac OS X
+ *) improved record editing interface (BibEdit)
+
+ *) fixed problem with empty fields treatment (BibConvert)
+
+ *) updated Report_Number_Generation submission function to be able to
+    easily generate report numbers from any submission information
+    (WebSubmit)
+
+ *) fixed problem with submission field value escaping (WebSubmit)
+
+ *) fixed problem with submission collection ordering (WebSubmit)
+
+ *) fixed BibSched task signal handling inconsistency (BibSched)
+
+ *) fixed TEXT versus BLOB database problems for some tables/columns
+
+ *) minor updates to the HOWTO Migrate guide and several admin guides
+    (WebHelp, BibIndex, BibFormat)
+
+ *) minor bugfixes to several modules; see ChangeLog for details and
+    credits
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz>
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.0.tar.gz.sig>
+  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz>
+  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -77,7 +95,7 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.90.1, then please follow the
+If you are upgrading from CDS Invenio v0.92.0, then please follow the
 following steps:
 
    - Launch the bibsched monitor and wait until all active bibsched
@@ -90,21 +108,17 @@ following steps:
 
    - Optionally, you may want to backup your current MySQL database
      and your CDS Invenio installation directory (@prefix@).  Note
-     that this step should not be really necessary for the v0.90.1 to
-     v0.92.0 upgrade, since the changes are of moderate nature only.
+     that this step should not be really necessary for the v0.92.0 to
+     v0.92.1 upgrade, since the changes are of moderate nature only.
 
    - Untar new sources and rerun configure with old arguments.  Your
      old configure line is available at
      @prefix@/etc/build/config.nice.
 
    - Merge your old config.wml with the new one.  Your old config.wml
-     file is available at @prefix@/lib/wml/invenio/config.wml.  The
-     novelties in the new config.wml file are: (i) the introduction of
-     the Croatian translation in the CDSNAMEINTL and CDSLANGS options;
-     (ii) location of example Apache group and passwords files; (iii)
-     removal of the CFG_GOOGLE_BOX variables that has now been moved
-     into WebSearch Admin interface.  This means that merging should
-     be relatively straightforward.
+     file is available at @prefix@/lib/wml/invenio/config.wml.  There
+     were no changes to this file in v0.92.1, so you may simply copy
+     your old version.
 
    - Run make.
 
@@ -116,38 +130,14 @@ following steps:
 
    - If you have backed up your old @prefix@/etc/ directory as
      mentioned before, then restore your old files now, paying
-     attention to differences with the new version.
+     attention to differences with the new versions.
 
    - Update your database table structure:
 
-        $ make update-v0.90.1-tables
-
-   - Optionally, update your tables with the new Croatian dynamic
-     element names:
-
-        $ grep "'hr'" modules/miscutil/sql/tabfill.sql | \
-               ./modules/miscutil/bin/dbexec  
-
-   - Decide whether you want to use the new output formatter in Python
-     or still your old PHP-based formatter.  In the latter case you
-     should inactivate the new formatter either by removing some (or
-     all) of the BFT template files from the
-     @prefix@/etc/bibformat/format_templates/ directory, or by editing
-     @prefix@/lib/python/invenio/bibformat_config.py file and setting
-     CFG_BIBFORMAT_USE_OLD_BIBFORMAT variable to True.
-
-   - Optionally, run webcoll to regenerate search interface pages in
-     Croatian.
+        $ make update-v0.92.0-tables
 
    - Re-enable write access to the site if you have disabled it before
      in the previous steps and restart your Apache server.
-
-   - If you have been using the "oaiarchive" tool to define sets
-     exportable via OAI-PMH, then please reset your configurations
-     anew in the new OAI Repository Admin interface.
-
-   - Delete all waiting tasks from the bibsched queue, and resubmit
-     periodical daemons anew, as indicated in the HOWTO Run guide.
 
    - Put the bibsched daemon back into the automatic mode.  You are
      done.
@@ -156,31 +146,37 @@ If you are upgrading from CDSware v0.7.1, then please follow the
 following steps:
 
    - We recommend you to install CDS Invenio into another @prefix@
-     directory and using another database name, *not* CDSware's
+     directory and to use another database name, *not* CDSware's
      values.
 
-   - Install Invenio demo site to make sure that everything works well
-     on your setup.  Optionally run the unit and the regression test
-     suites too.
+   - Install CDS Invenio demo site to make sure that everything works
+     well on your setup.  Optionally run the unit and the regression
+     test suites too.
 
-   - Drop Invenio tables with the demo site and copy old CDSware
-     tables into the new Invenio database.  (For example, stop MySQL
-     server, copy all the CDSware database directory into the new
-     Invenio directory, and restart MySQL server.)
+   - Drop CDS Invenio tables containing the demo site and copy your
+     old CDSware tables over into the new CDS Invenio database.  (For
+     example, stop your MySQL server, copy all the CDSware database
+     directory files into the new CDS Invenio database directory, and
+     restart your MySQL server.)
 
    - Run "make update-v0.7.1-tables".  This may take a while,
      depending on the number of records you had.
 
-   - Run commands from "make update-v0.90.0-tables" and "make
-     update-v0.90.1-tables" Makefile targets.  Please note that some
-     of the ALTER TABLE commands may fail, since you are skipping
-     installation of intermediate versions.  This is not harmful.
+   - Run subsequent table update commands:  
+
+          $ make update-v0.90.0-tables -i
+          $ make update-v0.90.1-tables -i
+          $ make update-v0.92.0-tables -i
+
+     Use the "-i" option to ignore errors, as it is expected that some
+     of the ALTER TABLE commands would fail due to your skipping of
+     the intermediate version installation.
 
    - Run "python ./modules/webbasket/lib/webbasket_migration_kit.py"
      in order to migrate personal baskets.  You will be asked some
      questions.  You can choose default answers when in doubt.  The
      kit is fully automatic but it may ask you to fix some problems
-     manually if they cannot be resolved automatically.
+     manually if it cannot resolve them automatically.
 
    - Rerun "webcoll".
 
@@ -197,35 +193,19 @@ following steps:
 Further notes and issues:
 -------------------------
 
- *) The old search results functionality of linking to other search
-    engines under "Haven't found what you were looking for? Try your
-    search on other servers:" box has been improved and integrated
-    into WebSearch Admin.  In addition to pure linking to external
-    sites, the CDS Invenio can now perform integrated parallel
-    searching of these sites and display external search results
-    alongside the usual CDS Invenio search results.  You may configure
-    this behaviour in the WebSearch Admin interface.
+ *) If you have been using external login method in your site, please
+    note that this release brings new support for advanced external
+    account and user group handling.  You may continue to use your old
+    external authentication classes, but we advise you to adapt to the
+    new style in order be able to fully profit from the new external
+    authentication and external group features.
 
- *) The new BibUpload in Python retains the philosophy of the old
-    BibUpload in PHP and fixes some of its problems.  But you are
-    advised to double-check its behaviour if you have been relying on
-    some very specific old BibUpload features in your installation.
-
- *) Due to better MARCXML standard compatibility, the demo submission
-    system now splits authors into 100 field (first author) and 700
-    fields (additional authors).  The demo submissions are still to be
-    improved.  In addition, the empty indicators are now treated as
-    blank space instead of empty string, and the text MARC output for
-    controlfields has been changed as well.  These changes should be
-    transparent to your installation.  See the ChangeLog file for
-    details.
-
- *) Several modules of the this release (e.g. mail submission system,
+ *) Several modules of this release (e.g. mail submission system,
     citation ranking) are still experimental and not yet activated.
     You may have a peek at what is planned, but please do not rely on
     them.
 
- *) The admin-level functionality for several modules is not fully
+ *) The admin-level functionality of several modules is not fully
     developed or documented yet.
 
 What's next:
@@ -233,6 +213,9 @@ What's next:
 
  *) Improving the known issues mentioned above.  Strengthening the
     documentation towards v1.0 release.
+
+ *) Removing submission field cookies.  Refactoring the WebSubmit
+    module.
 
  *) Removing dependency on WML too, now that the dependency on PHP was
     removed.

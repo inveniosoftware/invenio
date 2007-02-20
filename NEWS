@@ -7,6 +7,80 @@ Here is a short summary of the most notable changes in CDS Invenio
 releases.  For more info about the current release, please consult
 RELEASE-NOTES.  For more info about changes, please consult ChangeLog.
 
+CDS Invenio v0.92.1 -- released 2007-02-20
+------------------------------------------
+
+ *) new support for external authentication systems (WebSession,
+    WebAccess)
+
+ *) new support for external user groups (WebSession)
+
+ *) new experimental version of the reference extraction program
+    (BibEdit)
+
+ *) new optional Greek stopwords list, thanks to Theodoropoulos
+    Theodoros (BibIndex)
+
+ *) new Get_Recid submission function (WebSubmit)
+
+ *) new config variable governing the display of the download history
+    graph (BibRank)
+
+ *) started deployment of user preferences (WebSession, WebSearch)
+
+ *) split presentation style for "Narrow search", "Focus on" and
+    "Search also" search interface boxes (WebSearch, WebStyle)
+
+ *) updated CERN Indico and KEK external collection searching facility
+    (WebSearch)
+
+ *) fixed search interface portalbox and collection definition
+    escaping behaviour (WebSearch Admin)
+
+ *) fixed problems with external system number and OAI ID matching
+    (BibUpload)
+
+ *) fixed problem with case matching behaviour (BibUpload)
+
+ *) fixed problems with basket record display and basket topic change
+    (WebBasket)
+
+ *) fixed output format template attribution behaviour (BibFormat)
+
+ *) improved language context propagation in output formats
+    (BibFormat)
+
+ *) improved output format treatment of HTML-aware fields (BibFormat)
+
+ *) improved BibFormat migration kit (BibFormat)
+
+ *) improved speed and eliminated set duplication of the OAI
+    repository gateway (BibHarvest)
+
+ *) fixed resumption token handling (BibHarvest)
+
+ *) improved record editing interface (BibEdit)
+
+ *) fixed problem with empty fields treatment (BibConvert)
+
+ *) updated Report_Number_Generation submission function to be able to
+    easily generate report numbers from any submission information
+    (WebSubmit)
+
+ *) fixed problem with submission field value escaping (WebSubmit)
+
+ *) fixed problem with submission collection ordering (WebSubmit)
+
+ *) fixed BibSched task signal handling inconsistency (BibSched)
+
+ *) fixed TEXT versus BLOB database problems for some tables/columns
+
+ *) minor updates to the HOWTO Migrate guide and several admin guides
+    (WebHelp, BibIndex, BibFormat)
+
+ *) minor bugfixes to several modules; see ChangeLog for details and
+    credits
+
 CDS Invenio v0.92.0 -- released 2006-12-22
 ------------------------------------------
 
