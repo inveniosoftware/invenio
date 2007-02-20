@@ -165,7 +165,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
-                    mess = _("Switching to internal login method.")
+                    mess = _("Switched to internal login method.")
                 else:
                     query = """SELECT email FROM user
                             WHERE id = %i"""
