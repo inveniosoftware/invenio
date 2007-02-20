@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
 from mod_python import apache
 import smtplib
 
@@ -36,20 +35,19 @@ from invenio.config import \
      cdsname, \
      supportemail, \
      sweburl, \
-     version, \
      weburl
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
 from invenio import webbasket
 from invenio import webalert
-from invenio import webuser
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
+from invenio import webgroup_dblayer
 from invenio.messages import gettext_set_language
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -159,10 +157,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if prefs['login_method'] != args['login_method']:
                 if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
                     # Switching to internal authentication: we drop any external datas
-                    from invenio.webuser import drop_external_settings
-                    from invenio.webgroup_dblayer import drop_external_groups
-                    drop_external_settings(uid)
-                    drop_external_groups(uid)
+                    webuser.drop_external_settings(uid)
+                    webgroup_dblayer.drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
                     mess = _("Switched to internal login method.")
@@ -199,7 +195,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0) \
                and args['password'] == args['password2']:
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-                    change = webuser.updateDataUser(uid,args['email'],args['password'],args['nickname'],)
+                    change = webuser.updateDataUser(uid,
+                                                    args['email'],
+                                                    args['password'],
+                                                    args['nickname'],)
                 else:
                     return webuser.page_not_authorized(req, "../youraccount/change")
                 if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
@@ -340,7 +339,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         try:
             server.sendmail(fromaddr, toaddr, msg)
 
-        except smtplib.SMTPRecipientsRefused,e:
+        except smtplib.SMTPRecipientsRefused:
             eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
             return page(title=_("Incorrect email address"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -458,7 +457,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             lastupdated=__lastupdated__)
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
             if len(iden)>0:
-                uid = webuser.update_Uid(req,args['p_un'])
+                uid = webuser.update_Uid(req, args['p_un'])
                 uid2 = webuser.getUid(req)
                 if uid2 == -1:
                     webuser.logoutUser(req)
@@ -518,14 +517,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                          language=args['ln'],
                          lastupdated=__lastupdated__)
 
-        mess=""
-        act=""
+        mess = ""
+        act = ""
         if args['p_pw'] == args['p_pw2']:
             ruid = webuser.registerUser(req, args['p_email'], args['p_pw'], args['p_nickname'])
         else:
             ruid = -2
         if ruid == 0:
-            uid = webuser.update_Uid(req,args['p_email'])
+            uid = webuser.update_Uid(req, args['p_email'])
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
