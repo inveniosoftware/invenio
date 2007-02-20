@@ -266,7 +266,7 @@ class Manager:
             mypid = get_my_pid(process, str(task_id))
             if mypid != 0:
                 os.kill(mypid, signal.SIGUSR1)
-                self.display_in_footer("SLEEP signal sent to process #%s" % mypid)
+                self.display_in_footer("USR1 signal sent to process #%s" % mypid)
             else:
                 self.set_status(task_id, 'STOPPED')
                 self.display_in_footer("cannot find process...")
@@ -292,8 +292,8 @@ class Manager:
         #status = self.currentrow[5]
         mypid = get_my_pid(process, str(task_id))
         if mypid != 0:
-            os.kill(mypid, signal.SIGINT)
-            self.display_in_footer("INT signal sent to process #%s" % mypid)
+            os.kill(mypid, signal.SIGTERM)
+            self.display_in_footer("TERM signal sent to process #%s" % mypid)
         else:
             self.set_status(task_id, 'STOPPED')
             self.display_in_footer("cannot find process...")
@@ -559,7 +559,7 @@ class BibSched:
         elif status == "STOP":
             if task_id in self.running.keys():
                 self.set_status( task_id, "STOP SENT" )
-                os.kill( self.running[task_id], signal.SIGUSR2 )
+                os.kill( self.running[task_id], signal.SIGTERM )
                 self.stop_sent[task_id] = self.running[task_id]
                 del self.running[task_id]
         elif status == "STOPPED" and task_id in self.stop_sent.keys():
