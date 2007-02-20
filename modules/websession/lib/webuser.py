@@ -354,30 +354,30 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
     return 0
 
 def updateDataUser(uid, email, password, nickname, ignore_password_p=False):
-    """Update user data.  Used when a user changed his email or password or nickname.
     """
+    Update user data.  Used when a user changed his email or password
+    or nickname.
+
+    When IGNORE_PASSWORD_P is set to True, do not update user's
+    password or do not use it during lookups.
+    """
+    
     if email == 'guest':
         return 0
-    
-    
-    if ignore_password_p:
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 2:
-            run_sql("update user set email=%s where id=%s", (email, uid))
-        if nickname and nickname != '':
-            run_sql("update user set nickname=%s where id=%s", (nickname, uid))
-        return 1
-    else:
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        if not ignore_password_p:
             run_sql("update user set password=%s where id=%s", (password, uid))
-        else:
+    else:
+        if not ignore_password_p:
             run_sql("update user set email=%s,password=%s where id=%s", (email, password, uid))
-        if nickname and nickname != '':
-            run_sql("update user set nickname=%s where id=%s", (nickname, uid))
-        return 1
+        else:
+            run_sql("update user set email=%s where id=%s", (email, uid))
 
+    if nickname and nickname != '':
+        run_sql("update user set nickname=%s where id=%s", (nickname, uid))
 
-
-
+    return 1
 
 def loginUser(req, p_un, p_pw, login_method):
     """It is a first simple version for the authentication of user. It returns the id of the user,
