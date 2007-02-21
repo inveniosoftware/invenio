@@ -108,3 +108,14 @@ class functionStop(Exception):
         self.value = value
     def __str__(self):
         return repr(self.value)
+
+class InvenioWebSubmitWarningWebSubmitFunctionFailed(Exception):
+    """This exception should be raised by a WebSubmit function
+       when unexpected behaviour is encountered during the execution
+       of the function. The unexpected behaviour should not have been
+       so serious that execution had to be halted, but since the
+       function was unable to perform its task, the event must be
+       logged.
+       Logging of the exception will be performed by WebSubmit.
+    """
+    pass
