@@ -45,6 +45,7 @@ from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email
 from invenio.websubmit_config import *
+from websubmit_dblayer import *
 from invenio.file import *
 
 from invenio.messages import gettext_set_language, wash_language
@@ -86,53 +87,74 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                          ), req, ln)
         # warningMsg("""<center><font color="red"></font></center>""",req, ln)
     # check we have minimum fields
-    if doctype=="" or act=="" or access=="":
+    if "" in (doctype, act, access):
+        ## We don't have all the necessary information to go ahead
+        ## with this submission:
         return errorMsg(_("Invalid parameter"), req, c, ln)
-    # retrieve the action and doctype data
-    if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
-        if len(res) == 0:
-            return errorMsg(_("Unable to find the submission directory."), req, c, ln)
-        else:
-            row = res[0]
-            indir = row[0]
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
-    if len(res) == 0:
-        return errorMsg(_("Unknown document type"), req, c, ln)
-    else:
-        docname = res[0][0]
-        docname = string.replace(docname, " ", "&nbsp;")
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE sactname=%s", (act,))
-    if len(res) == 0:
-        return errorMsg(_("Unknown action"), req, c, ln)
-    else:
-        actname = res[0][0]
-        actname = string.replace(actname, " ", "&nbsp;")
+
+    ## retrieve the action and doctype data:
+
+    ## Concatenate action ID and doctype ID to make the submission ID:
     subname = "%s%s" % (act, doctype)
-    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
-    if len(res) == 0:
+
+    if indir == "":
+        ## Get the submission storage directory from the DB:
+        submission_dir = get_storage_directory_of_action(act)
+        if submission_dir not in ("", None):
+            indir = submission_dir
+        else:
+            ## Unable to determine the submission-directory:
+            return errorMsg(_("Unable to find the submission directory."), req, c, ln)
+
+    ## get the document type's long-name:
+    doctype_lname = get_longname_of_doctype(doctype)
+    if doctype_lname is not None:
+        ## Got the doctype long-name: replace spaces with HTML chars:
+        docname = doctype_lname.replace(" ", "&nbsp;")
+    else:
+        ## Unknown document type:
+        return errorMsg(_("Unknown document type"), req, c, ln)
+
+    ## get the action's long-name:
+    action_lname = get_longname_of_action(act)
+    if action_lname is not None:
+        ## Got the action long-name: replace spaces with HTML chars:
+        actname = action_lname.replace(" ", "&nbsp;")
+    else:
+        ## Unknown action:
+        return errorMsg(_("Unknown action"), req, c, ln)
+
+    ## Get the number of pages for this submission:
+    num_submission_pages = get_num_pages_of_submission(subname)
+    if num_submission_pages is not None:
+        nbpages = num_submission_pages
+    else:
+        ## Unable to determine the number of pages for this submission:
         return errorMsg(_("Unable to determine the number of submission pages."), req, c, ln)
-    else:
-        nbpages = res[0][0]
-    #Get current page
-    if startPg != "" and (curpage=="" or curpage==0):
+
+    ## If unknown, get the current page of submission:
+    if startPg != "" and curpage in ("", 0):
         curpage = startPg
-    # retrieve the name of the file in which the reference of
-    # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
-    if len(res) == 0:
-        edsrn = ""
+
+    ## retrieve the name of the file in which the reference of
+    ## the submitted document will be stored
+    rn_filename = get_parameter_value_for_doctype(doctype, "edsrn")
+    if rn_filename is not None:
+        edsrn = rn_filename
     else:
-        edsrn = res[0][0]
-    # This defines the path to the directory containing the action data
+        ## Unknown value for edsrn - set it to an empty string:
+        edsrn = ""
+
+    ## This defines the path to the directory containing the action data
     curdir = "%s/%s/%s/%s" % (storage, indir, doctype, access)
-    # if this submission comes from another one ($fromdir is then set)
-    # We retrieve the previous submission directory and put it in the proper one
+
+    ## if this submission comes from another one (fromdir is then set)
+    ## We retrieve the previous submission directory and put it in the proper one
     if fromdir != "":
         olddir = "%s/%s/%s/%s" % (storage, fromdir, doctype, access)
         if os.path.exists(olddir):
             os.rename(olddir, curdir)
-    # If the submission directory still does not exist, we create it
+    ## If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
         try:
             os.makedirs(curdir)
@@ -160,13 +182,19 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # is user authorized to perform this action?
     (auth_code, auth_message) = acc_authorize_action(uid, "submit", verbose=0, doctype=doctype, act=act)
     if acc_isRole("submit", doctype=doctype, act=act) and auth_code != 0:
-        return warningMsg("<center><font color=red>%s</font></center>" % auth_message, req)
-    # then we update the "journal of submission"
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
-    if len(res) == 0:
-        run_sql("INSERT INTO sbmSUBMISSIONS values (%s,%s,%s,'pending',%s,'',NOW(),NOW())", (uid_email, doctype, act, access,))
+        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+
+    ## update the "journal of submission":
+    ## Does the submission already exist in the log?
+    submission_exists = \
+         submission_exists_in_log(doctype, act, access, uid_email)
+    if submission_exists == 1:
+        ## update the modification-date of this submission in the log:
+        update_submission_modified_date_in_log(doctype, act, access, uid_email)
     else:
-        run_sql("UPDATE sbmSUBMISSIONS SET md=NOW() WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
+        ## Submission doesn't exist in log - create it:
+        log_new_pending_submission(doctype, act, access, uid_email)
+
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = req.form
@@ -212,52 +240,67 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 fp = open("%s/%s" % (curdir, key), "w")
                 fp.write(filename)
                 fp.close()
-        # if the found field is the reference of the document
-        # we save this value in the "journal of submissions"
+
+        ## if the found field is the reference of the document,
+        ## save this value in the "journal of submissions":
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value, doctype, access, uid_email,))
-        # Now deal with the cookies
-        # If the fields must be saved as a cookie, we do so
-        # In this case, the value of the field will be retrieved and
-        # displayed as the default value of the field next time the user
-        # does a submission
-        if value!="":
-            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
-            if len(res) > 0:
-                if res[0][0] == 1:
-                    setCookie(key, value, uid)
+                update_submission_reference_in_log(doctype, access, uid_email, value)
 
-    # create interface
-    # For each field to be displayed on the page
+        ## Cookies:
+        ## If the field should set a cookie, do so:
+        ## In this case, the value of the field will be retrieved and
+        ## displayed as the default value of the field next time the user
+        ## does a submission:
+        if value != "":
+            sets_cookie = form_element_sets_cookie(key)
+            if sets_cookie == 1:
+                ## This element sets a cookie, so do this:
+                setCookie(key, value, uid)
+
+    ## create the interface:
     subname = "%s%s" % (act, doctype)
-    res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb=%s ORDER BY fieldnb,fieldnb", (subname, curpage,))
+
+    ## Get all of the form fields that appear on this page, ordered by fieldnum:
+    form_fields = get_form_fields_on_submission_page(subname, curpage)
 
     full_fields = []
     values = []
-    for arr in res:
+
+    for field_instance in form_fields:
         full_field = {}
-        # We retrieve its HTML description
-        res3 = run_sql("SELECT * FROM sbmFIELDDESC WHERE  name=%s", (arr[3],))
-        arr3 = res3[0]
-        if arr3[8] is None:
-            val=""
+        ## Retrieve the field's description:
+        element_descr = get_element_description(field_instance[3])
+        if element_descr is None:
+            ## The form field doesn't seem to exist - return with error message:
+            return \
+             errorMsg(_("Unknown form field found on submission page."), \
+                      req, c, ln)
+
+        if element_descr[8] is None:
+            val = ""
         else:
-            val=arr3[8]
-        # we also retrieve and add the javascript code of the checking function, if needed
+            val = element_descr[8]
+
+        ## we also retrieve and add the javascript code of the checking function, if needed
+        ## Set it to empty string to begin with:
         full_field['javascript'] = ''
-        if arr[7] != '':
-            res2 = run_sql("SELECT chdesc FROM sbmCHECKS WHERE  chname=%s", (arr[7],))
-            full_field['javascript'] = res2[0][0]
-        full_field['type'] = arr3[3]
-        full_field['name'] = arr[3]
-        full_field['rows'] = arr3[5]
-        full_field['cols'] = arr3[6]
+        if field_instance[7] != '':
+            check_descr = get_element_check_description(field_instance[7])
+            if check_descr is not None:
+                ## Retrieved the check description:
+                full_field['javascript'] = check_descr
+
+        full_field['type'] = element_descr[3]
+        full_field['name'] = field_instance[3]
+        full_field['rows'] = element_descr[5]
+        full_field['cols'] = element_descr[6]
         full_field['val'] = val
-        full_field['size'] = arr3[4]
-        full_field['maxlength'] = arr3[7]
-        full_field['htmlcode'] = arr3[9]
-        full_field['typename'] = arr[1]
+        full_field['size'] = element_descr[4]
+        full_field['maxlength'] = element_descr[7]
+        full_field['htmlcode'] = element_descr[9]
+        full_field['typename'] = field_instance[1]  ## TODO: Investigate this, Not used?
+                                                    ## It also seems to refer to pagenum.
 
         # The 'R' fields must be executed in the engine's environment,
         # as the runtime functions access some global and local
@@ -271,10 +314,10 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         # we now determine the exact type of the created field
         if full_field['type'] not in [ 'D','R']:
             field.append(full_field['name'])
-            level.append(arr[5])
-            fullDesc.append(arr[4])
-            txt.append(arr[6])
-            check.append(arr[7])
+            level.append(field_instance[5])
+            fullDesc.append(field_instance[4])
+            txt.append(field_instance[6])
+            check.append(field_instance[7])
             # If the field is not user-defined, we try to determine its type
             # (select, radio, file upload...)
             # check whether it is a select field or not
@@ -314,13 +357,13 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
             radio.append(0)
             upload.append(0)
             # field.append(value) - initial version, not working with JS, taking a submitted value
-            field.append(arr[3])
-            level.append(arr[5])
-            txt.append(arr[6])
-            fullDesc.append(arr[4])
-            check.append(arr[7])
+            field.append(field_instance[3])
+            level.append(field_instance[5])
+            txt.append(field_instance[6])
+            fullDesc.append(field_instance[4])
+            check.append(field_instance[7])
             fieldhtml.append(text)
-        full_field['fullDesc'] = arr[4]
+        full_field['fullDesc'] = field_instance[4]
         full_field['text'] = text
 
         # If a file exists with the name of the field we extract the saved value
@@ -347,7 +390,8 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     returnto = {}
     if int(curpage) == int(nbpages):
         subname = "%s%s" % (act, doctype)
-        res = run_sql("SELECT * FROM sbmFIELD WHERE  subname=%s and pagenb!=%s", (subname, curpage,))
+        other_form_fields = \
+              get_form_fields_not_on_submission_page(subname, curpage)
         nbFields = 0
         message = ""
         fullcheck_select = []
@@ -358,15 +402,20 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         fullcheck_txt = []
         fullcheck_noPage = []
         fullcheck_check = []
-        for arr in res:
-            if arr[5] == "M":
-                res2 = run_sql("SELECT * FROM   sbmFIELDDESC WHERE  name=%s", (arr[3],));
-                row2 = res2[0]
-                if row2[3] in ['D','R']:
-                    if row2[3] == "D":
-                        text = row2[9]
+        for field_instance in other_form_fields:
+            if field_instance[5] == "M":
+                ## If this field is mandatory, get its description:
+                element_descr = get_element_description(field_instance[3])
+                if element_descr is None:
+                    ## The form field doesn't seem to exist - return with error message:
+                    return \
+                     errorMsg(_("Unknown form field found on one of the submission pages."), \
+                              req, c, ln)
+                if element_descr[3] in ['D', 'R']:
+                    if element_descr[3] == "D":
+                        text = element_descr[9]
                     else:
-                        text = eval(row2[9])
+                        text = eval(element_descr[9])
                     formfields = text.split(">")
                     for formfield in formfields:
                         match = re.match("name=([^ <>]+)", formfield, re.IGNORECASE)
@@ -376,17 +425,17 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                                 if value != "":
                                     value = re.compile("[\"']+").sub("", value)
                                     fullcheck_field.append(value)
-                                    fullcheck_level.append(arr[5])
-                                    fullcheck_txt.append(arr[6])
-                                    fullcheck_noPage.append(arr[1])
-                                    fullcheck_check.append(arr[7])
-                                    nbFields = nbFields+1
+                                    fullcheck_level.append(field_instance[5])
+                                    fullcheck_txt.append(field_instance[6])
+                                    fullcheck_noPage.append(field_instance[1])
+                                    fullcheck_check.append(field_instance[7])
+                                    nbFields = nbFields + 1
                 else:
-                    fullcheck_noPage.append(arr[1])
-                    fullcheck_field.append(arr[3])
-                    fullcheck_level.append(arr[5])
-                    fullcheck_txt.append(arr[6])
-                    fullcheck_check.append(arr[7])
+                    fullcheck_noPage.append(field_instance[1])
+                    fullcheck_field.append(field_instance[3])
+                    fullcheck_level.append(field_instance[5])
+                    fullcheck_txt.append(field_instance[6])
+                    fullcheck_check.append(field_instance[7])
                     nbFields = nbFields+1
         # tests each mandatory field
         fld = 0
@@ -479,7 +528,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     dismode = mode
     ln = wash_language(ln)
     sys.stdout = req
-    t=""
+    t = ""
     # get user ID:
     try:
         uid = getUid(req)
@@ -493,17 +542,25 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                            ln = ln,
                            msg = _("Sorry, you must log in to perform this action.")
                          ), req, ln)
-    # check we have minimum fields
-    if doctype=="" or act=="" or access=="":
+
+    ## check we have minimum fields
+    if "" in (doctype, act, access):
+        ## We don't have all the necessary information to go ahead
+        ## with this submission:
         return errorMsg(_("Invalid parameter"), req, c, ln)
-    # retrieve the action and doctype data
+
+
+    ## retrieve the action and doctype data
     if indir == "":
-        res = run_sql("select dir from sbmACTION where sactname=%s", (act,))
-        if len(res) == 0:
-            return errorMsg(_("Cannot find submission directory."), req, c, ln)
+        ## Get the submission storage directory from the DB:
+        submission_dir = get_storage_directory_of_action(act)
+        if submission_dir not in ("", None):
+            indir = submission_dir
         else:
-            row = res[0]
-            indir = row[0]
+            ## Unable to determine the submission-directory:
+            return errorMsg(_("Unable to find the submission directory."), \
+                            req, c, ln)
+
     # The following words are reserved and should not be used as field names
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
                       "indir", "doctype", "mode", "step", "deleted", "file_path", "userfile_name"]
@@ -528,13 +585,16 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         fp.close()
     else:
         mainmenu = "%s/submit" % (urlpath,)
-    # retrieve the name of the file in which the reference of
-    # the submitted document will be stored
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE  doctype=%s and name='edsrn'", (doctype,))
-    if len(res) == 0:
-        edsrn = ""
+
+    ## retrieve the name of the file in which the reference of
+    ## the submitted document will be stored
+    rn_filename = get_parameter_value_for_doctype(doctype, "edsrn")
+    if rn_filename is not None:
+        edsrn = rn_filename
     else:
-        edsrn = res[0][0]
+        ## Unknown value for edsrn - set it to an empty string:
+        edsrn = ""
+
     # Now we test whether the user has already completed the action and
     # reloaded the page (in this case we don't want the functions to be called
     # once again
@@ -542,12 +602,11 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # if the action has been completed
     #if reloaded:
     #    return warningMsg("<b> Sorry, this action has already been completed. Please go back to the main menu to start a new action.</b>",req)
-    # We must determine if the action is finished (ie there is no other steps after the current one
-    res = run_sql("SELECT step FROM sbmFUNCTIONS WHERE  action=%s and doctype=%s and step > %s", (act, doctype, step,))
-    if len(res) == 0:
-        finished = 1
-    else:
-        finished = 0
+
+    ## Determine whether the action is finished
+    ## (ie there are no other steps after the current one):
+    finished = function_step_is_last(doctype, act, step)
+
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = req.form
@@ -593,48 +652,53 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 fp = open("%s/%s" % (curdir, key), "w")
                 fp.write(filename)
                 fp.close()
-        # if the found field is the reference of the document
-        # we save this value in the "journal of submissions"
+        ## if the found field is the reference of the document
+        ## we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
-                run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (value, doctype, access, uid_email,))
+                update_submission_reference_in_log(doctype, access, uid_email, value)
         # Now deal with the cookies
         # If the fields must be saved as a cookie, we do so
         # In this case, the value of the field will be retrieved and
         # displayed as the default value of the field next time the user
         # does a submission
-        if value!="":
-            res = run_sql("SELECT cookie FROM sbmFIELDDESC WHERE  name=%s", (key,))
-            if len(res) > 0:
-                if res[0][0] == 1:
-                    setCookie(key, value, uid)
+        if value != "":
+            sets_cookie = form_element_sets_cookie(key)
+            if sets_cookie == 1:
+                ## This element sets a cookie, so do this:
+                setCookie(key, value, uid)  ## TODO: FIXME
 
-    # Get document name
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
-    if len(res) > 0:
-        docname = res[0][0]
+    ## get the document type's long-name:
+    doctype_lname = get_longname_of_doctype(doctype)
+    if doctype_lname is not None:
+        ## Got the doctype long-name: replace spaces with HTML chars:
+        docname = doctype_lname.replace(" ", "&nbsp;")
     else:
-        return errorMsg(_("Unknown type of document"), req, cdsname, ln)
-    # Get action name
-    res = run_sql("SELECT lactname FROM sbmACTION WHERE  sactname=%s", (act,))
-    if len(res) > 0:
-        actname = res[0][0]
+        ## Unknown document type:
+        return errorMsg(_("Unknown document type"), req, c, ln)
+
+    ## get the action's long-name:
+    action_lname = get_longname_of_action(act)
+    if action_lname is not None:
+        ## Got the action long-name: replace spaces with HTML chars:
+        actname = action_lname.replace(" ", "&nbsp;")
     else:
-        return errorMsg(_("Unknown action"), req, cdsname, ln)
-    # Get number of pages
+        ## Unknown action:
+        return errorMsg(_("Unknown action"), req, c, ln)
+
+    ## Get the number of pages for this submission:
     subname = "%s%s" % (act, doctype)
-    res = run_sql("SELECT nbpg FROM sbmIMPLEMENT WHERE  subname=%s", (subname,))
-    if len(res) > 0:
-        nbpages = res[0][0]
+    num_submission_pages = get_num_pages_of_submission(subname)
+    if num_submission_pages is not None:
+        nbpages = num_submission_pages
     else:
-        return errorMsg(_("This action does not exist for this document type."), req, cdsname, ln)
+        ## Unable to determine the number of pages for this submission:
+        return errorMsg(_("Unable to determine the number of submission pages."), \
+                        req, cdsname, ln)
 
-    # we specify here whether we are in the last step of the action or not
-    res = run_sql("SELECT step FROM   sbmFUNCTIONS WHERE  action=%s and doctype=%s and step>%s", (act, doctype, step,))
-    if len(res) == 0:
-        last_step = 1
-    else:
-        last_step = 0
+    ## Determine whether the action is finished
+    ## (ie there are no other steps after the current one):
+    last_step = function_step_is_last(doctype, act, step)
 
     # Prints the action details, returning the mandatory score
     action_score = action_details(doctype, act)
@@ -643,7 +707,11 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # Calls all the function's actions
     function_content = ''
     try:
-        function_content = print_function_calls(doctype=doctype, action=act, step=step, form=form, ln=ln)
+        function_content = print_function_calls(doctype=doctype,
+                                                action=act,
+                                                step=step,
+                                                form=form,
+                                                ln=ln)
     except functionError,e:
         return errorMsg(e.value, req, c, ln)
     except functionStop,e:
@@ -660,11 +728,18 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
     # If we are in the last step of an action, we can update the "journal of submissions"
     if last_step == 1:
         if uid_email != "" and uid_email != "guest" and rn != "":
-            res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE  doctype=%s and action=%s and id=%s and email=%s", (doctype, act, access, uid_email,))
-            if len(res) == 0:
-                run_sql("INSERT INTO sbmSUBMISSIONS values(%s,%s,%s,'finished',%s,%s,NOW(),NOW())", (uid_email, doctype, act, access, rn,))
+            ## update the "journal of submission":
+            ## Does the submission already exist in the log?
+            submission_exists = \
+                 submission_exists_in_log(doctype, act, access, uid_email)
+            if submission_exists == 1:
+                ## update the rn and status to finished for this submission in the log:
+                update_submission_reference_and_status_in_log(doctype, act,
+                                                              access, uid_email,
+                                                              rn, "finished")
             else:
-                run_sql("UPDATE sbmSUBMISSIONS SET md=NOW(),reference=%s,status='finished' WHERE  doctype=%s and action=%s and id=%s and email=%s", (rn, doctype, act, access, uid_email,))
+                ## Submission doesn't exist in log - create it:
+                log_new_completed_submission(doctype, act, access, uid_email, rn)
 
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
@@ -708,8 +783,12 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 req = req)
 
 def home(req, c=cdsname, ln=cdslang):
-    """
-       Generates and displays the default "home page" for Web-submit - contains a list of links to the various document submissions.
+    """This function generates the WebSubmit "home page".
+       Basically, this page contains a list of submission-collections
+       in WebSubmit, and gives links to the various document-type
+       submissions.
+       Document-types only appear on this page when they have been
+       connected to a submission-collection in WebSubmit.
     """
     ln = wash_language(ln)
     # get user ID:
@@ -740,88 +819,151 @@ def home(req, c=cdsname, ln=cdslang):
                )
 
 def makeCataloguesTable(ln=cdslang):
+    """Build the 'catalogues' (submission-collections) tree for
+       the WebSubmit home-page. This tree contains the links to
+       the various document types in WebSubmit.
+       @param ln: (string) - the language of the interface.
+        (defaults to 'cdslang').
+       @return: (string) - the submission-collections tree.
+    """
     text = ""
     catalogues = []
-    queryResult = run_sql("SELECT id_son FROM sbmCOLLECTION_sbmCOLLECTION WHERE id_father=0 ORDER BY catalogue_order");
-    if len(queryResult) != 0:
-        # Query has executed successfully, so we can proceed to display all
-        # catalogues in the EDS system...
-        for row in queryResult:
-            catalogues.append(getCatalogueBranch(row[0], 1))
+
+    ## Get the submission-collections attached at the top level
+    ## of the submission-collection tree:
+    top_level_collctns = get_collection_children_of_submission_collection(0)
+    if len(top_level_collctns) != 0:
+        ## There are submission-collections attatched to the top level.
+        ## retrieve their details for displaying:
+        for child_collctn in top_level_collctns:
+            catalogues.append(getCatalogueBranch(child_collctn[0], 1))
 
         text = websubmit_templates.tmpl_submit_home_catalogs(
-                 ln = ln,
-                 catalogs = catalogues
+                 ln=ln,
+                 catalogs=catalogues
                )
     else:
-        text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln = ln)
+        text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln=ln)
     return text
 
 def getCatalogueBranch(id_father, level):
-    elem = {}
-    queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
-    if len(queryResult) != 0:
-        row = queryResult[0]
-        elem['name'] = row[0]
-        elem['id'] = row[1]
-        elem['level'] = level
-    # display the son document types
-    elem['docs'] = []
-    res1 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmDOCTYPE WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
-    if len(res1) != 0:
-        for row in res1:
-            elem['docs'].append(getDoctypeBranch(row[0]))
+    """Build up a given branch of the submission-collection
+       tree. I.e. given a parent submission-collection ID,
+       build up the tree below it. This tree will include
+       doctype-children, as well as other submission-
+       collections and their children.
+       Finally, return the branch as a dictionary.
+       @param id_father: (integer) - the ID of the submission-collection
+        from which to begin building the branch.
+       @param level: (integer) - the level of the current submission-
+        collection branch.
+       @return: (dictionary) - the branch and its sub-branches.
+    """
+    elem = {} ## The dictionary to contain this branch of the tree.
+    ## First, get the submission-collection-details:
+    collctn_name = get_submission_collection_name(id_father)
+    if collctn_name is not None:
+        ## Got the submission-collection's name:
+        elem['name'] = collctn_name
+    else:
+        ## The submission-collection is unknown to the DB
+        ## set its name as empty:
+        elem['name'] = ""
+    elem['id']    = id_father
+    elem['level'] = level
 
+    ## Now get details of the doctype-children of this
+    ## submission-collection:
+    elem['docs'] = []  ## List to hold the doctype-children
+                       ## of the submission-collection
+    doctype_children = \
+       get_doctype_children_of_submission_collection(id_father)
+    for child_doctype in doctype_children:
+        elem['docs'].append(getDoctypeBranch(child_doctype[0]))
+
+    ## Now, get the collection-children of this submission-collection:
     elem['sons'] = []
-    res2 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmCOLLECTION WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
-    if len(res2) != 0:
-        for row in res2:
-            elem['sons'].append(getCatalogueBranch(row[0], level + 1))
+    collctn_children = \
+         get_collection_children_of_submission_collection(id_father)
+    for child_collctn in collctn_children:
+        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1))
 
+    ## Now return this branch of the built-up 'collection-tree':
     return elem
 
 def getDoctypeBranch(doctype):
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
-    return {'id' : doctype,
-            'name' : res[0][0],
-           }
+    """Create a document-type 'leaf-node' for the submission-collections
+       tree. Basically, this leaf is a dictionary containing the name
+       and ID of the document-type submission to which it links.
+       @param doctype: (string) - the ID of the document type.
+       @return: (dictionary) - the document-type 'leaf node'. Contains
+        the following values:
+          + id:   (string) - the document-type ID.
+          + name: (string) - the (long) name of the document-type.
+    """
+    ldocname = get_longname_of_doctype(doctype)
+    if ldocname is None:
+        ldocname = "Unknown Document Type"
+    return { 'id' : doctype, 'name' : ldocname, }
 
 def displayCatalogueBranch(id_father, level, catalogues):
     text = ""
-    queryResult = run_sql("SELECT name, id FROM   sbmCOLLECTION WHERE  id=%s", (id_father,))
-    if len(queryResult) != 0:
-        row = queryResult[0]
-        if level == 1:
-            text = "<LI><font size=\"+1\"><strong>%s</strong></font>\n" % row[0]
+    collctn_name = get_submission_collection_name(id_father)
+    if collctn_name is None:
+        ## If this submission-collection wasn't known in the DB,
+        ## give it the name "Unknown Submission-Collection" to
+        ## avoid errors:
+        collctn_name = "Unknown Submission-Collection"
+
+    ## Now, create the display for this submission-collection:
+    if level == 1:
+        text = "<LI><font size=\"+1\"><strong>%s</strong></font>\n" \
+               % collctn_name
+    else:
+        ## TODO: These are the same (and the if is ugly.) Why?
+        if level == 2:
+            text = "<LI>%s\n" % collctn_name
         else:
-            if level == 2:
-                text = "<LI>%s\n" % row[0]
-            else:
-                if level > 2:
-                    text = "<LI>%s\n" % row[0]
-    # display the son document types
-    res1 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmDOCTYPE WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
-    res2 = run_sql("SELECT id_son FROM   sbmCOLLECTION_sbmCOLLECTION WHERE  id_father=%s ORDER BY catalogue_order", (id_father,))
-    if len(res1) != 0 or len(res2) != 0:
+            if level > 2:
+                text = "<LI>%s\n" % collctn_name
+
+    ## Now display the children document-types that are attached
+    ## to this submission-collection:
+    ## First, get the children:
+    doctype_children = get_doctype_children_of_submission_collection(id_father)
+    collctn_children = get_collection_children_of_submission_collection(id_father)
+
+    if len(doctype_children) > 0 or len(collctn_children) > 0:
+        ## There is something to display, so open a list:
         text = text + "<UL>\n"
-    if len(res1) != 0:
-        for row in res1:
-            text = text + displayDoctypeBranch(row[0], catalogues)
-    # display the son catalogues
-    for row in res2:
-        catalogues.append(row[0])
-        text = text + displayCatalogueBranch(row[0], level+1, catalogues)
-    if len(res1) != 0 or len(res2) != 0:
+    ## First, add the doctype leaves of this branch:
+    for child_doctype in doctype_children:
+        ## Add the doctype 'leaf-node':
+        text = text + displayDoctypeBranch(child_doctype[0], catalogues)
+
+    ## Now add the submission-collection sub-branches:
+    for child_collctn in collctn_children:
+        catalogues.append(child_collctn[0])
+        text = text + displayCatalogueBranch(child_collctn[0], level+1, catalogues)
+
+    ## Finally, close up the list if there were nodes to display
+    ## at this branch:
+    if len(doctype_children) > 0 or len(collctn_children) > 0:
         text = text + "</UL>\n"
+
     return text
-
-
 
 def displayDoctypeBranch(doctype, catalogues):
     text = ""
-    res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
-    row = res[0]
-    text = "<LI><a href=\"\" onmouseover=\"javascript:popUpTextWindow('%s',true,event);\" onmouseout=\"javascript:popUpTextWindow('%s',false,event);\" onClick=\"document.forms[0].doctype.value='%s';document.forms[0].submit();return false;\">%s</a>\n" % (doctype, doctype, doctype, row[0])
+    ldocname = get_longname_of_doctype(doctype)
+    if ldocname is None:
+        ldocname = "Unknown Document Type"
+    text = "<LI><a href=\"\" onmouseover=\"javascript:" \
+           "popUpTextWindow('%s',true,event);\" onmouseout" \
+           "=\"javascript:popUpTextWindow('%s',false,event);\" " \
+           "onClick=\"document.forms[0].doctype.value='%s';" \
+           "document.forms[0].submit();return false;\">%s</a>\n" \
+           % (doctype, doctype, doctype, ldocname)
     return text
 
 
@@ -845,32 +987,36 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
     except Error, e:
         return errorMsg(e.value, req, ln)
     #parses database to get all data
-    #first the list of categories
-    res = run_sql("SELECT * FROM sbmCATEGORIES WHERE  doctype=%s ORDER BY score ASC, lname ASC", (doctype,))
-    if len(res) > 0:
-        for arr in res:
-            nbCateg = nbCateg+1
-            snameCateg.append(arr[1])
-            lnameCateg.append(arr[2])
-    #then data about the document type
-    res = run_sql("SELECT * FROM sbmDOCTYPE WHERE  sdocname=%s", (doctype,))
-    if len(res) > 0:
-        arr = res[0]
-        docFullDesc = arr[0]
-        docShortDesc = arr[1]
-        description = arr[4]
-    else:
-        return errorMsg (_("Unable to find document type.") + str(doctype), req)
-    #then data about associated actions
-    res2 = run_sql("SELECT * FROM sbmIMPLEMENT LEFT JOIN sbmACTION on sbmACTION.sactname=sbmIMPLEMENT.actname WHERE  docname=%s and displayed='Y' ORDER BY sbmIMPLEMENT.buttonorder", (docShortDesc,))
-    for arr2 in res2:
-        res = run_sql("SELECT * FROM   sbmACTION WHERE  sactname=%s", (arr2[1],))
-        for arr in res:
-            actionShortDesc.append(arr[1])
-            indir.append(arr[2])
-            actionbutton.append(arr[5])
-            statustext.append(arr[6])
+    ## first, get the list of categories
+    doctype_categs = get_categories_of_doctype(doctype)
+    for doctype_categ in doctype_categs:
+        nbCateg = nbCateg+1
+        snameCateg.append(doctype_categ[0])
+        lnameCateg.append(doctype_categ[1])
 
+    ## Now get the details of the document type:
+    doctype_details = get_doctype_details(doctype)
+    if doctype_details is None:
+        ## Doctype doesn't exist - raise error:
+        return errorMsg (_("Unable to find document type.") + str(doctype), req)
+    else:
+        docFullDesc  = doctype_details[0]
+        docShortDesc = doctype_details[1]
+        description  = doctype_details[4]
+
+    ## Get the details of the actions supported by this document-type:
+    doctype_actions = get_actions_on_submission_page_for_doctype(doctype)
+    for doctype_action in doctype_actions:
+        ## Get the details of this action:
+        action_details = get_action_details(doctype_action[0])
+        if action_details is not None:
+            actionShortDesc.append(doctype_action[0])
+            indir.append(action_details[1])
+            actionbutton.append(action_details[4])
+            statustext.append(action_details[5])
+
+    ## Send the gathered information to the template so that the doctype's
+    ## home-page can be displayed:
     t = websubmit_templates.tmpl_action_page(
           ln=ln,
           uid=uid, guest=(uid_email == "" or uid_email == "guest"),
@@ -899,33 +1045,52 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
                 req=req
                )
 
-
 def set_report_number (newrn):
+    """Set the report number for the current document into both the
+       global 'rn' scope, and the submission-log in the database.
+       @param newrn: (string) - the reference number to be allocated to
+        the document.
+       @return: None.
+    """
     global uid_email, doctype, access, rn
     # First we save the value in the global object
     rn = newrn
     # then we save this value in the "journal of submissions"
     if uid_email != "" and uid_email != "guest":
-        run_sql("UPDATE sbmSUBMISSIONS SET reference=%s WHERE  doctype=%s and id=%s and email=%s", (newrn, doctype, access, uid_email,))
+        update_submission_reference_in_log(doctype, access, uid_email, newrn)
 
 def get_report_number():
+    """Get the report number of the current document from the global
+       'rn', and return it.
+       @return: (string) - the report number held in the global 'rn'.
+    """
     global rn
     return rn
 
-def set_sysno (newsn) :
+def set_sysno(newsn):
+    """Set the global sysno with a given value.
+       @param newsn: the new value for the global 'sysno'.
+       @return: None.
+    """
     global sysno
     sysno = newsn
 
 def get_sysno() :
+    """Get the 'sysno' of the current document from the global
+       'sysno', and return it.
+       @return: (string) - the sysno (recid) held in the global 'sysno'.
+    """
     global sysno
     return sysno
 
 def Request_Print(m, txt):
-    # The argumemts to this function are the display mode (m) and the text to be displayed (txt)
-    # If the argument mode is 'ALL' then the text is unconditionally echoed
-    # m can also take values S (Supervisor Mode) and U (User Mode). In these
-    # circumstances txt is only echoed if the argument mode is the same as
-    # the current mode
+    """The argumemts to this function are the display mode (m) and the text
+       to be displayed (txt).
+       If the argument mode is 'ALL' then the text is unconditionally echoed
+       m can also take values S (Supervisor Mode) and U (User Mode). In these
+       circumstances txt is only echoed if the argument mode is the same as
+       the current mode
+    """
     global dismode
     if m == "A" or m == dismode:
         return txt
@@ -937,42 +1102,74 @@ def Evaluate_Parameter (field, doctype):
     # uniquely determined by the doctype, i.e. doctype is the primary key in
     # the table
     # If the table name is not null, evaluate the parameter
-    res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype=%s and name=%s", (doctype, field,))
-    # If no data is found then the data concerning the DEF(ault) doctype is used
-    if len(res) == 0:
-        res = run_sql("SELECT value FROM sbmPARAMETERS WHERE doctype='DEF' and name=%s", (field,))
-    if len(res) == 0:
+
+    ## TODO: The above comment looks like nonesense? This
+    ## function only seems to get the values of parameters
+    ## from the db...
+
+    ## Get the value for the parameter:
+    param_val = get_parameter_value_for_doctype(doctype, field)
+    if param_val is None:
+        ## Couldn't find a value for this parameter for this doctype.
+        ## Instead, try with the default doctype (DEF):
+        param_val = get_parameter_value_for_doctype("DEF", field)
+    if param_val is None:
+        ## There was no value for the parameter for the default doctype.
+        ## Nothing can be done about it - return an empty string:
         return ""
     else:
-        if res[0][0] is not None:
-            return res[0][0]
-        else:
-            return ""
+        ## There was some kind of value for the parameter; return it:
+        return param_val
+
 
 def Get_Parameters (function, doctype):
-    # Returns the function parameters, in an array, for the function
-    # Gets a description of the parameter
+    """For a given function of a given document type, a dictionary
+       of the parameter names and values are returned.
+       @param function: (string) - the name of the function for which the
+        parameters are to be retrieved.
+       @param doctype: (string) - the ID of the document type.
+       @return: (dictionary) - of the parameters of the function.
+        Keyed by the parameter name, values are of course the parameter
+        values.
+    """
     parray = {}
-    res = run_sql("SELECT * FROM sbmFUNDESC WHERE function=%s", (function,))
-    for i in range(0,len(res)):
-        parameter = res[i][1]
+    ## Get the names of the parameters expected by this function:
+    func_params = get_parameters_of_function(function)
+    for func_param in func_params:
+        ## For each of the parameters, get its value for this document-
+        ## type and add it into the dictionary of parameters:
+        parameter = func_param[0]
         parray[parameter] = Evaluate_Parameter (parameter, doctype)
     return parray
 
-def get_level (doctype, action):
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype, action,))
-    if len(res) > 0:
-        return res[0][9]
+def get_level(doctype, action):
+    """Get the level of a given submission. If unknown, return 0
+       as the level.
+       @param doctype: (string) - the ID of the document type.
+       @param action: (string) - the ID of the action.
+       @return: (integer) - the level of the submission; 0 otherwise.
+    """
+    subm_details = get_details_of_submission(doctype, action)
+    if subm_details is not None:
+        ## Return the level of this action
+        subm_level = subm_details[9]
+        try:
+            int(subm_level)
+        except ValueError:
+            return 0
+        else:
+            return subm_level
     else:
         return 0
 
 def action_details (doctype, action):
     # Prints whether the action is mandatory or optional. The score of the
     # action is returned (-1 if the action was optional)
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and actname=%s", (doctype, action,))
-    if len(res)>0:
-        if res[0][9] != "0":
-            return res[0][10]
+    subm_details = get_details_of_submission(doctype, action)
+    if subm_details is not None:
+        if subm_details[9] != "0":
+            ## This action is mandatory; return the score:
+            return subm_details[10]
         else:
             return -1
     else:
@@ -985,17 +1182,20 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
     t=""
-    # Get the list of functions to be called
-    res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype=%s and step=%s ORDER BY score", (action, doctype, step,))
-    # If no data is found then the data concerning the DEF(ault) doctype is used
-    if len(res) == 0:
-        res = run_sql("SELECT * FROM sbmFUNCTIONS WHERE action=%s and doctype='DEF' and step=%s ORDER BY score", (action, step,))
-    if len(res) > 0:
+
+    ## Get the list of functions to be called
+    funcs_to_call = get_functions_for_submission_step(doctype, action, step)
+
+    ## If no functions are found at this step for this doctype,
+    ## get the functions for the DEF(ault) doctype:
+    if len(funcs_to_call) == 0:
+        funcs_to_call = get_functions_for_submission_step("DEF", action, step)
+    if len(funcs_to_call) > 0:
         # while there are functions left...
         functions = []
-        for function in res:
-            function_name = function[2]
-            function_score = function[3]
+        for function in funcs_to_call:
+            function_name = function[0]
+            function_score = function[1]
             currfunction = {
               'name' : function_name,
               'score' : function_score,
@@ -1031,18 +1231,22 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
             t = "<br /><br /><b>" + _("The chosen action is not supported by the document type.") + "</b>"
     return t
 
+
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=cdslang):
     global machine, storage, act, rn
     t=""
-    res = run_sql("SELECT * FROM sbmIMPLEMENT WHERE docname=%s and level!='0' and level=%s and score>%s ORDER BY score", (doctype, currentlevel, action_score,))
-    if len(res) > 0:
+    next_submissions = \
+         get_submissions_at_level_X_with_score_above_N(doctype, currentlevel, action_score)
+
+    if len(next_submissions) > 0:
         actions = []
-        first_score = res[0][10]
-        for i in range(0,len(res)):
-            action = res[i]
+        first_score = next_submissions[0][10]
+        for action in next_submissions:
             if action[10] == first_score:
-                res2 = run_sql("SELECT dir FROM sbmACTION WHERE sactname=%s", (action[1],))
-                nextdir = res2[0][0]
+                ## Get the submission directory of this action:
+                nextdir = get_storage_directory_of_action(action[1])
+                if nextdir is None:
+                    nextdir = ""
                 curraction = {
                   'page' : action[11],
                   'action' : action[1],
@@ -1061,8 +1265,16 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
     return t
 
 def Test_Reload(uid_email, doctype, act, access):
-    res = run_sql("SELECT * FROM sbmSUBMISSIONS WHERE doctype=%s and action=%s and id=%s and email=%s and status='finished'", (doctype, act, access, uid_email,))
-    if len(res) > 0:
+    """Look in the submission log to see whether a submission is
+       marked as finished.
+       @param uid_email: (string) - the email of the submitter.
+       @param doctype: (string) - the ID of the document type.
+       @param act: (string) - the ID of the action.
+       @param access: (string) - the ID of the submission (access No.).
+       @return: (integer) - 1 if this is a reload of the page; 0 if not.
+    """
+    subm_finished = submission_is_finished(doctype, act, access, uid_email)
+    if subm_finished == 1:
         return 1
     else:
         return 0
@@ -1091,19 +1303,21 @@ def warningMsg(title, req, c=cdsname, ln=cdslang):
 
 def getCookie(name, uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select value from sbmCOOKIES where uid=%s and name=%s", (uid, name,))
-    if len(res) > 0:
-        return res[0][0]
+    field_cookies = get_cookies_set_on_field_for_user(uid, name)
+    if len(field_cookies) > 0:
+        return field_cookies[0][0]
     else:
         return None
 
 def setCookie(name, value, uid):
     # these are not real http cookies but are stored in the DB
-    res = run_sql("select id from sbmCOOKIES where uid=%s and name=%s", (uid, name,))
-    if len(res) > 0:
-        run_sql("update sbmCOOKIES set value=%s where uid=%s and name=%s", (value, uid, name,))
+    cookie_is_set = cookie_is_set_on_field_for_user(uid, name)
+    if cookie_is_set == 1:
+        ## Update the value of the cookie in the DB:
+        update_cookie_value_on_field_for_user(uid, name, value)
     else:
-        run_sql("insert into sbmCOOKIES(name,value,uid) values(%s,%s,%s)", (name, value, uid,))
+        ## No cookie set - create one:
+        add_new_cookie_to_field_for_user(uid, name, value)
     return 1
 
 def specialchars(text):
