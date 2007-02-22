@@ -898,7 +898,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
     """Test search results in various output"""
     
     def test_search_results_xm_output_split_on(self):
-        """ websearch - check document element of search results in xm output"""
+        """ websearch - check document element of search results in xm output (split by collection on)"""
         browser = Browser()
         browser.open(weburl + '/search?sc=1&of=xm')
         body = browser.response().read()
@@ -923,7 +923,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
 
     
     def test_search_results_xm_output_split_off(self):
-        """ websearch - check document element of search results in xm output"""
+        """ websearch - check document element of search results in xm output (split by collection off)"""
         browser = Browser()
         browser.open(weburl + '/search?sc=0&of=xm')
         body = browser.response().read()
@@ -947,7 +947,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
                       "found in search results.")
 
     def test_search_results_xd_output_split_on(self):
-        """ websearch - check document element of search results in xd output"""
+        """ websearch - check document element of search results in xd output (split by collection on)"""
         browser = Browser()
         browser.open(weburl + '/search?sc=1&of=xd')
         body = browser.response().read()
@@ -971,7 +971,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
 
     
     def test_search_results_xd_output_split_off(self):
-        """ websearch - check document element of search results in xd output"""
+        """ websearch - check document element of search results in xd output (split by collection off)"""
         browser = Browser()
         browser.open(weburl + '/search?sc=0&of=xd')
         body = browser.response().read()
