@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2007-02-20 17:26+0100\n"
-"PO-Revision-Date: 2006-12-01 13:19+0100\n"
+"PO-Revision-Date: 2007-02-21 22:23+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.es>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 # TODO:
-# settings = configuracio; parametres  = ?
+# settings = configuracio; parametres = parameters?
 # delete = suprimir; remove = elimina
 #: config/cdswmllib.wml:94 modules/webstyle/lib/webstyle_templates.py:482
 msgid "This site is also available in the following languages:"
@@ -318,9 +318,8 @@ msgid "Display"
 msgstr "Mostra"
 
 #: modules/bibedit/lib/bibedit_templates.py:243
-#, fuzzy
 msgid "Done"
-msgstr "el"
+msgstr "Fet"
 
 #: modules/bibedit/lib/bibedit_templates.py:343
 #: modules/bibedit/lib/bibedit_templates.py:444
@@ -3109,9 +3108,8 @@ msgstr ""
 "a l'intern."
 
 #: modules/websession/lib/websession_templates.py:108
-#, fuzzy
 msgid "External account settings"
-msgstr "Paràmetres generals"
+msgstr "Configuració del compte extern"
 
 #: modules/websession/lib/websession_templates.py:183
 msgid ""
@@ -3122,9 +3120,8 @@ msgstr ""
 "hi els nous valors en aquest formulari."
 
 #: modules/websession/lib/websession_templates.py:184
-#, fuzzy
 msgid "Edit login credentials"
-msgstr "Editeu el mètode d'identificació"
+msgstr "Editeu les credencials d'identificació"
 
 #: modules/websession/lib/websession_templates.py:188
 #: modules/websession/lib/websession_templates.py:191
@@ -3170,28 +3167,24 @@ msgid "Set new values"
 msgstr "Guardar els nous valors"
 
 #: modules/websession/lib/websession_templates.py:220
-#, fuzzy
 msgid "Edit search-related settings"
-msgstr "Edita els paràmetres"
+msgstr "Edita els paràmetres de cerca"
 
 #: modules/websession/lib/websession_templates.py:221
-#, fuzzy
 msgid "Show the latest additions box"
-msgstr "Mostrar els darrers %i comentaris:"
+msgstr "Mostra el text de les darreres entrades"
 
 #: modules/websession/lib/websession_templates.py:223
 msgid "Show collection help boxes"
-msgstr ""
+msgstr "Mostra els textos d'ajuda de la col·lecció"
 
 #: modules/websession/lib/websession_templates.py:236
-#, fuzzy
 msgid "Update settings"
-msgstr "Edita els paràmetres"
+msgstr "Actualitza els paràmetres"
 
 #: modules/websession/lib/websession_templates.py:237
-#, fuzzy
 msgid "Number of search results per page"
-msgstr "Torna als resultats de la cerca"
+msgstr "Nombre de resultats per pàgina"
 
 #: modules/websession/lib/websession_templates.py:267
 msgid "Edit login method"
@@ -3432,9 +3425,8 @@ msgstr ""
 "contacte amb %s si en voleu un."
 
 #: modules/websession/lib/websession_templates.py:697
-#, fuzzy
 msgid "Login method:"
-msgstr "Editeu el mètode d'identificació"
+msgstr "Mètode d'identificació"
 
 # Confirmar que no hagi de ser l'email!
 #: modules/websession/lib/websession_templates.py:723
@@ -3461,6 +3453,8 @@ msgstr "Heu perdut la contrasenya?"
 #: modules/websession/lib/websession_templates.py:738
 msgid "You can use your nickname or your email address to login."
 msgstr ""
+"Per a identificar-vos poseu usar el vostre àlias o la vostra adreça de "
+"correu elctrònic."
 
 #: modules/websession/lib/websession_templates.py:778
 msgid "Please enter your email address and desired nickname and password:"
@@ -3663,14 +3657,12 @@ msgid "Leave group"
 msgstr "Deixar el grup"
 
 #: modules/websession/lib/websession_templates.py:1242
-#, fuzzy
 msgid "You are a member of the following external groups:"
-msgstr "Sou membre d'aquests grups:"
+msgstr "Sou membre d'aquests grups externs:"
 
 #: modules/websession/lib/websession_templates.py:1265
-#, fuzzy
 msgid "You are not a member of any external groups."
-msgstr "No sou membre de cap grup."
+msgstr "No sou membre de cap grup extern."
 
 #: modules/websession/lib/websession_templates.py:1313
 msgid "Update group"
@@ -3879,9 +3871,8 @@ msgid "Show account"
 msgstr "Mostrar el compte"
 
 #: modules/websession/lib/websession_webinterface.py:165
-#, fuzzy
 msgid "Switched to internal login method."
-msgstr "Editeu el mètode d'identificació"
+msgstr "El mètode d'identificació és ara l'intern."
 
 #: modules/websession/lib/websession_webinterface.py:175
 #, python-format
@@ -3889,6 +3880,8 @@ msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown."
 msgstr ""
+"No és possible canviar al mètode d'autenticació extern %s, perquè no "
+"consta la vostra adreça de correu electrònic."
 
 #: modules/websession/lib/websession_webinterface.py:179
 #, python-format
@@ -3896,6 +3889,8 @@ msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown to the external login system."
 msgstr ""
+"No és possible canviar al mètode d'autenticació extern %s, perquè el "
+"sistem extern desconeix la vostra adreça de correu electrònic."
 
 #: modules/websession/lib/websession_webinterface.py:183
 msgid "Login method successfully selected."
@@ -3907,6 +3902,9 @@ msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
 msgstr ""
+"El mètode d'identificació extern %s no accepta identificacions basades "
+"en adreça de correu electrònic.  Poseu-vos en cotacte amb els "
+"administradors de la instal·lació."
 
 #: modules/websession/lib/websession_webinterface.py:210
 msgid "Password successfully edited."
@@ -3983,10 +3981,9 @@ msgstr "Les dues contrasenyes han de coincidir."
 
 #: modules/websession/lib/websession_webinterface.py:256
 msgid "User settings saved correctly."
-msgstr ""
+msgstr "S'han guardat correctament els paràmetres d'usuario."
 
 #: modules/websession/lib/websession_webinterface.py:258
-#, fuzzy
 msgid "Unable to update settings."
 msgstr "No s'ha pogut actualitzar els paràmetres."
 
