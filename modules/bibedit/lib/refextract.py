@@ -68,7 +68,7 @@ except ImportError, importerror:
     sys.stderr.flush()
     sys.exit(1)
 
-    cli_opts = {}
+cli_opts = {}
 
 def get_url_repair_patterns():
     """Initialise and return a list of precompiled regexp patterns that are used to
@@ -864,7 +864,9 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
             ## for each "classification" part of preprint references, create a complete regex:
             ## will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
-                search_pattern_str = r'\b((?P<categ>' + classification[0] + u')' + numeration_regexp + r')'
+                search_pattern_str = r'[^a-zA-Z0-9\/\.]((?P<categ>' \
+                                     + classification[0] + u')' \
+                                     + numeration_regexp + r')'
                 sre_search_pattern = sre.compile(search_pattern_str, sre.UNICODE)
                 preprint_reference_search_regexp_patterns[(kb_line_num, classification[0])]  = sre_search_pattern
                 standardised_preprint_reference_categories[(kb_line_num, classification[0])] = classification[1]
