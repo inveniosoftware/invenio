@@ -510,7 +510,8 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                               options=[ _("Ok")])
             
 
-
+        if bft.endswith('.xsl'):
+            format_name += ' (XSL)'
         return page(title=_("Format Template %s"%format_name),
                 body=bibformatadminlib.perform_request_format_template_show(format_template,
                                                           code=code,
@@ -771,7 +772,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                                                keywords,
                                                None,
                                                getUid(req))
-        (body, errors) = bibformat_engine.format_with_format_template("",
+        (body, errors) = bibformat_engine.format_with_format_template(bft,
                                                                       bfo,
                                                                       verbose=7,
                                                                       format_template_code=code)

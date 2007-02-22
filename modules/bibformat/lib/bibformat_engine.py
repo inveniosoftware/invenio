@@ -48,6 +48,7 @@ from invenio.bibrecord import \
      record_get_field_instances, \
      record_get_field_value, \
      record_get_field_values
+from invenio.bibformat_xslt_engine import format
 from invenio.dbquery import run_sql
 from invenio.messages import \
      language_list_long, \
@@ -275,7 +276,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
             return error[0][1]  
         return ""
 
-    #Format with template
+    # Format with template
     (out, errors) = format_with_format_template(template, bfo, verbose)
     errors_.extend(errors)
     
@@ -320,8 +321,10 @@ def format_with_format_template(format_template_filename, bfo,
     Returns a formatted version of the record represented by bfo,
     in the language specified in bfo, and with the specified format template.
 
-    Parameter format_template_filename will be ignored if format_template_code is provided.
-    This allows to preview format code without having to save file on disk
+    If format_template_code is provided, the template will not be loaded from
+    format_template_filename (but format_template_filename will still be used to
+    determine if bft or xsl transformation applies). This allows to preview format
+    code without having to save file on disk.
     
     @param format_template_filename the dilename of a format template
     @param bfo the object containing parameters for the current formatting
@@ -334,17 +337,27 @@ def format_with_format_template(format_template_filename, bfo,
     """
     errors_ = []
     if format_template_code is not None:
-        format_content = str(format_template_code)
+        format_content = str(format_template_code)            
     else:
         format_content = get_format_template(format_template_filename)['code']
-  
-    localized_format = filter_languages(format_content, bfo.lang)
-    (evaluated_format, errors) = eval_format_template_elements(localized_format,
-                                                               bfo,
-                                                               verbose)
-    errors_ = errors
+
+    if format_template_filename is None or \
+           format_template_filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+        # .bft
+        localized_format = filter_languages(format_content, bfo.lang)
+        (evaluated_format, errors) = eval_format_template_elements(localized_format,
+                                                                   bfo,
+                                                                   verbose)
+        errors_ = errors
+    else:
+        #.xsl
+        xml_record = record_get_xml(bfo.recID, 'xm')
+#        xml_record = '<?xml version="1.0" encoding="UTF-8"?>' + \
+#                     '<collection xmlns="http://www.loc.gov/MARC21/slim">'+ \
+#                     xml_record
+        evaluated_format = format(xml_record, template_source=format_content)
  
-    return (evaluated_format, errors)
+    return (evaluated_format, errors_)
 
 
 def eval_format_template_elements(format_template, bfo, verbose=0):
@@ -681,7 +694,8 @@ def get_format_template(filename, with_attributes=False):
     # Get from cache whenever possible
     global format_templates_cache
 
-    if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+    if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) and \
+           not filename.endswith(".xsl"):
         return None
         
     if format_templates_cache.has_key(filename):
@@ -703,12 +717,13 @@ def get_format_template(filename, with_attributes=False):
 
         # Load format template code
         # Remove name and description
-        code_and_description = pattern_format_template_name.sub("",
-                                                                format_content)
-        code = pattern_format_template_desc.sub("", code_and_description)
+        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+            code_and_description = pattern_format_template_name.sub("",
+                                                                    format_content)
+            code = pattern_format_template_desc.sub("", code_and_description)
+        else:
+            code = format_content
         
-        # Escape % chars in code (because we will use python
-        # formatting capabilities)
         format_template['code'] = code
 
     except Exception, e:
@@ -743,7 +758,8 @@ def get_format_templates(with_attributes=False):
     files = os.listdir(CFG_BIBFORMAT_TEMPLATES_PATH)
     
     for filename in files:
-        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) or \
+               filename.endswith(".xsl"):
             format_templates[filename] = get_format_template(filename,
                                                              with_attributes)
                        
@@ -768,15 +784,22 @@ def get_format_template_attrs(filename):
         code = template_file.read()
         template_file.close()
 
-        match = pattern_format_template_name.search(code)
-        if match is not None:
-            attrs['name'] = match.group('name')
+        match = None
+        if filename.endswith(".xsl"):
+            # .xsl
+            attrs['name'] = filename[:-4]
         else:
-            attrs['name'] = filename
-        
-        match = pattern_format_template_desc.search(code)
-        if match is not None:
-            attrs['description'] = match.group('desc').rstrip('.')
+            # .bft
+            match = pattern_format_template_name.search(code)
+            if match is not None:
+                attrs['name'] = match.group('name')
+            else:
+                attrs['name'] = filename
+                
+            
+            match = pattern_format_template_desc.search(code)
+            if match is not None:
+                attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
                                         stream='error', ln=cdslang)

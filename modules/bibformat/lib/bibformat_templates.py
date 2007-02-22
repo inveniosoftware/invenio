@@ -506,12 +506,18 @@ class Template:
         @param ln_for_preview the language for the preview (for bfo)
         @param pattern_for_preview the search pattern to be used for the preview (for bfo)
         @param editable True if we let user edit, else False
+        @param code the code of the template of the editor
         @return editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
         
         out = ""
 
+        # If xsl, hide some options in the menu
+        nb_menu_options = 4
+        if filename.endswith('.xsl'):
+            nb_menu_options = 2
+        
         out += '''
         <style type="text/css">
             <!--
@@ -573,12 +579,37 @@ class Template:
     
         </script>
         <table class="admin_wvar" cellspacing="0">
-        <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
+        <tr><th colspan="%(nb_menu_options)s" class="adminheaderleft">%(menu)s</th></tr>
         <tr>
         <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a></small>&nbsp;</td>
         <td>1.&nbsp;<small>%(template_editor)s</small>&nbsp;</td>
-        <td>2.&nbsp;<small><a href="format_template_show_attributes?ln=%(ln)s&amp;bft=%(filename)s">%(modify_template_attributes)s</a></small>&nbsp;</td>
-        <td>3.&nbsp;<small><a href="format_template_show_dependencies?ln=%(ln)s&amp;bft=%(filename)s">%(check_dependencies)s</a></small>&nbsp;</td>
+        ''' % {'ln': ln, 'filename': filename,
+               'menu': _("Menu"),
+               'label_show_doc': _("Show Documentation"),
+               'label_hide_doc': _("Hide Documentation"),
+               'close_editor': _("Close Editor"),
+               'modify_template_attributes': _("Modify Template Attributes"),
+               'template_editor': _("Template Editor"),
+               'check_dependencies': _("Check Dependencies"),
+               'nb_menu_options': nb_menu_options,
+               'weburl': sweburl or weburl
+               }
+
+        if not filename.endswith('.xsl'):
+            out +='''<td>2.&nbsp;<small><a href="format_template_show_attributes?ln=%(ln)s&amp;bft=%(filename)s">%(modify_template_attributes)s</a></small>&nbsp;</td>
+            <td>3.&nbsp;<small><a href="format_template_show_dependencies?ln=%(ln)s&amp;bft=%(filename)s">%(check_dependencies)s</a></small>&nbsp;</td>
+            ''' % {'ln': ln, 'filename': filename,
+               'menu': _("Menu"),
+               'label_show_doc': _("Show Documentation"),
+               'label_hide_doc': _("Hide Documentation"),
+               'close_editor': _("Close Editor"),
+               'modify_template_attributes': _("Modify Template Attributes"),
+               'template_editor': _("Template Editor"),
+               'check_dependencies': _("Check Dependencies"),
+               'weburl': sweburl or weburl
+               }
+            
+        out +='''
         </tr>
         </table>
 
@@ -1213,6 +1244,8 @@ class Template:
             for template in format_templates:
                 attrs = format_templates[template]['attrs']
                 attrs['template'] = template
+                if template.endswith('.xsl'):
+                    attrs['name'] += ' (XSL)'
                 
                 if template != rule['template']:
                     out += '''<option value="%(template)s">%(name)s</option>''' % attrs
@@ -1272,6 +1305,9 @@ class Template:
         for template in format_templates:
             attrs = format_templates[template]['attrs']
             attrs['template'] = template
+            if template.endswith('.xsl'):
+                attrs['name'] += ' (XSL)'
+                    
             if template  != default:
                 out += '''<option value="%(template)s">%(name)s</option>''' % attrs
             else:

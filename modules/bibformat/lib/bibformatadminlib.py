@@ -29,9 +29,14 @@ import os
 import re
 import stat
 import time
+import cgi
 
 from invenio.config import cdslang, weburl, etcdir
-from invenio.bibformat_config import CFG_BIBFORMAT_TEMPLATES_PATH, CFG_BIBFORMAT_OUTPUTS_PATH, CFG_BIBFORMAT_ELEMENTS_PATH, CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
+from invenio.bibformat_config import \
+     CFG_BIBFORMAT_TEMPLATES_PATH, \
+     CFG_BIBFORMAT_OUTPUTS_PATH, \
+     CFG_BIBFORMAT_ELEMENTS_PATH, \
+     CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
 from invenio.urlutils import wash_url_argument
 from invenio.errorlib import get_msgs_for_code_list
 from invenio.messages import gettext_set_language, wash_language, language_list_long
@@ -89,6 +94,8 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
     for filename in formats:
         attrs = formats[filename]['attrs']
         attrs['filename'] = filename
+        if filename.endswith('.xsl'):
+            attrs['name'] += ' (XSL)'
         attrs['editable'] = can_write_format_template(filename)
         path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
         attrs['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
@@ -110,7 +117,7 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
         Sort 'seq' by attribute name.
         @param seq a list of dictionaries, containing each one key named 'name'
         """
-        intermed = [ (x['name'], i, x) for i, x in enumerate(seq)]
+        intermed = [ (x['name'].lower(), i, x) for i, x in enumerate(seq)]
         intermed.sort()
         return [x[-1] for x in intermed]
         
@@ -135,8 +142,8 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
 
     # Either use code being edited, or the original code inside template
     if code is None:
-        code = format_template['code']#.replace('%%','%') #.replace("<","&lt;").replace(">","/&gt;").replace("&","&amp;")
-
+        code = cgi.escape(format_template['code'])
+    
     # Build a default pattern if it is empty
     if pattern_for_preview == "":
         recIDs = perform_request_search()
@@ -741,48 +748,51 @@ def update_format_template_attributes(filename, name="", description="", duplica
     @param duplicate the filename of a template that we want to copy
     @return the filename of the modified format
     """
-    format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-    if duplicate is not None and duplicate != "":
-        format_template_to_copy = bibformat_engine.get_format_template(duplicate)
-        code = format_template_to_copy['code']
-    else:
-        code = format_template['code']
-    if format_template['attrs']['name'] != name:
-        # Name has changed, so update filename
-        old_filename = filename
-        old_path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + old_filename
-        # Remove old one
-        os.remove(old_path)
-        
-        (filename, name) = bibformat_engine.get_fresh_format_template_filename(name)
+    if filename.endswith('.'+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+        format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
+        if duplicate is not None and duplicate != "":
+            format_template_to_copy = bibformat_engine.get_format_template(duplicate)
+            code = format_template_to_copy['code']
+        else:
+            code = format_template['code']
+        if format_template['attrs']['name'] != name:
+            # Name has changed, so update filename
+            old_filename = filename
+            old_path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + old_filename
+            # Remove old one
+            os.remove(old_path)
 
-        # Change output formats that calls this template
-        output_formats = bibformat_engine.get_output_formats()
+            (filename, name) = bibformat_engine.get_fresh_format_template_filename(name)
 
-        for output_format_filename in output_formats:
-            if can_read_output_format(output_format_filename) and can_write_output_format(output_format_filename):
-                output_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + output_format_filename
-                format = open(output_path, 'r')
-                output_text = format.read()
-                format.close
-                output_pattern = re.compile("---(\s)*" + old_filename, re.IGNORECASE)
-                mod_output_text = output_pattern.sub("--- " + filename, output_text)
-                if output_text != mod_output_text:
-                    format = open(output_path, 'w')
-                    format.write(mod_output_text)
+            # Change output formats that calls this template
+            output_formats = bibformat_engine.get_output_formats()
+
+            for output_format_filename in output_formats:
+                if can_read_output_format(output_format_filename) and can_write_output_format(output_format_filename):
+                    output_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + output_format_filename
+                    format = open(output_path, 'r')
+                    output_text = format.read()
                     format.close
+                    output_pattern = re.compile("---(\s)*" + old_filename, re.IGNORECASE)
+                    mod_output_text = output_pattern.sub("--- " + filename, output_text)
+                    if output_text != mod_output_text:
+                        format = open(output_path, 'w')
+                        format.write(mod_output_text)
+                        format.close
+                        
+        description = cgi.escape(description)
+        name = cgi.escape(name)
+        # Write updated format template
+        out = '''<name>%(name)s</name><description>%(description)s</description>%(code)s''' % {'name':name,
+                                                                                               'description':description,
+                                                                                               'code':code}
 
-    # Write updated format template
-    out = '''<name>%(name)s</name><description>%(description)s</description>%(code)s''' % {'name':name,
-                                                                                           'description':description,
-                                                                                           'code':code}
+        path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
+        format = open(path, 'w')
+        format.write(out)
+        format.close
 
-    path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
-    format = open(path, 'w')
-    format.write(out)
-    format.close
-
-    bibformat_engine.clear_caches()
+        bibformat_engine.clear_caches()
 
     return filename
 
@@ -1417,68 +1427,69 @@ def check_format_template(filename, checking=0):
     """
     errors = []
     if can_read_format_template(filename):#Can template be read?
-        #format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
-        format = open("%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename))
-        code = format.read()
-        format.close()
-        # Look for name
-        match = bibformat_engine.pattern_format_template_name.search(code)
-        if match is None:#Is tag <name> defined in template?
-            errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_NAME", filename))
+        if filename.endswith('.'+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+            #format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
+            format = open("%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename))
+            code = format.read()
+            format.close()
+            # Look for name
+            match = bibformat_engine.pattern_format_template_name.search(code)
+            if match is None:#Is tag <name> defined in template?
+                errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_NAME", filename))
 
-        # Look for description
-        match = bibformat_engine.pattern_format_template_desc.search(code)
-        if match is None:#Is tag <description> defined in template?
-            errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_DESCRIPTION", filename))
-        
-        format_template = bibformat_engine.get_format_template(filename, with_attributes=False)
-        code = format_template['code']
-        # Look for calls to format elements
-        # Check existence of elements and attributes used in call
-        elements_call = bibformat_engine.pattern_tag.finditer(code)
-        for element_match in elements_call:
-            element_name = element_match.group("function_name")
-            filename = bibformat_engine.resolve_format_element_filename(element_name)
-            if filename is None and not bibformat_dblayer.tag_exists_for_name(element_name): #Is element defined?
-                errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNDEFINED_ELEM", filename, element_name))
-            else:
-                format_element = bibformat_engine.get_format_element(element_name, with_built_in_params=True)
-                if format_element is None:#Can element be loaded?
-                    if not can_read_format_element(element_name):
-                        errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNREADABLE_ELEM", filename, element_name))
-                    else:
-                        errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNLOADABLE_ELEM", element_name, filename))
+            # Look for description
+            match = bibformat_engine.pattern_format_template_desc.search(code)
+            if match is None:#Is tag <description> defined in template?
+                errors.append(("ERR_BIBFORMAT_TEMPLATE_HAS_NO_DESCRIPTION", filename))
+
+            format_template = bibformat_engine.get_format_template(filename, with_attributes=False)
+            code = format_template['code']
+            # Look for calls to format elements
+            # Check existence of elements and attributes used in call
+            elements_call = bibformat_engine.pattern_tag.finditer(code)
+            for element_match in elements_call:
+                element_name = element_match.group("function_name")
+                filename = bibformat_engine.resolve_format_element_filename(element_name)
+                if filename is None and not bibformat_dblayer.tag_exists_for_name(element_name): #Is element defined?
+                    errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNDEFINED_ELEM", filename, element_name))
                 else:
-                    # Are the parameters used defined in element?
-                    params_call = bibformat_engine.pattern_function_params.finditer(element_match.group())
-                    all_params = {}
-                    for param_match in params_call:
-                        param = param_match.group("param")
-                        value = param_match.group("value")
-                        all_params[param] = value
-                        allowed_params = []
+                    format_element = bibformat_engine.get_format_element(element_name, with_built_in_params=True)
+                    if format_element is None:#Can element be loaded?
+                        if not can_read_format_element(element_name):
+                            errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNREADABLE_ELEM", filename, element_name))
+                        else:
+                            errors.append(("ERR_BIBFORMAT_TEMPLATE_CALLS_UNLOADABLE_ELEM", element_name, filename))
+                    else:
+                        # Are the parameters used defined in element?
+                        params_call = bibformat_engine.pattern_function_params.finditer(element_match.group())
+                        all_params = {}
+                        for param_match in params_call:
+                            param = param_match.group("param")
+                            value = param_match.group("value")
+                            all_params[param] = value
+                            allowed_params = []
 
-                        # Built-in params
-                        for allowed_param in format_element['attrs']['builtin_params']:
-                            allowed_params.append(allowed_param['name'])
+                            # Built-in params
+                            for allowed_param in format_element['attrs']['builtin_params']:
+                                allowed_params.append(allowed_param['name'])
 
-                        # Params defined in element
-                        for allowed_param in format_element['attrs']['params']:
-                            allowed_params.append(allowed_param['name'])
-                            
-                        if not param in allowed_params:
-                            errors.append(("ERR_BIBFORMAT_TEMPLATE_WRONG_ELEM_ARG",
-                                           element_name, param, filename))
+                            # Params defined in element
+                            for allowed_param in format_element['attrs']['params']:
+                                allowed_params.append(allowed_param['name'])
 
-                    # The following code is too much time consuming. Only do where really requested
-                    if checking > 0:
-                        # Try to evaluate, with any object and pattern
-                        recIDs = perform_request_search()
-                        if len(recIDs) > 0:
-                            recID = recIDs[0]
-                            bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
-                            (result, errors_) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
-                            errors.extend(errors_)
+                            if not param in allowed_params:
+                                errors.append(("ERR_BIBFORMAT_TEMPLATE_WRONG_ELEM_ARG",
+                                               element_name, param, filename))
+
+                        # The following code is too much time consuming. Only do where really requested
+                        if checking > 0:
+                            # Try to evaluate, with any object and pattern
+                            recIDs = perform_request_search()
+                            if len(recIDs) > 0:
+                                recID = recIDs[0]
+                                bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
+                                (result, errors_) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
+                                errors.extend(errors_)
                     
     else:# Template cannot be read
         errors.append(("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, ""))
