@@ -3631,7 +3631,7 @@ def convert_PDF_to_plaintext(fpath):
     cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 %(filepath)s -""" % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
                                                                               'filepath'  : fpath }
     if cli_opts['verbosity'] >= 1:
-        sys.stdout.write(cmd_pdftotext)
+        sys.stdout.write("%s\n" % cmd_pdftotext)
     ## open pipe to pdftotext:
     pipe_pdftotext = os.popen("%s" % cmd_pdftotext, 'r')
     ## read back results:
@@ -3642,7 +3642,7 @@ def convert_PDF_to_plaintext(fpath):
     ## close pipe to pdftotext:
     pipe_pdftotext.close()
     if cli_opts['verbosity'] >= 1:
-        sys.stdout.write("-----convert_PDF_to_plaintext found: %s lines of text" \
+        sys.stdout.write("-----convert_PDF_to_plaintext found: %s lines of text\n" \
                          % str(count))
 
     ## finally, check conversion result not bad:
@@ -3921,7 +3921,7 @@ def main():
         count_misc = count_title = count_reportnum = count_url = 0
         recid = curitem[0]
         if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("--- processing RecID: %s pdffile: %s" \
+            sys.stdout.write("--- processing RecID: %s pdffile: %s\n" \
                              % (str(curitem[0]), curitem[1]))
 
         if not done_coltags:
@@ -3946,7 +3946,7 @@ def main():
             extract_error = 3
         if cli_opts['verbosity'] >= 1:
             sys.stdout.write("-----get_plaintext_document_body gave: %s lines," \
-                             " overall error: %s" % (str(len(docbody)), str(extract_error)))
+                             " overall error: %s\n" % (str(len(docbody)), str(extract_error)))
         if len(docbody) > 0:
             ## the document body is not empty:
             ## 2. If necessary, locate the reference section:
@@ -3960,7 +3960,7 @@ def main():
                     extract_error = 6
                 if cli_opts['verbosity'] >= 1:
                     sys.stdout.write("-----extract_references_from_fulltext gave " \
-                                     "len(reflines): %s overall error: %s" \
+                                     "len(reflines): %s overall error: %s\n" \
                                      % (str(len(reflines)), str(extract_error)))
 
             ## 3. Standardise the reference lines:
@@ -3996,7 +3996,7 @@ def main():
         if cli_opts['verbosity'] >= 1:
             lines = out.split('\n')
             sys.stdout.write("-----display_xml_record gave: %s significant lines " \
-                             "of xml, overall error: %s" % (str(len(lines) - 7), extract_error))
+                             "of xml, overall error: %s\n" % (str(len(lines) - 7), extract_error))
         if cli_opts['xmlfile']:
             ofilehdl.write("%s" % (out.encode("utf-8"),))
             ofilehdl.flush()
