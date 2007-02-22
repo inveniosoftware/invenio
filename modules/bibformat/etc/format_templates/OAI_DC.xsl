@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$
+
+     This file is part of CDS Invenio.
+     Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+
+     CDS Invenio is free software; you can redistribute it and/or
+     modify it under the terms of the GNU General Public License as
+     published by the Free Software Foundation; either version 2 of the
+     License, or (at your option) any later version.
+
+     CDS Invenio is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+     General Public License for more details.  
+
+     You should have received a copy of the GNU General Public License
+     along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-->
+<!-- This stylesheet transforms a MARCXML input into an OAI DC output.
+     
+     This stylesheet is provided only as an example of transformation.
+
+-->
+<xsl:stylesheet version="1.0"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+xmlns:marc="http://www.loc.gov/MARC21/slim" 
+xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:dc="http://purl.org/dc/elements/1.1/" 
+xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
+exclude-result-prefixes="marc fn">
+        <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
+        <xsl:template match="/">
+		<xsl:if test="collection">
+			<oai_dc:dcCollection xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+				<xsl:for-each select="collection">
+					<xsl:for-each select="record">
+						<oai_dc:dc>
+							<xsl:apply-templates select="."/>
+						</oai_dc:dc>
+					</xsl:for-each>
+				</xsl:for-each>
+			</oai_dc:dcCollection>
+		</xsl:if>
+		<xsl:if test="record">
+			<oai_dc:dc xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd" xmlns:dc="http://purl.org/dc/elements/1.1/">
+				<xsl:apply-templates/>
+			</oai_dc:dc>
+		</xsl:if>
+        </xsl:template>
+        <xsl:template match="record">
+	        <xsl:for-each select="datafield[@tag=041]">
+			<dc:language>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:language>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=100]">
+			<dc:creator>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:creator>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=700]">
+			<dc:creator>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:creator>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=245]">
+			<dc:title>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:title>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=111]">
+			<dc:title>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:title>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=650 and @ind1=1 and @ind2=7]">
+			<dc:subject>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:subject>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
+			<dc:identifier>
+                                <xsl:value-of select="subfield[@code='u']"/>
+			</dc:identifier>
+		</xsl:for-each>
+	        <xsl:for-each select="datafield[@tag=520]">
+			<dc:description>
+                                <xsl:value-of select="subfield[@code='a']"/>
+			</dc:description>
+		</xsl:for-each>
+                <dc:date>
+                        <xsl:value-of select="fn:creation_date(controlfield[@tag=001])"/>
+                </dc:date>
+        </xsl:template>
+</xsl:stylesheet>
