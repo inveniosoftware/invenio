@@ -122,7 +122,7 @@ class BFXParser:
         if self.start_template_name:
             start_template = self.templates[self.start_template_name]['node']
         else:
-            print CFG_BIBFORMAT_BFX_WARNING_MESSAGES['WRN_BFX_NO_FORMAT_FOUND']
+            #print CFG_BIBFORMAT_BFX_WARNING_MESSAGES['WRN_BFX_NO_FORMAT_FOUND']
             if len(self.templates) == 1:
                 # no format found, check if there is a default template
                 self.start_template_name = self.templates.keys()[0]
@@ -131,8 +131,8 @@ class BFXParser:
                 #no formats found, templates either zero or more than one
                 if len(self.templates) > 1:
                     print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TOO_MANY_TEMPLATES']
-                else:
-                    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_TEMPLATES_FOUND']
+                #else:
+                #    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_TEMPLATES_FOUND']
                 return None
         self.flags['exec'] = True
         return start_template
