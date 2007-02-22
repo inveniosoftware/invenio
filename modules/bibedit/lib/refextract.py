@@ -530,7 +530,7 @@ sre_html_tagged_url = \
 ## Numeration recognition pattern - used to identify numeration associated with a title when
 ## marking the title up into MARC XML:
 sre_recognised_numeration_for_title = \
-     sre.compile(r'^(\s*.?,?\s*:\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', sre.UNICODE)
+     sre.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', sre.UNICODE)
 
 sre_title_followed_by_series_markup_tags = \
      sre.compile(r'(\<cds.TITLE\>([^\<]+)\<\/cds.TITLE\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', sre.UNICODE)
