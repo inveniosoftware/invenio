@@ -68,6 +68,8 @@ except ImportError, importerror:
     sys.stderr.flush()
     sys.exit(1)
 
+    cli_opts = {}
+
 def get_url_repair_patterns():
     """Initialise and return a list of precompiled regexp patterns that are used to
        try to re-assemble URLs that have been broken during a document's conversion
@@ -976,10 +978,15 @@ def build_titles_knowledge_base(fpath):
 
     try:
         fh = open(fpath, "r")
+        count = 0	      
         for rawline in fh:
+            count += 1
             ## Test line to ensure that it is a correctly formatted knowledge base line:
-            m_kb_line = p_kb_line.search(rawline.decode("utf-8").rstrip("\n"))
-
+            try:
+                m_kb_line = p_kb_line.search(rawline.decode("utf-8").rstrip("\n"))
+            except UnicodeError:
+                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
+                                 % (fpath, str(count)))
             if m_kb_line is not None:
                 ## good KB line
                 seek_phrase = m_kb_line.group('seek')
@@ -3556,27 +3563,33 @@ def extract_references_from_fulltext(fulltext):
     """
     ## Try to remove pagebreaks, headers, footers
     fulltext = remove_page_boundary_lines(fulltext)
-
+    status = 0
     ## Find start of refs section:
     ref_sect_start = find_reference_section(fulltext)
     if ref_sect_start is None:
-        ## No references found
+        ## No references found - try with no title option
         ref_sect_start = find_reference_section_no_title(fulltext)
     if ref_sect_start is None:
         ## No References
         refs = []
+        status = 4
+        if cli_opts['verbosity'] >= 1:
+            sys.stdout.write("-----extract_references_from_fulltext: ref_sect_start is None\n")
     else:
         ref_sect_end = find_end_of_reference_section(fulltext, ref_sect_start["start_line"], \
                                                      ref_sect_start["marker"], ref_sect_start["marker_pattern"])
         if ref_sect_end is None:
             ## No End to refs? Not safe to extract
             refs = []
+            status = 5
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----extract_references_from_fulltext: no end to refs!\n")
         else:
             ## Extract
             refs = get_reference_lines(fulltext, ref_sect_start["start_line"], ref_sect_end, \
                                        ref_sect_start["title_string"], ref_sect_start["marker_pattern"], \
                                        ref_sect_start["title_marker_same_line"])
-    return refs
+    return (refs, status)
 
 
 ## Tasks related to conversion of full-text to plain-text:
@@ -3610,22 +3623,31 @@ def convert_PDF_to_plaintext(fpath):
        @return: (list) of unicode strings (contents of the PDF file translated into plaintext;
         each string is a line in the document.)
     """
+    status = 0
     doclines = []
     ## build pdftotext command:
     cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 %(filepath)s -""" % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
                                                                               'filepath'  : fpath }
+    if cli_opts['verbosity'] >= 1:
+        sys.stdout.write(cmd_pdftotext)
     ## open pipe to pdftotext:
     pipe_pdftotext = os.popen("%s" % cmd_pdftotext, 'r')
     ## read back results:
+    count = 0
     for docline in pipe_pdftotext:
         doclines.append(docline.decode("utf-8"))
+        count += 1
     ## close pipe to pdftotext:
     pipe_pdftotext.close()
+    if cli_opts['verbosity'] >= 1:
+        sys.stdout.write("-----convert_PDF_to_plaintext found: %s lines of text" \
+                         % str(count))
 
     ## finally, check conversion result not bad:
     if _pdftotext_conversion_is_bad(doclines):
+        status = 2
         doclines = []
-    return doclines
+    return (doclines, status)
 
 def convert_document_to_plaintext(fpath):
     """Given the path to a file, convert it to plaintext and return the content as a list, whereby
@@ -3637,10 +3659,11 @@ def convert_document_to_plaintext(fpath):
     pipe_gfile = os.popen("%s %s" % (CFG_PATH_GFILE, fpath), "r")
     res_gfile = pipe_gfile.readline()
     pipe_gfile.close()
+    status = 0
     if res_gfile.lower().find("pdf") != -1:
         ## convert from PDF
-        doc_plaintext = convert_PDF_to_plaintext(fpath)
-    return doc_plaintext
+        (doc_plaintext, status) = convert_PDF_to_plaintext(fpath)
+    return (doc_plaintext, status)
 
 def get_plaintext_document_body(fpath):
     """Given a file-path to a full-text, return a list of unicode strings whereby each string
@@ -3652,6 +3675,7 @@ def get_plaintext_document_body(fpath):
        @return: (list) of strings - each string being a line in the document.
     """
     textbody = []
+    status = 0
     if os.access(fpath, os.F_OK|os.R_OK):
         # filepath OK - attempt to extract references:
         ## get file type:
@@ -3669,11 +3693,12 @@ def get_plaintext_document_body(fpath):
                 textbody.append(line.decode("utf-8"))
         else:
             ## assume file needs to be converted to text:
-            textbody = convert_document_to_plaintext(fpath)
+            (textbody, status) = convert_document_to_plaintext(fpath)
     else:
         ## filepath not OK
-        raise IOError("Could not find file %s" % fpath)
-    return textbody
+        status = 1
+##        raise IOError("Could not find file %s" % fpath)
+    return (textbody, status)
 
 def write_raw_references_to_stream(recid, raw_refs, strm=None):
     """Write a lost of raw reference lines to the a given stream.
@@ -3728,6 +3753,8 @@ def usage(wmsg="", err_code=0):
                   output raw references, as extracted from the document. No MARC XML
                   mark-up - just each extracted line, prefixed by the recid of the document
                   that it came from.
+   -x, --xmlfile
+                  write xml output to a file rather than standard out
    -z, --raw-references
                   treat the input file as pure references. i.e. skip the stage of trying to
                   locate the reference section within a document and instead move to the
@@ -3744,19 +3771,22 @@ def get_cli_options():
        @return: (tuple) of 2 elements. First element is a dictionary of cli options and
         flags, set as appropriate; Second element is a list of cli arguments.
     """
+    global cli_opts
     ## dictionary of important flags and values relating to cli call of program:
     cli_opts = { 'treat_as_reference_section' : 0,
                  'output_raw'                 : 0,
                  'verbosity'                  : 0,
+                 'xmlfile'                    : 0,
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zr", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:", \
                                           ["help",
                                            "version",
                                            "verbose=",
                                            "raw-references",
-                                           "output-raw-refs"])
+                                           "output-raw-refs",
+                                           "xmlfile="])
     except getopt.GetoptError, err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
@@ -3782,6 +3812,8 @@ def get_cli_options():
         elif o[0] in ("-z", "--raw-citations"):
             ## treat input as pure reference lines:
             cli_opts['treat_as_reference_section'] = 1
+        elif o[0] in ("-x", "--xmlfile"):
+            cli_opts['xmlfile'] = o[1]
 
     if len(myargs) == 0:
         ## no arguments: error message
@@ -3803,7 +3835,7 @@ def display_xml_record(status_code, count_reportnum,
            [...]
            <datafield tag="999" ind1="C" ind2="6">
               <subfield code="a">
-                CDS Invenio/0.92.0 refextract/0.92.0-timestamp-error-reportnum-title-URL-misc
+                CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-error-reportnum-title-URL-misc
               </subfield>
            </datafield>
         </record>
@@ -3859,15 +3891,13 @@ def display_xml_record(status_code, count_reportnum,
     ## Now add the closing tag to the record:
     out += u"%(record-close)s\n" % { 'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
 
-    ## Write the record to the standard output stream:
-    sys.stdout.write("%s" % (out.encode("utf-8"),))
-    sys.stdout.flush()
-    return
+    return out
 
 
 def main():
     """Main function.
     """
+    global cli_opts
     (cli_opts, cli_args) =  get_cli_options()
 
     extract_jobs = get_recids_and_filepaths(cli_args)
@@ -3888,16 +3918,33 @@ def main():
         ## reset the stats counters:
         count_misc = count_title = count_reportnum = count_url = 0
         recid = curitem[0]
+        if cli_opts['verbosity'] >= 1:
+            sys.stdout.write("--- processing RecID: %s pdffile: %s" \
+                             % (str(curitem[0]), curitem[1]))
 
         if not done_coltags:
             ## Output opening XML collection tags:
-            sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_VERSION.encode("utf-8"),))
-            sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"),))
+            if cli_opts['xmlfile']:
+                try:
+                    ofilehdl = open(cli_opts['xmlfile'], 'w')
+                    ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
+                    ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
+                    ofilehdl.flush()
+                except:
+                    sys.stdout.write("***%s\n\n" % cli_opts['xmlfile'])
+                    raise IOError("Cannot open %s to write!" % cli_opts['xmlfile'])
+            else:
+                sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_VERSION.encode("utf-8"),))
+                sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"),))
             done_coltags = 1
 
         ## 1. Get this document body as plaintext:
-        docbody = get_plaintext_document_body(curitem[1])
-
+        (docbody, extract_error) = get_plaintext_document_body(curitem[1])
+        if extract_error == 0 and len(docbody) == 0:
+            extract_error = 3
+        if cli_opts['verbosity'] >= 1:
+            sys.stdout.write("-----get_plaintext_document_body gave: %s lines," \
+                             " overall error: %s" % (str(len(docbody)), str(extract_error)))
         if len(docbody) > 0:
             ## the document body is not empty:
             ## 2. If necessary, locate the reference section:
@@ -3906,8 +3953,13 @@ def main():
                 reflines = docbody
             else:
                 ## launch search for the reference section in the document body:
-                reflines = extract_references_from_fulltext(docbody)
-                
+                (reflines, extract_error) = extract_references_from_fulltext(docbody)
+                if len(reflines) == 0 and extract_error == 0:
+                    extract_error = 6
+                if cli_opts['verbosity'] >= 1:
+                    sys.stdout.write("-----extract_references_from_fulltext gave " \
+                                     "len(reflines): %s overall error: %s" \
+                                     % (str(len(reflines)), str(extract_error)))
 
             ## 3. Standardise the reference lines:
 #            reflines = test_get_reference_lines()
@@ -3928,17 +3980,36 @@ def main():
         ## 4. Display the extracted references, status codes, etc:
         if cli_opts['output_raw']:
             ## now write the raw references to the stream:
-            write_raw_references_to_stream(recid, reflines, sys.stderr)
+            raw_file = str(recid) + '.rawrefs'
+            try:
+                rawfilehdl = open(raw_file, 'w')
+                write_raw_references_to_stream(recid, reflines, rawfilehdl)
+                rawfilehdl.close()
+            except:
+                raise IOError("Cannot open raw ref file: %s to write" % raw_file)
 
         ## Display the processed reference lines:
-        display_xml_record(extract_error, count_reportnum,
+        out = display_xml_record(extract_error, count_reportnum,
                            count_title, count_url, count_misc, recid, processed_references)
+        if cli_opts['verbosity'] >= 1:
+            lines = out.split('\n')
+            sys.stdout.write("-----display_xml_record gave: %s significant lines " \
+                             "of xml, overall error: %s" % (str(len(lines) - 7), extract_error))
+        if cli_opts['xmlfile']:
+            ofilehdl.write("%s" % (out.encode("utf-8"),))
+            ofilehdl.flush()
+        else:
+            ## Write the record to the standard output stream:
+            sys.stdout.write("%s" % out.encode("utf-8"))
+            sys.stdout.flush()
+
     ## If an XML collection was opened, display closing tag
     if done_coltags:
-        sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"),))
-
-
-
+        if (cli_opts['xmlfile']):
+            ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+            ofilehdl.close()
+        else:
+            sys.stdout.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
 
 
 def test_get_reference_lines():
