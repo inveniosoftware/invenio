@@ -894,6 +894,105 @@ class WebSearchSortResultsTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d&sp=cern',
                                                expected_text="CERN-TH-4036"))
 
+class WebSearchSearchResultsXML(unittest.TestCase):
+    """Test search results in various output"""
+    
+    def test_search_results_xm_output_split_on(self):
+        """ websearch - check document element of search results in xm output"""
+        browser = Browser()
+        browser.open(weburl + '/search?sc=1&of=xm')
+        body = browser.response().read()
+
+        num_doc_element = body.count("<collection "
+                                     "xmlns=\"http://www.loc.gov/MARC21/slim\">")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element <collection "
+                      "xmlns=\"http://www.loc.gov/MARC21/slim\">"
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements <collection> "
+                      "found in search results.")
+
+        num_doc_element = body.count("</collection>")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element </collection> "
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements </collection> "
+                      "found in search results.")
+
+    
+    def test_search_results_xm_output_split_off(self):
+        """ websearch - check document element of search results in xm output"""
+        browser = Browser()
+        browser.open(weburl + '/search?sc=0&of=xm')
+        body = browser.response().read()
+
+        num_doc_element = body.count("<collection "
+                                     "xmlns=\"http://www.loc.gov/MARC21/slim\">")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element <collection "
+                      "xmlns=\"http://www.loc.gov/MARC21/slim\">"
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements <collection> "
+                      "found in search results.")
+
+        num_doc_element = body.count("</collection>")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element </collection> "
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements </collection> "
+                      "found in search results.")
+
+    def test_search_results_xd_output_split_on(self):
+        """ websearch - check document element of search results in xd output"""
+        browser = Browser()
+        browser.open(weburl + '/search?sc=1&of=xd')
+        body = browser.response().read()
+
+        num_doc_element = body.count("<collection")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element <collection "
+                      "xmlns=\"http://www.loc.gov/MARC21/slim\">"
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements <collection> "
+                      "found in search results.")
+
+        num_doc_element = body.count("</collection>")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element </collection> "
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements </collection> "
+                      "found in search results.")
+
+    
+    def test_search_results_xd_output_split_off(self):
+        """ websearch - check document element of search results in xd output"""
+        browser = Browser()
+        browser.open(weburl + '/search?sc=0&of=xd')
+        body = browser.response().read()
+
+        num_doc_element = body.count("<collection>")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element <collection "
+                      "xmlns=\"http://www.loc.gov/MARC21/slim\">"
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements <collection> "
+                      "found in search results.")
+
+        num_doc_element = body.count("</collection>")
+        if num_doc_element == 0:
+            self.fail("Oops, no document element </collection> "
+                      "found in search results.")
+        elif num_doc_element > 1:
+            self.fail("Oops, multiple document elements </collection> "
+                      "found in search results.")
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -909,7 +1008,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchRSSFeedServiceTest,
                              WebSearchXSSVulnerabilityTest,
                              WebSearchResultsOverview,
-                             WebSearchSortResultsTest)
+                             WebSearchSortResultsTest,
+                             WebSearchSearchResultsXML)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
