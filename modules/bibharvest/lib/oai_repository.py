@@ -47,6 +47,7 @@ from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists
 from invenio.bibformat_dblayer import get_preformatted_record
+from invenio.bibformat import format_record
 
 verbs = {
     "Identify"            : [""],
@@ -373,41 +374,43 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
                 out = out + "    </marc:record>\n"
 
         elif format == "xd":
-        # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-            out = out + "       <oaidc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
+            out += format_record(sysno, 'xoaidc')
+##            out = re.sub('<\?xml[^>\?]*\?>', '', out, 1)
+##         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
+##             out = out + "       <oaidc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
 
-            for field_ in get_field(sysno, "041__a"):
-                out =  "%s         <dc:language>%s</dc:language>\n" % (out, field_)
+##             for field_ in get_field(sysno, "041__a"):
+##                 out =  "%s         <dc:language>%s</dc:language>\n" % (out, field_)
 
-            for field_ in get_field(sysno, "100__a"):
-                out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
+##             for field_ in get_field(sysno, "100__a"):
+##                 out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
 
-            # Generate additional authors in reverse order, to get correct order
-            authors = ""
-            for field_ in get_field(sysno, "700__a"):
-                authors =  "         <dc:creator>%s</dc:creator>\n%s" % (encode_for_xml(field_),
-                                                                         authors)
-            out += authors
+##             # Generate additional authors in reverse order, to get correct order
+##             authors = ""
+##             for field_ in get_field(sysno, "700__a"):
+##                 authors =  "         <dc:creator>%s</dc:creator>\n%s" % (encode_for_xml(field_),
+##                                                                          authors)
+##             out += authors
             
-            for field_ in get_field(sysno, "245__a"):
-                out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
+##             for field_ in get_field(sysno, "245__a"):
+##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
                                
-            for field_ in get_field(sysno, "111__a"):
-                out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
+##             for field_ in get_field(sysno, "111__a"):
+##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
 
-            for field_ in get_field(sysno, "65017a"):
-                out =  "%s         <dc:subject>%s</dc:subject>\n" % (out, encode_for_xml(field_))
+##             for field_ in get_field(sysno, "65017a"):
+##                 out =  "%s         <dc:subject>%s</dc:subject>\n" % (out, encode_for_xml(field_))
 
-            for field_ in get_field(sysno, "8564_u"):
-                out =  "%s         <dc:identifier>%s</dc:identifier>\n" % (out, encode_for_xml(escape_space(field_)))
+##             for field_ in get_field(sysno, "8564_u"):
+##                 out =  "%s         <dc:identifier>%s</dc:identifier>\n" % (out, encode_for_xml(escape_space(field_)))
         
-            for field_ in get_field(sysno, "520__a"):
-                out = "%s         <dc:description>%s</dc:description>\n" % (out, encode_for_xml(field_))
+##             for field_ in get_field(sysno, "520__a"):
+##                 out = "%s         <dc:description>%s</dc:description>\n" % (out, encode_for_xml(field_))
 
-            date = get_creation_date(sysno)
+##             date = get_creation_date(sysno)
  
-            out = "%s         <dc:date>%s</dc:date>\n" % (out, date)
-            out = out + "    </oaidc:dc>\n"
+##             out = "%s         <dc:date>%s</dc:date>\n" % (out, date)
+##             out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
     
@@ -948,9 +951,9 @@ def oai_profile():
     """
     Runs a benchmark
     """
-    #oailistrecords('set=&from=&metadataPrefix=oai_dc&verb=ListRecords&resumptionToken=&identifier=&until=')
+    oailistrecords('set=&from=&metadataPrefix=oai_dc&verb=ListRecords&resumptionToken=&identifier=&until=')
     #oailistrecords('set=&from=&metadataPrefix=marcxml&verb=ListRecords&resumptionToken=&identifier=&until=')
-    oailistidentifiers('set=&from=&metadataPrefix=oai_dc&verb=ListIdentifiers&resumptionToken=&identifier=&until=')
+    #oailistidentifiers('set=&from=&metadataPrefix=oai_dc&verb=ListIdentifiers&resumptionToken=&identifier=&until=')
 
     return 
 
