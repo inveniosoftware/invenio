@@ -2459,6 +2459,8 @@ def add_tagged_title(reading_line,
         ## Skip past any punctuation at the end of the replacement that was just made:
         if reading_line[startpos] in (".", ":", ";"):
             startpos += 1
+        if reading_line[startpos] == ")":
+            startpos += 1
 
     ## return the rebuilt line-segment, the position (of the reading line) from which the
     ## next part of the rebuilt line should be started, and the newly updated previous match.
