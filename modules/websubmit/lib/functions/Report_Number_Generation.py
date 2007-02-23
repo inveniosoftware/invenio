@@ -102,6 +102,7 @@ def Report_Number_Generation(parameters,curdir,form):
             elif pa_content.startswith('file'):
                 filename = ""
                 with_regexp = 0
+                regexp = ""
                 if "[" in pa_content:
                     with_regexp = 1
                     split_index_start = pa_content.find("[")
