@@ -33,9 +33,10 @@ def Upload_Files(parameters,curdir,form):
     minsize=parameters['minsize']
     maxsize=parameters['maxsize']
     iconsize=parameters['iconsize']
-    type=parameters['type']
+    type=parameters['type'] #fulltext || picture
     t=""
-    bibrecdocs = BibRecDocs(sysno)
+    bibrecdocs = BibRecDocs(sysno) # list of bibdoc attached to one recird each one is an instance of BibDoc class
+
     # first check if a file has been requested for deletion
     if form.has_key("deleted"):
         deleted = form['deleted']
@@ -46,15 +47,21 @@ def Upload_Files(parameters,curdir,form):
     else:
         deletedfile = ""
     if form.has_key("mybibdocid"):
+        #document existing, radio has value the docid
         mybibdocid = form['mybibdocid']
     else:
         mybibdocid = ""
     if form.has_key("fileAction"):
+        #action for new document submitted
+        #<option selected> Select:
+        #<option value=AddAdditional> Add Additional Document
+        #<option value=ReviseAdditional> Revise Document
+        #<option value=AddAdditionalFormat> Add new Format to Document
         fileAction = form['fileAction']
     else:
         fileAction = ""
     if deleted == "yes":
-        bibrecdocs.deleteBibDoc(int(deletedfile))
+        bibrecdocs.deleteBibDoc(int(deletedfile))#change the status to 1
     # then check if a file has been requested for addition
     if os.path.exists("%s/myfile" % curdir):
         fp = open("%s/myfile" % curdir,"r")
@@ -75,7 +82,7 @@ def Upload_Files(parameters,curdir,form):
             bibdoc = None
             if fileAction == "AddMain":
                 if not bibrecdocs.checkFileExists(fullpath,"Main"):
-                    bibdoc = bibrecdocs.addNewFile(fullpath,"Main")
+                    bibdoc = bibrecdocs.addNewFile(fullpath,"Main") # create new docid
             if fileAction == "AddAdditional":
                 if not bibrecdocs.checkFileExists(fullpath,"Additional"):
                     bibdoc = bibrecdocs.addNewFile(fullpath,"Additional")
