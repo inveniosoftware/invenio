@@ -106,7 +106,7 @@ INSERT INTO fieldname VALUES (1,'no','ln','alle felt');
 INSERT INTO fieldname VALUES (1,'sv','ln','samtliga fält');
 INSERT INTO fieldname VALUES (1,'el','ln','οποιοδήποτε πεδίο');
 INSERT INTO fieldname VALUES (1,'uk','ln','всі поля');
-INSERT INTO fieldname VALUES (1,'ja','ln','だれでも分野');
+INSERT INTO fieldname VALUES (1,'ja','ln','すべての分野');
 INSERT INTO fieldname VALUES (1,'bg','ln','всички');
 INSERT INTO fieldname VALUES (1,'hr','ln','bilo koje polje');
 

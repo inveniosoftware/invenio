@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2007-02-20 17:26+0100\n"
-"PO-Revision-Date: 2006-10-12 17:49+0200\n"
+"PO-Revision-Date: 2007-02-23 09:50+0100\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -39,7 +39,7 @@ msgstr "この場所は次の言語でまた利用できる:"
 #: modules/webstyle/lib/webstyle_templates.py:353
 #: modules/webstyle/lib/webstyle_templates.py:429
 msgid "Search"
-msgstr "調査"
+msgstr "検索"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
 #: modules/webstyle/lib/webstyle_templates.py:356
@@ -133,13 +133,13 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:732
 #: modules/websubmit/lib/websubmit_engine.py:890
 msgid "Submit"
-msgstr "堤出しなさい"
+msgstr "アップロード"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
 #: modules/webstyle/lib/webstyle_templates.py:355
 #: modules/webstyle/lib/webstyle_templates.py:431
 msgid "Personalize"
-msgstr "個人化しなさい"
+msgstr "あなたのページ"
 
 #: modules/webhelp/web/index.html.wml:22 modules/webhelp/web/index.html.wml:28
 #: modules/webhelp/web/index.html.wml:29 modules/webhelp/web/index.html.wml:30
@@ -224,11 +224,11 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:85
 #: modules/webstyle/lib/webstyle_templates.py:258
 msgid "Home"
-msgstr "家"
+msgstr "ホーム"
 
 #: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:435
 msgid "Maintained by"
-msgstr "維持しなさい"
+msgstr "管理者"
 
 #: config/cdspage.wml:59
 #, fuzzy
@@ -2733,7 +2733,7 @@ msgstr "記録は削除された"
 #: modules/websearch/lib/websearch_templates.py:1513
 #: modules/websearch/lib/websearch_templates.py:1543
 msgid "Browse"
-msgstr "拾い読みしなさい"
+msgstr "ブラウズ"
 
 #: modules/websearch/lib/search_engine.py:3275
 msgid "No match within your time limits, discarding this condition..."
@@ -2871,7 +2871,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1547
 #: modules/websearch/lib/websearch_webcoll.py:503
 msgid "results"
-msgstr "結果"
+msgstr "項目ごとに、"
 
 #: modules/websearch/lib/websearch_templates.py:1582
 #: modules/websearch/lib/websearch_webcoll.py:473
