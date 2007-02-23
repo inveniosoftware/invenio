@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""Function for the upload of files"""
 
 __revision__ = "$Id$"
 
@@ -33,10 +34,9 @@ def Upload_Files(parameters,curdir,form):
     minsize=parameters['minsize']
     maxsize=parameters['maxsize']
     iconsize=parameters['iconsize']
-    type=parameters['type'] #fulltext || picture
+    type=parameters['type']
     t=""
-    bibrecdocs = BibRecDocs(sysno) # list of bibdoc attached to one recird each one is an instance of BibDoc class
-
+    bibrecdocs = BibRecDocs(sysno)
     # first check if a file has been requested for deletion
     if form.has_key("deleted"):
         deleted = form['deleted']
@@ -47,21 +47,15 @@ def Upload_Files(parameters,curdir,form):
     else:
         deletedfile = ""
     if form.has_key("mybibdocid"):
-        #document existing, radio has value the docid
         mybibdocid = form['mybibdocid']
     else:
         mybibdocid = ""
     if form.has_key("fileAction"):
-        #action for new document submitted
-        #<option selected> Select:
-        #<option value=AddAdditional> Add Additional Document
-        #<option value=ReviseAdditional> Revise Document
-        #<option value=AddAdditionalFormat> Add new Format to Document
         fileAction = form['fileAction']
     else:
         fileAction = ""
     if deleted == "yes":
-        bibrecdocs.deleteBibDoc(int(deletedfile))#change the status to 1
+        bibrecdocs.deleteBibDoc(int(deletedfile))
     # then check if a file has been requested for addition
     if os.path.exists("%s/myfile" % curdir):
         fp = open("%s/myfile" % curdir,"r")
@@ -82,7 +76,7 @@ def Upload_Files(parameters,curdir,form):
             bibdoc = None
             if fileAction == "AddMain":
                 if not bibrecdocs.checkFileExists(fullpath,"Main"):
-                    bibdoc = bibrecdocs.addNewFile(fullpath,"Main") # create new docid
+                    bibdoc = bibrecdocs.addNewFile(fullpath,"Main")
             if fileAction == "AddAdditional":
                 if not bibrecdocs.checkFileExists(fullpath,"Additional"):
                     bibdoc = bibrecdocs.addNewFile(fullpath,"Additional")
