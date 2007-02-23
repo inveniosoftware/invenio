@@ -329,79 +329,121 @@ def oaiarchive_task(arg):
             ID = "%d" % recID
     
     ### oaiIDentry validation
-            
+    ### Check if OAI identifier is already in the record or not
+            add_ID_entry = True
+            oaiIDentry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % (CFG_OAI_ID_FIELD[5:6],
+                                                                           CFG_OAI_ID_PREFIX,
+                                                                           ID)
+
             query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD, recID)
-            res = run_sql(query)        
+            res = run_sql(query)
             if(res):
-                oaiIDentry = ''
-            else:
-                oaiIDentry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % (CFG_OAI_ID_FIELD[5:6], CFG_OAI_ID_PREFIX, ID)
+                # No need to add identifier if already exists. (Check
+                # that it INDEED exist, i.e. that field is not empty)
+                for value in res:
+                    if len(value) > 0 and value[0] != '':
+                        add_ID_entry = False
+                        
+            if add_ID_entry:
                 oaiIDentrycount += 1
 
-            datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_SET_FIELD[0:3], CFG_OAI_SET_FIELD[3:4], CFG_OAI_SET_FIELD[4:5])
-            datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5])
+            datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_SET_FIELD[0:3],
+                                                                                     CFG_OAI_SET_FIELD[3:4],
+                                                                                     CFG_OAI_SET_FIELD[4:5])
+            datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_ID_FIELD[0:3],
+                                                                                     CFG_OAI_ID_FIELD[3:4],
+                                                                                     CFG_OAI_ID_FIELD[4:5])
 
-            oaisetentry = "<subfield code=\"%s\">%s</subfield>\n" % (CFG_OAI_SET_FIELD[5:6], set)
+            oaisetentry = "<subfield code=\"%s\">%s</subfield>\n" % (CFG_OAI_SET_FIELD[5:6],
+                                                                     set)
             oaisetentrycount += 1
-
-
             
     ### oaisetentry validation
+    ### Check to which sets this record belongs
             query = "select b3.value from bibrec_bib%sx as br left join bib%sx as b3 on br.id_bibxxx=b3.id where b3.tag='%s' and br.id_bibrec='%s'" % (CFG_OAI_SET_FIELD[0:2], CFG_OAI_SET_FIELD[0:2], CFG_OAI_SET_FIELD, recID)
             res = run_sql(query)
     
-    
+            remaining_sets = []
             if(res):
                 for item in res:
                     if (item[0]==set):
+                        # The record will be removed from this set
                         oaisetentry = ''
                         oaisetentrycount -= 1
+                    elif item[0]:
+                        # Collect name of sets to which the record must still belong
+                        remaining_sets.append(item[0])
     
             if (mode==2):
-    
-                if (CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]):
+                # Delete mode
                 
+                oaisetentry = ''
+                # Build sets that the record is still part of 
+                for remaining_set in remaining_sets:
+                    oaisetentry +=  "<subfield code=\"%s\">%s</subfield>\n" % (CFG_OAI_SET_FIELD[5:6], remaining_set)
+
+                if (CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]):
+                    # Put set and OAI ID in the same datafield
                     oai_out.write("<record>\n")
                     oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
                     oai_out.write(datafield_id_head)
                     oai_out.write("\n")
-                    oai_out.write("<subfield code=\"")
-                    oai_out.write(CFG_OAI_ID_FIELD[5:6])
-                    oai_out.write("\"></subfield>\n")
-                    oai_out.write("<subfield code=\"")
-                    oai_out.write(CFG_OAI_SET_FIELD[5:6])
-                    oai_out.write("\"></subfield>\n")
+                    if oaisetentry:
+                        # Record is still part of some sets
+                        oai_out.write(oaiIDentry)
+                        oai_out.write(oaisetentry)
+                    else:
+                        # Remove record from OAI repository
+                        oai_out.write("<subfield code=\"")
+                        oai_out.write(CFG_OAI_ID_FIELD[5:6])
+                        oai_out.write("\"></subfield>\n")
+                        oai_out.write("<subfield code=\"")
+                        oai_out.write(CFG_OAI_SET_FIELD[5:6])
+                        oai_out.write("\"></subfield>\n")
                     oai_out.write("</datafield>\n")
                     oai_out.write("</record>\n")
 
                 else:
-                    
                     oai_out.write("<record>\n")
                     oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
-                    oai_out.write(datafield_id_head)
-                    oai_out.write("\n")
-                    oai_out.write("<subfield code=\"")
-                    oai_out.write(CFG_OAI_ID_FIELD[5:6])
-                    oai_out.write("\"></subfield>\n")
-                    oai_out.write("</datafield>\n")
+                    if oaisetentry:
+                        # Record is still part of some set
+                        # Keep the OAI ID as such
+                        pass
+                    else:
+                        # Remove record from OAI repository
+                        # i.e. remove OAI ID
+                        oai_out.write(datafield_id_head)
+                        oai_out.write("\n")
+                        oai_out.write("<subfield code=\"")
+                        oai_out.write(CFG_OAI_ID_FIELD[5:6])
+                        oai_out.write("\"></subfield>\n")
+                        oai_out.write("</datafield>\n")
 
                     oai_out.write(datafield_set_head)
                     oai_out.write("\n")
-                    oai_out.write("<subfield code=\"")
-                    oai_out.write(CFG_OAI_SET_FIELD[5:6])
-                    oai_out.write("\"></subfield>\n")
+                    if oaisetentry:
+                        # Record is still part of some set
+                        oai_out.write(oaisetentry)
+                    else:
+                        # Remove record from OAI repository
+                        oai_out.write("<subfield code=\"")
+                        oai_out.write(CFG_OAI_SET_FIELD[5:6])
+                        oai_out.write("\"></subfield>\n")
                     oai_out.write("</datafield>\n")
                     oai_out.write("</record>\n")
                         
             elif (mode==1):
-
-                if ((oaiIDentry)or(oaisetentry)):
-                    if (CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]):                
+                # Add mode
+                
+                if ((add_ID_entry)or(oaisetentry)):
+                    if (CFG_OAI_ID_FIELD[0:5] == CFG_OAI_SET_FIELD[0:5]):
+                        # Put set and OAI ID in the same datafield
                         oai_out.write("<record>\n")
                         oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
                         oai_out.write(datafield_id_head)
                         oai_out.write("\n")
-                        if(oaiIDentry):
+                        if(add_ID_entry):
                             oai_out.write(oaiIDentry)
                         if(oaisetentry):
                             oai_out.write(oaisetentry)
@@ -410,19 +452,17 @@ def oaiarchive_task(arg):
                     else:
                         oai_out.write("<record>\n")
                         oai_out.write("<controlfield tag=\"001\">%s</controlfield>\n" % recID)
-                        oai_out.write(datafield_id_head)
-                        oai_out.write("\n")
-                        if(oaiIDentry):
+                        if(add_ID_entry):
+                            oai_out.write(datafield_id_head)
+                            oai_out.write("\n")
                             oai_out.write(oaiIDentry)
-                        oai_out.write("</datafield>\n")
-
-                        oai_out.write(datafield_set_head)
-                        oai_out.write("\n")
+                            oai_out.write("</datafield>\n")
                         if(oaisetentry):
+                            oai_out.write(datafield_set_head)
+                            oai_out.write("\n")
                             oai_out.write(oaisetentry)
-                        oai_out.write("</datafield>\n")
+                            oai_out.write("</datafield>\n")
                         oai_out.write("</record>\n")
-                    
         oai_out.close()
     
     if upload:

@@ -290,7 +290,9 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
         out = "%s    <identifier>%s</identifier>\n" % (out, escape_space(ident))
     out = "%s    <datestamp>%s</datestamp>\n" % (out, get_modification_date(sysno))
     for set in get_field(sysno, CFG_OAI_SET_FIELD):
-        out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
+        if set:
+            # Print only if field not empty
+            out = "%s    <setSpec>%s</setSpec>\n" % (out, set)
     out = out + "   </header>\n"
 
     if _record_exists == -1: # Deleted?
@@ -635,7 +637,9 @@ def oailistidentifiers(args):
                         out = "%s      <identifier>%s</identifier>\n" % (out, escape_space(ident))
                         out = "%s      <datestamp>%s</datestamp>\n" % (out, get_modification_date(oaigetsysno(ident)))
                         for set in get_field(sysno_, CFG_OAI_SET_FIELD):
-                            out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
+                            if set:
+                                # Print only if field not empty
+                                out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
                         out = out + "    </header>\n"
 
     if i >= CFG_OAI_LOAD:
