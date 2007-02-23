@@ -144,7 +144,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         oai_src_frequency = oai_src[0][4]
         oai_src_config = oai_src[0][5]
         oai_src_post = oai_src[0][6]
-        oai_src_sets = oai_src[0][7]
+        oai_src_sets = oai_src[0][7].split()
         
     text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)

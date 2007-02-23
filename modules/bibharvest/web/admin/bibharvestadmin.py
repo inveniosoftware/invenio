@@ -71,6 +71,8 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
+        if isinstance(oai_src_sets, str):
+            oai_src_sets = [oai_src_sets]
         return page(title="Edit OAI Source",
                     body=bhc.perform_request_editsource(oai_src_id=oai_src_id,
                                                         oai_src_name=oai_src_name,
@@ -106,6 +108,8 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
 
     auth = bhc.check_user(uid,'cfgbibharvest')
     if not auth[0]:
+        if isinstance(oai_src_sets, str):
+            oai_src_sets = [oai_src_sets]
         return page(title="Add new OAI Source",
                     body=bhc.perform_request_addsource(oai_src_name=oai_src_name,
                                            oai_src_baseurl=oai_src_baseurl,
