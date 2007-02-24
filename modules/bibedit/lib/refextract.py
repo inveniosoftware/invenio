@@ -2443,8 +2443,12 @@ def add_tagged_title(reading_line,
             startpos = true_replacement_index + len_title + extras
 
             ## Skip past any punctuation at the end of the replacement that was just made:
-            if reading_line[startpos] in (".", ":", ";"):
-                startpos += 1
+            try:
+                if reading_line[startpos] in (".", ":", ";"):
+                    startpos += 1
+            except IndexError:
+                ## The match was at the very end of the line
+                pass
         else:
             ## no previous title-replacements in this line - IBID refers to something unknown and
             ## cannot be replaced:
@@ -2457,10 +2461,18 @@ def add_tagged_title(reading_line,
         previous_match = standardised_titles[matched_title]
         startpos = true_replacement_index + len_title + extras
         ## Skip past any punctuation at the end of the replacement that was just made:
-        if reading_line[startpos] in (".", ":", ";"):
-            startpos += 1
-        if reading_line[startpos] == ")":
-            startpos += 1
+        try:
+            if reading_line[startpos] in (".", ":", ";"):
+                startpos += 1
+        except IndexError:
+            ## The match was at the very end of the line
+            pass
+        try:
+            if reading_line[startpos] == ")":
+                startpos += 1
+        except IndexError:
+            ## The match was at the very end of the line
+            pass
 
     ## return the rebuilt line-segment, the position (of the reading line) from which the
     ## next part of the rebuilt line should be started, and the newly updated previous match.
