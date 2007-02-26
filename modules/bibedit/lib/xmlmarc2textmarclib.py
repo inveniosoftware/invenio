@@ -18,6 +18,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Library of functions for the xmlmarc2textmarc utility."""
+
 __revision__ = "$Id$"
 
 from invenio.bibrecord import create_records, create_record, record_get_field_values
@@ -30,8 +32,8 @@ import sys
 max_line_len = 1500
 
 def get_cds2aleph_changed_fieldnames():
-    """Get a dictionary of CDS MARC field names to be replaced with ALEPH fieldnames in an ALEPH
-       MARC record.
+    """Get a dictionary of CDS MARC field names to be replaced
+       with ALEPH fieldnames in an ALEPH MARC record.
        @return: dict {'cds_fieldname' : 'replacement_aleph_fieldname',
                       'cds_fieldname' : 'replacement_aleph_fieldname',
                       [...]
@@ -48,11 +50,17 @@ def get_cds2aleph_changed_fieldnames():
 
 def get_aleph_dropped_fieldnames():
     """Get a list of fieldnames to be dropped from an ALEPH MARC record.
+       These fields are dropped before the function
+       'get_cds2aleph_changed_fieldnames' is called, so even if they
+       appear in the dictionary of field-name changes returned by that
+       function, they won't appear in the output Aleph MARC record.
        @return: list [fieldname, fieldname, [...]]
     """
     return [
              '961',
-             '970'
+             '970',
+             '980',
+             'FFT',
            ]
 
 def get_aleph_001(sysno):
@@ -86,8 +94,8 @@ def get_aleph_008():
     return " 008   L ^^^^^^s^^^^^^^^^^^^^^^^r^^^^^000^0^eng^d"
 
 def _comp_subfieldinstances(x, y):
-    """Comparison function, used by sort to sort subfields of a field in a record into ascending
-       alphabetical order
+    """Comparison function, used by 'sort' to sort subfields
+       of a field in a record into ascending alphabetical order
     """
     if x[0][0].lower() < y[0][0].lower():
         return -1
@@ -97,8 +105,8 @@ def _comp_subfieldinstances(x, y):
         return 1
 
 def _comp_datataginstances(x, y):
-    """Comparison function, used by sort to sort instances of a field in a record into ascending
-       alphabetical order
+    """Comparison function, used by 'sort' to sort instances
+       of a field in a record into ascending alphabetical order
     """
     if x[1] < y[1]:
         return -1
@@ -114,8 +122,8 @@ def _comp_datataginstances(x, y):
 
 def get_sysno_generator():
     """Create and return a generator for an ALEPH system number.
-       The generator will create a 9-digit string, i.e. it the sequence will
-       end when it reaches 1000000000.
+       The generator will create a 9-digit string, i.e. the sequence
+       will end when it reaches 1000000000.
        @return: generator.
     """
     sysno = ""
@@ -129,13 +137,18 @@ def get_sysno_generator():
         sysno = sysno + 1
 
 def print_record(record, sysno, options, sysno_generator=get_sysno_generator()):
-    """Create a text-marc, or aleph-marc record from the contents of "record", and return it as a string.
-       @param record: Internal representation of an XML MARC record, created by bibrecord.
+    """Create a text-marc, or aleph-marc record from the contents
+       of "record", and return it as a string.
+       @param record: Internal representation of an XML MARC
+        record, created by bibrecord.
        @param sysno: the system number to be used for the record
-       @param options: the options about the MARC record to be created, as passed from command line
-       @param sysno_generator: A static parameter to act as an ALEPH system number generator. Do not provide a
-        value for this - it will be assigned upon first call to this function.
-       @return: string (MARC record, either text-marc or ALEPH marc format, depending upon "options".
+       @param options: the options about the MARC record to be created,
+        as passed from command line
+       @param sysno_generator: A static parameter to act as an Aleph
+        system number generator. Do not provide a value for this - it
+        will be assigned upon first call to this function.
+       @return: string (MARC record, either text-marc or ALEPH marc format,
+        depending upon "options".
     """
     out = ""
     recordfields = record.keys()
@@ -212,7 +225,11 @@ def print_record(record, sysno, options, sysno_generator=get_sysno_generator()):
     ## sort recordfields into ascending order:
     recordfields.sort()
     ## convert and display all remaining tags:
-    aleph_tagnamechanges = get_cds2aleph_changed_fieldnames()
+    if options["aleph-marc"] == 1:
+        aleph_tagnamechanges = get_cds2aleph_changed_fieldnames()
+    else:
+        aleph_tagnamechanges = {}
+    
     for field in recordfields:
         try:
             field_lines = create_field_lines(fieldname=aleph_tagnamechanges[str(field)], field=record[field], sysno=sysno, alephmarc=options["aleph-marc"])
@@ -223,10 +240,13 @@ def print_record(record, sysno, options, sysno_generator=get_sysno_generator()):
     return out
 
 def print_field(field_lines, alephmarc=0):
-    """Create the lines of a record relating to a given field, and return these lines as a string.
-       @param field_lines: A list of lists, whereby each item in the top-level list is an instance of a field
+    """Create the lines of a record relating to a given field,
+       and return these lines as a string.
+       @param field_lines: A list of lists, whereby each item in
+        the top-level list is an instance of a field
         (e.g. a "datafield" or "controlfield").
-       @param alephmarc: an integer flag to tell the function whether or not the record being created is a pure text MARC
+       @param alephmarc: an integer flag to tell the function whether
+        or not the record being created is a pure text MARC
         record, or an ALEPH MARC record.
        @return: A string containing the record lines for the given field
     """
@@ -292,14 +312,21 @@ def print_field(field_lines, alephmarc=0):
     return out
 
 def create_field_lines(fieldname, field, sysno, alephmarc=0):
-    """From the internal representation of a field, as pulled from a record created by bibrecord, create a list of lists
-       whereby each item in the top-level list represents a record line that should be created for the field, and each sublist
-       represents the various components that make up that line (sysno, line label, subfields, etc...)
+    """From the internal representation of a field, as pulled from
+       a record created by bibrecord, create a list of lists
+       whereby each item in the top-level list represents a record
+       line that should be created for the field, and each sublist
+       represents the various components that make up that line
+       (sysno, line label, subfields, etc...)
        @param fieldname: the name for the field (e.g. 001) - string
-       @param field: the internal representation of the field, as created by bibrecord - list
-       @param sysno: the system number to be used for the created field - string
-       @param alephmarc: a flag telling the function whether a pure text MARC or an ALEPH MARC record is being created - int
-       @return: list, containing the details of the created field lines
+       @param field: the internal representation of the field, as
+        created by bibrecord - list
+       @param sysno: the system number to be used for the created
+        field - string
+       @param alephmarc: a flag telling the function whether a pure
+        text MARC or an ALEPH MARC record is being created - int
+       @return: list, containing the details of the created field
+        lines
     """
     field_lines = []
     field.sort(_comp_datataginstances)
@@ -347,13 +374,17 @@ def create_field_lines(fieldname, field, sysno, alephmarc=0):
 
 def _get_sysno(record, options):
     """Function to get the system number for a record.
-       In the case of a pure text MARC record being created, the sysno will be retrieved from 001.
-       In the case of an ALEPH MARC record being created, the sysno will be retrieved from 970__a IF
-       this field exists.  If not, None will be returned.
-       @param record: the internal representation of the record (created by bibrecord) from which the sysno
-        is to be retrieved.
-       @param options: various options about the record to be created, as obtained from the command line.
-       @return: a string containing a 9-digit SYSNO, -OR- None in certai cases for an ALEPH MARC record.
+       In the case of a pure text MARC record being created, the
+       sysno will be retrieved from 001.
+       In the case of an Aleph MARC record being created, the sysno
+       will be retrieved from 970__a IF this field exists.  If not,
+       None will be returned.
+       @param record: the internal representation of the record
+        (created by bibrecord) from which the sysno is to be retrieved.
+       @param options: various options about the record to be created,
+        as obtained from the command line.
+       @return: a string containing a 9-digit SYSNO, -OR- None in
+       certain cases for an Aleph MARC record.
     """
     if options["text-marc"] != 0:
         vals001 = record_get_field_values(rec=record, tag="001")
@@ -382,10 +413,12 @@ def _get_sysno(record, options):
     return sysno
 
 def recxml2recmarc(xmltext, options):
-    """The function that processes creating the records from an XML string, and prints these records to the
+    """The function that processes creating the records from
+       an XML string, and prints these records to the
        standard output stream.
        @param xmltext: An XML MARC record in string form.
-       @param options: Various options about the record to be created, as passed from the command line.
+       @param options: Various options about the record to be
+        created, as passed from the command line.
        @return: Nothing.
     """
     ## create internal record structure from xmltext:
