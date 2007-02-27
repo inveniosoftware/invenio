@@ -910,6 +910,8 @@ def task_run(task_id):
     if options["verbose"] >= 3:
         write_message("Database timestamp is %s." % get_database_last_updated_timestamp())
         write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp())
+        if options.has_key("part"):
+            write_message("Running cache update part %s only." % options["part"])
     if options.has_key("force") or \
        compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
                                          get_cache_last_updated_timestamp(),
@@ -926,22 +928,24 @@ def task_run(task_id):
             for row in res:
                 colls.append(get_collection(row[0]))
         # secondly, update collection reclist cache:
-        i = 0
-        for coll in colls:
-            i += 1
-            if options["verbose"]:
-                write_message("%s / reclist cache update" % coll.name)
-            coll.calculate_reclist()
-            coll.update_reclist()
-            task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+        if options.get("part", 1) == 1:
+            i = 0
+            for coll in colls:
+                i += 1
+                if options["verbose"]:
+                    write_message("%s / reclist cache update" % coll.name)
+                coll.calculate_reclist()
+                coll.update_reclist()
+                task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
         # thirdly, update collection webpage cache:
-        i = 0
-        for coll in colls:
-            i += 1
-            if options["verbose"]:
-                write_message("%s / web cache update" % coll.name)
-            coll.update_webpage_cache()
-            task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
+        if options.get("part", 2) == 2:
+            i = 0
+            for coll in colls:
+                i += 1
+                if options["verbose"]:
+                    write_message("%s / webpage cache update" % coll.name)
+                coll.update_webpage_cache()
+                task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
 
         # finally update the cache last updated timestamp:
         # (but only when all collections were updated, not when only
@@ -970,6 +974,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("Command options:\n")
     sys.stderr.write("  -c, --collection\t Update cache for the given collection only. [all]\n")
     sys.stderr.write("  -f, --force\t Force update even if cache is up to date. [no]\n")
+    sys.stderr.write("  -p, --part\t Update only certain cache parts (1=reclist, 2=webpage). [both]\n")
     sys.stderr.write("Scheduling options:\n")
     sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
     sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
@@ -1013,8 +1018,10 @@ def main():
         options["sleeptime"] = ""
         # set user-defined options:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:f",
-                                       ["help", "version", "verbose=","user=","sleep=","time=","collection=","force"])
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:fp:",
+                                       ["help", "version", "verbose=", "user=",
+                                        "sleep=", "time=", "collection=",
+                                        "force", "part="])
         except getopt.GetoptError, err:
             usage(1, err)
         try:
@@ -1037,6 +1044,8 @@ def main():
                     options["collection"] = opt[1]
                 elif opt[0] in [ "-f", "--force"]:
                     options["force"] = 1
+                elif opt[0] in [ "-p", "--part"]:
+                    options["part"] = int(opt[1])
                 else:
                     usage(1)
         except StandardError, e:
