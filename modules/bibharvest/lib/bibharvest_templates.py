@@ -141,14 +141,15 @@ class Template:
         text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br>""" % (cgi.escape(name,1), cgi.escape(value, 1))  
         return text
     
-    def tmpl_admin_checkboxes(self, ln, title, names, labels, states):
+    def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states):
         """Draws a list of HTML checkboxes
           - 'title' *string* - The name of the list of checkboxes
-          - 'names' *list* - The names of the values in the checkboxes
+          - 'name' *string* - The name for this group of checkboxes
+          - 'values' *list* - The values of the checkboxes
           - 'labels' *list* - The labels for the checkboxes
           - 'states' *list* - The previous state of each checkbox 1|0
 
-          len(names) == len(labels) == len(states)
+          len(values) == len(labels) == len(states)
           """
         _ = gettext_set_language(ln)
         text = """<div><div style="float:left;"><span class="adminlabel">%s</span></div>""" % title
@@ -156,13 +157,13 @@ class Template:
         text += '&nbsp;&nbsp; <small><i>(Leave all unchecked for non-selective' \
                 ' harvesting)</i></small><br/>'
         
-        for i in range(len(names)):
-            name = names[i]
+        for i in range(len(values)):
+            value = values[i]
             label = labels[i]
             state = states[i]
-            chk_box_id = name + str(i)
+            chk_box_id = value + str(i)
             text += '&nbsp;&nbsp; <input type="checkbox"' \
-                    'name="%s" id="%s" value="%s" ' % ('oai_src_sets', chk_box_id, name)
+                    'name="%s" id="%s" value="%s" ' % (name, chk_box_id, value)
             if state:
                 text += 'checked="checked "' 
             text += "/>"

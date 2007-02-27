@@ -22,7 +22,6 @@
 
 __revision__ = "$Id$"
 
-import cgi
 import re
 import Numeric
 import os, sys, string
@@ -149,17 +148,27 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
     text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Base URL", name = "oai_src_baseurl", value = oai_src_baseurl)
+    
     sets = findSets(oai_src_baseurl)
-    sets_specs = [set[0] for set in sets]
-    sets_names = [set[1] for set in sets]
-    sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
-                   for set in sets]
-    sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
-    text += bibharvest_templates.tmpl_admin_checkboxes(ln = cdslang,
-                                                       title = "Sets",
-                                                       names = sets_specs,
-                                                       labels = sets_labels,
-                                                       states = sets_states)
+    if sets:
+        # Show available sets to users
+        sets_specs = [set[0] for set in sets]
+        sets_names = [set[1] for set in sets]
+        sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
+                       for set in sets]
+        sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
+        text += bibharvest_templates.tmpl_admin_checkboxes(ln=cdslang,
+                                                           title="Sets",
+                                                           name="oai_src_sets",
+                                                           values=sets_specs,
+                                                           labels=sets_labels,
+                                                           states=sets_states)
+    else:
+        # Let user specify sets in free textbox
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang,
+                                                          title = "Sets",
+                                                          name='oai_src_sets',
+                                                          value=' '.join(oai_src_sets))
     
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
@@ -211,41 +220,75 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
     if oai_src_name is None:
         return "No OAI source name selected."
 
-    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "add source", subtitle = "Add new OAI source", guideurl = guideurl)
+    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln=cdslang,
+                                                       weburl=weburl,
+                                                       title="add source",
+                                                       subtitle="Add new OAI source",
+                                                       guideurl=guideurl)
     output  = ""
 
     if confirm <= -1:
         text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Enter the base url", name = "oai_src_baseurl", value = oai_src_baseurl+'http://')
+        text += bibharvest_templates.tmpl_admin_w200_text(ln=cdslang,
+                                                          title="Enter the base url",
+                                                          name="oai_src_baseurl",
+                                                          value=oai_src_baseurl+'http://')
         output = createhiddenform(action="addsource",
                                   text=text,
                                   ln=ln,
                                   button="Validate",
                                   confirm=0)
 
-    if confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 0:
+    if (confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 0) or \
+           confirm in ["1", 1]:
         output += bibharvest_templates.tmpl_output_validate_info(cdslang, 0, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
-        text = bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
+        text = bibharvest_templates.tmpl_admin_w200_text(ln=cdslang,
+                                                         title="Source name",
+                                                         name="oai_src_name",
+                                                         value=oai_src_name)
 
         metadatas = findMetadataFormats(oai_src_baseurl)
-        prefixes = []
-        for value in metadatas:
-            prefixes.append([value, str(value)])
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", valuenil = "- select prefix -" , values = prefixes, lastval = oai_src_prefix)
-
+        if metadatas:
+            # Show available metadata to user
+            prefixes = []
+            for value in metadatas:
+                prefixes.append([value, str(value)])
+            text += bibharvest_templates.tmpl_admin_w200_select(ln=cdslang,
+                                                                title="Metadata prefix",
+                                                                name="oai_src_prefix",
+                                                                valuenil="- select prefix -" ,
+                                                                values=prefixes,
+                                                                lastval=oai_src_prefix)
+        else:
+            # Let user specify prefix in free textbox
+            text += bibharvest_templates.tmpl_admin_w200_text(ln=cdslang,
+                                                              title="Metadata prefix",
+                                                              name="oai_src_prefix",
+                                                              value=oai_src_prefix)
+            
         sets = findSets(oai_src_baseurl)
-        sets_specs = [set[0] for set in sets]
-        sets_names = [set[1] for set in sets]
-        sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
-                      for set in sets]
-        sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
-        text += bibharvest_templates.tmpl_admin_checkboxes(ln = cdslang,
-                                                           title = "Sets",
-                                                           names = sets_specs,
-                                                           labels = sets_labels ,
-                                                           states=sets_states)
-        
+        if sets:
+            # Show available sets to users
+            sets_specs = [set[0] for set in sets]
+            sets_names = [set[1] for set in sets]
+            sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
+                           for set in sets]
+            sets_states = [ ((set[0] in oai_src_sets and 1) or 0) \
+                            for set in sets]
+            text += bibharvest_templates.tmpl_admin_checkboxes(ln=cdslang,
+                                                               title="Sets",
+                                                               name="oai_src_sets",
+                                                               values=sets_specs,
+                                                               labels=sets_labels,
+                                                               states=sets_states)
+        else:
+            # Let user specify sets in free textbox
+            text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang,
+                                                              title = "Sets",
+                                                              name='oai_src_sets',
+                                                              value=' '.join(oai_src_sets))
+            
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
@@ -259,8 +302,19 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                    oai_src_baseurl=oai_src_baseurl,
                                    ln=ln,
                                    confirm=1)
-
-    elif confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 1:
+    elif confirm in ["0", 0] and validate(oai_src_baseurl)[0] > 0:
+        # Could not perform first url validation
+        lnargs = [["ln", ln]]
+        output += bibharvest_templates.tmpl_output_validate_info(cdslang, 1, str(oai_src_baseurl))
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again with another url", args = [])
+        output += """ or """
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Continue anyway", args = [['oai_src_baseurl', urllib.urlencode({'':oai_src_baseurl})[1:]], ['confirm', '1']])
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += """or"""
+        output += bibharvest_templates.tmpl_print_brs(cdslang, 1)
+        output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
+    elif confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] > 0:
         lnargs = [["ln", ln]]
         output += bibharvest_templates.tmpl_output_validate_info(cdslang, 1, str(oai_src_baseurl))
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
@@ -470,7 +524,7 @@ def validate(oai_src_baseurl):
         grepOUT1 = os.popen('grep -iwc "<OAI-PMH" '+tmppath).read()
         if int(grepOUT1) == 0:
             # No.. we have an http error
-            return os.popen('cat '+tmppath).read()
+            return (4, os.popen('cat '+tmppath).read())
 
         grepOUT2 = os.popen('grep -iwc "<identify>" '+tmppath).read()
         if int(grepOUT2) > 0:
@@ -530,9 +584,12 @@ def validatefile(oai_src_config):
 
 def findMetadataFormats(oai_src_baseurl):
     """This function finds the Metadata formats offered by a OAI repository by analysing the output of verb=ListMetadataFormats"""
-    url = oai_src_baseurl + "?verb=ListMetadataFormats"
-    urllib.urlretrieve(url, tmppath)
     formats = []
+    url = oai_src_baseurl + "?verb=ListMetadataFormats"
+    try:
+        urllib.urlretrieve(url, tmppath)
+    except IOError:
+        return formats
     ftmp = open(tmppath, 'r')
     xmlstr= ftmp.read()
     ftmp.close()
@@ -549,8 +606,11 @@ def findSets(oai_src_baseurl):
     by analysing the output of verb=ListSets.
     Returns list of tuples(SetSpec, SetName)"""
     url = oai_src_baseurl + "?verb=ListSets"
-    urllib.urlretrieve(url, tmppath)
     sets = {}
+    try:
+        urllib.urlretrieve(url, tmppath)
+    except IOError:
+        return sets
     ftmp = open(tmppath, 'r')
     xmlstr= ftmp.read()
     ftmp.close()
