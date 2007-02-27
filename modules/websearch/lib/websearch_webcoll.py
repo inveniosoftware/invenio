@@ -140,8 +140,8 @@ class Collection:
 
     def __init__(self, name=""):
         "Creates collection instance by querying the DB configuration database about 'name'."
-        self.calculate_reclist_run_already = 0 # to speed things up wihtout much refactoring
-        self.update_reclist_run_already = 0 # to speed things up wihtout much refactoring
+        self.calculate_reclist_run_already = 0 # to speed things up without much refactoring
+        self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_with_nonpublic_subcolls = HitSet()
         if not name:
             self.name = cdsname # by default we are working on the home page
@@ -160,7 +160,7 @@ class Collection:
                     self.dbquery = res[0][2]
                     self.nbrecs = res[0][3]
                     try:
-                        self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][5])))
+                        self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][4])))
                     except:
                         self.reclist = HitSet()
                 else: # collection does not exist!
