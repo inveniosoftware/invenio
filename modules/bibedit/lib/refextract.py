@@ -648,13 +648,16 @@ def get_recids_and_filepaths(args):
         jobs.append((items[0], items[1]))
     return jobs
 
-## components relating to the standardisation and recognition of citations in reference lines:
+## components relating to the standardisation and
+## recognition of citations in reference lines:
 
 def repair_broken_urls(line):
-    """Attempt to repair broken URLs in a line of text. (E.g.: remove spaces from the middle of
-       a URL; something like that.)
+    """Attempt to repair broken URLs in a line of text.
+       (E.g.: remove spaces from the middle of a URL; something like
+       that.)
        @param line: (string) the line in which to check for broken URLs.
-       @return: (string) the line after any broken URLs have (hopefully!) been repaired.
+       @return: (string) the line after any broken URLs have (hopefully!)
+        been repaired.
     """
     def _chop_spaces_in_url_match(m):
         """Suppresses spaces in a matched URL.
@@ -666,8 +669,10 @@ def repair_broken_urls(line):
 
 def replace_undesirable_characters(line):
     """Replace certain bad characters in a text line.
-       @param line: (string) the text line in which bad characters are to be replaced.
-       @return: (string) the text line after the bad characters have been replaced.
+       @param line: (string) the text line in which bad characters are to
+        be replaced.
+       @return: (string) the text line after the bad characters have been
+        replaced.
     """
     bad_chars = undesirable_char_replacements.keys()
     for bad_char in bad_chars:
@@ -678,14 +683,16 @@ def replace_undesirable_characters(line):
     return line
 
 def remove_and_record_multiple_spaces_in_line(line):
-    """For a given string, locate all ocurrences of multiple spaces together in the line, record the
-       number of spaces found at each position, and replace them with a single space.
+    """For a given string, locate all ocurrences of multiple spaces together
+       in the line, record the number of spaces found at each position, and
+       replace them with a single space.
        @param line: (string) the text line to be processed for multiple spaces.
-       @return: (tuple) countaining a dictionary and a string. The dictionary contains information about
-        the number of spaces removed at given positions in the line. For example, if 3 spaces were removed
-        from the line at index '22', the dictionary would be set as follows: { 22 : 3 }
-        The string that is also returned in this tuple is the line after multiple-space ocurrences have
-        replaced with single spaces.
+       @return: (tuple) countaining a dictionary and a string. The dictionary
+        contains information about the number of spaces removed at given
+        positions in the line. For example, if 3 spaces were removed from the
+        line at index '22', the dictionary would be set as follows: { 22 : 3 }
+        The string that is also returned in this tuple is the line after
+        multiple-space ocurrences have replaced with single spaces.
     """
     removed_spaces = {}
     ## get a collection of match objects for all instances of multiple-spaces found in the line:
@@ -698,9 +705,9 @@ def remove_and_record_multiple_spaces_in_line(line):
     return (removed_spaces, line)
 
 def wash_line(line):
-    """Wash a text line of certain punctuation errors, replacing them with more correct
-       alternatives.  E.g.: the string 'Yes , I like python.' will be transformed into
-       'Yes, I like python.'
+    """Wash a text line of certain punctuation errors, replacing them with
+       more correct alternatives.  E.g.: the string 'Yes , I like python.'
+       will be transformed into 'Yes, I like python.'
        @param line: (string) the line to be washed.
        @return: (string) the washed line.
     """
@@ -1018,7 +1025,6 @@ def build_titles_knowledge_base(fpath):
     ## return the raw knowledge base:
     return (kb, standardised_titles, seek_phrases)
 
-## NICK - 2007/01/11
 def standardize_and_markup_numeration_of_citations_in_line(line):
     """Given a reference line, attepmt to locate instances of citation 'numeration' in the line.
        Upon finding some numeration, re-arrange it into a standard order, and mark it up with tags.
@@ -2872,17 +2878,17 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
     g_name = unicode(r'(?P<mark>')
     g_close = u')'
     space = unicode(r'\s*?')
-    patterns = [ space + title + g_name + unicode(r'\[\s*?(?P<linenumber>\d+)\s*?\]') + g_close,
+    patterns = [ space + title + g_name + unicode(r'\[\s*?(?P<marknum>\d+)\s*?\]') + g_close,
                  space + title + g_name + unicode(r'\[\s*?[a-zA-Z]+\s?(\d{1,4}[A-Za-z]?)?\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'\{\s*?\d+\s*?\}') + g_close,
-                 space + title + g_name + unicode(r'\<\s*?\d+\s*?\>') + g_close,
-                 space + title + g_name + unicode(r'\(\s*?\d+\s*?\)') + g_close,
+                 space + title + g_name + unicode(r'\{\s*?(?P<marknum>\d+)\s*?\}') + g_close,
+                 space + title + g_name + unicode(r'\<\s*?(?P<marknum>\d+)\s*?\>') + g_close,
+                 space + title + g_name + unicode(r'\(\s*?(?P<marknum>\d+)\s*?\)') + g_close,
                  space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\.') + g_close,
-                 space + title + g_name + unicode(r'\d+\s*?') + g_close,
-                 space + title + g_name + unicode(r'\d+\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'\d+\s*?\}') + g_close,
-                 space + title + g_name + unicode(r'\d+\s*?\)') + g_close,
-                 space + title + g_name + unicode(r'\d+\s*?\>') + g_close,
+                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?') + g_close,
+                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\]') + g_close,
+                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\}') + g_close,
+                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\)') + g_close,
+                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\>') + g_close,
                  space + title + g_name + unicode(r'\[\s*?\]') + g_close,
                  space + title + g_name + unicode(r'\*') + g_close ]
     for p in patterns:
@@ -3354,32 +3360,42 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
     
     ## first line is correct, to put it into fixed:
     fixed.append(rebuilt_lines[0])
-    try:
-        for x in xrange(1, len(rebuilt_lines)):
-            m = p_refmarker.match(rebuilt_lines[x])
-            try:
-                if int(m.group("marknum")) == last_marknum + 1:
-                    ## The marker number for this reference line is correct.
-                    ## Append it to the 'fixed' lines and move on.
-                    fixed.append(rebuilt_lines[x])
-                    last_marknum += 1
-                    continue
-                elif len(rebuilt_lines[x][m.end():].strip()) == 0:
-                    ## This line consists of a marker-number only - it is not a
-                    ## correct marker. Append it to the last line.
-                    fixed[len(fixed) - 1] += rebuilt_lines[x]
-                    continue
-                else:
-                    ## This marker != previous-marker + 1.
-                    ## May have taken some of the last line into this line. Can we find the
-                    ## next marker in this line?
-                    ## Test for this situation:
-                    ## [54] for more info [3] Wills, A blah blah
-                    m_fix = p_refmarker.search(rebuilt_lines[x][m.end():])
-
-                    if m_fix is not None and int(m_fix.group("marknum")) == last_marknum + 1:
-                        ## found next marker in line. Test to see that marker is followed by
-                        ## something meaningful i.e. a letter at least (name).
+    for x in xrange(1, len(rebuilt_lines)):
+        m = p_refmarker.match(rebuilt_lines[x])
+        try:
+            ## Get the number of this line:
+            curline_mark_num = m.group("marknum")
+        except AttributeError:
+            ## This line does not have a line marker at the start.
+            ## Add this line to the end of the previous line.
+            fixed[len(fixed) - 1] += rebuilt_lines[x]
+        else:
+            if int(curline_mark_num) == last_marknum + 1:
+                ## The marker number for this reference line is correct.
+                ## Append it to the 'fixed' lines and move on.
+                fixed.append(rebuilt_lines[x])
+                last_marknum += 1
+            elif len(rebuilt_lines[x][m.end():].strip()) == 0:
+                ## This line consists of a marker-number only - it is not a
+                ## correct marker. Append it to the last line.
+                fixed[len(fixed) - 1] += rebuilt_lines[x]
+            else:
+                ## This marker != previous-marker + 1.
+                ## May have taken some of the last line into this line.
+                ## Can we find the next marker in this line?
+                ## Test for this situation:
+                ## [54] for more info [3] Wills, A blah blah
+                current_line = rebuilt_lines[x]
+                m_next_mark = p_refmarker.search(current_line[m.end():])
+                while m_next_mark is not None:
+                    ## Another "line marker" is present in this line.
+                    ## Test it to see if it is equal to the previous
+                    ## 'real' marker + 1:
+                    if int(m_next_mark.group("marknum")) == \
+                       last_marknum + 1:
+                        ## This seems to be the marker for the next line.
+                        ## Test to see that the marker is followed by
+                        ## something meaningful (a letter at least.)
                         ## I.e. We want to fix this:
                         ## [54] for more info [3] Wills, A blah blah
                         ##
@@ -3388,13 +3404,14 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         ##
                         ## as that would be unsafe.
                         m_test_nxt_mark_not_eol = \
-                          sre.search(sre.escape(m_fix.group()) + '\s*[A-Za-z]', rebuilt_lines[x])
+                          sre.search(sre.escape(m_next_mark.group()) \
+                                     + '\s*[A-Za-z]', current_line)
                         if m_test_nxt_mark_not_eol is not None:
                             ## move this section back to its real line:
 
                             ## get the segment of this line to be moved to the previous line
                             ## (append a newline to it too):
-                            movesect = rebuilt_lines[x][0:m_test_nxt_mark_not_eol.start()] + "\n"
+                            movesect = current_line[0:m_test_nxt_mark_not_eol.start()] + "\n"
 
                             ## Now get the previous line into a variable (without its newline at the end):
                             previous_line = fixed[len(fixed) - 1].rstrip("\n")
@@ -3402,39 +3419,59 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                             ## Now append the section to be moved to the previous line variable.
                             ## Check the last character of the previous line. If it's a space, then
                             ## just directly append this new section. Else, append a space then this new section.
-                            previous_line += "%s%s" % ((previous_line[len(previous_line) - 1] != " " and " ") or (""), movesect)
+                            previous_line += movesect
 
                             fixed[len(fixed) - 1] = previous_line
 
                             ## Now append the remainder of the current line to the list of fixed lines, and move on to the
                             ## next line:
-                            fixed.append(rebuilt_lines[x][m_test_nxt_mark_not_eol.start():])
-                            
+                            fixed.append(current_line[m_test_nxt_mark_not_eol.start():])
+
                             last_marknum += 1
-                            continue
-                        else:
-                            ## The next marker in the line was not followed by text. It is unsafe to move it.
-                            ## Give up trying to correct these reference lines - it's not safe to continue.
-                            unsafe = 1
                             break
+                        else:
+                            ## The next 'marker' in this line was not followed by text.
+                            ## take from the beginning of this line, to the end of this
+                            ## marker, and append it to the end of the previous line:
+                            previous_line = fixed[len(fixed) - 1].rstrip("\n")
+                            movesect = current_line[0:m_next_mark.end()] + "\n"
+                            ## Now append the section to be moved to the previous line variable.
+                            ## Check the last character of the previous line. If it's a space, then
+                            ## just directly append this new section. Else, append a space then this new section.
+                            previous_line += movesect
+                            fixed[len(fixed) - 1] = previous_line
+                            current_line = current_line[m_next_mark.end():]
+
                     else:
-                        ## Unable to find another marker in the line that starts with the incorrect marker.
-                        ## It is therefore unsafe to attempt to correct the lines: just return the original lines.
-                        unsafe = 1
-                        break
-            except AttributeError:
-                ## This line does not have a line marker at the start! This line shall be added to the end of the previous line.
-                fixed[len(fixed) - 1] += rebuilt_lines[x]
-                continue
-    except IndexError:
-        ## Somewhere, the boundaries of the list of references were over-stepped. Just return the original set of reference lines.
-        unsafe = 1
-    if unsafe:
-        ## return the original set of references.
-        return rebuilt_lines
-    else:
-        ## return the newly corrected references.
-        return fixed
+                        ## This 'marker' is false - its value is not equal to
+                        ## the previous marker + 1
+                        previous_line = fixed[len(fixed) - 1].rstrip("\n")
+                        movesect = current_line[0:m_next_mark.end()] + "\n"
+                        ## Now append the section to be moved to the previous line variable.
+                        ## Check the last character of the previous line. If it's a space, then
+                        ## just directly append this new section. Else, append a space then this new section.
+                        previous_line += movesect
+                        fixed[len(fixed) - 1] = previous_line
+                        current_line = current_line[m_next_mark.end():]
+
+
+                        
+                    ## Get next match:
+                    m_next_mark = p_refmarker.search(current_line)
+
+                ## If there was still some of the "current line" left,
+                ## append it to the previous line:
+                if len(current_line.strip()) > 0:
+                    previous_line = fixed[len(fixed) - 1].rstrip("\n")
+                    movesect = current_line
+                    ## Now append the section to be moved to the previous line variable.
+                    ## Check the last character of the previous line. If it's a space, then
+                    ## just directly append this new section. Else, append a space then this new section.
+                    previous_line += movesect
+                    fixed[len(fixed) - 1] = previous_line
+
+    return fixed
+
 
 def wash_and_repair_reference_line(line):
     """Wash a reference line of undesirable characters (such as poorly-encoded letters, etc),
@@ -3642,8 +3679,10 @@ def convert_PDF_to_plaintext(fpath):
     status = 0
     doclines = []
     ## build pdftotext command:
-    cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 %(filepath)s -""" % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
-                                                                              'filepath'  : fpath }
+    cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 '%(filepath)s' -""" \
+                    % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
+                        'filepath'  : fpath.replace("'", "\\'")
+                      }
     if cli_opts['verbosity'] >= 1:
         sys.stdout.write("%s\n" % cmd_pdftotext)
     ## open pipe to pdftotext:
@@ -3665,22 +3704,6 @@ def convert_PDF_to_plaintext(fpath):
         doclines = []
     return (doclines, status)
 
-def convert_document_to_plaintext(fpath):
-    """Given the path to a file, convert it to plaintext and return the content as a list, whereby
-       each line of text in the document file is a string in the list.
-       @param fpath: (string) the path to the file to be converted to text
-       @return: list of strings (the plaintext body of the file)
-    """
-    doc_plaintext = []
-    pipe_gfile = os.popen("%s %s" % (CFG_PATH_GFILE, fpath), "r")
-    res_gfile = pipe_gfile.readline()
-    pipe_gfile.close()
-    status = 0
-    if res_gfile.lower().find("pdf") != -1:
-        ## convert from PDF
-        (doc_plaintext, status) = convert_PDF_to_plaintext(fpath)
-    return (doc_plaintext, status)
-
 def get_plaintext_document_body(fpath):
     """Given a file-path to a full-text, return a list of unicode strings whereby each string
        is a line of the fulltext.
@@ -3695,21 +3718,21 @@ def get_plaintext_document_body(fpath):
     if os.access(fpath, os.F_OK|os.R_OK):
         # filepath OK - attempt to extract references:
         ## get file type:
-        pipe_gfile = os.popen("%s %s" % (CFG_PATH_GFILE, fpath), "r")
+        pipe_gfile = os.popen("%s '%s'" \
+                              % (CFG_PATH_GFILE, fpath.replace("'", "\\'")), "r")
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
         
         if res_gfile.lower().find("text") != -1 and \
-           res_gfile.lower().find("postscript") == -1 and \
            res_gfile.lower().find("pdf") == -1:
             ## plain-text file: don't convert - just read in:
             #textbody = open("%s" % fpath, "r").readlines()
             textbody = []
             for line in open("%s" % fpath, "r").readlines():
                 textbody.append(line.decode("utf-8"))
-        else:
-            ## assume file needs to be converted to text:
-            (textbody, status) = convert_document_to_plaintext(fpath)
+        elif res_gfile.lower().find("pdf") != -1:
+            ## convert from PDF
+            (textbody, status) = convert_PDF_to_plaintext(fpath)
     else:
         ## filepath not OK
         status = 1
