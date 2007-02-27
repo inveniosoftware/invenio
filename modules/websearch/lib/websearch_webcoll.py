@@ -272,6 +272,12 @@ class Collection:
     def update_webpage_cache(self):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
+
+        ## precalculate latest additions for non-aggregate
+        ## collections (the info is ln and as independent)        
+        if self.dbquery:
+            self.create_latest_additions_info()
+        
         ## do this for each language:
         for lang, lang_fullname in language_list_long():
 
@@ -379,30 +385,48 @@ class Collection:
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
+    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE):
+        """
+        Create info about latest additions that will be used for
+        create_instant_browse() later.
+        """
+        self.latest_additions_info = []
+        if self.nbrecs and self.reclist:
+            # firstly, get last 'rg' records:
+            recIDs = Numeric.nonzero(self.reclist._set)
+
+            total = len(recIDs)
+            to_display = min(rg, total)
+
+            for idx in range(total-1, total-to_display-1, -1):
+                recid = recIDs[idx]
+                self.latest_additions_info.append({'id': recid,
+                                                   'format': format_record(recid, "hb"), 
+                                                   'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
+        return
+
     def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
         
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
-        
+
         else:
-            if self.nbrecs and self.reclist:
-                # firstly, get last 'rg' records:
-                recIDs = Numeric.nonzero(self.reclist._set)
+            try:
+                self.latest_additions_info
+                latest_additions_info_p = True
+            except:
+                latest_additions_info_p = False
+
+            if latest_additions_info_p:
                 passIDs = []
-
-                total = len(recIDs)
-                to_display = min(rg, total)
-                
-                for idx in range(total-1, total-to_display-1, -1):
-                    recid = recIDs[idx]
-
-                    passIDs.append({'id': recid,
-                                    'body': format_record(recid, "hb", ln=ln) + \
+                for idx in range(0, min(len(self.latest_additions_info), rg)):
+                    passIDs.append({'id': self.latest_additions_info[idx]['id'],
+                                    'body': self.latest_additions_info[idx]['format'] + \
                                             websearch_templates.tmpl_record_links(weburl=weburl,
-                                                                                  recid=recid,
+                                                                                  recid=self.latest_additions_info[idx]['id'],
                                                                                   ln=ln),
-                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
+                                    'date': self.latest_additions_info[idx]['date']})
                     
                 if self.nbrecs > rg:
                     url = websearch_templates.build_search_url(
