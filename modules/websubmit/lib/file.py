@@ -31,7 +31,6 @@ import shutil
 import md5
 import urllib
 from xml.sax.saxutils import quoteattr
-from mod_python import apache
 
 from invenio.config import \
      cdslang, \
