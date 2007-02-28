@@ -35,6 +35,85 @@ from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
 class WebSessionYorSettingsTest(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
 
+    def test_password_setting(self):
+        """webuser - check password settings"""
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/login")
+        browser.select_form(nr=0)
+        browser['p_un'] = 'admin'
+        browser['p_pw'] = ''
+        browser.submit()
+
+        expected_response = "You are logged in as admin"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
+
+        # Going to set new password from "" to "123"
+        browser.open(sweburl + "/youraccount/edit")
+        browser.select_form(name="edit_password")
+        browser['old_password'] = ""
+        browser['password'] = "123"
+        browser['password2'] = "123"
+        browser.submit()
+        expected_response = "Password successfully edited"
+        change_password_body = browser.response().read()
+        try:
+            change_password_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, change_password_body))
+
+        # Going to set a wrong old password
+        browser.open(sweburl + "/youraccount/edit")
+        browser.select_form(name="edit_password")
+        browser['old_password'] = "321"
+        browser['password'] = "123"
+        browser['password2'] = "123"
+        browser.submit()
+        expected_response = "Wrong old password inserted"
+        change_password_body = browser.response().read()
+        try:
+            change_password_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, change_password_body))
+
+        # Going to put different new passwords
+        browser.open(sweburl + "/youraccount/edit")
+        browser.select_form(name="edit_password")
+        browser['old_password'] = "123"
+        browser['password'] = "123"
+        browser['password2'] = "321"
+        browser.submit()
+        expected_response = "Both passwords must match"
+        change_password_body = browser.response().read()
+        try:
+            change_password_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, change_password_body))
+
+        # Reset the situation
+        browser.open(sweburl + "/youraccount/edit")
+        browser.select_form(name="edit_password")
+        browser['old_password'] = "123"
+        browser['password'] = ""
+        browser['password2'] = ""
+        browser.submit()
+        expected_response = "Password successfully edited"
+        change_password_body = browser.response().read()
+        try:
+            change_password_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, change_password_body))
+
+
+
     def test_select_records_per_group(self):
         """webuser - test of user preferences setting"""
 

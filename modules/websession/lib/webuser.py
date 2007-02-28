@@ -353,30 +353,27 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
         sendNewAdminAccountWarning(email, adminemail)
     return 0
 
-def updateDataUser(uid, email, password, nickname, ignore_password_p=False):
+def updateDataUser(uid, email, nickname):
     """
     Update user data.  Used when a user changed his email or password
     or nickname.
-
-    When IGNORE_PASSWORD_P is set to True, do not update user's
-    password or do not use it during lookups.
     """
-    
+
     if email == 'guest':
         return 0
 
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-        if not ignore_password_p:
-            run_sql("update user set password=%s where id=%s", (password, uid))
-    else:
-        if not ignore_password_p:
-            run_sql("update user set email=%s,password=%s where id=%s", (email, password, uid))
-        else:
-            run_sql("update user set email=%s where id=%s", (email, uid))
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 2:
+        run_sql("update user set email=%s where id=%s", (email, uid))
 
     if nickname and nickname != '':
         run_sql("update user set nickname=%s where id=%s", (nickname, uid))
 
+    return 1
+
+def updatePasswordUser(uid, password):
+    """Update the password of a user."""
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
+        run_sql("update user set password=%s where id=%s", (password, uid))
     return 1
 
 def loginUser(req, p_un, p_pw, login_method):
@@ -624,7 +621,7 @@ def get_password(uid):
     the user is not found."""
     out = None
     res = run_sql("SELECT password FROM user WHERE id=%s", (uid,), 1)
-    if res and res[0][0]:
+    if res and res[0][0] != None:
         out = res[0][0]
     return out
 

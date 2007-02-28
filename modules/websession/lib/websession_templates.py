@@ -101,12 +101,20 @@ class Template:
     def tmpl_external_user_settings(self, ln, html_settings):
         _ = gettext_set_language(ln)
         out = """
-        <big><strong class="headline">%(external_user_settings)s</strong></big>
+        <p><big><strong class="headline">%(external_user_settings)s</strong></big></p>
         <table>
             %(html_settings)s
-        </table>""" % {
+        </table>
+        <p><big><strong class="headline">%(external_user_groups)s</strong></big></p>
+        <p>%(consult_external_groups)s</p>
+        """ % {
             'external_user_settings' : _('External account settings'),
             'html_settings' : html_settings,
+            'consult_external_groups' : _('You can consult the list of your external groups directly in the %(x_url_open)sgroups page%(x_url_close)s.') % {
+                'x_url_open' : '<a href=../yourgroups/display?ln=%s#external_groups>' % ln,
+                'x_url_close' : '</a>'
+            },
+            'external_user_groups' : _('External user groups'),
         }
         return out
 
@@ -135,8 +143,8 @@ class Template:
 
         out = """
                 <p><big><strong class="headline">%(edit_params)s</strong></big></p>
-                <form method="post" action="%(sweburl)s/youraccount/change">
-                <p>%(change_user_pass)s</p>
+                <form method="post" action="%(sweburl)s/youraccount/change" name="edit_logins_settings">
+                <p>%(change_user)s</p>
                 <table>
                   <tr><td align="right"><strong>
                       %(nickname_label)s:</strong><br/>
@@ -155,13 +163,50 @@ class Template:
                         <span class="example">john.doe@example.com</span>
                       </small>
                     </td>
-                    <td></td>
+                  </tr>
+                  <tr><td></td><td align="left">
+                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s"></code>&nbsp;&nbsp;&nbsp;
+                  </td></tr>
+                </table>
+                <input type="hidden" name="action" value="edit">
+                </form>
+            """ % {
+                'change_user' : _("If you want to change your email or set for the first time your nickname, please set new values in the form below."),
+                'edit_params' : _("Edit login credentials"),
+                'nickname_label' : _("Nickname"),
+                'nickname' : nickname,
+                'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
+                'nickname_suffix' : nickname=='' and '"><br><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
+                'new_email' : _("New email address"),
+                'mandatory' : _("mandatory"),
+                'example' : _("Example"),
+                'note' : _("Note"),
+                'set_values' : _("Set new values"),
+                'email' : email,
+                'email_disabled' : email_disabled and "readonly" or "",
+                'sweburl': sweburl,
+            }
+
+        if not password_disabled:
+            out += """
+                <form method="post" action="%(sweburl)s/youraccount/change" name="edit_password">
+                <p>%(change_pass)s</p>
+                <table>
+                  <tr>
+                    <td align="right"><strong>%(old_password)s:</strong><br>
+                      <small class="important">(%(mandatory)s)</small>
+                    </td><td align="left">
+                      <input type="password" size="25" name="old_password" %(password_disabled)s><br>
+                      <small><span class=quicknote>%(note)s:</span>
+                       %(old_password_note)s
+                      </small>
+                    </td>
                   </tr>
                   <tr>
                     <td align="right"><strong>%(new_password)s:</strong><br>
                       <small class="quicknote">(%(optional)s)</small>
                     </td><td align="left">
-                      <input type="password" size="25" name="password" %(password_disabled)s value="****"><br>
+                      <input type="password" size="25" name="password" %(password_disabled)s><br>
                       <small><span class=quicknote>%(note)s:</span>
                        %(password_note)s
                       </small>
@@ -172,43 +217,38 @@ class Template:
                     <td align="left">
                       <input type="password" size="25" name="password2" %(password_disabled)s value="">
                     </td>
-                    <td><input type="hidden" name="action" value="edit"></td>
                   </tr>
-                  <tr><td align="center" colspan="3">
+                  <tr><td></td><td align="left">
                     <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s"></code>&nbsp;&nbsp;&nbsp;
                   </td></tr>
                 </table>
-              </form>
-        """ % {
-          'change_user_pass' : _("If you want to change your email address or password, please set new values in the form below."),
-          'edit_params' : _("Edit login credentials"),
-          'nickname_label' : _("Nickname"),
-          'nickname' : nickname,
-          'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
-          'nickname_suffix' : nickname=='' and '"><br><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
-          'new_email' : _("New email address"),
-          'mandatory' : _("mandatory"),
-          'example' : _("Example"),
-          'new_password' : _("New password"),
-          'optional' : _("optional"),
-          'note' : _("Note"),
-          'password_note' : _("The password phrase may contain punctuation, spaces, etc."),
-          'retype_password' : _("Retype password"),
-          'set_values' : _("Set new values"),
-
-          'email' : email,
-          'email_disabled' : email_disabled and "readonly" or "",
-          'password' : password,
-          'password_disabled' : password_disabled and "disabled" or "",
-          'sweburl': sweburl,
-        }
+                <input type="hidden" name="action" value="edit">
+                </form>
+                """ % {
+                    'change_pass' : _("If you want to change your password, please fill in the old one and set new values in the form below."),
+                    'mandatory' : _("mandatory"),
+                    'old_password' : _("Old password"),
+                    'new_password' : _("New password"),
+                    'optional' : _("optional"),
+                    'note' : _("Note"),
+                    'password_note' : _("The password phrase may contain punctuation, spaces, etc."),
+                    'old_password_note' : _("You must fill the old password in order to set a new one."),
+                    'retype_password' : _("Retype password"),
+                    'set_values' : _("Set new password"),
+                    'password' : password,
+                    'password_disabled' : password_disabled and "disabled" or "",
+                    'sweburl': sweburl,
+                }
         return out
+
+
+
 
     def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
         _ = gettext_set_language(ln)
         out = """
             <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch_settings">
-              <big><strong class="headline">%(edit_websearch_settings)s</strong></big>
+              <p><big><strong class="headline">%(edit_websearch_settings)s</strong></big></p>
               <table>
                 <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value=1 name="latestbox"/></td>
                 <td valign="top"><b>%(show_latestbox)s</b></td></tr>
@@ -1061,7 +1101,7 @@ class Template:
     <td><br/>%s</td>
 </tr>
 <tr>
-    <td><br/>%s</td>
+    <td><br/><a name='external_groups'></a>%s</td>
 </tr>
 </table>""" %(admin_group_html, member_group_html, external_group_html)
         else:

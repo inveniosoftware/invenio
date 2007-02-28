@@ -131,6 +131,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         args = wash_urlargd(form, {
             'nickname': (str, None),
             'email': (str, None),
+            'old_password': (str, None),
             'password': (str, None),
             'password2': (str, None),
             'login_method': (str, ""),
@@ -140,6 +141,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             })
 
         uid = webuser.getUid(req)
+
+        current_password = webuser.get_password(uid)
+        if current_password == None:
+            current_password = ""
 
         # load the right message language
         _ = gettext_set_language(args['ln'])
@@ -196,19 +201,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                            webuser.email_valid_p(args['email']))) \
                and (args['nickname'] is None or webuser.nickname_valid_p(args['nickname'])) \
                and uid2 != -1 and (uid2 == uid or uid2 == 0) \
-               and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0) \
-               and args['password'] == args['password2']:
+               and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0):
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
                     change = webuser.updateDataUser(uid,
                                                     args['email'],
-                                                    args['password'],
-                                                    args['nickname'],
-                                                    ignore_password_p)
+                                                    args['nickname'])
                 else:
                     return webuser.page_not_authorized(req, "../youraccount/change")
-                if change and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-                    mess = _("Password successfully edited.")
-                elif change:
+                if change:
                     mess = _("Settings successfully edited.")
                 act = "display"
                 linkname = _("Show account")
@@ -238,12 +238,26 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 act = "edit"
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
-            elif args['password'] != args['password2']:
-                mess = _("Both passwords must match.")
+        elif args['old_password'] != None and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
+            if args['old_password'] == current_password:
+                if args['password'] == args['password2']:
+                    webuser.updatePasswordUser(uid, args['password'])
+                    mess = _("Password successfully edited.")
+                    act = "display"
+                    linkname = _("Show account")
+                    title = _("Password edited")
+                else:
+                    mess = _("Both passwords must match.")
+                    mess += " " + _("Please try again.")
+                    act = "edit"
+                    linkname = _("Edit settings")
+                    title = _("Editing password failed")
+            else:
+                mess = _("Wrong old password inserted.")
                 mess += " " + _("Please try again.")
                 act = "edit"
                 linkname = _("Edit settings")
-                title = _("Editing settings failed")
+                title = _("Editing password failed")
         elif args['group_records']:
             prefs = webuser.get_user_preferences(uid)
             prefs['websearch_group_records'] = args['group_records']
