@@ -71,11 +71,11 @@ except ImportError, importerror:
 cli_opts = {}
 
 def get_url_repair_patterns():
-    """Initialise and return a list of precompiled regexp patterns that are used to
-       try to re-assemble URLs that have been broken during a document's conversion
-       to plain-text.
-       @return: (list) of compiled sre regexp patterns used for finding various
-        broken URLs.
+    """Initialise and return a list of precompiled regexp patterns that
+       are used to try to re-assemble URLs that have been broken during
+       a document's conversion to plain-text.
+       @return: (list) of compiled sre regexp patterns used for finding
+        various broken URLs.
     """
     file_types_list = []
     file_types_list.append(r'h\s*?t\s*?m')           ## htm
@@ -127,13 +127,16 @@ def get_url_repair_patterns():
     return pattern_list
 
 def get_bad_char_replacements():
-    """When a document is converted to plain-text from PDF, certain characters may result in the
-       plain-text, that are either unwanted, or broken. These characters need to be corrected or
-       removed. Examples are, certain control characters that would be illegal in XML and must be
-       removed; TeX ligatures (etc); broken accents such as umlauts on letters that must be corrected.
-       This function returns a dictionary of (unwanted) characters to look for and the characters
-       that should be used to replace them.
-       @return: (dictionary) - { seek -> replace, } or charsacters to replace in plain-text.
+    """When a document is converted to plain-text from PDF,
+       certain characters may result in the plain-text, that are
+       either unwanted, or broken. These characters need to be corrected
+       or removed. Examples are, certain control characters that would
+       be illegal in XML and must be removed; TeX ligatures (etc); broken
+       accents such as umlauts on letters that must be corrected.
+       This function returns a dictionary of (unwanted) characters to look
+       for and the characters that should be used to replace them.
+       @return: (dictionary) - { seek -> replace, } or charsacters to
+        replace in plain-text.
     """
     replacements = {
         ## Control characters not allowed in XML:
@@ -656,8 +659,7 @@ def repair_broken_urls(line):
        (E.g.: remove spaces from the middle of a URL; something like
        that.)
        @param line: (string) the line in which to check for broken URLs.
-       @return: (string) the line after any broken URLs have (hopefully!)
-        been repaired.
+       @return: (string) the line after any broken URLs have been repaired.
     """
     def _chop_spaces_in_url_match(m):
         """Suppresses spaces in a matched URL.
@@ -683,24 +685,28 @@ def replace_undesirable_characters(line):
     return line
 
 def remove_and_record_multiple_spaces_in_line(line):
-    """For a given string, locate all ocurrences of multiple spaces together
-       in the line, record the number of spaces found at each position, and
-       replace them with a single space.
-       @param line: (string) the text line to be processed for multiple spaces.
-       @return: (tuple) countaining a dictionary and a string. The dictionary
-        contains information about the number of spaces removed at given
-        positions in the line. For example, if 3 spaces were removed from the
-        line at index '22', the dictionary would be set as follows: { 22 : 3 }
+    """For a given string, locate all ocurrences of multiple spaces
+       together in the line, record the number of spaces found at each
+       position, and replace them with a single space.
+       @param line: (string) the text line to be processed for multiple
+        spaces.
+       @return: (tuple) countaining a dictionary and a string. The
+        dictionary contains information about the number of spaces removed
+        at given positions in the line. For example, if 3 spaces were
+        removed from the line at index '22', the dictionary would be set
+        as follows: { 22 : 3 }
         The string that is also returned in this tuple is the line after
         multiple-space ocurrences have replaced with single spaces.
     """
     removed_spaces = {}
-    ## get a collection of match objects for all instances of multiple-spaces found in the line:
+    ## get a collection of match objects for all instances of
+    ## multiple-spaces found in the line:
     multispace_matches = sre_group_captured_multiple_space.finditer(line)
     ## record the number of spaces found at each match position:
     for multispace in multispace_matches:
         removed_spaces[multispace.start()] = (multispace.end() - multispace.start() - 1)
-    ## now remove the multiple-spaces from the line, replacing with a single space at each position:
+    ## now remove the multiple-spaces from the line, replacing with a
+    ## single space at each position:
     line = sre_group_captured_multiple_space.sub(u' ', line)
     return (removed_spaces, line)
 
@@ -724,12 +730,15 @@ def wash_line(line):
     return line
 
 def _order_institute_preprint_reference_numeration_patterns_by_length(numeration_patterns):
-    """Given a list of user-defined patterns for recognising the numeration styles of an institute's
-       preprint references, for each pattern, strip out character classes and record the length of the pattern.
-       Then add the length and the original pattern (in a tuple) into a new list for these patterns and return
-       this list.
-       @param numeration_patterns: (list) of strings, whereby each string is a numeration pattern.
-       @return: (list) of tuples, where each tuple contains a pattern and its length.
+    """Given a list of user-defined patterns for recognising the numeration
+       styles of an institute's preprint references, for each pattern,
+       strip out character classes and record the length of the pattern.
+       Then add the length and the original pattern (in a tuple) into a new
+       list for these patterns and return this list.
+       @param numeration_patterns: (list) of strings, whereby each string is
+        a numeration pattern.
+       @return: (list) of tuples, where each tuple contains a pattern and
+        its length.
     """
     def _compfunc_bylen(a, b):
         """Compares regexp patterns by the length of the pattern-text.
@@ -748,12 +757,14 @@ def _order_institute_preprint_reference_numeration_patterns_by_length(numeration
     return pattern_list
 
 def create_institute_numeration_group_regexp_pattern(patterns):
-    """Using a list of regexp patterns for recognising numeration patterns for institute preprint references,
-       ordered by length - longest to shortest - create a grouped 'OR' or of these patterns, ready to be used
-       in a bigger regexp.
-       @param patterns: (list) of strings. All of the numeration regexp patterns for recognising an institute's preprint
-        reference styles.
-       @return: (string) a grouped 'OR' regexp pattern of the numeration patterns. E.g.:
+    """Using a list of regexp patterns for recognising numeration patterns
+       for institute preprint references, ordered by length - longest to
+       shortest - create a grouped 'OR' or of these patterns, ready to be
+       used in a bigger regexp.
+       @param patterns: (list) of strings. All of the numeration regexp
+        patterns for recognising an institute's preprint reference styles.
+       @return: (string) a grouped 'OR' regexp pattern of the numeration
+        patterns. E.g.:
            (?P<num>[12]\d{3} \d\d\d|\d\d \d\d\d|[A-Za-z] \d\d\d)
     """
     grouped_numeration_pattern = u""
@@ -766,9 +777,9 @@ def create_institute_numeration_group_regexp_pattern(patterns):
     return grouped_numeration_pattern
 
 def institute_num_pattern_to_regex(pattern):
-    """Given a numeration pattern from the institutes preprint report numbers KB,
-       convert it to turn it into a regexp string for recognising such patterns in
-       a reference line.
+    """Given a numeration pattern from the institutes preprint report
+       numbers KB, convert it to turn it into a regexp string for
+       recognising such patterns in a reference line.
        Change:
            \     -> \\
            9     -> \d
@@ -778,7 +789,8 @@ def institute_num_pattern_to_regex(pattern):
            yyyy  -> [12]\d{3}
            /     -> \/
            s     -> \s*?
-       @param pattern: (string) a user-defined preprint reference numeration pattern.
+       @param pattern: (string) a user-defined preprint reference numeration
+        pattern.
        @return: (string) the regexp for recognising the pattern.
     """
     simple_replacements = [ ('9',    r'\d'),
@@ -806,64 +818,82 @@ def institute_num_pattern_to_regex(pattern):
     return pattern
 
 def build_institutes_preprints_numeration_knowledge_base(fpath):
-    """Given the path to a knowledge base file containing the details of institutes and the patterns
-       that their preprint report numberring schemes take, create a dictionary of regexp search patterns
-       to recognise these preprint references in reference lines, and a dictionary of replacements for
-       non-standard preprint categories in these references.
+    """Given the path to a knowledge base file containing the details
+       of institutes and the patterns that their preprint report
+       numbering schemes take, create a dictionary of regexp search
+       patterns to recognise these preprint references in reference
+       lines, and a dictionary of replacements for non-standard preprint
+       categories in these references.
 
-       The knowledge base file should consist only of lines that take one of the following 3 formats:
+       The knowledge base file should consist only of lines that take one
+       of the following 3 formats:
 
          #####Institute Name####
 
-       (the name of the institute to which the preprint reference patterns belong, e.g. '#####LANL#####',
-        surrounded by 5 # on either side.)
+       (the name of the institute to which the preprint reference patterns
+        belong, e.g. '#####LANL#####', surrounded by 5 # on either side.)
 
          <pattern>
 
-       (numeration patterns for an institute's preprints, surrounded by < and >.)
+       (numeration patterns for an institute's preprints, surrounded by
+        < and >.)
 
          seek-term       ---   replace-term
-       (i.e. a seek phrase on the left hand side, a replace phrase on the right hand side, with
-       the two phrases being separated by 3 hyphens.) E.g.:
+       (i.e. a seek phrase on the left hand side, a replace phrase on the
+       right hand side, with the two phrases being separated by 3 hyphens.)
+       E.g.:
          ASTRO PH        ---astro-ph
          
-       The left-hand side term is a non-standard version of the preprint reference category; the right-hand
-       side term is the standard version.
+       The left-hand side term is a non-standard version of the preprint
+       reference category; the right-hand side term is the standard version.
 
-       If the KB file cannot be read from, or an unexpected line is encountered in the KB, an error
-       message is output to standard error and execution is halted with an error-code 0.
+       If the KB file cannot be read from, or an unexpected line is
+       encountered in the KB, an error message is output to standard error
+       and execution is halted with an error-code 0.
 
        @param fpath: (string) the path to the knowledge base file.
-       @return: (tuple) containing 2 dictionaries. The first contains regexp search patterns used to identify
-        preprint references in a line. This dictionary is keyed by a tuple containing the line number of the
-        pattern in the KB and the non-standard category string.  E.g.: (3, 'ASTRO PH').
-        The second dictionary contains the standardised category string, and is keyed by the non-standard
-        category string. E.g.: 'astro-ph'.
+       @return: (tuple) containing 2 dictionaries. The first contains regexp
+        search patterns used to identify preprint references in a line. This
+        dictionary is keyed by a tuple containing the line number of the
+        pattern in the KB and the non-standard category string.
+        E.g.: (3, 'ASTRO PH').
+        The second dictionary contains the standardised category string,
+        and is keyed by the non-standard category string. E.g.: 'astro-ph'.
     """
     def _add_institute_preprint_patterns(preprint_classifications, preprint_numeration_ptns,\
                                          preprint_reference_search_regexp_patterns, \
                                          standardised_preprint_reference_categories, kb_line_num):
-        """For a list of preprint category strings and preprint numeration patterns for a given institute,
-           create the regexp patterns for each of the preprint types.  Add the regexp patterns to the dictionary
-           of search patterns (preprint_reference_search_regexp_patterns), keyed by the line number of the institute
-           in the KB, and the preprint category search string.  Also add the standardised preprint category string
-           to another dictionary, keyed by the line number of its position in the KB and its non-standardised
-           version.
-           @param preprint_classifications: (list) of tuples whereby each tuple contains a preprint category search
-            string and the line number of the name of institute to which it belongs in the KB. E.g.: (45, 'ASTRO PH').
-           @param preprint_numeration_ptns: (list) of preprint reference numeration search patterns (strings)
-           @param preprint_reference_search_regexp_patterns: (dictionary) of regexp patterns used to search in
-            document lines.
-           @param standardised_preprint_reference_categories: (dictionary) containing the standardised strings for
-            preprint reference categories. (E.g. 'astro-ph'.)
-           @param kb_line_num: (integer) - the line number int the KB at which a given institute name was found.
+        """For a list of preprint category strings and preprint numeration
+           patterns for a given institute, create the regexp patterns for
+           each of the preprint types.  Add the regexp patterns to the
+           dictionary of search patterns
+           (preprint_reference_search_regexp_patterns), keyed by the line
+           number of the institute in the KB, and the preprint category
+           search string.  Also add the standardised preprint category string
+           to another dictionary, keyed by the line number of its position
+           in the KB and its non-standardised version.
+           @param preprint_classifications: (list) of tuples whereby each tuple
+            contains a preprint category search string and the line number of
+            the name of institute to which it belongs in the KB.
+            E.g.: (45, 'ASTRO PH').
+           @param preprint_numeration_ptns: (list) of preprint reference
+            numeration search patterns (strings)
+           @param preprint_reference_search_regexp_patterns: (dictionary) of
+            regexp patterns used to search in document lines.
+           @param standardised_preprint_reference_categories: (dictionary)
+            containing the standardised strings for preprint reference
+            categories. (E.g. 'astro-ph'.)
+           @param kb_line_num: (integer) - the line number int the KB at
+            which a given institute name was found.
            @return: None
         """
         if len(preprint_classifications) > 0 and \
            len(preprint_numeration_ptns) > 0:
-            ## the previous institute had both numeration styles and categories for preprint references.
+            ## the previous institute had both numeration styles and categories
+            ## for preprint references.
             ## build regexps and add them for this institute:
-            ## First, order the numeration styles by line-length, and build a grouped regexp for recognising numeration:
+            ## First, order the numeration styles by line-length, and build a
+            ## grouped regexp for recognising numeration:
             ordered_patterns = _order_institute_preprint_reference_numeration_patterns_by_length(preprint_numeration_ptns)
             ## create a grouped regexp for numeration part of preprint reference:
             numeration_regexp = create_institute_numeration_group_regexp_pattern(ordered_patterns)
@@ -898,8 +928,14 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
     try:
         fh = open(fpath, "r")
         for rawline in fh:
-            rawline = rawline.decode("utf-8")
             kb_line_num += 1
+            try:
+                rawline = rawline.decode("utf-8")
+            except UnicodeError:
+                sys.stderr.write("*** Unicode problems in %s for line %s\n" \
+                                 % (fpath, str(kb_line_num)))
+                sys.exit(1)
+
             m_institute_name = sre_institute_name.search(rawline)
             if m_institute_name is not None:
                 ## This KB line is the name of an institute
@@ -949,31 +985,38 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
                % { 'kb' : fpath }
         sys.stderr.write(emsg)
         sys.stderr.flush()
-        sys.exit(0)
+        sys.exit(1)
 
     ## return the preprint reference patterns and the replacement strings for non-standard categ-strings:
     return (preprint_reference_search_regexp_patterns, standardised_preprint_reference_categories)
 
 def build_titles_knowledge_base(fpath):
-    """Given the path to a knowledge base file, read in the contents of that file into a dictionary
-       of search->replace word phrases. The search phrases are compiled into a regex pattern object.
-       The knowledge base file should consist only of lines that take the following format:
+    """Given the path to a knowledge base file, read in the contents
+       of that file into a dictionary of search->replace word phrases.
+       The search phrases are compiled into a regex pattern object.
+       The knowledge base file should consist only of lines that take
+       the following format:
          seek-term       ---   replace-term
-       (i.e. a seek phrase on the left hand side, a replace phrase on the right hand side, with
-       the two phrases being separated by 3 hyphens.) E.g.:
+       (i.e. a seek phrase on the left hand side, a replace phrase on
+       the right hand side, with the two phrases being separated by 3
+       hyphens.) E.g.:
          ASTRONOMY AND ASTROPHYSICS              ---Astron. Astrophys.
 
-       The left-hand side term is a non-standard version of the title, whereas the right-hand side
-       term is the standard version.
-       If the KB file cannot be read from, or an unexpected line is encountered in the KB, an error
-       message is output to standard error and execution is halted with an error-code 0.
+       The left-hand side term is a non-standard version of the title,
+       whereas the right-hand side term is the standard version.
+       If the KB file cannot be read from, or an unexpected line is
+       encountered in the KB, an error
+       message is output to standard error and execution is halted with
+       an error-code 0.
 
        @param fpath: (string) the path to the knowledge base file.
-       @return: (tuple) containing a list and a dictionary. The list contains compiled regex patterns
-        used as search terms and will be used to force searching order to match that of the knowledge
+       @return: (tuple) containing a list and a dictionary. The list
+        contains compiled regex patterns used as search terms and will
+        be used to force searching order to match that of the knowledge
         base.
-        The dictionary contains the search->replace terms.  The keys of the dictionary are the compiled
-        regex word phrases used for searching in the reference lines; The values in the dictionary are
+        The dictionary contains the search->replace terms.  The keys of
+        the dictionary are the compiled regex word phrases used for
+        searching in the reference lines; The values in the dictionary are
         the replace terms for matches.
     """
     ## Initialise vars:
@@ -992,10 +1035,14 @@ def build_titles_knowledge_base(fpath):
             count += 1
             ## Test line to ensure that it is a correctly formatted knowledge base line:
             try:
-                m_kb_line = p_kb_line.search(rawline.decode("utf-8").rstrip("\n"))
+                rawline = rawline.decode("utf-8").rstrip("\n")
             except UnicodeError:
                 sys.stderr.write("*** Unicode problems in %s for line %s\n" \
                                  % (fpath, str(count)))
+                sys.exit(1)
+
+            ## Extract the seek->replace terms from this KB line:
+            m_kb_line = p_kb_line.search(rawline)
             if m_kb_line is not None:
                 ## good KB line
                 seek_phrase = m_kb_line.group('seek')
@@ -1012,7 +1059,7 @@ def build_titles_knowledge_base(fpath):
                 emsg = """Error: Could not build list of journal titles - KB %(kb)s has errors.\n""" \
                        % { 'kb' : fpath }
                 sys.stderr.write(emsg)
-                sys.exit(0)
+                sys.exit(1)
         fh.close()
     except IOError:
         ## problem opening KB for reading, or problem while reading from it:
@@ -1020,16 +1067,19 @@ def build_titles_knowledge_base(fpath):
                % { 'kb' : fpath }
         sys.stderr.write(emsg)
         sys.stderr.flush()
-        sys.exit(0)
+        sys.exit(1)
 
     ## return the raw knowledge base:
     return (kb, standardised_titles, seek_phrases)
 
 def standardize_and_markup_numeration_of_citations_in_line(line):
-    """Given a reference line, attepmt to locate instances of citation 'numeration' in the line.
-       Upon finding some numeration, re-arrange it into a standard order, and mark it up with tags.
+    """Given a reference line, attepmt to locate instances of citation
+       'numeration' in the line.
+       Upon finding some numeration, re-arrange it into a standard
+       order, and mark it up with tags.
        Will process numeration in the following order:
-            Delete the colon and expressions such as Serie, vol, V. inside the pattern <serie : volume>
+            Delete the colon and expressions such as Serie, vol, V.
+            inside the pattern <serie : volume>
             E.g.: Replace the string 'Series A, Vol 4' with 'A 4'
             Then, the 4 main numeration patterns:
             Pattern 0 (was pattern 3): <x, vol, page, year>
@@ -1046,8 +1096,8 @@ def standardize_and_markup_numeration_of_citations_in_line(line):
             <v, [FS]?, s, p, y>
 
        @param line: (string) the reference line.
-       @return: (string) the reference line after numeration has been checked and possibly
-        recognized/marked-up.
+       @return: (string) the reference line after numeration has been checked
+        and possibly recognized/marked-up.
     """
     line = sre_strip_series_and_volume_labels[0].sub(sre_strip_series_and_volume_labels[1], line)
     line = sre_numeration_vol_nucphys_page_yr[0].sub(sre_numeration_vol_nucphys_page_yr[1], line)
@@ -1063,28 +1113,35 @@ def standardize_and_markup_numeration_of_citations_in_line(line):
 def identify_preprint_report_numbers(line,
                                      preprint_repnum_search_kb,
                                      preprint_repnum_standardised_categs):
-    """Attempt to identify all preprint report numbers in a reference line.
-       Report numbers will be identified, their information (location in line, length in line, and
-       standardised replacement version) will be record, and they will be replaced in the working-
-       line by underscores.
+    """Attempt to identify all preprint report numbers in a reference
+       line.
+       Report numbers will be identified, their information (location
+       in line, length in line, and standardised replacement version)
+       will be record, and they will be replaced in the working-line
+       by underscores.
        @param line: (string) - the working reference line.
-       @param preprint_repnum_search_kb: (dictionary) - contains the regexp patterns used to identify preprint
-        report numbers.
-       @param preprint_repnum_standardised_categs: (dictionary) - contains the standardised 'category' of a given
-        preprint report number.
+       @param preprint_repnum_search_kb: (dictionary) - contains the
+        regexp patterns used to identify preprint report numbers.
+       @param preprint_repnum_standardised_categs: (dictionary) -
+        contains the standardised 'category' of a given preprint report
+        number.
        @return: (tuple) - 3 elements:
-           * a dictionary containing the lengths in the line of the matched preprint report numbers, keyed by the
-             index at which each match was found in the line.
-           * a dictionary containing the replacement strings (standardised versions) of preprint report numbers
-             that were matched in the line.
-           * a string, that is the new version of the working reference line, in which any matched preprint report
-             numbers have been replaced by underscores.
+           * a dictionary containing the lengths in the line of the
+             matched preprint report numbers, keyed by the index at
+             which each match was found in the line.
+           * a dictionary containing the replacement strings (standardised
+             versions) of preprint report numbers that were matched in
+             the line.
+           * a string, that is the new version of the working reference
+             line, in which any matched preprint report numbers have been
+             replaced by underscores.
         Returned tuple is therefore in the following order:
-            (matched-reportnum-lengths, matched-reportnum-replacements, working-line)
+            (matched-reportnum-lengths, matched-reportnum-replacements,
+             working-line)
     """
     def _by_len(a, b):
-        """Comparison function used to sort a list by the length of the strings in
-           each element of the list.
+        """Comparison function used to sort a list by the length of the
+           strings in each element of the list.
         """
         if len(a[1]) < len(b[1]):
             return 1
@@ -1124,33 +1181,41 @@ def identify_preprint_report_numbers(line,
     return (repnum_matches_matchlen, repnum_matches_repl_str, line)
 
 def identify_and_tag_URLs(line):
-    """Given a reference line, identify URLs in the line and tag them between <cds.URL> tags.
-       URLs are identified in 2 forms:
+    """Given a reference line, identify URLs in the line and tag them
+       between <cds.URL> tags. URLs are identified in 2 forms:
         + Raw: http //cdsware.cern.ch/
-        + HTML marked-up: <a href="http //cdsware.cern.ch/">CERN Document Server Software Consortium</a>
-       These URLs are considered to have 2 components: The URL itself (url string); and the URL
-       description. The description is effectively the text used for the created Hyperlink when the
-       URL is marked-up in HTML. When an HTML marked-up URL has been recognised, the text between the
-       anchor tags is therefore taken as the URL description. In the case of a raw URL recognition,
-       however, the URL itself will also be used as the URL description. For example, in the
-       following reference line:
-        [1] See <a href="http //cdsware.cern.ch/">CERN Document Server Software Consortium</a>.
-       ...the URL string will be "http //cdsware.cern.ch/" and the URL description will be
-       "CERN Document Server Software Consortium". The line returned will therefore be:
-        [1] See <cds.URL description="http //cdsware.cern.ch/">CERN Document Server Software
-        Consortium</cds.URL>.
+        + HTML marked-up: <a href="http //cdsware.cern.ch/">CERN Document
+          Server Software Consortium</a>
+       These URLs are considered to have 2 components: The URL itself
+       (url string); and the URL description. The description is effectively
+       the text used for the created Hyperlink when the URL is marked-up
+       in HTML. When an HTML marked-up URL has been recognised, the text
+       between the anchor tags is therefore taken as the URL description.
+       In the case of a raw URL recognition, however, the URL itself will
+       also be used as the URL description. For example, in the following
+       reference line:
+        [1] See <a href="http //cdsware.cern.ch/">CERN Document Server
+        Software Consortium</a>.
+       ...the URL string will be "http //cdsware.cern.ch/" and the URL
+       description will be
+       "CERN Document Server Software Consortium". The line returned will
+       therefore be:
+        [1] See <cds.URL description="http //cdsware.cern.ch/">CERN Document
+        Server Software Consortium</cds.URL>.
        In the following line, however:
         [1] See http //cdsware.cern.ch/ for more details.
-       ...the URL string will be "http //cdsware.cern.ch/" and the URL description will also be
-       "http //cdsware.cern.ch/". The line returned will therefore be:
-        [1] See <cds.URL description="http //cdsware.cern.ch/">http //cdsware.cern.ch/</cds.URL>
-         for more details.
-       Note that URLs recognised may not have the colon separator in the protocol. This is because
-       in the step prior to the calling of this function, colons will have been removed from the
-       line so that numeration (as found in journal article citations) could be identified and
-       tagged.
+       ...the URL string will be "http //cdsware.cern.ch/" and the URL
+       description will also be "http //cdsware.cern.ch/". The line returned
+       will therefore be:
+        [1] See <cds.URL description="http //cdsware.cern.ch/">
+         http //cdsware.cern.ch/</cds.URL> for more details.
+       Note that URLs recognised may not have the colon separator in the
+       protocol. This is because in the step prior to the calling of this
+       function, colons will have been removed from the line so that numeration
+       (as found in journal article citations) could be identified and tagged.
        @param line: (string) the reference line in which to search for URLs.
-       @return: (string) the reference line in which any recognised URLs have been tagged.
+       @return: (string) the reference line in which any recognised URLs have
+        been tagged.
     """
     ## Dictionaries to record details of matched URLs:
     found_url_full_matchlen = {}
@@ -1204,22 +1269,26 @@ def identify_and_tag_URLs(line):
 
 def identify_periodical_titles(line, periodical_title_search_kb, periodical_title_search_keys):
     """Attempt to identify all periodical titles in a reference line.
-       Titles will be identified, their information (location in line, length in line, and non-
-       standardised version) will be record, and they will be replaced in the working line by
-       underscores.
+       Titles will be identified, their information (location in line,
+       length in line, and non-standardised version) will be record,
+       and they will be replaced in the working line by underscores.
        @param line: (string) - the working reference line.
-       @param periodical_title_search_kb: (dictionary) - contains the regexp patterns used to
-        search for a non-standard TITLE in the working reference line. Keyed by the TITLE string
-        itself.
-       @param periodical_title_search_keys: (list) - contains the non-standard periodical TITLEs
-        to be searched for in the line. This list of titles has already been ordered and is used
-        to force the order of searching.
+       @param periodical_title_search_kb: (dictionary) - contains the
+        regexp patterns used to search for a non-standard TITLE in the
+        working reference line. Keyed by the TITLE string itself.
+       @param periodical_title_search_keys: (list) - contains the non-
+        standard periodical TITLEs to be searched for in the line. This
+        list of titles has already been ordered and is used to force
+        the order of searching.
        @return: (tuple) containing 3 elements:
-                        + (dictionary) - the lengths of all titles matched at each given index
+                        + (dictionary) - the lengths of all titles
+                                         matched at each given index
                                          within the line.
-                        + (dictionary) - the text actually matched for each title at each given
+                        + (dictionary) - the text actually matched for
+                                         each title at each given
                                          index within the line.
-                        + (string)     - the working line, with the titles removed from it and
+                        + (string)     - the working line, with the
+                                         titles removed from it and
                                          replaced by underscores.
     """
     title_matches_matchlen  = {}  ## info about lengths of periodical titles matched at given locations in the line
@@ -1283,11 +1352,14 @@ def identify_periodical_titles(line, periodical_title_search_kb, periodical_titl
     return (title_matches_matchlen, title_matches_matchtext, processed_line)
 
 def identify_ibids(line):
-    """Find IBIDs within the line, record their position and length, and replace them with underscores.
+    """Find IBIDs within the line, record their position and length,
+       and replace them with underscores.
        @param line: (string) the working reference line
        @return: (tuple) containing 2 dictionaries and a string:
-         Dictionary 1: matched IBID lengths (Key: position of IBID in line; Value: length of matched IBID)
-         Dictionary 2: matched IBID text: (Key: position of IBID in line; Value: matched IBID text)
+         Dictionary 1: matched IBID lengths (Key: position of IBID
+                       in line; Value: length of matched IBID)
+         Dictionary 2: matched IBID text: (Key: position of IBID in
+                       line; Value: matched IBID text)
          String:       working line with matched IBIDs removed
     """
     ibid_match_len = {}
@@ -1302,16 +1374,22 @@ def identify_ibids(line):
     return (ibid_match_len, ibid_match_txt, line)
 
 def get_replacement_types(titles, reportnumbers):
-    """Given the indices of the titles and reportnumbers that have been recognised within
-       a reference line, create a dictionary keyed by the replacement position in the line,
-       where the value for each key is a string describing the type of item replaced at that
+    """Given the indices of the titles and reportnumbers that have been
+       recognised within a reference line, create a dictionary keyed by
+       the replacement position in the line, where the value for each
+       key is a string describing the type of item replaced at that
        position in the line.
        The description strings are:
-           'title'        - indicating that the replacement is a periodical title
-           'reportnumber' - indicating that the replacement is a preprint report number.
-       @param titles: (list) of locations in the string at which periodical titles were found.
-       @param reportnumbers: (list) of locations in the string at which reportnumbers were found.
-       @return: (dictionary) of replacement types at various locations within the string.
+           'title'        - indicating that the replacement is a
+                            periodical title
+           'reportnumber' - indicating that the replacement is a
+                            preprint report number.
+       @param titles: (list) of locations in the string at which
+        periodical titles were found.
+       @param reportnumbers: (list) of locations in the string at which
+        reportnumbers were found.
+       @return: (dictionary) of replacement types at various locations
+        within the string.
     """
     rep_types = {}
     for item_idx in titles:
@@ -1326,39 +1404,46 @@ def account_for_stripped_whitespace(spaces_keys,
                                     len_reportnums,
                                     len_titles,
                                     replacement_index):
-    """To build a processed (MARC XML) reference line in which the recognised citations such
-       as standardised periodical TITLEs and REPORT-NUMBERs have been marked up, it is necessary
-       to read from the reference line BEFORE all punctuation was stripped and it was made into
-       upper-case. The indices of the cited items in this 'original line', however, will be
-       different to those in the 'working-line', in which punctuation and multiple-spaces were
+    """To build a processed (MARC XML) reference line in which the
+       recognised citations such as standardised periodical TITLEs and
+       REPORT-NUMBERs have been marked up, it is necessary to read from
+       the reference line BEFORE all punctuation was stripped and it was
+       made into upper-case. The indices of the cited items in this
+       'original line', however, will be different to those in the
+       'working-line', in which punctuation and multiple-spaces were
        stripped out. For example, the following reading-line:
 
         [26] E. Witten and S.-T. Yau, hep-th/9910245.
        ...becomes (after punctuation and multiple white-space stripping):
         [26] E WITTEN AND S T YAU HEP TH/9910245
 
-       It can be seen that the report-number citation (hep-th/9910245) is at a different index
-       in the two strings. When refextract searches for this citation, it uses the 2nd string
-       (i.e. that which is capitalised and has no punctuation). When it builds the MARC XML
-       representation of the reference line, however, it needs to read from the first string.
-       It must therefore consider the whitespace, punctuation, etc that has been removed, in
-       order to get the correct index for the cited item. This function accounts for the stripped
+       It can be seen that the report-number citation (hep-th/9910245) is
+       at a different index in the two strings. When refextract searches
+       for this citation, it uses the 2nd string (i.e. that which is
+       capitalised and has no punctuation). When it builds the MARC XML
+       representation of the reference line, however, it needs to read from
+       the first string. It must therefore consider the whitespace,
+       punctuation, etc that has been removed, in order to get the correct
+       index for the cited item. This function accounts for the stripped
        characters before a given TITLE or REPORT-NUMBER index.
-       @param spaces_keys: (list) - the indices at which spaces were removed from the
-        reference line.
-       @param removed_spaces: (dictionary) - keyed by the indices at which spaces were removed
-        from the line, the values are the number of spaces actually removed from that position.
-        So, for example, "3 spaces were removed from position 25 in the line."
-       @param replacement_types: (dictionary) - at each 'replacement_index' in the line, the
-        of replacement to make (title or reportnumber).
-       @param len_reportnums: (dictionary) - the lengths of the REPORT-NUMBERs matched at the
-        various indices in the line.
-       @param len_titles: (dictionary) - the lengths of the various TITLEs matched at the
-        various indices in the line.
-       @param replacement_index: (integer) - the index in the working line of the identified
-        TITLE or REPORT-NUMBER citation.
+       @param spaces_keys: (list) - the indices at which spaces were
+        removed from the reference line.
+       @param removed_spaces: (dictionary) - keyed by the indices at which
+        spaces were removed from the line, the values are the number of
+        spaces actually removed from that position.
+        So, for example, "3 spaces were removed from position 25 in
+        the line."
+       @param replacement_types: (dictionary) - at each 'replacement_index'
+        in the line, the of replacement to make (title or reportnumber).
+       @param len_reportnums: (dictionary) - the lengths of the REPORT-
+        NUMBERs matched at the various indices in the line.
+       @param len_titles: (dictionary) - the lengths of the various
+        TITLEs matched at the various indices in the line.
+       @param replacement_index: (integer) - the index in the working line
+        of the identified TITLE or REPORT-NUMBER citation.
        @return: (tuple) containing 2 elements:
-                        + the true replacement index of a replacement in the reading line;
+                        + the true replacement index of a replacement in
+                          the reading line;
                         + any extras to add into the replacement index;
     """
     extras = 0
@@ -1367,8 +1452,9 @@ def account_for_stripped_whitespace(spaces_keys,
 
     for space in spaces_keys:
         if space < true_replacement_index:
-            ## There were spaces stripped before the current replacement - add the number of spaces removed from
-            ## this location to the current replacement index:
+            ## There were spaces stripped before the current replacement
+            ## Add the number of spaces removed from this location to the
+            ## current replacement index:
             true_replacement_index  += removed_spaces[space]
             spare_replacement_index += removed_spaces[space]
         elif (space >= spare_replacement_index) and (replacement_types[replacement_index] == u"title") \
@@ -1395,37 +1481,44 @@ def create_marc_xml_reference_line(working_line,
                                    pprint_repnum_matchtext,
                                    removed_spaces,
                                    standardised_titles):
-    """After the phase of identifying and tagging citation instances in a reference line,
-       this function is called to go through the line and the collected information about
-       the recognised citations, and to transform the line into a string of MARC XML in
-       which the recognised citations are grouped under various datafields and subfields,
-       depending upon their type.
-       @param working_line: (string) - the is the line before the punctuation was stripped.
-        At this stage, it has not been capitalised, and neither TITLES nor REPORT NUMBERS
-        have been stripped from it. However, any recognised numeration and/or URLs have
-        been tagged with <cds.YYYY> tags.
+    """After the phase of identifying and tagging citation instances
+       in a reference line, this function is called to go through the
+       line and the collected information about the recognised citations,
+       and to transform the line into a string of MARC XML in which the
+       recognised citations are grouped under various datafields and
+       subfields, depending upon their type.
+       @param working_line: (string) - the is the line before the
+        punctuation was stripped. At this stage, it has not been
+        capitalised, and neither TITLES nor REPORT NUMBERS have been
+        stripped from it. However, any recognised numeration and/or URLs
+        have been tagged with <cds.YYYY> tags.
         The working_line could, for example, look something like this:
-         [1] CDS <cds.URL description="http //cdsware.cern.ch/">http //cdsware.cern.ch/</cds.URL>.
-       @param found_title_len: (dictionary) - the lengths of the title citations that have
-        been recognised in the line. Keyed by the index within the line of each match.
-       @param found_title_matchtext: (dictionary) - The text that was found for each matched
-        title citation in the line. Keyed by the index within the line of each match.
-       @param pprint_repnum_len: (dictionary) - the lengths of the matched institutional
-        preprint report number citations found within the line. Keyed by the index within
+         [1] CDS <cds.URL description="http //cdsware.cern.ch/">
+         http //cdsware.cern.ch/</cds.URL>.
+       @param found_title_len: (dictionary) - the lengths of the title
+        citations that have been recognised in the line. Keyed by the index
+        within the line of each match.
+       @param found_title_matchtext: (dictionary) - The text that was found
+        for each matched title citation in the line. Keyed by the index within
         the line of each match.
-       @param pprint_repnum_matchtext: (dictionary) - The matched text for each matched
-        institutional report number. Keyed by the index within the line of each match.
-       @param removed_spaces: (dictionary) - The number of spaces removed from the various
-        positions in the line. Keyed by the index of the position within the line at which
-        the spaces were removed.
-       @param standardised_titles: (dictionary) - The standardised journal titles, keyed
-        by the non-standard version of those titles.
+       @param pprint_repnum_len: (dictionary) - the lengths of the matched
+        institutional preprint report number citations found within the line.
+        Keyed by the index within the line of each match.
+       @param pprint_repnum_matchtext: (dictionary) - The matched text for each
+        matched institutional report number. Keyed by the index within the line
+        of each match.
+       @param removed_spaces: (dictionary) - The number of spaces removed from
+        the various positions in the line. Keyed by the index of the position
+        within the line at which the spaces were removed.
+       @param standardised_titles: (dictionary) - The standardised journal
+        titles, keyed by the non-standard version of those titles.
        @return: (tuple) of 5 components:
                   ( string  -> a MARC XML-ized reference line.
-                    integer -> number of fields of miscellaneous text marked-up for the line.
+                    integer -> number of fields of miscellaneous text marked-up
+                               for the line.
                     integer -> number of title citations marked-up for the line.
-                    integer -> number of institutional report-number citations marked-up
-                     for the line.
+                    integer -> number of institutional report-number citations
+                               marked-up for the line.
                     integer -> number of URL citations marked-up for the record.
                   )
 
@@ -1504,24 +1597,24 @@ def create_marc_xml_reference_line(working_line,
     return (xml_line, count_misc, count_title, count_reportnum, count_url)
 
 def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text=""):
-    """Given a title, its numeration and some optional miscellaneous text, return a
-       string containing the MARC XML version of this information. E.g. for the
-       miscellaneous text "S. D. Hsu and M. Schwetz ", the title "Nucl. Phys., B",
-       the volume "572", the year "2000" and the page number "211" return the following
-       MARC XML string:
+    """Given a title, its numeration and some optional miscellaneous text,
+       return a string containing the MARC XML version of this information.
+       E.g. for the miscellaneous text "S. D. Hsu and M. Schwetz ", the
+       title "Nucl. Phys., B", the volume "572", the year "2000" and the
+       page number "211" return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
            <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
         </datafield>
-       In the event that the miscellaneous text string is zero-length, there will be
-       no $m subfield present in the returned XML.
+       In the event that the miscellaneous text string is zero-length, there
+       will be no $m subfield present in the returned XML.
        @param title: (string) - the cited title.
        @param volume: (string) - the volume of the cited title.
        @param year: (string) - the year of the cited title.
        @param page: (string) - the page of the cited title.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and its miscellaneous
-        text.
+       @return: (string) MARC XML representation of the cited title and its
+        miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
@@ -1554,26 +1647,27 @@ def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text="")
 def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume, year, page,
                                                                   report_number, misc_text=""):
     """Given a title (and its numeration), a report number, and some optional
-       miscellaneous text, return a string containing the MARC XML version of this
-       information. E.g. for the miscellaneous text "S. D. Hsu and M. Schwetz ",
-       the report number "hep-th/1111111", the title "Nucl. Phys., B", the volume "572",
-       the year "2000", and the page number "211", return the following
-       MARC XML string:
+       miscellaneous text, return a string containing the MARC XML version of
+       this information. E.g. for the miscellaneous text
+       "S. D. Hsu and M. Schwetz ", the report number "hep-th/1111111", the
+       title "Nucl. Phys., B", the volume "572", the year "2000", and the
+       page number "211", return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
            <subfield code="r">hep-th/1111111</subfield>
            <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
         </datafield>
-       In the event that the miscellaneous text string is zero-length, there will be
-       no $m subfield present in the returned XML.
+       In the event that the miscellaneous text string is zero-length, there
+       will be no $m subfield present in the returned XML.
        @param title: (string) - the cited title.
        @param volume: (string) - the volume of the cited title.
        @param year: (string) - the year of the cited title.
        @param page: (string) - the page of the cited title.
-       @param report_number: (string) - the institutional report number to be marked up.
+       @param report_number: (string) - the institutional report number to
+        be marked up.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and its miscellaneous
-        text.
+       @return: (string) MARC XML representation of the cited title and
+        its miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
@@ -1609,26 +1703,27 @@ def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume,
 def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume, year, page,
                                                                   report_number, misc_text=""):
     """Given a title (and its numeration), a report number, and some optional
-       miscellaneous text, return a string containing the MARC XML version of this
-       information. E.g. for the miscellaneous text "S. D. Hsu and M. Schwetz ",
-       the title "Nucl. Phys., B", the volume "572", the year "2000", the page
-       number "211", and the report number "hep-th/1111111", return the following
-       MARC XML string:
+       miscellaneous text, return a string containing the MARC XML version of
+       this information. E.g. for the miscellaneous text
+       "S. D. Hsu and M. Schwetz ", the title "Nucl. Phys., B", the volume
+       "572", the year "2000", the page number "211", and the report number
+       "hep-th/1111111", return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
            <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
            <subfield code="r">hep-th/1111111</subfield>
         </datafield>
-       In the event that the miscellaneous text string is zero-length, there will be
-       no $m subfield present in the returned XML.
+       In the event that the miscellaneous text string is zero-length, there
+       will be no $m subfield present in the returned XML.
        @param title: (string) - the cited title.
        @param volume: (string) - the volume of the cited title.
        @param year: (string) - the year of the cited title.
        @param page: (string) - the page of the cited title.
-       @param report_number: (string) - the institutional report number to be marked up.
+       @param report_number: (string) - the institutional report number to
+        be marked up.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and its miscellaneous
-        text.
+       @return: (string) MARC XML representation of the cited title and its
+        miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
@@ -1662,20 +1757,21 @@ def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume,
     return xml_line
 
 def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
-    """Given a report number and some optional miscellaneous text, return a string
-       containing the MARC XML version of this information. E.g. for the miscellaneous
-       text "Example, AN " and the institutional report number "hep-th/1111111", return
-       the following MARC XML string:
+    """Given a report number and some optional miscellaneous text, return a
+       string containing the MARC XML version of this information. E.g. for
+       the miscellaneous text "Example, AN " and the institutional report-
+       number "hep-th/1111111", return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">Example, AN </subfield>
            <subfield code="r">hep-th/1111111</subfield>
         </datafield>
-       In the event that the miscellaneous text string is zero-length, there will be
-       no $m subfield present in the returned XML.
-       @param report_number: (string) - the institutional report number to be marked up.
+       In the event that the miscellaneous text string is zero-length, there
+       will be no $m subfield present in the returned XML.
+       @param report_number: (string) - the institutional report number to be
+        marked up.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the report number and its miscellaneous
-        text.
+       @return: (string) MARC XML representation of the report number and its
+        miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
@@ -1703,22 +1799,24 @@ def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
     return xml_line
 
 def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text=""):
-    """Given a URL, a URL description, and some optional miscellaneous text, return a string
-       containing the MARC XML version of this information. E.g. for the miscellaneous
-       text "Example, AN ", the URL "http://cdsweb.cern.ch/", and the URL description
+    """Given a URL, a URL description, and some optional miscellaneous text,
+       return a string containing the MARC XML version of this information.
+       E.g. for the miscellaneous text "Example, AN ", the URL
+       "http://cdsweb.cern.ch/", and the URL description
        "CERN Document Server", return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">Example, AN </subfield>
            <subfield code="u">http://cdsweb.cern.ch/</subfield>
            <subfield code="z">CERN Document Server</subfield>
         </datafield>
-       In the event that the miscellaneous text string is zero-length, there will be
-       no $m subfield present in the returned XML.
+       In the event that the miscellaneous text string is zero-length, there
+       will be no $m subfield present in the returned XML.
        @param url_string: (string) - the URL to be marked up.
-       @param url_description: (string) - the description of the URL to be marked up.
+       @param url_description: (string) - the description of the URL to be
+        marked up.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the URL, its description, and its
-        miscellaneous text.
+       @return: (string) MARC XML representation of the URL, its description,
+        and its miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
@@ -1749,12 +1847,14 @@ def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text="")
     return xml_line
 
 def _refextract_markup_reference_line_marker_as_marcxml(marker_text):
-    """Given a reference line marker, return a string containing the MARC XML version of
-       the marker. E.g. for the line marker "[1]", return the following xml string:
+    """Given a reference line marker, return a string containing the MARC XML
+       version of the marker. E.g. for the line marker "[1]", return the
+       following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="o">[1]</subfield>
         </datafield>
-       @param marker_text: (string) the reference line marker to be marked up as MARC XML
+       @param marker_text: (string) the reference line marker to be marked up
+        as MARC XML
        @return: (string) MARC XML representation of the marker line.
     """
     xml_line = \
@@ -1770,12 +1870,14 @@ def _refextract_markup_reference_line_marker_as_marcxml(marker_text):
     return xml_line
 
 def _refextract_markup_miscellaneous_text_as_marcxml(misc_text):
-    """Given some miscellaneous text, return a string containing the MARC XML version of
-       the string. E.g. for the misc_text string "testing", return the following xml string:
+    """Given some miscellaneous text, return a string containing the MARC XML
+       version of the string. E.g. for the misc_text string "testing", return
+       the following xml string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">testing</subfield>
         </datafield>
-       @param misc_text: (string) the miscellaneous text to be marked up as MARC XML
+       @param misc_text: (string) the miscellaneous text to be marked up as
+        MARC XML
        @return: (string) MARC XML representation of the miscellaneous text.
     """
     xml_line = \
@@ -1791,21 +1893,27 @@ def _refextract_markup_miscellaneous_text_as_marcxml(misc_text):
     return xml_line
 
 def _convert_unusable_tag_to_misc(line, misc_text, tag_match_start, tag_match_end, closing_tag):
-    """Function to remove an unwanted, tagged, citation item from a reference line. Everything
-       prior to the opening tag, as well as the tagged item itself, is put into the miscellaneous
-       text variable; the data up to the closing tag is then trimmed from the beginning of the
-       working line. For example, the following working line:
+    """Function to remove an unwanted, tagged, citation item from a reference
+       line. Everything prior to the opening tag, as well as the tagged item
+       itself, is put into the miscellaneous text variable; the data up to the
+       closing tag is then trimmed from the beginning of the working line. For
+       example, the following working line:
          Example, AN. Testing software; <cds.YR>(2001)</cds.YR>, CERN, Geneva.
        ...would be trimmed down to:
          , CERN, Geneva.
        ...And the Miscellaneous text taken from the start of the line would be:
          Example, AN. Testing software; (2001)
-       ...(assuming that the details of <cds.YR> and </cds.YR> were passed to the function).
+       ...(assuming that the details of <cds.YR> and </cds.YR> were passed to
+       the function).
        @param line: (string) - the reference line.
-       @param misc_text: (string) - the variable containing the miscellaneous text recorded so far.
-       @param tag_match_start: (integer) - the index of the start of the opening tag in the line.
-       @param tag_match_end: (integer) - the index of the end of the opening tag in the line.
-       @param closing_tag: (string) - the closing tag to look for in the line (e.g. </cds.YR>).
+       @param misc_text: (string) - the variable containing the miscellaneous
+        text recorded so far.
+       @param tag_match_start: (integer) - the index of the start of the opening
+        tag in the line.
+       @param tag_match_end: (integer) - the index of the end of the opening tag
+        in the line.
+       @param closing_tag: (string) - the closing tag to look for in the line
+        (e.g. </cds.YR>).
        @return: (tuple) - containing misc_text (string) and line (string)
     """
     misc_text += line[0:tag_match_start]
@@ -1843,7 +1951,7 @@ def convert_processed_reference_line_to_marc_xml(line):
     previously_cited_item = None
     processed_line = line.lstrip()
 
-    ## 1. Extract reference line marker (e.g. [1]) from start of line and tag it:
+    ## 1. Extract reference line marker (e.g. [1]) from start of line & tag it:
     ## get patterns to identify numeration markers at the start of lines:
     marker_patterns = get_reference_line_numeration_marker_patterns()
     marker_match = perform_regex_match_upon_line_with_pattern_list(processed_line, marker_patterns)
@@ -1859,8 +1967,10 @@ def convert_processed_reference_line_to_marc_xml(line):
     ## Now display the marker in marked-up XML:
     xml_line += _refextract_markup_reference_line_marker_as_marcxml(marker_val)
 
-    ## 2. Loop through remaining identified segments in line and tag them into MARC XML segments:
-    cur_misc_txt = u""  ## a marker to hold gathered miscellaneous text before a citation
+    ## 2. Loop through remaining identified segments in line and tag them
+    ## into MARC XML segments:
+    cur_misc_txt = u""  ## a marker to hold gathered miscellaneous text before
+                        ## a citation
     tag_match = sre_tagged_citation.search(processed_line)
     while tag_match is not None:
         ## found a tag - process it:
@@ -1869,14 +1979,15 @@ def convert_processed_reference_line_to_marc_xml(line):
         tag_type        = tag_match.group(1)
 
         if tag_type == "TITLE":
-            ## This tag is an identified journal TITLE. It should be followed by VOLUME,
-            ## YEAR and PAGE tags.
+            ## This tag is an identified journal TITLE. It should be followed
+            ## by VOLUME, YEAR and PAGE tags.
             cur_misc_txt += processed_line[0:tag_match_start]
             ## extract the title from the line:
             idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_TITLE, tag_match_end)
             ## Sanity check - did we find a closing TITLE tag?
             if idx_closing_tag == -1:
-                ## no closing </cds.TITLE> tag found - strip the opening tag and move past it
+                ## no closing </cds.TITLE> tag found - strip the opening tag
+                ## and move past it
                 processed_line = processed_line[tag_match_end:]
             else:
                 ## Closing tag was found:
@@ -2286,22 +2397,24 @@ def add_tagged_report_number(reading_line,
                              startpos,
                              true_replacement_index,
                              extras):
-    """In rebuilding the line, add an identified institutional REPORT-NUMBER (standardised
-       and tagged) into the line.
-       @param reading_line: (string) The reference line before capitalization was performed, and
-        before REPORT-NUMBERs and TITLEs were stipped out.
+    """In rebuilding the line, add an identified institutional REPORT-NUMBER
+       (standardised and tagged) into the line.
+       @param reading_line: (string) The reference line before capitalization
+        was performed, and before REPORT-NUMBERs and TITLEs were stipped out.
        @param len_reportnum: (integer) the length of the matched REPORT-NUMBER.
-       @param reportnum: (string) the replacement text for the matched REPORT-NUMBER.
-       @param startpos: (integer) the pointer to the next position in the reading-line
-        from which to start rebuilding.
-       @param true_replacement_index: (integer) the replacement index of the matched REPORT-
-        NUMBER in the reading-line, with stripped punctuation and whitespace accounted for.
+       @param reportnum: (string) the replacement text for the matched
+        REPORT-NUMBER.
+       @param startpos: (integer) the pointer to the next position in the
+        reading-line from which to start rebuilding.
+       @param true_replacement_index: (integer) the replacement index of the
+        matched REPORT-NUMBER in the reading-line, with stripped punctuation
+        and whitespace accounted for.
        @param extras: (integer) extras to be added into the replacement index.
        @return: (tuple) containing a string (the rebuilt line segment) and an
         integer (the next 'startpos' in the reading-line).
     """
-    rebuilt_line = u""  ## The segment of the line that is being rebuilt to include the
-                        ## tagged and standardised institutional REPORT-NUMBER
+    rebuilt_line = u""  ## The segment of the line that's being rebuilt to
+                        ## include the tagged & standardised REPORT-NUMBER
     
     ## Fill rebuilt_line with the contents of the reading_line up to the point of the
     ## institutional REPORT-NUMBER. However, stop 1 character before the replacement
@@ -2331,8 +2444,8 @@ def add_tagged_report_number(reading_line,
         ## moved past end of line - ignore
         pass
     
-    ## return the rebuilt-line segment and the pointer to the next position in the
-    ## reading-line from  which to start rebuilding up to the next match:
+    ## return the rebuilt-line segment and the pointer to the next position in
+    ## the reading-line from  which to start rebuilding up to the next match:
     return (rebuilt_line, startpos)
 
 def add_tagged_title_in_place_of_IBID(ibid_string,
@@ -2340,11 +2453,11 @@ def add_tagged_title_in_place_of_IBID(ibid_string,
                                       ibid_series):
     """In rebuilding the line, if the matched TITLE was actually an IBID, this
        function will replace it with the previously matched TITLE, and add it
-       into the line, tagged. It will even handle the series letter, if it differs.
-       For example, if the previous match is "Nucl. Phys., B", and the ibid is
-       "IBID A", the title inserted into the line will be "Nucl. Phys., A".
-       Otherwise, if the IBID had no series letter, it will simply be replaced
-       by "Nucl. Phys., B" (i.e. the previous match.)
+       into the line, tagged. It will even handle the series letter, if it
+       differs. For example, if the previous match is "Nucl. Phys., B", and
+       the ibid is "IBID A", the title inserted into the line will be
+       "Nucl. Phys., A". Otherwise, if the IBID had no series letter, it will
+       simply be replaced by "Nucl. Phys., B" (i.e. the previous match.)
        @param ibid_string: (string) - the matched IBID.
        @param previous_match: (string) - the previously matched TITLE.
        @param ibid_series: (string) - the series of the IBID (if any).
@@ -2353,16 +2466,17 @@ def add_tagged_title_in_place_of_IBID(ibid_string,
     """
     rebuilt_line = u""
     if ibid_series != "":
-        ## This IBID has a series letter. If the previously matched TITLE also had a series letter
-        ## and that series letter differs to the one carried by this IBID, the series letter stored in
-        ## the previous-match must be updated to that of this IBID:
+        ## This IBID has a series letter. If the previously matched TITLE also
+        ## had a series letter and that series letter differs to the one
+        ## carried by this IBID, the series letter stored in the previous-match
+        ## must be updated to that of this IBID:
         if previous_match.find(",") != -1:
             ## Presence of comma in previous match could mean it has a series:
             m_previous_series = sre_title_series.search(previous_match)
             if m_previous_series is not None:
                 previous_series = m_previous_series.group(1)
                 if previous_series == ibid_series:
-                    ## Both the previous match and this IBID have the same series
+                    ## Both the previous match & this IBID have the same series
                     rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
                                     % { 'previous-match' : previous_match }
                 else:
@@ -2376,16 +2490,18 @@ def add_tagged_title_in_place_of_IBID(ibid_string,
                 ## cannot be sure about meaning of IBID - dont replace it
                 rebuilt_line += ibid_string
         else:
-            ## previous match had no series letter, but the IBID did. Add the a comma
-            ## followed by a series letter to the end of the previous match
+            ## previous match had no series letter, but the IBID did. Add the a
+            ## comma followed by a series letter to the end of the previous
+            ## match.
             ## Now add the previous match into the rebuilt-line:
             previous_match = previous_match.rstrip()
             if previous_match[-1] == ".":
-                ## Previous match ended with a full-stop. Add a comma, then the IBID series
+                ## Previous match ended with a full-stop. Add a comma, then
+                ## the IBID series
                 previous_match += ", %(ibid-series)s" % { 'ibid-series' : ibid_series }
             else:
-                ## Previous match did not end with a full-stop. Add a full-stop then the comma,
-                ## then the IBID series
+                ## Previous match did not end with a full-stop. Add a full-stop
+                ## then the comma, then the IBID series
                 previous_match += "., %(ibid-series)s" % { 'ibid-series' : ibid_series }
             rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
                            % { 'previous-match' : previous_match }
@@ -2403,36 +2519,39 @@ def add_tagged_title(reading_line,
                      true_replacement_index,
                      extras,
                      standardised_titles):
-    """In rebuilding the line, add an identified periodical TITLE (standardised and
-       tagged) into the line.
-       @param reading_line: (string) The reference line before capitalization was performed, and
-        before REPORT-NUMBERs and TITLEs were stipped out.
+    """In rebuilding the line, add an identified periodical TITLE (standardised
+       and tagged) into the line.
+       @param reading_line: (string) The reference line before capitalization
+        was performed, and before REPORT-NUMBERs and TITLEs were stipped out.
        @param len_title: (integer) the length of the matched TITLE.
        @param matched_title: (string) the matched TITLE text.
-       @previous_match: (string) the previous periodical TITLE citation to have been matched
-        in the current reference line. It is used when replacing an IBID instance in the line.
-       @param startpos: (integer) the pointer to the next position in the reading-line
-        from which to start rebuilding.
-       @param true_replacement_index: (integer) the replacement index of the matched TITLE
-        in the reading-line, with stripped punctuation and whitespace accounted for.
+       @previous_match: (string) the previous periodical TITLE citation to
+        have been matched in the current reference line. It is used when
+        replacing an IBID instance in the line.
+       @param startpos: (integer) the pointer to the next position in the
+        reading-line from which to start rebuilding.
+       @param true_replacement_index: (integer) the replacement index of the
+        matched TITLE in the reading-line, with stripped punctuation and
+        whitespace accounted for.
        @param extras: (integer) extras to be added into the replacement index.
-       @param standardised_titles: (dictionary) the standardised versions of periodical
-        titles, keyed by their various non-standard versions.
+       @param standardised_titles: (dictionary) the standardised versions of
+        periodical titles, keyed by their various non-standard versions.
        @return: (tuple) containing a string (the rebuilt line segment), an
         integer (the next 'startpos' in the reading-line), and an other string
         (the newly updated previous-match).
     """
-    ## Fill 'rebuilt_line' (the segment of the line that is being rebuilt to include the
-    ## tagged and standardised periodical TITLE) with the contents of the reading-line,
-    ## up to the point of the matched TITLE:
+    ## Fill 'rebuilt_line' (the segment of the line that is being rebuilt to
+    ## include the tagged and standardised periodical TITLE) with the contents
+    ## of the reading-line, up to the point of the matched TITLE:
     rebuilt_line = reading_line[startpos:true_replacement_index]
     ## Test to see whether a title or an "IBID" was matched:
     if matched_title.upper().find("IBID") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
         if previous_match != "":
-            ## A title has already been replaced in this line - IBID can be replaced meaninfully
-            ## First, try to get the series number/letter of this IBID:
+            ## A title has already been replaced in this line - IBID can be
+            ## replaced meaninfully First, try to get the series number/letter
+            ## of this IBID:
             m_ibid = sre_matched_ibid.search(matched_title)
             try:
                 series = m_ibid.group(1)
@@ -2448,7 +2567,8 @@ def add_tagged_title(reading_line,
             ## Update start position for next segment of original line:
             startpos = true_replacement_index + len_title + extras
 
-            ## Skip past any punctuation at the end of the replacement that was just made:
+            ## Skip past any punctuation at the end of the replacement that was
+            ## just made:
             try:
                 if reading_line[startpos] in (".", ":", ";"):
                     startpos += 1
@@ -2456,17 +2576,19 @@ def add_tagged_title(reading_line,
                 ## The match was at the very end of the line
                 pass
         else:
-            ## no previous title-replacements in this line - IBID refers to something unknown and
-            ## cannot be replaced:
+            ## no previous title-replacements in this line - IBID refers to
+            ## something unknown and cannot be replaced:
             rebuilt_line += \
                 reading_line[true_replacement_index:true_replacement_index + len_title + extras]
             startpos = true_replacement_index + len_title + extras
     else:
         ## This is a normal title, not an IBID
-        rebuilt_line += "<cds.TITLE>%(title)s</cds.TITLE>" % { 'title' : standardised_titles[matched_title] }
+        rebuilt_line += "<cds.TITLE>%(title)s</cds.TITLE>" \
+                        % { 'title' : standardised_titles[matched_title] }
         previous_match = standardised_titles[matched_title]
         startpos = true_replacement_index + len_title + extras
-        ## Skip past any punctuation at the end of the replacement that was just made:
+        ## Skip past any punctuation at the end of the replacement that was
+        ## just made:
         try:
             if reading_line[startpos] in (".", ":", ";"):
                 startpos += 1
@@ -2480,8 +2602,9 @@ def add_tagged_title(reading_line,
             ## The match was at the very end of the line
             pass
 
-    ## return the rebuilt line-segment, the position (of the reading line) from which the
-    ## next part of the rebuilt line should be started, and the newly updated previous match.
+    ## return the rebuilt line-segment, the position (of the reading line) from
+    ## which the next part of the rebuilt line should be started, and the newly
+    ## updated previous match.
     return (rebuilt_line, startpos, previous_match)
 
 def create_marc_xml_reference_section(ref_sect,
@@ -2490,30 +2613,34 @@ def create_marc_xml_reference_section(ref_sect,
                                       periodical_title_search_kb,
                                       standardised_periodical_titles,
                                       periodical_title_search_keys):
-    """Passed a complete reference section, process each line and attempt to identify and standardise
-       individual citations within the line.
-       @param ref_sect: (list) of strings - each string in the list is a reference line.
-       @param preprint_repnum_search_kb: (dictionary) - keyed by a tuple (containing the line-number
-                                               of the pattern in the KB and the non-standard
-                                               category string.  E.g.: (3, 'ASTRO PH'). Value is
-                                               regexp pattern used to search for that report-number.
-       @param preprint_repnum_standardised_categs: (dictionary) - keyed by non-standard version of
-                                               institutional report number, value is the standardised
-                                               version of that report number.
-       @param periodical_title_search_kb: (dictionary) - keyed by non-standard title to search for,
-                                               value is the compiled regexp pattern used to search
-                                               for that title.
-       @param standardised_periodical_titles: (dictionary) - keyed by non-standard title to search for,
-                                               value is the standardised version of that title.
-       @param periodical_title_search_keys: (list) - ordered list of non-standard titles to search for.
+    """Passed a complete reference section, process each line and attempt to
+       ## identify and standardise individual citations within the line.
+       @param ref_sect: (list) of strings - each string in the list is a
+        reference line.
+       @param preprint_repnum_search_kb: (dictionary) - keyed by a tuple
+        containing the line-number of the pattern in the KB and the non-standard
+        category string.  E.g.: (3, 'ASTRO PH'). Value is regexp pattern used to
+        search for that report-number.
+       @param preprint_repnum_standardised_categs: (dictionary) - keyed by non-
+        standard version of institutional report number, value is the
+        standardised version of that report number.
+       @param periodical_title_search_kb: (dictionary) - keyed by non-standard
+        title to search for, value is the compiled regexp pattern used to
+        search for that title.
+       @param standardised_periodical_titles: (dictionary) - keyed by non-
+        standard title to search for, value is the standardised version of that
+        title.
+       @param periodical_title_search_keys: (list) - ordered list of non-
+        standard titles to search for.
        @return: (tuple) of 5 components:
-                  ( list    -> of strings, each string is a MARC XML-ized reference line.
-                    integer -> number of fields of miscellaneous text found for the record.
-                    integer -> number of title citations found for the record.
-                    integer -> number of institutional report-number citations found for
-                     the record.
-                    integer -> number of URL citations found for the record.
-                  )
+         ( list    -> of strings, each string is a MARC XML-ized reference line.
+           integer -> number of fields of miscellaneous text found for the
+                      record.
+           integer -> number of title citations found for the record.
+           integer -> number of institutional report-number citations found for
+                      the record.
+           integer -> number of URL citations found for the record.
+         )
     """
     ## a list to contain the processed reference lines:
     xml_ref_sectn = []
@@ -2523,14 +2650,16 @@ def create_marc_xml_reference_section(ref_sect,
     ## process references line-by-line:
     for ref_line in ref_sect:
         ## initialise some variables:
-        ## dictionaries to record information about, and coordinates of, matched IBID items:
+        ## dictionaries to record information about, and coordinates of,
+        ## matched IBID items:
         found_ibids_len = {}
         found_ibids_matchtext = {}
-        ## dictionaries to record information about, and  coordinates of, matched journal title items:
+        ## dictionaries to record information about, and  coordinates of,
+        ## matched journal title items:
         found_title_len = {}
         found_title_matchtext = {}
-        ## dictionaries to record information about, and the coordinates of, matched preprint report
-        ## number items
+        ## dictionaries to record information about, and the coordinates of,
+        ## matched preprint report number items
         found_pprint_repnum_matchlens     = {}    ## lengths of given matches of preprint report numbers
         found_pprint_repnum_replstr       = {}    ## standardised replacement strings for preprint report numbers
                                                   ## to be substituted into a line
@@ -2604,14 +2733,18 @@ def create_marc_xml_reference_section(ref_sect,
 ## ----> 1. Removing page-breaks, headers and footers before searching for reference section:
 
 def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, num_foot_lines):
-    """Remove page-break lines, header lines, and footer lines from the document.
-       @param docbody: (list) of strings, whereby each string in the list is a line in the document.
-       @param page_break_posns: (list) of integers, whereby each integer represents the index in docbody
-        at which a page-break is found.
-       @param num_head_lines: (int) the number of header lines each page in the document has.
-       @param num_foot_lines: (int) the number of footer lines each page in the document has.
-       @return: (list) of strings - the document body after the headers, footers, and page-break lines
-        have been stripped from the list.
+    """Remove page-break lines, header lines, and footer lines from the
+       document.
+       @param docbody: (list) of strings, whereby each string in the list is a
+        line in the document.
+       @param page_break_posns: (list) of integers, whereby each integer
+        represents the index in docbody at which a page-break is found.
+       @param num_head_lines: (int) the number of header lines each page in the
+        document has.
+       @param num_foot_lines: (int) the number of footer lines each page in the
+        document has.
+       @return: (list) of strings - the document body after the headers,
+        footers, and page-break lines have been stripped from the list.
     """
     num_breaks = (len(page_break_posns))
     page_lens = []
@@ -2668,9 +2801,10 @@ def get_number_header_lines(docbody, page_break_posns):
     """Try to guess the number of header lines each page of a document has.
        The positions of the page breaks in the document are used to try to guess
        the number of header lines.
-       @param docbody: (list) of strings - each string being a line in the document
-       @param page_break_posns: (list) of integers - each integer is the position of a
-        page break in the document.
+       @param docbody: (list) of strings - each string being a line in the
+        document
+       @param page_break_posns: (list) of integers - each integer is the
+        position of a page break in the document.
        @return: (int) the number of lines that make up the header of each page.
     """
     remaining_breaks = (len(page_break_posns) - 1)
@@ -2721,9 +2855,10 @@ def get_number_footer_lines(docbody, page_break_posns):
     """Try to guess the number of footer lines each page of a document has.
        The positions of the page breaks in the document are used to try to guess
        the number of footer lines.
-       @param docbody: (list) of strings - each string being a line in the document
-       @param page_break_posns: (list) of integers - each integer is the position of a
-        page break in the document.
+       @param docbody: (list) of strings - each string being a line in the
+        document
+       @param page_break_posns: (list) of integers - each integer is the
+        position of a page break in the document.
        @return: (int) the number of lines that make up the footer of each page.
     """
     num_breaks = (len(page_break_posns))
@@ -2759,11 +2894,12 @@ def get_number_footer_lines(docbody, page_break_posns):
     return num_footer_lines
 
 def get_page_break_positions(docbody):
-    """Locate page breaks in the list of document lines and create a list positions in the
-       document body list.
-       @param docbody: (list) of strings - each string is a line in the document.
-       @return: (list) of integer positions, whereby each integer represents the position (in
-        the document body) of a page-break.
+    """Locate page breaks in the list of document lines and create a list
+       positions in the document body list.
+       @param docbody: (list) of strings - each string is a line in the
+        document.
+       @return: (list) of integer positions, whereby each integer represents the
+        position (in the document body) of a page-break.
     """
     page_break_posns = []
     p_break = sre.compile(unicode(r'^\s*?\f\s*?$'), sre.UNICODE)
@@ -2774,9 +2910,12 @@ def get_page_break_positions(docbody):
     return page_break_posns
 
 def document_contains_text(docbody):
-    """Test whether document contains text, or is just full of worthless whitespace.
-       @param docbody: (list) of strings - each string being a line of the document's body
-       @return: (integer) 1 if non-whitespace found in document; 0 if only whitespace found in document.
+    """Test whether document contains text, or is just full of worthless
+       whitespace.
+       @param docbody: (list) of strings - each string being a line of the
+        document's body
+       @return: (integer) 1 if non-whitespace found in document; 0 if only
+        whitespace found in document.
     """
     found_non_space = 0
     for line in docbody:
@@ -2787,17 +2926,19 @@ def document_contains_text(docbody):
     return found_non_space
 
 def remove_page_boundary_lines(docbody):
-    """Try to locate page breaks, headers and footers within a document body, and remove
-       the array cells at which they are found.
-       @param docbody: (list) of strings, each string being a line in the document's body.
-       @return: (list) of strings. The document body, hopefully with page-breaks, headers
-        and footers removed. Each string in the list once more represents a line in the
-        document.
+    """Try to locate page breaks, headers and footers within a document body,
+       and remove the array cells at which they are found.
+       @param docbody: (list) of strings, each string being a line in the
+        document's body.
+       @return: (list) of strings. The document body, hopefully with page-
+        breaks, headers and footers removed. Each string in the list once more
+        represents a line in the document.
     """
     number_head_lines = number_foot_lines = 0
     ## Make sure document not just full of whitespace:
     if not document_contains_text(docbody):
-        ## document contains only whitespace - cannot safely strip headers/footers
+        ## document contains only whitespace - cannot safely
+        ## strip headers/footers
         return docbody
     
     ## Get list of index posns of pagebreaks in document:
@@ -2817,11 +2958,11 @@ def remove_page_boundary_lines(docbody):
 ## ----> 2. Finding reference section in full-text:
 
 def _create_regex_pattern_add_optional_spaces_to_word_characters(word):
-    """Add the regex special characters (\s*?) to allow optional spaces between the
-       characters in a word.
+    """Add the regex special characters (\s*?) to allow optional spaces between
+       the characters in a word.
        @param word: (string) the word to be inserted into a regex pattern.
-       @return: string: the regex pattern for that word with optional spaces between all
-        of its characters.
+       @return: string: the regex pattern for that word with optional spaces
+        between all of its characters.
     """
     new_word = u""
     for ch in word:
@@ -2833,8 +2974,8 @@ def _create_regex_pattern_add_optional_spaces_to_word_characters(word):
 
 
 def get_reference_section_title_patterns():
-    """Return a list of compiled regex patterns used to search for the title of a reference section
-       in a full-text document.
+    """Return a list of compiled regex patterns used to search for the title of
+       a reference section in a full-text document.
        @return: (list) of compiled regex patterns.
     """
     patterns = []
@@ -2866,8 +3007,8 @@ def get_reference_section_title_patterns():
 
 
 def get_reference_line_numeration_marker_patterns(prefix=u''):
-    """Return a list of compiled regex patterns used to search for the marker of a reference line
-       in a full-text document.
+    """Return a list of compiled regex patterns used to search for the marker
+       of a reference line in a full-text document.
        @param prefix: (string) the possible prefix to a reference line
        @return: (list) of compiled regex patterns.
     """
@@ -2896,8 +3037,8 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
     return compiled_ptns
 
 def get_first_reference_line_numeration_marker_patterns():
-    """Return a list of compiled regex patterns used to search for the first reference line
-       in a full-text document.
+    """Return a list of compiled regex patterns used to search for the first
+       reference line in a full-text document.
        The line is considered to start with either: [1] or {1}
        @return: (list) of compiled regex patterns.
     """
@@ -2911,8 +3052,8 @@ def get_first_reference_line_numeration_marker_patterns():
     return compiled_patterns
 
 def get_post_reference_section_title_patterns():
-    """Return a list of compiled regex patterns used to search for the title of the section
-       after the reference section in a full-text document.
+    """Return a list of compiled regex patterns used to search for the title
+       of the section after the reference section in a full-text document.
        @return: (list) of compiled regex patterns.
     """
     compiled_patterns = []
@@ -2941,8 +3082,9 @@ def get_post_reference_section_title_patterns():
     return compiled_patterns
 
 def get_post_reference_section_keyword_patterns():
-    """Return a list of compiled regex patterns used to search for various keywords that can often be found after,
-       and therefore suggest the end of, a reference section in a full-text document.
+    """Return a list of compiled regex patterns used to search for various
+       keywords that can often be found after, and therefore suggest the end of,
+       a reference section in a full-text document.
        @return: (list) of compiled regex patterns.
     """
     compiled_patterns = []
@@ -2959,13 +3101,15 @@ def get_post_reference_section_keyword_patterns():
     return compiled_patterns
 
 def perform_regex_match_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "sre.match" operation on the line for every pattern.
-       Break from searching at the first match, returning the match object.  In the case that no patterns match,
-       the None type will be returned.
+    """Given a list of COMPILED regex patters, perform the "sre.match" operation
+       on the line for every pattern.
+       Break from searching at the first match, returning the match object.
+       In the case that no patterns match, the None type will be returned.
        @param line: (unicode string) to be searched in.
-       @param patterns: (list) of compiled regex patterns to search  "line" with.
-       @return: (None or an sre.match object), depending upon whether one of the patterns matched within line
-        or not.
+       @param patterns: (list) of compiled regex patterns to search  "line"
+        with.
+       @return: (None or an sre.match object), depending upon whether one of
+        the patterns matched within line or not.
     """
     if type(patterns) not in (list, tuple):
         raise TypeError()
@@ -2980,13 +3124,14 @@ def perform_regex_match_upon_line_with_pattern_list(line, patterns):
     return m
 
 def perform_regex_search_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "sre.search" operation on the line for every pattern.
-       Break from searching at the first match, returning the match object.  In the case that no patterns match,
-       the None type will be returned.
+    """Given a list of COMPILED regex patters, perform the "sre.search"
+       operation on the line for every pattern. Break from searching at the
+       first match, returning the match object.  In the case that no patterns
+       match, the None type will be returned.
        @param line: (unicode string) to be searched in.
-       @param patterns: (list) of compiled regex patterns to search  "line" with.
-       @return: (None or an sre.match object), depending upon whether one of the patterns matched within line
-        or not.
+       @param patterns: (list) of compiled regex patterns to search "line" with.
+       @return: (None or an sre.match object), depending upon whether one of the
+        patterns matched within line or not.
     """
     if type(patterns) not in (list, tuple):
         raise TypeError()
@@ -3002,24 +3147,24 @@ def perform_regex_search_upon_line_with_pattern_list(line, patterns):
 
 
 def find_reference_section(docbody):
-    """Search in document body for its reference section. More precisely, find the
-       first line of the reference section. Effectively, the function starts at the
-       end of a document and works backwards, line-by-line, looking for the title of
-       a reference section. It stops when (if) it finds something that it considers
-       to be the first line of a reference section.
+    """Search in document body for its reference section. More precisely, find
+       the first line of the reference section. Effectively, the function starts
+       at the end of a document and works backwards, line-by-line, looking for
+       the title of a reference section. It stops when (if) it finds something
+       that it considers to be the first line of a reference section.
        @param docbody: (list) of strings - the full document body.
        @return: (dictionary) :
-                 { 'start_line' : (integer) - index in docbody of first reference line,
-                   'title_string' : (string) - title of the reference section.
-                   'marker' : (string) - the marker of the first reference line,
-                   'marker_pattern' : (string) - the regexp string used to find the marker,
-                   'title_marker_same_line' : (integer) - a flag to indicate whether the
-                                               reference section title was on the same line
-                                               as the first reference line's marker or not.
-                                               1 if it was; 0 if it was not.
-                 }
-                 Much of this information is used by later functions to rebuild a reference
-                 section.
+          { 'start_line' : (integer) - index in docbody of 1st reference line,
+            'title_string' : (string) - title of the reference section.
+            'marker' : (string) - the marker of the first reference line,
+            'marker_pattern' : (string) - regexp string used to find the marker,
+            'title_marker_same_line' : (integer) - flag to indicate whether the
+                                        reference section title was on the same
+                                        line as the first reference line's
+                                        marker or not. 1 if it was; 0 if not.
+          }
+                 Much of this information is used by later functions to rebuild
+                 a reference section.
          -- OR --
                 (None) - when the reference section could not be found.
     """
@@ -3120,20 +3265,23 @@ def find_reference_section(docbody):
     return ref_sectn_details
 
 def find_reference_section_no_title(docbody):
-    """This function would generally be used when it was not possible to locate the start of a
-       document's reference section by means of its title.  Instead, this function will look for
-       reference lines that have numeric markers of the format [1], [2], etc.
-       @param docbody: (list) of strings - each string is a line in the document.
+    """This function would generally be used when it was not possible to locate
+       the start of a document's reference section by means of its title.
+       Instead, this function will look for reference lines that have numeric
+       markers of the format [1], [2], etc.
+       @param docbody: (list) of strings -each string is a line in the document.
        @return: (dictionary) :
-                 { 'start_line' : (integer) - index in docbody of first reference line,
-                   'title_string' : (None) - title of the reference section None since no title,
-                   'marker' : (string) - the marker of the first reference line,
-                   'marker_pattern' : (string) - the regexp string used to find the marker,
-                   'title_marker_same_line' : (integer) 0 - to signal title not on same line as
-                                               marker.
-                 }
-                 Much of this information is used by later functions to rebuild a reference
-                 section.
+         { 'start_line' : (integer) - index in docbody of 1st reference line,
+           'title_string' : (None) - title of the reference section
+                                     (None since no title),
+           'marker' : (string) - the marker of the first reference line,
+           'marker_pattern' : (string) - the regexp string used to find the
+                                         marker,
+           'title_marker_same_line' : (integer) 0 - to signal title not on same
+                                       line as marker.
+         }
+                 Much of this information is used by later functions to rebuild
+                 a reference section.
          -- OR --
                 (None) - when the reference section could not be found.
     """
@@ -3184,13 +3332,16 @@ def find_reference_section_no_title(docbody):
 
 
 def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_line_marker_ptn):
-    """Given that the start of a document's reference section has already been recognised, this
-       function is tasked with finding the line-number in the document of the last line of the
-       reference section.
+    """Given that the start of a document's reference section has already been
+       recognised, this function is tasked with finding the line-number in the
+       document of the last line of the reference section.
        @param docbody: (list) of strings - the entire plain-text document body.
-       @param ref_start_line: (integer) - the index in docbody of the first line of the reference section.
-       @param ref_line_marker: (string) - the line marker of the first reference line.
-       @param ref_line_marker_ptn: (string) - the pattern used to search for a reference line marker.
+       @param ref_start_line: (integer) - the index in docbody of the first line
+        of the reference section.
+       @param ref_line_marker: (string) - the line marker of the first reference
+        line.
+       @param ref_line_marker_ptn: (string) - the pattern used to search for a
+        reference line marker.
        @return: (integer) - index in docbody of the last reference line
          -- OR --
                 (None) - if ref_start_line was invalid.
@@ -3252,10 +3403,11 @@ def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_
 ## ----> 3. Found reference section - now take out lines and rebuild them:
 
 def test_for_blank_lines_separating_reference_lines(ref_sect):
-    """Test to see if reference lines are separated by blank lines so that these can be used
-       to rebuild reference lines.
+    """Test to see if reference lines are separated by blank lines so that
+       these can be used to rebuild reference lines.
        @param ref_sect: (list) of strings - the reference section.
-       @return: (int) 0 if blank lines do not separate reference lines; 1 if they do.
+       @return: (int) 0 if blank lines do not separate reference lines; 1 if
+        they do.
     """
     num_blanks = 0            ## Number of blank lines found between non-blanks
     num_lines = 0             ## Number of reference lines separated by blanks
@@ -3292,10 +3444,12 @@ def test_for_blank_lines_separating_reference_lines(ref_sect):
 
 
 def remove_leading_garbage_lines_from_reference_section(ref_sectn):
-    """Sometimes, the first lines of the extracted references are completely blank or email addresses.
-       These must be removed as they are not references.
+    """Sometimes, the first lines of the extracted references are completely
+       blank or email addresses. These must be removed as they are not
+       references.
        @param ref_sectn: (list) of strings - the reference section lines
-       @return: (list) of strings - the reference section without leading blank lines or email addresses.
+       @return: (list) of strings - the reference section without leading
+        blank lines or email addresses.
     """
     p_email = sre.compile(unicode(r'^\s*e\-?mail'), sre.UNICODE)
     while (len(ref_sectn) > 0) and (ref_sectn[0].isspace() or p_email.match(ref_sectn[0]) is not None):
@@ -3303,28 +3457,31 @@ def remove_leading_garbage_lines_from_reference_section(ref_sectn):
     return ref_sectn
 
 def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
-    """Try to correct any cases where a reference line has been incorrectly split based upon
-       a wrong numeration marker. That is to say, given the following situation:
+    """Try to correct any cases where a reference line has been incorrectly
+       split based upon a wrong numeration marker. That is to say, given the
+       following situation:
 
        [1] Smith, J blah blah
        [2] Brown, N blah blah see reference
        [56] for more info [3] Wills, A blah blah
        ...
 
-       The first part of the 3rd line clearly belongs with line 2. This function will try to fix this situation,
-       to have the following situation:
+       The first part of the 3rd line clearly belongs with line 2. This function
+       will try to fix this situation, to have the following situation:
 
        [1] Smith, J blah blah
        [2] Brown, N blah blah see reference [56] for more info
        [3] Wills, A blah blah
 
-       If it cannot correctly guess the correct break-point in such a line, it will give up and the original
-       list of reference lines will be returned.
+       If it cannot correctly guess the correct break-point in such a line, it
+       will give up and the original list of reference lines will be returned.
 
        @param rebuilt_lines: (list) the rebuilt reference lines
-       @param p_refmarker: (compiled regex pattern object) the pattern used to match regex line numeration
-        markers. **MUST HAVE A GROUP 'marknum' to encapsulate the mark number!** (e.g. r'\[(?P<marknum>\d+)\]')
-       @return: (list) of strings. If necessary, the corrected reference lines. Else the orginal 'rebuilt' lines.
+       @param p_refmarker: (compiled regex pattern object) the pattern used to
+        match regex line numeration markers. **MUST HAVE A GROUP 'marknum' to
+        encapsulate the mark number!** (e.g. r'\[(?P<marknum>\d+)\]')
+       @return: (list) of strings. If necessary, the corrected reference lines.
+        Else the orginal 'rebuilt' lines.
     """
     fixed = []
     unsafe = 0
@@ -3340,13 +3497,16 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
         ## reference line numberring - just return the lines as they were.
         return rebuilt_lines
 
-    ## Loop through each line in "rebuilt_lines" and test the mark at the beginning.
-    ## If current-line-mark = previous-line-mark + 1, the line will be taken to be correct and appended
-    ## to the list of fixed-lines. If not, then the loop will attempt to test whether the current line
-    ## marker is actually part of the previous line by looking in the current line for another marker
-    ## that has the numeric value of previous-marker + 1. If found, that marker will be taken as the true
-    ## marker for the line and the leader of the line (up to the point of this marker) will be appended
-    ## to the revious line. E.g.:
+    ## Loop through each line in "rebuilt_lines" and test the mark at the
+    ## beginning.
+    ## If current-line-mark = previous-line-mark + 1, the line will be taken to
+    ## be correct and appended to the list of fixed-lines. If not, then the loop
+    ## will attempt to test whether the current line marker is actually part of
+    ## the previous line by looking in the current line for another marker
+    ## that has the numeric value of previous-marker + 1. If found, that marker
+    ## will be taken as the true marker for the line and the leader of the line
+    ## (up to the point of this marker) will be appended to the revious line.
+    ## E.g.:
     ## [1] Smith, J blah blah
     ## [2] Brown, N blah blah see reference
     ## [56] for more info [3] Wills, A blah blah
@@ -3474,8 +3634,8 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
 
 
 def wash_and_repair_reference_line(line):
-    """Wash a reference line of undesirable characters (such as poorly-encoded letters, etc),
-       and repair any errors (such as broken URLs) if possible.
+    """Wash a reference line of undesirable characters (such as poorly-encoded
+       letters, etc), and repair any errors (such as broken URLs) if possible.
        @param line: (string) the reference line to be washed/repaired.
        @return: (string) the washed reference line.
     """
@@ -3488,26 +3648,30 @@ def wash_and_repair_reference_line(line):
     return line
 
 def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
-    """Given a reference section, rebuild the reference lines. After translation from PDF to text,
-       reference lines are often broken. This is because pdftotext doesn't know what is a wrapped-
-       line and what is a genuine new line. As a result, the following 2 reference lines:
+    """Given a reference section, rebuild the reference lines. After translation
+       from PDF to text, reference lines are often broken. This is because
+       pdftotext doesn't know what is a wrapped-line and what is a genuine new
+       line. As a result, the following 2 reference lines:
         [1] See http://cdsware.cern.ch/ for more details.
         [2] Example, AN: private communication (1996).
-       ...could be broken into the following 4 lines during translation from PDF to plaintext:
+       ...could be broken into the following 4 lines during translation from PDF
+       to plaintext:
         [1] See http://cdsware.cern.ch/ fo
         r more details.
         [2] Example, AN: private communica
         tion (1996).
-       Such a situation could lead to a citation being separated across 'lines', meaning that it
-       wouldn't be correctly recognised.
-       This function tries to rebuild the reference lines. It uses the pattern used to recognise a
-       reference line's numeration marker to indicate the start of a line. If no reference line
-       numeration was recognised, it will simply join all lines together into one large reference line.
-       @param ref_sectn: (list) of strings. The (potentially broken) reference lines.
-       @param ref_line_marker_ptn: (string) - the pattern used to recognise a reference line's
-        numeration marker.
-       @return: (list) of strings - the rebuilt reference section. Each string in the list
-        represents a complete reference line.
+       Such a situation could lead to a citation being separated across 'lines',
+       meaning that it wouldn't be correctly recognised.
+       This function tries to rebuild the reference lines. It uses the pattern
+       used to recognise a reference line's numeration marker to indicate the
+       start of a line. If no reference line numeration was recognised, it will
+       simply join all lines together into one large reference line.
+       @param ref_sectn: (list) of strings. The (potentially broken) reference
+        lines.
+       @param ref_line_marker_ptn: (string) - the pattern used to recognise a
+        reference line's numeration marker.
+       @return: (list) of strings - the rebuilt reference section. Each string
+        in the list represents a complete reference line.
     """
     ## initialise some vars:
     rebuilt_references = []
@@ -3570,20 +3734,28 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
 
 def get_reference_lines(docbody, ref_sect_start_line, ref_sect_end_line, \
                         ref_sect_title, ref_line_marker_ptn, title_marker_same_line):
-    """After the reference section of a document has been identified, and the first and last lines
-       of the reference section have been recorded, this function is called to take the reference
-       lines out of the document body. The document's reference lines are returned in a list of
-       strings whereby each string is a reference line. Before this can be done however, the
-       reference section is passed to another function that rebuilds any broken reference lines.
+    """After the reference section of a document has been identified, and the
+       first and last lines of the reference section have been recorded, this
+       function is called to take the reference lines out of the document body.
+       The document's reference lines are returned in a list of strings whereby
+       each string is a reference line. Before this can be done however, the
+       reference section is passed to another function that rebuilds any broken
+       reference lines.
        @param docbody: (list) of strings - the entire document body.
-       @param ref_sect_start_line: (integer) - the index in docbody of the first reference line.
-       @param ref_sect_end_line: (integer) - the index in docbody of the last reference line.
-       @param ref_sect_title: (string) - the title of the reference section (e.g. "References").
-       @param ref_line_marker_ptn: (string) - the patern used to match the marker for each
-        reference line (e.g., could be used to match lines with markers of the form [1], [2], etc.)
-       @param title_marker_same_line: (integer) - a flag to indicate whether or not the reference
-        section title was on the same line as the first reference line's marker.
-       @return: (list) of strings. Each string is a reference line, extracted from the document.
+       @param ref_sect_start_line: (integer) - the index in docbody of the first
+        reference line.
+       @param ref_sect_end_line: (integer) - the index in docbody of the last
+        reference line.
+       @param ref_sect_title: (string) - the title of the reference section
+        (e.g. "References").
+       @param ref_line_marker_ptn: (string) - the patern used to match the
+        marker for each reference line (e.g., could be used to match lines
+        with markers of the form [1], [2], etc.)
+       @param title_marker_same_line: (integer) - a flag to indicate whether
+        or not the reference section title was on the same line as the first
+        reference line's marker.
+       @return: (list) of strings. Each string is a reference line, extracted
+        from the document.
     """
     start_idx = ref_sect_start_line
     if title_marker_same_line:
@@ -3611,8 +3783,10 @@ def extract_references_from_fulltext(fulltext):
        string in the list is considered to be a single reference line.
         E.g. a string could be something like:
         '[19] Wilson, A. Unpublished (1986).
-       @param fulltext: (list) of strings, whereby each string is a line of the document.
-       @return: (list) of strings, where each string is an extracted reference line.
+       @param fulltext: (list) of strings, whereby each string is a line of the
+        document.
+       @return: (list) of strings, where each string is an extracted reference
+        line.
     """
     ## Try to remove pagebreaks, headers, footers
     fulltext = remove_page_boundary_lines(fulltext)
@@ -3648,10 +3822,13 @@ def extract_references_from_fulltext(fulltext):
 ## Tasks related to conversion of full-text to plain-text:
 
 def _pdftotext_conversion_is_bad(txtlines):
-    """Sometimes pdftotext performs a bad conversion which consists of many spaces and garbage characters.
-       This method takes a list of strings obtained from a pdftotext conversion and examines them to see if
-       they are likely to be the result of a bad conversion.
-       @param txtlines: (list) of unicode strings obtained from pdftotext conversion.
+    """Sometimes pdftotext performs a bad conversion which consists of many
+       spaces and garbage characters.
+       This method takes a list of strings obtained from a pdftotext conversion
+       and examines them to see if they are likely to be the result of a bad
+       conversion.
+       @param txtlines: (list) of unicode strings obtained from pdftotext
+        conversion.
        @return: (integer) - 1 if bad conversion; 0 if good conversion.
     """
     ## Numbers of 'words' and 'whitespaces' found in document:
@@ -3670,11 +3847,11 @@ def _pdftotext_conversion_is_bad(txtlines):
         return 0
 
 def convert_PDF_to_plaintext(fpath):
-    """Take the path to a PDF file and run pdftotext for this file, capturing the
-       output.
+    """Take the path to a PDF file and run pdftotext for this file, capturing
+       the output.
        @param fpath: (string) path to the PDF file
-       @return: (list) of unicode strings (contents of the PDF file translated into plaintext;
-        each string is a line in the document.)
+       @return: (list) of unicode strings (contents of the PDF file translated
+        into plaintext; each string is a line in the document.)
     """
     status = 0
     doclines = []
@@ -3705,11 +3882,11 @@ def convert_PDF_to_plaintext(fpath):
     return (doclines, status)
 
 def get_plaintext_document_body(fpath):
-    """Given a file-path to a full-text, return a list of unicode strings whereby each string
-       is a line of the fulltext.
-       In the case of a plain-text document, this simply means reading the contents in from the
-       file.  In the case of a PDF/PostScript however, this means converting the document to
-       plaintext.
+    """Given a file-path to a full-text, return a list of unicode strings
+       whereby each string is a line of the fulltext.
+       In the case of a plain-text document, this simply means reading the
+       contents in from the file. In the case of a PDF/PostScript however,
+       this means converting the document to plaintext.
        @param: fpath: (string) - the path to the fulltext file
        @return: (list) of strings - each string being a line in the document.
     """
@@ -3745,15 +3922,17 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
        the following 2 reference lines were passed to this function:
         [1] See http://cdsware.cern.ch/ for more details.
         [2] Example, AN: private communication (1996).
-       and the record-id was "1", the raw reference lines printed to the stream would be:
+       and the record-id was "1", the raw reference lines printed to the stream
+       would be:
         1:[1] See http://cdsware.cern.ch/ for more details.
         1:[2] Example, AN: private communication (1996).
-       @param recid: (string) the record-id of the document for which raw references are
-        to be written-out.
+       @param recid: (string) the record-id of the document for which raw
+        references are to be written-out.
        @param raw_refs: (list) of strings. The raw references to be written-out.
-       @param strm: (open stream object) - the stream object to which the references are to be
-        written. If the stream object is not a valid open stream (or is None, by default), the
-        standard error stream (sys.stderr) will be used by default.
+       @param strm: (open stream object) - the stream object to which the
+        references are to be written. If the stream object is not a valid open
+        stream (or is None, by default), the standard error stream (sys.stderr)
+        will be used by default.
        @return: None.
     """
     if strm is None or type(strm) is not file:
@@ -3768,18 +3947,19 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
     strm.flush()
 
 def usage(wmsg="", err_code=0):
-    """Display a usage message for refextract on the standard error stream and then exit.
+    """Display a usage message for refextract on the standard error stream and
+       then exit.
        @param wmsg: (string) - some kind of warning message for the user.
-       @param err_code: (integer) - an error code to be passed to sys.exit, which is called
-        after the usage message has been printed.
+       @param err_code: (integer) - an error code to be passed to sys.exit,
+        which is called after the usage message has been printed.
        @return: None.
     """
     if wmsg != "":
         wmsg = wmsg.strip() + "\n"
     msg = """Usage: refextract [options] recid:file1 [recid:file2 ...]
   refextract tries to extract the reference section from a full-text document.
-  Extracted reference lines are processed and any recognised citations are marked
-  up using MARC XML. Results are output to the standard output stream.
+  Extracted reference lines are processed and any recognised citations are
+  marked up using MARC XML. Results are output to the standard output stream.
   
   Options: 
    -h, --help     print this help
@@ -3789,15 +3969,16 @@ def usage(wmsg="", err_code=0):
                   3=display reference line citation processing analysis, 
 		  9=max information)
    -r, --output-raw-refs
-                  output raw references, as extracted from the document. No MARC XML
-                  mark-up - just each extracted line, prefixed by the recid of the document
-                  that it came from.
+                  output raw references, as extracted from the document.
+                  No MARC XML mark-up - just each extracted line, prefixed
+                  by the recid of the document that it came from.
    -x, --xmlfile
                   write xml output to a file rather than standard out
    -z, --raw-references
-                  treat the input file as pure references. i.e. skip the stage of trying to
-                  locate the reference section within a document and instead move to the
-                  stage of recognition and standardisation of citations within lines.
+                  treat the input file as pure references. i.e. skip the stage
+                  of trying to locate the reference section within a document
+                  and instead move to the stage of recognition and
+                  standardisation of citations within lines.
 
   Example: refextract 499:thesis.pdf
 """
@@ -3807,8 +3988,9 @@ def usage(wmsg="", err_code=0):
 def get_cli_options():
     """Get the various arguments and options from the command line and populate
        a dictionary of cli_options.
-       @return: (tuple) of 2 elements. First element is a dictionary of cli options and
-        flags, set as appropriate; Second element is a list of cli arguments.
+       @return: (tuple) of 2 elements. First element is a dictionary of cli
+        options and flags, set as appropriate; Second element is a list of cli
+        arguments.
     """
     global cli_opts
     ## dictionary of important flags and values relating to cli call of program:
@@ -3863,39 +4045,40 @@ def get_cli_options():
 def display_xml_record(status_code, count_reportnum,
                        count_title, count_url, count_misc, recid, xml_lines):
     """Given a series of MARC XML-ized reference lines and a record-id, write a
-       MARC XML record to the stdout stream. Include in the record some stats for
-       the extraction job.
-       The printed MARC XML record will essentially take the following structure:
+       MARC XML record to the stdout stream. Include in the record some stats
+       for the extraction job.
+       The printed MARC XML record will essentially take the following
+       structure:
         <record>
            <controlfield tag="001">1</controlfield>
            <datafield tag="999" ind1="C" ind2="5">
-              ...
+              [...]
            </datafield>
            [...]
            <datafield tag="999" ind1="C" ind2="6">
               <subfield code="a">
-                CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-error-reportnum-title-URL-misc
+        CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
               </subfield>
            </datafield>
         </record>
-       Timestamp, error(code), reportnum, title, URL, and misc will are of course take
-       the relevant values.
+       Timestamp, error(code), reportnum, title, URL, and misc will are of
+       course take the relevant values.
 
-       @param status_code: (integer)the status of reference-extraction for the given
-        record: was there an error or not? 0 = no error; 1 = error.
-       @param count_reportnum: (integer) - the number of institutional report-number
-        citations found in the document's reference lines.
-       @param count_title: (integer) - the number of journal title citations found
-        in the document's reference lines.
+       @param status_code: (integer)the status of reference-extraction for the
+        given record: was there an error or not? 0 = no error; 1 = error.
+       @param count_reportnum: (integer) - the number of institutional
+        report-number citations found in the document's reference lines.
+       @param count_title: (integer) - the number of journal title citations
+        found in the document's reference lines.
        @param count_url: (integer) - the number of URL citations found in the
         document's reference lines.
-       @param count_misc: (integer) - the number of sections of miscellaneous text
-        (i.e. 999C5$m) from the document's reference lines.
-       @param recid: (string) - the record-id of the given document. (put into 001
-        field.)
-       @param xml_lines: (list) of strings. Each string in the list contains a group
-        of MARC XML 999C5 dtafields, making up a single reference line. These reference
-        lines will make up the document body.
+       @param count_misc: (integer) - the number of sections of miscellaneous
+        text (i.e. 999C5$m) from the document's reference lines.
+       @param recid: (string) - the record-id of the given document. (put into
+        001 field.)
+       @param xml_lines: (list) of strings. Each string in the list contains a
+        group of MARC XML 999C5 datafields, making up a single reference line.
+        These reference lines will make up the document body.
        @return: None
     """
     ## Start with the opening record tag:
