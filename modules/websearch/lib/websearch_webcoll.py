@@ -278,37 +278,42 @@ class Collection:
         if self.dbquery:
             self.create_latest_additions_info()
         
-        ## do this for each language:
+        ## do this for each language:            
         for lang, lang_fullname in language_list_long():
 
-            # load the right message language
-            _ = gettext_set_language(lang)
+            # but only if some concrete language was not chosen only:
+            if options.get("language", lang) == lang:
 
-            ## first, update navtrail:
-            for as in range(0, 2):
-                self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang), self.create_navtrail_links(as, lang))
-            ## second, update page body:
-            for as in range(0, 2): # do both simple search and advanced search pages:
-                body = websearch_templates.tmpl_webcoll_body(
-                         ln=lang, collection=self.name,
-                         te_portalbox = self.create_portalbox(lang, 'te'),
-                         searchfor = self.create_searchfor(as, lang),
-                         np_portalbox = self.create_portalbox(lang, 'np'),
-                         narrowsearch = self.create_narrowsearch(as, lang, 'r'),
-                         focuson = self.create_narrowsearch(as, lang, "v") + self.create_external_collections_box(),
-                         instantbrowse = self.create_instant_browse(as=as, ln=lang),
-                         ne_portalbox = self.create_portalbox(lang, 'ne')
-                       )
-                self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
-            ## third, write portalboxes:
-            self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
-            self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
-            self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
-            self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
-            ## fourth, write 'last updated' information:
-            self.write_cache_file("last-updated-ln=%s" % lang,
-                                  convert_datestruct_to_dategui(time.localtime(),
-                                                                ln=lang))
+                # load the right message language
+                _ = gettext_set_language(lang)
+
+                ## first, update navtrail:
+                for as in range(0, 2):
+                    self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
+                                          self.create_navtrail_links(as, lang))
+                ## second, update page body:
+                for as in range(0, 2): # do both simple search and advanced search pages:
+                    body = websearch_templates.tmpl_webcoll_body(
+                             ln=lang, collection=self.name,
+                             te_portalbox = self.create_portalbox(lang, 'te'),
+                             searchfor = self.create_searchfor(as, lang),
+                             np_portalbox = self.create_portalbox(lang, 'np'),
+                             narrowsearch = self.create_narrowsearch(as, lang, 'r'),
+                             focuson = self.create_narrowsearch(as, lang, "v") + \
+                                       self.create_external_collections_box(),
+                             instantbrowse = self.create_instant_browse(as=as, ln=lang),
+                             ne_portalbox = self.create_portalbox(lang, 'ne')
+                           )
+                    self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
+                ## third, write portalboxes:
+                self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
+                self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
+                self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
+                self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
+                ## fourth, write 'last updated' information:
+                self.write_cache_file("last-updated-ln=%s" % lang,
+                                      convert_datestruct_to_dategui(time.localtime(),
+                                                                    ln=lang))
         return
 
     def create_navtrail_links(self, as=0, ln=cdslang):
@@ -999,6 +1004,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -c, --collection\t Update cache for the given collection only. [all]\n")
     sys.stderr.write("  -f, --force\t Force update even if cache is up to date. [no]\n")
     sys.stderr.write("  -p, --part\t Update only certain cache parts (1=reclist, 2=webpage). [both]\n")
+    sys.stderr.write("  -l, --language\t Update pages in only certain language (e.g. fr). [all]\n")
     sys.stderr.write("Scheduling options:\n")
     sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
     sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
@@ -1042,10 +1048,10 @@ def main():
         options["sleeptime"] = ""
         # set user-defined options:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:fp:",
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:fp:l:",
                                        ["help", "version", "verbose=", "user=",
                                         "sleep=", "time=", "collection=",
-                                        "force", "part="])
+                                        "force", "part=", "language="])
         except getopt.GetoptError, err:
             usage(1, err)
         try:
@@ -1070,6 +1076,8 @@ def main():
                     options["force"] = 1
                 elif opt[0] in [ "-p", "--part"]:
                     options["part"] = int(opt[1])
+                elif opt[0] in [ "-l", "--language"]:
+                    options["language"] = opt[1]
                 else:
                     usage(1)
         except StandardError, e:
