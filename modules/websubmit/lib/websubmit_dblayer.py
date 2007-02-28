@@ -220,7 +220,7 @@ def log_new_completed_submission(doctype, action, subm_id, email, reportnum):
     ## Insert the details of the new submission into the DB:
     qstr = """INSERT INTO sbmSUBMISSIONS """ \
            """(email, doctype, action, status, id, reference, cd, md) """ \
-           """(%s, %s, %s, 'finished', %s, %s, NOW(), NOW())"""
+           """VALUES (%s, %s, %s, 'finished', %s, %s, NOW(), NOW())"""
     qres = run_sql(qstr, (email, doctype, action, subm_id, reportnum))
     ## return the number of rows inserted:
     return int(qres)
