@@ -205,8 +205,13 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False):
         pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
                                                          "otype=%s" % format],
                                                         'rw')
-        #pipe_input.write(print_record(recID, "xm"))
-        pipe_input.write(record_get_xml(recID, "xm"))
+        # Retrieve MARCXML
+        # Build it on-the-fly only if 'call_old_bibformat' was called
+        # with format=xm and on_the_fly=True
+        xm_record = record_get_xml(recID, 'xm',
+                                   on_the_fly=(on_the_fly and format == 'xm'))
+
+        pipe_input.write(xm_record)
         pipe_input.close()
         bibformat_output = pipe_output.read()
         pipe_output.close()
@@ -254,7 +259,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
     # But if format not found for new BibFormat, then call old BibFormat  
 
     #Create a BibFormat Object to pass that contain record and context    
-    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, uid)
+    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, uid, of)
         
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
@@ -351,10 +356,9 @@ def format_with_format_template(format_template_filename, bfo,
         errors_ = errors
     else:
         #.xsl
-        xml_record = record_get_xml(bfo.recID, 'xm')
-#        xml_record = '<?xml version="1.0" encoding="UTF-8"?>' + \
-#                     '<collection xmlns="http://www.loc.gov/MARC21/slim">'+ \
-#                     xml_record
+        # Fetch MARCXML. On-the-fly xm if we are now formatting in xm
+        xml_record = record_get_xml(bfo.recID, 'xm', on_the_fly=(bfo.format != 'xm'))
+        # Transform MARCXML using stylesheet
         evaluated_format = format(xml_record, template_source=format_content)
  
     return (evaluated_format, errors_)
@@ -1582,9 +1586,12 @@ class BibFormatObject:
     # This allows for example to print a "edit record" link for people
     # who have right to edit a record.
     uid = None
+
+    # The format in which the record is being formatted
+    format = ''
     
     def __init__(self, recID, ln=cdslang, search_pattern=[],
-                 xml_record=None, uid=None):
+                 xml_record=None, uid=None, format=''):
         """
         Creates a new bibformat object, with given record.
 
@@ -1599,6 +1606,7 @@ class BibFormatObject:
         @param search_pattern list of string representing the request used by the user in web interface
         @param xml_record a xml string of the record to format
         @param uid the user id of the person who will view the formatted page
+        @param format the format used for formatting this record
         """
         if xml_record is not None:
             # If record is given as parameter
@@ -1610,6 +1618,7 @@ class BibFormatObject:
         self.search_pattern = search_pattern
         self.recID = recID
         self.uid = uid
+        self.format = format
         
     def get_record(self):
         """
@@ -1617,10 +1626,11 @@ class BibFormatObject:
 
         @return the record structure as returned by BibRecord
         """
-        
         # Create record if necessary
         if self.record is None:
-            record = create_record(record_get_xml(self.recID, 'xm'))
+            # on-the-fly creation if current output is xm
+            record = create_record(record_get_xml(self.recID, 'xm',
+                                                  on_the_fly=(self.format.lower() == 'xm')))
             self.record = record[0]
 
         return self.record
@@ -1785,14 +1795,14 @@ def bf_profile():
     """
     Runs a benchmark
     """
-    for i in range(50):
+    for i in range(1, 51):
         format_record(i, "HD", ln=cdslang, verbose=9, search_pattern=[])
     return 
 
 if __name__ == "__main__":   
     import profile
     import pstats
-    bf_profile()
+    #bf_profile()
     profile.run('bf_profile()', "bibformat_profile")
     p = pstats.Stats("bibformat_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()

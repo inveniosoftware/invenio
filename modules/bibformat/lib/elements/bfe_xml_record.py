@@ -29,13 +29,10 @@ def format(bfo, type='xml', encodeForXML='yes'):
     @param type the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd'
     @param encodeForXML if 'yes', replace all < > and & with html corresponding escaped characters.
     """
-    from invenio.bibformat_utils import record_get_xml, encode_for_xml
-    #This element is mainly a bridge between BibRecord XML formatting capabilities and
-    #BibFormat templates.
-    
+    from invenio.bibformat_utils import record_get_xml, encode_for_xml    
     #Can be used to output various xml flavours.
     
-    out = record_get_xml(bfo.recID, format=type)
+    out = record_get_xml(bfo.recID, format=type, on_the_fly=True)
 
     if encodeForXML.lower() == 'yes':
         return encode_for_xml(out)

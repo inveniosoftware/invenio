@@ -40,6 +40,7 @@ from invenio.config import \
      CFG_OAI_ID_FIELD, \
      version
 from invenio.dbquery import run_sql
+from invenio import bibformat_dblayer
 
 def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     """
@@ -132,7 +133,7 @@ def get_contextual_content(text, keywords, max_lines=2):
     else:
         return lines[index_with_highest_weight:index_with_highest_weight+max_lines]
 
-def record_get_xml(recID, format='xm', decompress=zlib.decompress):
+def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=False):
     """
     Returns an XML string of the record given by recID.
 
@@ -148,6 +149,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     If record does not exist, returns empty string.
 
     @param recID the id of the record to retrieve
+    @param on_the_fly if False, try to fetch precreated one in database
     @return the xml string of the record
     """
     from invenio.search_engine import record_exists
@@ -206,14 +208,19 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
         out += "   <metadata>\n"
 
     if format.startswith("xm") or format == "marcxml":
-        # look for detailed format existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-        res = run_sql(query, None, 1)
+        res = None
+        if on_the_fly == False:
+            # look for cached format existence:
+            query = """SELECT value FROM bibfmt WHERE
+            id_bibrec='%s' AND format='%s'""" % (recID, format)
+            res = run_sql(query, None, 1)
         if res and record_exist_p == 1:
             # record 'recID' is formatted in 'format', so print it
             out += "%s" % decompress(res[0][0])
         else:
-            # record 'recID' is not formatted in 'format' -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
+            # record 'recID' is not formatted in 'format' -- they are
+            # not in "bibfmt" table; so fetch all the data from
+            # "bibXXx" tables:
             if format == "marcxml":
                 out += """    <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
