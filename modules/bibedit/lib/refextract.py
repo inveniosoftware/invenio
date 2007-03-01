@@ -493,29 +493,33 @@ def get_bad_char_replacements():
     return replacements
 
 ## precompile some often-used regexp for speed reasons:
-sre_regexp_character_class               = sre.compile(r'\[[^\]]+\]', sre.UNICODE)
-sre_space_comma                          = sre.compile(r'\s,', sre.UNICODE)
-sre_space_semicolon                      = sre.compile(r'\s;', sre.UNICODE)
-sre_space_period                         = sre.compile(r'\s\.', sre.UNICODE)
-sre_colon_space_colon                    = sre.compile(r':\s:', sre.UNICODE)
-sre_comma_space_colon                    = sre.compile(r',\s:', sre.UNICODE)
-sre_space_closing_square_bracket         = sre.compile(r'\s\]', sre.UNICODE)
-sre_opening_square_bracket_space         = sre.compile(r'\[\s', sre.UNICODE)
-sre_hyphens = sre.compile(r'(\\255|\u02D7|\u0335|\u0336|\u2212|\u002D|\uFE63|\uFF0D)', sre.UNICODE)
-sre_multiple_hyphens                     = sre.compile(r'-{2,}', sre.UNICODE)
-sre_multiple_space                       = sre.compile(r'\s{2,}', sre.UNICODE)
-sre_group_captured_multiple_space        = sre.compile(r'(\s{2,})', sre.UNICODE)
-sre_colon_not_followed_by_numeration_tag = sre.compile(r':(?!\s*<cds)', sre.UNICODE|sre.I)
+sre_regexp_character_class = sre.compile(r'\[[^\]]+\]', sre.UNICODE)
+sre_space_comma = sre.compile(r'\s,', sre.UNICODE)
+sre_space_semicolon = sre.compile(r'\s;', sre.UNICODE)
+sre_space_period = sre.compile(r'\s\.', sre.UNICODE)
+sre_colon_space_colon = sre.compile(r':\s:', sre.UNICODE)
+sre_comma_space_colon = sre.compile(r',\s:', sre.UNICODE)
+sre_space_closing_square_bracket = sre.compile(r'\s\]', sre.UNICODE)
+sre_opening_square_bracket_space = sre.compile(r'\[\s', sre.UNICODE)
+sre_hyphens = sre.compile(\
+    r'(\\255|\u02D7|\u0335|\u0336|\u2212|\u002D|\uFE63|\uFF0D)', sre.UNICODE)
+sre_multiple_hyphens = sre.compile(r'-{2,}', sre.UNICODE)
+sre_multiple_space = sre.compile(r'\s{2,}', sre.UNICODE)
+sre_group_captured_multiple_space = sre.compile(r'(\s{2,})', sre.UNICODE)
+sre_colon_not_followed_by_numeration_tag = \
+                               sre.compile(r':(?!\s*<cds)', sre.UNICODE|sre.I)
 
 
 ## Patterns used for creating institutional preprint report-number
 ## recognition patterns (used by function "institute_num_pattern_to_regex"):
    ## Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
-sre_report_num_chars_to_escape = sre.compile(r'([^\]A-Za-z0-9\/\[ "])', sre.UNICODE)
+sre_report_num_chars_to_escape = \
+                sre.compile(r'([^\]A-Za-z0-9\/\[ "])', sre.UNICODE)
    ## Replace "hello" with hello:
 sre_extract_quoted_text = (sre.compile(r'\"([^"]+)\"', sre.UNICODE), r'\g<1>',)
    ## Replace / [abcd ]/ with /( [abcd])?/ :
-sre_extract_char_class = (sre.compile(r' \[([^\]]+) \]', sre.UNICODE), r'( [\g<1>])?')
+sre_extract_char_class = (sre.compile(r' \[([^\]]+) \]', sre.UNICODE), \
+                          r'( [\g<1>])?')
 ###
 
 
@@ -530,8 +534,8 @@ sre_html_tagged_url = \
              sre.UNICODE|sre.I)
 
 
-## Numeration recognition pattern - used to identify numeration associated with a title when
-## marking the title up into MARC XML:
+## Numeration recognition pattern - used to identify numeration
+## associated with a title when marking the title up into MARC XML:
 sre_recognised_numeration_for_title = \
      sre.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', sre.UNICODE)
 
@@ -543,7 +547,8 @@ sre_punctuation = sre.compile(r'[\.\,\;\'\(\)\-]', sre.UNICODE)
 #sre_tagged_citation = sre.compile(r'\<cds\.(TITLE|VOL|YR|PG|REPORTNUMBER|SER|URL).*?\>', sre.UNICODE)
 sre_tagged_citation = sre.compile(r'\<cds\.(TITLE|VOL|YR|PG|REPORTNUMBER|SER|URL)( description=\"[^\"]*\")?\>', sre.UNICODE)
 
-## is there pre-recognised numeration-tagging within a few characters of the start if this part of the line?
+## is there pre-recognised numeration-tagging within a
+## few characters of the start if this part of the line?
 sre_tagged_numeration_near_line_start = sre.compile(r'^.{0,4}?<CDS (VOL|SER)>', sre.UNICODE)
 
 
@@ -552,8 +557,9 @@ sre_matched_ibid = sre.compile(r'IBID\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', s
 
 sre_title_series = sre.compile(r'\, +([A-H]|(I{1,3}V?|VI{0,3}))$', sre.UNICODE)
 
-## After having processed a line for titles, it may be possible to find more numeration with the
-## aid of the recognised titles. The following 2 patterns are used for this:
+## After having processed a line for titles, it may be possible to find more
+## numeration with the aid of the recognised titles. The following 2 patterns
+## are used for this:
 
 sre_correct_numeration_2nd_try_ptn1 = \
     (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
@@ -564,15 +570,17 @@ sre_correct_numeration_2nd_try_ptn2 = \
                                         '\\g<1>\\g<2>, \\g<3> \\g<6> \\g<7> \\g<8> (\\g<1>)'
     )
 
-## precompile some regexps used to search for and standardize numeration patterns in a line for the first time:
+## precompile some regexps used to search for and standardize
+## numeration patterns in a line for the first time:
 
-## Delete the colon and expressions such as Serie, vol, V. inside the pattern <serie : volume>
-## E.g.: Replace the string """Series A, Vol 4""" with """A 4"""
+## Delete the colon and expressions such as Serie, vol, V. inside the pattern
+## <serie : volume> E.g. Replace the string """Series A, Vol 4""" with """A 4"""
 sre_strip_series_and_volume_labels = (sre.compile(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?)?\s?(\d+)', sre.UNICODE),
                       unicode('\\g<2> \\g<4>'))
 
 
-## This pattern is not compiled, but rather included in the other numeration paterns:
+## This pattern is not compiled, but rather included in
+## the other numeration paterns:
 _sre_non_compiled_pattern_nucphysb_subtitle = r'(?:[\(\[]\s*?(?:[Ff][Ss]|[Pp][Mm])\s*?\d{0,4}\s*?[\)\]])?'
 
 ## the 4 main numeration patterns:
@@ -591,13 +599,13 @@ sre_numeration_nucphys_vol_page_yr = (sre.compile(r'\b' + _sre_non_compiled_patt
 
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
-sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' +\
+sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?' +\
                                  _sre_non_compiled_pattern_nucphysb_subtitle +\
                                  r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 ## <[FS]?, v, y, p>
 sre_numeration_nucphys_vol_yr_page = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
@@ -637,7 +645,8 @@ undesirable_char_replacements = get_bad_char_replacements()
 ## General initiation tasks:
 
 def get_recids_and_filepaths(args):
-    """from a list of arguments in the form "recid:filepath" (["1:filepath", "2:filepath", [...]])
+    """from a list of arguments in the form "recid:filepath"
+       (["1:filepath", "2:filepath", [...]])
        split each string into 2 parts: the record ID and the filepath.
        @param args: a list of strings
        @return: a list of tuples: [(recid, filepath)]
@@ -679,7 +688,8 @@ def replace_undesirable_characters(line):
     bad_chars = undesirable_char_replacements.keys()
     for bad_char in bad_chars:
         try:
-            line = line.replace(bad_char, undesirable_char_replacements[bad_char])
+            line = line.replace(bad_char, \
+                                undesirable_char_replacements[bad_char])
         except UnicodeDecodeError:
             pass
     return line
@@ -704,7 +714,8 @@ def remove_and_record_multiple_spaces_in_line(line):
     multispace_matches = sre_group_captured_multiple_space.finditer(line)
     ## record the number of spaces found at each match position:
     for multispace in multispace_matches:
-        removed_spaces[multispace.start()] = (multispace.end() - multispace.start() - 1)
+        removed_spaces[multispace.start()] = (multispace.end() \
+                                              - multispace.start() - 1)
     ## now remove the multiple-spaces from the line, replacing with a
     ## single space at each position:
     line = sre_group_captured_multiple_space.sub(u' ', line)
@@ -771,8 +782,10 @@ def create_institute_numeration_group_regexp_pattern(patterns):
     if len(patterns) > 0:
         grouped_numeration_pattern = u"(?P<numn>"
         for pattern in patterns:
-            grouped_numeration_pattern += institute_num_pattern_to_regex(pattern[1]) + u"|"
-        grouped_numeration_pattern = grouped_numeration_pattern[0:len(grouped_numeration_pattern) - 1]
+            grouped_numeration_pattern += \
+                  institute_num_pattern_to_regex(pattern[1]) + u"|"
+        grouped_numeration_pattern = \
+              grouped_numeration_pattern[0:len(grouped_numeration_pattern) - 1]
         grouped_numeration_pattern += u")"
     return grouped_numeration_pattern
 
@@ -809,10 +822,12 @@ def institute_num_pattern_to_regex(pattern):
         pattern = pattern.replace(repl[0], repl[1])
 
     ## now replace a couple of regexp-like paterns:
-        ## quoted string with non-quoted version ("hello" with hello);
-        ## Replace / [abcd ]/ with /( [abcd])?/ :
-    pattern = sre_extract_quoted_text[0].sub(sre_extract_quoted_text[1], pattern)
-    pattern = sre_extract_char_class[0].sub(sre_extract_char_class[1], pattern)
+    ## quoted string with non-quoted version ("hello" with hello);
+    ## Replace / [abcd ]/ with /( [abcd])?/ :
+    pattern = sre_extract_quoted_text[0].sub(sre_extract_quoted_text[1], \
+                                             pattern)
+    pattern = sre_extract_char_class[0].sub(sre_extract_char_class[1], \
+                                            pattern)
 
     ## the pattern has been transformed
     return pattern
@@ -988,7 +1003,8 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
         sys.exit(1)
 
     ## return the preprint reference patterns and the replacement strings for non-standard categ-strings:
-    return (preprint_reference_search_regexp_patterns, standardised_preprint_reference_categories)
+    return (preprint_reference_search_regexp_patterns, \
+            standardised_preprint_reference_categories)
 
 def build_titles_knowledge_base(fpath):
     """Given the path to a knowledge base file, read in the contents
@@ -1026,7 +1042,8 @@ def build_titles_knowledge_base(fpath):
     seek_phrases = []
     
     ## Pattern to recognise a correct knowledge base line:
-    p_kb_line = sre.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', sre.UNICODE)
+    p_kb_line = sre.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', \
+                            sre.UNICODE)
 
     try:
         fh = open(fpath, "r")
@@ -1047,23 +1064,29 @@ def build_titles_knowledge_base(fpath):
                 ## good KB line
                 seek_phrase = m_kb_line.group('seek')
                 if len(seek_phrase) > 1:
-                    ## add the phrase from the KB if the 'seek' phrase is longer than 1 character:
+                    ## add the phrase from the KB if the 'seek' phrase is longer
+                    ## than 1 character:
                     ## compile the seek phrase into a pattern:
-                    seek_ptn = sre.compile(r'(?<!\/)\b(' + sre.escape(seek_phrase) + r')[^A-Z0-9]', sre.UNICODE)
+                    seek_ptn = sre.compile(r'(?<!\/)\b(' + \
+                                           sre.escape(seek_phrase) + \
+                                           r')[^A-Z0-9]', sre.UNICODE)
                     if not kb.has_key(seek_phrase):
                         kb[seek_phrase] = seek_ptn
-                        standardised_titles[seek_phrase] = m_kb_line.group('repl')
+                        standardised_titles[seek_phrase] = \
+                                                         m_kb_line.group('repl')
                         seek_phrases.append(seek_phrase)
             else:
                 ## KB line was not correctly formatted - die with error
-                emsg = """Error: Could not build list of journal titles - KB %(kb)s has errors.\n""" \
+                emsg = """Error: Could not build list of journal titles """ \
+                       """- KB %(kb)s has errors.\n""" \
                        % { 'kb' : fpath }
                 sys.stderr.write(emsg)
                 sys.exit(1)
         fh.close()
     except IOError:
         ## problem opening KB for reading, or problem while reading from it:
-        emsg = """Error: Could not build list of journal titles - failed to read from KB %(kb)s.\n""" \
+        emsg = """Error: Could not build list of journal titles - failed """ \
+               """to read from KB %(kb)s.\n""" \
                % { 'kb' : fpath }
         sys.stderr.write(emsg)
         sys.stderr.flush()
@@ -1231,10 +1254,12 @@ def identify_and_tag_URLs(line):
         found_url_full_matchlen[startposn] = matchlen
         found_url_urlstring[startposn]     = m_tagged_url.group(3)
         found_url_urldescr[startposn]      = m_tagged_url.group(12)
-        ## temporarily replace the URL match with underscores so that it won't be re-found
+        ## temporarily replace the URL match with underscores so that
+        ## it won't be re-found
         line = line[0:startposn] + u"_"*matchlen + line[endposn:]
 
-    ## Attempt to identify and tag all RAW (i.e. not HTML-marked-up) URLs in the line:
+    ## Attempt to identify and tag all RAW (i.e. not
+    ## HTML-marked-up) URLs in the line:
     m_raw_url_iter = sre_raw_url.finditer(line)
     for m_raw_url in m_raw_url_iter:
         startposn = m_raw_url.start()       ## start position of matched URL
@@ -1247,10 +1272,12 @@ def identify_and_tag_URLs(line):
         found_url_full_matchlen[startposn] = matchlen
         found_url_urlstring[startposn]     = matched_url
         found_url_urldescr[startposn]      = matched_url
-        ## temporarily replace the URL match with underscores so that it won't be re-found
+        ## temporarily replace the URL match with underscores
+        ## so that it won't be re-found
         line = line[0:startposn] + u"_"*matchlen + line[endposn:]
 
-    ## Now that all URLs have been identified, insert them back into the line, tagged:
+    ## Now that all URLs have been identified, insert them
+    ## back into the line, tagged:
     found_url_positions = found_url_urlstring.keys()
     found_url_positions.sort()
     extras_from_previous_url = 0
@@ -4277,5 +4304,11 @@ def test_get_reference_lines():
                 """[36] whatever http://cdsware.cern.ch/""",
                 """[37] some misc  lkjslkdjlksjflksj [hep-th/9804058] lkjlkjlkjlkj [hep-th/0001567], hep-th/1212321, some more misc, Nucl. Phys. B546 (1999) 96""",
                 """[38] R. Emparan, C. Johnson and R.... Myers, Phys. Rev. D60 (1999) 104001; this is :: .... misc! hep-th/9903238. and some ...,.,.,.,::: more hep-ph/9912000""",
-                ]
+                """[10] A. Ceresole, G. Dall Agata and R. D Auria, JHEP 11(1999) 009, [hep-th/9907216].""",
+                """[12] D.P. Jatkar and S. Randjbar-Daemi, Phys. Lett. B460, 281 (1999) [hep-th/9904187].""",
+                """[14] G. DallAgata, Phys. Lett. B460, (1999) 79, [hep-th/9904198].""",
+                """[13] S.M. Donaldson, Instantons and Geometric Invariant Theory, Comm. Math. Phys., 93, (1984), 453-460.""",
+                """[16] Becchi C., Blasi A., Bonneau G., Collina R., Delduc F., Commun. Math. Phys., 1988, 120, 121.""",
+                """[26]: N. Nekrasov, A. Schwarz, Instantons on noncommutative R4 and (2, 0) superconformal six-dimensional theory, Comm. Math. Phys., 198, (1998), 689-703.""",
+               ]
     return reflines
