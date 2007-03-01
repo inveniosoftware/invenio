@@ -181,7 +181,7 @@ def websubmit_legacy_getfile(req, form):
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
             target = '%s/record/%d/files/%s.%s' % (
-                weburl, doc.recid, docfile.name, docfile.format)
+                weburl, doc.recid, quote(docfile.name), docfile.format)
 
             if version and int(version) == int(doc.getLatestVersion()):
                 version = ''
