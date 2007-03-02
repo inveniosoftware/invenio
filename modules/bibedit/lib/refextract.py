@@ -555,7 +555,7 @@ sre_tagged_numeration_near_line_start = sre.compile(r'^.{0,4}?<CDS (VOL|SER)>', 
 sre_ibid = sre.compile(r'(-|\b)(IBID\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', sre.UNICODE)
 sre_matched_ibid = sre.compile(r'IBID\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', sre.UNICODE)
 
-sre_title_series = sre.compile(r'\, +([A-H]|(I{1,3}V?|VI{0,3}))$', sre.UNICODE)
+sre_title_series = sre.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', sre.UNICODE)
 
 ## After having processed a line for titles, it may be possible to find more
 ## numeration with the aid of the recognised titles. The following 2 patterns
@@ -2475,17 +2475,15 @@ def add_tagged_report_number(reading_line,
     ## the reading-line from  which to start rebuilding up to the next match:
     return (rebuilt_line, startpos)
 
-def add_tagged_title_in_place_of_IBID(ibid_string,
-                                      previous_match,
+def add_tagged_title_in_place_of_IBID(previous_match,
                                       ibid_series):
     """In rebuilding the line, if the matched TITLE was actually an IBID, this
        function will replace it with the previously matched TITLE, and add it
        into the line, tagged. It will even handle the series letter, if it
-       differs. For example, if the previous match is "Nucl. Phys., B", and
+       differs. For example, if the previous match is "Nucl. Phys. B", and
        the ibid is "IBID A", the title inserted into the line will be
-       "Nucl. Phys., A". Otherwise, if the IBID had no series letter, it will
-       simply be replaced by "Nucl. Phys., B" (i.e. the previous match.)
-       @param ibid_string: (string) - the matched IBID.
+       "Nucl. Phys. A". Otherwise, if the IBID had no series letter, it will
+       simply be replaced by "Nucl. Phys. B" (i.e. the previous match.)
        @param previous_match: (string) - the previously matched TITLE.
        @param ibid_series: (string) - the series of the IBID (if any).
        @return: (tuple) containing a string (the rebuilt line segment) and an
@@ -2497,39 +2495,36 @@ def add_tagged_title_in_place_of_IBID(ibid_string,
         ## had a series letter and that series letter differs to the one
         ## carried by this IBID, the series letter stored in the previous-match
         ## must be updated to that of this IBID:
-        if previous_match.find(",") != -1:
-            ## Presence of comma in previous match could mean it has a series:
-            m_previous_series = sre_title_series.search(previous_match)
-            if m_previous_series is not None:
-                previous_series = m_previous_series.group(1)
-                if previous_series == ibid_series:
-                    ## Both the previous match & this IBID have the same series
-                    rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                                    % { 'previous-match' : previous_match }
-                else:
-                    ## Previous match and this IBID do not have the same series
-                    previous_match = sre.sub("(\\.?)(,?) %s$" % previous_series, \
-                                             "\\g<1>\\g<2> %s" % ibid_series, previous_match)
-                    rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
-                                    % { 'previous-match' : previous_match }
+        m_previous_series = sre_title_series.search(previous_match)
+
+        if m_previous_series is not None:
+            ## Previous match had a series:
+            previous_series = m_previous_series.group(1)
+
+            if previous_series == ibid_series:
+                ## Both the previous match & this IBID have the same series
+                rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
+                                % { 'previous-match' : previous_match }
             else:
-                ## Series info of previous match is not a letter or roman numeral;
-                ## cannot be sure about meaning of IBID - dont replace it
-                rebuilt_line += ibid_string
+                ## Previous match and this IBID do not have the same series
+                previous_match = \
+                      sre.sub("(\\.?)(,?) +%s$" % previous_series, \
+                              "\\g<1>\\g<2> %s" % ibid_series, \
+                              previous_match)
+                rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
+                                % { 'previous-match' : previous_match }
         else:
-            ## previous match had no series letter, but the IBID did. Add the a
-            ## comma followed by a series letter to the end of the previous
-            ## match.
-            ## Now add the previous match into the rebuilt-line:
+            ## Previous match had no recognised series but the IBID did. Add a
+            ## the series letter to the end of the previous match.
             previous_match = previous_match.rstrip()
             if previous_match[-1] == ".":
-                ## Previous match ended with a full-stop. Add a comma, then
+                ## Previous match ended with a full-stop. Add a space, then
                 ## the IBID series
-                previous_match += ", %(ibid-series)s" % { 'ibid-series' : ibid_series }
+                previous_match += " %(ibid-series)s" % { 'ibid-series' : ibid_series }
             else:
                 ## Previous match did not end with a full-stop. Add a full-stop
-                ## then the comma, then the IBID series
-                previous_match += "., %(ibid-series)s" % { 'ibid-series' : ibid_series }
+                ## then a space, then the IBID series
+                previous_match += ". %(ibid-series)s" % { 'ibid-series' : ibid_series }
             rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
                            % { 'previous-match' : previous_match }
     else:
@@ -2588,8 +2583,7 @@ def add_tagged_title(reading_line,
                 series = u""
             ## Replace this IBID with the previous title match, if possible:
             (replaced_ibid_segment, previous_match) = \
-                 add_tagged_title_in_place_of_IBID(matched_title,
-                                                   previous_match, series)
+                 add_tagged_title_in_place_of_IBID(previous_match, series)
             rebuilt_line += replaced_ibid_segment
             ## Update start position for next segment of original line:
             startpos = true_replacement_index + len_title + extras
@@ -4310,5 +4304,8 @@ def test_get_reference_lines():
                 """[13] S.M. Donaldson, Instantons and Geometric Invariant Theory, Comm. Math. Phys., 93, (1984), 453-460.""",
                 """[16] Becchi C., Blasi A., Bonneau G., Collina R., Delduc F., Commun. Math. Phys., 1988, 120, 121.""",
                 """[26]: N. Nekrasov, A. Schwarz, Instantons on noncommutative R4 and (2, 0) superconformal six-dimensional theory, Comm. Math. Phys., 198, (1998), 689-703.""",
+                """[2] H. J. Bhabha, Rev. Mod. Phys. 17, 200(1945); ibid, 21, 451(1949); S. Weinberg, Phys. Rev. 133, B1318(1964); ibid, 134, 882(1964); D. L. Pursey, Ann. Phys(N. Y)32, 157(1965); W. K. Tung, Phys, Rev. Lett. 16, 763(1966); Phys. Rev. 156, 1385(1967); W. J. Hurley, Phys. Rev. Lett. 29, 1475(1972).""",
+                """[21] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931); K. Huang, Am. J. Phys. 20, 479(1952); H. Jehle, Phys, Rev. D3, 306(1971); G. A. Perkins, Found. Phys. 6, 237(1976); J. A. Lock, Am. J. Phys. 47, 797(1979); A. O. Barut et al, Phys. Rev. D23, 2454(1981); ibid, D24, 3333(1981); ibid, D31, 1386(1985); Phys. Rev. Lett. 52, 2009(1984).""",
+                """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                ]
     return reflines
