@@ -624,12 +624,12 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
 sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\((1\d\d\d|20\d\d)\)', sre.UNICODE),\
+                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 ## <v, [FS]?, s, p, y>
 sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\((1\d\d\d|20\d\d)\)', sre.UNICODE),\
+                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
