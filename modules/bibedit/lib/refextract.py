@@ -563,11 +563,11 @@ sre_title_series = sre.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', sre.UNICODE
 
 sre_correct_numeration_2nd_try_ptn1 = \
     (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
-                                        '\\g<1>\\g<2>, \\g<3> \\g<6> (\\g<1>) \\g<8>'
+                                        '\\g<3> : <cds.VOL>\\g<6></cds.VOL> <cds.YR>(\\g<1>)</cds.YR> <cds.PG>\\g<8></cds.PG>'
     )
 sre_correct_numeration_2nd_try_ptn2 = \
     (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
-                                        '\\g<1>\\g<2>, \\g<3> \\g<6> \\g<7> \\g<8> (\\g<1>)'
+            '\\g<3> <cds.SER>\\g<7></cds.SER> : <cds.VOL>\\g<6></cds.VOL> <cds.YR>(\\g<1>)</cds.YR> <cds.PG>\\g<8></cds.PG>'
     )
 
 ## precompile some regexps used to search for and standardize
@@ -589,34 +589,34 @@ _sre_non_compiled_pattern_nucphysb_subtitle = r'(?:[\(\[]\s*?(?:[Ff][Ss]|[Pp][Mm
 ## Pattern 0 (was pattern 3): <x, vol, page, year>
 sre_numeration_vol_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?' +\
                                                    _sre_non_compiled_pattern_nucphysb_subtitle +\
-                                                   r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?([1-2]\d\d\d)\)?', \
+                                                   r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', \
                                                    sre.UNICODE), \
                                           unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> '))
 
 sre_numeration_nucphys_vol_page_yr = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?([1-2]\d\d\d)\)?', sre.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> '))
 
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
 sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?' +\
                                  _sre_non_compiled_pattern_nucphysb_subtitle +\
-                                 r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+                                 r'[,;:\s]?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 ## <[FS]?, v, y, p>
 sre_numeration_nucphys_vol_yr_page = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
 sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                                 r'[,;:\s]?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+                                 r'[,;:\s]?\((1\d\d\d|2-\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
 sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?([A-H])\s?\(([1-2]\d\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+                      r'[,;:\s]?([A-H])\s?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 
 
@@ -624,12 +624,12 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
 sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', sre.UNICODE),\
+                      r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\((1\d\d\d|20\d\d)\)', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 ## <v, [FS]?, s, p, y>
 sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(([1-2]\d\d\d)\)', sre.UNICODE),\
+                      r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\((1\d\d\d|20\d\d)\)', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
@@ -1294,10 +1294,12 @@ def identify_and_tag_URLs(line):
     ## return the line containing the tagged URLs:
     return line
 
-def identify_periodical_titles(line, periodical_title_search_kb, periodical_title_search_keys):
+def identify_periodical_titles(line,
+                               periodical_title_search_kb,
+                               periodical_title_search_keys):
     """Attempt to identify all periodical titles in a reference line.
        Titles will be identified, their information (location in line,
-       length in line, and non-standardised version) will be record,
+       length in line, and non-standardised version) will be recorded,
        and they will be replaced in the working line by underscores.
        @param line: (string) - the working reference line.
        @param periodical_title_search_kb: (dictionary) - contains the
@@ -1318,65 +1320,37 @@ def identify_periodical_titles(line, periodical_title_search_kb, periodical_titl
                                          titles removed from it and
                                          replaced by underscores.
     """
-    title_matches_matchlen  = {}  ## info about lengths of periodical titles matched at given locations in the line
-    title_matches_matchtext = {}  ## the text matched at the given line location (i.e. the title itself)
-
-    ## Split the line into segments based on "</CDS PG>" ocurrences. Since the name of a periodical should
-    ## come before the numeration, "</CDS PG>" should mark the end of the recognised numeration and should be the
-    ## splitting point.
-    ## By splitting the line into segments that each contain only one instance of numeration, it can be said that at most,
-    ## there can only be one "meaningful" (one that can be linked to the numeration information) periodical in that segment.
-    ## This means that after identifying a title that is next to the numeration in the line, there should be no others in
-    ## the line and it should be possible to stop searching in the line for other titles.
-    line_segments = map(lambda x: ((x.find("<CDS PG>") != -1) and (x + "</CDS PG>") or (x)), line.split("</CDS PG>"))
-    if line_segments[len(line_segments) - 1] == "":
-        ## if the last element in the list of line segments is empty, drop it:
-        line_segments = line_segments[0:len(line_segments) - 1]
-
-    num_segments = len(line_segments)
-    len_previous_segments = 0  ## the combined length of previous line segments. Used to determine correct position
-                               ## in the line of a matched title, when dealing with line segments.
+    title_matches_matchlen  = {}  ## info about lengths of periodical titles
+                                  ## matched at given locations in the line
+    title_matches_matchtext = {}  ## the text matched at the given line
+                                  ## location (i.e. the title itself)
 
     ## Begin searching:
-    ## for each line segment:
-    for i in xrange(0, num_segments):
-        if line_segments[i].find("<CDS ") == -1:
-            ## no recognised numeration in this line - don't bother to search for titles as they will be useless:
-            continue
-        segment_match = 0  ## reset the segment-match flag as we start to check for titles in a new segment
-        for title in periodical_title_search_keys:
-            if segment_match != 0:
-                ## a usable title match has been found in the current line-segment - discontinue testing for
-                ## titles in this segment:
-                break
-            ## search for all instances of the current periodical title in the current line-segment:
-            title_matches_iter = periodical_title_search_kb[title].finditer(line_segments[i])
-            
-            ## for each matched periodical title:
-            for title_match in title_matches_iter:
-                ## record the details of this title match:
-                ## record the match length:
-                title_matches_matchlen[len_previous_segments + title_match.start()] = len(title_match.group(0)) - 1
-                ## record the matched non-standard version of the title:
-                title_matches_matchtext[len_previous_segments + title_match.start()] = title
-                ## replace the matched title text in the line it n * '-', where n is the length of the matched title:
-                line_segments[i] = line_segments[i][0:title_match.start(1)] + "_"*len(title_match.group(1)) \
-                                   + line_segments[i][title_match.end(1):]
+    for title in periodical_title_search_keys:
+        ## search for all instances of the current periodical title
+        ## in the line:
+        title_matches_iter = periodical_title_search_kb[title].finditer(line)
 
-                ## is this match next to the numeration tags? If yes, drop out of loop:
-                if sre_tagged_numeration_near_line_start.match(line_segments[i][title_match.end():]) is not None:
-                    ## Found a good match - drop out of this loop:
-                    segment_match = 1
-                    break
-        ## add the length of this segment to the combined length of previous segments:
-        len_previous_segments += len(line_segments[i])
+        ## for each matched periodical title:
+        for title_match in title_matches_iter:
+            ## record the details of this title match:
+            ## record the match length:
+            title_matches_matchlen[title_match.start()] = \
+                                           len(title_match.group(0)) - 1
 
-    ## rebuild a complete line from the segments:
-    processed_line = "".join(line_segments)
+            ## record the matched non-standard version of the title:
+            title_matches_matchtext[title_match.start()] = title
+
+            ## replace the matched title text in the line it n * '-',
+            ## where n is the length of the matched title:
+            line = u"".join((line[0:title_match.start(1)],
+                            u"_"*len(title_match.group(1)),
+                            line[title_match.end(1):]))
 
     ## return recorded information about matched periodical titles,
     ## along with the newly changed working line:
-    return (title_matches_matchlen, title_matches_matchtext, processed_line)
+    return (title_matches_matchlen, title_matches_matchtext, line)
+
 
 def identify_ibids(line):
     """Find IBIDs within the line, record their position and length,
@@ -2121,7 +2095,7 @@ def convert_processed_reference_line_to_marc_xml(line):
                         reference_page = ""
                 else:
                     ## No numeration was recognised after the title. Add the title into misc and carry on:
-                    cur_misc_txt += " %s" % title_text
+                    cur_misc_txt += "%s" % title_text
 
         elif tag_type == "REPORTNUMBER":
             ## This tag is an identified institutional report number:
@@ -2413,7 +2387,7 @@ def move_tagged_series_into_tagged_title(line):
 def _re_identify_numeration(line):
     """Look for other numeration in line.
     """
-    ## First, attempt to use marked-up titles 
+    ## First, attempt to use marked-up titles
     line = sre_correct_numeration_2nd_try_ptn1[0].sub(sre_correct_numeration_2nd_try_ptn1[1], line)
     line = sre_correct_numeration_2nd_try_ptn2[0].sub(sre_correct_numeration_2nd_try_ptn2[1], line)
     return line
