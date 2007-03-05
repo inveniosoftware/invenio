@@ -1475,7 +1475,8 @@ def account_for_stripped_whitespace(spaces_keys,
     return (true_replacement_index, extras)
 
 
-def create_marc_xml_reference_line(working_line,
+def create_marc_xml_reference_line(line_marker,
+                                   working_line,
                                    found_title_len,
                                    found_title_matchtext,
                                    pprint_repnum_len,
@@ -1488,7 +1489,9 @@ def create_marc_xml_reference_line(working_line,
        and to transform the line into a string of MARC XML in which the
        recognised citations are grouped under various datafields and
        subfields, depending upon their type.
-       @param working_line: (string) - the is the line before the
+       @param line_marker: (string) - this is the marker for this
+        reference line (e.g. [1]).
+       @param working_line: (string) - this is the line before the
         punctuation was stripped. At this stage, it has not been
         capitalised, and neither TITLES nor REPORT NUMBERS have been
         stripped from it. However, any recognised numeration and/or URLs
@@ -1593,8 +1596,13 @@ def create_marc_xml_reference_line(working_line,
         tagged_line = wash_line(tagged_line)
 
     ## Now, from the tagged line, create a MARC XML string, marking up any recognised citations:
-    (xml_line, count_misc, count_title, count_reportnum, count_url) = \
-               convert_processed_reference_line_to_marc_xml(tagged_line)
+    (xml_line, \
+     count_misc, \
+     count_title, \
+     count_reportnum, \
+     count_url) = \
+         convert_processed_reference_line_to_marc_xml(line_marker, \
+                                                      tagged_line)
     return (xml_line, count_misc, count_title, count_reportnum, count_url)
 
 def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text=""):
@@ -1932,8 +1940,10 @@ def _convert_unusable_tag_to_misc(line, misc_text, tag_match_start, tag_match_en
         line = line[idx_closing_tag+len(closing_tag):]
     return (misc_text, line)
 
-def convert_processed_reference_line_to_marc_xml(line):
+def convert_processed_reference_line_to_marc_xml(line_marker, line):
     """Given a processed reference line, convert it to MARC XML.
+       @param line_marker: (string) - the marker for the reference
+        line (e.g. [1]).
        @param line: (string) - the processed reference line, in which
         the recognised citations have been tagged.
        @return: (tuple) -
@@ -1950,23 +1960,10 @@ def convert_processed_reference_line_to_marc_xml(line):
     count_misc = count_title = count_reportnum = count_url = 0
     xml_line = ""
     previously_cited_item = None
-    processed_line = line.lstrip()
-
-    ## 1. Extract reference line marker (e.g. [1]) from start of line & tag it:
-    ## get patterns to identify numeration markers at the start of lines:
-    marker_patterns = get_reference_line_numeration_marker_patterns()
-    marker_match = perform_regex_match_upon_line_with_pattern_list(processed_line, marker_patterns)
-
-    if marker_match is not None:
-        ## found a marker:
-        marker_val = marker_match.group(u'mark')
-        ## trim the marker from the start of the line:
-        processed_line = processed_line[marker_match.end():].lstrip()
-    else:
-        marker_val = u" "
+    processed_line = line
 
     ## Now display the marker in marked-up XML:
-    xml_line += _refextract_markup_reference_line_marker_as_marcxml(marker_val)
+    xml_line += _refextract_markup_reference_line_marker_as_marcxml(line_marker)
 
     ## 2. Loop through remaining identified segments in line and tag them
     ## into MARC XML segments:
@@ -2602,6 +2599,33 @@ def add_tagged_title(reading_line,
     ## updated previous match.
     return (rebuilt_line, startpos, previous_match)
 
+
+def remove_reference_line_marker(line):
+    """Trim a reference line's 'marker' from the beginning of the line.
+       @param line: (string) - the reference line.
+       @return: (tuple) containing two strings:
+                 + The reference line's marker (or if there was not one,
+                   a 'space' character.
+                 + The reference line with it's marker removed from the
+                   beginning.
+    """
+    ## Get patterns to identify reference-line marker patterns:
+    marker_patterns = get_reference_line_numeration_marker_patterns()
+    line = line.lstrip()
+
+    marker_match = \
+        perform_regex_match_upon_line_with_pattern_list(line,
+                                                        marker_patterns)
+
+    if marker_match is not None:
+        ## found a marker:
+        marker_val = marker_match.group(u'mark')
+        ## trim the marker from the start of the line:
+        line = line[marker_match.end():].lstrip()
+    else:
+        marker_val = u" "
+    return (marker_val, line)
+
 def create_marc_xml_reference_section(ref_sect,
                                       preprint_repnum_search_kb,
                                       preprint_repnum_standardised_categs,
@@ -2662,8 +2686,13 @@ def create_marc_xml_reference_section(ref_sect,
         ## take a copy of the line as a first working line, clean it of bad accents, and correct puncutation, etc:
         working_line1 = wash_line(ref_line)
 
+        ## Strip the 'marker' (e.g. [1]) from this reference line:
+        (line_marker, working_line1) = \
+                      remove_reference_line_marker(working_line1)
+
         ## Identify and standardise numeration in the line:
-        working_line1 = standardize_and_markup_numeration_of_citations_in_line(working_line1)
+        working_line1 = \
+         standardize_and_markup_numeration_of_citations_in_line(working_line1)
 
         ## Identify and replace URLs in the line:
         working_line1 = identify_and_tag_URLs(working_line1)
@@ -2678,7 +2707,8 @@ def create_marc_xml_reference_section(ref_sect,
         working_line2 = sre_punctuation.sub(u' ', working_line2)
 
         ## Remove multiple spaces from the line, recording information about their coordinates:
-        (removed_spaces, working_line2) = remove_and_record_multiple_spaces_in_line(working_line2)
+        (removed_spaces, working_line2) = \
+             remove_and_record_multiple_spaces_in_line(working_line2)
 
         ## Identify and record coordinates of institute preprint report numbers:
         (found_pprint_repnum_matchlens, found_pprint_repnum_replstr, working_line2) = \
@@ -2704,7 +2734,8 @@ def create_marc_xml_reference_section(ref_sect,
         ## At the same time, get stats of citations found in the reference line (titles, urls, etc):
         (xml_line, this_count_misc, this_count_title, \
          this_count_reportnum, this_count_url) = \
-             create_marc_xml_reference_line(working_line=working_line1,
+             create_marc_xml_reference_line(line_marker=line_marker,
+                                            working_line=working_line1,
                                             found_title_len=found_title_len,
                                             found_title_matchtext=found_title_matchtext,
                                             pprint_repnum_len=found_pprint_repnum_matchlens,
