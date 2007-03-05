@@ -64,7 +64,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         uid = getUid(req)
         uid_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value, req, c, ln)
+        return errorMsg(e, req, c, ln)
     # variable initialisation
     t = ""
     field = []
@@ -534,7 +534,7 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         uid = getUid(req)
         uid_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value, req, c, ln)
+        return errorMsg(e, req, c, ln)
     # Preliminary tasks
     # check that the user is logged in
     if uid_email == "" or uid_email == "guest":
@@ -795,7 +795,7 @@ def home(req, c=cdsname, ln=cdslang):
     try:
         uid = getUid(req)
     except Error, e:
-        return errorMsg(e.value)
+        return errorMsg(e, req, c, ln)
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
@@ -985,7 +985,7 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
         uid = getUid(req)
         uid_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value, req, ln)
+        return errorMsg(e, req, c, ln)
     #parses database to get all data
     ## first, get the list of categories
     doctype_categs = get_categories_of_doctype(doctype)
