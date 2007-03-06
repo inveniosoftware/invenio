@@ -632,6 +632,20 @@ sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\
                       r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
+## Pattern 5: <year, vol, page>
+sre_numeration_yr_vol_page = (sre.compile(r"""
+  (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)  ## The year (optional brackets)
+  ([Vv]o?l?\.?)?\s?(\d+)[,:\s]\s?      ## The Volume (optional 'vol.' word
+  [pP]?[p]?\.?\s?                      ## Starting page num: optional Pp. 
+  ([RL]?\d+[c]?)                       ## 1st component of pagenum(optional R/L)
+  (?:\-|\255)?                         ## optional separator between pagenums
+  [RL]?\d{0,6}[c]?                     ## optional 2nd component of pagenum
+                                       ## (preceeded by optional R/L, followed
+                                       ## by optional c
+  """, sre.UNICODE|sre.VERBOSE), \
+                              unicode(' : <cds.VOL>\\g<5></cds.VOL> ' \
+                                      '<cds.YR>(\\g<2>)</cds.YR> ' \
+                                      '<cds.PG>\\g<6></cds.PG> '))
 
 ## a list of patterns used to try to repair broken URLs within reference lines:
 sre_list_url_repair_patterns = get_url_repair_patterns()
@@ -1131,6 +1145,8 @@ def standardize_and_markup_numeration_of_citations_in_line(line):
     line = sre_numeration_vol_nucphys_series_yr_page[0].sub(sre_numeration_vol_nucphys_series_yr_page[1], line)
     line = sre_numeration_vol_series_nucphys_page_yr[0].sub(sre_numeration_vol_series_nucphys_page_yr[1], line)
     line = sre_numeration_vol_nucphys_series_page_yr[0].sub(sre_numeration_vol_nucphys_series_page_yr[1], line)
+    line = sre_numeration_yr_vol_page[0].sub(sre_numeration_yr_vol_page[1], \
+                                             line)
     return line
 
 def identify_preprint_report_numbers(line,
