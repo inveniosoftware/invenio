@@ -562,11 +562,11 @@ sre_title_series = sre.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', sre.UNICODE
 ## are used for this:
 
 sre_correct_numeration_2nd_try_ptn1 = \
-    (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
+    (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)(,\s*|\s+)[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
                                         '\\g<3> : <cds.VOL>\\g<6></cds.VOL> <cds.YR>(\\g<1>)</cds.YR> <cds.PG>\\g<8></cds.PG>'
     )
 sre_correct_numeration_2nd_try_ptn2 = \
-    (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
+    (sre.compile(r'\(?([12]\d{3})([A-Za-z]?)\)?,? *(<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>),? *(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?([A-H])\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)\-?[RL]?\d{0,6}[c]?', sre.UNICODE), \
             '\\g<3> <cds.SER>\\g<7></cds.SER> : <cds.VOL>\\g<6></cds.VOL> <cds.YR>(\\g<1>)</cds.YR> <cds.PG>\\g<8></cds.PG>'
     )
 
@@ -575,7 +575,7 @@ sre_correct_numeration_2nd_try_ptn2 = \
 
 ## Delete the colon and expressions such as Serie, vol, V. inside the pattern
 ## <serie : volume> E.g. Replace the string """Series A, Vol 4""" with """A 4"""
-sre_strip_series_and_volume_labels = (sre.compile(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?)?\s?(\d+)', sre.UNICODE),
+sre_strip_series_and_volume_labels = (sre.compile(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)', sre.UNICODE),
                       unicode('\\g<2> \\g<4>'))
 
 
@@ -587,35 +587,35 @@ _sre_non_compiled_pattern_nucphysb_subtitle = r'(?:[\(\[]\s*?(?:[Ff][Ss]|[Pp][Mm
 
 
 ## Pattern 0 (was pattern 3): <x, vol, page, year>
-sre_numeration_vol_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?' +\
+sre_numeration_vol_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?[,:\s]\s?' +\
                                                    _sre_non_compiled_pattern_nucphysb_subtitle +\
                                                    r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', \
                                                    sre.UNICODE), \
                                           unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> '))
 
 sre_numeration_nucphys_vol_page_yr = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)\s?[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<3></cds.PG> '))
 
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
-sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?' +\
+sre_numeration_vol_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?[,:\s]?\s?' +\
                                  _sre_non_compiled_pattern_nucphysb_subtitle +\
                                  r'[,;:\s]?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 ## <[FS]?, v, y, p>
 sre_numeration_nucphys_vol_yr_page = (sre.compile(r'\b' + _sre_non_compiled_pattern_nucphysb_subtitle +\
-     r'[,;:\s]?([Vv]o?l?\.?)?\s?(\d+)\s?[,:\s]?\s?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
+     r'[,;:\s]?([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)\s?[,:\s]?\s?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<3>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
-sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
+sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?([A-H])\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
                                  r'[,;:\s]?\((1\d\d\d|2-\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
-sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
+sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
                       r'[,;:\s]?([A-H])\s?\((1\d\d\d|20\d\d)\),?\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<4>)</cds.YR> <cds.PG>\\g<5></cds.PG> '))
 
@@ -623,25 +623,25 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\
 
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
-sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
+sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?([A-H])[,:\s]\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
                       r'[,;:\s]?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 ## <v, [FS]?, s, p, y>
-sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
+sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r'(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?' + _sre_non_compiled_pattern_nucphysb_subtitle +\
                       r'[,;:\s]?([A-H])[,:\s]\s?[pP]?[p]?\.?\s?([RL]?\d+[c]?)(?:\-|\255)?[RL]?\d{0,6}[c]?,?\s?\(?(1\d\d\d|20\d\d)\)?', sre.UNICODE),\
                       unicode(' <cds.SER>\\g<3></cds.SER> : <cds.VOL>\\g<2></cds.VOL> <cds.YR>(\\g<5>)</cds.YR> <cds.PG>\\g<4></cds.PG> '))
 
 ## Pattern 5: <year, vol, page>
 sre_numeration_yr_vol_page = (sre.compile(r"""
-  (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)  ## The year (optional brackets)
-  ([Vv]o?l?\.?)?\s?(\d+)[,:\s]\s?      ## The Volume (optional 'vol.' word
-  [pP]?[p]?\.?\s?                      ## Starting page num: optional Pp. 
-  ([RL]?\d+[c]?)                       ## 1st component of pagenum(optional R/L)
-  (?:\-|\255)?                         ## optional separator between pagenums
-  [RL]?\d{0,6}[c]?                     ## optional 2nd component of pagenum
-                                       ## (preceeded by optional R/L, followed
-                                       ## by optional c
+  (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)      ## The year (optional brackets)
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)[,:\s]\s? ## The Volume (optional 'vol.' word
+  [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp. 
+  ([RL]?\d+[c]?)                           ## 1st psrt of pagenum(optional R/L)
+  (?:\-|\255)?                             ## optional separatr between pagenums
+  [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
+                                           ## preceeded by optional R/L,followed
+                                           ## by optional c
   """, sre.UNICODE|sre.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<5></cds.VOL> ' \
                                       '<cds.YR>(\\g<2>)</cds.YR> ' \
