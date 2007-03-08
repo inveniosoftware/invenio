@@ -32,6 +32,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql, escape_string
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
+from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 
 
 def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
@@ -155,13 +156,15 @@ def get_visible_group_list(uid, pattern=""):
     res = run_sql(query)
     map(lambda x: grpID.append(int(x[0])), res)
     query2 = """SELECT id,name
-                FROM usergroup"""
-    if len(grpID) == 0 :
-        query2 += " WHERE 1=1"
-    elif len(grpID) == 1 :
-        query2 += """ WHERE id!=%i""" % grpID[0]
-    else:
-        query2 += """ WHERE id NOT IN %s""" % str(tuple(grpID))
+                FROM usergroup
+                WHERE (join_policy='%s' OR join_policy='%s')""" % (
+                        CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEOPEN'],
+                        CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEMAIL'])
+
+    if len(grpID) == 1 :
+        query2 += """ AND id!=%i""" % grpID[0]
+    elif len(grpID) > 1:
+        query2 += """ AND id NOT IN %s""" % str(tuple(grpID))
 
     if pattern:
         pattern_query = """ AND name RLIKE '%s'""" % escape_string(pattern)

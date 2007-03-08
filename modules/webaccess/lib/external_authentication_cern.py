@@ -53,11 +53,12 @@ class ExternalAuthCern(ExternalAuth):
         """
         try:
             ret = funct(self.connection, **params)
-        except (httplib.CannotSendRequest, socket.error, AttributeError):
-            self.connection = AuthCernWrapper()
+        except:
             try:
+                self.connection = AuthCernWrapper()
                 ret = funct(self.connection, **params)
-            except (httplib.CannotSendRequest, socket.error, AttributeError):
+            except:
+                self.connection = None
                 raise WebAccessExternalAuthError
         return ret
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-## 
+##
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
@@ -79,7 +79,7 @@ def get_message(uid, msgid):
                       DATE_FORMAT(m.sent_date, '%%Y-%%m-%%d %%H:%%i:%%s'),
                       DATE_FORMAT(m.received_date, '%%Y-%%m-%%d %%H:%%i:%%s'),
                       um.status
-               FROM   msgMESSAGE m, 
+               FROM   msgMESSAGE m,
                       user_msgMESSAGE um,
                       user u
                WHERE  m.id=%(message_id)i AND
@@ -93,9 +93,9 @@ def get_message(uid, msgid):
         return res[0]
     else:
         return 0
-   
+
 def set_message_status(uid, msgid, new_status):
-    """ 
+    """
     Change the status of a message (e.g. from "new" to "read").
     the status is a single character string, specified in constant
     CFG_WEBMESSAGE_STATUS_CODE in file webmessage_config.py
@@ -113,7 +113,7 @@ def set_message_status(uid, msgid, new_status):
                 SET    status='%s'
                 WHERE  id_user_to=%i AND
                        id_msgMESSAGE=%i"""
-    params = (escape_string(new_status), uid, msgid)   
+    params = (escape_string(new_status), uid, msgid)
     return int(run_sql(query%params))
 
 def get_nb_new_messages_for_user(uid):
@@ -148,8 +148,8 @@ def get_nb_readable_messages_for_user(uid):
     if res:
         return res[0][0]
     return 0
-    
-    
+
+
 def get_all_messages_for_user(uid):
     """
     Get all messages for a user's inbox, without the eventual
@@ -184,7 +184,7 @@ def get_all_messages_for_user(uid):
                'status': escape_string(reminder_status)
               }
     return run_sql(query%params)
-    
+
 def count_nb_messages(uid):
     """
     @param uid: user id
@@ -250,15 +250,15 @@ def delete_all_messages(uid):
     """
     Delete all messages of a user (except reminders)
     @param uid: user id
-    @return the number of messages deleted 
+    @return the number of messages deleted
     """
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query1 = """SELECT id_msgMESSAGE
                FROM user_msgMESSAGE
                WHERE id_user_to=%i AND
                      NOT(BINARY status like '%s')"""
-    params = (int(uid), reminder_status)        
-    msg_ids = map(get_element, run_sql(query1%params))     
+    params = (int(uid), reminder_status)
+    msg_ids = map(get_element, run_sql(query1%params))
 
     query2 = """DELETE FROM user_msgMESSAGE
                 WHERE id_user_to=%i AND
@@ -283,7 +283,7 @@ def get_uids_from_nicks(nicks):
         for nick in users.keys()[0:-1]:
             query += "'%s'," % escape_string(nick)
         query += "'%s')" % escape_string(users.keys()[-1])
-        res = run_sql(query)  
+        res = run_sql(query)
         def enter_dict(couple):
             """ takes a a tuple and enters it into dict users """
             users[couple[0]] = int(couple[1])
@@ -306,7 +306,7 @@ def get_nicks_from_uids(uids):
         for uid in users.keys()[0:-1]:
             query += "%i," % int(uid)
         query += "%i)" % int(users.keys()[-1])
-        res = run_sql(query)  
+        res = run_sql(query)
         for (user_id, nickname) in res:
             users[int(user_id)] = nickname
     return users
@@ -327,11 +327,11 @@ def get_gids_from_groupnames(groupnames):
         for groupname in groups.keys()[0:-1]:
             query += "'%s'," % escape_string(groupname)
         query += "'%s')" % escape_string(groups.keys()[-1])
-        res = run_sql(query)  
+        res = run_sql(query)
         def enter_dict(couple):
             """ enter a tuple into dictionary groups """
             groups[couple[0]] = int(couple[1])
-        map(enter_dict, res)    
+        map(enter_dict, res)
     return groups
 
 def get_uids_members_of_groups(gids):
@@ -342,8 +342,8 @@ def get_uids_members_of_groups(gids):
     """
     if not((type(gids) is list) or (type(gids) is tuple)):
         gids = [gids]
-    query = """SELECT DISTINCT id_user 
-               FROM user_usergroup 
+    query = """SELECT DISTINCT id_user
+               FROM user_usergroup
                WHERE user_status!='%s' AND (
             """ % CFG_WEBSESSION_USERGROUP_STATUS['PENDING']
     if len(gids) > 0:
@@ -379,7 +379,7 @@ def create_message(uid_from,
                              datetex format (i.e. YYYY-mm-dd HH:MM:SS)
     @return id of the created message
     """
-    now = convert_datestruct_to_datetext(localtime())        
+    now = convert_datestruct_to_datetext(localtime())
     query = """INSERT INTO msgMESSAGE(id_user_from,
                                       sent_to_user_nicks,
                                       sent_to_group_names,
@@ -407,7 +407,7 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
     @return a list of users having their mailbox full
     """
     if not((type(uids_to) is list) or (type(uids_to) is tuple)):
-        uids_to = [uids_to]   
+        uids_to = [uids_to]
     user_problem = []
     if len(uids_to) > 0:
         users_quotas = check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
@@ -442,7 +442,7 @@ def check_quota(nb_messages):
         where += "id_user_to!=%i" % no_quota_users[-1]
     query = """SELECT id_user_to,
                       count(id_user_to)
-               FROM user_msgMESSAGE 
+               FROM user_msgMESSAGE
                %s
                GROUP BY id_user_to
                HAVING count(id_user_to)>%i"""
@@ -453,7 +453,7 @@ def check_quota(nb_messages):
         user_over_quota[int(couple[0])] = int(couple[1])
     map(enter_dict, res)
     return user_over_quota
-    
+
 def update_user_inbox_for_reminders(uid):
     """
     Updates user's inbox with any reminders that should have arrived
@@ -462,7 +462,7 @@ def update_user_inbox_for_reminders(uid):
     """
     now =  convert_datestruct_to_datetext(localtime())
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
-    new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']        
+    new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
     query1 = """SELECT m.id
                 FROM   msgMESSAGE m,
                        user_msgMESSAGE um
@@ -474,19 +474,19 @@ def update_user_inbox_for_reminders(uid):
     params1 = {'uid': int(uid),
                'date': now,
                'old_status': reminder_status}
-    res_ids = run_sql(query1%params1)       
+    res_ids = run_sql(query1%params1)
     out = len(res_ids)
     if (out>0):
         query2 = """UPDATE user_msgMESSAGE
                     SET    status='%(new_status)s'
-                    WHERE  id_user_to=%(uid)i AND ("""             
+                    WHERE  id_user_to=%(uid)i AND ("""
         for msg_id in res_ids[0:-1]:
             query2 += "id_msgMESSAGE=" + str(int(msg_id[0])) + " OR "
         params2 = {'uid': int(uid),
                    'new_status': new_status,
                    }
         query2 += "id_msgMESSAGE=" + str(int(res_ids[-1][0])) + ")"
-        run_sql(query2%params2)    
+        run_sql(query2%params2)
     return out
 
 def get_nicknames_like(pattern):
@@ -503,14 +503,15 @@ def get_groupnames_like(uid, pattern):
     """
     groups = {}
     if pattern:
-        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE '%s' AND join_policy like 'V%%'"
+        # For this use case external groups are like invisible one
+        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE '%s' AND join_policy like 'V%%' AND        join_policy<>'VE'"
         pattern = escape_string(pattern)
         res = run_sql(query1 % pattern)
-        # The line belows inserts into groups dictionary every tuple the database returned, 
+        # The line belows inserts into groups dictionary every tuple the database returned,
         # assuming field0=key and field1=value
         map(lambda x: groups.setdefault(x[0], x[1]), res)
-        query2 = """SELECT g.id, g.name 
-                    FROM usergroup g, user_usergroup ug 
+        query2 = """SELECT g.id, g.name
+                    FROM usergroup g, user_usergroup ug
                     WHERE g.id=ug.id_usergroup AND ug.id_user=%i AND g.name RLIKE '%s'"""
         res = run_sql(query2 % (uid, pattern))
         map(lambda x: groups.setdefault(x[0], x[1]), res)
@@ -528,7 +529,7 @@ def clean_messages():
     current_time = localtime()
     seconds = mktime(current_time)
     seconds -= CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS * 86400
-    sql_date = convert_datestruct_to_datetext(localtime(seconds))    
+    sql_date = convert_datestruct_to_datetext(localtime(seconds))
     deleted_items = 0
     #find id and email from every user who has got an email
     query1 = """SELECT distinct(umsg.id_user_to),
@@ -576,4 +577,4 @@ def clean_messages():
         query5 += "id IN (%s)" % reduce(tuplize, res4)
         deleted_items += int(run_sql(query5))
     return deleted_items
-    
+

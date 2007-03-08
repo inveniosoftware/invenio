@@ -23,6 +23,9 @@
 
 __revision__ = "$Id$"
 
+from mechanize import Browser
+from invenio.config import sweburl, adminemail
+
 from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
 from invenio.webgroup_dblayer import get_external_groups, get_all_login_method_groups
@@ -46,6 +49,16 @@ class WebGroupTest(unittest.TestCase):
         self.pwd2 = '1234'
         self.uid2 = run_sql("""INSERT INTO user (email, password) VALUES (%s, %s)""", (self.email2, self.pwd2, ))
         self.uid2 = int(self.uid2)
+
+        self.goodgroup = 'bla'
+        self.badgroup = 'blo'
+        self.goodid = run_sql("""INSERT INTO usergroup(name, description, join_policy, login_method)
+            VALUES (%s, %s, 'VE', 'INTERNAL')""", (self.goodgroup, self.goodgroup))
+        self.badid = run_sql("""INSERT INTO usergroup(name, description, join_policy, login_method)
+            VALUES (%s, %s, 'VE', 'INTERNAL')""", (self.badgroup, self.badgroup))
+        run_sql("""INSERT INTO user_usergroup(id_user, id_usergroup, user_status, user_status_date)
+            VALUES (1, %s, 'M', NOW())""", (self.goodid, ))
+
 
     def test_synchronize_external_groups(self):
         """webgroup - synchronizing one user external groups"""
@@ -95,6 +108,80 @@ class WebGroupTest(unittest.TestCase):
         groups = get_all_login_method_groups(self.login_method)
         self.failIf(groups)
 
+    def test_external_groups_visibility_groupspage(self):
+        """webgroup - external group visibility in groups page"""
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/login")
+        browser.select_form(nr=0)
+        browser['p_un'] = 'admin'
+        browser['p_pw'] = ''
+        browser.submit()
+
+        expected_response = "You are logged in as admin"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
+
+        browser.open(sweburl + "/yourgroups/display")
+        expected_response = self.goodgroup
+        groups_body = browser.response().read()
+        try:
+            groups_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, groups_body))
+
+        not_expected_response = self.badgroup
+        try:
+            groups_body.index(not_expected_response)
+        except ValueError:
+            pass
+        else:
+            self.fail("Not expected to see %s, got %s." % \
+                    (not_expected_response, groups_body))
+
+    def test_external_groups_visibility_messagespage(self):
+        """webgroup - external group visibility in messages page"""
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/login")
+        browser.select_form(nr=0)
+        browser['p_un'] = 'admin'
+        browser['p_pw'] = ''
+        browser.submit()
+
+        expected_response = "You are logged in as admin"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
+
+        browser.open(sweburl + "/yourmessages/write")
+        browser.select_form(nr=0)
+        browser['search_pattern'] = 'b'
+        browser.submit(name='search_group')
+
+        expected_response = self.goodgroup
+        groups_body = browser.response().read()
+        try:
+            groups_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                    (expected_response, groups_body))
+
+        not_expected_response = self.badgroup
+        try:
+            groups_body.index(not_expected_response)
+        except ValueError:
+            pass
+        else:
+            self.fail("Not expected to see %s, got %s." % \
+                    (not_expected_response, groups_body))
+
 
 
     def tearDown(self):
@@ -103,7 +190,8 @@ class WebGroupTest(unittest.TestCase):
         run_sql("""DELETE FROM usergroup WHERE login_method=%s""", (self.login_method,))
         run_sql("""DELETE FROM user_usergroup WHERE id_user=%i""" % self.uid)
         run_sql("""DELETE FROM user_usergroup WHERE id_user=%i""" % self.uid2)
-
+        run_sql("""DELETE FROM usergroup WHERE name=%s OR name=%s""", (self.goodgroup, self.badgroup,))
+        run_sql("""DELETE FROM user_usergroup WHERE id_usergroup=%i OR id_usergroup=%i""" % (self.goodid, self.badid,))
 
 test_suite = make_test_suite(WebGroupTest)
 
