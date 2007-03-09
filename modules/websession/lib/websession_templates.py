@@ -77,7 +77,7 @@ class Template:
         out = """
                  <table>
                     <tr>
-                      <td align=center>%(message)s
+                      <td align=left>%(message)s
                        <a href="./%(act)s">%(link)s</a></td>
                     </tr>
                  </table>

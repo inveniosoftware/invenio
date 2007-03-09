@@ -31,6 +31,12 @@ from invenio.external_authentication import ExternalAuth, \
         WebAccessExternalAuthError
 from invenio.external_authentication_cern_wrapper import AuthCernWrapper
 
+
+# Tunable list of settings to be hidden
+CFG_EXTERNAL_AUTH_CERN_HIDDEN_SETTINGS = ['auth', 'respccid', 'ccid']
+# Tunable list of groups to be hidden
+CFG_EXTERNAL_AUTH_CERN_HIDDEN_GROUPS = ['All Exchange People']
+
 class ExternalAuthCern(ExternalAuth):
     """
     External authentication example for a custom HTTPS-based
@@ -66,8 +72,15 @@ class ExternalAuthCern(ExternalAuth):
     def auth_user(self, username, password):
         """
         Check USERNAME and PASSWORD against CERN NICE/CRA database.
-        Return None if authentication failed, email address of the
-        person if authentication succeeded.
+        Return None if authentication failed, or the email address of the
+        person if the authentication was successful.  In order to do
+        this you may perhaps have to keep a translation table between
+        usernames and email addresses.
+        It can also return a tuple (actually a couple) (email, nickname).
+        If it is the first time the user logs in Invenio the nickname is
+        stored alongside the email. If this nickname is unfortunatly already
+        in use it is discarded. Otherwise it is ignored.
+        Raise WebAccessExternalAuthError in case of external troubles.
         """
 
         infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \
@@ -86,14 +99,27 @@ class ExternalAuthCern(ExternalAuth):
         return email.upper() in [user['email'].upper() for user in users]
 
 
-    def fetch_user_groups_membership(self, email, password=None):
+    def fetch_user_groups_membership(self, email, password):
         """Fetch user groups membership from the CERN NICE/CRA account.
         @return a dictionary of groupname, group description
         """
         groups = self._try_twice(funct=AuthCernWrapper.get_groups_for_user, \
                 params={"user_name":email})
+        # Filtering out uncomfortable groups
+        groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_CERN_HIDDEN_GROUPS]
         return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                         or x + ' (Group)'), groups))
+
+    def fetch_user_nickname(self, username, password):
+        """Given a username and a password, returns the right nickname belonging
+        to that user (username could be an email).
+        """
+        infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \
+                params={"user_name":username, "password":password})
+        if "login" in infos:
+            return infos["login"]
+        else:
+            return None
 
 
     def fetch_user_preferences(self, username, password=None):
@@ -105,16 +131,19 @@ class ExternalAuthCern(ExternalAuth):
         prefs = self._try_twice(funct=AuthCernWrapper.get_user_info, \
                 params={"user_name":username, "password":password})
         ret = {}
+        try:
+            if int(prefs['auth']) == 3 \
+                    and (int(prefs['respccid']) > 0 \
+                    or not prefs['email'].endswith('@cern.ch')):
+                ret['external'] = '1'
+            else:
+                ret['external'] = '0'
+        except KeyError:
+            ret['external'] = '1'
         for key, value in prefs.items():
-            if key in ['auth', 'respccid', 'ccid']:
+            if key in CFG_EXTERNAL_AUTH_CERN_HIDDEN_SETTINGS:
                 ret['HIDDEN_' + key] = value
             else:
                 ret[key] = value
-        if int(ret['HIDDEN_auth']) == 3 \
-                and (int(ret['HIDDEN_respccid']) > 0 \
-                or not ret['email'].endswith('@cern.ch')):
-            ret['external'] = '1'
-        else:
-            ret['external'] = '0'
         return ret
 

@@ -923,7 +923,7 @@ II. Example - connecting role and user</a>
      function auth_user. This function returns a valid email-address in CDS Invenio if the user
      is authenticated, not necessarily the same entered by the user as username. If the user
      is not authenticated, return None.
-     The class could also provide four more methods: fetch_user_preferences, user_exists,
+     The class could also provide five more methods: fetch_user_preferences, user_exists,
      fetch_user_groups_membership and fetch_all_users_groups_membership.
      The first should take an email and eventually a password and should return a dictionary of keys
      and value representing external preferences, infos or settings. If, for some reasons, you like
@@ -941,6 +941,8 @@ II. Example - connecting role and user</a>
      a group description and a list of email of users belonging to each groups. Those memberships
      will be merged into the database in the way done by the previous method, but could
      provide batch synchronization of groups.
+     The fifth method should just return the nickname as is known by the external authentication
+     system, given the usual email/username and the password.
      Note: if your system has more than one external login methods then incoherence in the groups
      memberships could happen when a user switch his login method. This will be fixed some times in the
      future.
@@ -999,6 +1001,12 @@ II. Example - connecting role and user</a>
              """
              raise NotImplementedError
 
+         def fetch_user_nickname(self, username, password):
+             """Given a username and a password, returns the right nickname belonging
+             to that user (username could be an email).
+             """
+             raise NotImplementedError
+             #return Nickname
 
 
 - end of file -

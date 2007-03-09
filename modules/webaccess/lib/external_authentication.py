@@ -36,6 +36,12 @@ class ExternalAuth:
     def __init__(self):
         """Initialize stuff here"""
         self.name = None
+        # Set the following variable to True in order to import the externally
+        # provided nickname into Invenio during the first login of a user
+        # through this external authentication system.
+        # If the nickname is already taken into Invenio, then it won't be
+        # considered.
+        self.enforce_external_nicknames = False
         pass
 
     def auth_user(self, username, password):
@@ -56,13 +62,20 @@ class ExternalAuth:
         raise NotImplementedError
 
 
-    def fetch_user_groups_membership(self, username, password=None):
-        """Given a username, returns a dictionary of groups
+    def fetch_user_groups_membership(self, username, password):
+        """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
         Raise WebAccessExternalAuthError in case of troubles.
         """
         raise NotImplementedError
         #return {}
+
+    def fetch_user_nickname(self, username, password):
+        """Given a username and a password, returns the right nickname belonging
+        to that user (username could be an email).
+        """
+        raise NotImplementedError
+        #return Nickname
 
     def fetch_user_preferences(self, username, password=None):
         """Given a username and a password, returns a dictionary of keys and

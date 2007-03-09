@@ -163,11 +163,21 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if prefs['login_method'] != args['login_method']:
                 if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
                     # Switching to internal authentication: we drop any external datas
+                    p_email = webuser.get_email(uid)
                     webuser.drop_external_settings(uid)
                     webgroup_dblayer.drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
-                    mess = _("Switched to internal login method.")
+                    mess = _("<p>Switched to internal login method. ")
+                    mess += _("""Please note, that if this is the first time that
+                        you are using this account with the internal method
+                        then the system has set for you a random generated password
+                        which you can obtain via email clicking on the following
+                        button:</p>""")
+                    mess += """<p><form  method="post" action="../youraccount/send_email">
+                        <input type="hidden" name="p_email" value="%s">
+                        <input class="formbutton" type="submit" value="%s">
+                        </form></p>""" % (p_email, _("Send Password"))
                 else:
                     query = """SELECT email FROM user
                             WHERE id = %i"""
@@ -275,7 +285,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             title = _("Editing settings failed")
 
         return page(title=title,
-                    body=webaccount.perform_back(mess,act, linkname, args['ln']),
+                    body=webaccount.perform_back(mess, act, linkname, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",

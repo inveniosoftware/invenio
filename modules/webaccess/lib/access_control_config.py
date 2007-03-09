@@ -55,10 +55,9 @@ MAXPAGEUSERS = 25
 # Adviced not to change the name, since it is used to identify the account
 # Format is:   System name: (System class, Default True/Flase), atleast one
 # must be default
-CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True)}
-#CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), \
-#    "CERN (external)": (external_authentication_cern.ExternalAuthCern(), False)}
-
+CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True)}
+#CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True), \
+#    "CERN": (external_authentication_cern.ExternalAuthCern(), False)}
 
 
 # default data for the add_default_settings function

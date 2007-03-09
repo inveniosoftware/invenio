@@ -391,15 +391,27 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
+            # auth_user can return either an email or a tuple(couple) of a email and
+            # a nickname
             p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw)
         except WebAccessExternalAuthError:
             return([], p_email, p_pw, 16)
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
-            if not query_result:
+            if not query_result: # First time user
                 import random
                 p_pw_local = int(random.random() * 1000000)
-                if registerUser(req, p_email, p_pw_local, "", register_without_nickname=True) == 0:
+                p_nickname = ''
+                if CFG_EXTERNAL_AUTHENTICATION[login_method][0].enforce_external_nicknames:
+                    try: # Let's discover the external nickname!
+                        p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw)
+                    except (AttributeError, NotImplementedError):
+                        pass
+                res = registerUser(req, p_email, p_pw_local, p_nickname, \
+                        register_without_nickname=p_nickname == '')
+                if res == 4 or res == 2: # The nickname was already taken
+                    res = registerUser(req, p_email, p_pw_local, '', register_without_nickname=True)
+                if res == 0: # Everything was ok, with or without nickname.
                     query_result = run_sql("SELECT id from user where email=%s", (p_email,))
                 else:
                     return([], p_email, p_pw_local, 13)
@@ -410,7 +422,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 for key, value in groups.items():
                     new_groups[key + " [" + str(login_method) + "]"] = value
                 groups = new_groups
-            except AttributeError:
+            except (AttributeError, NotImplementedError):
                 pass
             except WebAccessExternalAuthError:
                 return([], p_email, p_pw, 16)
@@ -429,7 +441,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw)
                 for key, value in new_prefs.items():
                     user_prefs['EXTERNAL_' + key] = value
-            except AttributeError:
+            except (AttributeError, NotImplementedError):
                 pass
             except WebAccessExternalAuthError:
                 return([], p_email, p_pw, 16)
