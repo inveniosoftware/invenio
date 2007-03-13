@@ -45,10 +45,44 @@ from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email
 from invenio.websubmit_config import *
-from websubmit_dblayer import *
 from invenio.file import *
-
 from invenio.messages import gettext_set_language, wash_language
+
+from websubmit_dblayer import \
+     get_storage_directory_of_action, \
+     get_longname_of_doctype, \
+     get_longname_of_action, \
+     get_num_pages_of_submission, \
+     get_parameter_value_for_doctype, \
+     submission_exists_in_log, \
+     log_new_pending_submission, \
+     log_new_completed_submission, \
+     update_submission_modified_date_in_log, \
+     update_submission_reference_in_log, \
+     update_submission_reference_and_status_in_log, \
+     form_element_sets_cookie, \
+     get_form_fields_on_submission_page, \
+     get_element_description, \
+     get_element_check_description, \
+     get_form_fields_not_on_submission_page, \
+     function_step_is_last, \
+     get_collection_children_of_submission_collection, \
+     get_submission_collection_name, \
+     get_doctype_children_of_submission_collection, \
+     get_categories_of_doctype, \
+     get_doctype_details, \
+     get_actions_on_submission_page_for_doctype, \
+     get_action_details, \
+     get_parameters_of_function, \
+     get_details_of_submission, \
+     get_functions_for_submission_step, \
+     get_submissions_at_level_X_with_score_above_N, \
+     submission_is_finished, \
+     get_cookies_set_on_field_for_user, \
+     cookie_is_set_on_field_for_user, \
+     update_cookie_value_on_field_for_user, \
+     add_new_cookie_to_field_for_user
+
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
