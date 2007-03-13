@@ -733,8 +733,10 @@
                 <li><b>Marc Code</b>: <font color=red>MySQL users only!</font> - This indicates in which field of the MySQL 
                 document database to retrieve the original value when modifying this information (function 
                 Create_Modify_Interface of action MBI).
-                <LI><b>Cookies</b>: indicates whether webSubmit will set a cookie on the value filled in by the user. If yes, 
-                next time the user will come to this submission, the value he has entered last time will be filled in automatically.
+                <LI><b>Cookies</b>: indicates whether WebSubmit will set a cookie on the value filled in by the user. If yes, 
+                next time the user will come to this submission, the value he has entered last time will be filled in
+                automatically. <span style="font-weight: bold;">Note:</span> <span style="color: red; font-weight: bold;">
+                This feature has been REMOVED.</span>
                 <LI><b>other fields</b>: The other fields help defining the html form element.
             </UL>
             <font color=red>Important warning!</font> Please remember this is a template! This means it can be used in 
