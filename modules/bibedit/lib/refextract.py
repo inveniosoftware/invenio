@@ -348,8 +348,10 @@ def get_bad_char_replacements():
         ## Word style speech marks:
         u'\u201d' : u'"',
         u'\u201c' : u'"',
-        ## pdftotext has problems with umlaut and prints it as diaeresis followed by a letter:correct it
-        ## (Optional space between char and letter - fixes broken line examples)
+        ## pdftotext has problems with umlaut and prints it as diaeresis
+        ## followed by a letter:correct it
+        ## (Optional space between char and letter - fixes broken
+        ## line examples)
         u'\u00A8 a' : u'\u00E4',
         u'\u00A8 e' : u'\u00EB',
         u'\u00A8 i' : u'\u00EF',
@@ -528,7 +530,8 @@ sre_extract_char_class = (sre.compile(r' \[([^\]]+) \]', sre.UNICODE), \
 sre_raw_url = \
  sre.compile(r'((https?|s?ftp) \/\/([\w\d\_\.\-])+(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
              sre.UNICODE|sre.I)
-## HTML marked-up URL (e.g. <a href="http //cdsware.cern.ch/">CERN Document Server Software Consortium</a> )
+## HTML marked-up URL (e.g. <a href="http //cdsware.cern.ch/">
+## CERN Document Server Software Consortium</a> )
 sre_html_tagged_url = \
  sre.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp) \/\/)?([\w\d\_\.\-])+(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
              sre.UNICODE|sre.I)
@@ -544,12 +547,12 @@ sre_title_followed_by_series_markup_tags = \
 
 sre_punctuation = sre.compile(r'[\.\,\;\'\(\)\-]', sre.UNICODE)
 
-#sre_tagged_citation = sre.compile(r'\<cds\.(TITLE|VOL|YR|PG|REPORTNUMBER|SER|URL).*?\>', sre.UNICODE)
 sre_tagged_citation = sre.compile(r'\<cds\.(TITLE|VOL|YR|PG|REPORTNUMBER|SER|URL)( description=\"[^\"]*\")?\>', sre.UNICODE)
 
 ## is there pre-recognised numeration-tagging within a
 ## few characters of the start if this part of the line?
-sre_tagged_numeration_near_line_start = sre.compile(r'^.{0,4}?<CDS (VOL|SER)>', sre.UNICODE)
+sre_tagged_numeration_near_line_start = \
+                         sre.compile(r'^.{0,4}?<CDS (VOL|SER)>', sre.UNICODE)
 
 
 sre_ibid = \
@@ -896,7 +899,7 @@ def wash_line(line):
     line = sre_multiple_space.sub(' ', line)
     return line
 
-def _order_institute_preprint_reference_numeration_patterns_by_length(numeration_patterns):
+def order_reportnum_patterns_bylen(numeration_patterns):
     """Given a list of user-defined patterns for recognising the numeration
        styles of an institute's preprint references, for each pattern,
        strip out character classes and record the length of the pattern.
@@ -1031,9 +1034,11 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
         The second dictionary contains the standardised category string,
         and is keyed by the non-standard category string. E.g.: 'astro-ph'.
     """
-    def _add_institute_preprint_patterns(preprint_classifications, preprint_numeration_ptns,\
-                                         preprint_reference_search_regexp_patterns, \
-                                         standardised_preprint_reference_categories, kb_line_num):
+    def _add_institute_preprint_patterns(preprint_classifications,
+                                         preprint_numeration_ptns,
+                                         preprint_reference_search_regexp_patterns,
+                                         standardised_preprint_reference_categories,
+                                         kb_line_num):
         """For a list of preprint category strings and preprint numeration
            patterns for a given institute, create the regexp patterns for
            each of the preprint types.  Add the regexp patterns to the
@@ -1065,36 +1070,60 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
             ## build regexps and add them for this institute:
             ## First, order the numeration styles by line-length, and build a
             ## grouped regexp for recognising numeration:
-            ordered_patterns = _order_institute_preprint_reference_numeration_patterns_by_length(preprint_numeration_ptns)
-            ## create a grouped regexp for numeration part of preprint reference:
-            numeration_regexp = create_institute_numeration_group_regexp_pattern(ordered_patterns)
+            ordered_patterns = \
+              order_reportnum_patterns_bylen(preprint_numeration_ptns)
+            ## create a grouped regexp for numeration part of
+            ## preprint reference:
+            numeration_regexp = \
+              create_institute_numeration_group_regexp_pattern(ordered_patterns)
 
-            ## for each "classification" part of preprint references, create a complete regex:
+            ## for each "classification" part of preprint references, create a
+            ## complete regex:
             ## will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
                 search_pattern_str = r'[^a-zA-Z0-9\/\.]((?P<categ>' \
                                      + classification[0] + u')' \
                                      + numeration_regexp + r')'
-                sre_search_pattern = sre.compile(search_pattern_str, sre.UNICODE)
-                preprint_reference_search_regexp_patterns[(kb_line_num, classification[0])]  = sre_search_pattern
-                standardised_preprint_reference_categories[(kb_line_num, classification[0])] = classification[1]
+                sre_search_pattern = sre.compile(search_pattern_str, \
+                                                 sre.UNICODE)
+                preprint_reference_search_regexp_patterns[(kb_line_num, \
+                                                          classification[0])] =\
+                                                          sre_search_pattern
+                standardised_preprint_reference_categories[(kb_line_num, \
+                                                          classification[0])] =\
+                                                          classification[1]
 
-    preprint_reference_search_regexp_patterns  = {}  ## a dictionary of paterns used to recognise categories of
-                                                     ## preprints as used by various institutes
-    standardised_preprint_reference_categories = {}  ## dictionary of standardised category strings for preprint cats
-    current_institute_preprint_classifications = []  ## list of tuples containing preprint categories in their raw and
-                                                     ## standardised forms, as read from the KB
-    current_institute_numerations = []               ## list of preprint numeration patterns, as read from the KB
-    sre_institute_name          = sre.compile(r'^\#{5}\s*(.+)\s*\#{5}$', sre.UNICODE)  ## pattern to recognise an
-                                                                                       ## institute name line in KB
-    sre_preprint_classification = sre.compile(r'^\s*(\w.*?)\s*---\s*(\w.*?)\s*$', sre.UNICODE) ## pattern to recognise
-                                                                                               ## an institute preprint
-                                                                                               ## categ line in KB
-    sre_numeration_pattern      = sre.compile(r'^\<(.+)\>$', sre.UNICODE)         ## pattern to recognise a preprint
-                                                                                  ## numeration-style line in KB
-    kb_line_num = 0    ## when making the dictionary of patterns, which is keyed by the category search string,
-                       ## this counter will ensure that patterns in the dictionary are not overwritten if 2
-                       ## institutes have the same category styles.
+    preprint_reference_search_regexp_patterns  = {}  ## a dictionary of paterns
+                                                     ## used to recognise
+                                                     ## categories of preprints
+                                                     ## as used by various
+                                                     ## institutes
+    standardised_preprint_reference_categories = {}  ## dictionary of
+                                                     ## standardised category
+                                                     ## stringsfor preprint cats
+    current_institute_preprint_classifications = []  ## listof tuples containing
+                                                     ## preprint categories in
+                                                     ## their raw & standardised
+                                                     ## forms,as read from KB
+    current_institute_numerations = []               ## list of preprint
+                                                     ## numeration patterns, as
+                                                     ## read from the KB
+
+    ## pattern to recognise an institute name line in the KB
+    sre_institute_name = sre.compile(r'^\#{5}\s*(.+)\s*\#{5}$', sre.UNICODE)
+
+    ## pattern to recognise an institute preprint categ line in the KB
+    sre_preprint_classification = \
+                sre.compile(r'^\s*(\w.*?)\s*---\s*(\w.*?)\s*$', sre.UNICODE)
+
+    ## pattern to recognise a preprint numeration-style line in KB
+    sre_numeration_pattern      = sre.compile(r'^\<(.+)\>$', sre.UNICODE)
+
+    kb_line_num = 0    ## when making the dictionary of patterns, which is
+                       ## keyed by the category search string, this counter
+                       ## will ensure that patterns in the dictionary are not
+                       ## overwritten if 2 institutes have the same category
+                       ## styles.
 
     try:
         fh = open(fpath, "r")
@@ -1110,21 +1139,26 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
             m_institute_name = sre_institute_name.search(rawline)
             if m_institute_name is not None:
                 ## This KB line is the name of an institute
-                ## append the last institute's pattern list to the list of institutes:
+                ## append the last institute's pattern list to the list of
+                ## institutes:
                 _add_institute_preprint_patterns(current_institute_preprint_classifications,\
                                                  current_institute_numerations,\
-                                                 preprint_reference_search_regexp_patterns, \
-                                                 standardised_preprint_reference_categories, kb_line_num)
+                                                 preprint_reference_search_regexp_patterns,\
+                                                 standardised_preprint_reference_categories,\
+                                                 kb_line_num)
 
-                ## Now start a new dictionary to contain the search patterns for this institute:
+                ## Now start a new dictionary to contain the search patterns
+                ## for this institute:
                 current_institute_preprint_classifications = []
                 current_institute_numerations = []
                 ## move on to the next line
                 continue
 
-            m_preprint_classification = sre_preprint_classification.search(rawline)
+            m_preprint_classification = \
+                                     sre_preprint_classification.search(rawline)
             if m_preprint_classification is not None:
-                ## This KB line contains a preprint classification for the current institute
+                ## This KB line contains a preprint classification for
+                ## the current institute
                 try:
                     current_institute_preprint_classifications.append((m_preprint_classification.group(1), \
                                                                       m_preprint_classification.group(2)))
@@ -1136,7 +1170,8 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
 
             m_numeration_pattern = sre_numeration_pattern.search(rawline)
             if m_numeration_pattern is not None:
-                ## This KB line contains a preprint item numeration pattern for the current institute
+                ## This KB line contains a preprint item numeration pattern
+                ## for the current institute
                 try:
                     current_institute_numerations.append(m_numeration_pattern.group(1))
                 except (AttributeError, NameError):
@@ -1146,19 +1181,22 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
 
         _add_institute_preprint_patterns(current_institute_preprint_classifications,\
                                          current_institute_numerations,\
-                                         preprint_reference_search_regexp_patterns, \
-                                         standardised_preprint_reference_categories, kb_line_num)
+                                         preprint_reference_search_regexp_patterns,\
+                                         standardised_preprint_reference_categories,\
+                                         kb_line_num)
 
     except IOError:
         ## problem opening KB for reading, or problem while reading from it:
-        emsg = """Error: Could not build knowledge base containing institute preprint referencing"""\
-               """ patterns - failed to read from KB %(kb)s.\n""" \
+        emsg = """Error: Could not build knowledge base containing """ \
+               """institute preprint referencing patterns - failed """ \
+               """to read from KB %(kb)s.\n""" \
                % { 'kb' : fpath }
         sys.stderr.write(emsg)
         sys.stderr.flush()
         sys.exit(1)
 
-    ## return the preprint reference patterns and the replacement strings for non-standard categ-strings:
+    ## return the preprint reference patterns and the replacement strings
+    ## for non-standard categ-strings:
     return (preprint_reference_search_regexp_patterns, \
             standardised_preprint_reference_categories)
 
@@ -1206,7 +1244,8 @@ def build_titles_knowledge_base(fpath):
         count = 0	      
         for rawline in fh:
             count += 1
-            ## Test line to ensure that it is a correctly formatted knowledge base line:
+            ## Test line to ensure that it is a correctly formatted
+            ## knowledge base line:
             try:
                 rawline = rawline.decode("utf-8").rstrip("\n")
             except UnicodeError:
@@ -1330,19 +1369,23 @@ def identify_preprint_report_numbers(line,
             return 0
         else:
             return -1
-    repnum_matches_matchlen = {}  ## info about lengths of report numbers matched at given locations in line
-    repnum_matches_repl_str = {}  ## standardised report numbers matched at given locations in line
+    repnum_matches_matchlen = {}  ## info about lengths of report numbers
+                                  ## matched at given locations in line
+    repnum_matches_repl_str = {}  ## standardised report numbers matched
+                                  ## at given locations in line
 
     preprint_repnum_categs = preprint_repnum_standardised_categs.keys()
     preprint_repnum_categs.sort(_by_len)
 
     ## try to match preprint report numbers in the line:
     for categ in preprint_repnum_categs:
-        ## search for all instances of the current report numbering style in the line:
+        ## search for all instances of the current report
+        ## numbering style in the line:
         repnum_matches_iter = preprint_repnum_search_kb[categ].finditer(line)
         ## for each matched report number of this style:
         for repnum_match in repnum_matches_iter:
-            ## Get the matched text for the numeration part of the preprint report number:
+            ## Get the matched text for the numeration part of the
+            ## preprint report number:
             numeration_match = repnum_match.group('numn')
             ## clean/standardise this numeration text:
             numeration_match = numeration_match.replace(" ", "-")
@@ -1350,15 +1393,21 @@ def identify_preprint_report_numbers(line,
             numeration_match = numeration_match.replace("/-", "/")
             numeration_match = numeration_match.replace("-/", "/")
             numeration_match = numeration_match.replace("-/-", "/")
-            ## replace the found preprint report number in the string with underscores:
-            line = line[0:repnum_match.start()] + "_"*len(repnum_match.group(0)) + line[repnum_match.end():]
+            ## replace the found preprint report number in the
+            ## string with underscores:
+            line = line[0:repnum_match.start()] \
+                   + "_"*len(repnum_match.group(0)) + line[repnum_match.end():]
             ## record the information about the matched preprint report number:
             ## total length in the line of the matched preprint report number:
-            repnum_matches_matchlen[repnum_match.start()] = len(repnum_match.group(0))
+            repnum_matches_matchlen[repnum_match.start()] = \
+                                                    len(repnum_match.group(0))
             ## standardised replacement for the matched preprint report number:
-            repnum_matches_repl_str[repnum_match.start()] = preprint_repnum_standardised_categs[categ] + numeration_match
+            repnum_matches_repl_str[repnum_match.start()] = \
+                                    preprint_repnum_standardised_categs[categ] \
+                                    + numeration_match
 
-    ## return recorded information about matched report numbers, along with the newly changed working line:
+    ## return recorded information about matched report numbers, along with
+    ## the newly changed working line:
     return (repnum_matches_matchlen, repnum_matches_repl_str, line)
 
 def identify_and_tag_URLs(line):
@@ -1441,13 +1490,16 @@ def identify_and_tag_URLs(line):
     extras_from_previous_url = 0
     for url_position in found_url_positions:
         line = line[0:url_position + extras_from_previous_url] \
-               + """<cds.URL description="%(url-description)s">%(url)s</cds.URL>""" \
+          + """<cds.URL description="%(url-description)s">%(url)s</cds.URL>""" \
                % { 'url-description' : found_url_urldescr[url_position],
                    'url'             : found_url_urlstring[url_position],
                  } \
-               + line[url_position+found_url_full_matchlen[url_position]+extras_from_previous_url:]
-        extras_from_previous_url += len("""<cds.URL description=""></cds.URL>""") \
-                                    + len(found_url_urldescr[url_position])
+               + line[url_position + found_url_full_matchlen[url_position] + \
+                      extras_from_previous_url:]
+
+        extras_from_previous_url += \
+                                 len("""<cds.URL description=""></cds.URL>""") \
+                                 + len(found_url_urldescr[url_position])
 
     ## return the line containing the tagged URLs:
     return line
@@ -1529,7 +1581,8 @@ def identify_ibids(line):
         ibid_match_len[m_ibid.start()] = len(m_ibid.group(2))
         ibid_match_txt[m_ibid.start()] = m_ibid.group(2)
         ## Replace matched text in line with underscores:
-        line = line[0:m_ibid.start(2)] + "_"*len(m_ibid.group(2)) + line[m_ibid.end(2):]
+        line = line[0:m_ibid.start(2)] + "_"*len(m_ibid.group(2)) + \
+               line[m_ibid.end(2):]
     return (ibid_match_len, ibid_match_txt, line)
 
 def get_replacement_types(titles, reportnumbers):
@@ -1616,20 +1669,27 @@ def account_for_stripped_whitespace(spaces_keys,
             ## current replacement index:
             true_replacement_index  += removed_spaces[space]
             spare_replacement_index += removed_spaces[space]
-        elif (space >= spare_replacement_index) and (replacement_types[replacement_index] == u"title") \
-             and (space < (spare_replacement_index + len_titles[replacement_index])):
-            ## A periodical title is being replaced. Account for multi-spaces that may have been stripped
-            ## from the title before its recognition:
+        elif (space >= spare_replacement_index) and \
+                 (replacement_types[replacement_index] == u"title") and \
+                 (space < (spare_replacement_index + \
+                           len_titles[replacement_index])):
+            ## A periodical title is being replaced. Account for multi-spaces
+            ## that may have been stripped from the title before its
+            ## recognition:
             spare_replacement_index += removed_spaces[space]
             extras += removed_spaces[space]
-        elif (space >= spare_replacement_index) and (replacement_types[replacement_index] == u"reportnumber") \
-             and (space < (spare_replacement_index + len_reportnums[replacement_index])):
-            ## An institutional preprint report-number is being replaced. Account for multi-spaces that may
-            ## have been stripped from it before its recognition:
+        elif (space >= spare_replacement_index) and \
+                 (replacement_types[replacement_index] == u"reportnumber") and \
+                 (space < (spare_replacement_index + \
+                           len_reportnums[replacement_index])):
+            ## An institutional preprint report-number is being replaced.
+            ## Account for multi-spaces that may have been stripped from it
+            ## before its recognition:
             spare_replacement_index += removed_spaces[space]
             extras += removed_spaces[space]
 
-    ## return the new values for replacement indices with stripped whitespace accounted for:
+    ## return the new values for replacement indices with stripped
+    ## whitespace accounted for:
     return (true_replacement_index, extras)
 
 
@@ -1686,16 +1746,17 @@ def create_marc_xml_reference_line(line_marker,
 
     """
     if len(found_title_len) + len(pprint_repnum_len) == 0:
-        ## no TITLE or REPORT-NUMBER citations were found within this line, use the raw line:
-        ## (This 'raw' line could still be tagged with recognised URLs or numeration.)
+        ## no TITLE or REPORT-NUMBER citations were found within this line,
+        ## use the raw line: (This 'raw' line could still be tagged with
+        ## recognised URLs or numeration.)
         tagged_line = working_line
     else:
-        ## TITLE and/or REPORT-NUMBER citations were found in this line, build a new
-        ## version of the working-line in which the standard versions of the REPORT-NUMBERs
-        ## and TITLEs are tagged:
+        ## TITLE and/or REPORT-NUMBER citations were found in this line,
+        ## build a new version of the working-line in which the standard
+        ## versions of the REPORT-NUMBERs and TITLEs are tagged:
         startpos = 0          ## First cell of the reference line...
-        previous_match = u""  ## previously matched TITLE within line (used for replacement
-                              ## of IBIDs.
+        previous_match = u""  ## previously matched TITLE within line (used
+                              ## for replacement of IBIDs.
         replacement_types = {}
         title_keys = found_title_matchtext.keys()
         title_keys.sort()
@@ -1707,9 +1768,10 @@ def create_marc_xml_reference_line(line_marker,
         replacement_locations = replacement_types.keys()
         replacement_locations.sort()
 
-        tagged_line = u"" ## This is to be the new 'working-line'. It will contain the
-                          ## tagged TITLEs and REPORT-NUMBERs, as well as any previously
-                          ## tagged URLs and numeration components.
+        tagged_line = u"" ## This is to be the new 'working-line'. It will
+                          ## contain the tagged TITLEs and REPORT-NUMBERs,
+                          ## as well as any previously tagged URLs and
+                          ## numeration components.
         ## begin:
         for replacement_index in replacement_locations:
             ## first, factor in any stripped spaces before this 'replacement'
@@ -1724,36 +1786,46 @@ def create_marc_xml_reference_line(line_marker,
             if replacement_types[replacement_index] == u"title":
                 ## Add a tagged periodical TITLE into the line:
                 (rebuilt_chunk, startpos, previous_match) = \
-                      add_tagged_title(reading_line=working_line,
-                                       len_title=found_title_len[replacement_index],
-                                       matched_title=found_title_matchtext[replacement_index],
-                                       previous_match=previous_match,
-                                       startpos=startpos,
-                                       true_replacement_index=true_replacement_index,
-                                       extras=extras,
-                                       standardised_titles=standardised_titles)
+                    add_tagged_title(reading_line=working_line,
+                                     len_title=\
+                                       found_title_len[replacement_index],
+                                     matched_title=\
+                                       found_title_matchtext[replacement_index],
+                                     previous_match=previous_match,
+                                     startpos=startpos,
+                                     true_replacement_index=\
+                                       true_replacement_index,
+                                     extras=extras,
+                                     standardised_titles=\
+                                       standardised_titles)
                 tagged_line += rebuilt_chunk
 
             elif replacement_types[replacement_index] == u"reportnumber":
-                ## Add a tagged institutional preprint REPORT-NUMBER into the line:
+                ## Add a tagged institutional preprint REPORT-NUMBER
+                ## into the line:
                 (rebuilt_chunk, startpos) = \
-                      add_tagged_report_number(reading_line=working_line,
-                                               len_reportnum=pprint_repnum_len[replacement_index],
-                                               reportnum=pprint_repnum_matchtext[replacement_index],
-                                               startpos=startpos,
-                                               true_replacement_index=true_replacement_index,
-                                               extras=extras)
+                  add_tagged_report_number(reading_line=working_line,
+                                           len_reportnum=\
+                                           pprint_repnum_len[replacement_index],
+                                           reportnum=pprint_repnum_matchtext[replacement_index],
+                                           startpos=startpos,
+                                           true_replacement_index=\
+                                             true_replacement_index,
+                                           extras=extras)
                 tagged_line += rebuilt_chunk
 
         ## add the remainder of the original working-line into the rebuilt line:
         tagged_line += working_line[startpos:]
-        ## use the recently marked-up title information to identify any numeration that escaped the last pass:
+        ## use the recently marked-up title information to identify any
+        ## numeration that escaped the last pass:
         tagged_line = _re_identify_numeration(tagged_line)
-        ## remove any series tags that are next to title tags, putting series information into the title tags:
+        ## remove any series tags that are next to title tags, putting
+        ## series information into the title tags:
         tagged_line = move_tagged_series_into_tagged_title(tagged_line)
         tagged_line = wash_line(tagged_line)
 
-    ## Now, from the tagged line, create a MARC XML string, marking up any recognised citations:
+    ## Now, from the tagged line, create a MARC XML string,
+    ## marking up any recognised citations:
     (xml_line, \
      count_misc, \
      count_title, \
@@ -1763,7 +1835,7 @@ def create_marc_xml_reference_line(line_marker,
                                                       tagged_line)
     return (xml_line, count_misc, count_title, count_reportnum, count_url)
 
-def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text=""):
+def markup_title_as_marcxml(title, volume, year, page, misc_text=""):
     """Given a title, its numeration and some optional miscellaneous text,
        return a string containing the MARC XML version of this information.
        E.g. for the miscellaneous text "S. D. Hsu and M. Schwetz ", the
@@ -1799,20 +1871,20 @@ def _refextract_markup_title_as_marcxml(title, volume, year, page, misc_text="")
 """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
    </datafield>
-"""               % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                      'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : encode_for_xml(title),
-                      'volume'                 : encode_for_xml(volume),
-                      'year'                   : encode_for_xml(year),
-                      'page'                   : encode_for_xml(page),
+"""               % { 'df-tag-ref'          : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                      'df-ind1-ref'         : CFG_REFEXTRACT_IND1_REFERENCE,
+                      'df-ind2-ref'         : CFG_REFEXTRACT_IND2_REFERENCE,
+                      'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                      'misc-subfield'       : xml_misc_subfield,
+                      'title'               : encode_for_xml(title),
+                      'volume'              : encode_for_xml(volume),
+                      'year'                : encode_for_xml(year),
+                      'page'                : encode_for_xml(page),
                     }
     return xml_line
 
-def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume, year, page,
-                                                                  report_number, misc_text=""):
+def markup_title_followedby_reportnum_as_marcxml(title, volume, year, page,
+                                                 report_number, misc_text=""):
     """Given a title (and its numeration), a report number, and some optional
        miscellaneous text, return a string containing the MARC XML version of
        this information. E.g. for the miscellaneous text
@@ -1853,22 +1925,22 @@ def _refextract_markup_title_followed_by_report_number_as_marcxml(title, volume,
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
       <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
    </datafield>
-"""               % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                      'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                      'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : encode_for_xml(title),
-                      'volume'                 : encode_for_xml(volume),
-                      'year'                   : encode_for_xml(year),
-                      'page'                   : encode_for_xml(page),
-                      'report-number'          : encode_for_xml(report_number),
-                    }
+"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
+                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
+                 'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
+                 'misc-subfield'          : xml_misc_subfield,
+                 'title'                  : encode_for_xml(title),
+                 'volume'                 : encode_for_xml(volume),
+                 'year'                   : encode_for_xml(year),
+                 'page'                   : encode_for_xml(page),
+                 'report-number'          : encode_for_xml(report_number),
+               }
     return xml_line
 
-def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume, year, page,
-                                                                  report_number, misc_text=""):
+def markup_reportnum_followedby_title_as_marcxml(title, volume, year, page,
+                                                 report_number, misc_text=""):
     """Given a title (and its numeration), a report number, and some optional
        miscellaneous text, return a string containing the MARC XML version of
        this information. E.g. for the miscellaneous text
@@ -1877,8 +1949,8 @@ def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume,
        "hep-th/1111111", return the following MARC XML string:
         <datafield tag="999" ind1="C" ind2="5">
            <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
-           <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
            <subfield code="r">hep-th/1111111</subfield>
+           <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
         </datafield>
        In the event that the miscellaneous text string is zero-length, there
        will be no $m subfield present in the returned XML.
@@ -1909,21 +1981,21 @@ def _refextract_markup_report_number_followed_by_title_as_marcxml(title, volume,
       <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
    </datafield>
-"""               % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                      'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                      'misc-subfield'          : xml_misc_subfield,
-                      'title'                  : encode_for_xml(title),
-                      'volume'                 : encode_for_xml(volume),
-                      'year'                   : encode_for_xml(year),
-                      'page'                   : encode_for_xml(page),
-                      'report-number'          : encode_for_xml(report_number),
-                    }
+"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
+                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
+                 'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
+                 'misc-subfield'          : xml_misc_subfield,
+                 'title'                  : encode_for_xml(title),
+                 'volume'                 : encode_for_xml(volume),
+                 'year'                   : encode_for_xml(year),
+                 'page'                   : encode_for_xml(page),
+                 'report-number'          : encode_for_xml(report_number),
+               }
     return xml_line
 
-def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
+def markup_reportnum_as_marcxml(report_number, misc_text=""):
     """Given a report number and some optional miscellaneous text, return a
        string containing the MARC XML version of this information. E.g. for
        the miscellaneous text "Example, AN " and the institutional report-
@@ -1956,16 +2028,16 @@ def _refextract_markup_reportnumber_as_marcxml(report_number, misc_text=""):
 """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
       <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
    </datafield>
-"""               % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                      'misc-subfield'          : xml_misc_subfield,
-                      'report-number'          : encode_for_xml(report_number),
-                    }
+"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
+                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
+                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
+                 'misc-subfield'          : xml_misc_subfield,
+                 'report-number'          : encode_for_xml(report_number),
+               }
     return xml_line
 
-def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text=""):
+def markup_url_as_marcxml(url_string, url_description, misc_text=""):
     """Given a URL, a URL description, and some optional miscellaneous text,
        return a string containing the MARC XML version of this information.
        E.g. for the miscellaneous text "Example, AN ", the URL
@@ -2002,18 +2074,18 @@ def _refextract_markup_url_as_marcxml(url_string, url_description, misc_text="")
       <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
       <subfield code="%(sf-code-ref-url-descr)s">%(url-descr)s</subfield>
    </datafield>
-"""               % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-url'        : CFG_REFEXTRACT_SUBFIELD_URL,
-                      'sf-code-ref-url-descr'  : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
-                      'misc-subfield'          : xml_misc_subfield,
-                      'url'                    : encode_for_xml(url_string),
-                      'url-descr'              : encode_for_xml(url_description),
-                    }
+"""            % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                   'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
+                   'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
+                   'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
+                   'sf-code-ref-url-descr' : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
+                   'misc-subfield'         : xml_misc_subfield,
+                   'url'                   : encode_for_xml(url_string),
+                   'url-descr'             : encode_for_xml(url_description),
+                 }
     return xml_line
 
-def _refextract_markup_reference_line_marker_as_marcxml(marker_text):
+def markup_refline_marker_as_marcxml(marker_text):
     """Given a reference line marker, return a string containing the MARC XML
        version of the marker. E.g. for the line marker "[1]", return the
        following MARC XML string:
@@ -2036,7 +2108,7 @@ def _refextract_markup_reference_line_marker_as_marcxml(marker_text):
       }
     return xml_line
 
-def _refextract_markup_miscellaneous_text_as_marcxml(misc_text):
+def markup_misc_as_marcxml(misc_text):
     """Given some miscellaneous text, return a string containing the MARC XML
        version of the string. E.g. for the misc_text string "testing", return
        the following xml string:
@@ -2059,7 +2131,11 @@ def _refextract_markup_miscellaneous_text_as_marcxml(misc_text):
                 }
     return xml_line
 
-def _convert_unusable_tag_to_misc(line, misc_text, tag_match_start, tag_match_end, closing_tag):
+def convert_unusable_tag_to_misc(line,
+                                 misc_text,
+                                 tag_match_start,
+                                 tag_match_end,
+                                 closing_tag):
     """Function to remove an unwanted, tagged, citation item from a reference
        line. Everything prior to the opening tag, as well as the tagged item
        itself, is put into the miscellaneous text variable; the data up to the
@@ -2121,7 +2197,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
     processed_line = line
 
     ## Now display the marker in marked-up XML:
-    xml_line += _refextract_markup_reference_line_marker_as_marcxml(line_marker)
+    xml_line += markup_refline_marker_as_marcxml(line_marker)
 
     ## 2. Loop through remaining identified segments in line and tag them
     ## into MARC XML segments:
@@ -2185,15 +2261,13 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         prev_report_num = previously_cited_item['report_num']
                         prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
                         xml_line += \
-                           _refextract_markup_title_followed_by_report_number_as_marcxml(title_text,
-                                                                                         reference_volume,
-                                                                                         reference_year,
-                                                                                         reference_page,
-                                                                                         prev_report_num,
-                                                                                         prev_misc_txt)
+                          markup_title_followedby_reportnum_as_marcxml(title_text,
+                                                                       reference_volume,
+                                                                       reference_year,
+                                                                       reference_page,
+                                                                       prev_report_num,
+                                                                       prev_misc_txt)
                         ## Increment the stats counters:
-##                         if len(prev_misc_txt) > 0:
-##                             count_misc += 1
                         count_title += 1
                         count_reportnum += 1
 
@@ -2213,11 +2287,10 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                             ## Add previously cited REPORT NUMBER to XML string:
                             prev_report_num = previously_cited_item['report_num']
                             prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                            xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
-                                                                                   prev_misc_txt)
+                            xml_line += \
+                                    markup_reportnum_as_marcxml(prev_report_num,
+                                                                prev_misc_txt)
                             ## Increment the stats counters:
-##                             if len(prev_misc_txt) > 0:
-##                                 count_misc += 1
                             count_reportnum += 1
                         elif previously_cited_item['type'] == "TITLE":
                             ## previously cited item was a TITLE.
@@ -2227,11 +2300,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                             prev_year     = previously_cited_item['year']
                             prev_page     = previously_cited_item['page']
                             prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                            xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
+                            xml_line += markup_title_as_marcxml(prev_title, prev_volume,
                                                                             prev_year, prev_page, prev_misc_txt)
                             ## Increment the stats counters:
-##                             if len(prev_misc_txt) > 0:
-##                                 count_misc += 1
                             count_title += 1
 
                         ## Now add the current cited item into the previously cited item marker
@@ -2293,15 +2364,13 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                     prev_page     = previously_cited_item['page']
                     prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
                     xml_line += \
-                      _refextract_markup_title_followed_by_report_number_as_marcxml(prev_title,
-                                                                                    prev_volume,
-                                                                                    prev_year,
-                                                                                    prev_page,
-                                                                                    report_num,
-                                                                                    prev_misc_txt)
+                     markup_title_followedby_reportnum_as_marcxml(prev_title,
+                                                                  prev_volume,
+                                                                  prev_year,
+                                                                  prev_page,
+                                                                  report_num,
+                                                                  prev_misc_txt)
                     ## Increment the stats counters:
-##                     if len(prev_misc_txt) > 0:
-##                         count_misc += 1
                     count_title += 1
                     count_reportnum += 1
 
@@ -2317,11 +2386,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         ## Add previously cited REPORT NUMBER to XML string:
                         prev_report_num = previously_cited_item['report_num']
                         prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
-                                                                               prev_misc_txt)
+                        xml_line += markup_reportnum_as_marcxml(prev_report_num,
+                                                                prev_misc_txt)
                         ## Increment the stats counters:
-##                         if len(prev_misc_txt) > 0:
-##                             count_misc += 1
                         count_reportnum += 1
                     elif previously_cited_item['type'] == "TITLE":
                         ## previously cited item was a TITLE.
@@ -2331,11 +2398,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         prev_year     = previously_cited_item['year']
                         prev_page     = previously_cited_item['page']
                         prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
+                        xml_line += markup_title_as_marcxml(prev_title, prev_volume,
                                                                         prev_year, prev_page, prev_misc_txt)
                         ## Increment the stats counters:
-##                         if len(prev_misc_txt) > 0:
-##                             count_misc += 1
                         count_title += 1
                     ## Now add the current cited item into the previously cited item marker
                     previously_cited_item = { 'type'       : "REPORTNUMBER",
@@ -2384,11 +2449,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         ## Add previously cited REPORT NUMBER to XML string:
                         prev_report_num = previously_cited_item['report_num']
                         prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
-                                                                               prev_misc_txt)
+                        xml_line += markup_reportnum_as_marcxml(prev_report_num,
+                                                                prev_misc_txt)
                         ## Increment the stats counters:
-##                         if len(prev_misc_txt) > 0:
-##                             count_misc += 1
                         count_reportnum += 1
                     elif previously_cited_item['type'] == "TITLE":
                         ## previously cited item was a TITLE.
@@ -2398,11 +2461,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         prev_year     = previously_cited_item['year']
                         prev_page     = previously_cited_item['page']
                         prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
+                        xml_line += markup_title_as_marcxml(prev_title, prev_volume,
                                                                         prev_year, prev_page, prev_misc_txt)
                         ## Increment the stats counters:
-##                         if len(prev_misc_txt) > 0:
-##                             count_misc += 1
                         count_title += 1
                     ## Empty the previously-cited item place-holder:
                     previously_cited_item = None
@@ -2416,45 +2477,47 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                     url_descr = u"http://" + url_descr[7:]
                 elif url_descr.find("ftp //") == 0:
                     url_descr = u"ftp://" + url_descr[6:]
-                xml_line += \
-                          _refextract_markup_url_as_marcxml(url_string, url_descr, cur_misc_txt)
+                xml_line += markup_url_as_marcxml(url_string, \
+                                                  url_descr, \
+                                                  cur_misc_txt)
                 ## Increment the stats counters:
-##                 if len(cur_misc_txt) > 0:
-##                     count_misc += 1
                 count_url += 1
                 cur_misc_txt = u""
 
         elif tag_type == "SER":
-            ## This tag is a SERIES tag; Since it was not preceeded by a TITLE tag,
-            ## it is useless - strip the tag and put it into miscellaneous:
+            ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
+            ## tag, it is useless - strip the tag and put it into miscellaneous:
             (cur_misc_txt, processed_line) = \
-                         _convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                                       tag_match_start,tag_match_end,
-                                                       CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
+              convert_unusable_tag_to_misc(processed_line, \
+                                           cur_misc_txt, \
+                                           tag_match_start,tag_match_end, \
+                                           CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
 
         elif tag_type == "VOL":
-            ## This tag is a VOLUME tag; Since it was not preceeded by a TITLE tag,
-            ## it is useless - strip the tag and put it into miscellaneous:
+            ## This tag is a VOLUME tag; Since it was not preceeded by a TITLE
+            ## tag, it is useless - strip the tag and put it into miscellaneous:
             (cur_misc_txt, processed_line) = \
-                         _convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                                       tag_match_start,tag_match_end,
-                                                       CFG_REFEXTRACT_MARKER_CLOSING_VOLUME)
+              convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
+                                           tag_match_start,tag_match_end, \
+                                           CFG_REFEXTRACT_MARKER_CLOSING_VOLUME)
 
         elif tag_type == "YR":
-            ## This tag is a YEAR tag; Since it's not preceeded by TITLE and VOLUME tags, it
-            ## is useless - strip the tag and put the contents into miscellaneous:
+            ## This tag is a YEAR tag; Since it's not preceeded by TITLE and
+            ## VOLUME tags, it is useless - strip the tag and put the contents
+            ## into miscellaneous:
             (cur_misc_txt, processed_line) = \
-                         _convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                                       tag_match_start,tag_match_end,
-                                                       CFG_REFEXTRACT_MARKER_CLOSING_YEAR)
+              convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
+                                           tag_match_start,tag_match_end, \
+                                           CFG_REFEXTRACT_MARKER_CLOSING_YEAR)
 
         elif tag_type == "PG":
-            ## This tag is a PAGE tag; Since it's not preceeded by TITLE, VOLUME and YEAR tags,
-            ## it is useless - strip the tag and put the contents into miscellaneous:
+            ## This tag is a PAGE tag; Since it's not preceeded by TITLE,
+            ## VOLUME and YEAR tags, it is useless - strip the tag and put the
+            ## contents into miscellaneous:
             (cur_misc_txt, processed_line) = \
-                         _convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
-                                                       tag_match_start,tag_match_end,
-                                                       CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
+              convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
+                                           tag_match_start,tag_match_end, \
+                                           CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
 
         else:
             ## Unknown tag - discard as miscellaneous text:
@@ -2471,11 +2534,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
             ## Add previously cited REPORT NUMBER to XML string:
             prev_report_num = previously_cited_item['report_num']
             prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-            xml_line += _refextract_markup_reportnumber_as_marcxml(prev_report_num,
-                                                                   prev_misc_txt)
+            xml_line += markup_reportnum_as_marcxml(prev_report_num,
+                                                    prev_misc_txt)
             ## Increment the stats counters:
-##             if len(prev_misc_txt) > 0:
-##                 count_misc += 1
             count_reportnum += 1
         elif previously_cited_item['type'] == "TITLE":
             ## previously cited item was a TITLE.
@@ -2485,20 +2546,20 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
             prev_year     = previously_cited_item['year']
             prev_page     = previously_cited_item['page']
             prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-            xml_line += _refextract_markup_title_as_marcxml(prev_title, prev_volume,
+            xml_line += markup_title_as_marcxml(prev_title, prev_volume,
                                                             prev_year, prev_page, prev_misc_txt)
             ## Increment the stats counters:
-##             if len(prev_misc_txt) > 0:
-##                 count_misc += 1
             count_title += 1
         ## free up previously_cited_item:
         previously_cited_item = None
 
-    ## place any remaining miscellaneous text into the appropriate MARC XML fields:
+    ## place any remaining miscellaneous text into the
+    ## appropriate MARC XML fields:
     cur_misc_txt += processed_line
     if len(cur_misc_txt.strip(" .;,")) > 0:
-        ## The remaining misc text is not just a full-stop or semi-colon. Add it:
-        xml_line += _refextract_markup_miscellaneous_text_as_marcxml(cur_misc_txt)
+        ## The remaining misc text is not just a full-stop
+        ## or semi-colon. Add it:
+        xml_line += markup_misc_as_marcxml(cur_misc_txt)
         ## Increment the stats counters:
         count_misc += 1
 
@@ -2572,15 +2633,17 @@ def add_tagged_report_number(reading_line,
     rebuilt_line = u""  ## The segment of the line that's being rebuilt to
                         ## include the tagged & standardised REPORT-NUMBER
     
-    ## Fill rebuilt_line with the contents of the reading_line up to the point of the
-    ## institutional REPORT-NUMBER. However, stop 1 character before the replacement
-    ## index of this REPORT-NUMBER to allow for removal of braces, if necessary:
+    ## Fill rebuilt_line with the contents of the reading_line up to the point
+    ## of the institutional REPORT-NUMBER. However, stop 1 character before the
+    ## replacement index of this REPORT-NUMBER to allow for removal of braces,
+    ## if necessary:
     if (true_replacement_index - startpos - 1) >= 0:
         rebuilt_line += reading_line[startpos:true_replacement_index - 1]
     else:
         rebuilt_line += reading_line[startpos:true_replacement_index]
 
-    ## check to see whether the REPORT-NUMBER was enclosed within brackets; drop them if so:
+    ## check to see whether the REPORT-NUMBER was enclosed within brackets;
+    ## drop them if so:
     if reading_line[true_replacement_index - 1] not in (u"[", u"("):
         ## no braces enclosing the REPORT-NUMBER:
         rebuilt_line += reading_line[true_replacement_index - 1]
@@ -2649,11 +2712,13 @@ def add_tagged_title_in_place_of_IBID(previous_match,
             if previous_match[-1] == ".":
                 ## Previous match ended with a full-stop. Add a space, then
                 ## the IBID series
-                previous_match += " %(ibid-series)s" % { 'ibid-series' : ibid_series }
+                previous_match += " %(ibid-series)s" \
+                                  % { 'ibid-series' : ibid_series }
             else:
                 ## Previous match did not end with a full-stop. Add a full-stop
                 ## then a space, then the IBID series
-                previous_match += ". %(ibid-series)s" % { 'ibid-series' : ibid_series }
+                previous_match += ". %(ibid-series)s" \
+                                  % { 'ibid-series' : ibid_series }
             rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
                            % { 'previous-match' : previous_match }
     else:
@@ -2729,7 +2794,8 @@ def add_tagged_title(reading_line,
             ## no previous title-replacements in this line - IBID refers to
             ## something unknown and cannot be replaced:
             rebuilt_line += \
-                reading_line[true_replacement_index:true_replacement_index + len_title + extras]
+                reading_line[true_replacement_index:true_replacement_index \
+                             + len_title + extras]
             startpos = true_replacement_index + len_title + extras
     else:
         ## This is a normal title, not an IBID
@@ -2837,11 +2903,15 @@ def create_marc_xml_reference_section(ref_sect,
         found_title_matchtext = {}
         ## dictionaries to record information about, and the coordinates of,
         ## matched preprint report number items
-        found_pprint_repnum_matchlens     = {}    ## lengths of given matches of preprint report numbers
-        found_pprint_repnum_replstr       = {}    ## standardised replacement strings for preprint report numbers
-                                                  ## to be substituted into a line
+        found_pprint_repnum_matchlens   = {}  ## lengths of given matches of
+                                              ## preprint report numbers
+        found_pprint_repnum_replstr     = {}  ## standardised replacement
+                                              ## strings for preprint report
+                                              ## numbers to be substituted into
+                                              ## a line
 
-        ## take a copy of the line as a first working line, clean it of bad accents, and correct puncutation, etc:
+        ## take a copy of the line as a first working line, clean it of bad
+        ## accents, and correct puncutation, etc:
         working_line1 = wash_line(ref_line)
 
         ## Strip the 'marker' (e.g. [1]) from this reference line:
@@ -2864,48 +2934,64 @@ def create_marc_xml_reference_section(ref_sect,
         ## Strip punctuation from the line:
         working_line2 = sre_punctuation.sub(u' ', working_line2)
 
-        ## Remove multiple spaces from the line, recording information about their coordinates:
+        ## Remove multiple spaces from the line, recording
+        ## information about their coordinates:
         (removed_spaces, working_line2) = \
              remove_and_record_multiple_spaces_in_line(working_line2)
 
         ## Identify and record coordinates of institute preprint report numbers:
-        (found_pprint_repnum_matchlens, found_pprint_repnum_replstr, working_line2) = \
-                                    identify_preprint_report_numbers(working_line2,
-                                                                     preprint_repnum_search_kb,
-                                                                     preprint_repnum_standardised_categs)
+        (found_pprint_repnum_matchlens, \
+         found_pprint_repnum_replstr, \
+         working_line2) = \
+           identify_preprint_report_numbers(working_line2,
+                                            preprint_repnum_search_kb,
+                                            preprint_repnum_standardised_categs)
 
         ## Identify and record coordinates of non-standard journal titles:
-        (found_title_len, found_title_matchtext, working_line2) = \
-                          identify_periodical_titles(working_line2,
-                                                     periodical_title_search_kb,
-                                                     periodical_title_search_keys)
+        (found_title_len, \
+         found_title_matchtext, \
+         working_line2) = \
+                    identify_periodical_titles(working_line2,
+                                               periodical_title_search_kb,
+                                               periodical_title_search_keys)
 
         ## Attempt to identify, record and replace any IBIDs in the line:
         if working_line2.upper().find(u"IBID") != -1:
-            ## there is at least one IBID in the line - try to identify its meaning:
-            (found_ibids_len, found_ibids_matchtext, working_line2) = identify_ibids(working_line2)
-            ## now update the dictionary of matched title lengths with the matched IBID(s) lengths information:
+            ## there is at least one IBID in the line - try to
+            ## identify its meaning:
+            (found_ibids_len, \
+             found_ibids_matchtext, \
+             working_line2) = identify_ibids(working_line2)
+            ## now update the dictionary of matched title lengths with the
+            ## matched IBID(s) lengths information:
             found_title_len.update(found_ibids_len)
             found_title_matchtext.update(found_ibids_matchtext)
 
-        ## Using the recorded information, create a MARC XML representation of the rebuilt line:
-        ## At the same time, get stats of citations found in the reference line (titles, urls, etc):
+        ## Using the recorded information, create a MARC XML representation
+        ## of the rebuilt line:
+        ## At the same time, get stats of citations found in the reference line
+        ## (titles, urls, etc):
         (xml_line, this_count_misc, this_count_title, \
          this_count_reportnum, this_count_url) = \
-             create_marc_xml_reference_line(line_marker=line_marker,
-                                            working_line=working_line1,
-                                            found_title_len=found_title_len,
-                                            found_title_matchtext=found_title_matchtext,
-                                            pprint_repnum_len=found_pprint_repnum_matchlens,
-                                            pprint_repnum_matchtext=found_pprint_repnum_replstr,
-                                            removed_spaces=removed_spaces,
-                                            standardised_titles=standardised_periodical_titles)
+           create_marc_xml_reference_line(line_marker=line_marker,
+                                          working_line=working_line1,
+                                          found_title_len=found_title_len,
+                                          found_title_matchtext=\
+                                            found_title_matchtext,
+                                          pprint_repnum_len=\
+                                            found_pprint_repnum_matchlens,
+                                          pprint_repnum_matchtext=\
+                                            found_pprint_repnum_replstr,
+                                          removed_spaces=removed_spaces,
+                                          standardised_titles=\
+                                            standardised_periodical_titles)
         count_misc      += this_count_misc
         count_title     += this_count_title
         count_reportnum += this_count_reportnum
         count_url       += this_count_url
 
-        ## Append the rebuilt line details to the list of MARC XML reference lines:
+        ## Append the rebuilt line details to the list of
+        ## MARC XML reference lines:
         xml_ref_sectn.append(xml_line)
 
     ## Return thereturn  list of processed reference lines:
@@ -2914,9 +3000,13 @@ def create_marc_xml_reference_section(ref_sect,
 
 ## Tasks related to extraction of reference section from full-text:
 
-## ----> 1. Removing page-breaks, headers and footers before searching for reference section:
+## ----> 1. Removing page-breaks, headers and footers before
+##          searching for reference section:
 
-def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, num_foot_lines):
+def strip_headers_footers_pagebreaks(docbody,
+                                     page_break_posns,
+                                     num_head_lines,
+                                     num_foot_lines):
     """Remove page-break lines, header lines, and footer lines from the
        document.
        @param docbody: (list) of strings, whereby each string in the list is a
@@ -2936,7 +3026,8 @@ def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, 
         if x < num_breaks - 1:
             page_lens.append(page_break_posns[x + 1] - page_break_posns[x])
     page_lens.sort()
-    if (len(page_lens) > 0) and (num_head_lines + num_foot_lines + 1 < page_lens[0]):
+    if (len(page_lens) > 0) and \
+           (num_head_lines + num_foot_lines + 1 < page_lens[0]):
         ## Safe to chop hdrs & ftrs
         page_break_posns.reverse()
         first = 1
@@ -2944,7 +3035,8 @@ def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, 
             ## Unless this is the last page break, chop headers
             if not first:
                 for dummy in xrange(1, num_head_lines + 1):
-                    docbody[page_break_posns[i] + 1:page_break_posns[i] + 2] = []
+                    docbody[page_break_posns[i] \
+                            + 1:page_break_posns[i] + 2] = []
             else:
                 first = 0
             ## Chop page break itself
@@ -2952,7 +3044,9 @@ def strip_headers_footers_pagebreaks(docbody, page_break_posns, num_head_lines, 
             ## Chop footers (unless this is the first page break)
             if i != len(page_break_posns) - 1:
                 for dummy in xrange(1, num_foot_lines + 1):
-                    docbody[page_break_posns[i] - num_foot_lines:page_break_posns[i] - num_foot_lines + 1] = []
+                    docbody[page_break_posns[i] \
+                            - num_foot_lines:page_break_posns[i] \
+                            - num_foot_lines + 1] = []
     return docbody
 
 def check_boundary_lines_similar(l_1, l_2):
@@ -2974,7 +3068,8 @@ def check_boundary_lines_similar(l_1, l_2):
         else:
             l1_str = l_1[i].lower()
             l2_str = l_2[i].lower()
-            if (l1_str[0] == l2_str[0]) and (l1_str[len(l1_str) - 1] == l2_str[len(l2_str) - 1]):
+            if (l1_str[0] == l2_str[0]) and \
+                   (l1_str[len(l1_str) - 1] == l2_str[len(l2_str) - 1]):
                 num_matches = num_matches + 1
     if (len(l_1) == 0) or (float(num_matches) / float(len(l_1)) < 0.9):
         return 0
@@ -3005,28 +3100,39 @@ def get_number_header_lines(docbody, page_break_posns):
         keep_checking = 1
         while keep_checking:
             cur_break = 1
-            if docbody[(page_break_posns[cur_break] + num_header_lines + 1)].isspace():
+            if docbody[(page_break_posns[cur_break] \
+                        + num_header_lines + 1)].isspace():
                 ## this is a blank line
                 empty_line = 1
             
-            if (page_break_posns[cur_break] + num_header_lines + 1) == (page_break_posns[(cur_break + 1)]):
-                # Have reached next page-break: document has no body - only head/footers!
+            if (page_break_posns[cur_break] + num_header_lines + 1) \
+                   == (page_break_posns[(cur_break + 1)]):
+                ## Have reached next page-break: document has no
+                ## body - only head/footers!
                 keep_checking = 0
             
-            grps_headLineWords = p_wordSearch.findall(docbody[(page_break_posns[cur_break] + num_header_lines + 1)])
+            grps_headLineWords = \
+                p_wordSearch.findall(docbody[(page_break_posns[cur_break] \
+                                              + num_header_lines + 1)])
             cur_break = cur_break + next_head
             while (cur_break < remaining_breaks) and keep_checking:
-                grps_thisLineWords = p_wordSearch.findall(docbody[(page_break_posns[cur_break]+ num_header_lines + 1)])
+                grps_thisLineWords = \
+                    p_wordSearch.findall(docbody[(page_break_posns[cur_break] \
+                                                  + num_header_lines + 1)])
                 if empty_line:
                     if len(grps_thisLineWords) != 0:
                         ## This line should be empty, but isn't
                         keep_checking = 0
                 else:
-                    if (len(grps_thisLineWords) == 0) or (len(grps_headLineWords) != len(grps_thisLineWords)):
-                        ## Not same num 'words' as equivilent line in 1st header:
+                    if (len(grps_thisLineWords) == 0) or \
+                           (len(grps_headLineWords) != len(grps_thisLineWords)):
+                        ## Not same num 'words' as equivilent line
+                        ## in 1st header:
                         keep_checking = 0
                     else:
-                        keep_checking = check_boundary_lines_similar(grps_headLineWords, grps_thisLineWords)
+                        keep_checking = \
+                            check_boundary_lines_similar(grps_headLineWords, \
+                                                         grps_thisLineWords)
                 ## Update cur_break for nxt line to check
                 cur_break = cur_break + next_head
             if keep_checking:
@@ -3053,22 +3159,31 @@ def get_number_footer_lines(docbody, page_break_posns):
     if num_breaks > 2:
         while keep_checking:
             cur_break = 1
-            if docbody[(page_break_posns[cur_break] - num_footer_lines - 1)].isspace():
+            if docbody[(page_break_posns[cur_break] \
+                        - num_footer_lines - 1)].isspace():
                 empty_line = 1
-            grps_headLineWords = p_wordSearch.findall(docbody[(page_break_posns[cur_break] - num_footer_lines - 1)])
+            grps_headLineWords = \
+                p_wordSearch.findall(docbody[(page_break_posns[cur_break] \
+                                              - num_footer_lines - 1)])
             cur_break = cur_break + 1
             while (cur_break < num_breaks) and keep_checking:
-                grps_thisLineWords = p_wordSearch.findall(docbody[(page_break_posns[cur_break] - num_footer_lines - 1)])
+                grps_thisLineWords = \
+                    p_wordSearch.findall(docbody[(page_break_posns[cur_break] \
+                                                  - num_footer_lines - 1)])
                 if empty_line:
                     if len(grps_thisLineWords) != 0:
                         ## this line should be empty, but isn't
                         keep_checking = 0
                 else:
-                    if (len(grps_thisLineWords) == 0) or (len(grps_headLineWords) != len(grps_thisLineWords)):
-                        ## Not same num 'words' as equivilent line in 1st footer:
+                    if (len(grps_thisLineWords) == 0) or \
+                           (len(grps_headLineWords) != len(grps_thisLineWords)):
+                        ## Not same num 'words' as equivilent line
+                        ## in 1st footer:
                         keep_checking = 0
                     else:
-                        keep_checking = check_boundary_lines_similar(grps_headLineWords, grps_thisLineWords)
+                        keep_checking = \
+                            check_boundary_lines_similar(grps_headLineWords, \
+                                                         grps_thisLineWords)
                 ## Update cur_break for nxt line to check
                 cur_break = cur_break + 1
             if keep_checking:
@@ -3135,7 +3250,10 @@ def remove_page_boundary_lines(docbody):
     number_foot_lines = get_number_footer_lines(docbody, page_break_posns)
 
     ## Remove pagebreaks,headers,footers:
-    docbody = strip_headers_footers_pagebreaks(docbody, page_break_posns, number_head_lines, number_foot_lines)
+    docbody = strip_headers_footers_pagebreaks(docbody, \
+                                               page_break_posns, \
+                                               number_head_lines, \
+                                               number_foot_lines)
 
     return docbody
 
@@ -3203,19 +3321,20 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
     g_name = unicode(r'(?P<mark>')
     g_close = u')'
     space = unicode(r'\s*?')
-    patterns = [ space + title + g_name + unicode(r'\[\s*?(?P<marknum>\d+)\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'\[\s*?[a-zA-Z]+\s?(\d{1,4}[A-Za-z]?)?\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'\{\s*?(?P<marknum>\d+)\s*?\}') + g_close,
-                 space + title + g_name + unicode(r'\<\s*?(?P<marknum>\d+)\s*?\>') + g_close,
-                 space + title + g_name + unicode(r'\(\s*?(?P<marknum>\d+)\s*?\)') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\.') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\}') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\)') + g_close,
-                 space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\>') + g_close,
-                 space + title + g_name + unicode(r'\[\s*?\]') + g_close,
-                 space + title + g_name + unicode(r'\*') + g_close ]
+    patterns = \
+      [ space + title + g_name + unicode(r'\[\s*?(?P<marknum>\d+)\s*?\]') + g_close,
+        space + title + g_name + unicode(r'\[\s*?[a-zA-Z]+\s?(\d{1,4}[A-Za-z]?)?\s*?\]') + g_close,
+        space + title + g_name + unicode(r'\{\s*?(?P<marknum>\d+)\s*?\}') + g_close,
+        space + title + g_name + unicode(r'\<\s*?(?P<marknum>\d+)\s*?\>') + g_close,
+        space + title + g_name + unicode(r'\(\s*?(?P<marknum>\d+)\s*?\)') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\.') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\]') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\}') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\)') + g_close,
+        space + title + g_name + unicode(r'(?P<marknum>\d+)\s*?\>') + g_close,
+        space + title + g_name + unicode(r'\[\s*?\]') + g_close,
+        space + title + g_name + unicode(r'\*') + g_close ]
     for p in patterns:
         compiled_ptns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_ptns
@@ -3229,8 +3348,11 @@ def get_first_reference_line_numeration_marker_patterns():
     compiled_patterns = []
     g_name = unicode(r'(?P<mark>')
     g_close = u')'
-    patterns = [ g_name + unicode(r'(?P<left>\[)\s*?(?P<num>\d+)\s*?(?P<right>\])') + g_close,
-                 g_name + unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})') + g_close ]
+    patterns = \
+      [ g_name + unicode(r'(?P<left>\[)\s*?(?P<num>\d+)\s*?(?P<right>\])') \
+          + g_close,
+        g_name + unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})') \
+          + g_close ]
     for p in patterns:
         compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
     return compiled_patterns
@@ -3363,12 +3485,17 @@ def find_reference_section(docbody):
         x = len(docbody) - 1
         found_title = 0
         while x >= 0 and not found_title:
-            title_match = perform_regex_search_upon_line_with_pattern_list(docbody[x], title_patterns)
+            title_match = \
+               perform_regex_search_upon_line_with_pattern_list(docbody[x], \
+                                                                title_patterns)
             if title_match is not None:
                 temp_ref_start_line = x
                 temp_title = title_match.group('title')
-                mk_with_title_ptns = get_reference_line_numeration_marker_patterns(temp_title)
-                mk_with_title_match = perform_regex_search_upon_line_with_pattern_list(docbody[x], mk_with_title_ptns)
+                mk_with_title_ptns = \
+                   get_reference_line_numeration_marker_patterns(temp_title)
+                mk_with_title_match = \
+                   perform_regex_search_upon_line_with_pattern_list(docbody[x],\
+                                                             mk_with_title_ptns)
                 if mk_with_title_match is not None:
                     mk = mk_with_title_match.group('mark')
                     mk_ptn = mk_with_title_match.re.pattern
@@ -3433,7 +3560,8 @@ def find_reference_section(docbody):
                                 ref_start_line = temp_ref_start_line
                                 ref_title=temp_title
                     except IndexError:
-                        ## References section title was on last line for some reason. Ignore
+                        ## References section title was on last line for some
+                        ## reason. Ignore
                         pass
             x = x - 1
     if ref_start_line is not None:
@@ -3442,7 +3570,8 @@ def find_reference_section(docbody):
                               'title_string' : ref_title,
                               'marker' : ref_line_marker,
                               'marker_pattern' : ref_line_marker_ptn,
-                              'title_marker_same_line' : (title_marker_same_line is not None and 1) or (0)
+                              'title_marker_same_line' : \
+                               (title_marker_same_line is not None and 1) or (0)
                             }
     else:
         ref_sectn_details = None
@@ -3477,7 +3606,9 @@ def find_reference_section_no_title(docbody):
         x = len(docbody) - 1
         found_ref_sect = 0
         while x >= 0 and not found_ref_sect:
-            mark_match = perform_regex_match_upon_line_with_pattern_list(docbody[x], marker_patterns)
+            mark_match = \
+                perform_regex_match_upon_line_with_pattern_list(docbody[x], \
+                                                                marker_patterns)
             if mark_match is not None and int(mark_match.group('num')) == 1:
                 ## Get marker recognition pattern:
                 mk_ptn = mark_match.re.pattern
@@ -3488,8 +3619,12 @@ def find_reference_section_no_title(docbody):
                 temp_found = 0
                 while y < len(docbody) and y < x + next_test_lines and not temp_found:
                     mark_match2 = perform_regex_match_upon_line_with_pattern_list(docbody[y], marker_patterns)
-                    if (mark_match2 is not None) and (int(mark_match2.group('num')) == 2) and \
-                           (mark_match.group('left') == mark_match2.group('left')) and (mark_match.group('right') == mark_match2.group('right')):
+                    if (mark_match2 is not None) and \
+                           (int(mark_match2.group('num')) == 2) and \
+                           (mark_match.group('left') == \
+                            mark_match2.group('left')) and \
+                            (mark_match.group('right') == \
+                             mark_match2.group('right')):
                         ## Found next reference line:
                         temp_found = 1
                     elif y == len(docbody) - 1:
@@ -3515,7 +3650,10 @@ def find_reference_section_no_title(docbody):
     return ref_sectn_details
 
 
-def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_line_marker_ptn):
+def find_end_of_reference_section(docbody,
+                                  ref_start_line,
+                                  ref_line_marker,
+                                  ref_line_marker_ptn):
     """Given that the start of a document's reference section has already been
        recognised, this function is tasked with finding the line-number in the
        document of the last line of the reference section.
@@ -3532,10 +3670,12 @@ def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_
     """
     section_ended = 0
     x = ref_start_line
-    if (type(x) is not int) or (x < 0) or (x > len(docbody)) or (len(docbody)<1):
-        ## The provided 'first line' of the reference section was invalid. Either it
-        ## was out of bounds in the document body, or it was not a valid integer.
-        ## Can't safely find end of refs with this info - quit! exit!
+    if (type(x) is not int) or (x < 0) or \
+           (x > len(docbody)) or (len(docbody)<1):
+        ## The provided 'first line' of the reference section was invalid.
+        ## Either it was out of bounds in the document body, or it was not a
+        ## valid integer.
+        ## Can't safely find end of refs with this info - quit.
         return None
     ## Get patterns for testing line:
     t_patterns = get_post_reference_section_title_patterns()
@@ -3545,13 +3685,15 @@ def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_
         mk_patterns = [sre.compile(ref_line_marker_ptn, sre.I|sre.UNICODE)]
     else:
         mk_patterns = get_reference_line_numeration_marker_patterns()
-    garbage_digit_pattern = sre.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'), sre.UNICODE)
+    garbage_digit_pattern = \
+     sre.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'), sre.UNICODE)
 
     while ( x < len(docbody)) and (not section_ended):
         ## look for a likely section title that would follow a reference section:
         end_match = perform_regex_search_upon_line_with_pattern_list(docbody[x], t_patterns)
         if end_match is None:
-            ## didn't match a section title - try looking for keywords that suggest the end of a reference section:
+            ## didn't match a section title - try looking for keywords that
+            ## suggest the end of a reference section:
             end_match = perform_regex_search_upon_line_with_pattern_list(docbody[x], kw_patterns)
         if end_match is not None:
             ## Is it really the end of the reference section? Check within the next
@@ -3567,8 +3709,8 @@ def find_end_of_reference_section(docbody, ref_start_line, ref_line_marker, ref_
                 ## No ref line found-end section
                 section_ended = 1
         if not section_ended:
-            ## Does this & the next 5 lines simply contain numbers? If yes, it's probably the axis
-            ## scale of a graph in a fig. End refs section
+            ## Does this & the next 5 lines simply contain numbers? If yes, it's
+            ## probably the axis scale of a graph in a fig. End refs section
             dm = garbage_digit_pattern.match(docbody[x])
             if dm is not None:
                 y = x + 1
@@ -3595,9 +3737,12 @@ def test_for_blank_lines_separating_reference_lines(ref_sect):
     """
     num_blanks = 0            ## Number of blank lines found between non-blanks
     num_lines = 0             ## Number of reference lines separated by blanks
-    blank_line_separators = 0 ## Flag to indicate whether blanks lines separate ref lines
-    multi_nonblanks_found = 0 ## Flag to indicate whether multiple nonblank lines are found together (used because
-                              ## if line is dbl-spaced, it isnt a blank that separates refs & can't be relied upon)
+    blank_line_separators = 0 ## Flag to indicate whether blanks lines separate
+                              ## ref lines
+    multi_nonblanks_found = 0 ## Flag to indicate whether multiple nonblank
+                              ## lines are found together (used because
+                              ## if line is dbl-spaced, it isnt a blank that
+                              ## separates refs & can't be relied upon)
     x = 0
     max_line = len(ref_sect)
     while x < max_line:
@@ -3620,9 +3765,12 @@ def test_for_blank_lines_separating_reference_lines(ref_sect):
                 num_blanks -= 1
             x = x - 1
         x = x + 1
-    ## Now from the number of blank lines & the number of text lines, if num_lines > 3, & num_blanks = num_lines,
-    ## or num_blanks = num_lines - 1, then we have blank line separators between reference lines
-    if (num_lines > 3) and ((num_blanks == num_lines) or (num_blanks == num_lines - 1)) and (multi_nonblanks_found):
+    ## Now from the number of blank lines & the number of text lines, if
+    ## num_lines > 3, & num_blanks = num_lines, or num_blanks = num_lines - 1,
+    ## then we have blank line separators between reference lines
+    if (num_lines > 3) and ((num_blanks == num_lines) or \
+                            (num_blanks == num_lines - 1)) and \
+                            (multi_nonblanks_found):
         blank_line_separators = 1
     return blank_line_separators
 
@@ -3636,7 +3784,8 @@ def remove_leading_garbage_lines_from_reference_section(ref_sectn):
         blank lines or email addresses.
     """
     p_email = sre.compile(unicode(r'^\s*e\-?mail'), sre.UNICODE)
-    while (len(ref_sectn) > 0) and (ref_sectn[0].isspace() or p_email.match(ref_sectn[0]) is not None):
+    while (len(ref_sectn) > 0) and (ref_sectn[0].isspace() or \
+                                    p_email.match(ref_sectn[0]) is not None):
         ref_sectn[0:1] = []
     return ref_sectn
 
@@ -3673,12 +3822,14 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
         m = p_refmarker.match(rebuilt_lines[0])
         last_marknum = int(m.group("marknum"))
         if last_marknum != 1:
-            ## Even the first mark isnt 1 - probaby too dangerous to try to repair
+            ## Even the first mark isnt 1 - probaby too dangerous to
+            ## try to repair
             return rebuilt_lines
     except (IndexError, AttributeError, ValueError):
-        ## Sometihng went wrong. Either no references, not a numbered line marker (int() failed), or
-        ## no reference line marker (NoneType was passed). In any case, unable to test for correct
-        ## reference line numberring - just return the lines as they were.
+        ## Sometihng went wrong. Either no references, not a numbered line
+        ## marker (int() failed), or no reference line marker (NoneType was
+        ## passed). In any case, unable to test for correct reference line
+        ## numberring - just return the lines as they were.
         return rebuilt_lines
 
     ## Loop through each line in "rebuilt_lines" and test the mark at the
@@ -3753,35 +3904,45 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         if m_test_nxt_mark_not_eol is not None:
                             ## move this section back to its real line:
 
-                            ## get the segment of this line to be moved to the previous line
-                            ## (append a newline to it too):
-                            movesect = current_line[0:m_test_nxt_mark_not_eol.start()] + "\n"
+                            ## get the segment of this line to be moved to the
+                            ## previous line (append a newline to it too):
+                            movesect = \
+                               current_line[0:m_test_nxt_mark_not_eol.start()] \
+                               + "\n"
 
-                            ## Now get the previous line into a variable (without its newline at the end):
+                            ## Now get the previous line into a variable
+                            ## (without its newline at the end):
                             previous_line = fixed[len(fixed) - 1].rstrip("\n")
 
-                            ## Now append the section to be moved to the previous line variable.
-                            ## Check the last character of the previous line. If it's a space, then
-                            ## just directly append this new section. Else, append a space then this new section.
+                            ## Now append the section to be moved to the
+                            ## previous line variable. Check the last character
+                            ## of the previous line. If it's a space, then just
+                            ## directly append this new section. Else, append a
+                            ## space then this new section.
                             previous_line += movesect
 
                             fixed[len(fixed) - 1] = previous_line
 
-                            ## Now append the remainder of the current line to the list of fixed lines, and move on to the
+                            ## Now append the remainder of the current line to
+                            ## the list of fixed lines, and move on to the
                             ## next line:
                             fixed.append(current_line[m_test_nxt_mark_not_eol.start():])
 
                             last_marknum += 1
                             break
                         else:
-                            ## The next 'marker' in this line was not followed by text.
-                            ## take from the beginning of this line, to the end of this
-                            ## marker, and append it to the end of the previous line:
+                            ## The next 'marker' in this line was not followed
+                            ## by text. Take from the beginning of this line, to
+                            ## the end of this marker, and append it to the end
+                            ## of the previous line:
                             previous_line = fixed[len(fixed) - 1].rstrip("\n")
                             movesect = current_line[0:m_next_mark.end()] + "\n"
-                            ## Now append the section to be moved to the previous line variable.
-                            ## Check the last character of the previous line. If it's a space, then
-                            ## just directly append this new section. Else, append a space then this new section.
+                            ## Append the section to be moved to the previous
+                            ## line variable.
+                            ## Check the last character of the previous line.
+                            ## If it's a space, then just directly append this
+                            ## new section. Else, append a space then this new
+                            ## section.
                             previous_line += movesect
                             fixed[len(fixed) - 1] = previous_line
                             current_line = current_line[m_next_mark.end():]
@@ -3791,9 +3952,11 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         ## the previous marker + 1
                         previous_line = fixed[len(fixed) - 1].rstrip("\n")
                         movesect = current_line[0:m_next_mark.end()] + "\n"
-                        ## Now append the section to be moved to the previous line variable.
-                        ## Check the last character of the previous line. If it's a space, then
-                        ## just directly append this new section. Else, append a space then this new section.
+                        ## Now append the section to be moved to the previous
+                        ## line variable.
+                        ## Check the last character of the previous line. If
+                        ## it's a space, then just directly append this new
+                        ## section. Else, append a space then this new section.
                         previous_line += movesect
                         fixed[len(fixed) - 1] = previous_line
                         current_line = current_line[m_next_mark.end():]
@@ -3808,9 +3971,11 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                 if len(current_line.strip()) > 0:
                     previous_line = fixed[len(fixed) - 1].rstrip("\n")
                     movesect = current_line
-                    ## Now append the section to be moved to the previous line variable.
-                    ## Check the last character of the previous line. If it's a space, then
-                    ## just directly append this new section. Else, append a space then this new section.
+                    ## Now append the section to be moved to the previous line
+                    ## variable.
+                    ## Check the last character of the previous line. If it's a
+                    ## space, then just directly append this new section. Else,
+                    ## append a space then this new section.
                     previous_line += movesect
                     fixed[len(fixed) - 1] = previous_line
 
@@ -3827,7 +3992,8 @@ def wash_and_repair_reference_line(line):
     line = repair_broken_urls(line)
     ## Replace various undesirable characters with their alternatives:
     line = replace_undesirable_characters(line)
-    ## remove instances of multiple spaces from line, replacing with a single space:
+    ## remove instances of multiple spaces from line, replacing with a
+    ## single space:
     line = sre_multiple_space.sub(u' ', line)
     return line
 
@@ -3863,7 +4029,8 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
 
     len_ref_sectn = len(ref_sectn)
     
-    if ref_line_marker_ptn is None or type(ref_line_marker_ptn) not in (str, unicode):
+    if ref_line_marker_ptn is None or \
+           type(ref_line_marker_ptn) not in (str, unicode):
         if test_for_blank_lines_separating_reference_lines(ref_sectn):
             ## Use blank lines to separate ref lines
             ref_line_marker_ptn = unicode(r'^\s*$')
@@ -3878,17 +4045,20 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
         if m_ref_line_marker is not None:
             ## Ref line start marker
             if current_string == '':
-                ## Blank line to separate refs. Append the current working line to the refs list
+                ## Blank line to separate refs. Append the current
+                ## working line to the refs list
                 working_line = working_line.rstrip()
                 working_line = wash_and_repair_reference_line(working_line)
                 rebuilt_references.append(working_line)
                 working_line = u''
             else:
                 if current_string[len(current_string) - 1] in (u'-', u' '):
-                    ## space or hyphenated word at the end of the line - don't add in a space
+                    ## space or hyphenated word at the end of the
+                    ## line - don't add in a space
                     working_line = current_string + working_line
                 else:
-                    ## no space or hyphenated word at the end of this line - add in a space
+                    ## no space or hyphenated word at the end of this
+                    ## line - add in a space
                     working_line = current_string + u' ' + working_line
                 working_line = working_line.rstrip()
                 working_line = wash_and_repair_reference_line(working_line)
@@ -3898,10 +4068,12 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
             if current_string != u'':
                 ## Continuation of line
                 if current_string[len(current_string) - 1] in (u'-', u' '):
-                    ## space or hyphenated word at the end of the line - don't add in a space
+                    ## space or hyphenated word at the end of the
+                    ## line - don't add in a space
                     working_line = current_string + working_line
                 else:
-                    ## no space or hyphenated word at the end of this line - add in a space
+                    ## no space or hyphenated word at the end of this
+                    ## line - add in a space
                     working_line = current_string + u' ' + working_line
     
     if working_line != u'':
@@ -3913,11 +4085,16 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
     ## a list of reference lines has been built backwards - reverse it:
     rebuilt_references.reverse()
 
-    rebuilt_references = correct_rebuilt_lines(rebuilt_references, p_ref_line_marker)
+    rebuilt_references = correct_rebuilt_lines(rebuilt_references, \
+                                               p_ref_line_marker)
     return rebuilt_references
 
-def get_reference_lines(docbody, ref_sect_start_line, ref_sect_end_line, \
-                        ref_sect_title, ref_line_marker_ptn, title_marker_same_line):
+def get_reference_lines(docbody,
+                        ref_sect_start_line,
+                        ref_sect_end_line,
+                        ref_sect_title,
+                        ref_line_marker_ptn,
+                        title_marker_same_line):
     """After the reference section of a document has been identified, and the
        first and last lines of the reference section have been recorded, this
        function is called to take the reference lines out of the document body.
@@ -3946,16 +4123,20 @@ def get_reference_lines(docbody, ref_sect_start_line, ref_sect_end_line, \
         ## Title on same line as 1st ref- take title out!
         title_start = docbody[start_idx].find(ref_sect_title)
         if title_start != -1:
-            docbody[start_idx] = docbody[start_idx][title_start + len(ref_sect_title):]
+            docbody[start_idx] = docbody[start_idx][title_start + \
+                                                    len(ref_sect_title):]
     elif ref_sect_title is not None:
         ## Pass title line
         start_idx += 1
 
     ## now rebuild reference lines:
     if type(ref_sect_end_line) is int:
-        ref_lines = rebuild_reference_lines(docbody[start_idx:ref_sect_end_line+1], ref_line_marker_ptn)
+        ref_lines = \
+           rebuild_reference_lines(docbody[start_idx:ref_sect_end_line+1], \
+                                   ref_line_marker_ptn)
     else:
-        ref_lines = rebuild_reference_lines(docbody[start_idx:], ref_line_marker_ptn)
+        ref_lines = rebuild_reference_lines(docbody[start_idx:], \
+                                            ref_line_marker_ptn)
     return ref_lines
 
 
@@ -3985,20 +4166,28 @@ def extract_references_from_fulltext(fulltext):
         refs = []
         status = 4
         if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("-----extract_references_from_fulltext: ref_sect_start is None\n")
+            sys.stdout.write("-----extract_references_from_fulltext: " \
+                             "ref_sect_start is None\n")
     else:
-        ref_sect_end = find_end_of_reference_section(fulltext, ref_sect_start["start_line"], \
-                                                     ref_sect_start["marker"], ref_sect_start["marker_pattern"])
+        ref_sect_end = \
+           find_end_of_reference_section(fulltext, \
+                                         ref_sect_start["start_line"], \
+                                         ref_sect_start["marker"], \
+                                         ref_sect_start["marker_pattern"])
         if ref_sect_end is None:
             ## No End to refs? Not safe to extract
             refs = []
             status = 5
             if cli_opts['verbosity'] >= 1:
-                sys.stdout.write("-----extract_references_from_fulltext: no end to refs!\n")
+                sys.stdout.write("-----extract_references_from_fulltext: " \
+                                 "no end to refs!\n")
         else:
             ## Extract
-            refs = get_reference_lines(fulltext, ref_sect_start["start_line"], ref_sect_end, \
-                                       ref_sect_start["title_string"], ref_sect_start["marker_pattern"], \
+            refs = get_reference_lines(fulltext, \
+                                       ref_sect_start["start_line"], \
+                                       ref_sect_end, \
+                                       ref_sect_start["title_string"], \
+                                       ref_sect_start["marker_pattern"], \
                                        ref_sect_start["title_marker_same_line"])
     return (refs, status)
 
@@ -4056,8 +4245,8 @@ def convert_PDF_to_plaintext(fpath):
     ## close pipe to pdftotext:
     pipe_pdftotext.close()
     if cli_opts['verbosity'] >= 1:
-        sys.stdout.write("-----convert_PDF_to_plaintext found: %s lines of text\n" \
-                         % str(count))
+        sys.stdout.write("-----convert_PDF_to_plaintext found: " \
+                         "%s lines of text\n" % str(count))
 
     ## finally, check conversion result not bad:
     if _pdftotext_conversion_is_bad(doclines):
@@ -4077,17 +4266,17 @@ def get_plaintext_document_body(fpath):
     textbody = []
     status = 0
     if os.access(fpath, os.F_OK|os.R_OK):
-        # filepath OK - attempt to extract references:
+        ## filepath OK - attempt to extract references:
         ## get file type:
-        pipe_gfile = os.popen("%s '%s'" \
-                              % (CFG_PATH_GFILE, fpath.replace("'", "\\'")), "r")
+        pipe_gfile = \
+               os.popen("%s '%s'" \
+                        % (CFG_PATH_GFILE, fpath.replace("'", "\\'")), "r")
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
         
         if res_gfile.lower().find("text") != -1 and \
            res_gfile.lower().find("pdf") == -1:
             ## plain-text file: don't convert - just read in:
-            #textbody = open("%s" % fpath, "r").readlines()
             textbody = []
             for line in open("%s" % fpath, "r").readlines():
                 textbody.append(line.decode("utf-8"))
@@ -4097,7 +4286,6 @@ def get_plaintext_document_body(fpath):
     else:
         ## filepath not OK
         status = 1
-##        raise IOError("Could not find file %s" % fpath)
     return (textbody, status)
 
 def write_raw_references_to_stream(recid, raw_refs, strm=None):
@@ -4127,7 +4315,8 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
         strm = sys.stderr
     ## write the reference lines to the stream:
     strm.writelines(map(lambda x: "%(recid)s:%(refline)s\n" \
-                        % { 'recid' : recid, 'refline' : x.encode("utf-8") }, raw_refs))
+                        % { 'recid' : recid,
+                            'refline' : x.encode("utf-8") }, raw_refs))
     strm.flush()
 
 def usage(wmsg="", err_code=0):
@@ -4266,13 +4455,15 @@ def display_xml_record(status_code, count_reportnum,
        @return: None
     """
     ## Start with the opening record tag:
-    out = u"%(record-open)s\n" % { 'record-open' : CFG_REFEXTRACT_XML_RECORD_OPEN, }
+    out = u"%(record-open)s\n" \
+              % { 'record-open' : CFG_REFEXTRACT_XML_RECORD_OPEN, }
 
     ## Display the record-id controlfield:
-    out += u"""   <controlfield tag="%(cf-tag-recid)s">%(recid)s</controlfield>\n""" \
-            % { 'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
-                'recid'        : encode_for_xml(recid),
-              }
+    out += \
+     u"""   <controlfield tag="%(cf-tag-recid)s">%(recid)s</controlfield>\n""" \
+     % { 'cf-tag-recid' : CFG_REFEXTRACT_CTRL_FIELD_RECID,
+         'recid'        : encode_for_xml(recid),
+       }
 
     ## Loop through all xml lines and add them to the output string:
     for line in xml_lines:
@@ -4281,21 +4472,23 @@ def display_xml_record(status_code, count_reportnum,
     ## add the 999C6 status subfields:
     out += u"""   <datafield tag="%(df-tag-ref-stats)s" ind1="%(df-ind1-ref-stats)s" ind2="%(df-ind2-ref-stats)s">
       <subfield code="%(sf-code-ref-stats)s">%(version)s-%(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(url)s-%(misc)s</subfield>
-   </datafield>\n""" % { 'df-tag-ref-stats'  : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
-                         'df-ind1-ref-stats' : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
-                         'df-ind2-ref-stats' : CFG_REFEXTRACT_IND2_EXTRACTION_STATS,
-                         'sf-code-ref-stats' : CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS,
-                         'version'           : CFG_REFEXTRACT_VERSION,
-                         'timestamp'         : str(int(mktime(localtime()))),
-                         'status'            : status_code,
-                         'reportnum'         : count_reportnum,
-                         'title'             : count_title,
-                         'url'               : count_url,
-                         'misc'              : count_misc,
-                       }
+   </datafield>\n""" \
+        % { 'df-tag-ref-stats'  : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
+            'df-ind1-ref-stats' : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
+            'df-ind2-ref-stats' : CFG_REFEXTRACT_IND2_EXTRACTION_STATS,
+            'sf-code-ref-stats' : CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS,
+            'version'           : CFG_REFEXTRACT_VERSION,
+            'timestamp'         : str(int(mktime(localtime()))),
+            'status'            : status_code,
+            'reportnum'         : count_reportnum,
+            'title'             : count_title,
+            'url'               : count_url,
+            'misc'              : count_misc,
+          }
 
     ## Now add the closing tag to the record:
-    out += u"%(record-close)s\n" % { 'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
+    out += u"%(record-close)s\n" \
+           % { 'record-close' : CFG_REFEXTRACT_XML_RECORD_CLOSE, }
 
     return out
 
@@ -4311,13 +4504,18 @@ def main():
         ## no files provided for reference extraction - error message
         usage()
 
-    ## Read the journal titles knowledge base, creating the search patterns and replace terms:
-    (title_search_kb, title_search_standardised_titles, title_search_keys) = \
-                     build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
-    (preprint_reportnum_sre, standardised_preprint_reportnum_categs) = \
-                     build_institutes_preprints_numeration_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
+    ## Read the journal titles knowledge base, creating the search
+    ## patterns and replace terms:
+    (title_search_kb, \
+     title_search_standardised_titles, \
+     title_search_keys) = \
+                 build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
+    (preprint_reportnum_sre, \
+     standardised_preprint_reportnum_categs) = \
+                 build_institutes_preprints_numeration_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
 
-    done_coltags = 0 ## flag to signal that the XML collection tags have been output
+    done_coltags = 0 ## flag to signal that the XML collection
+                     ## tags have been output
 
     for curitem in extract_jobs:
         extract_error = 0  ## extraction was OK unless determined otherwise
@@ -4333,15 +4531,20 @@ def main():
             if cli_opts['xmlfile']:
                 try:
                     ofilehdl = open(cli_opts['xmlfile'], 'w')
-                    ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
-                    ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
+                    ofilehdl.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
+                    ofilehdl.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
                     ofilehdl.flush()
                 except:
                     sys.stdout.write("***%s\n\n" % cli_opts['xmlfile'])
-                    raise IOError("Cannot open %s to write!" % cli_opts['xmlfile'])
+                    raise IOError("Cannot open %s to write!" \
+                                  % cli_opts['xmlfile'])
             else:
-                sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_VERSION.encode("utf-8"),))
-                sys.stdout.write("%s\n" % (CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"),))
+                sys.stdout.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
+                sys.stdout.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_COLLECTION_OPEN.encode("utf-8"))
             done_coltags = 1
 
         ## 1. Get this document body as plaintext:
@@ -4349,22 +4552,26 @@ def main():
         if extract_error == 0 and len(docbody) == 0:
             extract_error = 3
         if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("-----get_plaintext_document_body gave: %s lines," \
-                             " overall error: %s\n" % (str(len(docbody)), str(extract_error)))
+            sys.stdout.write("-----get_plaintext_document_body gave: " \
+                             "%s lines, overall error: %s\n" \
+                             % (str(len(docbody)), str(extract_error)))
         if len(docbody) > 0:
             ## the document body is not empty:
             ## 2. If necessary, locate the reference section:
             if cli_opts['treat_as_reference_section']:
-                ## don't search for citations in the document body: treat it as a reference section:
+                ## don't search for citations in the document body:
+                ## treat it as a reference section:
                 reflines = docbody
             else:
                 ## launch search for the reference section in the document body:
-                (reflines, extract_error) = extract_references_from_fulltext(docbody)
+                (reflines, extract_error) = \
+                           extract_references_from_fulltext(docbody)
                 if len(reflines) == 0 and extract_error == 0:
                     extract_error = 6
                 if cli_opts['verbosity'] >= 1:
-                    sys.stdout.write("-----extract_references_from_fulltext gave " \
-                                     "len(reflines): %s overall error: %s\n" \
+                    sys.stdout.write("-----extract_references_from_fulltext " \
+                                     "gave len(reflines): %s overall error: " \
+                                     "%s\n" \
                                      % (str(len(reflines)), str(extract_error)))
 
             ## 3. Standardise the reference lines:
@@ -4372,12 +4579,16 @@ def main():
             (processed_references, count_misc, \
              count_title, count_reportnum, count_url) = \
               create_marc_xml_reference_section(reflines,
-                                                preprint_repnum_search_kb=preprint_reportnum_sre,
+                                                preprint_repnum_search_kb=\
+                                                  preprint_reportnum_sre,
                                                 preprint_repnum_standardised_categs=\
-                                                      standardised_preprint_reportnum_categs,
-                                                periodical_title_search_kb=title_search_kb,
-                                                standardised_periodical_titles=title_search_standardised_titles,
-                                                periodical_title_search_keys=title_search_keys)
+                                                  standardised_preprint_reportnum_categs,
+                                                periodical_title_search_kb=\
+                                                  title_search_kb,
+                                                standardised_periodical_titles=\
+                                                  title_search_standardised_titles,
+                                                periodical_title_search_keys=\
+                                                  title_search_keys)
         else:
             ## document body is empty, therefore the reference section is empty:
             reflines = []
@@ -4392,15 +4603,22 @@ def main():
                 write_raw_references_to_stream(recid, reflines, rawfilehdl)
                 rawfilehdl.close()
             except:
-                raise IOError("Cannot open raw ref file: %s to write" % raw_file)
+                raise IOError("Cannot open raw ref file: %s to write" \
+                              % raw_file)
 
         ## Display the processed reference lines:
-        out = display_xml_record(extract_error, count_reportnum,
-                           count_title, count_url, count_misc, recid, processed_references)
+        out = display_xml_record(extract_error, \
+                                 count_reportnum, \
+                                 count_title, \
+                                 count_url, \
+                                 count_misc, \
+                                 recid, \
+                                 processed_references)
         if cli_opts['verbosity'] >= 1:
             lines = out.split('\n')
-            sys.stdout.write("-----display_xml_record gave: %s significant lines " \
-                             "of xml, overall error: %s\n" % (str(len(lines) - 7), extract_error))
+            sys.stdout.write("-----display_xml_record gave: %s significant " \
+                             "lines of xml, overall error: %s\n" \
+                             % (str(len(lines) - 7), extract_error))
         if cli_opts['xmlfile']:
             ofilehdl.write("%s" % (out.encode("utf-8"),))
             ofilehdl.flush()
@@ -4412,10 +4630,12 @@ def main():
     ## If an XML collection was opened, display closing tag
     if done_coltags:
         if (cli_opts['xmlfile']):
-            ofilehdl.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+            ofilehdl.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
             ofilehdl.close()
         else:
-            sys.stdout.write("%s\n" % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+            sys.stdout.write("%s\n" \
+                          % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
 
 
 def test_get_reference_lines():
