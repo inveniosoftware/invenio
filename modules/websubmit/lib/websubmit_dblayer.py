@@ -281,32 +281,6 @@ def update_submission_reference_and_status_in_log(doctype,
     run_sql(qstr, (reference, status, doctype, action, subm_id, email))
 
 
-def form_element_sets_cookie(element):
-    """Given the name of a WebSubmit form element, check its description
-       in the database to see whether or not it sets a cookie.
-       @param element: (string) - the name of the form element.
-       @return: (integer) - 1 if the element sets a cookie; 0 if not.
-    """
-    ## Flag to indicate whether or not the element sets a cookie:
-    sets_cookie = 0
-    ## Query the DB to see whether this element sets a cookie:
-    qstr = """SELECT cookie FROM sbmFIELDDESC WHERE name=%s LIMIT 1"""
-    qres = run_sql(qstr, (element,))
-    if len(qres) > 0:
-        cookie_flag = qres[0][0]
-        try:
-            cookie_flag = int(cookie_flag)
-        except (ValueError, TypeError):
-            ## Cookie flag doesn't seem to be an integer: bad value so
-            ## assume that no cookie is set:
-            cookie_flag = 0
-        if cookie_flag == 1:
-            ## The the element sets a cookie:
-            sets_cookie = 1
-    ## return the flag-value:
-    return sets_cookie
-
-
 def get_form_fields_on_submission_page(subname, pagenum):
     """Get the details of all form fields as they appear on the
        current page of the current submission.
@@ -622,70 +596,3 @@ def submission_is_finished(doctype, action, subm_id, email):
         ## submission is finished:
         submission_finished = 1
     return submission_finished
-
-
-def get_cookies_set_on_field_for_user(userid, fieldname):
-    """Given a userid and a fieldname, get a list of the cookies
-       stored in the DB for that user/field.
-       @param userid: (integer) - the user-ID of the current
-        submitter.
-       @param fieldname: (string) - the name of the field for which
-        the list of cookies is to be retrieved.
-       @return: (tuple) - of tuples. Each tuple containing the
-        'value' of the cookie.
-    """
-    qstr = """SELECT value FROM sbmCOOKIES """ \
-           """WHERE uid=%s AND name=%s"""
-    qres = run_sql(qstr, (userid, fieldname))
-    return qres
-
-
-def cookie_is_set_on_field_for_user(userid, fieldname):
-    """Determine whether or not a cookie is set on a given field
-       for a given user.
-       @param userid: (integer) - the user-ID of the current
-        submitter.
-       @param fieldname: (string) - the name of the field on
-        which we wish to know whether a cookie was set.
-       @return: (integer) - 0 if no cookie has been set on the
-        field; 1 if a cookie has been set on it.
-    """
-    cookie_set = 0
-    qstr = """SELECT id FROM sbmCOOKIES WHERE uid=%s AND name=%s"""
-    qres = run_sql(qstr, (userid, fieldname))
-    if len(qres) > 0:
-        ## There is a row, so this cookie is set:
-        cookie_set = 1
-    return cookie_set
-
-
-def update_cookie_value_on_field_for_user(userid, fieldname, value):
-    """Update the value for a given cookie that has been set on a
-       given field for a given user.
-       @param userid: (integer) the user-ID of the current submitter.
-       @param fieldname: (string) - the name of the field for which
-        the cookie's value is to be updated.
-       @param value: (string) - the new value for the cookie.
-       @return: None
-    """
-    qstr = """UPDATE sbmCOOKIES SET value=%s """ \
-           """WHERE uid=%s AND name=%s"""
-    run_sql(qstr, (value, userid, fieldname))
-
-
-def add_new_cookie_to_field_for_user(userid, fieldname, value):
-    """Add a new cookie to a given field for a given user.
-       @param userid: (integer) - the user-ID of the current submitter.
-       @param fieldname: (string) - the name of the onto which the
-        cookie is to be added.
-       @param value: (string) - the value that is to be assigned to
-        the cookie.
-       @return: (integer) - the number of rows inserted.
-    """
-    qstr = """INSERT into sbmCOOKIES (name, value, uid) """ \
-           """VALUES (%s, %s, %s)"""
-    qres = run_sql(qstr, (fieldname, value, userid))
-    ## Return the number of rows inserted:
-    return int(qres)
-
-
