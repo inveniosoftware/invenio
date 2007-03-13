@@ -307,13 +307,13 @@ def get_element_description(element):
        @param element: (string) - the name of the element.
        @return: (tuple -OR- None) - containing the details of the
         element. (name, alephcode, marccode, type, size, rows, cols,
-         maxlength, val, fidesc, cd, md, modifytext, fddfi2, cookie);
+         maxlength, val, fidesc, cd, md, modifytext, fddfi2);
          OR None if the field cannot be found.
     """
     element_descr = None
     qstr = """SELECT name, alephcode, marccode, type, size, """ \
            """rows, cols, maxlength, val, fidesc, cd, md, """ \
-           """modifytext, fddfi2, cookie """ \
+           """modifytext, fddfi2 """ \
            """FROM sbmFIELDDESC """ \
            """WHERE name=%s LIMIT 1"""
     qres = run_sql(qstr, (element,))
