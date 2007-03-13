@@ -60,7 +60,6 @@ from websubmit_dblayer import \
      update_submission_modified_date_in_log, \
      update_submission_reference_in_log, \
      update_submission_reference_and_status_in_log, \
-     form_element_sets_cookie, \
      get_form_fields_on_submission_page, \
      get_element_description, \
      get_element_check_description, \
@@ -77,11 +76,7 @@ from websubmit_dblayer import \
      get_details_of_submission, \
      get_functions_for_submission_step, \
      get_submissions_at_level_X_with_score_above_N, \
-     submission_is_finished, \
-     get_cookies_set_on_field_for_user, \
-     cookie_is_set_on_field_for_user, \
-     update_cookie_value_on_field_for_user, \
-     add_new_cookie_to_field_for_user
+     submission_is_finished
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -194,7 +189,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
             os.makedirs(curdir)
         except:
             return errorMsg(_("Unable to create a directory for this submission."), req, c, ln)
-    # retrieve the original main menu url ans save it in the "mainmenu" file
+    # retrieve the original main menu url and save it in the "mainmenu" file
     if mainmenu != "":
         fp = open("%s/mainmenu" % curdir, "w")
         fp.write(mainmenu)
@@ -280,17 +275,6 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
                 update_submission_reference_in_log(doctype, access, uid_email, value)
-
-        ## Cookies:
-        ## If the field should set a cookie, do so:
-        ## In this case, the value of the field will be retrieved and
-        ## displayed as the default value of the field next time the user
-        ## does a submission:
-        if value != "":
-            sets_cookie = form_element_sets_cookie(key)
-            if sets_cookie == 1:
-                ## This element sets a cookie, so do this:
-                setCookie(key, value, uid)
 
     ## create the interface:
     subname = "%s%s" % (act, doctype)
@@ -409,14 +393,7 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
             text = re.compile("\n").sub("\\n", text)
             text = re.compile("\r").sub("", text)
             file.close()
-        # Or if a cookie is set
-        # If a cookie is found corresponding to the name of the current
-        # field, we set the value of the field to the cookie's value
-        elif getCookie(full_field['name'], uid) is not None:
-            value = getCookie(full_field['name'], uid)
-            value = re.compile("\r").sub("", value)
-            value = re.compile("\n").sub("\\n", value)
-            text = value
+
         values.append(text)
 
         full_fields.append(full_field)
@@ -691,16 +668,6 @@ def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
         if uid_email != "" and uid_email != "guest":
             if key == edsrn:
                 update_submission_reference_in_log(doctype, access, uid_email, value)
-        # Now deal with the cookies
-        # If the fields must be saved as a cookie, we do so
-        # In this case, the value of the field will be retrieved and
-        # displayed as the default value of the field next time the user
-        # does a submission
-        if value != "":
-            sets_cookie = form_element_sets_cookie(key)
-            if sets_cookie == 1:
-                ## This element sets a cookie, so do this:
-                setCookie(key, value, uid)  ## TODO: FIXME
 
     ## get the document type's long-name:
     doctype_lname = get_longname_of_doctype(doctype)
@@ -1334,25 +1301,6 @@ def warningMsg(title, req, c=cdsname, ln=cdslang):
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
                 req=req)
-
-def getCookie(name, uid):
-    # these are not real http cookies but are stored in the DB
-    field_cookies = get_cookies_set_on_field_for_user(uid, name)
-    if len(field_cookies) > 0:
-        return field_cookies[0][0]
-    else:
-        return None
-
-def setCookie(name, value, uid):
-    # these are not real http cookies but are stored in the DB
-    cookie_is_set = cookie_is_set_on_field_for_user(uid, name)
-    if cookie_is_set == 1:
-        ## Update the value of the cookie in the DB:
-        update_cookie_value_on_field_for_user(uid, name, value)
-    else:
-        ## No cookie set - create one:
-        add_new_cookie_to_field_for_user(uid, name, value)
-    return 1
 
 def specialchars(text):
     text = string.replace(text, "&#147;", "\042");
