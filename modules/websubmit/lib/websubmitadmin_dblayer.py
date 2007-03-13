@@ -1307,15 +1307,15 @@ def get_all_element_names():
 def get_element_details(elname):
     """Get and return a tuple of tuples for all ELEMENTS with the element name "elname".
        @param elname: ELEMENT name (elname).
-       @return: tuple of tuples (one tuple per check row): (marccode,type,size,rows,cols,maxlength,
-                                                            val,fidesc,cd,md,modifytext,cookie)
+       @return: tuple of tuples (one tuple per element): (marccode,type,size,rows,cols,maxlength,
+                                                            val,fidesc,cd,md,modifytext)
     """
     q = "SELECT el.marccode, el.type, el.size, el.rows, el.cols, el.maxlength, " + \
-           "el.val, el.fidesc, el.cd, el.md, el.modifytext, el.cookie FROM sbmFIELDDESC AS el WHERE el.name=%s"
+           "el.val, el.fidesc, el.cd, el.md, el.modifytext FROM sbmFIELDDESC AS el WHERE el.name=%s"
     return run_sql(q, (elname,))
 
 def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, elmaxlength, \
-                           elval, elfidesc, elmodifytext, elcookie):
+                           elval, elfidesc, elmodifytext):
     """Update the details of an ELEMENT in the WebSubmit database IF there was only one Element
        with that element id/name (name).
        @param elname: unique Element id/name (name)
@@ -1328,7 +1328,6 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
        @param elval: element default value
        @param elfidesc: element description
        @param elmodifytext: element's modification text
-       @param elcookie: does this element set a cookie?
        @return 0 (ZERO) if update is performed; 1 (ONE) if update not performed due to rows existing for
                  given Element.
     """
@@ -1336,7 +1335,7 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
     numrows_elname = get_number_elements_with_elname(elname)
     if numrows_elname == 1:
         q = """UPDATE sbmFIELDDESC SET marccode=%s, type=%s, size=%s, rows=%s, cols=%s, maxlength=%s, """ +\
-            """val=%s, fidesc=%s, modifytext=%s, cookie=%s, md=CURDATE() WHERE name=%s"""
+            """val=%s, fidesc=%s, modifytext=%s, md=CURDATE() WHERE name=%s"""
         run_sql(q, ( elmarccode,
                      (eltype != "" and eltype) or (None),
                      (elsize != "" and elsize) or (None),
@@ -1346,7 +1345,6 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
                      (elval != "" and elval) or (None),
                      (elfidesc != "" and elfidesc) or (None),
                      (elmodifytext != "" and elmodifytext) or (None),
-                     (elcookie != "" and elcookie) or ("0"),
                      elname
                    ) )
         return 0 # Everything is OK
@@ -1354,7 +1352,7 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
         return 1 # Everything not OK: Either no rows or more than one row for element "elname"
 
 def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
-                           elmaxlength, elval, elfidesc, elmodifytext, elcookie):
+                           elmaxlength, elval, elfidesc, elmodifytext):
     """Insert details of a new Element into the WebSubmit database IF there are not already elements
        with the same element name (name).
        @param elname: unique Element id/name (name)
@@ -1367,7 +1365,6 @@ def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
        @param elval: element default value
        @param elfidesc: element description
        @param elmodifytext: element's modification text
-       @param elcookie: does this element set a cookie?
        @return 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
                  given Element.
     """
@@ -1376,8 +1373,8 @@ def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
     if numrows_elname == 0:
         # insert new Check:
         q = """INSERT INTO sbmFIELDDESC (name, alephcode, marccode, type, size, rows, cols, """ +\
-            """maxlength, val, fidesc, cd, md, modifytext, fddfi2, cookie) VALUES(%s, NULL, """ +\
-            """%s, %s, %s, %s, %s, %s, %s, %s, CURDATE(), CURDATE(), %s, NULL, %s)"""
+            """maxlength, val, fidesc, cd, md, modifytext, fddfi2) VALUES(%s, NULL, """ +\
+            """%s, %s, %s, %s, %s, %s, %s, %s, CURDATE(), CURDATE(), %s, NULL)"""
         run_sql(q, ( elname,
                      elmarccode,
                      (eltype != "" and eltype) or (None),
@@ -1387,8 +1384,7 @@ def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
                      (elmaxlength != "" and elmaxlength) or (None),
                      (elval != "" and elval) or (None),
                      (elfidesc != "" and elfidesc) or (None),
-                     (elmodifytext != "" and elmodifytext) or (None),
-                     (elcookie != "" and elcookie) or ("0")
+                     (elmodifytext != "" and elmodifytext) or (None)
                    ) )
         return 0 # Everything is OK
     else:

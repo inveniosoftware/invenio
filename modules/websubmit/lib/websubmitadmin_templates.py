@@ -356,7 +356,6 @@ class Template:
                                     elval="",
                                     elfidesc="",
                                     elmodifytext="",
-                                    elcookie="",
                                     elcd="",
                                     elmd="",
                                     perform_act="elementadd",
@@ -374,7 +373,6 @@ class Template:
            @param elval: value of element (e.g. for text input element)
            @param elfidesc: description for element (e.g. for user-defined element)
            @param elmodifytext: element's modification text
-           @param elcookie: Is a cookie to be set for the element?
            @param elcd: creation date of element
            @param elmd: last modification date of element
            @param user_msg: Any message to be displayed on screen, such as a status report for the last task, etc.
@@ -495,18 +493,6 @@ class Template:
           <td width="80%%"><textarea cols="100" rows="30" name="elfidesc" wrap="nowarp">%(el_fidesc)s</textarea></td>
          </tr>
         """ % {'el_fidesc' : cgi.escape(elfidesc, 1)}
-        body_content += """
-         <tr>
-          <td width="20%%"><span class="adminlabel">Sets Cookie:</span></td>
-          <td width="80%%"><select name="elcookie">
-            <option value="0"%s>No</option>
-            <option value="1"%s>Yes</option>
-           </select>
-          </td>
-         </tr>
-        """ % ( (elcookie == "0" and " selected" ) or (""),
-                (elcookie == "1" and " selected" ) or ("")
-              )
         body_content += """
          <tr>
           <td width="20%%">&nbsp;</td>

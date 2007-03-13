@@ -858,7 +858,7 @@ def perform_request_add_jscheck(chname=None, chdesc=None, chcommit=""):
 
 def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsize=None, elrows=None, \
                                 elcols=None, elmaxlength=None, elval=None, elfidesc=None, \
-                                elmodifytext=None, elcookie=None, elcommit=""):
+                                elmodifytext=None, elcommit=""):
     """An interface for adding a new ELEMENT to the WebSubmit DB.
        @param elname: (string) element name.
        @param elmarccode: (string) element's MARC code.
@@ -870,7 +870,6 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
        @param elval: (string) default value of element
        @param elfidesc: (string) description of element
        @param elmodifytext: (string) modification text of element
-       @param elcookie: (integer) does the element set a cookie?
        @param elcommit: (string) If this value is not empty, attempt to commit element details to WebSubmit DB
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
@@ -955,13 +954,6 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
             elmodifytext = ""
     else:
         elmodifytext = ""
-    if elcookie is not None:
-        try:
-            elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
-        except ValueError, e:
-            elcookie = 0
-    else:
-        elcookie = 0
 
     ## process request:
     if elcommit != "" and elcommit is not None:
@@ -987,18 +979,15 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
                                                                         elval=elval,
                                                                         elfidesc=elfidesc,
                                                                         elmodifytext=elmodifytext,
-                                                                        elcookie=str(elcookie),
                                                                         user_msg=user_msg,
                                                                        )
             return (title, body, errors, warnings)
 
         ## Commit new element description to WebSubmit DB:
-        ## First, wash and check arguments:
-        
         err_code = insert_element_details(elname=elname, elmarccode=elmarccode, eltype=eltype, \
                                           elsize=elsize, elrows=elrows, elcols=elcols, \
                                           elmaxlength=elmaxlength, elval=elval, elfidesc=elfidesc, \
-                                          elmodifytext=elmodifytext, elcookie=elcookie)
+                                          elmodifytext=elmodifytext)
         if err_code == 0:
             ## Element added: show page listing WebSubmit elements
             user_msg.append("""'%s' Element Added to WebSubmit""" % (elname,))
@@ -1019,7 +1008,6 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
                                                                         elval=elval,
                                                                         elfidesc=elfidesc,
                                                                         elmodifytext=elmodifytext,
-                                                                        elcookie=str(elcookie),
                                                                         user_msg=user_msg,
                                                                        )
     else:
@@ -1029,7 +1017,7 @@ def perform_request_add_element(elname=None, elmarccode=None, eltype=None, elsiz
 
 def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=None, \
                                  elrows=None, elcols=None, elmaxlength=None, elval=None, \
-                                 elfidesc=None, elmodifytext=None, elcookie=None, elcommit=""):
+                                 elfidesc=None, elmodifytext=None, elcommit=""):
     """An interface for the editing and updating the details of a WebSubmit ELEMENT.
        @param elname: element name.
        @param elmarccode: element's MARC code.
@@ -1041,7 +1029,6 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
        @param elval: default value of element
        @param elfidesc: description of element
        @param elmodifytext: modification text of element
-       @param elcookie: does the element set a cookie?
        @param elcommit: If this value is not empty, attempt to commit element details to WebSubmit DB
        @return: tuple containing "title" (title of page), body (page body), errors (list of errors),
                 warnings (list of warnings).
@@ -1126,13 +1113,6 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             elmodifytext = ""
     else:
         elmodifytext = ""
-    if elcookie is not None:
-        try:
-            elcookie = wash_single_urlarg(urlarg=elcookie, argreqdtype=int, argdefault=0)
-        except ValueError, e:
-            elcookie = 0
-    else:
-        elcookie = 0
 
     ## process request:
     if elcommit != "" and elcommit is not None:
@@ -1159,7 +1139,7 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
         err_code = update_element_details(elname=elname, elmarccode=elmarccode, eltype=eltype, \
                                           elsize=elsize, elrows=elrows, elcols=elcols, \
                                           elmaxlength=elmaxlength, elval=elval, elfidesc=elfidesc, \
-                                          elmodifytext=elmodifytext, elcookie=elcookie)
+                                          elmodifytext=elmodifytext)
         if err_code == 0:
             ## Element Updated: Show All Element Details Again
             user_msg.append("""'%s' Element Updated""" % (elname,))
@@ -1169,10 +1149,10 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             element_dets = stringify_listvars(element_dets)
             ## Take elements from results tuple:
             (elmarccode, eltype, elsize, elrows, elcols, elmaxlength, \
-             elval, elfidesc, elcd, elmd, elmodifytext, elcookie) = \
+             elval, elfidesc, elcd, elmd, elmodifytext) = \
                (element_dets[0][0], element_dets[0][1], element_dets[0][2], element_dets[0][3], \
                 element_dets[0][4], element_dets[0][5], element_dets[0][6], element_dets[0][7], \
-                element_dets[0][8], element_dets[0][9], element_dets[0][10], element_dets[0][11])
+                element_dets[0][8], element_dets[0][9], element_dets[0][10])
             ## Pass to template:
             body = websubmitadmin_templates.tmpl_display_addelementform(elname=elname,
                                                                         elmarccode=elmarccode,
@@ -1186,7 +1166,6 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
                                                                         elcd=elcd,
                                                                         elmd=elmd,
                                                                         elmodifytext=elmodifytext,
-                                                                        elcookie=elcookie,
                                                                         perform_act="elementedit",
                                                                         user_msg=user_msg,
                                                                         el_use_tuple=el_use
@@ -1209,10 +1188,10 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
             ## Display Element details
             ## Take elements from results tuple:
             (elmarccode, eltype, elsize, elrows, elcols, elmaxlength, \
-             elval, elfidesc, elcd, elmd, elmodifytext, elcookie) = \
+             elval, elfidesc, elcd, elmd, elmodifytext) = \
                (element_dets[0][0], element_dets[0][1], element_dets[0][2], element_dets[0][3], \
                 element_dets[0][4], element_dets[0][5], element_dets[0][6], element_dets[0][7], \
-                element_dets[0][8], element_dets[0][9], element_dets[0][10], element_dets[0][11])
+                element_dets[0][8], element_dets[0][9], element_dets[0][10])
             ## Pass to template:
             body = websubmitadmin_templates.tmpl_display_addelementform(elname=elname,
                                                                         elmarccode=elmarccode,
@@ -1226,7 +1205,6 @@ def perform_request_edit_element(elname, elmarccode=None, eltype=None, elsize=No
                                                                         elcd=elcd,
                                                                         elmd=elmd,
                                                                         elmodifytext=elmodifytext,
-                                                                        elcookie=elcookie,
                                                                         perform_act="elementedit",
                                                                         el_use_tuple=el_use
                                                                        )

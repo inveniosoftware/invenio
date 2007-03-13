@@ -332,7 +332,7 @@ def jscheckedit(req, chname, chdesc=None, chcommit="", ln=cdslang):
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elrows=None, elcols=None, elmaxlength=None, \
-                elval=None, elfidesc=None, elmodifytext=None, elcookie=None, elcommit="", ln=cdslang):
+                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=cdslang):
     """Add a new WebSubmit ELEMENT to the WebSubmit database.
        @param elname: unique name/ID for new check (if empty, Web form will be displayed)
        @param elmarccode: MARC Code for element
@@ -344,7 +344,6 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
        @param elval: element value.
        @param elfidesc: element description.
        @param elmodifytext: Modification text for the element.
-       @param elcookie: does the element set a cookie?
        @param elcommit: flag variable used to determine whether to commit element modifications or whether
                         to simply display a form containing element details.
        @param ln: language
@@ -362,7 +361,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
         (title, body, errors, warnings) = perform_request_add_element(elname, elmarccode, eltype, \
                                                                        elsize, elrows, elcols, elmaxlength, \
                                                                        elval, elfidesc, elmodifytext, \
-                                                                       elcookie, elcommit)
+                                                                       elcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
@@ -377,7 +376,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=None, elcols=None, elmaxlength=None, \
-                elval=None, elfidesc=None, elmodifytext=None, elcookie=None, elcommit="", ln=cdslang):
+                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=cdslang):
     """Display the details of a WebSubmit ELEMENT in a Web form so that it can be viewed
        and/or edited.
        @param elname: unique name/ID for new check (if empty, Web form will be displayed)
@@ -390,7 +389,6 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
        @param elval: element value.
        @param elfidesc: element description.
        @param elmodifytext: Modification text for the element.
-       @param elcookie: does the element set a cookie?
        @param elcommit: flag variable used to determine whether to commit element modifications or whether
                         to simply display a form containing element details.
        @param ln: language
@@ -408,7 +406,7 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
         (title, body, errors, warnings) = perform_request_edit_element(elname, elmarccode, eltype, \
                                                                        elsize, elrows, elcols, elmaxlength, \
                                                                        elval, elfidesc, elmodifytext, \
-                                                                       elcookie, elcommit)
+                                                                       elcommit)
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(ln),
