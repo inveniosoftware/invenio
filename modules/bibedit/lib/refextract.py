@@ -1519,7 +1519,7 @@ def identify_periodical_titles(line,
         standard periodical TITLEs to be searched for in the line. This
         list of titles has already been ordered and is used to force
         the order of searching.
-       @return: (tuple) containing 3 elements:
+       @return: (tuple) containing 4 elements:
                         + (dictionary) - the lengths of all titles
                                          matched at each given index
                                          within the line.
@@ -1529,11 +1529,15 @@ def identify_periodical_titles(line,
                         + (string)     - the working line, with the
                                          titles removed from it and
                                          replaced by underscores.
+                        + (dictionary) - the totals for each bad-title
+                                         found in the line.
     """
     title_matches_matchlen  = {}  ## info about lengths of periodical titles
                                   ## matched at given locations in the line
     title_matches_matchtext = {}  ## the text matched at the given line
                                   ## location (i.e. the title itself)
+    titles_count = {}             ## sum totals of each 'bad title found in
+                                  ## line.
 
     ## Begin searching:
     for title in periodical_title_search_keys:
@@ -1543,6 +1547,13 @@ def identify_periodical_titles(line,
 
         ## for each matched periodical title:
         for title_match in title_matches_iter:
+            if not titles_count.has_key(title):
+                ## Add this title into the titles_count dictionary:
+                titles_count[title] = 1
+            else:
+                ## Add 1 to the count for the given title:
+                titles_count[title] += 1
+
             ## record the details of this title match:
             ## record the match length:
             title_matches_matchlen[title_match.start()] = \
@@ -1559,7 +1570,7 @@ def identify_periodical_titles(line,
 
     ## return recorded information about matched periodical titles,
     ## along with the newly changed working line:
-    return (title_matches_matchlen, title_matches_matchtext, line)
+    return (title_matches_matchlen, title_matches_matchtext, line, titles_count)
 
 
 def identify_ibids(line):
@@ -2875,20 +2886,27 @@ def create_marc_xml_reference_section(ref_sect,
         title.
        @param periodical_title_search_keys: (list) - ordered list of non-
         standard titles to search for.
-       @return: (tuple) of 5 components:
-         ( list    -> of strings, each string is a MARC XML-ized reference line.
-           integer -> number of fields of miscellaneous text found for the
-                      record.
-           integer -> number of title citations found for the record.
-           integer -> number of institutional report-number citations found for
-                      the record.
-           integer -> number of URL citations found for the record.
+       @return: (tuple) of 6 components:
+         ( list       -> of strings, each string is a MARC XML-ized reference
+                         line.
+           integer    -> number of fields of miscellaneous text found for the
+                         record.
+           integer    -> number of title citations found for the record.
+           integer    -> number of institutional report-number citations found
+                         for the record.
+           integer    -> number of URL citations found for the record.
+           dictionary -> The totals for each 'bad title' found in the reference
+                         section.
          )
     """
     ## a list to contain the processed reference lines:
     xml_ref_sectn = []
     ## counters for extraction stats:
     count_misc = count_title = count_reportnum = count_url = 0
+
+    ## A dictionary to contain the total count of each 'bad title' found
+    ## in the entire reference section:
+    record_titles_count = {}
 
     ## process references line-by-line:
     for ref_line in ref_sect:
@@ -2950,10 +2968,16 @@ def create_marc_xml_reference_section(ref_sect,
         ## Identify and record coordinates of non-standard journal titles:
         (found_title_len, \
          found_title_matchtext, \
-         working_line2) = \
+         working_line2, \
+         line_titles_count) = \
                     identify_periodical_titles(working_line2,
                                                periodical_title_search_kb,
                                                periodical_title_search_keys)
+
+        ## Add the count of 'bad titles' found in this line to the total
+        ## for the reference section:
+        record_titles_count = sum_2_dictionaries(record_titles_count, \
+                                                 line_titles_count)
 
         ## Attempt to identify, record and replace any IBIDs in the line:
         if working_line2.upper().find(u"IBID") != -1:
@@ -2995,7 +3019,8 @@ def create_marc_xml_reference_section(ref_sect,
         xml_ref_sectn.append(xml_line)
 
     ## Return thereturn  list of processed reference lines:
-    return (xml_ref_sectn, count_misc, count_title, count_reportnum, count_url)
+    return (xml_ref_sectn, count_misc, count_title, \
+            count_reportnum, count_url, record_titles_count)
 
 
 ## Tasks related to extraction of reference section from full-text:
@@ -4492,12 +4517,35 @@ def display_xml_record(status_code, count_reportnum,
 
     return out
 
+def sum_2_dictionaries(dicta, dictb):
+    """Given two dictionaries of totals, where each total refers to a key
+       in the dictionary, add the totals.
+       E.g.:  dicta = { 'a' : 3, 'b' : 1 }
+              dictb = { 'a' : 1, 'c' : 5 }
+              dicta + dictb = { 'a' : 4, 'b' : 1, 'c' : 5 }
+       @param dicta: (dictionary)
+       @param dictb: (dictionary)
+       @return: (dictionary) - the sum of the 2 dictionaries
+    """
+    dict_out = dicta.copy()
+    for key in dictb.keys():
+        if dict_out.has_key(key):
+            ## Add the sum for key in dictb to that of dict_out:
+            dict_out[key] += dictb[key]
+        else:
+            ## the key is not in the first dictionary - add it directly:
+            dict_out[key] = dictb[key]
+    return dict_out
 
 def main():
     """Main function.
     """
     global cli_opts
     (cli_opts, cli_args) =  get_cli_options()
+
+    ## A dictionary to contain the counts of all 'bad titles' found during
+    ## this reference extraction job:
+    all_found_titles_count = {}
 
     extract_jobs = get_recids_and_filepaths(cli_args)
     if len(extract_jobs) == 0:
@@ -4577,7 +4625,8 @@ def main():
             ## 3. Standardise the reference lines:
 #            reflines = test_get_reference_lines()
             (processed_references, count_misc, \
-             count_title, count_reportnum, count_url) = \
+             count_title, count_reportnum, \
+             count_url, record_titles_count) = \
               create_marc_xml_reference_section(reflines,
                                                 preprint_repnum_search_kb=\
                                                   preprint_reportnum_sre,
@@ -4589,6 +4638,14 @@ def main():
                                                   title_search_standardised_titles,
                                                 periodical_title_search_keys=\
                                                   title_search_keys)
+
+            ## Add the count of 'bad titles' found in this line to the total
+            ## for the reference section:
+            all_found_titles_count = \
+                                   sum_2_dictionaries(all_found_titles_count, \
+                                                      record_titles_count)
+
+
         else:
             ## document body is empty, therefore the reference section is empty:
             reflines = []
