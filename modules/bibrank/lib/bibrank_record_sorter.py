@@ -241,7 +241,11 @@ def is_method_valid(colID, rank_method_code):
     
     enabled_colls = dict(run_sql("SELECT id_collection, score from collection_rnkMETHOD,rnkMETHOD WHERE id_rnkMETHOD=rnkMETHOD.id AND name='%s'" % rank_method_code))
 
-    colID = int(colID)
+    try:
+        colID = int(colID)
+    except TypeError:
+        return 0
+    
     if enabled_colls.has_key(colID):
         return 1
     else:
