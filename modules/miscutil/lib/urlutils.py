@@ -159,7 +159,7 @@ def make_canonical_urlargd(urlargd, default_urlargd):
     canonical = drop_default_urlargd(urlargd, default_urlargd)
 
     if canonical:
-        return '?' + urlencode(canonical, doseq=True)
+        return '?' + urlencode(canonical, doseq=True).replace('&', '&amp;')
 
     return ''
 
