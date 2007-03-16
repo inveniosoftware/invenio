@@ -17,6 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""WebSubmit: the mechanism for the submission of new records into CDS Invenio
+   via a Web interface.
+"""
+
 __revision__ = "$Id$"
 
 ## import interesting modules:
@@ -81,7 +85,73 @@ from websubmit_dblayer import \
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="", access="", mainmenu="", fromdir="", file="", nextPg="", nbPg="", curpage=1):
+def interface(req,
+              c=cdsname,
+              ln=cdslang,
+              doctype="",
+              act="",
+              startPg=1,
+              indir="",
+              access="",
+              mainmenu="",
+              fromdir="",
+              file="",
+              nextPg="",
+              nbPg="",
+              curpage=1):
+    """This function is called after a user has visited a document type's
+       "homepage" and selected the type of "action" to perform. Having
+       clicked an action-button (e.g. "Submit a New Record"), this function
+       will be called . It performs the task of initialising a new submission
+       session (retrieving information about the submission, creating a
+       working submission-directory, etc), and "drawing" a submission page
+       containing the WebSubmit form that the user uses to input the metadata
+       to be submitted.
+       When a user moves between pages in the submission interface, this
+       function is recalled so that it can save the metadata entered into the
+       previous page by the user, and draw the current submission-page.
+
+       Note: During a submission, for each page refresh, this function will be
+       called while the variable "step" (a form variable, seen by
+       websubmit_webinterface, which calls this function) is 0 (ZERO).
+
+       In other words, this function handles the FRONT-END phase of a
+       submission, BEFORE the WebSubmit functions are called.
+
+       @param req: (apache request object) *** NOTE: Added into this object, is
+        a variable called "form" (req.form). This is added into the object in
+        the index function of websubmit_webinterface. It contains a
+        "mod_python.util.FieldStorage" instance, that contains the form-fields
+        found on the previous submission page.
+       @param c: (string), defaulted to cdsname. The name of the CDS Invenio
+        installation.
+       @param ln: (string), defaulted to cdslang. The language in which to
+        display the pages.
+       @param doctype: (string) - the doctype ID of the doctype for which the
+        submission is being made.
+       @param act: (string) - The ID of the action being performed (e.g.
+        submission of bibliographic information; modification of bibliographic
+        information, etc).
+       @param startPg: (integer) - Starting page for the submission? Defaults
+        to 1.
+       @param indir: (string) - the directory used to store all submissions
+        of the given "type" of this submission. For example, if the submission
+        is of the type "modify bibliographic information", this variable would
+        contain "modify".
+       @param access: (string) - the "access" number for the submission
+        (e.g. 1174062451_7010). This number is also used as the name for the
+        current working submission directory.
+       @param mainmenu: (string) - contains the URL (minus the CDS Invenio
+        home stem) for the submission's home-page. (E.g. If this submission
+        is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
+       @param fromdir: (integer)
+       @param file: (string)
+       @param nextPg: (string)
+       @param nbPg: (string)
+       @param curpage: (integer) - the current submission page number. Defaults
+        to 1.
+    """
+
     ln = wash_language(ln)
 
     # load the right message language
@@ -525,8 +595,77 @@ def interface(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="
                 req = req)
 
 
-def endaction(req, c=cdsname, ln=cdslang, doctype="", act="", startPg=1, indir="", \
-              access="", mainmenu="", fromdir="", file="", nextPg="", nbPg="", curpage=1, step=1, mode="U"):
+def endaction(req,
+              c=cdsname,
+              ln=cdslang,
+              doctype="",
+              act="",
+              startPg=1,
+              indir="",
+              access="",
+              mainmenu="",
+              fromdir="",
+              file="",
+              nextPg="",
+              nbPg="",
+              curpage=1,
+              step=1,
+              mode="U"):
+    """Having filled-in the WebSubmit form created for metadata by the interface
+       function, the user clicks a button to either "finish the submission" or
+       to "proceed" to the next stage of the submission. At this point, a
+       variable called "step" will be given a value of 1 or above, which means
+       that this function is called by websubmit_webinterface.
+       So, during all non-zero steps of the submission, this function is called.
+
+       In other words, this function is called during the BACK-END phase of a
+       submission, in which WebSubmit *functions* are being called.
+
+       The function first ensures that all of the WebSubmit form field values
+       have been saved in the current working submission directory, in text-
+       files with the same name as the field elements have. It then determines
+       the functions to be called for the given step of the submission, and
+       executes them.
+       Following this, if this is the last step of the submission, it logs the
+       submission as "finished" in the journal of submissions.
+
+       @param req: (apache request object) *** NOTE: Added into this object, is
+        a variable called "form" (req.form). This is added into the object in
+        the index function of websubmit_webinterface. It contains a
+        "mod_python.util.FieldStorage" instance, that contains the form-fields
+        found on the previous submission page.
+       @param c: (string), defaulted to cdsname. The name of the CDS Invenio
+        installation.
+       @param ln: (string), defaulted to cdslang. The language in which to
+        display the pages.
+       @param doctype: (string) - the doctype ID of the doctype for which the
+        submission is being made.
+       @param act: (string) - The ID of the action being performed (e.g.
+        submission of bibliographic information; modification of bibliographic
+        information, etc).
+       @param startPg: (integer) - Starting page for the submission? Defaults
+        to 1.
+       @param indir: (string) - the directory used to store all submissions
+        of the given "type" of this submission. For example, if the submission
+        is of the type "modify bibliographic information", this variable would
+        contain "modify".
+       @param access: (string) - the "access" number for the submission
+        (e.g. 1174062451_7010). This number is also used as the name for the
+        current working submission directory.
+       @param mainmenu: (string) - contains the URL (minus the CDS Invenio
+        home stem) for the submission's home-page. (E.g. If this submission
+        is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
+       @param fromdir:
+       @param file:
+       @param nextPg:
+       @param nbPg:
+       @param curpage: (integer) - the current submission page number. Defaults
+        to 1.
+       @param step: (integer) - the current step of the submission. Defaults to
+        1.
+       @param mode:
+    """
+
     global rn, sysno, dismode, curdir, uid, uid_email, last_step, action_score
 
     # load the right message language
@@ -790,6 +929,11 @@ def home(req, c=cdsname, ln=cdslang):
        submissions.
        Document-types only appear on this page when they have been
        connected to a submission-collection in WebSubmit.
+       @param req: (apache request object)
+       @param c: (string) - defaults to cdsname
+       @param ln: (string) - The CDS Invenio interface language of choice.
+        Defaults to cdslang (the default language of the installation).
+       @return: (string) - the Web page to be displayed.
     """
     ln = wash_language(ln)
     # get user ID:
@@ -1235,7 +1379,7 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=cdslang):
     global machine, storage, act, rn
-    t=""
+    t = ""
     next_submissions = \
          get_submissions_at_level_X_with_score_above_N(doctype, currentlevel, action_score)
 
