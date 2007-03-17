@@ -991,7 +991,7 @@ def institute_num_pattern_to_regex(pattern):
     ## the pattern has been transformed
     return pattern
 
-def build_institutes_preprints_numeration_knowledge_base(fpath):
+def build_reportnum_knowledge_base(fpath):
     """Given the path to a knowledge base file containing the details
        of institutes and the patterns that their preprint report
        numbering schemes take, create a dictionary of regexp search
@@ -1081,7 +1081,7 @@ def build_institutes_preprints_numeration_knowledge_base(fpath):
             ## complete regex:
             ## will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
-                search_pattern_str = r'[^a-zA-Z0-9\/\.]((?P<categ>' \
+                search_pattern_str = r'[^a-zA-Z0-9\/\.\-]((?P<categ>' \
                                      + classification[0] + u')' \
                                      + numeration_regexp + r')'
                 sre_search_pattern = sre.compile(search_pattern_str, \
@@ -1395,14 +1395,14 @@ def identify_preprint_report_numbers(line,
             numeration_match = numeration_match.replace("-/-", "/")
             ## replace the found preprint report number in the
             ## string with underscores:
-            line = line[0:repnum_match.start()] \
-                   + "_"*len(repnum_match.group(0)) + line[repnum_match.end():]
+            line = line[0:repnum_match.start(1)] \
+                   + "_"*len(repnum_match.group(1)) + line[repnum_match.end(1):]
             ## record the information about the matched preprint report number:
             ## total length in the line of the matched preprint report number:
-            repnum_matches_matchlen[repnum_match.start()] = \
-                                                    len(repnum_match.group(0))
+            repnum_matches_matchlen[repnum_match.start(1)] = \
+                                                    len(repnum_match.group(1))
             ## standardised replacement for the matched preprint report number:
-            repnum_matches_repl_str[repnum_match.start()] = \
+            repnum_matches_repl_str[repnum_match.start(1)] = \
                                     preprint_repnum_standardised_categs[categ] \
                                     + numeration_match
 
@@ -4371,7 +4371,10 @@ def usage(wmsg="", err_code=0):
                   No MARC XML mark-up - just each extracted line, prefixed
                   by the recid of the document that it came from.
    -x, --xmlfile
-                  write xml output to a file rather than standard out
+                  write xml output to a file rather than standard output.
+   -d, --dictfile
+                  write statistics about all matched title abbreviations
+                  (i.e. LHS terms in the titles knowledge base) to a file.
    -z, --raw-references
                   treat the input file as pure references. i.e. skip the stage
                   of trying to locate the reference section within a document
@@ -4396,16 +4399,18 @@ def get_cli_options():
                  'output_raw'                 : 0,
                  'verbosity'                  : 0,
                  'xmlfile'                    : 0,
+                 'dictfile'                   : 0,
                }
 
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:zrx:d:", \
                                           ["help",
                                            "version",
                                            "verbose=",
                                            "raw-references",
                                            "output-raw-refs",
-                                           "xmlfile="])
+                                           "xmlfile=",
+                                           "dictfile="])
     except getopt.GetoptError, err:
         ## Invalid option provided - usage message
         usage(wmsg="Error: %(msg)s." % { 'msg' : str(err) })
@@ -4432,8 +4437,12 @@ def get_cli_options():
             ## treat input as pure reference lines:
             cli_opts['treat_as_reference_section'] = 1
         elif o[0] in ("-x", "--xmlfile"):
+            ## Write out MARC XML references to the specified file
             cli_opts['xmlfile'] = o[1]
-
+        elif o[0] in ("-d", "--dictfile"):
+            ## Write out the statistics of all titles matched during the
+            ## extraction job to the specified file
+            cli_opts['dictfile'] = o[1]
     if len(myargs) == 0:
         ## no arguments: error message
         usage(wmsg="Error: no full-text.")
@@ -4557,10 +4566,10 @@ def main():
     (title_search_kb, \
      title_search_standardised_titles, \
      title_search_keys) = \
-                 build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
+               build_titles_knowledge_base(CFG_REFEXTRACT_KB_JOURNAL_TITLES)
     (preprint_reportnum_sre, \
      standardised_preprint_reportnum_categs) = \
-                 build_institutes_preprints_numeration_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
+               build_reportnum_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
 
     done_coltags = 0 ## flag to signal that the XML collection
                      ## tags have been output
@@ -4693,6 +4702,28 @@ def main():
         else:
             sys.stdout.write("%s\n" \
                           % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
+
+    ## If the option to write the statistics about all periodical titles matched
+    ## during the extraction-job was selected, do so using the specified file.
+    ## Note: the matched titles are the Left-Hand-Side titles in the KB, i.e.
+    ## the BAD versions of titles.
+    if cli_opts['dictfile']:
+        ## title_keys are the titles matched:
+        title_keys = all_found_titles_count.keys()
+        try:
+            dfilehdl = open(cli_opts['dictfile'], "w")
+            for ktitle in title_keys:
+                dfilehdl.write("%d:%s\n" \
+                   % (all_found_titles_count[ktitle], ktitle.encode("utf-8")))
+                dfilehdl.flush()
+            dfilehdl.close()
+        except IOError, (errno, err_string):
+            ## There was a problem writing out the statistics
+            sys.stderr.write("""Error: Unable to write "matched titles" """ \
+                             """statistics to output file %s. """ \
+                             """Error Number %d (%s).\n""" \
+                             % (cli_opts['dictfile'], errno, err_string))
+            sys.exit(1)
 
 
 def test_get_reference_lines():
