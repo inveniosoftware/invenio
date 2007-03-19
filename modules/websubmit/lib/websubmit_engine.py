@@ -1190,44 +1190,6 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
                 req=req
                )
 
-def set_report_number (newrn):
-    """Set the report number for the current document into both the
-       global 'rn' scope, and the submission-log in the database.
-       @param newrn: (string) - the reference number to be allocated to
-        the document.
-       @return: None.
-    """
-    global uid_email, doctype, access, rn
-    # First we save the value in the global object
-    rn = newrn
-    # then we save this value in the "journal of submissions"
-    if uid_email != "" and uid_email != "guest":
-        update_submission_reference_in_log(doctype, access, uid_email, newrn)
-
-def get_report_number():
-    """Get the report number of the current document from the global
-       'rn', and return it.
-       @return: (string) - the report number held in the global 'rn'.
-    """
-    global rn
-    return rn
-
-def set_sysno(newsn):
-    """Set the global sysno with a given value.
-       @param newsn: the new value for the global 'sysno'.
-       @return: None.
-    """
-    global sysno
-    sysno = newsn
-
-def get_sysno() :
-    """Get the 'sysno' of the current document from the global
-       'sysno', and return it.
-       @return: (string) - the sysno (recid) held in the global 'sysno'.
-    """
-    global sysno
-    return sysno
-
 def Request_Print(m, txt):
     """The argumemts to this function are the display mode (m) and the text
        to be displayed (txt).
