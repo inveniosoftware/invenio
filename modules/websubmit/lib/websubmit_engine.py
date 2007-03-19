@@ -840,6 +840,8 @@ def endaction(req,
     ## (ie there are no other steps after the current one):
     last_step = function_step_is_last(doctype, act, step)
 
+    next_action = '' ## The next action to be proposed to the user
+
     # Prints the action details, returning the mandatory score
     action_score = action_details(doctype, act)
     current_level = get_level(doctype, act)
@@ -847,40 +849,70 @@ def endaction(req,
     # Calls all the function's actions
     function_content = ''
     try:
+        ## Handle the execution of the functions for this
+        ## submission/step:
         function_content = print_function_calls(doctype=doctype,
                                                 action=act,
                                                 step=step,
                                                 form=form,
                                                 ln=ln)
-    except functionError,e:
+    except functionError, e:
+        ## There was a serious function-error. Execution ends.
         return errorMsg(e.value, req, c, ln)
-    except functionStop,e:
+    except functionStop, e:
+        ## For one reason or another, one of the functions has determined that
+        ## the data-processing phase (i.e. the functions execution) should be
+        ## halted and the user should be returned to the form interface once
+        ## more. (NOTE: Redirecting the user to the Web-form interface is
+        ## currently done using JavaScript. The "functionStop" exception
+        ## contains a "value" string, which is effectively JavaScript -
+        ## probably an alert box and a form that is submitted). **THIS WILL
+        ## CHANGE IN THE FUTURE WHEN JavaScript IS REMOVED!**
         if e.value is not None:
             function_content = e.value
         else:
             function_content = e
+    else:
+        ## No function exceptions (functionStop, functionError) were raised
+        ## by the functions. Propose the next action (if applicable), and
+        ## log the submission as finished:
 
-    # If the action was mandatory we propose the next mandatory action (if any)
-    next_action = ''
-    if action_score != -1 and last_step == 1:
-        next_action = Propose_Next_Action(doctype, action_score, access, current_level, indir)
+        ## If the action was mandatory we propose the next
+        ## mandatory action (if any)
+        if action_score != -1 and last_step == 1:
+            next_action = Propose_Next_Action(doctype, \
+                                              action_score, \
+                                              access, \
+                                              current_level, \
+                                              indir)
 
-    # If we are in the last step of an action, we can update the "journal of submissions"
-    if last_step == 1:
-        if uid_email != "" and uid_email != "guest" and rn != "":
-            ## update the "journal of submission":
-            ## Does the submission already exist in the log?
-            submission_exists = \
-                 submission_exists_in_log(doctype, act, access, uid_email)
-            if submission_exists == 1:
-                ## update the rn and status to finished for this submission in the log:
-                update_submission_reference_and_status_in_log(doctype, act,
-                                                              access, uid_email,
-                                                              rn, "finished")
-            else:
-                ## Submission doesn't exist in log - create it:
-                log_new_completed_submission(doctype, act, access, uid_email, rn)
+        ## If we are in the last step of an action, we can update
+        ## the "journal of submissions"
+        if last_step == 1:
+            if uid_email != "" and uid_email != "guest" and rn != "":
+                ## update the "journal of submission":
+                ## Does the submission already exist in the log?
+                submission_exists = \
+                     submission_exists_in_log(doctype, act, access, uid_email)
+                if submission_exists == 1:
+                    ## update the rn and status to finished for this submission
+                    ## in the log:
+                    update_submission_reference_and_status_in_log(doctype, \
+                                                                  act, \
+                                                                  access, \
+                                                                  uid_email, \
+                                                                  rn, \
+                                                                  "finished")
+                else:
+                    ## Submission doesn't exist in log - create it:
+                    log_new_completed_submission(doctype, \
+                                                 act, \
+                                                 access, \
+                                                 uid_email, \
+                                                 rn)
 
+    ## Having executed the functions, create the page that will be displayed
+    ## to the user:
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
           weburl = weburl,
