@@ -27,7 +27,7 @@ import re
 import time
 
 from invenio.config import counters
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Report_Number_Generation(parameters,curdir,form):
     """Description:   function Report_Number_Generation
@@ -173,12 +173,12 @@ def Create_Reference(counter_path,ref_format):
         try: 
             os.mkdir(counters)
         except:
-            raise functionError("File System: Cannot create counters directory %s" % counters)
+            raise InvenioWebSubmitFunctionError("File System: Cannot create counters directory %s" % counters)
     if not os.path.exists("%s/%s" % (counters,counter_path)):
         try:
             fp = open("%s/%s" % (counters,counter_path),"w")
         except:
-            raise functionError("File System: no permission to write in counters directory %s" % counters)
+            raise InvenioWebSubmitFunctionError("File System: no permission to write in counters directory %s" % counters)
         fp.write ("0")
         fp.close()
     # retrieve current counter value

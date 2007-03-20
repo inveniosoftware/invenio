@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import storage
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Pending(parameters,curdir,form):
     global rn
@@ -39,7 +39,7 @@ def Move_to_Pending(parameters,curdir,form):
         try:
             os.makedirs(PENDIR)
         except:
-            raise functionError("Cannot create pending directory %s" % PENDIR)
+            raise InvenioWebSubmitFunctionError("Cannot create pending directory %s" % PENDIR)
     # Moves the files to the pending directory
     rn = rn.replace("/","-")
     namedir = rn

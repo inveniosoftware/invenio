@@ -27,13 +27,13 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Print_Success_APP(parameters,curdir,form):
     global rn
     # the field containing the decision of the referee must be called "decision".
     if not os.path.exists("%s/decision" % curdir):
-        raise functionError("Could not find decision file")
+        raise InvenioWebSubmitFunctionError("Could not find decision file")
     else:
         fp = open("%s/decision" % curdir,"r")
         decision = fp.read()
