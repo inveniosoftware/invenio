@@ -3,14 +3,17 @@
           xmlns:xlink="http://www.w3.org/1999/xlink/">
   <bx:format  name="NLM" description="The NLM output format." content-type="text/xml">
       <bx:loop object="record">
-        <bx:if name="doc_type" nin="ARTICLE REPORT THESIS">
-          <bx:then><bx:template_ref name="NLM_DEFAULT"/></bx:then>
-        <bx:elif name="doc_type" eq="ARTICLE">
-            <bx:then><bx:template_ref name="NLM_ARTICLE"/></bx:then>
-            <bx:elif name="doc_type" in="REPORT THESIS">
-                <bx:then><bx:template_ref name="NLM_REPORT"/></bx:then>
-            </bx:elif>
-        </bx:elif>
+        <bx:if name="doc_status" in="DELETED">
+          <bx:then><bx:template_ref name="NLM_DELETED"/></bx:then>
+          <bx:elif name="doc_type" nin="ARTICLE REPORT THESIS">
+            <bx:then><bx:template_ref name="NLM_DEFAULT"/></bx:then>
+            <bx:elif name="doc_type" eq="ARTICLE">
+              <bx:then><bx:template_ref name="NLM_ARTICLE"/></bx:then>
+                <bx:elif name="doc_type" in="REPORT THESIS">
+                  <bx:then><bx:template_ref name="NLM_REPORT"/></bx:then>
+                </bx:elif>
+             </bx:elif>
+          </bx:elif>
         </bx:if>
       </bx:loop>
   </bx:format>
@@ -174,4 +177,7 @@
       </article-type>
     </article>
   </bx:template>
+  <bx:template name="NLM_DELETED">
+  </bx:template>                            
+
 </bx:style>

@@ -78,6 +78,7 @@ CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS = {
                               r'/925__/a#(.*)(?P<value>\d\d\d\d).*',
                               r'/909C4/y'],
 'doc_type':                  [r'/980__/a'],
+'doc_status':                [r'/980__/c'],
 'uri':                       [r'/8564_/u',
                               r'/8564_/q'],
 'subject':                   [r'/65017/a'],
