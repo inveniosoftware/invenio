@@ -26,7 +26,7 @@ import time
 from invenio.config import \
      bibupload, \
      tmpdir
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Insert_Modify_Record(parameters,curdir,form):
     global rn
@@ -35,7 +35,7 @@ def Insert_Modify_Record(parameters,curdir,form):
     elif os.path.exists("%s/recmysql" % curdir):
         recfile = "recmysql"
     else:
-        raise functionError("Could not find record file")
+        raise InvenioWebSubmitFunctionError("Could not find record file")
     initialfile = "%s/%s" % (curdir,recfile)
     finalfile = "%s/%s_%s" % (tmpdir,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
     shutil.copy(initialfile,finalfile)

@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import storage
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_From_Pending(parameters,curdir,form):
     global rn
@@ -42,6 +42,6 @@ def Move_From_Pending(parameters,curdir,form):
                 os.rename("%s/%s" % (srcdir,file), "%s/%s" % (curdir,file))
             os.rmdir(srcdir)
     else:
-        raise functionError("Move_From_Pending: Cannot retrieve reference information %s" % srcdir)
+        raise InvenioWebSubmitFunctionError("Move_From_Pending: Cannot retrieve reference information %s" % srcdir)
     return ""
 

@@ -33,7 +33,7 @@ import os
 from invenio.config import \
      bibconvert, \
      bibconvertconf
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Make_Record(parameters,curdir,form): 
     # Get rid of "invisible" white spaces
@@ -49,7 +49,7 @@ def Make_Record(parameters,curdir,form):
         rectext = fp.read()
         fp.close()
     else:
-        raise functionError("Cannot create database record")
+        raise InvenioWebSubmitFunctionError("Cannot create database record")
     # First of all the &
     rectext = rectext.replace("&amp;","&")
     rectext = rectext.replace("&","&amp;")

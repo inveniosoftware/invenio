@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_PATH_GZIP, \
      CFG_PATH_TAR, \
      storage
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Done(parameters,curdir,form):
     global rn
@@ -45,7 +45,7 @@ def Move_to_Done(parameters,curdir,form):
         try:
             os.makedirs(DONEDIR)
         except:
-            raise functionError("Cannot create done directory %s" % DONEDIR)
+            raise InvenioWebSubmitFunctionError("Cannot create done directory %s" % DONEDIR)
     # Moves the files to the done diectory and creates an archive
     rn = rn.replace("/","-")
     namedir = "%s_%s" % (rn,time.strftime("%Y%m%d%H%M%S"))
