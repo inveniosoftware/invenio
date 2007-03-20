@@ -41,7 +41,8 @@ def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
     if p_tag[0].isdigit() and int(p_tag[0]) in range(0, 11):
         return  bfo.control_field(tag)
     elif p_tag[0].isdigit():
-        values = bfo.fields(tag)
+        #Get values without subcode. We will filter unneeded subcode later
+        values = bfo.fields(p_tag[0]+p_tag[1]+p_tag[2])
     else:
         return ''
     
@@ -52,14 +53,17 @@ def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
 
     if len(values) > 0 and isinstance(values[0], dict):
         x = 0
-        for value in values:
-            x += 1
-            out += subfields_separator.join(value.values())
+        for instance in values:
+            filtered_values = [value for (subcode, value) in instance.iteritems()
+                              if p_tag[3] == '' or p_tag[3] == '%' or p_tag[3] == subcode]
+            if filtered_values:
+                x += 1
+            out += subfields_separator.join(filtered_values)
             if x >= limit:
                 break
             
-            # Print separator between instances
-            if x < len(values):
+            # Print separator between non-empty instances, and if not last instance
+            if x < len(values) and filtered_values:
                 out += instances_separator
 
     else:
