@@ -17,40 +17,49 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""This is the Convert_RecXML_to_RecALEPH module. It contains the
+   Convert_RecXML_to_RecALEPH WebSubmit function.
+"""
+
 __revision__ = "$Id$"
 
 import os
-from os import access, R_OK
+from os import access, R_OK, W_OK
 from invenio.config import xmlmarc2textmarc
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Convert_RecXML_to_RecALEPH(parameters,curdir,form):
+def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
     """Function to create an ALEPH 500 MARC record from a MARC XML record.
        This function depends upon the following:
-         * "recmysql" already exists in the working submission directory. I.e.
-            "Make_Record" has already been called and the MARC XML record created.
-         * "recmysql" must contain an ALEPH 500 SYS in the field "970__a". That is to say,
-            the function "Allocate_ALEPH_SYS" should have been called and an ALEPH 500
-            SYS allocated to this record.
+         * "recmysql" is a file that already exists in the working
+            submission directory. I.e. "Make_Record" has already been called and
+            the MARC XML record created.
+         * "recmysql" must contain an ALEPH 500 SYS in the field "970__a". That
+            is to say, the function "Allocate_ALEPH_SYS" should have been called
+            and an ALEPH 500 SYS allocated to this record.
+            *** NOTE: "xmlmarc2textmarc" is left to check for this in the record
+                      It is run in --aleph-marc=r mode, which creates an ALEPH
+                      "replace" record.
 
-       Given the valid "recmysql" in the working submission directory, this function will
-       use the "xmlmarc2textmarc" tool to convert that record into the ALEPH MARC record.
-       The record will then be written into the file "recaleph500" in the current working
-       submission directory.
+       Given the valid "recmysql" in the working submission directory, this
+       function will use the "xmlmarc2textmarc" tool to convert that record into
+       the ALEPH MARC record. The record will then be written into the file
+       "recaleph500" in the current working submission directory.
        @parameters: None
        @return: (string) - Empty string.
     """
-    ## If recmysql does not exist in the current working submission directory, or
-    ## it is not readable, fail by raising a functionError:
+    ## If recmysql does not exist in the current working submission directory,
+    ## or it is not readable, fail by raising a InvenioWebSubmitFunctionError:
     if not access("%s/recmysql" % curdir, R_OK|W_OK):
         ## FAIL - recmysql cannot be accessed:
-        msg = """No recmysql in submission dir %s - Cannot create recaleph500!""" \
-              % curdir
-        raise functionError(msg)
+        msg = """No recmysql in submission dir %s - """ \
+              """Cannot create recaleph500!""" % curdir
+        raise InvenioWebSubmitFunctionError(msg)
 
     ## Command to perform conversion of recmysql -> recaleph500:
     convert_cmd = \
-        """%(xmlmarc2alephmarc)s --aleph-marc=r %(curdir)s/recmysql > %(curdir)s/recaleph500""" \
+        """%(xmlmarc2alephmarc)s --aleph-marc=r %(curdir)s/recmysql > """ \
+        """%(curdir)s/recaleph500""" \
         % { 'xmlmarc2alephmarc' : xmlmarc2textmarc,
             'curdir'            : curdir,
           }
@@ -60,16 +69,18 @@ def Convert_RecXML_to_RecALEPH(parameters,curdir,form):
     ## Check that the conversion was performed without error:
     if convert_status != 0:
         ## It was not possible to successfully create the ALEPH500 record, quit:
-        msg = """An error was encountered when attempting to convert %s/recmysql into recaleph500 - stopping""" \
-              % curdir
-        raise functionError(msg)
+        msg = """An error was encountered when attempting to """ \
+              """convert %s/recmysql into recaleph500 - stopping""" % curdir
+        raise InvenioWebSubmitFunctionError(msg)
 
-    ## Check for presence of recaleph500 in the current working submission directory:
+    ## Check for presence of recaleph500 in the current
+    ## working submission directory:
     if not access("%s/recaleph500" % curdir, R_OK|W_OK):
         ## Either not present, or not readable - ERROR
-        msg = """An error was encountered when attempting to convert %s/recmysql into recaleph500.""" \
-              """ After the conversion, recaleph500 could not be accessed.""" % curdir
-        raise functionError(msg)
+        msg = """An error was encountered when attempting to convert """ \
+              """%s/recmysql into recaleph500. After the conversion, """ \
+              """recaleph500 could not be accessed.""" % curdir
+        raise InvenioWebSubmitFunctionError(msg)
 
     ## Everything went OK:
     return ""
