@@ -856,26 +856,26 @@ def endaction(req,
                                                 step=step,
                                                 form=form,
                                                 ln=ln)
-    except functionError, e:
+    except InvenioWebSubmitFunctionError, e:
         ## There was a serious function-error. Execution ends.
         return errorMsg(e.value, req, c, ln)
-    except functionStop, e:
+    except InvenioWebSubmitFunctionStop, e:
         ## For one reason or another, one of the functions has determined that
         ## the data-processing phase (i.e. the functions execution) should be
         ## halted and the user should be returned to the form interface once
         ## more. (NOTE: Redirecting the user to the Web-form interface is
-        ## currently done using JavaScript. The "functionStop" exception
-        ## contains a "value" string, which is effectively JavaScript -
-        ## probably an alert box and a form that is submitted). **THIS WILL
+        ## currently done using JavaScript. The "InvenioWebSubmitFunctionStop"
+        ## exception contains a "value" string, which is effectively JavaScript
+        ## - probably an alert box and a form that is submitted). **THIS WILL
         ## CHANGE IN THE FUTURE WHEN JavaScript IS REMOVED!**
         if e.value is not None:
             function_content = e.value
         else:
             function_content = e
     else:
-        ## No function exceptions (functionStop, functionError) were raised
-        ## by the functions. Propose the next action (if applicable), and
-        ## log the submission as finished:
+        ## No function exceptions (InvenioWebSubmitFunctionStop,
+        ## InvenioWebSubmitFunctionError) were raised by the functions. Propose
+        ## the next action (if applicable), and log the submission as finished:
 
         ## If the action was mandatory we propose the next
         ## mandatory action (if any)
