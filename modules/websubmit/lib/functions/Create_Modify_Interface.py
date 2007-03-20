@@ -39,7 +39,7 @@ import re
 import time
 
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
@@ -107,7 +107,7 @@ def Create_Modify_Interface(parameters, curdir, form):
         fieldstext = fp.read()
         fp.close()
     else:
-        raise functionError("cannot find fields to modify")
+        raise InvenioWebSubmitFunctionError("cannot find fields to modify")
     fieldstext = re.sub("\+","\n", fieldstext)
     fields = fieldstext.split("\n")
     #output some text    
