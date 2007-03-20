@@ -22,12 +22,12 @@ __revision__ = "$Id$"
 import time
 import smtplib
 
-from invenio.websubmit_config import functionError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
     
 def send_email(fromaddr, toaddr, body, attempt=0):
     if toaddr != "":
         if attempt > 2:
-            raise functionError('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
+            raise InvenioWebSubmitFunctionError('error sending email to %s: SMTP error; gave up after 3 attempts' % toaddr)
         try:
             server = smtplib.SMTP('localhost')
             server.sendmail(fromaddr, toaddr, body)
