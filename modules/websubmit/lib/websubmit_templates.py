@@ -955,10 +955,14 @@ class Template:
         <br>"""
         # Add the "back to main menu" button
         if finished == 0:
-            out += """ <A HREF="%(mainmenu)s" onClick="return confirm('%(surequit)s')">""" % {
-                     'surequit' : _("Are you sure you want to quit this submission?"),
-                     'mainmenu' : mainmenu,
-                   }
+            out += """ <A HREF="%(mainmenu)s" onClick="return confirm('%(surequit)s')">
+                       <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
+                       <BR><BR>""" % {
+                           'surequit' : _("Are you sure you want to quit this submission?"),
+                           'back' : _("Back to main menu"),
+                           'images' : images,
+                           'mainmenu' : mainmenu
+                           }
         else:
             out += """ <A HREF="%(mainmenu)s">
                        <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
