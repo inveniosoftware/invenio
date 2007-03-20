@@ -1320,7 +1320,7 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
     global htdocsdir,storage,access,pylibdir,dismode
     # load the right message language
     _ = gettext_set_language(ln)
-    t=""
+    t = ""
 
     ## Get the list of functions to be called
     funcs_to_call = get_functions_for_submission_step(doctype, action, step)
@@ -1351,8 +1351,16 @@ def print_function_calls (doctype, action, step, form, ln=cdslang):
                     function = globals()[function_name]
                     # Evaluate the parameters, and place them in an array
                     parameters = Get_Parameters(function_name, doctype)
-                    # Call function
-                    currfunction['text'] = function(parameters, curdir, form)
+                    # Call function:
+                    func_returnval = function(parameters, curdir, form)
+                    if func_returnval is not None:
+                        ## Append the returned value as a string:
+                        currfunction['text'] = str(func_returnval)
+                    else:
+                        ## The function the NoneType. Don't keep that value as
+                        ## the currfunction->text. Replace it with the empty
+                        ## string.
+                        currfunction['text'] = ""
             else:
                 currfunction['error'] = 1
             functions.append(currfunction)
