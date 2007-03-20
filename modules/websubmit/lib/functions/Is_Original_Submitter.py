@@ -35,7 +35,7 @@ __revision__ = "$Id$"
 import re
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.websubmit_config import functionStop
+from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Is_Original_Submitter(parameters,curdir,form):
@@ -47,7 +47,7 @@ def Is_Original_Submitter(parameters,curdir,form):
     uid_email = re.sub("[\n\r ]+","",uid_email)
     (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
     if re.search(uid_email,email,re.IGNORECASE) is None and auth_code != 0:
-        raise functionStop("""
+        raise InvenioWebSubmitFunctionStop("""
 <SCRIPT>
    document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;

@@ -38,7 +38,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.search_engine import search_pattern
-from invenio.websubmit_config import functionStop
+from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Get_Sysno(parameters,curdir,form):
     """Get the recid of a record based upon report-number, as stored
@@ -57,9 +57,9 @@ def Get_Sysno(parameters,curdir,form):
     else:
         searchresults = search_pattern(req=None, p=rn, f="reportnumber").items().tolist()
         if len(searchresults) == 0:
-            raise functionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
         elif len(searchresults) > 1:
-            raise functionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;document.forms[0].submit();alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;document.forms[0].submit();alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
         else:
             sysno = searchresults[0]
         # save resultin a file

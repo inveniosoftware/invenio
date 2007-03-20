@@ -34,7 +34,7 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.websubmit_config import functionStop
+from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 titlevalue = ""
@@ -93,7 +93,7 @@ def Get_Info_In_DB(rn,parameters,curdir):
         return 0
 
 def DocumentNotFound(repno):
-    raise functionStop("""
+    raise InvenioWebSubmitFunctionStop("""
 <SCRIPT>
    document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;

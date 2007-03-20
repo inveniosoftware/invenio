@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 from invenio.config import supportemail
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
-from invenio.websubmit_config import functionStop
+from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Is_Referee(parameters,curdir,form):
     global uid_email,sysno,rn,uid
@@ -36,7 +36,7 @@ def Is_Referee(parameters,curdir,form):
     # Try to retrieve the referee's email from the referee's database
     (auth_code, auth_message) = acc_authorize_action(uid, "referee",doctype=doctype, categ=categ)
     if auth_code != 0:
-        raise functionStop("""
+        raise InvenioWebSubmitFunctionStop("""
 <SCRIPT> 
         document.forms[0].action="/submit";
         document.forms[0].curpage.value = 1;

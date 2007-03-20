@@ -27,18 +27,18 @@ __revision__ = "$Id$"
    ## PARAMETERS:    -
 
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import functionStop
+from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Test_Status(parameters,curdir,form):
     global rn
     res = run_sql("SELECT status, access FROM sbmAPPROVAL WHERE rn=%s", (rn,))
     if len(res) == 0:
-        raise functionStop(printNotRequested(rn))
+        raise InvenioWebSubmitFunctionStop(printNotRequested(rn))
     else:
         if res[0][0] == "approved":
-            raise functionStop(printApproved(rn))
+            raise InvenioWebSubmitFunctionStop(printApproved(rn))
         elif res[0][0] == "rejected":
-            raise functionStop(printRejected(rn))
+            raise InvenioWebSubmitFunctionStop(printRejected(rn))
     return ""
 
 def printNotRequested(rn):
