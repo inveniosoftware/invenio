@@ -97,17 +97,67 @@ CFG_KNOWN_FILE_EXTENSIONS = ["lis",
 			     "wav",
 			     "mpg"]
 
-class functionError(Exception):
+
+class InvenioWebSubmitFunctionError(Exception):
+    """This exception should only ever be raised by WebSubmit functions.
+       It will be caught and handled by the WebSubmit core itself.
+       It is used to signal to WebSubmit core that one of the functions
+       encountered a FATAL ERROR situation that should all further execution
+       of the submission.
+       The exception will carry an error message in its "value" string. This
+       message will probably be displayed on the user's browser in an Invenio
+       "error" box, and may be logged for the admin to examine.
+
+       Again: If this exception is raised by a WebSubmit function, an error
+              message will displayed and the submission ends in failure.
+
+       Extends: Exception.
+    """
     def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - an error string to display to the user.
+        """
         self.value = value
     def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
         return repr(self.value)
 
-class functionStop(Exception):
+
+class InvenioWebSubmitFunctionStop(Exception):
+    """This exception should only ever be raised by WebSubmit functions.
+       It will be caught and handled by the WebSubmit core itself.
+       It is used to signal to WebSubmit core that one of the functions
+       encountered a situation that should prevent the functions that follow
+       it from being executed, and that WebSubmit core should display some sort
+       of message to the user. This message will be stored in the "value"
+       attribute of the object.
+
+       ***
+       NOTE: In the current WebSubmit, this "value" is ususally a JavaScript
+             string that redirects the user's browser back to the Web form
+             phase of the submission. The use of JavaScript, however is going
+             to be removed in the future, so the mechanism may change.
+       ***
+
+       Extends: Exception.
+    """
     def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - a string to display to the user.
+        """
         self.value = value
     def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
         return repr(self.value)
+
 
 class InvenioWebSubmitFunctionWarning(Exception):
     """This exception should be raised by a WebSubmit function
@@ -118,4 +168,15 @@ class InvenioWebSubmitFunctionWarning(Exception):
        logged.
        Logging of the exception will be performed by WebSubmit.
     """
-    pass
+    def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - a string to write to the log.
+        """
+        self.value = value
+    def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
+        return repr(self.value)
