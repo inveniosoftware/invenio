@@ -260,11 +260,11 @@ def perform_remove_alert(alert_name, id_user, id_query, id_basket, uid, ln=cdsla
     out = ""
     if (None in (alert_name, id_user, id_query, id_basket, uid)):
         return out
-    
     # remove a row from the alerts table: user_query_basket
     query = """DELETE FROM user_query_basket
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
-    query %= (id_user, id_query, id_basket)
+               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'
+               AND id_user='%s'"""
+    query %= (id_user, id_query, id_basket, uid)
     run_sql(query)
     out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
     out += perform_list_alerts(uid, ln=ln)
