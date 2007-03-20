@@ -72,7 +72,8 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             uid = getUid(req)
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
-                return page_not_authorized(req, "../getfile.py/index")
+                return page_not_authorized(req, "../getfile.py/index",
+                                           navmenuid='submit')
 
             uid_email = get_email(uid)
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
@@ -127,7 +128,8 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         keywords="keywords",
                         uid=uid,
                         language=ln,
-                        req=req)
+                        req=req,
+                        navmenuid='submit')
 
         return getfile, []
 
@@ -159,7 +161,8 @@ def websubmit_legacy_getfile(req, form):
         try:
             uid = getUid(req)
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-                return page_not_authorized(req, "../getfile.py/index")
+                return page_not_authorized(req, "../getfile.py/index",
+                                           navmenuid='submit')
             uid_email = get_email(uid)
         except Error, e:
             return errorMsg(e.value,req)
@@ -216,7 +219,8 @@ def websubmit_legacy_getfile(req, form):
                     keywords="keywords",
                     uid=uid,
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='submit')
     
     return _getfile_py(req, **args)
 
@@ -237,7 +241,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../direct.py/index")
+            return page_not_authorized(req, "../direct.py/index",
+                                           navmenuid='submit')
 
         myQuery = req.args
         if sub == "":
@@ -279,7 +284,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     def sub(self, req, form):
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../sub/")
+            return page_not_authorized(req, "../sub/",
+                                       navmenuid='submit')
 
         myQuery = req.args
         if myQuery:
@@ -305,7 +311,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../summary.py/index")
+            return page_not_authorized(req, "../summary.py/index",
+                                       navmenuid='submit')
 
         t=""
         curdir  = "%s/%s/%s/%s" % (storage,args['indir'],args['doctype'],args['access'])
@@ -368,7 +375,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
             uid = getUid(req)
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-                return page_not_authorized(req, "../submit")
+                return page_not_authorized(req, "../submit",
+                                           navmenuid='submit')
 
             if doctype=="":
                 return home(req,c,ln)
@@ -396,7 +404,8 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     description=_("Internal Error"),
                     keywords="CDS Invenio, Internal Error",
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='submit')
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):
     _ = gettext_set_language(ln)
@@ -405,5 +414,6 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                     description=_("Internal Error"),
                     keywords="CDS Invenio, Internal Error",
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='submit')
 

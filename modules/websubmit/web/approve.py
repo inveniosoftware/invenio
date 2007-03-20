@@ -46,7 +46,8 @@ def index(req,c=cdsname,ln=cdslang):
 
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-        return page_not_authorized(req, "../approve.py/index")
+        return page_not_authorized(req, "../approve.py/index",
+                                   navmenuid='yourapprovals')
 
     ln = wash_language(ln)
     form = req.form
@@ -75,5 +76,6 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     description="%s - Internal Error" % c, 
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='yourapprovals')
 

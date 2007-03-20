@@ -95,7 +95,7 @@ class Template:
                   boxrightbottom="", boxrightbottomadd="",
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
-                  secure_page_p=0):
+                  secure_page_p=0, navmenuid=""):
         
         """Creates a complete page
 
@@ -151,6 +151,8 @@ class Template:
 
           - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
 
+          - 'navmenuid' *string* - the id of the navigation item to highlight for this page
+          
            Output:
 
           - HTML code of the page
@@ -167,8 +169,8 @@ class Template:
                                    userinfobox = userinfobox,
                                    navtrailbox = navtrailbox,
                                    pageheaderadd = pageheaderadd,
-                                   secure_page_p = secure_page_p
-                                   ) + """
+                                   secure_page_p = secure_page_p,
+                                   navmenuid=navmenuid) + """
 <div class="pagebody">
   <div class="pagebodystripeleft">
     <div class="pageboxlefttop">%(boxlefttop)s</div>
@@ -216,7 +218,7 @@ class Template:
     def tmpl_pageheader(self, req, ln=cdslang, headertitle="",
                         description="", keywords="", userinfobox="",
                         navtrailbox="", pageheaderadd="", uid=0,
-                        secure_page_p=0):
+                        secure_page_p=0, navmenuid="admin"):
 
         """Creates a page header
 
@@ -245,6 +247,8 @@ class Template:
           - 'languagebox' *string* - the HTML code for the language box
 
           - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
+
+          - 'navmenuid' *string* - the id of the navigation item to highlight for this page
 
            Output:
 

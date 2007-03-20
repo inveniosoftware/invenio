@@ -392,7 +392,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                                  description=description,
                                  keywords=keywords,
                                  uid=uid,
-                                 language=ln))
+                                 language=ln,
+                                 navmenuid='search'))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
     #    req.send_http_header()

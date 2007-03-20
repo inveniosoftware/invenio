@@ -712,7 +712,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                                          navtrail=""):
     """
     Print the preview of a record with a format template. To be included inside Format template
-    editor. If the save_actiom has a value, then the code should also be saved at the same time
+    editor. If the save_action has a value, then the code should also be saved at the same time
 
     @param code the code of a template to use for formatting   
     @param ln_for_preview the language for the preview (for bfo)
@@ -749,7 +749,8 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                             language=ln_for_preview,
                             navtrail = "",
                             lastupdated=__lastupdated__,
-                            req=req)
+                            req=req,
+                            navmenuid='search')
             else:
                 recID = recIDs[0]
                 pattern_for_preview = "recid:%s" % recID
@@ -785,7 +786,8 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                         language=ln_for_preview,
                         navtrail = navtrail,
                         lastupdated=__lastupdated__,
-                        req=req)
+                        req=req,
+                        navmenuid='search')
         else:
             #Output with chosen content-type.
             req.content_type = content_type_for_preview

@@ -62,7 +62,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/display")
+            return page_not_authorized(req, "../youralerts/display",
+                                       navmenuid='youralerts')
 
         return page(title=_("Display searches"),
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
@@ -76,7 +77,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youraccount')
 
     def input(left, req, form):
 
@@ -91,7 +93,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/input")
+            return page_not_authorized(req, "../youralerts/input",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -116,7 +119,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')
 
     def modify(self, req, form):
 
@@ -132,7 +136,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/modify")
+            return page_not_authorized(req, "../youralerts/modify",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -157,7 +162,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')
 
     def list(self, req, form):
 
@@ -166,7 +172,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/list")
+            return page_not_authorized(req, "../youralerts/list",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -183,7 +190,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')
 
     def add(self, req, form):
 
@@ -197,7 +205,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/add")
+            return page_not_authorized(req, "../youralerts/add",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -220,7 +229,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')
 
     def update(self, req, form):
 
@@ -235,7 +245,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/update")
+            return page_not_authorized(req, "../youralerts/update",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -257,7 +268,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')
 
     def remove(self, req, form):
 
@@ -270,7 +282,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/remove")
+            return page_not_authorized(req, "../youralerts/remove",
+                                       navmenuid='youralerts')
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -288,4 +301,5 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     uid=uid,
                     language=argd['ln'],
                     req=req,
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts')

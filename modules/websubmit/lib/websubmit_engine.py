@@ -592,7 +592,8 @@ def interface(req,
                 keywords = "submit",
                 uid = uid,
                 language = ln,
-                req = req)
+                req = req,
+                navmenuid='submit')
 
 
 def endaction(req,
@@ -952,7 +953,8 @@ def endaction(req,
                 keywords="submit",
                 uid = uid,
                 language = ln,
-                req = req)
+                req = req,
+                navmenuid='submit')
 
 def home(req, c=cdsname, ln=cdslang):
     """This function generates the WebSubmit "home page".
@@ -992,7 +994,8 @@ def home(req, c=cdsname, ln=cdslang):
                keywords="submit",
                uid=uid,
                language=ln,
-               req=req
+               req=req,
+               navmenuid='submit'
                )
 
 def makeCataloguesTable(ln=cdslang):
@@ -1219,7 +1222,8 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
                 keywords="submit",
                 uid=uid,
                 language=ln,
-                req=req
+                req=req,
+                navmenuid='submit'
                )
 
 def Request_Print(m, txt):
@@ -1435,7 +1439,8 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='submit')
 
 def warningMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
@@ -1446,7 +1451,8 @@ def warningMsg(title, req, c=cdsname, ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='submit')
 
 def specialchars(text):
     text = string.replace(text, "&#147;", "\042");

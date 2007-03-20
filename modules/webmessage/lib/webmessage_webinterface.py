@@ -66,7 +66,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if uid == -1 or isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
             return page_not_authorized(req, "%s/yourmessages/display" % \
-                                            (weburl,))    
+                                       (weburl,),
+                                       navmenuid="yourmessages")    
 
         _ = gettext_set_language(argd['ln'])
 
@@ -81,7 +82,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
     
     def write(self, req, form):
         """ write(): interface for message composing
@@ -101,7 +103,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
-            return page_not_authorized(req, "%s/yourmessages/write" % (weburl,))
+            return page_not_authorized(req, "%s/yourmessages/write" % (weburl,),
+                                       navmenuid="yourmessages")
 
         _ = gettext_set_language(argd['ln'])
 
@@ -122,7 +125,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
 
     def send(self, req, form):
         """
@@ -166,7 +170,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if uid == -1 or isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
-            return page_not_authorized(req, "%s/yourmessages/send" % (weburl,))
+            return page_not_authorized(req, "%s/yourmessages/send" % (weburl,),
+                                       navmenuid="yourmessages")
         _ = gettext_set_language(argd['ln'])
         if argd['send_button']:
             (body, errors, warnings, title, navtrail) = perform_request_send(
@@ -211,7 +216,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
 
     def delete(self, req, form):
         """
@@ -228,7 +234,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
             return page_not_authorized(req, 
                                        "%s/yourmessages/delete_msg" % \
-                                       (weburl,))
+                                       (weburl,),
+                                       navmenuid="yourmessages")
 
         _ = gettext_set_language(argd['ln'])
 
@@ -244,7 +251,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
 
     def delete_all(self, req, form):        
         """
@@ -260,7 +268,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
             return page_not_authorized(req, "%s/yourmessages/delete_all" % \
-                                            (weburl,))
+                                            (weburl,),
+                                       navmenuid="yourmessages")
 
         _ = gettext_set_language(argd['ln'])
 
@@ -276,7 +285,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
 
     def display_msg(self, req, form):
         """
@@ -292,7 +302,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1 or isGuestUser(uid): 
             return page_not_authorized(req, "%s/yourmessages/display_msg" % \
-                                             (weburl,))
+                                             (weburl,),
+                                       navmenuid="yourmessages")
 
         _ = gettext_set_language(argd['ln'])
         # Generate content
@@ -308,5 +319,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     errors      = errors,
-                    warnings    = warnings)
+                    warnings    = warnings,
+                    navmenuid   = "yourmessages")
 

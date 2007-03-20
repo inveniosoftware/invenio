@@ -62,7 +62,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=cdslang, verbose=1, titleprologue="",
-         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[]):
+         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin"):
 
     """page(): display CDS web page
         input: title of the page
@@ -84,6 +84,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                errors is the list of error codes as defined in the moduleName_config.py file of the calling module
                log is the string of data that should be appended to the log file (errors automatically logged)
                secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not
+               navmenuid the section of the website this page belongs (search, submit, baskets, etc.)
        output: the final cds page with header, footer, etc.
     """
 
@@ -124,11 +125,12 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                       body = body,                                        
                       # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
                       lastupdated = lastupdated,
-                      pagefooteradd = cdspagefooteradd)
+                      pagefooteradd = cdspagefooteradd,
+                      navmenuid = navmenuid)
 
 def pageheaderonly(title, navtrail="", description="", keywords="",
                    uid=0, cdspageheaderadd="", language=cdslang,
-                   req=None, secure_page_p=0, verbose=1):
+                   req=None, secure_page_p=0, verbose=1, navmenuid="admin"):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -143,7 +145,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="",
                       uid = uid,
                       secure_page_p = secure_page_p,
                       # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
-                      pageheaderadd = cdspageheaderadd)
+                      pageheaderadd = cdspageheaderadd,
+                      navmenuid = navmenuid)
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="",
                    language=cdslang, req=None, verbose=1):

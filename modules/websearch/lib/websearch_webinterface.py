@@ -90,7 +90,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1:
-            return page_not_authorized(req, "../")
+            return page_not_authorized(req, "../",
+                                       navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
@@ -136,7 +137,8 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1:
-            return page_not_authorized(req, "../")
+            return page_not_authorized(req, "../",
+                                       navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
@@ -180,7 +182,8 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1:
-            return page_not_authorized(req, "../search")
+            return page_not_authorized(req, "../search",
+                                       navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
@@ -375,7 +378,8 @@ def display_collection(req, c, as, verbose, ln):
         uid = getUid(req)
         user_preferences = {}
         if uid == -1:
-            return page_not_authorized(req, "../")
+            return page_not_authorized(req, "../",
+                                       navmenuid='search')
         elif uid > 0:
             user_preferences = get_user_preferences(uid)
     except Error:
@@ -384,7 +388,8 @@ def display_collection(req, c, as, verbose, ln):
                     description="%s - Internal Error" % cdsname,
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='search')
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
@@ -399,7 +404,8 @@ def display_collection(req, c, as, verbose, ln):
                     keywords="%s, CDS Invenio" % cdsname,
                     uid=uid,
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='search')
     # display collection interface page:
     try:
         filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
@@ -444,7 +450,8 @@ def display_collection(req, c, as, verbose, ln):
                     cdspageboxrighttopadd=c_portalbox_rt,
                     titleprologue=c_portalbox_tp,
                     titleepilogue=c_portalbox_te,
-                    lastupdated=c_last_updated)
+                    lastupdated=c_last_updated,
+                    navmenuid='search')
     except:
         if verbose >= 9:
             req.write("<br>c=%s" % c)
@@ -458,7 +465,8 @@ def display_collection(req, c, as, verbose, ln):
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     uid=uid,
                     language=ln,
-                    req=req)
+                    req=req,
+                    navmenuid='search')
 
     return "\n"
 

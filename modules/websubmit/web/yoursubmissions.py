@@ -62,7 +62,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
     try:
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../yoursubmissions.py/index")
+            return page_not_authorized(req, "../yoursubmissions.py/index",
+                                       navmenuid='yoursubmissions')
         u_email = get_email(uid)
     except Error, e:
         return errorMsg(e.value, req, ln)
@@ -181,7 +182,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 keywords="",
                 uid=uid,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='yoursubmissions')
 
 def deleteSubmission(id, action, doctype, u_email):
     global storage
@@ -200,7 +202,8 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='yoursubmissions')
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
@@ -208,5 +211,6 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                 description="%s - Internal Error" % c,
                 keywords="%s, CDS Invenio, Internal Error" % c,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='yoursubmissions')
 

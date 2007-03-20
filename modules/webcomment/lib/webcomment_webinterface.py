@@ -119,7 +119,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        errors=errors, warnings=warnings)
+                        errors=errors, warnings=warnings,
+                        navmenuid='search')
         else:
             return page(title=_("Record Not Found"),
                         body=problem,
@@ -127,7 +128,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        warnings=check_warnings, errors=[])
+                        warnings=check_warnings, errors=[],
+                        navmenuid='search')
 
     def add(self, req, form):
         """
@@ -176,7 +178,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             # is page allowed to be viewed
             if uid == -1 or (not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS):
-                return page_not_authorized(req, "../comments/add")
+                return page_not_authorized(req, "../comments/add",
+                                           navmenuid='search')
 
             # if guest, must log in first 
             if isGuestUser(uid):
@@ -196,7 +199,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             uid=uid,
                             language=cdslang,
                             verbose=1,
-                            req=req)
+                            req=req,
+                            navmenuid='search')
             # user logged in
             else:
                 (body, errors, warnings) = perform_request_add_comment_or_remark(recID=argd['recid'],
@@ -221,7 +225,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             verbose=1,
                             errors=errors,
                             warnings=warnings,
-                            req=req)
+                            req=req,
+                            navmenuid='search')
         # id not in range
         else:
             return page(title=_("Record Not Found"),
@@ -229,7 +234,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         uid=uid,
                         verbose=1,
                         req=req,
-                        warnings=check_warnings, errors=[])
+                        warnings=check_warnings, errors=[],
+                        navmenuid='search')
 
     def vote(self, req, form):
         """

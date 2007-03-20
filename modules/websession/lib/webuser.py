@@ -92,7 +92,8 @@ def createGuestUser():
         except OperationalError:
             return None
 
-def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslang):
+def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslang,
+                        navmenuid=""):
     """Show error message when account is not activated"""
 
     from invenio.webpage import page
@@ -137,7 +138,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
                 uid=getUid(req),
                 body=body,
                 navtrail=navtrail,
-                req=req)
+                req=req,
+                navmenuid=navmenuid)
 
 def getUid (req):
     """Return user ID taking it from the cookie of the request.

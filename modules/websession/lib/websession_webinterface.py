@@ -71,7 +71,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/display")
+            return webuser.page_not_authorized(req, "../youraccount/display",
+                                               navmenuid='youraccount')
 
         if webuser.isGuestUser(uid):
             return page(title=_("Your Account"),
@@ -82,7 +83,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         req=req,
                         secure_page_p = 1,
                         language=args['ln'],
-                        lastupdated=__lastupdated__)
+                        lastupdated=__lastupdated__,
+                        navmenuid='youraccount')
 
         username = webuser.get_nickname_or_email(uid)
         bask = webbasket.account_list_baskets(uid, ln=args['ln'])
@@ -98,7 +100,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youraccount')
 
 
     def edit(self, req, form):
@@ -109,10 +112,13 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/edit")
+            return webuser.page_not_authorized(req, "../youraccount/edit",
+                                               navmenuid='youraccount')
 
         if webuser.isGuestUser(uid):
-            return webuser.page_not_authorized(req, "../youraccount/edit", text=_("This functionality is forbidden to guest users."))
+            return webuser.page_not_authorized(req, "../youraccount/edit",
+                                               text=_("This functionality is forbidden to guest users."),
+                                               navmenuid='youraccount')
 
         return page(title= _("Your Settings"),
                     body=webaccount.perform_set(webuser.get_email(uid),
@@ -125,7 +131,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youraccount')
 
     def change(self, req, form):
         args = wash_urlargd(form, {
@@ -150,7 +157,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/change")
+            return webuser.page_not_authorized(req, "../youraccount/change",
+                                               navmenuid='youraccount')
 
         prefs = webuser.get_user_preferences(uid)
 
@@ -200,7 +208,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             mess = _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % args['login_method']
 
         elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
-            return webuser.page_not_authorized(req, "../youraccount/change")
+            return webuser.page_not_authorized(req, "../youraccount/change",
+                                               navmenuid='youraccount')
         elif args['email']:
             # We should ignore the password if the authentication method is an
             # external one.
@@ -217,7 +226,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                     args['email'],
                                                     args['nickname'])
                 else:
-                    return webuser.page_not_authorized(req, "../youraccount/change")
+                    return webuser.page_not_authorized(req, "../youraccount/change",
+                                                       navmenuid='youraccount')
                 if change:
                     mess = _("Settings successfully edited.")
                 act = "display"
@@ -293,7 +303,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='youraccount')
 
     def lost(self, req, form):
         args = wash_urlargd(form, {})
@@ -303,7 +314,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/lost")
+            return webuser.page_not_authorized(req, "../youraccount/lost",
+                                               navmenuid='login')
 
         return page(title=_("Lost your password?"),
                     body=webaccount.perform_lost(args['ln']),
@@ -314,7 +326,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='login')
 
 
     def send_email(self, req, form):
@@ -326,7 +339,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/send_email")
+            return webuser.page_not_authorized(req, "../youraccount/send_email",
+                                               navmenuid='login')
 
         user_prefs = webuser.get_user_preferences(webuser.emailUnique(args['p_email']))
         if user_prefs:
@@ -340,7 +354,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             uid=uid, req=req,
                             secure_page_p = 1,
                             language=args['ln'],
-                            lastupdated=__lastupdated__)
+                            lastupdated=__lastupdated__,
+                            navmenuid='login')
 
         passw = webuser.givePassword(args['p_email'])
         if passw == -999:
@@ -352,7 +367,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         uid=uid, req=req,
                         secure_page_p = 1,
                         language=args['ln'],
-                        lastupdated=__lastupdated__)
+                        lastupdated=__lastupdated__,
+                        navmenuid='login')
 
         fromaddr = "From: %s" % supportemail
         toaddr  = "To: " + args['p_email']
@@ -378,7 +394,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         req=req,
                         secure_page_p = 1,
                         language=args['ln'],
-                        lastupdated=__lastupdated__)
+                        lastupdated=__lastupdated__,
+                        navmenuid='login')
 
         server.quit()
         return page(title=_("Lost password sent"),
@@ -388,7 +405,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     uid=uid, req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='login')
 
     def youradminactivities(self, req, form):
         args = wash_urlargd(form, {})
@@ -398,7 +416,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/youradminactivities")
+            return webuser.page_not_authorized(req, "../youraccount/youradminactivities",
+                                               navmenuid='admin')
 
         return page(title=_("Your Administrative Activities"),
                     body=webaccount.perform_youradminactivities(uid, args['ln']),
@@ -409,7 +428,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='admin')
 
     def delete(self, req, form):
         args = wash_urlargd(form, {})
@@ -419,7 +439,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/delete")
+            return webuser.page_not_authorized(req, "../youraccount/delete",
+                                               navmenuid='login')
 
         return page(title=_("Delete Account"),
                     body=webaccount.perform_delete(args['ln']),
@@ -430,7 +451,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='login')
 
     def logout(self, req, form):
         args = wash_urlargd(form, {})
@@ -440,7 +462,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../youraccount/logout")
+            return webuser.page_not_authorized(req, "../youraccount/logout",
+                                               navmenuid='login')
 
         return page(title=_("Logout"),
                     body=webaccount.perform_logout(req, args['ln']),
@@ -451,7 +474,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='login')
 
     def login(self, req, form):
         args = wash_urlargd(form, {
@@ -464,7 +488,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         locals().update(args)
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-            return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'])
+            return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'],
+                                               navmenuid='login')
 
         uid = webuser.getUid(req)
 
@@ -483,14 +508,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             req=req,
                             secure_page_p = 1,
                             language=args['ln'],
-                            lastupdated=__lastupdated__)
+                            lastupdated=__lastupdated__,
+                            navmenuid='login')
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
             if len(iden)>0:
                 uid = webuser.update_Uid(req, args['p_un'])
                 uid2 = webuser.getUid(req)
                 if uid2 == -1:
                     webuser.logoutUser(req)
-                    return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid)
+                    return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
+                                                       navmenuid='login')
 
                 # login successful!
                 if args['referer']:
@@ -513,7 +540,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             req=req,
                             secure_page_p = 1,
                             language=args['ln'],
-                            lastupdated=__lastupdated__)
+                            lastupdated=__lastupdated__,
+                            navmenuid='login')
         else:
             return "This should have never happened.  Please contact %s." % supportemail
 
@@ -527,7 +555,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'referer': (str, "")})
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-            return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % args['ln'])
+            return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % args['ln'],
+                                               navmenuid='login')
 
         uid = webuser.getUid(req)
 
@@ -544,7 +573,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                          req=req,
                          secure_page_p = 1,
                          language=args['ln'],
-                         lastupdated=__lastupdated__)
+                         lastupdated=__lastupdated__,
+                         navmenuid='login')
 
         mess = ""
         act = ""
@@ -609,7 +639,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     req=req,
                     secure_page_p = 1,
                     language=args['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    navmenuid='login')
 
 
 class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
@@ -633,7 +664,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/display")
+            return webuser.page_not_authorized(req, "../yourgroups/display",
+                                               navmenuid='yourgroups')
 
         (body, errors, warnings) = webgroup.perform_request_groups_display(uid=uid,
                                                                           ln=argd['ln'])
@@ -646,7 +678,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
 
 
@@ -671,7 +704,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/create")
+            return webuser.page_not_authorized(req, "../yourgroups/create",
+                                               navmenuid='yourgroups')
 
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
@@ -702,7 +736,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
     def join(self, req, form):
         """join(): interface for joining a new group
@@ -725,7 +760,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/join")
+            return webuser.page_not_authorized(req, "../yourgroups/join",
+                                               navmenuid='yourgroups')
 
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
@@ -759,7 +795,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
     def leave(self, req, form):
         """leave(): interface for leaving a group
@@ -782,7 +819,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/leave")
+            return webuser.page_not_authorized(req, "../yourgroups/leave",
+                                               navmenuid='yourgroups')
 
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
@@ -806,7 +844,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
     def edit(self, req, form):
         """edit(): interface for editing group
@@ -834,7 +873,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(argd['ln'])
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/display")
+            return webuser.page_not_authorized(req, "../yourgroups/display",
+                                               navmenuid='yourgroups')
 
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
@@ -871,7 +911,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
 
     def members(self, req, form):
@@ -900,7 +941,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(argd['ln'])
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return webuser.page_not_authorized(req, "../yourgroups/display")
+            return webuser.page_not_authorized(req, "../yourgroups/display",
+                                               navmenuid='yourgroups')
 
         if argd['cancel']:
             url = weburl + '/yourgroups/display?ln=%s'
@@ -938,6 +980,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     language      = argd['ln'],
                     lastupdated   = __lastupdated__,
                     errors        = errors,
-                    warnings      = warnings)
+                    warnings      = warnings,
+                    navmenuid     = 'yourgroups')
 
 

@@ -53,7 +53,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
     try:
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../yourapprovals.py/index")
+            return page_not_authorized(req, "../yourapprovals.py/index",
+                                       navmenuid='yourapprovals')
         u_email = get_email(uid)
     except Error, e:
         return errorMsg(e.value,req, ln = ln)
@@ -100,7 +101,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 keywords="",
                 uid=uid,
                 language=ln,
-                req=req)
+                req=req,
+                navmenuid='yourapprovals')
 
 def isReferee(uid,doctype="",categ=""):
     (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
@@ -111,9 +113,10 @@ def isReferee(uid,doctype="",categ=""):
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c,
-                    keywords="%s, CDS Invenio, Internal Error" % c,
-                    language=ln,
-                    req=req)
+                body = create_error_box(req, title=title,verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, CDS Invenio, Internal Error" % c,
+                language=ln,
+                req=req,
+                navmenuid='yourapprovals')
 
