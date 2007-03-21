@@ -191,6 +191,23 @@ def interface(req,
         ## with this submission:
         return errorMsg(_("Invalid parameter"), req, c, ln)
 
+
+    ## Before continuing to display the submission form interface,
+    ## verify that this submission has not already been completed:
+    if submission_is_finished(doctype, act, access, uid_email):
+        ## This submission has already been completed.
+        ## This situation can arise when, having completed a submission,
+        ## the user uses the browser's back-button to go back to the form
+        ## stage of the submission and then tries to submit once more.
+        ## This is unsafe and should not be allowed. Instead of re-displaying
+        ## the submission forms, display an error message to the user:
+        wrnmsg = """<b>This submission has been completed. Please go to the""" \
+                 """ <a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s">""" \
+                 """main menu</a> to start a new submission.</b>""" \
+                 % { 'doctype' : doctype, 'ln' : ln }
+        return warningMsg(wrnmsg, req)
+
+
     ## retrieve the action and doctype data:
 
     ## Concatenate action ID and doctype ID to make the submission ID:
@@ -701,6 +718,21 @@ def endaction(req,
         return errorMsg(_("Invalid parameter"), req, c, ln)
 
 
+    ## Before continuing to process the submitted data, verify that
+    ## this submission has not already been completed:
+    if submission_is_finished(doctype, act, access, uid_email):
+        ## This submission has already been completed.
+        ## This situation can arise when, having completed a submission,
+        ## the user uses the browser's back-button to go back to the form
+        ## stage of the submission and then tries to submit once more.
+        ## This is unsafe and should not be allowed. Instead of re-processing
+        ## the submitted data, display an error message to the user:
+        wrnmsg = """<b>This submission has been completed. Please go to the""" \
+                 """ <a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s">""" \
+                 """main menu</a> to start a new submission.</b>""" \
+                 % { 'doctype' : doctype, 'ln' : ln }
+        return warningMsg(wrnmsg, req)
+
     ## retrieve the action and doctype data
     if indir == "":
         ## Get the submission storage directory from the DB:
@@ -745,14 +777,6 @@ def endaction(req,
     else:
         ## Unknown value for edsrn - set it to an empty string:
         edsrn = ""
-
-    # Now we test whether the user has already completed the action and
-    # reloaded the page (in this case we don't want the functions to be called
-    # once again
-    # reloaded = Test_Reload(uid_email,doctype,act,access)
-    # if the action has been completed
-    #if reloaded:
-    #    return warningMsg("<b> Sorry, this action has already been completed. Please go back to the main menu to start a new action.</b>",req)
 
     ## Determine whether the action is finished
     ## (ie there are no other steps after the current one):
@@ -1414,21 +1438,6 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
               actions = actions,
             )
     return t
-
-def Test_Reload(uid_email, doctype, act, access):
-    """Look in the submission log to see whether a submission is
-       marked as finished.
-       @param uid_email: (string) - the email of the submitter.
-       @param doctype: (string) - the ID of the document type.
-       @param act: (string) - the ID of the action.
-       @param access: (string) - the ID of the submission (access No.).
-       @return: (integer) - 1 if this is a reload of the page; 0 if not.
-    """
-    subm_finished = submission_is_finished(doctype, act, access, uid_email)
-    if subm_finished == 1:
-        return 1
-    else:
-        return 0
 
 def errorMsg(title, req, c=cdsname, ln=cdslang):
     # load the right message language
