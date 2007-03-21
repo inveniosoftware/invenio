@@ -61,6 +61,7 @@
     <li>3.9&nbsp;&nbsp;<a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a></li>
     <li>3.10&nbsp;<a href="#dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></li>
     <li>3.11&nbsp;<a href="#validityFormatTemplate">Check the Validity a Format Template</a></li>
+    <li>3.12&nbsp;<a href="#xslFormatTemplate">XSL Format templates</a></li>
     </ul>
 </li>
 <li><strong>4. <a href="#FormatElements">Configure Format Elements</a></strong>
@@ -101,6 +102,8 @@
     <li>7.3&nbsp;&nbsp;<a href="#integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></li>
     <li>7.4&nbsp;&nbsp;<a href="#faq">FAQ</a></li>
     </ul>
+</li>
+<li><strong>8. <a href="#oldGuide">Old (PHP) BibFormat Administration Guide</a></strong>
 </li>
 </ul>
 
@@ -228,7 +231,12 @@ a typical workflow:</p>
     authors' names and the link parameter tells if links to authors'
     websites have to be created. 
     All elements are described in the <a href="bibformatadmin.py/format_elements_doc">elements documentation</a>.<br/>
-    You can add, remove or edit format templates <a href="bibformatadmin.py/format_templates_manage">here</a></td>
+    You can add, remove or edit format templates <a href="bibformatadmin.py/format_templates_manage">here</a>.
+    <p>
+    In addition to this modified HTML language, BibFormat also supports XSL stylesheets as format templates.
+    Read the <a href="#xslFormatTemplate">XSL Format Templates</a> section to learn more about XSLT support for your format templates.
+    </p>
+    </td>
       
   </tr>
   <tr><td colspan="2"><hr/><span style="white-space: nowrap;">Step 4:</span></td></tr>
@@ -479,7 +487,7 @@ However you must make sure that it is removed from the tables <code>format</code
     the problems that have been found for the output format.</p>
 
 <h2><a name="formatTemplates">3. Format Templates</a></h2>
-    <p>A format template defines the how a record should be formatted. For example it specifies which fields of the record are to be displayed, in which order and with which visual attributes. Basically the format template is written in HTML, so that it is easy for anyone to edit it.</p>
+    <p>A format template defines how a record should be formatted. For example it specifies which fields of the record are to be displayed, in which order and with which visual attributes. Basically the format template is written in HTML, so that it is easy for anyone to edit it. BibFormat also has support for XSLT for formatting. Read more <a href="#xslFormatTemplate">about XSL format templates here</a>.</p>
     <h3><a name="addFormatTemplate">3.1 Add a Format Template</a></h3>
     <p>To add a new format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template, or ask to make a copy of an existing format.
  See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about editing the attributes.<p>
@@ -633,6 +641,21 @@ are not returned by the format elements.</p>
     <p>To check the validity of a format template, simply go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, and look at the column 'status' for the format template you want to check. If message "Ok" is there,
     then no problem was found with the template. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the template.</p>
+
+    <h3><a name="xslFormatTemplate">3.12 XSL Format templates</a></h3>
+    <p>In addition to the HTML-like syntax introduced in previous sections, BibFormat also
+    has support for server-side XSL transformation. Although you can do all the formatting using this custom HTML syntax, there are
+    cases where an XSL stylesheet might be preferred. XSLT is for example a natural choice
+    when you need to output complex XML, especially when your XML has a deep tree structure.
+    You might also prefer using XSLT if you already feel comfortable with XSL syntax.</p>
+    <p>XSL format templates are written using regular XSL. The template file has to be placed in the same folder
+    as regular format template files, and its file extension must be <code>.xsl</code>. The XSL template
+    are also visible through the web interface, as any regular format template file. However, some
+    functions like the "Dependencies checker" or the possibility to create a template or edit its attributes are not
+    available for the XSL templates.</p>
+
+    <p>Finally, please note that you will need to install a supported XSLT parser in order
+    to format using XSL stylesheets.</p>
     
 <h2><a name="FormatElements">4. Format Elements</a></h2>
  <p>Format elements are the bricks used in format templates to provide dynamic content to the formatting process.
@@ -1189,7 +1212,8 @@ This is to reduce the number of elements shown in the documentation as the logic
 table contains a lot of not so useful fields to be used in templates.</p>
 
 <a name="oldGuide"/>
-<h1>Old PHP BibFormat Aministration Guide</h1>
+<div style="background-color:rgb(204, 204, 204)";>
+<h1><span style="color:rgb(204, 0, 0);">Old</span> PHP BibFormat Aministration Guide</h1>
 <h2>Contents</h2>
 <strong>1. <a href="#1">Overview</a></strong><br>
 <strong>2. <a href="#2">Configuring BibFormat</a></strong><br>
@@ -2768,3 +2792,4 @@ else
 </pre>
 </li>
 </ul>
+</div>
