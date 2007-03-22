@@ -28,3 +28,12 @@ __revision__ = \
 
 ## do we want experimental features? (0=no, 1=yes)
 CFG_EXPERIMENTAL_FEATURES = 0
+
+class InvenioWebSearchUnknownCollectionError(Exception):
+    """Exception for bad collection."""
+    def __init__(self, colname):
+        """Initialisation."""
+        self.colname = colname
+    def __str__(self):
+        """String representation."""
+        return repr(self.colname)
