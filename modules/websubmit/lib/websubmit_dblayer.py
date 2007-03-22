@@ -88,6 +88,41 @@ def get_longname_of_action(action):
     return lactname
 
 
+def doctype_has_submission(doctype, action):
+    """Determine whether or not a doctype has a given submission.
+       A submission (i.e. an action of a document type) is identified
+       by the document type ID and the action ID.
+       @param doctype: (string) - the ID of the document type.
+       @param action:  (string) - the ID of the action.
+       @return: (integer) - 0 if the given submission does not exist
+        in WebSubmit; 1 if the submission exists.
+    """
+    exists = 0 ## Flag indicating the submission's existence
+
+    ## Execute the query to count the number of rows for this submission:
+    qstr = """SELECT count(docname) FROM sbmIMPLEMENT """ \
+           """WHERE docname=%s AND actname=%s"""
+    qres = run_sql(qstr, (doctype, action))
+
+    if len(qres) > 0:
+        ## Get the number of rows found for this submission:
+        num_submissions = qres[0][0]
+        try:
+            num_submissions = int(num_submissions)
+        except (ValueError, TypeError):
+            ## Unexpected result. Assume that the submission doesn't exist
+            ## for this document type:
+            num_submissions = 0
+
+        if num_submissions > 0:
+            ## The submission exists for this document type.
+            ## Set the return-flag.
+            exists = 1
+
+    ## return submission-exists flag:
+    return exists
+
+
 def get_num_pages_of_submission(submission):
     """Given the ID of a submission (e.g. SBITEXT, MBIPICT, etc), query
        the database to retrieve the number of pages making up the
