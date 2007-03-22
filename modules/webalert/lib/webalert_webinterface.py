@@ -273,8 +273,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def remove(self, req, form):
 
-        argd = wash_urlargd(form, {'name': (str, None),
-                                   'idu': (int, None),
+        argd = wash_urlargd(form, {'name': (str, None),                                   
                                    'idq': (int, None),
                                    'idb': (int, None),
                                    })
@@ -289,7 +288,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
 
         return page(title=_("Display alerts"),
-                    body=webalert.perform_remove_alert(argd['name'], argd['idu'], argd['idq'],
+                    body=webalert.perform_remove_alert(argd['name'], argd['idq'],
                                                        argd['idb'], uid, ln=argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sweburl' : sweburl,
