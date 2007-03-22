@@ -451,6 +451,7 @@ Contents
               NameVirtualHost *:80
               <VirtualHost *:80>
                       ServerName webserver.domain.com
+                      ServerAlias webserver
                       ServerAdmin cds.support@cern.ch
                       DocumentRoot /opt/cds-invenio/var/www
                       <Directory /opt/cds-invenio/var/www>
@@ -488,6 +489,7 @@ Contents
               SSLCertificateFile /etc/apache2/ssl/apache.pem
               <VirtualHost *:443>
                       ServerName webserver.domain.com
+                      ServerAlias webserver
                       ServerAdmin cds.support@cern.ch
                       SSLEngine on
                       DocumentRoot /opt/cds-invenio/var/www
