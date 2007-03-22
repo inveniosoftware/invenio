@@ -57,7 +57,7 @@ from invenio.config import \
      cdsnameintl, \
      logdir, \
      weburl
-from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
+from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
@@ -74,7 +74,7 @@ from invenio.dbquery import run_sql, get_table_update_time, escape_string, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
-    from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
+    from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
 
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
@@ -756,7 +756,6 @@ def wash_colls(cc, c, split_colls=0):
     This is because users might have chosen 'split by collection'
     functionality.
        The behaviour of "collections to display" depends solely whether
-
     user has deselected a particular collection: e.g. if it started
     from 'Articles and Preprints' page, and deselected 'Preprints',
     then collection to display is 'Articles'.  If he did not deselect
@@ -768,6 +767,10 @@ def wash_colls(cc, c, split_colls=0):
          * if is equal to 0, then we are splitting to the first level
            of collections, i.e. collections as they appear on the page
            we started to search from;
+
+    The function raises exception
+    InvenioWebSearchUnknownCollectionError
+    if cc or one of c collections is not known.
     """
 
     colls_out = []
@@ -783,7 +786,10 @@ def wash_colls(cc, c, split_colls=0):
     else:
         # check once if cc is real:
         if not collection_reclist_cache.has_key(cc):
-            cc = cdsname # cc is not real, so replace it with Home collection
+            if cc:
+                raise InvenioWebSearchUnknownCollectionError(cc)
+            else:
+                cc = cdsname # cc is not set, so replace it with Home collection
 
     # check type of 'c' argument:
     if type(c) is list:
@@ -796,6 +802,9 @@ def wash_colls(cc, c, split_colls=0):
     for coll in colls:
         if collection_reclist_cache.has_key(coll):
             colls_real.append(coll)
+        else:
+            if coll:
+                raise InvenioWebSearchUnknownCollectionError(coll)
     colls = colls_real
 
     # check if some real collections remain:
@@ -3020,9 +3029,21 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
           ec - List of external search engines enabled.
     """
     selected_external_collections_infos = None
-    
+
     # wash all arguments requiring special care
-    (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
+    try:
+        (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
+    except InvenioWebSearchUnknownCollectionError, exc:
+        colname = exc.colname
+        if of.startswith("h"):
+            page_start(req, of, cc, as, ln, getUid(req),
+                       websearch_templates.tmpl_collection_not_found_page_title(colname, ln))
+            req.write(websearch_templates.tmpl_collection_not_found_page_body(colname, ln))
+            return page_end(req, of, ln)
+        elif of == "id":
+            return []
+        else:
+            return page_end(req, of, ln)
 
     p = wash_pattern(p)
     f = wash_field(f)
