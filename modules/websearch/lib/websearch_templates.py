@@ -36,6 +36,7 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      cdslang, \
      cdsname, \
+     cdsnameintl, \
      version, \
      weburl, \
      supportemail
@@ -2491,4 +2492,28 @@ class Template:
         out = """\n</collection>"""
         return out
 
-    
+
+    def tmpl_collection_not_found_page_title(self, colname, ln=cdslang):
+        """
+        Create page title for cases when unexisting collection was asked for.
+        """
+        _ = gettext_set_language(ln)
+        out = _("Collection %s Not Found") % cgi.escape(colname)
+        return out
+
+    def tmpl_collection_not_found_page_body(self, colname, ln=cdslang):
+        """
+        Create page body for cases when unexisting collection was asked for.
+        """
+        _ = gettext_set_language(ln)
+        out = """<h1>%(title)s</h1>
+                 <p>%(sorry)s</p>
+                 <p>%(you_may_want)s</p>
+              """ % { 'title': self.tmpl_collection_not_found_page_title(colname, ln),
+                      'sorry': _("Sorry, collection %s does not seem to exist.") % \
+                                ('<strong>' + cgi.escape(colname) + '</strong>'),
+                      'you_may_want': _("You may want to start browsing from %s.") % \
+                                 ('<a href="' + weburl + '?ln=' + ln + '">' + \
+                                        cgi.escape(cdsnameintl[ln]) + '</a>')}
+        return out
+        
