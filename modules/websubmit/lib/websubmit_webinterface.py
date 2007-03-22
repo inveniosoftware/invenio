@@ -56,7 +56,6 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
     def __init__(self,recid):
         self.recid = recid
-        return
     
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
