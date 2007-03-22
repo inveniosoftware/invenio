@@ -621,10 +621,15 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         self.assertEqual([8],
                          perform_request_search(recid=8))
 
-    def test_search_engine_python_api_for_unexisting_record(self):
-        """websearch - search engine Python API for unexisting record"""
+    def test_search_engine_python_api_for_nonexisting_record(self):
+        """websearch - search engine Python API for non-existing record"""
         self.assertEqual([],
                          perform_request_search(recid=1234567809))
+
+    def test_search_engine_python_api_for_nonexisting_collection(self):
+        """websearch - search engine Python API for non-existing collection"""
+        self.assertEqual([],
+                         perform_request_search(c='Foo'))
 
     def test_search_engine_python_api_for_range_of_records(self):
         """websearch - search engine Python API for range of records"""
@@ -653,10 +658,16 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?recid=8&of=id',
                                                expected_text="[8]"))
 
-    def test_search_engine_web_api_for_unexisting_record(self):
-        """websearch - search engine Web API for unexisting record"""
+    def test_search_engine_web_api_for_nonexisting_record(self):
+        """websearch - search engine Web API for non-existing record"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?recid=123456789&of=id',
+                                               expected_text="[]"))
+
+    def test_search_engine_web_api_for_nonexisting_collection(self):
+        """websearch - search engine Web API for non-existing collection"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?c=Foo&of=id',
                                                expected_text="[]"))
 
     def test_search_engine_web_api_for_range_of_records(self):
@@ -794,6 +805,12 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
         """websearch - no XSS vulnerability in collection interface pages"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Collection &lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt; Not Found'))
+
+    def test_xss_in_collection_search_page(self):
+        """websearch - no XSS vulnerability in collection search pages"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Collection &lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt; Not Found'))
 
     def test_xss_in_simple_search(self):
