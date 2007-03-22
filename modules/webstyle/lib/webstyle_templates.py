@@ -296,26 +296,26 @@ class Template:
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td class="headermoduleboxbody">
-             <a class="header" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>
+       <td class="headermoduleboxbody%(search_selected)s">
+             <a class="header%(search_selected)s" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td class="headermoduleboxbody">
-             <a class="header" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
+       <td class="headermoduleboxbody%(submit_selected)s">
+             <a class="header%(submit_selected)s" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td class="headermoduleboxbody">
-             <a class="header" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
+       <td class="headermoduleboxbody%(personalize_selected)s">
+             <a class="header%(personalize_selected)s" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
-       <td class="headermoduleboxbody">
-             <a class="header" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
+       <td class="headermoduleboxbody%(help_selected)s">
+             <a class="header%(help_selected)s" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -353,6 +353,11 @@ class Template:
           'navtrailbox' : navtrailbox,
 
           'pageheaderadd' : pageheaderadd,
+
+          'search_selected': navmenuid == 'search' and "selected" or "",
+          'submit_selected': navmenuid == 'submit' and "selected" or "",
+          'personalize_selected': navmenuid.startswith('your') and "selected" or "",
+          'help_selected': navmenuid == 'help' and "selected" or "",
 
           'msg_search' : _("Search"),
           'msg_submit' : _("Submit"),
