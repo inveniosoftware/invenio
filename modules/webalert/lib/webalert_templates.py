@@ -342,7 +342,7 @@ class Template:
                               <td style="text-wrap:none;">%(created)s</td>
                               <td>%(textargs)s</td>
                               <td>
-                                 <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idu=%(userid)d&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
+                                 <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
                                  <a href="./modify?ln=%(ln)s&amp;idq=%(queryid)d&amp;name=%(alertname)s&amp;freq=%(freq)s&amp;notif=%(notif)s&amp;idb=%(basketid)d&amp;old_idb=%(basketid)d">%(modify)s</a><br />
                                  <a href="%(weburl)s/search?%(queryargs)s&amp;ln=%(ln)s">%(search)s</a>
                              </td>
@@ -356,7 +356,6 @@ class Template:
                     'lastrun' : alert['lastrun'],
                     'created' : alert['created'],
                     'textargs' : alert['textargs'],
-                    'userid' : alert['userid'],
                     'queryid' : alert['queryid'],
                     'basketid' : alert['basketid'],
                     'freq' : alert['frequency'],
