@@ -250,23 +250,26 @@ def perform_list_alerts (uid, ln=cdslang):
                                               guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
 
-def perform_remove_alert(alert_name, id_user, id_query, id_basket, uid, ln=cdslang):
+def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=cdslang):
     """perform_remove_alert: remove an alert from the database
-    input:  identifier of the user;
+    input:  alert name
             identifier of the query;
             identifier of the basket
+            uid
     output: confirmation message + the list of alerts Web page"""
     # set variables
     out = ""
-    if (None in (alert_name, id_user, id_query, id_basket, uid)):
+    if (None in (alert_name, id_query, id_basket, uid)):
         return out
     # remove a row from the alerts table: user_query_basket
     query = """DELETE FROM user_query_basket
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'
-               AND id_user='%s'"""
-    query %= (id_user, id_query, id_basket, uid)
-    run_sql(query)
-    out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
+               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
+    query %= (uid, id_query, id_basket)
+    res = run_sql(query)
+    if res:
+        out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
+    else:
+        out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % alert_name
     out += perform_list_alerts(uid, ln=ln)
     return out
 
