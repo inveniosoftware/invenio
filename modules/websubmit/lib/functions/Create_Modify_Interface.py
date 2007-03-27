@@ -106,10 +106,19 @@ def Create_Modify_Interface(parameters, curdir, form):
         fp = open( "%s/%s" % (curdir, fieldname), "r" )
         fieldstext = fp.read()
         fp.close()
+        fieldstext = re.sub("\+","\n", fieldstext)
+        fields = fieldstext.split("\n")
     else:
-        raise InvenioWebSubmitFunctionError("cannot find fields to modify")
-    fieldstext = re.sub("\+","\n", fieldstext)
-    fields = fieldstext.split("\n")
+        res = run_sql("SELECT fidesc FROM sbmFIELDDESC WHERE  name=%s", (fieldname,))
+        if len(res) == 1:
+            fields = res[0][0].replace(" ", "")
+            fields = re.findall("<optionvalue=.*>", fields)
+            regexp = re.compile("""<optionvalue=(?P<quote>['|"]?)(?P<value>.*?)(?P=quote)""")
+            fields = [regexp.search(x) for x in fields]
+            fields = [x.group("value") for x in fields if x is not None]
+            fields = [x for x in fields if x not in ("Select", "select")]
+        else:
+            raise InvenioWebSubmitFunctionError("cannot find fields to modify")
     #output some text    
     t = t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><BR>Please modify the following fields:<BR>Then press the 'END' button at the bottom of the page<BR>\n" % rn
     for field in fields:
