@@ -435,11 +435,19 @@ def loginUser(req, p_un, p_pw, login_method):
                     synchronize_external_groups(userid, groups, login_method)
 
             user_prefs = get_user_preferences(query_result[0][0])
+            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
+                # Let's prevent the user to switch login_method
+                if user_prefs.has_key("login_method") and \
+                           user_prefs["login_method"] != login_method:
+                    return([], p_email, p_pw, 11)
             user_prefs["login_method"] = login_method
+
+            # Cleaning external settings
             for key in user_prefs.keys():
                 if key.startswith('EXTERNAL_'):
                     del user_prefs[key]
             try:
+                # Importing external settings
                 new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw)
                 for key, value in new_prefs.items():
                     user_prefs['EXTERNAL_' + key] = value
@@ -447,6 +455,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 pass
             except WebAccessExternalAuthError:
                 return([], p_email, p_pw, 16)
+            # Storing settings
             set_user_preferences(query_result[0][0], user_prefs)
         else:
             return ([], p_un, p_pw, 10)
