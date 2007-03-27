@@ -212,14 +212,14 @@ def del_rank_method_codeDATA(rank_method_code):
     id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
     res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
 
-def del_recids(rank_method_code, range):
+def del_recids(rank_method_code, range_rec):
     """Delete some records from the rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
         write_message("Old size: %s" % len(rec_dict))
-        for (recids,recide) in range:
+        for (recids,recide) in range_rec:
             for i in range(int(recids), int(recide)):
                 if rec_dict.has_key(i):
                     del rec_dict[i]  
@@ -390,8 +390,8 @@ def task_update_status(val):
 def split_ranges(parse_string):
     recIDs = []
     ranges = string.split(parse_string, ",")
-    for range in ranges:
-        tmp_recIDs = string.split(range, "-")
+    for arange in ranges:
+        tmp_recIDs = string.split(arange, "-")
         
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
