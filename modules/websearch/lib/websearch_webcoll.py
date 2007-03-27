@@ -114,7 +114,10 @@ def write_message(msg, stream=sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
     if stream == sys.stdout or stream == sys.stderr:
         stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        stream.write("%s\n" % msg)
+        try:
+            stream.write("%s\n" % msg)
+        except UnicodeEncodeError:
+            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
         stream.flush()
     else:
         sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
