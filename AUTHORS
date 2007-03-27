@@ -42,6 +42,9 @@ The CERN development group currently consists of:
      External authentication rewrite, user preferences and external
      groups management.
 
+ - Jan Brice Krause <jan.brice.krause@cern.ch>
+     Fulltext file transfer mode for BibUpload.
+
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
