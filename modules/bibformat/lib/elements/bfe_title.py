@@ -37,8 +37,11 @@ def format(bfo, separator=" ", highlight='no'):
     title_remainder = bfo.field('245__b')
 
     if len(title) > 0:
-        titles.append( title + title_remainder )
-
+        if title_remainder:
+            titles.append( title + ': ' + title_remainder )
+        else:
+            titles.append( title )
+            
     title = bfo.field('0248_a')
     if len(title) > 0:
         titles.append( title )

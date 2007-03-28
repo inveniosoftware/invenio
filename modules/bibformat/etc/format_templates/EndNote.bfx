@@ -11,7 +11,11 @@
             <author><bx:field name="author"/></author>
           </bx:loop>
         </authors>
-        <title><bx:field name="title"/></title>
+        <title><bx:field name="title"/>
+               <bx:if name="subtitle">
+                        <bx:then><bx:text value=": "/><bx:field name="subtitle"/></bx:then>
+                </bx:if>
+        </title>
         <secondary_title><bx:field name="secondary_title"/></secondary_title>
         <pages><bx:field name="pages"/></pages>
         <number><bx:field name="journal_issue"/></number>

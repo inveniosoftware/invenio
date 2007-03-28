@@ -39,7 +39,11 @@
         </journal-meta>
         <article-meta>
           <title-group>
-            <article-title><bx:field name="title"/></article-title>
+            <article-title><bx:field name="title"/>
+                <bx:if name="subtitle">
+                        <bx:then><bx:text value=": "/><bx:field name="subtitle"/></bx:then>
+                </bx:if>
+            </article-title>
           </title-group>
           <bx:if name="doi">
             <bx:then>
@@ -104,7 +108,11 @@
         </publisher>
         <article-meta>
           <title-group>
-            <article-title><bx:field name="title"/></article-title>
+            <article-title><bx:field name="title"/>
+                <bx:if name="subtitle">
+                        <bx:then><bx:text value=": "/><bx:field name="subtitle"/></bx:then>
+                </bx:if>
+            </article-title>
           </title-group>
           <bx:if name="doi">
             <bx:then>
@@ -148,7 +156,11 @@
       <front>
         <article-meta>
           <title-group>
-            <article-title><bx:field name="title"/></article-title>
+            <article-title><bx:field name="title"/>
+                <bx:if name="subtitle">
+                        <bx:then><bx:text value=": "/><bx:field name="subtitle"/></bx:then>
+                </bx:if>
+            </article-title>
           </title-group>
           <contrib-group>
             <contrib contrib-type="author">
