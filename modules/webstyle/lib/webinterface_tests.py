@@ -44,7 +44,19 @@ class _FakeApache(object):
         self.mpm_query = None
         self.exists_config_define = None
         self.stat = None
-
+        self.AP_CONN_UNKNOWN = None
+        self.AP_CONN_CLOSE = None
+        self.AP_CONN_KEEPALIVE = None
+        self.APR_NOFILE = None
+        self.APR_REG = None
+        self.APR_DIR = None
+        self.APR_CHR = None
+        self.APR_BLK = None
+        self.APR_PIPE = None
+        self.APR_LNK = None
+        self.APR_SOCK = None
+        self.APR_UNKFILE = None        
+        
     def parse_qs(self, *args, **kargs):
         return cgi.parse_qs(*args, **kargs)
 
