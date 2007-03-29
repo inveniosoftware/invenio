@@ -337,7 +337,7 @@ def interface(req,
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
-        elif hasattr(formfields,"filename"):
+        elif hasattr(formfields,"filename") and formfields.filename is not None:
             if not os.path.exists("%s/files/%s" % (curdir, key)):
                 try:
                     os.makedirs("%s/files/%s" % (curdir, key))
@@ -808,7 +808,7 @@ def endaction(req,
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
-        elif hasattr(formfields, "filename"):
+        elif hasattr(formfields, "filename") and formfields.filename is not None:
             if not os.path.exists("%s/files/%s" % (curdir, key)):
                 try:
                     os.makedirs("%s/files/%s" % (curdir, key))
@@ -1236,9 +1236,9 @@ def action(req, c=cdsname, ln=cdslang, doctype=""):
           # actionbutton = actionbutton,
           statustext = statustext,
         )
-    
+
     p_navtrail = """<a href="/submit">%(submit)s</a>""" % {'submit' : _("Submit")}
-    
+
     return page(title = docFullDesc,
                 body=t,
                 navtrail=p_navtrail,
