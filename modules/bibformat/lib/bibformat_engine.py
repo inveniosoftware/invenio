@@ -394,25 +394,38 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
         """
 
         function_name = match.group("function_name")
-        
-        format_element = get_format_element(function_name, verbose)
-        params = {}
-        # Look for function parameters given in format template code
-        all_params = match.group('params')
-        if all_params is not None:
-            function_params_iterator = pattern_function_params.finditer(all_params)
-            for param_match in function_params_iterator:
-                name = param_match.group('param')
-                value = param_match.group('value')
-                params[name] = value
+        try:
+            format_element = get_format_element(function_name, verbose)
+        except Exception, e:
+            if verbose >= 5:
+                return '<b><span style="color: rgb(255, 0, 0);">' + \
+                       cgi.escape(str(e)).replace('\n', '<br/>') + \
+                       '</span>'
+        if format_element is None:
+            error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", function_name)],
+                                           stream='error', ln=cdslang)
+            errors_.append(error)
+            if verbose >= 5:
+                return '<b><span style="color: rgb(255, 0, 0);">' + \
+                       error[0][1]+'</span></b>'
+        else:
+            params = {}
+            # Look for function parameters given in format template code
+            all_params = match.group('params')
+            if all_params is not None:
+                function_params_iterator = pattern_function_params.finditer(all_params)
+                for param_match in function_params_iterator:
+                    name = param_match.group('param')
+                    value = param_match.group('value')
+                    params[name] = value
 
-        # Evaluate element with params and return (Do not return errors)
-        (result, errors) = eval_format_element(format_element,
-                                               bfo,
-                                               params,
-                                               verbose)
-        errors_ = errors
-        return result
+            # Evaluate element with params and return (Do not return errors)
+            (result, errors) = eval_format_element(format_element,
+                                                   bfo,
+                                                   params,
+                                                   verbose)
+            errors_.append(errors)
+            return result
         
     
     # Substitute special tags in the format by our own text.
@@ -479,7 +492,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
             errors.append(error)
             if verbose == 0:
                 register_errors(errors, 'error')
-            elif verbose >=5:
+            elif verbose >= 5:
                 tb = sys.exc_info()[2]
                 error_string = get_msgs_for_code_list(error,
                                                       stream='error',
@@ -493,7 +506,6 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
             output_text = ""
         else:
             output_text = str(output_text)
-
 
         # Escaping:
         # (1) By default, everything is escaped in mode 1
@@ -515,7 +527,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 errors.append(error)
                 if verbose == 0:
                     register_errors(errors, 'error')
-                elif verbose >=5:
+                elif verbose >= 5:
                     tb = sys.exc_info()[2]
                     error_string = get_msgs_for_code_list(error,
                                                           stream='error',
@@ -587,7 +599,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 errors.append(error)
                 if verbose < 5:
                     register_errors(error, 'error')
-                elif verbose >=5:
+                elif verbose >= 5:
                     error_string = get_msgs_for_code_list(error,
                                                           stream='error',
                                                           ln=cdslang)
@@ -621,7 +633,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         if verbose < 5:
             register_errors(error, 'error')
             return ("", errors)
-        elif verbose >=5:
+        elif verbose >= 5:
             if verbose >= 9:
                 sys.exit(error[0][1])
             return ('<b><span style="color: rgb(255, 0, 0);">' + \
@@ -805,7 +817,8 @@ def get_format_template_attrs(filename):
             if match is not None:
                 attrs['description'] = match.group('desc').rstrip('.')
     except Exception, e:
-        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
+        errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE",
+                                          filename, str(e))],
                                         stream='error', ln=cdslang)
         register_errors(errors, 'error')
         attrs['name'] = filename
@@ -836,6 +849,8 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
     # Get from cache whenever possible
     global format_elements_cache
 
+    errors = []
+
     # Resolve filename and prepare 'name' as key for the cache
     filename = resolve_format_element_filename(element_name)
     if filename is not None:
@@ -864,11 +879,12 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             return format_element
         
         else:
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND", element_name)],
+            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND",
+                                              element_name)],
                                             stream='error', ln=cdslang)
             if verbose == 0:
                 register_errors(errors, 'error')
-            elif verbose >=5:
+            elif verbose >= 5:
                 sys.stderr.write(errors[0][1])  
             return None
     
@@ -878,46 +894,70 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         module_name = filename
         if module_name.endswith(".py"):
             module_name = module_name[:-3]
-         
+
+        # Load element
         try:
             module = __import__(CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH + \
                                 "." + module_name)
-
             # Load last module in import path
-            # For eg. load bibformat_elements in
-            # invenio.elements.bibformat_element
+            # For eg. load bfe_name in
+            # invenio.bibformat_elements.bfe_name
             # Used to keep flexibility regarding where elements
             # directory is (for eg. test cases)
             components = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH.split(".")
             for comp in components[1:]:
-                module = getattr(module, comp) 
-
-            function_format  = module.__dict__[module_name].format
-            function_escape  = getattr(module.__dict__[module_name], 'escape_values', None)
-
-            format_element['code'] = function_format
-            format_element['escape_function'] = function_escape
-            format_element['attrs'] = get_format_element_attrs_from_function( \
-                function_format,
-                element_name,
-                with_built_in_params)
-            format_element['type'] = "python"
-    
-            # Cache and return
-            format_elements_cache[name] = format_element
-            return format_element
+                module = getattr(module, comp)
+                
         except Exception, e:
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND", element_name)],
+            # We catch all exceptions here, as we just want to print
+            # traceback in all cases
+            tb = sys.exc_info()[2]
+            stack = traceback.format_exception(Exception, e, tb, limit=None)
+            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_IN_FORMAT_ELEMENT",
+                                              element_name,"\n" + "\n".join(stack[-2:-1]))],
                                             stream='error', ln=cdslang)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
-                sys.stderr.write(str(e))
                 sys.stderr.write(errors[0][1])
-                if verbose >= 7:
-                    raise e
+
+        if errors:
+            if verbose >= 7:
+                raise Exception, errors[0][1]
             return None
 
+        # Load function 'format()' inside element
+        try:
+            function_format  = module.__dict__[module_name].format
+            format_element['code'] = function_format
+        except AttributeError, e:
+            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
+                                              element_name)],
+                                            stream='warning', ln=cdslang)
+            if verbose == 0:
+                register_errors(errors, 'error')
+            elif verbose >= 5:
+                sys.stderr.write(errors[0][1])
+
+        if errors:
+            if verbose >= 7:
+                raise Exception, errors[0][1]
+            return None
+        
+        # Load function 'escape_values()' inside element
+        function_escape  = getattr(module.__dict__[module_name],
+                                   'escape_values',
+                                   None)
+        format_element['escape_function'] = function_escape
+
+        # Prepare, cache and return
+        format_element['attrs'] = get_format_element_attrs_from_function( \
+                function_format,
+                element_name,
+                with_built_in_params)
+        format_element['type'] = "python"
+        format_elements_cache[name] = format_element
+        return format_element
         
 def get_format_elements(with_built_in_params=False):
     """
