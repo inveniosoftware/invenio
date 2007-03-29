@@ -63,7 +63,7 @@ def file_strip_ext(file):
         if file[-len(c_ext):len(file)]==c_ext and file[-len(c_ext)-1]==".":
             file = file[0:-len(c_ext)-1]
     return file
-			    
+
 class BibRecDocs:
     """this class represents all the files attached to one record"""
     def __init__(self,recid):
@@ -172,6 +172,43 @@ class BibRecDocs:
         else:
             return 0
 
+    def proposeUniqueName(self, filename, type=""):
+        """Produces a filename starting from filename that is known to not
+        overwrite files already existants. Returns the same filename if it's
+        already unique, otherwise it returns name-#.ext where name, ext are
+        part of filename and -# is a progressive integer number.
+        #FIXME Still to be checked.
+        """
+
+        # Splitting name from ext in order to insert the incremental number
+        if '.' in filename:
+            [name, ext] = filename.split('.', 1)
+            ext = '.' + ext
+        else:
+            name = filename
+            ext = ''
+
+        # Let's check if the filename is not already ok
+        docfiles = self.listLatestFiles(type)
+        ok_p = True
+        for docfile in docfiles:
+            if filename in docfile.name():
+                ok_p = False
+                break
+
+        if not ok_p:
+            # Let's try with incremental numbers
+            n = 1
+            while not ok_p:
+                ok_p = True
+                for docfile in docfiles:
+                    filename = "%s-%i%s" % (name, n, ext)
+                    if filename in docfile.name():
+                        ok_p = False
+                        break
+                n += 1
+        return filename
+
     def display(self,bibdocid="",version="",type="", ln = cdslang):
         t=""
         bibdocs = []
@@ -226,7 +263,7 @@ class BibDoc:
             self.recid = recid
             self.docname = res[0][2]
             self.id = bibdocid
-	    self.status = int(res[0][1])
+            self.status = int(res[0][1])
             group = "g"+str(int(int(self.id)/archivesize))
             self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
         # else it is a new document
@@ -237,7 +274,7 @@ class BibDoc:
                 self.recid = recid
                 self.type = type
                 self.docname = docname
-		self.status = 0
+                self.status = 0
                 self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
                 if self.id is not None:
                     #we link the document to the record if a recid was specified
@@ -376,7 +413,7 @@ class BibDoc:
     def getId(self):
         """retrieve bibdoc id"""
         return self.id
-	
+
     def getFile(self,name,format,version):
         if version == "":
             docfiles = self.listLatestFiles()
@@ -396,7 +433,7 @@ class BibDoc:
 
     def delete(self):
         """delete the current bibdoc instance"""
-	self.status = self.status | 1
+        self.status = self.status | 1
         run_sql("update bibdoc set status='" + str(self.status) + "' where id=%s",(self.id,))
 
     def BuildFileList(self):
@@ -426,7 +463,7 @@ class BibDoc:
                     else:
                         fullname_basename = fullname[:fullname_extension_postition]
                         fullname_extension = fullname[fullname_extension_postition+1:]
-                    # we can append file:		    
+                    # we can append file:
                     self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id,self.status))
 
     def BuildRelatedFileList(self):
@@ -434,11 +471,11 @@ class BibDoc:
         for row in res:
             bibdocid = row[0]
             type = row[1]
-	    if row[2] == "":
-	        status = 0
-	    else:
-	        status = int(row[2])
-	    if status & 1 == 0:
+            if row[2] == "":
+                status = 0
+            else:
+                status = int(row[2])
+            if status & 1 == 0:
                 if not self.relatedFiles.has_key(type):
                     self.relatedFiles[type] = []
                 self.relatedFiles[type].append(BibDoc(bibdocid=bibdocid))
@@ -478,7 +515,7 @@ class BibDocFile:
         self.type = type
         self.bibdocid = bibdocid
         self.version = version
-	self.status = status
+        self.status = status
         self.size = os.path.getsize(fullpath)
         self.md = os.path.getmtime(fullpath)
         try:
@@ -516,10 +553,10 @@ class BibDocFile:
 
     def isRestricted(self):
         """return restriction state"""
-	if int(self.status) & 10 == 10:
-	    return 1
-	return 0
-	
+        if int(self.status) & 10 == 10:
+            return 1
+        return 0
+
     def getType(self):
         return self.type
 
