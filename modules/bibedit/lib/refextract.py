@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 try:
     import sys, sre
     import os, getopt
-    from time import mktime, localtime
+    from time import mktime, localtime, ctime
     from invenio.refextract_config \
            import CFG_REFEXTRACT_VERSION, \
                   CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
@@ -541,6 +541,19 @@ sre_html_tagged_url = \
 ## associated with a title when marking the title up into MARC XML:
 sre_recognised_numeration_for_title = \
      sre.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', sre.UNICODE)
+
+## Another numeration pattern. This one is designed to match marked-up
+## numeration that is essentially an IBID, but without the word "IBID". E.g.:
+## <cds.TITLE>J. Phys. A</cds.TITLE> : <cds.VOL>31</cds.VOL>
+## <cds.YR>(1998)</cds.YR> <cds.PG>2391</cds.PG>; : <cds.VOL>32</cds.VOL>
+## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
+sre_numeration_no_ibid_txt = \
+          sre.compile(r"""
+          ^(\s*;\s*:?\s                                ## Leading ; :
+          \<cds\.VOL\>(\d+)\<\/cds\.VOL>\s             ## Volume
+          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s    ## year
+          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)      ## page
+          """, sre.UNICODE|sre.VERBOSE)
 
 sre_title_followed_by_series_markup_tags = \
      sre.compile(r'(\<cds.TITLE\>([^\<]+)\<\/cds.TITLE\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', sre.UNICODE)
@@ -2234,7 +2247,11 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                 processed_line = processed_line[tag_match_end:]
             else:
                 ## Closing tag was found:
+                ## The title text to be used in the marked-up citation:
                 title_text  = processed_line[tag_match_end:idx_closing_tag]
+                ## Title text to be referred to by IBID-numerations immediately
+                ## after this title citation:
+                title_text_for_ibid = title_text
                 ## Now trim this matched title and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_TITLE):]
 
@@ -2284,7 +2301,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
 
                         ## reset the various variables:
                         previously_cited_item = None
-                        cur_misc_txt = u""
+                        cur_misc_txt = ""
                         title_text = ""
                         reference_volume = ""
                         reference_year = ""
@@ -2330,6 +2347,119 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
                         reference_volume = ""
                         reference_year = ""
                         reference_page = ""
+
+                    ## The first title citation was successfully marked up.
+                    ## Now look for any numeration patterns that lead on from
+                    ## it. We're looking for IBIDs here, that didn't
+                    ## have the word IBID. E.g. the following line:
+                    ## R. M. Cavalcanti and C. A. A. de Carvalho,
+                    ## <cds.TITLE>J. Phys. A</cds.TITLE> : <cds.VOL>31</cds.VOL>
+                    ## <cds.YR>(1998)</cds.YR> <cds.PG>2391</cds.PG>;
+                    ## : <cds.VOL>32</cds.VOL> <cds.YR>(1999)</cds.YR>
+                    ## <cds.PG>6119</cds.PG>.   title_text_for_ibid
+                    numeration_match = sre_numeration_no_ibid_txt.match(processed_line)
+                    while numeration_match is not None:
+                        reference_volume = numeration_match.group(2)
+                        reference_year   = numeration_match.group(3)
+                        reference_page   = numeration_match.group(4)
+                        ## Skip past the matched numeration in the working line:
+                        processed_line = processed_line[numeration_match.end():]
+
+                        ## If the previously cited item is not None, it must
+                        ##  be a title since we just recognised one.
+                        if previously_cited_item is None:
+                            ## no previously cited item. The previous title
+                            ## must have been linked up with a report-number.
+                            ## Make this item into the "previously-cited-
+                            ## item":
+                            previously_cited_item = \
+                                    { 'type'       : "TITLE",
+                                      'misc_txt'   : "",
+                                      'title'      : title_text_for_ibid,
+                                      'volume'     : reference_volume,
+                                      'year'       : reference_year,
+                                      'page'       : reference_page,
+                                    }
+                            ## Now empty the miscellaneous text and title
+                            ## components:
+                            cur_misc_txt = ""
+                            title_text = ""
+                            reference_volume = ""
+                            reference_year = ""
+                            reference_page = ""
+                        elif previously_cited_item['type'] == "TITLE":
+                            ## logically, the previous citation was a title
+                            ## Add previously cited TITLE to XML string:
+                            prev_title    = previously_cited_item['title']
+                            prev_volume   = previously_cited_item['volume']
+                            prev_year     = previously_cited_item['year']
+                            prev_page     = previously_cited_item['page']
+                            prev_misc_txt = previously_cited_item['misc_txt'].\
+                                            lstrip(".;, ").rstrip()
+                            xml_line += markup_title_as_marcxml(prev_title, \
+                                                                prev_volume, \
+                                                                prev_year, \
+                                                                prev_page, \
+                                                                prev_misc_txt)
+                            ## Increment the stats counters:
+                            count_title += 1
+                            ## Now add the current cited item into the previously cited item marker
+                            previously_cited_item = { 'type'       : "TITLE",
+                                                      'misc_txt'   : "",
+                                                      'title'      : title_text_for_ibid,
+                                                      'volume'     : reference_volume,
+                                                      'year'       : reference_year,
+                                                      'page'       : reference_page,
+                                                    }
+                            ## empty miscellaneous text & title components:
+                            cur_misc_txt = u""
+                            title_text = ""
+                            reference_volume = ""
+                            reference_year = ""
+                            reference_page = ""
+                        elif previously_cited_item['type'] == "REPORTNUMBER":
+                            ## previously cited item was a REPORT NUMBER.
+                            ## ****NOTE: This should NEVER happen when we have
+                            ## just matched a TITLE.****
+                            
+                            ## Add previously cited REPORT NUMBER to XML string:
+                            prev_report_num = previously_cited_item['report_num']
+                            prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+                            xml_line += \
+                                    markup_reportnum_as_marcxml(prev_report_num,
+                                                                prev_misc_txt)
+                            ## Increment the stats counters:
+                            count_reportnum += 1
+                            ## Now add the current cited item into the previously cited item marker
+                            previously_cited_item = { 'type'       : "TITLE",
+                                                      'misc_txt'   : "",
+                                                      'title'      : title_text_for_ibid,
+                                                      'volume'     : reference_volume,
+                                                      'year'       : reference_year,
+                                                      'page'       : reference_page,
+                                                    }
+                            ## empty miscellaneous text & title components:
+                            cur_misc_txt = u""
+                            title_text = ""
+                            reference_volume = ""
+                            reference_year = ""
+                            reference_page = ""
+                        else:
+                            ## previously_cited_item is something unexpected
+                            ## refextract doesn't know how to continue from
+                            ## here. Launch an exception so that the stack
+                            ## trace can be analysed by the user:
+                            raise Exception("Unknown Citation Object " \
+                                            "Identified when Marking-Up " \
+                                            "Reference Line. Unable to " \
+                                            "Continue.")
+
+                        ## Look again for another following IBID numeration
+                        ## match (without the word "IBID"):
+                        numeration_match = sre_numeration_no_ibid_txt.match(\
+                            processed_line)
+                    title_text_for_ibid = ""
+
                 else:
                     ## No numeration was recognised after the title. Add the title into misc and carry on:
                     cur_misc_txt += "%s" % title_text
@@ -3710,8 +3840,6 @@ def find_end_of_reference_section(docbody,
         mk_patterns = [sre.compile(ref_line_marker_ptn, sre.I|sre.UNICODE)]
     else:
         mk_patterns = get_reference_line_numeration_marker_patterns()
-    garbage_digit_pattern = \
-     sre.compile(unicode(r'^\s*?([\+\-]?\d+?(\.\d+)?\s*?)+?\s*?$'), sre.UNICODE)
 
     while ( x < len(docbody)) and (not section_ended):
         ## look for a likely section title that would follow a reference section:
@@ -3736,15 +3864,32 @@ def find_end_of_reference_section(docbody,
         if not section_ended:
             ## Does this & the next 5 lines simply contain numbers? If yes, it's
             ## probably the axis scale of a graph in a fig. End refs section
-            dm = garbage_digit_pattern.match(docbody[x])
-            if dm is not None:
+            digit_test_str = docbody[x].replace(" ", "").\
+                                        replace(".", "").\
+                                        replace("-", "").\
+                                        replace("+", "").\
+                                        replace(u"\u00D7", "").\
+                                        replace(u"\u2212", "").\
+                                        strip()
+            if len(digit_test_str) > 10 and digit_test_str.isdigit():
+                ## The line contains only digits and is longer than 10 chars:
                 y = x + 1
                 digit_lines = 4
                 num_digit_lines = 1
                 while(y < x + digit_lines) and (y < len(docbody)):
-                    dm = garbage_digit_pattern.match(docbody[y])
-                    if dm is not None:
+                    digit_test_str = docbody[y].replace(" ", "").\
+                                     replace(".", "").\
+                                     replace("-", "").\
+                                     replace("+", "").\
+                                     replace(u"\u00D7", "").\
+                                     replace(u"\u2212", "").\
+                                     strip()
+                    if len(digit_test_str) > 10 and digit_test_str.isdigit():
                         num_digit_lines += 1
+                    elif len(digit_test_str) == 0:
+                        ## This is a blank line. Don't count it, to accommodate
+                        ## documents that are double-line spaced:
+                        digit_lines += 1
                     y = y + 1
                 if num_digit_lines == digit_lines:
                     section_ended = 1
@@ -4253,6 +4398,11 @@ def convert_PDF_to_plaintext(fpath):
     """
     status = 0
     doclines = []
+    ## Pattern to check for lines with a leading page-break character.
+    ## If this pattern is matched, we want to split the page-break into
+    ## its own line because we rely upon this for trying to strip headers
+    ## and footers, and for some other pattern matching.
+    p_break_in_line = sre.compile(unicode(r'^\s*?(\f)(?!$)(.*?)$'), sre.UNICODE)
     ## build pdftotext command:
     cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 '%(filepath)s' -""" \
                     % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
@@ -4265,8 +4415,20 @@ def convert_PDF_to_plaintext(fpath):
     ## read back results:
     count = 0
     for docline in pipe_pdftotext:
-        doclines.append(docline.decode("utf-8"))
-        count += 1
+        unicodeline = docline.decode("utf-8")
+        ## Check for a page-break in this line:
+        m_break_in_line = p_break_in_line.match(unicodeline)
+        if m_break_in_line is None:
+            ## There was no page-break in this line. Just add the line:
+            doclines.append(unicodeline)
+            count += 1
+        else:
+            ## If there was a page-break character in the same line as some
+            ## text, split it out into its own line so that we can later
+            ## try to find headers and footers:
+            doclines.append(m_break_in_line.group(1))
+            doclines.append(m_break_in_line.group(2))
+            count += 2
     ## close pipe to pdftotext:
     pipe_pdftotext.close()
     if cli_opts['verbosity'] >= 1:
@@ -4580,8 +4742,8 @@ def main():
         count_misc = count_title = count_reportnum = count_url = 0
         recid = curitem[0]
         if cli_opts['verbosity'] >= 1:
-            sys.stdout.write("--- processing RecID: %s pdffile: %s\n" \
-                             % (str(curitem[0]), curitem[1]))
+            sys.stdout.write("--- processing RecID: %s pdffile: %s; %s\n" \
+                             % (str(curitem[0]), curitem[1], ctime()))
 
         if not done_coltags:
             ## Output opening XML collection tags:
