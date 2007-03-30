@@ -220,7 +220,6 @@ The OAI repository is composed of OAI sets that correspond to a part of your met
 
  Additional parameters:
  -p --upload     Upload records
- -n --no-process Do not upload records (default)
 
  -u --user=USER       User name to submit the task as, password needed.
  -v --verbose=LEVEL   Verbose level (0=min,1=normal,9=max).

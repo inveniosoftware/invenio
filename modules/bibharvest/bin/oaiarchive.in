@@ -36,7 +36,6 @@
      -i --info       Give info about OAI set (default)
      
      -p --upload     Upload records
-     -n --no-process Do not upload records (default)
 
  Examples:
      

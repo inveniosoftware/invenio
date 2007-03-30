@@ -56,7 +56,6 @@ def printInfo():
     print " -i --info       Give info about OAI set (default)"
     print "\n Additional parameters:"
     print " -p --upload     Upload records"
-    print " -n --no-process Do not upload records (default)\n"
     print " -u --user=USER       User name to submit the task as, password needed."
     print " -v --verbose=LEVEL   Verbose level (0=min,1=normal,9=max)."
     print " -s --sleeptime=SLEEP Time after which to repeat tasks (no)"
