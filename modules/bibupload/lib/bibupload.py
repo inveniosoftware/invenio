@@ -61,6 +61,7 @@ import traceback
 from zlib import compress
 import MySQLdb
 import re
+import urllib
 
 from invenio.config import CFG_OAI_ID_FIELD
 from invenio.bibupload_config import * 
@@ -79,7 +80,9 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.bibformat import format_record
 from invenio.config import filedir, \
                            filedirsize, \
-                           htdocsurl
+                           htdocsurl, \
+                           tmpdir, \
+                           CFG_PREFIX
 
 # Global variables
 options = {}
@@ -109,7 +112,10 @@ def write_message(msg, stream=sys.stdout, verbose=1):
         if options['verbose'] >= verbose:
             stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
                                        time.localtime()))
-            stream.write("%s\n" % msg)
+            try:
+                stream.write("%s\n" % msg)
+            except UnicodeEncodeError:
+                stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
             stream.flush()
     else:
         sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
@@ -555,7 +561,7 @@ def bibupload(record):
         if insert_mode_p or options['mode'] == 'append':
             record = insert_fft_tags(record, rec_id)
         else:
-            record = update_fft_tag(record, rec_id)
+            update_fft_tag(record, rec_id)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -975,87 +981,341 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx, field_number, id_bibrec):
         write_message("   Error during the insert_record_bibrec_bibxxx function 2nd query : %s " % error, verbose=1, stream=sys.stderr) 
     return res
     
-def insert_fft_tags(record, rec_id):
-    """Process and insert FFT tags"""
+def insert_fft_tags(record, rec_id, cfg_bibupload_wget_sleep_time=1, cfg_bibupload_max_download_retires=10):
+    """
+    Process FFT tags that should contain $a with file pathes or URLs
+    to get the fulltext from.  This function enriches record with
+    proper 8564 URL tags, downloads fulltext files and stores them
+    into var/data structure where appropriate.
+
+    CFG_BIBUPLOAD_WGET_SLEEP_TIME defines time to sleep in seconds in
+    between URL downloads.
+
+    Note: if an FFT tag contains multiple $a subfields, we upload them
+    into different 856 URL tags in the metadata.  See regression test
+    case test_multiple_fft_insert_via_http().
+    """
+    curdir = os.getcwd()
+    os.chdir(tmpdir)
     tuple_list = None
     tuple_list = extract_tag_from_record(record, 'FFT')
-    # If there is a FFT TAG :)
+    # If there is a FFT TAG
+    add_local_fulltext = True
+    downloads_err_count = {}
     if tuple_list is not None:
-        for single_tuple in tuple_list:
-            # Get the inside of the FFT file
-            docpath = single_tuple[0][0][1]
-            docname = re.sub("\..*", "", os.path.basename(docpath))
-            extension = re.sub("^[^\.]*.", "", os.path.basename(docpath)).lower()
-            # Create a new docId
-            try:
-                bib_doc_id = run_sql("insert into bibdoc (docname,creation_date,modification_date) values(%s,NOW(),NOW())", (docname,))
-                write_message("   -Insert of the file %s into bibdoc : DONE" % docname, verbose=2)
-            except Error, error:
-                write_message("   Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr) 
-            
-            if bib_doc_id is not None:
-                # we link the document to the record if a rec_id was specified
-                if rec_id != "":
-                    
-                    # FIXME doc_type : main or additional, fron where the information come from?
-                    doc_type = ""
-                    try:
-                        res = run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (rec_id, bib_doc_id, doc_type))
-                        if res is None:
-                            write_message("   Failed during creation of link between doc Id and rec Id).", verbose=1, stream=sys.stderr)
-                        else:
-                            write_message("   -Insert of the link bibrec bibdoc for %s : DONE" % docname, verbose=2)
-                    except Error, error:
-                        write_message("   Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr) 
-            else:
-                write_message("   Failed during creation of the new doc Id.", verbose=1, stream=sys.stderr)
-            # Move the file to the correct place
-            # Variables from the config file
-            archivepath = filedir
-            archivesize = filedirsize
-            url_path = None
+        write_message("insert_fft_tags, all FFTs: "+str(tuple_list), verbose=9)
+        for aurl in record_get_field_values(record, 'FFT', ' ', ' ', 'a'):
+            file_exists_already = False
+            docuri = string.split(aurl,"//")
+            write_message("now processing FFT: "+str(docuri), verbose=9)
+            # Determine if docuri is a local file or a url
+            if len(docuri) == 1:  # it is something like /dfs/fs/sdfs/sdf.pdf
+                docpath = docuri[0]
+                if not (string.find(docpath, CFG_PREFIX) > -1  or string.find(docpath, "/home/") > -1):
+                    write_message("FFT tag contains path to a forbidden directory: " + docpath, stream=sys.stderr)
+                    docpath = ""                                                            
+            if len(docuri) == 2:
+                if docuri[0] == "file:": # it is something like file:///dfs/fs/sdfs/sdf.pdf
+                    docpath = docuri[1]
+                    if not (string.find(docpath, CFG_PREFIX) > -1  or string.find(docpath, "/home/") > -1):
+                        write_message("FFT tag contains path to a forbidden directory: " + docpath, stream=sys.stderr)
+                        docpath = ""
+                elif docuri[0] == "http:":  # it is something like http://arXiv.org/sdf/sdf.pdf
+                    base_url = string.split(docuri[1], "/")[0]
+                    fname = string.split(docuri[1], "/")[-1]
+                    if not base_url in downloads_err_count.keys():
+                        downloads_err_count[base_url] = 0
+                    if not downloads_err_count[base_url] > cfg_bibupload_max_download_retires:  
+                        try:
+                            if False: # switch to True for testing
+                                aurl = string.replace(aurl, "export.", "") 
+                            time.sleep(cfg_bibupload_wget_sleep_time)
+                            write_message("Downloading: " + aurl)
+                            if os.path.exists(fname):
+                                write_message("insert_fft_tags: " + fname + " already exists!",
+                                              verbose=3, stream=sys.stderr)
+                                file_exists_already = True
+                                os.rename(fname , fname + ".renamed_by_bibupload_fft" )
+                            os.system("wget -T 60 --tries 1 -q --user-agent='Mozilla/4.0' " + \
+                                      "http://"+ urllib.quote(aurl[7:]) )
+                        except OSError, errormsg:
+                            add_local_fulltext = False
+                            write_message("Error, pobabily in downloading " + aurl + " errormsg: " + errormsg,
+                                          verbose=1, stream=sys.stderr)
+                            downloads_err_count[base_url] += 1
 
-            group = "g"+str(int(int(bib_doc_id)/archivesize))
-            basedir = "%s/%s/%s" % (archivepath, group, bib_doc_id)
-            # we create the corresponding storage directory
-            if not os.path.exists(basedir):
-                try:
-                    os.makedirs(basedir)
-                    write_message("   -Create a new directory %s : DONE" % basedir, verbose=2)
-                except OSError, error:
-                    write_message("   Error making the directory : %s " % error, verbose=1, stream=sys.stderr) 
+                    docpath = os.getcwd() + "/" + fname
                     
-            # and save the father record id if it exists
-            if rec_id != "":
+                    if not os.path.exists(fname):
+                        add_local_fulltext = False
+                        write_message("Error in renaming " + string.split(docuri[1], "/")[-1],
+                                      verbose=1, stream=sys.stderr)                            
+                        # add tag 856 of source if download failed
+                        urlad = aurl
+                        if string.find(urlad, "arxiv.org") > -1 and string.find(urlad, "export.") > -1:
+                            urlad = string.replace(urlad, "export.", "")
+                        subfield_list = [('u', urlad)] 
+                        newfield_number = record_add_field(record, "856", "4", "", "", subfield_list)
+
+            if add_local_fulltext and not docpath=="":
+                #if not (string.find(docpath, CFG_PREFIX) > -1  or string.find(docpath, "/home/") > -1):
+                #    write_message("FFT tag contains path to a forbidden directory: " + docpath, stream=sys.stderr)
+                #    docpath = ""
+                docname = re.sub("\..*", "", os.path.basename(docpath))
+                extension = re.sub("^[^\.]*.", "", os.path.basename(docpath)).lower()
+                # Create a new docId
                 try:
-                    filep = open("%s/.recid" % basedir, "w")
-                    filep.write(str(bib_doc_id))
-                    filep.close()
-                except IOError, error:
-                    write_message("   Error writing the file : %s " % error, verbose=1, stream=sys.stderr) 
-                # Move the file to the good directory
-                try:
-                    os.system("mv %s %s" % (docpath, basedir))
-                    write_message("   -Move the file %s : DONE" % docname, verbose=2)
-                except OSError, error:
-                    write_message("   Error moving the file : %s " % error, verbose=1, stream=sys.stderr) 
-                
-                # Create the Url Path
-                url_path = htdocsurl+"/record/"+str(rec_id)+"/files/"+docname+"."+extension
-             
-                # add tag 856 to the xml marc to proceed
-                subfield_list = [('u', url_path), ('z', 'Access to Fulltext')] 
-                newfield_number = record_add_field(record, "856", "4", "", "", subfield_list)
-                if newfield_number is None:
-                    write_message("   Error when adding the field"+ single_tuple, verbose=1, stream=sys.stderr)
+                    bib_doc_id = run_sql("insert into bibdoc (docname,status,creation_date,modification_date) values(%s,0,NOW(),NOW())", (docname,))
+                    write_message("  -Insert of the file %s into bibdoc : DONE" % docname, verbose=2)
+                except Error, error:
+                    write_message("  Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr) 
+            
+                if bib_doc_id is not None:
+                    # we link the document to the record if a rec_id was specified
+                    if rec_id != "":
+                    
+                        # FIXME: doc_type : main or additional (with babbage.py , only main is needed)
+                        doc_type = "Main"
+                        try:
+                            res = run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (rec_id, bib_doc_id, doc_type))
+                            if res is None:
+                                write_message("   Failed during creation of link between doc Id and rec Id).", verbose=1, stream=sys.stderr)
+                            else:
+                                write_message("   -Insert of the link bibrec bibdoc for %s : DONE" % docname, verbose=2)
+                        except Error, error:
+                            write_message("   Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr) 
                 else:
-                    write_message("   -Add the new tag 856 to the record for %s : DONE" % docname, verbose=2)
+                    write_message("   Failed during creation of the new doc Id.", verbose=1, stream=sys.stderr)
+                # Move the file to the correct place
+                # Variables from the config file
+                archivepath = filedir
+                archivesize = filedirsize
+                url_path = None
+
+                group = "g"+str(int(int(bib_doc_id)/archivesize))
+                basedir = "%s/%s/%s" % (archivepath, group, bib_doc_id)
+
+                # we create the corresponding storage directory
+                if not os.path.exists(basedir):
+                    try:
+                        os.makedirs(basedir)
+                        write_message("   -Create a new directory %s : DONE" % basedir, verbose=2)
+                    except OSError, error:
+                        write_message("   Error making the directory : %s " % error, verbose=1, stream=sys.stderr) 
+                    
+
+
+                # and save the father record id if it exists
+                if rec_id != "":
+                    try:
+                        filep = open("%s/.recid" % basedir, "w")
+                        filep.write(str(rec_id))
+                        filep.close()
+                    except IOError, error:
+                        write_message("   Error writing the file : %s " % error, verbose=1, stream=sys.stderr) 
+
+                    # Move the file to the good directory
+                    try:
+                        dest = basedir + "/" + string.split(docpath,"/")[-1] + ";1"
+                        os.rename(docpath, dest )
+                        write_message("   -Move the file %s to %s : DONE" % (docpath, dest), verbose=8)
+                    except OSError, error:
+                        write_message("   Error moving the file : %s " % error, verbose=1, stream=sys.stderr)
+                    # Renames the orignial file if it had to be moved
+                    if file_exists_already:
+                        try:
+                            os.rename(fname + ".renamed_by_bibupload_fft", fname )
+                        except:
+                            pass
                 
-            # Delete FFT tag :)
-            record_delete_field(record, 'FFT', '', '')
-            write_message("   -Delete FFT tag from source : DONE", verbose=2)
+                    # Create the Url Path
+                    url_path = htdocsurl + "/record/" + str(rec_id) + "/files/" + docname + "." + extension
+             
+                    # add tag 856 to the xml marc to proceed
+                    subfield_list = [('u', url_path)] 
+                    newfield_number = record_add_field(record, "856", "4", " ", "", subfield_list)
+                    if newfield_number is None:
+                        write_message("   Error when adding the field"+ aurl, verbose=1, stream=sys.stderr)
+                    else:
+                        write_message("   -Add the new tag 856 to the record for %s : DONE" % docname, verbose=8)
+                
+                # Delete FFT tag :)
+                record_delete_field(record, 'FFT', ' ', ' ')
+                write_message("   -Delete FFT tag from source : DONE", verbose=2)
+    os.chdir(curdir)            
     return record
 
+def update_fft_tag(record, rec_id,
+                   cfg_bibupload_wget_sleep_time=1):
+    """
+      Processes and updates fulltexts documents in FFT tags.
+    
+      It tries to match filename and upps version of the file by downloading it
+      (no local file support).
+    
+      Important note: There is a fundamental difference with metadata
+      correct mode.  This function does not touch existing files, it just
+      adds the new ones.
+    
+      Beware: if no matching filename is found in invenio this will increment the version
+      of an existing file no matter what the new filename is.
+    
+    BEFORE:
+    file.pdf;2 
+    thesis.ppt;14
+    
+    INPUT:
+    thesis.ppt
+    
+    AFTER:
+    file.pdf;2
+    thesis.ppt;15
+    
+    ***
+    
+    BEFORE:
+    thesis.pdf;2 
+    thesis.ppt;14
+    
+    INPUT:
+    thesis.ppt
+    
+    AFTER:
+    ? (devrait pas arriver, mais...)
+    
+    ***
+    
+    BEFORE:
+    file.pdf;2 
+    thesis.ppt;14
+    
+    INPUT:
+    my_photo.jpeg
+    
+    AFTER:
+    file.jpeg;3   - ???
+    thesis.ppt;14
+    
+    ***
+    
+    
+    
+    """
+    
+    download_errors = 0
+    rec = record
+    
+    if "FFT" in rec.keys():
+
+
+        for uri in record_get_field_values(record, 'FFT', ' ', ' ', 'a'):
+
+            fname = string.split(uri, "/")[-1]
+            file_exists_already = False
+            
+            uri_type = "url"
+            if not "http://" in  uri:
+                uri_type = "file"
+                if not ((CFG_PREFIX in uri) or ("/home/" in uri)):
+                    uri = ""
+                    write_message("Local file "+uri+" is not in a permitted path (/home or CFG_PREFIX).", verbose=1, stream=sys.stderr)
+                if "file://" in uri:
+                    uri.replace("file://","")
+            
+            # Getting docid for this recid
+            res = run_sql("select id_bibdoc from bibrec_bibdoc where id_bibrec=%s", (rec_id,))
+
+            type_file = ""
+            type_exists = False
+            is_bibdocs = False
+
+            if len(res) == 0:
+                write_message("Error: no id_bibdoc for the rec_id " + str(rec_id),verbose=1, stream=sys.stderr)
+            else:
+                is_bibdocs= True
+                for res_s in res: 
+                    bib_doc_id = res_s[0]       
+                    # Determinig dir for this docid
+                    archivepath = filedir
+                    archivesize = filedirsize
+                    group = "g"+str(int(int(bib_doc_id)/archivesize))
+                    basedir = "%s/%s/%s" % (archivepath, group, bib_doc_id)
+        
+                    # Listing and analysing content of this directory: does this type of document exist ?
+                    ls = os.listdir(basedir)
+                    for filename in ls:
+                        if fname in filename:
+                            type_exists = True
+                            type_file = filename
+
+            # Atributes an existing filename if the right one was not found, etc.
+            if type_file == "" and is_bibdocs:
+                ls.sort()
+                write_message("Trying to atribute an existing filename to fulltext: the right one was not found.", verbose=9, stream=sys.stderr) 
+                for filename in ls:
+                    if filename.find("recid") == -1 :
+                        type_file = filename
+                        type_exists = True
+                write_message("Attributed filename to update: " + type_file, verbose=9, stream=sys.stderr)
+            if type_file == "":
+                write_message("No fulltext to update in this recid.", verbose=1, stream=sys.stderr)
+                type_exists = False
+                        
+            # Determine the new version, by taking next intger. If there is no vesion: assigning version 1
+            if not  len(res) == 0:
+                version = 0
+                for filename in ls:
+                    if ";" in filename:
+                        version_str = string.split(filename, ";")[1]
+                        is_int = True
+                        try:
+                            version_i = int(version_str)
+                        except:
+                            is_int = False
+                        if is_int:
+                            if version_i > version :
+                                version = version_i
+                version = str(version + 1)
+            else:
+                version = "1"
+        
+            #  determining new filename, if no  fulltext is found, just taking the first file
+            if type_exists:
+                base_filename = string.split (type_file,";") [0]
+                full_filename = basedir + "/" + base_filename + ";" + version
+                write_message("New filename: " + full_filename, verbose=9)
+
+            # Downloads revised fulltext if it is ok and moves it where it must be stored
+            if not type_file == "" and type_exists:
+                
+                if uri_type == "url":
+                    if download_errors < 10:
+                        cdir = os.getcwd()
+                        os.chdir(tmpdir)
+                        try:
+                            if os.path.exists(fname):
+                                file_exists_already = True
+                                os.rename(fname, fname + ".renamed_by_bibupload_fft")
+                            os.system("wget -T 60 --tries 1 -q --user-agent='CDS' " + uri)
+                            time.sleep(cfg_bibupload_wget_sleep_time)
+                            write_message("renaming from " + fname + " // to " + full_filename,
+                                          verbose=1, stream=sys.stderr )
+                            os.rename( fname , full_filename)
+                            if file_exists_already:
+                                os.rename(fname + ".renamed_by_bibupload_fft", fname)
+                        except OSError:
+                            write_message("Error in downloading " + uri, verbose=1, stream=sys.stderr)
+                            download_errors += 1
+                        os.chdir(cdir)
+                else:
+                    try:
+                        os.rename(uri , full_filename)
+                    except OSError:
+                        write_message("Local file "+uri+" in FFT field does not exist.", verbose=1, stream=sys.stderr)
+                                  
+    else:
+        pass # deleted records have no FFT tags
+  
 def insert_fmt_tags(record, rec_id):
     """Process and insert FMT tags"""
 
@@ -1285,25 +1545,6 @@ def append_new_tag_to_old_record(record, rec_old):
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     return rec_old
 
-def update_fft_tag(record, rec_id):
-    """Process and Update FFT tags"""
-    
-    # FIXME: SELECT THE BIBDOC ID TO DELETE AND FIRST INSERT THE NEW
-    # FFT TAGS BEFORE DELETING THE OLD ONE
-    
-    # We delete the bibdoc corresponding to this record
-    delete_bibdoc(rec_id)
-    
-    # We delete the links between bibrec and bibdoc
-    delete_bibrec_bibdoc(rec_id)
-    
-    # We delete the tag 856 from the record
-    record_delete_field(record, '856', '4')
-
-    # We add the new fft tags
-    record = insert_fft_tags(record, rec_id)
-    
-    return record
     
     
 ### Delete functions
@@ -1350,13 +1591,13 @@ def wipe_out_record_from_all_tables(recid):
     # delete from bibrec:
     run_sql("DELETE FROM bibrec WHERE id=%s", (recid,))
     # delete from bibrec_bibxxx:
-    for i in range(0,10):
+    for i in range(0, 10):
         for j in range(0, 10):
             run_sql("DELETE FROM %(bibrec_bibxxx)s WHERE id_bibrec=%%s" % \
                     {'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)},
                     (recid,))
     # delete all unused bibxxx values:
-    for i in range(0,10):
+    for i in range(0, 10):
         for j in range(0, 10):
             run_sql("DELETE %(bibxxx)s FROM %(bibxxx)s " \
                     " LEFT JOIN %(bibrec_bibxxx)s " \
