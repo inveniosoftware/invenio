@@ -28,7 +28,7 @@ bfxdir = $(sysconfdir)/bibconvert/config
 bfx_DATA = oaidc2marcxml.bfx
 
 xsldir = $(sysconfdir)/bibconvert/config
-xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl 
+xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl oaiarxiv2marcxml.xsl
 
 EXTRA_DIST = $(etc_DATA) $(bfx_DATA) $(xsl_DATA)
 
