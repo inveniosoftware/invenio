@@ -1352,8 +1352,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if basic_search_unit_hitset._nbhits > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % {'x_query1': "<em>"+bsu_p+"</em>",
-                                                                                                                        'x_query2': "<em>"+bsu_pn+"</em>"})
+                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
+                                                                                                                        'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"})
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
