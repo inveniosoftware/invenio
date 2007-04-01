@@ -158,6 +158,8 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
              old_id_basket = old_id_basket,
              id_basket = id_basket,
              id_query = id_query,
+             guest = isGuestUser(uid),
+             guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
 def check_alert_is_unique(id_basket, id_query, uid, ln=cdslang ):

@@ -124,7 +124,9 @@ class Template:
                 }
         return out
 
-    def tmpl_input_alert(self, ln, query, alert_name, action, frequency, notification, baskets, old_id_basket, id_basket, id_query):
+    def tmpl_input_alert(self, ln, query, alert_name, action, frequency, notification,
+                         baskets, old_id_basket, id_basket, id_query,
+                         guest, guesttxt):
         """
         Displays an alert adding form.
 
@@ -149,6 +151,10 @@ class Template:
           - 'id_basket' *string* - The id of the basket of this alert
 
           - 'id_query' *string* - The id of the query associated to this alert
+
+          - 'guest' *bool* - If the user is a guest user
+
+          - 'guesttxt' *string* - The HTML content of the warning box for guest users (produced by webaccount.tmpl_warning_guest_user)
         """
 
         # load the right message language
@@ -245,6 +251,9 @@ class Template:
         if action == "update":
             out += '<input type="hidden" name="old_idb" value="%s" />' % old_id_basket
         out += "</form>"
+
+        if guest:
+            out += guesttxt
 
         return out
 
