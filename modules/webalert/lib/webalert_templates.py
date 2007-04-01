@@ -174,7 +174,7 @@ class Template:
             <td>
               <table style="border: 0px; padding:10px;">
                 <tr>
-                   <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s:</td>
+                   <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s</td>
                    <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s"></td>
                 </tr>
                 <tr>
