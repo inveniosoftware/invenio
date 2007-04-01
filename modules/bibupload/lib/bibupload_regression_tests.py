@@ -31,7 +31,8 @@ import time
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl
 from invenio import bibupload
-from bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG
+from bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
+                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -61,7 +62,7 @@ def compare_xmbuffers(xmbuffer1, xmbuffer2):
     xmbuffer1 = remove_blanks_from_xmbuffer(xmbuffer1)
     xmbuffer2 = remove_blanks_from_xmbuffer(xmbuffer2)
 
-    if 1 and xmbuffer1 != xmbuffer2:
+    if xmbuffer1 != xmbuffer2:
         print "\n=" + xmbuffer1 + "=\n"
         print "\n=" + xmbuffer2 + "=\n"
 
@@ -93,7 +94,7 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     hmbuffer1 = re.sub(r'(^|\n)\s+', '', hmbuffer1)
     hmbuffer2 = re.sub(r'(^|\n)\s+', '', hmbuffer2)
 
-    if 0 and hmbuffer1 != hmbuffer2:
+    if hmbuffer1 != hmbuffer2:
         print "\n=" + hmbuffer1 + "=\n"
         print "\n=" + hmbuffer2 + "=\n"
 
@@ -1108,6 +1109,275 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         if self.verbose:
             print "test_replace_nonexisting_sysno_record() finished"
 
+class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
+    """Testing uploading of records that have external EXTOAIID present."""
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize the MARCXML test records."""
+        self.verbose = 0
+        # Note that EXTOAIID fields are repeated but with different
+        # subfields, this is to test whether bibupload would not
+        # mistakenly pick up wrong values.
+        self.xm_testrec1 = """
+        <record>
+         <controlfield tag="001">123456789</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+         </datafield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="0">extoaiid2</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1</subfield>
+         </datafield>
+        </record>
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or " ",
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.hm_testrec1 = """
+        001__ 123456789
+        003__ SzGeCERN
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid1
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid2
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 1
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.xm_testrec1_to_update = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+         </datafield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="0">extoaiid2</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+        </record>
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or " ",
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.xm_testrec1_updated = """
+        <record>
+         <controlfield tag="001">123456789</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+         </datafield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="0">extoaiid2</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+        </record>
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or " ",
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.hm_testrec1_updated = """
+        001__ 123456789
+        003__ SzGeCERN
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid1
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid2
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 1 Updated
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.xm_testrec2 = """
+        <record>
+         <controlfield tag="001">987654321</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="%(extoaiidsubfieldcode)s">extoaiid2</subfield>
+         </datafield>
+         <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+          <subfield code="0">extoaiid1</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 2</subfield>
+         </datafield>
+        </record>
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or " ",
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+        self.hm_testrec2 = """
+        001__ 987654321
+        003__ SzGeCERN
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid2
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid1
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 2
+        """ % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               }
+
+    def test_insert_the_same_extoaiid_record(self):
+        """bibupload - EXTOAIID tag, refuse to insert the same EXTOAIID record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_insert_the_same_extoaiid_record() started"
+        # insert record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1))
+        # insert record 2 first time:
+        testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid2, 'xm')
+        inserted_hm = print_record(recid2, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec2 =  self.xm_testrec2.replace('987654321', str(recid2))
+        self.hm_testrec2 =  self.hm_testrec2.replace('987654321', str(recid2))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec2))        
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec2))
+        # try to insert updated record 1, it should fail:
+        recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid1_updated)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+        if self.verbose:
+            print "test_insert_the_same_extoaiid_record() finished"
+
+    def test_insert_or_replace_the_same_extoaiid_record(self):
+        """bibupload - EXTOAIID tag, allow to insert or replace the same EXTOAIID record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_or_insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_insert_or_replace_the_same_extoaiid_record() started"
+        # insert/replace record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1))
+        # try to insert/replace updated record 1, it should be okay:
+        bibupload.options['mode'] = 'replace_or_insert'
+        bibupload.options['verbose'] = self.verbose
+        recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid1_updated, 'xm')
+        inserted_hm = print_record(recid1_updated, 'hm')
+        self.assertEqual(recid1, recid1_updated)
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1_updated =  self.xm_testrec1_updated.replace('123456789', str(recid1))
+        self.hm_testrec1_updated =  self.hm_testrec1_updated.replace('123456789', str(recid1))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated))
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid1_updated)
+        if self.verbose:
+            print "test_insert_or_replace_the_same_extoaiid_record() finished"
+
+    def test_replace_nonexisting_extoaiid_record(self):
+        """bibupload - EXTOAIID tag, refuse to replace non-existing EXTOAIID record"""
+        # initialize bibupload mode:
+        bibupload.options['mode'] = 'replace_or_insert'
+        bibupload.options['verbose'] = self.verbose
+        if self.verbose:
+            print "test_replace_nonexisting_extoaiid_record() started"
+        # insert record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1 = bibupload.bibupload(recs[0])
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1))
+        # try to replace record 2 it should fail:
+        bibupload.options['mode'] = 'replace'
+        bibupload.options['verbose'] = self.verbose
+        testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err2, recid2 = bibupload.bibupload(recs[0])
+        self.assertEqual(-1, recid2)
+        # delete test records
+        bibupload.wipe_out_record_from_all_tables(recid1)
+        bibupload.wipe_out_record_from_all_tables(recid2)
+        if self.verbose:
+            print "test_replace_nonexisting_extoaiid_record() finished"
+
 class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
     """Testing uploading of records that have OAI ID present."""
 
@@ -1255,7 +1525,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
                }
 
     def test_insert_the_same_oai_record(self):
-        """bibupload - OAI tag, refuse to insert the same OAI record"""
+        """bibupload - OAIID tag, refuse to insert the same OAI record"""
         # initialize bibupload mode:
         bibupload.options['mode'] = 'insert'
         bibupload.options['verbose'] = self.verbose
@@ -1297,7 +1567,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid1_updated)
 
     def test_insert_or_replace_the_same_oai_record(self):
-        """bibupload - OAI tag, allow to insert or replace the same OAI record"""
+        """bibupload - OAIID tag, allow to insert or replace the same OAI record"""
         # initialize bibupload mode:
         bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
@@ -1335,7 +1605,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid1_updated)
 
     def test_replace_nonexisting_oai_record(self):
-        """bibupload - OAI tag, refuse to replace non-existing OAI record"""
+        """bibupload - OAIID tag, refuse to replace non-existing OAI record"""
         # initialize bibupload mode:
         bibupload.options['mode'] = 'replace_or_insert'
         bibupload.options['verbose'] = self.verbose
@@ -1713,6 +1983,7 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadReplaceModeTest,
                              BibUploadReferencesModeTest,
                              BibUploadRecordsWithSYSNOTest,
+                             BibUploadRecordsWithEXTOAIIDTest,
                              BibUploadRecordsWithOAIIDTest,                             
                              BibUploadFMTModeTest,
                              BibUploadIndicatorsTest,
