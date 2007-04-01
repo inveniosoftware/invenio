@@ -760,6 +760,28 @@ def find_record_from_sysno(sysno):
     else:
         return None
 
+def find_record_from_extoaiid(extoaiid):
+    """
+    Try to find record in the database from the external EXTOAIID number.
+    Return record ID if found, None otherwise.
+    """
+    bibxxx = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:2]+'x'
+    bibrec_bibxxx = 'bibrec_' + bibxxx
+    try:
+        res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
+                                                 %(bibxxx)s AS b
+                         WHERE b.tag=%%s AND b.value=%%s AND bb.id_bibxxx=b.id""" % \
+                      {'bibxxx': bibxxx,
+                       'bibrec_bibxxx': bibrec_bibxxx},
+                      (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,))
+    except Error, error:
+        write_message("   Error during find_record_from_extoaiid(): %s " % error,
+                      verbose=1, stream=sys.stderr)     
+    if res:
+        return res[0][0]
+    else:
+        return None
+
 def find_record_from_oaiid(oaiid):
     """
     Try to find record in the database from the OAI ID number.
@@ -823,7 +845,7 @@ def retrieve_rec_id(record):
         write_message("   -Tag 001 not found in the xml marc file.", verbose=9)
 
     if rec_id is None:
-        # 2nd step we look for the SYSNO or OAIID
+        # 2nd step we look for the SYSNO 
         sysnos = record_get_field_values(record,
                                          CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
                                          CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
@@ -842,7 +864,7 @@ def retrieve_rec_id(record):
                 pass
             else:
                 # The record doesn't exist yet. We will try to check
-                # OAI id later.                
+                # external and internal OAI ids later.                
                 write_message("   -Tag SYSNO value not found in database.",
                               verbose=9)
                 rec_id = None
@@ -850,7 +872,34 @@ def retrieve_rec_id(record):
             write_message("   -Tag SYSNO not found in the xml marc file.", verbose=9)
 
     if rec_id is None:
-        # 3rd step we look for the OAI ID
+        # 2nd step we look for the external OAIID
+        extoaiids = record_get_field_values(record,
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or "",
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or "",
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6])
+        if extoaiids:
+            extoaiid = extoaiids[0] # there should be only one external OAI ID
+            write_message("   -Checking if EXTOAIID " + extoaiid + \
+                          " exists in the database", verbose=9)
+            # try to find the corresponding rec id from the database
+            rec_id = find_record_from_extoaiid(extoaiid)
+            if rec_id is not None:
+                # rec_id found
+                pass
+            else:
+                # The record doesn't exist yet. We will try to check
+                # OAI id later.                
+                write_message("   -Tag EXTOAIID value not found in database.",
+                              verbose=9)
+                rec_id = None
+        else:
+            write_message("   -Tag EXTOAIID not found in the xml marc file.", verbose=9)
+
+    if rec_id is None:
+        # 4th step we look for the OAI ID
         oaiidvalues = record_get_field_values(record,
                                               CFG_OAI_ID_FIELD[0:3],
                                               CFG_OAI_ID_FIELD[3:4] != "_" and \
@@ -860,7 +909,7 @@ def retrieve_rec_id(record):
                                               CFG_OAI_ID_FIELD[5:6])
         if oaiidvalues:
             oaiid = oaiidvalues[0] # there should be only one OAI ID
-            write_message("   -Check if the OAI ID " + oaiid + \
+            write_message("   -Check if local OAI ID " + oaiid + \
                           " exist in the database", verbose=9)
             
             # try to find the corresponding rec id from the database
