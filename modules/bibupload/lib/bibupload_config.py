@@ -32,4 +32,15 @@ CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT']
 
 CFG_BIBUPLOAD_REFERENCE_TAG = '999'
 
-CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = '970__a'
+CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = '970__a' # useful for matching when
+                                            # our records come from an
+                                            # external digital library
+                                            # system
+
+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = '0248_d' # useful for matching when
+                                            # we harvest stuff via OAI
+                                            # that we do not want to
+                                            # reexport via Invenio
+                                            # OAI, so records may have
+                                            # only source OAI ID but
+                                            # not Invenio OAI ID
