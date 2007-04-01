@@ -225,7 +225,7 @@ class Template:
                 <input type="hidden" name="action" value="edit">
                 </form>
                 """ % {
-                    'change_pass' : _("If you want to change your password, please fill in the old one and set new values in the form below."),
+                    'change_pass' : _("If you want to change your password, please enter the old one and set the new value in the form below."),
                     'mandatory' : _("mandatory"),
                     'old_password' : _("Old password"),
                     'new_password' : _("New password"),
@@ -961,9 +961,6 @@ class Template:
         out = """<img src="%s/img/head.gif" border="0" alt="">""" % weburl
         if guest:
             out += """%(guest_msg)s ::
-               <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(session)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s">%(login)s</a>""" % {
                      'weburl' : weburl,
                      'sweburl': sweburl,
