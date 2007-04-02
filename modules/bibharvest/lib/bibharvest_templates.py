@@ -198,35 +198,6 @@ class Template:
             text += """</select><br>"""
         return text
 
-### deprecated ###
-#    def tmpl_print_src_add_tips(self):
-#        """Outputs some tips for source adding and editing"""
-#        text =     """<br>
-#        <small><strong>Frequency</strong>: how often do you intend to harvest from this repository?</small><br><br>
-#        <small><strong>Starting date</strong>: do you intend to harvest the whole repository (from beginning) or only newly added material (from today)? <strong>WARNING</strong>: harvesting large collections of material may take very long!</small><br><br>
-#        <small><strong>Postprocess</strong>: how is the harvested material be dealt with after harvesting?
-#        <ul><li>h: harvest only<li>h-c: harvest and convert<li>h-c-u: harvest, convert and upload</ul></small>
-#        <small><strong>BibConvert configuration file</strong>: if postprocess involves conversion, please include full path to a configuration file</small>
-#        """
-#        return text
-
-### deprecated ###
-#    def tmpl_print_src_edit_tips(self):
-#        """Outputs some tips for source adding and editing"""
-#        text =     """<br>
-#        <small><strong>Frequency</strong>: how often do you intend to harvest from this repository?</small><br><br>
-#        <small><strong>Postprocess</strong>: how is the harvested material be dealt with after harvesting?
-#        <ul><li>h: harvest only<li>h-c: harvest and convert<li>h-c-u: harvest, convert and upload</ul></small>
-#        <small><strong>BibConvert configuration file</strong>: if postprocess involves conversion, please include full path to a configuration file</small>
-#        """
-#        return text
-
-### deprecated ###
-#    def tmpl_print_validate_tips(self):
-#        """Outputs some tips for source validation"""
-#        text =     """<br><small><strong>Validate</strong>: to check that the baseURL of the repository is OAI-compliant</small>"""
-#        return text
-
     def tmpl_print_info(self, ln, infotext):
         """Outputs some info"""
         _ = gettext_set_language(ln)
