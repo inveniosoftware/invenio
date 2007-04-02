@@ -55,7 +55,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1, oai_src_sets=[]):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
 
     try:
@@ -82,6 +82,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                                                         oai_src_config=oai_src_config,
                                                         oai_src_post=oai_src_post,
                                                         oai_src_sets=oai_src_sets,
+                                                        oai_src_bibfilter=oai_src_bibfilter,
                                                         ln=ln,
                                                         confirm=confirm),
                     uid=uid,
@@ -92,7 +93,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[]):
+def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
     
     try:
@@ -112,20 +113,21 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
             oai_src_sets = [oai_src_sets]
         return page(title="Add new OAI Source",
                     body=bhc.perform_request_addsource(oai_src_name=oai_src_name,
-                                           oai_src_baseurl=oai_src_baseurl,
-                                           oai_src_prefix=oai_src_prefix,
-                                           oai_src_frequency=oai_src_frequency,
-                                           oai_src_lastrun=oai_src_lastrun,
-                                           oai_src_config=oai_src_config,
-                                           oai_src_post=oai_src_post,
-                                           oai_src_sets=oai_src_sets,
-                                           ln=cdslang,
-                                           confirm=confirm),
-                uid=uid,
-                language=ln,
-                navtrail = navtrail_previous_links,
-                req=req,
-                lastupdated=__lastupdated__)
+                                                       oai_src_baseurl=oai_src_baseurl,
+                                                       oai_src_prefix=oai_src_prefix,
+                                                       oai_src_frequency=oai_src_frequency,
+                                                       oai_src_lastrun=oai_src_lastrun,
+                                                       oai_src_config=oai_src_config,
+                                                       oai_src_post=oai_src_post,
+                                                       oai_src_sets=oai_src_sets,
+                                                       oai_src_bibfilter=oai_src_bibfilter,
+                                                       ln=cdslang,
+                                                       confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    req=req,
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 

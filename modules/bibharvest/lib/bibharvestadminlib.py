@@ -70,7 +70,7 @@ tmppath = tmpdir + '/bibharvestadmin.' + str(os.getpid())
 guideurl = "admin/bibharvest/guide.html"
 
 freqs = [[0, "never"], [24, "daily"], [168, "weekly"], [720, "monthly"] ]
-posts = [["h", "harvest only (h)"], ["h-c", "harvest and convert (h-c)"], ["h-u", "harvest and upload (h-u)"], ["h-c-u", "harvest, convert and upload (h-c-u)"]]
+posts = [["h", "harvest only (h)"], ["h-c", "harvest and convert (h-c)"], ["h-u", "harvest and upload (h-u)"], ["h-c-u", "harvest, convert and upload (h-c-u)"], ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"]]
 dates = [[0, "from beginning"], [1, "from today"]]
 
 def getnavtrail(previous = ''):
@@ -88,7 +88,7 @@ def perform_request_index(ln=cdslang):
     upd_status = get_update_status()
 
     sources = []
-    for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post, oai_src_setspecs) in oai_src:
+    for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post,oai_src_bibfilter,oai_src_setspecs) in oai_src:
         namelinked_args = []
         namelinked_args.append(["oai_src_id", str(oai_src_id)]) 
         namelinked_args.append(["ln", ln])
@@ -125,7 +125,7 @@ def perform_request_index(ln=cdslang):
     
     return output
 
-def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1, oai_src_sets=[]):
+def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     """creates html form to edit a OAI source. this method is calling other methods which again is calling this and sending back the output of the method.
     confirm - determines the validation status of the data input into the form"""
 
@@ -144,6 +144,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         oai_src_config = oai_src[0][5]
         oai_src_post = oai_src[0][6]
         oai_src_sets = oai_src[0][7].split()
+        oai_src_bibfilter = oai_src[0][8]
         
     text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
@@ -173,7 +174,8 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibConvert configuration file", name = "oai_src_config", value = oai_src_config)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
     text += bibharvest_templates.tmpl_print_brs(cdslang, 2)
 
     output += createhiddenform(action="editsource#1",
@@ -193,9 +195,9 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting") 
     elif confirm in [1, "1"] and not oai_src_post:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode") 
-    elif confirm in [1, "1"] and (oai_src_post=="h-c" or oai_src_post=="h-c-u") and (not oai_src_config or validatefile(oai_src_config)!=0):
+    elif confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
         output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.") 
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid full path to a bibConvert config file or change postprocess mode.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.") 
     elif oai_src_id > -1 and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
@@ -203,7 +205,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
             oai_src_config = "NULL"
         if not oai_src_post:
             oai_src_post = "h"
-        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets)
+        res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
         output += write_outcome(res)
 
     lnargs = [["ln", ln]]
@@ -214,7 +216,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
 
     return addadminbox(subtitle, body)
 
-def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1, oai_src_sets=[]):
+def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=cdslang, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     """creates html form to add a new source"""
 
     if oai_src_name is None:
@@ -292,7 +294,8 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Bibconvert configuration file", name = "oai_src_config", value = oai_src_config)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
         text += bibharvest_templates.tmpl_print_brs(cdslang, 2)
 
         
@@ -346,9 +349,9 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose the harvesting starting date")
     if confirm in [1, "1"] and not oai_src_post:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode") 
-    if confirm in [1, "1"] and (oai_src_post=="h-c" or oai_src_post=="h-c-u") and (not oai_src_config or validatefile(oai_src_config)!=0):
+    if confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
         output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.") 
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid full path to a bibConvert config file or change postprocess mode.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.") 
     elif oai_src_name and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
@@ -359,7 +362,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         if not oai_src_post:
             oai_src_post = "h"
 
-        res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets)
+        res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
         output += write_outcome(res) 
 
         lnargs = [["ln", ln]]
@@ -420,7 +423,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
 
 def get_oai_src(oai_src_id=''):
     """Returns a row parameters for a given id"""
-    sql = "SELECT id,name,baseurl,metadataprefix,frequency,bibconvertcfgfile,postprocess, setspecs FROM oaiHARVEST"
+    sql = "SELECT id,name,baseurl,metadataprefix,frequency,bibconvertcfgfile,postprocess,setspecs,bibfilterprogram FROM oaiHARVEST"
     try:
         if oai_src_id:
             sql += " WHERE id=%s" % oai_src_id
@@ -430,7 +433,7 @@ def get_oai_src(oai_src_id=''):
     except StandardError, e:
         return ""
 
-def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[]):
+def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
     """Modifies a row's parameters"""
     
     try:
@@ -448,18 +451,20 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
         res = run_sql(sql)
         sql = "UPDATE oaiHARVEST SET setspecs='%s' WHERE id=%s" % (escape_string(' '.join(oai_src_sets)), oai_src_id)
         res = run_sql(sql)
+        sql = "UPDATE oaiHARVEST SET bibfilterprogram='%s' WHERE id=%s" % (escape_string(oai_src_bibfilter), oai_src_id)
+        res = run_sql(sql)
         return (1, "")
     except StandardError, e:
         return (0, e)
 
-def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets=[]):
+def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
     """Adds a new row to the database with the given parameters"""
     try:
         if oai_src_lastrun in [0, "0"]: lastrun_mode = 'NULL'
         else:
             lastrun_mode = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # lastrun_mode = "'"+lastrun_mode+"'"
-        sql = "insert into oaiHARVEST values (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post), escape_string(" ".join(oai_src_sets)))
+        sql = "INSERT INTO oaiHARVEST (id, baseurl, metadataprefix, arguments, comment,  bibconvertcfgfile,  name,  lastrun,  frequency,  postprocess,  bibfilterprogram,  setspecs) VALUES (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post), escape_string(oai_src_bibfilter), escape_string(" ".join(oai_src_sets)))
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:
@@ -476,7 +481,7 @@ def delete_oai_src(oai_src_id):
 def get_tot_oai_src():
     """Returns number of rows in the database"""
     try:
-        sql = "select count(*) FROM oaiHARVEST"
+        sql = "SELECT COUNT(*) FROM oaiHARVEST"
         res = run_sql(sql)
         return res[0][0]
     except StandardError, e:
@@ -485,7 +490,7 @@ def get_tot_oai_src():
 def get_update_status():
     """Returns a table showing a list of all rows and their LastUpdate status"""
     try:
-        sql = "select name,lastrun from oaiHARVEST order by lastrun desc"
+        sql = "SELECT name,lastrun FROM oaiHARVEST ORDER BY lastrun desc"
         res = run_sql(sql)
         return res
     except StandardError, e:
@@ -494,7 +499,7 @@ def get_update_status():
 def get_next_schedule():
     """Returns the next scheduled oaiharvestrun tasks"""
     try:
-        sql = "select runtime,status from schTASK where proc='oaiharvest' and runtime > now() ORDER by runtime limit 1"
+        sql = "SELECT runtime,status FROM schTASK WHERE proc='oaiharvest' AND runtime > now() ORDER by runtime LIMIT 1"
         res = run_sql(sql)
         if len(res)>0:
             return res[0]

@@ -34,6 +34,7 @@ import time
 import signal
 import traceback
 import calendar
+import shutil
 
 from invenio.config import \
      bibconvert, \
@@ -211,13 +212,15 @@ def task_run(row):
         for element in options["dates"]:
             datelist.append(element)
 
+    error_happened_p = False
     for repos in reposlist:
         postmode = str(repos[0][9]) 
         setspecs = str(repos[0][10])
         harvested_files = []
         
         if postmode == "h" or postmode == "h-c" or \
-               postmode == "h-u" or postmode == "h-c-u":
+               postmode == "h-u" or postmode == "h-c-u" or \
+               postmode == "h-c-f-u":
             harvestpath = tmpdir + "/oaiharvest" + str(os.getpid())
             harvest_dir, harvest_filename = os.path.split(harvestpath)
              
@@ -236,6 +239,7 @@ def task_run(row):
                 else:
                     write_message("an error occurred while harvesting from source " + \
                                   str(repos[0][6]) + " for the dates chosen")
+                    error_happened_p = True
                     continue
 
             elif dateflag != 1 and repos[0][7] is None and repos[0][8] != 0:
@@ -250,6 +254,7 @@ def task_run(row):
                     harvested_files = res[1]
                 else :
                     write_message("an error occurred while harvesting from source " + str(repos[0][6]))
+                    error_happened_p = True
                     continue
 
             elif dateflag != 1 and repos[0][8] != 0:
@@ -273,25 +278,30 @@ def task_run(row):
                         harvested_files = res[1]
                     else :
                         write_message("an error occurred while harvesting from source " + str(repos[0][6]))
+                        error_happened_p = True
                         continue
                 else:
                     write_message("source " + str(repos[0][6]) + " does not need updating")
                     continue
 
             elif dateflag != 1 and repos[0][8] == 0:
-                write_message("source " + str(repos[0][6]) + " has frequency set to 'Never' so it will not be updated")
+                write_message("source " + str(repos[0][6]) +
+                              " has frequency set to 'Never' so it will not be updated")
                 continue
 
         if postmode == "h-u":
+            res = 0
             for harvested_file in harvested_files:
-                res = call_bibupload(harvested_file)
-                if res == 0 :
-                    write_message("material harvested from source " + str(repos[0][6]) + " was successfully uploaded") 
-                else :
+                res += call_bibupload(harvested_file)
+                if res == 0:
+                    write_message("material harvested from source " + str(repos[0][6]) +
+                                  " was successfully uploaded") 
+                else:
                     write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
+                    error_happened_p = True
                     continue                    
 
-        if postmode == "h-c" or postmode == "h-c-u":
+        if postmode == "h-c" or postmode == "h-c-u" or postmode == "h-c-f-u":
             convert_dir = tmpdir
             convertpath = convert_dir + os.sep +"bibconvertrun" + str(os.getpid())
             converted_files = []
@@ -304,26 +314,59 @@ def task_run(row):
                                       convertpath=converted_file)
                 i += 1
                 
-                if res == 0 :
-                    write_message("material harvested from source " + str(repos[0][6]) + " was successfully converted") 
-                else :
+                if res == 0:
+                    write_message("material harvested from source " + str(repos[0][6]) +
+                                  " was successfully converted") 
+                else:
                     write_message("an error occurred while converting from " + str(repos[0][6]))
+                    error_happened_p = True
                     continue
 
         if postmode == "h-c-u":
+            res = 0
             for converted_file in converted_files:
-                res = call_bibupload(converted_file)
-            if res == 0 :
-                write_message("material harvested from source " + str(repos[0][6]) + " was successfully uploaded") 
-            else :
+                res += call_bibupload(converted_file)
+            if res == 0:
+                write_message("material harvested from source " + str(repos[0][6]) +
+                              " was successfully uploaded") 
+            else:
                 write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
+                error_happened_p = True
                 continue                    
 
-        elif postmode not in ["h", "h-c", "h-u", "h-c-u"]: ### this should not happen
+        elif postmode == "h-c-f-u":
+            # first call bibfilter:
+            res = 0
+            for converted_file in converted_files:
+                res += call_bibfilter(str(repos[0][11]), converted_file)
+            if res == 0:
+                write_message("material harvested from source " + str(repos[0][6]) +
+                              " was successfully bibfiltered") 
+            else:
+                write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
+                error_happened_p = True
+                continue                    
+            # only then call upload:
+            for converted_file in converted_files:
+                res += call_bibupload(converted_file + ".insert.xml", "-i")
+                res += call_bibupload(converted_file + ".correct.xml", "-c")
+            if res == 0:
+                write_message("material harvested from source " + str(repos[0][6]) +
+                              " was successfully uploaded") 
+            else:
+                write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
+                error_happened_p = True
+                continue                    
+
+        elif postmode not in ["h", "h-c", "h-u", "h-c-u", "h-c-f-u"]: ### this should not happen
             write_message("invalid postprocess mode: " + postmode + " skipping repository")
+            error_happened_p = True
             continue
 
-    task_update_status("DONE")
+    if error_happened_p: 
+        task_update_status("DONE WITH ERRORS")
+    else:
+        task_update_status("DONE")
     if options["verbose"]:
         write_message("Task #%d finished." % task_id)
     return 1
@@ -401,17 +444,54 @@ def call_bibconvert(config, harvestpath, convertpath):
     stdout = os.popen(command)
     return 0 
 
-def call_bibupload(convertpath):
-    """ A method that uploads a file to the database - calls bibUpload """
-    command = '%s/bibupload -r -i %s ' % (bindir, convertpath)
-    p=os.system(command)
-    return p
+def call_bibupload(marcxmlfile, mode="-r -i"):
+    """Call bibupload in insert mode on MARCXMLFILE."""
+    if os.path.exists(marcxmlfile):
+        command = '%s/bibupload %s %s ' % (bindir, mode, marcxmlfile)
+        return os.system(command)
+    else:
+        return 0
+
+def call_bibfilter(bibfilterprogram, marcxmlfile):
+    """
+    Call bibfilter program BIBFILTERPROGRAM on MARCXMLFILE that is a
+    MARCXML file usually obtained after harvest and convert steps.
+
+    The bibfilter should produce two files called MARCXMLFILE.insert.xml
+    and MARCXMLFILE.correct.xml, the first file containing parts of
+    MARCXML to be uploaded in insert mode and the second file part of
+    MARCXML to be uploaded in correct mode.
+
+    Return 0 if everything went okay, 1 otherwise.
+    """
+    if bibfilterprogram:
+        if not os.path.isfile(bibfilterprogram):
+            write_message("bibfilterprogram %s is not a file" % bibfilterprogram)
+            return 1
+        elif not os.path.isfile(marcxmlfile):
+            write_message("marcxmlfile %s is not a file" % marcxmlfile)
+            return 1
+        else:
+            return os.system('%s %s' % (bibfilterprogram, marcxmlfile))
+            return 0
+    else:
+        try:
+            write_message("no bibfilterprogram defined, copying %s only" % marcxmlfile)
+            shutil.copy(marcxmlfile, marcxmlfile + ".insert.xml")
+            return 0
+        except:
+            write_message("cannot copy %s into %s.insert.xml" % marcxmlfile)        
+            return 1        
 
 def get_row_from_reposname(reposname):
     """ Returns all information about a row (OAI source) from the source name """
     try:
-        sql = 'select * from oaiHARVEST where name="%s"' % escape_string(reposname)
-        res = run_sql(sql)
+        sql = """SELECT id, baseurl, metadataprefix, arguments,
+                        comment, bibconvertcfgfile, name, lastrun,
+                        frequency, postprocess, setspecs, 
+                        bibfilterprogram
+                   FROM oaiHARVEST WHERE name=%s""" % escape_string(reposname)
+        res = run_sql(sql, (reposname,))
         reposdata = []
         for element in res:
             reposdata.append(element)
@@ -421,14 +501,19 @@ def get_row_from_reposname(reposname):
 
 def get_all_rows_from_db():
     """ This method retrieves the full database of repositories and returns a list containing (in exact order):
-    | id | baseurl | metadataprefix | arguments | comment | bibconvertcfgfile | name   | lastrun | frequency | postprocess |
+    | id | baseurl | metadataprefix | arguments | comment | bibconvertcfgfile | name   | lastrun | frequency | postprocess | setspecs | bibfilterprogram
     """
     try:
         reposlist = []
-        sql = """select id from oaiHARVEST"""
+        sql = """SELECT id FROM oaiHARVEST"""
         idlist = run_sql(sql)
         for index in idlist:
-            sql = """select * from oaiHARVEST where id=%s""" % index
+            sql = """SELECT id, baseurl, metadataprefix, arguments,
+                            comment, bibconvertcfgfile, name, lastrun,
+                            frequency, postprocess, setspecs, 
+                            bibfilterprogram
+                     FROM oaiHARVEST WHERE id=%s""" % index
+            
             reposelements = run_sql(sql)
             repos = []
             for element in reposelements:
