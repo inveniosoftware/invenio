@@ -2800,7 +2800,11 @@ def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None
                          uid=uid)
             
 def log_query(hostname, query_args, uid=-1):
-    """Log query into the query and user_query tables."""
+    """
+    Log query into the query and user_query tables.
+    Return id_query or None in case of problems.
+    """
+    id_query = None
     if uid > 0:
         # log the query only if uid is reasonable
         res = run_sql("SELECT id FROM query WHERE urlargs=%s", (query_args,), 1)
@@ -2812,7 +2816,7 @@ def log_query(hostname, query_args, uid=-1):
             run_sql("INSERT INTO user_query (id_user, id_query, hostname, date) VALUES (%s, %s, %s, %s)",
                     (uid, id_query, hostname,
                      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
-    return
+    return id_query
 
 def log_query_info(action, p, f, colls, nb_records_found_total=-1):
     """Write some info to the log file for later analysis."""
@@ -3414,7 +3418,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 req.write(create_similarly_named_authors_link_box(p, ln))
             # log query:
             try:
-                log_query(req.get_remote_host(), req.args, uid)
+                id_query = log_query(req.get_remote_host(), req.args, uid)
+                if of.startswith("h") and id_query:
+                    # Alert/RSS teaser:
+                    req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln)) 
             except:
                 # do not log query if req is None (used by CLI interface)
                 pass
