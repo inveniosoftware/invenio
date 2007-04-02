@@ -2504,7 +2504,8 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
                 
             # at the end of HTML brief mode, print the "Detailed record" functionality:
-            if format.lower().startswith('hb'):
+            if format.lower().startswith('hb') and \
+                   format.lower() != 'hb_p':
                 out += websearch_templates.tmpl_print_record_brief_links(
                     ln = ln,
                     recID = recID,
