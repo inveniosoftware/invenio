@@ -2201,6 +2201,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
   lastrun datetime,
   frequency mediumint(12) NOT NULL default '0',
   postprocess varchar(20) NOT NULL default 'h',
+  bibfilterprogram varchar(255) NOT NULL default '',
   setspecs text NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
