@@ -2541,12 +2541,11 @@ class Template:
                  <tr><td class="googleboxbody">%(msg_alert)s</td></tr>
                  </table>
                  ''' % {
-                'similar' : _("Interested in getting alerted about new documents satisfying this query?"),
-                'msg_alert': _("""You may want to
-                                  subscribe to %(x_url1_open)semail notification alert%(x_url1_close)s
-                                  or to %(x_url2_open)sRSS feed%(x_url2_close)s for this query.""") % \
-                        {'x_url1_open': '<a href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
+                'similar' : _("Interested in being notified about new results for this query?"),
+                'msg_alert': _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
+                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
+                        {'x_url1_open': '<a class="google" href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
                          'x_url1_close': '</a>',
-                         'x_url2_open': '<a href="%s">' % (rssurl,),
+                         'x_url2_open': '<a class="google" href="%s">' % (rssurl,),
                          'x_url2_close': '</a>'}}
         return out
