@@ -450,7 +450,8 @@ def call_bibupload(marcxmlfile, mode="-r -i"):
         command = '%s/bibupload %s %s ' % (bindir, mode, marcxmlfile)
         return os.system(command)
     else:
-        return 0
+        write_message("marcxmlfile %s does not exist" % marcxmlfile)
+        return 1
 
 def call_bibfilter(bibfilterprogram, marcxmlfile):
     """
