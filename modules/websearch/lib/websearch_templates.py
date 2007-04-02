@@ -2517,3 +2517,36 @@ class Template:
                                         cgi.escape(cdsnameintl[ln]) + '</a>')}
         return out
         
+    def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln):
+        """Propose teaser for setting up this query as alert or RSS feed.
+
+        Parameters:
+          - 'id_query' *int* - ID of the query we make teaser for
+          - 'ln' *string* - The language to display
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        # get query arguments:
+        res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
+        if res:
+            rssurl = weburl + '/search?of=xr&' + res[0][0]
+        else:
+            # cannot detect query arguments, use generic RSS URL
+            rssurl = weburl + '/rss/'
+
+        out = '''<a name="googlebox"></a>
+                 <table class="googlebox"><tr><th class="googleboxheader">%(similar)s</th></tr>
+                 <tr><td class="googleboxbody">%(msg_alert)s</td></tr>
+                 </table>
+                 ''' % {
+                'similar' : _("Interested in getting alerted about new documents satisfying this query?"),
+                'msg_alert': _("""You may want to
+                                  subscribe to %(x_url1_open)semail notification alert%(x_url1_close)s
+                                  or to %(x_url2_open)sRSS feed%(x_url2_close)s for this query.""") % \
+                        {'x_url1_open': '<a href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
+                         'x_url1_close': '</a>',
+                         'x_url2_open': '<a href="%s">' % (rssurl,),
+                         'x_url2_close': '</a>'}}
+        return out
