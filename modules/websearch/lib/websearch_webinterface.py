@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import cgi
 from urllib import quote
+from mod_python import apache
 
 from invenio.config import weburl, cdsname, cachedir, cdsnameintl
 from invenio.dbquery import Error
@@ -179,6 +180,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     def __call__(self, req, form):
         """ Perform a search. """
         argd = wash_search_urlargd(form)
+
+        if req.method == 'POST':
+            raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
         uid = getUid(req)
         if uid == -1:
