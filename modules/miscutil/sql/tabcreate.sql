@@ -2200,7 +2200,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
   name varchar(255) NOT NULL,
   lastrun datetime,
   frequency mediumint(12) NOT NULL default '0',
-  postprocess varchar(5) NOT NULL default 'h__',
+  postprocess varchar(20) NOT NULL default 'h__',
   setspecs text NOT NULL default '',
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
