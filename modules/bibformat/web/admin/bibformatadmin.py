@@ -735,6 +735,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
         if save_action is not None and code is not None:
             #save
             bibformatadminlib.update_format_template_code(bft, code=code)
+        bibformat_engine.clear_caches()
         if code is None:
             code = bibformat_engine.get_format_template(bft)['code']
 
