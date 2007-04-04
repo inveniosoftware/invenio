@@ -2546,6 +2546,6 @@ class Template:
                                   or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
                         {'x_url1_open': '<a class="google" href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
                          'x_url1_close': '</a>',
-                         'x_url2_open': '<a class="google" href="%s">' % (rssurl,),
+                         'x_url2_open': '<a class="google" href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="RSS icon" />&nbsp;' % (rssurl, weburl),
                          'x_url2_close': '</a>'}}
         return out

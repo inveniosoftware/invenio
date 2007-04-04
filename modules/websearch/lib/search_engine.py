@@ -366,10 +366,16 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
     content_type = get_output_format_content_type(of)
 
     if of.startswith('x'):
-        # we are doing XML output:
-        req.content_type = "text/xml"
-        req.send_http_header()
-        req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
+        if of == 'xr':
+            # we are doing RSS output
+            req.content_type = "application/rss+xml"
+            req.send_http_header()
+            req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
+        else:
+            # we are doing XML output:
+            req.content_type = "text/xml"
+            req.send_http_header()
+            req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
     elif of.startswith('t') or str(of[0:3]).isdigit():
         # we are doing plain text output:
         req.content_type = "text/plain"
