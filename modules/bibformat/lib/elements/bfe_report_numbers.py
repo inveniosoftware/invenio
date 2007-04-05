@@ -23,13 +23,18 @@
 
 __revision__ = ""
 
-def format(bfo, separator):
+def format(bfo, separator, limit, extension=" etc."):
     """
     Prints the report numbers of the record (037__a and 088__a)
     
     @param separator the separator between report numbers.
+    @param limit the max number of report numbers to print
+    @param extension a prefix printed when limit param is reached
     """
     
     numbers = bfo.fields("037__a")
     numbers.extend(bfo.fields("088__a"))
-    return separator.join(numbers)
+    if limit.isdigit() and int(limit) <= len(numbers):
+        return separator.join(numbers[:limit]) + extension
+    else:
+        return separator.join(numbers)
