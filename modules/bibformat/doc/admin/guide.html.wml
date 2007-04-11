@@ -188,7 +188,7 @@ a typical workflow:</p>
   <tr>
   <td colspan="2"><hr/><span style="white-space: nowrap;">Step 2:</span></td>
   </tr><tr valign="top">
-  <td><img src="guide_output_format_hd_rules.png" alt="1. Use Template [Picture HTML Detailed] if tag [980.a] is equal to [PICTURE] 2. Use Template [Thesis HTML detailed] if tag [980.a] is equal to [THESIS] 3. By default use [Default HTML Detailed]"/>
+  <td><img src="guide_output_format_hd_rules.png" alt="1. Use Template [Picture HTML Detailed] if tag [980__a] is equal to [PICTURE] 2. Use Template [Thesis HTML detailed] if tag [980__a] is equal to [THESIS] 3. By default use [Default HTML Detailed]"/>
 
     <td>
     Beside is a screenshot of the "hd" or "HTML Detailed" output format.
@@ -197,7 +197,7 @@ a typical workflow:</p>
     The rules are evaluated from top to bottom.
     Each rule defines a condition on a field of the record, and a format template to use to
     format the record if the condition matches.
-    Let's say that the field 980.a of the record is equal to
+    Let's say that the field 980__a of the record is equal to
     &quot;Picture&quot;. Then first rules matches, and format template
     <span class="formatTemplateBox">Picture HTML Detailed</span> is
     used for formatting by BibFormat.<br/>
@@ -375,8 +375,8 @@ However you must make sure that it is removed from the tables <code>format</code
     this is enough. You can however add other rules, by clicking on the "Add New Rule" button.<br/>
     Once you have added a rule, you can fill it with a condition, and a template that should be used
     if the condition is true. For example the rule</p>
-    <img src="guide_output_format_edit_rule.png" alt="Rule: Use template [Picture HTML Detailed] if field [980.a] is equal to [PICTURE]"/>
-   <p> will use template named "Picture HTML Detailed" if the field <code>980.a</code> of the record to format is equal to "Picture".
+    <img src="guide_output_format_edit_rule.png" alt="Rule: Use template [Picture HTML Detailed] if field [980__a] is equal to [PICTURE]"/>
+   <p> will use template named "Picture HTML Detailed" if the field <code>980__a</code> of the record to format is equal to "Picture".
     Note that text "PICTURE" will match any letter case like "picture" or "Picture".
     Leading and trailing spaces are ignored too ("  Picture  " will match "PICTURE").
     <br/><b>Tips:</b> you can use a regular expression as text. For example "PICT.*" will match "pictures"
@@ -384,7 +384,7 @@ However you must make sure that it is removed from the tables <code>format</code
     
     <p><div style="float:right"><img src="guide_output_format_edit_rule2.png" alt="Reorder rules using arrows"/></div>
     The above configuration will use format template "Default HTML Detailed" if all above rules fail (in that case
-    if field 980.a is different from "PICTURE"). If you have more rules, you decide in which order the conditions are evaluated. You can reorder rules by clicking on the small arrows on the left of the rules.
+    if field 980__a is different from "PICTURE"). If you have more rules, you decide in which order the conditions are evaluated. You can reorder rules by clicking on the small arrows on the left of the rules.
     </p>
     <p>Note that when you are migrating your output formats from the old PHP BibFormat, you might not have translated all the formats to which your output formats refers. In that case you should use <code>defined in old BibFormat</code> option in the format templates menu, to make BibFormat understand that a match for this rule must trigger a call to the <i>Behaviour</i> of the old BibFormat. See section on <a href="#runSideBySide">Run old and new formats side by side</a> for more details on this.</p>
     <strong>For developers and adventurers only:</strong>
@@ -395,17 +395,17 @@ However you must make sure that it is removed from the tables <code>format</code
     the condition, followed by --- and then the filename of the template
     to use:</p>
 <pre>
-  tag 980.a:
+  tag 980__a:
   PICTURE --- PICTURE_HTML_BRIEF.bft
   PREPRINT --- PREPRINT_HTML_BRIEF.bft
   PUBLICATION --- PUBLICATION_HTML_BRIEF.bft
 </pre>
     <p>
-    This means that if value of field 980.a is equal to PICTURE, then we
+    This means that if value of field 980__a is equal to PICTURE, then we
     will use format template PICTURE_HTML_BRIEF.bft. Note that you must
     use the filename of the template, not the name. Also note that spaces
     at the end or beginning are not considered. On the following lines,
-    you can either put other conditions on tag 980.a, or add another tag on
+    you can either put other conditions on tag 980__a, or add another tag on
     which you want to put conditions.</p>
     <p>At the end you can add a default condition:</p>
 <pre>
@@ -416,12 +416,12 @@ However you must make sure that it is removed from the tables <code>format</code
 
     <p>The output format file could then look like this:</p>
 <pre>
-  tag 980.a:
+  tag 980__a:
   PICTURE --- PICTURE_HTML_BRIEF.bft
   PREPRINT --- PREPRINT_HTML_BRIEF.bft
   PUBLICATION --- PUBLICATION_HTML_BRIEF.bft
 
-  tag 8560.f:
+  tag 8560_f:
   .*@cern.ch --- SPECIAL_MEMBER_FORMATTING.bft
 
   default: PREPRINT_HTML_BRIEF.bft
@@ -429,7 +429,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p> You can add as many rules as you want. Keep in mind that they are read
     in the order they are defined, and that only first rule that
     matches will be used.
-    Notice the condition on tag 8560.f: it uses a regular expression to
+    Notice the condition on tag 8560_f: it uses a regular expression to
     match any email address that ends with @cern.ch (the regular
     expression must be understandable by Python)
     </p>
@@ -952,7 +952,7 @@ Your CDS Invenio Installation</a> guide for more information.</p>
       <li>Omit any whitespace character (or use as many as you want)</li>
       <li>Omit the <code>$</code> character (or use as many as you want)</li>
       <li>Omit or use both indicators. You cannot specify only one indicator. If you need to use only one, use underscore <code>_</code> character for the other indicator.</li>
-      <li>Use percent <code>%</code> instead of any character to specify all ("don'care" or wildcard character) for that character. </li>
+      <li>Use percent '<code>%</code>' instead of any character to specify all ("don't care" or wildcard character) for that character. </li>
       </ul></p>
 <h3><a name="migration">7.2 Migrating from Previous BibFormat</a></h3>
 <p>The new Python BibFormat formats are not backward compatible with the previous formats. New concepts and capabilities have been introduced and some have been dropped. If you have not modified the "Formats" or modified only a
@@ -1073,7 +1073,7 @@ of the record to define the format template to use.</p>
 <p>translates to the following output format (in textual configuration file):</p>
 <p>
 <code>
-tag 980.a:<br/>
+tag 980__a:<br/>
 PICTURE --- Picture_HTML_brief.bft<br/>
 default: Default_HTML_brief.bft<br/>
 </code><p/>
@@ -1129,12 +1129,12 @@ BibFormat will do this almost automatically. This section tells you what you sho
 output format in the (new) output formats directory. If the output format cannot be found, it handle the formatting process
 to the old BibFormat, which will look for a behaviour with a name corresponding to code. This leads to the first rule you should follow:</p>
 <p align="center"><i>For each of the Behaviours you want to migrate, you should have an Output Format with a code corresponding to the name of the Behaviour.</i></p>
-<p>The second (and last) rule is as simple as the first one. Imagine you have a Behaviour "HD" that you want to migrate to Output Format "HB". Let's say that "HD" links to 'picture_HTML_detailed' format if field <code>980$a</code> is equal to "Picture", and links to 'default_HTML_detailed' in all other cases, but that 'picture_HTML_detailed' has not been migrated to a new format template. Then second rule says:<p>
+<p>The second (and last) rule is as simple as the first one. Imagine you have a Behaviour "HD" that you want to migrate to Output Format "HB". Let's say that "HD" links to 'picture_HTML_detailed' format if field <code>980__a</code> is equal to "Picture", and links to 'default_HTML_detailed' in all other cases, but that 'picture_HTML_detailed' has not been migrated to a new format template. Then second rule says:<p>
 <p align="center"><i>Output Formats should have the same conditions on tags as Behaviours, even if format for that condition has not been migrated.</i></p>
-<p>In our example if you open the "HD" ouput format in the web interface, we can add a rule that works on condition <code>"If 980$a is PICTURE"</code> and set the template to be used to "defined in old BibFormat" in the template menu. This looks strange, this is the only way to tell BibFormat that it should consider this condition and not go to the default rule and use the default template.</p>
+<p>In our example if you open the "HD" ouput format in the web interface, we can add a rule that works on condition <code>"If 980__a is PICTURE"</code> and set the template to be used to "defined in old BibFormat" in the template menu. This looks strange, this is the only way to tell BibFormat that it should consider this condition and not go to the default rule and use the default template.</p>
 <strong>For developers and adventurers only:</strong>
 <p>If you are to write Output Formats without the web interface, you should use the name <code>migration_in_progress</code> for each template which has not been migrated. The above example would therefore become:<br/>
-  <code>tag 980.a :<br/>
+  <code>tag 980__a :<br/>
 PICTURE --- migration_in_progress<br/>
 default: Default_HTML_detailed.bft</code>
   </p>
@@ -1189,8 +1189,8 @@ has been introduced to limit the security risks caused by the upload of Pythonic
 <h4>Why are some Marc codes omitted in the "Check Dependencies" pages?</h4>
 <p>When you check the dependencies of a format, the page reminds you that
 some use of Marc codes might not be indicated. This is because it is not
-possible (or at least not trivial) to guess that the call to <code>field(str(5+4)+"80"+".a")</code>
-is equal to a call to <code>field("980.a")</code>. You should then not completely rely on this indication.</p>
+possible (or at least not trivial) to guess that the call to <code>field(str(5+4)+"80"+"__a")</code>
+is equal to a call to <code>field("980__a")</code>. You should then not completely rely on this indication.</p>
 
 <h4>How are displayed deleted record?</h4>
 <p>By default, CDS Invenio displays a standard "The record has been deleted." message for all
