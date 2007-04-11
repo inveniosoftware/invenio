@@ -23,11 +23,17 @@
 
 __revision__ = "$Id$"
 
-def format(bfo, separator):
+def format(bfo, separator, limit):
     """
     Prints the additional report numbers of the record
     
     @param separator the separator between report numbers.
+    @param limit the max number of report numbers to display
     """
-    numbers = bfo.fields("088__a")    
+    
+    numbers = bfo.fields("088__a")
+
+    if limit.isdigit() and int(limit) <= len(numbers):
+        numbers = numbers[:int(limit)]
+    
     return separator.join(numbers)
