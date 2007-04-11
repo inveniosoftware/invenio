@@ -809,8 +809,8 @@ class Template:
         ')</small>')
         """
 
-        if number is None: return ''
-
+        if number is None:
+            number = 0
         if prolog is None:
             prolog = '''&nbsp;<small class="nbdoccoll">('''
         if epilog is None:
