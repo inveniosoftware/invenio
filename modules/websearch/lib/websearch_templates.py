@@ -751,7 +751,7 @@ class Template:
                 # iterate trough grandsons:
                 out += """<br>"""
                 for grandson in grandsons[i]:
-                    out += """ %(link)s%(nbrec)s """ % {
+                    out += """<small>%(link)s%(nbrec)s</small>""" % {
                         'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, as=as),
                                                  {},
                                                  grandson.get_name(ln)),
