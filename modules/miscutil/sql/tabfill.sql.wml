@@ -42,6 +42,9 @@ INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
 <el>INSERT INTO collectionname VALUES (1,'el','ln',"<CDSNAMEINTL>");</el>
 <uk>INSERT INTO collectionname VALUES (1,'uk','ln',"<CDSNAMEINTL>");</uk>
 <bg>INSERT INTO collectionname VALUES (1,'bg','ln',"<CDSNAMEINTL>");</bg>
+<lang:hr>INSERT INTO collectionname VALUES (1,'hr','ln',"<CDSNAMEINTL>");</lang:hr>
+<zh_CN>INSERT INTO collectionname VALUES (1,'zh_CN','ln',"<CDSNAMEINTL>");</zh_CN>
+<zh_TW>INSERT INTO collectionname VALUES (1,'zh_TW','ln',"<CDSNAMEINTL>");</zh_TW>
 
 INSERT INTO user VALUES (1, "<ADMINEMAIL>", '', 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
@@ -74,6 +77,8 @@ INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'el','ln','ομ
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'uk','ln','подібні слова');
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'bg','ln','word similarity');
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'hr','ln','sličnost riječi');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'zh_CN','ln','相似字词');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'zh_TW','ln','相似字詞');
 
 <protect>
 INSERT INTO field VALUES (1,'any field','anyfield');
@@ -109,6 +114,8 @@ INSERT INTO fieldname VALUES (1,'uk','ln','всі поля');
 INSERT INTO fieldname VALUES (1,'ja','ln','すべての分野');
 INSERT INTO fieldname VALUES (1,'bg','ln','всички');
 INSERT INTO fieldname VALUES (1,'hr','ln','bilo koje polje');
+INSERT INTO fieldname VALUES (1,'zh_CN','ln','任何字段');
+INSERT INTO fieldname VALUES (1,'zh_TW','ln','任何欄位');
 
 INSERT INTO fieldname VALUES (2,'en','ln','title');
 INSERT INTO fieldname VALUES (2,'fr','ln','titre');
@@ -128,6 +135,8 @@ INSERT INTO fieldname VALUES (2,'uk','ln','назва');
 INSERT INTO fieldname VALUES (2,'ja','ln','タイトル');
 INSERT INTO fieldname VALUES (2,'bg','ln','заглавие');
 INSERT INTO fieldname VALUES (2,'hr','ln','naslov');
+INSERT INTO fieldname VALUES (2,'zh_CN','ln','标题');
+INSERT INTO fieldname VALUES (2,'zh_TW','ln','標題');
 
 INSERT INTO fieldname VALUES (3,'en','ln','author');
 INSERT INTO fieldname VALUES (3,'fr','ln','auteur');
@@ -147,6 +156,8 @@ INSERT INTO fieldname VALUES (3,'uk','ln','автор');
 INSERT INTO fieldname VALUES (3,'ja','ln','著者');
 INSERT INTO fieldname VALUES (3,'bg','ln','автор');
 INSERT INTO fieldname VALUES (3,'hr','ln','autor');
+INSERT INTO fieldname VALUES (3,'zh_CN','ln','作者');
+INSERT INTO fieldname VALUES (3,'zh_TW','ln','作者');
 
 INSERT INTO fieldname VALUES (4,'en','ln','abstract');
 INSERT INTO fieldname VALUES (4,'fr','ln','abstract');
@@ -166,6 +177,8 @@ INSERT INTO fieldname VALUES (4,'uk','ln','резюме');
 INSERT INTO fieldname VALUES (4,'ja','ln','概要');
 INSERT INTO fieldname VALUES (4,'bg','ln','резюме');
 INSERT INTO fieldname VALUES (4,'hr','ln','sažetak');
+INSERT INTO fieldname VALUES (4,'zh_CN','ln','摘要');
+INSERT INTO fieldname VALUES (4,'zh_TW','ln','摘要');
 
 INSERT INTO fieldname VALUES (5,'en','ln','keyword');
 INSERT INTO fieldname VALUES (5,'fr','ln','mot clé');
@@ -185,6 +198,8 @@ INSERT INTO fieldname VALUES (5,'uk','ln','ключеве слово');
 INSERT INTO fieldname VALUES (5,'ja','ln','キーワード');
 INSERT INTO fieldname VALUES (5,'bg','ln','ключова дума');
 INSERT INTO fieldname VALUES (5,'hr','ln','ključna riječ');
+INSERT INTO fieldname VALUES (5,'zh_CN','ln','关键词');
+INSERT INTO fieldname VALUES (5,'zh_TW','ln','關鍵詞');
 
 INSERT INTO fieldname VALUES (6,'en','ln','report number');
 INSERT INTO fieldname VALUES (6,'fr','ln','numéro de rapport');
@@ -204,6 +219,8 @@ INSERT INTO fieldname VALUES (6,'uk','ln','номер документа');
 INSERT INTO fieldname VALUES (6,'ja','ln','レポート数');
 INSERT INTO fieldname VALUES (6,'bg','ln','номер на документа');
 INSERT INTO fieldname VALUES (6,'hr','ln','broj izvještaja');
+INSERT INTO fieldname VALUES (6,'zh_CN','ln','报告编号');
+INSERT INTO fieldname VALUES (6,'zh_TW','ln','報告編號');
 
 INSERT INTO fieldname VALUES (7,'en','ln','subject');
 INSERT INTO fieldname VALUES (7,'fr','ln','sujet');
@@ -223,6 +240,8 @@ INSERT INTO fieldname VALUES (7,'uk','ln','тема');
 INSERT INTO fieldname VALUES (7,'ja','ln','ﾂ 主題');
 INSERT INTO fieldname VALUES (7,'bg','ln','тема');
 INSERT INTO fieldname VALUES (7,'hr','ln','predmetna odrednica');
+INSERT INTO fieldname VALUES (7,'zh_CN','ln','主题');
+INSERT INTO fieldname VALUES (7,'zh_TW','ln','主題');
 
 INSERT INTO fieldname VALUES (8,'en','ln','reference');
 INSERT INTO fieldname VALUES (8,'fr','ln','référence');
@@ -242,6 +261,8 @@ INSERT INTO fieldname VALUES (8,'uk','ln','посилання');
 INSERT INTO fieldname VALUES (8,'ja','ln','参照');
 INSERT INTO fieldname VALUES (8,'bg','ln','препратка');
 INSERT INTO fieldname VALUES (8,'hr','ln','referenca');
+INSERT INTO fieldname VALUES (8,'zh_CN','ln','参考');
+INSERT INTO fieldname VALUES (8,'zh_TW','ln','參考');
 
 INSERT INTO fieldname VALUES (9,'en','ln','fulltext');
 INSERT INTO fieldname VALUES (9,'fr','ln','fulltext');
@@ -261,6 +282,8 @@ INSERT INTO fieldname VALUES (9,'uk','ln','повний текст');
 INSERT INTO fieldname VALUES (9,'ja','ln','フルテキスト');
 INSERT INTO fieldname VALUES (9,'bg','ln','пълен текст');
 INSERT INTO fieldname VALUES (9,'hr','ln','cjeloviti tekst');
+INSERT INTO fieldname VALUES (9,'zh_CN','ln','全文');
+INSERT INTO fieldname VALUES (9,'zh_TW','ln','全文');
 
 INSERT INTO fieldname VALUES (10,'en','ln','collection');
 INSERT INTO fieldname VALUES (10,'fr','ln','collection');
@@ -280,6 +303,8 @@ INSERT INTO fieldname VALUES (10,'uk','ln','розділ');
 INSERT INTO fieldname VALUES (10,'ja','ln','コレクション');
 INSERT INTO fieldname VALUES (10,'bg','ln','колекция');
 INSERT INTO fieldname VALUES (10,'hr','ln','kolekcija');
+INSERT INTO fieldname VALUES (10,'zh_CN','ln','汇集');
+INSERT INTO fieldname VALUES (10,'zh_TW','ln','彙集');
 
 INSERT INTO fieldname VALUES (11,'en','ln','division');
 INSERT INTO fieldname VALUES (11,'fr','ln','division');
@@ -299,6 +324,8 @@ INSERT INTO fieldname VALUES (11,'uk','ln','підрозділ');
 INSERT INTO fieldname VALUES (11,'ja','ln','部');
 INSERT INTO fieldname VALUES (11,'bg','ln','отдел');
 INSERT INTO fieldname VALUES (11,'hr','ln','odjel');
+INSERT INTO fieldname VALUES (11,'zh_CN','ln','分类');
+INSERT INTO fieldname VALUES (11,'zh_TW','ln','分類');
 
 INSERT INTO fieldname VALUES (12,'en','ln','year');
 INSERT INTO fieldname VALUES (12,'fr','ln','année');
@@ -318,6 +345,8 @@ INSERT INTO fieldname VALUES (12,'uk','ln','рік');
 INSERT INTO fieldname VALUES (12,'ja','ln','年');
 INSERT INTO fieldname VALUES (12,'bg','ln','година');
 INSERT INTO fieldname VALUES (12,'hr','ln','godina');
+INSERT INTO fieldname VALUES (12,'zh_CN','ln','年份');
+INSERT INTO fieldname VALUES (12,'zh_TW','ln','年份');
 
 INSERT INTO fieldname VALUES (13,'en','ln','experiment');
 INSERT INTO fieldname VALUES (13,'fr','ln','expérience');
@@ -337,6 +366,8 @@ INSERT INTO fieldname VALUES (13,'uk','ln','експеримент');
 INSERT INTO fieldname VALUES (13,'ja','ln','実験');
 INSERT INTO fieldname VALUES (13,'bg','ln','експеримент');
 INSERT INTO fieldname VALUES (13,'hr','ln','eksperiment');
+INSERT INTO fieldname VALUES (13,'zh_CN','ln','实验');
+INSERT INTO fieldname VALUES (13,'zh_TW','ln','實驗');
 
 INSERT INTO fieldname VALUES (14,'en','ln','record ID');
 INSERT INTO fieldname VALUES (14,'fr','ln','identificateur de notice');
@@ -356,6 +387,8 @@ INSERT INTO fieldname VALUES (14,'uk','ln','номер запису');
 INSERT INTO fieldname VALUES (14,'ja','ln','記録的なID');
 INSERT INTO fieldname VALUES (14,'bg','ln','ID на записа');
 INSERT INTO fieldname VALUES (14,'hr','ln','ID unosa');
+INSERT INTO fieldname VALUES (14,'zh_CN','ln','记录号');
+INSERT INTO fieldname VALUES (14,'zh_TW','ln','記錄號');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,101,10);

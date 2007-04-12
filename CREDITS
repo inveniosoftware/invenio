@@ -61,6 +61,9 @@ contributed to the project:
   - Jasna Marković <jmarkov@irb.hr>
     Contributions to the Croatian translation.
 
+  - Kam-ming Ku <kmku@hkusua.hku.hk>
+    Contributions to the Chinese translations (zh_CN, zh_TW). 
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.

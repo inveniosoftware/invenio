@@ -68,6 +68,8 @@ cdsnameintl = {}
 <ja>cdsnameintl['ja'] = "<CDSNAMEINTL>"</ja>
 <pl>cdsnameintl['pl'] = "<CDSNAMEINTL>"</pl>
 <bg>cdsnameintl['bg'] = "<CDSNAMEINTL>"</bg>
+<zh_CN>cdsnameintl['zh_CN'] = "<CDSNAMEINTL>"</zh_CN>
+<zh_TW>cdsnameintl['zh_TW'] = "<CDSNAMEINTL>"</zh_TW>
 
 ## helper programs:
 CFG_PATH_PHP = "<PHP>"

@@ -21,9 +21,9 @@ SUBDIRS = admin hacking
 
 docdir = $(localstatedir)/www/help/search
 
-doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.hr.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.bg.html index.uk.html \
-	tips.en.html tips.fr.html tips.de.html tips.pl.html tips.pt.html tips.es.html tips.ca.html tips.hr.html tips.it.html tips.ja.html tips.ru.html tips.sk.html tips.cs.html tips.no.html tips.sv.html tips.el.html tips.bg.html tips.uk.html \
-	guide.en.html guide.fr.html guide.de.html guide.pl.html guide.pt.html guide.es.html guide.ca.html guide.hr.html guide.it.html guide.ja.html guide.ru.html guide.sk.html guide.cs.html guide.no.html guide.sv.html guide.el.html guide.bg.html guide.uk.html
+doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.hr.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.bg.html index.zh_CN.html index.zh_TW.html index.uk.html \
+	tips.en.html tips.fr.html tips.de.html tips.pl.html tips.pt.html tips.es.html tips.ca.html tips.hr.html tips.it.html tips.ja.html tips.ru.html tips.sk.html tips.cs.html tips.no.html tips.sv.html tips.el.html tips.bg.html tips.zh_CN.html tips.zh_TW.html tips.uk.html \
+	guide.en.html guide.fr.html guide.de.html guide.pl.html guide.pt.html guide.es.html guide.ca.html guide.hr.html guide.it.html guide.ja.html guide.ru.html guide.sk.html guide.cs.html guide.no.html guide.sv.html guide.el.html guide.bg.html  guide.zh_CN.html guide.zh_TW.html guide.uk.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
@@ -33,7 +33,7 @@ CLEANFILES = $(doc_DATA) *~ *.tmp
 LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
 MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 
-%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.hr.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.bg.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
+%.en.html %.fr.html %.de.html %.es.html %.ca.html %.pl.html %.pt.html %.hr.html %.it.html %.ja.html %.ru.html %.sk.html %.cs.html %.no.html %.sv.html %.el.html %.bg.html %.zh_CN.html %.zh_TW.html %.uk.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(MO)
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$*.en.html \
 	       -o\(ALL-LANG_*\)+LANG_FR:$*.fr.html \
 	       -o\(ALL-LANG_*\)+LANG_DE:$*.de.html \
@@ -51,6 +51,8 @@ MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
 	       -o\(ALL-LANG_*\)+LANG_SV:$*.sv.html \
 	       -o\(ALL-LANG_*\)+LANG_EL:$*.el.html \
 	       -o\(ALL-LANG_*\)+LANG_BG:$*.bg.html \
+	       -o\(ALL-LANG_*\)+LANG_ZH_CN:$*.zh_CN.html \
+	       -o\(ALL-LANG_*\)+LANG_ZH_TW:$*.zh_TW.html \
 	       -o\(ALL-LANG_*\)+LANG_UK:$*.uk.html $<
 	for lang in $(LINGUAS); do \
 		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.$${lang}.html" ; \

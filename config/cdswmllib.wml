@@ -39,6 +39,8 @@
 <lang:new id=el short>
 <lang:new id=uk short>
 <lang:new id=pl short>
+<lang:new id=zh_CN short>
+<lang:new id=zh_TW short>
 
 ## library of WML functions of general interest:
 
@@ -65,7 +67,9 @@
                       'uk' => 'Українська',
                       'ja' => '日本語',
                       'pl' => 'Polski',
-                      'bg' => 'Български');
+                      'bg' => 'Български',
+                      'zh_CN' => '中文(简)',
+                      'zh_TW' => '中文(繁)');
         return $longnames{$ln};
     }
     

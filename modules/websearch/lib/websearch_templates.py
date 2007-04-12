@@ -88,6 +88,8 @@ class Template:
         'ja': 'ja_JA',
         'pl': 'pl_PL',
         'hr': 'hr_HR',
+        'zh_CN': 'zh_CN',
+        'zh_TW': 'zh_TW',
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 

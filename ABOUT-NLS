@@ -40,6 +40,8 @@ CDS Invenio is currently available in the following languages:
    sk = Slovak 
    sv = Swedish
    uk = Ukrainian
+   zh_CN = Chinese (China)
+   zh_TW = Chinese (Taiwan)
 
 If you are installing CDS Invenio and you want to enable/disable some
 languages, please just follow the standard installation procedure as
