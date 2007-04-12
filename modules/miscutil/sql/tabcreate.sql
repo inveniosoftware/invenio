@@ -1752,7 +1752,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
 
 CREATE TABLE IF NOT EXISTS idxINDEXNAME (
   id_idxINDEX mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_idxINDEX,ln,type)
@@ -2078,7 +2078,7 @@ CREATE TABLE IF NOT EXISTS rnkMETHOD (
 
 CREATE TABLE IF NOT EXISTS rnkMETHODNAME (
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_rnkMETHOD,ln,type)
@@ -2154,7 +2154,7 @@ CREATE TABLE IF NOT EXISTS collection (
 
 CREATE TABLE IF NOT EXISTS collectionname (
   id_collection mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_collection,ln,type)
@@ -2211,7 +2211,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
 CREATE TABLE IF NOT EXISTS collection_portalbox (
   id_collection mediumint(9) unsigned NOT NULL,
   id_portalbox mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   position char(3) NOT NULL default 'top',
   score tinyint(4) unsigned NOT NULL default '0',
   PRIMARY KEY  (id_collection,id_portalbox,ln)
@@ -2261,7 +2261,7 @@ CREATE TABLE IF NOT EXISTS format (
 
 CREATE TABLE IF NOT EXISTS formatname (
   id_format mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_format,ln,type)
@@ -2291,7 +2291,7 @@ CREATE TABLE IF NOT EXISTS field (
 
 CREATE TABLE IF NOT EXISTS fieldname (
   id_field mediumint(9) unsigned NOT NULL,
-  ln char(2) NOT NULL default '',
+  ln char(5) NOT NULL default '',
   type char(3) NOT NULL default 'sn',
   value varchar(255) NOT NULL,
   PRIMARY KEY  (id_field,ln,type)
