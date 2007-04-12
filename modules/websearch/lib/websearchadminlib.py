@@ -255,7 +255,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
 
     output = show_coll_not_in_tree(colID, ln, col_dict)
     text = """
-    <span class="adminlabel">Attach which</span>
+    <span class="adminlabel">Attach collection:</span>
     <select name="add_son" class="admin_w200">
     <option value="">- select collection -</option>
     """
@@ -264,7 +264,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
             text += """<option value="%s" %s>%s</option>""" % (id, str(id)==str(add_son) and 'selected="selected"' or '', name)
     text += """
     </select><br>
-    <span class="adminlabel">Attach to</span>
+    <span class="adminlabel">to parent collection:</span>
     <select name="add_dad" class="admin_w200">
     <option value="">- select parent collection -</option>
     """
@@ -276,7 +276,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     """
     
     text += """
-    <span class="adminlabel">Relationship</span>
+    <span class="adminlabel">with relationship:</span>
     <select name="rtype" class="admin_w200">
     <option value="">- select relationship -</option>
     <option value="r" %s>Regular (Narrow by...)</option>
