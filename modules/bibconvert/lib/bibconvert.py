@@ -853,6 +853,11 @@ def FormatField(value, fn):
     CUT(prefix,postfix)         - remove substring from side
     RANGE(MIN,MAX)              - select items in repetitive fields
     RE(regexp)                  - regular expressions
+    IFDEFP(field,value,0/1)     - confirm validity of output line (check other field)
+                                  NOTE: This function works for CONSTANT
+                                  lines - those without any variable values in
+                                  them.
+                                  
     
     bibconvert character TYPES
     ==========================
@@ -1229,9 +1234,40 @@ def FormatField(value, fn):
             out = ""
         if ((found == 0) and (string.atoi(par[2]) == 0)):
             out = value
-              
         return out
-    
+
+    elif (fn == "IFDEFP"):
+
+        par = set_par_defaults(par, ",,1")
+
+        found = 0
+        par1  = ""
+
+        data = select_line(par[0], data_parsed)
+        
+        for line in data:
+            if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
+                par1 = par[1][NRE:-NRE]
+            else:
+                par1 = par[1]
+
+            if (par1 == ""):
+                if (line == ""):
+                    found = 1
+
+            elif (len(re.split(par1,line)) > 1 ):
+                found = 1
+
+        if ((found == 1) and (string.atoi(par[2]) == 1)):
+            out = value
+        if ((found == 1) and (string.atoi(par[2]) == 0)):
+            out = ""
+        if ((found == 0) and (string.atoi(par[2]) == 1)):
+            out = ""
+        if ((found == 0) and (string.atoi(par[2]) == 0)):
+            out = value
+        return out
+
     elif (fn == "CONFL"):
 
         set_par_defaults(par,",1")
@@ -1924,6 +1960,14 @@ def create_record(begin_record_header,
                     if (parR[1]!="MAX"):
                         if (string.atoi(parR[1]) < (current+1)):
                             output = ""
+                elif (GFF[:6] == "IFDEFP"):
+                    ## Like a DEFP and a CONF combined. I.e. Print the line
+                    ## EVEN if its a constant, but ONLY IF the condition in
+                    ## the IFDEFP is met.
+                    ## If the value returned is an empty string, no line will
+                    ## be printed.
+                    output = FormatField(output, GFF)
+                    print_line = 1
                 elif (GFF[:4] == "DEFP"):
                     default_print = 1
                 else:
