@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2007-02-20 17:26+0100\n"
+"POT-Creation-Date: 2007-04-12 18:26+0200\n"
 "PO-Revision-Date: 2006-12-13 17:21+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
@@ -29,24 +29,24 @@ msgstr ""
 "X-Poedit-Country: CROATIA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: config/cdswmllib.wml:94 modules/webstyle/lib/webstyle_templates.py:482
+#: config/cdswmllib.wml:98 modules/webstyle/lib/webstyle_templates.py:491
 msgid "This site is also available in the following languages:"
 msgstr "Sadržaj je dostupan i na slijedećim jezicima:"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
-#: modules/websearch/lib/websearch_templates.py:341
-#: modules/websearch/lib/websearch_templates.py:462
-#: modules/websearch/lib/websearch_templates.py:1305
-#: modules/websearch/lib/websearch_templates.py:1398
-#: modules/websearch/lib/websearch_templates.py:1454
-#: modules/webstyle/lib/webstyle_templates.py:353
-#: modules/webstyle/lib/webstyle_templates.py:429
+#: modules/websearch/lib/websearch_templates.py:344
+#: modules/websearch/lib/websearch_templates.py:465
+#: modules/websearch/lib/websearch_templates.py:1308
+#: modules/websearch/lib/websearch_templates.py:1401
+#: modules/websearch/lib/websearch_templates.py:1457
+#: modules/webstyle/lib/webstyle_templates.py:362
+#: modules/webstyle/lib/webstyle_templates.py:438
 msgid "Search"
 msgstr "Pretraži"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
-#: modules/webstyle/lib/webstyle_templates.py:356
-#: modules/webstyle/lib/webstyle_templates.py:432
+#: modules/webstyle/lib/webstyle_templates.py:365
+#: modules/webstyle/lib/webstyle_templates.py:441
 msgid "Help"
 msgstr "Pomoć"
 
@@ -108,13 +108,13 @@ msgstr "Pomoć"
 #: modules/websubmit/doc/admin/index.html.wml:22
 #: modules/websubmit/doc/admin/guide.html.wml:23
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
-#: modules/bibformat/lib/bibformatadminlib.py:50
+#: modules/bibformat/lib/bibformatadminlib.py:55
 #: modules/bibformat/web/admin/bibformatadmin.py:79
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "Admin Area"
 msgstr "Administracija"
 
-#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:397
+#: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:406
 msgid "Last updated"
 msgstr "Ažurirano"
 
@@ -128,18 +128,18 @@ msgstr "Pretvori"
 
 #: config/cdspage.wml:55 config/cdspage.wml:141
 #: modules/bibedit/lib/bibedit_templates.py:104
-#: modules/webstyle/lib/webstyle_templates.py:354
-#: modules/webstyle/lib/webstyle_templates.py:430
-#: modules/websubmit/lib/websubmit_engine.py:454
-#: modules/websubmit/lib/websubmit_engine.py:696
-#: modules/websubmit/lib/websubmit_engine.py:732
-#: modules/websubmit/lib/websubmit_engine.py:890
+#: modules/webstyle/lib/webstyle_templates.py:363
+#: modules/webstyle/lib/webstyle_templates.py:439
+#: modules/websubmit/lib/websubmit_engine.py:601
+#: modules/websubmit/lib/websubmit_engine.py:968
+#: modules/websubmit/lib/websubmit_engine.py:1014
+#: modules/websubmit/lib/websubmit_engine.py:1240
 msgid "Submit"
 msgstr "Prihvati"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
-#: modules/webstyle/lib/webstyle_templates.py:355
-#: modules/webstyle/lib/webstyle_templates.py:431
+#: modules/webstyle/lib/webstyle_templates.py:364
+#: modules/webstyle/lib/webstyle_templates.py:440
 msgid "Personalize"
 msgstr "Personaliziraj"
 
@@ -152,7 +152,8 @@ msgstr "Personaliziraj"
 #: modules/webhelp/web/index.html.wml:39 modules/webhelp/web/index.html.wml:40
 #: modules/webhelp/web/index.html.wml:41 modules/webhelp/web/index.html.wml:42
 #: modules/webhelp/web/index.html.wml:43 modules/webhelp/web/index.html.wml:44
-#: modules/webhelp/web/index.html.wml:45
+#: modules/webhelp/web/index.html.wml:45 modules/webhelp/web/index.html.wml:46
+#: modules/webhelp/web/index.html.wml:47
 #: modules/websearch/doc/guide.html.wml:24
 #: modules/websearch/doc/index.html.wml:24
 #: modules/websearch/doc/tips.html.wml:24
@@ -175,7 +176,7 @@ msgstr "Personaliziraj"
 msgid "Help Central"
 msgstr "Pomoć"
 
-#: modules/webhelp/web/index.html.wml:69
+#: modules/webhelp/web/index.html.wml:73
 #: modules/websubmit/doc/access.html.wml:23
 #: modules/websubmit/doc/actions.html.wml:23
 #: modules/websubmit/doc/approval.html.wml:23
@@ -207,12 +208,12 @@ msgstr "Knjižnica"
 msgid "Agenda"
 msgstr "Agenda"
 
-#: modules/websearch/doc/index.html.wml:50
+#: modules/websearch/doc/index.html.wml:52
 #: modules/websearch/doc/tips.html.wml:22
-#: modules/websearch/lib/websearch_templates.py:343
-#: modules/websearch/lib/websearch_templates.py:464
-#: modules/websearch/lib/websearch_templates.py:1402
-#: modules/websearch/lib/websearch_templates.py:1458
+#: modules/websearch/lib/websearch_templates.py:346
+#: modules/websearch/lib/websearch_templates.py:467
+#: modules/websearch/lib/websearch_templates.py:1405
+#: modules/websearch/lib/websearch_templates.py:1461
 msgid "Search Tips"
 msgstr "Savjeti za pretraživanje"
 
@@ -223,11 +224,11 @@ msgstr "Webcast"
 #: config/cdspage.wml:65 config/cdspage.wml:67
 #: modules/webstyle/lib/webstyle_templates.py:76
 #: modules/webstyle/lib/webstyle_templates.py:85
-#: modules/webstyle/lib/webstyle_templates.py:258
+#: modules/webstyle/lib/webstyle_templates.py:262
 msgid "Home"
 msgstr "Početna stranica"
 
-#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:435
+#: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:444
 msgid "Maintained by"
 msgstr "Održava"
 
@@ -235,14 +236,14 @@ msgstr "Održava"
 msgid "Bulletin"
 msgstr "Bilten"
 
-#: modules/webhelp/web/index.html.wml:50
+#: modules/webhelp/web/index.html.wml:52
 #: modules/websearch/doc/guide.html.wml:24
 #: modules/websearch/doc/index.html.wml:22
 #: modules/websearch/doc/tips.html.wml:24
 msgid "Search Help"
 msgstr "Pomoć kod pretraživanja"
 
-#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:434
+#: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:443
 msgid "Powered by"
 msgstr "Powered by"
 
@@ -265,39 +266,39 @@ msgstr "Prikaži"
 
 #: modules/bibedit/lib/bibedit_templates.py:110
 #: modules/bibformat/web/admin/bibformatadmin.py:397
-#: modules/bibformat/web/admin/bibformatadmin.py:677
-#: modules/bibformat/web/admin/bibformatadmin.py:1312
+#: modules/bibformat/web/admin/bibformatadmin.py:678
+#: modules/bibformat/web/admin/bibformatadmin.py:1316
 #: modules/webbasket/lib/webbasket_templates.py:1236
 #: modules/webbasket/lib/webbasket_templates.py:1341
 #: modules/webbasket/lib/webbasket_templates.py:1441
-#: modules/websession/lib/websession_templates.py:1395
-#: modules/websession/lib/websession_templates.py:1501
-#: modules/websession/lib/websession_templates.py:1674
-#: modules/websession/lib/websession_templates.py:1754
+#: modules/websession/lib/websession_templates.py:1432
+#: modules/websession/lib/websession_templates.py:1538
+#: modules/websession/lib/websession_templates.py:1711
+#: modules/websession/lib/websession_templates.py:1791
 msgid "Cancel"
 msgstr "Odustani"
 
 #: modules/bibedit/lib/bibedit_templates.py:111
 #: modules/bibedit/lib/bibedit_templates.py:307
 #: modules/bibedit/lib/bibedit_templates.py:351
-#: modules/bibformat/lib/bibformat_templates.py:973
+#: modules/bibformat/lib/bibformat_templates.py:1004
 #: modules/bibformat/web/admin/bibformatadmin.py:397
 #: modules/bibformat/web/admin/bibformatadmin.py:399
-#: modules/bibformat/web/admin/bibformatadmin.py:677
-#: modules/bibformat/web/admin/bibformatadmin.py:679
-#: modules/bibformat/web/admin/bibformatadmin.py:1312
-#: modules/bibformat/web/admin/bibformatadmin.py:1314
+#: modules/bibformat/web/admin/bibformatadmin.py:678
+#: modules/bibformat/web/admin/bibformatadmin.py:680
+#: modules/bibformat/web/admin/bibformatadmin.py:1316
+#: modules/bibformat/web/admin/bibformatadmin.py:1318
 #: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
 msgstr "Briši"
 
 #: modules/bibedit/lib/bibedit_templates.py:122
-#: modules/bibformat/lib/bibformat_templates.py:916
-#: modules/bibformat/lib/bibformat_templates.py:1042
-#: modules/webalert/lib/webalert_templates.py:317
-#: modules/webalert/lib/webalert_templates.py:438
+#: modules/bibformat/lib/bibformat_templates.py:947
+#: modules/bibformat/lib/bibformat_templates.py:1073
+#: modules/webalert/lib/webalert_templates.py:326
+#: modules/webalert/lib/webalert_templates.py:446
 #: modules/webmessage/lib/webmessage_templates.py:91
-#: modules/websubmit/lib/websubmit_templates.py:1413
+#: modules/websubmit/lib/websubmit_templates.py:1417
 msgid "Action"
 msgstr "Akcija"
 
@@ -306,8 +307,8 @@ msgstr "Akcija"
 #: modules/bibedit/web/admin/bibeditadmin.py:60
 #: modules/webcomment/lib/webcomment_templates.py:617
 #: modules/webcomment/lib/webcomment_templates.py:1170
-#: modules/websearch/lib/websearch_templates.py:181
-#: modules/websearch/lib/websearch_templates.py:183
+#: modules/websearch/lib/websearch_templates.py:184
+#: modules/websearch/lib/websearch_templates.py:186
 msgid "Record"
 msgstr "Unos"
 
@@ -385,20 +386,20 @@ msgstr "Želite li stvarno izbrisati ovaj zapis?"
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
 #: modules/webmessage/lib/webmessage_templates.py:513
-#: modules/websession/lib/websession_templates.py:1793
-#: modules/websession/lib/websession_templates.py:1832
+#: modules/websession/lib/websession_templates.py:1830
+#: modules/websession/lib/websession_templates.py:1869
 msgid "Yes"
 msgstr "Da"
 
 #: modules/bibedit/lib/bibedit_templates.py:480
-#: modules/webalert/lib/webalert_templates.py:309
+#: modules/webalert/lib/webalert_templates.py:318
 #: modules/webcomment/lib/webcomment_templates.py:216
 #: modules/webcomment/lib/webcomment_templates.py:473
 #: modules/webcomment/lib/webcomment_templates.py:1307
 #: modules/webcomment/lib/webcomment_templates.py:1332
 #: modules/webmessage/lib/webmessage_templates.py:514
-#: modules/websession/lib/websession_templates.py:1794
-#: modules/websession/lib/websession_templates.py:1833
+#: modules/websession/lib/websession_templates.py:1831
+#: modules/websession/lib/websession_templates.py:1870
 msgid "No"
 msgstr "Ne"
 
@@ -431,70 +432,80 @@ msgid "Submit and save record %s"
 msgstr "Prihvati i spremi zapis %s"
 
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
-#: modules/bibformat/lib/bibformatadminlib.py:50
+#: modules/bibformat/lib/bibformatadminlib.py:55
 #: modules/bibformat/web/admin/bibformatadmin.py:81
 msgid "BibFormat Admin"
 msgstr "BibFormat Admin"
 
 #: modules/bibformat/lib/bibformat_templates.py:340
 #: modules/bibformat/lib/bibformat_templates.py:452
+#: modules/bibformat/lib/bibformat_templates.py:587
 #: modules/bibformat/lib/bibformat_templates.py:602
-#: modules/bibformat/lib/bibformat_templates.py:913
-#: modules/bibformat/lib/bibformat_templates.py:1048
-#: modules/bibformat/lib/bibformat_templates.py:1349
-#: modules/bibformat/lib/bibformat_templates.py:1447
-#: modules/bibformat/lib/bibformat_templates.py:1507
-#: modules/bibformat/lib/bibformat_templates.py:1769
-#: modules/bibformat/lib/bibformat_templates.py:1852
-#: modules/bibformat/lib/bibformat_templates.py:2015
-#: modules/bibformat/lib/bibformat_templates.py:2083
+#: modules/bibformat/lib/bibformat_templates.py:633
+#: modules/bibformat/lib/bibformat_templates.py:944
+#: modules/bibformat/lib/bibformat_templates.py:1079
+#: modules/bibformat/lib/bibformat_templates.py:1385
+#: modules/bibformat/lib/bibformat_templates.py:1483
+#: modules/bibformat/lib/bibformat_templates.py:1543
+#: modules/bibformat/lib/bibformat_templates.py:1805
+#: modules/bibformat/lib/bibformat_templates.py:1888
+#: modules/bibformat/lib/bibformat_templates.py:2051
+#: modules/bibformat/lib/bibformat_templates.py:2119
 #: modules/webcomment/lib/webcomment_templates.py:1017
 msgid "Menu"
 msgstr "Izbornik"
 
 #: modules/bibformat/lib/bibformat_templates.py:342
 #: modules/bibformat/lib/bibformat_templates.py:453
+#: modules/bibformat/lib/bibformat_templates.py:590
 #: modules/bibformat/lib/bibformat_templates.py:605
-#: modules/bibformat/lib/bibformat_templates.py:1848
-#: modules/bibformat/lib/bibformat_templates.py:2014
-#: modules/bibformat/lib/bibformat_templates.py:2082
+#: modules/bibformat/lib/bibformat_templates.py:636
+#: modules/bibformat/lib/bibformat_templates.py:1884
+#: modules/bibformat/lib/bibformat_templates.py:2050
+#: modules/bibformat/lib/bibformat_templates.py:2118
 msgid "Close Editor"
 msgstr "Zatvori uređivač"
 
 #: modules/bibformat/lib/bibformat_templates.py:343
 #: modules/bibformat/lib/bibformat_templates.py:454
+#: modules/bibformat/lib/bibformat_templates.py:591
 #: modules/bibformat/lib/bibformat_templates.py:606
+#: modules/bibformat/lib/bibformat_templates.py:637
 msgid "Modify Template Attributes"
 msgstr "Promijeni karakteristike predloška"
 
 #: modules/bibformat/lib/bibformat_templates.py:344
 #: modules/bibformat/lib/bibformat_templates.py:455
+#: modules/bibformat/lib/bibformat_templates.py:592
 #: modules/bibformat/lib/bibformat_templates.py:607
+#: modules/bibformat/lib/bibformat_templates.py:638
 msgid "Template Editor"
 msgstr "Uređivač predložaka"
 
 #: modules/bibformat/lib/bibformat_templates.py:345
 #: modules/bibformat/lib/bibformat_templates.py:456
+#: modules/bibformat/lib/bibformat_templates.py:593
 #: modules/bibformat/lib/bibformat_templates.py:608
-#: modules/bibformat/lib/bibformat_templates.py:1163
-#: modules/bibformat/lib/bibformat_templates.py:1348
-#: modules/bibformat/lib/bibformat_templates.py:1446
+#: modules/bibformat/lib/bibformat_templates.py:639
+#: modules/bibformat/lib/bibformat_templates.py:1194
+#: modules/bibformat/lib/bibformat_templates.py:1384
+#: modules/bibformat/lib/bibformat_templates.py:1482
 msgid "Check Dependencies"
 msgstr "Provjeri zavisnosti"
 
 #: modules/bibformat/lib/bibformat_templates.py:395
-#: modules/bibformat/lib/bibformat_templates.py:911
-#: modules/bibformat/lib/bibformat_templates.py:1038
-#: modules/webalert/lib/webalert_templates.py:310
+#: modules/bibformat/lib/bibformat_templates.py:942
+#: modules/bibformat/lib/bibformat_templates.py:1069
+#: modules/webalert/lib/webalert_templates.py:319
 msgid "Name"
 msgstr "Ime"
 
 #: modules/bibformat/lib/bibformat_templates.py:414
-#: modules/bibformat/lib/bibformat_templates.py:912
-#: modules/bibformat/lib/bibformat_templates.py:1039
-#: modules/websession/lib/websession_templates.py:1120
-#: modules/websession/lib/websession_templates.py:1194
-#: modules/websession/lib/websession_templates.py:1258
+#: modules/bibformat/lib/bibformat_templates.py:943
+#: modules/bibformat/lib/bibformat_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1157
+#: modules/websession/lib/websession_templates.py:1231
+#: modules/websession/lib/websession_templates.py:1295
 msgid "Description"
 msgstr "Opis"
 
@@ -502,171 +513,175 @@ msgstr "Opis"
 msgid "Update Format Attributes"
 msgstr "Osvježi atribute oblikovanja"
 
+#: modules/bibformat/lib/bibformat_templates.py:588
 #: modules/bibformat/lib/bibformat_templates.py:603
+#: modules/bibformat/lib/bibformat_templates.py:634
 msgid "Show Documentation"
 msgstr "Prikaži dokumentaciju"
 
+#: modules/bibformat/lib/bibformat_templates.py:589
 #: modules/bibformat/lib/bibformat_templates.py:604
-#: modules/bibformat/lib/bibformat_templates.py:655
+#: modules/bibformat/lib/bibformat_templates.py:635
+#: modules/bibformat/lib/bibformat_templates.py:686
 msgid "Hide Documentation"
 msgstr "Sakrij dokumentaciju"
 
-#: modules/bibformat/lib/bibformat_templates.py:914
-#: modules/bibformat/lib/bibformat_templates.py:1040
-#: modules/websubmit/lib/websubmit_templates.py:1414
+#: modules/bibformat/lib/bibformat_templates.py:945
+#: modules/bibformat/lib/bibformat_templates.py:1071
+#: modules/websubmit/lib/websubmit_templates.py:1418
 msgid "Status"
 msgstr "Status"
 
-#: modules/bibformat/lib/bibformat_templates.py:915
-#: modules/bibformat/lib/bibformat_templates.py:1041
+#: modules/bibformat/lib/bibformat_templates.py:946
+#: modules/bibformat/lib/bibformat_templates.py:1072
 msgid "Last Modification Date"
 msgstr "Datum posljednje promjene"
 
-#: modules/bibformat/lib/bibformat_templates.py:918
-#: modules/bibformat/lib/bibformat_templates.py:1044
-#: modules/bibformat/lib/bibformat_templates.py:1508
-#: modules/bibformat/lib/bibformat_templates.py:1770
+#: modules/bibformat/lib/bibformat_templates.py:949
+#: modules/bibformat/lib/bibformat_templates.py:1075
+#: modules/bibformat/lib/bibformat_templates.py:1544
+#: modules/bibformat/lib/bibformat_templates.py:1806
 #: modules/bibformat/web/admin/bibformatadmin.py:110
 #: modules/bibformat/web/admin/bibformatadmin.py:171
 #: modules/bibformat/web/admin/bibformatadmin.py:242
 #: modules/bibformat/web/admin/bibformatadmin.py:287
 #: modules/bibformat/web/admin/bibformatadmin.py:376
-#: modules/bibformat/web/admin/bibformatadmin.py:1351
+#: modules/bibformat/web/admin/bibformatadmin.py:1355
 msgid "Manage Output Formats"
 msgstr "Uredi oblikovanje izlaznih podataka"
 
-#: modules/bibformat/lib/bibformat_templates.py:919
-#: modules/bibformat/lib/bibformat_templates.py:1045
-#: modules/bibformat/lib/bibformat_templates.py:1509
-#: modules/bibformat/lib/bibformat_templates.py:1771
+#: modules/bibformat/lib/bibformat_templates.py:950
+#: modules/bibformat/lib/bibformat_templates.py:1076
+#: modules/bibformat/lib/bibformat_templates.py:1545
+#: modules/bibformat/lib/bibformat_templates.py:1807
 #: modules/bibformat/web/admin/bibformatadmin.py:443
 #: modules/bibformat/web/admin/bibformatadmin.py:476
-#: modules/bibformat/web/admin/bibformatadmin.py:546
-#: modules/bibformat/web/admin/bibformatadmin.py:591
-#: modules/bibformat/web/admin/bibformatadmin.py:657
-#: modules/bibformat/web/admin/bibformatadmin.py:1372
+#: modules/bibformat/web/admin/bibformatadmin.py:547
+#: modules/bibformat/web/admin/bibformatadmin.py:592
+#: modules/bibformat/web/admin/bibformatadmin.py:658
+#: modules/bibformat/web/admin/bibformatadmin.py:1376
 msgid "Manage Format Templates"
 msgstr "Predlošci oblikovanja (#)"
 
-#: modules/bibformat/lib/bibformat_templates.py:920
-#: modules/bibformat/lib/bibformat_templates.py:1046
-#: modules/bibformat/lib/bibformat_templates.py:1510
-#: modules/bibformat/lib/bibformat_templates.py:1772
-#: modules/bibformat/web/admin/bibformatadmin.py:837
-#: modules/bibformat/web/admin/bibformatadmin.py:858
-#: modules/bibformat/web/admin/bibformatadmin.py:891
-#: modules/bibformat/web/admin/bibformatadmin.py:1390
+#: modules/bibformat/lib/bibformat_templates.py:951
+#: modules/bibformat/lib/bibformat_templates.py:1077
+#: modules/bibformat/lib/bibformat_templates.py:1546
+#: modules/bibformat/lib/bibformat_templates.py:1808
+#: modules/bibformat/web/admin/bibformatadmin.py:841
+#: modules/bibformat/web/admin/bibformatadmin.py:862
+#: modules/bibformat/web/admin/bibformatadmin.py:895
+#: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Format Elements Documentation"
 msgstr "Dokumentacija elemenata oblikovanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:921
-#: modules/bibformat/lib/bibformat_templates.py:1047
-#: modules/bibformat/lib/bibformat_templates.py:1511
-#: modules/bibformat/lib/bibformat_templates.py:1773
-#: modules/bibformat/web/admin/bibformatadmin.py:932
-#: modules/bibformat/web/admin/bibformatadmin.py:958
-#: modules/bibformat/web/admin/bibformatadmin.py:1005
-#: modules/bibformat/web/admin/bibformatadmin.py:1050
-#: modules/bibformat/web/admin/bibformatadmin.py:1097
-#: modules/bibformat/web/admin/bibformatadmin.py:1148
-#: modules/bibformat/web/admin/bibformatadmin.py:1201
-#: modules/bibformat/web/admin/bibformatadmin.py:1256
-#: modules/bibformat/web/admin/bibformatadmin.py:1268
-#: modules/bibformat/web/admin/bibformatadmin.py:1283
-#: modules/bibformat/web/admin/bibformatadmin.py:1319
+#: modules/bibformat/lib/bibformat_templates.py:952
+#: modules/bibformat/lib/bibformat_templates.py:1078
+#: modules/bibformat/lib/bibformat_templates.py:1547
+#: modules/bibformat/lib/bibformat_templates.py:1809
+#: modules/bibformat/web/admin/bibformatadmin.py:936
+#: modules/bibformat/web/admin/bibformatadmin.py:962
+#: modules/bibformat/web/admin/bibformatadmin.py:1009
+#: modules/bibformat/web/admin/bibformatadmin.py:1054
+#: modules/bibformat/web/admin/bibformatadmin.py:1101
+#: modules/bibformat/web/admin/bibformatadmin.py:1152
+#: modules/bibformat/web/admin/bibformatadmin.py:1205
+#: modules/bibformat/web/admin/bibformatadmin.py:1260
+#: modules/bibformat/web/admin/bibformatadmin.py:1272
+#: modules/bibformat/web/admin/bibformatadmin.py:1287
+#: modules/bibformat/web/admin/bibformatadmin.py:1323
 msgid "Manage Knowledge Bases"
 msgstr "Upravljenje bazama znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:996
+#: modules/bibformat/lib/bibformat_templates.py:1027
 msgid "Add New Format Template"
 msgstr "Dodaj novi predložak oblikovanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:997
+#: modules/bibformat/lib/bibformat_templates.py:1028
 msgid "Check Format Templates Extensively"
 msgstr "Provjeri predloške oblikovanja ekstenzivno"
 
-#: modules/bibformat/lib/bibformat_templates.py:1037
+#: modules/bibformat/lib/bibformat_templates.py:1068
 msgid "Code"
 msgstr "Kod"
 
-#: modules/bibformat/lib/bibformat_templates.py:1121
+#: modules/bibformat/lib/bibformat_templates.py:1152
 msgid "Add New Output Format"
 msgstr "Dodaj novi format prikaza"
 
-#: modules/bibformat/lib/bibformat_templates.py:1159
+#: modules/bibformat/lib/bibformat_templates.py:1190
 msgid "menu"
 msgstr "izbornik"
 
-#: modules/bibformat/lib/bibformat_templates.py:1160
-#: modules/bibformat/lib/bibformat_templates.py:1345
-#: modules/bibformat/lib/bibformat_templates.py:1443
+#: modules/bibformat/lib/bibformat_templates.py:1191
+#: modules/bibformat/lib/bibformat_templates.py:1381
+#: modules/bibformat/lib/bibformat_templates.py:1479
 msgid "Close Output Format"
 msgstr "Zatvori formatiranje izlaza (#)"
 
-#: modules/bibformat/lib/bibformat_templates.py:1161
-#: modules/bibformat/lib/bibformat_templates.py:1346
-#: modules/bibformat/lib/bibformat_templates.py:1444
+#: modules/bibformat/lib/bibformat_templates.py:1192
+#: modules/bibformat/lib/bibformat_templates.py:1382
+#: modules/bibformat/lib/bibformat_templates.py:1480
 msgid "Rules"
 msgstr "Pravila"
 
-#: modules/bibformat/lib/bibformat_templates.py:1162
-#: modules/bibformat/lib/bibformat_templates.py:1347
-#: modules/bibformat/lib/bibformat_templates.py:1445
+#: modules/bibformat/lib/bibformat_templates.py:1193
+#: modules/bibformat/lib/bibformat_templates.py:1383
+#: modules/bibformat/lib/bibformat_templates.py:1481
 msgid "Modify Output Format Attributes"
 msgstr "Promjeni atribute oblikovanja izlaznih podataka"
 
-#: modules/bibformat/lib/bibformat_templates.py:1258
-#: modules/bibformat/lib/bibformatadminlib.py:527
+#: modules/bibformat/lib/bibformat_templates.py:1291
+#: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Remove Rule"
 msgstr "Izbriši pravilo"
 
-#: modules/bibformat/lib/bibformat_templates.py:1307
-#: modules/bibformat/lib/bibformatadminlib.py:534
+#: modules/bibformat/lib/bibformat_templates.py:1343
+#: modules/bibformat/lib/bibformatadminlib.py:541
 msgid "Add New Rule"
 msgstr "Dodaj novo pravilo"
 
-#: modules/bibformat/lib/bibformat_templates.py:1308
-#: modules/bibformat/lib/bibformatadminlib.py:531
+#: modules/bibformat/lib/bibformat_templates.py:1344
+#: modules/bibformat/lib/bibformatadminlib.py:538
 msgid "Save Changes"
 msgstr "Spremi promjene"
 
-#: modules/bibformat/lib/bibformat_templates.py:1849
-#: modules/bibformat/lib/bibformat_templates.py:2016
-#: modules/bibformat/lib/bibformat_templates.py:2084
+#: modules/bibformat/lib/bibformat_templates.py:1885
+#: modules/bibformat/lib/bibformat_templates.py:2052
+#: modules/bibformat/lib/bibformat_templates.py:2120
 msgid "Knowledge Base Mappings"
 msgstr "Mapiranje baze znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1850
-#: modules/bibformat/lib/bibformat_templates.py:2017
-#: modules/bibformat/lib/bibformat_templates.py:2085
+#: modules/bibformat/lib/bibformat_templates.py:1886
+#: modules/bibformat/lib/bibformat_templates.py:2053
+#: modules/bibformat/lib/bibformat_templates.py:2121
 msgid "Knowledge Base Attributes"
 msgstr "Atributi baze znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1851
-#: modules/bibformat/lib/bibformat_templates.py:2018
-#: modules/bibformat/lib/bibformat_templates.py:2086
+#: modules/bibformat/lib/bibformat_templates.py:1887
+#: modules/bibformat/lib/bibformat_templates.py:2054
+#: modules/bibformat/lib/bibformat_templates.py:2122
 msgid "Knowledge Base Dependencies"
 msgstr "Zavisnosti baze znanje"
 
-#: modules/bibformat/lib/bibformat_templates.py:2231
+#: modules/bibformat/lib/bibformat_templates.py:2267
 msgid "No problem found with format"
 msgstr "Oblikovanje je u redu"
 
-#: modules/bibformat/lib/bibformat_templates.py:2233
+#: modules/bibformat/lib/bibformat_templates.py:2269
 msgid "An error has been found"
 msgstr "Pronađena je greška"
 
-#: modules/bibformat/lib/bibformat_templates.py:2235
+#: modules/bibformat/lib/bibformat_templates.py:2271
 msgid "The following errors have been found"
 msgstr "Pronađene su slijedeće greške"
 
-#: modules/bibformat/lib/bibformatadminlib.py:330
-#: modules/bibformat/lib/bibformatadminlib.py:369
-#: modules/bibformat/lib/bibformatadminlib.py:371
+#: modules/bibformat/lib/bibformatadminlib.py:337
+#: modules/bibformat/lib/bibformatadminlib.py:376
+#: modules/bibformat/lib/bibformatadminlib.py:378
 msgid "Test with record:"
 msgstr "Testiraj s unosom:"
 
-#: modules/bibformat/lib/bibformatadminlib.py:331
+#: modules/bibformat/lib/bibformatadminlib.py:338
 msgid "Enter a search query here."
 msgstr "Ovdje unesite vaš upit."
 
@@ -689,13 +704,13 @@ msgstr "Prikaži svih %i autora"
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:382
-#: modules/websearch/lib/websearch_webinterface.py:455
+#: modules/websearch/lib/websearch_webinterface.py:390
+#: modules/websearch/lib/websearch_webinterface.py:466
 #: modules/websearch/web/admin/websearchadmin.py:1071
-#: modules/websession/lib/websession_webinterface.py:575
-#: modules/webstyle/lib/webstyle_templates.py:513
-#: modules/websubmit/lib/websubmit_webinterface.py:396
-#: modules/websubmit/lib/websubmit_webinterface.py:405
+#: modules/websession/lib/websession_webinterface.py:629
+#: modules/webstyle/lib/webstyle_templates.py:522
+#: modules/websubmit/lib/websubmit_webinterface.py:403
+#: modules/websubmit/lib/websubmit_webinterface.py:413
 msgid "Internal Error"
 msgstr "Internal Error"
 
@@ -719,13 +734,13 @@ msgstr "Migriraj oblikovanja"
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:254
 #: modules/bibformat/web/admin/bibformatadmin.py:299
-#: modules/bibformat/web/admin/bibformatadmin.py:1354
+#: modules/bibformat/web/admin/bibformatadmin.py:1358
 msgid "Restricted Output Format"
 msgstr "Ograničeno oblikovanje izlaznih podataka"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:212
 #: modules/bibformat/web/admin/bibformatadmin.py:510
-#: modules/bibformat/web/admin/bibformatadmin.py:1240
+#: modules/bibformat/web/admin/bibformatadmin.py:1244
 msgid "Ok"
 msgstr "U redu"
 
@@ -749,89 +764,89 @@ msgid "Delete Output Format"
 msgstr "Obriši oblikovanje izlaznih podataka"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:489
-#: modules/bibformat/web/admin/bibformatadmin.py:560
-#: modules/bibformat/web/admin/bibformatadmin.py:1375
+#: modules/bibformat/web/admin/bibformatadmin.py:561
+#: modules/bibformat/web/admin/bibformatadmin.py:1379
 msgid "Restricted Format Template"
 msgstr "Ograničeni predložak oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:514
+#: modules/bibformat/web/admin/bibformatadmin.py:515
 #, python-format
 msgid "Format Template %s"
 msgstr "Predložak oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:571
+#: modules/bibformat/web/admin/bibformatadmin.py:572
 #, python-format
 msgid "Format Template %s Attributes"
 msgstr "Atributi predlošaka oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:603
+#: modules/bibformat/web/admin/bibformatadmin.py:604
 #, fuzzy, python-format
 msgid "Format Template %s Dependencies"
 msgstr "Oblikuj datoteke vezane uz predložak %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:657
+#: modules/bibformat/web/admin/bibformatadmin.py:658
 msgid "Delete Format Template"
 msgstr "Izbriši predložak oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:867
+#: modules/bibformat/web/admin/bibformatadmin.py:871
 #, fuzzy, python-format
 msgid "Format Element %s Dependencies"
 msgstr "Oblikuj datoteke vezane uz element %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:900
+#: modules/bibformat/web/admin/bibformatadmin.py:904
 #, python-format
 msgid "Test Format Element %s"
 msgstr "Testiraj element oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:972
-#: modules/bibformat/web/admin/bibformatadmin.py:1019
-#: modules/bibformat/web/admin/bibformatadmin.py:1064
-#: modules/bibformat/web/admin/bibformatadmin.py:1111
-#: modules/bibformat/web/admin/bibformatadmin.py:1161
-#: modules/bibformat/web/admin/bibformatadmin.py:1220
-#: modules/bibformat/web/admin/bibformatadmin.py:1295
+#: modules/bibformat/web/admin/bibformatadmin.py:976
+#: modules/bibformat/web/admin/bibformatadmin.py:1023
+#: modules/bibformat/web/admin/bibformatadmin.py:1068
+#: modules/bibformat/web/admin/bibformatadmin.py:1115
+#: modules/bibformat/web/admin/bibformatadmin.py:1165
+#: modules/bibformat/web/admin/bibformatadmin.py:1224
+#: modules/bibformat/web/admin/bibformatadmin.py:1299
 msgid "Unknown Knowledge Base"
 msgstr "Nepoznata baza znanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:981
+#: modules/bibformat/web/admin/bibformatadmin.py:985
 #, python-format
 msgid "Knowledge Base %s"
 msgstr "Baza znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1028
+#: modules/bibformat/web/admin/bibformatadmin.py:1032
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr "Karakteristike baze znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1073
+#: modules/bibformat/web/admin/bibformatadmin.py:1077
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr "Zavisnosti baze znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1283
+#: modules/bibformat/web/admin/bibformatadmin.py:1287
 msgid "Delete Knowledge Base"
 msgstr "Izbriši bazu znanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1368
+#: modules/bibformat/web/admin/bibformatadmin.py:1372
 #, python-format
 msgid "Validation of Output Format %s"
 msgstr "Potvrda oblikovanja izlaznih podataka %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1386
+#: modules/bibformat/web/admin/bibformatadmin.py:1390
 #, python-format
 msgid "Validation of Format Template %s"
 msgstr "Potvrda predloška oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1394
+#: modules/bibformat/web/admin/bibformatadmin.py:1398
 msgid "Restricted Format Element"
 msgstr "Ograničeni element oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1402
+#: modules/bibformat/web/admin/bibformatadmin.py:1406
 #, python-format
 msgid "Validation of Format Element %s"
 msgstr "Potvrda elementa oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1405
+#: modules/bibformat/web/admin/bibformatadmin.py:1409
 msgid "Format Validation"
 msgstr "Potvrda oblikovanja"
 
@@ -864,11 +879,11 @@ msgstr "trenutno stanje:"
 msgid "No oaiharvest task currently scheduled."
 msgstr "Trenutno nema zakazanih oaiharvest zadataka."
 
-#: modules/bibharvest/lib/bibharvest_templates.py:255
+#: modules/bibharvest/lib/bibharvest_templates.py:227
 msgid "successfully validated"
 msgstr "uspješno potvrđeno"
 
-#: modules/bibharvest/lib/bibharvest_templates.py:256
+#: modules/bibharvest/lib/bibharvest_templates.py:228
 msgid "does not seem to be a OAI-compliant baseURL"
 msgstr "baseURL nije OAI kompatibilan "
 
@@ -883,8 +898,8 @@ msgstr "Povijest download-a"
 #: modules/miscutil/lib/dateutils.py:70 modules/miscutil/lib/dateutils.py:97
 #: modules/webbasket/lib/webbasket.py:169
 #: modules/webbasket/lib/webbasket.py:632
-#: modules/websession/lib/webuser.py:223
-#: modules/webstyle/lib/webstyle_templates.py:507
+#: modules/websession/lib/webuser.py:225
+#: modules/webstyle/lib/webstyle_templates.py:516
 msgid "N/A"
 msgstr "N/A"
 
@@ -965,8 +980,8 @@ msgid "Apr"
 msgstr "Tra"
 
 #: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
-#: modules/websearch/lib/search_engine.py:427
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/search_engine.py:434
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "May"
 msgstr "Svi"
 
@@ -999,68 +1014,68 @@ msgid "Dec"
 msgstr "Pro"
 
 #: modules/miscutil/lib/dateutils.py:197
-#: modules/websearch/lib/search_engine.py:426
-#: modules/websearch/lib/websearch_templates.py:657
+#: modules/websearch/lib/search_engine.py:433
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "January"
 msgstr "Siječanj"
 
 #: modules/miscutil/lib/dateutils.py:198
-#: modules/websearch/lib/search_engine.py:426
-#: modules/websearch/lib/websearch_templates.py:657
+#: modules/websearch/lib/search_engine.py:433
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "February"
 msgstr "Veljača"
 
 #: modules/miscutil/lib/dateutils.py:199
-#: modules/websearch/lib/search_engine.py:426
-#: modules/websearch/lib/websearch_templates.py:657
+#: modules/websearch/lib/search_engine.py:433
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "March"
 msgstr "Ožujak"
 
 #: modules/miscutil/lib/dateutils.py:200
-#: modules/websearch/lib/search_engine.py:426
-#: modules/websearch/lib/websearch_templates.py:657
+#: modules/websearch/lib/search_engine.py:433
+#: modules/websearch/lib/websearch_templates.py:660
 msgid "April"
 msgstr "Travanj"
 
 #: modules/miscutil/lib/dateutils.py:202
-#: modules/websearch/lib/search_engine.py:427
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/search_engine.py:434
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "June"
 msgstr "Lipanj"
 
 #: modules/miscutil/lib/dateutils.py:203
-#: modules/websearch/lib/search_engine.py:427
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/search_engine.py:434
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "July"
 msgstr "Srpanj"
 
 #: modules/miscutil/lib/dateutils.py:204
-#: modules/websearch/lib/search_engine.py:427
-#: modules/websearch/lib/websearch_templates.py:658
+#: modules/websearch/lib/search_engine.py:434
+#: modules/websearch/lib/websearch_templates.py:661
 msgid "August"
 msgstr "Kolovoz"
 
 #: modules/miscutil/lib/dateutils.py:205
-#: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/search_engine.py:435
+#: modules/websearch/lib/websearch_templates.py:662
 msgid "September"
 msgstr "Rujan"
 
 #: modules/miscutil/lib/dateutils.py:206
-#: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/search_engine.py:435
+#: modules/websearch/lib/websearch_templates.py:662
 msgid "October"
 msgstr "Listopad"
 
 #: modules/miscutil/lib/dateutils.py:207
-#: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/search_engine.py:435
+#: modules/websearch/lib/websearch_templates.py:662
 msgid "November"
 msgstr "Studeni"
 
 #: modules/miscutil/lib/dateutils.py:208
-#: modules/websearch/lib/search_engine.py:428
-#: modules/websearch/lib/websearch_templates.py:659
+#: modules/websearch/lib/search_engine.py:435
+#: modules/websearch/lib/websearch_templates.py:662
 msgid "December"
 msgstr "Prosinac"
 
@@ -1114,29 +1129,29 @@ msgstr "Već imate upozorenje nazvano %s."
 msgid "unknown"
 msgstr "nepoznato"
 
-#: modules/webalert/lib/webalert.py:172
+#: modules/webalert/lib/webalert.py:174
 msgid "You already have an alert defined for the specified query and basket."
 msgstr "Već imate definirano upozorenje za taj upit i košaricu."
 
-#: modules/webalert/lib/webalert.py:191 modules/webalert/lib/webalert.py:294
+#: modules/webalert/lib/webalert.py:193 modules/webalert/lib/webalert.py:299
 msgid "The alert name cannot be empty."
 msgstr "Naziv upozorenja ne može biti prazan."
 
-#: modules/webalert/lib/webalert.py:196
+#: modules/webalert/lib/webalert.py:198
 msgid "You are not the owner of this basket."
 msgstr "Vi niste vlasnik ove košarice."
 
-#: modules/webalert/lib/webalert.py:207
+#: modules/webalert/lib/webalert.py:209
 #, python-format
 msgid "The alert %s has been added to your profile."
 msgstr "Upozorenje %s je dodano vašem profilu."
 
-#: modules/webalert/lib/webalert.py:325
+#: modules/webalert/lib/webalert.py:330
 #, python-format
 msgid "The alert %s has been successfully updated."
 msgstr "Upozorenje %s je uspješno osvježeno. "
 
-#: modules/webalert/lib/webalert.py:377
+#: modules/webalert/lib/webalert.py:382
 #, python-format
 msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
@@ -1195,7 +1210,7 @@ msgstr "naziv upozorenja"
 msgid "SHOW"
 msgstr "PRIKAŽI"
 
-#: modules/webalert/lib/webalert_templates.py:166
+#: modules/webalert/lib/webalert_templates.py:172
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
@@ -1203,65 +1218,65 @@ msgstr ""
 "Ovo upozorenje ćete dobiti svaki puta/samo ako nova stavka zadovoljava "
 "slijedeći upit:"
 
-#: modules/webalert/lib/webalert_templates.py:167
+#: modules/webalert/lib/webalert_templates.py:173
 msgid "QUERY"
 msgstr "UPIT"
 
-#: modules/webalert/lib/webalert_templates.py:205
+#: modules/webalert/lib/webalert_templates.py:211
 msgid "Alert identification name:"
 msgstr "Naziv oznake upozorenja (#):"
 
-#: modules/webalert/lib/webalert_templates.py:207
+#: modules/webalert/lib/webalert_templates.py:213
 msgid "Search-checking frequency:"
 msgstr "Učestalost provjere pretraživanja (#):"
 
-#: modules/webalert/lib/webalert_templates.py:211
-#: modules/webalert/lib/webalert_templates.py:328
+#: modules/webalert/lib/webalert_templates.py:217
+#: modules/webalert/lib/webalert_templates.py:337
 msgid "monthly"
 msgstr "mjesečno"
 
-#: modules/webalert/lib/webalert_templates.py:212
-#: modules/webalert/lib/webalert_templates.py:326
+#: modules/webalert/lib/webalert_templates.py:218
+#: modules/webalert/lib/webalert_templates.py:335
 msgid "weekly"
 msgstr "tjedno"
 
-#: modules/webalert/lib/webalert_templates.py:213
-#: modules/webalert/lib/webalert_templates.py:323
+#: modules/webalert/lib/webalert_templates.py:219
+#: modules/webalert/lib/webalert_templates.py:332
 msgid "daily"
 msgstr "dnevno"
 
-#: modules/webalert/lib/webalert_templates.py:214
+#: modules/webalert/lib/webalert_templates.py:220
 msgid "Send notification email?"
 msgstr "Poslati obavijest mail-om?"
 
-#: modules/webalert/lib/webalert_templates.py:217
-#: modules/webalert/lib/webalert_templates.py:331
+#: modules/webalert/lib/webalert_templates.py:223
+#: modules/webalert/lib/webalert_templates.py:340
 msgid "yes"
 msgstr "da"
 
-#: modules/webalert/lib/webalert_templates.py:218
-#: modules/webalert/lib/webalert_templates.py:333
+#: modules/webalert/lib/webalert_templates.py:224
+#: modules/webalert/lib/webalert_templates.py:342
 msgid "no"
 msgstr "ne"
 
-#: modules/webalert/lib/webalert_templates.py:219
+#: modules/webalert/lib/webalert_templates.py:225
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
 msgstr "ako %(x_fmt_open)sne%(x_fmt_close)s, morate odrediti košaricu"
 
-#: modules/webalert/lib/webalert_templates.py:221
+#: modules/webalert/lib/webalert_templates.py:227
 msgid "Store results in basket?"
 msgstr "Spremiti rezultate u košaricu?"
 
-#: modules/webalert/lib/webalert_templates.py:242
+#: modules/webalert/lib/webalert_templates.py:248
 msgid "SET ALERT"
 msgstr "POSTAVI UPOZORENJE"
 
-#: modules/webalert/lib/webalert_templates.py:243
+#: modules/webalert/lib/webalert_templates.py:249
 msgid "CLEAR DATA"
 msgstr "IZBRIŠI PODATKE"
 
-#: modules/webalert/lib/webalert_templates.py:291
+#: modules/webalert/lib/webalert_templates.py:300
 #, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
@@ -1270,54 +1285,54 @@ msgstr ""
 "Postavite novo upozorenje iz %(x_url1_open)svaših pretraga%(x_url1_close)s, %"
 "(x_url2_open)spopularnih pretraga%(x_url2_close)s ili putem obrasca za unos."
 
-#: modules/webalert/lib/webalert_templates.py:311
+#: modules/webalert/lib/webalert_templates.py:320
 msgid "Search checking frequency"
 msgstr "Učestalost provjera pretraživanjem"
 
-#: modules/webalert/lib/webalert_templates.py:312
+#: modules/webalert/lib/webalert_templates.py:321
 msgid "Notification by email"
 msgstr "Obavijest email-om"
 
-#: modules/webalert/lib/webalert_templates.py:313
+#: modules/webalert/lib/webalert_templates.py:322
 msgid "Result in basket"
 msgstr "Rezultati u košaricu"
 
-#: modules/webalert/lib/webalert_templates.py:314
+#: modules/webalert/lib/webalert_templates.py:323
 msgid "Date last run"
 msgstr "Datum posljednjeg izvođenja"
 
-#: modules/webalert/lib/webalert_templates.py:315
+#: modules/webalert/lib/webalert_templates.py:324
 msgid "Creation date"
 msgstr "Datum stvaranja"
 
-#: modules/webalert/lib/webalert_templates.py:316
+#: modules/webalert/lib/webalert_templates.py:325
 msgid "Query"
 msgstr "Upit"
 
-#: modules/webalert/lib/webalert_templates.py:355
+#: modules/webalert/lib/webalert_templates.py:364
 #: modules/webbasket/lib/webbasket_templates.py:1456
 msgid "no basket"
 msgstr "nema košarice"
 
-#: modules/webalert/lib/webalert_templates.py:365
+#: modules/webalert/lib/webalert_templates.py:373
 msgid "Remove"
 msgstr "Ukloni"
 
-#: modules/webalert/lib/webalert_templates.py:366
+#: modules/webalert/lib/webalert_templates.py:374
 msgid "Modify"
 msgstr "Izmijeni"
 
-#: modules/webalert/lib/webalert_templates.py:368
-#: modules/webalert/lib/webalert_templates.py:458
+#: modules/webalert/lib/webalert_templates.py:376
+#: modules/webalert/lib/webalert_templates.py:466
 msgid "Execute search"
 msgstr "Pretraži"
 
-#: modules/webalert/lib/webalert_templates.py:374
+#: modules/webalert/lib/webalert_templates.py:382
 #, python-format
 msgid "You have defined %s alerts."
 msgstr "Definirali ste %s upozorenja."
 
-#: modules/webalert/lib/webalert_templates.py:412
+#: modules/webalert/lib/webalert_templates.py:420
 #, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
@@ -1326,7 +1341,7 @@ msgstr ""
 "Još niste izvršili pretraživanje. Molimo otiđite na %(x_url_open)ssučelje za "
 "pretraživanje%(x_url_close)s."
 
-#: modules/webalert/lib/webalert_templates.py:421
+#: modules/webalert/lib/webalert_templates.py:429
 #, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
@@ -1335,78 +1350,78 @@ msgstr ""
 "Izvršili ste %(x_nb1)s pretraživanja (%(x_nb2)s različitih upita) tijekom "
 "poslijednjih 30 dana."
 
-#: modules/webalert/lib/webalert_templates.py:426
+#: modules/webalert/lib/webalert_templates.py:434
 #, python-format
 msgid "Here are the %s most popular searches."
 msgstr "%s najpopularnijih pretraživanja."
 
-#: modules/webalert/lib/webalert_templates.py:437
+#: modules/webalert/lib/webalert_templates.py:445
 msgid "Question"
 msgstr "Pitanje"
 
-#: modules/webalert/lib/webalert_templates.py:441
+#: modules/webalert/lib/webalert_templates.py:449
 msgid "Last Run"
 msgstr "Posljednje izvođenje"
 
-#: modules/webalert/lib/webalert_templates.py:459
+#: modules/webalert/lib/webalert_templates.py:467
 msgid "Set new alert"
 msgstr "Postavi novo upozorenje"
 
-#: modules/webalert/lib/webalert_webinterface.py:67
+#: modules/webalert/lib/webalert_webinterface.py:68
 msgid "Display searches"
 msgstr "Prikaži pretraživanja"
 
-#: modules/webalert/lib/webalert_webinterface.py:72
-#: modules/webalert/lib/webalert_webinterface.py:112
-#: modules/webalert/lib/webalert_webinterface.py:153
-#: modules/webalert/lib/webalert_webinterface.py:179
-#: modules/webalert/lib/webalert_webinterface.py:216
-#: modules/webalert/lib/webalert_webinterface.py:253
-#: modules/webalert/lib/webalert_webinterface.py:284
-#: modules/webbasket/lib/webbasket_webinterface.py:76
-#: modules/webbasket/lib/webbasket_webinterface.py:121
-#: modules/webbasket/lib/webbasket_webinterface.py:165
-#: modules/webbasket/lib/webbasket_webinterface.py:219
-#: modules/webbasket/lib/webbasket_webinterface.py:319
-#: modules/webbasket/lib/webbasket_webinterface.py:360
-#: modules/webbasket/lib/webbasket_webinterface.py:422
-#: modules/webbasket/lib/webbasket_webinterface.py:515
-#: modules/webbasket/lib/webbasket_webinterface.py:570
+#: modules/webalert/lib/webalert_webinterface.py:73
+#: modules/webalert/lib/webalert_webinterface.py:115
+#: modules/webalert/lib/webalert_webinterface.py:158
+#: modules/webalert/lib/webalert_webinterface.py:186
+#: modules/webalert/lib/webalert_webinterface.py:225
+#: modules/webalert/lib/webalert_webinterface.py:264
+#: modules/webalert/lib/webalert_webinterface.py:296
+#: modules/webbasket/lib/webbasket_webinterface.py:77
+#: modules/webbasket/lib/webbasket_webinterface.py:124
+#: modules/webbasket/lib/webbasket_webinterface.py:170
+#: modules/webbasket/lib/webbasket_webinterface.py:226
+#: modules/webbasket/lib/webbasket_webinterface.py:330
+#: modules/webbasket/lib/webbasket_webinterface.py:373
+#: modules/webbasket/lib/webbasket_webinterface.py:437
+#: modules/webbasket/lib/webbasket_webinterface.py:532
+#: modules/webbasket/lib/webbasket_webinterface.py:589
 #: modules/webmessage/lib/webmessage_templates.py:471
-#: modules/websession/lib/websession_templates.py:506
-#: modules/websession/lib/websession_templates.py:1906
-#: modules/websession/lib/websession_webinterface.py:77
-#: modules/websession/lib/websession_webinterface.py:93
-#: modules/websession/lib/websession_webinterface.py:121
-#: modules/websession/lib/websession_webinterface.py:265
-#: modules/websession/lib/websession_webinterface.py:286
-#: modules/websession/lib/websession_webinterface.py:312
-#: modules/websession/lib/websession_webinterface.py:324
-#: modules/websession/lib/websession_webinterface.py:381
-#: modules/websession/lib/websession_webinterface.py:402
-#: modules/websession/lib/websession_webinterface.py:423
-#: modules/websession/lib/websession_webinterface.py:455
-#: modules/websession/lib/websession_webinterface.py:485
-#: modules/websession/lib/websession_webinterface.py:516
-#: modules/websession/lib/websession_webinterface.py:581
-#: modules/websubmit/web/publiline.py:88
-#: modules/websubmit/web/yourapprovals.py:96
-#: modules/websubmit/web/yoursubmissions.py:177
+#: modules/websession/lib/websession_templates.py:546
+#: modules/websession/lib/websession_templates.py:1943
+#: modules/websession/lib/websession_webinterface.py:78
+#: modules/websession/lib/websession_webinterface.py:95
+#: modules/websession/lib/websession_webinterface.py:127
+#: modules/websession/lib/websession_webinterface.py:299
+#: modules/websession/lib/websession_webinterface.py:322
+#: modules/websession/lib/websession_webinterface.py:350
+#: modules/websession/lib/websession_webinterface.py:363
+#: modules/websession/lib/websession_webinterface.py:424
+#: modules/websession/lib/websession_webinterface.py:447
+#: modules/websession/lib/websession_webinterface.py:470
+#: modules/websession/lib/websession_webinterface.py:504
+#: modules/websession/lib/websession_webinterface.py:536
+#: modules/websession/lib/websession_webinterface.py:569
+#: modules/websession/lib/websession_webinterface.py:635
+#: modules/websubmit/web/publiline.py:89
+#: modules/websubmit/web/yourapprovals.py:97
+#: modules/websubmit/web/yoursubmissions.py:178
 msgid "Your Account"
 msgstr "Vaš korisnički račun"
 
-#: modules/webalert/lib/webalert_webinterface.py:107
+#: modules/webalert/lib/webalert_webinterface.py:110
 msgid "Set a new alert"
 msgstr "Postavi novo upozorenje"
 
-#: modules/webalert/lib/webalert_webinterface.py:148
+#: modules/webalert/lib/webalert_webinterface.py:153
 msgid "Modify alert settings"
 msgstr "Izmijeni postavke upozorenja"
 
-#: modules/webalert/lib/webalert_webinterface.py:174
-#: modules/webalert/lib/webalert_webinterface.py:211
-#: modules/webalert/lib/webalert_webinterface.py:248
-#: modules/webalert/lib/webalert_webinterface.py:278
+#: modules/webalert/lib/webalert_webinterface.py:181
+#: modules/webalert/lib/webalert_webinterface.py:220
+#: modules/webalert/lib/webalert_webinterface.py:259
+#: modules/webalert/lib/webalert_webinterface.py:290
 msgid "Display alerts"
 msgstr "Prikaži upozorenja"
 
@@ -1462,7 +1477,7 @@ msgstr ""
 "(x_url_close)s na nju."
 
 #: modules/webbasket/lib/webbasket_templates.py:282
-#: modules/webbasket/lib/webbasket_webinterface.py:624
+#: modules/webbasket/lib/webbasket_webinterface.py:645
 msgid "Public basket"
 msgstr "Javna košarica"
 
@@ -1537,7 +1552,7 @@ msgid "Group-shared basket"
 msgstr "Košarica dijeljena unutar grupe"
 
 #: modules/webbasket/lib/webbasket_templates.py:465
-#: modules/webbasket/lib/webbasket_webinterface.py:525
+#: modules/webbasket/lib/webbasket_webinterface.py:542
 msgid "Edit basket"
 msgstr "Uredi košaricu"
 
@@ -1585,8 +1600,8 @@ msgid "last"
 msgstr "poslijednji"
 
 #: modules/webbasket/lib/webbasket_templates.py:643
-#: modules/webbasket/lib/webbasket_webinterface.py:128
-#: modules/webbasket/lib/webbasket_webinterface.py:226
+#: modules/webbasket/lib/webbasket_webinterface.py:131
+#: modules/webbasket/lib/webbasket_webinterface.py:233
 msgid "Details and comments"
 msgstr "Detalji i komentari"
 
@@ -1595,8 +1610,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "Ova košarica je javno dostupna na slijedećoj adresi:"
 
 #: modules/webbasket/lib/webbasket_templates.py:697
-#: modules/websearch/lib/websearch_templates.py:533
-#: modules/websearch/lib/websearch_templates.py:1576
+#: modules/websearch/lib/websearch_templates.py:536
+#: modules/websearch/lib/websearch_templates.py:1579
 msgid "Sort by:"
 msgstr "Sortiraj po:"
 
@@ -1612,7 +1627,7 @@ msgstr "Datum"
 
 #: modules/webbasket/lib/webbasket_templates.py:769
 #: modules/webcomment/lib/webcomment_webinterface.py:113
-#: modules/webcomment/lib/webcomment_webinterface.py:172
+#: modules/webcomment/lib/webcomment_webinterface.py:174
 msgid "Comments"
 msgstr "Komentari"
 
@@ -1622,7 +1637,7 @@ msgid "There is a total of %i comments"
 msgstr "Ukupno ima %i komentara"
 
 #: modules/webbasket/lib/webbasket_templates.py:772
-#: modules/webbasket/lib/webbasket_webinterface.py:172
+#: modules/webbasket/lib/webbasket_webinterface.py:177
 #: modules/webcomment/lib/webcomment_templates.py:95
 #: modules/webcomment/lib/webcomment_templates.py:579
 msgid "Write a comment"
@@ -1654,7 +1669,7 @@ msgstr "Obriši komentar"
 
 #: modules/webbasket/lib/webbasket_templates.py:925
 #: modules/webbasket/lib/webbasket_templates.py:930
-#: modules/webcomment/lib/webcomment_webinterface.py:215
+#: modules/webcomment/lib/webcomment_webinterface.py:219
 msgid "Add Comment"
 msgstr "Dodaj komentar"
 
@@ -1850,7 +1865,7 @@ msgid "Sharing basket to a new group"
 msgstr "Zajednička košarica za novu grupu"
 
 #: modules/webbasket/lib/webbasket_templates.py:1464
-#: modules/websession/lib/websession_templates.py:412
+#: modules/websession/lib/websession_templates.py:452
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
@@ -1858,7 +1873,7 @@ msgstr "Prijavljeni ste kao gost, pa će vaša košarica nestati kad se odjavite
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
 #: modules/webbasket/lib/webbasket_templates.py:1482
-#: modules/websession/lib/websession_templates.py:415
+#: modules/websession/lib/websession_templates.py:455
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
@@ -1867,7 +1882,7 @@ msgstr ""
 "(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
-#: modules/websession/lib/websession_webinterface.py:115
+#: modules/websession/lib/websession_webinterface.py:120
 msgid "This functionality is forbidden to guest users."
 msgstr "Ova funkcionalnost nije dostupna za goste."
 
@@ -1876,35 +1891,35 @@ msgstr "Ova funkcionalnost nije dostupna za goste."
 msgid "Back to search results"
 msgstr "Natrag na rezultate pretrage"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:82
+#: modules/webbasket/lib/webbasket_webinterface.py:83
 msgid "Display baskets"
 msgstr "Prikaži košarice"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:314
-#: modules/websession/lib/websession_templates.py:369
-#: modules/websession/lib/websession_templates.py:508
+#: modules/webbasket/lib/webbasket_webinterface.py:325
+#: modules/websession/lib/websession_templates.py:409
+#: modules/websession/lib/websession_templates.py:548
 msgid "Your Baskets"
 msgstr "Vaša košarica"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:316
+#: modules/webbasket/lib/webbasket_webinterface.py:327
 msgid "Add records to baskets"
 msgstr "Dodaj zapise u košaricu"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:369
+#: modules/webbasket/lib/webbasket_webinterface.py:382
 msgid "Delete a basket"
 msgstr "Obriši košaricu"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:407
+#: modules/webbasket/lib/webbasket_webinterface.py:422
 msgid "Copy record to basket"
 msgstr "Kopiraj zapis u košaricu"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:573
+#: modules/webbasket/lib/webbasket_webinterface.py:592
 msgid "Create basket"
 msgstr "Kreiraj košaricu"
 
-#: modules/webbasket/lib/webbasket_webinterface.py:599
-#: modules/webbasket/lib/webbasket_webinterface.py:623
-#: modules/webbasket/lib/webbasket_webinterface.py:650
+#: modules/webbasket/lib/webbasket_webinterface.py:620
+#: modules/webbasket/lib/webbasket_webinterface.py:644
+#: modules/webbasket/lib/webbasket_webinterface.py:673
 msgid "List of public baskets"
 msgstr "Lista javnih košarica"
 
@@ -2093,7 +2108,7 @@ msgid "Write your review"
 msgstr "Upiši svoje izvješće"
 
 #: modules/webcomment/lib/webcomment_templates.py:903
-#: modules/webcomment/lib/webcomment_webinterface.py:213
+#: modules/webcomment/lib/webcomment_webinterface.py:217
 msgid "Add Review"
 msgstr "Dodaj izvješće"
 
@@ -2170,8 +2185,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1120
 #: modules/webcomment/lib/webcomment_templates.py:1149
-#: modules/websession/lib/websession_templates.py:185
-#: modules/websession/lib/websession_templates.py:821
+#: modules/websession/lib/websession_templates.py:176
+#: modules/websession/lib/websession_templates.py:861
 msgid "Nickname"
 msgstr "Nadimak"
 
@@ -2286,25 +2301,25 @@ msgid "successfully suppressed abuse report"
 msgstr "uspješno onemogućeno izvještavanje o zloupotrebi"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
-#: modules/webcomment/lib/webcomment_webinterface.py:167
-#: modules/websearch/lib/websearch_templates.py:986
-#: modules/websearch/lib/websearch_templates.py:2393
-#: modules/websearch/lib/websearch_templates.py:2399
-#: modules/websearch/lib/websearch_templates.py:2404
+#: modules/webcomment/lib/webcomment_webinterface.py:169
+#: modules/websearch/lib/websearch_templates.py:989
+#: modules/websearch/lib/websearch_templates.py:2396
+#: modules/websearch/lib/websearch_templates.py:2402
+#: modules/websearch/lib/websearch_templates.py:2407
 msgid "Detailed record"
 msgstr "Detaljnije"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:113
-#: modules/webcomment/lib/webcomment_webinterface.py:172
+#: modules/webcomment/lib/webcomment_webinterface.py:174
 msgid "Reviews"
 msgstr "Pregledi (#)"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:124
-#: modules/webcomment/lib/webcomment_webinterface.py:227
+#: modules/webcomment/lib/webcomment_webinterface.py:125
+#: modules/webcomment/lib/webcomment_webinterface.py:232
 msgid "Record Not Found"
 msgstr "Zapis nije pronađen"
 
-#: modules/webcomment/lib/webcomment_webinterface.py:189
+#: modules/webcomment/lib/webcomment_webinterface.py:192
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
@@ -2312,9 +2327,9 @@ msgid ""
 msgstr ""
 "Prije dodavanja komentara, trebate se %(x_url_open)sprijaviti%(x_url_close)s."
 
-#: modules/webcomment/lib/webcomment_webinterface.py:193
-#: modules/websession/lib/websession_webinterface.py:453
-#: modules/websession/lib/websession_webinterface.py:483
+#: modules/webcomment/lib/webcomment_webinterface.py:196
+#: modules/websession/lib/websession_webinterface.py:502
+#: modules/websession/lib/websession_webinterface.py:534
 msgid "Login"
 msgstr "Prijava"
 
@@ -2384,8 +2399,8 @@ msgid "User %s does not exist."
 msgstr "Korisnik %s ne postoji."
 
 #: modules/webmessage/lib/webmessage.py:397
-#: modules/webmessage/lib/webmessage_webinterface.py:115
-#: modules/webmessage/lib/webmessage_webinterface.py:183
+#: modules/webmessage/lib/webmessage_webinterface.py:118
+#: modules/webmessage/lib/webmessage_webinterface.py:188
 msgid "Write a message"
 msgstr "Unesite poruku"
 
@@ -2401,10 +2416,10 @@ msgstr "Poruka je poslana."
 
 #: modules/webmessage/lib/webmessage.py:423
 #: modules/webmessage/lib/webmessage_templates.py:477
-#: modules/webmessage/lib/webmessage_webinterface.py:76
-#: modules/webmessage/lib/webmessage_webinterface.py:239
-#: modules/webmessage/lib/webmessage_webinterface.py:271
-#: modules/websession/lib/websession_templates.py:507
+#: modules/webmessage/lib/webmessage_webinterface.py:77
+#: modules/webmessage/lib/webmessage_webinterface.py:246
+#: modules/webmessage/lib/webmessage_webinterface.py:280
+#: modules/websession/lib/websession_templates.py:547
 msgid "Your Messages"
 msgstr "Vaše poruke"
 
@@ -2519,7 +2534,7 @@ msgid "No matching user"
 msgstr "Nema takvog korisnika"
 
 #: modules/webmessage/lib/webmessage_templates.py:628
-#: modules/websession/lib/websession_templates.py:1433
+#: modules/websession/lib/websession_templates.py:1470
 msgid "No matching group"
 msgstr "Nema takve grupe"
 
@@ -2540,109 +2555,109 @@ msgstr "Pronađi grupu"
 msgid "You have %s new messages out of %s messages"
 msgstr "Imate %s novih od ukupno %s poruka "
 
-#: modules/webmessage/lib/webmessage_webinterface.py:302
+#: modules/webmessage/lib/webmessage_webinterface.py:313
 msgid "Read a message"
 msgstr "Prikaži poruku"
 
 #: modules/websearch/lib/search_engine.py:361
-#: modules/websearch/lib/search_engine.py:385
-#: modules/websearch/lib/search_engine.py:3110
-#: modules/websearch/lib/search_engine.py:3149
-#: modules/websearch/lib/search_engine.py:3183
+#: modules/websearch/lib/search_engine.py:391
+#: modules/websearch/lib/search_engine.py:3143
+#: modules/websearch/lib/search_engine.py:3182
+#: modules/websearch/lib/search_engine.py:3216
 msgid "Search Results"
 msgstr "Pretraži rezultate"
 
-#: modules/websearch/lib/search_engine.py:419
-#: modules/websearch/lib/websearch_templates.py:642
+#: modules/websearch/lib/search_engine.py:426
+#: modules/websearch/lib/websearch_templates.py:645
 msgid "any day"
 msgstr "bilo koji dan"
 
-#: modules/websearch/lib/search_engine.py:425
-#: modules/websearch/lib/websearch_templates.py:654
+#: modules/websearch/lib/search_engine.py:432
+#: modules/websearch/lib/websearch_templates.py:657
 msgid "any month"
 msgstr "bilo koji mjesec"
 
-#: modules/websearch/lib/search_engine.py:433
-#: modules/websearch/lib/websearch_templates.py:668
+#: modules/websearch/lib/search_engine.py:440
+#: modules/websearch/lib/websearch_templates.py:671
 msgid "any year"
 msgstr "bilo koja godina"
 
-#: modules/websearch/lib/search_engine.py:476
-#: modules/websearch/lib/search_engine.py:491
+#: modules/websearch/lib/search_engine.py:483
+#: modules/websearch/lib/search_engine.py:498
 msgid "any collection"
 msgstr "bilo koja kolekcija"
 
-#: modules/websearch/lib/search_engine.py:487
+#: modules/websearch/lib/search_engine.py:494
 msgid "add another collection"
 msgstr "dodaj kolekciju"
 
-#: modules/websearch/lib/search_engine.py:496
-#: modules/websearch/lib/websearch_webcoll.py:455
+#: modules/websearch/lib/search_engine.py:503
+#: modules/websearch/lib/websearch_webcoll.py:487
 msgid "latest first"
 msgstr "prvo najnovije"
 
-#: modules/websearch/lib/search_engine.py:511
-#: modules/websearch/lib/search_engine.py:633
-#: modules/websearch/lib/websearch_templates.py:619
-#: modules/websearch/lib/websearch_webcoll.py:485
+#: modules/websearch/lib/search_engine.py:518
+#: modules/websearch/lib/search_engine.py:640
+#: modules/websearch/lib/websearch_templates.py:622
+#: modules/websearch/lib/websearch_webcoll.py:517
 msgid "OR"
 msgstr "OR"
 
-#: modules/websearch/lib/search_engine.py:511
-#: modules/websearch/lib/websearch_webcoll.py:485
+#: modules/websearch/lib/search_engine.py:518
+#: modules/websearch/lib/websearch_webcoll.py:517
 msgid "rank by"
 msgstr "poredaj po"
 
-#: modules/websearch/lib/search_engine.py:531
+#: modules/websearch/lib/search_engine.py:538
 msgid "HTML brief"
 msgstr "sažeti HTML"
 
-#: modules/websearch/lib/search_engine.py:632
-#: modules/websearch/lib/websearch_templates.py:618
+#: modules/websearch/lib/search_engine.py:639
+#: modules/websearch/lib/websearch_templates.py:621
 msgid "AND"
 msgstr "AND"
 
-#: modules/websearch/lib/search_engine.py:634
-#: modules/websearch/lib/websearch_templates.py:620
+#: modules/websearch/lib/search_engine.py:641
+#: modules/websearch/lib/websearch_templates.py:623
 msgid "AND NOT"
 msgstr "AND NOT"
 
-#: modules/websearch/lib/search_engine.py:652
-#: modules/websearch/lib/websearch_templates.py:568
+#: modules/websearch/lib/search_engine.py:659
+#: modules/websearch/lib/websearch_templates.py:571
 msgid "All of the words:"
 msgstr "Sve riječi:"
 
-#: modules/websearch/lib/search_engine.py:653
-#: modules/websearch/lib/websearch_templates.py:570
+#: modules/websearch/lib/search_engine.py:660
+#: modules/websearch/lib/websearch_templates.py:573
 msgid "Any of the words:"
 msgstr "Bilo koja riječ:"
 
-#: modules/websearch/lib/search_engine.py:654
-#: modules/websearch/lib/websearch_templates.py:572
+#: modules/websearch/lib/search_engine.py:661
+#: modules/websearch/lib/websearch_templates.py:575
 msgid "Exact phrase:"
 msgstr "Točna fraza:"
 
-#: modules/websearch/lib/search_engine.py:655
-#: modules/websearch/lib/websearch_templates.py:574
+#: modules/websearch/lib/search_engine.py:662
+#: modules/websearch/lib/websearch_templates.py:577
 msgid "Partial phrase:"
 msgstr "Dio fraze:"
 
-#: modules/websearch/lib/search_engine.py:656
-#: modules/websearch/lib/websearch_templates.py:576
+#: modules/websearch/lib/search_engine.py:663
+#: modules/websearch/lib/websearch_templates.py:579
 msgid "Regular expression:"
 msgstr "Regularni izraz:"
 
-#: modules/websearch/lib/search_engine.py:1212
+#: modules/websearch/lib/search_engine.py:1228
 msgid "No values found."
 msgstr "Nema pronađenih vrijednosti"
 
-#: modules/websearch/lib/search_engine.py:1345
+#: modules/websearch/lib/search_engine.py:1361
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Nema rezultata za %(x_query1)s, umjesto traženog koristi se %(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1584
+#: modules/websearch/lib/search_engine.py:1600
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -2651,7 +2666,7 @@ msgstr ""
 "Nije pronađeno u kolekciji %(x_collection)s. Pretraživanje drugih javnih "
 "kolekcija dalo je %(x_url_open)s%(x_nb_hits)d rezultate%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:1593
+#: modules/websearch/lib/search_engine.py:1609
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -2659,16 +2674,16 @@ msgstr ""
 "Vaš upit nije pronađen niti u jednoj javnoj kolekciji. Ako ste tražili "
 "privatni dokument, molimo prvo odaberite željenu ograničenu kolekciju."
 
-#: modules/websearch/lib/search_engine.py:1707
+#: modules/websearch/lib/search_engine.py:1723
 #, fuzzy
 msgid "No words index available for"
 msgstr "Indeks riječi nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:1711
+#: modules/websearch/lib/search_engine.py:1727
 msgid "No phrase index available for"
 msgstr "Indeks fraza nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:1743
+#: modules/websearch/lib/search_engine.py:1759
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -2677,14 +2692,14 @@ msgstr ""
 "Traženi pojam %(x_term)s u popisu %(x_index)s nije pronađen. Najsličniji "
 "pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:1747
+#: modules/websearch/lib/search_engine.py:1763
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr ""
 "Traženi pojam %s nije pronađen. Najsličniji pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:2194
+#: modules/websearch/lib/search_engine.py:2210
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -2693,7 +2708,7 @@ msgstr ""
 "Nažalost, sortiranje je dozvoljeno samo na skupovima od više od %d zapisa. "
 "Koristi se uobičajeno sortiranje."
 
-#: modules/websearch/lib/search_engine.py:2218
+#: modules/websearch/lib/search_engine.py:2234
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -2702,252 +2717,252 @@ msgstr ""
 "Nažalost, %s nije valjana opcija za sortiranje. Umjesto toga, izabrano je "
 "sortiranje prema naslovu."
 
-#: modules/websearch/lib/search_engine.py:2428
+#: modules/websearch/lib/search_engine.py:2444
 msgid "Use different search terms."
 msgstr "Koristite druge pojmove za pretragu."
 
-#: modules/websearch/lib/search_engine.py:2491
-#: modules/websearch/lib/search_engine.py:2642
-#: modules/websearch/lib/search_engine.py:2665
-#: modules/websearch/lib/search_engine.py:2672
-#: modules/websearch/lib/search_engine.py:2679
-#: modules/websearch/lib/search_engine.py:2725
+#: modules/websearch/lib/search_engine.py:2507
+#: modules/websearch/lib/search_engine.py:2659
+#: modules/websearch/lib/search_engine.py:2682
+#: modules/websearch/lib/search_engine.py:2689
+#: modules/websearch/lib/search_engine.py:2696
+#: modules/websearch/lib/search_engine.py:2742
 msgid "The record has been deleted."
 msgstr "Zapis je obrisan."
 
-#: modules/websearch/lib/search_engine.py:3092
-#: modules/websearch/lib/websearch_templates.py:342
-#: modules/websearch/lib/websearch_templates.py:463
-#: modules/websearch/lib/websearch_templates.py:1308
-#: modules/websearch/lib/websearch_templates.py:1399
-#: modules/websearch/lib/websearch_templates.py:1455
-#: modules/websearch/lib/websearch_templates.py:1490
-#: modules/websearch/lib/websearch_templates.py:1513
-#: modules/websearch/lib/websearch_templates.py:1543
+#: modules/websearch/lib/search_engine.py:3125
+#: modules/websearch/lib/websearch_templates.py:345
+#: modules/websearch/lib/websearch_templates.py:466
+#: modules/websearch/lib/websearch_templates.py:1311
+#: modules/websearch/lib/websearch_templates.py:1402
+#: modules/websearch/lib/websearch_templates.py:1458
+#: modules/websearch/lib/websearch_templates.py:1493
+#: modules/websearch/lib/websearch_templates.py:1516
+#: modules/websearch/lib/websearch_templates.py:1546
 msgid "Browse"
 msgstr "Pregledaj"
 
-#: modules/websearch/lib/search_engine.py:3275
+#: modules/websearch/lib/search_engine.py:3308
 #, fuzzy
 msgid "No match within your time limits, discarding this condition..."
 msgstr "Nema rezultata u traženim vremenskim okvirima, zahtjev je odbačen..."
 
-#: modules/websearch/lib/search_engine.py:3297
+#: modules/websearch/lib/search_engine.py:3330
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Nema rezultata u traženim okvirima, zahtjev je odbačen..."
 
-#: modules/websearch/lib/websearch_templates.py:305
+#: modules/websearch/lib/websearch_templates.py:308
 #, python-format
 msgid "Search %s records for:"
 msgstr "Pretražite %s zapise za:"
 
-#: modules/websearch/lib/websearch_templates.py:338
-#: modules/websearch/lib/websearch_templates.py:1443
+#: modules/websearch/lib/websearch_templates.py:341
+#: modules/websearch/lib/websearch_templates.py:1446
 msgid "Advanced Search"
 msgstr "Napredno pretraživanje"
 
-#: modules/websearch/lib/websearch_templates.py:405
+#: modules/websearch/lib/websearch_templates.py:408
 #, python-format
 msgid "Search %s records for"
 msgstr "Pretražite %s zapise za"
 
-#: modules/websearch/lib/websearch_templates.py:448
-#: modules/websearch/lib/websearch_templates.py:1360
+#: modules/websearch/lib/websearch_templates.py:451
+#: modules/websearch/lib/websearch_templates.py:1363
 msgid "Simple Search"
 msgstr "Jednostavno pretraživanje"
 
-#: modules/websearch/lib/websearch_templates.py:481
+#: modules/websearch/lib/websearch_templates.py:484
 msgid "Search options:"
 msgstr "Opcije za pretraživanje:"
 
-#: modules/websearch/lib/websearch_templates.py:528
-#: modules/websearch/lib/websearch_templates.py:1536
+#: modules/websearch/lib/websearch_templates.py:531
+#: modules/websearch/lib/websearch_templates.py:1539
 msgid "Added since:"
 msgstr "Dodano od:"
 
-#: modules/websearch/lib/websearch_templates.py:529
-#: modules/websearch/lib/websearch_templates.py:1537
+#: modules/websearch/lib/websearch_templates.py:532
+#: modules/websearch/lib/websearch_templates.py:1540
 msgid "until:"
 msgstr "do:"
 
-#: modules/websearch/lib/websearch_templates.py:534
-#: modules/websearch/lib/websearch_templates.py:1577
+#: modules/websearch/lib/websearch_templates.py:537
+#: modules/websearch/lib/websearch_templates.py:1580
 msgid "Display results:"
 msgstr "Prikaz rezultata:"
 
-#: modules/websearch/lib/websearch_templates.py:535
-#: modules/websearch/lib/websearch_templates.py:1578
+#: modules/websearch/lib/websearch_templates.py:538
+#: modules/websearch/lib/websearch_templates.py:1581
 msgid "Output format:"
 msgstr "Oblik izlaznih podataka:"
 
-#: modules/websearch/lib/websearch_templates.py:708
+#: modules/websearch/lib/websearch_templates.py:711
 msgid "Narrow by collection:"
 msgstr "Suzi izbor:"
 
-#: modules/websearch/lib/websearch_templates.py:709
+#: modules/websearch/lib/websearch_templates.py:712
 msgid "Focus on:"
 msgstr "Fokus na:"
 
-#: modules/websearch/lib/websearch_templates.py:748
+#: modules/websearch/lib/websearch_templates.py:751
 msgid "restricted"
 msgstr "ograničeno"
 
-#: modules/websearch/lib/websearch_templates.py:768
+#: modules/websearch/lib/websearch_templates.py:771
 msgid "Search also:"
 msgstr "Također pretraži:"
 
-#: modules/websearch/lib/websearch_templates.py:833
+#: modules/websearch/lib/websearch_templates.py:836
 msgid "The contents of this collection is restricted."
 msgstr "Sadržaj ove kolekcije je ograničen."
 
-#: modules/websearch/lib/websearch_templates.py:848
+#: modules/websearch/lib/websearch_templates.py:851
 msgid "This collection does not contain any document yet."
 msgstr "Ova kolekcija još ne sadrži nijedan dokument."
 
-#: modules/websearch/lib/websearch_templates.py:882
-#: modules/websearch/lib/websearch_templates.py:2032
-#: modules/websearch/lib/websearch_templates.py:2046
-#: modules/websearch/lib/websearch_templates.py:2062
+#: modules/websearch/lib/websearch_templates.py:885
+#: modules/websearch/lib/websearch_templates.py:2035
+#: modules/websearch/lib/websearch_templates.py:2049
+#: modules/websearch/lib/websearch_templates.py:2065
 msgid "more"
 msgstr "više"
 
-#: modules/websearch/lib/websearch_templates.py:897
+#: modules/websearch/lib/websearch_templates.py:900
 msgid "Latest additions:"
 msgstr "Najnovije dodano:"
 
-#: modules/websearch/lib/websearch_templates.py:989
-#: modules/websearch/lib/websearch_templates.py:2010
-#: modules/websearch/lib/websearch_templates.py:2411
+#: modules/websearch/lib/websearch_templates.py:992
+#: modules/websearch/lib/websearch_templates.py:2013
+#: modules/websearch/lib/websearch_templates.py:2414
 msgid "Similar records"
 msgstr "Slični zapisi"
 
-#: modules/websearch/lib/websearch_templates.py:995
-#: modules/websearch/lib/websearch_templates.py:2419
+#: modules/websearch/lib/websearch_templates.py:998
+#: modules/websearch/lib/websearch_templates.py:2422
 #, fuzzy
 msgid "Cited by"
 msgstr "Naveo/la"
 
-#: modules/websearch/lib/websearch_templates.py:1063
+#: modules/websearch/lib/websearch_templates.py:1066
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
 "Riječi najsličnije %(x_word)s unutar %(x_field)s u svim kolekcijama su:"
 
-#: modules/websearch/lib/websearch_templates.py:1066
+#: modules/websearch/lib/websearch_templates.py:1069
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "Riječi najsličnije %(x_word)s u svim kolekcijama su:"
 
-#: modules/websearch/lib/websearch_templates.py:1158
+#: modules/websearch/lib/websearch_templates.py:1161
 msgid "Hits"
 msgstr "Upute"
 
-#: modules/websearch/lib/websearch_templates.py:1223
-#: modules/websearch/lib/websearch_templates.py:1791
+#: modules/websearch/lib/websearch_templates.py:1226
+#: modules/websearch/lib/websearch_templates.py:1794
 msgid "next"
 msgstr "slijedeći"
 
-#: modules/websearch/lib/websearch_templates.py:1485
+#: modules/websearch/lib/websearch_templates.py:1488
 msgid "collections"
 msgstr "kolekcije"
 
-#: modules/websearch/lib/websearch_templates.py:1507
+#: modules/websearch/lib/websearch_templates.py:1510
 msgid "Limit to:"
 msgstr "Ograniči na:"
 
-#: modules/websearch/lib/websearch_templates.py:1547
-#: modules/websearch/lib/websearch_webcoll.py:503
+#: modules/websearch/lib/websearch_templates.py:1550
+#: modules/websearch/lib/websearch_webcoll.py:535
 msgid "results"
 msgstr "rezultati"
 
-#: modules/websearch/lib/websearch_templates.py:1582
-#: modules/websearch/lib/websearch_webcoll.py:473
+#: modules/websearch/lib/websearch_templates.py:1585
+#: modules/websearch/lib/websearch_webcoll.py:505
 msgid "asc."
 msgstr "u rastućem poretku"
 
-#: modules/websearch/lib/websearch_templates.py:1585
-#: modules/websearch/lib/websearch_webcoll.py:474
+#: modules/websearch/lib/websearch_templates.py:1588
+#: modules/websearch/lib/websearch_webcoll.py:506
 msgid "desc."
 msgstr "u padajućem poretku"
 
-#: modules/websearch/lib/websearch_templates.py:1591
-#: modules/websearch/lib/websearch_webcoll.py:517
+#: modules/websearch/lib/websearch_templates.py:1594
+#: modules/websearch/lib/websearch_webcoll.py:549
 msgid "single list"
 msgstr "jednostruka lista"
 
-#: modules/websearch/lib/websearch_templates.py:1594
-#: modules/websearch/lib/websearch_webcoll.py:516
+#: modules/websearch/lib/websearch_templates.py:1597
+#: modules/websearch/lib/websearch_webcoll.py:548
 msgid "split by collection"
 msgstr "razdijeli po kolekciji"
 
-#: modules/websearch/lib/websearch_templates.py:1629
+#: modules/websearch/lib/websearch_templates.py:1632
 msgid "MARC tag"
 msgstr "MARC tag"
 
-#: modules/websearch/lib/websearch_templates.py:1743
-#: modules/websearch/lib/websearch_templates.py:1748
-#: modules/websearch/lib/websearch_templates.py:2133
+#: modules/websearch/lib/websearch_templates.py:1746
+#: modules/websearch/lib/websearch_templates.py:1751
+#: modules/websearch/lib/websearch_templates.py:2136
 #, python-format
 msgid "%s records found"
 msgstr "Pronađeno je %s zapisa"
 
-#: modules/websearch/lib/websearch_templates.py:1774
+#: modules/websearch/lib/websearch_templates.py:1777
 msgid "begin"
 msgstr "početak"
 
-#: modules/websearch/lib/websearch_templates.py:1779
-#: modules/websubmit/lib/websubmit_templates.py:1177
+#: modules/websearch/lib/websearch_templates.py:1782
+#: modules/websubmit/lib/websubmit_templates.py:1181
 msgid "previous"
 msgstr "prethodni"
 
-#: modules/websearch/lib/websearch_templates.py:1798
+#: modules/websearch/lib/websearch_templates.py:1801
 msgid "end"
 msgstr "kraj"
 
-#: modules/websearch/lib/websearch_templates.py:1818
+#: modules/websearch/lib/websearch_templates.py:1821
 msgid "jump to record:"
 msgstr "idi na zapis:"
 
-#: modules/websearch/lib/websearch_templates.py:1831
+#: modules/websearch/lib/websearch_templates.py:1834
 #, python-format
 msgid "Search took %s seconds."
 msgstr "Pretraživanje je potrajalo %s sekundi"
 
-#: modules/websearch/lib/websearch_templates.py:1928
-#: modules/websearch/lib/websearch_templates.py:2012
+#: modules/websearch/lib/websearch_templates.py:1931
+#: modules/websearch/lib/websearch_templates.py:2015
 msgid "ADD TO BASKET"
 msgstr "DODAJ U KOŠARICU"
 
-#: modules/websearch/lib/websearch_templates.py:1960
+#: modules/websearch/lib/websearch_templates.py:1963
 msgid "Format:"
 msgstr "Oblik:"
 
-#: modules/websearch/lib/websearch_templates.py:1999
+#: modules/websearch/lib/websearch_templates.py:2002
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
 "Zapis kreiran %(x_date_creation)s, zadnja izmjena %(x_date_modification)s"
 
-#: modules/websearch/lib/websearch_templates.py:2021
+#: modules/websearch/lib/websearch_templates.py:2024
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Naveo/la: %s zapisa"
 
-#: modules/websearch/lib/websearch_templates.py:2039
+#: modules/websearch/lib/websearch_templates.py:2042
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Citirano zajedno sa: %s zapisa"
 
-#: modules/websearch/lib/websearch_templates.py:2056
+#: modules/websearch/lib/websearch_templates.py:2059
 msgid "People who downloaded this document also downloaded:"
 msgstr "Korisnici koji su preuzeli ovaj dokument, također su preuzeli:"
 
-#: modules/websearch/lib/websearch_templates.py:2071
+#: modules/websearch/lib/websearch_templates.py:2074
 msgid "People who viewed this page also viewed:"
 msgstr "Korisnici koji su pogledalii ovaj dokument, također su pogledali:"
 
-#: modules/websearch/lib/websearch_templates.py:2120
+#: modules/websearch/lib/websearch_templates.py:2123
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -2956,32 +2971,47 @@ msgstr ""
 "%(x_fmt_open)sPrikaz rezultata:%(x_fmt_close)s Pronađeno %(x_nb_records)s "
 "zapisa u %(x_nb_seconds)s sekunda."
 
-#: modules/websearch/lib/websearch_templates.py:2160
+#: modules/websearch/lib/websearch_templates.py:2163
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Logički upit nije dao rezultate. Molimo drugačije povežite tražene pojmove."
 
-#: modules/websearch/lib/websearch_templates.py:2192
+#: modules/websearch/lib/websearch_templates.py:2195
 msgid "See also: similar author names"
 msgstr "Također vidi: slična imena autora"
 
-#: modules/websearch/lib/websearch_webinterface.py:394
-#, python-format
-msgid "Sorry, collection %s does not seem to exist."
-msgstr "Nažalost, kolekcija %s ne postoji."
-
-#: modules/websearch/lib/websearch_webinterface.py:395
-#, python-format
-msgid "You may want to start browsing from %s."
-msgstr "Započni pregledavanje od %s. "
-
-#: modules/websearch/lib/websearch_webinterface.py:396
+#: modules/websearch/lib/websearch_templates.py:2503
+#: modules/websearch/lib/websearch_webinterface.py:405
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Kolekcija %s nije pronađena"
 
-#: modules/websearch/lib/websearch_webinterface.py:398
+#: modules/websearch/lib/websearch_templates.py:2515
+#: modules/websearch/lib/websearch_webinterface.py:403
+#, python-format
+msgid "Sorry, collection %s does not seem to exist."
+msgstr "Nažalost, kolekcija %s ne postoji."
+
+#: modules/websearch/lib/websearch_templates.py:2517
+#: modules/websearch/lib/websearch_webinterface.py:404
+#, python-format
+msgid "You may want to start browsing from %s."
+msgstr "Započni pregledavanje od %s. "
+
+#: modules/websearch/lib/websearch_templates.py:2546
+msgid "Interested in being notified about new results for this query?"
+msgstr ""
+
+#: modules/websearch/lib/websearch_templates.py:2547
+#, python-format
+msgid ""
+"Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
+"                                  or subscribe to the %(x_url2_open)sRSS feed"
+"%(x_url2_close)s."
+msgstr ""
+
+#: modules/websearch/lib/websearch_webinterface.py:407
 msgid "Not found"
 msgstr "Nije pronađeno"
 
@@ -3027,7 +3057,7 @@ msgstr "Pronađeno je %s rezultata"
 msgid "%s seconds"
 msgstr "%s sekundi"
 
-#: modules/websearch/lib/websearch_webcoll.py:537
+#: modules/websearch/lib/websearch_webcoll.py:569
 msgid "brief"
 msgstr "sažeto"
 
@@ -3078,116 +3108,155 @@ msgstr ""
 "Ili, možete zatražiti %s da se Vaš sistem prijave promijeni sa vanjskog u "
 "unutarnji."
 
-#: modules/websession/lib/websession_templates.py:108
+#: modules/websession/lib/websession_templates.py:111
 #, fuzzy
 msgid "External account settings"
 msgstr "Postavke"
 
-#: modules/websession/lib/websession_templates.py:183
+#: modules/websession/lib/websession_templates.py:113
+#, fuzzy, python-format
 msgid ""
-"If you want to change your email address or password, please set new values "
-"in the form below."
+"You can consult the list of your external groups directly in the %"
+"(x_url_open)sgroups page%(x_url_close)s."
+msgstr ""
+"Možete se konzultirati listom %(x_url_open)sVaših grupa%(x_url_close)s."
+
+#: modules/websession/lib/websession_templates.py:117
+#, fuzzy
+msgid "External user groups"
+msgstr "Traži korisnike ili grupe:"
+
+#: modules/websession/lib/websession_templates.py:174
+#, fuzzy
+msgid ""
+"If you want to change your email or set for the first time your nickname, "
+"please set new values in the form below."
 msgstr ""
 "Ako želite promijeniti Vašu email adresu ili lozinku, molimo unesite nove "
 "vrijednosti dolje."
 
-#: modules/websession/lib/websession_templates.py:184
+#: modules/websession/lib/websession_templates.py:175
 #, fuzzy
 msgid "Edit login credentials"
 msgstr "Uredi način prijave"
 
-#: modules/websession/lib/websession_templates.py:188
-#: modules/websession/lib/websession_templates.py:191
-#: modules/websession/lib/websession_templates.py:825
+#: modules/websession/lib/websession_templates.py:179
+#: modules/websession/lib/websession_templates.py:182
+#: modules/websession/lib/websession_templates.py:865
 msgid "Example"
 msgstr "Primjer"
 
-#: modules/websession/lib/websession_templates.py:189
+#: modules/websession/lib/websession_templates.py:180
 msgid "New email address"
 msgstr "Nova email adresa"
 
-#: modules/websession/lib/websession_templates.py:190
-#: modules/websession/lib/websession_templates.py:823
+#: modules/websession/lib/websession_templates.py:181
+#: modules/websession/lib/websession_templates.py:229
+#: modules/websession/lib/websession_templates.py:863
 msgid "mandatory"
 msgstr "obavezno"
 
-#: modules/websession/lib/websession_templates.py:192
-msgid "New password"
-msgstr "Nova lozinka"
-
-#: modules/websession/lib/websession_templates.py:193
-#: modules/websession/lib/websession_templates.py:824
-msgid "optional"
-msgstr "neobavezno"
-
-#: modules/websession/lib/websession_templates.py:194
-#: modules/websession/lib/websession_templates.py:737
-#: modules/websession/lib/websession_templates.py:826
+#: modules/websession/lib/websession_templates.py:183
+#: modules/websession/lib/websession_templates.py:233
+#: modules/websession/lib/websession_templates.py:777
+#: modules/websession/lib/websession_templates.py:866
 msgid "Note"
 msgstr "Napomena"
 
-#: modules/websession/lib/websession_templates.py:195
-#: modules/websession/lib/websession_templates.py:827
-msgid "The password phrase may contain punctuation, spaces, etc."
-msgstr "Lozinka smije sadržavati punktacijske znakove, razmake, itd."
-
-#: modules/websession/lib/websession_templates.py:196
-msgid "Retype password"
-msgstr "Lozinka ponovno"
-
-#: modules/websession/lib/websession_templates.py:197
+#: modules/websession/lib/websession_templates.py:184
 msgid "Set new values"
 msgstr "Postavi nove vrijednosti"
 
-#: modules/websession/lib/websession_templates.py:220
+#: modules/websession/lib/websession_templates.py:228
+#, fuzzy
+msgid ""
+"If you want to change your password, please enter the old one and set the "
+"new value in the form below."
+msgstr ""
+"Ako želite promijeniti Vašu email adresu ili lozinku, molimo unesite nove "
+"vrijednosti dolje."
+
+#: modules/websession/lib/websession_templates.py:230
+#, fuzzy
+msgid "Old password"
+msgstr "lozinka"
+
+#: modules/websession/lib/websession_templates.py:231
+msgid "New password"
+msgstr "Nova lozinka"
+
+#: modules/websession/lib/websession_templates.py:232
+#: modules/websession/lib/websession_templates.py:864
+msgid "optional"
+msgstr "neobavezno"
+
+#: modules/websession/lib/websession_templates.py:234
+#: modules/websession/lib/websession_templates.py:867
+msgid "The password phrase may contain punctuation, spaces, etc."
+msgstr "Lozinka smije sadržavati punktacijske znakove, razmake, itd."
+
+#: modules/websession/lib/websession_templates.py:235
+msgid "You must fill the old password in order to set a new one."
+msgstr ""
+
+#: modules/websession/lib/websession_templates.py:236
+msgid "Retype password"
+msgstr "Lozinka ponovno"
+
+#: modules/websession/lib/websession_templates.py:237
+#, fuzzy
+msgid "Set new password"
+msgstr "Nova lozinka"
+
+#: modules/websession/lib/websession_templates.py:260
 #, fuzzy
 msgid "Edit search-related settings"
 msgstr "Uredi postavke"
 
-#: modules/websession/lib/websession_templates.py:221
+#: modules/websession/lib/websession_templates.py:261
 #, fuzzy
 msgid "Show the latest additions box"
 msgstr "Prikaz poslijednjih %i komentara:"
 
-#: modules/websession/lib/websession_templates.py:223
+#: modules/websession/lib/websession_templates.py:263
 msgid "Show collection help boxes"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:236
+#: modules/websession/lib/websession_templates.py:276
 #, fuzzy
 msgid "Update settings"
 msgstr "Uredi postavke"
 
-#: modules/websession/lib/websession_templates.py:237
+#: modules/websession/lib/websession_templates.py:277
 #, fuzzy
 msgid "Number of search results per page"
 msgstr "Natrag na rezultate pretrage"
 
-#: modules/websession/lib/websession_templates.py:267
+#: modules/websession/lib/websession_templates.py:307
 msgid "Edit login method"
 msgstr "Uredi način prijave"
 
-#: modules/websession/lib/websession_templates.py:268
+#: modules/websession/lib/websession_templates.py:308
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr "Molimo izaberite način prijave"
 
-#: modules/websession/lib/websession_templates.py:269
-#: modules/websession/lib/websession_templates.py:282
+#: modules/websession/lib/websession_templates.py:309
+#: modules/websession/lib/websession_templates.py:322
 msgid "Select method"
 msgstr "Izaberite način"
 
-#: modules/websession/lib/websession_templates.py:320
-#: modules/websession/lib/websession_templates.py:820
+#: modules/websession/lib/websession_templates.py:360
+#: modules/websession/lib/websession_templates.py:860
 msgid "Email address"
 msgstr "Email adresa"
 
-#: modules/websession/lib/websession_templates.py:321
+#: modules/websession/lib/websession_templates.py:361
 msgid "Send lost password"
 msgstr "Pošalji izgubljenu lozinku"
 
-#: modules/websession/lib/websession_templates.py:347
+#: modules/websession/lib/websession_templates.py:387
 #, python-format
 msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
@@ -3198,12 +3267,12 @@ msgstr ""
 "dokumenata, ili postavljanje automatskog upozorenja koje će se pokretati "
 "periodički izvještavajući Vas o rezultatima pretrage putem email-a."
 
-#: modules/websession/lib/websession_templates.py:356
-#: modules/websession/lib/websession_webinterface.py:117
+#: modules/websession/lib/websession_templates.py:396
+#: modules/websession/lib/websession_webinterface.py:123
 msgid "Your Settings"
 msgstr "Vaše postavke"
 
-#: modules/websession/lib/websession_templates.py:357
+#: modules/websession/lib/websession_templates.py:397
 msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
@@ -3211,26 +3280,26 @@ msgstr ""
 "Postavi ili promijeni svoju email adresu ili lozinku. Specificiraj svoj "
 "izbor izgleda sučelja."
 
-#: modules/websession/lib/websession_templates.py:367
-#: modules/websession/lib/websession_templates.py:510
+#: modules/websession/lib/websession_templates.py:407
+#: modules/websession/lib/websession_templates.py:550
 msgid "Your Searches"
 msgstr "Vaše pretrage"
 
-#: modules/websession/lib/websession_templates.py:368
+#: modules/websession/lib/websession_templates.py:408
 msgid "View all the searches you performed during the last 30 days."
 msgstr "Pogledajte sve svoje pretrage obavljene tijekom poslijednjih 30 dana."
 
-#: modules/websession/lib/websession_templates.py:370
+#: modules/websession/lib/websession_templates.py:410
 msgid ""
 "With baskets you can define specific collections of items, store interesting "
 "records you want to access later or share with others."
 msgstr "Pomoću košarice možete definirati specifične kolekcije stavki"
 
-#: modules/websession/lib/websession_templates.py:378
+#: modules/websession/lib/websession_templates.py:418
 msgid "Your Alerts"
 msgstr "Vaša upozorenja"
 
-#: modules/websession/lib/websession_templates.py:379
+#: modules/websession/lib/websession_templates.py:419
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
@@ -3239,12 +3308,12 @@ msgstr ""
 "Rezultati će Vam ili biti poslani putem e-maila ili će biti spremljeni u "
 "neku od Vaših košarica."
 
-#: modules/websession/lib/websession_templates.py:388
+#: modules/websession/lib/websession_templates.py:428
 #, fuzzy
 msgid "Your Loans"
 msgstr "Vaše posudbe"
 
-#: modules/websession/lib/websession_templates.py:389
+#: modules/websession/lib/websession_templates.py:429
 msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
@@ -3252,7 +3321,7 @@ msgstr ""
 "Odjavi posuđenu knjigu, prijevi zahtjev za posudbom, itd. Potreban je CERN "
 "ID."
 
-#: modules/websession/lib/websession_templates.py:414
+#: modules/websession/lib/websession_templates.py:454
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
@@ -3260,7 +3329,7 @@ msgstr ""
 "Prijavljeni ste kao gost, pa će Vaša upozorenja nestati nakon što se "
 "odjavite."
 
-#: modules/websession/lib/websession_templates.py:439
+#: modules/websession/lib/websession_templates.py:479
 #, python-format
 msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
@@ -3271,12 +3340,12 @@ msgstr ""
 "(x_url1_close)s; b) urediti %(x_url2_open)spostavke svog korisničkog računa%"
 "(x_url2_close)s."
 
-#: modules/websession/lib/websession_templates.py:509
+#: modules/websession/lib/websession_templates.py:549
 #, fuzzy
 msgid "Your Alert Searches"
 msgstr "Vaše pretrage s upozorenjem"
 
-#: modules/websession/lib/websession_templates.py:511
+#: modules/websession/lib/websession_templates.py:551
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
@@ -3285,13 +3354,13 @@ msgstr ""
 "Možete se konzultirati listom %(x_url_open)sVaših grupa%(x_url_close)s koje "
 "administrirate ili ste im član."
 
-#: modules/websession/lib/websession_templates.py:514
-#: modules/websession/lib/websession_templates.py:1904
-#: modules/websession/lib/websession_webinterface.py:617
+#: modules/websession/lib/websession_templates.py:554
+#: modules/websession/lib/websession_templates.py:1941
+#: modules/websession/lib/websession_webinterface.py:673
 msgid "Your Groups"
 msgstr "Vaše grupe"
 
-#: modules/websession/lib/websession_templates.py:515
+#: modules/websession/lib/websession_templates.py:555
 #, fuzzy, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
@@ -3300,13 +3369,13 @@ msgstr ""
 "Možete se konzultirati listom %(x_url_open)sVaših prijavaka%(x_url_close)sc "
 "i informirati se o njihovom statusu."
 
-#: modules/websession/lib/websession_templates.py:518
-#: modules/websubmit/web/yoursubmissions.py:174
+#: modules/websession/lib/websession_templates.py:558
+#: modules/websubmit/web/yoursubmissions.py:175
 #, fuzzy
 msgid "Your Submissions"
 msgstr "Vaše prijavke"
 
-#: modules/websession/lib/websession_templates.py:519
+#: modules/websession/lib/websession_templates.py:559
 #, fuzzy, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
@@ -3315,74 +3384,74 @@ msgstr ""
 "Možete se konzultirati listom %(x_url_open)sVaših odobrenja%(x_url_close)s "
 "sa dokumentima koje ste odobrili ili moderirali."
 
-#: modules/websession/lib/websession_templates.py:522
-#: modules/websubmit/web/yourapprovals.py:93
+#: modules/websession/lib/websession_templates.py:562
+#: modules/websubmit/web/yourapprovals.py:94
 msgid "Your Approvals"
 msgstr "Vaša odobrenja"
 
-#: modules/websession/lib/websession_templates.py:523
-#: modules/websession/lib/websession_webinterface.py:379
+#: modules/websession/lib/websession_templates.py:563
+#: modules/websession/lib/websession_webinterface.py:422
 msgid "Your Administrative Activities"
 msgstr "Vaše administracijske aktivnosti"
 
-#: modules/websession/lib/websession_templates.py:550
+#: modules/websession/lib/websession_templates.py:590
 msgid "Try again"
 msgstr "pokušajte ponovno"
 
-#: modules/websession/lib/websession_templates.py:579
+#: modules/websession/lib/websession_templates.py:619
 msgid "Hello"
 msgstr "Pozdrav"
 
-#: modules/websession/lib/websession_templates.py:580
+#: modules/websession/lib/websession_templates.py:620
 #, fuzzy
 msgid "Here are your user credentials for"
 msgstr "Vaši korisnički podaci za"
 
-#: modules/websession/lib/websession_templates.py:582
+#: modules/websession/lib/websession_templates.py:622
 msgid "username"
 msgstr "korisničko ime"
 
-#: modules/websession/lib/websession_templates.py:584
+#: modules/websession/lib/websession_templates.py:624
 msgid "password"
 msgstr "lozinka"
 
-#: modules/websession/lib/websession_templates.py:586
+#: modules/websession/lib/websession_templates.py:626
 msgid "You can login at"
 msgstr "Možete se prijaviti na"
 
-#: modules/websession/lib/websession_templates.py:588
+#: modules/websession/lib/websession_templates.py:628
 msgid "Best regards"
 msgstr "Srdačno"
 
-#: modules/websession/lib/websession_templates.py:590
+#: modules/websession/lib/websession_templates.py:630
 msgid "Need human intervention?  Contact"
 msgstr "Trebate pomoć? Kontaktirajte nas"
 
-#: modules/websession/lib/websession_templates.py:610
+#: modules/websession/lib/websession_templates.py:650
 #, python-format
 msgid "Okay, password has been emailed to %s."
 msgstr "ok, lozinka je poslana na %s"
 
-#: modules/websession/lib/websession_templates.py:625
+#: modules/websession/lib/websession_templates.py:665
 msgid "Deleting your account"
 msgstr "Brisanje Vašeg korisničkog računa"
 
-#: modules/websession/lib/websession_templates.py:639
+#: modules/websession/lib/websession_templates.py:679
 msgid "You are no longer recognized."
 msgstr "Sustav Vas više ne prepoznaje."
 
-#: modules/websession/lib/websession_templates.py:640
+#: modules/websession/lib/websession_templates.py:680
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr "Ako želite možete se prijaviti %(x_url_open)sovdje%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:669
+#: modules/websession/lib/websession_templates.py:709
 msgid "If you already have an account, please login using the form below."
 msgstr ""
 "Već imate otvoren korisnički račun, molimo prijavite se koristeći formu "
 "ispod."
 
-#: modules/websession/lib/websession_templates.py:673
+#: modules/websession/lib/websession_templates.py:713
 #, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
@@ -3391,7 +3460,7 @@ msgstr ""
 "Ukoliko već nemate otvoren korisnički račun, molimo %(x_url_open)"
 "sregistrirajte se%(x_url_close)s na unutarnji korisnički račun."
 
-#: modules/websession/lib/websession_templates.py:677
+#: modules/websession/lib/websession_templates.py:717
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
@@ -3400,57 +3469,57 @@ msgstr ""
 "Ne možete sami kreirati korisnički račun. Kontaktirajte %s za otvaranje "
 "računa."
 
-#: modules/websession/lib/websession_templates.py:697
+#: modules/websession/lib/websession_templates.py:737
 #, fuzzy
 msgid "Login method:"
 msgstr "Uredi način prijave"
 
-#: modules/websession/lib/websession_templates.py:723
+#: modules/websession/lib/websession_templates.py:763
 msgid "Username"
 msgstr "Korisničko ime"
 
-#: modules/websession/lib/websession_templates.py:724
-#: modules/websession/lib/websession_templates.py:822
+#: modules/websession/lib/websession_templates.py:764
+#: modules/websession/lib/websession_templates.py:862
 msgid "Password"
 msgstr "Lozinka"
 
-#: modules/websession/lib/websession_templates.py:725
-#: modules/websession/lib/websession_templates.py:935
-#: modules/websession/lib/websession_webinterface.py:451
-#: modules/websession/lib/websession_webinterface.py:484
+#: modules/websession/lib/websession_templates.py:765
+#: modules/websession/lib/websession_templates.py:972
+#: modules/websession/lib/websession_webinterface.py:500
+#: modules/websession/lib/websession_webinterface.py:535
 msgid "login"
 msgstr "prijava"
 
-#: modules/websession/lib/websession_templates.py:730
-#: modules/websession/lib/websession_webinterface.py:284
+#: modules/websession/lib/websession_templates.py:770
+#: modules/websession/lib/websession_webinterface.py:320
 msgid "Lost your password?"
 msgstr "Zaboravili ste lozinku?"
 
-#: modules/websession/lib/websession_templates.py:738
+#: modules/websession/lib/websession_templates.py:778
 msgid "You can use your nickname or your email address to login."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:778
+#: modules/websession/lib/websession_templates.py:818
 msgid "Please enter your email address and desired nickname and password:"
 msgstr "Molimo unesite svoju emailadresu i željeni nadimak i lozinku:"
 
-#: modules/websession/lib/websession_templates.py:780
+#: modules/websession/lib/websession_templates.py:820
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
 msgstr ""
 "Nećete moći koristiti korisnički račun prije verifikacije i aktivacije."
 
-#: modules/websession/lib/websession_templates.py:828
+#: modules/websession/lib/websession_templates.py:868
 msgid "Retype Password"
 msgstr "Lozinka ponovno"
 
-#: modules/websession/lib/websession_templates.py:829
-#: modules/websession/lib/websession_webinterface.py:580
+#: modules/websession/lib/websession_templates.py:869
+#: modules/websession/lib/websession_webinterface.py:634
 msgid "register"
 msgstr "registriraj se"
 
-#: modules/websession/lib/websession_templates.py:830
+#: modules/websession/lib/websession_templates.py:870
 #, fuzzy, python-format
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
@@ -3466,64 +3535,64 @@ msgstr ""
 "Na primjer, možete postaviti da Vam dnevno dolazi email sa rezultatima "
 "automatskog pretraživanja novih preprinata."
 
-#: modules/websession/lib/websession_templates.py:859
+#: modules/websession/lib/websession_templates.py:899
 #, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr "Vi ste gost. Morate se prvo %(x_url_open)sprijaviti%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:865
+#: modules/websession/lib/websession_templates.py:905
 msgid "You are not authorized to access administrative functions."
 msgstr "Niste ovlašteni za pristup administracijskim funkcijama."
 
-#: modules/websession/lib/websession_templates.py:868
+#: modules/websession/lib/websession_templates.py:908
 #, python-format
 msgid "You seem to be %(x_role)s."
 msgstr "Vi ste %(x_role)s."
 
-#: modules/websession/lib/websession_templates.py:869
+#: modules/websession/lib/websession_templates.py:909
 #, fuzzy
 msgid "Here are some interesting web admin links for you:"
 msgstr "Neki zanimljivi linkovi za Vas:"
 
-#: modules/websession/lib/websession_templates.py:875
+#: modules/websession/lib/websession_templates.py:915
 msgid "Run BibEdit"
 msgstr "Pokreni BibEdit"
 
-#: modules/websession/lib/websession_templates.py:877
+#: modules/websession/lib/websession_templates.py:917
 msgid "Configure BibFormat"
 msgstr "Konfiguriraj BibFormat"
 
-#: modules/websession/lib/websession_templates.py:879
+#: modules/websession/lib/websession_templates.py:919
 msgid "Configure BibHarvest"
 msgstr "Konfiguriraj BibHarvest"
 
-#: modules/websession/lib/websession_templates.py:881
+#: modules/websession/lib/websession_templates.py:921
 msgid "Configure BibIndex"
 msgstr "Konfiguriraj BibIndex"
 
-#: modules/websession/lib/websession_templates.py:883
+#: modules/websession/lib/websession_templates.py:923
 msgid "Configure BibRank"
 msgstr "Konfiguriraj BibRank"
 
-#: modules/websession/lib/websession_templates.py:885
+#: modules/websession/lib/websession_templates.py:925
 msgid "Configure WebAccess"
 msgstr "Konfiguriraj WebAccess"
 
-#: modules/websession/lib/websession_templates.py:887
+#: modules/websession/lib/websession_templates.py:927
 msgid "Configure WebComment"
 msgstr "Konfiguriraj WebComment"
 
-#: modules/websession/lib/websession_templates.py:889
+#: modules/websession/lib/websession_templates.py:929
 msgid "Configure WebSearch"
 msgstr "Konfiguriraj WebSearch"
 
-#: modules/websession/lib/websession_templates.py:891
+#: modules/websession/lib/websession_templates.py:931
 msgid "Configure WebSubmit"
 msgstr "Konfiguriraj WebSubmit"
 
-#: modules/websession/lib/websession_templates.py:892
+#: modules/websession/lib/websession_templates.py:932
 #, fuzzy, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
@@ -3532,197 +3601,197 @@ msgstr ""
 "Za još administracijskih aktivnosti, pogledajte %(x_url_open)sAdmin područje%"
 "(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:931
+#: modules/websession/lib/websession_templates.py:968
 msgid "guest"
 msgstr "gost"
 
-#: modules/websession/lib/websession_templates.py:932
+#: modules/websession/lib/websession_templates.py:969
 #, fuzzy
 msgid "session"
 msgstr "session"
 
-#: modules/websession/lib/websession_templates.py:933
-#: modules/websession/lib/websession_templates.py:949
+#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:986
 msgid "alerts"
 msgstr "upozorenja"
 
-#: modules/websession/lib/websession_templates.py:934
-#: modules/websession/lib/websession_templates.py:951
+#: modules/websession/lib/websession_templates.py:971
+#: modules/websession/lib/websession_templates.py:988
 msgid "baskets"
 msgstr "košarice"
 
-#: modules/websession/lib/websession_templates.py:948
+#: modules/websession/lib/websession_templates.py:985
 msgid "account"
 msgstr "korisnički račun"
 
-#: modules/websession/lib/websession_templates.py:950
+#: modules/websession/lib/websession_templates.py:987
 msgid "messages"
 msgstr "poruke"
 
-#: modules/websession/lib/websession_templates.py:952
+#: modules/websession/lib/websession_templates.py:989
 msgid "groups"
 msgstr "grupe"
 
-#: modules/websession/lib/websession_templates.py:958
+#: modules/websession/lib/websession_templates.py:995
 #, fuzzy
 msgid "submissions"
 msgstr "prijave"
 
-#: modules/websession/lib/websession_templates.py:964
+#: modules/websession/lib/websession_templates.py:1001
 #, fuzzy
 msgid "approvals"
 msgstr "odobrenja"
 
-#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:1007
 msgid "administration"
 msgstr "administracija"
 
-#: modules/websession/lib/websession_templates.py:975
+#: modules/websession/lib/websession_templates.py:1012
 msgid "logout"
 msgstr "odjava"
 
-#: modules/websession/lib/websession_templates.py:1100
+#: modules/websession/lib/websession_templates.py:1137
 msgid "You are an administrator of the following groups:"
 msgstr "Vi ste administrator slijedećih grupa:"
 
-#: modules/websession/lib/websession_templates.py:1120
-#: modules/websession/lib/websession_templates.py:1194
-#: modules/websession/lib/websession_templates.py:1258
+#: modules/websession/lib/websession_templates.py:1157
+#: modules/websession/lib/websession_templates.py:1231
+#: modules/websession/lib/websession_templates.py:1295
 msgid "Group"
 msgstr "Grupa"
 
-#: modules/websession/lib/websession_templates.py:1127
+#: modules/websession/lib/websession_templates.py:1164
 msgid "You are not an administrator of any groups."
 msgstr "Niste administrator nijedne grupe."
 
-#: modules/websession/lib/websession_templates.py:1134
+#: modules/websession/lib/websession_templates.py:1171
 msgid "Edit group"
 msgstr "Uredi grupe"
 
-#: modules/websession/lib/websession_templates.py:1141
+#: modules/websession/lib/websession_templates.py:1178
 #, python-format
 msgid "Edit %s members"
 msgstr "Uredi %s članove"
 
-#: modules/websession/lib/websession_templates.py:1164
-#: modules/websession/lib/websession_templates.py:1305
-#: modules/websession/lib/websession_templates.py:1307
-#: modules/websession/lib/websession_webinterface.py:670
+#: modules/websession/lib/websession_templates.py:1201
+#: modules/websession/lib/websession_templates.py:1342
+#: modules/websession/lib/websession_templates.py:1344
+#: modules/websession/lib/websession_webinterface.py:728
 msgid "Create new group"
 msgstr "Kreiraj novu grupu"
 
-#: modules/websession/lib/websession_templates.py:1178
+#: modules/websession/lib/websession_templates.py:1215
 msgid "You are a member of the following groups:"
 msgstr "Član ste slijedećih grupa:"
 
-#: modules/websession/lib/websession_templates.py:1201
+#: modules/websession/lib/websession_templates.py:1238
 msgid "You are not a member of any groups."
 msgstr "Niste član niti jedne grupe."
 
-#: modules/websession/lib/websession_templates.py:1226
+#: modules/websession/lib/websession_templates.py:1263
 msgid "Join new group"
 msgstr "Pridruži se novoj grupi"
 
-#: modules/websession/lib/websession_templates.py:1227
-#: modules/websession/lib/websession_templates.py:1742
-#: modules/websession/lib/websession_templates.py:1753
+#: modules/websession/lib/websession_templates.py:1264
+#: modules/websession/lib/websession_templates.py:1779
+#: modules/websession/lib/websession_templates.py:1790
 msgid "Leave group"
 msgstr "Napusti grupu"
 
-#: modules/websession/lib/websession_templates.py:1242
+#: modules/websession/lib/websession_templates.py:1279
 #, fuzzy
 msgid "You are a member of the following external groups:"
 msgstr "Član ste slijedećih grupa:"
 
-#: modules/websession/lib/websession_templates.py:1265
+#: modules/websession/lib/websession_templates.py:1302
 #, fuzzy
 msgid "You are not a member of any external groups."
 msgstr "Niste član niti jedne grupe."
 
-#: modules/websession/lib/websession_templates.py:1313
+#: modules/websession/lib/websession_templates.py:1350
 msgid "Update group"
 msgstr "Ažuriraj grupu"
 
-#: modules/websession/lib/websession_templates.py:1315
+#: modules/websession/lib/websession_templates.py:1352
 #, python-format
 msgid "Edit group %s"
 msgstr "Uredi grupu %s"
 
-#: modules/websession/lib/websession_templates.py:1317
+#: modules/websession/lib/websession_templates.py:1354
 msgid "Delete group"
 msgstr "Obriši grupu"
 
-#: modules/websession/lib/websession_templates.py:1387
+#: modules/websession/lib/websession_templates.py:1424
 msgid "Group name:"
 msgstr "Ime grupe:"
 
-#: modules/websession/lib/websession_templates.py:1389
+#: modules/websession/lib/websession_templates.py:1426
 msgid "Group description:"
 msgstr "Opis grupe:"
 
-#: modules/websession/lib/websession_templates.py:1390
+#: modules/websession/lib/websession_templates.py:1427
 msgid "Group join policy:"
 msgstr "Način pridruživanja grupi:"
 
-#: modules/websession/lib/websession_templates.py:1431
-#: modules/websession/lib/websession_templates.py:1502
-#: modules/websession/lib/websession_templates.py:1634
-#: modules/websession/lib/websession_templates.py:1643
-#: modules/websession/lib/websession_templates.py:1740
-#: modules/websession/lib/websession_templates.py:1850
+#: modules/websession/lib/websession_templates.py:1468
+#: modules/websession/lib/websession_templates.py:1539
+#: modules/websession/lib/websession_templates.py:1671
+#: modules/websession/lib/websession_templates.py:1680
+#: modules/websession/lib/websession_templates.py:1777
+#: modules/websession/lib/websession_templates.py:1887
 msgid "Please select:"
 msgstr "Molimo odaberite:"
 
-#: modules/websession/lib/websession_templates.py:1495
+#: modules/websession/lib/websession_templates.py:1532
 #, fuzzy
 msgid "Join group"
 msgstr "Pridruži se grupi"
 
-#: modules/websession/lib/websession_templates.py:1497
+#: modules/websession/lib/websession_templates.py:1534
 msgid "or find it"
 msgstr "ili pronađi"
 
-#: modules/websession/lib/websession_templates.py:1498
+#: modules/websession/lib/websession_templates.py:1535
 msgid "Choose group:"
 msgstr "izaberi grupu:"
 
-#: modules/websession/lib/websession_templates.py:1500
+#: modules/websession/lib/websession_templates.py:1537
 msgid "Find group"
 msgstr "pronađi grupu"
 
-#: modules/websession/lib/websession_templates.py:1639
+#: modules/websession/lib/websession_templates.py:1676
 msgid "Remove member"
 msgstr "Ukloni člana"
 
-#: modules/websession/lib/websession_templates.py:1641
+#: modules/websession/lib/websession_templates.py:1678
 msgid "No members."
 msgstr "Nema članova."
 
-#: modules/websession/lib/websession_templates.py:1651
+#: modules/websession/lib/websession_templates.py:1688
 msgid "Accept member"
 msgstr "Prihvati člana"
 
-#: modules/websession/lib/websession_templates.py:1651
+#: modules/websession/lib/websession_templates.py:1688
 msgid "Reject member"
 msgstr "Odbij člana"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1690
 msgid "No members awaiting approval."
 msgstr "Nema članova koji čekaju na dozvolu."
 
-#: modules/websession/lib/websession_templates.py:1655
+#: modules/websession/lib/websession_templates.py:1692
 msgid "Current members"
 msgstr "Trenutni članovi"
 
-#: modules/websession/lib/websession_templates.py:1656
+#: modules/websession/lib/websession_templates.py:1693
 msgid "Members awaiting approval"
 msgstr "Članovi koji čekaju dozvolu"
 
-#: modules/websession/lib/websession_templates.py:1657
+#: modules/websession/lib/websession_templates.py:1694
 msgid "Invite new members"
 msgstr "Pozovi nove članove"
 
-#: modules/websession/lib/websession_templates.py:1660
+#: modules/websession/lib/websession_templates.py:1697
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
@@ -3731,90 +3800,90 @@ msgstr ""
 "Ako želite pozvati nove članove u svoju grupu, molimo koristite sistem %"
 "(x_url_open)sweb poruka%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1664
+#: modules/websession/lib/websession_templates.py:1701
 #, python-format
 msgid "Group: %s"
 msgstr "Grupa: %s"
 
-#: modules/websession/lib/websession_templates.py:1741
+#: modules/websession/lib/websession_templates.py:1778
 msgid "Group list"
 msgstr "Lista grupa"
 
-#: modules/websession/lib/websession_templates.py:1744
+#: modules/websession/lib/websession_templates.py:1781
 msgid "You are not member of any group."
 msgstr "Niste član niti jedne grupe."
 
-#: modules/websession/lib/websession_templates.py:1791
+#: modules/websession/lib/websession_templates.py:1828
 msgid "Are you sure you want to delete this group?"
 msgstr "Jeste li sigurni da želite obrisati grupu?"
 
-#: modules/websession/lib/websession_templates.py:1830
+#: modules/websession/lib/websession_templates.py:1867
 msgid "Are you sure you want to leave this group?"
 msgstr "jeste li sigurni da želite napustiti grupu?"
 
-#: modules/websession/lib/websession_templates.py:1846
+#: modules/websession/lib/websession_templates.py:1883
 msgid "Visible and open for new members"
 msgstr "Vidljivo i otvoreno za nove članove"
 
-#: modules/websession/lib/websession_templates.py:1848
+#: modules/websession/lib/websession_templates.py:1885
 msgid "Visible but new members need approval"
 msgstr "Vidljivo novim članovima, ali za otvaranje trebaju odobrenje"
 
-#: modules/websession/lib/websession_templates.py:1933
+#: modules/websession/lib/websession_templates.py:1970
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "Grupa %s: Novi zahtjev za članstvom"
 
-#: modules/websession/lib/websession_templates.py:1937
+#: modules/websession/lib/websession_templates.py:1974
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "Korisnik se želi pridružiti grupi %s."
 
-#: modules/websession/lib/websession_templates.py:1938
+#: modules/websession/lib/websession_templates.py:1975
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
 "Molimo %(x_url_open)sprihvatite ili odbijte%(x_url_close)s zahtjev korisnika."
 
-#: modules/websession/lib/websession_templates.py:1955
+#: modules/websession/lib/websession_templates.py:1992
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "Grupa %s: Zahtjev za priključenjem grupi je odobren"
 
-#: modules/websession/lib/websession_templates.py:1956
+#: modules/websession/lib/websession_templates.py:1993
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "Vaš zahtjev za priključenjem grupi %s je prihvaćen."
 
-#: modules/websession/lib/websession_templates.py:1958
+#: modules/websession/lib/websession_templates.py:1995
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "Grupa %s: Zahtjev za priključenjem grupi je odbijen"
 
-#: modules/websession/lib/websession_templates.py:1959
+#: modules/websession/lib/websession_templates.py:1996
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "Vaš zahtjev za priključenjem grupi %s je odbijen."
 
-#: modules/websession/lib/websession_templates.py:1962
-#: modules/websession/lib/websession_templates.py:1980
+#: modules/websession/lib/websession_templates.py:1999
+#: modules/websession/lib/websession_templates.py:2017
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
 "Možete se konzultirati listom %(x_url_open)sVaših grupa%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1976
+#: modules/websession/lib/websession_templates.py:2013
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "Grupa %s je obrisana"
 
-#: modules/websession/lib/websession_templates.py:1978
+#: modules/websession/lib/websession_templates.py:2015
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "Grupa %s je obrisana od strane administratora."
 
-#: modules/websession/lib/websession_templates.py:1995
+#: modules/websession/lib/websession_templates.py:2032
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
@@ -3824,137 +3893,171 @@ msgstr ""
 "(x_url_close)s na koje ste predbilježeni (%(x_nb_member)i) ili ih "
 "administrirate (%(x_nb_admin)i)."
 
-#: modules/websession/lib/webuser.py:125
+#: modules/websession/lib/webuser.py:126
 msgid "Database problem"
 msgstr "Problem sa bazom podataka"
 
-#: modules/websession/lib/webuser.py:221
-#: modules/websession/lib/webgroup_dblayer.py:293
+#: modules/websession/lib/webuser.py:223
+#: modules/websession/lib/webgroup_dblayer.py:296
 msgid "user"
 msgstr "korisnik"
 
-#: modules/websession/lib/websession_webinterface.py:154
-#: modules/websession/lib/websession_webinterface.py:215
-#: modules/websession/lib/websession_webinterface.py:253
+#: modules/websession/lib/websession_webinterface.py:167
+#: modules/websession/lib/websession_webinterface.py:235
+#: modules/websession/lib/websession_webinterface.py:287
 msgid "Settings edited"
 msgstr "Postavke su promijenjene"
 
-#: modules/websession/lib/websession_webinterface.py:156
-#: modules/websession/lib/websession_webinterface.py:214
-#: modules/websession/lib/websession_webinterface.py:255
+#: modules/websession/lib/websession_webinterface.py:169
+#: modules/websession/lib/websession_webinterface.py:234
+#: modules/websession/lib/websession_webinterface.py:267
+#: modules/websession/lib/websession_webinterface.py:289
 msgid "Show account"
 msgstr "Prikažikorisnički račun"
 
-#: modules/websession/lib/websession_webinterface.py:165
+#: modules/websession/lib/websession_webinterface.py:179
 #, fuzzy
-msgid "Switched to internal login method."
+msgid "<p>Switched to internal login method. "
 msgstr "Uredi način prijave"
 
-#: modules/websession/lib/websession_webinterface.py:175
+#: modules/websession/lib/websession_webinterface.py:180
+msgid ""
+"Please note, that if this is the first time that\n"
+"                        you are using this account with the internal method\n"
+"                        then the system has set for you a random generated "
+"password\n"
+"                        which you can obtain via email clicking on the "
+"following\n"
+"                        button:</p>"
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:188
+#, fuzzy
+msgid "Send Password"
+msgstr "Pošalji izgubljenu lozinku"
+
+#: modules/websession/lib/websession_webinterface.py:198
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:179
+#: modules/websession/lib/websession_webinterface.py:202
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown to the external login system."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:183
+#: modules/websession/lib/websession_webinterface.py:206
 msgid "Login method successfully selected."
 msgstr "Uspješno je izabran način prijave."
 
-#: modules/websession/lib/websession_webinterface.py:185
+#: modules/websession/lib/websession_webinterface.py:208
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:210
-msgid "Password successfully edited."
-msgstr "Lozinka je uspješno promijenjena."
-
-#: modules/websession/lib/websession_webinterface.py:212
+#: modules/websession/lib/websession_webinterface.py:232
 msgid "Settings successfully edited."
 msgstr "Postavke su uspješno promijenjene."
 
-#: modules/websession/lib/websession_webinterface.py:217
-#: modules/websession/lib/websession_webinterface.py:554
+#: modules/websession/lib/websession_webinterface.py:237
+#: modules/websession/lib/websession_webinterface.py:608
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Uneseni nadimak %s nije valjan."
 
-#: modules/websession/lib/websession_webinterface.py:218
-#: modules/websession/lib/websession_webinterface.py:224
-#: modules/websession/lib/websession_webinterface.py:237
-#: modules/websession/lib/websession_webinterface.py:243
-#: modules/websession/lib/websession_webinterface.py:545
-#: modules/websession/lib/websession_webinterface.py:550
-#: modules/websession/lib/websession_webinterface.py:555
-#: modules/websession/lib/websession_webinterface.py:566
+#: modules/websession/lib/websession_webinterface.py:238
+#: modules/websession/lib/websession_webinterface.py:244
+#: modules/websession/lib/websession_webinterface.py:257
+#: modules/websession/lib/websession_webinterface.py:271
+#: modules/websession/lib/websession_webinterface.py:277
+#: modules/websession/lib/websession_webinterface.py:599
+#: modules/websession/lib/websession_webinterface.py:604
+#: modules/websession/lib/websession_webinterface.py:609
+#: modules/websession/lib/websession_webinterface.py:620
 msgid "Please try again."
 msgstr "Molimo pokušajte ponovno."
 
-#: modules/websession/lib/websession_webinterface.py:220
-#: modules/websession/lib/websession_webinterface.py:226
-#: modules/websession/lib/websession_webinterface.py:233
-#: modules/websession/lib/websession_webinterface.py:239
-#: modules/websession/lib/websession_webinterface.py:245
-#: modules/websession/lib/websession_webinterface.py:260
+#: modules/websession/lib/websession_webinterface.py:240
+#: modules/websession/lib/websession_webinterface.py:246
+#: modules/websession/lib/websession_webinterface.py:253
+#: modules/websession/lib/websession_webinterface.py:259
+#: modules/websession/lib/websession_webinterface.py:273
+#: modules/websession/lib/websession_webinterface.py:279
+#: modules/websession/lib/websession_webinterface.py:294
 msgid "Edit settings"
 msgstr "Uredi postavke"
 
-#: modules/websession/lib/websession_webinterface.py:221
-#: modules/websession/lib/websession_webinterface.py:227
-#: modules/websession/lib/websession_webinterface.py:234
-#: modules/websession/lib/websession_webinterface.py:240
-#: modules/websession/lib/websession_webinterface.py:246
-#: modules/websession/lib/websession_webinterface.py:261
+#: modules/websession/lib/websession_webinterface.py:241
+#: modules/websession/lib/websession_webinterface.py:247
+#: modules/websession/lib/websession_webinterface.py:254
+#: modules/websession/lib/websession_webinterface.py:260
+#: modules/websession/lib/websession_webinterface.py:295
 msgid "Editing settings failed"
 msgstr "Uređivanje postavki nije uspjelo"
 
-#: modules/websession/lib/websession_webinterface.py:223
-#: modules/websession/lib/websession_webinterface.py:549
+#: modules/websession/lib/websession_webinterface.py:243
+#: modules/websession/lib/websession_webinterface.py:603
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "Unesena email adresa %s nije važeća."
 
-#: modules/websession/lib/websession_webinterface.py:229
-#: modules/websession/lib/websession_webinterface.py:559
+#: modules/websession/lib/websession_webinterface.py:249
+#: modules/websession/lib/websession_webinterface.py:613
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "Unesena email adresa %s već postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:231
-#: modules/websession/lib/websession_webinterface.py:561
+#: modules/websession/lib/websession_webinterface.py:251
+#: modules/websession/lib/websession_webinterface.py:615
 msgid "Or please try again."
 msgstr "Ili pokušajte ponovno."
 
-#: modules/websession/lib/websession_webinterface.py:236
+#: modules/websession/lib/websession_webinterface.py:256
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "Uneseni nadimak %s već je u upotrebi."
 
-#: modules/websession/lib/websession_webinterface.py:242
-#: modules/websession/lib/websession_webinterface.py:544
+#: modules/websession/lib/websession_webinterface.py:265
+msgid "Password successfully edited."
+msgstr "Lozinka je uspješno promijenjena."
+
+#: modules/websession/lib/websession_webinterface.py:268
+#, fuzzy
+msgid "Password edited"
+msgstr "Lozinka"
+
+#: modules/websession/lib/websession_webinterface.py:270
+#: modules/websession/lib/websession_webinterface.py:598
 msgid "Both passwords must match."
 msgstr "Lozinke se moraju podudarati."
 
-#: modules/websession/lib/websession_webinterface.py:256
+#: modules/websession/lib/websession_webinterface.py:274
+#: modules/websession/lib/websession_webinterface.py:280
+#, fuzzy
+msgid "Editing password failed"
+msgstr "Uređivanje postavki nije uspjelo"
+
+#: modules/websession/lib/websession_webinterface.py:276
+#, fuzzy
+msgid "Wrong old password inserted."
+msgstr "Lozinka je poslana"
+
+#: modules/websession/lib/websession_webinterface.py:290
 msgid "User settings saved correctly."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:258
+#: modules/websession/lib/websession_webinterface.py:292
 #, fuzzy
 msgid "Unable to update settings."
 msgstr "Nije moguće ažurirati postavke."
 
-#: modules/websession/lib/websession_webinterface.py:311
+#: modules/websession/lib/websession_webinterface.py:349
 msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
@@ -3962,15 +4065,15 @@ msgstr ""
 "Nismou mogućnosti poslati lozinku putem email-a jer koristite vanjski sistem "
 "autentifikacije."
 
-#: modules/websession/lib/websession_webinterface.py:323
+#: modules/websession/lib/websession_webinterface.py:362
 msgid "The entered email address does not exist in the database."
 msgstr "Unesena email adresa ne postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:335
+#: modules/websession/lib/websession_webinterface.py:375
 msgid "Credentials for"
 msgstr "Korisnički podaci za"
 
-#: modules/websession/lib/websession_webinterface.py:348
+#: modules/websession/lib/websession_webinterface.py:388
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -3978,40 +4081,40 @@ msgstr ""
 "Unesena email adresa nije ispravna, molimo provjerite jeste li ju dobro "
 "upisali (npr. ivanhorvat@primjer.com)."
 
-#: modules/websession/lib/websession_webinterface.py:349
+#: modules/websession/lib/websession_webinterface.py:389
 msgid "Incorrect email address"
 msgstr "Netočna email adresa"
 
-#: modules/websession/lib/websession_webinterface.py:360
+#: modules/websession/lib/websession_webinterface.py:401
 msgid "Lost password sent"
 msgstr "Lozinka je poslana"
 
-#: modules/websession/lib/websession_webinterface.py:400
+#: modules/websession/lib/websession_webinterface.py:445
 msgid "Delete Account"
 msgstr "Obriši korisnički račun"
 
-#: modules/websession/lib/websession_webinterface.py:421
+#: modules/websession/lib/websession_webinterface.py:468
 msgid "Logout"
 msgstr "Odjavi se"
 
-#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:567
 msgid "Register"
 msgstr "Registriraj se"
 
-#: modules/websession/lib/websession_webinterface.py:533
+#: modules/websession/lib/websession_webinterface.py:587
 msgid "Your account has been successfully created."
 msgstr "Vaš korisnički račun je uspješno kreiran."
 
-#: modules/websession/lib/websession_webinterface.py:534
+#: modules/websession/lib/websession_webinterface.py:588
 msgid "Account created"
 msgstr "Korisnički račun je kreiran"
 
-#: modules/websession/lib/websession_webinterface.py:536
+#: modules/websession/lib/websession_webinterface.py:590
 msgid ""
 "An email has been sent to the given address with the account information."
 msgstr "Na unesenu adresu je poslan email sa korisničkim podacima."
 
-#: modules/websession/lib/websession_webinterface.py:538
+#: modules/websession/lib/websession_webinterface.py:592
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -4019,149 +4122,150 @@ msgstr ""
 "Drugi email biti će poslan kad se korisnički račun aktivira i bude spreman "
 "za uporabu."
 
-#: modules/websession/lib/websession_webinterface.py:540
+#: modules/websession/lib/websession_webinterface.py:594
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr ""
 "Sada možete pristupiti %(x_url_open)sVašem korisničkom računu%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:547
-#: modules/websession/lib/websession_webinterface.py:552
-#: modules/websession/lib/websession_webinterface.py:557
-#: modules/websession/lib/websession_webinterface.py:563
-#: modules/websession/lib/websession_webinterface.py:568
-#: modules/websession/lib/websession_webinterface.py:572
-#: modules/websession/lib/websession_webinterface.py:577
+#: modules/websession/lib/websession_webinterface.py:601
+#: modules/websession/lib/websession_webinterface.py:606
+#: modules/websession/lib/websession_webinterface.py:611
+#: modules/websession/lib/websession_webinterface.py:617
+#: modules/websession/lib/websession_webinterface.py:622
+#: modules/websession/lib/websession_webinterface.py:626
+#: modules/websession/lib/websession_webinterface.py:631
 msgid "Registration failure"
 msgstr "Registracija nije uspjela"
 
-#: modules/websession/lib/websession_webinterface.py:565
+#: modules/websession/lib/websession_webinterface.py:619
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Uneseni nadimak %s već postoji u bazi podataka."
 
-#: modules/websession/lib/websession_webinterface.py:570
+#: modules/websession/lib/websession_webinterface.py:624
 msgid "Users cannot register themselves, only admin can register them."
 msgstr "Korisnici se ne mogu sami registrirati, to mora učiniti administrator."
 
-#: modules/websession/lib/websession_webinterface.py:729
+#: modules/websession/lib/websession_webinterface.py:789
 msgid "Join New Group"
 msgstr "Pridruži se novoj grupi"
 
-#: modules/websession/lib/websession_webinterface.py:776
+#: modules/websession/lib/websession_webinterface.py:838
 msgid "Leave Group"
 msgstr "Napusti grupu"
 
-#: modules/websession/lib/websession_webinterface.py:841
+#: modules/websession/lib/websession_webinterface.py:905
 msgid "Edit Group"
 msgstr "Uredi grupu"
 
-#: modules/websession/lib/websession_webinterface.py:908
+#: modules/websession/lib/websession_webinterface.py:974
 msgid "Edit group members"
 msgstr "Uredi članove grupe"
 
-#: modules/webstyle/lib/webstyle_templates.py:511
-#: modules/webstyle/lib/webstyle_templates.py:548
-#: modules/webstyle/lib/webstyle_templates.py:550
-#: modules/websubmit/lib/websubmit_engine.py:1074
-#: modules/websubmit/lib/websubmit_webinterface.py:394
+#: modules/webstyle/lib/webstyle_templates.py:520
+#: modules/webstyle/lib/webstyle_templates.py:557
+#: modules/webstyle/lib/webstyle_templates.py:559
+#: modules/websubmit/lib/websubmit_engine.py:1446
+#: modules/websubmit/lib/websubmit_webinterface.py:401
 msgid "Error"
 msgstr "Greška"
 
-#: modules/webstyle/lib/webstyle_templates.py:515
+#: modules/webstyle/lib/webstyle_templates.py:524
 msgid "Browser"
 msgstr "Preglednik"
 
-#: modules/webstyle/lib/webstyle_templates.py:537
+#: modules/webstyle/lib/webstyle_templates.py:546
 msgid "System Error"
 msgstr "Sistemska greška"
 
-#: modules/webstyle/lib/webstyle_templates.py:552
+#: modules/webstyle/lib/webstyle_templates.py:561
 #, fuzzy
 msgid "Traceback"
 msgstr "Pogledaj unatrag"
 
-#: modules/webstyle/lib/webstyle_templates.py:599
+#: modules/webstyle/lib/webstyle_templates.py:608
 msgid "Time"
 msgstr "Vrijeme"
 
-#: modules/webstyle/lib/webstyle_templates.py:600
+#: modules/webstyle/lib/webstyle_templates.py:609
 msgid "Client"
 msgstr "Klijent"
 
-#: modules/webstyle/lib/webstyle_templates.py:602
+#: modules/webstyle/lib/webstyle_templates.py:611
 msgid "Please send an error report to the Administrator."
 msgstr "Molimo pošaljite administratoru izvještaj o greški."
 
-#: modules/webstyle/lib/webstyle_templates.py:603
+#: modules/webstyle/lib/webstyle_templates.py:612
 msgid "Send error report"
 msgstr "Izvijesti o grešci"
 
-#: modules/webstyle/lib/webstyle_templates.py:607
+#: modules/webstyle/lib/webstyle_templates.py:616
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Molimo kontaktirajte %s navodeći slijedeće informacije:"
 
-#: modules/websubmit/lib/websubmit_engine.py:85
-#: modules/websubmit/lib/websubmit_engine.py:494
-#: modules/websubmit/web/yoursubmissions.py:73
+#: modules/websubmit/lib/websubmit_engine.py:185
+#: modules/websubmit/lib/websubmit_engine.py:711
+#: modules/websubmit/web/yoursubmissions.py:74
 msgid "Sorry, you must log in to perform this action."
 msgstr "Morate se pijaviti da biste izvršili željenu akciju."
 
-#: modules/websubmit/lib/websubmit_engine.py:90
-#: modules/websubmit/lib/websubmit_engine.py:498
+#: modules/websubmit/lib/websubmit_engine.py:192
+#: modules/websubmit/lib/websubmit_engine.py:718
 msgid "Invalid parameter"
 msgstr "Nevažeći parametar"
 
-#: modules/websubmit/lib/websubmit_engine.py:95
+#: modules/websubmit/lib/websubmit_engine.py:223
+#: modules/websubmit/lib/websubmit_engine.py:744
 #, fuzzy
 msgid "Unable to find the submission directory."
 msgstr "Ne mogu pronaći direktorij."
 
-#: modules/websubmit/lib/websubmit_engine.py:101
+#: modules/websubmit/lib/websubmit_engine.py:232
+#: modules/websubmit/lib/websubmit_engine.py:843
 msgid "Unknown document type"
 msgstr "Nepoznati tip dokumenta"
 
-#: modules/websubmit/lib/websubmit_engine.py:107
-#: modules/websubmit/lib/websubmit_engine.py:623
+#: modules/websubmit/lib/websubmit_engine.py:241
+#: modules/websubmit/lib/websubmit_engine.py:852
 msgid "Unknown action"
 msgstr "nepoznata akcija"
 
-#: modules/websubmit/lib/websubmit_engine.py:114
+#: modules/websubmit/lib/websubmit_engine.py:249
+#: modules/websubmit/lib/websubmit_engine.py:861
 msgid "Unable to determine the number of submission pages."
 msgstr "Nije moguće odretiti broj prijavljenih stranica."
 
-#: modules/websubmit/lib/websubmit_engine.py:140
+#: modules/websubmit/lib/websubmit_engine.py:278
 msgid "Unable to create a directory for this submission."
 msgstr "Nije moguće kreirati direktorij."
 
-#: modules/websubmit/lib/websubmit_engine.py:201
-#: modules/websubmit/lib/websubmit_engine.py:517
+#: modules/websubmit/lib/websubmit_engine.py:345
+#: modules/websubmit/lib/websubmit_engine.py:757
 msgid "Cannot create submission directory."
 msgstr "Prijavljeni direktorij ne može biti kreiran."
 
-#: modules/websubmit/lib/websubmit_engine.py:503
-msgid "Cannot find submission directory."
-msgstr "Prijavljeni direktorij nije pronađen."
+#: modules/websubmit/lib/websubmit_engine.py:382
+#, fuzzy
+msgid "Unknown form field found on submission page."
+msgstr "Nije moguće odretiti broj prijavljenih stranica."
 
-#: modules/websubmit/lib/websubmit_engine.py:617
-msgid "Unknown type of document"
-msgstr "Nepoznat tip dokumenta"
+#: modules/websubmit/lib/websubmit_engine.py:510
+#, fuzzy
+msgid "Unknown form field found on one of the submission pages."
+msgstr "Nije moguće odretiti broj prijavljenih stranica."
 
-#: modules/websubmit/lib/websubmit_engine.py:630
-msgid "This action does not exist for this document type."
-msgstr "Za ovaj tip dokumenta nije moguće izvršiti akciju."
-
-#: modules/websubmit/lib/websubmit_engine.py:863
+#: modules/websubmit/lib/websubmit_engine.py:1205
 msgid "Unable to find document type."
 msgstr "Tip dokumenta nije pronađen."
 
-#: modules/websubmit/lib/websubmit_engine.py:1031
+#: modules/websubmit/lib/websubmit_engine.py:1406
 msgid "The chosen action is not supported by the document type."
 msgstr "Tip dokumenta ne podržava izabranu akciju."
 
-#: modules/websubmit/lib/websubmit_engine.py:1085
-#: modules/websubmit/lib/websubmit_webinterface.py:403
+#: modules/websubmit/lib/websubmit_engine.py:1458
+#: modules/websubmit/lib/websubmit_webinterface.py:411
 msgid "Warning"
 msgstr "Upozorenje"
 
@@ -4225,12 +4329,13 @@ msgid "Next page"
 msgstr "Slijedeća stranica"
 
 #: modules/websubmit/lib/websubmit_templates.py:549
-#: modules/websubmit/lib/websubmit_templates.py:959
+#: modules/websubmit/lib/websubmit_templates.py:961
 msgid "Are you sure you want to quit this submission?"
 msgstr "Jeste li sigurni da želite prekinuti prijavu?"
 
 #: modules/websubmit/lib/websubmit_templates.py:550
-#: modules/websubmit/lib/websubmit_templates.py:966
+#: modules/websubmit/lib/websubmit_templates.py:962
+#: modules/websubmit/lib/websubmit_templates.py:970
 msgid "Back to main menu"
 msgstr "Natrag na glavni izbornik"
 
@@ -4285,7 +4390,7 @@ msgstr "kraj akcije"
 msgid "Submission no"
 msgstr "Broj prijave"
 
-#: modules/websubmit/lib/websubmit_templates.py:1009
+#: modules/websubmit/lib/websubmit_templates.py:1013
 #, python-format
 msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
@@ -4294,215 +4399,215 @@ msgstr ""
 "Ovdje je %(x_action)s lista funkcija %(x_doctype)s za dokumente na razini %"
 "(x_step)s"
 
-#: modules/websubmit/lib/websubmit_templates.py:1014
+#: modules/websubmit/lib/websubmit_templates.py:1018
 msgid "Function"
 msgstr "Funkcija"
 
-#: modules/websubmit/lib/websubmit_templates.py:1015
+#: modules/websubmit/lib/websubmit_templates.py:1019
 msgid "Score"
 msgstr "Rezultat"
 
-#: modules/websubmit/lib/websubmit_templates.py:1016
+#: modules/websubmit/lib/websubmit_templates.py:1020
 #, fuzzy
 msgid "Running function"
 msgstr "Funkcija se izvršava"
 
-#: modules/websubmit/lib/websubmit_templates.py:1022
+#: modules/websubmit/lib/websubmit_templates.py:1026
 #, python-format
 msgid "Function %s does not exist."
 msgstr "Funkcija %s ne postoji"
 
-#: modules/websubmit/lib/websubmit_templates.py:1061
+#: modules/websubmit/lib/websubmit_templates.py:1065
 msgid "You must now"
 msgstr "Morate znati"
 
-#: modules/websubmit/lib/websubmit_templates.py:1066
+#: modules/websubmit/lib/websubmit_templates.py:1070
 msgid "or"
 msgstr "ili"
 
-#: modules/websubmit/lib/websubmit_templates.py:1093
+#: modules/websubmit/lib/websubmit_templates.py:1097
 msgid "record"
 msgstr "zapis"
 
-#: modules/websubmit/lib/websubmit_templates.py:1095
+#: modules/websubmit/lib/websubmit_templates.py:1099
 msgid "document"
 msgstr "dokument"
 
-#: modules/websubmit/lib/websubmit_templates.py:1097
-#: modules/websubmit/lib/websubmit_templates.py:1188
+#: modules/websubmit/lib/websubmit_templates.py:1101
+#: modules/websubmit/lib/websubmit_templates.py:1192
 msgid "version"
 msgstr "verzija"
 
-#: modules/websubmit/lib/websubmit_templates.py:1126
+#: modules/websubmit/lib/websubmit_templates.py:1130
 msgid "file(s)"
 msgstr "dokument(i)"
 
-#: modules/websubmit/lib/websubmit_templates.py:1174
+#: modules/websubmit/lib/websubmit_templates.py:1178
 msgid "see"
 msgstr "vidi"
 
-#: modules/websubmit/lib/websubmit_templates.py:1360
+#: modules/websubmit/lib/websubmit_templates.py:1364
 msgid "For"
 msgstr "Za"
 
-#: modules/websubmit/lib/websubmit_templates.py:1361
+#: modules/websubmit/lib/websubmit_templates.py:1365
 msgid "all types of document"
 msgstr "sve vrste dokumenata"
 
-#: modules/websubmit/lib/websubmit_templates.py:1415
+#: modules/websubmit/lib/websubmit_templates.py:1419
 msgid "Id"
 msgstr "Id"
 
-#: modules/websubmit/lib/websubmit_templates.py:1416
+#: modules/websubmit/lib/websubmit_templates.py:1420
 msgid "Reference"
 msgstr "Referenca"
 
-#: modules/websubmit/lib/websubmit_templates.py:1418
+#: modules/websubmit/lib/websubmit_templates.py:1422
 msgid "First access"
 msgstr "Prvi prijava"
 
-#: modules/websubmit/lib/websubmit_templates.py:1419
+#: modules/websubmit/lib/websubmit_templates.py:1423
 msgid "Last access"
 msgstr "Zadnja prijava"
 
-#: modules/websubmit/lib/websubmit_templates.py:1429
+#: modules/websubmit/lib/websubmit_templates.py:1433
 msgid "Are you sure you want to delete this submission?"
 msgstr "Jeste li sigurni da želite obrisati uneseno?"
 
-#: modules/websubmit/lib/websubmit_templates.py:1430
+#: modules/websubmit/lib/websubmit_templates.py:1434
 #, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
 msgstr "Obriši upisano %(x_id)s u %(x_docname)s"
 
-#: modules/websubmit/lib/websubmit_templates.py:1446
+#: modules/websubmit/lib/websubmit_templates.py:1450
 msgid "Reference not yet given"
 msgstr "Referenca još nije dana"
 
-#: modules/websubmit/lib/websubmit_templates.py:1517
+#: modules/websubmit/lib/websubmit_templates.py:1521
 #, fuzzy
 msgid "Refereed Documents"
 msgstr "Referirani dokumenti"
 
-#: modules/websubmit/lib/websubmit_templates.py:1527
+#: modules/websubmit/lib/websubmit_templates.py:1531
 msgid "You are a general referee"
 msgstr "Vi ste glavni moderator"
 
-#: modules/websubmit/lib/websubmit_templates.py:1532
+#: modules/websubmit/lib/websubmit_templates.py:1536
 #, fuzzy
 msgid "You are a referee for category:"
 msgstr "Vi ste moderator za kategoriju:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1569
+#: modules/websubmit/lib/websubmit_templates.py:1573
 #, fuzzy
 msgid "List of refereed types of documents"
 msgstr "Lista moderiranih tipova dokumenata"
 
-#: modules/websubmit/lib/websubmit_templates.py:1570
+#: modules/websubmit/lib/websubmit_templates.py:1574
 msgid ""
 "Select one of the following types of documents to check the documents status."
 msgstr ""
 "Odaberite jedan od slijedećih tipova dokumenata kako biste provjerili status "
 "dokumenta."
 
-#: modules/websubmit/lib/websubmit_templates.py:1628
+#: modules/websubmit/lib/websubmit_templates.py:1632
 #, fuzzy
 msgid "List of refereed categories"
 msgstr "Lista referiranih kategorija"
 
-#: modules/websubmit/lib/websubmit_templates.py:1629
+#: modules/websubmit/lib/websubmit_templates.py:1633
 msgid "Please choose a category"
 msgstr "Molimo izaberite kategoriju"
 
-#: modules/websubmit/lib/websubmit_templates.py:1648
-#: modules/websubmit/lib/websubmit_templates.py:1689
-#: modules/websubmit/lib/websubmit_templates.py:1754
+#: modules/websubmit/lib/websubmit_templates.py:1652
+#: modules/websubmit/lib/websubmit_templates.py:1693
+#: modules/websubmit/lib/websubmit_templates.py:1758
 msgid "Pending"
 msgstr "U tijeku"
 
-#: modules/websubmit/lib/websubmit_templates.py:1654
-#: modules/websubmit/lib/websubmit_templates.py:1692
-#: modules/websubmit/lib/websubmit_templates.py:1755
+#: modules/websubmit/lib/websubmit_templates.py:1658
+#: modules/websubmit/lib/websubmit_templates.py:1696
+#: modules/websubmit/lib/websubmit_templates.py:1759
 msgid "Approved"
 msgstr "Odobreno"
 
-#: modules/websubmit/lib/websubmit_templates.py:1660
-#: modules/websubmit/lib/websubmit_templates.py:1694
-#: modules/websubmit/lib/websubmit_templates.py:1695
-#: modules/websubmit/lib/websubmit_templates.py:1756
+#: modules/websubmit/lib/websubmit_templates.py:1664
+#: modules/websubmit/lib/websubmit_templates.py:1698
+#: modules/websubmit/lib/websubmit_templates.py:1699
+#: modules/websubmit/lib/websubmit_templates.py:1760
 msgid "Rejected"
 msgstr "Odbijeno"
 
-#: modules/websubmit/lib/websubmit_templates.py:1688
+#: modules/websubmit/lib/websubmit_templates.py:1692
 msgid "Key"
 msgstr "Ključ"
 
-#: modules/websubmit/lib/websubmit_templates.py:1691
+#: modules/websubmit/lib/websubmit_templates.py:1695
 msgid "Waiting for approval"
 msgstr "Pričekajte odobrenje"
 
-#: modules/websubmit/lib/websubmit_templates.py:1693
+#: modules/websubmit/lib/websubmit_templates.py:1697
 msgid "Already approved"
 msgstr "Ranije odobreno"
 
-#: modules/websubmit/lib/websubmit_templates.py:1696
+#: modules/websubmit/lib/websubmit_templates.py:1700
 msgid "Some documents are pending."
 msgstr "Neki dokumenti nisu izvršeni, izvršavanje je u tijeku."
 
-#: modules/websubmit/lib/websubmit_templates.py:1751
+#: modules/websubmit/lib/websubmit_templates.py:1755
 #, fuzzy
 msgid "List of refereed documents"
 msgstr "Lista referiranih dokumenata"
 
-#: modules/websubmit/lib/websubmit_templates.py:1752
+#: modules/websubmit/lib/websubmit_templates.py:1756
 msgid "Click on a report number for more information."
 msgstr "Kliknite na broj izvještaja za više informacija."
 
-#: modules/websubmit/lib/websubmit_templates.py:1753
+#: modules/websubmit/lib/websubmit_templates.py:1757
 msgid "Report Number"
 msgstr "Broj izvještaja"
 
-#: modules/websubmit/lib/websubmit_templates.py:1876
+#: modules/websubmit/lib/websubmit_templates.py:1880
 msgid "Your request has been sent to the referee."
 msgstr "Vaš zahtjev je poslan moderatoru."
 
-#: modules/websubmit/lib/websubmit_templates.py:1890
+#: modules/websubmit/lib/websubmit_templates.py:1894
 msgid "Title:"
 msgstr "Naslov:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1896
+#: modules/websubmit/lib/websubmit_templates.py:1900
 msgid "Author:"
 msgstr "Autor:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1904
+#: modules/websubmit/lib/websubmit_templates.py:1908
 msgid "More information:"
 msgstr "Više informacija:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1905
+#: modules/websubmit/lib/websubmit_templates.py:1909
 msgid "Click here"
 msgstr "Klikni ovdje"
 
-#: modules/websubmit/lib/websubmit_templates.py:1911
+#: modules/websubmit/lib/websubmit_templates.py:1915
 #, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr "Ovaj dokument još %(x_fmt_open)sčeka na odobrenje%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1914
-#: modules/websubmit/lib/websubmit_templates.py:1934
-#: modules/websubmit/lib/websubmit_templates.py:1944
+#: modules/websubmit/lib/websubmit_templates.py:1918
+#: modules/websubmit/lib/websubmit_templates.py:1938
+#: modules/websubmit/lib/websubmit_templates.py:1948
 msgid "It was first sent for approval on:"
 msgstr "Poslano na odobrenje:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1916
-#: modules/websubmit/lib/websubmit_templates.py:1918
-#: modules/websubmit/lib/websubmit_templates.py:1936
-#: modules/websubmit/lib/websubmit_templates.py:1938
-#: modules/websubmit/lib/websubmit_templates.py:1946
-#: modules/websubmit/lib/websubmit_templates.py:1948
+#: modules/websubmit/lib/websubmit_templates.py:1920
+#: modules/websubmit/lib/websubmit_templates.py:1922
+#: modules/websubmit/lib/websubmit_templates.py:1940
+#: modules/websubmit/lib/websubmit_templates.py:1942
+#: modules/websubmit/lib/websubmit_templates.py:1950
+#: modules/websubmit/lib/websubmit_templates.py:1952
 msgid "Last approval email was sent on:"
 msgstr "Email sa odobrenjem je poslan:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1919
+#: modules/websubmit/lib/websubmit_templates.py:1923
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
@@ -4510,51 +4615,51 @@ msgstr ""
 "Možete ponovno poslati zahtjev za odobrenjem tako da kliknete na slijedeći "
 "gumb:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1921
-#: modules/websubmit/web/publiline.py:201
+#: modules/websubmit/lib/websubmit_templates.py:1925
+#: modules/websubmit/web/publiline.py:203
 msgid "Send Again"
 msgstr "Pošalji ponovno"
 
-#: modules/websubmit/lib/websubmit_templates.py:1922
+#: modules/websubmit/lib/websubmit_templates.py:1926
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr "UPOZORENJE! Prilikom potvrde, email će biti poslan moderatoru."
 
-#: modules/websubmit/lib/websubmit_templates.py:1925
+#: modules/websubmit/lib/websubmit_templates.py:1929
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
 msgstr ""
 "Kao moderator ovog dokumenta, možete ga klikom na gumb odobriti ili odbiti."
 
-#: modules/websubmit/lib/websubmit_templates.py:1927
+#: modules/websubmit/lib/websubmit_templates.py:1931
 msgid "Approve/Reject"
 msgstr "Odobri/Odbij"
 
-#: modules/websubmit/lib/websubmit_templates.py:1931
+#: modules/websubmit/lib/websubmit_templates.py:1935
 #, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
 msgstr "Dokument je %(x_fmt_open)sodobren%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1933
+#: modules/websubmit/lib/websubmit_templates.py:1937
 msgid "Its approved reference is:"
 msgstr "Odobrena referenca je:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1939
+#: modules/websubmit/lib/websubmit_templates.py:1943
 msgid "It was approved on:"
 msgstr "Odobreno:"
 
-#: modules/websubmit/lib/websubmit_templates.py:1941
+#: modules/websubmit/lib/websubmit_templates.py:1945
 #, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
 msgstr "Dokument je %(x_fmt_open)sodbijen%(x_fmt_close)s."
 
-#: modules/websubmit/lib/websubmit_templates.py:1949
+#: modules/websubmit/lib/websubmit_templates.py:1953
 msgid "It was rejected on:"
 msgstr "Odbijeno:"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:101
 #: modules/websubmit/lib/websubmit_webinterface.py:112
-#: modules/websubmit/lib/websubmit_webinterface.py:179
+#: modules/websubmit/lib/websubmit_webinterface.py:181
 msgid "Unable to find file."
 msgstr "Datoteka nije pronađena."
 
@@ -4563,21 +4668,30 @@ msgid "This file is restricted!"
 msgstr "Datoteka je ograničena."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:125
-#: modules/websubmit/lib/websubmit_webinterface.py:211
+#: modules/websubmit/lib/websubmit_webinterface.py:213
 msgid "Access to Fulltext"
 msgstr "Pristup punom tekstu."
 
-#: modules/websubmit/lib/websubmit_webinterface.py:173
+#: modules/websubmit/lib/websubmit_webinterface.py:175
 msgid "Parameter docid missing"
 msgstr "Nedostaje parametar docid"
 
-#: modules/websubmit/web/publiline.py:193
+#: modules/websubmit/web/publiline.py:195
 msgid "Approval has never been requested for this document."
 msgstr "Za ovaj dokument nije zatraženo odobrenje."
 
-#: modules/websubmit/web/publiline.py:198
+#: modules/websubmit/web/publiline.py:200
 msgid "Unable to display document."
 msgstr "Dokument se ne može prikazati."
+
+#~ msgid "Cannot find submission directory."
+#~ msgstr "Prijavljeni direktorij nije pronađen."
+
+#~ msgid "Unknown type of document"
+#~ msgstr "Nepoznat tip dokumenta"
+
+#~ msgid "This action does not exist for this document type."
+#~ msgstr "Za ovaj tip dokumenta nije moguće izvršiti akciju."
 
 #~ msgid "Login via:"
 #~ msgstr "Prijava preko:"
