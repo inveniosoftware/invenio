@@ -746,12 +746,12 @@ class Template:
                 'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
 
             if son.restricted_p():
-                out += """ <small class="warning">[%(msg)s]</small>""" % { 'msg' : _("restricted") }
+                out += """ <small class="warning">[%(msg)s]</small> """ % { 'msg' : _("restricted") }
             if display_grandsons and len(grandsons[i]):
                 # iterate trough grandsons:
                 out += """<br>"""
                 for grandson in grandsons[i]:
-                    out += """<small>%(link)s%(nbrec)s</small>""" % {
+                    out += """ <small>%(link)s%(nbrec)s</small> """ % {
                         'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, as=as),
                                                  {},
                                                  grandson.get_name(ln)),
