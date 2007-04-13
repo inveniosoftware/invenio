@@ -316,6 +316,8 @@ into more lines</A>
 of a field</A>
 <BR><A HREF="#RANGE">RANGE(from,to) - confirm only entries in the specified
 range</A>
+<BR><A HREF="#DEFP">DEFP() - default print</A>
+<BR><A HREF="#IFDEFP">IFDEFP(field,value,1/0) - IF condition is met, default print</A>
 <BR>&nbsp;</BLOCKQUOTE>
 
 <H4>
@@ -904,6 +906,29 @@ the AU field
 
 <H4><A NAME="DEFP"></A>DEFP() - default print</H4>
 <BLOCKQUOTE>The value is printed by default even if it does not contain any variable input from the source file.</BLOCKQUOTE>
+
+<H4>
+<A NAME="IFDEFP"></A>IFDEFP(field,value,1/0)&nbsp;- IF condition is met, default print</H4>
+<BLOCKQUOTE>The line is printed by default (even if it does not contain any variable input from the source file) IF
+a condition is met that depends on the value of some other field. The condition is basically either that "field"
+contains "value" (in which case the 3rd parameter should be set to 1), or that "field" does NOT contain "value"
+(in which case the 3rd parameter should be set to 0).
+<br>
+<br>
+For example, given the following line:<br><br>
+690C::REP(EOL,)::IFDEFP(comboYEL,BOOK,1)---&lt;datafield tag="690" ind1="C" ind2=" ">&lt;subfield code="a">BOOK&lt;/subfield>&lt;/datafield><br>
+<br>
+We want to print the line if the (field) "comboYEL" contains the (value) "BOOK", otherwise we don't want to print it.
+Therefore, the 3rd parameter is set to "1". However, in the following line:<br><br>
+690C::REP(EOL,)::IFDEFP(comboYEL,BOOK,0)---&lt;datafield tag="690" ind1="C" ind2=" ">&lt;subfield code="a">OTHER&lt;/subfield>&lt;/datafield><br>
+<br>
+We want to print the line if the (field) "comboYEL" does NOT contain the (value) "BOOK", otherwise we don't want to
+print it. Therefore, the 3rd parameter is set to "0".<br>
+<br>
+This is achieved by using "IFDEFP". If the line had contained variables, the "CONF" function would have been used 
+instead.
+</BLOCKQUOTE>
+
 
 <H4>
 <A NAME="C.3.4.2"></A>3.4.2 Generated values</H4>
