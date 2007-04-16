@@ -158,9 +158,11 @@ update-v0.90.1-tables: local-dbexec
 	echo "ALTER TABLE oaiARCHIVE CHANGE p3 p3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiARCHIVE CHANGE f3 f3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiARCHIVE CHANGE m3 m3 text NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 
 update-v0.92.0-tables: local-dbexec
+	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ./modules/miscutil/bin/dbexec
@@ -171,6 +173,8 @@ update-v0.92.0-tables: local-dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ./modules/miscutil/bin/dbexec
 
 update-v0.92.1-tables: local-dbexec
+	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
