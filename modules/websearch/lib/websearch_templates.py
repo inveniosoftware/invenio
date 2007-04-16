@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -134,7 +134,7 @@ class Template:
         url. 'known_parameters' is the list of query parameters you
         inherit from your current query. You can then pass keyword
         arguments to modify this query.
-        
+
            build_search_url(known_parameters, of="xm")
 
         The generated URL is absolute.
@@ -165,21 +165,21 @@ class Template:
 
         c = parameters['c']
         del parameters['c']
-        
+
         # Now, we only have the arguments which have _not_ their default value
         if c and c != cdsname:
             base = weburl + '/collection/' + urllib.quote(c)
         else:
             base = weburl
         return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
-        
+
     def tmpl_record_page_header_content(self, req, recid, ln):
         """ Provide extra information in the header of /record pages """
-        
+
         _ = gettext_set_language(ln)
 
         title = get_fieldvalues(recid, "245__a")
-        
+
         if title:
             title = _("Record") + '#%d: %s' %(recid, title[0])
         else:
@@ -189,9 +189,9 @@ class Template:
         description = ' '.join(get_fieldvalues(recid, "520__a"))
         description += "\n"
         description += '; '.join(get_fieldvalues(recid, "100__a") + get_fieldvalues(recid, "700__a"))
-        
+
         return [cgi.escape(x, True) for x in (title, description, keywords)]
-                             
+
     def tmpl_navtrail_links(self, as, ln, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)
@@ -211,7 +211,7 @@ class Template:
         out = []
         for url, name in dads:
             out.append(create_html_link(self.build_search_interface_url(c=url, as=as, ln=ln), {}, name, {'class': 'navtrail'}))
-            
+
         return ' &gt; '.join(out)
 
     def tmpl_webcoll_body(self, ln, collection, te_portalbox,
@@ -225,7 +225,7 @@ class Template:
           - 'ln' *string* - language of the page being generated
 
           - 'collection' - collection id of the page being generated
-          
+
           - 'te_portalbox' *string* - The HTML code for the portalbox on top of search
 
           - 'searchfor' *string* - The HTML code for the search options
@@ -241,7 +241,7 @@ class Template:
 
         if not narrowsearch:
             narrowsearch = instantbrowse
-            
+
         body = '''
                 <form name="search" action="%(weburl)s/search" method="get">
                 %(searchfor)s
@@ -308,7 +308,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "","")
         asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
-        
+
         # print commentary start:
         out += '''
         <table class="searchbox">
@@ -344,7 +344,7 @@ class Template:
                'msg_search' : _('Search'),
                'msg_browse' : _('Browse'),
                'msg_search_tips' : _('Search Tips')}
-        
+
         return out
 
     def tmpl_searchfor_advanced(self,
@@ -396,7 +396,7 @@ class Template:
         out = '''
         <!--create_searchfor_advanced()-->
         '''
-        
+
         argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id, 'sc': 1},
                                     self.search_results_default_urlargd)
 
@@ -710,7 +710,7 @@ class Template:
 
         title = {'r': _("Narrow by collection:"),
                  'v': _("Focus on:")}[type]
-        
+
 
         if has_grandchildren:
             style_prolog = "<strong>"
@@ -736,7 +736,7 @@ class Template:
             out += """<tr><td class="%(narrowsearchbox)sbody" valign="top">""" % \
                    { 'narrowsearchbox': {'r': 'narrowsearchbox',
                                          'v': 'focusonsearchbox'}[type]}
-            
+
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
                     out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
@@ -916,7 +916,7 @@ class Template:
 
           - 'values' *list* - the list of values in the select
         """
-        
+
         out = '<select name="%(fieldname)s">' % {'fieldname': fieldname}
 
         if values:
@@ -957,13 +957,13 @@ class Template:
                 flag = ' selected'
             else:
                 flag = ''
-            
+
             out += '<option value="%(value)s"%(selected)s>%(text)s' % {
                      'value'    : pair['value'],
                      'selected' : flag,
                      'text'     : pair['text']
                    }
-            
+
         out += """</select>"""
         return out
 
@@ -989,14 +989,14 @@ class Template:
                                          _("Detailed record"), {'class': "moreinfo"}),
             'similar': create_html_link(self.build_search_url(p="recid:%d" % recid, rm='wrd', ln=ln),
                                         {},
-                                        _("Similar records"), 
+                                        _("Similar records"),
                                         {'class': "moreinfo"})}
-                 
+
         if CFG_EXPERIMENTAL_FEATURES:
             out += '''<span class="moreinfo"> - %s </span>''' % \
                    create_html_link(self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln),
                                     {}, _("Cited by"), {'class': "moreinfo"})
-                 
+
         return out
 
     def tmpl_record_body(self, weburl, titles, authors, dates, rns, abstracts, urls_u, urls_z, ln):
@@ -1030,7 +1030,7 @@ class Template:
                 out += '%s; ' % \
                        create_html_link(self.build_search_url(p=author, f='author', ln=ln),
                                         {}, cgi.escape(author))
-                    
+
             if len(authors) > CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD:
                 out += "<em>et al</em>"
         for date in dates:
@@ -1097,13 +1097,13 @@ class Template:
                 hitsinfo = str(hits)
             else:
                 hitsinfo = '-'
-            
+
             term = cgi.escape(term)
 
             if term == p: # print search word for orientation:
                 nearesttermsboxbody_class = "nearesttermsboxbodyselected"
                 if hits > 0:
-                    term = create_html_link(self.build_search_url(argd), {}, 
+                    term = create_html_link(self.build_search_url(argd), {},
                                             term, {'class': "nearesttermsselected"})
             else:
                 nearesttermsboxbody_class = "nearesttermsboxbody"
@@ -1115,7 +1115,7 @@ class Template:
               <td class="%(nearesttermsboxbody_class)s" align="right">%(hits)s</td>
               <td class="%(nearesttermsboxbody_class)s" width="15">&nbsp;</td>
               <td class="%(nearesttermsboxbody_class)s" align="left">%(term)s</td>
-            </tr>  
+            </tr>
             ''' % {'hits': hitsinfo,
                    'nearesttermsboxbody_class': nearesttermsboxbody_class,
                    'term': term}
@@ -1182,9 +1182,9 @@ class Template:
                         %(link)s
                        </td>
                       </tr>""" % {'nbhits': nbhits,
-                                  'link': create_html_link(self.build_search_url(query), 
+                                  'link': create_html_link(self.build_search_url(query),
                                                            {}, cgi.escape(phrase))}
-                        
+
         elif len(browsed_phrases_in_colls) > 1:
             # first display what was found but the last one:
             for phrase, nbhits in browsed_phrases_in_colls[:-1]:
@@ -1192,7 +1192,7 @@ class Template:
                          'ln': ln,
                          'p': '"%s"' % phrase,
                          'f': f}
-                
+
                 out += """<tr>
                            <td class="searchresultsboxbody" align="right">
                             %(nbhits)s
@@ -1207,14 +1207,14 @@ class Template:
                                       'link': create_html_link(self.build_search_url(query),
                                                                {},
                                                                cgi.escape(phrase))}
-                            
+
             # now display last hit as "next term":
             phrase, nbhits = browsed_phrases_in_colls[-1]
             query = {'c': colls,
                      'ln': ln,
                      'p': phrase,
                      'f': f}
-            
+
             out += """<tr><td colspan="2" class="normal">
                             &nbsp;
                           </td>
@@ -1234,7 +1234,7 @@ class Template:
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
                         d1y, d2y, d1m, d2m, d1d, d2d, sort_formats,
                         sf, so, ranks, sc, rg, formats, of, pl, jrec, ec):
-        
+
         """
           Displays the *Nearest search terms* box
 
@@ -1291,20 +1291,20 @@ class Template:
         # directly
         argd = drop_default_urlargd({
             'ln': ln, 'as': as,
-            'cc': cc, 'ot': ot, 'sp': sp, 'ec': ec, 
+            'cc': cc, 'ot': ot, 'sp': sp, 'ec': ec,
             }, self.search_results_default_urlargd)
-        
+
 
         out = '''
         <h1 class="headline">%(ccname)s</h1>
         <form name="search" action="%(weburl)s/search" method="get">
         ''' % {'ccname' : cc_intl,
                'weburl' : weburl}
-        
+
         # Only add non-default hidden values
         for field, value in argd.items():
             out += self.tmpl_input_hidden(field, value)
-        
+
         leadingtext = _("Search")
 
         if action == 'browse':
@@ -1361,7 +1361,7 @@ class Template:
             ''' % {
                 'simple_search': create_html_link(self.build_search_url(p=p1, f=f1, rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg),
                                                   {}, _("Simple Search")),
-                
+
                 'leading' : leadingtext,
                 'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
                 'matchbox1' : self.tmpl_matchtype_box('m1', m1, ln=ln),
@@ -1436,15 +1436,15 @@ class Template:
             </table>
             ''' % {
               'advanced_search': create_html_link(self.build_search_url(p1=p,
-                                                                        f1=f, 
-                                                                        rm=rm, 
-                                                                        as=1, 
+                                                                        f1=f,
+                                                                        rm=rm,
+                                                                        as=1,
                                                                         cc=cc,
-                                                                        jrec=jrec, 
-                                                                        ln=ln, 
+                                                                        jrec=jrec,
+                                                                        ln=ln,
                                                                         rg=rg),
                                                   {}, _("Advanced Search")),
-              
+
               'leading' : leadingtext,
               'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
               'p' : cgi.escape(p, 1),
@@ -1460,7 +1460,7 @@ class Template:
               'ln' : ln,
               'search_tips': _("Search Tips"),
             }
-            
+
         ## secondly, print Collection(s) box:
         selects = ''
         for sel in coll_selects:
@@ -1668,7 +1668,7 @@ class Template:
                                p3, d1y, d1m, d1d, d2y, d2m, d2d,
                                all_fieldcodes, cpu_time, pl_in_url,
                                jrec, sc, sp):
-        
+
         """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
            Also, prints navigation links (beg/next/prev/end) inside the results set.
            If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
@@ -1766,7 +1766,7 @@ class Template:
                      'd1y': d1y, 'd1m': d1m, 'd1d': d1d,
                      'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
                 }
-            
+
             # @todo here
             def img(gif, txt):
                 return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s" border="0">' % {
@@ -1774,33 +1774,33 @@ class Template:
 
             if jrec-rg > 1:
                 out += create_html_link(self.build_search_url(query, jrec=1, rg=rg),
-                                        {}, img('sb', _("begin")), 
+                                        {}, img('sb', _("begin")),
                                         {'class': 'img'})
-                
+
             if jrec > 1:
                 out += create_html_link(self.build_search_url(query, jrec=max(jrec-rg, 1), rg=rg),
-                                        {}, img('sp', _("previous")), 
+                                        {}, img('sp', _("previous")),
                                         {'class': 'img'})
-                
+
             if jrec+rg-1 < nb_found:
                 out += "%d - %d" % (jrec, jrec+rg-1)
             else:
                 out += "%d - %d" % (jrec, nb_found)
 
             if nb_found >= jrec+rg:
-                out += create_html_link(self.build_search_url(query, 
-                                                              jrec=jrec+rg, 
+                out += create_html_link(self.build_search_url(query,
+                                                              jrec=jrec+rg,
                                                               rg=rg),
-                                        {}, img('sn', _("next")), 
+                                        {}, img('sn', _("next")),
                                         {'class':'img'})
 
             if nb_found >= jrec+rg+rg:
-                out += create_html_link(self.build_search_url(query, 
-                                                            jrec=nb_found-rg+1, 
+                out += create_html_link(self.build_search_url(query,
+                                                            jrec=nb_found-rg+1,
                                                             rg=rg),
-                                        {}, img('se', _("end")), 
+                                        {}, img('se', _("end")),
                                         {'class': 'img'})
-                
+
 
             # still in the navigation part
             cc = collection
@@ -1846,7 +1846,7 @@ class Template:
 
         This version does not pay attention to locale.  See
         tmpl_nice_number_via_locale().
-        """    
+        """
         chars_in = list(str(number))
         number = len(chars_in)
         chars_out = []
@@ -1856,7 +1856,7 @@ class Template:
             chars_out.append(chars_in[number-i-1])
         chars_out.reverse()
         return ''.join(chars_out)
-        
+
     def tmpl_nice_number_via_locale(self, number, ln=cdslang):
         """
         Return nicely printed number NUM in language LN using the locale.
@@ -1964,7 +1964,7 @@ class Template:
               }
 
         result = []
-        
+
         for abbrev, name in (('hd', 'HTML'),
                              ('hx', 'BibTeX'),
                              ('xd', 'DC'),
@@ -1980,7 +1980,7 @@ class Template:
                                                {}, name))
 
         out += " | ".join(result)
-        
+
         out += "</small></div>"
 
         for row in rows:
@@ -1988,7 +1988,7 @@ class Template:
 
             if format.startswith("hd"):
                 # do not print further information but for HTML detailed formats
-            
+
                 if row ['creationdate']:
                     out += '''<div class="recordlastmodifiedbox">%(dates)s</div>
                               <p><span class="moreinfo">%(similar)s</span>
@@ -2007,10 +2007,10 @@ class Template:
                         'ln': ln,
                         'similar': create_html_link(
                                     self.build_search_url(p='recid:%d' % \
-                                                            row['recid'], 
+                                                            row['recid'],
                                                           rm='wrd',
                                                           ln=ln),
-                                                    {}, _("Similar records"), 
+                                                    {}, _("Similar records"),
                                                     {'class': "moreinfo"}),
                         'basket' : _("ADD TO BASKET")
                         }
@@ -2030,7 +2030,7 @@ class Template:
                     </td></tr>''' % {
                         'more': create_html_link(
                                     self.build_search_url(p='recid:%d' % \
-                                                             row['recid'], 
+                                                             row['recid'],
                                                           rm='cit', ln=ln),
                                     {}, _("more")),
                         'similar': similar}
@@ -2122,8 +2122,8 @@ class Template:
                 <tbody><tr><td class="searchresultsboxbody"> """ % {
                 'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
                 {'x_fmt_open': '<strong>',
-                 'x_fmt_close': '</strong>', 
-                 'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>', 
+                 'x_fmt_close': '</strong>',
+                 'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>',
                  'x_nb_seconds': '%.2f' % cpu_time}
               }
         # then print hits per collection:
@@ -2173,7 +2173,7 @@ class Template:
               </td>
             </tr>''' % {'hits' : hits,
                         'link': create_html_link(self.build_search_url(argd),
-                                                 {}, cgi.escape(term), 
+                                                 {}, cgi.escape(term),
                                                  {'class': "nearestterms"})}
         out += """</table></blockquote>"""
         return out
@@ -2201,11 +2201,11 @@ class Template:
               <td class="googleboxbody">%(link)s</td>
             </tr>''' % {'link': create_html_link(
                                     self.build_search_url(p=author,
-                                                          f='author', 
+                                                          f='author',
                                                           ln=ln),
                                     {}, cgi.escape(author), {'class':"google"}),
                         'nb' : hits}
-            
+
         out += """</table>"""
 
         return out
@@ -2233,8 +2233,8 @@ class Template:
             out += "<p><p><center>"
             for author in authors:
                 out += '%s; ' % create_html_link(self.build_search_url(
-                                                                ln=ln, 
-                                                                p=author, 
+                                                                ln=ln,
+                                                                p=author,
                                                                 f='author'),
                                                  {}, cgi.escape(author))
             out += "</center>"
@@ -2254,11 +2254,11 @@ class Template:
                      <small><strong>Keyword(s):</strong>"""
             for keyword in keywords:
                 out += '%s; ' % create_html_link(
-                                    self.build_search_url(ln=ln, 
-                                                          p=keyword, 
+                                    self.build_search_url(ln=ln,
+                                                          p=keyword,
                                                           f='keyword'),
                                     {}, cgi.escape(keyword))
-                
+
             out += '</small>'
         # fifthly bis bis, published in:
         prs_p = get_fieldvalues(recID, "909C4p")
@@ -2302,15 +2302,15 @@ class Template:
         from invenio.search_engine import print_record, record_public_p
 
         recID_score_list_to_be_printed = []
-        
+
         # firstly find 5 first public records to print:
         nb_records_to_be_printed = 0
         nb_records_seen = 0
-        while nb_records_to_be_printed < 5 and nb_records_seen < len(recID_score_list) and nb_records_seen < 50:        
+        while nb_records_to_be_printed < 5 and nb_records_seen < len(recID_score_list) and nb_records_seen < 50:
             # looking through first 50 records only, picking first 5 public ones
             (recID, score) = recID_score_list[nb_records_seen]
             nb_records_seen += 1
-            if record_public_p(recID):            
+            if record_public_p(recID):
                 nb_records_to_be_printed += 1
                 recID_score_list_to_be_printed.append([recID, score])
 
@@ -2329,7 +2329,7 @@ class Template:
                 }
 
         out += """</table></small></td></tr></table> """
-        return out                              
+        return out
 
     def tmpl_print_record_brief(self, ln, recID, weburl):
         """Displays a brief record on-the-fly
@@ -2391,37 +2391,37 @@ class Template:
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
                 out += '<br><span class="moreinfo">%s</span>' % \
-                    create_html_link(self.build_search_url(sysno=alephsysno, 
+                    create_html_link(self.build_search_url(sysno=alephsysno,
                                                            ln=ln),
-                                     {}, _("Detailed record"), 
+                                     {}, _("Detailed record"),
                                      {'class': "moreinfo"})
             else:
                 out += '<br><span class="moreinfo">%s</span>' % \
                     create_html_link(self.build_search_url(recid=recID, ln=ln),
                                      {},
-                                     _("Detailed record"), 
+                                     _("Detailed record"),
                                      {'class': "moreinfo"})
         else:
             out += '<br><span class="moreinfo">%s</span>' % \
                    create_html_link(self.build_search_url(recid=recID, ln=ln),
-                                    {}, _("Detailed record"), 
+                                    {}, _("Detailed record"),
                                     {'class': "moreinfo"})
 
             out += '<span class="moreinfo"> - %s</span>' % \
-                   create_html_link(self.build_search_url(p="recid:%d" % recID, 
-                                                     rm="wrd", 
+                   create_html_link(self.build_search_url(p="recid:%d" % recID,
+                                                     rm="wrd",
                                                      ln=ln),
-                                    {}, _("Similar records"), 
+                                    {}, _("Similar records"),
                                     {'class': "moreinfo"})
 
         if CFG_EXPERIMENTAL_FEATURES:
             out += '<span class="moreinfo"> - %s</span>' % \
-                   create_html_link(self.build_search_url(p="recid:%d" % recID, 
-                                                     rm="cit", 
+                   create_html_link(self.build_search_url(p="recid:%d" % recID,
+                                                     rm="cit",
                                                      ln=ln),
-                                    {}, _("Cited by"), 
+                                    {}, _("Cited by"),
                                     {'class': "moreinfo"})
-                 
+
         return out
 
     def tmpl_xml_rss_prologue(self):
@@ -2460,7 +2460,7 @@ class Template:
     def tmpl_xml_rss_epilogue(self):
         """Creates XML RSS 2.0 epilogue."""
         out = """\
-      </channel>    
+      </channel>
 </rss>\n"""
         return out
 
@@ -2518,7 +2518,7 @@ class Template:
                                  ('<a href="' + weburl + '?ln=' + ln + '">' + \
                                         cgi.escape(cdsnameintl[ln]) + '</a>')}
         return out
-        
+
     def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln):
         """Propose teaser for setting up this query as alert or RSS feed.
 
@@ -2538,20 +2538,19 @@ class Template:
             # cannot detect query arguments, use generic RSS URL
             rssurl = weburl + '/rss/'
 
+        alerturl = weburl + '/youralerts/input?ln=%s&idq=%s' % (ln, id_query)
+
         out = '''<a name="googlebox"></a>
                  <table class="googlebox"><tr><th class="googleboxheader">%(similar)s</th></tr>
                  <tr><td class="googleboxbody">%(msg_alert)s</td></tr>
                  </table>
                  ''' % {
                 'similar' : _("Interested in being notified about new results for this query?"),
-                'msg_alert': _("""Set up a personal %(x_mail_icon)s %(x_url1_open)semail alert%(x_url1_close)s
-                                  or subscribe to the %(x_rss_icon)s %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
-                        {'x_url1_open': '<a class="google" href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
+                'msg_alert': _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
+                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
+                        {'x_url1_open': '<a href="%s"><img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a> ' % (alerturl, weburl) + ' <a class="google" href="%s">' % (alerturl),
                          'x_url1_close': '</a>',
-                         'x_url2_open': '<a class="google" href="%s">' % (rssurl),
+                         'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, weburl) + ' <a class="google" href="%s">' % rssurl,
                          'x_url2_close': '</a>',
-                         'x_mail_icon':'''<a href="%s/youralerts/input?ln=%s&idq=%s">
-                         <img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a>''' % \
-                         (weburl, ln, id_query, weburl),
-                         'x_rss_icon':'<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a>'% (rssurl, weburl)}}
+                         }}
         return out
