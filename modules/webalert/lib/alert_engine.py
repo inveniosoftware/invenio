@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -47,6 +47,7 @@ from invenio.alert_engine_config import *
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
 from invenio.htmlparser import *
+from invenio.webuser import get_email
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 webalert_templates = invenio.template.load('webalert')
@@ -57,7 +58,7 @@ def update_date_lastrun(alert):
 
 def get_alert_queries(frequency):
     return run_sql('select distinct id, urlargs from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.frequency=%s and uqb.date_lastrun <= now();', (frequency,))
-    
+
 def get_alert_queries_for_user(uid):
     return run_sql('select distinct id, urlargs, uqb.frequency from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.id_user=%s and uqb.date_lastrun <= now();', (uid,))
 
@@ -65,7 +66,7 @@ def get_alerts(query, frequency):
     r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr'], 'date_from': query['date_from'], 'date_until': query['date_until']}
 
-    
+
 # def add_record_to_basket(record_id, basket_id):
 #     if CFG_WEBALERT_DEBUG_LEVEL > 0:
 #         print "-> adding record %s into basket %s" % (record_id, basket_id)
@@ -74,7 +75,7 @@ def get_alerts(query, frequency):
 #     except:
 #         return 0
 
-    
+
 # def add_records_to_basket(record_ids, basket_id):
 #     # TBD: generate the list and all all records in one step (see below)
 #     for i in record_ids:
@@ -82,7 +83,7 @@ def get_alerts(query, frequency):
 
 # Optimized version:
 def add_records_to_basket(record_ids, basket_id):
-  
+
     nrec = len(record_ids)
     if nrec > 0:
         vals = '(%s,%s)' % (basket_id, record_ids[0])
@@ -101,11 +102,7 @@ def add_records_to_basket(record_ids, basket_id):
             return 0
     else:
         return 0
-    
 
-def get_email(uid):
-    r = run_sql('select email from user where id=%s', (uid,))
-    return r[0][0]
 
 def get_query(alert_id):
     r = run_sql('select urlargs from query where id=%s', (alert_id,))
@@ -125,7 +122,7 @@ def send_email(fromaddr, toaddr, body,
     if attempt_times < 1:
         log('Not attempting to send email to %s.' % toaddr)
         return 1
-    
+
     try:
         server = smtplib.SMTP('localhost')
         if CFG_WEBALERT_DEBUG_LEVEL > 2:
@@ -148,7 +145,7 @@ def send_email(fromaddr, toaddr, body,
 
 def forge_email(fromaddr, toaddr, subject, content):
     msg = MIMEText(content, _charset='utf-8')
-    
+
     msg['From'] = fromaddr
     msg['To'] = toaddr
     msg['Subject'] = Header(subject, 'utf-8')
@@ -162,7 +159,7 @@ def email_notify(alert, records, argstr):
         return
 
     msg = ""
-    
+
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
@@ -174,21 +171,27 @@ def email_notify(alert, records, argstr):
     catalogues = query.get('c', [])
 
     frequency = alert[3]
-    
+
     msg += webalert_templates.tmpl_alert_email_body(
         alert[5], url, records, pattern, catalogues, frequency)
-
-    email = get_email(alert[0])    
-        
     msg = MIMEText(msg, _charset='utf-8')
-    
+
+    email = get_email(alert[0])
+
+    if email == 'guest':
+        print "********************************************************************************"
+        print "The following alert was not send, because cannot detect user email address:"
+        print "   " + repr(argstr)
+        print "********************************************************************************"
+        return
+
     msg['To'] = email
 
     # Let the template fill in missing fields
     webalert_templates.tmpl_alert_email_headers(alert[5], msg)
 
     sender = msg['From']
-    
+
     body = msg.as_string()
 
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
@@ -256,7 +259,7 @@ def get_argument_as_string(argstr, argname):
     for i in a[1:len(a)]:
         r += ", %s" % i
     return r
-    
+
 def get_pattern(argstr):
     return get_argument_as_string(argstr, 'p')
 
@@ -293,13 +296,13 @@ def run_query(query, frequency, date_until):
             y = y - 1
 
         date_from = datetime.date(year=y, month=m, day=d)
-    
+
     recs = get_record_ids(query[1], date_from, date_until)
 
     n = len(recs)
     if n:
         log('query %08s produced %08s records' % (query[0], len(recs)))
-    
+
     if CFG_WEBALERT_DEBUG_LEVEL > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
             strftime("%c"), query, date_from, date_until, recs)
@@ -313,7 +316,7 @@ def process_alert_queries(frequency, date):
 
     Retrieves the queries for which an alert exists, performs it, and
     processes the corresponding alerts."""
-    
+
     alert_queries = get_alert_queries(frequency)
 
     for aq in alert_queries:
@@ -326,19 +329,19 @@ def replace_argument(argstr, argname, argval):
     """Replace the given date argument value with the new one.
 
     If the argument is missing, it is added."""
-    
+
     if search('%s=\d+' % argname, argstr):
         r = sub('%s=\d+' % argname, '%s=%s' % (argname, argval), argstr)
     else:
         r = argstr + '&%s=%s' % (argname, argval)
-        
+
     return r
-    
+
 def update_arguments(argstr, date_from, date_until):
     """Replace date arguments in argstr with the ones specified by date_from and date_until.
 
     Absent arguments are added."""
-    
+
     d1y, d1m, d1d = _date_to_tuple(date_from)
     d2y, d2m, d2d = _date_to_tuple(date_until)
 
@@ -348,7 +351,7 @@ def update_arguments(argstr, date_from, date_until):
     r = replace_argument(r, 'd2y', d2y)
     r = replace_argument(r, 'd2m', d2m)
     r = replace_argument(r, 'd2d', d2d)
-        
+
     return r
 
 def log(msg):
@@ -359,7 +362,7 @@ def log(msg):
         log.close()
     except:
         pass
-    
+
 def process_alerts(alerts):
     # TBD: do not generate the email each time, forge it once and then
     # send it to all appropriate people
@@ -370,10 +373,10 @@ def process_alerts(alerts):
         if alert_use_notification_p(a):
             argstr = update_arguments(alerts['argstr'], alerts['date_from'], alerts['date_until'])
             email_notify(a, alerts['records'], argstr)
-            
+
         update_date_lastrun(a)
 
-        
+
 def alert_use_basket_p(alert):
     return alert[2] != 0
 
@@ -393,14 +396,14 @@ def run_alerts(date):
 
     if date.isoweekday() == 1: # first day of the week
         process_alert_queries('week', date)
-        
+
     process_alert_queries('day', date)
 
 def process_alert_queries_for_user(uid, date):
     """Process the alerts for the given user id.
 
     All alerts are with reference date set as the current local time."""
-    
+
     alert_queries = get_alert_queries_for_user(uid)
     print alert_queries
 
