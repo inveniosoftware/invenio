@@ -2544,10 +2544,14 @@ class Template:
                  </table>
                  ''' % {
                 'similar' : _("Interested in being notified about new results for this query?"),
-                'msg_alert': _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
-                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
+                'msg_alert': _("""Set up a personal %(x_mail_icon)s %(x_url1_open)semail alert%(x_url1_close)s
+                                  or subscribe to the %(x_rss_icon)s %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
                         {'x_url1_open': '<a class="google" href="%s/youralerts/input?ln=%s&idq=%s">' % (weburl, ln, id_query),
                          'x_url1_close': '</a>',
-                         'x_url2_open': '<a class="google" href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="RSS icon" />&nbsp;' % (rssurl, weburl),
-                         'x_url2_close': '</a>'}}
+                         'x_url2_open': '<a class="google" href="%s">' % (rssurl),
+                         'x_url2_close': '</a>',
+                         'x_mail_icon':'''<a href="%s/youralerts/input?ln=%s&idq=%s">
+                         <img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a>''' % \
+                         (weburl, ln, id_query, weburl),
+                         'x_rss_icon':'<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a>'% (rssurl, weburl)}}
         return out
