@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.92.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2007-04-12 18:26+0200\n"
-"PO-Revision-Date: 2007-04-12 15:41+0200\n"
+"PO-Revision-Date: 2007-04-12 15:40+0200\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
 "Language-Team: ZH_TW <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr ""
 
 #: config/cdswmllib.wml:98 modules/webstyle/lib/webstyle_templates.py:491
 msgid "This site is also available in the following languages:"
-msgstr ""
+msgstr "本網站提供以下語言選擇:"
 
 #: config/cdspage.wml:54 config/cdspage.wml:140
 #: modules/websearch/lib/websearch_templates.py:344
@@ -40,14 +40,14 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:362
 #: modules/webstyle/lib/webstyle_templates.py:438
 msgid "Search"
-msgstr ""
+msgstr "搜尋"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
 #: modules/webstyle/lib/webstyle_templates.py:365
 #: modules/webstyle/lib/webstyle_templates.py:441
 msgid "Help"
-msgstr ""
-
+msgstr "幫助"
+ 
 #: modules/bibclassify/doc/admin/index.html.wml:22
 #: modules/bibclassify/doc/admin/guide.html.wml:23
 #: modules/bibconvert/doc/admin/guide.html.wml:22
@@ -110,19 +110,19 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:79
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "Admin Area"
-msgstr ""
+msgstr "管理"
 
 #: config/cdspage.wml:145 modules/webstyle/lib/webstyle_templates.py:406
 msgid "Last updated"
-msgstr ""
+msgstr "最後更新 "
 
 #: modules/websubmit/doc/admin/guide.html.wml:23
 msgid "WebSubmit Administration"
-msgstr ""
+msgstr "WebSubmit 管理"
 
 #: config/cdspage.wml:56
 msgid "Convert"
-msgstr ""
+msgstr "轉換"
 
 #: config/cdspage.wml:55 config/cdspage.wml:141
 #: modules/bibedit/lib/bibedit_templates.py:104
@@ -133,13 +133,13 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:1014
 #: modules/websubmit/lib/websubmit_engine.py:1240
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
 #: modules/webstyle/lib/webstyle_templates.py:364
 #: modules/webstyle/lib/webstyle_templates.py:440
 msgid "Personalize"
-msgstr ""
+msgstr "個人化"
 
 #: modules/webhelp/web/index.html.wml:22 modules/webhelp/web/index.html.wml:28
 #: modules/webhelp/web/index.html.wml:29 modules/webhelp/web/index.html.wml:30
@@ -172,7 +172,7 @@ msgstr ""
 #: modules/websubmit/doc/submission.html.wml:23
 #: modules/websubmit/doc/subnumber.html.wml:23
 msgid "Help Central"
-msgstr ""
+msgstr "幫助中心"
 
 #: modules/webhelp/web/index.html.wml:73
 #: modules/websubmit/doc/access.html.wml:23
@@ -192,19 +192,19 @@ msgstr ""
 #: modules/websubmit/doc/submission.html.wml:23
 #: modules/websubmit/doc/subnumber.html.wml:23
 msgid "Submit Help"
-msgstr ""
+msgstr "提交幫助"
 
 #: modules/websubmit/doc/admin/guide.html.wml:22
 msgid "Guide"
-msgstr ""
+msgstr "指南"
 
 #: config/cdspage.wml:60
 msgid "Library"
-msgstr ""
+msgstr "圖書館"
 
 #: config/cdspage.wml:57
 msgid "Agenda"
-msgstr ""
+msgstr "議程"
 
 #: modules/websearch/doc/index.html.wml:52
 #: modules/websearch/doc/tips.html.wml:22
@@ -213,54 +213,54 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1405
 #: modules/websearch/lib/websearch_templates.py:1461
 msgid "Search Tips"
-msgstr ""
+msgstr "搜索幫助"
 
 #: config/cdspage.wml:58
 msgid "Webcast"
-msgstr ""
+msgstr "Webcast"
 
 #: config/cdspage.wml:65 config/cdspage.wml:67
 #: modules/webstyle/lib/webstyle_templates.py:76
 #: modules/webstyle/lib/webstyle_templates.py:85
 #: modules/webstyle/lib/webstyle_templates.py:262
 msgid "Home"
-msgstr ""
+msgstr "主頁"
 
 #: config/cdspage.wml:146 modules/webstyle/lib/webstyle_templates.py:444
 msgid "Maintained by"
-msgstr ""
+msgstr "管理者："
 
 #: config/cdspage.wml:59
 msgid "Bulletin"
-msgstr ""
+msgstr "公告"
 
 #: modules/webhelp/web/index.html.wml:52
 #: modules/websearch/doc/guide.html.wml:24
 #: modules/websearch/doc/index.html.wml:22
 #: modules/websearch/doc/tips.html.wml:24
 msgid "Search Help"
-msgstr ""
+msgstr "搜索幫助"
 
 #: config/cdspage.wml:147 modules/webstyle/lib/webstyle_templates.py:443
 msgid "Powered by"
-msgstr ""
+msgstr "伺服器系統："
 
 #: modules/bibedit/lib/bibedit_templates.py:52
 msgid "Add Subfield"
-msgstr ""
+msgstr "新增副欄位"
 
 #: modules/bibedit/lib/bibedit_templates.py:63
 #: modules/webalert/lib/webalert_templates.py:76
 msgid "Field"
-msgstr ""
+msgstr "欄位"
 
 #: modules/bibedit/lib/bibedit_templates.py:86
 msgid "Add Field"
-msgstr ""
+msgstr "新增欄位"
 
 #: modules/bibedit/lib/bibedit_templates.py:93
 msgid "Verbose"
-msgstr ""
+msgstr "詳細"
 
 #: modules/bibedit/lib/bibedit_templates.py:110
 #: modules/bibformat/web/admin/bibformatadmin.py:397
@@ -274,7 +274,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1711
 #: modules/websession/lib/websession_templates.py:1791
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: modules/bibedit/lib/bibedit_templates.py:111
 #: modules/bibedit/lib/bibedit_templates.py:307
@@ -288,7 +288,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1318
 #: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
-msgstr ""
+msgstr "刪除"
 
 #: modules/bibedit/lib/bibedit_templates.py:122
 #: modules/bibformat/lib/bibformat_templates.py:947
@@ -298,7 +298,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:91
 #: modules/websubmit/lib/websubmit_templates.py:1417
 msgid "Action"
-msgstr ""
+msgstr "行動"
 
 #: modules/bibedit/lib/bibedit_templates.py:123
 #: modules/bibedit/lib/bibedit_templates.py:139
@@ -308,69 +308,69 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:184
 #: modules/websearch/lib/websearch_templates.py:186
 msgid "Record"
-msgstr ""
+msgstr "記錄"
 
 #: modules/bibedit/lib/bibedit_templates.py:124
 msgid "Display"
-msgstr ""
+msgstr "顯示"
 
 #: modules/bibedit/lib/bibedit_templates.py:243
 msgid "Done"
-msgstr ""
+msgstr "完成"
 
 #: modules/bibedit/lib/bibedit_templates.py:343
 #: modules/bibedit/lib/bibedit_templates.py:444
 msgid "Edit"
-msgstr ""
+msgstr "編輯"
 
 #: modules/bibedit/lib/bibedit_templates.py:398
 msgid "Your changes are TEMPORARY."
-msgstr ""
+msgstr "這更改是臨時性的"
 
 #: modules/bibedit/lib/bibedit_templates.py:399
 msgid "To save this record, please click on submit."
-msgstr ""
+msgstr "請按'提交'來儲存記錄。"
 
 #: modules/bibedit/lib/bibedit_templates.py:413
 msgid "This record does not exist."
-msgstr ""
+msgstr "這記錄並不存在。"
 
 #: modules/bibedit/lib/bibedit_templates.py:414
 msgid "Please try another record ID."
-msgstr ""
+msgstr "請使用其他記錄ID重試。"
 
 #: modules/bibedit/lib/bibedit_templates.py:422
 msgid "This record is currently being edited by another user."
-msgstr ""
+msgstr "這記錄正被編輯中。"
 
 #: modules/bibedit/lib/bibedit_templates.py:423
 msgid "Please try again later."
-msgstr ""
+msgstr "請稍後再嘗試。"
 
 #: modules/bibedit/lib/bibedit_templates.py:430
 msgid "Cannot edit deleted record."
-msgstr ""
+msgstr "不能編輯已刪除的記錄"
 
 #: modules/bibedit/lib/bibedit_templates.py:441
 msgid "Please enter the ID of the record you want to edit"
-msgstr ""
+msgstr "請輸入記錄ID"
 
 #: modules/bibedit/lib/bibedit_templates.py:453
 msgid ""
 "Your modifications have now been submitted. They will be processed as soon "
 "as the task queue is empty."
-msgstr ""
+msgstr "您的修改已被接納，並將盡快處理。"
 
 #: modules/bibedit/lib/bibedit_templates.py:455
 #: modules/bibedit/lib/bibedit_templates.py:487
 #, python-format
 msgid ""
 "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
-msgstr ""
+msgstr "返回%(x_url_open)sBibEdit 管理介面%(x_url_close)s。"
 
 #: modules/bibedit/lib/bibedit_templates.py:475
 msgid "Do you really want to delete this record?"
-msgstr ""
+msgstr "您是否確定要刪除這筆紀錄？"
 
 #: modules/bibedit/lib/bibedit_templates.py:479
 #: modules/webbasket/lib/webbasket_templates.py:1235
@@ -382,7 +382,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1830
 #: modules/websession/lib/websession_templates.py:1869
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: modules/bibedit/lib/bibedit_templates.py:480
 #: modules/webalert/lib/webalert_templates.py:318
@@ -394,41 +394,41 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1831
 #: modules/websession/lib/websession_templates.py:1870
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: modules/bibedit/lib/bibedit_templates.py:485
 msgid "The record will be deleted as soon as the task queue is empty."
-msgstr ""
+msgstr "這記錄將會盡快處理。"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:62
 #, python-format
 msgid "Record %s - Add a field"
-msgstr ""
+msgstr "記錄 %s - 加入欄位"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:64
 msgid "BibEdit Admin Interface"
-msgstr ""
+msgstr "BibEdit 管理介面"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:98
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s"
-msgstr ""
+msgstr "編輯記錄 %(x_recid)s, 欄位 %(x_field)s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:101
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-msgstr ""
+msgstr "編輯記錄 %(x_recid)s, 欄位 %(x_field)s - 加入副欄位"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:129
 #, python-format
 msgid "Submit and save record %s"
-msgstr ""
+msgstr "提交並儲存記錄 %s"
 
 #: modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py:48
 #: modules/bibformat/lib/bibformatadminlib.py:55
 #: modules/bibformat/web/admin/bibformatadmin.py:81
 msgid "BibFormat Admin"
-msgstr ""
+msgstr "BibFormat 管理"
 
 #: modules/bibformat/lib/bibformat_templates.py:340
 #: modules/bibformat/lib/bibformat_templates.py:452
@@ -446,7 +446,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:2119
 #: modules/webcomment/lib/webcomment_templates.py:1017
 msgid "Menu"
-msgstr ""
+msgstr "目錄"
 
 #: modules/bibformat/lib/bibformat_templates.py:342
 #: modules/bibformat/lib/bibformat_templates.py:453
@@ -457,7 +457,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:2050
 #: modules/bibformat/lib/bibformat_templates.py:2118
 msgid "Close Editor"
-msgstr ""
+msgstr "關閉編輯器"
 
 #: modules/bibformat/lib/bibformat_templates.py:343
 #: modules/bibformat/lib/bibformat_templates.py:454
@@ -465,7 +465,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:606
 #: modules/bibformat/lib/bibformat_templates.py:637
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "修改模板屬性"
 
 #: modules/bibformat/lib/bibformat_templates.py:344
 #: modules/bibformat/lib/bibformat_templates.py:455
@@ -473,7 +473,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:607
 #: modules/bibformat/lib/bibformat_templates.py:638
 msgid "Template Editor"
-msgstr ""
+msgstr "模板編輯器"
 
 #: modules/bibformat/lib/bibformat_templates.py:345
 #: modules/bibformat/lib/bibformat_templates.py:456
@@ -484,14 +484,14 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1384
 #: modules/bibformat/lib/bibformat_templates.py:1482
 msgid "Check Dependencies"
-msgstr ""
+msgstr "檢查從屬關係"
 
 #: modules/bibformat/lib/bibformat_templates.py:395
 #: modules/bibformat/lib/bibformat_templates.py:942
 #: modules/bibformat/lib/bibformat_templates.py:1069
 #: modules/webalert/lib/webalert_templates.py:319
 msgid "Name"
-msgstr ""
+msgstr "名稱"
 
 #: modules/bibformat/lib/bibformat_templates.py:414
 #: modules/bibformat/lib/bibformat_templates.py:943
@@ -500,35 +500,35 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1231
 #: modules/websession/lib/websession_templates.py:1295
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: modules/bibformat/lib/bibformat_templates.py:415
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "更新格式屬性"
 
 #: modules/bibformat/lib/bibformat_templates.py:588
 #: modules/bibformat/lib/bibformat_templates.py:603
 #: modules/bibformat/lib/bibformat_templates.py:634
 msgid "Show Documentation"
-msgstr ""
+msgstr "顯示文件"
 
 #: modules/bibformat/lib/bibformat_templates.py:589
 #: modules/bibformat/lib/bibformat_templates.py:604
 #: modules/bibformat/lib/bibformat_templates.py:635
 #: modules/bibformat/lib/bibformat_templates.py:686
 msgid "Hide Documentation"
-msgstr ""
+msgstr "隱藏文件"
 
 #: modules/bibformat/lib/bibformat_templates.py:945
 #: modules/bibformat/lib/bibformat_templates.py:1071
 #: modules/websubmit/lib/websubmit_templates.py:1418
 msgid "Status"
-msgstr ""
+msgstr "狀態"
 
 #: modules/bibformat/lib/bibformat_templates.py:946
 #: modules/bibformat/lib/bibformat_templates.py:1072
 msgid "Last Modification Date"
-msgstr ""
+msgstr "更新日期"
 
 #: modules/bibformat/lib/bibformat_templates.py:949
 #: modules/bibformat/lib/bibformat_templates.py:1075
@@ -541,7 +541,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:376
 #: modules/bibformat/web/admin/bibformatadmin.py:1355
 msgid "Manage Output Formats"
-msgstr ""
+msgstr "管理輸出格式"
 
 #: modules/bibformat/lib/bibformat_templates.py:950
 #: modules/bibformat/lib/bibformat_templates.py:1076
@@ -554,7 +554,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:658
 #: modules/bibformat/web/admin/bibformatadmin.py:1376
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "管理格式模板"
 
 #: modules/bibformat/lib/bibformat_templates.py:951
 #: modules/bibformat/lib/bibformat_templates.py:1077
@@ -565,7 +565,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:895
 #: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "格式元件文件"
 
 #: modules/bibformat/lib/bibformat_templates.py:952
 #: modules/bibformat/lib/bibformat_templates.py:1078
@@ -583,109 +583,109 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1287
 #: modules/bibformat/web/admin/bibformatadmin.py:1323
 msgid "Manage Knowledge Bases"
-msgstr ""
+msgstr "管理知識庫"
 
 #: modules/bibformat/lib/bibformat_templates.py:1027
 msgid "Add New Format Template"
-msgstr ""
+msgstr "新增格式模板"
 
 #: modules/bibformat/lib/bibformat_templates.py:1028
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "詳盡的檢查格式模板"
 
 #: modules/bibformat/lib/bibformat_templates.py:1068
 msgid "Code"
-msgstr ""
+msgstr "代號"
 
 #: modules/bibformat/lib/bibformat_templates.py:1152
 msgid "Add New Output Format"
-msgstr ""
+msgstr "新增輸出格式"
 
 #: modules/bibformat/lib/bibformat_templates.py:1190
 msgid "menu"
-msgstr ""
+msgstr "目錄"
 
 #: modules/bibformat/lib/bibformat_templates.py:1191
 #: modules/bibformat/lib/bibformat_templates.py:1381
 #: modules/bibformat/lib/bibformat_templates.py:1479
 msgid "Close Output Format"
-msgstr ""
+msgstr "關閉輸出格式"
 
 #: modules/bibformat/lib/bibformat_templates.py:1192
 #: modules/bibformat/lib/bibformat_templates.py:1382
 #: modules/bibformat/lib/bibformat_templates.py:1480
 msgid "Rules"
-msgstr ""
+msgstr "規則"
 
 #: modules/bibformat/lib/bibformat_templates.py:1193
 #: modules/bibformat/lib/bibformat_templates.py:1383
 #: modules/bibformat/lib/bibformat_templates.py:1481
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "修改輸出格式屬性"
 
 #: modules/bibformat/lib/bibformat_templates.py:1291
 #: modules/bibformat/lib/bibformatadminlib.py:534
 msgid "Remove Rule"
-msgstr ""
+msgstr "移除規則"
 
 #: modules/bibformat/lib/bibformat_templates.py:1343
 #: modules/bibformat/lib/bibformatadminlib.py:541
 msgid "Add New Rule"
-msgstr ""
+msgstr "增添規則"
 
 #: modules/bibformat/lib/bibformat_templates.py:1344
 #: modules/bibformat/lib/bibformatadminlib.py:538
 msgid "Save Changes"
-msgstr ""
+msgstr "儲存"
 
 #: modules/bibformat/lib/bibformat_templates.py:1885
 #: modules/bibformat/lib/bibformat_templates.py:2052
 #: modules/bibformat/lib/bibformat_templates.py:2120
 msgid "Knowledge Base Mappings"
-msgstr ""
+msgstr "知識庫對照"
 
 #: modules/bibformat/lib/bibformat_templates.py:1886
 #: modules/bibformat/lib/bibformat_templates.py:2053
 #: modules/bibformat/lib/bibformat_templates.py:2121
 msgid "Knowledge Base Attributes"
-msgstr ""
+msgstr "知識庫屬性"
 
 #: modules/bibformat/lib/bibformat_templates.py:1887
 #: modules/bibformat/lib/bibformat_templates.py:2054
 #: modules/bibformat/lib/bibformat_templates.py:2122
 msgid "Knowledge Base Dependencies"
-msgstr ""
+msgstr "知識庫從屬關係"
 
 #: modules/bibformat/lib/bibformat_templates.py:2267
 msgid "No problem found with format"
-msgstr ""
+msgstr "格式正確無誤"
 
 #: modules/bibformat/lib/bibformat_templates.py:2269
 msgid "An error has been found"
-msgstr ""
+msgstr "發現有錯誤"
 
 #: modules/bibformat/lib/bibformat_templates.py:2271
 msgid "The following errors have been found"
-msgstr ""
+msgstr "發現以下錯誤"
 
 #: modules/bibformat/lib/bibformatadminlib.py:337
 #: modules/bibformat/lib/bibformatadminlib.py:376
 #: modules/bibformat/lib/bibformatadminlib.py:378
 msgid "Test with record:"
-msgstr ""
+msgstr "用作測試之記錄："
 
 #: modules/bibformat/lib/bibformatadminlib.py:338
 msgid "Enter a search query here."
-msgstr ""
+msgstr "輸入查詢。"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:119
 msgid "Hide"
-msgstr ""
+msgstr "隱藏"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:120
 #, python-format
 msgid "Show all %i authors"
-msgstr ""
+msgstr "顯示全部 %i 名作者"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:50
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:81
@@ -705,91 +705,91 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_webinterface.py:403
 #: modules/websubmit/lib/websubmit_webinterface.py:413
 msgid "Internal Error"
-msgstr ""
+msgstr "內部錯誤"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:59
 msgid "Migrate BibFormat Settings"
-msgstr ""
+msgstr "轉移BibFormat的設置"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:90
 msgid "Migrate Knowledge Bases"
-msgstr ""
+msgstr "轉移知識庫"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:121
 msgid "Migrate Behaviours"
-msgstr ""
+msgstr "轉移習性"
 
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:151
 #: modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:181
 msgid "Migrate Formats"
-msgstr ""
+msgstr "轉移格式"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:254
 #: modules/bibformat/web/admin/bibformatadmin.py:299
 #: modules/bibformat/web/admin/bibformatadmin.py:1358
 msgid "Restricted Output Format"
-msgstr ""
+msgstr "限制輸出格式"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:212
 #: modules/bibformat/web/admin/bibformatadmin.py:510
 #: modules/bibformat/web/admin/bibformatadmin.py:1244
 msgid "Ok"
-msgstr ""
+msgstr "是"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:214
 #, python-format
 msgid "Output Format %s Rules"
-msgstr ""
+msgstr "輸出格式 %s 規則"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:267
 #, python-format
 msgid "Output Format %s Attributes"
-msgstr ""
+msgstr "輸出格式 %s 屬性"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:312
 #, python-format
 msgid "Output Format %s Dependencies"
-msgstr ""
+msgstr "輸出格式 %s 從屬關係"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:376
 msgid "Delete Output Format"
-msgstr ""
+msgstr "刪除輸出格式"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:489
 #: modules/bibformat/web/admin/bibformatadmin.py:561
 #: modules/bibformat/web/admin/bibformatadmin.py:1379
 msgid "Restricted Format Template"
-msgstr ""
+msgstr "限制格式模板"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:515
 #, python-format
 msgid "Format Template %s"
-msgstr ""
+msgstr "格式模板 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:572
 #, python-format
 msgid "Format Template %s Attributes"
-msgstr ""
+msgstr "格式模板 %s 屬性"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:604
 #, python-format
 msgid "Format Template %s Dependencies"
-msgstr ""
+msgstr "格式模板 %s 從屬關係"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:658
 msgid "Delete Format Template"
-msgstr ""
+msgstr "刪除格式模板"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:871
 #, python-format
 msgid "Format Element %s Dependencies"
-msgstr ""
+msgstr "格式元件 %s 從屬關係"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:904
 #, python-format
 msgid "Test Format Element %s"
-msgstr ""
+msgstr "測試格式元件 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:976
 #: modules/bibformat/web/admin/bibformatadmin.py:1023
@@ -799,94 +799,94 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:1224
 #: modules/bibformat/web/admin/bibformatadmin.py:1299
 msgid "Unknown Knowledge Base"
-msgstr ""
+msgstr "未知的知識庫"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:985
 #, python-format
 msgid "Knowledge Base %s"
-msgstr ""
+msgstr "知識庫 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1032
 #, python-format
 msgid "Knowledge Base %s Attributes"
-msgstr ""
+msgstr "知識庫 %s 屬性"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1077
 #, python-format
 msgid "Knowledge Base %s Dependencies"
-msgstr ""
+msgstr "知識庫 %s 從屬關係"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1287
 msgid "Delete Knowledge Base"
-msgstr ""
+msgstr "刪除知識庫"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1372
 #, python-format
 msgid "Validation of Output Format %s"
-msgstr ""
+msgstr "驗證輸出格式 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1390
 #, python-format
 msgid "Validation of Format Template %s"
-msgstr ""
+msgstr "驗證格式模板 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1398
 msgid "Restricted Format Element"
-msgstr ""
+msgstr "限制格式元件"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1406
 #, python-format
 msgid "Validation of Format Element %s"
-msgstr ""
+msgstr "驗證格式元件 %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1409
 msgid "Format Validation"
-msgstr ""
+msgstr "驗證格式"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:55
 #: modules/bibharvest/lib/bibharvest_templates.py:73
 msgid "See Guide"
-msgstr ""
+msgstr "參見指南"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:110
 msgid "OAI sources currently present in the database"
-msgstr ""
+msgstr "已記錄之OAI源"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:111
 msgid "No OAI sources currently present in the database"
-msgstr ""
+msgstr "沒有OAI源之記錄"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:121
 msgid "Next oaiharvest task"
-msgstr ""
+msgstr "下一個oaiharvest工作"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:122
 msgid "scheduled time:"
-msgstr ""
+msgstr "預定的時間："
 
 #: modules/bibharvest/lib/bibharvest_templates.py:123
 msgid "current status:"
-msgstr ""
+msgstr "現在的狀況："
 
 #: modules/bibharvest/lib/bibharvest_templates.py:124
 msgid "No oaiharvest task currently scheduled."
-msgstr ""
+msgstr "沒有預定的oaiharvest工作。"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:227
 msgid "successfully validated"
-msgstr ""
+msgstr "驗證有效"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:228
 msgid "does not seem to be a OAI-compliant baseURL"
-msgstr ""
+msgstr "並不是有效的OAI baseURL"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:120
 msgid "Citation history"
-msgstr ""
+msgstr "引用之歷史記錄"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:95
 msgid "Downloads history"
-msgstr ""
+msgstr "下載之歷史記錄"
 
 #: modules/miscutil/lib/dateutils.py:70 modules/miscutil/lib/dateutils.py:97
 #: modules/webbasket/lib/webbasket.py:169
@@ -894,253 +894,253 @@ msgstr ""
 #: modules/websession/lib/webuser.py:225
 #: modules/webstyle/lib/webstyle_templates.py:516
 msgid "N/A"
-msgstr ""
+msgstr "不適用"
 
 #: modules/miscutil/lib/dateutils.py:154
 msgid "Sun"
-msgstr ""
+msgstr "星期日"
 
 #: modules/miscutil/lib/dateutils.py:155
 msgid "Mon"
-msgstr ""
+msgstr "星期一"
 
 #: modules/miscutil/lib/dateutils.py:156
 msgid "Tue"
-msgstr ""
+msgstr "星期二"
 
 #: modules/miscutil/lib/dateutils.py:157
 msgid "Wed"
-msgstr ""
+msgstr "星期三"
 
 #: modules/miscutil/lib/dateutils.py:158
 msgid "Thu"
-msgstr ""
+msgstr "星期四"
 
 #: modules/miscutil/lib/dateutils.py:159
 msgid "Fri"
-msgstr ""
+msgstr "星期五"
 
 #: modules/miscutil/lib/dateutils.py:160
 msgid "Sat"
-msgstr ""
+msgstr "星期六"
 
 #: modules/miscutil/lib/dateutils.py:162
 msgid "Sunday"
-msgstr ""
+msgstr "星期日"
 
 #: modules/miscutil/lib/dateutils.py:163
 msgid "Monday"
-msgstr ""
+msgstr "星期一"
 
 #: modules/miscutil/lib/dateutils.py:164
 msgid "Tuesday"
-msgstr ""
+msgstr "星期二"
 
 #: modules/miscutil/lib/dateutils.py:165
 msgid "Wednesday"
-msgstr ""
+msgstr "星期三"
 
 #: modules/miscutil/lib/dateutils.py:166
 msgid "Thursday"
-msgstr ""
+msgstr "星期四"
 
 #: modules/miscutil/lib/dateutils.py:167
 msgid "Friday"
-msgstr ""
+msgstr "星期五"
 
 #: modules/miscutil/lib/dateutils.py:168
 msgid "Saturday"
-msgstr ""
+msgstr "星期六"
 
 #: modules/miscutil/lib/dateutils.py:182 modules/miscutil/lib/dateutils.py:196
 msgid "Month"
-msgstr ""
+msgstr "月份"
 
 #: modules/miscutil/lib/dateutils.py:183
 msgid "Jan"
-msgstr ""
+msgstr "一月"
 
 #: modules/miscutil/lib/dateutils.py:184
 msgid "Feb"
-msgstr ""
+msgstr "二月"
 
 #: modules/miscutil/lib/dateutils.py:185
 msgid "Mar"
-msgstr ""
+msgstr "三月"
 
 #: modules/miscutil/lib/dateutils.py:186
 msgid "Apr"
-msgstr ""
+msgstr "四月"
 
 #: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
 #: modules/websearch/lib/search_engine.py:434
 #: modules/websearch/lib/websearch_templates.py:661
 msgid "May"
-msgstr ""
+msgstr "五月"
 
 #: modules/miscutil/lib/dateutils.py:188
 msgid "Jun"
-msgstr ""
+msgstr "六月"
 
 #: modules/miscutil/lib/dateutils.py:189
 msgid "Jul"
-msgstr ""
+msgstr "七月"
 
 #: modules/miscutil/lib/dateutils.py:190
 msgid "Aug"
-msgstr ""
+msgstr "八月"
 
 #: modules/miscutil/lib/dateutils.py:191
 msgid "Sep"
-msgstr ""
+msgstr "九月"
 
 #: modules/miscutil/lib/dateutils.py:192
 msgid "Oct"
-msgstr ""
+msgstr "十月"
 
 #: modules/miscutil/lib/dateutils.py:193
 msgid "Nov"
-msgstr ""
+msgstr "十一月"
 
 #: modules/miscutil/lib/dateutils.py:194
 msgid "Dec"
-msgstr ""
+msgstr "十二月"
 
 #: modules/miscutil/lib/dateutils.py:197
 #: modules/websearch/lib/search_engine.py:433
 #: modules/websearch/lib/websearch_templates.py:660
 msgid "January"
-msgstr ""
+msgstr "一月"
 
 #: modules/miscutil/lib/dateutils.py:198
 #: modules/websearch/lib/search_engine.py:433
 #: modules/websearch/lib/websearch_templates.py:660
 msgid "February"
-msgstr ""
+msgstr "二月"
 
 #: modules/miscutil/lib/dateutils.py:199
 #: modules/websearch/lib/search_engine.py:433
 #: modules/websearch/lib/websearch_templates.py:660
 msgid "March"
-msgstr ""
+msgstr "三月"
 
 #: modules/miscutil/lib/dateutils.py:200
 #: modules/websearch/lib/search_engine.py:433
 #: modules/websearch/lib/websearch_templates.py:660
 msgid "April"
-msgstr ""
+msgstr "四月"
 
 #: modules/miscutil/lib/dateutils.py:202
 #: modules/websearch/lib/search_engine.py:434
 #: modules/websearch/lib/websearch_templates.py:661
 msgid "June"
-msgstr ""
+msgstr "六月"
 
 #: modules/miscutil/lib/dateutils.py:203
 #: modules/websearch/lib/search_engine.py:434
 #: modules/websearch/lib/websearch_templates.py:661
 msgid "July"
-msgstr ""
+msgstr "七月"
 
 #: modules/miscutil/lib/dateutils.py:204
 #: modules/websearch/lib/search_engine.py:434
 #: modules/websearch/lib/websearch_templates.py:661
 msgid "August"
-msgstr ""
+msgstr "八月"
 
 #: modules/miscutil/lib/dateutils.py:205
 #: modules/websearch/lib/search_engine.py:435
 #: modules/websearch/lib/websearch_templates.py:662
 msgid "September"
-msgstr ""
+msgstr "九月"
 
 #: modules/miscutil/lib/dateutils.py:206
 #: modules/websearch/lib/search_engine.py:435
 #: modules/websearch/lib/websearch_templates.py:662
 msgid "October"
-msgstr ""
+msgstr "十月"
 
 #: modules/miscutil/lib/dateutils.py:207
 #: modules/websearch/lib/search_engine.py:435
 #: modules/websearch/lib/websearch_templates.py:662
 msgid "November"
-msgstr ""
+msgstr "十一月"
 
 #: modules/miscutil/lib/dateutils.py:208
 #: modules/websearch/lib/search_engine.py:435
 #: modules/websearch/lib/websearch_templates.py:662
 msgid "December"
-msgstr ""
+msgstr "十二月"
 
 #: modules/miscutil/lib/dateutils.py:226
 msgid "Day"
-msgstr ""
+msgstr "日"
 
 #: modules/miscutil/lib/dateutils.py:277
 msgid "Year"
-msgstr ""
+msgstr "年"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:66
 #: modules/miscutil/lib/errorlib_webinterface.py:71
 #: modules/miscutil/lib/errorlib_webinterface.py:76
 #: modules/miscutil/lib/errorlib_webinterface.py:81
 msgid "Sorry"
-msgstr ""
-
+msgstr "對不起"
+ 
 #: modules/miscutil/lib/errorlib_webinterface.py:67
 #: modules/miscutil/lib/errorlib_webinterface.py:72
 #: modules/miscutil/lib/errorlib_webinterface.py:77
 #: modules/miscutil/lib/errorlib_webinterface.py:82
 #, python-format
 msgid "Cannot send error request, %s parameter missing."
-msgstr ""
+msgstr "缺少 %s 參數，不能發送錯誤請求。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:100
 msgid "The error report has been sent."
-msgstr ""
+msgstr "錯誤報告已被發送。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Many thanks for helping us make CDS Invenio better."
-msgstr ""
+msgstr "多謝協助我們把 CDS Invenio 做得更好。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Use the back button of your browser to return to the previous page."
-msgstr ""
+msgstr "使用您的瀏覽器的'back'按鈕返回到前頁。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:105
 msgid "Thank you!"
-msgstr ""
+msgstr "謝謝!"
 
 #: modules/webalert/lib/webalert.py:55
 #, python-format
 msgid "You already have an alert named %s."
-msgstr ""
+msgstr "您已經建立了名為 %s 的警報。"
 
 #: modules/webalert/lib/webalert.py:111
 msgid "unknown"
-msgstr ""
+msgstr "未知的"
 
 #: modules/webalert/lib/webalert.py:174
 msgid "You already have an alert defined for the specified query and basket."
-msgstr ""
+msgstr "您已經建立了指定的查詢和收藏籃的警報。"
 
 #: modules/webalert/lib/webalert.py:193 modules/webalert/lib/webalert.py:299
 msgid "The alert name cannot be empty."
-msgstr ""
+msgstr "警報的名稱不可以留空。"
 
 #: modules/webalert/lib/webalert.py:198
 msgid "You are not the owner of this basket."
-msgstr ""
+msgstr "您並不是這收藏籃的擁有者。"
 
 #: modules/webalert/lib/webalert.py:209
 #, python-format
 msgid "The alert %s has been added to your profile."
-msgstr ""
+msgstr "這警報 %s 已加入您的設定檔。"
 
 #: modules/webalert/lib/webalert.py:330
 #, python-format
 msgid "The alert %s has been successfully updated."
-msgstr ""
+msgstr "這警報 %s 已成功被修改。"
 
 #: modules/webalert/lib/webalert.py:382
 #, python-format
@@ -1148,208 +1148,208 @@ msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
 "is available with a posibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
-msgstr ""
+msgstr "您已有 %(x_nb)s 條查詢。您可以用%(x_url_open)s详细列表%(x_url_close)s a)查閱搜尋結果；b)訂閱讀警報電郵。"
 
 #: modules/webalert/lib/webalert_templates.py:74
 msgid "Pattern"
-msgstr ""
+msgstr "式樣"
 
 #: modules/webalert/lib/webalert_templates.py:78
 msgid "Pattern 1"
-msgstr ""
+msgstr "式樣 1"
 
 #: modules/webalert/lib/webalert_templates.py:80
 msgid "Field 1"
-msgstr ""
+msgstr "欄位 1"
 
 #: modules/webalert/lib/webalert_templates.py:82
 msgid "Pattern 2"
-msgstr ""
+msgstr "式樣 2"
 
 #: modules/webalert/lib/webalert_templates.py:84
 msgid "Field 2"
-msgstr ""
+msgstr "欄位 2"
 
 #: modules/webalert/lib/webalert_templates.py:86
 msgid "Pattern 3"
-msgstr ""
+msgstr "式樣 3"
 
 #: modules/webalert/lib/webalert_templates.py:88
 msgid "Field 3"
-msgstr ""
+msgstr "欄位 3"
 
 #: modules/webalert/lib/webalert_templates.py:90
 msgid "Collections"
-msgstr ""
+msgstr "專輯"
 
 #: modules/webalert/lib/webalert_templates.py:92
 msgid "Collection"
-msgstr ""
+msgstr "專輯"
 
 #: modules/webalert/lib/webalert_templates.py:113
 msgid "You own the following alerts:"
-msgstr ""
+msgstr "您擁有以下的警報："
 
 #: modules/webalert/lib/webalert_templates.py:114
 msgid "alert name"
-msgstr ""
+msgstr "警報名稱"
 
 #: modules/webalert/lib/webalert_templates.py:123
 msgid "SHOW"
-msgstr ""
+msgstr "顯示"
 
 #: modules/webalert/lib/webalert_templates.py:172
 msgid ""
 "This alert will notify you each time/only if a new item satisfies the "
 "following query:"
-msgstr ""
+msgstr "如果一個新增項目滿足以下的查詢條件，您會收到我們發出的警報電郵。"
 
 #: modules/webalert/lib/webalert_templates.py:173
 msgid "QUERY"
-msgstr ""
+msgstr "詢問"
 
 #: modules/webalert/lib/webalert_templates.py:211
 msgid "Alert identification name:"
-msgstr ""
+msgstr "警報辨認名稱："
 
 #: modules/webalert/lib/webalert_templates.py:213
 msgid "Search-checking frequency:"
-msgstr ""
+msgstr "檢查頻率："
 
 #: modules/webalert/lib/webalert_templates.py:217
 #: modules/webalert/lib/webalert_templates.py:337
 msgid "monthly"
-msgstr ""
+msgstr "每月的"
 
 #: modules/webalert/lib/webalert_templates.py:218
 #: modules/webalert/lib/webalert_templates.py:335
 msgid "weekly"
-msgstr ""
+msgstr "每週的"
 
 #: modules/webalert/lib/webalert_templates.py:219
 #: modules/webalert/lib/webalert_templates.py:332
 msgid "daily"
-msgstr ""
+msgstr "每日的"
 
 #: modules/webalert/lib/webalert_templates.py:220
 msgid "Send notification email?"
-msgstr ""
+msgstr "發送通知電郵？"
 
 #: modules/webalert/lib/webalert_templates.py:223
 #: modules/webalert/lib/webalert_templates.py:340
 msgid "yes"
-msgstr ""
+msgstr "是"
 
 #: modules/webalert/lib/webalert_templates.py:224
 #: modules/webalert/lib/webalert_templates.py:342
 msgid "no"
-msgstr ""
+msgstr "否"
 
 #: modules/webalert/lib/webalert_templates.py:225
 #, python-format
 msgid "if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket"
-msgstr ""
+msgstr "如 %(x_fmt_open)s否%(x_fmt_close)s，您需要指定一收藏籃"
 
 #: modules/webalert/lib/webalert_templates.py:227
 msgid "Store results in basket?"
-msgstr ""
+msgstr "存儲結果於收藏籃？"
 
 #: modules/webalert/lib/webalert_templates.py:248
 msgid "SET ALERT"
-msgstr ""
+msgstr "設置警報"
 
 #: modules/webalert/lib/webalert_templates.py:249
 msgid "CLEAR DATA"
-msgstr ""
+msgstr "清除資料"
 
 #: modules/webalert/lib/webalert_templates.py:300
 #, python-format
 msgid ""
 "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
 "(x_url2_open)spopular_searches%(x_url2_close)s, or the input form."
-msgstr ""
+msgstr "從%(x_url1_open)s您的檢索%(x_url1_close)s、 %(x_url2_open)s熱門檢索%(x_url2_close)s或表格中建設新的警報。"
 
 #: modules/webalert/lib/webalert_templates.py:320
 msgid "Search checking frequency"
-msgstr ""
+msgstr "檢查頻率"
 
 #: modules/webalert/lib/webalert_templates.py:321
 msgid "Notification by email"
-msgstr ""
+msgstr "由電郵通知"
 
 #: modules/webalert/lib/webalert_templates.py:322
 msgid "Result in basket"
-msgstr ""
+msgstr "收藏籃裡的結果"
 
 #: modules/webalert/lib/webalert_templates.py:323
 msgid "Date last run"
-msgstr ""
+msgstr "最後執行日期"
 
 #: modules/webalert/lib/webalert_templates.py:324
 msgid "Creation date"
-msgstr ""
+msgstr "創建日期"
 
 #: modules/webalert/lib/webalert_templates.py:325
 msgid "Query"
-msgstr ""
+msgstr "詢問"
 
 #: modules/webalert/lib/webalert_templates.py:364
 #: modules/webbasket/lib/webbasket_templates.py:1456
 msgid "no basket"
-msgstr ""
+msgstr "沒有收藏籃"
 
 #: modules/webalert/lib/webalert_templates.py:373
 msgid "Remove"
-msgstr ""
+msgstr "移除"
 
 #: modules/webalert/lib/webalert_templates.py:374
 msgid "Modify"
-msgstr ""
+msgstr "修改"
 
 #: modules/webalert/lib/webalert_templates.py:376
 #: modules/webalert/lib/webalert_templates.py:466
 msgid "Execute search"
-msgstr ""
+msgstr "執行搜索"
 
 #: modules/webalert/lib/webalert_templates.py:382
 #, python-format
 msgid "You have defined %s alerts."
-msgstr ""
+msgstr "您已定義 %s 警報。"
 
 #: modules/webalert/lib/webalert_templates.py:420
 #, python-format
 msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
-msgstr ""
+msgstr "您未執行任何查尋。請先到%(x_url_open)s搜索介面%(x_url_close)s。"
 
 #: modules/webalert/lib/webalert_templates.py:429
 #, python-format
 msgid ""
 "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
 "the last 30 days or so."
-msgstr ""
+msgstr "在之前的三十天，您已執行了%(x_nb1)s 搜索 (%(x_nb2)s 不同的問題)。"
 
 #: modules/webalert/lib/webalert_templates.py:434
 #, python-format
 msgid "Here are the %s most popular searches."
-msgstr ""
+msgstr "這些是 %s 熱門檢索。"
 
 #: modules/webalert/lib/webalert_templates.py:445
 msgid "Question"
-msgstr ""
+msgstr "問題"
 
 #: modules/webalert/lib/webalert_templates.py:449
 msgid "Last Run"
-msgstr ""
+msgstr "最後執行"
 
 #: modules/webalert/lib/webalert_templates.py:467
 msgid "Set new alert"
-msgstr ""
+msgstr "設置新警報"
 
 #: modules/webalert/lib/webalert_webinterface.py:68
 msgid "Display searches"
-msgstr ""
+msgstr "顯示搜索"
 
 #: modules/webalert/lib/webalert_webinterface.py:73
 #: modules/webalert/lib/webalert_webinterface.py:115
@@ -1388,263 +1388,263 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:97
 #: modules/websubmit/web/yoursubmissions.py:178
 msgid "Your Account"
-msgstr ""
+msgstr "帳戶"
 
 #: modules/webalert/lib/webalert_webinterface.py:110
 msgid "Set a new alert"
-msgstr ""
+msgstr "設置新警報"
 
 #: modules/webalert/lib/webalert_webinterface.py:153
 msgid "Modify alert settings"
-msgstr ""
+msgstr "修改警報設定"
 
 #: modules/webalert/lib/webalert_webinterface.py:181
 #: modules/webalert/lib/webalert_webinterface.py:220
 #: modules/webalert/lib/webalert_webinterface.py:259
 #: modules/webalert/lib/webalert_webinterface.py:290
 msgid "Display alerts"
-msgstr ""
+msgstr "顯示警報"
 
 #: modules/webbasket/lib/webbasket.py:345
 msgid "Your comment has been successfully posted"
-msgstr ""
+msgstr "您的意見已被張貼。"
 
 #: modules/webbasket/lib/webbasket.py:744
 #: modules/webbasket/lib/webbasket_templates.py:98
 msgid "Personal baskets"
-msgstr ""
+msgstr "個人收藏籃"
 
 #: modules/webbasket/lib/webbasket.py:768
 #: modules/webbasket/lib/webbasket_templates.py:105
 msgid "Group baskets"
-msgstr ""
+msgstr "群組收藏籃"
 
 #: modules/webbasket/lib/webbasket.py:794
 #: modules/webbasket/lib/webbasket_templates.py:112
 msgid "Others' baskets"
-msgstr ""
+msgstr "其他的收藏籃"
 
 #: modules/webbasket/lib/webbasket.py:832
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
 "s group baskets and %(x_nb_public)s other users public baskets."
-msgstr ""
+msgstr "您有 %(x_nb_perso)s 個個人收藏籃、訂閱 %(x_nb_group)s 組別收藏籃和%(x_nb_public)s 其他用戶的共享收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:199
 #, python-format
 msgid "There are %i baskets"
-msgstr ""
+msgstr "總共有 %i 個收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:207
 msgid "updated on"
-msgstr ""
+msgstr "更新"
 
 #: modules/webbasket/lib/webbasket_templates.py:242
 #: modules/webbasket/lib/webbasket_templates.py:475
 msgid "Basket is empty"
-msgstr ""
+msgstr "收藏籃沒有任何記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:255
 #, python-format
 msgid ""
 "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
 "(x_url_close)s to it"
-msgstr ""
+msgstr "您可以%(x_url_open)s訂閱%(x_url_close)s這屬於%(x_name)s的收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:282
 #: modules/webbasket/lib/webbasket_webinterface.py:645
 msgid "Public basket"
-msgstr ""
+msgstr "共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:285
 #: modules/webbasket/lib/webbasket_templates.py:546
 #: modules/webbasket/lib/webbasket_templates.py:822
 msgid "records"
-msgstr ""
+msgstr "記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:286
 #: modules/webbasket/lib/webbasket_templates.py:547
 #: modules/webbasket/lib/webbasket_templates.py:823
 msgid "last update"
-msgstr ""
+msgstr "最後更新"
 
 #: modules/webbasket/lib/webbasket_templates.py:292
 msgid "Subscribe to this basket"
-msgstr ""
+msgstr "訂閱這收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:310
 #: modules/webbasket/lib/webbasket_templates.py:1011
 #: modules/webbasket/lib/webbasket_templates.py:1255
 msgid "Basket's name"
-msgstr ""
+msgstr "收藏籃名稱"
 
 #: modules/webbasket/lib/webbasket_templates.py:311
 msgid "Number of views"
-msgstr ""
+msgstr "閱讀次數"
 
 #: modules/webbasket/lib/webbasket_templates.py:312
 msgid "Owner"
-msgstr ""
+msgstr "擁有者"
 
 #: modules/webbasket/lib/webbasket_templates.py:356
 msgid "View"
-msgstr ""
+msgstr "閱讀"
 
 #: modules/webbasket/lib/webbasket_templates.py:365
 msgid "Subscribe"
-msgstr ""
+msgstr "訂閱"
 
 #: modules/webbasket/lib/webbasket_templates.py:378
 msgid "There is currently no publicly accessible basket"
-msgstr ""
+msgstr "沒有共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:390
 #, python-format
 msgid ""
 "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
 "in total."
-msgstr ""
+msgstr "共%(x_nb_total)i收藏籃。 顯示%(x_nb_begin)i-%(x_nb_end)i之收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:423
 msgid "Actions"
-msgstr ""
+msgstr "行動"
 
 #: modules/webbasket/lib/webbasket_templates.py:454
 #: modules/webbasket/lib/webbasket_templates.py:775
 msgid "Non-shared basket"
-msgstr ""
+msgstr "非共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:457
 #: modules/webbasket/lib/webbasket_templates.py:777
 msgid "Shared basket"
-msgstr ""
+msgstr "共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:460
 #: modules/webbasket/lib/webbasket_templates.py:779
 msgid "Group-shared basket"
-msgstr ""
+msgstr "組別共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:465
 #: modules/webbasket/lib/webbasket_webinterface.py:542
 msgid "Edit basket"
-msgstr ""
+msgstr "編輯收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:504
 msgid "You do not have sufficient rights to view this basket's content."
-msgstr ""
+msgstr "您沒有足夠權限以讀取這收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:509
 #: modules/webbasket/lib/webbasket_templates.py:784
 msgid "Unsubscribe from this basket"
-msgstr ""
+msgstr "取消訂閱收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
 #: modules/webbasket/lib/webbasket_templates.py:641
 msgid "comments"
-msgstr ""
+msgstr "意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:522
 msgid "last comment:"
-msgstr ""
+msgstr "最新意見："
 
 #: modules/webbasket/lib/webbasket_templates.py:583
 msgid "Move item up"
-msgstr ""
+msgstr "上移"
 
 #: modules/webbasket/lib/webbasket_templates.py:591
 msgid "Move item down"
-msgstr ""
+msgstr "下移"
 
 #: modules/webbasket/lib/webbasket_templates.py:599
 msgid "Copy item"
-msgstr ""
+msgstr "拷貝"
 
 #: modules/webbasket/lib/webbasket_templates.py:607
 msgid "Remove item"
-msgstr ""
+msgstr "移除"
 
 #: modules/webbasket/lib/webbasket_templates.py:610
 msgid "External record"
-msgstr ""
+msgstr "外部記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:642
 msgid "last"
-msgstr ""
+msgstr "最後"
 
 #: modules/webbasket/lib/webbasket_templates.py:643
 #: modules/webbasket/lib/webbasket_webinterface.py:131
 #: modules/webbasket/lib/webbasket_webinterface.py:233
 msgid "Details and comments"
-msgstr ""
+msgstr "詳細資料和意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:667
 msgid "This basket is publicly accessible at the following address:"
-msgstr ""
+msgstr "可閱讀這收藏籃的地址："
 
 #: modules/webbasket/lib/webbasket_templates.py:697
 #: modules/websearch/lib/websearch_templates.py:536
 #: modules/websearch/lib/websearch_templates.py:1579
 msgid "Sort by:"
-msgstr ""
+msgstr "排序"
 
 #: modules/webbasket/lib/webbasket_templates.py:698
 #: modules/webbasket/lib/webbasket_templates.py:926
 msgid "Title"
-msgstr ""
+msgstr "標題"
 
 #: modules/webbasket/lib/webbasket_templates.py:699
 #: modules/webmessage/lib/webmessage_templates.py:90
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: modules/webbasket/lib/webbasket_templates.py:769
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:174
 msgid "Comments"
-msgstr ""
+msgstr "意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:770
 #, python-format
 msgid "There is a total of %i comments"
-msgstr ""
+msgstr "總共有 %i 意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:772
 #: modules/webbasket/lib/webbasket_webinterface.py:177
 #: modules/webcomment/lib/webcomment_templates.py:95
 #: modules/webcomment/lib/webcomment_templates.py:579
 msgid "Write a comment"
-msgstr ""
+msgstr "撰寫意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:828
 msgid "Back to baskets"
-msgstr ""
+msgstr "返回收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:857
 #: modules/webbasket/lib/webbasket_templates.py:885
 msgid "by"
-msgstr ""
+msgstr "由"
 
 #: modules/webbasket/lib/webbasket_templates.py:858
 #: modules/webbasket/lib/webbasket_templates.py:885
 msgid "on"
-msgstr ""
+msgstr "在"
 
 #: modules/webbasket/lib/webbasket_templates.py:870
 #: modules/webcomment/lib/webcomment_templates.py:330
 #: modules/webmessage/lib/webmessage_templates.py:113
 msgid "Reply"
-msgstr ""
+msgstr "回復"
 
 #: modules/webbasket/lib/webbasket_templates.py:871
 msgid "Delete comment"
-msgstr ""
+msgstr "刪除意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:925
 #: modules/webbasket/lib/webbasket_templates.py:930
 #: modules/webcomment/lib/webcomment_webinterface.py:219
 msgid "Add Comment"
-msgstr ""
+msgstr "新增評論"
 
 #: modules/webbasket/lib/webbasket_templates.py:927
 #: modules/webcomment/lib/webcomment_templates.py:626
@@ -1652,137 +1652,137 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1173
 #: modules/webcomment/lib/webcomment_templates.py:1239
 msgid "Comment"
-msgstr ""
+msgstr "意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:946
 #: modules/webbasket/lib/webbasket_templates.py:1042
 msgid "Create new basket"
-msgstr ""
+msgstr "創建收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:996
 msgid "Select topic"
-msgstr ""
+msgstr "選擇主題"
 
 #: modules/webbasket/lib/webbasket_templates.py:1012
 #: modules/webbasket/lib/webbasket_templates.py:1257
 #: modules/webbasket/lib/webbasket_templates.py:1266
 msgid "Choose topic"
-msgstr ""
+msgstr "選擇主題"
 
 #: modules/webbasket/lib/webbasket_templates.py:1013
 #: modules/webbasket/lib/webbasket_templates.py:1268
 msgid "or create a new one"
-msgstr ""
+msgstr "或創建"
 
 #: modules/webbasket/lib/webbasket_templates.py:1013
 msgid "Create new topic"
-msgstr ""
+msgstr "創建主題"
 
 #: modules/webbasket/lib/webbasket_templates.py:1015
 msgid "Create a new basket"
-msgstr ""
+msgstr "創建收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1076
 #: modules/webbasket/lib/webbasket_templates.py:1097
 #: modules/webbasket/lib/webbasket_templates.py:1113
 msgid "Select basket"
-msgstr ""
+msgstr "選擇收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1084
 msgid "Add to a personal basket"
-msgstr ""
+msgstr "加入個人收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1085
 #: modules/webbasket/lib/webbasket_templates.py:1106
 #: modules/webbasket/lib/webbasket_templates.py:1124
 #, python-format
 msgid "%i baskets"
-msgstr ""
+msgstr "%i 收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1105
 msgid "Add to a group-shared basket"
-msgstr ""
+msgstr "新增至組別收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1123
 msgid "Add to a public basket"
-msgstr ""
+msgstr "新增至共享收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1156
 #, python-format
 msgid "Adding %i records to these baskets"
-msgstr ""
+msgstr "新增 %i 記錄至這些收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1161
 msgid "Add to baskets"
-msgstr ""
+msgstr "新增至收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1168
 #, python-format
 msgid "The selected records have been successfully added to %i baskets."
-msgstr ""
+msgstr "您挑選的記錄已被加進 %i 收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1171
 msgid "No records were added to the selected baskets."
-msgstr ""
+msgstr "沒有記錄被加進收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1191
 msgid "Are you sure you want to delete this basket?"
-msgstr ""
+msgstr "您是否決定移除這收藏籃？"
 
 #: modules/webbasket/lib/webbasket_templates.py:1193
 #, python-format
 msgid "%i users are subscribed to this basket."
-msgstr ""
+msgstr "%i 用戶已訂閱這收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1195
 #, python-format
 msgid "%i user groups are subscribed to this basket."
-msgstr ""
+msgstr "%i 用戶組別已訂閱這收藏籃。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1197
 #, python-format
 msgid "You have set %i alerts on this basket."
-msgstr ""
+msgstr "您的收藏籃已設有 %i 條警報。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1271
 msgid "General settings"
-msgstr ""
+msgstr "一般設定"
 
 #: modules/webbasket/lib/webbasket_templates.py:1286
 #: modules/webbasket/lib/webbasket_templates.py:1415
 #: modules/webbasket/lib/webbasket_templates.py:1442
 msgid "Add group"
-msgstr ""
+msgstr "新增組別"
 
 #: modules/webbasket/lib/webbasket_templates.py:1291
 msgid "Manage group rights"
-msgstr ""
+msgstr "管理組別權利"
 
 #: modules/webbasket/lib/webbasket_templates.py:1303
 msgid "Manage global sharing rights"
-msgstr ""
+msgstr "管理系統性分享權利"
 
 #: modules/webbasket/lib/webbasket_templates.py:1308
 msgid "Delete basket"
-msgstr ""
+msgstr "刪除收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1332
 msgid "Editing basket"
-msgstr ""
+msgstr "編輯收藏籃"
 
 #: modules/webbasket/lib/webbasket_templates.py:1340
 msgid "Save changes"
-msgstr ""
+msgstr "儲存更改"
 
 #: modules/webbasket/lib/webbasket_templates.py:1353
 #: modules/webbasket/lib/webbasket_templates.py:1377
 msgid "No rights"
-msgstr ""
+msgstr "沒有權限"
 
 #: modules/webbasket/lib/webbasket_templates.py:1355
 #: modules/webbasket/lib/webbasket_templates.py:1379
 msgid "View records"
-msgstr ""
+msgstr "閱讀記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:1357
 #: modules/webbasket/lib/webbasket_templates.py:1359
@@ -1797,52 +1797,52 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1389
 #: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "and"
-msgstr ""
+msgstr "和"
 
 #: modules/webbasket/lib/webbasket_templates.py:1357
 #: modules/webbasket/lib/webbasket_templates.py:1381
 msgid "view comments"
-msgstr ""
+msgstr "閱讀意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:1359
 #: modules/webbasket/lib/webbasket_templates.py:1383
 msgid "add comments"
-msgstr ""
+msgstr "新增意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:1361
 #: modules/webbasket/lib/webbasket_templates.py:1385
 msgid "add records"
-msgstr ""
+msgstr "添加記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:1363
 #: modules/webbasket/lib/webbasket_templates.py:1387
 msgid "delete comments"
-msgstr ""
+msgstr "刪除意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:1365
 #: modules/webbasket/lib/webbasket_templates.py:1389
 msgid "remove records"
-msgstr ""
+msgstr "移除記錄"
 
 #: modules/webbasket/lib/webbasket_templates.py:1367
 #: modules/webbasket/lib/webbasket_templates.py:1391
 msgid "manage sharing rights"
-msgstr ""
+msgstr "管理共享權限"
 
 #: modules/webbasket/lib/webbasket_templates.py:1413
 msgid "You are not a member of a group."
-msgstr ""
+msgstr "您並不是這組別的用戶。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1435
 msgid "Sharing basket to a new group"
-msgstr ""
+msgstr "分享這收藏籃於組別"
 
 #: modules/webbasket/lib/webbasket_templates.py:1464
 #: modules/websession/lib/websession_templates.py:452
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
-msgstr ""
+msgstr "您是用遊客登錄, 因此您的收藏籃將不會保存在這系統中。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
 #: modules/webbasket/lib/webbasket_templates.py:1482
@@ -1850,414 +1850,414 @@ msgstr ""
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
-msgstr ""
+msgstr "您可以%(x_url_open)s登入或%(x_url_close)s註冊。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1481
 #: modules/websession/lib/websession_webinterface.py:120
 msgid "This functionality is forbidden to guest users."
-msgstr ""
+msgstr "遊客是被禁止使用這功能。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1542
 #: modules/webcomment/lib/webcomment_templates.py:618
 msgid "Back to search results"
-msgstr ""
+msgstr "返回檢索結果頁"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:83
 msgid "Display baskets"
-msgstr ""
+msgstr "顯示收藏籃"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:325
 #: modules/websession/lib/websession_templates.py:409
 #: modules/websession/lib/websession_templates.py:548
 msgid "Your Baskets"
-msgstr ""
+msgstr "收藏"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:327
 msgid "Add records to baskets"
-msgstr ""
+msgstr "新增記錄進收藏籃"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:382
 msgid "Delete a basket"
-msgstr ""
+msgstr "刪除收藏籃"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:422
 msgid "Copy record to basket"
-msgstr ""
+msgstr "拷貝記錄進收藏籃"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:592
 msgid "Create basket"
-msgstr ""
+msgstr "創建收藏籃"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:620
 #: modules/webbasket/lib/webbasket_webinterface.py:644
 #: modules/webbasket/lib/webbasket_webinterface.py:673
 msgid "List of public baskets"
-msgstr ""
+msgstr "共享收藏籃列表"
 
 #: modules/webcomment/lib/webcommentadminlib.py:38
 msgid "WebComment Admin"
-msgstr ""
+msgstr "WebComment 管理"
 
 #: modules/webcomment/lib/webcomment.py:799
 #: modules/webcomment/lib/webcomment_templates.py:326
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr ""
+msgstr "%(x_name)s 在 %(x_date)s 寫："
 
 #: modules/webcomment/lib/webcomment_templates.py:107
 #, python-format
 msgid "Showing the latest %i comments:"
-msgstr ""
+msgstr "顯示最後的 %i 意見："
 
 #: modules/webcomment/lib/webcomment_templates.py:122
 #: modules/webcomment/lib/webcomment_templates.py:147
 msgid "Discuss this document"
-msgstr ""
+msgstr "討論這評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:148
 msgid "Start a discussion about any aspect of this document."
-msgstr ""
+msgstr "討論這文件。"
 
 #: modules/webcomment/lib/webcomment_templates.py:164
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
-msgstr ""
+msgstr "對不起，記錄 %s 並不存在。"
 
 #: modules/webcomment/lib/webcomment_templates.py:166
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
-msgstr ""
+msgstr "對不起，%s 不是一有效數值。"
 
 #: modules/webcomment/lib/webcomment_templates.py:168
 msgid "Sorry, no record ID was provided."
-msgstr ""
+msgstr "對不起，並沒有提供記錄ID。"
 
 #: modules/webcomment/lib/webcomment_templates.py:172
 #, python-format
 msgid "You may want to start browsing from %s"
-msgstr ""
+msgstr "您可以從%s開始瀏覽 "
 
 #: modules/webcomment/lib/webcomment_templates.py:240
 #: modules/webcomment/lib/webcomment_templates.py:509
 msgid "Was this review helpful?"
-msgstr ""
+msgstr "這評論有用嗎？"
 
 #: modules/webcomment/lib/webcomment_templates.py:251
 #: modules/webcomment/lib/webcomment_templates.py:288
 #: modules/webcomment/lib/webcomment_templates.py:579
 msgid "Write a review"
-msgstr ""
+msgstr "撰寫評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:258
 #: modules/webcomment/lib/webcomment_templates.py:565
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr ""
+msgstr "平均評論得分：%(x_nb_score)s 基於 %(x_nb_reviews)s 條評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:261
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
-msgstr ""
+msgstr "讀者覺得以下 %s 評論是有用的。"
 
 #: modules/webcomment/lib/webcomment_templates.py:264
 #: modules/webcomment/lib/webcomment_templates.py:287
 #, python-format
 msgid "View all %s reviews"
-msgstr ""
+msgstr "閱讀全部%s評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:283
 #: modules/webcomment/lib/webcomment_templates.py:305
 msgid "Rate this document"
-msgstr ""
+msgstr "評價這文件"
 
 #: modules/webcomment/lib/webcomment_templates.py:306
 msgid "Be the first to review this document."
-msgstr ""
-
+msgstr "成為第一個讀者去評論這文件。"
+ 
 #: modules/webcomment/lib/webcomment_templates.py:334
 #: modules/webcomment/lib/webcomment_templates.py:376
 #: modules/webcomment/lib/webcomment_templates.py:510
 msgid "Report abuse"
-msgstr ""
+msgstr "舉報濫用"
 
 #: modules/webcomment/lib/webcomment_templates.py:371
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
-msgstr ""
+msgstr "%(x_nickname)s 在 %(x_date)s 評論這文件"
 
 #: modules/webcomment/lib/webcomment_templates.py:372
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr ""
+msgstr "%(x_nb_people)i/%(x_nb_total)i個讀者評價這評論是有用的"
 
 #: modules/webcomment/lib/webcomment_templates.py:540
 msgid "Previous"
-msgstr ""
+msgstr "前一個"
 
 #: modules/webcomment/lib/webcomment_templates.py:556
 msgid "Next"
-msgstr ""
+msgstr "下一個"
 
 #: modules/webcomment/lib/webcomment_templates.py:582
 #, python-format
 msgid "There is a total of %s reviews"
-msgstr ""
+msgstr "總共有 %s 評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:584
 #, python-format
 msgid "There is a total of %s comments"
-msgstr ""
+msgstr "總共有 %s "
 
 #: modules/webcomment/lib/webcomment_templates.py:625
 #: modules/webcomment/lib/webcomment_templates.py:676
 msgid "review"
-msgstr ""
+msgstr "評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:625
 #: modules/webcomment/lib/webcomment_templates.py:676
 msgid "comment"
-msgstr ""
+msgstr "意見"
 
 #: modules/webcomment/lib/webcomment_templates.py:626
 #: modules/webcomment/lib/webcomment_templates.py:1239
 msgid "Review"
-msgstr ""
+msgstr "評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:674
 msgid "Viewing"
-msgstr ""
+msgstr "閱讀"
 
 #: modules/webcomment/lib/webcomment_templates.py:675
 msgid "Page:"
-msgstr ""
+msgstr "頁:"
 
 #: modules/webcomment/lib/webcomment_templates.py:793
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
-msgstr ""
+msgstr "注意：您的諢號 - %s - 將會成顯示為文件的作者名稱。"
 
 #: modules/webcomment/lib/webcomment_templates.py:797
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
 "(x_nickname)s will be displayed as the author of this comment."
-msgstr ""
+msgstr "注意：您並未%(x_url_open)s定義您的諢號%(x_url_close)s。%(x_nickname)s 是會成顯示為文件的作者名稱。"
 
 #: modules/webcomment/lib/webcomment_templates.py:819
 #: modules/webcomment/lib/webcomment_templates.py:893
 msgid "Article"
-msgstr ""
+msgstr "文章"
 
 #: modules/webcomment/lib/webcomment_templates.py:847
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
-msgstr ""
+msgstr "您的諢號 - %s - 將會成顯示為評論的作者名稱。"
 
 #: modules/webcomment/lib/webcomment_templates.py:894
 msgid "Rate this article"
-msgstr ""
+msgstr "評價這文章"
 
 #: modules/webcomment/lib/webcomment_templates.py:895
 msgid "Select a score"
-msgstr ""
+msgstr "選擇評分"
 
 #: modules/webcomment/lib/webcomment_templates.py:896
 msgid "Give a title to your review"
-msgstr ""
+msgstr "輸入評論標題"
 
 #: modules/webcomment/lib/webcomment_templates.py:897
 msgid "Write your review"
-msgstr ""
+msgstr "撰寫評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:903
 #: modules/webcomment/lib/webcomment_webinterface.py:217
 msgid "Add Review"
-msgstr ""
+msgstr "新增評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:922
 msgid "Your review was successfully added."
-msgstr ""
+msgstr "您的評論已被接受。"
 
 #: modules/webcomment/lib/webcomment_templates.py:924
 msgid "Your comment was successfully added."
-msgstr ""
+msgstr "您的意見已被接受。"
 
 #: modules/webcomment/lib/webcomment_templates.py:926
 msgid "Back to record"
-msgstr ""
+msgstr "返回記錄"
 
 #: modules/webcomment/lib/webcomment_templates.py:1002
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
-msgstr ""
+msgstr "閱讀所有意見"
 
 #: modules/webcomment/lib/webcomment_templates.py:1005
 msgid "View all reported reviews"
-msgstr ""
+msgstr "閱讀所有評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:1010
 msgid "Delete a specific comment/review (by ID)"
-msgstr ""
+msgstr "刪除某一意見/評論 (按照ID)"
 
 #: modules/webcomment/lib/webcomment_templates.py:1011
 msgid "View all users who have been reported"
-msgstr ""
+msgstr "查閱全部曾給予意見/評論的用戶"
 
 #: modules/webcomment/lib/webcomment_templates.py:1014
 msgid "Comments and reviews are disabled"
-msgstr ""
+msgstr "意見和評論已被禁止"
 
 #: modules/webcomment/lib/webcomment_templates.py:1032
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
-msgstr ""
+msgstr "請輸入意見/評論ID以便查閱，之後您可以決定是否刪除它。"
 
 #: modules/webcomment/lib/webcomment_templates.py:1044
 msgid "Comment ID:"
-msgstr ""
+msgstr "意見ID："
 
 #: modules/webcomment/lib/webcomment_templates.py:1046
 msgid "View Comment"
-msgstr ""
+msgstr "查閱意見"
 
 #: modules/webcomment/lib/webcomment_templates.py:1067
 msgid "There have been no reports so far."
-msgstr ""
+msgstr "沒有任何報告記錄。"
 
 #: modules/webcomment/lib/webcomment_templates.py:1071
 #, python-format
 msgid "View all %s reported comments"
-msgstr ""
+msgstr "查閱全部 %s 意見"
 
 #: modules/webcomment/lib/webcomment_templates.py:1074
 #, python-format
 msgid "View all %s reported reviews"
-msgstr ""
+msgstr "查閱全部 %s 評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:1112
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
-msgstr ""
+msgstr "這名單列出全部曾提交意見或評論的用戶。"
 
 #: modules/webcomment/lib/webcomment_templates.py:1120
 #: modules/webcomment/lib/webcomment_templates.py:1149
 #: modules/websession/lib/websession_templates.py:176
 #: modules/websession/lib/websession_templates.py:861
 msgid "Nickname"
-msgstr ""
+msgstr "諢號"
 
 #: modules/webcomment/lib/webcomment_templates.py:1121
 #: modules/webcomment/lib/webcomment_templates.py:1153
 msgid "Email"
-msgstr ""
+msgstr "電郵"
 
 #: modules/webcomment/lib/webcomment_templates.py:1122
 #: modules/webcomment/lib/webcomment_templates.py:1151
 msgid "User ID"
-msgstr ""
+msgstr "用戶ID"
 
 #: modules/webcomment/lib/webcomment_templates.py:1124
 msgid "Number positive votes"
-msgstr ""
+msgstr "正面的投票"
 
 #: modules/webcomment/lib/webcomment_templates.py:1125
 msgid "Number negative votes"
-msgstr ""
+msgstr "負面的投票"
 
 #: modules/webcomment/lib/webcomment_templates.py:1126
 msgid "Total number votes"
-msgstr ""
+msgstr "全部投票數目"
 
 #: modules/webcomment/lib/webcomment_templates.py:1127
 msgid "Total number of reports"
-msgstr ""
+msgstr "報告數目"
 
 #: modules/webcomment/lib/webcomment_templates.py:1128
 msgid "View all user's reported comments/reviews"
-msgstr ""
+msgstr "查閱全部用戶的意見和評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:1161
 #, python-format
 msgid "This review has been reported %i times"
-msgstr ""
+msgstr "這評論已被報告了%i次"
 
 #: modules/webcomment/lib/webcomment_templates.py:1163
 #, python-format
 msgid "This comment has been reported %i times"
-msgstr ""
+msgstr "這意見已被報告了%i次"
 
 #: modules/webcomment/lib/webcomment_templates.py:1240
 msgid "Written by"
-msgstr ""
+msgstr "作者："
 
 #: modules/webcomment/lib/webcomment_templates.py:1241
 msgid "General informations"
-msgstr ""
+msgstr "一般資料"
 
 #: modules/webcomment/lib/webcomment_templates.py:1242
 msgid "Select"
-msgstr ""
+msgstr "選擇"
 
 #: modules/webcomment/lib/webcomment_templates.py:1256
 msgid "Delete selected reviews"
-msgstr ""
+msgstr "刪除已選擇的評論"
 
 #: modules/webcomment/lib/webcomment_templates.py:1257
 #: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Suppress selected abuse report"
-msgstr ""
+msgstr "查禁已選擇的濫用報告"
 
 #: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "Delete selected comments"
-msgstr ""
+msgstr "刪除已選擇的意見"
 
 #: modules/webcomment/lib/webcomment_templates.py:1270
 msgid "OK"
-msgstr ""
+msgstr "是"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
 #, python-format
 msgid "Here are the reported reviews of user %s"
-msgstr ""
+msgstr "用戶 %s 的評論："
 
 #: modules/webcomment/lib/webcomment_templates.py:1278
 #, python-format
 msgid "Here are the reported comments of user %s"
-msgstr ""
+msgstr "用戶 %s 的意見："
 
 #: modules/webcomment/lib/webcomment_templates.py:1281
 #, python-format
 msgid "Here is comment/review %s"
-msgstr ""
+msgstr "評論/意見 %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1283
 #, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
-msgstr ""
+msgstr "用戶 %(x_user)s 的評論/意見 %(x_cmtID)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1288
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr ""
+msgstr "全部評論 (以最多提供評論者排序)"
 
 #: modules/webcomment/lib/webcomment_templates.py:1290
 msgid "Here are all reported comments sorted by the most reported"
-msgstr ""
+msgstr "全部意見 (以最多提供意見者排序)"
 
 #: modules/webcomment/lib/webcomment_templates.py:1315
 #: modules/webcomment/lib/webcomment_templates.py:1340
 msgid "comment ID"
-msgstr ""
+msgstr "意見ID"
 
 #: modules/webcomment/lib/webcomment_templates.py:1315
 msgid "successfully deleted"
-msgstr ""
+msgstr "成功刪除"
 
 #: modules/webcomment/lib/webcomment_templates.py:1340
 msgid "successfully suppressed abuse report"
-msgstr ""
+msgstr "成功查禁濫用報告"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:111
 #: modules/webcomment/lib/webcomment_webinterface.py:169
@@ -2266,30 +2266,30 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2402
 #: modules/websearch/lib/websearch_templates.py:2407
 msgid "Detailed record"
-msgstr ""
+msgstr "詳細記錄"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:113
 #: modules/webcomment/lib/webcomment_webinterface.py:174
 msgid "Reviews"
-msgstr ""
+msgstr "評論"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:125
 #: modules/webcomment/lib/webcomment_webinterface.py:232
 msgid "Record Not Found"
-msgstr ""
+msgstr "找不到記錄"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:192
 #, python-format
 msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
-msgstr ""
+msgstr "請先%(x_url_open)s登入%(x_url_close)s才發表意見"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:196
 #: modules/websession/lib/websession_webinterface.py:502
 #: modules/websession/lib/websession_webinterface.py:534
 msgid "Login"
-msgstr ""
+msgstr "登入"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:46
 #: modules/webcomment/web/admin/webcommentadmin.py:60
@@ -2298,77 +2298,77 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:154
 #: modules/webcomment/web/admin/webcommentadmin.py:191
 msgid "Comment Management"
-msgstr ""
+msgstr "管理意見"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:95
 msgid "Delete Comment"
-msgstr ""
+msgstr "刪除意見"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:168
 msgid "View all reported users"
-msgstr ""
+msgstr "查閱全部用戶"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:214
 msgid "Delete comments"
-msgstr ""
+msgstr "刪除意見"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:217
 msgid "Suppress abuse reports"
-msgstr ""
+msgstr "查禁濫用報告"
 
 #: modules/webmessage/lib/webmessage.py:129
 msgid "The message could not be deleted."
-msgstr ""
+msgstr "這訊息不能刪除。"
 
 #: modules/webmessage/lib/webmessage.py:131
 msgid "The message was successfully deleted."
-msgstr ""
+msgstr "這訊息已被刪除。"
 
 #: modules/webmessage/lib/webmessage.py:148
 msgid "Your mailbox has been emptied."
-msgstr ""
+msgstr "您的電郵箱已被清空。"
 
 #: modules/webmessage/lib/webmessage.py:335
 #, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
-msgstr ""
+msgstr "日期 %(x_year)i/%(x_month)i/%(x_day)i) 錯誤"
 
 #: modules/webmessage/lib/webmessage.py:344
 msgid "Please enter a user name or a group name."
-msgstr ""
+msgstr "請輸入用戶名稱或組別名稱。"
 
 #: modules/webmessage/lib/webmessage.py:348
 #, python-format
 msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
 "characters."
-msgstr ""
+msgstr "您的訊息太長，請修改它。最大允許是%i個字。"
 
 #: modules/webmessage/lib/webmessage.py:359
 #, python-format
 msgid "Group %s does not exist."
-msgstr ""
+msgstr "組別 %s 並不存在。"
 
 #: modules/webmessage/lib/webmessage.py:384
 #, python-format
 msgid "User %s does not exist."
-msgstr ""
+msgstr "用戶 %s 並不存在。"
 
 #: modules/webmessage/lib/webmessage.py:397
 #: modules/webmessage/lib/webmessage_webinterface.py:118
 #: modules/webmessage/lib/webmessage_webinterface.py:188
 msgid "Write a message"
-msgstr ""
+msgstr "撰寫訊息"
 
 #: modules/webmessage/lib/webmessage.py:412
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
-msgstr ""
+msgstr "因限額問題，您的訊息不能發到以下的收件人："
 
 #: modules/webmessage/lib/webmessage.py:416
 msgid "Your message has been sent."
-msgstr ""
+msgstr "您的訊息已被發出。"
 
 #: modules/webmessage/lib/webmessage.py:423
 #: modules/webmessage/lib/webmessage_templates.py:477
@@ -2377,143 +2377,143 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:280
 #: modules/websession/lib/websession_templates.py:547
 msgid "Your Messages"
-msgstr ""
+msgstr "訊息"
 
 #: modules/webmessage/lib/webmessage_templates.py:88
 msgid "Subject"
-msgstr ""
+msgstr "主題"
 
 #: modules/webmessage/lib/webmessage_templates.py:89
 msgid "Sender"
-msgstr ""
+msgstr "發送者"
 
 #: modules/webmessage/lib/webmessage_templates.py:98
 msgid "No messages"
-msgstr ""
+msgstr "沒有訊息"
 
 #: modules/webmessage/lib/webmessage_templates.py:102
 msgid "No subject"
-msgstr ""
+msgstr "沒有主題"
 
 #: modules/webmessage/lib/webmessage_templates.py:148
 msgid "Write new message"
-msgstr ""
+msgstr "撰寫新訊息"
 
 #: modules/webmessage/lib/webmessage_templates.py:149
 msgid "Delete All"
-msgstr ""
+msgstr "全部刪除"
 
 #: modules/webmessage/lib/webmessage_templates.py:191
 msgid "Re:"
-msgstr ""
+msgstr "回覆："
 
 #: modules/webmessage/lib/webmessage_templates.py:285
 msgid "Send later?"
-msgstr ""
+msgstr "稍後發送？"
 
 #: modules/webmessage/lib/webmessage_templates.py:286
 msgid "To:"
-msgstr ""
+msgstr "收件者："
 
 #: modules/webmessage/lib/webmessage_templates.py:287
 msgid "Users"
-msgstr ""
+msgstr "用戶"
 
 #: modules/webmessage/lib/webmessage_templates.py:288
 msgid "Groups"
-msgstr ""
+msgstr "組別"
 
 #: modules/webmessage/lib/webmessage_templates.py:289
 #: modules/webmessage/lib/webmessage_templates.py:451
 msgid "Subject:"
-msgstr ""
+msgstr "主題:"
 
 #: modules/webmessage/lib/webmessage_templates.py:290
 msgid "Message:"
-msgstr ""
+msgstr "訊息："
 
 #: modules/webmessage/lib/webmessage_templates.py:291
 msgid "SEND"
-msgstr ""
+msgstr "發送"
 
 #: modules/webmessage/lib/webmessage_templates.py:450
 msgid "From:"
-msgstr ""
+msgstr "送件者："
 
 #: modules/webmessage/lib/webmessage_templates.py:452
 msgid "Sent on:"
-msgstr ""
+msgstr "發送日期："
 
 #: modules/webmessage/lib/webmessage_templates.py:453
 msgid "Received on:"
-msgstr ""
+msgstr "收件日期："
 
 #: modules/webmessage/lib/webmessage_templates.py:454
 msgid "Sent to:"
-msgstr ""
+msgstr "發送至："
 
 #: modules/webmessage/lib/webmessage_templates.py:455
 msgid "Sent to groups:"
-msgstr ""
+msgstr "發送至組別："
 
 #: modules/webmessage/lib/webmessage_templates.py:456
 msgid "REPLY"
-msgstr ""
+msgstr "回復"
 
 #: modules/webmessage/lib/webmessage_templates.py:457
 msgid "DELETE"
-msgstr ""
+msgstr "刪除"
 
 #: modules/webmessage/lib/webmessage_templates.py:511
 msgid "Are you sure you want to empty your whole mailbox?"
-msgstr ""
+msgstr "您是否決定清空電郵箱？"
 
 #: modules/webmessage/lib/webmessage_templates.py:573
 #, python-format
 msgid "Quota used: %i messages out of max. %i"
-msgstr ""
+msgstr "配額：%i/%i 訊息"
 
 #: modules/webmessage/lib/webmessage_templates.py:590
 msgid "Please select one or more:"
-msgstr ""
+msgstr "請選擇："
 
 #: modules/webmessage/lib/webmessage_templates.py:621
 msgid "Add to users"
-msgstr ""
+msgstr "加入至用戶"
 
 #: modules/webmessage/lib/webmessage_templates.py:623
 msgid "Add to groups"
-msgstr ""
+msgstr "加入至組別"
 
 #: modules/webmessage/lib/webmessage_templates.py:626
 msgid "No matching user"
-msgstr ""
+msgstr "找尋不到用戶"
 
 #: modules/webmessage/lib/webmessage_templates.py:628
 #: modules/websession/lib/websession_templates.py:1470
 msgid "No matching group"
-msgstr ""
+msgstr "找尋不到組別"
 
 #: modules/webmessage/lib/webmessage_templates.py:662
 msgid "Find users or groups:"
-msgstr ""
+msgstr "找尋用戶或組別"
 
 #: modules/webmessage/lib/webmessage_templates.py:663
 msgid "Find a user"
-msgstr ""
+msgstr "找尋用戶"
 
 #: modules/webmessage/lib/webmessage_templates.py:664
 msgid "Find a group"
-msgstr ""
+msgstr "找尋組別"
 
 #: modules/webmessage/lib/webmessage_templates.py:679
 #, python-format
 msgid "You have %s new messages out of %s messages"
-msgstr ""
+msgstr "您有%s個新訊息，總共有%s訊息。"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:313
 msgid "Read a message"
-msgstr ""
+msgstr "閱讀訊息"
 
 #: modules/websearch/lib/search_engine.py:361
 #: modules/websearch/lib/search_engine.py:391
@@ -2521,148 +2521,148 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:3182
 #: modules/websearch/lib/search_engine.py:3216
 msgid "Search Results"
-msgstr ""
+msgstr "檢索結果"
 
 #: modules/websearch/lib/search_engine.py:426
 #: modules/websearch/lib/websearch_templates.py:645
 msgid "any day"
-msgstr ""
+msgstr "任何日子"
 
 #: modules/websearch/lib/search_engine.py:432
 #: modules/websearch/lib/websearch_templates.py:657
 msgid "any month"
-msgstr ""
+msgstr "任何月份"
 
 #: modules/websearch/lib/search_engine.py:440
 #: modules/websearch/lib/websearch_templates.py:671
 msgid "any year"
-msgstr ""
+msgstr "任何年份"
 
 #: modules/websearch/lib/search_engine.py:483
 #: modules/websearch/lib/search_engine.py:498
 msgid "any collection"
-msgstr ""
+msgstr "任何專輯"
 
 #: modules/websearch/lib/search_engine.py:494
 msgid "add another collection"
-msgstr ""
+msgstr "新增專輯"
 
 #: modules/websearch/lib/search_engine.py:503
 #: modules/websearch/lib/websearch_webcoll.py:487
 msgid "latest first"
-msgstr ""
+msgstr "時間"
 
 #: modules/websearch/lib/search_engine.py:518
 #: modules/websearch/lib/search_engine.py:640
 #: modules/websearch/lib/websearch_templates.py:622
 #: modules/websearch/lib/websearch_webcoll.py:517
 msgid "OR"
-msgstr ""
+msgstr "或"
 
 #: modules/websearch/lib/search_engine.py:518
 #: modules/websearch/lib/websearch_webcoll.py:517
 msgid "rank by"
-msgstr ""
+msgstr "排列"
 
 #: modules/websearch/lib/search_engine.py:538
 msgid "HTML brief"
-msgstr ""
+msgstr "簡短的HTML"
 
 #: modules/websearch/lib/search_engine.py:639
 #: modules/websearch/lib/websearch_templates.py:621
 msgid "AND"
-msgstr ""
+msgstr "和"
 
 #: modules/websearch/lib/search_engine.py:641
 #: modules/websearch/lib/websearch_templates.py:623
 msgid "AND NOT"
-msgstr ""
+msgstr "不包含"
 
 #: modules/websearch/lib/search_engine.py:659
 #: modules/websearch/lib/websearch_templates.py:571
 msgid "All of the words:"
-msgstr ""
+msgstr "包含以下全部的字詞:"
 
 #: modules/websearch/lib/search_engine.py:660
 #: modules/websearch/lib/websearch_templates.py:573
 msgid "Any of the words:"
-msgstr ""
+msgstr "包含以下任何一個字詞:"
 
 #: modules/websearch/lib/search_engine.py:661
 #: modules/websearch/lib/websearch_templates.py:575
 msgid "Exact phrase:"
-msgstr ""
+msgstr "包含以下的完整字句:"
 
 #: modules/websearch/lib/search_engine.py:662
 #: modules/websearch/lib/websearch_templates.py:577
 msgid "Partial phrase:"
-msgstr ""
+msgstr "包含以下的部分字句"
 
 #: modules/websearch/lib/search_engine.py:663
 #: modules/websearch/lib/websearch_templates.py:579
 msgid "Regular expression:"
-msgstr ""
+msgstr "正則表達式:"
 
 #: modules/websearch/lib/search_engine.py:1228
 msgid "No values found."
-msgstr ""
+msgstr "沒有找到。"
 
 #: modules/websearch/lib/search_engine.py:1361
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
-msgstr ""
+msgstr "用 %(x_query1)s 沒有確實匹配任何記錄，現嘗試用 %(x_query2)s 來查詢… ，"
 
 #: modules/websearch/lib/search_engine.py:1600
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
-msgstr ""
+msgstr "在專輯 %(x_collection)s 裡沒有匹配任何記錄；但在其他的專輯裡找到%(x_url_open)s%(x_nb_hits)d 筆記錄%(x_url_close)s。"
 
 #: modules/websearch/lib/search_engine.py:1609
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
-msgstr ""
+msgstr "沒有在專輯裡匹配任何記錄。您可嘗試在限制的專輯裡找尋。"
 
 #: modules/websearch/lib/search_engine.py:1723
 msgid "No words index available for"
-msgstr ""
+msgstr "沒有可用的字索引給"
 
 #: modules/websearch/lib/search_engine.py:1727
 msgid "No phrase index available for"
-msgstr ""
+msgstr "沒有可用的短語索引給"
 
 #: modules/websearch/lib/search_engine.py:1759
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
-msgstr ""
+msgstr "在索引 %(x_index)s 匹配不到關於 %(x_term)s 的任何記錄。接近的短語是："
 
 #: modules/websearch/lib/search_engine.py:1763
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
-msgstr ""
+msgstr "匹配不到關於 %s 的任何記錄。接近的短語是："
 
 #: modules/websearch/lib/search_engine.py:2210
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
-msgstr ""
+msgstr "對不起，這排序功能只被允許在最多 %d 紀錄中使用。請用正常排序。"
 
 #: modules/websearch/lib/search_engine.py:2234
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
-msgstr ""
+msgstr "對不起，%s 不是一正確的排序選項，請選用標題排序。"
 
 #: modules/websearch/lib/search_engine.py:2444
 msgid "Use different search terms."
-msgstr ""
+msgstr "用其他關鍵詞。"
 
 #: modules/websearch/lib/search_engine.py:2507
 #: modules/websearch/lib/search_engine.py:2659
@@ -2671,7 +2671,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:2696
 #: modules/websearch/lib/search_engine.py:2742
 msgid "The record has been deleted."
-msgstr ""
+msgstr "記錄已被刪除。"
 
 #: modules/websearch/lib/search_engine.py:3125
 #: modules/websearch/lib/websearch_templates.py:345
@@ -2683,261 +2683,261 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1516
 #: modules/websearch/lib/websearch_templates.py:1546
 msgid "Browse"
-msgstr ""
+msgstr "瀏覽"
 
 #: modules/websearch/lib/search_engine.py:3308
 msgid "No match within your time limits, discarding this condition..."
-msgstr ""
+msgstr "沒有在時限內匹配到記錄, 放棄中..."
 
 #: modules/websearch/lib/search_engine.py:3330
 msgid "No match within your search limits, discarding this condition..."
-msgstr ""
+msgstr "沒有在找尋限制內匹配到記錄, 放棄中..."
 
 #: modules/websearch/lib/websearch_templates.py:308
 #, python-format
 msgid "Search %s records for:"
-msgstr ""
+msgstr "搜尋 %s 筆記錄: "
 
 #: modules/websearch/lib/websearch_templates.py:341
 #: modules/websearch/lib/websearch_templates.py:1446
 msgid "Advanced Search"
-msgstr ""
+msgstr "高級檢索"
 
 #: modules/websearch/lib/websearch_templates.py:408
 #, python-format
 msgid "Search %s records for"
-msgstr ""
+msgstr "搜尋 %s 筆記錄"
 
 #: modules/websearch/lib/websearch_templates.py:451
 #: modules/websearch/lib/websearch_templates.py:1363
 msgid "Simple Search"
-msgstr ""
+msgstr "初級檢索"
 
 #: modules/websearch/lib/websearch_templates.py:484
 msgid "Search options:"
-msgstr ""
+msgstr "檢索選項"
 
 #: modules/websearch/lib/websearch_templates.py:531
 #: modules/websearch/lib/websearch_templates.py:1539
 msgid "Added since:"
-msgstr ""
+msgstr "記錄日期 由:"
 
 #: modules/websearch/lib/websearch_templates.py:532
 #: modules/websearch/lib/websearch_templates.py:1540
 msgid "until:"
-msgstr ""
+msgstr "至:"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #: modules/websearch/lib/websearch_templates.py:1580
 msgid "Display results:"
-msgstr ""
+msgstr "結果顯示"
 
 #: modules/websearch/lib/websearch_templates.py:538
 #: modules/websearch/lib/websearch_templates.py:1581
 msgid "Output format:"
-msgstr ""
+msgstr "輸出格式:"
 
 #: modules/websearch/lib/websearch_templates.py:711
 msgid "Narrow by collection:"
-msgstr ""
+msgstr "專輯:"
 
 #: modules/websearch/lib/websearch_templates.py:712
 msgid "Focus on:"
-msgstr ""
+msgstr "特輯:"
 
 #: modules/websearch/lib/websearch_templates.py:751
 msgid "restricted"
-msgstr ""
+msgstr "限制的"
 
 #: modules/websearch/lib/websearch_templates.py:771
 msgid "Search also:"
-msgstr ""
+msgstr "也搜尋:"
 
 #: modules/websearch/lib/websearch_templates.py:836
 msgid "The contents of this collection is restricted."
-msgstr ""
+msgstr "這是一個受限制的專輯."
 
 #: modules/websearch/lib/websearch_templates.py:851
 msgid "This collection does not contain any document yet."
-msgstr ""
+msgstr "這專輯還未有記錄."
 
 #: modules/websearch/lib/websearch_templates.py:885
 #: modules/websearch/lib/websearch_templates.py:2035
 #: modules/websearch/lib/websearch_templates.py:2049
 #: modules/websearch/lib/websearch_templates.py:2065
 msgid "more"
-msgstr ""
+msgstr "更多"
 
 #: modules/websearch/lib/websearch_templates.py:900
 msgid "Latest additions:"
-msgstr ""
+msgstr "新增："
 
 #: modules/websearch/lib/websearch_templates.py:992
 #: modules/websearch/lib/websearch_templates.py:2013
 #: modules/websearch/lib/websearch_templates.py:2414
 msgid "Similar records"
-msgstr ""
+msgstr "相似記錄"
 
 #: modules/websearch/lib/websearch_templates.py:998
 #: modules/websearch/lib/websearch_templates.py:2422
 msgid "Cited by"
-msgstr ""
+msgstr "引用: "
 
 #: modules/websearch/lib/websearch_templates.py:1066
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
-msgstr ""
+msgstr "在全部專輯裡，最接近在 %(x_field)s 的字詞 %(x_word)s 是："
 
 #: modules/websearch/lib/websearch_templates.py:1069
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr ""
+msgstr "在全部專輯裡，最接近 %(x_word)s 的字詞是："
 
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "Hits"
-msgstr ""
+msgstr "結果"
 
 #: modules/websearch/lib/websearch_templates.py:1226
 #: modules/websearch/lib/websearch_templates.py:1794
 msgid "next"
-msgstr ""
+msgstr "下一個"
 
 #: modules/websearch/lib/websearch_templates.py:1488
 msgid "collections"
-msgstr ""
+msgstr "專輯"
 
 #: modules/websearch/lib/websearch_templates.py:1510
 msgid "Limit to:"
-msgstr ""
+msgstr "只在："
 
 #: modules/websearch/lib/websearch_templates.py:1550
 #: modules/websearch/lib/websearch_webcoll.py:535
 msgid "results"
-msgstr ""
+msgstr "結果"
 
 #: modules/websearch/lib/websearch_templates.py:1585
 #: modules/websearch/lib/websearch_webcoll.py:505
 msgid "asc."
-msgstr ""
+msgstr "順序排列"
 
 #: modules/websearch/lib/websearch_templates.py:1588
 #: modules/websearch/lib/websearch_webcoll.py:506
 msgid "desc."
-msgstr ""
+msgstr "降序排列"
 
 #: modules/websearch/lib/websearch_templates.py:1594
 #: modules/websearch/lib/websearch_webcoll.py:549
 msgid "single list"
-msgstr ""
+msgstr "單一列表"
 
 #: modules/websearch/lib/websearch_templates.py:1597
 #: modules/websearch/lib/websearch_webcoll.py:548
 msgid "split by collection"
-msgstr ""
+msgstr "以專輯分類"
 
 #: modules/websearch/lib/websearch_templates.py:1632
 msgid "MARC tag"
-msgstr ""
+msgstr "MARC 標籤"
 
 #: modules/websearch/lib/websearch_templates.py:1746
 #: modules/websearch/lib/websearch_templates.py:1751
 #: modules/websearch/lib/websearch_templates.py:2136
 #, python-format
 msgid "%s records found"
-msgstr ""
+msgstr "找到 %s 筆記錄"
 
 #: modules/websearch/lib/websearch_templates.py:1777
 msgid "begin"
-msgstr ""
+msgstr "開始"
 
 #: modules/websearch/lib/websearch_templates.py:1782
 #: modules/websubmit/lib/websubmit_templates.py:1181
 msgid "previous"
-msgstr ""
+msgstr "上頁"
 
 #: modules/websearch/lib/websearch_templates.py:1801
 msgid "end"
-msgstr ""
+msgstr "最後"
 
 #: modules/websearch/lib/websearch_templates.py:1821
 msgid "jump to record:"
-msgstr ""
+msgstr "跳到記錄:"
 
 #: modules/websearch/lib/websearch_templates.py:1834
 #, python-format
 msgid "Search took %s seconds."
-msgstr ""
+msgstr "檢索需時 %s 秒."
 
 #: modules/websearch/lib/websearch_templates.py:1931
 #: modules/websearch/lib/websearch_templates.py:2015
 msgid "ADD TO BASKET"
-msgstr ""
+msgstr "加入您的收藏籃"
 
 #: modules/websearch/lib/websearch_templates.py:1963
 msgid "Format:"
-msgstr ""
+msgstr "格式:"
 
 #: modules/websearch/lib/websearch_templates.py:2002
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr ""
+msgstr "記錄創建於%(x_date_creation)s，最後更新在%(x_date_modification)s"
 
 #: modules/websearch/lib/websearch_templates.py:2024
 #, python-format
 msgid "Cited by: %s records"
-msgstr ""
+msgstr "已有 %s 記錄引用"
 
 #: modules/websearch/lib/websearch_templates.py:2042
 #, python-format
 msgid "Co-cited with: %s records"
-msgstr ""
+msgstr "引用: %s 記錄"
 
 #: modules/websearch/lib/websearch_templates.py:2059
 msgid "People who downloaded this document also downloaded:"
-msgstr ""
+msgstr "下載這個文件的人們也下載："
 
 #: modules/websearch/lib/websearch_templates.py:2074
 msgid "People who viewed this page also viewed:"
-msgstr ""
+msgstr "閱讀這個文件的人們也閱讀："
 
 #: modules/websearch/lib/websearch_templates.py:2123
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
-msgstr ""
+msgstr "%(x_fmt_open)s查詢結果:%(x_fmt_close)s 找到 %(x_nb_records)s 記錄，需時 in %(x_nb_seconds)s 秒。"
 
 #: modules/websearch/lib/websearch_templates.py:2163
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
-msgstr ""
+msgstr "匹配不到記錄，請試用其他關鍵詞。"
 
 #: modules/websearch/lib/websearch_templates.py:2195
 msgid "See also: similar author names"
-msgstr ""
+msgstr "參見：相似的作者"
 
 #: modules/websearch/lib/websearch_templates.py:2503
 #: modules/websearch/lib/websearch_webinterface.py:405
 #, python-format
 msgid "Collection %s Not Found"
-msgstr ""
+msgstr "找不到 %s 專輯"
 
 #: modules/websearch/lib/websearch_templates.py:2515
 #: modules/websearch/lib/websearch_webinterface.py:403
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
-msgstr ""
+msgstr "對不起，%s 專輯並不存在。"
 
 #: modules/websearch/lib/websearch_templates.py:2517
 #: modules/websearch/lib/websearch_webinterface.py:404
 #, python-format
 msgid "You may want to start browsing from %s."
-msgstr ""
+msgstr "您可以從 %s 開始瀏覽。"
 
 #: modules/websearch/lib/websearch_templates.py:2546
 msgid "Interested in being notified about new results for this query?"
-msgstr ""
+msgstr "您想得到有關這檢索條件的最新結果嗎？"
 
 #: modules/websearch/lib/websearch_templates.py:2547
 #, python-format
@@ -2945,223 +2945,223 @@ msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
 "                                  or subscribe to the %(x_url2_open)sRSS feed"
 "%(x_url2_close)s."
-msgstr ""
+msgstr "建立您的%(x_url1_open)s電郵警報%(x_url1_close)s\n或訂閱%(x_url2_open)sRSS feed%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_webinterface.py:407
 msgid "Not found"
-msgstr ""
+msgstr "找尋不到"
 
 #: modules/websearch/lib/websearch_external_collections.py:129
 msgid "in"
-msgstr ""
+msgstr "在"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:50
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
-msgstr ""
+msgstr "沒有尋找到什麼? 嘗試在以下的服務器查尋："
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:79
 msgid "External collections results overview:"
-msgstr ""
+msgstr "外部專輯結果："
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:119
 msgid "Search timed out."
-msgstr ""
+msgstr "時限已過。"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:120
 msgid ""
 "The external search engine has not responded in time. You can check its "
 "results here:"
-msgstr ""
+msgstr "外部搜尋器沒有在時限前回應，您可檢索部分結果："
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:145
 #: modules/websearch/lib/websearch_external_collections_templates.py:153
 #: modules/websearch/lib/websearch_external_collections_templates.py:166
 msgid "No results found."
-msgstr ""
+msgstr "找尋不到記錄"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:149
 #, python-format
 msgid "%s results found"
-msgstr ""
+msgstr "找到 %s 記錄"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:151
 #, python-format
 msgid "%s seconds"
-msgstr ""
+msgstr "%s 秒"
 
 #: modules/websearch/lib/websearch_webcoll.py:569
 msgid "brief"
-msgstr ""
+msgstr "摘要"
 
 #: modules/websession/lib/webaccount.py:113
 #, python-format
 msgid ""
 "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
 "s as a regular user."
-msgstr ""
+msgstr "您的身份是遊客。您需要先%(x_url_open)s登入%(x_url_close)s。"
 
 #: modules/websession/lib/webaccount.py:117
 #, python-format
 msgid ""
 "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
 "(x_url_close)s first"
-msgstr ""
+msgstr "%(x_fmt_open)s遊客%(x_fmt_close)s 需要先%(x_url_open)s註冊%(x_url_close)s。"
 
 #: modules/websession/lib/webaccount.py:122
 msgid "No queries found"
-msgstr ""
+msgstr "沒有找到查詢"
 
 #: modules/websession/lib/websession_templates.py:57
 msgid ""
 "If you have lost password for your CDS Invenio internal account, then please "
 "enter your email address below and the lost password will be emailed to you."
-msgstr ""
+msgstr "如果您丟失了密碼，請輸入您的電郵，我們會電郵密碼給您。"
 
 #: modules/websession/lib/websession_templates.py:59
 msgid ""
 "Note that if you have been using an external login system (such as CERN "
 "NICE), then we cannot do anything and you have to ask there."
-msgstr ""
+msgstr "如果您是用外部的登錄系統，那麼我們將不能幫助您。"
 
 #: modules/websession/lib/websession_templates.py:60
 #, python-format
 msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
 "internal."
-msgstr ""
+msgstr "另外，您可以向 %s 重設登錄系統。"
 
 #: modules/websession/lib/websession_templates.py:111
 msgid "External account settings"
-msgstr ""
+msgstr "外部帳號設定"
 
 #: modules/websession/lib/websession_templates.py:113
 #, python-format
 msgid ""
 "You can consult the list of your external groups directly in the %"
 "(x_url_open)sgroups page%(x_url_close)s."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的外部組別名單。"
 
 #: modules/websession/lib/websession_templates.py:117
 msgid "External user groups"
-msgstr ""
+msgstr "外部用戶組別"
 
 #: modules/websession/lib/websession_templates.py:174
 msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
-msgstr ""
+msgstr "請用以下表格來改變您的電郵或諢號。"
 
 #: modules/websession/lib/websession_templates.py:175
 msgid "Edit login credentials"
-msgstr ""
+msgstr "編輯登入資料"
 
 #: modules/websession/lib/websession_templates.py:179
 #: modules/websession/lib/websession_templates.py:182
 #: modules/websession/lib/websession_templates.py:865
 msgid "Example"
-msgstr ""
+msgstr "例子"
 
 #: modules/websession/lib/websession_templates.py:180
 msgid "New email address"
-msgstr ""
+msgstr "新電郵"
 
 #: modules/websession/lib/websession_templates.py:181
 #: modules/websession/lib/websession_templates.py:229
 #: modules/websession/lib/websession_templates.py:863
 msgid "mandatory"
-msgstr ""
+msgstr "必須的"
 
 #: modules/websession/lib/websession_templates.py:183
 #: modules/websession/lib/websession_templates.py:233
 #: modules/websession/lib/websession_templates.py:777
 #: modules/websession/lib/websession_templates.py:866
 msgid "Note"
-msgstr ""
+msgstr "注意"
 
 #: modules/websession/lib/websession_templates.py:184
 msgid "Set new values"
-msgstr ""
+msgstr "重設"
 
 #: modules/websession/lib/websession_templates.py:228
 msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
-msgstr ""
+msgstr "請用以下表格來改變您的電郵。"
 
 #: modules/websession/lib/websession_templates.py:230
 msgid "Old password"
-msgstr ""
+msgstr "舊密碼"
 
 #: modules/websession/lib/websession_templates.py:231
 msgid "New password"
-msgstr ""
+msgstr "新密碼"
 
 #: modules/websession/lib/websession_templates.py:232
 #: modules/websession/lib/websession_templates.py:864
 msgid "optional"
-msgstr ""
+msgstr "可選擇的"
 
 #: modules/websession/lib/websession_templates.py:234
 #: modules/websession/lib/websession_templates.py:867
 msgid "The password phrase may contain punctuation, spaces, etc."
-msgstr ""
+msgstr "您的密碼可包含標點、空格等。"
 
 #: modules/websession/lib/websession_templates.py:235
 msgid "You must fill the old password in order to set a new one."
-msgstr ""
+msgstr "您需要輸入舊密碼。"
 
 #: modules/websession/lib/websession_templates.py:236
 msgid "Retype password"
-msgstr ""
+msgstr "重打密碼"
 
 #: modules/websession/lib/websession_templates.py:237
 msgid "Set new password"
-msgstr ""
+msgstr "建立密碼"
 
 #: modules/websession/lib/websession_templates.py:260
 msgid "Edit search-related settings"
-msgstr ""
+msgstr "編輯有關搜索的設定"
 
 #: modules/websession/lib/websession_templates.py:261
 msgid "Show the latest additions box"
-msgstr ""
+msgstr "顯示最新的新增方塊"
 
 #: modules/websession/lib/websession_templates.py:263
 msgid "Show collection help boxes"
-msgstr ""
+msgstr "顯示專輯的幫助方塊"
 
 #: modules/websession/lib/websession_templates.py:276
 msgid "Update settings"
-msgstr ""
+msgstr "更新設定"
 
 #: modules/websession/lib/websession_templates.py:277
 msgid "Number of search results per page"
-msgstr ""
+msgstr "每頁的最高顯示的數量"
 
 #: modules/websession/lib/websession_templates.py:307
 msgid "Edit login method"
-msgstr ""
+msgstr "編輯登錄方法"
 
 #: modules/websession/lib/websession_templates.py:308
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
-msgstr ""
+msgstr "請選擇所需之登錄方法"
 
 #: modules/websession/lib/websession_templates.py:309
 #: modules/websession/lib/websession_templates.py:322
 msgid "Select method"
-msgstr ""
+msgstr "選擇方法"
 
 #: modules/websession/lib/websession_templates.py:360
 #: modules/websession/lib/websession_templates.py:860
 msgid "Email address"
-msgstr ""
+msgstr "電郵"
 
 #: modules/websession/lib/websession_templates.py:361
 msgid "Send lost password"
-msgstr ""
+msgstr "發送密碼"
 
 #: modules/websession/lib/websession_templates.py:387
 #, python-format
@@ -3169,59 +3169,59 @@ msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
 "own personal library of documents, or to set up an automatic alert query "
 "that would run periodically and would notify you of search results by email."
-msgstr ""
+msgstr "%s 提供以下服務：個人化介面、個人收藏籃、設定電郵警報。"
 
 #: modules/websession/lib/websession_templates.py:396
 #: modules/websession/lib/websession_webinterface.py:123
 msgid "Your Settings"
-msgstr ""
+msgstr "您的設定"
 
 #: modules/websession/lib/websession_templates.py:397
 msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
-msgstr ""
+msgstr "設定或更改您的電郵、密碼和介面。"
 
 #: modules/websession/lib/websession_templates.py:407
 #: modules/websession/lib/websession_templates.py:550
 msgid "Your Searches"
-msgstr ""
+msgstr "您的搜尋結果"
 
 #: modules/websession/lib/websession_templates.py:408
 msgid "View all the searches you performed during the last 30 days."
-msgstr ""
+msgstr "查閱您過去三十天沒內曾進行過搜索。"
 
 #: modules/websession/lib/websession_templates.py:410
 msgid ""
 "With baskets you can define specific collections of items, store interesting "
 "records you want to access later or share with others."
-msgstr ""
+msgstr "您可以用收藏籃定義記錄收藏、貯藏有用的記錄以便稍後閱覽或分享。"
 
 #: modules/websession/lib/websession_templates.py:418
 msgid "Your Alerts"
-msgstr ""
+msgstr "警報"
 
 #: modules/websession/lib/websession_templates.py:419
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
-msgstr ""
+msgstr "訂閱查尋條件；我們的服務器具定時執行搜索，並把結果發到您的電郵或收藏籃子中。"
 
 #: modules/websession/lib/websession_templates.py:428
 msgid "Your Loans"
-msgstr ""
+msgstr "外借"
 
 #: modules/websession/lib/websession_templates.py:429
 msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
-msgstr ""
+msgstr "借出書本、提交借出要求等。須要 CERN ID。"
 
 #: modules/websession/lib/websession_templates.py:454
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
-msgstr ""
+msgstr "您是用遊客登錄, 因此您的警報將不會保存在這系統中。"
 
 #: modules/websession/lib/websession_templates.py:479
 #, python-format
@@ -3229,169 +3229,170 @@ msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
 "(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
 "s."
-msgstr ""
+msgstr "您是用%(x_user)s身份登錄，你可以 a)%(x_url1_open)s登出%(x_url1_close)s； b) 修改您的%(x_url2_open)s戶囗設定%(x_url2_close)s。"
 
 #: modules/websession/lib/websession_templates.py:549
 msgid "Your Alert Searches"
-msgstr ""
+msgstr "搜查警報"
 
 #: modules/websession/lib/websession_templates.py:551
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
 "administering or are a member of."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的組別名單。"
 
 #: modules/websession/lib/websession_templates.py:554
 #: modules/websession/lib/websession_templates.py:1941
 #: modules/websession/lib/websession_webinterface.py:673
 msgid "Your Groups"
-msgstr ""
+msgstr "組別"
 
 #: modules/websession/lib/websession_templates.py:555
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的提交名單。"
 
 #: modules/websession/lib/websession_templates.py:558
 #: modules/websubmit/web/yoursubmissions.py:175
 msgid "Your Submissions"
-msgstr ""
+msgstr "提交"
 
 #: modules/websession/lib/websession_templates.py:559
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的批核名單。"
 
 #: modules/websession/lib/websession_templates.py:562
 #: modules/websubmit/web/yourapprovals.py:94
 msgid "Your Approvals"
-msgstr ""
+msgstr "批核"
 
 #: modules/websession/lib/websession_templates.py:563
 #: modules/websession/lib/websession_webinterface.py:422
 msgid "Your Administrative Activities"
-msgstr ""
+msgstr "管理行動"
 
 #: modules/websession/lib/websession_templates.py:590
 msgid "Try again"
-msgstr ""
+msgstr "請重試"
 
 #: modules/websession/lib/websession_templates.py:619
 msgid "Hello"
-msgstr ""
+msgstr "您好"
 
 #: modules/websession/lib/websession_templates.py:620
 msgid "Here are your user credentials for"
-msgstr ""
+msgstr "登入資料："
 
 #: modules/websession/lib/websession_templates.py:622
 msgid "username"
-msgstr ""
+msgstr "帳號"
 
 #: modules/websession/lib/websession_templates.py:624
 msgid "password"
-msgstr ""
+msgstr "密碼"
 
 #: modules/websession/lib/websession_templates.py:626
 msgid "You can login at"
-msgstr ""
+msgstr "您可以登入"
 
 #: modules/websession/lib/websession_templates.py:628
 msgid "Best regards"
-msgstr ""
+msgstr "頌安"
 
 #: modules/websession/lib/websession_templates.py:630
 msgid "Need human intervention?  Contact"
-msgstr ""
+msgstr "需要協助？請聯絡"
 
 #: modules/websession/lib/websession_templates.py:650
 #, python-format
 msgid "Okay, password has been emailed to %s."
-msgstr ""
+msgstr "密碼已經電郵至 %s."
 
 #: modules/websession/lib/websession_templates.py:665
 msgid "Deleting your account"
-msgstr ""
+msgstr "刪除帳戶"
 
 #: modules/websession/lib/websession_templates.py:679
 msgid "You are no longer recognized."
-msgstr ""
+msgstr "您已被刪除。"
 
 #: modules/websession/lib/websession_templates.py:680
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
-msgstr ""
+msgstr "您可以%(x_url_open)s登入%(x_url_close)s。"
 
 #: modules/websession/lib/websession_templates.py:709
 msgid "If you already have an account, please login using the form below."
-msgstr ""
+msgstr "如果您已經登記帳號, 請登入."
 
 #: modules/websession/lib/websession_templates.py:713
 #, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
 "s an internal account."
-msgstr ""
+msgstr "如果您沒有帳號, 請先%(x_url_open)s註冊%(x_url_close)s."
+
 
 #: modules/websession/lib/websession_templates.py:717
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
-msgstr ""
+msgstr "請聯絡 %s 關於創建帳號事情。"
 
 #: modules/websession/lib/websession_templates.py:737
 msgid "Login method:"
-msgstr ""
+msgstr "登入方法："
 
 #: modules/websession/lib/websession_templates.py:763
 msgid "Username"
-msgstr ""
+msgstr "帳號"
 
 #: modules/websession/lib/websession_templates.py:764
 #: modules/websession/lib/websession_templates.py:862
 msgid "Password"
-msgstr ""
+msgstr "密碼"
 
 #: modules/websession/lib/websession_templates.py:765
 #: modules/websession/lib/websession_templates.py:972
 #: modules/websession/lib/websession_webinterface.py:500
 #: modules/websession/lib/websession_webinterface.py:535
 msgid "login"
-msgstr ""
+msgstr "登入"
 
 #: modules/websession/lib/websession_templates.py:770
 #: modules/websession/lib/websession_webinterface.py:320
 msgid "Lost your password?"
-msgstr ""
+msgstr "忘記您的密碼？"
 
 #: modules/websession/lib/websession_templates.py:778
 msgid "You can use your nickname or your email address to login."
-msgstr ""
+msgstr "您可以使用您的諢號或電郵登入."
 
 #: modules/websession/lib/websession_templates.py:818
 msgid "Please enter your email address and desired nickname and password:"
-msgstr ""
+msgstr "請輸入您的電郵、諢號、密碼:"
 
 #: modules/websession/lib/websession_templates.py:820
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
-msgstr ""
+msgstr "您的帳戶要被核實後才可使用."
 
 #: modules/websession/lib/websession_templates.py:868
 msgid "Retype Password"
-msgstr ""
+msgstr "重打密碼"
 
 #: modules/websession/lib/websession_templates.py:869
 #: modules/websession/lib/websession_webinterface.py:634
 msgid "register"
-msgstr ""
+msgstr "註冊"
 
 #: modules/websession/lib/websession_templates.py:870
 #, python-format
@@ -3402,197 +3403,197 @@ msgid ""
 "to identify you for personal services of %s. For example, you may set up an "
 "automatic alert search that will look for new preprints and will notify you "
 "daily of new arrivals by email."
-msgstr ""
+msgstr "請不要使用您自己沿用的密碼。您的電郵不會被透露到第三方，它只會使用以辨認您的%s服務。"
 
 #: modules/websession/lib/websession_templates.py:899
 #, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
-msgstr ""
+msgstr "您的身份是遊客。您需要先%(x_url_open)s登入%(x_url_close)s。"
 
 #: modules/websession/lib/websession_templates.py:905
 msgid "You are not authorized to access administrative functions."
-msgstr ""
+msgstr "您不能使用管理功能。"
 
 #: modules/websession/lib/websession_templates.py:908
 #, python-format
 msgid "You seem to be %(x_role)s."
-msgstr ""
+msgstr "您的身份角色是%(x_role)s。"
 
 #: modules/websession/lib/websession_templates.py:909
 msgid "Here are some interesting web admin links for you:"
-msgstr ""
+msgstr "以下是一些有用的連結："
 
 #: modules/websession/lib/websession_templates.py:915
 msgid "Run BibEdit"
-msgstr ""
+msgstr "執行 BibEdit"
 
 #: modules/websession/lib/websession_templates.py:917
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "設定 BibFormat"
 
 #: modules/websession/lib/websession_templates.py:919
 msgid "Configure BibHarvest"
-msgstr ""
+msgstr "設定 BibHarvest"
 
 #: modules/websession/lib/websession_templates.py:921
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "設定 BibIndex"
 
 #: modules/websession/lib/websession_templates.py:923
 msgid "Configure BibRank"
-msgstr ""
+msgstr "設定 BibRank"
 
 #: modules/websession/lib/websession_templates.py:925
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "設定 WebAccess"
 
 #: modules/websession/lib/websession_templates.py:927
 msgid "Configure WebComment"
-msgstr ""
+msgstr "設定 WebComment"
 
 #: modules/websession/lib/websession_templates.py:929
 msgid "Configure WebSearch"
-msgstr ""
+msgstr "設定 WebSearch"
 
 #: modules/websession/lib/websession_templates.py:931
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "設定 WebSubmit"
 
 #: modules/websession/lib/websession_templates.py:932
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
 "(x_url_close)s."
-msgstr ""
+msgstr "請到%(x_url_open)s管理區%(x_url_close)s以便使用更多管理功能。"
 
 #: modules/websession/lib/websession_templates.py:968
 msgid "guest"
-msgstr ""
+msgstr "遊客"
 
 #: modules/websession/lib/websession_templates.py:969
 msgid "session"
-msgstr ""
+msgstr "連線階段" 
 
 #: modules/websession/lib/websession_templates.py:970
 #: modules/websession/lib/websession_templates.py:986
 msgid "alerts"
-msgstr ""
+msgstr "警報"
 
 #: modules/websession/lib/websession_templates.py:971
 #: modules/websession/lib/websession_templates.py:988
 msgid "baskets"
-msgstr ""
+msgstr "收藏"
 
 #: modules/websession/lib/websession_templates.py:985
 msgid "account"
-msgstr ""
+msgstr "帳號"
 
 #: modules/websession/lib/websession_templates.py:987
 msgid "messages"
-msgstr ""
+msgstr "訊息"
 
 #: modules/websession/lib/websession_templates.py:989
 msgid "groups"
-msgstr ""
+msgstr "組別"
 
 #: modules/websession/lib/websession_templates.py:995
 msgid "submissions"
-msgstr ""
+msgstr "提交"
 
 #: modules/websession/lib/websession_templates.py:1001
 msgid "approvals"
-msgstr ""
+msgstr "批核"
 
 #: modules/websession/lib/websession_templates.py:1007
 msgid "administration"
-msgstr ""
+msgstr "管理"
 
 #: modules/websession/lib/websession_templates.py:1012
 msgid "logout"
-msgstr ""
+msgstr "登出"
 
 #: modules/websession/lib/websession_templates.py:1137
 msgid "You are an administrator of the following groups:"
-msgstr ""
+msgstr "您是以下組別的管理人："
 
 #: modules/websession/lib/websession_templates.py:1157
 #: modules/websession/lib/websession_templates.py:1231
 #: modules/websession/lib/websession_templates.py:1295
 msgid "Group"
-msgstr ""
+msgstr "組別"
 
 #: modules/websession/lib/websession_templates.py:1164
 msgid "You are not an administrator of any groups."
-msgstr ""
+msgstr "您不是以下組別的管理人："
 
 #: modules/websession/lib/websession_templates.py:1171
 msgid "Edit group"
-msgstr ""
+msgstr "編輯組別"
 
 #: modules/websession/lib/websession_templates.py:1178
 #, python-format
 msgid "Edit %s members"
-msgstr ""
+msgstr "編輯 %s 成員"
 
 #: modules/websession/lib/websession_templates.py:1201
 #: modules/websession/lib/websession_templates.py:1342
 #: modules/websession/lib/websession_templates.py:1344
 #: modules/websession/lib/websession_webinterface.py:728
 msgid "Create new group"
-msgstr ""
+msgstr "新增組別"
 
 #: modules/websession/lib/websession_templates.py:1215
 msgid "You are a member of the following groups:"
-msgstr ""
+msgstr "您是以下組別的成員："
 
 #: modules/websession/lib/websession_templates.py:1238
 msgid "You are not a member of any groups."
-msgstr ""
+msgstr "您不是以下組別的成員："
 
 #: modules/websession/lib/websession_templates.py:1263
-msgid "Join new group"
-msgstr ""
+msgid "Join new group" 
+msgstr "加入組別"
 
 #: modules/websession/lib/websession_templates.py:1264
 #: modules/websession/lib/websession_templates.py:1779
 #: modules/websession/lib/websession_templates.py:1790
 msgid "Leave group"
-msgstr ""
+msgstr "脫離組別"
 
 #: modules/websession/lib/websession_templates.py:1279
 msgid "You are a member of the following external groups:"
-msgstr ""
+msgstr "您是以下外部組別的成員："
 
 #: modules/websession/lib/websession_templates.py:1302
 msgid "You are not a member of any external groups."
-msgstr ""
+msgstr "您不是以下外部組別的成員："
 
 #: modules/websession/lib/websession_templates.py:1350
 msgid "Update group"
-msgstr ""
+msgstr "更新組別"
 
 #: modules/websession/lib/websession_templates.py:1352
 #, python-format
 msgid "Edit group %s"
-msgstr ""
+msgstr "編輯組別 %s"
 
 #: modules/websession/lib/websession_templates.py:1354
 msgid "Delete group"
-msgstr ""
+msgstr "刪除組別名稱"
 
 #: modules/websession/lib/websession_templates.py:1424
 msgid "Group name:"
-msgstr ""
+msgstr "組別:"
 
 #: modules/websession/lib/websession_templates.py:1426
 msgid "Group description:"
-msgstr ""
+msgstr "組別描述"
 
 #: modules/websession/lib/websession_templates.py:1427
 msgid "Group join policy:"
-msgstr ""
+msgstr "加入組別條件："
 
 #: modules/websession/lib/websession_templates.py:1468
 #: modules/websession/lib/websession_templates.py:1539
@@ -3601,176 +3602,176 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1777
 #: modules/websession/lib/websession_templates.py:1887
 msgid "Please select:"
-msgstr ""
+msgstr "請選擇:"
 
 #: modules/websession/lib/websession_templates.py:1532
 msgid "Join group"
-msgstr ""
+msgstr "加入組別"
 
 #: modules/websession/lib/websession_templates.py:1534
 msgid "or find it"
-msgstr ""
+msgstr "找尋"
 
 #: modules/websession/lib/websession_templates.py:1535
 msgid "Choose group:"
-msgstr ""
+msgstr "選擇組別"
 
 #: modules/websession/lib/websession_templates.py:1537
 msgid "Find group"
-msgstr ""
+msgstr "找尋組別"
 
 #: modules/websession/lib/websession_templates.py:1676
 msgid "Remove member"
-msgstr ""
+msgstr "移除成員"
 
 #: modules/websession/lib/websession_templates.py:1678
 msgid "No members."
-msgstr ""
+msgstr "沒有成員"
 
 #: modules/websession/lib/websession_templates.py:1688
 msgid "Accept member"
-msgstr ""
+msgstr "接受成員"
 
 #: modules/websession/lib/websession_templates.py:1688
 msgid "Reject member"
-msgstr ""
+msgstr "拒絕成員"
 
 #: modules/websession/lib/websession_templates.py:1690
 msgid "No members awaiting approval."
-msgstr ""
+msgstr "沒有等待審批的成員"
 
 #: modules/websession/lib/websession_templates.py:1692
 msgid "Current members"
-msgstr ""
+msgstr "現在成員"
 
 #: modules/websession/lib/websession_templates.py:1693
 msgid "Members awaiting approval"
-msgstr ""
+msgstr "等待審批的成員"
 
 #: modules/websession/lib/websession_templates.py:1694
 msgid "Invite new members"
-msgstr ""
+msgstr "邀請成員"
 
 #: modules/websession/lib/websession_templates.py:1697
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
 "(x_url_open)sweb message%(x_url_close)s system."
-msgstr ""
+msgstr "請使用%(x_url_open)s訊息%(x_url_close)s來邀請成員加入組別。"
 
 #: modules/websession/lib/websession_templates.py:1701
 #, python-format
 msgid "Group: %s"
-msgstr ""
+msgstr "組別: %s"
 
 #: modules/websession/lib/websession_templates.py:1778
 msgid "Group list"
-msgstr ""
+msgstr "組別名單"
 
 #: modules/websession/lib/websession_templates.py:1781
 msgid "You are not member of any group."
-msgstr ""
+msgstr "您沒有加入任何組別。"
 
 #: modules/websession/lib/websession_templates.py:1828
 msgid "Are you sure you want to delete this group?"
-msgstr ""
+msgstr "您是否決定刪除這組別？"
 
 #: modules/websession/lib/websession_templates.py:1867
 msgid "Are you sure you want to leave this group?"
-msgstr ""
+msgstr "您是否決定離開這組別？"
 
-#: modules/websession/lib/websession_templates.py:1883
+#: modules/websession/lib/websession_templates.py:1883 judge
 msgid "Visible and open for new members"
-msgstr ""
+msgstr "開放給新用戶"
 
 #: modules/websession/lib/websession_templates.py:1885
 msgid "Visible but new members need approval"
-msgstr ""
+msgstr "審批後開放給新用戶"
 
 #: modules/websession/lib/websession_templates.py:1970
 #, python-format
 msgid "Group %s: New membership request"
-msgstr ""
+msgstr "組別 %s：新用戶要求加入"
 
 #: modules/websession/lib/websession_templates.py:1974
 #, python-format
 msgid "A user wants to join the group %s."
-msgstr ""
+msgstr "用戶要求加入組別 %s。"
 
 #: modules/websession/lib/websession_templates.py:1975
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
-msgstr ""
+msgstr "請%(x_url_open)s接納或拒絕%(x_url_close)s用戶要求。"
 
 #: modules/websession/lib/websession_templates.py:1992
 #, python-format
 msgid "Group %s: Join request has been accepted"
-msgstr ""
+msgstr "組別 %s：用戶加入要求已被接納"
 
 #: modules/websession/lib/websession_templates.py:1993
 #, python-format
 msgid "Your request for joining group %s has been accepted."
-msgstr ""
+msgstr "您加入組別 %s的要求已被接納。"
 
 #: modules/websession/lib/websession_templates.py:1995
 #, python-format
 msgid "Group %s: Join request has been rejected"
-msgstr ""
+msgstr "組別 %s：用戶加入要求已被拒絕"
 
 #: modules/websession/lib/websession_templates.py:1996
 #, python-format
 msgid "Your request for joining group %s has been rejected."
-msgstr ""
+msgstr "您加入組別 %s的要求已被拒絕。"
 
 #: modules/websession/lib/websession_templates.py:1999
 #: modules/websession/lib/websession_templates.py:2017
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的組別名單。"
 
 #: modules/websession/lib/websession_templates.py:2013
 #, python-format
 msgid "Group %s has been deleted"
-msgstr ""
+msgstr "組別 %s 已被刪除"
 
 #: modules/websession/lib/websession_templates.py:2015
 #, python-format
 msgid "Group %s has been deleted by its administrator."
-msgstr ""
+msgstr "組別 %s 已被管理員刪除。"
 
 #: modules/websession/lib/websession_templates.py:2032
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
 "s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
-msgstr ""
+msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的%(x_nb_total)i組別給(%(x_nb_member)i) or 管理 (%(x_nb_admin)i)名單。"
 
 #: modules/websession/lib/webuser.py:126
 msgid "Database problem"
-msgstr ""
+msgstr "數據庫錯誤"
 
 #: modules/websession/lib/webuser.py:223
 #: modules/websession/lib/webgroup_dblayer.py:296
 msgid "user"
-msgstr ""
+msgstr "用戶"
 
 #: modules/websession/lib/websession_webinterface.py:167
 #: modules/websession/lib/websession_webinterface.py:235
 #: modules/websession/lib/websession_webinterface.py:287
 msgid "Settings edited"
-msgstr ""
+msgstr "設定已被修改"
 
 #: modules/websession/lib/websession_webinterface.py:169
 #: modules/websession/lib/websession_webinterface.py:234
 #: modules/websession/lib/websession_webinterface.py:267
 #: modules/websession/lib/websession_webinterface.py:289
 msgid "Show account"
-msgstr ""
+msgstr "顯示帳戶"
 
 #: modules/websession/lib/websession_webinterface.py:179
 msgid "<p>Switched to internal login method. "
-msgstr ""
+msgstr "<p>轉用內部登錄方法。"
 
 #: modules/websession/lib/websession_webinterface.py:180
 msgid ""
@@ -3781,46 +3782,46 @@ msgid ""
 "                        which you can obtain via email clicking on the "
 "following\n"
 "                        button:</p>"
-msgstr ""
+msgstr "注意：如您是首次使用內部登錄方法登入，您可以點擊以下按鈕已取得密碼："
 
 #: modules/websession/lib/websession_webinterface.py:188
 msgid "Send Password"
-msgstr ""
+msgstr "發送密碼"
 
 #: modules/websession/lib/websession_webinterface.py:198
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown."
-msgstr ""
+msgstr "因為找不到您的電郵，所以不能轉用外部登錄方法 %s。"
 
 #: modules/websession/lib/websession_webinterface.py:202
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown to the external login system."
-msgstr ""
+msgstr "因為外部登錄系統找不到您的電郵，所以不能轉用外部登錄方法 %s。"
 
 #: modules/websession/lib/websession_webinterface.py:206
 msgid "Login method successfully selected."
-msgstr ""
+msgstr "登錄方法已成功選擇。"
 
 #: modules/websession/lib/websession_webinterface.py:208
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
-msgstr ""
+msgstr "外部登錄方法 %s 並不支援用電郵登入；請聯絡管理員。"
 
 #: modules/websession/lib/websession_webinterface.py:232
 msgid "Settings successfully edited."
-msgstr ""
+msgstr "設定已被修改。"
 
 #: modules/websession/lib/websession_webinterface.py:237
 #: modules/websession/lib/websession_webinterface.py:608
 #, python-format
 msgid "Desired nickname %s is invalid."
-msgstr ""
+msgstr "諢號 %s 無效。"
 
 #: modules/websession/lib/websession_webinterface.py:238
 #: modules/websession/lib/websession_webinterface.py:244
@@ -3832,7 +3833,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:609
 #: modules/websession/lib/websession_webinterface.py:620
 msgid "Please try again."
-msgstr ""
+msgstr "請重試。"
 
 #: modules/websession/lib/websession_webinterface.py:240
 #: modules/websession/lib/websession_webinterface.py:246
@@ -3842,7 +3843,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:279
 #: modules/websession/lib/websession_webinterface.py:294
 msgid "Edit settings"
-msgstr ""
+msgstr "修改設定"
 
 #: modules/websession/lib/websession_webinterface.py:241
 #: modules/websession/lib/websession_webinterface.py:247
@@ -3850,123 +3851,123 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:260
 #: modules/websession/lib/websession_webinterface.py:295
 msgid "Editing settings failed"
-msgstr ""
+msgstr "修改設定失敗"
 
 #: modules/websession/lib/websession_webinterface.py:243
 #: modules/websession/lib/websession_webinterface.py:603
 #, python-format
 msgid "Supplied email address %s is invalid."
-msgstr ""
+msgstr "電郵 %s 無效。"
 
 #: modules/websession/lib/websession_webinterface.py:249
 #: modules/websession/lib/websession_webinterface.py:613
 #, python-format
 msgid "Supplied email address %s already exists in the database."
-msgstr ""
+msgstr "電郵 %s 已被使用。"
 
 #: modules/websession/lib/websession_webinterface.py:251
 #: modules/websession/lib/websession_webinterface.py:615
 msgid "Or please try again."
-msgstr ""
+msgstr "請重試。"
 
 #: modules/websession/lib/websession_webinterface.py:256
 #, python-format
 msgid "Desired nickname %s is already in use."
-msgstr ""
+msgstr "諢號 %s 正被使用中。"
 
 #: modules/websession/lib/websession_webinterface.py:265
 msgid "Password successfully edited."
-msgstr ""
+msgstr "密碼已被成功修改。"
 
 #: modules/websession/lib/websession_webinterface.py:268
 msgid "Password edited"
-msgstr ""
+msgstr "密碼已被修改。"
 
 #: modules/websession/lib/websession_webinterface.py:270
 #: modules/websession/lib/websession_webinterface.py:598
 msgid "Both passwords must match."
-msgstr ""
+msgstr "輸入的密碼需要一致。"
 
 #: modules/websession/lib/websession_webinterface.py:274
 #: modules/websession/lib/websession_webinterface.py:280
 msgid "Editing password failed"
-msgstr ""
+msgstr "修改密碼失敗。"
 
 #: modules/websession/lib/websession_webinterface.py:276
 msgid "Wrong old password inserted."
-msgstr ""
+msgstr "舊密碼錯誤。"
 
 #: modules/websession/lib/websession_webinterface.py:290
 msgid "User settings saved correctly."
-msgstr ""
+msgstr "用戶設定已儲存。"
 
 #: modules/websession/lib/websession_webinterface.py:292
 msgid "Unable to update settings."
-msgstr ""
+msgstr "不能更新用戶設定。"
 
 #: modules/websession/lib/websession_webinterface.py:349
 msgid ""
 "Cannot send password by email since you are using external authentication "
 "system."
-msgstr ""
+msgstr "因為您使用外部登錄系統，所以不能用電郵發送密碼給您。"
 
 #: modules/websession/lib/websession_webinterface.py:362
 msgid "The entered email address does not exist in the database."
-msgstr ""
+msgstr "輸入的電郵並不存在。"
 
 #: modules/websession/lib/websession_webinterface.py:375
 msgid "Credentials for"
-msgstr ""
+msgstr "登入資料："
 
 #: modules/websession/lib/websession_webinterface.py:388
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
-msgstr ""
+msgstr "請核對您輸入的電郵是否有錯(e.g. johndoe@example.com)。"
 
 #: modules/websession/lib/websession_webinterface.py:389
 msgid "Incorrect email address"
-msgstr ""
+msgstr "電郵不正確"
 
 #: modules/websession/lib/websession_webinterface.py:401
 msgid "Lost password sent"
-msgstr ""
+msgstr "已送出密碼"
 
 #: modules/websession/lib/websession_webinterface.py:445
 msgid "Delete Account"
-msgstr ""
+msgstr "刪除帳號"
 
 #: modules/websession/lib/websession_webinterface.py:468
 msgid "Logout"
-msgstr ""
+msgstr "登出"
 
 #: modules/websession/lib/websession_webinterface.py:567
 msgid "Register"
-msgstr ""
+msgstr "註冊"
 
 #: modules/websession/lib/websession_webinterface.py:587
 msgid "Your account has been successfully created."
-msgstr ""
+msgstr "帳號已建立。"
 
 #: modules/websession/lib/websession_webinterface.py:588
 msgid "Account created"
-msgstr ""
+msgstr "帳號已建立"
 
 #: modules/websession/lib/websession_webinterface.py:590
 msgid ""
 "An email has been sent to the given address with the account information."
-msgstr ""
+msgstr "我們已經發送有關帳號的電郵給您。"
 
 #: modules/websession/lib/websession_webinterface.py:592
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
-msgstr ""
+msgstr "當您的帳號已經開通，我們會再發送電郵給您。"
 
 #: modules/websession/lib/websession_webinterface.py:594
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
-msgstr ""
+msgstr "您可以使用您的%(x_url_open)s帳號%(x_url_close)s。"
 
 #: modules/websession/lib/websession_webinterface.py:601
 #: modules/websession/lib/websession_webinterface.py:606
@@ -3976,32 +3977,32 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:626
 #: modules/websession/lib/websession_webinterface.py:631
 msgid "Registration failure"
-msgstr ""
+msgstr "註冊失敗"
 
 #: modules/websession/lib/websession_webinterface.py:619
 #, python-format
 msgid "Desired nickname %s already exists in the database."
-msgstr ""
+msgstr "諢號 %s 已被使用。"
 
 #: modules/websession/lib/websession_webinterface.py:624
 msgid "Users cannot register themselves, only admin can register them."
-msgstr ""
+msgstr "只有管理員才可建立帳號。"
 
 #: modules/websession/lib/websession_webinterface.py:789
 msgid "Join New Group"
-msgstr ""
+msgstr "加入新的組別"
 
 #: modules/websession/lib/websession_webinterface.py:838
 msgid "Leave Group"
-msgstr ""
+msgstr "退出組別"
 
 #: modules/websession/lib/websession_webinterface.py:905
 msgid "Edit Group"
-msgstr ""
+msgstr "修改組別"
 
 #: modules/websession/lib/websession_webinterface.py:974
 msgid "Edit group members"
-msgstr ""
+msgstr "修改組員"
 
 #: modules/webstyle/lib/webstyle_templates.py:520
 #: modules/webstyle/lib/webstyle_templates.py:557
@@ -4009,418 +4010,418 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:1446
 #: modules/websubmit/lib/websubmit_webinterface.py:401
 msgid "Error"
-msgstr ""
+msgstr "錯誤"
 
 #: modules/webstyle/lib/webstyle_templates.py:524
 msgid "Browser"
-msgstr ""
+msgstr "瀏覽器"
 
 #: modules/webstyle/lib/webstyle_templates.py:546
 msgid "System Error"
-msgstr ""
+msgstr "系統錯誤"
 
 #: modules/webstyle/lib/webstyle_templates.py:561
 msgid "Traceback"
-msgstr ""
+msgstr "後退"
 
 #: modules/webstyle/lib/webstyle_templates.py:608
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #: modules/webstyle/lib/webstyle_templates.py:609
 msgid "Client"
-msgstr ""
+msgstr "客戶"
 
 #: modules/webstyle/lib/webstyle_templates.py:611
 msgid "Please send an error report to the Administrator."
-msgstr ""
+msgstr "請給管理員發送錯誤報告。"
 
 #: modules/webstyle/lib/webstyle_templates.py:612
 msgid "Send error report"
-msgstr ""
+msgstr "發送錯誤報告"
 
 #: modules/webstyle/lib/webstyle_templates.py:616
 #, python-format
 msgid "Please contact %s quoting the following information:"
-msgstr ""
+msgstr "請聯絡 %s 並引用以下資料："
 
 #: modules/websubmit/lib/websubmit_engine.py:185
 #: modules/websubmit/lib/websubmit_engine.py:711
 #: modules/websubmit/web/yoursubmissions.py:74
 msgid "Sorry, you must log in to perform this action."
-msgstr ""
+msgstr "抱歉, 您必須先登入。"
 
 #: modules/websubmit/lib/websubmit_engine.py:192
 #: modules/websubmit/lib/websubmit_engine.py:718
 msgid "Invalid parameter"
-msgstr ""
+msgstr "參數無效"
 
 #: modules/websubmit/lib/websubmit_engine.py:223
 #: modules/websubmit/lib/websubmit_engine.py:744
 msgid "Unable to find the submission directory."
-msgstr ""
+msgstr "沒法找到提交目錄。"
 
 #: modules/websubmit/lib/websubmit_engine.py:232
 #: modules/websubmit/lib/websubmit_engine.py:843
 msgid "Unknown document type"
-msgstr ""
+msgstr "不知名文件種類"
 
 #: modules/websubmit/lib/websubmit_engine.py:241
 #: modules/websubmit/lib/websubmit_engine.py:852
 msgid "Unknown action"
-msgstr ""
+msgstr "不知名動作"
 
 #: modules/websubmit/lib/websubmit_engine.py:249
 #: modules/websubmit/lib/websubmit_engine.py:861
 msgid "Unable to determine the number of submission pages."
-msgstr ""
+msgstr "不能確定提交頁數數量。"
 
 #: modules/websubmit/lib/websubmit_engine.py:278
 msgid "Unable to create a directory for this submission."
-msgstr ""
+msgstr "不能創建提交目錄。"
 
 #: modules/websubmit/lib/websubmit_engine.py:345
 #: modules/websubmit/lib/websubmit_engine.py:757
 msgid "Cannot create submission directory."
-msgstr ""
+msgstr "不能創建提交目錄。"
 
 #: modules/websubmit/lib/websubmit_engine.py:382
 msgid "Unknown form field found on submission page."
-msgstr ""
+msgstr "不知名表格欄位。"
 
 #: modules/websubmit/lib/websubmit_engine.py:510
 msgid "Unknown form field found on one of the submission pages."
-msgstr ""
+msgstr "不知名表格欄位。"
 
 #: modules/websubmit/lib/websubmit_engine.py:1205
 msgid "Unable to find document type."
-msgstr ""
+msgstr "不能找到文件種類。"
 
 #: modules/websubmit/lib/websubmit_engine.py:1406
 msgid "The chosen action is not supported by the document type."
-msgstr ""
+msgstr "這文件種類並不支援這行動。"
 
 #: modules/websubmit/lib/websubmit_engine.py:1458
 #: modules/websubmit/lib/websubmit_webinterface.py:411
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: modules/websubmit/lib/websubmit_templates.py:87
 msgid "Document types available for submission"
-msgstr ""
+msgstr "可使用的文件種類"
 
 #: modules/websubmit/lib/websubmit_templates.py:88
 msgid "Please select the type of document you want to submit."
-msgstr ""
+msgstr "請選擇文件種類。"
 
 #: modules/websubmit/lib/websubmit_templates.py:104
 msgid "No document types available."
-msgstr ""
+msgstr "沒有可使用的文件種類。"
 
 #: modules/websubmit/lib/websubmit_templates.py:247
 msgid "Please log in first."
-msgstr ""
+msgstr "您必須先登入。"
 
 #: modules/websubmit/lib/websubmit_templates.py:247
 msgid "Use the top-right menu to log in."
-msgstr ""
+msgstr "請用右上角的目錄進行登入。"
 
 #: modules/websubmit/lib/websubmit_templates.py:290
 msgid "Please select a category"
-msgstr ""
+msgstr "請選擇類別"
 
 #: modules/websubmit/lib/websubmit_templates.py:328
 msgid "Notice"
-msgstr ""
+msgstr "注意"
 
 #: modules/websubmit/lib/websubmit_templates.py:329
 msgid "Select a category and then click on an action button."
-msgstr ""
+msgstr "請選擇類別並點擊行動按鈕。"
 
 #: modules/websubmit/lib/websubmit_templates.py:350
 msgid ""
 "To continue with a previously interrupted submission, enter an access number "
 "into the box below:"
-msgstr ""
+msgstr "請輸入存取號碼以便繼續上次中斷的提交："
 
 #: modules/websubmit/lib/websubmit_templates.py:352
 msgid "GO"
-msgstr ""
+msgstr "去"
 
 #: modules/websubmit/lib/websubmit_templates.py:477
 #: modules/websubmit/lib/websubmit_templates.py:920
 msgid "SUMMARY"
-msgstr ""
+msgstr "概要"
 
 #: modules/websubmit/lib/websubmit_templates.py:514
 msgid "Previous page"
-msgstr ""
+msgstr "上一頁"
 
 #: modules/websubmit/lib/websubmit_templates.py:520
 msgid "Submission number"
-msgstr ""
+msgstr "提交號碼"
 
 #: modules/websubmit/lib/websubmit_templates.py:534
 msgid "Next page"
-msgstr ""
+msgstr "下一頁"
 
 #: modules/websubmit/lib/websubmit_templates.py:549
 #: modules/websubmit/lib/websubmit_templates.py:961
 msgid "Are you sure you want to quit this submission?"
-msgstr ""
+msgstr "您是否決定離放棄提交？"
 
 #: modules/websubmit/lib/websubmit_templates.py:550
 #: modules/websubmit/lib/websubmit_templates.py:962
 #: modules/websubmit/lib/websubmit_templates.py:970
 msgid "Back to main menu"
-msgstr ""
+msgstr "返回主目錄"
 
 #: modules/websubmit/lib/websubmit_templates.py:553
 msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
-msgstr ""
+msgstr "這是您的存取號碼，您可以用它以重試中斷的提交。"
 
 #: modules/websubmit/lib/websubmit_templates.py:554
 msgid "Mandatory fields appear in red in the SUMMARY window."
-msgstr ""
+msgstr "紅色的欄位不可留空。"
 
 #: modules/websubmit/lib/websubmit_templates.py:702
 #, python-format
 msgid "The field %s is mandatory."
-msgstr ""
+msgstr "欄位 %s 不可留空。"
 
 #: modules/websubmit/lib/websubmit_templates.py:702
 msgid "Please make a choice in the select box"
-msgstr ""
+msgstr "請選擇"
 
 #: modules/websubmit/lib/websubmit_templates.py:716
 msgid "Please press a button."
-msgstr ""
+msgstr "請按鍵。"
 
 #: modules/websubmit/lib/websubmit_templates.py:724
 #, python-format
 msgid "The field %s is mandatory. Please fill it in."
-msgstr ""
+msgstr "欄位 %s 不可留空。請輸入。"
 
 #: modules/websubmit/lib/websubmit_templates.py:800
 #, python-format
 msgid "The field %(field)s is mandatory."
-msgstr ""
+msgstr "欄位 %(field)s 不可留空。"
 
 #: modules/websubmit/lib/websubmit_templates.py:800
 msgid "Going back to page"
-msgstr ""
+msgstr "回到頁"
 
 #: modules/websubmit/lib/websubmit_templates.py:911
 msgid "finished!"
-msgstr ""
+msgstr "完成！"
 
 #: modules/websubmit/lib/websubmit_templates.py:919
 msgid "end of action"
-msgstr ""
+msgstr "完了"
 
 #: modules/websubmit/lib/websubmit_templates.py:943
 msgid "Submission no"
-msgstr ""
+msgstr "提交號碼"
 
 #: modules/websubmit/lib/websubmit_templates.py:1013
 #, python-format
 msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
 "(x_step)s"
-msgstr ""
+msgstr "這是 %(x_action)s 功能名單  %(x_doctype)s 文件 在 級別 %(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1018
 msgid "Function"
-msgstr ""
+msgstr "功能"
 
 #: modules/websubmit/lib/websubmit_templates.py:1019
 msgid "Score"
-msgstr ""
+msgstr "評分"
 
 #: modules/websubmit/lib/websubmit_templates.py:1020
 msgid "Running function"
-msgstr ""
+msgstr "流動功能"
 
 #: modules/websubmit/lib/websubmit_templates.py:1026
 #, python-format
 msgid "Function %s does not exist."
-msgstr ""
+msgstr "功能 %s 並不存在。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1065
 msgid "You must now"
-msgstr ""
+msgstr "您要先"
 
 #: modules/websubmit/lib/websubmit_templates.py:1070
 msgid "or"
-msgstr ""
+msgstr "或"
 
 #: modules/websubmit/lib/websubmit_templates.py:1097
 msgid "record"
-msgstr ""
+msgstr "記錄"
 
 #: modules/websubmit/lib/websubmit_templates.py:1099
 msgid "document"
-msgstr ""
+msgstr "文件"
 
 #: modules/websubmit/lib/websubmit_templates.py:1101
 #: modules/websubmit/lib/websubmit_templates.py:1192
 msgid "version"
-msgstr ""
+msgstr "版本"
 
 #: modules/websubmit/lib/websubmit_templates.py:1130
 msgid "file(s)"
-msgstr ""
+msgstr "文檔"
 
 #: modules/websubmit/lib/websubmit_templates.py:1178
 msgid "see"
-msgstr ""
+msgstr "參見"
 
 #: modules/websubmit/lib/websubmit_templates.py:1364
 msgid "For"
-msgstr ""
+msgstr "為"
 
 #: modules/websubmit/lib/websubmit_templates.py:1365
 msgid "all types of document"
-msgstr ""
+msgstr "全部文件類型"
 
 #: modules/websubmit/lib/websubmit_templates.py:1419
 msgid "Id"
-msgstr ""
+msgstr "Id"
 
 #: modules/websubmit/lib/websubmit_templates.py:1420
 msgid "Reference"
-msgstr ""
+msgstr "參考"
 
 #: modules/websubmit/lib/websubmit_templates.py:1422
 msgid "First access"
-msgstr ""
+msgstr "最初訪問"
 
 #: modules/websubmit/lib/websubmit_templates.py:1423
 msgid "Last access"
-msgstr ""
+msgstr "最後訪問"
 
 #: modules/websubmit/lib/websubmit_templates.py:1433
 msgid "Are you sure you want to delete this submission?"
-msgstr ""
+msgstr "您是否決定移除這提交？"
 
 #: modules/websubmit/lib/websubmit_templates.py:1434
 #, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
-msgstr ""
+msgstr "刪除提交%(x_id)s 在 %(x_docname)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1450
 msgid "Reference not yet given"
-msgstr ""
+msgstr "並沒有參考"
 
 #: modules/websubmit/lib/websubmit_templates.py:1521
 msgid "Refereed Documents"
-msgstr ""
+msgstr "參考文件"
 
 #: modules/websubmit/lib/websubmit_templates.py:1531
 msgid "You are a general referee"
-msgstr ""
+msgstr "您是這一位裁判員為類別"
 
 #: modules/websubmit/lib/websubmit_templates.py:1536
 msgid "You are a referee for category:"
-msgstr ""
+msgstr "您是以下類別的裁判員："
 
 #: modules/websubmit/lib/websubmit_templates.py:1573
 msgid "List of refereed types of documents"
-msgstr ""
+msgstr "文件類型名單"
 
 #: modules/websubmit/lib/websubmit_templates.py:1574
 msgid ""
 "Select one of the following types of documents to check the documents status."
-msgstr ""
+msgstr "選擇以下之文件類型以檢查其狀態。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1632
 msgid "List of refereed categories"
-msgstr ""
+msgstr "類別名單"
 
 #: modules/websubmit/lib/websubmit_templates.py:1633
 msgid "Please choose a category"
-msgstr ""
+msgstr "請選擇類別"
 
 #: modules/websubmit/lib/websubmit_templates.py:1652
 #: modules/websubmit/lib/websubmit_templates.py:1693
 #: modules/websubmit/lib/websubmit_templates.py:1758
 msgid "Pending"
-msgstr ""
+msgstr "等待中"
 
 #: modules/websubmit/lib/websubmit_templates.py:1658
 #: modules/websubmit/lib/websubmit_templates.py:1696
 #: modules/websubmit/lib/websubmit_templates.py:1759
 msgid "Approved"
-msgstr ""
+msgstr "已批核"
 
 #: modules/websubmit/lib/websubmit_templates.py:1664
 #: modules/websubmit/lib/websubmit_templates.py:1698
 #: modules/websubmit/lib/websubmit_templates.py:1699
 #: modules/websubmit/lib/websubmit_templates.py:1760
 msgid "Rejected"
-msgstr ""
+msgstr "已拒絕"
 
 #: modules/websubmit/lib/websubmit_templates.py:1692
 msgid "Key"
-msgstr ""
+msgstr "關鍵"
 
 #: modules/websubmit/lib/websubmit_templates.py:1695
 msgid "Waiting for approval"
-msgstr ""
+msgstr "等待批核中"
 
 #: modules/websubmit/lib/websubmit_templates.py:1697
 msgid "Already approved"
-msgstr ""
+msgstr "已批核"
 
 #: modules/websubmit/lib/websubmit_templates.py:1700
 msgid "Some documents are pending."
-msgstr ""
+msgstr "有文件在等待批核中。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1755
 msgid "List of refereed documents"
-msgstr ""
+msgstr "文件名單"
 
 #: modules/websubmit/lib/websubmit_templates.py:1756
 msgid "Click on a report number for more information."
-msgstr ""
+msgstr "點擊報告遍號以獲得更多資料。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1757
 msgid "Report Number"
-msgstr ""
+msgstr "報告遍號"
 
 #: modules/websubmit/lib/websubmit_templates.py:1880
 msgid "Your request has been sent to the referee."
-msgstr ""
+msgstr "您的請求已被送出。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1894
 msgid "Title:"
-msgstr ""
+msgstr "標題"
 
 #: modules/websubmit/lib/websubmit_templates.py:1900
 msgid "Author:"
-msgstr ""
+msgstr "作者"
 
 #: modules/websubmit/lib/websubmit_templates.py:1908
 msgid "More information:"
-msgstr ""
+msgstr "更多資料"
 
 #: modules/websubmit/lib/websubmit_templates.py:1909
 msgid "Click here"
-msgstr ""
+msgstr "點擊這"
 
 #: modules/websubmit/lib/websubmit_templates.py:1915
 #, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
-msgstr ""
+msgstr "這文件還在%(x_fmt_open)s等候批核中%(x_fmt_close)s。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1918
 #: modules/websubmit/lib/websubmit_templates.py:1938
 #: modules/websubmit/lib/websubmit_templates.py:1948
 msgid "It was first sent for approval on:"
-msgstr ""
+msgstr "最初獲得批核日期："
 
 #: modules/websubmit/lib/websubmit_templates.py:1920
 #: modules/websubmit/lib/websubmit_templates.py:1922
@@ -4429,78 +4430,78 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1950
 #: modules/websubmit/lib/websubmit_templates.py:1952
 msgid "Last approval email was sent on:"
-msgstr ""
+msgstr "最後的批核電郵已在這日期發送："
 
 #: modules/websubmit/lib/websubmit_templates.py:1923
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
-msgstr ""
+msgstr "您可以點擊以下按鈕從而再發送要求批核之電郵："
 
 #: modules/websubmit/lib/websubmit_templates.py:1925
 #: modules/websubmit/web/publiline.py:203
 msgid "Send Again"
-msgstr ""
+msgstr "重新發送"
 
 #: modules/websubmit/lib/websubmit_templates.py:1926
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
-msgstr ""
+msgstr "警告！"
 
 #: modules/websubmit/lib/websubmit_templates.py:1929
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
-msgstr ""
+msgstr "您可以點擊這個按鈕來批核或拒絕這文件。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1931
 msgid "Approve/Reject"
-msgstr ""
+msgstr "批核/拒絕"
 
 #: modules/websubmit/lib/websubmit_templates.py:1935
 #, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
-msgstr ""
+msgstr "這文件已被%(x_fmt_open)s批核%(x_fmt_close)s。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1937
 msgid "Its approved reference is:"
-msgstr ""
+msgstr "批核參考："
 
 #: modules/websubmit/lib/websubmit_templates.py:1943
 msgid "It was approved on:"
-msgstr ""
+msgstr "已被批核："
 
 #: modules/websubmit/lib/websubmit_templates.py:1945
 #, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
-msgstr ""
+msgstr "這文件已被%(x_fmt_open)s拒絕%(x_fmt_close)s。"
 
 #: modules/websubmit/lib/websubmit_templates.py:1953
 msgid "It was rejected on:"
-msgstr ""
+msgstr "已被拒絕："
 
 #: modules/websubmit/lib/websubmit_webinterface.py:101
 #: modules/websubmit/lib/websubmit_webinterface.py:112
 #: modules/websubmit/lib/websubmit_webinterface.py:181
 msgid "Unable to find file."
-msgstr ""
+msgstr "無法找到檔案。"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:104
 msgid "This file is restricted!"
-msgstr ""
+msgstr "這是受讀取限制的檔案！"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:125
 #: modules/websubmit/lib/websubmit_webinterface.py:213
 msgid "Access to Fulltext"
-msgstr ""
+msgstr "讀取全文"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:175
 msgid "Parameter docid missing"
-msgstr ""
+msgstr "缺少 docid 參數"
 
 #: modules/websubmit/web/publiline.py:195
 msgid "Approval has never been requested for this document."
-msgstr ""
+msgstr "這個文件未曾被請求批核。"
 
 #: modules/websubmit/web/publiline.py:200
 msgid "Unable to display document."
-msgstr ""
+msgstr "無法顯示文件。"
