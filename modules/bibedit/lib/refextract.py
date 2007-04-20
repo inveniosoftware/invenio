@@ -1242,6 +1242,22 @@ def build_titles_knowledge_base(fpath):
         searching in the reference lines; The values in the dictionary are
         the replace terms for matches.
     """
+    ## Private function used for sorting titles by string-length:
+    def _cmp_bystrlen_reverse(a, b):
+        """A private "cmp" function to be used by the "sort" function of a
+           list when ordering the titles found in a knowledge base by string-
+           length - LONGEST -> SHORTEST.
+           @param a: (string)
+           @param b: (string)
+           @return: (integer) - 0 if len(a) == len(b); 1 if len(a) < len(b);
+            -1 if len(a) > len(b);
+        """
+        if len(a) > len(b):
+            return -1
+        elif len(a) < len(b):
+            return 1
+        else:
+            return 0
     ## Initialise vars:
     ## dictionary of search and replace phrases from KB:
     kb = {}
@@ -1283,6 +1299,26 @@ def build_titles_knowledge_base(fpath):
                         standardised_titles[seek_phrase] = \
                                                          m_kb_line.group('repl')
                         seek_phrases.append(seek_phrase)
+                ## Is the "replace term" in the KB as a "seek term"?
+                ## If not, add it.
+                raw_replace_phrase = m_kb_line.group('repl').upper()
+                raw_replace_phrase = \
+                               sre_punctuation.sub(u' ', raw_replace_phrase)
+                raw_replace_phrase = \
+                      sre_group_captured_multiple_space.sub(u' ', \
+                                                            raw_replace_phrase)
+                raw_replace_phrase = raw_replace_phrase.strip()
+
+                if not kb.has_key(raw_replace_phrase):
+                    ## The replace-phrase was not in the KB as a seek phrase.
+                    ## It should be added.
+                    seek_ptn = sre.compile(r'(?<!\/)\b(' + \
+                                           sre.escape(raw_replace_phrase) + \
+                                           r')[^A-Z0-9]', sre.UNICODE)
+                    kb[raw_replace_phrase] = seek_ptn
+                    standardised_titles[raw_replace_phrase] = \
+                                                     m_kb_line.group('repl')
+                    seek_phrases.append(raw_replace_phrase)
             else:
                 ## KB line was not correctly formatted - die with error
                 emsg = """Error: Could not build list of journal titles """ \
@@ -1291,6 +1327,9 @@ def build_titles_knowledge_base(fpath):
                 sys.stderr.write(emsg)
                 sys.exit(1)
         fh.close()
+
+        ## Sort the titles by string length (long - short)
+        seek_phrases.sort(_cmp_bystrlen_reverse)
     except IOError:
         ## problem opening KB for reading, or problem while reading from it:
         emsg = """Error: Could not build list of journal titles - failed """ \
@@ -3703,7 +3742,7 @@ def find_reference_section(docbody):
                                 else:
                                     found_part = 1
                                     ref_start_line = temp_ref_start_line
-                                    ref_title=temp_title
+                                    ref_title = temp_title
                                     ref_line_marker = mark
                                     ref_line_marker_ptn = mk_ptn
                         else:
@@ -3713,7 +3752,7 @@ def find_reference_section(docbody):
                             else:
                                 found_part = 1
                                 ref_start_line = temp_ref_start_line
-                                ref_title=temp_title
+                                ref_title = temp_title
                     except IndexError:
                         ## References section title was on last line for some
                         ## reason. Ignore
@@ -3928,7 +3967,7 @@ def test_for_blank_lines_separating_reference_lines(ref_sect):
             ## empty line
             num_blanks += 1
             x = x + 1
-            while x< len(ref_sect) and ref_sect[x].isspace():
+            while x < len(ref_sect) and ref_sect[x].isspace():
                 x = x + 1
             if x == len(ref_sect):
                 ## Blanks at end doc: dont count
