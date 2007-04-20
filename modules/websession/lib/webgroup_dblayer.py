@@ -97,6 +97,17 @@ def get_external_groups(uid):
     res = run_sql(query % uid)
     return res
 
+def get_groups(uid):
+    """Select all the groups id the user is member of."""
+    query = """SELECT g.id, g.name
+               FROM usergroup g, user_usergroup ug
+               WHERE ug.id_user=%s AND
+                     ug.id_usergroup=g.id
+            """
+    res = run_sql(query, (uid, ))
+    res = list(res)
+    return res
+
 def get_group_id(group_name, login_method):
     """@return the id of the group called group_name with given login_method."""
     return run_sql("""
