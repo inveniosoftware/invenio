@@ -19,6 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:OAI-PMH="http://www.openarchives.org/OAI/2.0/"
                 xmlns:arXiv="http://arxiv.org/OAI/arXiv/"
@@ -280,13 +281,20 @@
            </xsl:if>
 
 
-           <!-- MARC FIELD 037$$a = metadata/arXiv/id  -->           
+           <!-- MARC FIELD 037$$a = metadata/arXiv/id             
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id">
              <datafield tag="037" ind1=" " ind2=" ">
                 <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id"/></subfield>
              </datafield>
-           </xsl:if>
+           </xsl:if> -->
 
+
+           <!-- MARC FIELD 037_$$a = metadata/header/identifier  -->           
+           <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier">
+             <datafield tag="037" ind1=" " ind2=" ">
+                <subfield code="a"><xsl:value-of select="substring-after(./OAI-PMH:header/OAI-PMH:identifier, ':')"/></subfield>
+             </datafield>
+           </xsl:if>
 
 
            <!-- MARC FIELD 041$$a = default value: eng for english  -->           
@@ -380,7 +388,7 @@
            <!-- MARC FIELD 8564   <subfield code="y">Access to fulltext document</subfield> -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id"> 
              <datafield tag="856" ind1="4" ind2=" ">
-                  <subfield code="u">http://arxiv.org/pdf/<xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id"/>.pdf</subfield>
+                  <subfield code="u">http://arxiv.org/pdf/<xsl:value-of select="substring-after(./OAI-PMH:header/OAI-PMH:identifier, '.org:')"/>.pdf</subfield>
              </datafield>
            </xsl:if> 
 
