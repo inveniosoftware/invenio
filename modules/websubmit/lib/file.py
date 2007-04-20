@@ -83,6 +83,9 @@ class BibRecDocs:
                 self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
 
     def listBibDocs(self,type=""):
+        """Returns the list all bibdocs object belonging to a recid.
+        If type is set, it returns just the bibdocs of that type.
+        """
         tmp=[]
         for bibdoc in self.bibdocs:
             if type=="" or type == bibdoc.getType():
@@ -90,24 +93,32 @@ class BibRecDocs:
         return tmp
 
     def getBibDocNames(self,type="Main"):
+        """Returns the names of the files associated with the bibdoc of a paritcular type"""
         names = []
         for bibdoc in self.listBibDocs(type):
             names.append(bibdoc.getDocName())
         return names
 
     def getBibDoc(self,bibdocid):
+        """Returns the bibdoc with a particular bibdocid associated with this recid"""
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 return bibdoc
         return None
 
     def deleteBibDoc(self,bibdocid):
+        """Delete a bibdocid associated with the recid."""
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 bibdoc.delete()
         self.buildBibDocList()
 
     def addBibDoc(self,type="Main",docname="file"):
+        """Creates a new bibdoc associated with the recid, with a file called docname
+        and a paritcular type. It returns the bibdoc object which was just created.
+        If it already exists a bibdoc with docname name, it appends _2 the necessary
+        number of times for having a unique name.
+        """
         while docname in self.getBibDocNames(type):
             match = re.match("(.*_)([^_]*)",docname)
             if match:
@@ -123,6 +134,9 @@ class BibRecDocs:
         return bibdoc
 
     def addNewFile(self,fullpath,type="Main"):
+        """Creates a new bibdoc given a fullpath file and store the file in it.
+        It returns the bibdoc object.
+        """
         filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
         bibdoc = self.addBibDoc(type,filename)
         if bibdoc is not None:
@@ -131,6 +145,10 @@ class BibRecDocs:
         return None
 
     def addNewVersion(self,fullpath,bibdocid):
+        """Adds a new fullpath file to an already existent bibdocid making the previous
+        files associated with the same bibdocids obsolete.
+        It returns the bibdoc object.
+        """
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc is not None:
             bibdoc.addFilesNewVersion(files=[fullpath])
@@ -150,6 +168,10 @@ class BibRecDocs:
         return None
 
     def addNewFormat(self,fullpath,bibdocid):
+        """Adds a new format for a fullpath file to an already existent bibdocid
+        along side already there files.
+        It returns the bibdoc object.
+        """
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc is not None:
             bibdoc.addFilesNewFormat(files=[fullpath])
@@ -172,42 +194,6 @@ class BibRecDocs:
         else:
             return 0
 
-    def proposeUniqueName(self, filename, type=""):
-        """Produces a filename starting from filename that is known to not
-        overwrite files already existants. Returns the same filename if it's
-        already unique, otherwise it returns name-#.ext where name, ext are
-        part of filename and -# is a progressive integer number.
-        #FIXME Still to be checked.
-        """
-
-        # Splitting name from ext in order to insert the incremental number
-        if '.' in filename:
-            [name, ext] = filename.split('.', 1)
-            ext = '.' + ext
-        else:
-            name = filename
-            ext = ''
-
-        # Let's check if the filename is not already ok
-        docfiles = self.listLatestFiles(type)
-        ok_p = True
-        for docfile in docfiles:
-            if filename in docfile.name():
-                ok_p = False
-                break
-
-        if not ok_p:
-            # Let's try with incremental numbers
-            n = 1
-            while not ok_p:
-                ok_p = True
-                for docfile in docfiles:
-                    filename = "%s-%i%s" % (name, n, ext)
-                    if filename in docfile.name():
-                        ok_p = False
-                        break
-                n += 1
-        return filename
 
     def display(self,bibdocid="",version="",type="", ln = cdslang):
         t=""
