@@ -183,6 +183,7 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE collection_portalbox CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE formatname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE fieldname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE bibrec ADD COLUMN rules tinyblob NULL;" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
