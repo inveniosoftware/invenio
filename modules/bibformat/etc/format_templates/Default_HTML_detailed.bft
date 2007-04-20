@@ -1,5 +1,6 @@
+
 <name>Default HTML detailed</name>
-<description>This is the default HTML detailed format.</description>
+<description>This is the default HTML detailed format</description>
 <BFE_EDIT_RECORD style='color:rgb(255,0,0)'
 prefix='<div style="text-align:right;font-size:small;">' 
 suffix='</div>'/>
@@ -36,10 +37,14 @@ suffix="<br/>" />
 
 <BFE_PUBLI_INFO prefix="<br/><br/><strong>Published in: </strong>"/>
 <br/>
-<BFE_FULLTEXT prefix="<br/><strong>Fulltext : </strong><small>" suffix="</small>"/>
+<BFE_FULLTEXT2 />
 <BFE_CITED_BY prefix="<br/><br/><strong>Cited by:</strong> try citation search for "/>
 </p> 
 <BFE_REFERENCES 
 prefix='<blockquote><strong>References:</strong><ul>' 
 suffix='</ul><p><small><i><b>Warning</b>: references are automatically extracted and standardized from the PDF document and may therefore contain errors. If you think they are incorrect or incomplete, look at the fulltext document itself.<br></i></small></blockquote>'/>
 </p>
+    
+    
+    
+    
