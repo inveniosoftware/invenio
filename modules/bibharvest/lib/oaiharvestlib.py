@@ -491,7 +491,7 @@ def get_row_from_reposname(reposname):
                         comment, bibconvertcfgfile, name, lastrun,
                         frequency, postprocess, setspecs, 
                         bibfilterprogram
-                   FROM oaiHARVEST WHERE name=%s""" % escape_string(reposname)
+                   FROM oaiHARVEST WHERE name=%s"""
         res = run_sql(sql, (reposname,))
         reposdata = []
         for element in res:
