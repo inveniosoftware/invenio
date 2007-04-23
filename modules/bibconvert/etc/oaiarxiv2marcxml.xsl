@@ -57,6 +57,23 @@
  </xsl:template>
 
 
+ <!-- FUNCTION   output-695a-subfields -->
+<xsl:template name="output-695a-subfields">
+      <xsl:param name="list" />
+      <xsl:variable name="first" select="substring-before($list, '.')" />
+      <xsl:variable name="remaining" select="substring-after($list, '.')" />
+      <xsl:if test="not($first='')">
+        <subfield code="a"><xsl:value-of select="$first" /></subfield>
+      </xsl:if>
+      <xsl:if test="$remaining">
+          <xsl:call-template name="output-695a-subfields">
+              <xsl:with-param name="list" select="$remaining" />
+          </xsl:call-template>
+      </xsl:if>
+</xsl:template>
+
+
+
  <!-- FUNCTION  last-word : returns last word of a string of words separated by spaces -->
  <xsl:template name="last-word">
     <xsl:param name="text"/>
@@ -72,6 +89,7 @@
       </xsl:otherwise>
     </xsl:choose>
  </xsl:template>
+
 
  <!-- FUNCTION  rn-extract : returns a subfield for each reportnumber in a string (comma separted)  -->
  <xsl:template name="rn-extract">
@@ -512,24 +530,24 @@
            </xsl:choose>
 
 
-           <!-- MARC FIELD 695$$a
-           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:subj-class">
-             <datafield tag="695" ind1=" " ind2=" ">
-                <subfield code="9">LANL EDS</subfield>
-                <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:subj-class"/></subfield>
-             </datafield>
-           </xsl:if>
-           -->
-
-
-           <!-- MARC FIELD 695$$a new -->
+           <!-- MARC FIELD 695$$a OLD
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories">
              <datafield tag="695" ind1=" " ind2=" ">
                 <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories"/></subfield>
                 <subfield code="9">LANL EDS</subfield>
              </datafield>
-           </xsl:if>
+           </xsl:if> -->
 
+
+           <!-- MARC FIELD 695$$a new -->
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories">
+             <datafield tag="695" ind1=" " ind2=" ">
+                <xsl:call-template name="output-695a-subfields">
+                    <xsl:with-param name="list"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories"/></xsl:with-param>
+                </xsl:call-template>
+                <subfield code="9">LANL EDS</subfield>
+             </datafield>
+           </xsl:if> 
 
 
            <!-- MARC FIELD 773 -->
