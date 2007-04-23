@@ -108,6 +108,11 @@
     </xsl:choose>          
  </xsl:template>
 
+ <!-- FUNCTION Print sets values separated by ;  -->
+ <xsl:template name="print-sets">
+    <xsl:for-each select="./OAI-PMH:header/OAI-PMH:setSpec"><xsl:value-of select="."/>;</xsl:for-each>
+ </xsl:template>
+
  
  <!-- FUNCTION cern-detect-aff : used by cern-detect : detects if the srting  CERN is present in affiaitons  -->
  <xsl:template name="cern-detect-aff">
@@ -234,7 +239,12 @@
     </xsl:variable>
 
 
-    <xsl:if test=" ($setspec ='solv-int') or ($setspec ='quant-ph') or ($setspec ='q-alg') or ($setspec ='plasm-ph') or ($setspec ='physics') or ($setspec ='patt-sol') or ($setspec ='nucl-th') or ($setspec ='nucl-ex') or ($setspec ='nlin') or ($setspec ='neuro-sci') or ($setspec ='neuro-dev') or ($setspec ='neuro-cel') or ($setspec ='mtrl-th') or ($setspec ='math') or ($setspec ='math-ph') or ($setspec ='lc-om') or ($setspec ='hep-th') or ($setspec ='hep-ph') or ($setspec ='hep-lat') or ($setspec ='hep-ex') or ($setspec ='gr-qc') or ($setspec ='funct-an') or ($setspec ='dg-ga') or ($setspec ='cs') or ($setspec ='cond-mat') or ($setspec ='comp-gas') or ($setspec ='cmp-lg') or ($setspec ='chem-ph') or ($setspec ='chao-dyn') or ($setspec ='cd-hg') or ($setspec ='bayes-an') or ($setspec ='auto-fms') or ($setspec ='atom-ph') or ($setspec ='astro-ph') or ($setspec ='ao-sci') or ($setspec ='alg-geom') or ($setspec ='adap-org') or ($setspec ='acc-phys')  ">    
+    <xsl:variable name="allsets">
+      <xsl:call-template name="print-sets" />
+    </xsl:variable>
+
+    <xsl:if test=" contains($allsets,'solv-int') or contains($allsets,'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'patt-sol') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'nlin') or contains($allsets,'neuro-sci') or contains($allsets,'neuro-dev') or contains($allsets,'neuro-cel') or contains($allsets,'mtrl-th') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'lc-om') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'funct-an') or contains($allsets,'dg-ga') or contains($allsets,'cs') or contains($allsets,'cond-mat') or contains($allsets,'comp-gas') or contains($allsets,'cmp-lg') or contains($allsets,'chem-ph') or contains($allsets,'chao-dyn') or contains($allsets,'cd-hg') or contains($allsets,'bayes-an') or contains($allsets,'auto-fms') or contains($allsets,'atom-ph') or contains($allsets,'astro-ph') or contains($allsets,'ao-sci') or contains($allsets,'alg-geom') or contains($allsets,'adap-org') or contains($allsets,'acc-phys')  "> 
+
 
 
     <xsl:choose>
