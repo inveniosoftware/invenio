@@ -43,7 +43,7 @@ except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
-    
+
 
 http_response_status_code = {
 
@@ -64,7 +64,7 @@ def http_param_resume(http_param_dict,resumptionToken):
         'verb'            : http_param_dict['verb'],
         'resumptionToken' : resumptionToken
     }
-    
+
     return http_param
 
 def http_request_parameters(http_param_dict, method="POST"):
@@ -85,7 +85,7 @@ def http_request_parameters(http_param_dict, method="POST"):
             if http_param_dict[key]:
                 http_param[key] = http_param_dict[key]
         params = urllib.urlencode(http_param)
-    
+
     return params
 
 def OAI_Session(server, script, http_param_dict ,method="POST",output="", stylesheet="", resume_request_nbr=0):
@@ -104,31 +104,41 @@ def OAI_Session(server, script, http_param_dict ,method="POST",output="", styles
 
     a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
 
-    rt_obj = re.search('>[^<]*</resumptionToken>',a)
+    rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',a)
 
     i = resume_request_nbr
 
     while rt_obj is not None and rt_obj !="":
 
-        if output:
+        if output and a.find("</record>") > -1:
             write_file( "%s.%07d" % (output,i), a)
         else:
+            # hmm, were there no records in output?
             sys.stdout.write(a)
+            sys.stdout.write("\n<!--\n*** WARNING: NO RECORDS IN THE OUTPUT: " + \
+                             repr(output) +  "\n" + \
+                             repr(a) + \
+                             "\n***\n-->\n")
 
         i = i + 1
 
         time.sleep(1)
 
-        http_param_dict = http_param_resume(http_param_dict,rt_obj.group()[1:-18])
+        http_param_dict = http_param_resume(http_param_dict,rt_obj.group(1))
 
         a = OAI_Request(server, script, http_request_parameters(http_param_dict, method), method)
 
-        rt_obj = re.search('>[^<]*</resumptionToken>',a)
+        rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',a)
 
-    if output:
+    if output and a.find("</record>") > -1:
         write_file("%s.%07d" % (output,i),a)
     else:
+        # hmm, were there no records in output?
         sys.stdout.write(a)
+        sys.stdout.write("\n<!--\n*** WARNING: NO RECORDS IN THE OUTPUT: " + \
+                         repr(output) +  "\n" + \
+                         repr(a) + \
+                         "\n***\n-->\n")
 
     return i
 
@@ -177,7 +187,7 @@ def help():
 
 def OAI_Request(server, script, params, method="POST"):
     "Handle OAI request"
- 
+
     headers = {"Content-type":"application/x-www-form-urlencoded", "Accept":"text/xml", "From": adminemail, "User-Agent":"CDS Invenio %s" % version}
 
     i = 0
@@ -193,7 +203,7 @@ def OAI_Request(server, script, params, method="POST"):
             conn.endheaders()
         elif method == "POST":
             conn.request("POST", script, params, headers)
-            
+
         response = conn.getresponse()
 
         status = "%d" % response.status
@@ -244,7 +254,7 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hVo:v:m:p:i:s:f:u:r:x:",
-                 [ 
+                 [
                    "help",
                    "version",
                    "output",
@@ -261,7 +271,7 @@ def main():
     except getopt.error:
         help()
         sys.exit(1)
-		
+
     http_param_dict        = {}
     method                 = "POST"
     output                 = ""
