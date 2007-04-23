@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -72,7 +72,7 @@ def usage(code, msg=''):
     "Prints usage for this module."
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    usagetext = """ Usage: oaiharvest [options] 
+    usagetext = """ Usage: oaiharvest [options]
      Examples:
       oaiharvest -r arxiv -s 24h
       oaiharvest -r pubmed -d 2005-05-05:2005-05-10 -t 10m
@@ -80,7 +80,7 @@ def usage(code, msg=''):
  Specific options:
  -r, --repository=REPOS_ONE,"REPOS TWO"     name of the OAI repositories to be harvested (default=all)
  -d, --dates=yyyy-mm-dd:yyyy-mm-dd          harvest repositories between specified dates (overrides repositories' last updated timestamps)
-     
+
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
@@ -109,13 +109,13 @@ def authenticate(user, header="oaiharvest Task Submission", action="runoaiharves
         print >> sys.stdout, "\rUsername: ",
         user = string.strip(string.lower(sys.stdin.readline()))
     else:
-        print >> sys.stdout, "\rUsername:", user        
+        print >> sys.stdout, "\rUsername:", user
     ## first check user pw:
     res = run_sql("select id,password from user where email=%s", (user,), 1) + \
           run_sql("select id,password from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
-        sys.exit(1)        
+        sys.exit(1)
     else:
         (uid_db, password_db) = res[0]
         if password_db:
@@ -150,7 +150,19 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
-                    
+def get_nb_records_in_file(filename):
+    """
+    Return number of record in FILENAME that is either harvested or converted file.
+    Useful for statistics.
+    """
+    try:
+        nb = open(filename, 'r').read().count("</record>")
+    except IOError:
+        nb = 0 # file not exists and such
+    except:
+        nb = -1
+    return nb
+
 def task_run(row):
     """Run the harvesting task.  The row argument is the Bibharvest task
     queue row, containing if, arguments, etc.
@@ -161,7 +173,7 @@ def task_run(row):
     reposlist = []
     datelist = []
     dateflag = 0
-    
+
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
@@ -190,7 +202,7 @@ def task_run(row):
     signal.signal(signal.SIGINT, task_sig_unknown)
 
     ### go ahead: build up the reposlist
-    if options["repository"] is not None:  
+    if options["repository"] is not None:
         ### user requests harvesting from selected repositories
         write_message("harvesting from selected repositories")
         for reposname in options["repository"]:
@@ -214,16 +226,16 @@ def task_run(row):
 
     error_happened_p = False
     for repos in reposlist:
-        postmode = str(repos[0][9]) 
+        postmode = str(repos[0][9])
         setspecs = str(repos[0][10])
         harvested_files = []
-        
+
         if postmode == "h" or postmode == "h-c" or \
                postmode == "h-u" or postmode == "h-c-u" or \
                postmode == "h-c-f-u":
             harvestpath = tmpdir + "/oaiharvest" + str(os.getpid())
             harvest_dir, harvest_filename = os.path.split(harvestpath)
-             
+
             if dateflag == 1:
                 res = call_bibharvest(prefix=repos[0][2],
                                       baseurl=repos[0][1],
@@ -289,17 +301,23 @@ def task_run(row):
                               " has frequency set to 'Never' so it will not be updated")
                 continue
 
+            # print stats:
+            for harvested_file in harvested_files:
+                write_message("File %s contains %i records." % \
+                              (harvested_file,
+                               get_nb_records_in_file(harvested_file)))
+
         if postmode == "h-u":
             res = 0
             for harvested_file in harvested_files:
                 res += call_bibupload(harvested_file)
                 if res == 0:
                     write_message("material harvested from source " + str(repos[0][6]) +
-                                  " was successfully uploaded") 
+                                  " was successfully uploaded")
                 else:
                     write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
                     error_happened_p = True
-                    continue                    
+                    continue
 
         if postmode == "h-c" or postmode == "h-c-u" or postmode == "h-c-f-u":
             convert_dir = tmpdir
@@ -313,14 +331,20 @@ def task_run(row):
                                       harvestpath=harvested_file,
                                       convertpath=converted_file)
                 i += 1
-                
+
                 if res == 0:
                     write_message("material harvested from source " + str(repos[0][6]) +
-                                  " was successfully converted") 
+                                  " was successfully converted")
                 else:
                     write_message("an error occurred while converting from " + str(repos[0][6]))
                     error_happened_p = True
                     continue
+
+            # print stats:
+            for converted_file in converted_files:
+                write_message("File %s contains %i records." % \
+                              (converted_file,
+                               get_nb_records_in_file(converted_file)))
 
         if postmode == "h-c-u":
             res = 0
@@ -328,11 +352,11 @@ def task_run(row):
                 res += call_bibupload(converted_file)
             if res == 0:
                 write_message("material harvested from source " + str(repos[0][6]) +
-                              " was successfully uploaded") 
+                              " was successfully uploaded")
             else:
                 write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
                 error_happened_p = True
-                continue                    
+                continue
 
         elif postmode == "h-c-f-u":
             # first call bibfilter:
@@ -341,29 +365,37 @@ def task_run(row):
                 res += call_bibfilter(str(repos[0][11]), converted_file)
             if res == 0:
                 write_message("material harvested from source " + str(repos[0][6]) +
-                              " was successfully bibfiltered") 
+                              " was successfully bibfiltered")
             else:
                 write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
                 error_happened_p = True
-                continue                    
+                continue
+            # print stats:
+            for converted_file in converted_files:
+                write_message("File %s contains %i records." % \
+                              (converted_file + ".insert.xml",
+                               get_nb_records_in_file(converted_file + ".insert.xml")))
+                write_message("File %s contains %i records." % \
+                              (converted_file + ".correct.xml",
+                               get_nb_records_in_file(converted_file + ".correct.xml")))
             # only then call upload:
             for converted_file in converted_files:
                 res += call_bibupload(converted_file + ".insert.xml", "-i")
                 res += call_bibupload(converted_file + ".correct.xml", "-c")
             if res == 0:
                 write_message("material harvested from source " + str(repos[0][6]) +
-                              " was successfully uploaded") 
+                              " was successfully uploaded")
             else:
                 write_message("an error occurred while uploading harvest from " + str(repos[0][6]))
                 error_happened_p = True
-                continue                    
+                continue
 
         elif postmode not in ["h", "h-c", "h-u", "h-c-u", "h-c-f-u"]: ### this should not happen
             write_message("invalid postprocess mode: " + postmode + " skipping repository")
             error_happened_p = True
             continue
 
-    if error_happened_p: 
+    if error_happened_p:
         task_update_status("DONE WITH ERRORS")
     else:
         task_update_status("DONE")
@@ -400,7 +432,7 @@ def call_bibharvest(prefix, baseurl, harvestpath, fro="", until="", setspecs="")
         command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (bindir,
                                                                  harvestpath,
                                                                  prefix)
-                                                                
+
         if fro != "":
             command += '-f %s ' % fro
         if until!="":
@@ -408,7 +440,7 @@ def call_bibharvest(prefix, baseurl, harvestpath, fro="", until="", setspecs="")
         if setspecs!="":
             command += '-s "%s" ' % setspecs
         command += baseurl
-       
+
 	print "Start harvesting"
 	#print command
         ret = os.system(command)
@@ -442,7 +474,7 @@ def call_bibconvert(config, harvestpath, convertpath):
     """ A method that reads from a file and converts according to a BibConvert Configuration file. Converted output is returned """
     command = """%s/bibconvert -c %s < %s > %s """ % (bindir, config, harvestpath, convertpath)
     stdout = os.popen(command)
-    return 0 
+    return 0
 
 def call_bibupload(marcxmlfile, mode="-r -i"):
     """Call bibupload in insert mode on MARCXMLFILE."""
@@ -481,15 +513,15 @@ def call_bibfilter(bibfilterprogram, marcxmlfile):
             shutil.copy(marcxmlfile, marcxmlfile + ".insert.xml")
             return 0
         except:
-            write_message("cannot copy %s into %s.insert.xml" % marcxmlfile)        
-            return 1        
+            write_message("cannot copy %s into %s.insert.xml" % marcxmlfile)
+            return 1
 
 def get_row_from_reposname(reposname):
     """ Returns all information about a row (OAI source) from the source name """
     try:
         sql = """SELECT id, baseurl, metadataprefix, arguments,
                         comment, bibconvertcfgfile, name, lastrun,
-                        frequency, postprocess, setspecs, 
+                        frequency, postprocess, setspecs,
                         bibfilterprogram
                    FROM oaiHARVEST WHERE name=%s"""
         res = run_sql(sql, (reposname,))
@@ -511,10 +543,10 @@ def get_all_rows_from_db():
         for index in idlist:
             sql = """SELECT id, baseurl, metadataprefix, arguments,
                             comment, bibconvertcfgfile, name, lastrun,
-                            frequency, postprocess, setspecs, 
+                            frequency, postprocess, setspecs,
                             bibfilterprogram
                      FROM oaiHARVEST WHERE id=%s""" % index
-            
+
             reposelements = run_sql(sql)
             repos = []
             for element in reposelements:
@@ -564,10 +596,10 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-        
+
     options={"sleeptime":0, "verbose":1, "repository":0, "dates":0}
     sched_time = time.strftime(format_string)
-    
+
     user = ""
     # Check for key options
 
@@ -602,7 +634,7 @@ def command_line():
     if dates is not None and options["dates"] is None:
         write_message("Date format not valid. Quitting task...")
         sys.exit(1)
-        
+
     user = authenticate(user)
 
     if options["verbose"] >= 9:
@@ -617,7 +649,7 @@ def command_line():
                              VALUES ('oaiharvest',%s,%s,%s,%s,'WAITING')""",
                       (user, sched_time, sleeptime, marshal.dumps(options)))
 
-    ## update task number: 
+    ## update task number:
     options["task"] = new_task_id
     run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), new_task_id))
 
@@ -651,7 +683,7 @@ def get_dates(dates):
             if compare_timestamps_with_tolerance(date1, date2)!=-1:
                 write_message("First date must be before second date.")
                 twodates=None
-                return twodates          
+                return twodates
         else:
             write_message("Dates have invalid format, not 'yyyy-mm-dd:yyyy-mm-dd'")
             twodates=None
@@ -712,12 +744,12 @@ def task_sig_stop(sig, frame):
 
 def task_sig_stop_commands():
     """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.    
+    Useful for task_sig_stop() handler.
     """
     write_message("stopping commands started")
     pass
-    write_message("stopping commands ended")    
-    
+    write_message("stopping commands ended")
+
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
@@ -731,7 +763,7 @@ def task_sig_suicide(sig, frame):
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
@@ -745,7 +777,7 @@ def task_update_status(val):
     global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 def main():
     """Reads arguments and either runs the task, or starts user-interface (command line)."""
@@ -765,10 +797,10 @@ def main():
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            if options["verbose"] >= 9:        
+            if options["verbose"] >= 9:
                 traceback.print_tb(sys.exc_info()[2])
             write_message("Exiting.")
-            task_update_status("ERROR")                                               
+            task_update_status("ERROR")
     else:
         command_line()
 
