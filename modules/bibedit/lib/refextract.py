@@ -726,7 +726,7 @@ sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   """, sre.UNICODE|sre.VERBOSE), \
-                              unicode(' <cds.SER>\\g<3></cds.SER> : ' \
+                              unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
                                       '<cds.PG>\\g<5></cds.PG> '))
@@ -744,7 +744,7 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   """, sre.UNICODE|sre.VERBOSE), \
-                              unicode(' <cds.SER>\\g<3></cds.SER> : ' \
+                              unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
                                       '<cds.PG>\\g<5></cds.PG> '))
@@ -766,7 +766,7 @@ sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r"""
                                            ## by optional c
   ?\s?\(?(1\d\d\d|20\d\d)\)?               ## Year
   """, sre.UNICODE|sre.VERBOSE), \
-                              unicode(' <cds.SER>\\g<3></cds.SER> : ' \
+                              unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<5>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
@@ -785,7 +785,7 @@ sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r"""
                                            ## by optional c
   ,?\s?\(?(1\d\d\d|20\d\d)\)?              ## Year
   """, sre.UNICODE|sre.VERBOSE), \
-                              unicode(' <cds.SER>\\g<3></cds.SER> : ' \
+                              unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<5>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
@@ -1263,6 +1263,10 @@ def build_titles_knowledge_base(fpath):
     kb = {}
     standardised_titles = {}
     seek_phrases = []
+    ## A dictionary of "replacement terms" (RHS) to be inserted into KB as
+    ## "seek terms" later, if they were not already explicitly added
+    ## by the KB:
+    repl_terms = {}
     
     ## Pattern to recognise a correct knowledge base line:
     p_kb_line = sre.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', \
@@ -1286,6 +1290,11 @@ def build_titles_knowledge_base(fpath):
             m_kb_line = p_kb_line.search(rawline)
             if m_kb_line is not None:
                 ## good KB line
+                ## Add the 'replacement term' into the dictionary of
+                ## replacement terms:
+                repl_terms[m_kb_line.group('repl')] = None
+
+                ## Get the "seek term":
                 seek_phrase = m_kb_line.group('seek')
                 if len(seek_phrase) > 1:
                     ## add the phrase from the KB if the 'seek' phrase is longer
@@ -1299,26 +1308,6 @@ def build_titles_knowledge_base(fpath):
                         standardised_titles[seek_phrase] = \
                                                          m_kb_line.group('repl')
                         seek_phrases.append(seek_phrase)
-                ## Is the "replace term" in the KB as a "seek term"?
-                ## If not, add it.
-                raw_replace_phrase = m_kb_line.group('repl').upper()
-                raw_replace_phrase = \
-                               sre_punctuation.sub(u' ', raw_replace_phrase)
-                raw_replace_phrase = \
-                      sre_group_captured_multiple_space.sub(u' ', \
-                                                            raw_replace_phrase)
-                raw_replace_phrase = raw_replace_phrase.strip()
-
-                if not kb.has_key(raw_replace_phrase):
-                    ## The replace-phrase was not in the KB as a seek phrase.
-                    ## It should be added.
-                    seek_ptn = sre.compile(r'(?<!\/)\b(' + \
-                                           sre.escape(raw_replace_phrase) + \
-                                           r')[^A-Z0-9]', sre.UNICODE)
-                    kb[raw_replace_phrase] = seek_ptn
-                    standardised_titles[raw_replace_phrase] = \
-                                                     m_kb_line.group('repl')
-                    seek_phrases.append(raw_replace_phrase)
             else:
                 ## KB line was not correctly formatted - die with error
                 emsg = """Error: Could not build list of journal titles """ \
@@ -1327,6 +1316,26 @@ def build_titles_knowledge_base(fpath):
                 sys.stderr.write(emsg)
                 sys.exit(1)
         fh.close()
+
+        ## Now, for every 'replacement term' found in the KB, if it is
+        ## not already in the KB as a "search term", add it:
+        for repl_term in repl_terms.keys():
+            raw_repl_phrase = repl_term.upper()
+            raw_repl_phrase = sre_punctuation.sub(u' ', raw_repl_phrase)
+            raw_repl_phrase = \
+                 sre_group_captured_multiple_space.sub(u' ', \
+                                                       raw_repl_phrase)
+            raw_repl_phrase = raw_repl_phrase.strip()
+            if not kb.has_key(raw_repl_phrase):
+                ## The replace-phrase was not in the KB as a seek phrase
+                ## It should be added.
+                seek_ptn = sre.compile(r'(?<!\/)\b(' + \
+                                       sre.escape(raw_repl_phrase) + \
+                                       r')[^A-Z0-9]', sre.UNICODE)
+                kb[raw_repl_phrase] = seek_ptn
+                standardised_titles[raw_repl_phrase] = \
+                                                 repl_term
+                seek_phrases.append(raw_repl_phrase)
 
         ## Sort the titles by string length (long - short)
         seek_phrases.sort(_cmp_bystrlen_reverse)
@@ -2965,7 +2974,7 @@ def add_tagged_title(reading_line,
             ## Skip past any punctuation at the end of the replacement that was
             ## just made:
             try:
-                if reading_line[startpos] in (".", ":", ";"):
+                if reading_line[startpos] in (".", ":", ";", "-"):
                     startpos += 1
             except IndexError:
                 ## The match was at the very end of the line
@@ -2986,7 +2995,7 @@ def add_tagged_title(reading_line,
         ## Skip past any punctuation at the end of the replacement that was
         ## just made:
         try:
-            if reading_line[startpos] in (".", ":", ";"):
+            if reading_line[startpos] in (".", ":", ";", "-"):
                 startpos += 1
         except IndexError:
             ## The match was at the very end of the line
