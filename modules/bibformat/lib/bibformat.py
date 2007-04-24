@@ -47,6 +47,8 @@ try:
     websearch_templates = invenio.template.load('websearch')
 except:
     pass
+import getopt
+import sys
 
 # Functions to format a single record 
 ##
@@ -79,43 +81,76 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
     @param on_the_fly if False, try to return an already preformatted version of the record in the database
     @return formatted record
     """
+    out = ""
+    if verbose == 9:
+        out += """\n<span class="quicknote">
+        Formatting record %i with output format %s.
+        </span>""" % (recID, of)
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
         return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
     ############################# END ##################################
-
+    
     if not on_the_fly and \
        (ln==cdslang or CFG_BIBFORMAT_USE_OLD_BIBFORMAT):
 	# Try to fetch preformatted record
         # Only possible for records formatted in cdslang language (other are never stored)
-        out = bibformat_dblayer.get_preformatted_record(recID, of)
-        if out is not None:
+        res = bibformat_dblayer.get_preformatted_record(recID, of)
+        if res is not None:
             # record 'recID' is formatted in 'of', so return it
+            if verbose == 9:
+                last_updated = bibformat_dblayer.get_preformatted_record_date(recID, of)
+                out += """\n<br/><span class="quicknote">
+                Found preformatted output for record %i (cache updated on %s).
+                </span><br/>""" % (recID, last_updated)
+            out += res
             return out
+        else:
+            if verbose == 9:
+                out+= """\n<br/><span class="quicknote">
+                No preformatted output found for record %s.
+                </span>"""% recID
+
 
     # Live formatting of records in all other cases
-    try:
-        out = bibformat_engine.format_record(recID=recID,
-					     of=of,
-					     ln=ln,
-					     verbose=verbose,
-					     search_pattern=search_pattern,
-					     xml_record=xml_record,
-					     uid=uid)
-        return out
-    except:
-        #Failsafe execution mode
-        if of.lower() == 'hd':
-            return websearch_templates.tmpl_print_record_detailed(
-                ln = ln,
-                recID = recID,
-                weburl = weburl,
-                )
+    if verbose == 9:
+        out+= """\n<br/><span class="quicknote">
+        Formatting record %i on-the-fly.
+        </span>""" % recID
         
-        return websearch_templates.tmpl_print_record_brief(ln = ln,
-                                                           recID = recID,
-                                                           weburl = weburl,
-                                                           )
+    try:
+        out += bibformat_engine.format_record(recID=recID,
+                                              of=of,
+                                              ln=ln,
+                                              verbose=verbose,
+                                              search_pattern=search_pattern,
+                                              xml_record=xml_record,
+                                              uid=uid)
+        return out
+    except Exception, e:
+        #Failsafe execution mode
+        if verbose == 9:
+            out+= """\n<br/><span class="quicknote">
+            An error occured while formatting record %i. (%s)
+            </span>""" % (recID, str(e))
+        if of.lower() == 'hd':
+            if verbose == 9:
+                out+= """\n<br/><span class="quicknote">
+                Formatting record %i with websearch_templates.tmpl_print_record_detailed.
+                </span><br/>""" % recID
+                return out + websearch_templates.tmpl_print_record_detailed(
+                    ln = ln,
+                    recID = recID,
+                    weburl = weburl,
+                    )
+        if verbose == 9:
+            out+= """\n<br/><span class="quicknote">
+            Formatting record %i with websearch_templates.tmpl_print_record_brief.
+            </span><br/>""" % recID
+        return out + websearch_templates.tmpl_print_record_brief(ln = ln,
+                                                                 recID = recID,
+                                                                 weburl = weburl,
+                                                                 )
         
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
@@ -304,3 +339,98 @@ def get_output_format_content_type(of):
         content_type = 'text/html'
 
     return content_type
+
+def usage(exitcode=1, msg=""):
+    """Prints usage info."""
+    if msg:
+        sys.stderr.write("Error: %s.\n" % msg)
+    print """BibFormat: outputs the result of the formatting of a record.
+    
+    Usage: bibformat required [options]
+    Examples:  
+      $ bibformat -i 10 -o HB
+      $ bibformat -i 10,11,13 -o HB
+      $ bibformat -i 10:13
+      $ bibformat -i 10 -o HB -v 9
+
+    Required:
+     -i, --id=ID[ID2,ID3:ID5]  ID (or range of IDs) of the record(s) to be formatted. 
+
+    Options:
+     -o, --output=CODE          short code of the output format used for formatting (default HB).
+     -l, --lang=LN              language used for formatting.  
+     -y, --onthefly             on-the-fly formatting, avoiding caches created by BibReformat.
+     
+    General options:
+     -h, --help                 print this help and exit
+     -v, --verbose=LEVEL        verbose level (from 0 to 9, default 0)
+     -V  --version              print the script version    
+     """
+    sys.exit(exitcode)
+    
+def main():
+    """main entry point for biformat via command line"""
+    
+    options = {} # will hold command-line options
+    options["verbose"] = 0
+    options["onthefly"] = False
+    options["lang"] = cdslang
+    options["output"] = "HB"
+    options["recID"] = None
+    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],
+                                   "hVv:yl:i:o:",
+                                   ["help",
+                                    "version",
+                                    "verbose=",
+                                    "onthefly",
+                                    "lang=",
+                                    "id=",
+                                    "output="])
+    except getopt.GetoptError, err:
+        usage(1, err)
+        pass
+    try:
+        for opt in opts:
+            if opt[0] in ["-h", "--help"]:
+                usage(0)
+            elif opt[0] in ["-V", "--version"]:
+                print __revision__
+                sys.exit(0)
+            elif opt[0] in ["-v", "--verbose"]:
+                options["verbose"]  = int(opt[1])
+            elif opt[0] in ["-y", "--onthefly"]:
+                options["onthefly"]    = True
+            elif opt[0] in ["-l", "--lang"]:
+                options["lang"] = opt[1]
+            elif opt[0] in ["-i", "--id"]:
+                recIDs = []
+                for recID in opt[1].split(','):
+                    if ":" in recID:
+                        start = int(recID.split(':')[0])
+                        end = int(recID.split(':')[1])
+                        recIDs.extend(range(start, end))
+                    else:
+                        recIDs.append(int(recID))
+                options["recID"] = recIDs
+            elif opt[0] in ["-o", "--output"]:
+                options["output"]  = opt[1]
+
+        if options["recID"] == None:
+            usage(1, "-i argument is needed")
+    except StandardError, e:
+        usage(e)
+        
+
+    
+    print format_records(recIDs=options["recID"],
+                         of=options["output"],
+                         ln=options["lang"],
+                         verbose=options["verbose"],
+                         on_the_fly=options["onthefly"])
+
+    return
+
+if __name__ == "__main__":
+    main()

@@ -630,6 +630,27 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
         return "%s" % decompress(res[0][0])
     else:
         return None
+
+def get_preformatted_record_date(recID, of):
+    """
+    Returns the date of the last update of the cache for the considered
+    preformatted record in bibfmt
+    
+    If corresponding record does not exist for given output format,
+    returns None
+    
+    @param recID the id of the record to fetch
+    @param of the output format code
+    @return the date of the last update of the cache, or None if not exist
+    """
+    # Try to fetch preformatted record
+    query = "SELECT last_updated FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
+    res = run_sql(query)
+    if res:
+	# record 'recID' is formatted in 'of', so return it
+        return "%s" % res[0][0]
+    else:
+        return None
     
 ## def keep_formats_in_db(output_formats):
 ##     """

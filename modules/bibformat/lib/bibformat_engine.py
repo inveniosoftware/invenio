@@ -176,7 +176,7 @@ pattern_format_element_seealso = re.compile('''@see\s*(?P<see>.*)''',
 ##      (?P=sep2)
 ##      ''', re.VERBOSE | re.MULTILINE)    
 
-def call_old_bibformat(recID, format="HD", on_the_fly=False):
+def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
     """
     FIXME: REMOVE FUNCTION WHEN MIGRATION IS DONE
     Calls BibFormat for the record RECID in the desired output format FORMAT.
@@ -188,20 +188,29 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False):
     FMT $g, as is suitable for prestoring output formats, we
     perform un-XML-izing here in order to return HTML body only.
     """
+    out = ""
     res = []
     if not on_the_fly:
         # look for formatted notice existence:
-        query = "SELECT value FROM bibfmt WHERE "\
+        query = "SELECT value, last_updated FROM bibfmt WHERE "\
                 "id_bibrec='%s' AND format='%s'" % (recID, format)
         res = run_sql(query, None, 1)
     if res:
         # record 'recID' is formatted in 'format', so print it
+        if verbose == 9:
+            last_updated = res[0][1]
+            out += """\n<br/><span class="quicknote">
+            Found preformatted output for record %i (cache updated on %s).
+            </span>""" % (recID, last_updated)
         decompress = zlib.decompress
         return "%s" % decompress(res[0][0])
     else:
         # record 'recID' is not formatted in 'format',
         # so try to call BibFormat on the fly or use default format:
-        out = ""
+        if verbose == 9:
+            out += """\n<br/><span class="quicknote">
+            Formatting record %i on-the-fly with old BibFormat.
+            </span><br/>""" % recID
         pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
                                                          "otype=%s" % format],
                                                         'rw')
@@ -223,7 +232,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False):
                     for t in e.childNodes:
                         out += t.data.encode('utf-8')
         else:
-            out = bibformat_output
+            out += bibformat_output
         return out
 
 def format_record(recID, of, ln=cdslang, verbose=0,
@@ -253,6 +262,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
     @param uid the user id of the person who will view the formatted page
     @return formatted record
     """
+    out = ""
     errors_ = []
     # Temporary workflow (during migration of formats):
     # Call new BibFormat
@@ -263,13 +273,31 @@ def format_record(recID, of, ln=cdslang, verbose=0,
         
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
+    if verbose == 9 and template is not None:
+        out += """\n<br/><span class="quicknote">
+        Using %s template for record %i.
+        </span>""" % (template, recID)
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
     if template is None or not os.access(path, os.R_OK):  
         # template not found in new BibFormat. Call old one
+        if verbose == 9:
+            if template is None:
+                out += """\n<br/><span class="quicknote">
+                No template found for output format %s and record %i. 
+                (Check invenio.err log file for more details)
+                </span>""" % (of, recID)
+            else:
+                out += """\n<br/><span class="quicknote">
+                Template %s could not be read.
+                </span>""" % (template)
         if CFG_PATH_PHP:
-            return call_old_bibformat(recID, format=of, on_the_fly=True)
+            if verbose == 9:
+                out+= """\n<br/><span class="quicknote">
+                Using old BibFormat for record %s.
+                </span>""" % recID
+            return out + call_old_bibformat(recID, format=of, on_the_fly=True, verbose=verbose)
     ############################# END ##################################
      
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
@@ -278,12 +306,14 @@ def format_record(recID, of, ln=cdslang, verbose=0,
         if verbose == 0:
             register_errors(error, 'error')
         elif verbose > 5:
-            return error[0][1]  
-        return ""
+            return out + error[0][1]  
+        return out
 
     # Format with template
-    (out, errors) = format_with_format_template(template, bfo, verbose)
+    (out_, errors) = format_with_format_template(template, bfo, verbose)
     errors_.extend(errors)
+    
+    out += out_
     
     return out
 
