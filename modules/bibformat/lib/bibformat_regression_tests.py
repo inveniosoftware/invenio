@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -32,7 +32,7 @@ from invenio.bibformat import format_record
 
 class BibFormatAPITest(unittest.TestCase):
     """Check BibFormat API"""
-    
+
     def test_basic_formatting(self):
         """bibformat - Checking BibFormat API"""
         result = format_record(recID=73,
@@ -43,7 +43,7 @@ class BibFormatAPITest(unittest.TestCase):
                                xml_record=None,
                                uid=None,
                                on_the_fly=True)
-        
+
         pageurl = weburl + '/record/73?of=hx'
         result = test_web_page_content(pageurl,
                                        expected_text=result)
@@ -66,9 +66,9 @@ class BibFormatBibTeXTest(unittest.TestCase):
       year         = "2000",
 }
 </pre>'''
-      
+
     def test_bibtex_output(self):
-        """bibformat - BibTeX output""" 
+        """bibformat - BibTeX output"""
 
         pageurl = weburl + '/record/74?of=hx'
         result = test_web_page_content(pageurl,
@@ -77,14 +77,14 @@ class BibFormatBibTeXTest(unittest.TestCase):
 
 class BibFormatDetailedHTMLTest(unittest.TestCase):
     """Check output produced by BibFormat for detailed HTML ouput for
-    various records"""      
+    various records"""
 
     def setUp(self):
         """Prepare some ideal outputs"""
         self.record_74_hd = '''<table border="0" width="100%%"><tr class="blocknote"><td valign="left">
     Published Article
-    <small> / Particle Physics - Theory</small></td><td align="right"><strong>hep-th/0003295</strong></td></tr></table><br> 
-<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center> 
+    <small> / Particle Physics - Theory</small></td><td align="right"><strong>hep-th/0003295</strong></td></tr></table><br>
+<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>
 <p><center>
 <a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br/>
 
@@ -105,9 +105,9 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
 <br/><br/><strong>Published in: </strong><a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.%%20Lett.%%2C%%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>
 <br/>
-<br/><strong>Fulltext : </strong><small><a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295">http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295</a></small>
+<strong>CERN links</strong>: <a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295">Fulltext</a>
 <br/><br/><strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>
-</p> 
+</p>
 <blockquote><strong>References:</strong><ul><li><small>[1]</small> <small>K. D. Kokkotas, B. G. Schmidt</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=gr-qc/9909058&amp;ln=%(lang)s">gr-qc/9909058</a>] </small> <br/><small>and references therein</small> <li><small>[2]</small> <small>W. Krivan</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=101501">Phys. Rev., D: 60 (1999) 101501</a> </small> <br/><li><small>[3]</small> <small>S. Hod</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=gr-qc/9902072&amp;ln=%(lang)s">gr-qc/9902072</a>] </small> <br/><li><small>[4]</small> <small>P. R. Brady, C. M. Chambers, W. G. Laarakkers and E. Poisson</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=064003">Phys. Rev., D: 60 (1999) 064003</a> </small> <br/><li><small>[5]</small> <small>P. R. Brady, C. M. Chambers, W. Krivan and P. Laguna</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=55&amp;year=1997&amp;page=7538">Phys. Rev., D: 55 (1997) 7538</a> </small> <br/><li><small>[6]</small> <small>G. T. Horowitz and V. E. Hubeny</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=hep-th/9909056&amp;ln=%(lang)s">hep-th/9909056</a>] </small> <br/><small>G. T. Horowitz</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=hep-th/9910082&amp;ln=%(lang)s">hep-th/9910082</a>] </small> <br/><li><small>[7]</small> <small>E. S. C. Ching, P. T. Leung, W. M. Suen and K. Young</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=52&amp;year=1995&amp;page=2118">Phys. Rev., D: 52 (1995) 2118</a> </small> <br/><li><small>[8]</small> <small>J. M. Maldacena</small>  <small> Adv. Theor. Math. Phys.21998231 </small> <br/><li><small>[9]</small> <small>E. Witten</small>  <small> Adv. Theor. Math. Phys.21998253 </small> <br/><li><small>[10]</small> <small>S. S. Gubser, I. R. Klebanov and A. M. Polyakov</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Lett.,+B&amp;volume=428&amp;year=1998&amp;page=105">Phys. Lett., B: 428 (1998) 105</a> </small> <br/><li><small>[11]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=064018">Phys. Rev., D: 60 (1999) 064018</a> </small> <br/><li><small>[12]</small> <small>E. W. Leaver</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=J.+Math.+Phys.&amp;volume=27&amp;year=1986&amp;page=1238">J. Math. Phys.: 27 (1986) 1238</a> </small> <br/><li><small>[13]</small> <small>E. W. Leaver</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=41&amp;year=1990&amp;page=2986">Phys. Rev., D: 41 (1990) 2986</a> </small> <br/><li><small>[14]</small> <small>C. O. Lousto</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=51&amp;year=1995&amp;page=1733">Phys. Rev., D: 51 (1995) 1733</a> </small> <br/><li><small>[15]</small> <small>O. Kaburaki</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Lett.,+A&amp;volume=217&amp;year=1996&amp;page=316">Phys. Lett., A: 217 (1996) 316</a> </small> <br/><li><small>[16]</small> <small>R. K. Su, R. G. Cai and P. K. N. Yu</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=50&amp;year=1994&amp;page=2932">Phys. Rev., D: 50 (1994) 2932</a> </small> <br/> <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=48&amp;year=1993&amp;page=3473">Phys. Rev., D: 48 (1993) 3473</a> </small> <br/> <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=52&amp;year=1995&amp;page=6186">Phys. Rev., D: 52 (1995) 6186</a> </small> <br/><small>B. Wang, J. M. Zhu</small>  <small> Mod. Phys. Lett., A1019951269 </small> <br/><li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </ul><p><small><i><b>Warning</b>: references are automatically extracted and standardized from the PDF document and may therefore contain errors. If you think they are incorrect or incomplete, look at the fulltext document itself.<br></i></small></blockquote>
 </p>''' % {'weburl' : weburl,
            'lang': cdslang}
@@ -156,9 +156,9 @@ The words CERN Photo must be quoted for each use. </small>
 </tr>
 
 </table>'''
-    
+
     def test_detailed_html_output(self):
-        """bibformat - Detailed HTML output""" 
+        """bibformat - Detailed HTML output"""
 
         # Test record 74 (Article)
         pageurl = weburl + '/record/74?of=hd'
@@ -184,9 +184,9 @@ class BibFormatNLMTest(unittest.TestCase):
     
 
 </articles>''' % weburl
-      
+
     def test_nlm_output(self):
-        """bibformat - NLM output""" 
+        """bibformat - NLM output"""
 
         pageurl = weburl + '/record/70?of=xn'
         result = test_web_page_content(pageurl,
@@ -195,7 +195,7 @@ class BibFormatNLMTest(unittest.TestCase):
 
 class BibFormatBriefHTMLTest(unittest.TestCase):
     """Check output produced by BibFormat for brief HTML ouput for
-    various records"""      
+    various records"""
 
     def setUp(self):
         """Prepare some ideal outputs"""
@@ -220,7 +220,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
         self.assertEqual([], result)
 
 class BibFormatMARCXMLTest(unittest.TestCase):
-    """Check output produced by BibFormat for MARCXML ouput for various records"""      
+    """Check output produced by BibFormat for MARCXML ouput for various records"""
 
     def setUp(self):
         """Prepare some ideal outputs"""
@@ -290,9 +290,9 @@ class BibFormatMARCXMLTest(unittest.TestCase):
  </datafield>
 </record>
 </collection>'''
-    
+
     def test_marcxml_output(self):
-        """bibformat - MARCXML output"""        
+        """bibformat - MARCXML output"""
         pageurl = weburl + '/record/9?of=xm'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_9_xm)
@@ -300,7 +300,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
 
 class BibFormatMARCTest(unittest.TestCase):
     """Check output produced by BibFormat for MARC ouput for various
-    records"""      
+    records"""
 
     def setUp(self):
         """Prepare some ideal outputs"""
@@ -318,10 +318,10 @@ class BibFormatMARCTest(unittest.TestCase):
 000000029 909C1 $$c1990-01-27$$l00$$m2002-04-12$$oBATCH
 000000029 909CS $$sm$$w198606
 000000029 980__ $$aBOOK'''
-    
+
     def test_marc_output(self):
         """bibformat - MARC output"""
-        
+
         pageurl = weburl + '/record/29?of=hm'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_29_hm)
@@ -338,4 +338,4 @@ test_suite = make_test_suite(BibFormatBibTeXTest,
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
-    
+
