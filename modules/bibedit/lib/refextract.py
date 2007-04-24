@@ -2771,9 +2771,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
 
 def move_tagged_series_into_tagged_title(line):
     """Moves a marked-up series item into a marked-up title.
-       E.g.: should change <cds.TITLE>Blah</cds.TITLE> <cds.SER>A</cds.SER>
+       E.g. should change <cds.TITLE>Phys. Rev.</cds.TITLE> <cds.SER>D</cds.SER>
         into:
-       <cds.TITLE>Blah., A</cds.TITLE>
+       <cds.TITLE>Phys. Rev. D</cds.TITLE>
        @param line: (string) - the line in which a series tagged item is to be
         moved into title tags.
        @return: (string) - the line after the series items have been moved
@@ -2783,22 +2783,21 @@ def move_tagged_series_into_tagged_title(line):
     m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
     while m_tagged_series is not None:
         ## tagged series found in line - try to remove it and put it into the title:
-        entire_match = m_tagged_series.group(0) ## the entire match (e.g.<cds.TITLE>xxxxx</cds.TITLE <cds.SER>A</cds.SER>)
+        entire_match = m_tagged_series.group(0) ## the entire match (e.g.<cds.TITLE>xxxxx</cds.TITLE> <cds.SER>A</cds.SER>)
         title_match = m_tagged_series.group(2)  ## the string matched between <cds.TITLE></cds.TITLE> tags
         series_match = m_tagged_series.group(3) ## the series information matched between <cds.SER></cds.SER> tags.
         corrected_title_text = title_match
-        ## If there is no comma in the matched title, add one to the end of it before the series info is
-        ## added. If there is already a comma present, discard the series info (as there is already a series)
-        if corrected_title_text.find(",") == -1:
-            corrected_title_text = corrected_title_text.rstrip()
-            if corrected_title_text[-1] == ".":
-                corrected_title_text += ", %s" % series_match
-            else:
-                corrected_title_text += "., %s" % series_match
-        elif corrected_title_text.rstrip()[-1:] == ",":
-            ## There is a "," at the end of the title, but no series present.
-            ## add it:
-            corrected_title_text = corrected_title_text.rstrip() + " %s" % series_match
+
+        ## Add the series letter into the title:
+        corrected_title_text = corrected_title_text.strip()
+        if corrected_title_text[-1] == ".":
+            ## The corrected title ends with a full-stop. Add a space, followed
+            ## by the series letter:
+            corrected_title_text += " %s" % series_match
+        else:
+            ## Add a full-stop followed by a space, then the series letter:
+            corrected_title_text += ". %s" % series_match
+
         line = sre.sub("%s" % sre.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
         m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
     return line
