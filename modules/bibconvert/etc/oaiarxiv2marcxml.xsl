@@ -60,10 +60,14 @@
  <!-- FUNCTION   output-695a-subfields -->
 <xsl:template name="output-695a-subfields">
       <xsl:param name="list" />
-      <xsl:variable name="first" select="substring-before($list, '.')" />
-      <xsl:variable name="remaining" select="substring-after($list, '.')" />
+      <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
+      <xsl:variable name="first" select="substring-before($newlist, ' ')" />
+      <xsl:variable name="remaining" select="substring-after($newlist, ' ')" />
       <xsl:if test="not($first='')">
-        <subfield code="a"><xsl:value-of select="$first" /></subfield>
+         <datafield tag="695" ind1=" " ind2=" ">
+           <subfield code="a"><xsl:value-of select="$first" /></subfield>
+           <subfield code="9">LANL EDS</subfield>
+         </datafield>
       </xsl:if>
       <xsl:if test="$remaining">
           <xsl:call-template name="output-695a-subfields">
@@ -507,17 +511,40 @@
               </datafield>
 
 
-           <!-- MARC FIELD 65017$$a  -->
+
+           <!-- MARC FIELD 65017$$a -->
            <xsl:choose>
-           <xsl:when test="$setspec">
+           <xsl:when test="./OAI-PMH:header/OAI-PMH:setSpec[1]">
              <datafield tag="650" ind1="1" ind2="7">
-                <subfield code="a"><xsl:value-of select="$setspec"/></subfield>
+                <xsl:choose>
+                <xsl:when test="not(contains(./OAI-PMH:header/OAI-PMH:setSpec[1],':'))">
+                  <subfield code="a"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:setSpec[1]"/></subfield>
+                </xsl:when>
+                <xsl:otherwise>
+                  <subfield code="a"><xsl:value-of select="substring-after(./OAI-PMH:header/OAI-PMH:setSpec[1],':')"/></subfield>
+                </xsl:otherwise>
+                </xsl:choose>
                 <subfield code="2">SzGeCERN</subfield>
              </datafield>
+             <xsl:if test="./OAI-PMH:header/OAI-PMH:setSpec[2]">
+             <xsl:for-each select="./OAI-PMH:header/OAI-PMH:setSpec[position()>1]">
+               <datafield tag="650" ind1="1" ind2="7">
+                  <xsl:choose>
+                  <xsl:when test="not(contains(.,':'))">
+                    <subfield code="b"><xsl:value-of select="."/></subfield>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <subfield code="b"><xsl:value-of select="substring-after(.,':')"/></subfield>
+                  </xsl:otherwise>
+                  </xsl:choose>
+                  <subfield code="2">SzGeCERN</subfield>
+               </datafield>
+             </xsl:for-each>
+             </xsl:if>
            </xsl:when>
-           <xsl:when test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories">
+           <xsl:when test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories[1]">
              <datafield tag="650" ind1="1" ind2="7">
-                <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories"/></subfield>
+                <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories[1]"/></subfield>
                 <subfield code="2">SzGeCERN</subfield>
              </datafield>
            </xsl:when>
@@ -528,6 +555,7 @@
              </datafield>
            </xsl:otherwise>
            </xsl:choose>
+
 
 
            <!-- MARC FIELD 695$$a OLD
@@ -541,12 +569,9 @@
 
            <!-- MARC FIELD 695$$a new -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories">
-             <datafield tag="695" ind1=" " ind2=" ">
                 <xsl:call-template name="output-695a-subfields">
                     <xsl:with-param name="list"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:categories"/></xsl:with-param>
                 </xsl:call-template>
-                <subfield code="9">LANL EDS</subfield>
-             </datafield>
            </xsl:if> 
 
 
