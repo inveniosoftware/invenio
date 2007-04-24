@@ -512,6 +512,20 @@ sre_colon_not_followed_by_numeration_tag = \
                                sre.compile(r':(?!\s*<cds)', sre.UNICODE|sre.I)
 
 
+## In certain papers, " bf " appears just before the volume of a
+## cited item. It is believed that this is a mistyped TeX command for
+## making the volume "bold" in the paper.
+## The line may look something like this after numeration has been recognised:
+## M. Bauer, B. Stech, M. Wirbel, Z. Phys. bf C : <cds.VOL>34</cds.VOL>
+## <cds.YR>(1987)</cds.YR> <cds.PG>103</cds.PG>
+## The " bf " stops the title from being correctly linked with its series
+## and/or numeration and thus breaks the citation.
+## The pattern below is used to identify this situation and remove the
+## " bf" component:
+sre_identify_bf_before_vol = \
+                sre.compile(r' bf ((\w )?: \<cds\.VOL\>)', \
+                            sre.UNICODE)
+
 ## Patterns used for creating institutional preprint report-number
 ## recognition patterns (used by function "institute_num_pattern_to_regex"):
    ## Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
@@ -3117,6 +3131,10 @@ def create_marc_xml_reference_section(ref_sect,
         ## Identify and standardise numeration in the line:
         working_line1 = \
          standardize_and_markup_numeration_of_citations_in_line(working_line1)
+
+        ## Now that numeration has been marked-up, check for and remove any
+        ## ocurrences of " bf ":
+        working_line1 = sre_identify_bf_before_vol.sub(r" \1", working_line1)
 
         ## Identify and replace URLs in the line:
         working_line1 = identify_and_tag_URLs(working_line1)
