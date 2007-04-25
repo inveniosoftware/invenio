@@ -574,7 +574,22 @@ sre_title_followed_by_series_markup_tags = \
 
 sre_punctuation = sre.compile(r'[\.\,\;\'\(\)\-]', sre.UNICODE)
 
-sre_tagged_citation = sre.compile(r'\<cds\.(TITLE|VOL|YR|PG|REPORTNUMBER|SER|URL)( description=\"[^\"]*\")?\>', sre.UNICODE)
+## The following pattern is used to recognise "citation items" that have been
+## identified in the line, when building a MARC XML representation of the line:
+sre_tagged_citation = sre.compile(r"""
+          \<cds\.                ## open tag: <cds.
+          (TITLE                 ## a TITLE tag
+          |VOL                   ## or a VOL tag
+          |YR                    ## or a YR tag
+          |PG                    ## or a PG tag
+          |REPORTNUMBER          ## or a REPORTNUMBER tag
+          |SER                   ## or a SER tag
+          |URL)                  ## or a URL tag
+          (\s\/)?                ## optional /
+          \>                     ## closing of tag (>)
+          """, \
+                                  sre.UNICODE|sre.VERBOSE)
+
 
 ## is there pre-recognised numeration-tagging within a
 ## few characters of the start if this part of the line?
@@ -1486,8 +1501,9 @@ def identify_preprint_report_numbers(line,
     return (repnum_matches_matchlen, repnum_matches_repl_str, line)
 
 def identify_and_tag_URLs(line):
-    """Given a reference line, identify URLs in the line and tag them
-       between <cds.URL> tags. URLs are identified in 2 forms:
+    """Given a reference line, identify URLs in the line, record the
+       information about them, and replace them with a "<cds.URL />" tag.
+       URLs are identified in 2 forms:
         + Raw: http //cdsware.cern.ch/
         + HTML marked-up: <a href="http //cdsware.cern.ch/">CERN Document
           Server Software Consortium</a>
@@ -1497,35 +1513,45 @@ def identify_and_tag_URLs(line):
        in HTML. When an HTML marked-up URL has been recognised, the text
        between the anchor tags is therefore taken as the URL description.
        In the case of a raw URL recognition, however, the URL itself will
-       also be used as the URL description. For example, in the following
-       reference line:
+       also be used as the URL description.
+       For example, in the following reference line:
         [1] See <a href="http //cdsware.cern.ch/">CERN Document Server
         Software Consortium</a>.
        ...the URL string will be "http //cdsware.cern.ch/" and the URL
        description will be
-       "CERN Document Server Software Consortium". The line returned will
-       therefore be:
-        [1] See <cds.URL description="http //cdsware.cern.ch/">CERN Document
-        Server Software Consortium</cds.URL>.
+       "CERN Document Server Software Consortium".
+       The line returned from this function will be:
+        [1] See <cds.URL />
        In the following line, however:
         [1] See http //cdsware.cern.ch/ for more details.
        ...the URL string will be "http //cdsware.cern.ch/" and the URL
-       description will also be "http //cdsware.cern.ch/". The line returned
-       will therefore be:
-        [1] See <cds.URL description="http //cdsware.cern.ch/">
-         http //cdsware.cern.ch/</cds.URL> for more details.
+       description will also be "http //cdsware.cern.ch/".
+       The line returned will be:
+        [1] See <cds.URL /> for more details.
+
        Note that URLs recognised may not have the colon separator in the
        protocol. This is because in the step prior to the calling of this
        function, colons will have been removed from the line so that numeration
        (as found in journal article citations) could be identified and tagged.
        @param line: (string) the reference line in which to search for URLs.
-       @return: (string) the reference line in which any recognised URLs have
-        been tagged.
+       @return: (tuple) - containing 2 items:
+        + the line after URLs have been recognised and removed;
+        + a list of 2-item tuples where each tuple represents a recognised URL
+          and its description:
+            [(url, url-description), (url, url-description), ... ]
+       @Exceptions raised:
+        + an IndexError if there is a problem with the number of URLs
+          recognised (this should not happen.)
     """
+    ## Take a copy of the line:
+    line_pre_url_check = line
     ## Dictionaries to record details of matched URLs:
     found_url_full_matchlen = {}
     found_url_urlstring     = {}
     found_url_urldescr      = {}
+
+    ## List to contain details of all matched URLs:
+    identified_urls = []
 
     ## Attempt to identify and tag all HTML-MARKED-UP URLs in the line:
     m_tagged_url_iter = sre_html_tagged_url.finditer(line)
@@ -1533,12 +1559,14 @@ def identify_and_tag_URLs(line):
         startposn = m_tagged_url.start()       ## start position of matched URL
         endposn   = m_tagged_url.end()         ## end position of matched URL
         matchlen  = len(m_tagged_url.group(0)) ## total length of URL match
+
         found_url_full_matchlen[startposn] = matchlen
         found_url_urlstring[startposn]     = m_tagged_url.group(3)
         found_url_urldescr[startposn]      = m_tagged_url.group(12)
         ## temporarily replace the URL match with underscores so that
         ## it won't be re-found
         line = line[0:startposn] + u"_"*matchlen + line[endposn:]
+
 
     ## Attempt to identify and tag all RAW (i.e. not
     ## HTML-marked-up) URLs in the line:
@@ -1562,22 +1590,31 @@ def identify_and_tag_URLs(line):
     ## back into the line, tagged:
     found_url_positions = found_url_urlstring.keys()
     found_url_positions.sort()
-    extras_from_previous_url = 0
+    found_url_positions.reverse()
     for url_position in found_url_positions:
-        line = line[0:url_position + extras_from_previous_url] \
-          + """<cds.URL description="%(url-description)s">%(url)s</cds.URL>""" \
-               % { 'url-description' : found_url_urldescr[url_position],
-                   'url'             : found_url_urlstring[url_position],
-                 } \
-               + line[url_position + found_url_full_matchlen[url_position] + \
-                      extras_from_previous_url:]
+        line = line[0:url_position] + "<cds.URL />" \
+               + line[url_position + found_url_full_matchlen[url_position]:]
 
-        extras_from_previous_url += \
-                                 len("""<cds.URL description=""></cds.URL>""") \
-                                 + len(found_url_urldescr[url_position])
+    ## The line has been rebuilt. Now record the information about the
+    ## matched URLs:
+    found_url_positions = found_url_urlstring.keys()
+    found_url_positions.sort()
+    for url_position in found_url_positions:
+        identified_urls.append((found_url_urlstring[url_position], \
+                                found_url_urldescr[url_position]))
+
+    if len(identified_urls) != len(found_url_positions):
+        ## Somehow the number of URLs found doesn't match the number of
+        ## URLs recorded in "identified_urls". Raise an IndexError.
+        msg = """Error: The number of URLs found in the reference line """ \
+              """does not match the number of URLs recorded in the """ \
+              """list of identified URLs!\nLine pre-URL checking: %s\n""" \
+              """Line post-URL checking: %s\n""" \
+              % (line_pre_url_check, line)
+        raise IndexError(msg)
 
     ## return the line containing the tagged URLs:
-    return line
+    return (line, identified_urls)
 
 def identify_periodical_titles(line,
                                periodical_title_search_kb,
@@ -1785,6 +1822,7 @@ def create_marc_xml_reference_line(line_marker,
                                    found_title_matchtext,
                                    pprint_repnum_len,
                                    pprint_repnum_matchtext,
+                                   identified_urls,
                                    removed_spaces,
                                    standardised_titles):
     """After the phase of identifying and tagging citation instances
@@ -1815,6 +1853,10 @@ def create_marc_xml_reference_line(line_marker,
        @param pprint_repnum_matchtext: (dictionary) - The matched text for each
         matched institutional report number. Keyed by the index within the line
         of each match.
+       @identified_urls: (list) - contains 2-cell tuples, each of which
+        represents an idenitfied URL and its description string.
+        The list takes the order in which the URLs were identified in the line
+        (i.e. first-found, second-found, etc).
        @param removed_spaces: (dictionary) - The number of spaces removed from
         the various positions in the line. Keyed by the index of the position
         within the line at which the spaces were removed.
@@ -1918,7 +1960,8 @@ def create_marc_xml_reference_line(line_marker,
      count_reportnum, \
      count_url) = \
          convert_processed_reference_line_to_marc_xml(line_marker, \
-                                                      tagged_line)
+                                                      tagged_line, \
+                                                      identified_urls)
     return (xml_line, count_misc, count_title, count_reportnum, count_url)
 
 def markup_title_as_marcxml(title, volume, year, page, misc_text=""):
@@ -2260,12 +2303,18 @@ def convert_unusable_tag_to_misc(line,
         line = line[idx_closing_tag+len(closing_tag):]
     return (misc_text, line)
 
-def convert_processed_reference_line_to_marc_xml(line_marker, line):
+def convert_processed_reference_line_to_marc_xml(line_marker,
+                                                 line,
+                                                 identified_urls):
     """Given a processed reference line, convert it to MARC XML.
        @param line_marker: (string) - the marker for the reference
         line (e.g. [1]).
        @param line: (string) - the processed reference line, in which
         the recognised citations have been tagged.
+       @identified_urls: (list) - contains 2-cell tuples, each of which
+        represents an idenitfied URL and its description string.
+        The list takes the order in which the URLs were identified in the line
+        (i.e. first-found, second-found, etc).
        @return: (tuple) -
           + xml_line (string) - the reference line with all of its
             identified citations marked up into the various subfields.
@@ -2618,74 +2667,62 @@ def convert_processed_reference_line_to_marc_xml(line_marker, line):
             ## This tag is an identified URL:
             ## Account for the miscellaneous text before the URL:
             cur_misc_txt += processed_line[0:tag_match_start]
-            ## extract the URL information from within the tags in the line:
-            idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_URL, tag_match_end)
-            ## Sanity check - did we find a closing URL tag?
-            if idx_closing_tag == -1:
-                ## no closing </cds.URL> tag found - strip the opening tag and move past it
-                processed_line = processed_line[tag_match_end:]
-            else:
-                ## Closing tag was found:
-                ## First, get the URL string from between the tags:
-                url_string = processed_line[tag_match_end:idx_closing_tag]
 
-                ## Now, get the URL description string from within the opening cds tag. E.g.:
-                ## from <cds.URL description="abc"> get the "abc" value:
-                opening_url_tag = processed_line[tag_match_start:tag_match_end]
-                if opening_url_tag.find(u"""<cds.URL description=\"""") != -1:
-                    ## the description is present - extract it:
-                    ## (Stop 2 characters before the end of the string - we assume they are the
-                    ## closing characters '">'.
-                    url_descr = opening_url_tag[22:-2]
-                else:
-                    ## There is no description - description should now be the url string:
-                    url_descr = url_string
-                ## now trim this URL and its tags from the start of the line:
-                processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_URL):]
+            ## From the "identified_urls" list, get this URL and its
+            ## description string:
+            url_string = identified_urls[0][0]
+            url_descr  = identified_urls[0][1]
 
-                ## Build the MARC XML representation of this identified URL:
-                if previously_cited_item is not None:
-                    ## There was a previously cited item. We must convert it to XML before we can
-                    ## convert this URL to XML:
-                    if previously_cited_item['type'] == "REPORTNUMBER":
-                        ## previously cited item was a REPORT NUMBER.
-                        ## Add previously cited REPORT NUMBER to XML string:
-                        prev_report_num = previously_cited_item['report_num']
-                        prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += markup_reportnum_as_marcxml(prev_report_num,
-                                                                prev_misc_txt)
-                        ## Increment the stats counters:
-                        count_reportnum += 1
-                    elif previously_cited_item['type'] == "TITLE":
-                        ## previously cited item was a TITLE.
-                        ## Add previously cited TITLE to XML string:
-                        prev_title    = previously_cited_item['title']
-                        prev_volume   = previously_cited_item['volume']
-                        prev_year     = previously_cited_item['year']
-                        prev_page     = previously_cited_item['page']
-                        prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                                        prev_year, prev_page, prev_misc_txt)
-                        ## Increment the stats counters:
-                        count_title += 1
-                    ## Empty the previously-cited item place-holder:
-                    previously_cited_item = None
-                ## Now convert this URL to MARC XML
-                cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
-                if url_string.find("http //") == 0:
-                    url_string = u"http://" + url_string[7:]
-                elif url_string.find("ftp //") == 0:
-                    url_string = u"ftp://" + url_string[6:]
-                if url_descr.find("http //") == 0:
-                    url_descr = u"http://" + url_descr[7:]
-                elif url_descr.find("ftp //") == 0:
-                    url_descr = u"ftp://" + url_descr[6:]
-                xml_line += markup_url_as_marcxml(url_string, \
-                                                  url_descr, \
-                                                  cur_misc_txt)
-                ## Increment the stats counters:
-                count_url += 1
-                cur_misc_txt = u""
+            ## Now move past this "<cds.URL />"tag in the line:
+            processed_line = processed_line[tag_match_end:]
+
+            ## Delete the information for this URL from the start of the list
+            ## of identified URLs:
+            identified_urls[0:1] = []
+
+            ## Build the MARC XML representation of this identified URL:
+            if previously_cited_item is not None:
+                ## There was a previously cited item. We must convert it to XML before we can
+                ## convert this URL to XML:
+                if previously_cited_item['type'] == "REPORTNUMBER":
+                    ## previously cited item was a REPORT NUMBER.
+                    ## Add previously cited REPORT NUMBER to XML string:
+                    prev_report_num = previously_cited_item['report_num']
+                    prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+                    xml_line += markup_reportnum_as_marcxml(prev_report_num,
+                                                            prev_misc_txt)
+                    ## Increment the stats counters:
+                    count_reportnum += 1
+                elif previously_cited_item['type'] == "TITLE":
+                    ## previously cited item was a TITLE.
+                    ## Add previously cited TITLE to XML string:
+                    prev_title    = previously_cited_item['title']
+                    prev_volume   = previously_cited_item['volume']
+                    prev_year     = previously_cited_item['year']
+                    prev_page     = previously_cited_item['page']
+                    prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+                    xml_line += markup_title_as_marcxml(prev_title, prev_volume,
+                                                                    prev_year, prev_page, prev_misc_txt)
+                    ## Increment the stats counters:
+                    count_title += 1
+                ## Empty the previously-cited item place-holder:
+                previously_cited_item = None
+            ## Now convert this URL to MARC XML
+            cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
+            if url_string.find("http //") == 0:
+                url_string = u"http://" + url_string[7:]
+            elif url_string.find("ftp //") == 0:
+                url_string = u"ftp://" + url_string[6:]
+            if url_descr.find("http //") == 0:
+                url_descr = u"http://" + url_descr[7:]
+            elif url_descr.find("ftp //") == 0:
+                url_descr = u"ftp://" + url_descr[6:]
+            xml_line += markup_url_as_marcxml(url_string, \
+                                              url_descr, \
+                                              cur_misc_txt)
+            ## Increment the stats counters:
+            count_url += 1
+            cur_misc_txt = u""
 
         elif tag_type == "SER":
             ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
@@ -3136,7 +3173,7 @@ def create_marc_xml_reference_section(ref_sect,
         working_line1 = sre_identify_bf_before_vol.sub(r" \1", working_line1)
 
         ## Identify and replace URLs in the line:
-        working_line1 = identify_and_tag_URLs(working_line1)
+        (working_line1, identified_urls) = identify_and_tag_URLs(working_line1)
 
         ## Clean the line once more:
         working_line1 = wash_line(working_line1)
@@ -3201,6 +3238,7 @@ def create_marc_xml_reference_section(ref_sect,
                                             found_pprint_repnum_matchlens,
                                           pprint_repnum_matchtext=\
                                             found_pprint_repnum_replstr,
+                                          identified_urls=identified_urls,
                                           removed_spaces=removed_spaces,
                                           standardised_titles=\
                                             standardised_periodical_titles)
@@ -4958,7 +4996,8 @@ def test_get_reference_lines():
        @return: (list) of strings - the test reference lines. Each
         string in the list is a reference line that should be processed.
     """
-    reflines = ["""[1] J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/""",
+    reflines = ["""[1] <a href="http://cdsweb.cern.ch/">CERN Document Server</a> J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/ then http://www.itp.ucsb.edu/online/susyc99/discussion/. ; L. Susskind, J. Math. Phys. 36 (1995) 6377; hep-th/9409089. hello world a<a href="http://uk.yahoo.com/">Yahoo!</a>. Fin.""",
+                """[1] J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/""",
                 """[2] S. Gubser, I. Klebanov and A. Polyakov, Phys. Lett. B428 (1998) 105; hep-th/9802109. http://cdsweb.cern.ch/search.py?AGE=hello-world&ln=en""",
                 """[3] E. Witten, Adv. Theor. Math. Phys. 2 (1998) 253; hep-th/9802150.""",
                 """[4] O. Aharony, S. Gubser, J. Maldacena, H. Ooguri and Y. Oz, hep-th/9905111.""",
