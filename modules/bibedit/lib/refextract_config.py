@@ -65,7 +65,6 @@ CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
 CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
 CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
 CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
-CFG_REFEXTRACT_MARKER_CLOSING_URL        = r"</cds.URL>"
 
 
 ## XML Record and collection opening/closing tags:
