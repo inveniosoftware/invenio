@@ -562,10 +562,10 @@ sre_recognised_numeration_for_title = \
 ## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
 sre_numeration_no_ibid_txt = \
           sre.compile(r"""
-          ^(\s*;\s*:?\s                                ## Leading ; :
-          \<cds\.VOL\>(\d+)\<\/cds\.VOL>\s             ## Volume
-          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s    ## year
-          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)      ## page
+          ^((\s*;\s*|\s+and\s+):?\s                   ## Leading ; : or " and :"
+          \<cds\.VOL\>(\d+)\<\/cds\.VOL>\s            ## Volume
+          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s   ## year
+          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)     ## page
           """, sre.UNICODE|sre.VERBOSE)
 
 sre_title_followed_by_series_markup_tags = \
@@ -2469,9 +2469,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## <cds.PG>6119</cds.PG>.   title_text_for_ibid
                     numeration_match = sre_numeration_no_ibid_txt.match(processed_line)
                     while numeration_match is not None:
-                        reference_volume = numeration_match.group(2)
-                        reference_year   = numeration_match.group(3)
-                        reference_page   = numeration_match.group(4)
+                        reference_volume = numeration_match.group(3)
+                        reference_year   = numeration_match.group(4)
+                        reference_page   = numeration_match.group(5)
                         ## Skip past the matched numeration in the working line:
                         processed_line = processed_line[numeration_match.end():]
 
