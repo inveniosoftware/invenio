@@ -344,10 +344,11 @@
              <controlfield tag="003">SzGeCERN</controlfield>
 
 
-           <!-- MARC FIELD 0248_$$d = metadata/header/identifier  -->
+           <!-- MARC FIELD 034_$$9,a  = metadata/header/identifier  -->
            <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier">
-             <datafield tag="024" ind1="8" ind2=" ">
-                <subfield code="d"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
+             <datafield tag="035" ind1=" " ind2=" ">
+                <subfield code="9">arXiv</subfield>
+                <subfield code="a"><xsl:value-of select="./OAI-PMH:header/OAI-PMH:identifier"/></subfield>
              </datafield>
            </xsl:if>
 
