@@ -664,7 +664,7 @@ _sre_non_compiled_pattern_nucphysb_subtitle = \
 
 ## Pattern 0 (was pattern 3): <x, vol, page, year>
 sre_numeration_vol_nucphys_page_yr = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   [,:\s]\s?
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -685,7 +685,7 @@ sre_numeration_nucphys_vol_page_yr = (sre.compile(r"""
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?
-  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)\s?       ## The volume (optional "vol"/"no")
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?       ## The volume (optional "vol"/"no")
   [,:\s]\s?
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
@@ -702,7 +702,7 @@ sre_numeration_nucphys_vol_page_yr = (sre.compile(r"""
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
 sre_numeration_vol_nucphys_yr_page = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   [,:\s]?\s?
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -724,7 +724,7 @@ sre_numeration_nucphys_vol_yr_page = (sre.compile(r"""
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?
-  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)\s?       ## The volume (optional "vol"/"no")
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?       ## The volume (optional "vol"/"no")
   [,:\s]?\s?
   \((1\d\d\d|20\d\d)\),?\s?                ## Year
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
@@ -742,7 +742,7 @@ sre_numeration_nucphys_vol_yr_page = (sre.compile(r"""
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
 sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   ([A-H])\s?                               ## The series
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -760,7 +760,7 @@ sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r"""
                                       '<cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
 sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?([A-H])\s?                   ## The series
@@ -782,7 +782,7 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
 sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   ([A-H])[,:\s]\s?                         ## The series
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -801,7 +801,7 @@ sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r"""
 
 ## <v, [FS]?, s, p, y>
 sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?([A-H])[,:\s]\s?             ## The series
