@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,7 +22,7 @@
 """
 BibUpload Engine configuration.
 """
- 
+
 __revision__ = "$Id$"
 
 CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',
@@ -37,10 +37,12 @@ CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = '970__a' # useful for matching when
                                             # external digital library
                                             # system
 
-CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = '0248_d' # useful for matching when
+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = '035__a' # useful for matching when
                                             # we harvest stuff via OAI
                                             # that we do not want to
                                             # reexport via Invenio
-                                            # OAI, so records may have
-                                            # only source OAI ID but
-                                            # not Invenio OAI ID
+                                            # OAI; so records may have
+                                            # only the source OAI ID
+                                            # stored in this tag (kind
+                                            # of like external system
+                                            # number too)
