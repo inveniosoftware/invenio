@@ -786,12 +786,16 @@ class Template:
                 checked = ''
 
             html += """<tr><td class="searchalsosearchboxbody" valign="top">
-                <input type="checkbox" name="ec" value="%(internal_name)s" %(checked)s>&nbsp;</td>
-                <td valign="top"><a href="%(base_url)s">%(name)s</a></td></tr>""" % \
+                <input type="checkbox" name="ec" id="extSearch%(name)s" value="%(internal_name)s" %(checked)s>&nbsp;</td>
+                <td valign="top" class="searchalsosearchboxbody"><label for="extSearch%(name)s">%(name)s</label>
+                <a href="%(base_url)s">
+                <img src="%(weburl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/>
+                </a></td></tr>""" % \
                                  { 'checked': checked,
                                    'base_url': base_url,
                                    'internal_name': internal_name,
-                                   'name': name, }
+                                   'name': name,
+                                   'weburl': weburl,}
 
         html += """</tr></tbody></table></table>"""
         return html
