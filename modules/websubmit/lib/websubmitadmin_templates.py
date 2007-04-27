@@ -3040,7 +3040,7 @@ class Template:
          <tbody>
          <tr>
           <td width="20%%">&nbsp;</td>
-          <td width="80%%">&nbsp;<form method="get" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters"></td>
+          <td width="80%%">&nbsp;<form method="post" action="%(websubadmin_url)s/doctypeconfiguresubmissionfunctionsparameters"></td>
          </tr>
          <tr>
           <td width="20%%"><span class="adminlabel">Parameter Value:</span></td>
