@@ -393,9 +393,7 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
-            # auth_user can return either an email or a tuple(couple) of a email and
-            # a nickname
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw)
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req)
         except WebAccessExternalAuthError:
             return([], p_email, p_pw, 16)
         if p_email: # Authenthicated externally
@@ -406,7 +404,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 p_nickname = ''
                 if CFG_EXTERNAL_AUTHENTICATION[login_method][0].enforce_external_nicknames:
                     try: # Let's discover the external nickname!
-                        p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw)
+                        p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw, req)
                     except (AttributeError, NotImplementedError):
                         pass
                 res = registerUser(req, p_email, p_pw_local, p_nickname, \
@@ -418,7 +416,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 else:
                     return([], p_email, p_pw_local, 13)
             try:
-                groups = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_groups_membership(p_email, p_pw)
+                groups = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_groups_membership(p_email, p_pw, req)
                 # groups is a dictionary {group_name : group_description,}
                 new_groups = {}
                 for key, value in groups.items():
@@ -448,7 +446,7 @@ def loginUser(req, p_un, p_pw, login_method):
                     del user_prefs[key]
             try:
                 # Importing external settings
-                new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw)
+                new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw, req)
                 for key, value in new_prefs.items():
                     user_prefs['EXTERNAL_' + key] = value
             except (AttributeError, NotImplementedError):

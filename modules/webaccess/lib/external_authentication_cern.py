@@ -69,14 +69,13 @@ class ExternalAuthCern(ExternalAuth):
         return ret
 
 
-    def auth_user(self, username, password):
+    def auth_user(self, username, password, req=None):
         """
         Check USERNAME and PASSWORD against CERN NICE/CRA database.
         Return None if authentication failed, or the email address of the
         person if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
         usernames and email addresses.
-        It can also return a tuple (actually a couple) (email, nickname).
         If it is the first time the user logs in Invenio the nickname is
         stored alongside the email. If this nickname is unfortunatly already
         in use it is discarded. Otherwise it is ignored.
@@ -90,7 +89,7 @@ class ExternalAuthCern(ExternalAuth):
         else:
             return None
 
-    def user_exists(self, email):
+    def user_exists(self, email, req=None):
         """Checks against CERN NICE/CRA for existance of email.
         @return True if the user exists, False otherwise
         """
@@ -99,7 +98,7 @@ class ExternalAuthCern(ExternalAuth):
         return email.upper() in [user['email'].upper() for user in users]
 
 
-    def fetch_user_groups_membership(self, email, password):
+    def fetch_user_groups_membership(self, email, password, req=None):
         """Fetch user groups membership from the CERN NICE/CRA account.
         @return a dictionary of groupname, group description
         """
@@ -110,7 +109,7 @@ class ExternalAuthCern(ExternalAuth):
         return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                         or x + ' (Group)'), groups))
 
-    def fetch_user_nickname(self, username, password):
+    def fetch_user_nickname(self, username, password, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
         """
@@ -122,7 +121,7 @@ class ExternalAuthCern(ExternalAuth):
             return None
 
 
-    def fetch_user_preferences(self, username, password=None):
+    def fetch_user_preferences(self, username, password=None, req=None):
         """Fetch user preferences/settings from the CERN Nice account.
         the external key will be '1' if the account is external to NICE/CRA,
         otherwise 0

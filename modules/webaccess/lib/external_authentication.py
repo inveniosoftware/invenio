@@ -44,7 +44,7 @@ class ExternalAuth:
         self.enforce_external_nicknames = False
         pass
 
-    def auth_user(self, username, password):
+    def auth_user(self, username, password, req=None):
         """Authenticate user-supplied USERNAME and PASSWORD.  Return
         None if authentication failed, or the email address of the
         person if the authentication was successful.  In order to do
@@ -55,14 +55,14 @@ class ExternalAuth:
         raise NotImplementedError
         #return None
 
-    def user_exists(self, email):
+    def user_exists(self, email, req=None):
         """Check the external authentication system for existance of email.
         @return True if the user exists, False otherwise
         """
         raise NotImplementedError
 
 
-    def fetch_user_groups_membership(self, username, password):
+    def fetch_user_groups_membership(self, username, password, req=None):
         """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
         Raise WebAccessExternalAuthError in case of troubles.
@@ -70,14 +70,14 @@ class ExternalAuth:
         raise NotImplementedError
         #return {}
 
-    def fetch_user_nickname(self, username, password):
+    def fetch_user_nickname(self, username, password, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
         """
         raise NotImplementedError
         #return Nickname
 
-    def fetch_user_preferences(self, username, password=None):
+    def fetch_user_preferences(self, username, password=None, req=None):
         """Given a username and a password, returns a dictionary of keys and
         values, corresponding to external infos and settings.
 
@@ -92,7 +92,7 @@ class ExternalAuth:
         raise NotImplementedError
         #return {}
 
-    def fetch_all_users_groups_membership(self):
+    def fetch_all_users_groups_membership(self, req=None):
         """Fetch all the groups with a description, and users who belong to
         each groups.
         @return {'mygroup': ('description', ['email1', 'email2', ...]), ...}

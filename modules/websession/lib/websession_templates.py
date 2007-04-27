@@ -36,6 +36,8 @@ from invenio.config import \
      sweburl, \
      version, \
      weburl
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
+        CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -187,7 +189,7 @@ class Template:
                 'sweburl': sweburl,
             }
 
-        if not password_disabled:
+        if not password_disabled and not CFG_EXTERNAL_AUTH_USING_SSO:
             out += """
                 <form method="post" action="%(sweburl)s/youraccount/change" name="edit_password">
                 <p>%(change_pass)s</p>
@@ -676,7 +678,9 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = _("You are no longer recognized.") + ' '
+        out = _("You are no longer recognized by our system.") + ' '
+        if CFG_EXTERNAL_AUTH_USING_SSO and CFG_EXTERNAL_AUTH_LOGOUT_SSO:
+            out += _("You are still recognized by the centralized <strong>SSO</strong> system. You can <a href='%s'>logout from SSO</a>, too.<br />") % CFG_EXTERNAL_AUTH_LOGOUT_SSO
         out += _("If you wish you can %(x_url_open)slogin here%(x_url_close)s.") % {'x_url_open': '<a href="./login?ln=' + ln + '">',
                                                                                     'x_url_close': '</a>'}
         return out

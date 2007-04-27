@@ -497,20 +497,24 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         _ = gettext_set_language(args['ln'])
 
         #return action+_("login")
-        if args['action'] == "login" or args['action'] == _("login"):
-            if args['p_un'] is None or not args['login_method']:
-                return page(title=_("Login"),
-                            body=webaccount.create_login_page_box(args['referer'], args['ln']),
-                            navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                            description="CDS Personalize, Main page",
-                            keywords="CDS, personalize",
-                            uid=uid,
-                            req=req,
-                            secure_page_p = 1,
-                            language=args['ln'],
-                            lastupdated=__lastupdated__,
-                            navmenuid='login')
-            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
+        if args['action'] == "login" or args['action'] == _("login") or CFG_EXTERNAL_AUTH_USING_SSO:
+            if not CFG_EXTERNAL_AUTH_USING_SSO:
+                if args['p_un'] is None or not args['login_method']:
+                    return page(title=_("Login"),
+                                body=webaccount.create_login_page_box(args['referer'], args['ln']),
+                                navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                                description="CDS Personalize, Main page",
+                                keywords="CDS, personalize",
+                                uid=uid,
+                                req=req,
+                                secure_page_p = 1,
+                                language=args['ln'],
+                                lastupdated=__lastupdated__,
+                                navmenuid='login')
+                (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
+            else:
+                # Fake parameters for p_un & p_pw because SSO takes them from the environment
+                (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', 'SSO')
             if len(iden)>0:
                 uid = webuser.update_Uid(req, args['p_un'])
                 uid2 = webuser.getUid(req)

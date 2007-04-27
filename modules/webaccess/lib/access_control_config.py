@@ -24,7 +24,8 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-import external_authentication_cern
+#import external_authentication_sso
+#import external_authentication_cern
 from invenio.config import cdsname, sweburl, supportemail
 
 # VALUES TO BE EXPORTED
@@ -49,6 +50,12 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
+# To be set in order to change the login Behaviour into Invenio
+CFG_EXTERNAL_AUTH_USING_SSO = False
+
+# Link to reach in order to logout from SSO
+#CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
+CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
 
 # Use external source for access control?
 # Atleast one must be added
@@ -56,6 +63,7 @@ MAXPAGEUSERS = 25
 # Format is:   System name: (System class, Default True/Flase), atleast one
 # must be default
 CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True)}
+#CFG_EXTERNAL_AUTHENTICATION = {"SSO" : (external_authentication_sso.ExternalAuthSSO(), True)}
 #CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True), \
 #    "CERN": (external_authentication_cern.ExternalAuthCern(), False)}
 
