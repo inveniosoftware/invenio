@@ -238,6 +238,19 @@ def create_handler(root):
 
     return _handler
 
+
+def http_get_credentials(req, realm="restricted collection"):
+    if req.headers_in.has_key("Authorization"):
+        try:
+            s = req.headers_in["Authorization"][6:]
+            s = base64.decodestring(s)
+            user, passwd = s.split(":", 1)
+        except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
+            raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
+
+        return (user, passwd)
+    return (None, None)
+
 def http_check_credentials(req, realm, check_auth):
 
     authorized = False
