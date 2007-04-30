@@ -10,7 +10,7 @@ contributed to the project:
     Patches for compiling old CDSware 0.3.x sources on FreeBSD.
   
   - Guido Pelzer <guido.pelzer@web.de>
-    Contributions to the German translation, German stopword list.
+    Contributions to the German translation.  German stopword list.
   
   - Valerio Gracco <valerio.gracco@cern.ch>
     Contributions to the Italian translation.
@@ -63,6 +63,9 @@ contributed to the project:
 
   - Kam-ming Ku <kmku@hkusua.hku.hk>
     Contributions to the Chinese translations (zh_CN, zh_TW). 
+
+  - Benedikt Koeppel <be.public@gmail.com>
+    Contributions to the German translation.
 
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
