@@ -67,6 +67,7 @@ from invenio.access_control_config import *
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.messages import gettext_set_language
+from invenio.webinterface_handler import http_get_credentials
 from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
 tmpl = invenio.template.load('websession')
@@ -802,6 +803,39 @@ def get_default_user_preferences():
             user_preference['login_method'] = system
             break
     return user_preference
+
+def extract_user_info(req):
+    """Return a tuple (uid, nickname, email, groupids, remote_ip, remote_host, external)
+    containing all the useful info to identificate a user in order
+    to restrict his/her rights.
+    """
+    user_info = {}
+    uid = getUid(req)
+    userinfo['uid'] = uid
+    user_info['apache_user'], apache_pwd = http_get_credentials(req)
+    if apache_user:
+        if not auth_apache_user_p(apache_user, apache_pwd):
+            apache_user = None
+            apache_pwd = None
+    if user_info['apache_user']:
+        user_info['apache_groups'] = auth_apache_user_in_groups(user_info['apache_user'])
+    else:
+        user_info['apache_groups'] = []
+    user_info['nickname'] = get_nickname(uid) or None
+    user_info['email'] = get_email(uid) or None
+    prefs = get_user_preferences(uid)
+    for key, value in prefs:
+        user_info[key] = value
+    if uid:
+        user_info['groups'] = [group[1] for group in get_groups(uid)]
+    else:
+        user_info['groups'] = []
+    user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+    user_info['remote_host'] = req.connection.remote_host or None
+    for key, value in prefs:
+        user_info[key.lower()] = value
+    return user_info
+
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
