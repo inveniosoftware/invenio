@@ -539,14 +539,14 @@ sre_extract_char_class = (sre.compile(r' \[([^\]]+) \]', sre.UNICODE), \
 
 
 ## URL recognition:
-## Stand-alone URL (e.g. http //cdsware.cern.ch/ )
+## Stand-alone URL (e.g. http://cdsware.cern.ch/ )
 sre_raw_url = \
- sre.compile(r'((https?|s?ftp) \/\/([\w\d\_\.\-])+(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
+ sre.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
              sre.UNICODE|sre.I)
-## HTML marked-up URL (e.g. <a href="http //cdsware.cern.ch/">
+## HTML marked-up URL (e.g. <a href="http://cdsware.cern.ch/">
 ## CERN Document Server Software Consortium</a> )
 sre_html_tagged_url = \
- sre.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp) \/\/)?([\w\d\_\.\-])+(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
+ sre.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
              sre.UNICODE|sre.I)
 
 
@@ -1503,8 +1503,8 @@ def identify_and_tag_URLs(line):
     """Given a reference line, identify URLs in the line, record the
        information about them, and replace them with a "<cds.URL />" tag.
        URLs are identified in 2 forms:
-        + Raw: http //cdsware.cern.ch/
-        + HTML marked-up: <a href="http //cdsware.cern.ch/">CERN Document
+        + Raw: http://cdsware.cern.ch/
+        + HTML marked-up: <a href="http://cdsware.cern.ch/">CERN Document
           Server Software Consortium</a>
        These URLs are considered to have 2 components: The URL itself
        (url string); and the URL description. The description is effectively
@@ -1514,24 +1514,20 @@ def identify_and_tag_URLs(line):
        In the case of a raw URL recognition, however, the URL itself will
        also be used as the URL description.
        For example, in the following reference line:
-        [1] See <a href="http //cdsware.cern.ch/">CERN Document Server
+        [1] See <a href="http://cdsware.cern.ch/">CERN Document Server
         Software Consortium</a>.
-       ...the URL string will be "http //cdsware.cern.ch/" and the URL
+       ...the URL string will be "http://cdsware.cern.ch/" and the URL
        description will be
        "CERN Document Server Software Consortium".
        The line returned from this function will be:
         [1] See <cds.URL />
        In the following line, however:
         [1] See http //cdsware.cern.ch/ for more details.
-       ...the URL string will be "http //cdsware.cern.ch/" and the URL
-       description will also be "http //cdsware.cern.ch/".
+       ...the URL string will be "http://cdsware.cern.ch/" and the URL
+       description will also be "http://cdsware.cern.ch/".
        The line returned will be:
         [1] See <cds.URL /> for more details.
 
-       Note that URLs recognised may not have the colon separator in the
-       protocol. This is because in the step prior to the calling of this
-       function, colons will have been removed from the line so that numeration
-       (as found in journal article citations) could be identified and tagged.
        @param line: (string) the reference line in which to search for URLs.
        @return: (tuple) - containing 2 items:
         + the line after URLs have been recognised and removed;
@@ -1561,7 +1557,7 @@ def identify_and_tag_URLs(line):
 
         found_url_full_matchlen[startposn] = matchlen
         found_url_urlstring[startposn]     = m_tagged_url.group(3)
-        found_url_urldescr[startposn]      = m_tagged_url.group(12)
+        found_url_urldescr[startposn]      = m_tagged_url.group(15)
         ## temporarily replace the URL match with underscores so that
         ## it won't be re-found
         line = line[0:startposn] + u"_"*matchlen + line[endposn:]
@@ -2708,14 +2704,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 previously_cited_item = None
             ## Now convert this URL to MARC XML
             cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
-            if url_string.find("http //") == 0:
-                url_string = u"http://" + url_string[7:]
-            elif url_string.find("ftp //") == 0:
-                url_string = u"ftp://" + url_string[6:]
-            if url_descr.find("http //") == 0:
-                url_descr = u"http://" + url_descr[7:]
-            elif url_descr.find("ftp //") == 0:
-                url_descr = u"ftp://" + url_descr[6:]
             xml_line += markup_url_as_marcxml(url_string, \
                                               url_descr, \
                                               cur_misc_txt)
@@ -3155,13 +3143,16 @@ def create_marc_xml_reference_section(ref_sect,
                                               ## numbers to be substituted into
                                               ## a line
 
-        ## take a copy of the line as a first working line, clean it of bad
-        ## accents, and correct puncutation, etc:
-        working_line1 = wash_line(ref_line)
-
         ## Strip the 'marker' (e.g. [1]) from this reference line:
         (line_marker, working_line1) = \
-                      remove_reference_line_marker(working_line1)
+                      remove_reference_line_marker(ref_line)
+
+        ## Identify and replace URLs in the line:
+        (working_line1, identified_urls) = identify_and_tag_URLs(working_line1)
+
+        ## take a copy of the line as a first working line, clean it of bad
+        ## accents, and correct puncutation, etc:
+        working_line1 = wash_line(working_line1)
 
         ## Identify and standardise numeration in the line:
         working_line1 = \
@@ -3170,9 +3161,6 @@ def create_marc_xml_reference_section(ref_sect,
         ## Now that numeration has been marked-up, check for and remove any
         ## ocurrences of " bf ":
         working_line1 = sre_identify_bf_before_vol.sub(r" \1", working_line1)
-
-        ## Identify and replace URLs in the line:
-        (working_line1, identified_urls) = identify_and_tag_URLs(working_line1)
 
         ## Clean the line once more:
         working_line1 = wash_line(working_line1)
