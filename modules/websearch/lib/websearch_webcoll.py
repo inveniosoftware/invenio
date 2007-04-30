@@ -666,7 +666,11 @@ class Collection:
         else:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
-            reclist = search_pattern(None, self.dbquery + ' -collection:"DELETED"')
+            if CFG_CERN_SITE:
+                reclist = search_pattern(None, self.dbquery + \
+                                         ' -collection:"DELETED" -collection:"DUMMY"')
+            else:
+                reclist = search_pattern(None, self.dbquery + ' -collection:"DELETED"')
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
         # deduce the number of records:
         reclist.calculate_nbhits()
