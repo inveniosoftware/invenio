@@ -70,6 +70,9 @@ contributed to the project:
   - Toru Tsuboyama <toru.tsuboyama@kek.jp>
     Contributions to the Japanese translation.
 
+  - Mike Marino <mmarino@gmail.com>
+    Several minor patches and suggestions.
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.
