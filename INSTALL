@@ -464,7 +464,7 @@ Contents
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache.log combined
                       DirectoryIndex index.en.html index.html
-                      <LocationMatch "^(/$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss)">
+                      <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
                          PythonDebug On
@@ -503,7 +503,7 @@ Contents
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
                       DirectoryIndex index.en.html index.html
-                      <LocationMatch "^(/$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss)">
+                      <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
                          PythonDebug On
