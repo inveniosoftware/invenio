@@ -476,7 +476,7 @@
              <xsl:variable name="lkrmatch"><xsl:value-of select="normalize-space(translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments, $ucletters, $lcletters))"/></xsl:variable>
              <xsl:if test="contains($lkrmatch,'conf') or contains($lkrmatch,'talk') or contains($lkrmatch,'seminar') or contains($lkrmatch,'lecture')  or contains($lkrmatch,'contrib')  or contains($lkrmatch,'forum')  or contains($lkrmatch,'seminar') or contains($lkrmatch,'meeting') or contains($lkrmatch,'symp')or contains($lkrmatch,'rencontre') or contains($lkrmatch,'proc') or contains($lkrmatch,'workshop')   ">
                <datafield tag="962" ind1=" " ind2=" ">
-                 <subfield code="b"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments"/> </subfield>
+                 <subfield code="b"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments)"/> </subfield>
                </datafield>
              </xsl:if>
              </xsl:if>
