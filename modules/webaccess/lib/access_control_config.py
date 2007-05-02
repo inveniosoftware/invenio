@@ -50,6 +50,10 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
+# Default behaviour when a definition is parsed to the end without having decided
+# if the user should belong to it or not
+CFG_FIREWALL_DEFAULT_ALLOW = True
+
 # To be set in order to change the login Behaviour into Invenio
 CFG_EXTERNAL_AUTH_USING_SSO = False
 
