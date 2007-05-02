@@ -26,7 +26,6 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      version
 from invenio.dbquery import run_sql, ProgrammingError
-from invenio.firewall import load_role_definition, firewall
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 
 called_from = 1 #1=web,0=cli
@@ -257,6 +256,7 @@ def acc_authorize_action_req(req, name_action, verbose=0, **arguments):
     #        if not CFG_EXTERNAL_ACCESS_CONTROL.loginUser(em_pw[0][0], em_pw[0][1]):
     #            return (10, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[10], (called_from and CFG_WEBACCESS_MSGS[1] or "")))
     # TASK 0: find id and allowedkeywords of action
+    from invenio.firewall import load_role_definition, firewall
     if type(req) in [type(1), type(1L)]:
         return acc_authorize_action(req, name_action, verbose, **arguments)
     if verbose: print 'task 0 - get action info'
