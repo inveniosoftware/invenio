@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
     """Check browser test_web_page_content() function."""
 
     def test_twpc_username_arg(self):
-        """testutils - test_web_page_content() and username arguments""" 
+        """testutils - test_web_page_content() and username arguments"""
         # should login as admin without password:
         self.assertEqual([],
                          test_web_page_content(weburl,
                                                username="admin",
-                                               expected_text="</html>"))        
+                                               expected_text="</html>"))
         # should not login as admin with password:
         errmsgs = test_web_page_content(weburl,
                                         username="admin",
@@ -49,9 +49,9 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         else:
             self.fail("Should not be able to login as admin with foo password.")
         return
-    
+
     def test_twpc_expected_text_arg(self):
-        """testutils - test_web_page_content() and expected_text argument""" 
+        """testutils - test_web_page_content() and expected_text argument"""
         # should find HTML in an HTML page:
         self.assertEqual([],
                          test_web_page_content(weburl + "/search?p=ellis",
@@ -65,7 +65,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         return
 
     def test_twpc_expected_link_arg(self):
-        """testutils - test_web_page_content() and expected_link argument""" 
+        """testutils - test_web_page_content() and expected_link argument"""
         # should find link to ALEPH:
         self.assertEqual([],
                          test_web_page_content(weburl,
@@ -76,7 +76,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
                               expected_link_label="ISOLDE"))
         # should find link to ISOLDE entitled ISOLDE:
         self.assertEqual([],
-                         test_web_page_content("http://localhost/",
+                         test_web_page_content(weburl,
                               expected_link_target=weburl+"/collection/ISOLDE",
                               expected_link_label="ISOLDE"))
         # should not find link to ALEPH entitled ISOLDE:
@@ -88,7 +88,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         else:
             self.fail("Should not find link to ALEPH entitled ISOLDE.")
         return
-    
+
 test_suite = make_test_suite(TestFunctionTestWebPageContent)
 
 if __name__ == "__main__":
