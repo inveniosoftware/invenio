@@ -329,17 +329,10 @@ def print_field(field_lines, alephmarc=0):
         for line in field_lines:
             ## create line in text-marc mode:
             for segment in line:
-                segment_code  = segment[0]
-                segment_value = segment[1]
-                ## Is there a newline in this segment? If yes, replace it
-                ## with a space or simply remove it if it was preceeded
-                ## by whitespace:
-                segment_value = segment_value.replace(" \n", " ")
-                segment_value = segment_value.replace("\n", " ")
-
-                out += "%(code)s%(value)s" % { 'code'  : segment[0],
-                                               'value' : segment[1],
-                                             }
+                segment[1] = segment[1].replace(" \n", " ")
+                segment[1] = segment[1].replace("\n", " ")
+                out += "%(code)s%(value)s" % { 'code' : segment[0],
+                                               'value' : segment[1] }
             out += "\n"
     else:
         ## creating an aleph-marc record
@@ -352,15 +345,9 @@ def print_field(field_lines, alephmarc=0):
                 printable_line = ""
                 i = 1
                 while i < num_linesegments:
-                    segment_code  = line[i][0]
-                    segment_value = line[i][1]
-
-                    ## Is there a newline in this segment? If yes, replace it
-                    ## with a space or simply remove it if it was preceeded
-                    ## by whitespace:
-                    segment_value = segment_value.replace(" \n", " ")
-                    segment_value = segment_value.replace("\n", " ")
-                    cur_segment_len = len(segment_code) + len(segment_value)
+                    line[i][1] = line[i][1].replace(" \n", " ")
+                    line[i][1] = line[i][1].replace("\n", " ")
+                    cur_segment_len = len(line[i][0]) + len(line[i][1])
                     if (line_leader_len + cur_line_len + cur_segment_len + 2 \
                         + len(str(glue_count))) > (CFG_MAXLEN_ALEPH_LINE - 25):
                         ## adding this segment makes the line too long. It
@@ -368,12 +355,12 @@ def print_field(field_lines, alephmarc=0):
                         ## How much of the current line can be printed?
                         space_remaining = (CFG_MAXLEN_ALEPH_LINE - 25) - \
                                           (line_leader_len + cur_line_len + 3) \
-                                          - len(segment_code)
+                                          - len(line[i][0])
                         if space_remaining > 0:
                             ## there is space to add some of this line
-                            printable_line += segment_code + \
-                                              segment_value[0:space_remaining]
-                            segment_value = segment_value[space_remaining:]
+                            printable_line += line[i][0] + \
+                                              line[i][1][0:space_remaining]
+                            line[i][1] = line[i][1][space_remaining:]
                         ## print this line:
                         out += """%(sys)s$$9%(glue_count)s""" \
                                """%(printable_line)s\n""" \
@@ -388,8 +375,8 @@ def print_field(field_lines, alephmarc=0):
                     else:
                         ## Including this line segment, the line fits within a
                         ## maximum line length, so add it:
-                        printable_line += segment_code + segment_value
-                        cur_line_len += (len(segment_code) + len(segment_value))
+                        printable_line += line[i][0] + line[i][1]
+                        cur_line_len += (len(line[i][0]) + len(line[i][1]))
                         i += 1
 
                 ## Now add to the display string, any of the line
