@@ -540,7 +540,7 @@
            <!-- MARC FIELD 500$$a -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
               <datafield tag="500" ind1=" " ind2=" ">
-                <subfield code="a"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments)"/></subfield>
+                <subfield code="a">Comments: <xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments)"/></subfield>
               </datafield>
            </xsl:if>
 
