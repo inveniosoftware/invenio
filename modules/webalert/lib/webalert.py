@@ -146,7 +146,7 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
     baskets = create_personal_baskets_selection_box(uid=uid,
                                                     html_select_box_name='idb',
                                                     selected_bskid=old_id_basket,
-                                                    ln=cdslang)
+                                                    ln=ln)
     return webalert_templates.tmpl_input_alert(
              ln = ln,
              query = get_textual_query_info_from_urlargs(urlargs, ln = ln),
@@ -216,7 +216,7 @@ def perform_list_alerts (uid, ln=cdslang):
     """perform_list_alerts display the list of alerts for the connected user"""
     # set variables
     out = ""
-    
+
     # query the database
     query = """ SELECT q.id, q.urlargs,
                        a.id_basket, b.name,
@@ -225,7 +225,7 @@ def perform_list_alerts (uid, ln=cdslang):
                        DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
                 FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
                                          LEFT JOIN bskBASKET b ON a.id_basket=b.id
-                WHERE a.id_user='%s' 
+                WHERE a.id_user='%s'
                 ORDER BY a.alert_name ASC """ % uid
     res = run_sql(query)
     alerts = []
@@ -290,7 +290,7 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
     out = ''
     if (None in (alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid)):
         return out
-        
+
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -310,21 +310,21 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
         # FIXME: I18N since this technique of the below raise message,
         # since this technique (detecting old alert IDs) is not nice
         # and should be replaced some day soon.
-        raise AlertError("Unable to detect old alert name.") 
+        raise AlertError("Unable to detect old alert name.")
     if old_alert_name.strip()!="" and old_alert_name != alert_name:
         check_alert_name( alert_name, uid, ln)
     if id_basket != old_id_basket:
         check_alert_is_unique( id_basket, id_query, uid, ln)
 
     # update a row into the alerts table: user_query_basket
-    query = """UPDATE user_query_basket 
+    query = """UPDATE user_query_basket
                SET alert_name='%s',frequency='%s',notification='%s',
                    date_creation='%s',date_lastrun='',id_basket='%s'
                WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
     query %= (alert_name, frequency, notification,
               convert_datestruct_to_datetext(time.localtime()),
               id_basket, uid, id_query, old_id_basket)
-    
+
     run_sql(query)
 
     out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>",)
