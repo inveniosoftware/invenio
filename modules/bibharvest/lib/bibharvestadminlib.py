@@ -31,6 +31,7 @@ import random
 import urllib
 import sre
 
+from httplib import InvalidURL
 from invenio.config import \
      cdslang, \
      tmpdir, \
@@ -547,6 +548,8 @@ def validate(oai_src_baseurl):
         return (4, strerror)
     except StandardError, e:
         return (4, "An unknown error has occured")
+    except InvalidURL, e:
+        return (2, "Could not connect with URL %s. Check URL or retry when server is available." % url)
 
 def validatefile(oai_src_config):
     """This function checks whether the given path to text file exists or not
