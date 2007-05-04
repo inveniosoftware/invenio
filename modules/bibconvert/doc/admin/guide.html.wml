@@ -280,6 +280,24 @@ and <A HREF="#C.3.4.2">generated values</A>
 </pre>
 </protect>
 
+<br>- preserve newlines in a source field for later use by formatting
+functions by marking them with "^"
+<P>Example of a definition of a book editors field in which the newlines are preserved
+so that they can be processed by the JOINMULTILINES formatting function:
+<protect>
+<pre>
+<br/>AU---&lt;datafield id="773" ind1=" " ind2=" ">&lt;:BOOKEDITOR^::BOOKEDITOR::JOINMULTILINES(&lt;subfield code="a">,&lt;/subfield>):>&lt;/datafield>
+<br /><br />
+With a value such as:<br />
+Test
+Case, A
+<br />
+The results may be:<br /><br />
+&lt;datafield tag="773" ind1="" ind2="">&lt;subfield code="a">Test&lt;/subfield>&lt;subfield code="a">Case, A&lt;/subfield>&lt;/datafield>
+</pre>
+</protect>
+
+
 <h4><A NAME="C.3.4"></a>3.4 Formatting in BibConvert</H4>
 
 <H5>&nbsp;<A NAME="C.3.4.1"></A>3.4.1 Definition of formatting functions</H5>
@@ -318,6 +336,8 @@ of a field</A>
 range</A>
 <BR><A HREF="#DEFP">DEFP() - default print</A>
 <BR><A HREF="#IFDEFP">IFDEFP(field,value,1/0) - IF condition is met, default print</A>
+<BR><A HREF="#JOINMULTILINES">JOINMULTILINES(prefix,suffix) - Join a multiline string into a single line
+with each segment having prefix and suffix</A>
 <BR>&nbsp;</BLOCKQUOTE>
 
 <H4>
@@ -929,6 +949,23 @@ This is achieved by using "IFDEFP". If the line had contained variables, the "CO
 instead.
 </BLOCKQUOTE>
 
+<H4>
+<A NAME="JOINMULTILINES"></A>JOINMULTILINES(prefix,suffix) - Join a multiline string into a single line
+with each segment having prefix and suffix</H4>
+<BLOCKQUOTE>
+Given a field-value with newlines in it, split the field on the new lines (\n),
+separating them with prefix, then suffix. E.g.:<br>
+For the field XX with the value:<br><br>
+&nbsp;&nbsp;Test<br>
+&nbsp;&nbsp;Case, A<br>
+<br>And the function call:<br><br>
+&nbsp;&nbsp;&lt;:XX^::XX::JOINMULTILINES(&lt;subfield code="a">,&lt;/subfield>):><br>
+<br>The results would be:<br>
+<br>&nbsp;&nbsp;&lt;subfield code="a">Test&lt;/subfield>&lt;subfield code="a">Case, A&lt;/subfield><br>
+<br>One note on this: &lt;:XX^::XX:<br>
+Without the ^ the newlines will be lost as bibconvert will remove them, so
+you'll never see an effect from this function.
+</BLOCKQUOTE>
 
 <H4>
 <A NAME="C.3.4.2"></A>3.4.2 Generated values</H4>
