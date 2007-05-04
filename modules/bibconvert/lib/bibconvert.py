@@ -857,6 +857,20 @@ def FormatField(value, fn):
                                   NOTE: This function works for CONSTANT
                                   lines - those without any variable values in
                                   them.
+    JOINMULTILINES(prefix,suffix) - Given a field-value with newlines in it,
+                                    split the field on the new lines (\n), separating
+                                    them with prefix, then suffix. E.g.:
+                                    For the field XX with the value:
+                                       Test
+                                       Case, A
+                                    And the function call:
+                                    <:XX^::XX::JOINMULTILINES(<subfield code="a">,</subfield>):>
+                                    The results would be:
+                                    <subfield code="a">Test</subfield><subfield code="a">Case, A</subfield>
+                                    One note on this: <:XX^::XX:
+                                    Without the ^ the newlines will be lost as
+                                    bibconvert will remove them, so you'll
+                                    never see an effect from this function.
                                   
     
     bibconvert character TYPES
@@ -1129,6 +1143,24 @@ def FormatField(value, fn):
                 
         out = string.join(out2," ")
         
+    elif fn == "JOINMULTILINES":
+        ## Take a string, split it on newlines, and join them together, with
+        ## a prefix and suffix for each segment. If prefix and suffix are
+        ## empty strings, make suffix a single space.
+        prefix = par[0]
+        suffix = par[1]
+        if prefix == "" and suffix == "":
+            ## Values should at least be separated by something;
+            ## make suffix a space:
+            suffix = " "
+        new_value = ""
+        vals_list = value.split("\n")
+        for item in vals_list:
+            new_value += "%s%s%s" % (prefix, item, suffix)
+
+        new_value.rstrip(" ")
+        ## Update "out" with the newly created value:
+        out = new_value
 
     elif (fn == "SPLIT"):
         par = set_par_defaults(par, "%d,0,,1" % conv_setting[1])
@@ -1858,6 +1890,7 @@ def create_record(begin_record_header,
         to_output = []
         rows      = 1  
         for field_tpl_item_STRING in T_tpl_item_LIST[1]:
+            save_field_newlines = 0
             DATA = []
             if (field_tpl_item_STRING[:2]=="<:"):
                 field_tpl_item_STRING = field_tpl_item_STRING[2:-2]
@@ -1870,13 +1903,22 @@ def create_record(begin_record_header,
                     if (field[-1] == "*"):
                         repetitive = 1
                         field = field[:-1]
+                    elif field[-1] == "^":
+                        ## Keep the newlines in a field's value:
+                        repetitive = 0
+                        save_field_newlines = 1
+                        field = field[:-1]
                     else:
                         repetitive = 0
                     if dirmode:
                         DATA    = select_line(field, data_parsed)
                     else:
                         DATA    = select_line(field, data_parsed)
-                    if (repetitive == 0):
+
+                    if save_field_newlines == 1:
+                        ## put newlines back into the element value:
+                        DATA = [string.join(DATA, "\n")]
+                    elif (repetitive == 0):
                         DATA = [string.join(DATA, " ")]
                     SRC_TPL = select_line(field, source_tpl_parsed)
                     try:
