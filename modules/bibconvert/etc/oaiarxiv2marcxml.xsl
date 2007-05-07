@@ -96,6 +96,7 @@
       </xsl:if>
 </xsl:template>
 
+
 <!-- FUNCTION   output-65017b-subfields -->
 <xsl:template name="output-65017b-subfields">
       <xsl:param name="list" />
@@ -131,6 +132,52 @@
         <xsl:value-of select="$text"/>
       </xsl:otherwise>
     </xsl:choose>
+ </xsl:template>
+
+
+ <!-- FUNCTION  matchPR773p -->
+ <xsl:template name="matchPR773p">
+    <xsl:param name="detectPR"/>
+    <xsl:param name="commentsf"/>
+    <xsl:choose>
+      <xsl:when test="contains(normalize-space($detectPR), '@')">
+        <xsl:variable name="after" select="substring-after( normalize-space($detectPR), '@') "/>
+        <xsl:variable name="todetect" select="substring-before( normalize-space($detectPR), '@') "/>
+        <xsl:call-template name="matchPR773pSUB">
+          <xsl:with-param name="todetect" select="$todetect"/>
+	  <xsl:with-param name="commentsf" select="$commentsf"/>
+        </xsl:call-template>
+        <xsl:call-template name="matchPR773p">
+          <xsl:with-param name="detectPR" select="$after"/>
+          <xsl:with-param name="commentsf" select="$commentsf"/> 
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+ </xsl:template>
+
+<!--
+      <xsl:otherwise>
+        <xsl:variable name="todetect" select="substring-before( normalize-space($detectPR), '@') "/>
+        <xsl:call-template name="matchPR773pSUB">
+	  <xsl:with-param name="commentsf" select="$commentsf"/>
+          <xsl:with-param name="todetect" select="$todetect"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+ </xsl:template>
+
+-->
+
+
+ <!-- FUNCTION  matchPR773pSUB called by mathPR773p  -->
+ <xsl:template name="matchPR773pSUB">
+    <xsl:param name="todetect"/>
+    <xsl:param name="commentsf"/>
+    <xsl:if test="contains($commentsf, $todetect)">
+       <datafield tag="773" ind1=" " ind2=" ">
+          <subfield code="p"><xsl:value-of select="normalize-space(substring-after($commentsf, $todetect))"/></subfield>
+       </datafield>
+    </xsl:if>
  </xsl:template>
 
 
@@ -289,6 +336,8 @@
   <xsl:variable name="abstractlow">
     <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:abstract,$ucletters,$lcletters)"/>
   </xsl:variable>
+ 
+  <xsl:variable name="detectPR">accepted@appear@press@publ@review@submitted"></xsl:variable>
 
   <!-- *** END GLOBAL RECIRD VARS *** -->
 
@@ -481,6 +530,14 @@
              </xsl:if>
              </xsl:if>
 
+
+             <!-- Filling 773$$p  - publication detection in comments field -->
+             <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
+	       <xsl:variable name="commentsf">
+	         <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
+	       </xsl:variable>
+             <xsl:call-template name="matchPR773p"><xsl:with-param name="detectPR" select="$detectPR"/><xsl:with-param name="commentsf" select="$commentsf"/></xsl:call-template>
+             </xsl:if>
 
 
            <!-- MARC FIELD 245$$a  -->
