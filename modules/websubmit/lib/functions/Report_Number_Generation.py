@@ -29,7 +29,7 @@ import time
 from invenio.config import counters
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Report_Number_Generation(parameters,curdir,form):
+def Report_Number_Generation(parameters, curdir, form):
     """Description:   function Report_Number_Generation
                       This function creates a reference for the submitted 
                       document and saves it in the specified file.
@@ -61,7 +61,7 @@ def Report_Number_Generation(parameters,curdir,form):
                    yeargen: if "AUTO", current year, else the year is
                               extracted from the file [yeargen]
     """
-    global doctype,access,act,dir,rn
+    global doctype, access, act, dir, rn
     # The program must automatically generate the report number    
     # Generate Year
     if parameters['autorngen'] == "Y":
@@ -71,15 +71,15 @@ def Report_Number_Generation(parameters,curdir,form):
         else :
             # If yeargen != auto then the contents of the file named 'yeargen' is used
             # Assumes file uses DD-MM-YYYY format
-            fp = open("%s/%s" % (curdir,parameters['yeargen']),"r")
+            fp = open("%s/%s" % (curdir, parameters['yeargen']), "r")
             mydate = fp.read()
             fp.close()
-            yy = re.sub("^......","",mydate)
+            yy = re.sub("^......", "", mydate)
         # Evaluate category - Category is read from the file named 'rnin
         if os.path.isfile("%s/%s" % (curdir,parameters['rnin'])):
-            fp = open("%s/%s" % (curdir,parameters['rnin']),"r")
+            fp = open("%s/%s" % (curdir,parameters['rnin']), "r")
             category = fp.read()
-            category =  category.replace("\n","")
+            category =  category.replace("\n", "")
         else:
             category = ""
 
@@ -123,77 +123,121 @@ def Report_Number_Generation(parameters,curdir,form):
         counter_path = re.sub('<PA>(?P<content>[^<]*)</PA>', 
                               get_pa_tag_content, 
                               parameters['counterpath'])
-        counter_path = counter_path.replace(" ","")
-        counter_path = counter_path.replace("\n","")
+        counter_path = counter_path.replace(" ", "")
+        counter_path = counter_path.replace("\n", "")
                 
         rn_format = re.sub('<PA>(?P<content>[^<]*)</PA>', 
                            get_pa_tag_content, 
                            parameters['rnformat'])
         # Check if the report number does not already exists
         if os.path.exists("%s/%s" % (curdir, parameters['edsrn'])):
-            fp = open("%s/%s" % (curdir,parameters['edsrn']),"r")
+            fp = open("%s/%s" % (curdir, parameters['edsrn']), "r")
             oldrn = fp.read()
             fp.close()
-            if oldrn != "" and not re.search("\?\?\?",oldrn):
+            if oldrn != "" and not re.search("\?\?\?", oldrn):
                 rn = oldrn
                 return ""
         # create it
         rn = Create_Reference(counter_path, rn_format)
-        rn = rn.replace("\n","")
-        rn = rn.replace("\r","")
-        rn = rn.replace("\015","")
-        rn = rn.replace("\013","")
-        rn = rn.replace("\012","")
+        rn = rn.replace("\n", "")
+        rn = rn.replace("\r", "")
+        rn = rn.replace("\015", "")
+        rn = rn.replace("\013", "")
+        rn = rn.replace("\012", "")
         
         # The file edsrn is created in the submission directory, and it stores the report number
-        fp = open("%s/%s" % (curdir,parameters['edsrn']),"w")
+        fp = open("%s/%s" % (curdir, parameters['edsrn']), "w")
         fp.write(rn)
         fp.close()
     # The report number is just read from a specified file
     elif parameters['autorngen'] == "N":
-        fp = open("%s/%s" % (curdir,parameters['edsrn']),"r")
+        fp = open("%s/%s" % (curdir, parameters['edsrn']), "r")
         rn = fp.read()
         fp.close()
     # Some documents are really annoying and insist on a totally different way of doing things
     # This code is for documents which have the access number in the report
     # number (instead of using a counter) 
     elif parameters['autorngen'] == "A":
-        rn = parameters['rnformat'].replace ("<PA>access</PA>",access)
+        rn = parameters['rnformat'].replace("<PA>access</PA>", access)
     # The file accessno/edsrn is created, and it stores the report number
-    fp = open("%s/%s" % (curdir,parameters['edsrn']),"w")
+    fp = open("%s/%s" % (curdir, parameters['edsrn']), "w")
     fp.write(rn)
     fp.close()
     return ""
     
 
    
-def Create_Reference(counter_path,ref_format):
-    # test if the counters directory exists, if not attempts to create it
+def Create_Reference(counter_path, ref_format):
+    """From the counter-file for this document submission, get the next
+       reference number and create the reference.
+    """
+    ## Does the WebSubmit counters directory exist? Create it if not.
+    ## (~cds-invenio/var/data/submit/counters)
     if not os.path.exists(counters):
-        try: 
+        ## Counters dit doesn't exist. Create:
+        try:
             os.mkdir(counters)
         except:
-            raise InvenioWebSubmitFunctionError("File System: Cannot create counters directory %s" % counters)
-    if not os.path.exists("%s/%s" % (counters,counter_path)):
+            ## Unable to create the counters Dir.
+            msg = "File System: Cannot create counters directory %s" % counters
+            raise InvenioWebSubmitFunctionError(msg)
+
+    ## Now, take the "counter_path", and split it into the head (the path
+    ## to the counter file) and tail (the name of the counter file itself).
+    (head_cpath, tail_cpath) = os.path.split(counter_path)
+    if head_cpath.strip() != "":
+        ## There is a "head" for counter-path. If these directories
+        ## don't exist, make them:
+        if not os.path.exists("%s/%s" % (counters, head_cpath)):
+            try:
+                os.makedirs(os.path.normpath("%s/%s" % (counters, head_cpath)))
+            except OSError:
+                msg = "File System: no permission to create counters " \
+                      "directory [%s/%s]" % (counters, head_cpath)
+                raise InvenioWebSubmitFunctionError(msg)
+
+    ## Now, if the counter-file itself doesn't exist, create it:
+    if not os.path.exists("%s/%s" % (counters, counter_path)):
         try:
-            fp = open("%s/%s" % (counters,counter_path),"w")
+            fp = open("%s/%s" % (counters, counter_path),"w")
         except:
-            raise InvenioWebSubmitFunctionError("File System: no permission to write in counters directory %s" % counters)
-        fp.write ("0")
+            msg = "File System: no permission to write in counters " \
+                  "directory %s" % counters
+            raise InvenioWebSubmitFunctionError(msg)
+        else:
+            fp.write("0")
+            fp.close()
+    ## retrieve current counter value
+    try:
+        fp = open("%s/%s" % (counters, counter_path), "r")
+    except IOError:
+        ## Unable to open the counter file for reading:
+        msg = "File System: Unable to read from counter-file [%s/%s]." \
+              % (counters, counter_path)
+        raise InvenioWebSubmitFunctionError(msg)
+    else:
+        id = fp.read()
         fp.close()
-    # retrieve current counter value
-    fp = open("%s/%s" % (counters,counter_path),"r")
-    id = fp.read()
-    fp.close()
+
     if id == "":
-        id=0
-    # increment the counter
-    id = int(id)+1
-    # store new value
-    fp = open("%s/%s" % (counters,counter_path),"w")
-    fp.write (str(id))
-    fp.close()
-    # create final value
+        ## The counter file seems to have been empty. Set the value to 0:
+        id = 0
+
+    ## increment the counter by 1:
+    id = int(id) + 1
+
+    ## store the new value in the counter file:
+    try:
+        fp = open("%s/%s" % (counters, counter_path), "w")
+    except IOError:
+        ## Unable to open the counter file for writing:
+        msg = "File System: Unable to write to counter-file [%s/%s]. " \
+              % (counters, counter_path)
+        raise InvenioWebSubmitFunctionError(msg)
+    else:
+        fp.write(str(id))
+        fp.close()
+    ## create final value
     reference = "%s-%03d" % (ref_format,id)
-    # Return the report number prelude with the id concatenated on at the end
+    ## Return the report number prelude with the id concatenated on at the end
     return reference
