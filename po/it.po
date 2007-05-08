@@ -3624,7 +3624,7 @@ msgstr "cestini"
 
 #: modules/websession/lib/websession_templates.py:985
 msgid "account"
-msgstr "conto"
+msgstr "account"
 
 #: modules/websession/lib/websession_templates.py:987
 msgid "messages"
