@@ -86,7 +86,7 @@
       <xsl:if test="not($first='')">
          <datafield tag="650" ind1="1" ind2="7">
            <subfield code="a"><xsl:value-of select="$first" /></subfield>
-           <subfield code="2">SzGeCERN</subfield>
+           <subfield code="2">arXiv</subfield>
          </datafield>
       </xsl:if>
       <xsl:if test="$remaining">
@@ -106,7 +106,7 @@
       <xsl:if test="not($first='')">
          <datafield tag="650" ind1="2" ind2="7">
            <subfield code="a"><xsl:value-of select="$first" /></subfield>
-           <subfield code="2">SzGeCERN</subfield>
+           <subfield code="2">arXiv</subfield>
          </datafield>
       </xsl:if>
       <xsl:if test="$remaining">
