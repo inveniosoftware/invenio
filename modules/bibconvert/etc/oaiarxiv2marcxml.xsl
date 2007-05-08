@@ -90,27 +90,27 @@
          </datafield>
       </xsl:if>
       <xsl:if test="$remaining">
-          <xsl:call-template name="output-65017b-subfields">
+          <xsl:call-template name="output-65027a-subfields">
               <xsl:with-param name="list" select="$remaining" />
           </xsl:call-template>
       </xsl:if>
 </xsl:template>
 
 
-<!-- FUNCTION   output-65017b-subfields -->
-<xsl:template name="output-65017b-subfields">
+<!-- FUNCTION   output-65027a-subfields -->
+<xsl:template name="output-65027a-subfields">
       <xsl:param name="list" />
       <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
       <xsl:variable name="first" select="substring-before($newlist, ' ')" />
       <xsl:variable name="remaining" select="substring-after($newlist, ' ')" />
       <xsl:if test="not($first='')">
-         <datafield tag="650" ind1="1" ind2="7">
-           <subfield code="b"><xsl:value-of select="$first" /></subfield>
+         <datafield tag="650" ind1="2" ind2="7">
+           <subfield code="a"><xsl:value-of select="$first" /></subfield>
            <subfield code="2">SzGeCERN</subfield>
          </datafield>
       </xsl:if>
       <xsl:if test="$remaining">
-          <xsl:call-template name="output-65017b-subfields">
+          <xsl:call-template name="output-65027a-subfields">
               <xsl:with-param name="list" select="$remaining" />
           </xsl:call-template>
       </xsl:if>
@@ -353,9 +353,9 @@
       <xsl:call-template name="print-sets" />
     </xsl:variable>
 
-    <xsl:if test=" contains($allsets,'solv-int') or contains($allsets,'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'patt-sol') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'nlin') or contains($allsets,'neuro-sci') or contains($allsets,'neuro-dev') or contains($allsets,'neuro-cel') or contains($allsets,'mtrl-th') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'lc-om') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'funct-an') or contains($allsets,'dg-ga') or contains($allsets,'cs') or contains($allsets,'cond-mat') or contains($allsets,'comp-gas') or contains($allsets,'cmp-lg') or contains($allsets,'chem-ph') or contains($allsets,'chao-dyn') or contains($allsets,'cd-hg') or contains($allsets,'bayes-an') or contains($allsets,'auto-fms') or contains($allsets,'atom-ph') or contains($allsets,'astro-ph') or contains($allsets,'ao-sci') or contains($allsets,'alg-geom') or contains($allsets,'adap-org') or contains($allsets,'acc-phys')  ">
+   <!--  <xsl:if test=" contains($allsets,'solv-int') or contains($allsets,'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'patt-sol') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'nlin') or contains($allsets,'neuro-sci') or contains($allsets,'neuro-dev') or contains($allsets,'neuro-cel') or contains($allsets,'mtrl-th') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'lc-om') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'funct-an') or contains($allsets,'dg-ga') or contains($allsets,'cs') or contains($allsets,'cond-mat') or contains($allsets,'comp-gas') or contains($allsets,'cmp-lg') or contains($allsets,'chem-ph') or contains($allsets,'chao-dyn') or contains($allsets,'cd-hg') or contains($allsets,'bayes-an') or contains($allsets,'auto-fms') or contains($allsets,'atom-ph') or contains($allsets,'astro-ph') or contains($allsets,'ao-sci') or contains($allsets,'alg-geom') or contains($allsets,'adap-org') or contains($allsets,'acc-phys')  "> -->
 
-
+     <xsl:if test=" contains($allsets, 'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'cs') or contains($allsets,'astro-ph') or contains($allsets,'acc-phys')  ">
 
     <xsl:choose>
        <!-- HANDLING DELETED RECORDS -->
