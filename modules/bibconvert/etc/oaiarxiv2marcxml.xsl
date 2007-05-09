@@ -155,28 +155,18 @@
     </xsl:choose>
  </xsl:template>
 
-<!--
-      <xsl:otherwise>
-        <xsl:variable name="todetect" select="substring-before( normalize-space($detectPR), '@') "/>
-        <xsl:call-template name="matchPR773pSUB">
-	  <xsl:with-param name="commentsf" select="$commentsf"/>
-          <xsl:with-param name="todetect" select="$todetect"/>
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
- </xsl:template>
-
--->
-
 
  <!-- FUNCTION  matchPR773pSUB called by mathPR773p  -->
  <xsl:template name="matchPR773pSUB">
     <xsl:param name="todetect"/>
     <xsl:param name="commentsf"/>
     <xsl:if test="contains($commentsf, $todetect)">
+    <xsl:variable name="disp773t" select="normalize-space(substring-after($commentsf, $todetect))"/>
+       <xsl:if test="string-length($disp773t)>0">
        <datafield tag="773" ind1=" " ind2=" ">
           <subfield code="p"><xsl:value-of select="normalize-space(substring-after($commentsf, $todetect))"/></subfield>
        </datafield>
+       </xsl:if>
     </xsl:if>
  </xsl:template>
 
@@ -531,15 +521,6 @@
              </xsl:if>
 
 
-             <!-- Filling 773$$p  - publication detection in comments field -->
-             <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
-	       <xsl:variable name="commentsf">
-	         <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
-	       </xsl:variable>
-             <xsl:call-template name="matchPR773p"><xsl:with-param name="detectPR" select="$detectPR"/><xsl:with-param name="commentsf" select="$commentsf"/></xsl:call-template>
-             </xsl:if>
-
-
            <!-- MARC FIELD 245$$a  -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:title">
              <datafield tag="245" ind1=" " ind2=" ">
@@ -618,7 +599,16 @@
            </xsl:if>
 
 
-           <!-- MARC FIELD 773 -->
+             <!-- MARC FIELD 773$$p  - publication detection in comments field -->
+             <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
+	       <xsl:variable name="commentsf">
+	         <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
+	       </xsl:variable>
+             <xsl:call-template name="matchPR773p"><xsl:with-param name="detectPR" select="$detectPR"/><xsl:with-param name="commentsf" select="$commentsf"/></xsl:call-template>
+             </xsl:if>
+
+
+           <!-- MARC FIELD 773 - using journal-ref field -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
 
              <!-- typically something like: A)  Phys. Rev. B 58, 10648 (1998)
@@ -665,15 +655,26 @@
 
 
                <datafield tag="773" ind1=" " ind2=" ">
-                  <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
-                  <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
-                  <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
-                  <subfield code="c"><xsl:value-of select="$jref-pages-base"/></subfield>
+		  <xsl:if test="string-length($jref-title2)>0">
+                    <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-volume)>0">
+                    <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-year)>0">
+                    <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-pages-base)>0">
+                    <subfield code="c"><xsl:value-of select="$jref-pages-base"/></subfield>
+		  </xsl:if>
                </datafield>
 
+
+	       <xsl:if test="string-length($jref-year)>0">
                <datafield tag="260" ind1=" " ind2=" ">
                    <subfield code="c"><xsl:value-of select="$jref-year"/></subfield>
-                </datafield>
+               </datafield>
+	       </xsl:if>
 
 
              </xsl:when>
@@ -724,15 +725,25 @@
                </xsl:variable>
 
                <datafield tag="773" ind1=" " ind2=" ">
-                  <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
-                  <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
-                  <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
-                  <subfield code="c"><xsl:value-of select="$jref-pages"/></subfield>
+		  <xsl:if test="string-length($jref-title2)>0">
+                    <subfield code="p"><xsl:value-of select="normalize-space($jref-title2)"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-volume)>0">
+                    <subfield code="v"><xsl:value-of select="$jref-volume"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-year)>0">
+                     <subfield code="y"><xsl:value-of select="$jref-year"/></subfield>
+		  </xsl:if>
+		  <xsl:if test="string-length($jref-pages)>0">
+                    <subfield code="c"><xsl:value-of select="$jref-pages"/></subfield>
+		  </xsl:if>
                </datafield>
 
+	       <xsl:if test="string-length($jref-year)>0">
                <datafield tag="260" ind1=" " ind2=" ">
                    <subfield code="c"><xsl:value-of select="$jref-year"/></subfield>
-                </datafield>
+               </datafield>
+	       </xsl:if>
 
              </xsl:otherwise>
            </xsl:choose>
