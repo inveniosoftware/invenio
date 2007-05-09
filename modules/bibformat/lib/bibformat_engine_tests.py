@@ -33,6 +33,7 @@ import sys
 from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio import bibformat_config
+from invenio import bibformatadminlib
 from invenio import bibrecord
 from invenio.config import tmpdir
 
@@ -243,6 +244,14 @@ class FormatElementTest(unittest.TestCase):
         self.assert_("TEST_3" not in elements.keys())
         self.assert_("TEST_4" not in elements.keys())
 
+    def test_get_tags_used_by_element(self):
+        """bibformat - identification of tag usage inside element"""
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = bibformat_config.CFG_BIBFORMAT_ELEMENTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = bibformat_config.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+        tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
+        self.failUnless(len(tags) == 4,
+                        'Could not correctly identify tags used in bfe_abstract.py')
+            
 class OutputFormatTest(unittest.TestCase):
     """ bibformat - tests on output formats"""
 

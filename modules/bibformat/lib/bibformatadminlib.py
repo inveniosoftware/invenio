@@ -1090,7 +1090,13 @@ def get_outputs_that_use_template(filename):
 def get_elements_used_by_template(filename):
     """
     Returns a list of format elements that are called by the given format template.
-    The returned elements also give their dependencies on tags
+    The returned elements also give their dependencies on tags.
+
+    Dependencies on tag might be approximative. See get_tags_used_by_element()
+    doc string.
+
+    We must handle usage of bfe_field in a special way if we want to retrieve
+    used tag: used tag is given in "tag" parameter, not inside element code.
 
     The list is returned sorted by name
 
@@ -1111,14 +1117,33 @@ def get_elements_used_by_template(filename):
     format_elements_iter = bibformat_engine.pattern_tag.finditer(code)
     for result in format_elements_iter:
         function_name = result.group("function_name").lower()
-        if function_name is not None and not format_elements.has_key(function_name):
+        if function_name is not None and not format_elements.has_key(function_name) \
+               and not function_name == "field":
             filename = bibformat_engine.resolve_format_element_filename("BFE_"+function_name)
             if filename is not None:
                 tags = get_tags_used_by_element(filename)
                 format_elements[function_name] = {'name':function_name.lower(),
                                                   'filename':filename,
                                                   'tags':tags}
-
+        elif function_name == "field":
+            # Handle bfe_field element in a special way
+            if not format_elements.has_key(function_name):
+                #Indicate usage of bfe_field if not already done
+                filename = bibformat_engine.resolve_format_element_filename("BFE_"+function_name)
+                format_elements[function_name] = {'name':function_name.lower(),
+                                                  'filename':filename,
+                                                  'tags':[]}
+            # Retrieve value of parameter "tag"
+            all_params = result.group('params')
+            function_params_iterator = bibformat_engine.pattern_function_params.finditer(all_params)
+            for param_match in function_params_iterator:
+                name = param_match.group('param')
+                if name == "tag":
+                    value = param_match.group('value')
+                    if not value in format_elements[function_name]['tags']:
+                        format_elements[function_name]['tags'].append(value)
+                    break
+            
     keys = format_elements.keys()
     keys.sort()
     return map(format_elements.get, keys)
@@ -1134,8 +1159,8 @@ def get_tags_used_by_element(filename):
     APPROXIMATIVE RESULTS: the tag are retrieved in field(), fields()
     and control_field() function. If they are used computed, or saved
     in a variable somewhere else, they are not retrieved
-    @TODO: There is room for improvements. For example catch call
-    to BibRecord functions, or use of <BFE_FIELD tag=""/>
+    @TODO: There is room for improvements. For example catch
+    call to BibRecord functions.
 
     Returns tags sorted by value
     
@@ -1161,6 +1186,7 @@ def get_tags_used_by_element(filename):
     [\'"]+                                #Single or double quote
     (?P<tag>.+?)                          #Tag
     [\'"]+\s*                             #Single or double quote
+    (,[^\)]+)*                            #Additional function param
     \)                                    #Closing parenthesis
      ''', re.VERBOSE | re.MULTILINE)
     
