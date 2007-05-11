@@ -1,6 +1,15 @@
 #include "config.wml"
 #include "configbis.wml"
 
+INSERT INTO accROLE VALUES (4,'thesisviewer','thesis viewer',NULL,'allow group "Thesis viewer"');
+INSERT INTO accARGUMENT VALUES (2,'collection','Theses');
+INSERT INTO accROLE_accACTION_accARGUMENT VALUES (4,22,2,1);
+INSERT INTO user_accROLE VALUES (1,4);
+INSERT INTO user VALUES (2,'jekyll@cern.ch','j123ekyll',NULL,NULL,'jekyll',NOW());
+INSERT INTO user VALUES (3,'hyde@cern.ch','h123yde',NULL,NULL,'hyde',NOW());
+INSERT INTO usergroup VALUES (1,'Thesis viewer','Thesis viewer internal group','VI','INTERNAL');
+INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
+
 INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL,NULL);
 INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL,NULL);
 INSERT INTO collection VALUES (4,'Theses','collection:THESIS',NULL,NULL,'theses');
@@ -25,7 +34,7 @@ INSERT INTO collectionname VALUES (2,'es','ln','Preprints');
 INSERT INTO collectionname VALUES (2,'ca','ln','Preprints');
 INSERT INTO collectionname VALUES (2,'pl','ln','Preprinty');
 INSERT INTO collectionname VALUES (2,'pt','ln','Preprints');
-INSERT INTO collectionname VALUES (2,'it','ln','Preprints');
+INSERT INTO collectionname VALUES (2,'it','ln','Preprint');
 INSERT INTO collectionname VALUES (2,'ru','ln','Препринты');
 INSERT INTO collectionname VALUES (2,'sk','ln','Preprinty');
 INSERT INTO collectionname VALUES (2,'cs','ln','Preprinty');
@@ -277,7 +286,7 @@ INSERT INTO collectionname VALUES (15,'es','ln','Articulos y preprints');
 INSERT INTO collectionname VALUES (15,'ca','ln','Articles i preprints');
 INSERT INTO collectionname VALUES (15,'pl','ln','Artykuły i Preprinty');
 INSERT INTO collectionname VALUES (15,'pt','ln','Artigos e Preprints');
-INSERT INTO collectionname VALUES (15,'it','ln','Articoli e Preprints');
+INSERT INTO collectionname VALUES (15,'it','ln','Articoli e Preprint');
 INSERT INTO collectionname VALUES (15,'ru','ln','Статьи и Препринты');
 INSERT INTO collectionname VALUES (15,'sk','ln','Články a Preprinty');
 INSERT INTO collectionname VALUES (15,'cs','ln','Články a Preprinty');
