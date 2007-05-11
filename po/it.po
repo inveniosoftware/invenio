@@ -40,7 +40,7 @@ msgstr "Questo sito è disponibile anche nelle lingue seguenti:"
 #: modules/webstyle/lib/webstyle_templates.py:362
 #: modules/webstyle/lib/webstyle_templates.py:438
 msgid "Search"
-msgstr "Ricercare"
+msgstr "Cerca"
 
 #: config/cdspage.wml:61 config/cdspage.wml:142
 #: modules/webstyle/lib/webstyle_templates.py:365
@@ -133,13 +133,13 @@ msgstr "Converti"
 #: modules/websubmit/lib/websubmit_engine.py:1014
 #: modules/websubmit/lib/websubmit_engine.py:1240
 msgid "Submit"
-msgstr "Sottomettere"
+msgstr "Sottometti"
 
 #: config/cdspage.wml:62 config/cdspage.wml:143
 #: modules/webstyle/lib/webstyle_templates.py:364
 #: modules/webstyle/lib/webstyle_templates.py:440
 msgid "Personalize"
-msgstr "Personalizzazione"
+msgstr "Personalizza"
 
 #: modules/webhelp/web/index.html.wml:22 modules/webhelp/web/index.html.wml:28
 #: modules/webhelp/web/index.html.wml:29 modules/webhelp/web/index.html.wml:30
@@ -2743,7 +2743,7 @@ msgstr "Il record è stato cancellato."
 #: modules/websearch/lib/websearch_templates.py:1516
 #: modules/websearch/lib/websearch_templates.py:1546
 msgid "Browse"
-msgstr "Sfogliare"
+msgstr "Sfoglia"
 
 #: modules/websearch/lib/search_engine.py:3308
 msgid "No match within your time limits, discarding this condition..."
@@ -3003,7 +3003,7 @@ msgstr "Spiacente, la collezione %s non sembra esister."
 #: modules/websearch/lib/websearch_webinterface.py:404
 #, python-format
 msgid "You may want to start browsing from %s."
-msgstr "Potresti iniziare a sfogliare a partire da %s."
+msgstr "Potresti iniziare a sfogliare cominciando con %s."
 
 #: modules/websearch/lib/websearch_templates.py:2546
 msgid "Interested in being notified about new results for this query?"
@@ -3615,7 +3615,7 @@ msgstr "sessione"
 #: modules/websession/lib/websession_templates.py:970
 #: modules/websession/lib/websession_templates.py:986
 msgid "alerts"
-msgstr "allerta"
+msgstr "avvisi"
 
 #: modules/websession/lib/websession_templates.py:971
 #: modules/websession/lib/websession_templates.py:988
