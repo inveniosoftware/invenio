@@ -1276,19 +1276,24 @@ def FormatField(value, fn):
         par1  = ""
 
         data = select_line(par[0], data_parsed)
-        
-        for line in data:
-            if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
-                par1 = par[1][NRE:-NRE]
-            else:
-                par1 = par[1]
 
-            if (par1 == ""):
-                if (line == ""):
+        if len(data) == 0 and par[1] == "":
+            ## The "found" condition is that the field was empty
+            found = 1
+        else:
+            ## Seeking a value in the field - conduct the search:
+            for line in data:
+                if (par[1][0:NRE] == regexp and par[1][-NRE:] == regexp):
+                    par1 = par[1][NRE:-NRE]
+                else:
+                    par1 = par[1]
+
+                if (par1 == ""):
+                    if (line == ""):
+                        found = 1
+
+                elif (len(re.split(par1,line)) > 1 ):
                     found = 1
-
-            elif (len(re.split(par1,line)) > 1 ):
-                found = 1
 
         if ((found == 1) and (string.atoi(par[2]) == 1)):
             out = value
