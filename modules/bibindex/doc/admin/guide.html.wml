@@ -41,7 +41,7 @@
      web admin interface.  If you are interested in seeing some
      specific things implemented with high priority, please contact us
      at <SUPPORTEMAIL>.  Thanks for your interest!
-     
+
    </td>
    </tr>
    </tbody>
@@ -83,7 +83,7 @@ included in the index must be selected.
 
 <p>When desired to fill the index based on the fields selected, you can
 schedule the update by running <b>bibindex -w indexname</b> together
-with other desired parameters. 
+with other desired parameters.
 
 <a name="3.2"></a><h3>3.2 Configure Word-Breaking Procedure</h3>
 
@@ -105,32 +105,23 @@ smaller by removing much used words.
 <p>Which stopword list that should be used can be configured in the
 general config file file by changing the value of the variable
 CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE. If no stopword list should be
-used, the value should be 0. 
+used, the value should be 0.
 
 <a name="3.4"></a><h3>3.4 Configure stemming</h3>
 
 <p>The BibIndex indexer supports stemming, removing the ending of
-words thus creating a smaller indexer. For example, using english, the
-word "information" will be stemmed to "inform", "looking", "looks",
-"looked" will be stemmed to "look", thus giving more hits to each
+words thus creating a smaller indexer. For example, using English, the
+word "information" will be stemmed to "inform"; or "looking", "looks",
+and "looked" will be all stemmed to "look", thus giving more hits to each
 word.
 
-<p>Currently only one stemmer is supported, so the stemmer to use
-should be selected based on the most used language. All searches will
-also be stemmed based on the same language. For documents in other
+<p>Currently only the English stemmer is supported.  All searches will
+also be stemmed based on this same language. For documents in other
 languages, there will be no difference if stemmer is used or not.
 
-<p>The Stemmer currently supported, supports the following languages:
-French, English, Norwegian, Swedish, German, Italian and Portugese.
-
-<p>If another than the default stemmer should be used, the file
-<b>bibindex_engine_stemmer.py</b> must be changed to support the
-desired stemmers interface.
-
-<p>To change the default language to use for the stemmer, change the
-variable <b>CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE</b> in the general
-config file.  To disable use of stemmer, set the value to empty
-string.
+<p>To set up the stemmer, change the variable
+<b>CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE</b> in the general config
+file.  To disable use of stemmer, set the value to empty string.
 
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
 
@@ -238,8 +229,8 @@ The steps to perform are:
     /opt/cds-invenio/bin/dbexec # rewind the last ranking time
   $ bibindex -f50000 -wcollection # reindex the collection index (fast)
   $ webcoll -f # recreate the collection cache
-  $ bibsched # run the two above-submitted tasks  
-  $ sudo apachectl restart 
+  $ bibsched # run the two above-submitted tasks
+  $ sudo apachectl restart
   $ bibindex -f50000 # reindex other indexes (slow)
   $ bibrank -f50000
   $ webcoll -f
