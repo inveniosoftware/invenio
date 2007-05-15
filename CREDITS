@@ -83,4 +83,8 @@ additional capabilities to the edition of BibFormat templates through
 the web admin interface.  
 <http://www.alexking.org>
 
+The indexer engine uses the Martin Porter Stemming Algorithm and its
+Vivake Gupta free Python implementation.
+<http://tartarus.org/~martin/PorterStemmer/>
+
 - end of file -
