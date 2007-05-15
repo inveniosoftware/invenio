@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -45,12 +45,12 @@ def wait_for_user(msg):
     except EOFError:
         print " (continuing in batch mode)"
         return
-    
+
 ## 1) check Python version:
 if sys.version < cfg_min_python_version:
     print """
     *******************************************************
-    ** ERROR: OLD PYTHON DETECTED: %s 
+    ** ERROR: OLD PYTHON DETECTED: %s
     *******************************************************
     ** You seem to be using an old version of Python.    **
     ** You must use at least Python %s.                 **
@@ -119,26 +119,6 @@ except ImportError, e:
     *****************************************************
     """ % e
 
-    wait_for_user("Press ENTER to continue the installation...")
-
-try:
-    import Stemmer
-except ImportError, e:
-    print """
-    *****************************************************
-    ** IMPORT WARNING %s
-    *****************************************************
-    ** Note that PyStemmer is not really required but  **
-    ** we recommend it to enable the stemming feature  **
-    ** in the indexing engine and to bump up the speed **
-    ** and accuracy of word-frequency based rankings.  **
-    **                                                 **
-    ** You can safely continue installing CDS Invenio  **
-    ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
-    ** into production.)                               **
-    *****************************************************
-    """ % e
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
