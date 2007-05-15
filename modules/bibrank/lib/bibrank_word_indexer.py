@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -55,7 +55,7 @@ from invenio.bibindex_engine_config import CONV_PROGRAMS, CONV_PROGRAMS_HELPERS
 options = {} # global variable to hold task options
 
 ## safety parameters concerning DB thread-multiplication problem:
-CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem? 
+CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem?
 CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we consider as still safe
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping for more than X seconds
 
@@ -66,9 +66,9 @@ class MyFancyURLopener(urllib.FancyURLopener):
         return ("mysuperuser", "mysuperpass")
     def http_error_401(self, url, fp, errcode, errmsg, headers):
         # do not bother with protected pages
-        raise IOError, (999, 'unauthorized access')  
+        raise IOError, (999, 'unauthorized access')
         return None
-    
+
 #urllib._urlopener = MyFancyURLopener()
 
 ## precompile some often-used regexp for speed reasons:
@@ -105,7 +105,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
        state for more than THREAD_TIMEOUT seconds.  (This is useful
        for working around the the max_connection problem that appears
        during indexation in some not-yet-understood cases.)  If some
-       threads are to be killed, write info into the log file.      
+       threads are to be killed, write info into the log file.
     """
     res = run_sql("SHOW FULL PROCESSLIST")
     if len(res) > max_threads:
@@ -113,7 +113,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
             r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
-                if options["verbose"] >= 1:                
+                if options["verbose"] >= 1:
                     write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
@@ -126,12 +126,12 @@ def get_words_from_phrase(phrase, weight, lang="",
                           chars_alphanumericseparators=r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
                           split=string.split):
     "Returns list of words from phrase 'phrase'."
-    words = {} 
-    phrase = strip_accents(phrase) 
-    phrase = lower(phrase) 
+    words = {}
+    phrase = strip_accents(phrase)
+    phrase = lower(phrase)
     #Getting rid of strange characters
-    phrase = re.sub("&eacute;", 'e', phrase) 
-    phrase = re.sub("&egrave;", 'e', phrase) 
+    phrase = re.sub("&eacute;", 'e', phrase)
+    phrase = re.sub("&egrave;", 'e', phrase)
     phrase = re.sub("&agrave;", 'a', phrase)
     phrase = re.sub("&nbsp;", ' ', phrase)
     phrase = re.sub("&laquo;", ' ', phrase)
@@ -146,16 +146,16 @@ def get_words_from_phrase(phrase, weight, lang="",
     phrase = re.sub(chars_punctuation, ' ', phrase)
 
     #By doing this like below, characters standing alone, like c a b is not added to the inedx, but when they are together with characters like c++ or c$ they are added.
-    for word in split(phrase):    
+    for word in split(phrase):
         if options["remove_stopword"] == "True" and not is_stopword(word, 1) and check_term(word, 0):
             if lang and lang !="none" and options["use_stemming"]:
                 word = stem(word, lang)
             if not words.has_key(word):
                 words[word] = (0,0)
             words[word] = (words[word][0] + weight, 0)
-        elif options["remove_stopword"] == "True" and not is_stopword(word, 1):  
-            phrase = re.sub(chars_alphanumericseparators, ' ', word) 
-            for word_ in split(phrase):   
+        elif options["remove_stopword"] == "True" and not is_stopword(word, 1):
+            phrase = re.sub(chars_alphanumericseparators, ' ', word)
+            for word_ in split(phrase):
                 if lang and lang !="none" and options["use_stemming"]:
                     word_ = stem(word_, lang)
                 if word_:
@@ -169,7 +169,7 @@ def split_ranges(parse_string):
     ranges = string.split(parse_string, ",")
     for range in ranges:
         tmp_recIDs = string.split(range, "-")
-        
+
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
         else:
@@ -208,7 +208,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     else:
         date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)        
+        date = time.strftime(format_string, date)
     return date
 
 def create_range_list(res):
@@ -228,7 +228,7 @@ def create_range_list(res):
         else:
             range_list.append([id,id])
     return range_list
-        
+
 def beautify_range_list(range_list):
     """Returns a non overlapping, maximal range list"""
     ret_list = []
@@ -243,7 +243,7 @@ def beautify_range_list(range_list):
 
         if not found:
             ret_list.append(new)
-                
+
     return ret_list
 
 def serialize_via_numeric_array_dumps(arr):
@@ -308,7 +308,7 @@ class WordTable:
             write_message('...updating %d words into %sR started' % \
                 (len(self.value), self.tablename[:-1]))
         task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
-            
+
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
         if mode == "normal":
@@ -333,7 +333,7 @@ class WordTable:
         if options["verbose"] >= 9:
             write_message('...updating %d words into %s ended' % \
                 (nb_words_total, self.tablename))
-                
+
         #if options["verbose"]:
         #    write_message('...updating reverse table %sR started' % self.tablename[:-1])
         if mode == "normal":
@@ -386,7 +386,7 @@ class WordTable:
             return deserialize_via_marshal(res[0][0])
         else:
             return None
-    
+
     def merge_with_old_recIDs(self,word,recIDs, set):
         """Merge the system numbers stored in memory (hash of recIDs with value[0] > 0 or -1
         according to whether to add/delete them) with those stored in the database index
@@ -431,16 +431,16 @@ class WordTable:
             if options["verbose"] >= 9:
                 write_message("......... inserting hitlist for ``%s''" % word)
 	    set = self.value[word]
-	    if len(set) > 0:   
+	    if len(set) > 0:
                 #new word, add to list
                 options["modified_words"][word] = 1
-	        run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))       
+	        run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
- 
+
         del self.value[word]
-            
+
     def display(self):
         "Displays the word table."
         keys = self.value.keys()
@@ -486,7 +486,7 @@ class WordTable:
         if starting_time is None:
             return None
         if options["verbose"] >= 9:
-            write_message("updating last_updated to %s...", starting_time)            
+            write_message("updating last_updated to %s...", starting_time)
         return run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s",
                        (starting_time, rank_method_code,))
 
@@ -502,7 +502,7 @@ class WordTable:
 
         for range in recIDs:
             records_to_go = records_to_go + range[1] - range[0] + 1
-            
+
         time_started = time.time() # will measure profile time
         for range in recIDs:
             i_low = range[0]
@@ -515,7 +515,7 @@ class WordTable:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:        
+                    if options["verbose"] >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
                     task_sig_stop_commands()
@@ -573,7 +573,7 @@ class WordTable:
         if dates[1]:
             query += "and b.modification_date <= '%s'" % dates[1]
         query += "ORDER BY b.id ASC"""
-        res = run_sql(query)        
+        res = run_sql(query)
 
         list = create_range_list(res)
         if not list:
@@ -583,7 +583,7 @@ class WordTable:
             self.add_recIDs(list)
         return list
 
-        
+
     def add_recID_range(self, recID1, recID2):
         empty_list_string = serialize_via_marshal([])
         wlist = {}
@@ -591,7 +591,7 @@ class WordTable:
 
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
-        
+
         for (tag, weight, lang) in self.fields_to_index:
 	    if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[ tag ]
@@ -600,12 +600,12 @@ class WordTable:
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
                     WHERE bb.id_bibrec BETWEEN %d AND %d
-                    AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)    
+                    AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)
             res = run_sql(query)
 	    nb_total_to_read = len(res)
-            verbose_idx = 0     # for verbose pretty printing       
+            verbose_idx = 0     # for verbose pretty printing
             for row in res:
-		recID, phrase = row 
+		recID, phrase = row
                 if options["validset"].contains(recID):
                     if not wlist.has_key(recID): wlist[recID] = {}
                     new_words = get_words_function(phrase, weight, lang) # ,self.separators
@@ -662,14 +662,14 @@ class WordTable:
             run_sql(query)
         except DatabaseError:
             pass
-        
+
         put = self.put
         for recID in recIDs:
             for (w, count) in wlist[recID].iteritems():
                 put(recID, w, count)
-        
+
         return len(recIDs)
-                
+
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.
         start: start time,
@@ -684,14 +684,14 @@ class WordTable:
         if options["verbose"]:
             write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
                 % (done, time_elapsed, time_recs_per_min))
-        
+
         if time_recs_per_min:
             if options["verbose"]:
                 write_message("Estimated runtime: %.1f minutes" % \
                     ((todo-done)/time_recs_per_min))
 
     def put(self, recID, word, sign):
-        "Adds/deletes a word to the word list."        
+        "Adds/deletes a word to the word list."
         try:
             word = lower(word[:50])
             if self.value.has_key(word):
@@ -714,7 +714,7 @@ class WordTable:
             self.del_recID_range(range[0],range[1])
             count = count + range[1] - range[0]
         self.put_into_db()
-        
+
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
@@ -724,7 +724,7 @@ class WordTable:
         self.recIDs_in_mem.append([low,high])
         query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
         BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
-        recID_rows = run_sql(query)        
+        recID_rows = run_sql(query)
         for recID_row in recID_rows:
             recID = recID_row[0]
             wlist = deserialize_via_marshal(recID_row[1])
@@ -772,7 +772,7 @@ class WordTable:
         else:
             if options["verbose"]:
                 write_message("%s is in consistent state" % (self.tablename))
-        
+
         return nb_bad_records
 
     def repair(self):
@@ -782,9 +782,9 @@ class WordTable:
         res = run_sql(query, None, 1)
         if res:
             nb_bad_records = res[0][0]
-        else: 
+        else:
             nb_bad_records = 0
-      
+
         # find number of records:
         query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR""" % (self.tablename[:-1])
         res = run_sql(query)
@@ -819,7 +819,7 @@ class WordTable:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:        
+                    if options["verbose"] >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
                     task_sig_stop_commands()
@@ -925,7 +925,7 @@ class WordTable:
                 of the %s - %sR tables. Deleting affected records is
                 recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
-                       
+
 def word_index(row, run):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
@@ -947,8 +947,8 @@ def word_index(row, run):
         print "Warning: Psyco", e
         pass
 
-    global options, wordTables, languages 
-      
+    global options, wordTables, languages
+
     # read from SQL row:
     task_id = row[0]
     task_proc = row[1]
@@ -1033,21 +1033,21 @@ def word_index(row, run):
             update_rnkWORD(options["table"], options["modified_words"])
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
-            if options["verbose"] >= 9:        
+            if options["verbose"] >= 9:
                 traceback.print_tb(sys.exc_info()[2])
             sys.exit(1)
         wordTable.report_on_table_consistency()
     # We are done. State it in the database, close and quit
 
     return 1
-       
+
 def get_tags(config):
     """Get the tags that should be used creating the index and each tag's parameter"""
     tags = []
     function = config.get("rank_method","function")
     i = 1
     shown_error = 0
-  
+
     #try:
     if 1:
         while config.has_option(function,"tag%s"% i):
@@ -1055,14 +1055,14 @@ def get_tags(config):
             tag = string.split(tag, ",")
             tag[1] = int(string.strip(tag[1]))
             tag[2] = string.strip(tag[2])
-  
+
             #check if stemmer for language is available
             if config.get(function,"stemming") and stem("information", "en") != "inform":
                 if shown_error == 0:
-                    write_message("Warning: PyStemmer not found. Please read INSTALL.")
+                    write_message("Warning: Stemming not working. Please check it out!")
                     shown_error = 1
-            elif tag[2] and tag[2] != "none" and config.get(function,"stemming") and not is_stemmer_available_for_language(tag[2]): 
-                write_message("Warning: Language '%s' not available in PyStemmer." % tag[2])
+            elif tag[2] and tag[2] != "none" and config.get(function,"stemming") and not is_stemmer_available_for_language(tag[2]):
+                write_message("Warning: Stemming not available for language '%s'." % tag[2])
             tags.append(tag)
             i += 1
     #except Exception:
@@ -1084,7 +1084,7 @@ def get_valid_range(rank_method_code):
     #    recIDs = perform_request_search(c=l_of_colls)
     #else:
     #    recIDs = []
-    
+
     valid = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
     #valid.addlist(recIDs)
     return valid
@@ -1120,11 +1120,11 @@ def check_term(term, termlength):
 
 def check_rnkWORD(table):
     """Checks for any problems in rnkWORD tables."""
-    i = 0 
+    i = 0
     errors = {}
     termslist = run_sql("SELECT term FROM %s" % table)
     N = run_sql("select max(id_bibrec) from %sR" % table[:-1])[0][0]
-    write_message("Checking integrity of rank values in %s" % table) 
+    write_message("Checking integrity of rank values in %s" % table)
     terms = map(lambda x: x[0], termslist)
 
     while i < len(terms):
@@ -1132,13 +1132,13 @@ def check_rnkWORD(table):
         for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
             current_terms += "'%s'," % terms[j]
         terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table, current_terms[:-1]))
-        for (t, hitlist) in terms_docs: 
+        for (t, hitlist) in terms_docs:
             term_docs = deserialize_via_marshal(hitlist)
             if (term_docs.has_key("Gi") and term_docs["Gi"][1] == 0) or not term_docs.has_key("Gi"):
                 write_message("ERROR: Missing value for term: %s (%s) in %s: %s" % (t, repr(t), table, len(term_docs)))
                 errors[t] = 1
         i += 5000
-    write_message("Checking integrity of rank values in %sR" % table[:-1]) 
+    write_message("Checking integrity of rank values in %sR" % table[:-1])
     i = 0
     while i < N:
         docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec>=%s and id_bibrec<=%s" % (table[:-1], i, i+5000))
@@ -1167,7 +1167,7 @@ def rank_method_code_statistics(table):
     Gi = {}
 
     write_message("Showing statistics of terms in index:")
-    write_message("Important: For the 'Least used terms', the number of terms is shown first, and the number of occurences second.") 
+    write_message("Important: For the 'Least used terms', the number of terms is shown first, and the number of occurences second.")
     write_message("Least used terms---Most important terms---Least important terms")
     i = 0
     while i < maxID:
@@ -1187,29 +1187,29 @@ def rank_method_code_statistics(table):
 
 def update_rnkWORD(table, terms):
     """Updates rnkWORDF and rnkWORDR with Gi and Nj values. For each term in rnkWORDF, a Gi value for the term is added. And for each term in each document, the Nj value for that document is added. In rnkWORDR, the Gi value for each term in each document is added. For description on how things are computed, look in the hacking docs.
-    table - name of forward index to update 
+    table - name of forward index to update
     terms - modified terms"""
 
     stime = time.time()
     Gi = {}
     Nj = {}
     N = run_sql("select count(id_bibrec) from %sR" % table[:-1])[0][0]
-     
+
     if len(terms) == 0 and options["quick"] == "yes":
         write_message("No terms to process, ending...")
         return ""
-    elif options["quick"] == "yes": #not used -R option, fast calculation (not accurate)       
+    elif options["quick"] == "yes": #not used -R option, fast calculation (not accurate)
         write_message("Beginning post-processing of %s terms" % len(terms))
-       
-        #Locating all documents related to the modified/new/deleted terms, if fast update, 
+
+        #Locating all documents related to the modified/new/deleted terms, if fast update,
         #only take into account new/modified occurences
-        write_message("Phase 1: Finding records containing modified terms")      
+        write_message("Phase 1: Finding records containing modified terms")
         terms = terms.keys()
-        i = 0 
+        i = 0
 
         while i < len(terms):
             terms_docs = get_from_forward_index(terms, i, (i+5000), table)
-            for (t, hitlist) in terms_docs: 
+            for (t, hitlist) in terms_docs:
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     del term_docs["Gi"]
@@ -1219,16 +1219,16 @@ def update_rnkWORD(table, terms):
             write_message("Phase 1: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
         write_message("Phase 1: Finished finding records containing modified terms")
-    
+
         #Find all terms in the records found in last phase
         write_message("Phase 2: Finding all terms in affected records")
-        records = Nj.keys()   
+        records = Nj.keys()
         i = 0
         while i < len(records):
             docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
             for (j, termlist) in docs_terms:
                 doc_terms = deserialize_via_marshal(termlist)
-                for (t, tf) in doc_terms.iteritems(): 
+                for (t, tf) in doc_terms.iteritems():
                     Gi[t] = 0
             write_message("Phase 2: ......processed %s/%s records " % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
     	    i += 5000
@@ -1238,7 +1238,7 @@ def update_rnkWORD(table, terms):
         max_id = run_sql("SELECT MAX(id) FROM %s" % table)
         max_id = max_id[0][0]
         write_message("Beginning recalculation of %s terms" % max_id)
-        
+
         terms = []
         i = 0
         while i < max_id:
@@ -1255,7 +1255,7 @@ def update_rnkWORD(table, terms):
 
         write_message("Phase 1: Finished finding which records contains which terms")
         write_message("Phase 2: Jumping over..already done in phase 1 because of -R option")
- 
+
     terms = Gi.keys()
     Gi = {}
     i = 0
@@ -1274,7 +1274,7 @@ def update_rnkWORD(table, terms):
                     Fi += tf[0]
                 for (j, tf) in term_docs.iteritems():
                     if tf[0] != Fi:
-                        Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N) 
+                        Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N)
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
         write_message("Phase 3: Finished calculating importance of all affected terms")
@@ -1296,7 +1296,7 @@ def update_rnkWORD(table, terms):
                         Fi += tf[0]
                     for (j, tf) in term_docs.iteritems():
                         if tf[0] != Fi:
-                            Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N) 
+                            Gi[t] = Gi[t] + ((float(tf[0]) / Fi) * math.log(float(tf[0]) / Fi) / math.log(2)) / math.log(N)
             write_message("Phase 3: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
         write_message("Phase 3: Finished getting approximate importance of all affected terms")
@@ -1308,7 +1308,7 @@ def update_rnkWORD(table, terms):
         #Calculating the normalization value for each document, and adding the Gi value to each term in each document.
         docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
         for (j, termlist) in docs_terms:
-            doc_terms = deserialize_via_marshal(termlist)           
+            doc_terms = deserialize_via_marshal(termlist)
             for (t, tf) in doc_terms.iteritems():
                 if Gi.has_key(t):
                     Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
@@ -1316,13 +1316,13 @@ def update_rnkWORD(table, terms):
                     if Git >= 0:
                         Git += 1
                     doc_terms[t] = (tf[0], Git)
-                else:  
+                else:
                     Nj[j] = Nj.get(j, 0) + math.pow(tf[1] * (1 + math.log(tf[0])), 2)
             Nj[j] = 1.0 / math.sqrt(Nj[j])
             Nj[j] = int(Nj[j] * 100)
             if Nj[j] >= 0:
                 Nj[j] += 1
-            run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], serialize_via_marshal(doc_terms), j))  
+            run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], serialize_via_marshal(doc_terms), j))
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
 	i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
@@ -1332,7 +1332,7 @@ def update_rnkWORD(table, terms):
     while i < len(terms):
         #Adding the Gi value to each term, and adding the normalization value to each term in each document.
         terms_docs = get_from_forward_index(terms, i, (i+5000), table)
-        for (t, hitlist) in terms_docs: 
+        for (t, hitlist) in terms_docs:
             term_docs = deserialize_via_marshal(hitlist)
             if term_docs.has_key("Gi"):
                 del term_docs["Gi"]
@@ -1348,8 +1348,8 @@ def update_rnkWORD(table, terms):
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)
     write_message("Time used for post-processing: %.1fmin" % ((time.time() - stime) / 60))
-    write_message("Finished post-processing") 
-    
+    write_message("Finished post-processing")
+
 
 def get_from_forward_index(terms, start, stop, table):
     current_terms = ""
@@ -1359,7 +1359,7 @@ def get_from_forward_index(terms, start, stop, table):
     return terms_docs
 
 def get_from_forward_index_with_id(start, stop, table):
-    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE id between %s and %s" % (table, start, stop)) 
+    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE id between %s and %s" % (table, start, stop))
     return terms_docs
 
 def get_from_reverse_index(records, start, stop, table):
@@ -1409,13 +1409,13 @@ def task_sig_stop(sig, frame):
 
 def task_sig_stop_commands():
     """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.    
+    Useful for task_sig_stop() handler.
     """
-    write_message("stopping commands started")    
+    write_message("stopping commands started")
     for table in wordTables:
-        table.put_into_db()    
-    write_message("stopping commands ended")    
-    
+        table.put_into_db()
+    write_message("stopping commands ended")
+
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
@@ -1429,7 +1429,7 @@ def task_sig_suicide(sig, frame):
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
@@ -1443,7 +1443,7 @@ def task_update_status(val):
     global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 def getName(methname, ln=cdslang, type='ln'):
     """Returns the name of the rank method, either in default language or given language.
