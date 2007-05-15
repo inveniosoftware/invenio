@@ -76,8 +76,6 @@ Contents
              <http://sourceforge.net/projects/mysql-python>                
           - (mandatory) Numeric module (v21 and above):
              <http://sourceforge.net/projects/numpy>
-          - (recommended) PyStemmer, for indexing and ranking: 
-             <http://sourceforge.net/projects/pystemmer/>
           - (recommended) PyXML, for XML processing:
              <http://pyxml.sourceforge.net/topics/download.html>
           - (recommended) PyRXP, for very fast XML MARC processing: 
