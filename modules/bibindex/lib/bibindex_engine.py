@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -103,7 +103,7 @@ options = {} # will hold task options
 def intersection(dict1, dict2):
     "Returns intersection of the two dictionaries."
     int_dict = {}
-    if len(dict1) > len(dict2): 
+    if len(dict1) > len(dict2):
         for e in dict2:
             if dict1.has_key(e):
                 int_dict[e] = 1
@@ -146,7 +146,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
        state for more than THREAD_TIMEOUT seconds.  (This is useful
        for working around the the max_connection problem that appears
        during indexation in some not-yet-understood cases.)  If some
-       threads are to be killed, write info into the log file.      
+       threads are to be killed, write info into the log file.
     """
     res = run_sql("SHOW FULL PROCESSLIST")
     if len(res) > max_threads:
@@ -154,7 +154,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
             r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
-                if options["verbose"] >= 1:                
+                if options["verbose"] >= 1:
                     write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
@@ -190,16 +190,16 @@ def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
             (bibXXx, bibrec_bibXXx, recID, tag[:-1])
     res = run_sql(query)
     field_number = -1
-    for row in res:        
+    for row in res:
         if row[1] == tag and row[2] == value:
             field_number = row[0]
     if field_number > 0:
-        for row in res:        
+        for row in res:
             if row[0] == field_number and row[1] == tag[:-1] + associated_subfield_code:
                 out = row[2]
                 break
     return out
-    
+
 def get_field_tags(field):
     """Returns a list of MARC tags for the field code 'field'.
        Returns empty list in case of error.
@@ -224,7 +224,7 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
     out = []
     for ext in CONV_PROGRAMS.keys():
         expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
-                           ext + r")\"") 
+                           ext + r")\"")
         match =  expr.search(htmlpagebody)
         if match:
             out.append([ext,match.group(1)])
@@ -232,7 +232,7 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
             expr_getfile = sre.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
             if match:
-                out.append([ext,match.group(1)])            
+                out.append([ext,match.group(1)])
     return out
 
 def get_words_from_fulltext(url_direct_or_indirect,
@@ -249,7 +249,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
        presents the links to be indexed.  In the latter case the
        URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
        to fulltext documents, for all knows file extensions as
-       specified by global CONV_PROGRAMS config variable.   
+       specified by global CONV_PROGRAMS config variable.
     """
 
     if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY and string.find(url_direct_or_indirect, weburl) < 0:
@@ -288,7 +288,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         if options["verbose"] >= 2:
             write_message(".... processing %s from %s started" % (ext,url_direct))
-        
+
         # sanity check:
         if not url_direct:
             break;
@@ -299,7 +299,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         except:
             sys.stderr.write("Error: Cannot read %s.\n" % url_direct)
             break # try other fulltext files...
-        
+
         tmp_fd, tmp_name = tempfile.mkstemp('invenio.tmp')
         data_chunk = url.read(8*1024)
         while data_chunk:
@@ -318,8 +318,8 @@ def get_words_from_fulltext(url_direct_or_indirect,
                     cmd = "%s -enc UTF-8 %s %s.txt" % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "pstotext":
                     if ext == "ps.gz":
-                        # is there gzip available?                        
-                        if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]): 
+                        # is there gzip available?
+                        if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
                             cmd = "%s -cd %s | %s > %s.txt" \
                                   % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_name)
                     else:
@@ -327,7 +327,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                               % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "ps2ascii":
                     if ext == "ps.gz":
-                         # is there gzip available?                        
+                         # is there gzip available?
                         if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
                             cmd = "%s -cd %s | %s > %s.txt"\
                                   % (CONV_PROGRAMS_HELPERS["gz"], tmp_name,
@@ -343,7 +343,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                     cmd = "%s %s %s.txt" % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "ppthtml":
                     # is there html2text available?
-                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]): 
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
                         cmd = "%s %s | %s > %s.txt"\
                               % (conv_program, tmp_name,
                                  CONV_PROGRAMS_HELPERS["html"], tmp_name)
@@ -352,7 +352,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                               % (conv_program, tmp_name, tmp_name)
                 elif os.path.basename(conv_program) == "xlhtml":
                     # is there html2text available?
-                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]): 
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
                         cmd = "%s %s | %s > %s.txt" % \
                               (conv_program, tmp_name,
                                CONV_PROGRAMS_HELPERS["html"], tmp_name)
@@ -391,15 +391,15 @@ def get_words_from_fulltext(url_direct_or_indirect,
             os.unlink(tmp_name)
             os.unlink(tmp_name + ".txt")
         except StandardError:
-            write_message("Error: Could not delete file. It didn't exist", sys.stderr) 
+            write_message("Error: Could not delete file. It didn't exist", sys.stderr)
 
         if options["verbose"] >= 2:
             write_message(".... processing %s from %s ended" % (ext,url_direct))
-        
+
 
     if options["verbose"] >= 2:
         write_message("... reading fulltext files from %s ended" % url_direct_or_indirect)
-        
+
     return words.keys()
 
 # tagToFunctions mapping. It offers an indirection level necesary for
@@ -423,17 +423,17 @@ def get_words_from_phrase(phrase, split=string.split):
         if block:
             block = apply_stemming_and_stopwords_and_length_check(block)
             if block:
-                words[block] = 1    
+                words[block] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in sre_punctuation.split(block):
                 subblock = apply_stemming_and_stopwords_and_length_check(subblock)
                 if subblock:
                     words[subblock] = 1
-                    # 4th break each subblock into alphanumeric groups and add groups:                    
+                    # 4th break each subblock into alphanumeric groups and add groups:
                     for alphanumeric_group in sre_separators.split(subblock):
                         alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
                         if alphanumeric_group:
-                            words[alphanumeric_group] = 1 
+                            words[alphanumeric_group] = 1
     return words.keys()
 
 def apply_stemming_and_stopwords_and_length_check(word):
@@ -443,8 +443,8 @@ def apply_stemming_and_stopwords_and_length_check(word):
     # stem word, when configured so:
     if CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE != "":
         word = stem(word, CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE)
-    # now check against stopwords: 
-    if is_stopword(word): 
+    # now check against stopwords:
+    if is_stopword(word):
         return ""
     # finally check the word length:
     if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
@@ -460,7 +460,7 @@ def get_index_id(indexname):
        Returns empty string in case there is no words table for this index.
        Example: field='author', output=4."""
     out = 0
-    query = """SELECT w.id FROM idxINDEX AS w 
+    query = """SELECT w.id FROM idxINDEX AS w
                 WHERE w.name='%s' LIMIT 1""" % indexname
     res = run_sql(query, None, 1)
     if res:
@@ -491,13 +491,13 @@ def get_all_indexes():
     for row in res:
         out.append(row[0])
     return out
-        
+
 def usage(code, msg=''):
     "Prints usage for this module."
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     print >> sys.stderr, \
-    """ Usage: %s [options] 
+    """ Usage: %s [options]
      Examples:
        %s -a -i 234-250,293,300-500 -u admin@localhost
        %s -a -w author,fulltext -M 8192 -v3
@@ -518,7 +518,7 @@ def usage(code, msg=''):
  -w,  --windex=w1[,w2]     word/phrase indexes to consider (all)
  -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
  -f,  --flush=NNN          full consistent table flush after NNN records (10000)
-      
+
  Scheduling options:
  -u,  --user=USER          user name to store task, password needed
  -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
@@ -546,13 +546,13 @@ def authenticate(user, header="BibIndex Task Submission", action="runbibindex"):
         print >> sys.stdout, "\rUsername: ",
         user = string.strip(string.lower(sys.stdin.readline()))
     else:
-        print >> sys.stdout, "\rUsername:", user        
+        print >> sys.stdout, "\rUsername:", user
     ## first check user pw:
     res = run_sql("select id,password from user where email=%s", (user,), 1) + \
           run_sql("select id,password from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
-        sys.exit(1)        
+        sys.exit(1)
     else:
         (uid_db, password_db) = res[0]
         if password_db:
@@ -568,13 +568,13 @@ def authenticate(user, header="BibIndex Task Submission", action="runbibindex"):
             print auth_message
             sys.exit(1)
     return user
-        
+
 def split_ranges(parse_string):
     recIDs = []
     ranges = string.split(parse_string, ",")
     for arange in ranges:
         tmp_recIDs = string.split(arange, "-")
-        
+
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
         else:
@@ -594,7 +594,7 @@ def get_word_tables(tables):
             if index_id:
                 wordTables.append({"idxWORD%02dF" % index_id: \
                                    get_index_tags(index)})
-            else:                
+            else:
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
@@ -650,7 +650,7 @@ def create_range_list(res):
         else:
             range_list.append([row_id,row_id])
     return range_list
-        
+
 def beautify_range_list(range_list):
     """Returns a non overlapping, maximal range list"""
     ret_list = []
@@ -665,7 +665,7 @@ def beautify_range_list(range_list):
 
         if not found:
             ret_list.append(new)
-                
+
     return ret_list
 
 def serialize_via_numeric_array(arr):
@@ -724,7 +724,7 @@ class WordTable:
             write_message('...updating %d words into %s started' % \
                 (len(self.value), self.tablename))
         task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
-            
+
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
         if mode == "normal":
@@ -749,7 +749,7 @@ class WordTable:
         if options["verbose"] >= 9:
             write_message('...updating %d words into %s ended' % \
                 (nb_words_total, self.tablename))
-                
+
         if options["verbose"]:
             write_message('...updating reverse table %sR started' % self.tablename[:-1])
         if mode == "normal":
@@ -801,7 +801,7 @@ class WordTable:
             return deserialize_via_numeric_array(res[0][0])
         else:
             return None
-    
+
     def merge_with_old_recIDs(self,word,set):
         """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
         according to whether to add/delete them) with those stored in the database index
@@ -837,7 +837,7 @@ class WordTable:
                     write_message("......... updating hitlist for ``%s''" % word)
                 run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
                         (serialize_via_numeric_array(set), word))
-                
+
         else: # the word is new, will create new set:
             set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
             Numeric.put(set, self.value[word].keys(), 1)
@@ -849,9 +849,9 @@ class WordTable:
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
- 
+
         del self.value[word]
-            
+
     def display(self):
         "Displays the word table."
         keys = self.value.keys()
@@ -897,7 +897,7 @@ class WordTable:
         if starting_time is None:
             return None
         if options["verbose"] >= 9:
-            write_message("updating last_updated to %s...", starting_time)            
+            write_message("updating last_updated to %s...", starting_time)
         return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
                        (starting_time, self.tablename[-3:-1],))
 
@@ -913,7 +913,7 @@ class WordTable:
 
         for arange in recIDs:
             records_to_go = records_to_go + arange[1] - arange[0] + 1
-            
+
         time_started = time.time() # will measure profile time
         for arange in recIDs:
             i_low = arange[0]
@@ -926,7 +926,7 @@ class WordTable:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:        
+                    if options["verbose"] >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
                     task_sig_stop_commands()
@@ -988,7 +988,7 @@ class WordTable:
                           (dates[1],))
         else:
             res = run_sql("""SELECT b.id FROM bibrec AS b
-                              WHERE b.modification_date >= %s AND 
+                              WHERE b.modification_date >= %s AND
                                     b.modification_date <= %s ORDER BY b.id ASC""",
                           (dates[0], dates[1]))
         alist = create_range_list(res)
@@ -997,7 +997,7 @@ class WordTable:
                 write_message( "No new records added. %s is up to date" % self.tablename)
         else:
             self.add_recIDs(alist)
-        
+
     def add_recID_range(self, recID1, recID2):
         empty_list_string = serialize_via_marshal([])
         wlist = {}
@@ -1012,7 +1012,7 @@ class WordTable:
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
                     WHERE bb.id_bibrec BETWEEN %d AND %d
-                    AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)    
+                    AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)
             res = run_sql(query)
             for row in res:
                 recID,phrase = row
@@ -1027,7 +1027,7 @@ class WordTable:
                     # FIXME: this is a quick fix only.  We should
                     # rather download all 856 $$u files and analyze
                     # content in order to decide how to index them
-                    # (directly for Indico, indirectly for Setlink).                    
+                    # (directly for Indico, indirectly for Setlink).
                     filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
                     filename_extension = string.lower(string.split(filename, ".")[-1])
                     if filename_extension in CONV_PROGRAMS.keys():
@@ -1053,7 +1053,7 @@ class WordTable:
         # Using cStringIO for speed.
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
-        
+
         qwrite( "INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
         qwrite( "('" )
         qwrite( str(recIDs[0]) )
@@ -1071,10 +1071,10 @@ class WordTable:
         query = query_factory.getvalue()
         query_factory.close()
         run_sql(query)
-        
+
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
-        
+
         qwrite("INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
         qwrite("('")
         qwrite(str(recIDs[0]))
@@ -1091,7 +1091,7 @@ class WordTable:
 
         query = query_factory.getvalue()
         query_factory.close()
-        
+
         try:
             run_sql(query)
         except DatabaseError:
@@ -1102,9 +1102,9 @@ class WordTable:
         for recID in recIDs:
             for w in wlist[recID]:
                 put(recID, w, 1)
-                
+
         return len(recIDs)
-                
+
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.
         start: start time,
@@ -1119,14 +1119,14 @@ class WordTable:
         if options["verbose"]:
             write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
                 % (done, time_elapsed, time_recs_per_min))
-        
+
         if time_recs_per_min:
             if options["verbose"]:
                 write_message("Estimated runtime: %.1f minutes" % \
                     ((todo-done)/time_recs_per_min))
 
     def put(self, recID, word, sign):
-        "Adds/deletes a word to the word list."        
+        "Adds/deletes a word to the word list."
         try:
             word = string.lower(word[:50])
             if self.value.has_key(word):
@@ -1147,7 +1147,7 @@ class WordTable:
             self.del_recID_range(arange[0],arange[1])
             count = count + arange[1] - arange[0]
         self.put_into_db()
-        
+
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
@@ -1157,7 +1157,7 @@ class WordTable:
         self.recIDs_in_mem.append([low,high])
         query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
         BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
-        recID_rows = run_sql(query)        
+        recID_rows = run_sql(query)
         for recID_row in recID_rows:
             recID = recID_row[0]
             wlist = deserialize_via_marshal(recID_row[1])
@@ -1205,7 +1205,7 @@ class WordTable:
         else:
             if options["verbose"]:
                 write_message("%s is in consistent state" % (self.tablename))
-        
+
         return nb_bad_records
 
     def repair(self):
@@ -1215,9 +1215,9 @@ class WordTable:
         res = run_sql(query, None, 1)
         if res:
             nb_bad_records = res[0][0]
-        else: 
+        else:
             nb_bad_records = 0
-            
+
         if nb_bad_records == 0:
             return
 
@@ -1246,7 +1246,7 @@ class WordTable:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:        
+                    if options["verbose"] >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
                     task_sig_stop_commands()
@@ -1286,7 +1286,7 @@ class WordTable:
         write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibindex --repair' is recommended.""" \
             % (self.tablename, self.tablename[:-1]))
         raise StandardError
-        
+
     def fix_recID_range(self, low, high):
         """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
 
@@ -1315,7 +1315,7 @@ class WordTable:
             if not 'TEMPORARY' in state[recID]:
                 if 'FUTURE' in state[recID]:
                     if 'CURRENT' not in state[recID]:
-                        write_message("EMERGENCY: Record %d is in inconsistent state. Can't repair it" % recID)
+                        write_message("EMERGENCY: Record %d is in inconsistent state. Can't repair it." % recID)
                         ok = 0
                     else:
                         write_message("EMERGENCY: Inconsistency in record %d detected" % recID)
@@ -1351,16 +1351,16 @@ class WordTable:
 
         if not ok:
             write_message("""EMERGENCY: Unrepairable errors found. You should check consistency
-                of the %s - %sR tables. Deleting affected records is
-                recommended.""" % (self.tablename, self.tablename[:-1]))
+                of the %s - %sR tables. Deleting affected entries from these tables
+                is recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
-                                    
+
 def task_run(row):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-    
+
     global options, wordTables, stemmer, stopwords
 
     # read from SQL row:
@@ -1423,7 +1423,7 @@ def task_run(row):
                     wordTable.add_recIDs_by_date(options["modified"])
                     # only update last_updated if run via automatic mode:
                     wordTable.update_last_updated(task_starting_time)
-                
+
             elif options["cmd"] == "repair":
                 wordTable.repair()
             else:
@@ -1433,12 +1433,12 @@ def task_run(row):
 
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
-            if options["verbose"] >= 9:        
+            if options["verbose"] >= 9:
                 traceback.print_tb(sys.exc_info()[2])
             task_update_status("ERROR")
             task_sig_stop_commands()
             sys.exit(1)
-            
+
         wordTable.report_on_table_consistency()
 
     # We are done. State it in the database, close and quit
@@ -1446,7 +1446,7 @@ def task_run(row):
     if options["verbose"]:
         write_message("Task #%d finished." % task_id)
     return 1
-        
+
 def command_line():
     global options
     long_flags =["add","del","id=","modified=","collection=", "windex=",
@@ -1464,11 +1464,11 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-        
-    options={"cmd":"add", "id":[], "modified":[], "collection":[], "maxmem":0, 
+
+    options={"cmd":"add", "id":[], "modified":[], "collection":[], "maxmem":0,
                "flush":10000, "sleeptime":0, "verbose":1 }
     sched_time = time.strftime(format_string)
-    
+
     user = ""
     # Check for key options
 
@@ -1489,12 +1489,12 @@ def command_line():
                 options["cmd"] = "check"
             elif opt == ("-r","") or opt == ("--repair",""):
                 options["cmd"] = "repair"
-            elif opt == ("-d","") or opt == ("--del",""):            
+            elif opt == ("-d","") or opt == ("--del",""):
                 options["cmd"]="del"
             elif opt[0] in [ "-i", "--id" ]:
                 options["id"] = options["id"] + split_ranges(opt[1])
             elif opt[0] in [ "-m", "--modified" ]:
-                options["modified"] = get_date_range(opt[1]) 
+                options["modified"] = get_date_range(opt[1])
             elif opt[0] in [ "-c", "--collection" ]:
                 options["collection"] = opt[1]
             elif opt[0] in [ "-w", "--windex" ]:
@@ -1523,7 +1523,7 @@ def command_line():
         for table in options["windex"]:
             wordTable = WordTable(table.keys()[0], table.values()[0])
             wordTable.report_on_table_consistency()
-        return 
+        return
 
     user = authenticate(user)
 
@@ -1539,7 +1539,7 @@ def command_line():
                              VALUES ('bibindex',%s,%s,%s,%s,'WAITING')""",
                       (user, sched_time, sleeptime, marshal.dumps(options)))
 
-    ## update task number: 
+    ## update task number:
     options["task"] = new_task_id
     run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), new_task_id))
 
@@ -1580,13 +1580,13 @@ def task_sig_stop(sig, frame):
 
 def task_sig_stop_commands():
     """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.    
+    Useful for task_sig_stop() handler.
     """
-    write_message("stopping commands started")    
+    write_message("stopping commands started")
     for table in wordTables:
-        table.put_into_db()    
-    write_message("stopping commands ended")    
-    
+        table.put_into_db()
+    write_message("stopping commands ended")
+
 def task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     if options["verbose"] >= 9:
@@ -1600,7 +1600,7 @@ def task_sig_suicide(sig, frame):
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
@@ -1614,7 +1614,7 @@ def task_update_status(val):
     global options
     if options["verbose"] >= 9:
         write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))    
+    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
 
 def test_fulltext_indexing():
     """Tests fulltext indexing programs on PDF, PS, DOC, PPT,
@@ -1655,9 +1655,9 @@ def main():
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except StandardError, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            if options["verbose"] >= 9:        
+            if options["verbose"] >= 9:
                 traceback.print_tb(sys.exc_info()[2])
             write_message("Exiting.")
-            task_update_status("ERROR")                                               
+            task_update_status("ERROR")
     else:
         command_line()
