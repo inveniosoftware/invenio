@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -28,25 +28,34 @@ import unittest
 from invenio import bibindex_engine_stemmer
 
 class TestStemmer(unittest.TestCase):
-    """Test stemming, if available."""
+    """Test stemmer."""
 
     def test_stemmer_none(self):
         """bibindex engine - no stemmer"""
         self.assertEqual("information",
                          bibindex_engine_stemmer.stem("information", None))
+
     def test_stemmer_english(self):
         """bibindex engine - English stemmer"""
-        try:
-            import Stemmer
-            self.assertEqual("inform",
-                             Stemmer.Stemmer('english').stem("information"))
-            self.assertEqual("inform",
-                             bibindex_engine_stemmer.stem("information", "en"))
-        except ImportError:
-            # we don't have Stemmer available:
-            self.assertEqual("information",
-                             bibindex_engine_stemmer.stem("information", "en"))
-            self.fail("WARNING: cannot import Stemmer module; test not run.")
+        english_test_cases = [['information', 'inform'],
+                              ['experiment', 'experi'],
+                              ['experiments', 'experi'],
+                              ['experimented', 'experi'],
+                              ['experimenting', 'experi'],
+                              ['experimental', 'experiment'],
+                              ['experimentally', 'experiment'],
+                              ['experimentation', 'experiment'],
+                              ['experimentalism', 'experiment'],
+                              ['experimenter', 'experiment'],
+                              ['experimentalise', 'experimentalis'],
+                              ['experimentalist', 'experimentalist'],
+                              ['experimentalists', 'experimentalist'],
+                              ['GeV', 'GeV'],
+                              ['$\Omega$', '$\Omega$'],
+                              ['e^-', 'e^-']]
+        for test_word, expected_result in english_test_cases:
+            self.assertEqual(expected_result,
+                             bibindex_engine_stemmer.stem(test_word, "en"))
 
 def create_test_suite():
     """Return test suite for the indexing engine."""
