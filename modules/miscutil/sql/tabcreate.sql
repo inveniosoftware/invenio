@@ -11,7 +11,7 @@
 -- CDS Invenio is distributed in the hope that it will be useful, but
 -- WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--- General Public License for more details.  
+-- General Public License for more details.
 --
 -- You should have received a copy of the GNU General Public License
 -- along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -2400,7 +2400,7 @@ CREATE TABLE IF NOT EXISTS user_usergroup (
   id_user int(15) unsigned NOT NULL default '0',
   id_usergroup int(15) unsigned NOT NULL default '0',
   user_status char(1) NOT NULL default '',
-  user_status_date datetime NOT NULL default '0000-00-00 00:00:00',  
+  user_status_date datetime NOT NULL default '0000-00-00 00:00:00',
   KEY id_user (id_user),
   KEY id_usergroup (id_usergroup)
 ) TYPE=MyISAM;
@@ -2408,9 +2408,11 @@ CREATE TABLE IF NOT EXISTS user_usergroup (
 -- tables for access control engine
 
 CREATE TABLE IF NOT EXISTS accROLE (
-  id int(15) unsigned NOT NULL auto_increment, 
-  name varchar(32), 
-  description varchar(255), 
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(32),
+  description varchar(255),
+  firerole_def_ser tinyblob NULL,
+  firerole_def_src tinytext NULL,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
@@ -2427,7 +2429,7 @@ CREATE TABLE IF NOT EXISTS accACTION (
   description varchar(255),
   allowedkeywords varchar(255),
   optional ENUM ('yes', 'no') NOT NULL default 'no',
-  PRIMARY KEY (id), 
+  PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
@@ -2512,7 +2514,7 @@ CREATE TABLE IF NOT EXISTS bskEXTREC (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS bskEXTFMT (  
+CREATE TABLE IF NOT EXISTS bskEXTFMT (
    id int(15) unsigned NOT NULL auto_increment,
    id_bskEXTREC int(15) unsigned NOT NULL default '0',
    format varchar(10) NOT NULL default '',

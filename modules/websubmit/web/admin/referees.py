@@ -50,7 +50,7 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
         uid_email = get_email(uid)
     except Error, e:
         return errorMsg(e.value,req)
-    (auth_code, auth_message) = acc_authorize_action(uid, "cfgwebsubmit",verbose=0)
+    (auth_code, auth_message) = acc_authorize_action(req, "cfgwebsubmit",verbose=0)
     if auth_code != 0:
         return errorMsg(auth_message, req, uid)
     # request for deleting a user
@@ -136,7 +136,7 @@ def displayRefereesPage(doctype,warningText):
     <a href="%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s">Finished</a>
     </FORM>""" % (weburl, doctype)
     return t
-    
+
 def displayUserTable(doctype):
     t=""
     # start displaying the table which will contain the list of email addresses.
@@ -219,7 +219,7 @@ def displayAddUser(doctype):
 def errorMsg(title,req,uid,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     uid=uid,

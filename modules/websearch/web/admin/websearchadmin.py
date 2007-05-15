@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -35,13 +35,13 @@ from invenio.messages import gettext_set_language
 
 def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfmtscore(colID=colID,
@@ -53,19 +53,19 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldscore(colID=colID,
@@ -77,19 +77,19 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=cdslang):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchfldvaluescore(colID=colID,
@@ -101,19 +101,19 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=cdsla
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def runwebcoll(req, colID, ln=cdslang, confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                     body=wsc.perform_checkwebcollstatus(colID=colID,
@@ -123,19 +123,19 @@ def runwebcoll(req, colID, ln=cdslang, confirm=0):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_switchpbxscore(colID=colID,
@@ -147,19 +147,19 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=cdslang):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifydbquery(colID=colID,
@@ -170,19 +170,19 @@ def modifydbquery(req, colID, ln=cdslang, dbquery='', confirm=-1):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showtree(req, colID, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection tree",
                     body=wsc.perform_showtree(colID=colID,
@@ -191,19 +191,19 @@ def showtree(req, colID, ln=cdslang):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrestricted(colID=colID,
@@ -214,19 +214,19 @@ def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-  
+
 def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifytranslations(colID=colID,
@@ -238,19 +238,19 @@ def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype='', mtype='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-  
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_addcollectiontotree(colID=colID,
@@ -264,19 +264,19 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
                 language=ln,
                 navtrail = navtrail_previous_links,
                 req=req,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_addcollection(colID=colID,
@@ -290,19 +290,19 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
                 language=ln,
                 navtrail = navtrail_previous_links,
                 req=req,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyrankmethods(colID=colID,
@@ -314,19 +314,19 @@ def modifyrankmethods(req, colID, ln=cdslang, func='', rnkID='', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deletecollection(req, colID, ln=cdslang, confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deletecollection(colID=colID,
@@ -336,19 +336,19 @@ def deletecollection(req, colID, ln=cdslang, confirm=-1):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def editcollection(req, colID=1, ln=cdslang, mtype=''):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_editcollection(colID=colID,
@@ -358,20 +358,20 @@ def editcollection(req, colID=1, ln=cdslang, mtype=''):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-   
 
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addoutputformat(colID=colID,
@@ -384,19 +384,19 @@ def addoutputformat(req, colID, ln=cdslang, code='', name='', callback='yes', co
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showoutputformats(colID=colID,
@@ -407,19 +407,19 @@ def showoutputformats(req, colID, ln=cdslang, callback='yes', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingoutputformat(colID=colID,
@@ -437,13 +437,13 @@ def addexistingoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', co
 
 def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deleteoutputformat(colID=colID,
@@ -455,19 +455,19 @@ def deleteoutputformat(req, colID, ln=cdslang, fmtID=-1, callback='yes', confirm
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removeoutputformat(colID=colID,
@@ -479,7 +479,7 @@ def removeoutputformat(req, colID, ln=cdslang, fmtID='', callback='yes', confirm
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -491,7 +491,7 @@ def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body = wsc.perform_update_external_collections(colID, ln, state, recurse),
@@ -505,13 +505,13 @@ def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None
 
 def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removefieldvalue(colID=colID,
@@ -525,20 +525,20 @@ def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', call
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-  
+
 
 def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removefield(colID=colID,
@@ -552,19 +552,19 @@ def removefield(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback=
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-  
+
 def modifyfield(req, colID, fldID, fldvID='', ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
         	body=wsc.perform_modifyfield(colID=colID,
@@ -577,19 +577,19 @@ def modifyfield(req, colID, fldID, fldvID='', ln=cdslang, callback='yes', confir
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyoutputformat(colID=colID,
@@ -602,19 +602,19 @@ def modifyoutputformat(req, colID, ln=cdslang, fmtID=-1, sel_type='', trans=[], 
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchoptions(colID=colID,
@@ -625,19 +625,19 @@ def showsearchoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingfield(colID=colID,
@@ -651,7 +651,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page(title='Authorization failure',
                 uid=uid,
@@ -660,16 +660,16 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
-    
+
 def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_rearrangefield(colID=colID,
@@ -681,7 +681,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page(title='Authorization failure',
                 uid=uid,
@@ -693,13 +693,13 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
 
 def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingfieldvalue(colID=colID,
@@ -711,7 +711,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page(title='Authorization failure',
                 uid=uid,
@@ -723,13 +723,13 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
 
 def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_rearrangefieldvalue(colID=colID,
@@ -741,7 +741,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page(title='Authorization failure',
                 uid=uid,
@@ -753,13 +753,13 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
 
 def addnewfieldvalue(req, colID, fldID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_addnewfieldvalue(colID=colID,
@@ -773,23 +773,23 @@ def addnewfieldvalue(req, colID, fldID, ln=cdslang, name='', value='', callback=
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyfieldvalue(req, colID, fldID, fldvID, ln=cdslang, name='', value='', callback="yes", confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_modifyfieldvalue(colID=colID,
-  					      fldID=fldID, 
+  					      fldID=fldID,
                                               fldvID=fldvID,
                                               ln=cdslang,
                                               name=name,
@@ -800,19 +800,19 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=cdslang, name='', value='', c
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsearchfields(colID=colID,
@@ -823,19 +823,19 @@ def showsearchfields(req, colID, ln=cdslang, callback='yes', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showsortoptions(colID=colID,
@@ -846,19 +846,19 @@ def showsortoptions(req, colID, ln=cdslang, callback='yes', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel_ln='', title='', body='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_modifyportalbox(colID=colID,
@@ -875,19 +875,19 @@ def modifyportalbox(req, colID, ln=cdslang, pbxID=-1, score='', position='', sel
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_removeportalbox(colID=colID,
@@ -900,7 +900,7 @@ def removeportalbox(req, colID, ln=cdslang, pbxID='', sel_ln='', callback='yes',
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -912,7 +912,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addexistingportalbox(colID=colID,
@@ -927,7 +927,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page(title='Authorization failure',
                 uid=uid,
@@ -939,14 +939,14 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
 
 def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_deleteportalbox(colID=colID,
@@ -961,18 +961,18 @@ def deleteportalbox(req, colID, ln=cdslang, pbxID=-1, callback='yes', confirm=-1
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_showportalboxes(colID=colID,
@@ -983,10 +983,10 @@ def showportalboxes(req, colID, ln=cdslang, callback='yes', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
@@ -994,8 +994,8 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-   
-    auth = check_user(uid,'cfgwebsearch')
+
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
                 body=wsc.perform_addportalbox(colID=colID,
@@ -1008,10 +1008,10 @@ def addportalbox(req, colID, ln=cdslang, title='', body='', callback='yes', conf
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_from='', move_to='', delete='', rtype='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
@@ -1020,7 +1020,7 @@ def modifycollectiontree(req, colID, ln=cdslang, move_up='', move_down='', move_
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_modifycollectiontree(colID=colID,
@@ -1049,7 +1049,7 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
     except Error, e:
         return error_page(req)
 
-    auth = check_user(uid,'cfgwebsearch')
+    auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Collection Management",
                 body=wsc.perform_index(colID=colID,
@@ -1061,16 +1061,16 @@ def index(req, colID=1, ln=cdslang, mtype='', content='', confirm=0):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def error_page(req, ln=cdslang, verbose=1):
     _ = gettext_set_language(ln)
-    
+
     return page(title=_("Internal Error"),
                 body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % cdsname, 
+                description="%s - Internal Error" % cdsname,
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
                 req=req)

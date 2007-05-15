@@ -46,7 +46,7 @@ from invenio.config import \
      cdsname, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname
+from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, restricted_collection_cache
 from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
@@ -55,7 +55,7 @@ from invenio.bibformat import format_record
 from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
-     external_collection_sort_engine_by_name 
+     external_collection_sort_engine_by_name
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
@@ -213,14 +213,10 @@ class Collection:
         """Predicate to test if the collection is restricted or not.  Return the contect of the
          `restrited' column of the collection table (typically Apache group).  Otherwise return
          None if the collection is public."""
-        out = None
-        query = "SELECT restricted FROM collection WHERE id=%d" % self.id
-        res = run_sql(query, None, 1)
-        try:
-            out = res[0][0]
-        except:
-            pass
-        return out
+
+        if restricted_collection_cache.collection_restricted_p(self.name):
+            return 1
+        return None
 
     def get_sons(self, type='r'):
         "Returns list of direct sons of type 'type' for the current collection."
@@ -277,11 +273,11 @@ class Collection:
            call write_cache_file() afterwards to update the collection webpage cache."""
 
         ## precalculate latest additions for non-aggregate
-        ## collections (the info is ln and as independent)        
+        ## collections (the info is ln and as independent)
         if self.dbquery:
             self.create_latest_additions_info()
-        
-        ## do this for each language:            
+
+        ## do this for each language:
         for lang, lang_fullname in language_list_long():
 
             # but only if some concrete language was not chosen only:
@@ -324,7 +320,7 @@ class Collection:
         ancestors (except Home collection).  If as==1, then links to
         Advanced Search interfaces; otherwise Simple Search.
         """
-        
+
         dads = []
         for dad in self.get_ancestors():
             if dad.name != cdsname: # exclude Home collection
@@ -362,7 +358,7 @@ class Collection:
 
         if not sons:
             return ''
-        
+
         # get descendents
         descendants = self.get_descendants(type)
 
@@ -409,13 +405,13 @@ class Collection:
             for idx in range(total-1, total-to_display-1, -1):
                 recid = recIDs[idx]
                 self.latest_additions_info.append({'id': recid,
-                                                   'format': format_record(recid, "hb"), 
+                                                   'format': format_record(recid, "hb"),
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
         return
 
     def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=cdslang):
         "Searches database and produces list of last 'rg' records."
-        
+
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
 
@@ -435,13 +431,13 @@ class Collection:
                                                                                   recid=self.latest_additions_info[idx]['id'],
                                                                                   ln=ln),
                                     'date': self.latest_additions_info[idx]['date']})
-                    
+
                 if self.nbrecs > rg:
                     url = websearch_templates.build_search_url(
                         cc=self.name, jrec=rg+1, ln=ln, as=as)
                 else:
                     url = ""
-                    
+
                 return websearch_templates.tmpl_instant_browse(
                                  as=as, ln=ln, recids=passIDs, more_link=url)
 
@@ -475,7 +471,8 @@ class Collection:
         return box
 
     def create_sortoptions(self, ln=cdslang):
-        "Produces 'Sort options' portal box."
+        """Produces 'Sort options' portal box."""
+
 
         # load the right message language
         _ = gettext_set_language(ln)
@@ -575,7 +572,8 @@ class Collection:
         return box
 
     def create_searchwithin_selection_box(self, fieldname='f', value='', ln='en'):
-        "Produces 'search within' selection box for the current collection."
+        """Produces 'search within' selection box for the current collection."""
+
 
         # get values
         query = """SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
@@ -726,7 +724,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
 def get_current_time_timestamp():
     """Return timestamp corresponding to the current time."""
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    
+
 def compare_timestamps_with_tolerance(timestamp1,
                                       timestamp2,
                                       tolerance=0):
@@ -823,7 +821,7 @@ def task_sig_suicide(sig, frame):
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
     """Authenticate the user against the user database.
@@ -993,8 +991,8 @@ def task_run(task_id):
     else:
         ## cache up to date, we don't have to run
         if options["verbose"]:
-            write_message("Collection cache is up to date, no need to run.")        
-        pass 
+            write_message("Collection cache is up to date, no need to run.")
+        pass
     ## we are done:
     task_update_progress("Done.")
     task_update_status("DONE")

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -56,7 +56,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
     def __init__(self,recid):
         self.recid = recid
-    
+
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
         # name (with possible path in the case of archives to be
@@ -64,9 +64,9 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         filename = component
 
         def getfile(req, form):
-            args = wash_urlargd(form, websubmit_templates.files_default_urlargd)            
+            args = wash_urlargd(form, websubmit_templates.files_default_urlargd)
             ln = args['ln']
-            
+
             _ = gettext_set_language(ln)
 
             uid = getUid(req)
@@ -92,21 +92,21 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 		format = filename[len(name):]
                 if format and format[0] == '.':
                     format = format[1:]
-                
+
                 # search this filename in the complete list of files
                 for doc in bibarchive.listBibDocs():
                     if filename in [f.fullname for f in doc.listAllFiles()]:
                         docfile=doc.getFile(name,format,args['version'])
                         if docfile is None:
                             return warningMsg(_("Unable to find file."), req, cdsname, ln)
-                            
+
                         if docfile.isRestricted():
                             return warningMsg(_("This file is restricted!"), req, cdsname, ln)
-			    
+
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                             res = doc.registerDownload(ip, version, format, uid)
-                            
+
                         return docfile.stream(req)
                 else:
                     return warningMsg(_("Unable to find file."), req, cdsname, ln)
@@ -119,7 +119,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 docid="",
                 version=args['version'],
                 filelist=filelist)
-            
+
             return page(title="",
                         body=t,
                         navtrail=_("Access to Fulltext"),
@@ -143,7 +143,7 @@ def websubmit_legacy_getfile(req, form):
 
     # FIXME: this should _redirect_ to the proper
     # /record/.../files/... URL.
-    
+
     args = wash_urlargd(form, {
         'c': (str, cdsname),
         'recid': (str, ''),
@@ -176,7 +176,7 @@ def websubmit_legacy_getfile(req, form):
 
             doc = BibDoc(bibdocid=docid)
             docfile=doc.getFile(name,format,version)
-            
+
             if docfile is None:
                 return warningMsg(_("Unable to find file."),req, c, ln)
 
@@ -187,12 +187,12 @@ def websubmit_legacy_getfile(req, form):
 
             if version and int(version) == int(doc.getLatestVersion()):
                 version = ''
-                    
+
             target += make_canonical_urlargd({
                 'version': version}, websubmit_templates.files_default_urlargd)
 
             return redirect_to_url(req, target)
-        
+
         # all files attached to a record
         elif recid!="":
             return redirect_to_url(req, '%s/record/%s/files/' % (weburl, recid))
@@ -202,7 +202,7 @@ def websubmit_legacy_getfile(req, form):
             bibdoc = BibDoc(bibdocid=docid)
             recid = bibdoc.getRecid()
             filelist = bibdoc.display(version, ln=ln)
-            
+
         t = websubmit_templates.tmpl_filelist(
               ln = ln,
               recid = recid,
@@ -220,7 +220,7 @@ def websubmit_legacy_getfile(req, form):
                     language=ln,
                     req=req,
                     navmenuid='submit')
-    
+
     return _getfile_py(req, **args)
 
 
@@ -237,7 +237,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         args = wash_urlargd(form, {'sub': (str, '')})
         sub = args['sub']
-        
+
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../direct.py/index",
@@ -307,7 +307,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             'act': (str, ''),
             'access': (str, ''),
             'indir': (str, '')})
-        
+
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../summary.py/index",
@@ -316,7 +316,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         t=""
         curdir  = "%s/%s/%s/%s" % (storage,args['indir'],args['doctype'],args['access'])
         subname = "%s%s" % (args['act'], args['doctype'])
-        
+
         res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s "
                       "order by pagenb,fieldnb", (subname,))
         nbFields = 0

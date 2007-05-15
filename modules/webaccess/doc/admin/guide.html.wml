@@ -51,6 +51,12 @@
   librarian</em> with action <em>runbibwords</em> using the argument
   <em>index='author'</em>.
 
+  Additionally, roles could have <em><a href="firerole.html">definitions</a></em>. A definition is a formal
+  description of which users are entitled to belong to the role. So you
+  have two ways for connecting users to roles. Either linking explicitly
+  a user with the role or describing the characteristics that makes users
+  belong to the role.
+
   WebAccess is based on allowing users to perform actions. This means
   that only allowed actions are stored in the access control engine's
   database.
@@ -101,159 +107,126 @@ I. Role area</a>
 
 </pre>
 
-<div class="snapshot">
-
-   <div>
-   <table border="0" cellspacing="0" cellpadding="0" class="navtrailbox" width="100%" summary="">
+<table class="navtrailbox">
     <tr>
-     <td class="navtrailboxbody">
-      <a class="navtrail" href="">Home</a> &gt; <a class="navtrail" href="">Admin Area</a> &gt; <a class="navtrail" href="">WebAccess Admin</a> &gt;
-      <a class="navtrail" href="">Manage WebAccess</a>  &gt; Role Administration
-     </td>
-
+        <td class="navtrailboxbody">
+            <a href="http://pcsk.cern.ch?ln=en" class="navtrail">Home</a> &gt; <a class=navtrail href="http://pcsk.cern.ch/admin/">Admin Area</a> &gt; <a class=navtrail href="http://pcsk.cern.ch/admin/webaccess/">WebAccess Admin</a> &gt; <a class=navtrail href=http://pcsk.cern.ch/admin/webaccess/webaccessadmin.py>Manage WebAccess</a>  &gt; Role Administration
+        </td>
     </tr>
-   </table>
-   </div>
-
-   <div class="pagebody">
-    <table border="0" cellspacing="0" cellpadding="0" width="100%" summary="">
-     <tr valign="top">
-      <td class="pagebodystripemiddle" align="left">
-
-       <h1 class="headline">Role Administration</h1>
-       <table class="admin_wvar" width="100%" summary="">
-        <thead>
-         <tr>
-          <th class="adminheaderleft" colspan="2">administration with roles as access point</th>
-         </tr>
-        </thead>
-        <tbody>
-         <tr>
-          <td style="vertical-align: top; margin-top: 5px; width: 75%;">
-           <dl>
-            <dt>Users:</dt>
-            <dd>add or remove users from the access to a role and its priviliges.</dd>
-            <dt>Authorizations/Actions:</dt>
-            <dd>these terms means almost the same, but an authorization is a <br>
-                connection between a role and an action (possibly) containing arguments.</dd>
-            <dt>Roles:</dt>
-            <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
-           </dl>
-
-           <table class="admin_wvar_nomargin" summary="">
-            <tr>
-             <th class="adminheader">id</th>
-             <th class="adminheader">name</th>
-             <th class="adminheader">description</th>
-             <th class="adminheader">users</th>
-             <th class="adminheader">authorizations / actions</th>
-             <th class="adminheader">role</th>
-             <th class="adminheader"></th>
-             <th class="adminheader"></th>
-            </tr>
-
-            <tr>
-             <td class="admintdright">2</td>
-             <td class="admintdleft">photoadmin</td>
-             <td class="admintdleft">administrator of the photo col...</td>
-             <td class="admintdleft">
-              <a href="">add</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft">
-              <a href="">add</a> /
-              <a href="">modify</a> /
-              <a href="">remove</a>
-             </td>
-
-             <td class="admintdleft"><a href="">delete</a></td>
-             <td class="admintdleft"><a href="">show details</a></td>
-             <td rowspan="4" style="vertical-align: bottom">
-
-             </td>
-            </tr>
-             <tr>
-             <td class="admintdright">9</td>
-             <td class="admintdleft">submitter</td>
-             <td class="admintdleft"></td>
-             <td class="admintdleft">
-              <a href="">add</a> /
-              <a href="">remove</a>
-             </td>
-
-             <td class="admintdleft"><a href="">add</a> /
-              <a href="">modify</a> /
-              <a href="">remove</a>
-             </td>
-
-             <td class="admintdleft"><a href="">delete</a></td>
-             <td class="admintdleft"><a href="">show details</a></td>
-            </tr>
-
-            <tr>
-             <td class="admintdright">1</td>
-             <td class="admintdleft">superadmin</td>
-             <td class="admintdleft">all rights</td>
-             <td class="admintdleft"><a href="">add</a> / <a href="">remove</a></td>
-             <td class="admintdleft"><a href="">add</a> /
-              <a href="">modify</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft"><a href="">delete</a></td>
-             <td class="admintdleft"><a href="">show details</a></td>
-            </tr>
-
-            <tr>
-             <td class="admintdright">4</td>
-             <td class="admintdleft">systemlibrarian</td>
-             <td class="admintdleft">system librarian</td>
-             <td class="admintdleft">
-              <a href="">add</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft"><a href="">add</a> /
-              <a href="">modify</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft"><a href="">delete</a></td>
-             <td class="admintdleft"><a href="">show details</a></td>
-            </tr>
-
-            <tr>
-             <td class="admintdright">3</td>
-             <td class="admintdleft">webaccessadmin</td>
-             <td class="admintdleft">access to web administrator in...</td>
-             <td class="admintdleft">
-              <a href="">add</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft"><a href="">add</a> /
-              <a href="">modify</a> /
-              <a href="">remove</a>
-             </td>
-             <td class="admintdleft"><a href="">delete</a></td>
-             <td class="admintdleft"><a href="">show details</a></td>
-            </tr>
-
-           </table>
-          </td>
-          <td style="vertical-align: top; margin-top: 5px; width: 25%;">
-           <dl>
-            <dt><a href="">Create new role</a></dt>
-            <dd>go here to add a new role.</dd>
-            <dt><a href="">Create new action</a></dt>
-            <dd>go here to add a new action.</dd>
-           </dl>
-          </td>
-         </tr>
-        </tbody>
-       </table>
-      </td>
-     </tr>
-    </table>
-   </div>
+</table>
+<!-- end replaced page header -->
 
 </div>
+
+<div class="pagebody">
+    <div class="pagebodystripeleft">
+        <div class="pageboxlefttop">
+        </div>
+        <div class="pageboxlefttopadd"></div>
+        <div class="pageboxleftbottomadd"></div>
+        <div class="pageboxleftbottom">
+        </div>
+    </div>
+    <div class="pagebodystriperight">
+        <div class="pageboxrighttop">
+        </div>
+        <div class="pageboxrighttopadd"></div>
+        <div class="pageboxrightbottomadd"></div>
+        <div class="pageboxrightbottom">
+        </div>
+    </div>
+    <div class="pagebodystripemiddle">
+
+        <h1 class="headline">Role Administration</h1>
+
+        <table class="admin_wvar" width="95%">
+
+            <thead>
+                <tr>
+                    <th class="adminheaderleft" colspan="2">administration with roles as access point</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+
+                    <td style="vertical-align: top; margin-top: 5px; width: 75%;">
+
+                        <dl>
+                            <dt>Users:</dt>
+                            <dd>add or remove users from the access to a role and its priviliges.</dd>
+                            <dt>Authorizations/Actions:</dt>
+                            <dd>these terms means almost the same, but an authorization is a <br>
+                                    connection between a role and an action (possibly) containing arguments.</dd>
+                                <dt>Roles:</dt>
+                                <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
+                                </dl>
+                                <table class="admin_wvar_nomargin">
+                                    <tr>
+                                        <th class="adminheader">id</th>
+                                        <th class="adminheader">name</th>
+                                        <th class="adminheader">description</th>
+                                        <th class="adminheader">definition</th>
+                                        <th class="adminheader">users</th>
+                                        <th class="adminheader">authorizations / actions</th>
+                                        <th class="adminheader">role</th>
+                                        <th class="adminheader"></th>
+                                        <th class="adminheader"></th>
+
+                                    </tr>
+                                    <tr><td class="admintdleft">2</td>
+                                        <td class="admintdleft">photoadmin</td>
+                                        <td class="admintdleft">Photo collection administrator</td>
+                                        <td class="admintdleft">None</td>
+                                        <td class="admintdleft"><a href="adduserrole?id_role=2">add</a> / <a href="deleteuserrole?id_role=2">delete</a></td>
+                                        <td class="admintdleft"><a href="addauthorization?id_role=2">add</a> / <a href="modifyauthorizations?id_role=2">modify</a> / <a href="deleteroleaction?id_role=2">remove</a></td>
+                                        <td class="admintdleft"><a href="modifyrole?id_role=2">modify</a> / <a href="deleterole?id_role=2">delete</a></td>
+                                        <td class="admintdleft"><a href="showroledetails?id_role=2">show details</a></td>
+                                        <td rowspan="3" style="vertical-align: top">
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="admintdleft">1</td>
+                                        <td class="admintdleft">superadmin</td>
+                                        <td class="admintdleft">superuser with all rights</td>
+                                        <td class="admintdleft">allow email /.*@cern.ch/</td>
+                                        <td class="admintdleft"><a href="adduserrole?id_role=1">add</a> / <a href="deleteuserrole?id_role=1">delete</a></td>
+                                        <td class="admintdleft"><a href="addauthorization?id_role=1">add</a> / <a href="modifyauthorizations?id_role=1">modify</a> / <a href="deleteroleaction?id_role=1">remove</a></td>
+                                        <td class="admintdleft"><a href="modifyrole?id_role=1">modify</a> / <a href="deleterole?id_role=1">delete</a></td>
+                                        <td class="admintdleft"><a href="showroledetails?id_role=1">show details</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="admintdleft">3</td>
+                                        <td class="admintdleft">webaccessadmin</td>
+                                        <td class="admintdleft">WebAccess administrator</td>
+                                        <td class="admintdleft">allow apache_user 'jekyll'
+                                            de...</td>
+                                        <td class="admintdleft"><a href="adduserrole?id_role=3">add</a> / <a href="deleteuserrole?id_role=3">delete</a></td>
+                                        <td class="admintdleft"><a href="addauthorization?id_role=3">add</a> / <a href="modifyauthorizations?id_role=3">modify</a> / <a href="deleteroleaction?id_role=3">remove</a></td>
+                                        <td class="admintdleft"><a href="modifyrole?id_role=3">modify</a> / <a href="deleterole?id_role=3">delete</a></td>
+                                        <td class="admintdleft"><a href="showroledetails?id_role=3">show details</a></td>
+                                    </tr>
+                                </table>
+
+                            </td>
+
+                            <td style="vertical-align: top; margin-top: 5px; width: 25%;">
+
+                                <dl>
+                                    <dt><a href="addrole">Create new role</a></dt>
+                                    <dd>go here to add a new role.</dd>
+                                    <dt><a href="addaction">Create new action</a></dt>
+                                    <dd>go here to add a new action.</dd>
+                                </dl>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
 
 <pre>
 

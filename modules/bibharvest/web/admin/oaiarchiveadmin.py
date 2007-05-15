@@ -33,7 +33,7 @@ from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=cdslang):
     navtrail_previous_links = bhc.getnavtrail()
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -45,7 +45,7 @@ def index(req, ln=cdslang):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
 
         return page(title="OAI Repository Admin Interface",
@@ -61,7 +61,7 @@ def index(req, ln=cdslang):
 def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
 
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -73,7 +73,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="Add new OAI Set",
                 body=bhc.perform_request_addset(oai_set_name=oai_set_name,
@@ -104,7 +104,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
 
 def delset(req, oai_set_id=None, ln=cdslang, func=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -116,7 +116,7 @@ def delset(req, oai_set_id=None, ln=cdslang, func=0):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="Delete OAI Set",
                     body=bhc.perform_request_delset(oai_set_id=oai_set_id,
@@ -145,7 +145,7 @@ def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_coll
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="Edit OAI Set",
                     body=bhc.perform_request_editset(oai_set_id=oai_set_id,
@@ -166,7 +166,7 @@ def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_coll
                                                      oai_set_m3=oai_set_m3,
                                                      ln=ln,
                                                      func=func),
-                                                        
+
                     uid=uid,
                     language=ln,
                     req=req,

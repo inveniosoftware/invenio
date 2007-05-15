@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -74,21 +74,21 @@ def perform_request_index(ln=cdslang):
 
     oai_set = get_oai_set()
     sets = []
-    
+
     for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3) in oai_set:
 
         del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&oai_set_id=" + str(id) + '">delete</a>'
-        
+
         edit_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&oai_set_id=" + str(id) + '">edit</a>'
 
         sets.append([id, setSpec, setName, setCollection, p1,f1,m1, p2,f2,m2, p3,f3,m3, del_request, edit_request])
 
     add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
-    
+
     sets.append(['',add_request,'','','','','','','','','','','',''])
 
     out += transform_tuple(header=header, tuple=sets)
-    
+
     out += "<br /><br />"
 
     return out
@@ -197,10 +197,10 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
             out += bibharvest_templates.tmpl_print_info(cdslang,
                                                         "OAI set definition #%s edited." % oai_set_id)
             out += "<br />"
-            
+
     lnargs = [["ln", ln]]
     out += "<br />"
-       
+
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     body = [out]
@@ -228,10 +228,10 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
             oai_set_definition = ''
             oai_set_reclist = ''
             oai_set_p1 = oai_set[0][5]
-            oai_set_f1 = oai_set[0][6] 
-            oai_set_m1 = oai_set[0][7] 
-            oai_set_p2 = oai_set[0][8] 
-            oai_set_f2 = oai_set[0][9] 
+            oai_set_f1 = oai_set[0][6]
+            oai_set_m1 = oai_set[0][7]
+            oai_set_p2 = oai_set[0][8]
+            oai_set_f2 = oai_set[0][9]
             oai_set_m2 = oai_set[0][10]
             oai_set_p3 = oai_set[0][11]
             oai_set_f3 = oai_set[0][12]
@@ -268,7 +268,7 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
                 out += "<br />"
             else:
                 pass
-                
+
     lnargs = [["ln", ln]]
     out += "<br /><br />"
     out += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
@@ -280,7 +280,7 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
 def get_oai_set(id=''):
     """Returns a row parameters for a given id"""
     sets = []
-    sql = "SELECT id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, setDefinition FROM oaiARCHIVE"  
+    sql = "SELECT id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, setDefinition FROM oaiARCHIVE"
     try:
         if id:
             sql += " WHERE id=%s" % id
@@ -309,7 +309,7 @@ def get_oai_set(id=''):
 
 def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3):
     """Modifies a row's parameters"""
-    
+
     try:
         set_definition = 'c=' + oai_set_collection + ';' + \
                          'p1=' + oai_set_p1 + ';' + \
@@ -353,7 +353,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
             escape_string(oai_set_m3),  \
             oai_set_id \
             )
-            
+
         res = run_sql(sql)
 
         return (1, "")
@@ -389,12 +389,12 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descript
             escape_string(oai_set_f3), \
             escape_string(oai_set_m3)  \
             )
-            
+
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:
         return (0, e)
-    
+
 def delete_oai_set(oai_set_id):
     """"""
 
@@ -408,7 +408,7 @@ def drop_down_menu(boxname, list=['Select', 'selected', 'select']):
     """"""
 
     text = "<select name=\"%s\">" % boxname
-    
+
     for (value, selectedflag, txt) in list:
         text += "<option value=\""
         text += "%s\"" % value
@@ -436,7 +436,7 @@ def createform(action="", text="", button="func", cnfrm='', **hidden):
 
     out += text
     if cnfrm:
-        out += ' <input type="checkbox" name="func" value="1"/>' 
+        out += ' <input type="checkbox" name="func" value="1"/>'
     for key in hidden.keys():
         if type(hidden[key]) is list:
             for value in hidden[key]:
@@ -452,7 +452,7 @@ def createform(action="", text="", button="func", cnfrm='', **hidden):
 
 def oai_table(ln=cdslang):
     """"""
-    
+
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
     header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'p2', 'f2', 'm2', 'p3', 'f3', 'm3', '', '']
     oai_set = get_oai_set()
@@ -465,12 +465,12 @@ def oai_table(ln=cdslang):
 
     add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
     sets.append(['',add_request,'','','','','','','','','','','',''])
-    
+
     out = transform_tuple(header=header, tuple=sets)
     out += "<br /><br />"
-    
+
     return out
-    
+
 def input_text(ln, title, name, value):
     """"""
     if name is None:
@@ -478,7 +478,7 @@ def input_text(ln, title, name, value):
     if value is None:
         value = ""
     text = """<table><tr><td width=100><span class="adminlabel">%s</span></td>""" % title
-    text += """<td align=left><input class="admin_w200" type="text" name="%s" value="%s" /></td></tr></table>""" % (cgi.escape(name,1), cgi.escape(value, 1))  
+    text += """<td align=left><input class="admin_w200" type="text" name="%s" value="%s" /></td></tr></table>""" % (cgi.escape(name,1), cgi.escape(value, 1))
     return text
 
 def pagebody_text(title):
@@ -493,7 +493,7 @@ def bar_text(title):
 
 def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, ln=cdslang):
     """"""
-    
+
     modes = {
     'r' : 'Regular Expression',
     'a' : 'All of the words',
@@ -527,11 +527,11 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     #    menu.append([oai_set_collection,'selected',oai_set_collection])
     #else:
     #    menu.append(['','selected','Collection'])
-        
+
     text += input_text(ln = cdslang, title = "Collection(s):", name="oai_set_collection", value=oai_set_collection)
 
     #text += drop_down_menu("oai_set_collection", menu)
-    
+
     text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p1", value = oai_set_p1)
     text += "</td><td>"
@@ -540,18 +540,18 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     fields.append(['','',''])
     if (oai_set_f1):
         fields.append([oai_set_f1,'selected',oai_set_f1])
-    else:    
+    else:
         fields.append(['','selected','Field'])
 
     if (oai_set_m1):
         mode_dropdown.append([oai_set_m1,'selected',modes[oai_set_m1]])
-    else:    
+    else:
         mode_dropdown.append(['','selected','Mode'])
 
     text += drop_down_menu("oai_set_f1", fields)
     text += "</td><td>"
     text += drop_down_menu("oai_set_m1", mode_dropdown)
-    
+
     text += "</td><td>"
     text += bar_text(" and")
     text += "</td></tr><tr><td>"
@@ -568,7 +568,7 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
         mode_dropdown.append([oai_set_m2,'selected',modes[oai_set_m2]])
     else:
         mode_dropdown.append(['','selected','Mode'])
-    
+
     text += drop_down_menu("oai_set_f2", fields)
     text += "</td><td>"
     text += drop_down_menu("oai_set_m2", mode_dropdown)
@@ -593,14 +593,14 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text += drop_down_menu("oai_set_f3", fields)
     text += "</td><td>"
     text += drop_down_menu("oai_set_m3", mode_dropdown)
-                           
+
     text += "</td></tr></table>"
 
     return text
 
-def check_user(uid, role, adminarea=2, authorized=0):
+def check_user(req, role, adminarea=2, authorized=0):
     """"""
-    (auth_code, auth_message) = access_manager.acc_authorize_action(uid, role)
+    (auth_code, auth_message) = access_manager.acc_authorize_action(req, role)
     if not authorized and auth_code != 0:
         return ("false", auth_message)
     return ("", auth_message)
@@ -611,8 +611,8 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
     align = []
     try:
         firstrow = tuple[0]
-    
-        if type(firstrow) in [int, long]: 
+
+        if type(firstrow) in [int, long]:
             align = ['admintdright']
         elif type(firstrow) in [str, dict]:
             align = ['admintdleft']
@@ -624,15 +624,15 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
                     align.append('admintdleft')
     except IndexError:
         firstrow = []
-                        
+
     tblstr = ''
     for h in header + ['']:
         tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
     if tblstr: tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
-    
+
     tblstr = start + '<table class="admin_wvar_nomargin">\n' + tblstr
-    
-    try: 
+
+    try:
         extra = '<tr>'
 
         if type(firstrow) not in [int, long, str, dict]:
@@ -654,7 +654,7 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
 
     tblstr += '</table> \n '
     tblstr += end
-    
+
     return tblstr
 
 def nice_box(header='', datalist=[], cls="admin_wvar"):
@@ -662,7 +662,7 @@ def nice_box(header='', datalist=[], cls="admin_wvar"):
 
     if len(datalist) == 1: per = '100'
     else: per = '75'
-    
+
     out  = '<table class="%s" ' % (cls, ) + 'width="95%">\n'
     out += """
      <thead>
@@ -677,19 +677,19 @@ def nice_box(header='', datalist=[], cls="admin_wvar"):
 
     out += """
     <td style="vertical-align: top; margin-top: 5px; width: %s;">
-     %s 
+     %s
     </td>
     """ % (per+'%', datalist[0])
 
     if len(datalist) > 1:
         out += """
         <td style="vertical-align: top; margin-top: 5px; width: %s;">
-         %s 
+         %s
         </td>
         """ % ('25%', datalist[1])
-        
+
     out += '      </tr>\n'
-    
+
     out += """
      </tbody>
     </table>
@@ -699,12 +699,12 @@ def nice_box(header='', datalist=[], cls="admin_wvar"):
 
 def extended_input_form(action="", text="", button="func", cnfrm='', **hidden):
     """"""
-    
+
     out  = '<form action="%s" method="POST">\n' % (action, )
     out += '<table>\n<tr><td style="vertical-align: top">'
     out += text
     if cnfrm:
-        out += ' <input type="checkbox" name="func" value="1"/>' 
+        out += ' <input type="checkbox" name="func" value="1"/>'
     for key in hidden.keys():
         if type(hidden[key]) is list:
             for value in hidden[key]:

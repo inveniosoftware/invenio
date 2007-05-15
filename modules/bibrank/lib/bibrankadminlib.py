@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## Youshould have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -47,26 +47,26 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def check_user(uid, role, adminarea=2, authorized=0):
-    (auth_code, auth_message) = is_adminuser(uid, role)
+def check_user(req, role, adminarea=2, authorized=0):
+    (auth_code, auth_message) = is_adminuser(req, role)
     if not authorized and auth_code != 0:
         return ("false", auth_message)
     return ("", auth_message)
-        
-def is_adminuser(uid, role):
+
+def is_adminuser(req, role):
     """check if user is a registered administrator. """
-    return acce.acc_authorize_action(uid, role)
+    return acce.acc_authorize_action(req, role)
 
 def perform_index(ln=cdslang):
     """create the bibrank main area menu page."""
-    
+
     header = ['Code', 'Translations', 'Collections', 'Rank method']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
-    
+
     for (rnkID, name) in rnk_list:
         actions.append([name])
-        
+
         for col in [(('Modify', 'modifytranslations'),),
                     (('Modify', 'modifycollection'),),
                     (('Show Details', 'showrankdetails'),
@@ -79,13 +79,13 @@ def perform_index(ln=cdslang):
     output = """
     <a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a><br><br>
     """ % (weburl, ln)
-    
+
     output += tupletotable(header=header, tuple=actions)
     return addadminbox("""Overview of rank methods&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
-    
+
     output = ""
     subtitle = ""
 
@@ -114,7 +114,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
         output += """</dd>
         </dl>
         """
-                        
+
         col_list = get_def_name('', "collection")
         col_rnk = dict(get_rnk_col(rnkID))
         col_list = filter(lambda x: not col_rnk.has_key(x[0]), col_list)
@@ -125,7 +125,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             <select name="colID" class="admin_w200">
             <option value="">- select collection -</option>
             """
-            
+
             for (id, name) in col_list:
                 text += """<option value="%s" %s>%s</option>""" % (id, (func in ["0", 0] and confirm in ["0", 0] and colID and int(colID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
@@ -153,7 +153,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["0", 0]:
             output += """<b><span class="info">Please select a collection.</span></b>"""
-        
+
         col_list = get_rnk_col(rnkID, ln)
         if col_list:
             text  = """
@@ -161,7 +161,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             <select name="colID" class="admin_w200">
             <option value="">- select collection -</option>
             """
-        
+
             for (id, name) in col_list:
                 text += """<option value="%s" %s>%s</option>""" % (id, (func in ["1", 1] and confirm in ["0", 0] and colID and int(colID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
@@ -172,7 +172,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
                                        ln=ln,
                                        func=1,
                                        confirm=1)
-             
+
         if confirm in ["1", 1] and func in ["1", 1] and colID:
             subtitle = "Step 3 - Result"
             output += write_outcome(finresult)
@@ -180,40 +180,40 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
             output += """<b><span class="info">Please select a collection.</span></b>"""
 
     body = [output]
-    
+
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mc">?</a>]</small>""" % weburl, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
     """Modify the translations of a rank method"""
-    
+
     output = ''
     subtitle = ''
     cdslangs = get_languages()
     cdslangs.sort()
-    
+
     if confirm in ["2", 2] and rnkID:
         finresult = modify_translations(rnkID, cdslangs, sel_type, trans, "rnkMETHOD")
-        
+
     rnk_name = get_def_name(rnkID, "rnkMETHOD")[0][1]
     rnk_dict = dict(get_i8n_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
     if rnkID and rnk_dict.has_key(int(rnkID)):
         rnkID = int(rnkID)
         subtitle = """<a name="3">3. Modify translations for rank method '%s'</a>""" % rnk_name
-        
+
         if type(trans) is str:
             trans = [trans]
         if sel_type == '':
             sel_type = get_rnk_nametypes()[0][0]
-            
+
         header = ['Language', 'Translation']
 
         actions = []
-                        
+
         text  = """
         <span class="adminlabel">Name type</span>
         <select name="sel_type" class="admin_w200">
         """
-    
+
         types = get_rnk_nametypes()
         if len(types) > 1:
             for (key, value) in types:
@@ -223,7 +223,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
                     text += ": %s" % trans_names[0][0]
                 text += "</option>"
             text += """</select>"""
-        
+
             output += createhiddenform(action="modifytranslations",
                                        text=text,
                                        button="Select",
@@ -255,14 +255,14 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
         if sel_type and len(trans) and confirm in ["2", 2]:
             output += write_outcome(finresult)
-  
+
     body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
-        
+
 def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     """form to add a new rank method with these values:"""
- 
+
     subtitle = 'Step 1 - Create new rank method'
     output  = """
     <dl>
@@ -276,24 +276,24 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     <span class="adminlabel">BibRank code</span>
     <input class="admin_wvar" type="text" name="rnkcode" value="%s" />
     """ % (rnkcode)
-     
+
     text += """<br>
     <span class="adminlabel">Cfg template</span>
     <select name="template" class="admin_w200">
     <option value="">No template</option>
     """
-    
+
     templates = get_templates()
     for templ in templates:
         text += """<option value="%s" %s>%s</option>""" % (templ, template == templ and 'selected="selected"' or '', templ[9:len(templ)-4])
     text += """</select>"""
-    
+
     output += createhiddenform(action="addrankarea",
                                text=text,
                                button="Add rank method",
                                ln=ln,
                                confirm=1)
-    
+
     if rnkcode:
         if confirm in ["0", 0]:
             subtitle = 'Step 2 - Confirm addition of rank method'
@@ -308,7 +308,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                                        button="Confirm",
                                        template=template,
                                        confirm=1)
-             
+
         elif confirm in ["1", 1]:
             rnkID = add_rnk(rnkcode)
             subtitle = "Step 3 - Result"
@@ -332,23 +332,23 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                         text += """<b><span class="info"><br>Empty configuration file created.</span></b>"""
                 except StandardError, e:
                     text += """<b><span class="info"><br>Sorry, could not create configuration file: '%s/bibrank/%s.cfg', either because it already exists, or not enough rights to create file. <br>Please create the file in the path given.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
-                    
+
             else:
                 text = """<b><span class="info">Sorry, could not add rank method, rank method with the same BibRank code probably exists.</span></b>"""
             output += text
     elif not rnkcode and confirm not in [-1, "-1"]:
         output += """<b><span class="info">Sorry, could not add rank method, not enough data submitted.</span></b>"""
-            
+
     body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#ar">?</a>]</small>""" % weburl, body)
-      
+
 def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', confirm=0):
     """form to modify a rank method
 
     rnkID - id of the rank method
     """
-    
+
     if not rnkID:
         return "No ranking method selected."
     if not get_rnk_code(rnkID):
@@ -366,13 +366,13 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
      <br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
     """ % weburl
-    
+
     text = """
      <span class="adminlabel">BibRank code</span>
      <input class="admin_wvar" type="text" name="rnkcode" value="%s" />
      <br>
     """ % (oldcode)
-        
+
     try:
         text += """<span class="adminlabel">Cfg file</span>"""
         textarea = ""
@@ -385,13 +385,13 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
         text += """<textarea class="admin_wvar" name="cfgfile" rows="15" cols="70">""" + textarea + """</textarea>"""
     except StandardError, e:
         text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s.cfg'<br>Please create the file in the path given.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
-    
+
     output += createhiddenform(action="modifyrank",
                                text=text,
                                rnkID=rnkID,
                                button="Modify",
                                confirm=1)
-            
+
     if rnkcode and confirm in ["1", 1] and get_rnk_code(rnkID)[0][0] != rnkcode:
         oldcode = get_rnk_code(rnkID)[0][0]
         result = modify_rnk(rnkID, rnkcode)
@@ -425,7 +425,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
 
     finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mr">?</a>]</small>""" % weburl, [output])
     output = ""
-    
+
     text = """
     <span class="adminlabel">Select</span>
     <select name="template" class="admin_w200">
@@ -445,7 +445,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     try:
         if template:
             textarea = ""
-            text = """<span class="adminlabel">Content:</span>"""    
+            text = """<span class="adminlabel">Content:</span>"""
             file =  open("%s/bibrank/%s" % (etcdir, template), 'r')
             lines = file.readlines()
             for line in lines:
@@ -475,7 +475,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     </strong>
     </span>
     """ % weburl
-    
+
     if rnkID:
         if confirm in ["0", 0]:
             rnkNAME = get_def_name(rnkID, "rnkMETHOD")[0][1]
@@ -511,7 +511,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
             except StandardError, e:
                 text = """<b><span class="info">Sorry, could not delete rank method, most likely already deleted</span></b>"""
             output = text
-            
+
     body = [output]
 
     return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#dr">?</a>]</small>""" % weburl, body)
@@ -524,7 +524,7 @@ def perform_showrankdetails(rnkID, ln=cdslang):
         return "No ranking method selected."
     if not get_rnk_code(rnkID):
         return "Ranking method %s does not seem to exist." % str(rnkID)
-    
+
     subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
     text  = """
     BibRank code: %s<br>
@@ -592,7 +592,7 @@ def compare_on_val(second, first):
 def get_rnk_code(rnkID):
     """Returns the name from rnkMETHOD based on argument
     rnkID - id from rnkMETHOD"""
-    
+
     try:
         res = run_sql("SELECT name FROM rnkMETHOD where id=%s" % (rnkID))
         return res
@@ -602,7 +602,7 @@ def get_rnk_code(rnkID):
 def get_rnk(rnkID=''):
     """Return one or all rank methods
     rnkID - return the rank method given, or all if not given"""
-    
+
     try:
         if rnkID:
             res = run_sql("SELECT id,name,DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s') from rnkMETHOD WHERE id=%s" % rnkID)
@@ -615,16 +615,16 @@ def get_rnk(rnkID=''):
 def get_translations(rnkID):
     """Returns the translations in rnkMETHODNAME for a rankmethod
     rnkID - the id of the rankmethod from rnkMETHOD """
-    
+
     try:
         res = run_sql("SELECT ln, type, value FROM rnkMETHODNAME where id_rnkMETHOD=%s ORDER BY ln,type" % (rnkID))
         return res
     except StandardError, e:
         return ()
-    
+
 def get_rnk_nametypes():
     """Return a list of the various translationnames for the rank methods"""
-    
+
     type = []
     type.append(('ln', 'Long name'))
     #type.append(('sn', 'Short name'))
@@ -632,7 +632,7 @@ def get_rnk_nametypes():
 
 def get_col_nametypes():
     """Return a list of the various translationnames for the rank methods"""
-    
+
     type = []
     type.append(('ln', 'Long name'))
     return type
@@ -640,7 +640,7 @@ def get_col_nametypes():
 def get_rnk_col(rnkID, ln=cdslang):
     """ Returns a list of the collections the given rank method is attached to
     rnkID - id from rnkMETHOD"""
-    
+
     try:
         res1 = dict(run_sql("SELECT id_collection, '' FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID))
         res2 = get_def_name('', "collection")
@@ -651,7 +651,7 @@ def get_rnk_col(rnkID, ln=cdslang):
 
 def get_templates():
     """Read etcdir/bibrank and returns a list of all files with 'template' """
-    
+
     templates = []
     files = os.listdir(etcdir + "/bibrank/")
     for file in files:
@@ -663,7 +663,7 @@ def attach_col_rnk(rnkID, colID):
     """attach rank method to collection
     rnkID - id from rnkMETHOD table
     colID - id of collection, as in collection table """
-    
+
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
         return (1, "")
@@ -674,7 +674,7 @@ def detach_col_rnk(rnkID, colID):
     """detach rank method from collection
     rnkID - id from rnkMETHOD table
     colID - id of collection, as in collection table """
-    
+
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
         return (1, "")
@@ -684,7 +684,7 @@ def detach_col_rnk(rnkID, colID):
 def delete_rnk(rnkID, table=""):
     """Deletes all data for the given rank method
     rnkID - delete all data in the tables associated with ranking and this id """
-    
+
     try:
         res = run_sql("DELETE FROM rnkMETHOD WHERE id=%s" % rnkID)
         res = run_sql("DELETE FROM rnkMETHODNAME WHERE id_rnkMETHOD=%s" % rnkID)
@@ -701,7 +701,7 @@ def modify_rnk(rnkID, rnkcode):
     """change the code for the rank method given
     rnkID - change in rnkMETHOD where id is like this
     rnkcode - new value for field 'name' in rnkMETHOD """
-    
+
     try:
         res = run_sql("UPDATE rnkMETHOD set name='%s' WHERE id=%s" % (escape_string(rnkcode), rnkID))
         return (1, "")
@@ -711,7 +711,7 @@ def modify_rnk(rnkID, rnkcode):
 def add_rnk(rnkcode):
     """Adds a new rank method to rnkMETHOD
     rnkcode - the "code" for the rank method, to be used by bibrank daemon """
-    
+
     try:
         res = run_sql("INSERT INTO rnkMETHOD(name) VALUES('%s')" % escape_string(rnkcode))
         res = run_sql("SELECT id FROM rnkMETHOD WHERE name='%s'" % escape_string(rnkcode))
@@ -733,7 +733,7 @@ def addadminbox(header='', datalist=[], cls="admin_wvar"):
 
     if len(datalist) == 1: per = '100'
     else: per = '75'
-    
+
     output  = '<table class="%s" ' % (cls, ) + 'width="95%">\n'
     output += """
      <thead>
@@ -748,19 +748,19 @@ def addadminbox(header='', datalist=[], cls="admin_wvar"):
 
     output += """
     <td style="vertical-align: top; margin-top: 5px; width: %s;">
-     %s 
+     %s
     </td>
     """ % (per+'%', datalist[0])
 
     if len(datalist) > 1:
         output += """
         <td style="vertical-align: top; margin-top: 5px; width: %s;">
-         %s 
+         %s
         </td>
         """ % ('25%', datalist[1])
-        
+
     output += '      </tr>\n'
-    
+
     output += """
      </tbody>
     </table>
@@ -772,21 +772,21 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
     """create html table for a tuple.
 
          header - optional header for the columns
-     
+
           tuple - create table of this
-     
+
           start - text to be added in the beginning, most likely beginning of a form
-     
+
             end - text to be added in the end, mot likely end of a form.
-     
+
     extracolumn - mainly used to put in a button. """
 
     # study first row in tuple for alignment
     align = []
-    try: 
+    try:
         firstrow = tuple[0]
-    
-        if type(firstrow) in [int, long]: 
+
+        if type(firstrow) in [int, long]:
             align = ['admintdright']
         elif type(firstrow) in [str, dict]:
             align = ['admintdleft']
@@ -798,16 +798,16 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
                     align.append('admintdleft')
     except IndexError:
         firstrow = []
-                        
+
     tblstr = ''
     for h in header + ['']:
         tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
     if tblstr: tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
-    
+
     tblstr = start + '<table class="admin_wvar_nomargin">\n' + tblstr
-    
+
     # extra column
-    try: 
+    try:
         extra = '<tr>'
 
         if type(firstrow) not in [int, long, str, dict]:
@@ -833,7 +833,7 @@ def tupletotable(header=[], tuple=[], start='', end='', extracolumn=''):
 
     tblstr += '</table> \n '
     tblstr += end
-    
+
     return tblstr
 
 
@@ -874,7 +874,7 @@ def addcheckboxes(datalist=[], name='authids', startindex=1, checked=[]):
     startindex - usually 1 because of the header
 
        checked - values of checkboxes to be pre-checked """
-    
+
     if not type(checked) is list: checked = [checked]
     for row in datalist:
         if 1 or row[0] not in [-1, "-1", 0, "0"]: # always box, check another place
@@ -898,12 +898,12 @@ def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
        cnfrm - if given, must check checkbox to confirm
 
     **hidden - dictionary with name=value pairs for hidden input """
-    
+
     output  = '<form action="%s" method="POST">\n' % (action, )
     output += '<table>\n<tr><td style="vertical-align: top">'
     output += text
     if cnfrm:
-        output += ' <input type="checkbox" name="confirm" value="1"/>' 
+        output += ' <input type="checkbox" name="confirm" value="1"/>'
     for key in hidden.keys():
         if type(hidden[key]) is list:
             for value in hidden[key]:
@@ -976,11 +976,11 @@ def get_def_name(ID, table):
         else:
             res = run_sql("SELECT id,name FROM %s" % table)
         res = list(res)
-	res.sort(compare_on_val) 
+	res.sort(compare_on_val)
         return res
     except StandardError, e:
         return []
-        
+
 def get_i8n_name(ID, ln, rtype, table):
     """Returns a list of the names, either with the name in the current language, the default language, or just the name from the given table
     ln - a language supported by CDS Invenio
@@ -1011,14 +1011,14 @@ def get_i8n_name(ID, ln, rtype, table):
         result = filter(lambda x: not res2.has_key(x[0]), res1)
         res = res + result
         res = list(res)
-	res.sort(compare_on_val) 
+	res.sort(compare_on_val)
         return res
     except StandardError, e:
         raise StandardError
-    
+
 def get_name(ID, ln, rtype, table):
     """Returns the value from the table name based on arguments
-    ID - id 
+    ID - id
     ln - a language supported by CDS Invenio
     type - the type of value wanted, like 'ln', 'sn'
     table - tablename"""
@@ -1026,7 +1026,7 @@ def get_name(ID, ln, rtype, table):
     name = "name"
     if table[-1:].isupper():
         name = "NAME"
-        
+
     try:
         res = run_sql("SELECT value FROM %s%s WHERE type='%s' and ln='%s' and id_%s=%s" % (table, name, rtype, ln, table, ID))
         return res
@@ -1044,7 +1044,7 @@ def modify_translations(ID, langs, sel_type, trans, table):
     name = "name"
     if table[-1:].isupper():
         name = "NAME"
-    
+
     try:
         for nr in range(0,len(langs)):
             res = run_sql("SELECT value FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
@@ -1052,7 +1052,7 @@ def modify_translations(ID, langs, sel_type, trans, table):
                 if trans[nr]:
                     res = run_sql("UPDATE %s%s SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
                 else:
-                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))    
+                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
             else:
                 if trans[nr]:
                     res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], escape_string(trans[nr])))
@@ -1068,5 +1068,5 @@ def write_outcome(res):
             return """<b><span class="info">Operation failed. Reason:</span></b><br>%s""" % res[1][1]
     except Exception, e:
         return """<b><span class="info">Operation failed. Reason unknown</span></b><br>"""
- 
+
 

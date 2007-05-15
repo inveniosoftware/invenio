@@ -33,12 +33,12 @@ from invenio.messages import wash_language, gettext_set_language
 
 def index(req, ln=cdslang):
     """Websubmit Admin home page. Default action: list all WebSubmit document types."""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_doctypes()
@@ -57,12 +57,12 @@ def index(req, ln=cdslang):
 
 def showall(req, ln=cdslang):
     """Placeholder for the showall functionality"""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_doctypes()
@@ -81,12 +81,12 @@ def showall(req, ln=cdslang):
 
 def doctypelist(req, ln=cdslang):
     """List all WebSubmit document types."""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_doctypes()
@@ -106,12 +106,12 @@ def doctypelist(req, ln=cdslang):
 
 def jschecklist(req, ln=cdslang):
     """List all WebSubmit JavaScript Checks (checks can be applied to form elements in WebSubmit.)"""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_jschecks()
@@ -131,12 +131,12 @@ def jschecklist(req, ln=cdslang):
 
 def actionlist(req, ln=cdslang):
     """List all WebSubmit actions."""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_actions()
@@ -156,12 +156,12 @@ def actionlist(req, ln=cdslang):
 
 def functionlist(req, ln=cdslang):
     """List all WebSubmit FUNCTIONS (Functions do the work of processing a submission)"""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_functions()
@@ -180,12 +180,12 @@ def functionlist(req, ln=cdslang):
 
 def elementlist(req, ln=cdslang):
     """List all WebSubmit form ELEMENTS (elements are input fields on a WebSubmit form)"""
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_list_elements()
@@ -218,7 +218,7 @@ def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -249,7 +249,7 @@ def actionedit(req, actid, actname=None, working_dir=None, status_text=None, act
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -282,7 +282,7 @@ def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=cdslang):
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -313,7 +313,7 @@ def jscheckedit(req, chname, chdesc=None, chcommit="", ln=cdslang):
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -354,7 +354,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -399,7 +399,7 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -426,7 +426,7 @@ def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=cdslang
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -455,7 +455,7 @@ def functionedit(req, funcname=None, funcdescr=None, funceditaddparam=None, func
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         # Generate content
@@ -488,12 +488,12 @@ def functionusage(req, funcname, ln=cdslang):
        @param ln: the language
        @return: a web page
     """
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (body, errors, warnings) = perform_request_function_usage(funcname)
@@ -516,12 +516,12 @@ def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln
     @param ln: the interface language
     @return: HTML page.
     """
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_remove_doctype(doctype=doctype,
@@ -546,7 +546,7 @@ def doctypeadd(req, doctype=None, doctypename=None, doctypedescr=None, clonefrom
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_add_doctype(doctype=doctype,
@@ -590,7 +590,7 @@ def doctypeconfiguresubmissionpageelements(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_elements(doctype=doctype,
@@ -631,7 +631,7 @@ def doctypeconfiguresubmissionpagespreview(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpage_preview(doctype=doctype,
@@ -668,7 +668,7 @@ def doctypeconfiguresubmissionpages(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype_submissionpages(doctype=doctype,
@@ -730,7 +730,7 @@ def doctypeconfiguresubmissionfunctionsparameters(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) =\
@@ -759,7 +759,7 @@ def doctypeconfiguresubmissionfunctionsparameters(req,
     else:
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
-    
+
 
 def doctypeconfiguresubmissionfunctions(req,
                                         doctype="",
@@ -789,7 +789,7 @@ def doctypeconfiguresubmissionfunctions(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = \
@@ -870,7 +870,7 @@ def doctypeconfigure(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = perform_request_configure_doctype(doctype=doctype,
@@ -939,7 +939,7 @@ def organisesubmissionpage(req,
     _ = gettext_set_language(ln)
     uid = getUid(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebsubmit')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebsubmit')
     if not auth_code:
         ## user is authorised to use WebSubmit Admin:
         (title, body, errors, warnings) = \

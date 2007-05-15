@@ -76,6 +76,25 @@ def get_groups_by_login_method(uid, login_method):
     res = run_sql(query % (uid, escape_string(login_method)))
     return res
 
+def get_groups(uid):
+    """Select all the groups the user is member of.
+    @param uid: user id
+    @return ((id_usergroup,
+              group_name,
+              group_description, ))
+    """
+    query = """SELECT g.id,
+                      g.name,
+                      g.description
+               FROM usergroup g, user_usergroup ug
+               WHERE ug.id_user=%s AND
+                     ug.id_usergroup=g.id
+               ORDER BY g.name"""
+    uid = int(uid)
+    res = run_sql(query, (uid, ))
+    return res
+
+
 def get_external_groups(uid):
     """Select all the groups the user is member of selecting the login_method.
     @param uid: user id

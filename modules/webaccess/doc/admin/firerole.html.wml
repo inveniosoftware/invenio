@@ -1,0 +1,116 @@
+## $Id$
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+#include "cdspage.wml" \
+title="FireRole language description" \
+navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/>Admin Area</a>  &gt; <a class=navtrail href=<WEBURL>/admin/webaccess/>WebAccess Admin</a> " \
+navbar_name="admin" \
+navbar_select="webaccess-admin-guide"
+
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+
+    <h2>The FireRole language description</h2>
+
+    <pre>
+    In the WebAccess RBAC system, roles are built up from their names,
+    description and definition.
+
+    A definition is the way to <em>formally implicitly define</em> which users belong
+    to which roles.
+
+    A definition is expressed in a <em>firewall like rules language</em>. It's built up
+    by rows which are matched from top to bottom, in order to decide if the
+    current user (wethever he/she is logged in or not) may belong to a role.
+
+    Any row has this syntax:
+
+        <strong>ALLOW/DENY ANY</strong>
+
+        or
+
+        <strong>ALLOW/DENY [NOT] <em>field</em> {<em>one or more values</em>}</strong>
+
+    The rows are parsed from top to bottom. If a row matches the user than the
+    user belongs to the role if the rule is an ALLOW rule, otherwise, if the
+    rule is a DENY one, the user doesn't belong to the role.
+
+    A rule of the kind ALLOW|DENY ANY always matches, regardless of the user.
+
+    The second type of rule is interpreted as follows: given a dictionary
+    of keys:values describing a user (we will cover this below), the rule
+    considers the value associated with the key named in field, and checks
+    if it corresponds to at least one of the values in the "one or more values" list.
+    This is a list of comma separated strings, which can be literal
+    (double-)quoted strings or regexps (marked by `/' ... `/' signs). If at
+    least a value matches (literally or through the regexp language), the
+    whole rule is considered to match.
+    If the optional NOT keyword is specified than if at least a value of the
+    rule matches the rule is skipped, otherwise if all the value of the rules
+    don't match the whole rule matches.
+
+    A <strong>DENY ANY</strong> rule is implicitly added at the end of every definition.
+
+    Any field is valid, but only rules concerning fields which currently
+    exist in the user describing dictionary are checked. All the rules
+    with non existant fields are skipped.
+
+    The user describing dictionary is built at runtime with all the informations
+    that can be gathered about the current user (and its session).
+    Currently valid fields are: <em>uid, email, nickname, apache_user, remote_ip,
+    remote_host, groups, apache_groups</em> and all the external settings provided
+    by the external authentication systems (e.g. CERN SSO provides:
+    external_authmethod, external_building, external_department, external_email,
+    external_external, external_firstname, external_fullname, external_homdir,
+    external_homeinstitute, external_lastname, external_login, external_mobilenumber,
+    external_phonenumber).
+
+    Among those fields there are some special cases, which are <em>remote_ip</em> and
+    (<em>apache_</em>)<em>groups</em>. Rules can refer to remote_ip either using a literal
+    expression for specifing list of single ips, or a usual regexp (or list
+    of regexps), or, also, using the common network group/mask notation
+    (e.g. <em>"127.0.0.0/24"</em>) as a literal string, which is a mix between literal
+    expressions and regexps. (apache_)groups are related to group memberships.
+    Since a user will probably belong to more than a group, than the rule
+    matches if there's at least one group to which the user belong, that matches
+    at least one of the expressions (NOT rules behave as you can imagine).
+
+    The dictionary is built using the current user session. If the user is
+    authenticated in some way (apache, locally, externally, SSO...) than more
+    infos could be provided to the firerole system in order to decide if the
+    user should belong to a role or not.
+
+    Every rule is <em>case-insensitive</em> (apart values which must match literally
+    and regexp values which don't explicitly specify case-insesitiveness matches).
+
+    Every rule may contain <em>comments</em> preceded by the '<em>#</em>' character. Any comment
+    is discarded.
+
+    When you set a definition for a role, it is actually compiled and stored
+    in a binary compressed form inside the database. If the syntax isn't correct
+    this will be stated and the definition won't be set or updated.
+
+    Example of role definition:
+        allow not email /.*@gmail.com/,/.*@hotmail.com/
+        deny group badguys
+        allow remote_ip "127.0.0.0/24"
+        deny all
+
+    This definition would match all users whose emails don't end with @gmail.com and
+    @hotmail.com, or who don't belong to the group badguys and have remote_ip
+    in the 24bit mask network of 127.0.0.0. All the the other users don't belong
+    to the role which is being defined.

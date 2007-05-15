@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-   
+
 ## import interesting modules:
 import string
 import os
@@ -73,7 +73,7 @@ def index(req,c=cdsname,ln=cdslang):
 def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c, 
+                    description="%s - Internal Error" % c,
                     keywords="%s, CDS Invenio, Internal Error" % c,
                     language=ln,
                     req=req,

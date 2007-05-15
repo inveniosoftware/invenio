@@ -40,7 +40,7 @@ CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME = 'HTTP_ADFS_'
 # Name of the variable containing groups
 CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'GROUP'
 # Name of the variable containing login name
-CFG_EXTERNAL_AUTH_CERN_SSO_LOGIN_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'LOGIN'
+CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'LOGIN'
 # Name of the variable containing email
 CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'EMAIL'
 # Name of the variable containing groups
@@ -58,6 +58,8 @@ class ExternalAuthSSO(ExternalAuth):
     def __init__(self):
         """Initialize stuff here"""
         ExternalAuth.__init__(self)
+        self.enforce_external_nicknames = True
+
 
     def auth_user(self, username, password, req=None):
         """
@@ -78,7 +80,7 @@ class ExternalAuthSSO(ExternalAuth):
             if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE):
                 return req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE]
         return None
-        
+
     #def user_exists(self, email, req=None):
         #"""Checks against CERN NICE/CRA for existance of email.
         #@return True if the user exists, False otherwise
@@ -102,7 +104,7 @@ class ExternalAuthSSO(ExternalAuth):
                 groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
                 return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                                 or x + ' (Group)'), groups))
-        return []
+        return {}
 
     def fetch_user_nickname(self, username, password, req=None):
         """Given a username and a password, returns the right nickname belonging
@@ -132,14 +134,14 @@ class ExternalAuthSSO(ExternalAuth):
                     ret['external'] = '0'
             return ret
         return {}
-            
-        
+
+
 
     def fetch_user_preferences(self, username, password=None, req=None):
         """Fetch user preferences/settings from the SSO account.
         the external key will be '1' if the account is external to SSO,
         otherwise 0
-        @return a dictionary. 
+        @return a dictionary.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """

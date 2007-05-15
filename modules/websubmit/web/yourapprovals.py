@@ -65,7 +65,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
         doctype = row[0]
         docname = row[1]
         reftext = ""
-        if isReferee(uid,doctype,"*"):
+        if isReferee(req,doctype,"*"):
             referees.append ({'doctype': doctype,
                               'docname': docname,
                               'categories': None})
@@ -75,7 +75,7 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
             for row2 in res2:
                 category = row2[0]
                 categname = row2[1]
-                if isReferee(uid,doctype,category):
+                if isReferee(req,doctype,category):
                     categories.append({
                                         'id' : category,
                                         'name' : categname,
@@ -104,8 +104,8 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 req=req,
                 navmenuid='yourapprovals')
 
-def isReferee(uid,doctype="",categ=""):
-    (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
+def isReferee(req,doctype="",categ=""):
+    (auth_code, auth_message) = acc_authorize_action(req, "referee",verbose=0,doctype=doctype, categ=categ)
     if auth_code == 0:
         return 1
     else:

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -31,7 +31,7 @@ from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=cdslang):
     navtrail_previous_links = bhc.getnavtrail()
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -43,7 +43,7 @@ def index(req, ln=cdslang):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="BibHarvest Admin Interface",
                     body=bhc.perform_request_index(ln),
@@ -69,7 +69,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         if isinstance(oai_src_sets, str):
             oai_src_sets = [oai_src_sets]
@@ -89,13 +89,13 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -107,7 +107,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         if isinstance(oai_src_sets, str):
             oai_src_sets = [oai_src_sets]
@@ -134,7 +134,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
 
 def delsource(req, oai_src_id=None, ln=cdslang, confirm=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -146,7 +146,7 @@ def delsource(req, oai_src_id=None, ln=cdslang, confirm=0):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(uid,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="Delete OAI Source",
                     body=bhc.perform_request_delsource(oai_src_id=oai_src_id,
@@ -156,6 +156,6 @@ def delsource(req, oai_src_id=None, ln=cdslang, confirm=0):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)    
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)

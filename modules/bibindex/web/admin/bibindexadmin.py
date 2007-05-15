@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -39,7 +39,7 @@ def deletetag(req, fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_deletetag(fldID=fldID,
@@ -51,10 +51,10 @@ def deletetag(req, fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
- 
+
 def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
@@ -62,8 +62,8 @@ def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confi
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-   
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_addtag(fldID=fldID,
@@ -76,21 +76,21 @@ def addtag(req, fldID, ln=cdslang, value=['',-1], name='', callback='yes', confi
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifyfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_modifyfieldtags(fldID=fldID,
@@ -101,7 +101,7 @@ def modifyfieldtags(req, fldID, ln=cdslang, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -112,8 +112,8 @@ def addindexfield(req, idxID, ln=cdslang, fldID='', callback='yes', confirm=-1):
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-   
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_addindexfield(idxID=idxID,
@@ -125,21 +125,21 @@ def addindexfield(req, idxID, ln=cdslang, fldID='', callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyindexfields(req, idxID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_modifyindexfields(idxID=idxID,
@@ -150,21 +150,21 @@ def modifyindexfields(req, idxID, ln=cdslang, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showdetailsfieldtag(req, fldID, tagID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_showdetailsfieldtag(fldID=fldID,
@@ -176,21 +176,21 @@ def showdetailsfieldtag(req, fldID, tagID, ln=cdslang, callback='yes', confirm=-
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def showdetailsfield(req, fldID, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_showdetailsfield(fldID=fldID,
@@ -201,10 +201,10 @@ def showdetailsfield(req, fldID, ln=cdslang, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def modifyfield(req, fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
@@ -213,7 +213,7 @@ def modifyfield(req, fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_modifyfield(fldID=fldID,
@@ -237,7 +237,7 @@ def modifyindex(req, idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', 
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_modifyindex(idxID=idxID,
@@ -262,7 +262,7 @@ def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', 
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_modifytag(fldID=fldID,
@@ -282,13 +282,13 @@ def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', 
 
 def deletefield(req, fldID, ln=cdslang, confirm=0):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_deletefield(fldID=fldID,
@@ -298,19 +298,19 @@ def deletefield(req, fldID, ln=cdslang, confirm=0):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deleteindex(req, idxID, ln=cdslang, confirm=0):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_deleteindex(idxID=idxID,
@@ -320,21 +320,21 @@ def deleteindex(req, idxID, ln=cdslang, confirm=0):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showfieldoverview(req, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage logical fields",
                     body=bic.perform_showfieldoverview(ln=ln,
@@ -344,21 +344,21 @@ def showfieldoverview(req, ln=cdslang, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def editfields(req, ln=cdslang, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage logical fields",
                     body=bic.perform_editfields(ln=ln,
@@ -368,21 +368,21 @@ def editfields(req, ln=cdslang, callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def editfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_editfield(fldID=fldID,
@@ -394,21 +394,21 @@ def editfield(req, fldID, ln=cdslang, mtype='', callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def editindex(req, idxID, ln=cdslang, mtype='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
 
- 
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_editindex(idxID=idxID,
@@ -420,19 +420,19 @@ def editindex(req, idxID, ln=cdslang, mtype='', callback='yes', confirm=-1):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyindextranslations(req, idxID, ln=cdslang, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
-        
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_modifyindextranslations(idxID=idxID,
@@ -444,19 +444,19 @@ def modifyindextranslations(req, idxID, ln=cdslang, sel_type='', trans = [], con
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyfieldtranslations(req, fldID, ln=cdslang, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
-        
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_modifyfieldtranslations(fldID=fldID,
@@ -468,19 +468,19 @@ def modifyfieldtranslations(req, fldID, ln=cdslang, sel_type='', trans = [], con
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addfield(req, ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage logical fields",
                     body=bic.perform_addfield(ln=cdslang,
@@ -492,19 +492,19 @@ def addfield(req, ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addindex(req, ln=cdslang, idxNAME='', callback="yes", confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage Indexes",
                     body=bic.perform_addindex(ln=cdslang,
@@ -515,19 +515,19 @@ def addindex(req, ln=cdslang, idxNAME='', callback="yes", confirm=-1):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_switchtagscore(fldID=fldID,
@@ -538,19 +538,19 @@ def switchtagscore(req, fldID, id_1, id_2, ln=cdslang):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removeindexfield(req, idxID, fldID, ln=cdslang, callback="yes", confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Index",
                     body=bic.perform_removeindexfield(idxID=idxID,
@@ -562,19 +562,19 @@ def removeindexfield(req, idxID, fldID, ln=cdslang, callback="yes", confirm=-1):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removefieldtag(req, fldID, tagID, ln=cdslang, callback="yes", confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
-    
-    auth = bic.check_user(uid,'cfgbibindex')
+
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Edit Logical Field",
                     body=bic.perform_removefieldtag(fldID=fldID,
@@ -586,10 +586,10 @@ def removefieldtag(req, fldID, tagID, ln=cdslang, callback="yes", confirm=-1):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     req=req,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 
 def index(req, ln=cdslang, mtype='', content=''):
     navtrail_previous_links = bic.getnavtrail()
@@ -599,7 +599,7 @@ def index(req, ln=cdslang, mtype='', content=''):
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage Indexes",
                     body=bic.perform_index(ln=ln,
@@ -609,7 +609,7 @@ def index(req, ln=cdslang, mtype='', content=''):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
@@ -621,7 +621,7 @@ def field(req, ln=cdslang, mtype='', content=''):
     except Error, e:
         return error_page(req)
 
-    auth = bic.check_user(uid,'cfgbibindex')
+    auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
         return page(title="Manage logical fields",
                     body=bic.perform_field(ln=ln,
@@ -631,14 +631,14 @@ def field(req, ln=cdslang, mtype='', content=''):
                     language=ln,
                     req=req,
                     navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)   
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def error_page(req, ln=cdslang, verbose=1):
     return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % cdsname, 
+                description="%s - Internal Error" % cdsname,
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
                 req=req)

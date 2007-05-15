@@ -10,7 +10,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,7 +20,7 @@
     title="Access Control Engine API" \
     navbar_name="hacking-webaccess" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
-    navbar_select="hacking-webaccess-engine-api" 
+    navbar_select="hacking-webaccess-engine-api"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
@@ -46,15 +46,18 @@ Contents:
 
    Signature:
 
-      def acc_authorize_action(id_user, name_action, dict={}, **arguments):
+      def acc_authorize_action(req, name_action, dict={}, **arguments):
           """ Check if user is allowed to perform action
 	  with given list of arguments.
 	  Return (0, message) if authentication succeeds, (error_code, error_message) if it fails.
 
 	  The arguments are as follows:
-    
-                  id_user - id of the user to be authorized in the database
-                            
+
+                  req - could be either one of these three things:
+                        id_user of the current user
+                        user_info dictionary built against the user details
+                        req mod_python request object
+
               name_action - the name of the action
 
                 arguments - dictionary with keyword=value pairs created automatically
@@ -75,32 +78,35 @@ Contents:
 >>> # authorize user 109 for action BibFormat_modify with format="htmlbrief"
 >>> acc_authorize_action(109, 'cfgbibformat', format="htmlbrief")
       (0, "User authorized")
+>>> # authorize user foo.bar@cern.ch for action BibFormat_modify with format="htmlbrief"
+>>> acc_authorize_action({'uid':109, 'email':'foo.bar@cern.ch'}, 'cfgbibformat', format="htmlbrief")
+    (0, "User authorized")
 
 2. Command Line Interface
 
    Description:
 
       The Command Line Interface uses the regular API of acc_authorize_action.
-      
+
    Signature:
 
       authaction id_user name_action keyword1 value1 keyword2 value2 ...
           """ See description from function acc_authorize_action.
                   id_user - id of user to be authorized
- 
+
 	      name_action - name of the action
- 
+
 	         keyword1 - first keyword like in the keyword=value pairs,
                             same rules for the following ones.
 			    always one word.
- 
+
 	           value1 - value that belongs in a pair with the corresponding keyword,
                             same rules for the following ones.
 			    add quotes if it is more that one word.
- 
+
               the keyword=value pairs are collected in a dictionary
           """
-   
+
    Examples:
 
       These are the same ones as for the regular API:
@@ -116,33 +122,33 @@ Contents:
 
    this is a quick explanation of the different tasks
    performed by the authorization engine.
-   
+
    I. find information for the action
-     use admin API to find info. 
-   
+     use admin API to find info.
+
    II. see if user is a superadmin
      query the database for connection between user and role superadmin.
      -> authorize if yes
-   
+
    III. check if the user exists and find all of the users roles and create string with the ids
      query the database and build string of ids
      -> don't authorize if no roles
-   
+
    IV. try to authorize without arguments
      action without arguments: query database
      -> authorize if yes
      action with optional arguments
      -> authorize if yes
-   
+
    V. create list of keyword=value pairs to query the database
      run through dictionary and create string for adding to database query
-   
+
    VI. find all table entries from the database
      query the database for table entries
      create list of the tuples and sort it
      -> don't authorize if no entries
      -> authorize if only 1 argument and result
-   
+
    VII. combine entries and try to satisfy authorization
      dictionary with the arguments as keys, all values 0
      run throught the list created in VI
@@ -154,12 +160,12 @@ Contents:
        (countinue loop)
 
    VIII. all the above failed
-     -> authorization failed   
+     -> authorization failed
 
 4. External login methods
 
    If you want to call defined external loginmethods, it can be done by:
-   
+
    import invenio.external_authentication
    example_method = invenio.external_authentication.example()
    example_method.auth_user("testuser", "testpassword")

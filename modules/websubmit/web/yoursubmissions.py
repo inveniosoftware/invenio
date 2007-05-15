@@ -193,7 +193,7 @@ def deleteSubmission(id, action, doctype, u_email):
     if not ('..' in doctype or '..' in id) and id != "":
         full = os.path.join(storage, dir, doctype, id)
         if os.path.isdir(full):
-            shutil.rmtree(full)        
+            shutil.rmtree(full)
     return ""
 
 def warningMsg(title,req,c=cdsname,ln=cdslang):

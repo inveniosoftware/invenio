@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -46,12 +46,12 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSearch web pages whether they are up or not."""
 
     def test_search_interface_pages_availability(self):
-        """websearch - availability of search interface pages""" 
+        """websearch - availability of search interface pages"""
 
         baseurl = weburl + '/'
 
         _exports = ['', 'collection/Poetry', 'collection/Poetry?as=1']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -60,12 +60,12 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_search_results_pages_availability(self):
-        """websearch - availability of search results pages""" 
+        """websearch - availability of search results pages"""
 
         baseurl = weburl + '/search'
 
         _exports = ['', '?c=Poetry', '?p=ellis', '/cache', '/log']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -74,12 +74,12 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_search_detailed_record_pages_availability(self):
-        """websearch - availability of search detailed record pages""" 
+        """websearch - availability of search detailed record pages"""
 
         baseurl = weburl + '/record/'
 
         _exports = ['', '1', '1/', '1/files', '1/files/']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -88,12 +88,12 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_browse_results_pages_availability(self):
-        """websearch - availability of browse results pages""" 
+        """websearch - availability of browse results pages"""
 
         baseurl = weburl + '/search'
 
         _exports = ['?p=ellis&f=author&action_browse=Browse']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -102,12 +102,12 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_search_user_help_pages_availability(self):
-        """websearch - availability of search user help pages""" 
+        """websearch - availability of search user help pages"""
 
         baseurl = weburl + '/help/search/'
 
         _exports = ['', 'index.fr.html', 'tips.fr.html', 'guide.fr.html']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -128,7 +128,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         def check(legacy, new):
             browser.open(legacy)
             got = browser.geturl()
-            
+
             self.failUnless(same_urls_p(got, new), got)
 
         # Use the root URL unless we need more
@@ -151,7 +151,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         # Support the /index.py addressing too
         check(make_url('/index.py', c='Poetry'),
               make_url('/collection/Poetry'))
-        
+
 
     def test_legacy_search(self):
         """ websearch - search queries handle legacy urls """
@@ -161,7 +161,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         def check(legacy, new):
             browser.open(legacy)
             got = browser.geturl()
-            
+
             self.failUnless(same_urls_p(got, new), got)
 
         # /search.py is redirected on /search
@@ -190,7 +190,7 @@ class WebSearchTestRecord(unittest.TestCase):
             # page.
             for oformat in ('hd', 'hx', 'hm', 'xm', 'xd'):
                 target = make_url('/record/1', of=oformat)
-                
+
                 if oformat == hformat:
                     try:
                         browser.find_link(url=target)
@@ -203,12 +203,12 @@ class WebSearchTestRecord(unittest.TestCase):
                         browser.find_link(url=target)
                     except LinkNotFoundError:
                         self.fail('link %r should be in page' % target)
-                    
+
         return
 
 
 class WebSearchTestCollections(unittest.TestCase):
-    
+
     def test_traversal_links(self):
         """ websearch - traverse all the publications of a collection """
 
@@ -225,13 +225,13 @@ class WebSearchTestCollections(unittest.TestCase):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
                     if as:
                         args['as'] = as
-                        
+
                     url = make_url('/search', **args)
                     browser.follow_link(url=url)
-                    
+
         except LinkNotFoundError:
             self.fail('no link %r in %r' % (url, browser.geturl()))
-            
+
     def test_collections_links(self):
         """ websearch - enter in collections and subcollections """
 
@@ -253,7 +253,7 @@ class WebSearchTestCollections(unittest.TestCase):
                 kargs = {'as': 1}
             else:
                 kargs = {}
-                
+
             # We navigate from immediate son to immediate son...
             browser.open(make_url('/', **kargs))
             tryfollow(make_url('/collection/Articles%20%26%20Preprints',
@@ -269,7 +269,7 @@ class WebSearchTestCollections(unittest.TestCase):
 
     def test_records_links(self):
         """ websearch - check the links toward records in leaf collections """
-        
+
         browser = Browser()
         browser.open(make_url('/collection/Preprints'))
 
@@ -278,16 +278,16 @@ class WebSearchTestCollections(unittest.TestCase):
             """ Parse all the links in the page, and check that for
             each link to a detailed record, we also have the
             corresponding link to the similar records."""
-            
+
             records = Set()
             similar = Set()
-            
+
             for link in browser.links():
                 path, q = parse_url(link.url)
 
                 if not path:
                     continue
-                
+
                 if path[0] == 'record':
                     records.add(int(path[1]))
                     continue
@@ -298,11 +298,11 @@ class WebSearchTestCollections(unittest.TestCase):
 
                     recid = q['p'][0].split(':')[1]
                     similar.add(int(recid))
-            
+
             self.failUnlessEqual(records, similar)
-            
+
             return records
-        
+
         # We must have 10 links to the corresponding /records
         found = harvest()
         self.failUnlessEqual(len(found), 10)
@@ -337,12 +337,12 @@ class WebSearchTestBrowse(unittest.TestCase):
                                                            r'/search\?')):
                 if link.text == 'Advanced Search':
                     continue
-            
+
                 dummy, q = parse_url(link.url)
                 res.append((link, q))
 
             return res
-        
+
         # if we follow the last link, we should get another
         # batch. There is an overlap of one item.
         batch_1 = collect()
@@ -354,7 +354,7 @@ class WebSearchTestBrowse(unittest.TestCase):
         # FIXME: we cannot compare the whole query, as the collection
         # set is not equal
         self.failUnlessEqual(batch_1[-2][1]['p'], batch_2[0][1]['p'])
-        
+
 
 class WebSearchTestSearch(unittest.TestCase):
 
@@ -362,17 +362,17 @@ class WebSearchTestSearch(unittest.TestCase):
         """ websearch - check extension of a query to the home collection """
 
         browser = Browser()
-        
+
         # We do a precise search in an isolated collection
         browser.open(make_url('/collection/ISOLDE', ln='en'))
-        
+
         browser.select_form(name='search')
         browser['f'] = ['author']
         browser['p'] = 'matsubara'
         browser.submit()
 
         dummy, current_q = parse_url(browser.geturl())
-        
+
         link = browser.find_link(text_regex=re.compile('.*hit', re.I))
         dummy, target_q = parse_url(link.url)
 
@@ -386,7 +386,7 @@ class WebSearchTestSearch(unittest.TestCase):
 
     def test_nearest_terms(self):
         """ websearch - provide a list of nearest terms """
-        
+
         browser = Browser()
         browser.open(make_url(''))
 
@@ -396,21 +396,21 @@ class WebSearchTestSearch(unittest.TestCase):
         browser.submit()
 
         dummy, original = parse_url(browser.geturl())
-        
+
         for to_drop in ('cc', 'action_search', 'f'):
             if to_drop in original:
                 del original[to_drop]
-        
+
         # we should get a few searches back, which are identical
         # except for the p field being substituted (and the cc field
         # being dropped).
         if 'cc' in original:
             del original['cc']
-        
+
         for link in browser.links(url_regex=re.compile(weburl + r'/search\?')):
             if link.text == 'Advanced Search':
                 continue
-            
+
             dummy, target = parse_url(link.url)
 
             original['p'] = [link.text]
@@ -420,7 +420,7 @@ class WebSearchTestSearch(unittest.TestCase):
 
     def test_switch_to_simple_search(self):
         """ websearch - switch to simple search """
-        
+
         browser = Browser()
         browser.open(make_url('/collection/ISOLDE', as=1))
 
@@ -436,10 +436,10 @@ class WebSearchTestSearch(unittest.TestCase):
         self.failUnlessEqual(q, {'cc': ['ISOLDE'],
                                  'p': ['tandem'],
                                  'f': ['title']})
-        
+
     def test_switch_to_advanced_search(self):
         """ websearch - switch to advanced search """
-        
+
         browser = Browser()
         browser.open(make_url('/collection/ISOLDE'))
 
@@ -456,10 +456,10 @@ class WebSearchTestSearch(unittest.TestCase):
                                  'p1': ['tandem'],
                                  'f1': ['title'],
                                  'as': ['1']})
-        
+
     def test_no_boolean_hits(self):
         """ websearch - check the 'no boolean hits' proposed links """
-        
+
         browser = Browser()
         browser.open(make_url(''))
 
@@ -472,7 +472,7 @@ class WebSearchTestSearch(unittest.TestCase):
         for to_drop in ('cc', 'action_search', 'f'):
             if to_drop in q:
                 del q[to_drop]
-        
+
         for bsu in ('quasinormal', 'muon'):
             l = browser.find_link(text=bsu)
             q['p'] = bsu
@@ -507,7 +507,7 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=ellis',
                                                expected_text="jump to record"))
-        
+
     def test_nearest_terms_box_in_unsuccessful_simple_query(self):
         """ websearch - nearest terms box for unsuccessful simple query """
         self.assertEqual([],
@@ -541,7 +541,7 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_text="Nearest terms in any collection are",
                                                expected_link_target=weburl+"/search?p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
-        
+
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
         """ websearch - nearest terms box for unsuccessful boolean query """
         self.assertEqual([],
@@ -609,7 +609,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     def test_search_engine_python_api_for_failed_query(self):
         """websearch - search engine Python API for failed query"""
         self.assertEqual([],
-                         perform_request_search(p='aoeuidhtns'))        
+                         perform_request_search(p='aoeuidhtns'))
 
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
@@ -644,7 +644,7 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=aoeuidhtns&of=id',
                                                expected_text="[]"))
-        
+
 
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
@@ -687,20 +687,23 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
 
     def test_restricted_search_as_anonymous_guest(self):
         """websearch - restricted collection not searchable by anonymous guest"""
-        errmsgs = test_web_page_content(weburl + '/search?c=Theses')
-        if errmsgs[0].find("HTTP Error 401: Authorization Required") > -1:
+        browser = Browser()
+        browser.open(weburl + '/search?c=Theses')
+        loginbox = browser.response().read()
+        if loginbox.find("If you already have an account, please login using the form below") > -1:
             pass
         else:
-            self.fail("Oops, searching restricted collection without password should have returned HTTP Error 401.")
+            self.fail("Oops, searching restricted collection without password should have redirected to login dialog.")
         return
 
     def test_restricted_search_as_authorized_person(self):
         """websearch - restricted collection searchable by authorized person"""
-        testurl = weburl + '/search?c=Theses'
         browser = Browser()
-        # Dr. Jekyll should be able to connect:
-        browser.add_password(testurl, "jekyll", "j123ekyll")
-        browser.open(testurl)
+        browser.open(weburl + '/search?c=Theses')
+        browser.select_form(nr=0)
+        browser['p_un'] = 'jekyll'
+        browser['p_pw'] = 'j123ekyll'
+        browser.submit()
         if browser.response().read().find("records found") > -1:
             pass
         else:
@@ -708,52 +711,36 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
 
     def test_restricted_search_as_unauthorized_person(self):
         """websearch - restricted collection not searchable by unauthorized person"""
-        testurl = weburl + '/search?c=Theses'
         browser = Browser()
+        browser.open(weburl + '/search?c=Theses')
+        browser.select_form(nr=0)
+        browser['p_un'] = 'hyde'
+        browser['p_pw'] = 'h123yde'
+        browser.submit()
         # Mr. Hyde should not be able to connect:
-        browser.add_password(testurl, "hyde", "h123yde")
-        try:
-            browser.open(testurl)
-        except HTTPError, errmsg:
-            if str(errmsg) == "HTTP Error 401: Authorization Required":
-                # good, things worked
-                return
-        # if we got here, things are broken:
-        self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
-
-    def test_restricted_search_with_wrong_credentials(self):
-        """websearch - restricted collection not searchable with wrong credentials"""
-        testurl = weburl + '/search?c=Theses'
-        browser = Browser()
-        # Dr. Jekyll with wrong password should not be able to connect:
-        browser.add_password(testurl, "jekyll", "h123yde")
-        try:
-            browser.open(testurl)
-        except HTTPError, errmsg:
-            if str(errmsg) == "HTTP Error 401: Authorization Required":
-                # good, things worked
-                return 
-        # if we got here, things are broken:
-        self.fail("Oops, Dr. Jekyll with wrong password should not be able to search Theses collection.")
+        if browser.response().read().find("You are not authorized to view this area") <= -1:
+            # if we got here, things are broken:
+            self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
 
     def test_restricted_detailed_record_page_as_anonymous_guest(self):
         """websearch - restricted detailed record page not accessible to guests"""
-        errmsgs = test_web_page_content(weburl + '/record/35')
-        if errmsgs[0].find("HTTP Error 401: Authorization Required") > -1:
-            pass
-        else:
-            self.fail("Oops, accessing restricted detailed record page without password should have returned HTTP Error 401.")
-        return
+        browser = Browser()
+        browser.open(weburl + '/record/35')
+        if browser.response().read().find("You are not authorized to view this record") <= -1:
+            self.fail("Oops, accessing restricted detailed record page without password should have returned authorization error.")
 
     def test_restricted_detailed_record_page_as_authorized_person(self):
         """websearch - restricted detailed record page accessible to authorized person"""
-        testurl = weburl + '/record/35'
         browser = Browser()
+        browser.open(weburl + '/youraccount/login')
+        browser.select_form(nr=0)
+        browser['p_un'] = 'jekyll'
+        browser['p_pw'] = 'j123ekyll'
+        browser.submit()
+        browser.open(weburl + '/record/35')
         # Dr. Jekyll should be able to connect
         # (add the pw to the whole weburl because we shall be
         # redirected to '/reordrestricted/'):
-        browser.add_password(weburl, "jekyll", "j123ekyll") 
-        browser.open(testurl)
         if browser.response().read().find("A High-performance Video Browsing System") > -1:
             pass
         else:
@@ -761,33 +748,17 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
 
     def test_restricted_detailed_record_page_as_unauthorized_person(self):
         """websearch - restricted detailed record page not accessible to unauthorized person"""
-        testurl = weburl + '/record/35'
         browser = Browser()
+        browser.open(weburl + '/youraccount/login')
+        browser.select_form(nr=0)
+        browser['p_un'] = 'hyde'
+        browser['p_pw'] = 'h123yde'
+        browser.submit()
+        browser.open(weburl + '/record/35')
         # Mr. Hyde should not be able to connect:
-        browser.add_password(testurl, "hyde", "h123yde")
-        try:
-            browser.open(testurl)
-        except HTTPError, errmsg:
-            if str(errmsg) == "HTTP Error 401: Authorization Required":
-                # good, things worked
-                return
-        # if we got here, things are broken:
-        self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
-
-    def test_restricted_detailed_record_page_with_wrong_credentials(self):
-        """websearch - restricted detailed record page not accessible with wrong credentials"""
-        testurl = weburl + '/record/35'
-        browser = Browser()
-        # Dr. Jekyll with wrong password should not be able to connect:
-        browser.add_password(testurl, "jekyll", "h123yde")
-        try:
-            browser.open(testurl)
-        except HTTPError, errmsg:
-            if str(errmsg) == "HTTP Error 401: Authorization Required":
-                # good, things worked
-                return 
-        # if we got here, things are broken:
-        self.fail("Oops, Dr. Jekyll with wrong password should not be able to access restricted detailed record page.")
+        if browser.response().read().find('You are not authorized to view this record') <= -1:
+            # if we got here, things are broken:
+            self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
 
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
@@ -832,7 +803,7 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?as=1&p1=ellis&f1=author&op1=a&p2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
 
-        
+
 
     def test_xss_in_browse(self):
         """websearch - no XSS vulnerability in browse"""
@@ -913,7 +884,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
 
 class WebSearchSearchResultsXML(unittest.TestCase):
     """Test search results in various output"""
-    
+
     def test_search_results_xm_output_split_on(self):
         """ websearch - check document element of search results in xm output (split by collection on)"""
         browser = Browser()
@@ -938,7 +909,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
             self.fail("Oops, multiple document elements </collection> "
                       "found in search results.")
 
-    
+
     def test_search_results_xm_output_split_off(self):
         """ websearch - check document element of search results in xm output (split by collection off)"""
         browser = Browser()
@@ -986,7 +957,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
             self.fail("Oops, multiple document elements </collection> "
                       "found in search results.")
 
-    
+
     def test_search_results_xd_output_split_off(self):
         """ websearch - check document element of search results in xd output (split by collection off)"""
         browser = Browser()
@@ -1030,4 +1001,4 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
-    
+

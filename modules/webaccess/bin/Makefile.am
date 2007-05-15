@@ -22,3 +22,6 @@ bin_SCRIPTS = authaction webaccessadmin
 EXTRA_DIST = authaction.in webaccessadmin.in
 
 CLEANFILES = *~ *.tmp authactionc
+
+all:
+	chmod u+x ./webaccessadmin

@@ -22,7 +22,7 @@
 
 __revision__ = "$Id$"
 
-from marshal import loads,dumps
+import marshal
 from zlib import compress,decompress
 from string import split,translate,lower,upper
 import getopt
@@ -49,8 +49,8 @@ from invenio.config import \
      cdslang, \
      etcdir, \
      version
-from invenio.search_engine import perform_request_search, strip_accents
-from invenio.search_engine import HitSet, get_index_id, create_basic_search_units
+from invenio.search_engine import perform_request_search, strip_accents, HitSet
+from invenio.search_engine import get_index_id, create_basic_search_units
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, escape_string
@@ -153,7 +153,7 @@ def single_tag_rank(config):
     tags = split(config.get(config.get("rank_method", "function"), "check_mandatory_tags"),",")
     if tags == ['']:
 	tags = ""
-   
+
     records = []
     for (recids,recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
@@ -222,13 +222,13 @@ def del_recids(rank_method_code, range_rec):
         for (recids,recide) in range_rec:
             for i in range(int(recids), int(recide)):
                 if rec_dict.has_key(i):
-                    del rec_dict[i]  
+                    del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, date, rank_method_code)
     else:
         print "Create before deleting!"
-    
+
 def union_dicts(dict1, dict2):
     "Returns union of the two dicts."
     union_dict = {}
@@ -240,8 +240,8 @@ def union_dicts(dict1, dict2):
 
 def rank_method_code_statistics(rank_method_code):
     """Print statistics"""
-    
-    method = fromDB(rank_method_code) 
+
+    method = fromDB(rank_method_code)
     max = ('',-999999)
     maxcount = 0
     min = ('',999999)
@@ -252,7 +252,7 @@ def rank_method_code_statistics(rank_method_code):
             min = value
         if value > max:
             max = value
-         
+
     for (recID, value) in method.iteritems():
         if value == min:
             mincount += 1
@@ -276,7 +276,7 @@ def rank_method_code_statistics(rank_method_code):
             if value >= lower and value <= upper:
                 setcount += 1
                 distinct_values[value] = 1
-        write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount)) 
+        write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount))
 
 def check_method(rank_method_code):
     write_message("Checking rank method...")
@@ -287,7 +287,7 @@ def check_method(rank_method_code):
             write_message("Records modified, update recommended")
         else:
             write_message("No records modified, update not necessary")
- 
+
 def write_message(msg, stream = sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr). Useful for debugging stuff."""
     if stream == sys.stdout or stream == sys.stderr:
@@ -372,7 +372,7 @@ def task_sig_suicide(sig, frame):
 def task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame)) 
+    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
@@ -395,7 +395,7 @@ def split_ranges(parse_string):
     ranges = string.split(parse_string, ",")
     for arange in ranges:
         tmp_recIDs = string.split(arange, "-")
-        
+
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
         else:
@@ -411,21 +411,21 @@ def bibrank_engine(row, run):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-   
+
     try:
         import psyco
-        psyco.bind(single_tag_rank) 
+        psyco.bind(single_tag_rank)
         psyco.bind(single_tag_rank_method_exec)
         psyco.bind(serialize_via_numeric_array)
         psyco.bind(deserialize_via_numeric_array)
-    except StandardError, e: 
-        print "Psyco ERROR",e 
+    except StandardError, e:
+        print "Psyco ERROR",e
 
     startCreate = time.time()
     global options
     task_id = row[0]
     task_proc = row[1]
-    options = loads(row[6])
+    options = marshal.loads(row[6])
 
     task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     signal.signal(signal.SIGUSR1, task_sig_sleep)
@@ -474,7 +474,7 @@ def bibrank_engine(row, run):
                     write_message("No records specified, updating all")
                 min_id = run_sql("SELECT min(id) from bibrec")[0][0]
                 max_id = run_sql("SELECT max(id) from bibrec")[0][0]
-                options["recid_range"] = [[min_id, max_id]] 
+                options["recid_range"] = [[min_id, max_id]]
 
             if options["quick"] == "no" and options["verbose"] >= 9:
                 write_message("Recalculate parameter not used, parameter ignored.")
@@ -495,7 +495,7 @@ def bibrank_engine(row, run):
                 raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
-        if options["verbose"] >= 9:      
+        if options["verbose"] >= 9:
             traceback.print_tb(sys.exc_info()[2])
         raise StandardError
 
@@ -519,7 +519,7 @@ def get_valid_range(rank_method_code):
     valid = HitSet()
     valid.addlist(recIDs)
     return valid
-   
+
 def add_recIDs_by_date(rank_method_code, dates=""):
     """Return recID range from records modified between DATES[0] and DATES[1].
        If DATES is not set, then add records modified since the last run of
@@ -534,7 +534,7 @@ def add_recIDs_by_date(rank_method_code, dates=""):
     if dates[1]:
         query += "and b.modification_date <= '%s'" % dates[1]
     query += "ORDER BY b.id ASC"""
-    res = run_sql(query)        
+    res = run_sql(query)
     list = create_range_list(res)
     if not list:
         if options["verbose"]:
@@ -551,7 +551,7 @@ def getName(rank_method_code, ln=cdslang, type='ln'):
             res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
             if not res:
                 res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
-            if not res: 
+            if not res:
                 return rank_method_code
             return res[0][0]
         else:
@@ -600,11 +600,11 @@ def deserialize_via_numeric_array(string):
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(dumps(obj)))
+    return escape_string(compress(marshal.dumps(obj)))
 
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
-    return loads(decompress(string))
+    return marshal.loads(decompress(string))
 
 def showtime(timeused):
     """Show time used for method"""

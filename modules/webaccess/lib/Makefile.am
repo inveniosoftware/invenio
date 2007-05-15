@@ -22,13 +22,14 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = access_control_engine.py \
              access_control_config.py \
              access_control_admin.py \
+             access_control_firerole.py \
+             access_control_firerole_tests.py \
              webaccessadmin_lib.py \
              external_authentication_cern.py \
              external_authentication.py \
              external_authentication_cern_wrapper.py \
              external_authentication_cern_tests.py \
              external_authentication_sso.py \
-             firewall.py \
              webaccess_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

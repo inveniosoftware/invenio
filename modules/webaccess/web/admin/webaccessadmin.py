@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import sys
 import invenio.webaccessadmin_lib as wal
+from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
 # reload(wal)
 # from invenio.webaccessadmin_lib import index
 
@@ -53,7 +54,7 @@ def resetarea(req):
     return wal.perform_resetarea(req=req)
 
 
-def resetdefaultsettings(req, superusers=[], confirm=0): 
+def resetdefaultsettings(req, superusers=[], confirm=0):
     """create the reset default settings page. """
 
     return wal.perform_resetdefaultsettings(req=req,
@@ -64,44 +65,44 @@ def resetdefaultsettings(req, superusers=[], confirm=0):
 def adddefaultsettings(req, superusers=[], confirm=0):
     """create the add default settings page. """
 
-    return wal.perform_adddefaultsettings(req=req, 
+    return wal.perform_adddefaultsettings(req=req,
                                           superusers=superusers,
                                           confirm=confirm)
 
 
 def manageaccounts(req, mtype='', content='', confirm=0):
     """enable, disable and edit accounts"""
-            
+
     return wal.perform_manageaccounts(req=req, mtype=mtype, content=content, confirm=confirm)
 
 def modifyaccountstatus(req, userID, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
     """enable or disable account"""
-            
+
     return wal.perform_modifyaccountstatus(req=req, userID=userID, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback, confirm=confirm)
 
 def modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
     """modify the preferences of an account"""
-            
+
     return wal.perform_modifypreferences(req=req, userID=userID, login_method=login_method, callback=callback, confirm=confirm)
 
 def modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
     """modify the email/password of an account"""
-            
+
     return wal.perform_modifylogindata(req=req, userID=userID, email=email, password=password, callback=callback, confirm=confirm)
 
 def rejectaccount(req, userID, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
     """Set account inactive, delete it and send email to the owner."""
-            
+
     return wal.perform_rejectaccount(req=req, userID=userID, email_user_pattern=email_user_pattern, limit_to=limit_to, maxpage=maxpage, page=page, callback=callback, confirm=confirm)
 
 def deleteaccount(req, userID, callback='yes', confirm=0):
     """delete account"""
-            
+
     return wal.perform_deleteaccount(req=req, userID=userID, callback=callback, confirm=confirm)
 
 def createaccount(req, email='', password='', callback='yes', confirm=0):
     """create account"""
-            
+
     return wal.perform_createaccount(req=req, email=email, password=password, callback=callback, confirm=confirm)
 
 def editaccount(req, userID, mtype='', content='', callback='yes', confirm=0):
@@ -116,13 +117,13 @@ def modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=25, page=1, 
 
 def delegate_startarea(req):
     """add info here"""
-            
+
     return wal.perform_delegate_startarea(req=req)
 
 
 def delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confirm=0):
     """add info here"""
-            
+
     return wal.perform_delegate_adminsetup(req=req,
                                            id_role_admin=id_role_admin,
                                            id_role_delegate=id_role_delegate,
@@ -131,7 +132,7 @@ def delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confirm=0):
 
 def delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=0, confirm=0):
     """add info here"""
-            
+
     return wal.perform_delegate_adduserrole(req=req,
                                             id_role=id_role,
                                             email_user_pattern=email_user_pattern,
@@ -141,7 +142,7 @@ def delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=0, confi
 
 def delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
     """add info here"""
-            
+
     return wal.perform_delegate_deleteuserrole(req=req,
                                                id_role=id_role,
                                                id_user=id_user,
@@ -167,22 +168,45 @@ def addaction(req, name_action='', arguments='', optional='no', description='put
 
 def deleteaction(req, id_action="0", confirm=0):
     """show all roles connected, and ask for confirmation."""
-    
+
     return wal.perform_deleteaction(req=req,
                                     id_action=id_action,
                                     confirm=confirm)
 
 
-def addrole(req, name_role='', description='put description here.', confirm=0):
+def addrole(req, name_role='', description='put description here.', firerole_def_src=CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, confirm=0):
     """form to add a new role with these values:
-    
+
       name_role - name of the new role
-    
-    description - optional description of the role """
-    
+
+    description - optional description of the role
+
+    firerole_def_src - optional firerole like definition
+    """
+
     return wal.perform_addrole(req=req,
                                name_role=name_role,
                                description=description,
+                               firerole_def_src=firerole_def_src,
+                               confirm=confirm)
+
+
+def modifyrole(req, id_role='0', name_role='', description='put description here.', firerole_def_src='', modified='0', confirm=0):
+    """form to add a new role with these values:
+
+      name_role - name of the new role
+
+    description - optional description of the role
+
+    firerole_def_src - optional firerole like definition
+    """
+
+    return wal.perform_modifyrole(req=req,
+                               id_role=id_role,
+                               name_role=name_role,
+                               description=description,
+                               firerole_def_src=firerole_def_src,
+                               modified=modified,
                                confirm=confirm)
 
 
@@ -192,7 +216,7 @@ def deleterole(req, id_role="0", confirm=0):
       users - users that can access the role.
 
     actions - actions with possible authorizations."""
-    
+
     return wal.perform_deleterole(req=req,
                                   id_role=id_role,
                                   confirm=confirm)
@@ -227,7 +251,7 @@ def adduserrole(req, id_role='0', email_user_pattern='', id_user='0', confirm=0)
     email_user_pattern - search for users using this pattern
 
                id_user - id of user to add to the role. """
-    
+
     return wal.perform_adduserrole(req=req,
                                    id_role=id_role,
                                    email_user_pattern=email_user_pattern,
@@ -241,7 +265,7 @@ def addroleuser(req, email_user_pattern='', id_user='0', id_role='0', confirm=0)
     email_user_pattern - search for users using this pattern
 
                id_user - id of user to add to the role.
-    
+
                id_role - id of the role to add user to. """
 
     return wal.perform_addroleuser(req=req,
@@ -268,7 +292,7 @@ def deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
 def addauthorization(req, id_role="0", id_action="0", reverse="0", confirm=0, **keywords):
     """ form to add new connection between user and role:
 
-      id_role - role to connect 
+      id_role - role to connect
 
     id_action - action to connect
 
@@ -291,7 +315,7 @@ def deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm=0):
 
       reverse - 0: ask for role first
                 1: ask for action first"""
-    
+
     return wal.perform_deleteroleaction(req=req,
                                     id_role=id_role,
                                     id_action=id_action,
@@ -311,9 +335,9 @@ def modifyauthorizations(req, id_role="0", id_action="0", reverse=0, confirm=0, 
                 1: ask for action first
 
           sel - which button and modification that is selected
-    
+
     errortext - text to print when no connection exist between role and action
-    
+
       authids - ids of checked checkboxes """
 
     return wal.perform_modifyauthorizations(req=req,
@@ -336,7 +360,7 @@ def simpleauthorization(req, id_role=0, id_action=0):
 
 def showroleusers(req, id_role=0):
     """show a page with simple overview of a role and connected users. """
-    
+
     return wal.perform_showroleusers(req=req,
                                      id_role=id_role)
 

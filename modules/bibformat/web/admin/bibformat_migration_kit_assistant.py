@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -54,7 +54,7 @@ def index(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Migrate BibFormat Settings"),
                 body=perform_request_migration_kit_status(ln=ln),
@@ -62,11 +62,11 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-  
+
 def migrate_kb(req, ln=cdslang):
     """
     Migrate kbs and tell users the result of migration
@@ -85,7 +85,7 @@ def migrate_kb(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Migrate Knowledge Bases"),
                 body=perform_request_migration_kit_knowledge_bases(ln=ln),
@@ -93,7 +93,7 @@ def migrate_kb(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -116,7 +116,7 @@ def migrate_behaviours(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Migrate Behaviours"),
                 body=perform_request_migration_kit_behaviours(ln=ln),
@@ -124,7 +124,7 @@ def migrate_behaviours(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -146,7 +146,7 @@ def migrate_formats(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Migrate Formats"),
                 body=perform_request_migration_kit_formats(ln=ln),
@@ -154,9 +154,9 @@ def migrate_formats(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
-        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links) 
+        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 def migrate_formats_do(req, ln=cdslang):
     """
@@ -176,7 +176,7 @@ def migrate_formats_do(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Migrate Formats"),
                 body=perform_request_migration_kit_formats_do(ln=ln),
@@ -184,6 +184,6 @@ def migrate_formats_do(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
-        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links) 
+        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)

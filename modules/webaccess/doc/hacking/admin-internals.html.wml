@@ -10,7 +10,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,13 +20,13 @@
     title="Access Control Admin Internals" \
     navbar_name="hacking-webaccess" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
-    navbar_select="hacking-webaccess-admin-internals" 
+    navbar_select="hacking-webaccess-admin-internals"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <pre>
 These are the functions called by the WebAccess Web Admin Interface to administrate
-the wanted authorizations. This listing is of the most important functions. 
+the wanted authorizations. This listing is of the most important functions.
 
 For more information look in the source code or at the signatures.
 
@@ -53,12 +53,16 @@ acc_addAction(name_action='', description='', optional='no', *allowedkeywords)
 
 
 
-acc_addRole(name_role, description)
+acc_addRole(name_role, description, definition, definition_src)
     add a new role to accROLE in the database.
 
       name_role - name of the role, must be unique
 
     description - text to describe the role
+
+    definition - precompiled serialized firewall like role definition (firerole)
+
+    definition_src - definition text source for repairing after Python upgrades
 
 
 

@@ -25,17 +25,19 @@ import cgi
 from urllib import quote
 from mod_python import apache
 
-from invenio.config import weburl, cdsname, cachedir, cdsnameintl
+from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang
 from invenio.dbquery import Error
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, http_check_credentials
+from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized, \
-     get_user_preferences, auth_apache_user_collection_p
+     get_user_preferences, collect_user_info
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
-from invenio.search_engine import get_colID, get_coll_i18nname
+from invenio.search_engine import get_colID, get_coll_i18nname, restricted_collection_cache
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_config import VIEWRESTRCOLL
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -47,7 +49,7 @@ def wash_search_urlargd(form):
     """
     Create canonical search arguments from those passed via web form.
     """
-    
+
     argd = wash_urlargd(form, search_results_default_urlargd)
 
     # Sometimes, users pass ot=245,700 instead of
@@ -91,7 +93,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1:
-            return page_not_authorized(req, "../",
+            return page_not_authorized(req, "../", \
+                text="You are not authorized to view this record.", \
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -104,7 +107,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
-        if search_engine.coll_restricted_p(record_primary_collection):
+        if restricted_collection_cache.collection_restricted_p(record_primary_collection):
             del argd['recid'] # not wanted argument for detailed record page
             target = '/record-restricted/' + str(self.recid) + '/' + \
                      make_canonical_urlargd(argd, search_results_default_urlargd)
@@ -137,8 +140,10 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         req.argd = argd
 
         uid = getUid(req)
+        user_info = collect_user_info(req)
         if uid == -1:
-            return page_not_authorized(req, "../",
+            return page_not_authorized(req, "../", \
+                text="You are not authorized to view this record.", \
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -148,15 +153,13 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
                 pass
 
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
-        def check_credentials(user, password):
-            """Validate user and password against Apache user database."""
-            if not auth_apache_user_collection_p(user, password,
-                                                 record_primary_collection):
-                return False
-            return True
 
-        # this function only returns if the credentials are valid
-        http_check_credentials(req, record_primary_collection, check_credentials)
+        if restricted_collection_cache.collection_restricted_p(record_primary_collection):
+            (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+            if ret:
+                return page_not_authorized(req, "../", \
+                    text="You are not authorized to view this record.", \
+                    navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
         # record page itself to derivate other queries
@@ -185,8 +188,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
         uid = getUid(req)
+        user_info = collect_user_info(req)
         if uid == -1:
-            return page_not_authorized(req, "../search",
+            return page_not_authorized(req, "../", \
+                text="You are not authorized to view this area.", \
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -198,10 +203,16 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # If any of the collection requires authentication, redirect
         # to the authentication form.
         for coll in argd['c'] + [argd['cc']]:
-            if search_engine.coll_restricted_p(coll):
-                target = '/search/authenticate' + \
-                         make_canonical_urlargd(argd, search_results_default_urlargd)
-                return redirect_to_url(req, target)
+            if restricted_collection_cache.collection_restricted_p(coll):
+                (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                if ret and user_info['email'] == 'guest':
+                    target = '/youraccount/login' +                     make_canonical_urlargd({'ln' : argd['ln'], 'referer' : weburl + '/search' + make_canonical_urlargd(argd, search_results_default_urlargd)}, {'ln' : cdslang})
+                    return redirect_to_url(req, target)
+                elif ret:
+                    return page_not_authorized(req, "../", \
+                        text="You are not authorized to view this area.", \
+                        navmenuid='search')
+
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -226,17 +237,17 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
     def authenticate(self, req, form):
         """Restricted search results pages."""
+
         argd = wash_search_urlargd(form)
 
-        def check_credentials(user, password):
-            """Validate user and password against Apache user database."""
-            for coll in argd['c'] + [argd['cc']]:
-                if not auth_apache_user_collection_p(user, password, coll):
-                    return False
-            return True
-
-        # this function only returns if the credentials are valid
-        http_check_credentials(req, "restricted collection", check_credentials)
+        user_info = collect_user_info(req)
+        for coll in argd['c'] + [argd['cc']]:
+            if restricted_collection_cache.collection_restricted_p(coll):
+                (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                if ret:
+                    return page_not_authorized(req, "../", \
+                        text="You are not authorized to view this collection.", \
+                        navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -382,7 +393,8 @@ def display_collection(req, c, as, verbose, ln):
         uid = getUid(req)
         user_preferences = {}
         if uid == -1:
-            return page_not_authorized(req, "../",
+            return page_not_authorized(req, "../", \
+                text="You are not authorized to view this collection", \
                                        navmenuid='search')
         elif uid > 0:
             user_preferences = get_user_preferences(uid)
@@ -427,7 +439,7 @@ def display_collection(req, c, as, verbose, ln):
         filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
         c_portalbox_lt = filedesc.read()
         filedesc.close()
-        # show help boxes (usually located in "tr", "top right") 
+        # show help boxes (usually located in "tr", "top right")
         # if users have not banned them in their preferences:
         c_portalbox_rt = ""
         if user_preferences.get('websearch_helpbox', 1) > 0:

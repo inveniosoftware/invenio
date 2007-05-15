@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,7 +20,7 @@
 """CDS Invenio BibRank Administrator Interface."""
 
 __revision__ = "$Id$"
-    
+
 __lastupdated__ = """$Date$"""
 
 import sys
@@ -33,13 +33,13 @@ from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=cdslang):
     navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="BibRank Admin Interface",
                 body=brc.perform_index(ln),
@@ -53,13 +53,13 @@ def index(req, ln=cdslang):
 
 def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Add new rank method",
                 body=brc.perform_addrankarea(rnkcode=rnkcode,
@@ -76,13 +76,13 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
 
 def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Modify translations",
                     body=brc.perform_modifytranslations(rnkID=rnkID,
@@ -100,13 +100,13 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
 
 def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Modify visibility toward collections",
                 body=brc.perform_modifycollection(rnkID=rnkID,
@@ -124,13 +124,13 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
 
 def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Delete rank method",
                 body=brc.perform_deleterank(rnkID=rnkID,
@@ -146,13 +146,13 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
 
 def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Modify rank method",
                 body=brc.perform_modifyrank(rnkID=rnkID,
@@ -165,19 +165,19 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showrankdetails(req, ln=cdslang, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
         return error_page(req)
 
-    auth = brc.check_user(uid,'cfgbibrank')
+    auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
         return page(title="Rank method details",
                 body=brc.perform_showrankdetails(rnkID=rnkID,
@@ -186,14 +186,14 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
                 language=ln,
                 req=req,
                 navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)   
+                lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def error_page(req, ln=cdslang, verbose=1):
     return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % cdsname, 
+                description="%s - Internal Error" % cdsname,
                 keywords="%s, CDS Invenio, Internal Error" % cdsname,
                 language=ln,
                 req=req)

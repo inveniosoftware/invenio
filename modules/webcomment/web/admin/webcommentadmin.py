@@ -29,7 +29,7 @@ from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.config import weburl,cdslang,cdsname
-from invenio.dbquery import Error 
+from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language
@@ -37,7 +37,7 @@ from invenio.messages import wash_language, gettext_set_language
 def index(req, ln=cdslang):
     """
     Menu of admin options
-    @param ln: language  
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -55,7 +55,7 @@ def index(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgwebcomment')
+    (auth_code, auth_msg) = check_user(req, 'cfgwebcomment')
     if (auth_code != 'false'):
         return page(title=_("Comment Management"),
                 body=perform_request_index(ln=ln),
@@ -63,7 +63,7 @@ def index(req, ln=cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -88,8 +88,8 @@ def delete(req, ln=cdslang, comid=""):
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
                     req=req)
-    
-    (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
+
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
     if (auth_code != 'false'):
         (body, errors, warnings) = perform_request_delete(ln=ln, comID=comid)
         return page(title=_("Delete Comment"),
@@ -98,7 +98,7 @@ def delete(req, ln=cdslang, comid=""):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 req = req,
-                errors = errors, 
+                errors = errors,
                 warnings = warnings,
                 lastupdated=__lastupdated__)
     else:
@@ -118,7 +118,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
     navtrail_previous_links += _("Comment Management") + '</a>'
-    
+
     try:
         auid = getUid(req)
     except Error:
@@ -128,7 +128,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
                     keywords="%s, CDS Invenio, Internal Error" % cdsname,
                     language=ln,
                     req=req)
-    
+
     (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
     if (auth_code != 'false'):
         return page(title=_("View all reported comments"),
@@ -145,7 +145,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
 def users(req, ln=cdslang):
     """
     View a list of all the users that have been reported, sorted by most reported
-    @param ln: language 
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -163,7 +163,7 @@ def users(req, ln=cdslang):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
     if (auth_code != 'false'):
         return page(title=_("View all reported users"),
                     body=perform_request_users(ln=ln),
@@ -200,10 +200,10 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
                     language=ln,
                     req=req)
 
-    (auth_code, auth_msg) = check_user(uid,'cfgwebcomment')
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
     if (auth_code != 'false'):
         comIDs = []
-        args = hidden.keys() 
+        args = hidden.keys()
         for var in args:
             try:
                 comIDs.append(int(var.split('comid')[1]))

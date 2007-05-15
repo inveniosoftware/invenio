@@ -35,8 +35,9 @@ from invenio.config import \
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
 from invenio.webpage import page
 from invenio.dbquery import run_sql
-from invenio.webuser import getUid,isGuestUser, get_user_preferences, set_user_preferences
-from invenio.access_control_admin import acc_findUserRoleActions
+from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
+        set_user_preferences, collect_user_info
+from invenio.access_control_admin import acc_findUserRoleActions_user_info
 from invenio.messages import gettext_set_language
 from invenio.external_authentication import WebAccessExternalAuthError
 
@@ -70,15 +71,15 @@ def perform_display_external_user_settings(settings, ln):
             html_settings += websession_templates.tmpl_external_setting(ln, key, value)
     return print_settings and websession_templates.tmpl_external_user_settings(ln, html_settings) or ""
 
-def perform_youradminactivities(uid, ln):
+def perform_youradminactivities(user_info, ln):
     """Return text for the `Your Admin Activities' box.  Analyze
        whether user UID has some admin roles, and if yes, then print
        suitable links for the actions he can do.  If he's not admin,
        print a simple non-authorized message."""
-    your_role_actions = acc_findUserRoleActions(uid)
+    your_role_actions = acc_findUserRoleActions_user_info(user_info)
     your_roles = []
     your_admin_activities = []
-    guest = isGuestUser(uid)
+    guest = isGuestUser(user_info['uid'])
     for (role, action) in your_role_actions:
         if role not in your_roles:
             your_roles.append(role)
@@ -92,7 +93,7 @@ def perform_youradminactivities(uid, ln):
 
     return websession_templates.tmpl_account_adminactivities(
              ln = ln,
-             uid = uid,
+             uid = user_info['uid'],
              guest = guest,
              roles = your_roles,
              activities = your_admin_activities,
@@ -106,6 +107,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
     _ = gettext_set_language(ln)
 
     uid = getUid(req)
+    user_info = collect_user_info(req)
     #your account
     if isGuestUser(uid):
         user = "guest"
@@ -136,7 +138,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
              searches = sear,
              messages = msgs,
              groups = grps,
-             administrative = perform_youradminactivities(uid, ln)
+             administrative = perform_youradminactivities(user_info, ln)
            )
 
 # template_account() : it is a template for print each of the options from the user's account
@@ -163,7 +165,7 @@ def perform_delete(ln):
     return websession_templates.tmpl_account_delete(ln = ln)
 
 def perform_set(email,password, ln, verbose=0):
-    """Perform_set(email,password): edit your account parameters, email and 
+    """Perform_set(email,password): edit your account parameters, email and
     password.
     """
 

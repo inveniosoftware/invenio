@@ -30,7 +30,6 @@ from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers, acc_deleteUserRole
 from invenio.config import cdslang, bibconvertconf
 from invenio.access_control_engine import acc_authorize_action
-
 import invenio.template
 
 try:
@@ -41,12 +40,12 @@ except:
 
 ## utility functions:
 
-def is_adminuser(uid, role):
+def is_adminuser(req, role):
     """check if user is a registered administrator. """
-    return acc_authorize_action(uid, role)
+    return acc_authorize_action(req, role)
 
-def check_user(uid, role, adminarea=2, authorized=0):
-    (auth_code, auth_message) = is_adminuser(uid, role)
+def check_user(req, role, adminarea=2, authorized=0):
+    (auth_code, auth_message) = is_adminuser(req, role)
     if not authorized and auth_code != 0:
         return ("false", auth_message)
     return ("", auth_message)
@@ -334,7 +333,7 @@ def build_submission_collection_tree(collection_id, has_brother_above=0, has_bro
             build_submission_collection_tree(collection_id=res_collection_children[child_num][0],
                                   has_brother_above=brother_above,
                                   has_brother_below=brother_below))
-        
+
 
     ## return the built collection tree:
     return collection_node
@@ -481,7 +480,7 @@ def perform_request_organise_submission_page(doctype="",
         (title, body) = _organise_submission_page_display_submission_tree(errors, warnings, user_msg=user_msg)
     elif "" not in (movesbmcollectiondown, sbmcolid):
         ## move a submission-collection down in order:
-        
+
         ## Sanity checking:
         try:
             int(sbmcolid)
@@ -2397,7 +2396,7 @@ def _add_submission_to_doctype(errors, warnings, doctype, action, displayed, but
         user_msg.append("""Unable to Add '%s' Submission to '%s' Document Type""" % (action, doctype))
         ## TODO : LOG ERROR
     (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
-    return (title, body)    
+    return (title, body)
 
 def _delete_submission_from_doctype(errors, warnings, doctype, action):
     """Delete a submission (action) from the document type identified by "doctype".
@@ -2627,7 +2626,7 @@ def _move_category(errors, warnings, doctype, categid, movecategup=""):
         error_code = move_category_by_one_place_in_score(doctype=doctype,
                                                          categsname=categid,
                                                          direction="down")
-    
+
     if error_code == 0:
         ## successful move of category
         user_msg.append("""[%s] Category Successfully Moved""" % (categid,))
@@ -3258,7 +3257,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         except ValueError, e:
             movedownfunctionscore = ""
 
-    
+
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
     if doctype in ("", None):
         user_msg.append("""Unknown Document Type""")
@@ -3304,7 +3303,7 @@ def perform_request_configure_doctype_submissionfunctions(doctype,
         ## TODO : LOG ERROR
         (title, body) = _create_configure_doctype_form(doctype=doctype, user_msg=user_msg)
         return (title, body, errors, warnings)
-        
+
 
     ## submission valid
     if movefromfunctionname != "" and movefromfunctionstep != "" and movefromfunctionscore != "" and \
@@ -3680,8 +3679,8 @@ def perform_request_configure_doctype_submissionpage_elements(doctype, action, p
         user_msg.append("Invalid page number - must be an integer value!")
         (title, body) = _create_configure_doctype_submission_pages_form(doctype=doctype, action=action, user_msg=user_msg)
         return (title, body, errors, warnings)
-    
-    
+
+
     ## submission valid
     if editfieldposn != "" and editfieldposncommit == "":
         ## display form for editing field
@@ -3766,7 +3765,7 @@ def _configure_doctype_edit_field_on_submissionpage(errors, warnings, doctype, a
         ## TODO : LOG WARNING
 
     (title, body) = _create_configure_doctype_submission_page_elements_form(doctype=doctype, action=action, pagenum=pagenum, user_msg=user_msg)
-    return (title, body)        
+    return (title, body)
 
 def _configure_doctype_edit_field_on_submissionpage_display_field_details(errors, warnings, doctype, action, pagenum, fieldposn,
                                                                           fieldtext=None, fieldlevel=None, fieldshortdesc=None,
@@ -3895,7 +3894,7 @@ def _configure_doctype_add_field_to_submissionpage(errors, warnings, doctype, ac
                                                                                     fieldname=fieldname, fieldtext=fieldtext,
                                                                                     fieldlevel=fieldlevel, fieldshortdesc=fieldshortdesc,
                                                                                     fieldcheck=fieldcheck, user_msg=user_msg)
-    return (title, body)        
+    return (title, body)
 
 def _configure_doctype_add_field_to_submissionpage_display_form(doctype, action, pagenum, fieldname="", fieldtext="",
                                                                 fieldlevel="", fieldshortdesc="", fieldcheck="", user_msg=""):
@@ -4037,7 +4036,7 @@ def perform_request_configure_doctype_submissionpages(doctype,
         pagenum = int(pagenum)
     except ValueError:
         pagenum = ""
-    
+
     ## ensure that there is only one doctype for this doctype ID - simply display all doctypes with warning if not
     if doctype in ("", None):
         user_msg.append("""Unknown Document Type""")

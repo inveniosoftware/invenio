@@ -47,7 +47,7 @@ from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_isRole
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email
+from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
 from invenio.file import *
 from invenio.messages import gettext_set_language, wash_language
@@ -296,7 +296,7 @@ def interface(req,
         fp.write(uid_email)
         fp.close()
     # is user authorized to perform this action?
-    (auth_code, auth_message) = acc_authorize_action(uid, "submit", verbose=0, doctype=doctype, act=act)
+    (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act)
     if acc_isRole("submit", doctype=doctype, act=act) and auth_code != 0:
         return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
 
@@ -876,7 +876,7 @@ def endaction(req,
     try:
         ## Handle the execution of the functions for this
         ## submission/step:
-        function_content = print_function_calls(doctype=doctype,
+        function_content = print_function_calls(req=req, doctype=doctype,
                                                 action=act,
                                                 step=step,
                                                 form=form,
@@ -1342,10 +1342,11 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (doctype, action, step, form, ln=cdslang):
+def print_function_calls (req, doctype, action, step, form, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
-    global htdocsdir,storage,access,pylibdir,dismode
+    global htdocsdir,storage,access,pylibdir,dismode,user_info
+    user_info = collect_user_info(req)
     # load the right message language
     _ = gettext_set_language(ln)
     t = ""

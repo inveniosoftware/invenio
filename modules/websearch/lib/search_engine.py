@@ -63,8 +63,10 @@ from invenio.bibrank_downloads_similarity import register_page_view_event, calcu
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-
+from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
+from invenio.access_control_admin import acc_getActionId
+from invenio.access_control_config import VIEWRESTRCOLL
 
 if CFG_EXPERIMENTAL_FEATURES:
     from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
@@ -129,6 +131,154 @@ sre_unicode_uppercase_u = sre.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
 sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
 sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
+
+class RestrictedCollectionDataCacher(DataCacher):
+    def __init__(self):
+        def cache_filler():
+            ret = []
+            try:
+                viewcollid = acc_getActionId(VIEWRESTRCOLL)
+                res = run_sql("""SELECT DISTINCT ar.value
+                    FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
+                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (viewcollid,))
+            except Exception:
+                # database problems, return empty cache
+                return []
+            for coll in res:
+                ret.append(coll[0])
+            return ret
+
+        def timestamp_getter():
+            return max(get_table_update_time('accROLE_accACTION_accARGUMENT'), get_table_update_time('accARGUMENT'))
+
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+    def collection_restricted_p(self, collection):
+        cache = self.get_cache()
+        return collection in cache
+
+try:
+    restricted_collection_cache.is_ok_p
+except Exception:
+    restricted_collection_cache = RestrictedCollectionDataCacher()
+
+
+class FieldI18nNameDataCacher(DataCacher):
+    def __init__(self):
+        def cache_filler():
+            ret = {}
+            try:
+                res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
+            except Exception:
+                # database problems, return empty cache
+                return {}
+            for f, ln, i18nname in res:
+                if i18nname:
+                    if not ret.has_key(f):
+                        ret[f] = {}
+                    ret[f][ln] = i18nname
+            return ret
+
+        def timestamp_getter():
+            return get_table_update_time('fieldname')
+
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+    def get_field_i18nname(self, f, ln=cdslang):
+        out = f
+        try:
+            out = self.get_cache()[f][ln]
+        except KeyError:
+            pass # translation in LN does not exist
+        return out
+
+try:
+    if not field_i18n_name_cache.is_ok_p:
+        raise Exception
+except Exception:
+    field_i18n_name_cache = FieldI18nNameDataCacher()
+
+
+class CollectionRecListDataCacher(DataCacher):
+    def __init__(self):
+        def cache_filler():
+            ret = {}
+            try:
+                res = run_sql("SELECT name,reclist FROM collection")
+            except Exception:
+                # database problems, return empty cache
+                return {}
+            for name, reclist in res:
+                ret[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
+            return ret
+
+        def timestamp_getter():
+            return get_table_update_time('collection')
+
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+    def get_collection_reclist(self, coll):
+        cache = self.get_cache()
+        if not cache[coll]:
+            # not yet it the cache, so calculate it and fill the cache:
+            set = HitSet()
+            query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
+            res = run_sql(query, None, 1)
+            if res:
+                try:
+                    set._nbhits, set._set = res[0][0], Numeric.loads(zlib.decompress(res[0][1]))
+                except:
+                    set._nbhits = 0
+            self.cache[coll] = set
+            cache[coll] = set
+        # finally, return reclist:
+        return cache[coll]
+
+try:
+    if not collection_reclist_cache.is_ok_p:
+        raise Exception
+except Exception:
+    collection_reclist_cache = CollectionRecListDataCacher()
+
+
+class CollectionI18nDataCacher(DataCacher):
+    def __init__(self):
+        def cache_filler():
+            ret = {}
+            try:
+                res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
+            except Exception:
+                # database problems,
+                return {}
+            for c, ln, i18nname in res:
+                if i18nname:
+                    if not ret.has_key(c):
+                        ret[c] = {}
+                    ret[c][ln] = i18nname
+            return ret
+
+        def timestamp_getter():
+            return get_table_update_time('collectionname')
+
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+    def get_coll_i18nname(self, c, ln=cdslang):
+        """Return nicely formatted collection name (of name type 'ln',
+        'long name') for collection C in language LN."""
+        cache = self.get_cache()
+        out = c
+        try:
+            out = cache[c][ln]
+        except KeyError:
+            pass # translation in LN does not exist
+        return out
+
+try:
+    if not collection_i18n_name_cache.is_ok_p:
+        raise Exception
+except Exception:
+    collection_i18n_name_cache = CollectionI18nDataCacher()
+
 
 def get_alphabetically_ordered_collection_list(level=0, ln=cdslang):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
@@ -449,7 +599,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                       m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec,
                       action=""):
     
-    "Create search box for 'search again in the results page' functionality."
+    """Create search box for 'search again in the results page' functionality."""
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -594,7 +744,8 @@ def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1):
         as=as, ln=ln, dads=dads)
 
 def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
-    "Produces 'search within' selection box for the current collection."
+    """Produces 'search within' selection box for the current collection."""
+
     out = ""
     out += """<select name="%s">""" % fieldname
     out += """<option value="">%s""" % get_field_i18nname("any field", ln)
@@ -610,7 +761,8 @@ def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
     return out
 
 def get_searchwithin_fields(ln='en'):
-    "Retrieves the fields name used in the 'search within' selection box for the current collection."
+    """Retrieves the fields name used in the 'search within' selection box for the current collection."""
+
     query = "SELECT code,name FROM field ORDER BY name ASC"
     res = run_sql(query)
     fields = [{
@@ -754,7 +906,6 @@ except:
     pass
 
 def wash_colls(cc, c, split_colls=0):
-
     """Wash collection list by checking whether user has deselected
     anything under 'Narrow search'.  Checks also if cc is a list or not.
        Return list of cc, colls_to_display, colls_to_search since the list
@@ -2174,7 +2325,8 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
            )
 
 def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang, ec=[]):
-    "Prints results overview box with links to particular collections below."
+    """Prints results overview box with links to particular collections below."""
+
     out = ""
     new_colls = []
     for coll in colls:
@@ -2480,7 +2632,8 @@ def print_records_epilogue(req, format):
         
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
                  search_pattern=None, uid=None, verbose=0):
-    "Prints record 'recID' formatted accoding to 'format'."
+    """Prints record 'recID' formatted accoding to 'format'."""
+
     _ = gettext_set_language(ln)
 
     out = ""

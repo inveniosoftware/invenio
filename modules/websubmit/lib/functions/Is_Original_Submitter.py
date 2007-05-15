@@ -22,7 +22,7 @@ __revision__ = "$Id$"
    ##
    ## Name:          Is_Original_Submitter
    ## Description:   function Is_Original_Submitter
-   ##                This function compares the email of the current logged 
+   ##                This function compares the email of the current logged
    ##             user with the original submitter of the document, then
    ##             check whether the user has special rights.
    ## Author:         T.Baron
@@ -39,13 +39,13 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Is_Original_Submitter(parameters,curdir,form):
-    global uid_email,sysno,uid
+    global uid_email,sysno,uid,user_info
     doctype = form['doctype']
     act = form['act']
     email = Get_Field("8560_f",sysno)
     email = re.sub("[\n\r ]+","",email)
     uid_email = re.sub("[\n\r ]+","",uid_email)
-    (auth_code, auth_message) = acc_authorize_action(uid, "submit",verbose=0,doctype=doctype, act=act)
+    (auth_code, auth_message) = acc_authorize_action(user_info, "submit",verbose=0,doctype=doctype, act=act)
     if re.search(uid_email,email,re.IGNORECASE) is None and auth_code != 0:
         raise InvenioWebSubmitFunctionStop("""
 <SCRIPT>

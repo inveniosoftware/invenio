@@ -28,13 +28,13 @@
 ## About "config.wml" ##
 ## #####################
 
-## This file ('config.wml') consists of several relatively independent 
+## This file ('config.wml') consists of several relatively independent
 ## configuration parts:
 ##
 ##   Part  1: Essential parameters
 ##   Part  2: CDS page elements
 ##   Part  3: CDS navigation bar
-##   Part  5: WebSearch parameters 
+##   Part  5: WebSearch parameters
 ##   Part  4: BibHarvest OAI parameters
 ##   Part  6: WebSubmit parameters
 ##   Part  7: Fulltext Archive parameters
@@ -42,7 +42,7 @@
 ##   Part  9: BibIndex parameters
 ##   Part 10: Access Control parameters
 ##
-## The configuration is done by editing the content of the "define-tag" 
+## The configuration is done by editing the content of the "define-tag"
 ## WML elements below.  Feel free to edit as many as you need.  When done,
 ## return to the main CDS Invenio source directory and type 'make'.  Good luck! :-)
 
@@ -56,7 +56,7 @@
 
 ## This part defines essential CDS Invenio internal parameters that
 ## everybody should modify, like the name of the server or the email
-## address of the local CDS Invenio administrator.  
+## address of the local CDS Invenio administrator.
 
 ## CDSNAME -- the visible name of your CDS Invenio installation:
 ##  (example: "My Document Server")
@@ -153,6 +153,15 @@ cds.support@cern.ch
 8000
 </define-tag>
 
+## CFG_MAX_CACHED_QUERIES -- maximum cached queries number possible
+## after reaching this number of cached queries the cache is pruned
+## deleting half of the older accessed cached queries.
+##  (example: "10000")
+<define-tag CFG_MAX_CACHED_QUERIES whitespace=delete>
+10000
+</define-tag>
+
+
 ## CFG_APACHE_PASSWORD_FILE -- the file where Apache user credentials
 ## are stored.  Must be an absolute pathname.  If the value does not
 ## start by a slash, it is considered to be the filename of a file
@@ -220,7 +229,7 @@ demo-site-apache-user-groups
 ## sheet in the file 'htdocs/img/cds.css' that you can change at your
 ## will too.
 
-## CFG_TEMPLATE_SKIN -- what template skin do you want to use? 
+## CFG_TEMPLATE_SKIN -- what template skin do you want to use?
 ##  (example: "default")
 <define-tag CFG_TEMPLATE_SKIN whitespace=delete>
 default
@@ -457,26 +466,26 @@ default
 ## This part defines parameters for the CDS Invenio OAI gateway.
 ## Useful if you are running CDS Invenio as OAI data provider.
 
-## CFG_OAI_ID_SCHEME -- OAI identifier scheme:  
+## CFG_OAI_ID_SCHEME -- OAI identifier scheme:
 ##  (example: "oai")
 <define-tag CFG_OAI_ID_SCHEME whitespace=delete>
 oai
 </define-tag>
 
-## CFG_OAI_ID_TAG -- OAI identifier tag:  
+## CFG_OAI_ID_TAG -- OAI identifier tag:
 ##  (example: "0248_a")
 <define-tag CFG_OAI_ID_TAG whitespace=delete>
 909COo
 </define-tag>
 
-## CFG_OAI_SET_TAG -- OAI set tag:  
+## CFG_OAI_SET_TAG -- OAI set tag:
 ##  (example: "0248_p")
 <define-tag CFG_OAI_SET_TAG whitespace=delete>
 909COp
 </define-tag>
 
 ## CFG_OAI_DELETED_TAG -- OAI tag for deleted records mark. OAI record
-## is considered deleted if the value of this field is set to 
+## is considered deleted if the value of this field is set to
 ## "DELETED" and the OAI deleted records policy is set either to
 ## "transient" or "persistent".
 ##  (example: "980__c")
@@ -490,13 +499,13 @@ oai
 no
 </define-tag>
 
-## CFG_OAI_ID_PREFIX -- OAI identifier prefix:  
+## CFG_OAI_ID_PREFIX -- OAI identifier prefix:
 ##  (example: "cds.cern.ch")
 <define-tag CFG_OAI_ID_PREFIX whitespace=delete>
 atlantis.cern.ch
 </define-tag>
 
-## CFG_OAI_SAMPLE_IDENTIFIER -- OAI sample identifier:  
+## CFG_OAI_SAMPLE_IDENTIFIER -- OAI sample identifier:
 ##  (example: "oai:cds.cern.ch:CERN-TH-4036")
 <define-tag CFG_OAI_SAMPLE_IDENTIFIER whitespace=delete>
 <CFG_OAI_ID_SCHEME>:<CFG_OAI_ID_PREFIX>:CERN-TH-4036
@@ -558,7 +567,7 @@ atlantis.cern.ch
 90000
 </define-tag>
 
-## CFG_OAI_SLEEP -- service unavailable between two consecutive 
+## CFG_OAI_SLEEP -- service unavailable between two consecutive
 ## requests for CFG_OAI_SLEEP seconds:
 ##  (example: "10")
 <define-tag CFG_OAI_SLEEP whitespace=delete>
@@ -594,7 +603,7 @@ atlantis.cern.ch
 ## This section contains some WML-based configuration parameters for
 ## fulltext archive.
 
-## CFG_FILE_DIR -- this indicates where the fulltext files will be 
+## CFG_FILE_DIR -- this indicates where the fulltext files will be
 ## stored
 <define-tag CFG_FILE_DIR whitespace=delete>
 <DATADIR>/files
@@ -803,7 +812,7 @@ mysuperpass
 ##########################
 ##  THAT's ALL, FOLKS!  ##
 ##########################
-  
+
 ## And this is the end of "config.wml" WML configuration phase.  Now
 ## please return to the main CDS source directory and type 'make'.
 ## (Note: if you have bravely edited the "cdsnavbar.wml" file too,

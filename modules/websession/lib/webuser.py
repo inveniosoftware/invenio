@@ -33,8 +33,9 @@ It also contains Apache-related user authentication stuff.
 
 __revision__ = "$Id$"
 
-from marshal import loads, dumps
+import marshal
 from zlib import compress, decompress
+from socket import gethostbyname
 import time
 import os
 import crypt
@@ -64,10 +65,10 @@ from invenio.dbquery import run_sql, escape_string, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.access_control_config import *
-from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import http_get_credentials
+from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
 tmpl = invenio.template.load('websession')
@@ -240,36 +241,36 @@ def isGuestUser(uid):
         pass
     return out
 
-def isUserSubmitter(uid):
-    u_email = get_email(uid)
-    res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
-    if len(res) > 0:
-        return 1
-    else:
-        return 0
+#def isUserSubmitter(uid):
+    #u_email = get_email(uid)
+    #res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
+    #if len(res) > 0:
+        #return 1
+    #else:
+        #return 0
 
-def isUserReferee(uid):
-    res = run_sql("select sdocname from sbmDOCTYPE")
-    for row in res:
-        doctype = row[0]
-        categ = "*"
-        (auth_code, auth_message) = acc_authorize_action(uid, "referee", doctype=doctype, categ=categ)
-        if auth_code == 0:
-            return 1
-        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
-        for row2 in res2:
-            categ = row2[0]
-            (auth_code, auth_message) = acc_authorize_action(uid, "referee", doctype=doctype, categ=categ)
-            if auth_code == 0:
-                return 1
-    return 0
+#def isUserReferee(req):
+    #res = run_sql("select sdocname from sbmDOCTYPE")
+    #for row in res:
+        #doctype = row[0]
+        #categ = "*"
+        #(auth_code, auth_message) = ace.acc_authorize_action_req(req, "referee", doctype=doctype, categ=categ)
+        #if auth_code == 0:
+            #return 1
+        #res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
+        #for row2 in res2:
+            #categ = row2[0]
+            #(auth_code, auth_message) = ace.acc_authorize_action_req(req, "referee", doctype=doctype, categ=categ)
+            #if auth_code == 0:
+                #return 1
+    #return 0
 
-def isUserAdmin(uid):
-    "Return 1 if the user UID has some admin rights; 0 otherwise."
-    out = 0
-    if acc_findUserRoleActions(uid):
-        out = 1
-    return out
+#def isUserAdmin(req):
+    #"Return 1 if the user UID has some admin rights; 0 otherwise."
+    #out = 0
+    #if acc_findUserRoleActions_req(req):
+        #out = 1
+    #return out
 
 def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
@@ -685,9 +686,9 @@ def create_userinfobox_body(req, uid, language="en"):
                                             url_referer=url_referer,
                                             guest = isGuestUser(uid),
                                             username = get_nickname_or_email(uid),
-                                            submitter = isUserSubmitter(uid),
-                                            referee = isUserReferee(uid),
-                                            admin = isUserAdmin(uid),
+                                            submitter = True, # FIXME isUserSubmitter(uid),
+                                            referee = True, # FIXME isUserReferee(req),
+                                            admin = True # FIXME isUserAdmin(req),
                                             )
     except OperationalError:
         return ""
@@ -765,29 +766,14 @@ def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
         pass
     return out
 
-def auth_apache_user_collection_p(user, password, coll):
-    """Check whether user-supplied credentials correspond to valid
-    Apache password data file, and whether this user is authorized to
-    see the given collections.  Return 0 in case of failure, 1 in case
-    of success."""
-    from invenio.search_engine import coll_restricted_p, coll_restricted_group
-    if not auth_apache_user_p(user, password):
-        return 0
-    if not coll_restricted_p(coll):
-        return 1
-    if coll_restricted_group(coll) in auth_apache_user_in_groups(user):
-        return 1
-    else:
-        return 0
-
 def get_user_preferences(uid):
     pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
     if pref:
         try:
             return deserialize_via_marshal(pref[0][1])
         except:
-            return get_default_user_preferences()
-    return {} # empty dict mean no preferences
+            pass
+    return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
     assert(type(pref) == type({}))
@@ -804,42 +790,42 @@ def get_default_user_preferences():
             break
     return user_preference
 
-def extract_user_info(req):
-    """Return a tuple (uid, nickname, email, groupids, remote_ip, remote_host, external)
-    containing all the useful info to identificate a user in order
-    to restrict his/her rights.
+def collect_user_info(req):
+    """Given the mod_python request object rec it returns a dictionary
+    containing at least the keys uid, apache_user, apache_groups, nickname,
+    email, groups, remote_ip, remote_host, plus any external keys in
+    the user preferences (collected at login time and built by the different
+    external authentication plugins)
     """
     user_info = {}
     uid = getUid(req)
-    userinfo['uid'] = uid
-    user_info['apache_user'], apache_pwd = http_get_credentials(req)
-    if apache_user:
-        if not auth_apache_user_p(apache_user, apache_pwd):
-            apache_user = None
-            apache_pwd = None
-    if user_info['apache_user']:
-        user_info['apache_groups'] = auth_apache_user_in_groups(user_info['apache_user'])
-    else:
-        user_info['apache_groups'] = []
+    user_info['uid'] = uid
+    #apache_user, apache_pwd = http_get_credentials(req)
+    #if apache_user:
+        #if not auth_apache_user_p(apache_user, apache_pwd):
+            #apache_user = None
+            #apache_pwd = None
+    #user_info['apache_user'] = apache_user
+    #user_info['apache_group'] = []
+    #if user_info['apache_user']:
+        #user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
     user_info['nickname'] = get_nickname(uid) or None
     user_info['email'] = get_email(uid) or None
-    prefs = get_user_preferences(uid)
-    for key, value in prefs:
-        user_info[key] = value
+    user_info['group'] = []
     if uid:
-        user_info['groups'] = [group[1] for group in get_groups(uid)]
-    else:
-        user_info['groups'] = []
+        user_info['group'] = [group[1] for group in get_groups(uid)]
     user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
     user_info['remote_host'] = req.connection.remote_host or None
-    for key, value in prefs:
-        user_info[key.lower()] = value
+    prefs = get_user_preferences(uid)
+    if prefs:
+        for key, value in prefs.items():
+            user_info[key.lower()] = value
     return user_info
 
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
-    return compress(dumps(obj))
+    return compress(marshal.dumps(obj))
 def deserialize_via_marshal(string):
     """Decompress and deserialize string into a Python object via marshal."""
-    return loads(decompress(string))
+    return marshal.loads(decompress(string))

@@ -24,6 +24,7 @@ pylib_DATA = __init__.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              config.py \
+             data_cacher.py \
              dbquery.py \
              dbquery_tests.py \
 	     miscutil_config.py \

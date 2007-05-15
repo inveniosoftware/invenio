@@ -19,7 +19,7 @@
 
 docdir = $(localstatedir)/www/admin/webaccess
 
-doc_DATA = index.html guide.html
+doc_DATA = index.html guide.html firerole.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

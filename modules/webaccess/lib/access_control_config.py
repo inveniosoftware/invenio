@@ -24,9 +24,13 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-#import external_authentication_sso
-#import external_authentication_cern
-from invenio.config import cdsname, sweburl, supportemail
+from invenio.config import cdsname, sweburl, supportemail, CFG_CERN_SITE
+import cPickle
+from zlib import compress
+
+class WebAccessFireroleError(Exception):
+    """Just an Exception to discover if it's a FireRole problem"""
+    pass
 
 # VALUES TO BE EXPORTED
 # CURRENTLY USED BY THE FILES access_control_engine.py access_control_admin.py webaccessadmin_lib.py
@@ -40,6 +44,10 @@ WEBACCESSADMINROLE  = 'webaccessadmin'
 # name of the action allowing roles to access the web administrator interface
 WEBACCESSACTION     = 'cfgwebaccess'
 
+# name of the action allowing roles to access the web administrator interface
+VIEWRESTRCOLL     = 'accrestrcoll'
+
+
 # name of the action allowing roles to delegate the rights to other roles
 # ex: libraryadmin to delegate libraryworker
 DELEGATEADDUSERROLE = 'accdelegaterole'
@@ -50,16 +58,13 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
-# Default behaviour when a definition is parsed to the end without having decided
-# if the user should belong to it or not
-CFG_FIREWALL_DEFAULT_ALLOW = True
+""" Serialized compiled default role definition"""
+CFG_ACC_EMPTY_ROLE_DEFINITION_SER=compress(cPickle.dumps((False, ()), -1))
 
-# To be set in order to change the login Behaviour into Invenio
-CFG_EXTERNAL_AUTH_USING_SSO = False
+""" Source of the default role definition"""
+CFG_ACC_EMPTY_ROLE_DEFINITION_SRC='deny any'
 
-# Link to reach in order to logout from SSO
-#CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
-CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+
 
 # Use external source for access control?
 # Atleast one must be added
@@ -67,18 +72,35 @@ CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
 # Format is:   System name: (System class, Default True/Flase), atleast one
 # must be default
 CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True)}
-#CFG_EXTERNAL_AUTHENTICATION = {"SSO" : (external_authentication_sso.ExternalAuthSSO(), True)}
-#CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True), \
-#    "CERN": (external_authentication_cern.ExternalAuthCern(), False)}
+
+# Variables to set if using SSO
+CFG_EXTERNAL_AUTH_USING_SSO = False
+CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+
+if CFG_CERN_SITE:
+    if False: #FIXME set this to True when we deploy SSO at CERN
+        import external_authentication_sso as ea_sso
+        CFG_EXTERNAL_AUTH_USING_SSO = True
+        # Link to reach in order to logout from SSO
+        CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
+        CFG_EXTERNAL_AUTHENTICATION = {"SSO" : (ea_sso.ExternalAuthSSO(), True)}
+    else:
+        import external_authentication_cern as ea_cern
+        CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True), \
+        "CERN": (ea_cern.ExternalAuthCern(), False)}
+
+
+
 
 
 # default data for the add_default_settings function
-
+# Note: by default the definition is set to deny any. This won't be a problem
+# because userid directly connected with roles will still be allowed.
 # roles
-#           name          description
-DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights'),
-             ('photoadmin',   'Photo collection administrator'),
-             (WEBACCESSADMINROLE,     'WebAccess administrator'))
+#           name          description          definition
+DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
+             ('photoadmin',   'Photo collection administrator', 'deny any'),
+             (WEBACCESSADMINROLE,     'WebAccess administrator', 'deny any'))
 
 # users
 # list of e-mail addresses
@@ -96,6 +118,7 @@ DEF_ACTIONS = (
                ('runbibformat',         'run BibFormat',       'format',        'yes'),
                (WEBACCESSACTION,        'configure WebAccess',       '',              'no'),
                (DELEGATEADDUSERROLE,    'delegate subroles inside WebAccess',       'role',          'no'),
+               (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
                ('runbibtaskex',         'run BibTaskEx example',       '',              'no'),
                ('referee',                  'referee document type doctype/category categ', 'doctype,categ',    'yes'),
                ('submit',                   'use webSubmit',    'doctype,act',  'yes'),

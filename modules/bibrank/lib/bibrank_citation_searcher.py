@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from marshal import loads
+import marshal
 from zlib import decompress
 
 from invenio.dbquery import run_sql, OperationalError
@@ -36,7 +36,7 @@ def init_cited_by_dictionary():
         compressed_citation_dic = []
     citation_dic = None
     if compressed_citation_dic and compressed_citation_dic[0]:
-        citation_dic = loads(decompress(compressed_citation_dic[0][0]))
+        citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
     return citation_dic
 
 def init_reference_list_dictionary():
@@ -49,7 +49,7 @@ def init_reference_list_dictionary():
         compressed_ref_dic = []
     ref_dic = None
     if compressed_ref_dic and compressed_ref_dic[0]:
-        ref_dic = loads(decompress(compressed_ref_dic[0][0]))
+        ref_dic = marshal.loads(decompress(compressed_ref_dic[0][0]))
     return ref_dic
 
 cache_cited_by_dictionary = init_cited_by_dictionary()
@@ -71,7 +71,7 @@ def calculate_cited_by_list(record_id, sort_order="d"):
     query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='cit'"
     compressed_citation_weight_dic = run_sql(query)
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
-        citation_dic = loads(decompress(compressed_citation_weight_dic[0][0]))
+        citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
         for id in citation_list:
             tmp = [id, citation_dic[id]]
             result.append(tmp)

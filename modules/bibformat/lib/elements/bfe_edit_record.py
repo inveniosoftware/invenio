@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,23 +30,28 @@ def format(bfo, style):
     """
     from invenio.config import weburl
     from invenio.access_control_engine import acc_authorize_action
-    
+
     out = ""
-    
+
     uid = bfo.uid
+    req = bfo.rec
     if uid is not None:
-        (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+        if (req):
+            (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
+        else:
+            (auth_code, auth_message) =
+            acc_authorize_action(uid, 'runbibedit')
         if auth_code == 0:
             print_style = ''
             if style != '':
                 print_style = 'style="' + style + '"'
-            
+
             out += '<a href="'+weburl + \
                    '/admin/bibedit/bibeditadmin.py/index?recid=' + \
                    str(bfo.recID) + '&amp;ln=' + bfo.lang +'" ' + \
                    print_style + \
                    '>Edit This Record</a>'
-            
+
     return out
 
 def escape_values(bfo):

@@ -82,7 +82,7 @@ def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send=""):
     elif RN == "":
         t = selectDocument(doctype,categ, ln)
     else:
-        t = displayDocument(doctype,categ,RN,send, ln)
+        t = displayDocument(req, doctype,categ,RN,send, ln)
     return page(title="publication line",
                 navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
                              'sweburl' : sweburl,
@@ -172,7 +172,7 @@ def selectDocument(doctype,categ, ln = cdslang):
         )
     return t
 
-def displayDocument(doctype,categ,RN,send, ln = cdslang):
+def displayDocument(req, doctype,categ,RN,send, ln = cdslang):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -210,10 +210,10 @@ def displayDocument(doctype,categ,RN,send, ln = cdslang):
             confirm_send = 1
 
     if status == "waiting":
-        (auth_code, auth_message) = acc_authorize_action(uid, "referee",verbose=0,doctype=doctype, categ=categ)
+        (auth_code, auth_message) = acc_authorize_action(req, "referee",verbose=0,doctype=doctype, categ=categ)
     else:
         (auth_code, auth_message) = (None, None)
-        
+
     t = websubmit_templates.tmpl_publiline_displaydoc(
           ln = ln,
           docname = docname,

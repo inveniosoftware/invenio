@@ -33,22 +33,23 @@ from invenio.config import \
      supportemail, \
      version
 from invenio.access_control_config import *
-from invenio.access_control_engine import acc_authorize_action    
 from invenio.dbquery import run_sql, ProgrammingError
+from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user, deserialize
+from sets import Set
 
 # ACTIONS
 
 def acc_addAction(name_action='', description='', optional='no', *allowedkeywords):
     """function to create new entry in accACTION for an action
-    
+
     name_action     - name of the new action, must be unique
-        
-      keyvalstr     - string with allowed keywords
+
+    keyvalstr       - string with allowed keywords
 
     allowedkeywords - a list of allowedkeywords
-          
+
     keyvalstr and allowedkeywordsdict can not be in use simultanously
-    
+
     success -> return id_action, name_action, description and allowedkeywords
     failure -> return 0 """
 
@@ -63,11 +64,11 @@ def acc_addAction(name_action='', description='', optional='no', *allowedkeyword
         keystr += value
 
     if not allowedkeywords: optional = 'no'
-    
+
     # insert the new entry
     try: res = run_sql("""INSERT INTO accACTION (name, description, allowedkeywords, optional) VALUES ('%s', '%s', '%s', '%s')""" % (name_action, description, keystr, optional))
     except ProgrammingError: return 0
-    
+
     if res: return res, name_action, description, keystr, optional
     return 0
 
@@ -127,18 +128,18 @@ def acc_updateAction(id_action=0, name_action='', verbose=0, **update):
                                                 allowedkeywords and/or
                                                 optional
                   other keywords are ignored """
-    
+
     id_action = id_action or acc_getActionId(name_action=name_action)
 
     if not id_action: return 0
 
-    try: 
+    try:
         if update.has_key('description'):
             # change the description, no other effects
             if verbose: print 'desc'
             run_sql("""UPDATE accACTION SET description = '%s' WHERE id = %s"""
                     % (update['description'], id_action))
-        
+
         if update.has_key('allowedkeywords'):
             # change allowedkeywords
             if verbose: print 'keys'
@@ -153,7 +154,7 @@ def acc_updateAction(id_action=0, name_action='', verbose=0, **update):
                 if verbose: print ' deleting auths'
                 run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
                 WHERE id_accACTION = %s %s """ % (id_action, update['allowedkeywords'] and 'AND id_accARGUMENT != -1' or ''))
-                    
+
         if update.has_key('optional'):
             # check if there changing optional or not
             if verbose: print 'optional'
@@ -170,34 +171,39 @@ def acc_updateAction(id_action=0, name_action='', verbose=0, **update):
                     WHERE id_accACTION = %s AND
                     id_accARGUMENT = -1 AND
                     argumentlistid = -1 """ % (id_action, ))
-    
+
     except ProgrammingError:
         return 0
 
     return 1
-    
+
 
 # ROLES
 
-def acc_addRole(name_role, description):
+def acc_addRole(name_role, description, firerole_def_ser, firerole_def_src):
     """add a new role to accROLE in the database.
 
-      name_role - name of the role, must be unique
+    name_role - name of the role, must be unique
 
-    description - text to describe the role"""
+    description - text to describe the role
+
+    firerole_def_ser - compiled firerole like definition
+
+    firerole_def_src - firerole like definition sources
+    """
 
     if not run_sql("""SELECT * FROM accROLE WHERE name = '%s'""" % (name_role, )):
-        res = run_sql("""INSERT INTO accROLE (name, description) VALUES ('%s', '%s') """ % (name_role, description))
-        return res, name_role, description
+        res = run_sql("""INSERT INTO accROLE (name, description, firerole_def_ser, firerole_def_src) VALUES (%s, %s, %s, %s)""", (name_role, description, firerole_def_ser, firerole_def_src))
+        return res, name_role, description, firerole_def_src
     return 0
 
 def acc_isRole(name_action,**arguments):
     """ check whether the role which allows action name_action  on arguments exists
-    
+
     action_name - name of the action
-    
+
     arguments - arguments for authorization"""
-    
+
     # first check if an action exists with this name
     query1 = """select a.id, a.allowedkeywords, a.optional
                 from accACTION a
@@ -209,7 +215,7 @@ def acc_isRole(name_action,**arguments):
     defkeys = aallowedkeywords.split(',')
     for key in arguments.keys():
         if key not in defkeys: return 0
-    
+
     # then check if a role giving this authorization exists
     # create dictionary with default values and replace entries from input arguments
     defdict = {}
@@ -230,11 +236,11 @@ def acc_isRole(name_action,**arguments):
     FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
     WHERE raa.id_accACTION = %s AND
     (%s) AND
-    raa.id_accARGUMENT = arg.id """ % (id_action, str_args)                
+    raa.id_accARGUMENT = arg.id """ % (id_action, str_args)
 
     try: res4 = run_sql(query4)
     except ProgrammingError: return 0
-    
+
     if not res4: return 0 # no entries at all
 
     res5 = []
@@ -245,7 +251,7 @@ def acc_isRole(name_action,**arguments):
     if len(defdict) == 1: return 1
 
     cur_role = cur_action = cur_arglistid = 0
-    
+
     booldict = {}
     for key in defkeys: booldict[key] = 0
 
@@ -272,12 +278,12 @@ def acc_isRole(name_action,**arguments):
 
     # matching failed
     return 0
-    
+
 def acc_deleteRole(id_role=0, name_role=0):
     """ delete role entry in table accROLE and all references from other tables.
-    
+
       id_role - id of role to be deleted, prefered variable
-      
+
     name_role - this is used if id_role is not given """
 
     count = 0
@@ -309,7 +315,9 @@ def acc_deleteRole(id_role=0, name_role=0):
     return count
 
 
-def acc_updateRole(id_role=0, name_role='', verbose=0, description=''):
+def acc_updateRole(id_role=0, name_role='', verbose=0, description='', \
+    firerole_def_ser=CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
+    firerole_def_src=CFG_ACC_EMPTY_ROLE_DEFINITION_SRC):
     """try to change the description.
 
         id_role - id of the role to change
@@ -318,16 +326,19 @@ def acc_updateRole(id_role=0, name_role='', verbose=0, description=''):
 
         verbose - extra output
 
-    description - new description """
+    description - new description
+
+    firerole_def_ser - compiled firerole like definition
+
+    firerole_def_src - firerole like definition
+    """
 
     id_role = id_role or acc_getRoleId(name_role=name_role)
 
     if not id_role: return 0
 
-    return run_sql("""UPDATE accROLE SET description = '%s'
-    WHERE id = %s AND
-    description != '%s' """
-            % (description, id_role, description))
+    return run_sql("""UPDATE accROLE SET description = %s, firerole_def_ser = %s, firerole_def_src = %s
+    WHERE id = %s""", (description, firerole_def_ser, firerole_def_src, id_role))
 
 
 # CONNECTIONS BETWEEN USER AND ROLE
@@ -346,7 +357,7 @@ def acc_addUserRole(id_user=0, id_role=0, email='', name_role=''):
 
     # check if the id_role exists
     if id_role and not acc_getRoleName(id_role=id_role): return 0
-    
+
     # check that the user actually exist
     if not acc_getUserEmail(id_user=id_user): return 0
 
@@ -360,7 +371,7 @@ def acc_addUserRole(id_user=0, id_role=0, email='', name_role=''):
 
 def acc_deleteUserRole(id_user, id_role=0, name_role=0):
     """ function deletes entry from user_accROLE and reports the success.
-    
+
       id_user - user in database
 
       id_role - role in the database, prefered parameter
@@ -369,7 +380,7 @@ def acc_deleteUserRole(id_user, id_role=0, name_role=0):
 
     # need to find id of the role
     id_role = id_role or acc_getRoleId(name_role=name_role)
-    
+
     # number of deleted entries will be returned (0 or 1)
     return run_sql("""DELETE FROM user_accROLE WHERE id_user = %s AND id_accROLE = %s """ % (id_user, id_role))
 
@@ -383,7 +394,7 @@ def acc_addArgument(keyword='', value=''):
     keyword - inserted in keyword column
 
       value - inserted in value column. """
-    
+
     # if one of the values are missing, return 0
     if not keyword or not value: return 0
 
@@ -419,20 +430,20 @@ def acc_deleteArgument_names(keyword='', value=''):
 
 # ADD WITH names and keyval list
 
-def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval): 
+def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
     """ function inserts entries in accROLE_accACTION_accARGUMENT if all references are valid.
     this function is made specially for the webaccessadmin web interface.
-    always inserting only one authorization. 
+    always inserting only one authorization.
 
     id_role, id_action - self explanatory, preferably used
 
     name_role, name_action - self explanatory, used if id not given
 
     optional - if this is set to 1, check that function can have optional
-                arguments and add with arglistid -1 and id_argument -1 
-       
+                arguments and add with arglistid -1 and id_argument -1
+
     **keyval - dictionary of keyword=value pairs, used to find ids. """
-    
+
     inserted = []
 
     # check that role and action exist
@@ -475,12 +486,12 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
             # insert new authorization
             run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid) VALUES (%s, %s, -1, -1) """ % (id_role, id_action))
             return [[id_role, id_action, -1, -1], ]
-        return []    
+        return []
 
 
     else:
         # regular authorization
-        
+
         # get list of ids, if they don't exist, create arguments
         id_arguments = []
         argstr = ''
@@ -491,7 +502,7 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
                            run_sql("""INSERT INTO accARGUMENT (keyword, value) values ('%s', '%s') """ % (key, keyval[key])))
             id_arguments.append(id_argument)
             argstr += (argstr and ',' or '') + str(id_argument)
-    
+
         # check if equal authorization exists
         for (id_trav, ) in run_sql("""SELECT DISTINCT argumentlistid FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = '%s' AND id_accACTION = '%s' """% (id_role, id_action)):
             listlength = run_sql("""SELECT COUNT(*) FROM accROLE_accACTION_accARGUMENT
@@ -502,36 +513,36 @@ def acc_addAuthorization(name_role='', name_action='', optional=0, **keyval):
             id_accARGUMENT NOT IN (%s) """ % (id_role, id_action, id_trav, argstr))[0][0]
             # this means that a duplicate already exists
             if not notlist and listlength == len(id_arguments): return []
-    
+
         # find new arglistid, highest + 1
         try: arglistid = 1 + run_sql("""SELECT MAX(argumentlistid) FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s """
                                      % (id_role, id_action))[0][0]
         except (IndexError, TypeError): arglistid = 1
         if arglistid <= 0: arglistid = 1
-        
+
         # insert
         for id_argument in id_arguments:
             run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT values (%s, %s, %s, %s) """
                     % (id_role, id_action, id_argument, arglistid))
             inserted.append([id_role, id_action, id_argument, arglistid])
 
-    
+
     return inserted
 
 
-def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0, verbose=0, id_arguments=[]): 
+def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0, verbose=0, id_arguments=[]):
     """ function inserts entries in accROLE_accACTION_accARGUMENT if all references are valid.
 
              id_role, id_action - self explanatory
-       
+
            arglistid - argumentlistid for the inserted entries
                        if -1: create new group
                        other values: add to this group, if it exists or not
 
             optional - if this is set to 1, check that function can have
                        optional arguments and add with arglistid -1 and
-                       id_argument -1 
-       
+                       id_argument -1
+
              verbose - extra output
 
         id_arguments - list of arguments to add to group."""
@@ -559,7 +570,7 @@ def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0,
         if verbose: print 'ids: yes - optional'
         if not acc_getActionIsOptional(id_action=id_action):
             return []
-        
+
         if verbose: print 'ids: run query to check if exists'
         if not run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
         WHERE id_accROLE = %s AND
@@ -572,7 +583,7 @@ def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0,
                     % (id_role, id_action))
             return ((id_role, id_action, -1, -1), )
         if verbose: print 'ids: exists'
-        return []    
+        return []
 
     if verbose: print 'ids: check if not arguments'
     # action without arguments
@@ -620,9 +631,9 @@ def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0,
                                     (id_role, id_action))[0][0] + 1
             except ProgrammingError: return 0
             except (IndexError, TypeError): arglistid = 1
-        
+
         if arglistid <= 0: arglistid = 1
-    
+
         if verbose: print 'ids: insert all the entries'
         # all references are valid, insert: one entry in raa for each argument
         for id_argument in id_arguments:
@@ -630,14 +641,14 @@ def acc_addRoleActionArguments(id_role=0, id_action=0, arglistid=-1, optional=0,
                            (id_role, id_action, id_argument, arglistid)):
                 run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid) VALUES (%s, %s, %s, %s) """
                         % (id_role, id_action, id_argument, arglistid))
-                inserted.append((id_role, id_action, id_argument, arglistid)) 
+                inserted.append((id_role, id_action, id_argument, arglistid))
         # [(r, ac, ar1, aid), (r, ac, ar2, aid)]
 
-        if verbose: 
+        if verbose:
             print 'ids:   inside add function'
             for r in acc_findPossibleActions(id_role=id_role, id_action=id_action):
                 print 'ids:   ', r
-    
+
     return inserted
 
 
@@ -656,7 +667,7 @@ def acc_addRoleActionArguments_names(name_role='', name_action='', arglistid=-1,
       verbose - used to print extra information
 
      **keyval - dictionary of keyword=value pairs, used to find ids. """
-    
+
     if verbose: print 'names: starting'
     if verbose: print 'names: checking ids'
 
@@ -671,22 +682,22 @@ def acc_addRoleActionArguments_names(name_role='', name_action='', arglistid=-1,
     else: return 0
 
     if verbose: print 'names: checking arguments'
-    
+
     id_arguments = []
     if not optional:
         if verbose: print 'names: not optional'
         # place to keep ids of arguments and list of allowed keywords
         allowedkeys = acc_getActionKeywords(id_action=id_action) # res[0][3].split(',')
-    
+
         # find all the id_arguments and create those that does not exist
         for key in keyval.keys():
             # this key does not exist
             if key not in allowedkeys:
                 return 0
-    
+
             id_argument = acc_getArgumentId(key, keyval[key])
             id_argument = id_argument or run_sql("""INSERT INTO accARGUMENT (keyword, value) values ('%s', '%s') """ % (key, keyval[key]))
-            
+
             id_arguments.append(id_argument) # append the id to the list
     else:
         if verbose: print 'names: optional'
@@ -707,20 +718,20 @@ def acc_deleteRoleActionArguments(id_role, id_action, arglistid=1, auths=[[]]):
     return number of actual deletes.
 
     this function relies on the id-lists in auths to have the same order has the possible actions...
-    
+
     id_role, id_action - self explanatory
 
        arglistid - group to delete from.
                    if more entries than deletes, split the group before delete.
 
     id_arguments - list of ids to delete."""
-    
+
     keepauths = [] # these will be kept
     # find all possible actions
     pas = acc_findPossibleActions_ids(id_role, id_action)
     header = pas[0]
     # decide which to keep or throw away
-    
+
     for pa in pas[1:]:
         if pa[0] == arglistid and pa[1:] not in auths:
             keepauths.append(pa[1:])
@@ -731,14 +742,14 @@ def acc_deleteRoleActionArguments(id_role, id_action, arglistid=1, auths=[[]]):
     id_accACTION = %s AND
     argumentlistid = %s """
             % (id_role, id_action, arglistid))
-    
+
     # insert those to be kept
     for auth in keepauths:
         acc_addRoleActionArguments(id_role=id_role,
                                    id_action=id_action,
                                    arglistid=-1,
                                    id_arguments=auth)
-    
+
     return 1
 
 
@@ -753,7 +764,7 @@ def acc_deleteRoleActionArguments_names(name_role='', name_action='', arglistid=
     arglistid - the argumentlistid, all keyword=value pairs must be in this same group.
 
     **keyval - dictionary of keyword=value pairs for the arguments."""
-    
+
     # find ids for role and action
     id_role = acc_getRoleId(name_role=name_role)
     id_action = acc_getActionId(name_action=name_action)
@@ -802,26 +813,26 @@ def acc_deletePossibleActions(id_role=0, id_action=0, authids=[]):
     id_action - id of action to be connected to role
 
     authids - list of row indexes to be removed. """
-    
+
     # find all authorizations
     pas = acc_findPossibleActions(id_role=id_role, id_action=id_action)
-    
+
     # get the keys
     keys = pas[0][1:]
-    
+
     # create dictionary for all the argumentlistids
     ald = {}
     for authid in authids:
         if authid > len(pas): return authid, len(pas)
-        
+
         # get info from possible action
-        id = pas[authid][0] 
+        id = pas[authid][0]
         values = pas[authid][1:]
         # create list of authids for each authorization
         auth = [acc_getArgumentId(keys[0], values[0])]
         for i in range(1, len(keys)):
             auth.append(acc_getArgumentId(keys[i], values[i]))
-            
+
         # create entries in the dictionary for each argumentlistid
         try: ald[id].append(auth)
         except KeyError: ald[id] = [auth]
@@ -838,10 +849,10 @@ def acc_deletePossibleActions(id_role=0, id_action=0, authids=[]):
 
 def acc_deleteRoleAction(id_role=0, id_action=0):
     """delete all connections between a role and an action. """
-    
+
     count = run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT
     WHERE id_accROLE = '%s' AND id_accACTION = '%s' """ % (id_role, id_action))
-    
+
     return count
 
 # GET FUNCTIONS
@@ -852,14 +863,14 @@ def acc_getActionId(name_action):
     """get id of action when name is given
 
     name_action - name of the wanted action"""
-    
+
     try: return run_sql("""SELECT id FROM accACTION WHERE name = '%s'""" % (name_action, ))[0][0]
     except IndexError: return 0
 
 
 def acc_getActionName(id_action):
     """get name of action when id is given. """
-    
+
     try:
         return run_sql("""SELECT name FROM accACTION WHERE id = %s""" % (id_action, ))[0][0]
     except (ProgrammingError, IndexError):
@@ -868,7 +879,7 @@ def acc_getActionName(id_action):
 
 def acc_getActionDescription(id_action):
     """get description of action when id is given. """
-    
+
     try:
         return run_sql("""SELECT description FROM accACTION WHERE id = %s""" % (id_action, ))[0][0]
     except (ProgrammingError, IndexError):
@@ -878,27 +889,27 @@ def acc_getActionDescription(id_action):
 def acc_getActionKeywords(id_action=0, name_action=''):
     """get list of keywords for action when id is given.
     empty list if no keywords."""
-    
+
     result = acc_getActionKeywordsString(id_action=id_action, name_action=name_action)
-    
+
     if result: return result.split(',')
     else: return []
-    
+
 
 def acc_getActionKeywordsString(id_action=0, name_action=''):
     """get keywordstring when id is given. """
-    
+
     id_action = id_action or acc_getActionId(name_action)
     try: result = run_sql("""SELECT allowedkeywords from accACTION where id = %s """ % (id_action, ))[0][0]
     except IndexError: return ''
-    
+
     return result
 
 
 def acc_getActionIsOptional(id_action=0):
     """get if the action arguments are optional or not.
     return 1 if yes, 0 if no."""
-    
+
     result = acc_getActionOptional(id_action=id_action)
     return result == 'yes' and 1 or 0
 
@@ -906,25 +917,25 @@ def acc_getActionIsOptional(id_action=0):
 def acc_getActionOptional(id_action=0):
     """get if the action arguments are optional or not.
     return result, but 0 if action does not exist. """
-    
+
     try: result = run_sql("""SELECT optional from accACTION where id = %s """ % (id_action, ))[0][0]
     except IndexError: return 0
-    
+
     return result
 
 
 def acc_getActionDetails(id_action=0):
     """get all the fields for an action."""
-    
+
     details = []
     try: result = run_sql("""SELECT * FROM accACTION WHERE id = %s """ % (id_action, ))[0]
     except IndexError: return details
-    
+
     if result:
         for r in result: details.append(r)
 
     return details
-        
+
 
 def acc_getAllActions():
     """returns all entries in accACTION."""
@@ -949,33 +960,39 @@ def acc_getRoleId(name_role):
 
 def acc_getRoleName(id_role):
     """get name of role, id given. """
-    
+
     try: return run_sql("""SELECT name FROM accROLE WHERE id = %s""", (id_role, ))[0][0]
+    except IndexError: return ''
+
+def acc_getRoleDefinition(id_role=0):
+    """get definition object for a role."""
+
+    try: return run_sql("""SELECT firerole_def_ser FROM accROLE WHERE id = %s""", (id_role, ))[0][0]
     except IndexError: return ''
 
 
 def acc_getRoleDetails(id_role=0):
     """get all the fields for an action."""
-    
+
     details = []
-    try: result = run_sql("""SELECT * FROM accROLE WHERE id = %s """, (id_role, ))[0]
+    try: result = run_sql("""SELECT id, name, description, firerole_def_src FROM accROLE WHERE id = %s """, (id_role, ))[0]
     except IndexError: return details
-    
+
     if result:
         for r in result: details.append(r)
 
     return details
-        
+
 
 def acc_getAllRoles():
     """get all entries in accROLE."""
-    
-    return run_sql("""SELECT r.id, r.name, r.description FROM accROLE r ORDER BY r.name""")
+
+    return run_sql("""SELECT r.id, r.name, r.description, r.firerole_def_ser, r.firerole_def_src FROM accROLE r ORDER BY r.name""")
 
 
 def acc_getRoleActions(id_role):
     """get all actions connected to a role. """
-    
+
     return run_sql("""SELECT DISTINCT(a.id), a.name, a.description
                       FROM accROLE_accACTION_accARGUMENT raa, accACTION a
                       WHERE raa.id_accROLE = %s and
@@ -985,7 +1002,7 @@ def acc_getRoleActions(id_role):
 
 def acc_getRoleUsers(id_role):
     """get all users that have access to a role. """
-    
+
     return run_sql("""SELECT DISTINCT(u.id), u.email, u.settings
     FROM user_accROLE ur, user u
     WHERE ur.id_accROLE = %s AND
@@ -998,7 +1015,7 @@ def acc_getRoleUsers(id_role):
 def acc_getArgumentId(keyword, value):
     """get id of argument, keyword=value pair given.
     value = 'optional value' is replaced for id_accARGUMENT = -1."""
-    
+
     try: return run_sql("""SELECT DISTINCT id FROM accARGUMENT WHERE keyword = %s and value = %s""", (keyword, value))[0][0]
     except IndexError:
         if value == 'optional value': return -1
@@ -1009,21 +1026,21 @@ def acc_getArgumentId(keyword, value):
 
 def acc_getUserEmail(id_user=0):
     """get email of user, id given."""
-    
+
     try: return run_sql("""SELECT email FROM user WHERE id = %s """, (id_user, ))[0][0]
     except IndexError: return ''
-    
+
 
 def acc_getUserId(email=''):
     """get id of user, email given."""
-    
+
     try: return run_sql("""SELECT id FROM user WHERE email = %s """, (email, ))[0][0]
     except IndexError: return 0
-    
+
 
 def acc_getUserRoles(id_user=0):
     """get all roles a user is connected to."""
-    
+
     res = run_sql("""SELECT ur.id_accROLE
     FROM user_accROLE ur
     WHERE ur.id_user = %s
@@ -1034,7 +1051,7 @@ def acc_getUserRoles(id_user=0):
 
 def acc_findUserInfoIds(id_user=0):
     """find all authorization entries for all the roles a user is connected to."""
-    
+
     res1 = run_sql("""SELECT ur.id_user, raa.*
     FROM user_accROLE ur LEFT JOIN accROLE_accACTION_accARGUMENT raa
     ON ur.id_accROLE = raa.id_accROLE
@@ -1054,32 +1071,50 @@ def acc_findUserInfoNames(id_user=0):
     raa.id_accROLE = r.id and
     raa.id_accACTION = ac.id and
     raa.id_accARGUMENT = ar.id """ % (id_user, )
-    
+
     res1 =  run_sql(query)
-    
+
     res2 = []
     for res in res1: res2.append(res)
     res2.sort()
-    
+
     return res2
 
 def acc_findUserRoleActions(id_user=0):
     """find name of all roles and actions connected to user, id given."""
-    
+
     query = """SELECT DISTINCT r.name, a.name
     FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
     WHERE ur.id_user = %s and
     ur.id_accROLE = raa.id_accROLE and
     raa.id_accACTION = a.id and
     raa.id_accROLE = r.id """ % (id_user, )
-    
+
     res1 = run_sql(query)
-    
+
     res2 = []
     for res in res1: res2.append(res)
     res2.sort()
-    
+
     return res2
+
+def acc_findUserRoleActions_user_info(user_info):
+    """find name of all roles and actions connected to user_info, id given."""
+    query = """SELECT DISTINCT r.name, a.name, r.firerole_def_ser
+    FROM accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
+    WHERE raa.id_accACTION = a.id and
+    raa.id_accROLE = r.id """
+
+    res1 = run_sql(query)
+    res2 = []
+    for role_name, action_name, role_definition in res1:
+        if acc_firerole_check_user(user_info, deserialize(role_definition)):
+            res2.append((role_name, action_name))
+
+    # Collect also traditional explicit id_user authorization
+    res3 = acc_findUserRoleActions(user_info['uid'])
+
+    return list(Set(res2) or Set(res3))
 
 
 # POSSIBLE ACTIONS / AUTHORIZATIONS
@@ -1092,7 +1127,7 @@ def acc_findPossibleActionsAll(id_role):
     id_role - role to find all actions for
 
     returns a list with headers"""
-    
+
     query = """SELECT DISTINCT(aar.id_accACTION)
                FROM accROLE_accACTION_accARGUMENT aar
                WHERE aar.id_accROLE = %s
@@ -1111,7 +1146,7 @@ def acc_findPossibleActionsAll(id_role):
 
 def acc_findPossibleActionsArgumentlistid(id_role, id_action, arglistid):
     """find all possible actions with the given arglistid only."""
-    
+
     # get all, independent of argumentlistid
     res1 = acc_findPossibleActions_ids(id_role, id_action)
 
@@ -1131,23 +1166,23 @@ def acc_findPossibleActionsUser(id_user, id_action):
       id_user - user id, used to find roles
 
     id_action - action id. """
-    
+
     res = []
 
-    for (id_role, ) in acc_getUserRoles(id_user): 
+    for (id_role, ) in acc_getUserRoles(id_user):
         hlp = acc_findPossibleActions(id_role, id_action)
         if hlp and not res: res.append(['role'] + hlp[0])
 
         for row in hlp[1:]:
             res.append([id_role] + row)
-                                       
+
     return res
 
 
 def acc_findPossibleActions_ids(id_role, id_action):
     """finds the ids of the possible actions.
     utilization of acc_getArgumentId and acc_findPossibleActions. """
-    
+
     pas = acc_findPossibleActions(id_role, id_action)
 
     if not pas: return []
@@ -1162,26 +1197,26 @@ def acc_findPossibleActions_ids(id_role, id_action):
         pas_ids.append(auth)
 
     return pas_ids
-        
+
 
 def acc_findPossibleActions(id_role, id_action):
     """Role based function to find all action combinations for a
     give role and action.
-    
+
       id_role - id of role in the database
 
     id_action - id of the action in the database
 
     returns a list with all the combinations.
     first row is used for header."""
-    
+
     # query to find all entries for user and action
     res1 = run_sql(""" SELECT raa.argumentlistid, ar.keyword, ar.value
     FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT ar
-    WHERE raa.id_accROLE = %s and                
+    WHERE raa.id_accROLE = %s and
     raa.id_accACTION = %s and
     raa.id_accARGUMENT = ar.id """, (id_role, id_action))
-    
+
     # find needed keywords, create header
     keywords = acc_getActionKeywords(id_action=id_action)
     keywords.sort()
@@ -1190,7 +1225,7 @@ def acc_findPossibleActions(id_role, id_action):
         # action without arguments
         if run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0 AND argumentlistid = 0""", (id_role, id_action)):
             return [['#', 'argument keyword'], ['0', 'action without arguments']]
-        
+
 
     # tuples into lists
     res2, arglistids = [], {}
@@ -1198,7 +1233,7 @@ def acc_findPossibleActions(id_role, id_action):
         res2.append([])
         for r in res: res2[-1].append(r)
     res2.sort()
-    
+
     # create multilevel dictionary
     for res in res2:
         a, kw, value = res # rolekey, argumentlistid, keyword, value
@@ -1208,7 +1243,7 @@ def acc_findPossibleActions(id_role, id_action):
         # fill dictionary
         if not arglistids[a].has_key(kw):    arglistids[a][kw] = [value]
         elif not value in arglistids[a][kw]: arglistids[a][kw] = arglistids[a][kw] + [value]
-    
+
     # fill list with all possible combinations
     res3 = []
     # rolekeys = roles2.keys();    rolekeys.sort()
@@ -1219,7 +1254,7 @@ def acc_findPossibleActions(id_role, id_action):
         # run through the rest of the keywords
         for kw in keywords[1:]:
             if not arglistids[a].has_key(kw): arglistids[a][kw] = ['optional value']
-                
+
             new_list = arglistids[a][kw][:]
             new_len  = len(new_list)
             # duplicate the list
@@ -1231,9 +1266,9 @@ def acc_findPossibleActions(id_role, id_action):
                 new_item = new_list[i % new_len][:]
                 temp_list[i].append(  new_item  )
             next_arglistid = temp_list[:]
-           
+
         res3.extend(next_arglistid)
-    
+
     res3.sort()
 
     # if optional allowed, put on top
@@ -1248,14 +1283,14 @@ def acc_findPossibleActions(id_role, id_action):
     # put header on top
     if res3:
         res3.insert(0, ['#'] + keywords)
-    
+
     return res3
 
 
 def acc_splitArgumentGroup(id_role=0, id_action=0, arglistid=0):
     """collect the arguments, find all combinations, delete original entries
     and insert the new ones with different argumentlistids for each group
- 
+
       id_role - id of the role
 
     id_action - id of the action
@@ -1294,7 +1329,7 @@ def acc_mergeArgumentGroups(id_role=0, id_action=0, arglistids=[]):
     id_action - role of the action
 
     arglistids - list of groups to be merged together into one."""
-    
+
     if len(arglistids) < 2: return []
 
     argstr = ''
@@ -1305,7 +1340,7 @@ def acc_mergeArgumentGroups(id_role=0, id_action=0, arglistids=[]):
     # query to find all entries that will be merged
     query = """ SELECT ar.keyword, ar.value, raa.id_accARGUMENT
     FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT ar
-    WHERE raa.id_accROLE = %s and                
+    WHERE raa.id_accROLE = %s and
      raa.id_accACTION = %s and
      %s and
      raa.id_accARGUMENT = ar.id """ % (id_role, id_action, argstr)
@@ -1340,7 +1375,7 @@ def acc_reset_default_settings(superusers=[]):
     """reset to default by deleting everything and adding default.
 
     superusers - list of superuser emails """
-    
+
     remove = acc_delete_all_settings()
     add = acc_add_default_settings(superusers=superusers)
 
@@ -1349,13 +1384,13 @@ def acc_reset_default_settings(superusers=[]):
 def acc_delete_all_settings():
     """simply remove all data affiliated with webaccess by truncating
     tables accROLE, accACTION, accARGUMENT and those connected. """
-    
+
     run_sql("""TRUNCATE accROLE""")
     run_sql("""TRUNCATE accACTION""")
     run_sql("""TRUNCATE accARGUMENT""")
     run_sql("""TRUNCATE user_accROLE""")
     run_sql("""TRUNCATE accROLE_accACTION_accARGUMENT""")
-    
+
     return 1
 
 
@@ -1371,7 +1406,7 @@ def acc_add_default_settings(superusers=[]):
     global DEF_USERS
     global DEF_ACTIONS
     global DEF_AUTHS
-    
+
     # from superusers: allow input formats ['email1', 'email2'] and [['email1'], ['email2']] and [['email1', id], ['email2', id]]
     for user in superusers:
         if type(user) is str: user = [user]
@@ -1379,17 +1414,17 @@ def acc_add_default_settings(superusers=[]):
     if supportemail not in DEF_USERS: DEF_USERS.append(supportemail)
 
     # add data
-    
+
     # add roles
     insroles = []
-    for (name, description) in DEF_ROLES:
+    for (name, description, firerole_def_src) in DEF_ROLES:
         # try to add, don't care if description is different
         id = acc_addRole(name_role=name,
-                         description=description)
+                         description=description, firerole_def_ser=compile_role_definition(firerole_def_src), firerole_def_src=firerole_def_src)
         if not id:
             id = acc_getRoleId(name_role=name)
-            acc_updateRole(id_role=id, description=description)
-        insroles.append([id, name, description])
+            acc_updateRole(id_role=id, description=description, firerole_def_ser=compile_role_definition(firerole_def_src), firerole_def_src=firerole_def_src)
+        insroles.append([id, name, description, firerole_def_src])
 
     # add users to superadmin
     insuserroles = []
@@ -1417,12 +1452,12 @@ def acc_add_default_settings(superusers=[]):
         acc_addRoleActionArguments_names(name_role=name_role,
                                          name_action=name_action,
                                          arglistid=arglistid,
-                                         optional=optional, 
+                                         optional=optional,
                                          **args)
         # keep track of inserted authorizations
         insauths.append([name_role, name_action, arglistid, optional, args])
 
-    
+
     return insroles, insactions, insuserroles, insauths
 
 
@@ -1473,7 +1508,7 @@ def acc_cleanupArguments():
     # delete unreferenced arguments
     count = run_sql("""DELETE FROM accARGUMENT
     WHERE id in (%s)""" % (idstr, ))
-    
+
     # return count and ids of deleted arguments
     return (count, ids2)
 
@@ -1487,7 +1522,7 @@ def acc_cleanupUserRoles():
     # find unreferenced arguments
     ids1 = run_sql("""SELECT DISTINCT ur.id_accROLE
     FROM accROLE ur LEFT JOIN accROLE r ON ur.id_accROLE = r.id
-    WHERE r.id IS NULL""") 
+    WHERE r.id IS NULL""")
 
     # it is clean
     if not ids1: return 1
@@ -1503,7 +1538,7 @@ def acc_cleanupUserRoles():
     # delete unreferenced arguments
     count = run_sql("""DELETE FROM user_accROLE
     WHERE id_accROLE in (%s)""" % (idstr, ))
-    
+
     # return count and ids of deleted arguments
     return (count, ids2)
 
@@ -1522,17 +1557,17 @@ def acc_garbage_collector(verbose=0):
     idrolesstr = ''
     for (id, ) in id_roles:
         idrolesstr += (idrolesstr and ',' or '') + '%s' % id
-    if idrolesstr: 
+    if idrolesstr:
         count += run_sql("""DELETE FROM user_accROLE WHERE id_accROLE NOT IN (%s)""" % (idrolesstr, ))
-    # users have been deleted                         
+    # users have been deleted
     id_users = run_sql("""SELECT DISTINCT u.id FROM user u WHERE email != ''""")
     idusersstr = ''
     for (id, ) in id_users:
         idusersstr += (idusersstr and ',' or '') + '%s' % id
-    if idusersstr: 
+    if idusersstr:
         count += run_sql("""DELETE FROM user_accROLE WHERE id_user NOT IN (%s) """ % (idusersstr, ))
 
-    del_entries.append([count])                         
+    del_entries.append([count])
 
     # accROLE_accACTION_accARGUMENT where role is deleted
     count = 0
@@ -1559,13 +1594,13 @@ def acc_garbage_collector(verbose=0):
         idstr = ''
         for (id, ) in idargs:
             idstr += (idstr and ',' or '') + '%s' % id
-            
+
     if namestr and idstr:
         count = run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE id_accARGUMENT IN (%s) """ % (idstr, ))
     else: count = 0
 
-    del_entries.append([0])    
-    
+    del_entries.append([0])
+
     # delete unreferenced arguments
     unused_args = run_sql("""SELECT DISTINCT ar.id
     FROM accARGUMENT ar LEFT JOIN accROLE_accACTION_accARGUMENT raa ON ar.id = raa.id_accARGUMENT
@@ -1579,7 +1614,7 @@ def acc_garbage_collector(verbose=0):
 
     count = run_sql("""DELETE FROM accARGUMENT
     WHERE id in (%s)""" % (idstr, ))
-    
+
     del_entries.append([count, args])
 
     # return statistics

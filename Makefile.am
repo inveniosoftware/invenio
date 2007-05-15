@@ -183,8 +183,10 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE collection_portalbox CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE formatname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE fieldname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE bibrec ADD COLUMN rules tinyblob NULL;" | ./modules/miscutil/bin/dbexec
-
+	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_ser tinyblob NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
+	
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
@@ -203,6 +205,7 @@ create-demo-site:
 # 	    fi \
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
+	./modules/webaccess/bin/webaccessadmin -u admin compile-role-definitions
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1

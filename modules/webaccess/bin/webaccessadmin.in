@@ -30,6 +30,8 @@ try:
     from invenio.config import supportemail
     from invenio.access_control_admin import acc_reset_default_settings
     from invenio.access_control_admin import acc_add_default_settings
+    from invenio.access_control_firerole import repair_role_definitions
+    from invenio.access_control_engine import acc_authorize_action
     from invenio.dbquery import run_sql
 except ImportError, e:
     print "Error: %s" % e
@@ -45,17 +47,56 @@ def usage(code, msg=''):
     sys.stderr.write("Command options:\n")
     sys.stderr.write("  <command> = reset-default-settings\n")
     sys.stderr.write("  <command> = add-default-settings\n")
+    sys.stderr.write("  <command> = compile-role-definitions\n")
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
+    sys.stderr.write("  -u, --user username\t Set the user name.\n")
     sys.exit(code)
+
+def authenticate(user, header="WebAccess Administration", action="cfgwebaccess"):
+    """Authenticate the user against the user database.
+       Check for its password, if it exists.
+       Check for action access rights.
+       Return user name upon authorization success,
+       do system exit upon authorization failure.
+       """
+    print header
+    print "=" * len(header)
+    if user == "":
+        print >> sys.stdout, "\rUsername: ",
+        user = string.strip(string.lower(sys.stdin.readline()))
+    else:
+        print >> sys.stdout, "\rUsername:", user
+    ## first check user pw:
+    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
+          run_sql("select id,password from user where nickname=%s", (user,), 1)
+    if not res:
+        print "Sorry, %s does not exist." % user
+        sys.exit(1)
+    else:
+        (uid_db, password_db) = res[0]
+        if password_db:
+            password_entered = getpass.getpass()
+            if password_db == password_entered:
+                pass
+            else:
+                print "Sorry, wrong credentials for %s." % user
+                sys.exit(1)
+        ## secondly check authorization for the action:
+        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
+        if auth_code != 0:
+            print auth_message
+            sys.exit(1)
+    return user
+
 
 def main():
     """CLI to acc_authorize_action. The function finds the needed
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
     Return 1 on success, 0 on failure. """
-    
+
     alen = len(sys.argv)
     action = ''
 
@@ -64,26 +105,35 @@ def main():
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
         print __revision__
-        sys.exit(0)    
-    if alen != 2 or sys.argv[1] not in ['reset-default-settings', 'add-default-settings']: 
+        sys.exit(0)
+
+    isUser = -1
+    try:
+        isUser = sys.argv.index('-u')
+        sys.argv.remove('-u')
+    except ValueError:
+        try:
+            isUser = sys.argv.index('--user')
+            sys.argv.remove('--user')
+        except ValueError:
+            pass
+
+    if isUser > 0 and isUser < alen:
+        username = sys.argv[isUser]
+        sys.argv.remove(username)
+    elif isUser > 0:
+        usage(0)
+    else:
+        username = ''
+
+    alen = len(sys.argv)
+
+    if alen != 2 or sys.argv[1] not in ['reset-default-settings', 'add-default-settings', 'compile-role-definitions']:
         usage(1)
 
-    # getting input from user
-    print 'User:    ', 
-    user = raw_input()
-    password = getpass.getpass()
+    user = authenticate(username)
 
-    # validating input
     perform = 0
-
-    # check password
-    if user == supportemail:
-        perform = run_sql("""select * from user where email = '%s' and password = '%s' """ % (supportemail, password)) and 1 or 0
-
-    if not perform:
-        # wrong password or user not recognized
-        print 'User not authorized'
-        return perform
 
     # perform chosen action, add all users above as superusers
     if sys.argv[1] == 'reset-default-settings':
@@ -92,9 +142,12 @@ def main():
     elif sys.argv[1] == 'add-default-settings':
         action = 'added'
         acc_add_default_settings([supportemail])
+    elif sys.argv[1] == 'compile-role-definitions':
+        action = 'compiled'
+        repair_role_definitions()
 
     # notify of success
-    if action: 
+    if action:
         print '\nOkay, the default authorization settings have been __%s__.' % (action, )
     else:
         print 'Requested action failed.'
@@ -102,5 +155,5 @@ def main():
     return perform
 
 if __name__ == '__main__':
-    main() 
+    main()
 

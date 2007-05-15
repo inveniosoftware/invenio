@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -60,10 +60,10 @@ def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
     """
     Returns the main BibFormat admin page.
 
-    
+
     This is the only page where the code needs to be cleaned
     when the migration kit will be removed. #TODO: remove when removing migration_kit
-   
+
     @param ln language
     @param warnings a list of messages to display at top of the page, that prevents writability in etc
     @param is_admin indicate if user is authorized to use BibFormat
@@ -78,16 +78,16 @@ def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
 def perform_request_format_templates_management(ln=cdslang, checking=0):
     """
     Returns the main management console for format templates
-    
+
     @param ln language
     @param checking the level of checking (0: basic, 1:extensive (time consuming) )
     @return the main page for format templates management
     """
 
-    
+
     # Reload in case a format was changed
     bibformat_engine.clear_caches()
-    
+
     # Get formats lists of attributes
     formats = bibformat_engine.get_format_templates(with_attributes=True)
     formats_attrs = []
@@ -111,7 +111,7 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
             status = '<span style="color: rgb(0, 255, 0);">OK</span>'
         attrs['status'] = status
         formats_attrs.append(attrs)
-        
+
     def sort_by_attr(seq):
         """
         Sort 'seq' by attribute name.
@@ -120,9 +120,9 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
         intermed = [ (x['name'].lower(), i, x) for i, x in enumerate(seq)]
         intermed.sort()
         return [x[-1] for x in intermed]
-        
+
     sorted_format_templates = sort_by_attr(formats_attrs)
-    
+
     return bibformat_templates.tmpl_admin_format_templates_management(ln, sorted_format_templates)
 
 def perform_request_format_template_show(bft, ln=cdslang, code=None,
@@ -143,7 +143,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
     # Either use code being edited, or the original code inside template
     if code is None:
         code = cgi.escape(format_template['code'])
-    
+
     # Build a default pattern if it is empty
     if pattern_for_preview == "":
         recIDs = perform_request_search()
@@ -155,7 +155,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
 
     # Look for all existing content_types
     content_types = bibformat_dblayer.get_existing_content_types()
-    
+
     return bibformat_templates.tmpl_admin_format_template_show(ln, format_template['attrs']['name'],
                                                                format_template['attrs']['description'],
                                                                code, bft,
@@ -168,7 +168,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
 def perform_request_format_template_show_dependencies(bft, ln=cdslang):
     """
     Show the dependencies (on elements) of the given format.
-    
+
     @param ln language
     @param bft the filename of the template to show
     """
@@ -182,7 +182,7 @@ def perform_request_format_template_show_dependencies(bft, ln=cdslang):
             tags.append(tag)
     for format_element in format_elements:
         for tag in format_element['tags']:
-            tags.append(tag)            
+            tags.append(tag)
 
     tags.sort()
     return bibformat_templates.tmpl_admin_format_template_show_dependencies(ln,
@@ -191,12 +191,12 @@ def perform_request_format_template_show_dependencies(bft, ln=cdslang):
                                                                             output_formats,
                                                                             format_elements,
                                                                             tags)
-    
+
 def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
     """
     Page for template name and descrition attributes edition.
-    
-    If format template is new, offer the possibility to 
+
+    If format template is new, offer the possibility to
     make a duplicate of an existing format template.
 
     @param ln language
@@ -209,12 +209,12 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
         all_templates_attrs = bibformat_engine.get_format_templates(with_attributes=True)
         if all_templates_attrs.has_key(bft): # Sanity check. Should always be true at this stage
             del all_templates_attrs[bft] # Remove in order not to make a duplicate of self..
-    
+
     # Sort according to name, inspired from Python Cookbook
 
         def sort_by_name(seq, keys):
             """
-            Sort the sequence 'seq' by 'keys' 
+            Sort the sequence 'seq' by 'keys'
             """
             intermed = [(x['attrs']['name'], keys[i], i, x) for i, x in enumerate(seq)]
             intermed.sort()
@@ -223,13 +223,13 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
         all_templates = sort_by_name(all_templates_attrs.values(), all_templates_attrs.keys())
 	#keys = all_templates_attrs.keys()
 	#keys.sort()
-	#all_templates = map(lambda x: (x, all_templates_attrs.get(x)['attrs']['name']), keys) 
+	#all_templates = map(lambda x: (x, all_templates_attrs.get(x)['attrs']['name']), keys)
 
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
     name = format_template['attrs']['name']
     description = format_template['attrs']['description']
     editable = can_write_format_template(bft)
-    
+
     return bibformat_templates.tmpl_admin_format_template_show_attributes(ln,
                                                                           name,
                                                                           description,
@@ -238,7 +238,7 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
 									  all_templates,
 									  new)
 
-   
+
 def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_pattern=""):
     """
     Returns the format elements documentation to be included inside format templated editor.
@@ -255,7 +255,7 @@ def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_patter
 
     keys =  elements.keys()
     keys.sort()
-    elements = map(elements.get, keys) 
+    elements = map(elements.get, keys)
 
     def filter_elem(element):
         """Keep element if is string representation contains all keywords of search_doc_pattern,
@@ -268,13 +268,13 @@ def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_patter
             for word in search_doc_pattern.split():
                 if word.upper() != "AND" and text.find(word.upper()) == -1:
                     return False
-                    
+
         return True
-    
+
     elements = filter(filter_elem, elements)
 
-  
-        
+
+
     return bibformat_templates.tmpl_admin_format_template_show_short_doc(ln, elements)
 
 def perform_request_format_elements_documentation(ln=cdslang):
@@ -287,14 +287,14 @@ def perform_request_format_elements_documentation(ln=cdslang):
     """
     # Get format elements lists of attributes
     elements = bibformat_engine.get_format_elements(with_built_in_params=True)
-    
+
     keys =  elements.keys()
     keys.sort()
     elements = map(elements.get, keys)
     # Remove all elements found in table and that begin with a number (to remove 'garbage')
     filtered_elements = [element for element in elements if element['type'] == 'python' or \
                          element['attrs']['name'][0] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
-    
+
     return bibformat_templates.tmpl_admin_format_elements_documentation(ln, filtered_elements)
 
 def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
@@ -306,24 +306,25 @@ def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
     """
     format_templates = get_templates_that_use_element(bfe)
     tags = get_tags_used_by_element(bfe)
-    
+
     return bibformat_templates.tmpl_admin_format_element_show_dependencies(ln,
                                                                            bfe,
                                                                            format_templates,
                                                                            tags)
 
-def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=None):
+def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=None, req=None):
     """
     Show the dependencies of the given format.
 
     'param_values' is the list of values to pass to 'format'
     function of the element as parameters, in the order ...
     If params is None, this means that they have not be defined by user yet.
-    
+
     @param ln language
     @param bfe the name of the format element to show
     @param params the list of parameters to pass to element format function
     @param uid the user id for this request
+    @param req the mod_python request object
     """
     _ = gettext_set_language(ln)
     format_element = bibformat_engine.get_format_element(bfe, with_built_in_params=True)
@@ -332,11 +333,11 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     ##
     param_names = []
     param_descriptions = []
-    
+
     # First value is a search pattern to choose the record
     param_names.append(_("Test with record:")) # Caution: keep in sync with same text below
     param_descriptions.append(_("Enter a search query here."))
-    
+
     # Parameters defined in this element
     for param in format_element['attrs']['params']:
         param_names.append(param['name'])
@@ -346,10 +347,10 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     for param in format_element['attrs']['builtin_params']:
         param_names.append(param['name'])
         param_descriptions.append(param['description'])
-        
+
     # Load parameters values
     ##
-    
+
     if param_values is None: #First time the page is loaded
         param_values = []
 
@@ -358,7 +359,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
         if len(recIDs) > 0:
             recID = recIDs[0]
             param_values.append("recid:%s" % recID)
-        
+
         # Default values defined in this element
         for param in format_element['attrs']['params']:
             param_values.append(param['default'])
@@ -376,9 +377,9 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     search_pattern = params[_("Test with record:")] # Caution keep in sync with same text above and below
     recIDs = perform_request_search(p=search_pattern)
     del params[_("Test with record:")] # Caution keep in sync with same text above
-    
+
     if len(recIDs) > 0:
-        bfo = bibformat_engine.BibFormatObject(recIDs[0], ln, search_pattern, None, uid)
+        bfo = bibformat_engine.BibFormatObject(recIDs[0], ln, search_pattern, None, uid, req)
         (result, errors) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
         result = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", search_pattern)],
@@ -403,7 +404,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
     """
     # Reload in case a format was changed
     bibformat_engine.clear_caches()
-    
+
     # Get output formats lists of attributes
     output_formats_list = bibformat_engine.get_output_formats(with_attributes=True)
     output_formats = {}
@@ -427,7 +428,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
             status = '<span style="color: rgb(0, 255, 0);">OK</span>'
         output_format['status'] = status
         output_formats[filename] = output_format
-        
+
     # Sort according to code or name, inspired from Python Cookbook
     def get_attr(dic, attr):
         """
@@ -443,7 +444,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
             return dic['attrs']['code']
         else:
             return dic['attrs']['names']['generic']
-        
+
     def sort_by_attr(seq, attr):
         """
         Sort dictionaries given in 'seq' according to parameter 'attr'
@@ -454,7 +455,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
 
     if sortby != "code" and sortby != "name":
         sortby = "code"
-        
+
     sorted_output_formats = sort_by_attr(output_formats.values(), sortby)
 
     return bibformat_templates.tmpl_admin_output_formats_management(ln, sorted_output_formats)
@@ -495,7 +496,7 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
 
     IMPORTANT: we display rules evaluation index starting at 1 in
     interface, but we start internally at 0
-        
+
     @param ln language
     @param bfo the filename of the output format to show
     @param r_fld the list of 'field' attribute for each rule
@@ -505,7 +506,7 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
     @param r_upd the rule that we want to increase/decrease in order of evaluation
     """
 
-    output_format = bibformat_engine.get_output_format(bfo, with_attributes=True)    
+    output_format = bibformat_engine.get_output_format(bfo, with_attributes=True)
     format_templates =  bibformat_engine.get_format_templates(with_attributes=True)
     name = output_format['attrs']['names']['generic']
     rules = []
@@ -523,7 +524,7 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
             r_fld = [r_fld]
             r_val = [r_val]
             r_tpl = [r_tpl]
-             
+
         for i in range(len(r_fld)):
             rule = {'field': r_fld[i],
                     'value': r_val[i],
@@ -533,7 +534,7 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
         _ = gettext_set_language(ln)
         if r_upd.startswith(_("Remove Rule")):
             # Remove rule
-            index = int(r_upd.split(" ")[-1]) -1 
+            index = int(r_upd.split(" ")[-1]) -1
             del rules[index]
         elif r_upd.startswith(_("Save Changes")):
             # Save
@@ -581,23 +582,23 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
 def perform_request_output_format_show_dependencies(bfo, ln=cdslang):
     """
     Show the dependencies of the given format.
-    
+
     @param ln language
     @param bfo the filename of the output format to show
     """
     output_format = bibformat_engine.get_output_format(code=bfo, with_attributes=True)
     name = output_format['attrs']['names']['generic']
     format_templates = get_templates_used_by_output(bfo)
-    
+
     return bibformat_templates.tmpl_admin_output_format_show_dependencies(ln,
                                                                           name,
                                                                           bfo,
                                                                           format_templates)
-    
+
 def perform_request_output_format_show_attributes(bfo, ln=cdslang):
     """
     Page for output format names and description attributes edition.
-    
+
     @param ln language
     @param bfo filename of output format to edit
     @return the main page for output format attributes edition
@@ -615,7 +616,7 @@ def perform_request_output_format_show_attributes(bfo, ln=cdslang):
         names_trans.append({'lang':lang[1], 'trans':name_trans})
 
     editable = can_write_output_format(bfo)
-    
+
     return bibformat_templates.tmpl_admin_output_format_show_attributes(ln,
                                                                         name,
                                                                         description,
@@ -628,18 +629,18 @@ def perform_request_output_format_show_attributes(bfo, ln=cdslang):
 def perform_request_knowledge_bases_management(ln=cdslang):
     """
     Returns the main page for knowledge bases management.
-    
+
     @param ln language
     @return the main page for knowledge bases management
     """
     kbs = bibformat_dblayer.get_kbs()
-    
+
     return bibformat_templates.tmpl_admin_kbs_management(ln, kbs)
 
 def perform_request_knowledge_base_show(kb_id, ln=cdslang, sortby="to"):
     """
     Show the content of a knowledge base
-    
+
     @param ln language
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
@@ -647,14 +648,14 @@ def perform_request_knowledge_base_show(kb_id, ln=cdslang, sortby="to"):
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
-    
+
     return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=cdslang, sortby="to"):
     """
     Show the attributes of a knowledge base
-    
+
     @param ln language
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
@@ -662,14 +663,14 @@ def perform_request_knowledge_base_show_attributes(kb_id, ln=cdslang, sortby="to
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     description = bibformat_dblayer.get_kb_description(name)
-    
+
     return bibformat_templates.tmpl_admin_kb_show_attributes(ln, kb_id, name, description, sortby)
 
 
 def perform_request_knowledge_base_show_dependencies(kb_id, ln=cdslang, sortby="to"):
     """
     Show the dependencies of a kb
-    
+
     @param ln language
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
@@ -677,7 +678,7 @@ def perform_request_knowledge_base_show_dependencies(kb_id, ln=cdslang, sortby="
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     format_elements = get_elements_that_use_kb(name)
-    
+
     return bibformat_templates.tmpl_admin_kb_show_dependencies(ln, kb_id, name, sortby, format_elements)
 
 def add_format_template():
@@ -687,7 +688,7 @@ def add_format_template():
     @return the filename of the created format
     """
     (filename, name) = bibformat_engine.get_fresh_format_template_filename("Untitled")
-    
+
     out = '<name>%(name)s</name><description></description>' % {'name':name}
     path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
@@ -706,11 +707,11 @@ def delete_format_template(filename):
     """
     if not can_write_format_template(filename):
         return
-    
+
     path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     os.remove(path)
     bibformat_engine.clear_caches()
-    
+
 def update_format_template_code(filename, code=""):
     """
     Saves code inside template given by filename
@@ -718,7 +719,7 @@ def update_format_template_code(filename, code=""):
     format_template = bibformat_engine.get_format_template_attrs(filename)
     name = format_template['name']
     description = format_template['description']
-    
+
     out = '''
 <name>%(name)s</name>
 <description>%(description)s</description>
@@ -728,9 +729,9 @@ def update_format_template_code(filename, code=""):
     format = open(path, 'w')
     format.write(out)
     format.close
-    
+
     bibformat_engine.clear_caches()
-    
+
 def update_format_template_attributes(filename, name="", description="", duplicate=None):
     """
     Saves name and description inside template given by filename.
@@ -779,7 +780,7 @@ def update_format_template_attributes(filename, name="", description="", duplica
                         format = open(output_path, 'w')
                         format.write(mod_output_text)
                         format.close
-                        
+
         description = cgi.escape(description)
         name = cgi.escape(name)
         # Write updated format template
@@ -803,13 +804,13 @@ def add_output_format():
     @return the code of the created format
     """
     (filename, code) = bibformat_engine.get_fresh_output_format_filename("UNTLD")
-    
+
     # Add entry in database
     bibformat_dblayer.add_output_format(code)
     bibformat_dblayer.set_output_format_name(code, "Untitled", lang="generic")
     bibformat_dblayer.set_output_format_content_type(code, "text/html")
-    
-    # Add file 
+
+    # Add file
     out = ""
     path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
     format = open(path, 'w')
@@ -828,7 +829,7 @@ def delete_output_format(code):
     """
     if not can_write_output_format(code):
         return
-        
+
     # Remove entry from database
     bibformat_dblayer.remove_output_format(code)
 
@@ -838,8 +839,8 @@ def delete_output_format(code):
     os.remove(path)
 
     bibformat_engine.clear_caches()
-    
-    
+
+
 def update_output_format_rules(code, rules=[], default=""):
     """
     Saves rules inside output format given by code
@@ -882,7 +883,7 @@ def update_output_format_attributes(code, name="", description="", new_code="", 
     @param content_type the new content_type of the output format
     @return the filename of the modified format
     """
-    
+
     bibformat_dblayer.set_output_format_description(code, description)
     bibformat_dblayer.set_output_format_content_type(code, content_type)
     bibformat_dblayer.set_output_format_name(code, name, lang="generic")
@@ -900,12 +901,12 @@ def update_output_format_attributes(code, name="", description="", new_code="", 
         (new_filename, new_code) = bibformat_engine.get_fresh_output_format_filename(new_code)
         new_path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + new_filename
         os.rename(old_path, new_path)
-        bibformat_dblayer.change_output_format_code(code, new_code)    
-    
+        bibformat_dblayer.change_output_format_code(code, new_code)
+
     bibformat_engine.clear_caches()
 
     return new_code
-    
+
 def add_kb_mapping(kb_name, key, value=""):
     """
     Adds a new mapping to given kb
@@ -919,7 +920,7 @@ def add_kb_mapping(kb_name, key, value=""):
 def remove_kb_mapping(kb_name, key):
     """
     Delete an existing kb mapping in kb
-    
+
     @param kb_name the name of the kb where to insert the new value
     @param key the key of the mapping
     """
@@ -928,7 +929,7 @@ def remove_kb_mapping(kb_name, key):
 def update_kb_mapping(kb_name, old_key, key, value):
     """
     Update an existing kb mapping with key old_key with a new key and value
-    
+
     @param kb_name the name of the kb where to insert the new value
     @param the key of the mapping in the kb
     @param key the new key of the mapping
@@ -970,7 +971,7 @@ def add_kb(kb_name="Untitled"):
     while bibformat_dblayer.kb_exists(name):
         name = kb_name + " " + str(i)
         i += 1
-        
+
     kb_id = bibformat_dblayer.add_kb(name, "")
 
     return kb_id
@@ -988,7 +989,7 @@ def can_read_format_template(filename):
     """
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
-   
+
 def can_read_output_format(bfo):
     """
     Returns 0 if we have read permission on given output format, else
@@ -997,7 +998,7 @@ def can_read_output_format(bfo):
     filename = bibformat_engine.resolve_output_format_filename(bfo)
     path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
-    
+
 def can_read_format_element(name):
     """
     Returns 0 if we have read permission on given format element, else
@@ -1007,7 +1008,7 @@ def can_read_format_element(name):
     filename = bibformat_engine.resolve_format_element_filename(name)
     path = "%s%s%s" % (CFG_BIBFORMAT_ELEMENTS_PATH, os.sep, filename)
     return os.access(path, os.R_OK)
-    
+
 def can_write_format_template(bft):
     """
     Returns 0 if we have write permission on given format template, else
@@ -1026,7 +1027,7 @@ def can_write_output_format(bfo):
     """
     if not can_read_output_format(bfo):
         return False
-    
+
     filename = bibformat_engine.resolve_output_format_filename(bfo)
     path = "%s%s%s" % (CFG_BIBFORMAT_OUTPUTS_PATH, os.sep, filename)
     return os.access(path, os.W_OK)
@@ -1037,12 +1038,12 @@ def can_write_etc_bibformat_dir():
     """
     path = "%s%sbibformat" % (etcdir, os.sep)
     return os.access(path, os.W_OK)
-       
+
 def get_outputs_that_use_template(filename):
     """
     Returns a list of output formats that call the given format template.
     The returned output formats also give their dependencies on tags.
-    
+
     We don't return the complete output formats but some reference to
     them (filename + names)
 
@@ -1080,12 +1081,12 @@ def get_outputs_that_use_template(filename):
             output_formats_list[name] = {'filename':output_format,
                                          'names':output_formats[output_format]['attrs']['names'],
                                          'tags':tags}
-            
+
 
 
     keys = output_formats_list.keys()
     keys.sort()
-    return map(output_formats_list.get, keys)        
+    return map(output_formats_list.get, keys)
 
 def get_elements_used_by_template(filename):
     """
@@ -1163,8 +1164,8 @@ def get_tags_used_by_element(filename):
     call to BibRecord functions.
 
     Returns tags sorted by value
-    
-    @param filename a format element filename  
+
+    @param filename a format element filename
     """
     tags = {}
 
@@ -1174,7 +1175,7 @@ def get_tags_used_by_element(filename):
     elif format_element['type']=="field":
         tags = format_element['attrs']['tags']
         return tags
-        
+
     filename = bibformat_engine.resolve_format_element_filename(filename)
     path = CFG_BIBFORMAT_ELEMENTS_PATH + os.sep + filename
     format = open(path, 'r')
@@ -1189,7 +1190,7 @@ def get_tags_used_by_element(filename):
     (,[^\)]+)*                            #Additional function param
     \)                                    #Closing parenthesis
      ''', re.VERBOSE | re.MULTILINE)
-    
+
     tags_iter = tags_pattern.finditer(code)
     for result in tags_iter:
         tags[result.group("tag")] = result.group("tag")
@@ -1209,7 +1210,7 @@ def get_templates_that_use_element(name):
     ]
 
     Returns templates sorted by name
-    
+
     @param name a format element name
     """
     format_templates = {}
@@ -1221,7 +1222,7 @@ def get_templates_that_use_element(name):
             format_elements = map(lambda x: x['name'].lower(), format_elements)
             try: #Look for element
                 format_elements.index(name.lower()) #If not found, get out of "try" statement
-                
+
                 format_template = bibformat_engine.get_format_template(filename=possible_template, with_attributes=True)
                 template_name = format_template['attrs']['name']
                 format_templates[template_name] = {'name':template_name,
@@ -1229,10 +1230,10 @@ def get_templates_that_use_element(name):
             except:
                 print name+" not found in "+str(format_elements)
                 pass
-            
+
     keys = format_templates.keys()
     keys.sort()
-    return map(format_templates.get, keys)  
+    return map(format_templates.get, keys)
 
 # Output Formats Dependencies
 ##
@@ -1251,7 +1252,7 @@ def get_templates_used_by_output(code):
     ]
 
     Returns templates sorted by name
-    
+
     """
     format_templates = {}
     output_format = bibformat_engine.get_output_format(code, with_attributes=True)
@@ -1259,7 +1260,7 @@ def get_templates_used_by_output(code):
     filenames = map(lambda x: x['template'], output_format['rules'])
     if output_format['default'] != "":
         filenames.append(output_format['default'])
-        
+
     for filename in filenames:
         template = bibformat_engine.get_format_template(filename, with_attributes=True)
         name = template['attrs']['name']
@@ -1271,7 +1272,7 @@ def get_templates_used_by_output(code):
 
     keys = format_templates.keys()
     keys.sort()
-    return map(format_templates.get, keys)  
+    return map(format_templates.get, keys)
 
 
 # Knowledge Bases Dependencies
@@ -1286,7 +1287,7 @@ def get_elements_that_use_kb(name):
       },
       ...
     ]
-    
+
     Returns elements sorted by name
     """
 
@@ -1307,18 +1308,18 @@ def get_elements_that_use_kb(name):
             [\'"]+\s*                  #Single or double quote
             ,                          #comma
             ''' % name, re.VERBOSE | re.MULTILINE | re.IGNORECASE)
-    
+
             result = kb_pattern.search(code)
             if result is not None:
                 name = ("".join(filename.split(".")[:-1])).lower()
                 if name.startswith("bfe_"):
                     name = name[4:]
                 format_elements[name] = {'filename':filename, 'name': name}
-            
-       
+
+
     keys = format_elements.keys()
     keys.sort()
-    return map(format_elements.get, keys)  
+    return map(format_elements.get, keys)
 
 # Validation tools
 ##
@@ -1353,10 +1354,10 @@ def perform_request_format_validate(ln=cdslang, bfo=None, bft=None, bfe=None):
         messages = []
 
     messages = map(lambda x: encode_for_xml(x[1]), messages)
-    
+
     return bibformat_templates.tmpl_admin_validate_format(ln, messages)
-                                                                         
-    
+
+
 def check_output_format(code):
     """
     Returns the list of errors in the output format given by code
@@ -1382,7 +1383,7 @@ def check_output_format(code):
             if line.strip().endswith(":") or (line.strip().lower().startswith("tag") and line.find('---') == -1):
                 # Check tag
                 if not clean_line.endswith(":"):
-                    # Column misses at the end of line  
+                    # Column misses at the end of line
                     errors.append(("ERR_BIBFORMAT_OUTPUT_RULE_FIELD_COL", line, i))
                 if not clean_line.lower().startswith("tag"):
                     # Tag keyword is missing
@@ -1390,12 +1391,12 @@ def check_output_format(code):
                 elif not clean_line.startswith("tag"):
                     # Tag was not lower case
                     errors.append(("ERR_BIBFORMAT_OUTPUT_WRONG_TAG_CASE", line, i))
-                    
+
                 clean_line = clean_line.rstrip(": ") #remove : and spaces at the end of line
-                
+
                 current_tag = "".join(clean_line.split()[1:]).strip() #the tag starts at second position
                 if len(clean_line.split()) > 2: #We should only have 'tag' keyword and tag
-                    errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD", i))  
+                    errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_RULE_FIELD", i))
                 else:
                     if len(check_tag(current_tag)) > 0:
                         # Invalid tag
@@ -1407,7 +1408,7 @@ def check_output_format(code):
                 # Check condition
                 if current_tag == "":
                     errors.append(("ERR_BIBFORMAT_OUTPUT_CONDITION_OUTSIDE_FIELD", line, i))
-                    
+
                 words = line.split('---')
                 if len(words) != 2:
                     errors.append(("ERR_BIBFORMAT_INVALID_OUTPUT_CONDITION", line, i))
@@ -1415,12 +1416,12 @@ def check_output_format(code):
                 path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + template
                 if not os.path.exists(path):
                     errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", template, i))
-                              
+
             elif line.find(':') != -1 or (line.strip().lower().startswith("default") and line.find('---') == -1):
                 # Check default template
                 clean_line = line.strip()
                 if line.find(':') == -1:
-                    # Column misses after default  
+                    # Column misses after default
                     errors.append(("ERR_BIBFORMAT_OUTPUT_RULE_DEFAULT_COL", line, i))
                 if not clean_line.startswith("default"):
                     # Default keyword is missing
@@ -1432,13 +1433,13 @@ def check_output_format(code):
                 path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + default
                 if not os.path.exists(path):
                     errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_RULE_TEMPLATE_REF", default, i))
-                              
+
             else:
                 # Check others
                 errors.append(("ERR_BIBFORMAT_WRONG_OUTPUT_LINE", line, i))
     else:
         errors.append(("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", filename, ""))
-    
+
     return errors
 
 def check_format_template(filename, checking=0):
@@ -1516,7 +1517,7 @@ def check_format_template(filename, checking=0):
                                 bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
                                 (result, errors_) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
                                 errors.extend(errors_)
-                    
+
     else:# Template cannot be read
         errors.append(("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, ""))
     return errors
@@ -1539,7 +1540,7 @@ def check_format_element(name):
                 module_name = filename
                 if module_name.endswith(".py"):
                     module_name = module_name[:-3]
-                    
+
                 module = __import__("invenio.bibformat_elements."+module_name)
                 function_format  = module.bibformat_elements.__dict__[module_name].format
 
@@ -1552,7 +1553,7 @@ def check_format_element(name):
                     (result, errors_) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
                     errors.extend(errors_)
             except Exception, e:
-                errors.append(("ERR_BIBFORMAT_IN_FORMAT_ELEMENT", name, e))            
+                errors.append(("ERR_BIBFORMAT_IN_FORMAT_ELEMENT", name, e))
         else:
             errors.append(("ERR_BIBFORMAT_CANNOT_READ_ELEMENT_FILE", filename, ""))
     elif bibformat_dblayer.tag_exists_for_name(name):#Can element be found in database?
@@ -1579,7 +1580,7 @@ def perform_request_dreamweaver_floater():
 
     keys =  elements.keys()
     keys.sort()
-    elements = map(elements.get, keys) 
+    elements = map(elements.get, keys)
 
     def filter_elem(element):
         """Keep element if is string representation contains all keywords of search_doc_pattern,
@@ -1589,9 +1590,9 @@ def perform_request_dreamweaver_floater():
             return False
         else:
             return True
-    
+
     elements = filter(filter_elem, elements)
 
-  
-        
+
+
     return bibformat_templates.tmpl_dreamweaver_floater(cdslang, elements)

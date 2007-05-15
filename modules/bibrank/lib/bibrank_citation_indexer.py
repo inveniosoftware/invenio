@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import time
 import os
-from marshal import loads, dumps
+import marshal
 from zlib import decompress, compress
 
 from invenio.dbquery import run_sql, escape_string
@@ -55,7 +55,7 @@ def get_citation_weight(rank_method_code, config):
     begin_time = time.time()
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
     last_modified_records = get_last_modified_rec(last_update_time)
-    
+
     if last_modified_records:
         updated_recid_list = create_recordid_list(last_modified_records)
         result_intermediate = last_updated_result(rank_method_code, updated_recid_list)
@@ -119,13 +119,13 @@ def last_updated_result(rank_method_code, recid_list):
                rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.Name = '%s'"""% rank_method_code
     dict = run_sql(query)
     if dict:
-        dic = loads(decompress(dict[0][0]))
+        dic = marshal.loads(decompress(dict[0][0]))
         query = "select citation_data from rnkCITATIONDATA"
         cit_compressed = run_sql(query)
-        cit = loads(decompress(cit_compressed[0][0]))
+        cit = marshal.loads(decompress(cit_compressed[0][0]))
         query = "select citation_data_reversed from rnkCITATIONDATA"
         ref_compressed = run_sql(query)
-        ref = loads(decompress(ref_compressed[0][0]))
+        ref = marshal.loads(decompress(ref_compressed[0][0]))
         result = get_initial_result(dic, cit, ref, recid_list)
     else: result = make_initial_result()
     return result
@@ -177,13 +177,13 @@ def get_citation_informations(recid_list, config):
     reference_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
     reference_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
     record_publication_info_tag = config.get(config.get("rank_method", "function"),"publication_info_tag")
-    
+
     p_record_pri_number_tag = parse_tag(record_pri_number_tag)
     p_record_add_number_tag = parse_tag(record_add_number_tag)
     p_reference_number_tag = parse_tag(reference_number_tag)
     p_reference_tag = parse_tag(reference_tag)
     p_record_publication_info_tag = parse_tag(record_publication_info_tag)
-    
+
     for recid in recid_list:
         xml = print_record(int(recid),'xm')
         rs = create_records(xml)
@@ -322,7 +322,7 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
                 (get_compressed_dictionary(citation_dic)))
         run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
                 (get_compressed_dictionary(reference_dic)))
-        
+
 def get_compressed_dictionary(dic):
     """Serialize Python object vi a marshal into a compressed string."""
-    return escape_string(compress(dumps(dic)))
+    return escape_string(compress(marshal.dumps(dic)))

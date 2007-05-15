@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -37,19 +37,19 @@ navtrail    = """ <a class=navtrail href=\"%s/admin/\">Admin Area</a> &gt;
 
 def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,
-          delete=0 ,confirm_delete=0,  **args):    
+          delete=0 ,confirm_delete=0,  **args):
     """ BibEdit Admin interface. """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
-    
+
     recid          = wash_url_argument(recid,          "int")
     add            = wash_url_argument(add,            "int")
     cancel         = wash_url_argument(cancel,         "int")
     delete         = wash_url_argument(delete,         "int")
     confirm_delete = wash_url_argument(confirm_delete, "int")
-    
-    (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+
+    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
     if auth_code == 0:
         (body, errors, warnings) = perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag,
                                                          edit_tag, delete_tag, num_field, add, args)
@@ -62,31 +62,31 @@ def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
             title = _("Record %s - Add a field") % ('#' + str(recid))
     else:
         title = _("BibEdit Admin Interface")
-        
+
     return page(title       = title,
                 body        = body,
                 errors      = errors,
                 warnings    = warnings,
                 uid         = getUid(req),
                 language    = ln,
-                navtrail    = navtrail,               
+                navtrail    = navtrail,
                 lastupdated = __lastupdated__,
-                req         = req) 
+                req         = req)
 
 
 def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='marc',
-         del_subfield=None, temp="false", add=0, ln=cdslang, **args):    
+         del_subfield=None, temp="false", add=0, ln=cdslang, **args):
     """ Edit Field page. """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    
+
     uid       = getUid(req)
     recid     = wash_url_argument(recid,     "int")
     num_field = wash_url_argument(num_field, "int")
     add       = wash_url_argument(add,       "int")
     num_subfield = wash_url_argument(num_subfield, "int")
-    
-    (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+
+    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
     if (auth_code == 0):
         if (recid and tag and (record_exists(recid)>0)):
             (body, errors, warnings) = perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
@@ -99,7 +99,7 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='m
                                                                'x_field':  '#' + str(tag[:3])}
     if add == 1:
         title = _("Edit record %(x_recid)s, field %(x_field)s - Add a subfield") % {'x_recid': '#' + str(recid),
-                                                                                  'x_field':  '#' + str(tag[:3])}        
+                                                                                  'x_field':  '#' + str(tag[:3])}
     return page(title       = title,
                 body        = body,
                 errors      = errors,
@@ -108,7 +108,7 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='m
                 language    = ln,
                 navtrail    = navtrail,
                 lastupdated = __lastupdated__,
-                req         = req)    
+                req         = req)
 
 
 def submit(req, recid='', ln=cdslang):
@@ -118,7 +118,7 @@ def submit(req, recid='', ln=cdslang):
     uid = getUid(req)
 
     recid = wash_url_argument(recid, "int")
-    (auth_code, auth_message) = acc_authorize_action(uid,'runbibedit')
+    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
     if auth_code == 0:
         if (recid and (record_exists(recid)>0)):
             (body, errors, warnings) = perform_request_submit(ln, recid)
@@ -134,4 +134,4 @@ def submit(req, recid='', ln=cdslang):
                 language    = ln,
                 navtrail    = navtrail,
                 lastupdated = __lastupdated__,
-                req         = req) 
+                req         = req)

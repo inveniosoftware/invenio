@@ -1306,9 +1306,9 @@ INSERT INTO sbmGFILERESULT VALUES ('Tarred Tex (.tar)','tar archive');
 INSERT INTO sbmGFILERESULT VALUES ('JPEG','JPEG image');
 INSERT INTO sbmGFILERESULT VALUES ('GIF','GIF');
 
-INSERT INTO accROLE VALUES (1,'superadmin','superuser with all rights');
-INSERT INTO accROLE VALUES (2,'photoadmin','Photo collection administrator');
-INSERT INTO accROLE VALUES (3,'webaccessadmin','WebAccess administrator');
+INSERT INTO accROLE VALUES (1,'superadmin','superuser with all rights', NULL, NULL);
+INSERT INTO accROLE VALUES (2,'photoadmin','Photo collection administrator', NULL, NULL);
+INSERT INTO accROLE VALUES (3,'webaccessadmin','WebAccess administrator', NULL, NULL);
 
 INSERT INTO user_accROLE VALUES (1,1);
 INSERT INTO user_accROLE VALUES (1,3);
@@ -1333,6 +1333,7 @@ INSERT INTO accACTION VALUES (18,'runoaiharvest','run BibHarvest oaiharvest','',
 INSERT INTO accACTION VALUES (19,'cfgwebcomment','configure WebComment','','no');
 INSERT INTO accACTION VALUES (20,'runoaiarchive','run BibHarvest oaiarchive','','no');
 INSERT INTO accACTION VALUES (21,'runbibedit','run BibEdit','','no');
+INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');
 
 
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');

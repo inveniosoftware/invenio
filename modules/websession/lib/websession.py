@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -48,25 +48,25 @@ class SessionNotInDb(Exception):
     pass
 
 class pSession(Session):
-    """Specialisation of the class Session which adds persistence to sessions 
-        by using a database table (it pickles itself into the corresponding row of 
-        the table). The class provides methods to save and retrieve an instance 
-        to/from the DB and to access the main session attributes (uid). The 
+    """Specialisation of the class Session which adds persistence to sessions
+        by using a database table (it pickles itself into the corresponding row of
+        the table). The class provides methods to save and retrieve an instance
+        to/from the DB and to access the main session attributes (uid). The
         table in the DB must have the following structure:
             session_key - text - unique
             uid         - int
             session_object - blob
        Attributes:
-            __tableName -- (string) name of the table in the DB where the 
+            __tableName -- (string) name of the table in the DB where the
                 sessions are going to be stored
             __uid -- (int) user identifier who initiated the session
-            __dirty -- (bool) flag indicating whether the session has been 
+            __dirty -- (bool) flag indicating whether the session has been
                 modified (and therefore needs to be saved back to the DB) or not
     """
-    
-    __tableName = "session" 
+
+    __tableName = "session"
     __ExpireTime = 1050043127
-    
+
     def __init__( self, request, id, uid=-1 ):
         Session.__init__( self, request, id )
         self.__uid = uid
@@ -94,15 +94,19 @@ class pSession(Session):
         """
         sql = "select session_object from %s where session_key='%s'" % \
               (cls.__tableName, sessionId)
-        try:            
+        try:
             res = run_sql(sql)
         except OperationalError:
             raise SessionNotInDb("Session %s doesn't exist" % \
-                                 sessionId)            
+                                 sessionId)
         if len(res)==0:
             raise SessionNotInDb("Session %s doesn't exist" % \
                                  sessionId)
-        s = cPickle.loads(blob_to_string(res[0][0]))
+        try:
+            s = cPickle.loads(blob_to_string(res[0][0]))
+        except cPickle.UnpicklingError:
+            raise SessionNotInDb("Session %s is broken" % \
+                                 sessionId)
         return s
     retrieve = classmethod( retrieve )
 
@@ -110,12 +114,12 @@ class pSession(Session):
         return cPickle.dumps( self )
 
     def save( self ):
-        """method that tries to insert the session as NEW in the DB. If this 
+        """method that tries to insert the session as NEW in the DB. If this
             fails (giving an integrity error) it means the session already
-            exists there and it must be updated, so it performs the 
+            exists there and it must be updated, so it performs the
             corresponding SQL update
         """
-      
+
         sessrepr = self.__getRepr().replace("'", "\\\'")
         sessrepr = sessrepr.replace('"', '\\\"')
         try:
@@ -129,7 +133,7 @@ class pSession(Session):
         except IntegrityError:
             try:
                 sql = """UPDATE %s SET uid=%s, session_expiry=%s,
-                                       session_object="%s" 
+                                       session_object="%s"
                                  WHERE session_key="%s" """ % \
                       (self.__class__.__tableName, int(self.getUid()),
                        self.get_access_time()+60*60*24*2, sessrepr,
@@ -139,13 +143,13 @@ class pSession(Session):
                 pass
             self.__dirty = 0
         except OperationalError:
-            self.__dirty = 0            
+            self.__dirty = 0
 
 class pSessionMapping(UserDict):
-    """Only the necessary methods to make it work with the session manager 
+    """Only the necessary methods to make it work with the session manager
         have been implemented.
     """
-    
+
     def __includeItemFromDB(self, key):
         if  key not in self.data.keys():
             try:
@@ -155,18 +159,18 @@ class pSessionMapping(UserDict):
                 pass
 
     def __setitem__(self, key, v):
-        """when a session is added or updated in the dictionary it means it 
+        """when a session is added or updated in the dictionary it means it
             must be updated within the DB
         """
         v.save()
         UserDict.__setitem__(self, key, v)
 
     def __getitem__(self, key):
-        """in order not to have to load all the sessions in the dictionary 
-            (normally only a single session is needed on each web request) when 
-            a session is requested the object looks to see if it is in the 
-            dictionary (memory) and if not it tries to retrieve it from the 
-            DB, puts it in the dictionary and returns the requested item. If 
+        """in order not to have to load all the sessions in the dictionary
+            (normally only a single session is needed on each web request) when
+            a session is requested the object looks to see if it is in the
+            dictionary (memory) and if not it tries to retrieve it from the
+            DB, puts it in the dictionary and returns the requested item. If
             the session doesn't exist a normal KeyError exception is raised
         """
         self.__includeItemFromDB( key )

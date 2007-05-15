@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -51,13 +51,13 @@ def index(req, ln=config.cdslang):
 
     #FIXME Remove when removing Migration Kit
     from invenio.bibformat_migration_kit_assistant_lib \
-         import can_write_migration_status_file 
+         import can_write_migration_status_file
     if not can_write_migration_status_file():
         warnings.append(("WRN_BIBFORMAT_CANNOT_WRITE_MIGRATION_STATUS"))
-        
+
     if not bibformatadminlib.can_write_etc_bibformat_dir():
         warnings.append(("WRN_BIBFORMAT_CANNOT_WRITE_IN_ETC_BIBFORMAT"))
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
@@ -67,17 +67,17 @@ def index(req, ln=config.cdslang):
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-        is_admin = True 
+        is_admin = True
     else:
         is_admin = False
-        
+
     navtrail = '''<a class=navtrail href="%s/admin/index.%s.html">%s</a>''' % \
                (config.weburl,
                 ln,
                 _("Admin Area"))
-    
+
     return page(title=_("BibFormat Admin"),
                 body=bibformatadminlib.perform_request_index(ln=ln,
                                                              warnings=warnings,
@@ -104,7 +104,7 @@ def output_formats_manage(req, ln=config.cdslang, sortby="code"):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         sortby = wash_url_argument(sortby, 'str')
         return page(title=_("Manage Output Formats"),
@@ -113,12 +113,12 @@ def output_formats_manage(req, ln=config.cdslang, sortby="code"):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
-    
+
 def output_format_show(req, bfo, ln=config.cdslang,
                        r_fld=[], r_val=[], r_tpl=[],
                        default="", r_upd="", chosen_option="",
@@ -156,8 +156,8 @@ def output_format_show(req, bfo, ln=config.cdslang,
     (means we must have loaded the output format first, which is
     totally normal and expected behaviour)
 
-    
-    
+
+
     @param ln language
     @param bfo the filename of the output format to show
     @param r_fld the list of 'field' attribute for each rule
@@ -170,13 +170,13 @@ def output_format_show(req, bfo, ln=config.cdslang,
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Output Formats")))
     code = wash_url_argument(bfo, 'str')
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-     
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfo = wash_url_argument(bfo, 'str')
         default = wash_url_argument(default, 'str')
@@ -193,13 +193,13 @@ def output_format_show(req, bfo, ln=config.cdslang,
                                    "")],
                         lastupdated=__lastupdated__,
                         req=req)
-          
+
         output_format = bibformat_engine.get_output_format(code=bfo,
                                                            with_attributes=True)
         name = output_format['attrs']['names']['generic']
         if name == "":
             name = bfo
-            
+
         if not bibformatadminlib.can_write_output_format(bfo) and \
                chosen_option == "":#No write permission
             return dialog_box(req=req,
@@ -224,7 +224,7 @@ def output_format_show(req, bfo, ln=config.cdslang,
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
-                    req=req)   
+                    req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -233,9 +233,9 @@ def output_format_show(req, bfo, ln=config.cdslang,
 def output_format_show_attributes(req, bfo, ln=config.cdslang):
     """
     Page for output format names and descrition attributes edition.
-        
+
     @param ln language
-    @param bfo the filename of the template to show 
+    @param bfo the filename of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -245,8 +245,8 @@ def output_format_show_attributes(req, bfo, ln=config.cdslang):
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-    
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfo = wash_url_argument(bfo, 'str')
 
@@ -259,18 +259,18 @@ def output_format_show_attributes(req, bfo, ln=config.cdslang):
                         errors = [("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", bfo ,"")],
                         lastupdated=__lastupdated__,
                         req=req)
-        
+
         output_format = bibformat_engine.get_output_format(code=bfo,
                                                            with_attributes=True)
         name = output_format['attrs']['names']['generic']
-            
+
         return page(title=_("Output Format %s Attributes" % name),
                     body=bibformatadminlib.perform_request_output_format_show_attributes(bfo, ln=ln),
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links ,
                     lastupdated=__lastupdated__,
-                    req=req)   
+                    req=req)
 
     else:
         return page_not_authorized(req=req, text=auth_msg)
@@ -278,20 +278,20 @@ def output_format_show_attributes(req, bfo, ln=config.cdslang):
 def output_format_show_dependencies(req, bfo, ln=config.cdslang):
     """
     Show the dependencies of the given output format.
-    
+
     @param ln language
     @param bfo the filename of the output format to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s </a>''' % (config.weburl, ln, _("Manage Output Formats")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-    
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfo = wash_url_argument(bfo, 'str')
 
@@ -306,7 +306,7 @@ def output_format_show_dependencies(req, bfo, ln=config.cdslang):
                                    "")],
                         lastupdated=__lastupdated__,
                         req=req)
-        
+
         format_name = bibformat_engine.get_output_format_attrs(bfo)['names']['generic']
 
         return page(title=_("Output Format %s Dependencies" % format_name),
@@ -315,7 +315,7 @@ def output_format_show_dependencies(req, bfo, ln=config.cdslang):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
-                    req=req)   
+                    req=req)
 
     else:
         return page_not_authorized(req=req, text=auth_msg)
@@ -326,7 +326,7 @@ def output_format_update_attributes(req, bfo, ln=config.cdslang,
                                     names_trans=[]):
     """
     Update the name, description and code of given output format
-     
+
     @param ln language
     @param description the new description
     @param name the new name
@@ -343,7 +343,7 @@ def output_format_update_attributes(req, bfo, ln=config.cdslang,
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
 
         name = wash_url_argument(name, 'str')
@@ -356,7 +356,7 @@ def output_format_update_attributes(req, bfo, ln=config.cdslang,
                                                                 code,
                                                                 content_type,
                                                                 names_trans)
-        
+
         redirect_to_url(req, "output_format_show?ln=%(ln)s&bfo=%(bfo)s" % {'ln':ln,
                                                                            'bfo':bfo,
                                                                            'names_trans':names_trans})
@@ -374,15 +374,15 @@ def output_format_delete(req, bfo, ln=config.cdslang, chosen_option=""):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln, _("Manage Output Formats"), _("Delete Output Format")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-        
+
         #Ask confirmation to user if not already done
         chosen_option = wash_url_argument(chosen_option, 'str')
         if chosen_option == "":
@@ -395,13 +395,13 @@ def output_format_delete(req, bfo, ln=config.cdslang, chosen_option=""):
                               "delete output format <i>%s</i>?" % format_name,
                               navtrail=navtrail_previous_links,
                               options=[_("Cancel"), _("Delete")])
-        
+
         elif chosen_option==_("Delete"):
             bibformatadminlib.delete_output_format(bfo)
         redirect_to_url(req, "output_formats_manage?ln=%(ln)s"%{'ln':ln})
     else:
         return page_not_authorized(req=req, text=auth_msg)
-    
+
 def output_format_add(req, ln=config.cdslang):
     """
     Adds a new output format
@@ -414,7 +414,7 @@ def output_format_add(req, ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
 
         bfo = bibformatadminlib.add_output_format()
@@ -437,7 +437,7 @@ def format_templates_manage(req, ln=config.cdslang, checking='0'):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         checking_level = wash_url_argument(checking, 'int')
         return page(title=_("Manage Format Templates"),
@@ -446,7 +446,7 @@ def format_templates_manage(req, ln=config.cdslang, checking='0'):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -460,7 +460,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                          chosen_option=""):
     """
     Main page for template edition. Check for authentication and print formats editor.
-    
+
     @param ln language
     @param code the code being edited
     @param bft the name of the template to show
@@ -471,7 +471,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-        
+
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
     &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln ,  _("Manage Format Templates")))
 
@@ -480,7 +480,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         format_template = wash_url_argument(bft, 'str')
         ln_preview = wash_language(ln_for_preview)
@@ -496,7 +496,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                                    "")],
                         lastupdated=__lastupdated__,
                         req=req)
-          
+
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
         if not bibformatadminlib.can_write_format_template(bft) and \
                chosen_option == "": #No write permission
@@ -508,7 +508,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                               ", but not edit it." % format_name,
                               navtrail=navtrail_previous_links,
                               options=[ _("Ok")])
-            
+
 
         if bft.endswith('.xsl'):
             format_name += ' (XSL)'
@@ -523,7 +523,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -532,14 +532,14 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
 def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
     """
     Page for template name and descrition attributes edition.
-    
+
     This is also the first page shown when a format template
     has just been added. In that case new is different from
     False and we can offer specific option to user (for ex
     let him make a duplicate of existing template).
 
     @param ln language
-    @param bft the name of the template to show 
+    @param bft the name of the template to show
     @param new if "False", the template has not just been added
     """
     ln = wash_language(ln)
@@ -550,8 +550,8 @@ def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-    
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         format_template = wash_url_argument(bft, 'str')
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
@@ -568,14 +568,14 @@ def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
                                    "")],
                         lastupdated=__lastupdated__,
                         req=req)
-        
+
         return page(title=_("Format Template %s Attributes"%format_name),
                     body=bibformatadminlib.perform_request_format_template_show_attributes(bft, ln=ln, new=is_new),
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links ,
                     lastupdated=__lastupdated__,
-                    req=req)   
+                    req=req)
 
     else:
         return page_not_authorized(req=req, text=auth_msg)
@@ -583,31 +583,31 @@ def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
 def format_template_show_dependencies(req, bft, ln=config.cdslang):
     """
     Show the dependencies (on elements) of the given format.
-    
+
     @param ln language
     @param bft the filename of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
-    
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         format_template = wash_url_argument(bft, 'str')
         format_name = bibformat_engine.get_format_template_attrs(bft)['name']
-        
+
         return page(title=_("Format Template %s Dependencies" % format_name),
                     body=bibformatadminlib.perform_request_format_template_show_dependencies(bft, ln=ln),
                     uid=uid,
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
-                    req=req)   
+                    req=req)
 
     else:
         return page_not_authorized(req=req, text=auth_msg)
@@ -617,7 +617,7 @@ def format_template_update_attributes(req, bft, ln=config.cdslang,
                                       duplicate=None):
     """
     Update the name and description of given format template
-     
+
     @param ln language
     @param description the new description
     @param name the new name
@@ -632,7 +632,7 @@ def format_template_update_attributes(req, bft, ln=config.cdslang,
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
 
         if duplicate is not None:
@@ -643,7 +643,7 @@ def format_template_update_attributes(req, bft, ln=config.cdslang,
                                                                   name,
                                                                   description,
                                                                   duplicate)
-        
+
         redirect_to_url(req, "format_template_show?ln=%(ln)s&bft=%(bft)s" % {'ln':ln, 'bft':bft})
     else:
         return page_not_authorized(req=req, text=auth_msg)
@@ -662,7 +662,7 @@ def format_template_delete(req, bft, ln=config.cdslang, chosen_option=""):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         #Ask confirmation to user if not already done
         chosen_option = wash_url_argument(chosen_option, 'str')
@@ -676,14 +676,14 @@ def format_template_delete(req, bft, ln=config.cdslang, chosen_option=""):
                               "format template <i>%s</i>?" % format_name,
                               navtrail=navtrail_previous_links,
                               options=[_("Cancel"), _("Delete")])
-        
+
         elif chosen_option==_("Delete"):
             bibformatadminlib.delete_format_template(bft)
-            
+
         redirect_to_url(req, "format_templates_manage?ln=%(ln)s" % {'ln':ln})
     else:
         return page_not_authorized(req=req, text=auth_msg)
-    
+
 def format_template_add(req, ln=config.cdslang):
     """
     Adds a new format template
@@ -696,14 +696,14 @@ def format_template_add(req, ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
 
         bft = bibformatadminlib.add_format_template()
         redirect_to_url(req, "format_template_show_attributes?ln=%(ln)s&bft=%(bft)s&new=1" % {'ln':ln, 'bft':bft})
     else:
         return page_not_authorized(req=req, text=auth_msg)
-    
+
 def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                                          ln_for_preview=config.cdslang,
                                          pattern_for_preview="",
@@ -714,7 +714,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
     Print the preview of a record with a format template. To be included inside Format template
     editor. If the save_action has a value, then the code should also be saved at the same time
 
-    @param code the code of a template to use for formatting   
+    @param code the code of a template to use for formatting
     @param ln_for_preview the language for the preview (for bfo)
     @param pattern_for_preview the search pattern to be used for the preview (for bfo)
     @param save_action has a value if the code has to be saved
@@ -723,13 +723,13 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-  
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bft = wash_url_argument(bft, 'str')
         if save_action is not None and code is not None:
@@ -764,7 +764,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                             language=ln_for_preview,
                             navtrail = "",
                             lastupdated=__lastupdated__,
-                            req=req) 
+                            req=req)
             else:
                 recID = recIDs[0]
         units = create_basic_search_units(None, pattern_for_preview, None)
@@ -773,12 +773,12 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                                                ln_for_preview,
                                                keywords,
                                                None,
-                                               getUid(req))
+                                               getUid(req), req=req)
         (body, errors) = bibformat_engine.format_with_format_template(bft,
                                                                       bfo,
                                                                       verbose=7,
                                                                       format_template_code=code)
-        
+
         if content_type_for_preview == 'text/html':
             #Standard page display with CDS headers, etc.
             return page(title="",
@@ -801,27 +801,27 @@ def format_template_show_short_doc(req, ln=config.cdslang, search_doc_pattern=""
     """
     Prints the format elements documentation in a brief way. To be included inside Format template
     editor.
-    
+
     @param ln: language
     @param search_doc_pattern a search pattern that specified which elements to display
     @param bft the name of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-  
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         search_doc_pattern = wash_url_argument(search_doc_pattern, 'str')
         return bibformatadminlib.perform_request_format_template_show_short_doc(ln=ln, search_doc_pattern=search_doc_pattern)
     else:
         return page_not_authorized(req=req, text=auth_msg)
-    
-    
+
+
 def format_elements_doc(req, ln=config.cdslang):
     """
     Main page for format elements documentation. Check for authentication and print format elements list.
@@ -836,7 +836,7 @@ def format_elements_doc(req, ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Format Elements Documentation"),
                 body=bibformatadminlib.perform_request_format_elements_documentation(ln=ln),
@@ -844,7 +844,7 @@ def format_elements_doc(req, ln=config.cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -865,7 +865,7 @@ def format_element_show_dependencies(req, bfe, ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
         return page(title=_("Format Element %s Dependencies" % bfe),
@@ -874,7 +874,7 @@ def format_element_show_dependencies(req, bfe, ln=config.cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -898,19 +898,19 @@ def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
         return page(title=_("Test Format Element %s" % bfe),
                 body=bibformatadminlib.perform_request_format_element_test(bfe=bfe,
                                                                            ln=ln,
                                                                            param_values=param_values,
-                                                                           uid=getUid(req)),
+                                                                           uid=getUid(req), req=req),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -919,7 +919,7 @@ def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
 def kb_manage(req, ln=config.cdslang):
     """
     Main page for knowledge bases management. Check for authentication.
-    
+
     @param ln: language
     """
     ln = wash_language(ln)
@@ -931,7 +931,7 @@ def kb_manage(req, ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Manage Knowledge Bases"),
                 body=bibformatadminlib.perform_request_knowledge_bases_management(ln=ln),
@@ -939,24 +939,24 @@ def kb_manage(req, ln=config.cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
-    
+
 
 def kb_show(req, kb, sortby="to", ln=config.cdslang):
     """
     Shows the content of the given knowledge base id. Check for authentication and kb existence.
     Before displaying the content of the knowledge base, check if a form was submitted asking for
     adding, editing or removing a value.
-    
+
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
     """
-    
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
@@ -966,9 +966,9 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-    
+
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
@@ -990,7 +990,7 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -999,7 +999,7 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
 def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
     """
     Shows the attributes (name, description) of a given kb
-    
+
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
@@ -1013,9 +1013,9 @@ def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-    
+
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
@@ -1037,14 +1037,14 @@ def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
     """
     Shows the dependencies of a given kb
-    
+
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
@@ -1058,9 +1058,9 @@ def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-    
+
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
@@ -1082,16 +1082,16 @@ def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
                 language=ln,
                 navtrail = navtrail_previous_links,
                 lastupdated=__lastupdated__,
-                req=req)   
+                req=req)
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
-    
+
 def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
     """
     Adds a new mapping to a kb.
-    
+
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
@@ -1099,18 +1099,18 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
 
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
-   
+
         if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
@@ -1121,10 +1121,10 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
                         req=req)
 
 
-    
+
         key = wash_url_argument(mapFrom, 'str')
         value = wash_url_argument(mapTo, 'str')
-        
+
         bibformatadminlib.add_kb_mapping(kb_name, key, value)
         redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln,
                                                                                 'kb':kb_id,
@@ -1150,17 +1150,17 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
-   
+
         if kb_name is None:
             return page(title=_("Unknown Knowledge Base"),
                         body = "",
@@ -1170,7 +1170,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
                         lastupdated=__lastupdated__,
                         req=req)
 
-        
+
         key = wash_url_argument(key, 'str')
         if delete != "":
             #Delete
@@ -1191,7 +1191,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
                          ln=config.cdslang, chosen_option=None):
     """
     Update the attributes of the kb
-    
+
     @param ln language
     @param kb the kb id to update
     @param sortby the sorting criteria ('from' or 'to')
@@ -1203,13 +1203,13 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     _ = gettext_set_language(ln)
 
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
-    
+
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
         if chosen_option is not None:
@@ -1217,7 +1217,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
 	    # Redirect to kb attributes page
             redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
 
-       
+
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
         if kb_name is None:
@@ -1242,7 +1242,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
                                                                    new_name),
 			      navtrail=navtrail_previous_links,
 			      options=[ _("Ok")])
-	    
+
         new_desc = wash_url_argument(description, 'str')
         bibformatadminlib.update_kb_attributes(kb_name, new_name, new_desc)
         redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
@@ -1250,7 +1250,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
-    
+
 def kb_add(req, ln=config.cdslang, sortby="to"):
     """
     Adds a new kb
@@ -1264,17 +1264,17 @@ def kb_add(req, ln=config.cdslang, sortby="to"):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         kb_id = bibformatadminlib.add_kb()
         redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
-    
+
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
-    
+
 
 def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
     """
@@ -1291,7 +1291,7 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
@@ -1314,14 +1314,14 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
                               delete knowledge base <i>%s</i>?""" % kb_name,
                               navtrail=navtrail_previous_links,
                               options=[_("Cancel"), _("Delete")])
-        
+
         elif chosen_option==_("Delete"):
             bibformatadminlib.delete_kb(kb_name)
-            
+
         redirect_to_url(req, "kb_manage?ln=%(ln)s" % {'ln':ln})
     else:
         navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage">%s</a>'''%(config.weburl, _("Manage Knowledge Bases")))
-    
+
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
@@ -1348,12 +1348,12 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
     except MySQLdb.Error, e:
         return error_page(req)
 
-    (auth_code, auth_msg) = check_user(uid, 'cfgbibformat')
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         if bfo is not None: #Output format validation
             bfo = wash_url_argument(bfo, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(config.weburl, ln, _("Manage Output Formats")))
-            
+
             if not bibformatadminlib.can_read_output_format(bfo): #No read permission
                 return page(title=_("Restricted Output Format"),
                             body = """You don't have permission
@@ -1365,16 +1365,16 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
                                        "")],
                             lastupdated=__lastupdated__,
                             req=req)
-        
+
             output_format = bibformat_engine.get_output_format(code=bfo,
                                                                with_attributes=True)
             name = output_format['attrs']['names']['generic']
             title = _("Validation of Output Format %s" % name)
-            
+
         elif bft is not None: #Format template validation
             bft = wash_url_argument(bft, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
-            
+
             if not bibformatadminlib.can_read_format_template(bft): #No read permission
                 return page(title=_("Restricted Format Template"),
                             body = """You don't have permission to
@@ -1388,11 +1388,11 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
                             req=req)
             name = bibformat_engine.get_format_template_attrs(bft)['name']
             title = _("Validation of Format Template %s" % name)
-            
+
         elif bfe is not None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
             navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (config.weburl, ln , bfe.upper() , _("Format Elements Documentation")))
-            
+
             if not bibformatadminlib.can_read_format_element(bfe) and \
                    not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
                 return page(title=_("Restricted Format Element"),
@@ -1412,7 +1412,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
                         errors = [("ERR_BIBFORMAT_VALIDATE_NO_FORMAT")],
                         navtrail = navtrail_previous_links,
                         lastupdated=__lastupdated__,
-                        req=req)       
+                        req=req)
 
         return page(title=title,
                     body=bibformatadminlib.perform_request_format_validate(ln=ln,
@@ -1423,11 +1423,11 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
-                    req=req) 
+                    req=req)
 
     else:
         navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/?ln=%s'''%(config.weburl, ln))
-        
+
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
@@ -1449,7 +1449,7 @@ def dialog_box(req, url="", ln=config.cdslang, navtrail="",
     Used for asking confirmation on actions.
 
     The page that will receive the result must take 'chosen_option' as parameter.
-    
+
     @param url the url used to submit the options chosen by the user
     @param options the list of labels for the buttons given as choice to user
     """
@@ -1473,6 +1473,6 @@ def error_page(req):
     """
     return page(title="Internal Error",
                 body = create_error_box(req, ln=config.cdslang),
-                description="%s - Internal Error" % config.cdsname, 
+                description="%s - Internal Error" % config.cdsname,
                 keywords="%s, CDS Invenio, Internal Error" % config.cdsname,
                 language=config.cdslang)

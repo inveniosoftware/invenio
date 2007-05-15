@@ -411,6 +411,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     def youradminactivities(self, req, form):
         args = wash_urlargd(form, {})
         uid = webuser.getUid(req)
+        user_info = webuser.collect_user_info(req)
 
         # load the right message language
         _ = gettext_set_language(args['ln'])
@@ -420,7 +421,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                navmenuid='admin')
 
         return page(title=_("Your Administrative Activities"),
-                    body=webaccount.perform_youradminactivities(uid, args['ln']),
+                    body=webaccount.perform_youradminactivities(user_info, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description="CDS Personalize, Main page",
                     keywords="CDS, personalize",

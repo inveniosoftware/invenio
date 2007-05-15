@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.webuser import external_authentication_cern as cern
+from invenio import external_authentication_cern as cern
 
 class ExternalAuthenticationCernTest(unittest.TestCase):
     """Test functions related to the CERN authentication."""
