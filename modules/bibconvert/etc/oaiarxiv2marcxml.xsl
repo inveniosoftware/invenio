@@ -391,7 +391,7 @@
              <controlfield tag="003">SzGeCERN</controlfield>
 
 
-           <!-- MARC FIELD 034_$$9,a  = metadata/header/identifier  -->
+           <!-- MARC FIELD 035_$$9,a  = metadata/header/identifier  -->
            <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier">
              <datafield tag="035" ind1=" " ind2=" ">
                 <subfield code="9">arXiv</subfield>
@@ -450,21 +450,12 @@
 
 
 
-           <!-- MARC FIELDS [1,7]00$$a,u and 710  = metadata/arXiv/[author,affiliation]
+           <!-- MARC FIELDS [1,7]00$$a,u  = metadata/arXiv/[author,affiliation]
                 N.B.: $$v not used, all affiliations are repeated in $$u   -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
 
-             <!-- Filling 710$$g   substring(chaîne,position,longueur)  -->
-                <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[1]/arXiv:affiliation">
-                  <xsl:if test="contains( translate(., $lcletters, $ucletters), 'collaboration')">
-                      <datafield tag="710" ind1=" " ind2=" ">
-                       <subfield code="g"><xsl:value-of select="."/></subfield>
-                     </datafield>
-                  </xsl:if>
-                </xsl:for-each>
-
-
-             <!-- Filling 100$$a,u   substring(chaîne,position,longueur)  -->
+             <!-- Filling 100$$a,u   substring(chaine,position,longueur)  -->
+             <xsl:if test="not(contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:forenames, 'Collab') or contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:keyname, 'Collab'))">
              <datafield tag="100" ind1=" " ind2=" ">
                 <subfield code="a">
                   <xsl:variable name="fnames">
@@ -476,17 +467,13 @@
                   <subfield code="u"><xsl:value-of select="."/></subfield>
                 </xsl:for-each>
              </datafield>
-
+             </xsl:if>>
 
 
              <!-- Filling 700$$a,u -->
              <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[position()>1]">
+             <xsl:if test="not(contains(./arXiv:forenames, 'Collab') or contains(./arXiv:keyname, 'Collab'))">
                <datafield tag="700" ind1=" " ind2=" ">
-                <!-- Old way without reformating to initials
-                <subfield code="a">
-                  <xsl:value-of select="./arXiv:keyname"/>, <xsl:value-of select="./arXiv:forenames"/>
-                </subfield>
-                -->
                 <subfield code="a">
                   <xsl:variable name="fnames">
                     <xsl:value-of select="normalize-space(./arXiv:forenames)"/>
@@ -497,18 +484,39 @@
                   <subfield code="u"><xsl:value-of select="."/></subfield>
                 </xsl:for-each>
                </datafield>
+             </xsl:if>
              </xsl:for-each>
 
 
              <!-- Filling 710$$g - collaboration detection in affiliation field  -->
-             <xsl:variable name="knlow"><xsl:value-of select="normalize-space(translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[1]/arXiv:affiliation, $ucletters, $lcletters))"/></xsl:variable>
+	     <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
+             <xsl:variable name="knlowc"><xsl:value-of select="normalize-space(translate(./arXiv:affiliation, $ucletters, $lcletters))"/></xsl:variable>
+             <xsl:variable name="knlowfn"><xsl:value-of select="normalize-space(translate(./arXiv:forenames, $ucletters, $lcletters))"/></xsl:variable>
+             <xsl:variable name="knlowkn"><xsl:value-of select="normalize-space(translate(./arXiv:keyname, $ucletters, $lcletters))"/></xsl:variable>
+             <xsl:variable name="knlow"><xsl:value-of select="concat($knlowc,$knlowfn,$knlowkn)"/></xsl:variable>
              <xsl:if test="contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group') ">
                <datafield tag="710" ind1=" " ind2=" ">
-                 <subfield code="g"><xsl:value-of select="concat(translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[1]/arXiv:forenames, $lcletters, $ucletters), ' ', ./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[1]/arXiv:affiliation)"/> </subfield>
+                 <subfield code="g">
+                   <xsl:choose>
+                     <xsl:when test="contains($knlowc, 'collab')">
+                       <xsl:value-of select="./arXiv:affiliation"/> 
+                     </xsl:when>
+                     <xsl:when test="contains($knlowfn, 'collab')">
+                       <xsl:value-of select="concat(./arXiv:keyname , ' ', ./arXiv:forenames)"/> 
+                     </xsl:when>
+                     <xsl:when test="contains($knlowkn, 'collab')">
+                       <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname)"/> 
+                     </xsl:when>
+                     <xsl:otherwise>
+                       <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname, ' ', ./arXiv:affiliation)"/> 
+                     </xsl:otherwise>
+                   </xsl:choose>
+                   </subfield>
                </datafield>
              </xsl:if>
-             </xsl:if>
+	     </xsl:for-each>
 
+             </xsl:if>
 
            <!-- MARC FIELD 8564   <subfield code="y">Access to fulltext document</subfield> -->
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:id">
@@ -607,13 +615,13 @@
            </xsl:if>
 
 
-             <!-- MARC FIELD 773$$p  - publication detection in comments field -->
+             <!-- MARC FIELD 773$$p  - publication detection in comments field
              <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
 	       <xsl:variable name="commentsf">
 	         <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
 	       </xsl:variable>
              <xsl:call-template name="matchPR773p"><xsl:with-param name="detectPR" select="$detectPR"/><xsl:with-param name="commentsf" select="$commentsf"/></xsl:call-template>
-             </xsl:if>
+             </xsl:if> -->
 
 
            <!-- MARC FIELD 773 - using journal-ref field -->
@@ -763,7 +771,7 @@
 
            <!-- MARC FIELDS which are treated differently according to the base  -->
            <!-- MARC FIELDS 269$$[b,a,c], 300$$a , V 500$$a,  502$$[a,b,c] , V 595$$a, V 690$$c, V 960$$a, V 980$$a -->
-           <!-- RE-MARC :-) FIELD 962 (LKR) is genrated via FFT tag by bibupload  -->
+           <!-- RE-MARC :-) FIELD 8564 is genrated via FFT tag by bibupload  -->
            <!-- Base: 10=hep related topics , 11=hep topics , 13=published articles, 14=theses  -->
 
 
