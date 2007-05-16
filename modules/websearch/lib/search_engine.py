@@ -414,8 +414,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
             # so, let us replace temporarily any space within quotes by '__SPACE__'
-            p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
-            p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p) 
+            p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
+            p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
             p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
             # wash argument:
             p = sre_equal.sub(":", p)
@@ -451,7 +451,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                             pi = string.replace(pi, "'", "") # remove quote signs
                             opfts.append([oi, "%" + pi + "%", fi, 'a'])
                         else: # unbalanced quotes, so do WRD query:
-                            opfts.append([oi, pi, fi, 'w'])                            
+                            opfts.append([oi, pi, fi, 'w'])
                     else:
                         # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
                         if pi[0] == '"' and pi[-1] == '"':
@@ -510,8 +510,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
     _ = gettext_set_language(ln)
 
     if not title_message: title_message = _("Search Results")
-    
-    if not req: 
+
+    if not req:
         return # we were called from CLI
 
     content_type = get_output_format_content_type(of)
@@ -540,10 +540,10 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
 
         if not description:
             description = "%s %s." % (cc, _("Search Results"))
-            
+
         if not keywords:
             keywords = "CDS Invenio, WebSearch, %s" % cc
-            
+
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln),
                                  description=description,
@@ -554,12 +554,12 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
     #    req.send_http_header()
-        
+
 def page_end(req, of="hb", ln=cdslang):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
-        return [] # empty recID list 
-    if not req: 
+        return [] # empty recID list
+    if not req:
         return # we were called from CLI
     if of.startswith('h'):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
@@ -599,7 +599,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                       ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3,
                       m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec,
                       action=""):
-    
+
     """Create search box for 'search again in the results page' functionality."""
 
     # load the right message language
@@ -737,7 +737,7 @@ def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1):
     for dad in get_coll_ancestors(cc):
         if dad != cdsname: # exclude Home collection
             dads.append ((dad, get_coll_i18nname (dad, ln)))
-        
+
     if self_p and cc != cdsname:
         dads.append((cc, get_coll_i18nname(cc, ln)))
 
@@ -792,7 +792,7 @@ def create_andornot_box(name='op', value='', ln='en'):
            is_selected('a', value), _("AND"),
            is_selected('o', value), _("OR"),
            is_selected('n', value), _("AND NOT"))
-    
+
     return out
 
 def create_matchtype_box(name='m', value='', ln='en'):
@@ -1052,8 +1052,8 @@ def wash_pattern(p):
     # get rid of wildcards at the beginning of words:
     p = sre_pattern_wildcards_at_beginning.sub("\\1", p)
     # replace spaces within quotes by __SPACE__ temporarily:
-    p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p) 
-    p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p) 
+    p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
+    p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
     p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
     # get rid of extremely short words (1-3 letters with wildcards):
     p = sre_pattern_short_words.sub("\\1", p)
@@ -1080,7 +1080,7 @@ def wash_dates(d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0):
     YYYY-MM-DD format suitable for time restricted searching.
     I.e. pay attention when months are not there to put 01 or 12
     according to whether it's the starting or the ending date, etc.
-    """    
+    """
     day1, day2 =  "", ""
     # sanity checking:
     if d1y == 0 and d1m == 0 and d1d == 0 and d2y == 0 and d2m == 0 and d2d == 0:
@@ -1275,7 +1275,7 @@ def create_collection_reclist_cache():
     except Error:
         # database problems, set timestamp to zero and return empty cache
         collection_reclist_cache_timestamp = 0
-        return collrecs    
+        return collrecs
     for name, reclist in res:
         collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
     # update timestamp:
@@ -1421,7 +1421,7 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
     urlargd = {}
     urlargd.update(req.argd)
     urlargd['action'] = 'search'
-    
+
     nearest_box = create_nearest_terms_box(urlargd, p, f, 'w', ln=ln, intro_text_p=0)
 
     req.write(websearch_templates.tmpl_search_in_bibwords(
@@ -1572,7 +1572,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
                 argd['p'] = bsu_p
                 argd['f'] = bsu_f
-                
+
                 nearestterms.append((bsu_p, bsu_nbhits, argd))
 
             text = websearch_templates.tmpl_search_no_boolean_hits(
@@ -1732,7 +1732,7 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     _ = gettext_set_language(ln)
-    
+
     # search stage 4: intersect with the collection universe:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
@@ -1753,7 +1753,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>', 
+                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': results_in_Home._nbhits,
                                'x_url_close': '</a>'})
@@ -1905,7 +1905,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p
                     elif string.find(argd[px], f+':"'+p+'"') > -1:
                         argd[px] = string.replace(argd[px], f+':"'+p+'"', f+':"'+term+'"')
                         break
-                    
+
         terminfo.append((term, hits, argd))
 
     intro = ""
@@ -2454,7 +2454,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     'print_records_prologue_p' and/or print_records_epilogue_p' are
     True.
     """
-    
+
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -2492,7 +2492,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
             # print header if needed
             if print_records_prologue_p:
                 print_records_prologue(req, format)
- 
+
             # print records
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
             req.write(format_records(recIDs_to_print,
@@ -2576,20 +2576,20 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         if r:
                             temp ['downloadsimilarity'] = r
                             temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
-                    
+
                     # Get comments and reviews for this record if exist
                     # FIXME: templatize me
                     if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
                         from invenio.webcomment import get_first_comments_or_remarks
-                        (comments, reviews) = get_first_comments_or_remarks(recID=recIDs[irec], ln=ln, 
-                                                                            nb_comments=CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW, 
+                        (comments, reviews) = get_first_comments_or_remarks(recID=recIDs[irec], ln=ln,
+                                                                            nb_comments=CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW,
                                                                             nb_reviews=CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW)
                         temp['comments'] = comments
                         temp['reviews']  = reviews
 
                     r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
                     if r: temp ['viewsimilarity'] = r
-                    
+
                     rows.append(temp)
 
                 req.write(websearch_templates.tmpl_records_format_other(
@@ -2633,7 +2633,7 @@ def print_records_epilogue(req, format):
     elif format.startswith('x'):
         epilogue = websearch_templates.tmpl_xml_default_epilogue()
     req.write(epilogue)
-        
+
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
                  search_pattern=None, uid=None, verbose=0):
     """Prints record 'recID' formatted accoding to 'format'."""
@@ -2641,12 +2641,12 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
     _ = gettext_set_language(ln)
 
     out = ""
-    
+
     # sanity check:
     record_exist_p = record_exists(recID)
     if record_exist_p == 0: # doesn't exist
         return out
-    
+
     # New Python BibFormat procedure for formatting
     # Old procedure follows further below
     # We must still check some special formats, but these
@@ -2656,11 +2656,11 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             or format.lower().startswith('hm') \
             or str(format[0:3]).isdigit() \
             or ot):
-        
+
         # Unspecified format is hd
         if format == '':
             format = 'hd'
-        
+
         if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
             # HTML output displays a default value for deleted records.
             # Other format have to deal with it.
@@ -2668,7 +2668,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   uid=uid, verbose=verbose)
-                
+
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format.lower().startswith('hb') and \
                    format.lower() != 'hb_p':
@@ -2678,7 +2678,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                     weburl = weburl
                     )
         return out
-    
+
     # Old PHP BibFormat procedure for formatting
     # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -2852,9 +2852,9 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   uid=uid, verbose=verbose)
-        
+
     elif format.startswith("hs"):
-        # for citation/download similarity navigation links:        
+        # for citation/download similarity navigation links:
         if record_exist_p == -1:
             out += _("The record has been deleted.")
         else:
@@ -2879,7 +2879,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             if authors:
                 out += " - %s" % authors[0]
                 if len(authors) > 1:
-                    out += " <em>et al</em>"  
+                    out += " <em>et al</em>"
             # thirdly publication info:
             publinfos = get_fieldvalues(recID, "773__s")
             if not publinfos:
@@ -2896,9 +2896,9 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 if not years:
                     years = get_fieldvalues(recID, "909C4y")
                     if not years:
-                        years = get_fieldvalues(recID, "260__c") 
+                        years = get_fieldvalues(recID, "260__c")
                 if years:
-                    out += " (%s)" % years[0]   
+                    out += " (%s)" % years[0]
     else:
         # HTML brief format by default
         if record_exist_p == -1:
@@ -2928,7 +2928,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                              recID = recID,
                              weburl = weburl,
                            )
-    
+
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 pass # do nothing for portfolio and on-the-fly formats
@@ -2958,7 +2958,7 @@ def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None
 
     BibFormat will decide by itself if old or new BibFormat must be used.
     """
-    
+
     keywords = []
     if search_pattern is not None:
         units = create_basic_search_units(None, str(search_pattern), None)
@@ -2970,7 +2970,7 @@ def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None
                          search_pattern=keywords,
                          uid=uid,
                          verbose=verbose)
-            
+
 def log_query(hostname, query_args, uid=-1):
     """
     Log query into the query and user_query tables.
@@ -3265,7 +3265,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         ## 1 - detailed record display
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
-        
+
         page_start(req, of, cc, as, ln, uid, title, description, keywords)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
@@ -3344,7 +3344,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 
     elif CFG_EXPERIMENTAL_FEATURES and p.startswith("cocitedwith:"):
         ## 3-terter - cited by search needed
-        page_start(req, of, cc, as, ln, uid, _("Search Results")) 
+        page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
@@ -3510,10 +3510,30 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         ## search stage 6: display results:
         results_final_nb_total = 0
         results_final_nb = {} # will hold number of records found in each collection
-                              # (in simple dict to display overview more easily; may refactor later)
+                              # (in simple dict to display overview more easily)
         for coll in results_final.keys():
             results_final_nb[coll] = results_final[coll]._nbhits
-            results_final_nb_total += results_final_nb[coll]
+            #results_final_nb_total += results_final_nb[coll]
+
+        # Now let us calculate results_final_nb_total more precisely,
+        # in order to get the total number of "distinct" hits across
+        # searched collections; this is useful because a record might
+        # have been attributed to more than one primary collection; so
+        # we have to avoid counting it multiple times.  The price to
+        # pay for this accuracy of results_final_nb_total is somewhat
+        # increased CPU time.
+        if results_final.keys() == 1:
+            # only one collection; no need to union them
+            results_final_for_all_selected_colls = results_final.values()[0]
+            results_final_nb_total = results_final_nb.values()[0]
+        else:
+            # okay, some work ahead to union hits across collections:
+            results_final_for_all_selected_colls = HitSet()
+            for coll in results_final.keys():
+               results_final_for_all_selected_colls.union(results_final[coll])
+            results_final_for_all_selected_colls.calculate_nbhits()
+            results_final_nb_total = results_final_for_all_selected_colls._nbhits
+
         if results_final_nb_total == 0:
             if of.startswith('h'):
                 print_warning(req, "No match found, please enter different search terms.")
@@ -3526,10 +3546,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
-                results_final_for_all_colls = HitSet()
-                for coll in results_final.keys():
-                    results_final_for_all_colls.union(results_final[coll])
-                recIDs = results_final_for_all_colls.items().tolist()
+                recIDs = results_final_for_all_selected_colls.items().tolist()
                 if sf: # do we have to sort?
                     recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
                 elif rm: # do we have to rank?
@@ -3594,7 +3611,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 id_query = log_query(req.get_remote_host(), req.args, uid)
                 if of.startswith("h") and id_query:
                     # Alert/RSS teaser:
-                    req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln)) 
+                    req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln))
             except:
                 # do not log query if req is None (used by CLI interface)
                 pass
