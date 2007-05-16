@@ -655,10 +655,7 @@ atlantis.cern.ch
 
 ## CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE -- when indexing, do you want to use
 ## stemming?  If so, stem according to which language?  Use '' for
-## no stemming, 'fr' for French, 'en' for English, 'no' for Norwegian,
-## 'sv' for Swedish, 'de' for German, 'it' for Italian, 'pt' for
-## Portuguese'. This feature is still somewhat experimental.  We
-## recommend to say nothing ("") at this stage of things.
+## no stemming, 'en' for English.
 ##  (example: "")
 <define-tag CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE whitespace=delete>
 </define-tag>
