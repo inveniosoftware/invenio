@@ -60,6 +60,7 @@ from invenio.config import \
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
+from invenio.bibindex_engine_stemmer import stem
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -1627,9 +1628,12 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     if len(words) == 2:
         word0 = sre_word.sub('', words[0])
         word1 = sre_word.sub('', words[1])
+        word0 = stem(word0)
+        word1 = stem(word1)
         query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
     else:
         word = sre_word.sub('', word)
+        word = stem(word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
         else:
