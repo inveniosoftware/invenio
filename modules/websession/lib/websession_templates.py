@@ -680,12 +680,19 @@ class Template:
         _ = gettext_set_language(ln)
         out = _("You are no longer recognized by our system.") + ' '
         if CFG_EXTERNAL_AUTH_USING_SSO and CFG_EXTERNAL_AUTH_LOGOUT_SSO:
-            out += _("You are still recognized by the centralized <strong>SSO</strong> system. You can <a href='%s'>logout from SSO</a>, too.<br />") % CFG_EXTERNAL_AUTH_LOGOUT_SSO
-        out += _("If you wish you can %(x_url_open)slogin here%(x_url_close)s.") % {'x_url_open': '<a href="./login?ln=' + ln + '">',
-                                                                                    'x_url_close': '</a>'}
+            out += _("""You are still recognized by the centralized
+                %(x_fmt_open)sSSO%(x_fmt_close)s system. You can
+                %(x_url_open)slogout from SSO%(x_url_close)s, too.""") % \
+                {'x_fmt_open' : '<strong>', 'x_fmt_close' : '</strong>',
+                 'x_url_open' : '<a href="%s">' % CFG_EXTERNAL_AUTH_LOGOUT_SSO,
+                 'x_url_close' : '</a>'}
+            out += '<br />'
+        out += _("If you wish you can %(x_url_open)slogin here%(x_url_close)s.") % \
+                {'x_url_open': '<a href="./login?ln=' + ln + '">',
+                 'x_url_close': '</a>'}
         return out
 
-    def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, supportemail):
+    def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, supportemail, msg=None):
         """
         Displays a login form
 
@@ -704,21 +711,26 @@ class Template:
           - 'selected_method' *string* - The default authentication method
 
           - 'supportemail' *string* - The email of the support team
+
+          - 'msg' *string* - The message to print before the form, if needed
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<p>%(please_login)s<br />" % {
-                'please_login' : _("If you already have an account, please login using the form below.")
-              }
+        if msg is None:
+            out = "<p>%(please_login)s</p>" % {
+                    'please_login' : _("If you already have an account, please login using the form below.")
+                }
 
-        if register_available:
-            out += _("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
-                {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
-                 'x_url_close': '</a>'}
+            if register_available:
+                out += "<p>"+_("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
+                    {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
+                    'x_url_close': '</a>'} + "</p>"
+            else:
+                out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) + "</p>"
         else:
-            out += _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail))
+            out = "<p>%s</p>" % msg
         out += """<form method="post" action="../youraccount/login">
                   <table>
 
