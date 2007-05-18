@@ -791,35 +791,30 @@ def get_default_user_preferences():
     return user_preference
 
 def collect_user_info(req):
-    """Given the mod_python request object rec it returns a dictionary
-    containing at least the keys uid, apache_user, apache_groups, nickname,
-    email, groups, remote_ip, remote_host, plus any external keys in
+    """Given the mod_python request object rec or a uid it returns a dictionary
+    containing at least the keys uid, nickname, email, groups, plus any external keys in
     the user preferences (collected at login time and built by the different
-    external authentication plugins)
+    external authentication plugins) and if the mod_python request object is
+    provided, also the remote_ip and remote_host fields.
     """
     user_info = {}
-    uid = getUid(req)
+
+    if type(req) in [type(1), type(1L)]:
+        uid = req
+    else:
+        uid = getUid(req)
+        user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+        user_info['remote_host'] = req.connection.remote_host or None
     user_info['uid'] = uid
-    #apache_user, apache_pwd = http_get_credentials(req)
-    #if apache_user:
-        #if not auth_apache_user_p(apache_user, apache_pwd):
-            #apache_user = None
-            #apache_pwd = None
-    #user_info['apache_user'] = apache_user
-    #user_info['apache_group'] = []
-    #if user_info['apache_user']:
-        #user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
     user_info['nickname'] = get_nickname(uid) or None
     user_info['email'] = get_email(uid) or None
     user_info['group'] = []
     if uid:
         user_info['group'] = [group[1] for group in get_groups(uid)]
-    user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
-    user_info['remote_host'] = req.connection.remote_host or None
-    prefs = get_user_preferences(uid)
-    if prefs:
-        for key, value in prefs.items():
-            user_info[key.lower()] = value
+        prefs = get_user_preferences(uid)
+        if prefs:
+            for key, value in prefs.items():
+                user_info[key.lower()] = value
     return user_info
 
 
