@@ -42,7 +42,6 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     ProgrammingError
 
 import string
-import datetime
 import time
 from MySQLdb import connect
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_MAX_CACHED_QUERIES
@@ -73,7 +72,6 @@ try:
     _db_cache
 except NameError:
     _db_cache = {}
-    _db_cache_last_timestamp = {}
 
 def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
     """Caches whatever SQL command is passed by.
@@ -83,32 +81,29 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
     @param with_desc: if true, will return a
     DB API 7-tuple describing columns in query
     @return the result as provided by run_sql
-    Note, it's useless and even wrong to use this function with SQL commands
+    Note, it's pointless and even wrong to use this function with SQL commands
     different from SELECT
     """
-    global _db_cache, _db_cache_last_timestamp
-    key = repr((sql, param, n, with_desc, affected_tables))
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    _db_cache_last_timestamp[key] = timestamp
-    if len(_db_cache_last_timestamp) >= CFG_MAX_CACHED_QUERIES:
-        _run_sql_cached_gc()
-    if _db_cache.has_key(key):
-        result, last_timestamp = _db_cache[key]
-        if max([get_table_update_time(table) for table in affected_tables]) > last_timestamp:
-            result = run_sql(sql, param, n, with_desc)
-            _db_cache[key] = (result, timestamp)
-    else:
-        result = run_sql(sql, param, n, with_desc)
-        _db_cache[key] = (result, timestamp)
-    return result
+    global _db_cache
 
-def _run_sql_cached_gc():
-    global _db_cache, _db_cache_last_timestamp
-    key_rank = _db_cache_last_timestamp.keys()
-    key_rank.sort(lambda x, y:_db_cache_last_timestamp[x] < _db_cache_last_timestamp[y] and -1 or _db_cache_last_timestamp[x] > _db_cache_last_timestamp[y] and 1 or 0)
-    for i in range(0, len(key_rank)/2):
-        del _db_cache[key_rank[i]]
-        del _db_cache_last_timestamp[key_rank[i]]
+    key = repr((sql, param, n, with_desc))
+
+    # Garbage collecting needed?
+    if len(_db_cache) >= CFG_MAX_CACHED_QUERIES:
+        _db_cache = {}
+
+    # Query already in the cache?
+    if not _db_cache.has_key(key) or _db_cache[key][1] < max([get_table_update_time(table) for table in affected_tables]):
+            # Let's update the cache
+            result = run_sql(sql, param, n, with_desc)
+            _db_cache[key] = (result, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+            ### log_sql_query_cached(key, result, False) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+
+    else:
+        result = _db_cache[key][0]
+        ### log_sql_query_cached(key, result, True) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+
+    return result
 
 def run_sql(sql, param=None, n=0, with_desc=0):
     """Run SQL on the server with PARAM and return result.
@@ -181,14 +176,35 @@ def blob_to_string(ablob):
         # BLOB is array.array in MySQLdb 1.0.0 and later
         return ablob.tostring()
 
+def log_sql_query_cached(key, result, hit_p):
+    """Log SQL query cached into prefix/var/log/dbquery.log log file.  In order
+    to enable logging of all SQL queries, please uncomment two lines
+    in run_sql_cached() above. Useful for fine-level debugging only!
+    """
+    from invenio.config import logdir
+    from invenio.dateutils import convert_datestruct_to_datetext
+    from invenio.textutils import indent_text
+    log_path = logdir + '/dbquery.log'
+    date_of_log = convert_datestruct_to_datetext(time.localtime())
+    message = date_of_log + '-->\n'
+    message += indent_text('Key:\n' + indent_text(str(key), 2), 2)
+    message += indent_text('Result:\n' + indent_text(str(result) + (hit_p and ' HIT' or ' MISS'), 2), 2)
+    message += 'Cached queries: %i\n\n' % len(_db_cache)
+    try:
+        log_file = open(log_path, 'a+')
+        log_file.writelines(message)
+        log_file.close()
+    except:
+        pass
+
+
 def log_sql_query(sql, param=None):
-    """Log SQL query into prefix/var/dbquery.log log file.  In order
+    """Log SQL query into prefix/var/log/dbquery.log log file.  In order
        to enable logging of all SQL queries, please uncomment one line
        in run_sql() above. Useful for fine-level debugging only!
     """
     from invenio.config import logdir
     from invenio.dateutils import convert_datestruct_to_datetext
-    import time
     from invenio.textutils import indent_text
     log_path = logdir + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
