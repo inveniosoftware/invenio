@@ -34,9 +34,9 @@ def format(bfo, style):
     out = ""
 
     uid = bfo.uid
-    req = bfo.rec
+    req = bfo.req
     if uid is not None:
-        if (req):
+        if req:
             (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
         else:
             (auth_code, auth_message) =
