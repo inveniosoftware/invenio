@@ -187,9 +187,9 @@ def acc_addRole(name_role, description, firerole_def_ser, firerole_def_src):
 
     description - text to describe the role
 
-    firerole_def_ser - compiled firerole like definition
+    firerole_def_ser - compiled firewall like role definition
 
-    firerole_def_src - firerole like definition sources
+    firerole_def_src - firewall like role definition sources
     """
 
     if not run_sql("""SELECT * FROM accROLE WHERE name = '%s'""" % (name_role, )):
@@ -328,9 +328,9 @@ def acc_updateRole(id_role=0, name_role='', verbose=0, description='', \
 
     description - new description
 
-    firerole_def_ser - compiled firerole like definition
+    firerole_def_ser - compiled firewall like role definition
 
-    firerole_def_src - firerole like definition
+    firerole_def_src - firewall like role definition
     """
 
     id_role = id_role or acc_getRoleId(name_role=name_role)
@@ -965,7 +965,7 @@ def acc_getRoleName(id_role):
     except IndexError: return ''
 
 def acc_getRoleDefinition(id_role=0):
-    """get definition object for a role."""
+    """get firewall like role definition object for a role."""
 
     try: return run_sql("""SELECT firerole_def_ser FROM accROLE WHERE id = %s""", (id_role, ))[0][0]
     except IndexError: return ''
@@ -1080,15 +1080,20 @@ def acc_findUserInfoNames(id_user=0):
 
     return res2
 
-def acc_findUserRoleActions(id_user=0):
-    """find name of all roles and actions connected to user, id given."""
+def acc_findUserRoleActions(user_info):
+    """find name of all roles and actions connected to user_info (or uid), id given."""
+
+    if type(user_info) in [type(1), type(1L)]:
+        uid = user_info
+    else:
+        uid = user_info['uid']
 
     query = """SELECT DISTINCT r.name, a.name
     FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
     WHERE ur.id_user = %s and
     ur.id_accROLE = raa.id_accROLE and
     raa.id_accACTION = a.id and
-    raa.id_accROLE = r.id """ % (id_user, )
+    raa.id_accROLE = r.id """ % (uid, )
 
     res1 = run_sql(query)
 
@@ -1096,25 +1101,20 @@ def acc_findUserRoleActions(id_user=0):
     for res in res1: res2.append(res)
     res2.sort()
 
-    return res2
+    if type(user_info) == type({}):
+        query = """SELECT DISTINCT r.name, a.name, r.firerole_def_ser
+        FROM accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
+        WHERE raa.id_accACTION = a.id and
+        raa.id_accROLE = r.id """
 
-def acc_findUserRoleActions_user_info(user_info):
-    """find name of all roles and actions connected to user_info, id given."""
-    query = """SELECT DISTINCT r.name, a.name, r.firerole_def_ser
-    FROM accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
-    WHERE raa.id_accACTION = a.id and
-    raa.id_accROLE = r.id """
-
-    res1 = run_sql(query)
-    res2 = []
-    for role_name, action_name, role_definition in res1:
-        if acc_firerole_check_user(user_info, deserialize(role_definition)):
-            res2.append((role_name, action_name))
-
-    # Collect also traditional explicit id_user authorization
-    res3 = acc_findUserRoleActions(user_info['uid'])
-
-    return list(Set(res2) or Set(res3))
+        res3 = run_sql(query)
+        res4 = []
+        for role_name, action_name, role_definition in res3:
+            if acc_firerole_check_user(user_info, deserialize(role_definition)):
+                res4.append((role_name, action_name))
+        return list(Set(res2) or Set(res4))
+    else:
+        return res2
 
 
 # POSSIBLE ACTIONS / AUTHORIZATIONS
