@@ -25,11 +25,11 @@ __revision__ = "$Id$"
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      version
-from invenio.dbquery import run_sql, ProgrammingError
+from invenio.dbquery import run_sql_cached, ProgrammingError
 import invenio.access_control_admin as aca
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
-import invenio.webuser as wu
-import invenio.access_control_firerole as fw
+from invenio import webuser
+from invenio import access_control_firerole
 
 
 called_from = 1 #1=web,0=cli
@@ -39,22 +39,26 @@ except ImportError, e:
     called_from = 0
 
 ## access controle engine function
-def acc_authorize_action(req, name_action, verbose=0, **arguments):
+def acc_authorize_action(req, name_action, verbose=0, check_only_uid_p=False, **arguments):
     """Check if user is allowed to perform action
     with given list of arguments.
     Return (0, message) if authentication succeeds, (error code, error message) if it fails.
 
     The arguments are as follows:
 
-          req - mod_python req necessary to discover info on the user
-                or uid of the user
-                or dictionary produces by collect_user_info
+          req - could be either one of these three things:
+                id_user of the current user
+                user_info dictionary built against the user details
+                req mod_python request object
 
       name_action - the name of the action
 
         arguments - dictionary with keyword=value pairs created automatically
                     by python on the extra arguments. these depend on the
                     given action.
+
+check_only_uid_p - hidden parameter needed to only check against uids without
+                    looking at role definitions
     """
 
     #TASK -1: Checking external source if user is authorized:
@@ -65,31 +69,35 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
     #            return (10, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[10], (called_from and CFG_WEBACCESS_MSGS[1] or "")))
     # TASK 0: find id and allowedkeywords of action
 
-    id_user = req # We initially suppose req contain the id_user
-    have_uid_p = type(id_user) in [type(1), type(1L)]
-    if not have_uid_p: # Does req contains more infos?
-        if type(req) == type({}): # we suppose it's a dict by collect_user_info
+    if check_only_uid_p:
+        id_user = req
+    else:
+        if type(req) in [type(1), type(1L)]: # req is id_user
+            id_user = req
+            user_info = webuser.collect_user_info(id_user)
+        elif type(req) == type({}): # req is user_info
             user_info = req
-        else: # otherwise it is a mod_python request object
-            user_info = wu.collect_user_info(req)
-
-        if user_info.has_key('uid'):
-            id_user = user_info['uid']
-        else:
-            return (4, CFG_WEBACCESS_WARNING_MSGS[4])
-
+            if user_info.has_key('uid'):
+                id_user = user_info['uid']
+            else:
+                return (4, CFG_WEBACCESS_WARNING_MSGS[4])
+        else: # req is req
+            user_info = webuser.collect_user_info(req)
+            if user_info.has_key('uid'):
+                id_user = user_info['uid']
+            else:
+                return (4, CFG_WEBACCESS_WARNING_MSGS[4])
         # Check if just the userid is enough to execute this action
-        (ret, msg) = acc_authorize_action(id_user, name_action, verbose, **arguments)
-        if ret == 0:
-            return (ret, msg)
-
+        (auth_code, auth_message) = acc_authorize_action(id_user, name_action, verbose, check_only_uid_p=True, **arguments)
+        if auth_code == 0:
+            return (auth_code, auth_message)
 
     if verbose: print 'task 0 - get action info'
     query1 = """select a.id, a.allowedkeywords, a.optional
                 from accACTION a
                 where a.name = '%s'""" % (name_action)
 
-    try: id_action, aallowedkeywords, optional = run_sql(query1)[0]
+    try: id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
     except (ProgrammingError, IndexError): return (3, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[3] % name_action, (called_from and CFG_WEBACCESS_MSGS[1] or "")))
 
     defkeys = aallowedkeywords.split(',')
@@ -104,15 +112,15 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
     # no check to see if the argument exists
     if verbose: print 'task 1 - is user %s' % (SUPERADMINROLE, )
 
-    if have_uid_p:
-        if run_sql("""SELECT *
+    if check_only_uid_p:
+        if run_sql_cached("""SELECT *
                 FROM accROLE r LEFT JOIN user_accROLE ur
                 ON r.id = ur.id_accROLE
                 WHERE r.name = '%s' AND
-                ur.id_user = '%s' """ % (SUPERADMINROLE, id_user)):
+                ur.id_user = '%s' """ % (SUPERADMINROLE, id_user), affected_tables=['accROLE', 'user_accROLE']):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
     else:
-        if fw.acc_firerole_check_user(user_info, fw.load_role_definition(aca.acc_getRoleId(SUPERADMINROLE))):
+        if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(aca.acc_getRoleId(SUPERADMINROLE))):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
 
@@ -121,8 +129,8 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
 
     try:
         query2 = """SELECT email, note from user where id=%s""" % id_user
-        res2 = run_sql(query2)
-        if have_uid_p:
+        res2 = run_sql_cached(query2, affected_tables=['user'])
+        if check_only_uid_p:
             if not res2:
                 raise Exception
         if res2:
@@ -131,12 +139,12 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
                     return (9, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % res2[0][0], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
                 else:
                     raise Exception
-        if have_uid_p:
+        if check_only_uid_p:
             query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
-            res2 = run_sql(query2)
+            res2 = run_sql_cached(query2, affected_tables=['user_accROLE'])
     except Exception: return (6, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[6], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
 
-    if have_uid_p:
+    if check_only_uid_p:
         if not res2:
             return (2, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[2], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) #user has no roles
         # -------------------------------------------
@@ -153,26 +161,26 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
         # 3.1
         if optional == 'no':
             if verbose: print ' - action with zero arguments'
-            if have_uid_p:
-                connection = run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+            if check_only_uid_p:
+                connection = run_sql_cached("""SELECT * FROM accROLE_accACTION_accARGUMENT
                         WHERE id_accROLE IN (%s) AND
                         id_accACTION = %s AND
                         argumentlistid = 0 AND
-                        id_accARGUMENT = 0 """ % (str_roles, id_action))
+                        id_accARGUMENT = 0 """ % (str_roles, id_action), affected_tables=['accROLE_accACTION_accARGUMENT'])
 
                 if connection and 1:
                     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 else:
                     return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
             else:
-                connection = run_sql("""SELECT id_accROLE FROM
+                connection = run_sql_cached("""SELECT id_accROLE FROM
                         accROLE_accACTION_accARGUMENT
                         WHERE id_accACTION = %s AND
                         argumentlistid = 0 AND
-                        id_accARGUMENT = 0 """ % id_action)
+                        id_accARGUMENT = 0 """ % id_action, affected_tables=['accROLE_accACTION_accARGUMENT'])
 
                 for id_accROLE in connection:
-                    if fw.acc_firerole_check_user(user_info, fw.load_role_definition(id_accROLE[0])):
+                    if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
                 return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
@@ -180,26 +188,26 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
         # 3.2
         if optional == 'yes':
             if verbose: print ' - action with optional arguments'
-            if have_uid_p:
-                connection = run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+            if check_only_uid_p:
+                connection = run_sql_cached("""SELECT * FROM accROLE_accACTION_accARGUMENT
                         WHERE id_accROLE IN (%s) AND
                         id_accACTION = %s AND
                         id_accARGUMENT = -1 AND
-                        argumentlistid = -1 """ % (str_roles, id_action))
+                        argumentlistid = -1 """ % (str_roles, id_action), affected_tables=['accROLE_accACTION_accARGUMENT'])
 
                 if connection and 1:
                     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 else:
                     return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
             else:
-                connection = run_sql("""SELECT id_accROLE FROM
+                connection = run_sql_cached("""SELECT id_accROLE FROM
                         accROLE_accACTION_accARGUMENT
                         WHERE id_accACTION = %s AND
                         id_accARGUMENT = -1 AND
-                        argumentlistid = -1 """ % id_action)
+                        argumentlistid = -1 """ % id_action, affected_tables=['accROLE_accACTION_accARGUMENT'])
 
                 for id_accROLE in connection:
-                    if fw.acc_firerole_check_user(user_info, fw.load_role_definition(id_accROLE[0])):
+                    if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
 
@@ -228,7 +236,7 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
     # TASK 5: find all the table entries that partially authorize the action in question
     if verbose: print 'task 5 - find table entries that are part of the result'
 
-    if have_uid_p:
+    if check_only_uid_p:
         query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
                 raa.id_accARGUMENT, arg.keyword, arg.value
                 FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
@@ -245,13 +253,13 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
                 (%s) AND
                 raa.id_accARGUMENT = arg.id """ % (id_action, str_args)
 
-    try: res4 = run_sql(query4)
+    try: res4 = run_sql_cached(query4, affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT', 'accROLE'])
     except ProgrammingError:
         raise query4
         return (3, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[3] % id_action, (called_from and "%s" % (CFG_WEBACCESS_MSGS[1] or ""))))
 
     res5 = []
-    if have_uid_p:
+    if check_only_uid_p:
         if not res4: return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) # no entries at all
 
         res5 = []
@@ -260,7 +268,7 @@ def acc_authorize_action(req, name_action, verbose=0, **arguments):
 
     else:
         for row in res4:
-            if fw.acc_firerole_check_user(user_info, fw.load_role_definition(row[0])):
+            if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(row[0])):
                 res5.append(row)
         if not res5:
             return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) # no entries at all
