@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 import sys
 import string
 import cgi
+import re
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -37,7 +38,7 @@ from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
         set_user_preferences, collect_user_info
-from invenio.access_control_admin import acc_findUserRoleActions_user_info
+from invenio.access_control_admin import acc_findUserRoleActions
 from invenio.messages import gettext_set_language
 from invenio.external_authentication import WebAccessExternalAuthError
 
@@ -76,7 +77,7 @@ def perform_youradminactivities(user_info, ln):
        whether user UID has some admin roles, and if yes, then print
        suitable links for the actions he can do.  If he's not admin,
        print a simple non-authorized message."""
-    your_role_actions = acc_findUserRoleActions_user_info(user_info)
+    your_role_actions = acc_findUserRoleActions(user_info)
     your_roles = []
     your_admin_activities = []
     guest = isGuestUser(user_info['uid'])
@@ -256,6 +257,19 @@ def create_register_page_box(referer='', ln=cdslang):
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
 def create_login_page_box(referer='', ln=cdslang):
+    # List of referer regexep and message to print
+
+    _ = gettext_set_language(ln)
+
+    login_referrer2msg = (
+        (re.compile(r".*/search/.*"), _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.")),
+    )
+
+    msg = None
+    for regexp, txt in login_referrer2msg:
+        if regexp.match(referer):
+            msg = txt
+            break
 
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():
@@ -279,6 +293,7 @@ def create_login_page_box(referer='', ln=cdslang):
              methods = methods,
              selected_method = selected,
              supportemail = supportemail,
+             msg = msg,
            )
 
 
