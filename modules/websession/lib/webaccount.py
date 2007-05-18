@@ -262,12 +262,12 @@ def create_login_page_box(referer='', ln=cdslang):
     _ = gettext_set_language(ln)
 
     login_referrer2msg = (
-        (re.compile(r".*/search/.*"), _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.")),
+        (re.compile(r"/search"), _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.")),
     )
 
     msg = None
     for regexp, txt in login_referrer2msg:
-        if regexp.match(referer):
+        if regexp.search(referer):
             msg = txt
             break
 

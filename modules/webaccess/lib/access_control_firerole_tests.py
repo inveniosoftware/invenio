@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.access_control_firerole import *
-from invenio.access_control_config import WebAccessFireroleError, \
+from invenio.access_control_config import InvenioWebAccessFireroleError, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
 
 class AccessControlFireRoleTest(unittest.TestCase):
@@ -79,8 +79,8 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_wrong(self):
         """firerole - compiling wrong role definitions"""
-        self.assertRaises(WebAccessFireroleError, compile_role_definition, "allow all")
-        self.assertRaises(WebAccessFireroleError, compile_role_definition, "fgdfglk  g fgk")
+        self.assertRaises(InvenioWebAccessFireroleError, compile_role_definition, "allow all")
+        self.assertRaises(InvenioWebAccessFireroleError, compile_role_definition, "fgdfglk  g fgk")
 
     def test_deserialize(self):
         """firerole - deserializing"""

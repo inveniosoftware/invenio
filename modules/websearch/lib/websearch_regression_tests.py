@@ -689,8 +689,8 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         """websearch - restricted collection not searchable by anonymous guest"""
         browser = Browser()
         browser.open(weburl + '/search?c=Theses')
-        loginbox = browser.response().read()
-        if loginbox.find("If you already have an account, please login using the form below") > -1:
+        response = browser.response().read()
+        if response.find("If you think you have right to access it, please authenticate yourself.") > -1:
             pass
         else:
             self.fail("Oops, searching restricted collection without password should have redirected to login dialog.")
@@ -718,7 +718,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser['p_pw'] = 'h123yde'
         browser.submit()
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find("You are not authorized to view this area") <= -1:
+        if browser.response().read().find("You are not authorized to access this resource.") <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
 
@@ -726,8 +726,11 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         """websearch - restricted detailed record page not accessible to guests"""
         browser = Browser()
         browser.open(weburl + '/record/35')
-        if browser.response().read().find("You are not authorized to view this record") <= -1:
-            self.fail("Oops, accessing restricted detailed record page without password should have returned authorization error.")
+        if browser.response().read().find("If you already have an account, please login using the form below") > -1:
+            pass
+        else:
+            self.fail("Oops, searching restricted collection without password should have redirected to login dialog.")
+        return
 
     def test_restricted_detailed_record_page_as_authorized_person(self):
         """websearch - restricted detailed record page accessible to authorized person"""
@@ -756,7 +759,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser.submit()
         browser.open(weburl + '/record/35')
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find('You are not authorized to view this record') <= -1:
+        if browser.response().read().find('You are not authorized to access this resource.') <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
 

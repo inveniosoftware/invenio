@@ -25,7 +25,7 @@ import cgi
 from urllib import quote
 from mod_python import apache
 
-from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang
+from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang, adminemail
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -35,7 +35,7 @@ from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
-from invenio.search_engine import get_colID, get_coll_i18nname, restricted_collection_cache
+from invenio.search_engine import get_colID, get_coll_i18nname, collection_restricted_p
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 
@@ -89,12 +89,13 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
 
-        req.argd = argd
+        _ = gettext_set_language(argd['ln'])
 
+        req.argd = argd
         uid = getUid(req)
         if uid == -1:
-            return page_not_authorized(req, "../", \
-                text="You are not authorized to view this record.", \
+            return page_not_authorized(req, "../",
+                text="You are not authorized to view this record.",
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -107,11 +108,27 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
-        if restricted_collection_cache.collection_restricted_p(record_primary_collection):
-            del argd['recid'] # not wanted argument for detailed record page
-            target = '/record-restricted/' + str(self.recid) + '/' + \
-                     make_canonical_urlargd(argd, search_results_default_urlargd)
-            return redirect_to_url(req, target)
+        if collection_restricted_p(record_primary_collection):
+            user_info = collect_user_info(req)
+            (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+            if auth_code and user_info['email'] == 'guest':
+                target = '/youraccount/login' + \
+                        make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
+                        weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                        search_results_default_urlargd)}, {'ln' : cdslang})
+                return redirect_to_url(req, target)
+            elif auth_code:
+                return page_not_authorized(req, "../", \
+                    text = _("""You are not authorized to access this resource.
+                        If you think this is a mistake, please contact the
+                        %(x_url_open)sadministrators%(x_url_close)s.""") % \
+                        {'x_url_open' : '<a href="mailto:%s">' % adminemail, 'x_url_close' : '</a>'}, \
+                    navmenuid='search')
+
+            #del argd['recid'] # not wanted argument for detailed record page
+            #target = '/record-restricted/' + str(self.recid) + '/' + \
+                     #make_canonical_urlargd(argd, search_results_default_urlargd)
+            #return redirect_to_url(req, target)
 
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
@@ -142,8 +159,8 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         uid = getUid(req)
         user_info = collect_user_info(req)
         if uid == -1:
-            return page_not_authorized(req, "../", \
-                text="You are not authorized to view this record.", \
+            return page_not_authorized(req, "../",
+                text="You are not authorized to view this record.",
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -154,11 +171,11 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
 
-        if restricted_collection_cache.collection_restricted_p(record_primary_collection):
-            (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-            if ret:
-                return page_not_authorized(req, "../", \
-                    text="You are not authorized to view this record.", \
+        if collection_restricted_p(record_primary_collection):
+            (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+            if auth_code:
+                return page_not_authorized(req, "../",
+                    text="You are not authorized to view this record.",
                     navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
@@ -184,14 +201,16 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         """ Perform a search. """
         argd = wash_search_urlargd(form)
 
+        _ = gettext_set_language(argd['ln'])
+
         if req.method == 'POST':
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
         uid = getUid(req)
         user_info = collect_user_info(req)
         if uid == -1:
-            return page_not_authorized(req, "../", \
-                text="You are not authorized to view this area.", \
+            return page_not_authorized(req, "../",
+                text = _("You are not authorized to view this area."),
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -203,14 +222,20 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # If any of the collection requires authentication, redirect
         # to the authentication form.
         for coll in argd['c'] + [argd['cc']]:
-            if restricted_collection_cache.collection_restricted_p(coll):
-                (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if ret and user_info['email'] == 'guest':
-                    target = '/youraccount/login' +                     make_canonical_urlargd({'ln' : argd['ln'], 'referer' : weburl + '/search' + make_canonical_urlargd(argd, search_results_default_urlargd)}, {'ln' : cdslang})
+            if collection_restricted_p(coll):
+                (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                if auth_code and user_info['email'] == 'guest':
+                    target = '/youraccount/login' + \
+                    make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
+                    weburl + '/search' + make_canonical_urlargd(argd, \
+                    search_results_default_urlargd)}, {'ln' : cdslang})
                     return redirect_to_url(req, target)
-                elif ret:
+                elif auth_code:
                     return page_not_authorized(req, "../", \
-                        text="You are not authorized to view this area.", \
+                        text = _("""You are not authorized to access this resource.
+                            If you think this is a mistake, please contact the
+                            %(x_url_open)sadministrators%(x_url_close)s.""") % \
+                            {'x_url_open' : '<a href="mailto:%s">' % adminemail, 'x_url_close' : '</a>'}, \
                         navmenuid='search')
 
 
@@ -242,11 +267,11 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
         user_info = collect_user_info(req)
         for coll in argd['c'] + [argd['cc']]:
-            if restricted_collection_cache.collection_restricted_p(coll):
-                (ret, out) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if ret:
-                    return page_not_authorized(req, "../", \
-                        text="You are not authorized to view this collection.", \
+            if collection_restricted_p(coll):
+                (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                if auth_code:
+                    return page_not_authorized(req, "../",
+                        text="You are not authorized to view this collection.",
                         navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
@@ -393,8 +418,8 @@ def display_collection(req, c, as, verbose, ln):
         uid = getUid(req)
         user_preferences = {}
         if uid == -1:
-            return page_not_authorized(req, "../", \
-                text="You are not authorized to view this collection", \
+            return page_not_authorized(req, "../",
+                text="You are not authorized to view this collection",
                                        navmenuid='search')
         elif uid > 0:
             user_preferences = get_user_preferences(uid)

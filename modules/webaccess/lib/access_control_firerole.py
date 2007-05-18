@@ -30,7 +30,7 @@ webaccess to connect user to roles using every infos about users.
 
 from invenio.webgroup_dblayer import get_groups
 from invenio.webinterface_handler import http_get_credentials
-from invenio.access_control_config import WebAccessFireroleError
+from invenio.access_control_config import InvenioWebAccessFireroleError
 from invenio.dbquery import run_sql
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
@@ -87,19 +87,19 @@ def compile_role_definition(firerole_def_src):
                         try:
                             expressions_list.append((True, re.compile(expr[1:-1], re.I)))
                         except Exception, msg:
-                            raise WebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid re because %s!" % (row, line, expr, msg)
+                            raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid re because %s!" % (row, line, expr, msg)
                     else:
                         if field == 'remote_ip' and '/' in expr[1:-1]:
                             try:
                                 expressions_list.append((False, _ip_matcher_builder(expr[1:-1])))
                             except Exception, msg:
-                                raise WebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid ip group because %s!" % (row, line, expr, msg)
+                                raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid ip group because %s!" % (row, line, expr, msg)
                         else:
                             expressions_list.append((False, expr[1:-1]))
                 expressions_list = tuple(expressions_list)
                 ret.append((allow_p, not_p, field, expressions_list))
             else:
-                raise WebAccessFireroleError, "Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line)
+                raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line)
     return (compress(cPickle.dumps((default_allow_p, tuple(ret)), -1)))
 
 
@@ -195,7 +195,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
             if not_p and not next_rule_p: # Nothing has matched and we got not
                 return allow_p # Then the whole rule matched!
     except Exception, msg:
-        raise WebAccessFireroleError, msg
+        raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenSource project
 
 def deserialize(firerole_def_ser):
@@ -240,7 +240,7 @@ def _ip_matcher_builder(group):
     gmk = int(gmk)
     mask = (_full - (2L ** (32 - gmk) - 1))
     if not (gip & mask == gip):
-        raise WebAccessFireroleError, "Netmask does not match IP (%Lx %Lx)" % (gip, mask)
+        raise InvenioWebAccessFireroleError, "Netmask does not match IP (%Lx %Lx)" % (gip, mask)
     return (gip, mask)
 
 def _ipmatch(ip, ip_matcher):

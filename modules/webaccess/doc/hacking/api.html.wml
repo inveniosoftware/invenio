@@ -47,22 +47,23 @@ Contents:
    Signature:
 
       def acc_authorize_action(req, name_action, dict={}, **arguments):
-          """ Check if user is allowed to perform action
-	  with given list of arguments.
-	  Return (0, message) if authentication succeeds, (error_code, error_message) if it fails.
+         """Check if user is allowed to perform action
+         with given list of arguments.
+         Return (0, message) if authentication succeeds, (error code, error message) if it fails.
 
-	  The arguments are as follows:
+         The arguments are as follows:
 
-                  req - could be either one of these three things:
-                        id_user of the current user
-                        user_info dictionary built against the user details
-                        req mod_python request object
+         req - could be either one of these three things:
+               id_user of the current user
+               user_info dictionary built against the user details
+               req mod_python request object
 
-              name_action - the name of the action
+ name_action - the name of the action
 
-                arguments - dictionary with keyword=value pairs created automatically
-                            by python on the extra arguments. these depend on the
-                            given action. """
+   arguments - dictionary with keyword=value pairs created automatically
+               by python on the extra arguments. these depend on the
+               given action.
+         """
 
    Examples:
 

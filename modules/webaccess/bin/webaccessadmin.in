@@ -107,21 +107,21 @@ def main():
         print __revision__
         sys.exit(0)
 
-    isUser = -1
+    is_user = -1
     try:
-        isUser = sys.argv.index('-u')
+        is_user = sys.argv.index('-u')
         sys.argv.remove('-u')
     except ValueError:
         try:
-            isUser = sys.argv.index('--user')
+            is_user = sys.argv.index('--user')
             sys.argv.remove('--user')
         except ValueError:
             pass
 
-    if isUser > 0 and isUser < alen:
-        username = sys.argv[isUser]
+    if is_user > 0 and is_user < alen:
+        username = sys.argv[is_user]
         sys.argv.remove(username)
-    elif isUser > 0:
+    elif is_user > 0:
         usage(0)
     else:
         username = ''

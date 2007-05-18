@@ -46,7 +46,7 @@ from invenio.config import \
      cdsname, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
-from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, restricted_collection_cache
+from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
 from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
@@ -214,7 +214,7 @@ class Collection:
          `restrited' column of the collection table (typically Apache group).  Otherwise return
          None if the collection is public."""
 
-        if restricted_collection_cache.collection_restricted_p(self.name):
+        if collection_restricted_p(self.name):
             return 1
         return None
 

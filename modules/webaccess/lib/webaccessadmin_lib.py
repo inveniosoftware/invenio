@@ -132,11 +132,11 @@ def perform_rolearea(req):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    header = ['id', 'name', 'description', 'definition', 'users', 'authorizations / actions', 'role', '']
+    header = ['id', 'name', 'description', 'firewall like role definition', 'users', 'authorizations / actions', 'role', '']
     roles = acca.acc_getAllRoles()
 
     roles2 = []
-    for (id, name, desc, dontcare, firerole_def_src) in roles:
+    for (id, name, desc, dummy, firerole_def_src) in roles:
         if len(desc) > 30: desc = desc[:30] + '...'
         if firerole_def_src and len(firerole_def_src) > 30: firerole_def_src = firerole_def_src[:30] + '...'
         roles2.append([id, name, desc, firerole_def_src])
@@ -193,7 +193,7 @@ def perform_actionarea(req):
 
     actions2 = []
     roles2 = []
-    for (id, name, dontcare) in actions:
+    for (id, name, dummy) in actions:
         actions2.append([id, name])
         for col in [(('add', 'addauthorization'),
                      ('modify', 'modifyauthorizations'),
@@ -1699,7 +1699,7 @@ def actiondetails(id_action=0):
         roleshlp = acca.acc_getActionRoles(id_action=id_action)
         if roleshlp:
             roles = []
-            for (id, name, dontcare) in roleshlp:
+            for (id, name, dummy) in roleshlp:
                 roles.append([id, name,
                               '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>'
                               % (id, id_action),
@@ -1735,14 +1735,21 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
 
     output = """
     <form action="addrole" method="POST">
+     <table><tbody><tr><td align='right' valign='top'>
      <span class="adminlabel">role name </span>
-     <input class="admin_wvar" type="text" name="name_role" value="%s" /> <br />
+     </td><td>
+     <input class="admin_wvar" type="text" name="name_role" value="%s" />
+     </td></tr><tr><td align='right' valign='top'>
      <span class="adminlabel">description </span>
-     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea><br />
-     <span class="adminlabel">firewall like role definition </span>
-     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
-     For a help on writing definition, please, see the <a href="/admin/webaccess/firerole.html">help page</a>. <br />
+     </td><td>
+     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
+     </td></tr><tr><td align='right' valign='top'>
+     <span class="adminlabel">firewall like role definition [<a href="/admin/webaccess/firerole.html">?</a>]</span>
+     </td><td>
+     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea>
+     </td></tr><tr><td></td><td>
      <input class="adminbutton" type="submit" value="add role" />
+     </td></tr></tbody></table>
     </form>
     """ % (escape(name_role, '"'), escape(description),  escape(firerole_def_src))
 
@@ -1755,7 +1762,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
 
         try:
             firerole_def_ser = compile_role_definition(firerole_def_src)
-        except WebAccessFireroleError, msg:
+        except InvenioWebAccessFireroleError, msg:
             output += "<strong>%s</strong>" % msg
         else:
             text = """
@@ -1825,6 +1832,9 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
         description = ret[2]
         firerole_def_src = ret[3]
 
+    if not firerole_def_src or firerole_def_src == '' or firerole_def_src is None:
+        firerole_def_src = 'deny any'
+
     name_role = cleanstring(name_role)
 
     title='Modify Role'
@@ -1832,18 +1842,25 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
 
     output = """
     <form action="modifyrole" method="POST">
+     <table><tbody><tr><td align='right' valign='top'>
      <input type="hidden" name="id_role" value="%s" />
      <span class="adminlabel">role name </span>
+     </td><td>
      <input class="admin_wvar" type="text" name="name_role" value="%s" /> <br />
+     </td></tr><tr><td align='right' valign='top'>
      <span class="adminlabel">description </span>
+     </td><td>
      <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea> <br />
-     <span class="adminlabel">firewall like role definition </span>
+     </td></tr><tr><td align='right' valign='top'>
+     <span class="adminlabel">firewall like role definition</span> [<a href="/admin/webaccess/firerole.html">?</a>]
+     </td><td>
      <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
-     For a help on writing definition, please, see the <a href="/admin/webaccess/firerole.html">help page</a>. <br />
+     </td></tr><tr><td></td><td>
      <input class="adminbutton" type="submit" value="modify role" />
      <input type="hidden" name="modified" value="1" />
+     </td></tr></tbody></table>
     </form>
-    """ % (id_role, escape(name_role), description, firerole_def_src)
+    """ % (id_role, escape_string(name_role), escape(description), escape(firerole_def_src))
 
     if modified in [1, '1']:
         # description must be changed before submitting
@@ -1860,16 +1877,16 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
 
         try:
             firerole_def_ser = compile_role_definition(firerole_def_src)
-        except WebAccessFireroleError, msg:
+        except InvenioWebAccessFireroleError, msg:
             subtitle = 'step 2 - role could not be modified'
             output += '<p>sorry, could not modify role because of troubles with            its definition:<br>%s</p>' % msg
         else:
             output += createhiddenform(action="modifyrole",
                                         text=text,
                                         id_role = id_role,
-                                        name_role=escape(name_role),
-                                        description=escape(description),
-                                        firerole_def_src=escape(firerole_def_src),
+                                        name_role=escape(name_role, True),
+                                        description=escape(description, True),
+                                        firerole_def_src=escape(firerole_def_src, True),
                                         modified=1,
                                         confirm=1)
             if confirm not in ["0", 0]:
@@ -1964,20 +1981,20 @@ def perform_showroledetails(req, id_role):
 
         extra = """
         <dl>
-         <dt><a href="modifyrole?id_role=%s">Modify role</a><dt>
+         <dt><a href="modifyrole?id_role=%(id_role)s">Modify role</a><dt>
          <dd>modify the role you are seeing</dd>
-         <dt><a href="addauthorization?id_role=%s">Add new authorization</a></dt>
+         <dt><a href="addauthorization?id_role=%(id_role)s">Add new authorization</a></dt>
          <dd>add an authorization.</dd>
-         <dt><a href="modifyauthorizations?id_role=%s">Modify authorizations</a></dt>
+         <dt><a href="modifyauthorizations?id_role=%(id_role)s">Modify authorizations</a></dt>
          <dd>modify existing authorizations.</dd>
         </dl>
         <dl>
-         <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-         <dd>connect a user to role %s.</dd>
-         <dt><a href="deleteuserrole?id_role=%s">Remove user</a></dt>
-         <dd>remove a user from role %s.</dd>
+         <dt><a href="adduserrole?id_role=%(id_role)s">Connect user</a></dt>
+         <dd>connect a user to role %(name_role)s.</dd>
+         <dt><a href="deleteuserrole?id_role=%(id_role)s">Remove user</a></dt>
+         <dd>remove a user from role %(name_role)s.</dd>
         </dl>
-        """ % (id_role, id_role, id_role, id_role, name_role, id_role, name_role)
+        """ % {'id_role' : id_role, 'name_role' : name_role}
         body = [output, extra]
 
     else:
@@ -1998,13 +2015,13 @@ def roledetails(id_role=0):
 
     usershlp = acca.acc_getRoleUsers(id_role)
     users = []
-    for (id, email, dontcare) in usershlp:
+    for (id, email, dummy) in usershlp:
         users.append([id, email, '<a href="showuserdetails?id_user=%s">show user details</a>' % (id, )])
     usertable = tupletotable(header=['id', 'email'], tuple=users)
 
     actionshlp = acca.acc_getRoleActions(id_role)
     actions = []
-    for (id, name, dontcare) in actionshlp:
+    for (id, name, dummy) in actionshlp:
         actions.append([id, name,
                         '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, id),
                         '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>' % (id_role, id)])
@@ -2461,7 +2478,7 @@ def userdetails(id_user=0):
     conn_roles = []
 
     # find connected roles
-    for (id, name, desc, dontcare, dontcare2) in acca.acc_getAllRoles():
+    for (id, name, desc, dummy, dummy) in acca.acc_getAllRoles():
         if (id, ) in userroles:
             conn_roles.append([id, name, desc])
             conn_roles[-1].append('<a href="showroledetails?id_role=%s">show details</a>' % (id, ))
@@ -3263,7 +3280,7 @@ def perform_showroleusers(req, id_role=0):
 
     if res:
         users = []
-        for (id, name, dontcare) in res: users.append([id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
+        for (id, name, dummy) in res: users.append([id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
                                                        % (id, )])
         output  = '<p>users connected to %s:</p>' % (headerstrong(role=id_role), )
         output += tupletotable(header=['id', 'name', ''], tuple=users)

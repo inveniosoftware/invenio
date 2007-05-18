@@ -53,16 +53,16 @@ acc_addAction(name_action='', description='', optional='no', *allowedkeywords)
 
 
 
-acc_addRole(name_role, description, definition, definition_src)
+acc_addRole(name_role, description, firerole_def_ser, firerole_def_src)
     add a new role to accROLE in the database.
 
-      name_role - name of the role, must be unique
+       name_role - name of the role, must be unique
 
-    description - text to describe the role
+     description - text to describe the role
 
-    definition - precompiled serialized firewall like role definition (firerole)
+firerole_def_ser - precompiled serialized firewall like role definition (firerole)
 
-    definition_src - definition text source for repairing after Python upgrades
+firerole_def_src - definition text source for repairing after Python upgrades
 
 
 

@@ -154,9 +154,9 @@ class RestrictedCollectionDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_getter)
 
-    def collection_restricted_p(self, collection):
-        cache = self.get_cache()
-        return collection in cache
+def collection_restricted_p(collection):
+    cache = restricted_collection_cache.get_cache()
+    return collection in cache
 
 try:
     restricted_collection_cache.is_ok_p

@@ -28,7 +28,7 @@ from invenio.config import cdsname, sweburl, supportemail, CFG_CERN_SITE
 import cPickle
 from zlib import compress
 
-class WebAccessFireroleError(Exception):
+class InvenioWebAccessFireroleError(Exception):
     """Just an Exception to discover if it's a FireRole problem"""
     pass
 

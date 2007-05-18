@@ -33,15 +33,15 @@ roles are collections of authorizations within specified areas. these should
 have a clear connection, for example within a module or for a special type of
 person, e.g a library administator.
 
-            id - specify the id of the role
+              id - specify the id of the role
 
-          name - unique name for the role
+            name - unique name for the role
 
-   description - describe the authorization tasks the role will cover
+     description - describe the authorization tasks the role will cover
 
-    definition - precompiled serialized firewall like role definition (firerole)
+firerole_def_ser - precompiled serialized firewall like role definition (firerole)
 
-definition_src - definition text source for repairing after Python upgrades
+firerole_def_src - definition text source for repairing after Python upgrades
 
 
 -- user_accROLE --
