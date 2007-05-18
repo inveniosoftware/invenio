@@ -23,13 +23,7 @@
 """Tool for caching important infos, which are slow to rebuild, but that rarely change"""
 
 from invenio.dbquery import run_sql, get_table_update_time
-from invenio.config import cdslang, CFG_MAX_RECID
-from invenio.access_control_admin import acc_getActionId
-from invenio.access_control_config import VIEWRESTRCOLL
 import time
-import string
-import Numeric
-import zlib
 
 class CacherError(Exception):
     """Error raised by data cacher"""
@@ -56,7 +50,7 @@ class DataCacher:
 
     def clear(self):
         """ Clear the cache rebuilding it"""
-        self.cache = self.create_cache()
+        self.create_cache()
 
     def create_cache(self):
         """Create cache. Called on startup and used later during the search time."""
@@ -69,6 +63,25 @@ class DataCacher:
         if self.timestamp_getter() > self.timestamp:
             self.create_cache()
         return self.cache
+
+class SQLDataCacher(DataCacher):
+    """ DataCacher is an abstract cacher system, for caching informations
+    that are slow to retrieve but that don't change too much during time."""
+    def __init__(self, query, affected_tables):
+        """ @param cache_filler a function that receives the cache dictionary.
+            @param timestamp_getter a function that returns a timestamp for checking
+             if something has changed after cache creation.
+        """
+        self.query = query
+        self.affected_tables = affected_tables
+        def cache_filler():
+            """Standard SQL filler, with results from sql query."""
+            return run_sql(self.query)
+
+        def timestamp_getter():
+            """Standard timestamp getter from affected tables by query."""
+            return max([get_table_update_time(table) for table in self.affected_tables])
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
 
 
 
