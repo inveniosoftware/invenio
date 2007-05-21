@@ -488,7 +488,8 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     suffix = parameters.get('suffix', "")
     default_value = parameters.get('default', "")
     escape = parameters.get('escape', "")
-
+    output_text = ''
+    
     # 3 possible cases:
     # a) format element file is found: we execute it
     # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
