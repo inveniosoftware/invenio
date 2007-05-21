@@ -34,7 +34,7 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """setting up helper variables for tests"""
         self.username, self.userpwd, self.useremail = \
-                open('demopwd.cfg', 'r').read().split(':', 2)
+                open('demopwd.cfg', 'r').readline().strip().split(':', 2)
         self.cern = cern.ExternalAuthCern()
 
     def test_auth_user_ok(self):
@@ -48,8 +48,8 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
 
     def test_fetch_user_groups_membership(self):
         """external CERN - fetching user group membership at CERN"""
-        self.assertNotEqual(self.cern.fetch_user_groups_membership(self.useremail), 0)
-        self.assertEqual(self.cern.fetch_user_groups_membership('patata'), {})
+        self.assertNotEqual(self.cern.fetch_user_groups_membership(self.useremail, self.userpwd), 0)
+        self.assertEqual(self.cern.fetch_user_groups_membership('patata', 'patata'), {})
 
     def test_fetch_user_preferences(self):
         """external CERN - fetching user setting from CERN"""
