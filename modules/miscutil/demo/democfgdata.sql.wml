@@ -7,7 +7,7 @@ INSERT INTO accROLE_accACTION_accARGUMENT VALUES (4,22,2,1);
 INSERT INTO user_accROLE VALUES (1,4);
 INSERT INTO user VALUES (2,'jekyll@cern.ch','j123ekyll',NULL,NULL,'jekyll',NOW());
 INSERT INTO user VALUES (3,'hyde@cern.ch','h123yde',NULL,NULL,'hyde',NOW());
-INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VI','INTERNAL');
+INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
 INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL,NULL);
