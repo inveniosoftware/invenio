@@ -1,8 +1,8 @@
 #!@PYTHON@
 ## -*- mode: python; coding: utf-8; -*-
-##
+
 ## $Id$
-##
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -25,135 +25,10 @@
 __revision__ = "$Id$"
 
 try:
-    import getpass
-    import sys
-    from invenio.config import supportemail
-    from invenio.access_control_admin import acc_reset_default_settings
-    from invenio.access_control_admin import acc_add_default_settings
-    from invenio.access_control_firerole import repair_role_definitions
-    from invenio.access_control_engine import acc_authorize_action
-    from invenio.dbquery import run_sql
+    from invenio.webaccessadmin_lib import main
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
-def usage(code, msg=''):
-    """Print usage info."""
-    if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("WebAccess Admin -- reset or add default authorization settings\n")
-    sys.stderr.write("Usage: %s [options] <command>\n" % sys.argv[0])
-    sys.stderr.write("Command options:\n")
-    sys.stderr.write("  <command> = reset-default-settings\n")
-    sys.stderr.write("  <command> = add-default-settings\n")
-    sys.stderr.write("  <command> = compile-role-definitions\n")
-    sys.stderr.write("General options:\n")
-    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("  -u, --user username\t Set the user name.\n")
-    sys.exit(code)
-
-def authenticate(user, header="WebAccess Administration", action="cfgwebaccess"):
-    """Authenticate the user against the user database.
-       Check for its password, if it exists.
-       Check for action access rights.
-       Return user name upon authorization success,
-       do system exit upon authorization failure.
-       """
-    print header
-    print "=" * len(header)
-    if user == "":
-        print >> sys.stdout, "\rUsername: ",
-        user = string.strip(string.lower(sys.stdin.readline()))
-    else:
-        print >> sys.stdout, "\rUsername:", user
-    ## first check user pw:
-    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
-          run_sql("select id,password from user where nickname=%s", (user,), 1)
-    if not res:
-        print "Sorry, %s does not exist." % user
-        sys.exit(1)
-    else:
-        (uid_db, password_db) = res[0]
-        if password_db:
-            password_entered = getpass.getpass()
-            if password_db == password_entered:
-                pass
-            else:
-                print "Sorry, wrong credentials for %s." % user
-                sys.exit(1)
-        ## secondly check authorization for the action:
-        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
-        if auth_code != 0:
-            print auth_message
-            sys.exit(1)
-    return user
-
-
-def main():
-    """CLI to acc_authorize_action. The function finds the needed
-    arguments in sys.argv.
-    If the number of arguments is wrong it prints help.
-    Return 1 on success, 0 on failure. """
-
-    alen = len(sys.argv)
-    action = ''
-
-    # print help if wrong arguments
-    if alen > 1 and sys.argv[1] in ["-h", "--help"]:
-        usage(0)
-    elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
-        print __revision__
-        sys.exit(0)
-
-    is_user = -1
-    try:
-        is_user = sys.argv.index('-u')
-        sys.argv.remove('-u')
-    except ValueError:
-        try:
-            is_user = sys.argv.index('--user')
-            sys.argv.remove('--user')
-        except ValueError:
-            pass
-
-    if is_user > 0 and is_user < alen:
-        username = sys.argv[is_user]
-        sys.argv.remove(username)
-    elif is_user > 0:
-        usage(0)
-    else:
-        username = ''
-
-    alen = len(sys.argv)
-
-    if alen != 2 or sys.argv[1] not in ['reset-default-settings', 'add-default-settings', 'compile-role-definitions']:
-        usage(1)
-
-    user = authenticate(username)
-
-    perform = 0
-
-    # perform chosen action, add all users above as superusers
-    if sys.argv[1] == 'reset-default-settings':
-        action = 'reset'
-        acc_reset_default_settings([supportemail])
-    elif sys.argv[1] == 'add-default-settings':
-        action = 'added'
-        acc_add_default_settings([supportemail])
-    elif sys.argv[1] == 'compile-role-definitions':
-        action = 'compiled'
-        repair_role_definitions()
-
-    # notify of success
-    if action:
-        print '\nOkay, the default authorization settings have been __%s__.' % (action, )
-    else:
-        print 'Requested action failed.'
-
-    return perform
-
-if __name__ == '__main__':
-    main()
-
+main()

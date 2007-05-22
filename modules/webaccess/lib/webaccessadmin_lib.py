@@ -30,6 +30,8 @@ import cgi
 import re
 import random
 import smtplib
+import getopt
+import sys
 
 try:
     from mod_python import apache
@@ -57,7 +59,7 @@ import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import adderrorbox, addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_config import *
-from invenio.access_control_firerole import compile_role_definition
+from invenio.access_control_firerole import compile_role_definition, repair_role_definitions
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
@@ -3547,7 +3549,110 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
     server.quit()
     return 1
 
+def authenticate(user, header="WebAccess Administration", action="cfgwebaccess"):
+    """Authenticate the user against the user database.
+       Check for its password, if it exists.
+       Check for action access rights.
+       Return user name upon authorization success,
+       do system exit upon authorization failure.
+       """
+    print header
+    print "=" * len(header)
+    if user == "":
+        print >> sys.stdout, "\rUsername: ",
+        user = sys.stdin.readline().lower().strip()
+    else:
+        print >> sys.stdout, "\rUsername:", user
+    ## first check user pw:
+    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
+          run_sql("select id,password from user where nickname=%s", (user,), 1)
+    if not res:
+        print "Sorry, %s does not exist." % user
+        sys.exit(1)
+    else:
+        (uid_db, password_db) = res[0]
+        if password_db:
+            password_entered = getpass.getpass()
+            if password_db == password_entered:
+                pass
+            else:
+                print "Sorry, wrong credentials for %s." % user
+                sys.exit(1)
+        ## secondly check authorization for the action:
+        (auth_code, auth_message) = acce.acc_authorize_action(uid_db, action)
+        if auth_code != 0:
+            print auth_message
+            sys.exit(1)
+    return user
 
 
+def usage(exitcode=1, msg=""):
+    """Prints usage info."""
+    if msg:
+        sys.stderr.write("Error: %s.\n" % msg)
+    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("Command options:\n")
+    sys.stderr.write("  -a, --add\t\t add default settings\n")
+    sys.stderr.write("  -c, --compile\t\t compile role definitions\n")
+    sys.stderr.write("  -h, --help\t\t Print this help.\n")
+    sys.stderr.write("  -r, --reset\t\t reset default settings\n")
+    sys.stderr.write("  -u, --user=USER\t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -V, --version\t\t Print version information.\n")
+    sys.stderr.write("""Description: %s is used to reset the access settings,
+or to just add default values, or to compile firewall like
+role definition manually set in the accROLE table in the firerole_def_src field.\n""" % sys.argv[0])
+    sys.exit(exitcode)
+
+
+def main():
+    """Main function that analyzes command line input and calls whatever is appropriate.
+    """
+
+    ## parse command line:
+    # set user-defined options:
+    options = {'user' : '', 'reset' : 0, 'compile' : 0, 'add' : 0}
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hVu:rac",
+                                    ["help", "version", "user=",
+                                    "reset", "add", "compile"])
+    except getopt.GetoptError, err:
+        usage(1, err)
+    try:
+        for opt in opts:
+            if opt[0] in ["-h", "--help"]:
+                usage(0)
+            elif opt[0] in ["-V", "--version"]:
+                print __revision__
+                sys.exit(0)
+            elif opt[0] in ["-u", "--user"]:
+                options["user"] = opt[1]
+            elif opt[0] in ["-r", "--reset"]:
+                options["reset"] = 1
+            elif opt[0] in ["-a", "--add"]:
+                options["add"] = 1
+            elif opt[0] in ["-c", "--compile"]:
+                options["compile"] = 1
+            else:
+                usage(1)
+        if options['add'] or options['reset'] or options['compile']:
+            options['user'] = authenticate(options['user'])
+            if options['reset']:
+                acca.acc_reset_default_settings([supportemail])
+                print "Reset default settings."
+            if options['add']:
+                acca.acc_add_default_settings([supportemail])
+                print "Added default settings."
+            if options['compile']:
+                repair_role_definitions()
+                print "Compiled firewall like role definitions."
+        else:
+            usage(1, "You must specify at least one command")
+    except StandardError, e:
+        usage(e)
+    return
+
+### okay, here we go:
+if __name__ == '__main__':
+    main()
 
 

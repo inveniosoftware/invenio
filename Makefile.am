@@ -205,7 +205,7 @@ create-demo-site:
 # 	    fi \
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
-	./modules/webaccess/bin/webaccessadmin -u admin compile-role-definitions
+	./modules/webaccess/bin/webaccessadmin -u admin -c
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
