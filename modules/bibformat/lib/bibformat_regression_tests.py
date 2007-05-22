@@ -172,6 +172,13 @@ The words CERN Photo must be quoted for each use. </small>
                                        expected_text=self.record_7_hd)
         self.assertEqual([], result)
 
+    def test_detailed_html_edit_record(self):
+        """bibformat - Detailed HTML output edit record link presence"""
+        pageurl = weburl + '/record/74?of=hd'
+        result = test_web_page_content(pageurl, username='admin', expected_text="Edit This Record")
+        self.assertEqual([], result)
+                                            
+
 class BibFormatNLMTest(unittest.TestCase):
     """Check output produced by BibFormat for NLM output for various
     records"""
