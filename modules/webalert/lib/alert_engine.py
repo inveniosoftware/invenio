@@ -26,7 +26,7 @@
 __revision__ = "$Id$"
 
 from cgi import parse_qs
-from sre import search, sub
+from re import search, sub
 import sys
 from time import localtime, strftime, mktime, sleep
 from string import split

@@ -31,7 +31,7 @@ import cgi
 import copy
 import string
 import os
-import sre
+import re
 import time
 import urllib
 import zlib
@@ -99,39 +99,39 @@ field_i18nname_cache_timestamp = 0
 collection_i18nname_cache_timestamp = 0
 
 ## precompile some often-used regexp for speed reasons:
-sre_word = sre.compile('[\s]')
-sre_quotes = sre.compile('[\'\"]')
-sre_doublequote = sre.compile('\"')
-sre_equal = sre.compile('\=')
-sre_logical_and = sre.compile('\sand\s', sre.I)
-sre_logical_or = sre.compile('\sor\s', sre.I)
-sre_logical_not = sre.compile('\snot\s', sre.I)
-sre_operators = sre.compile(r'\s([\+\-\|])\s')
-sre_pattern_wildcards_at_beginning = sre.compile(r'(\s)[\*\%]+')
-sre_pattern_single_quotes = sre.compile("'(.*?)'")
-sre_pattern_double_quotes = sre.compile("\"(.*?)\"")
-sre_pattern_regexp_quotes = sre.compile("\/(.*?)\/")
-sre_pattern_short_words = sre.compile(r'([\s\"]\w{1,3})[\*\%]+')
-sre_pattern_space = sre.compile("__SPACE__")
-sre_pattern_today = sre.compile("\$TODAY\$")
-sre_unicode_lowercase_a = sre.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
-sre_unicode_lowercase_ae = sre.compile(unicode(r"(?u)[æ]", "utf-8"))
-sre_unicode_lowercase_e = sre.compile(unicode(r"(?u)[éèëê]", "utf-8"))
-sre_unicode_lowercase_i = sre.compile(unicode(r"(?u)[íìïî]", "utf-8"))
-sre_unicode_lowercase_o = sre.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
-sre_unicode_lowercase_u = sre.compile(unicode(r"(?u)[úùüû]", "utf-8"))
-sre_unicode_lowercase_y = sre.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
-sre_unicode_lowercase_c = sre.compile(unicode(r"(?u)[çć]", "utf-8"))
-sre_unicode_lowercase_n = sre.compile(unicode(r"(?u)[ñ]", "utf-8"))
-sre_unicode_uppercase_a = sre.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
-sre_unicode_uppercase_ae = sre.compile(unicode(r"(?u)[Æ]", "utf-8"))
-sre_unicode_uppercase_e = sre.compile(unicode(r"(?u)[ÉÈËÊ]", "utf-8"))
-sre_unicode_uppercase_i = sre.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
-sre_unicode_uppercase_o = sre.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
-sre_unicode_uppercase_u = sre.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
-sre_unicode_uppercase_y = sre.compile(unicode(r"(?u)[Ý]", "utf-8"))
-sre_unicode_uppercase_c = sre.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
-sre_unicode_uppercase_n = sre.compile(unicode(r"(?u)[Ñ]", "utf-8"))
+re_word = re.compile('[\s]')
+re_quotes = re.compile('[\'\"]')
+re_doublequote = re.compile('\"')
+re_equal = re.compile('\=')
+re_logical_and = re.compile('\sand\s', re.I)
+re_logical_or = re.compile('\sor\s', re.I)
+re_logical_not = re.compile('\snot\s', re.I)
+re_operators = re.compile(r'\s([\+\-\|])\s')
+re_pattern_wildcards_at_beginning = re.compile(r'(\s)[\*\%]+')
+re_pattern_single_quotes = re.compile("'(.*?)'")
+re_pattern_double_quotes = re.compile("\"(.*?)\"")
+re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
+re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
+re_pattern_space = re.compile("__SPACE__")
+re_pattern_today = re.compile("\$TODAY\$")
+re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
+re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
+re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
+re_unicode_lowercase_i = re.compile(unicode(r"(?u)[íìïî]", "utf-8"))
+re_unicode_lowercase_o = re.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
+re_unicode_lowercase_u = re.compile(unicode(r"(?u)[úùüû]", "utf-8"))
+re_unicode_lowercase_y = re.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
+re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
+re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
+re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
+re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
+re_unicode_uppercase_e = re.compile(unicode(r"(?u)[ÉÈËÊ]", "utf-8"))
+re_unicode_uppercase_i = re.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
+re_unicode_uppercase_o = re.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
+re_unicode_uppercase_u = re.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
+re_unicode_uppercase_y = re.compile(unicode(r"(?u)[Ý]", "utf-8"))
+re_unicode_uppercase_c = re.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
+re_unicode_uppercase_n = re.compile(unicode(r"(?u)[Ñ]", "utf-8"))
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -414,17 +414,17 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             ## B3 - doing WRD search, but maybe ACC too
             # search units are separated by spaces unless the space is within single or double quotes
             # so, let us replace temporarily any space within quotes by '__SPACE__'
-            p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
-            p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
-            p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+            p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
+            p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
+            p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
             # wash argument:
-            p = sre_equal.sub(":", p)
-            p = sre_logical_and.sub(" ", p)
-            p = sre_logical_or.sub(" |", p)
-            p = sre_logical_not.sub(" -", p)
-            p = sre_operators.sub(r' \1', p)
+            p = re_equal.sub(":", p)
+            p = re_logical_and.sub(" ", p)
+            p = re_logical_or.sub(" |", p)
+            p = re_logical_not.sub(" -", p)
+            p = re_operators.sub(r' \1', p)
             for pi in string.split(p): # iterate through separated units (or items, as "pi" stands for "p item")
-                pi = sre_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
+                pi = re_pattern_space.sub(" ", pi) # replace back '__SPACE__' by ' '
                 # firstly, determine set operator
                 if pi[0] == '+' or pi[0] == '-' or pi[0] == '|':
                     oi = pi[0]
@@ -441,7 +441,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 if fi and CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(fi)):
                     fi = CFG_WEBSEARCH_FIELDS_CONVERT[string.lower(fi)]
                 # wash 'pi' argument:
-                if sre_quotes.match(pi):
+                if re_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
                     if fi:
                         if pi[0] == '"' and pi[-1] == '"':
@@ -638,7 +638,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                     if not cx.startswith("Unnamed collection"):
                         temp.append({ 'value' : val['value'],
                                       'text' : val['text'],
-                                      'selected' : (c == sre.sub("^[\s\-]*","", val['value']))
+                                      'selected' : (c == re.sub("^[\s\-]*","", val['value']))
                                     })
                 coll_selects.append(temp)
         coll_selects.append([{ 'value' : '',
@@ -1017,25 +1017,25 @@ def strip_accents(x):
     except:
         return x # something went wrong, probably the input wasn't UTF-8
     # asciify Latin-1 lowercase characters:
-    y = sre_unicode_lowercase_a.sub("a", y)
-    y = sre_unicode_lowercase_ae.sub("ae", y)
-    y = sre_unicode_lowercase_e.sub("e", y)
-    y = sre_unicode_lowercase_i.sub("i", y)
-    y = sre_unicode_lowercase_o.sub("o", y)
-    y = sre_unicode_lowercase_u.sub("u", y)
-    y = sre_unicode_lowercase_y.sub("y", y)
-    y = sre_unicode_lowercase_c.sub("c", y)
-    y = sre_unicode_lowercase_n.sub("n", y)
+    y = re_unicode_lowercase_a.sub("a", y)
+    y = re_unicode_lowercase_ae.sub("ae", y)
+    y = re_unicode_lowercase_e.sub("e", y)
+    y = re_unicode_lowercase_i.sub("i", y)
+    y = re_unicode_lowercase_o.sub("o", y)
+    y = re_unicode_lowercase_u.sub("u", y)
+    y = re_unicode_lowercase_y.sub("y", y)
+    y = re_unicode_lowercase_c.sub("c", y)
+    y = re_unicode_lowercase_n.sub("n", y)
     # asciify Latin-1 uppercase characters:
-    y = sre_unicode_uppercase_a.sub("A", y)
-    y = sre_unicode_uppercase_ae.sub("AE", y)
-    y = sre_unicode_uppercase_e.sub("E", y)
-    y = sre_unicode_uppercase_i.sub("I", y)
-    y = sre_unicode_uppercase_o.sub("O", y)
-    y = sre_unicode_uppercase_u.sub("U", y)
-    y = sre_unicode_uppercase_y.sub("Y", y)
-    y = sre_unicode_uppercase_c.sub("C", y)
-    y = sre_unicode_uppercase_n.sub("N", y)
+    y = re_unicode_uppercase_a.sub("A", y)
+    y = re_unicode_uppercase_ae.sub("AE", y)
+    y = re_unicode_uppercase_e.sub("E", y)
+    y = re_unicode_uppercase_i.sub("I", y)
+    y = re_unicode_uppercase_o.sub("O", y)
+    y = re_unicode_uppercase_u.sub("U", y)
+    y = re_unicode_uppercase_y.sub("Y", y)
+    y = re_unicode_uppercase_c.sub("C", y)
+    y = re_unicode_uppercase_n.sub("N", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
 
@@ -1050,17 +1050,17 @@ def wash_pattern(p):
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " "
     # get rid of wildcards at the beginning of words:
-    p = sre_pattern_wildcards_at_beginning.sub("\\1", p)
+    p = re_pattern_wildcards_at_beginning.sub("\\1", p)
     # replace spaces within quotes by __SPACE__ temporarily:
-    p = sre_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
-    p = sre_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
-    p = sre_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+    p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
+    p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
+    p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
     # get rid of extremely short words (1-3 letters with wildcards):
-    p = sre_pattern_short_words.sub("\\1", p)
+    p = re_pattern_short_words.sub("\\1", p)
     # replace back __SPACE__ by spaces:
-    p = sre_pattern_space.sub(" ", p)
+    p = re_pattern_space.sub(" ", p)
     # replace special terms:
-    p = sre_pattern_today.sub(time.strftime("%Y-%m-%d", time.localtime()), p)
+    p = re_pattern_today.sub(time.strftime("%Y-%m-%d", time.localtime()), p)
     # remove unnecessary whitespace:
     p = string.strip(p)
     return p
@@ -1499,11 +1499,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_units_hitsets.append(basic_search_unit_hitset)
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
-            if sre.search(r'[^a-zA-Z0-9\s\:]', bsu_p):
+            if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p):
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
-                    bsu_pn = sre.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
+                    bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
                 else: # it is WRD query
-                    bsu_pn = sre.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
+                    bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
                     print_warning(req, "trying (%s,%s,%s)" % (bsu_pn, bsu_f, bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
@@ -1626,13 +1626,13 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
     words = string.split(word, "->", 1) # check for span query
     if len(words) == 2:
-        word0 = sre_word.sub('', words[0])
-        word1 = sre_word.sub('', words[1])
+        word0 = re_word.sub('', words[0])
+        word1 = re_word.sub('', words[1])
         word0 = stem(word0)
         word1 = stem(word1)
         query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
     else:
-        word = sre_word.sub('', word)
+        word = re_word.sub('', word)
         word = stem(word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
@@ -1812,10 +1812,10 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
     if CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX == 0:
         return ""
     # return empty box if there is no initial:
-    if sre.match(r'[^ ,]+, [^ ]', author_name) is None:
+    if re.match(r'[^ ,]+, [^ ]', author_name) is None:
         return ""
     # firstly find name comma initial:
-    author_name_to_search = sre.sub(r'^([^ ,]+, +[^ ,]).*$', '\\1', author_name)
+    author_name_to_search = re.sub(r'^([^ ,]+, +[^ ,]).*$', '\\1', author_name)
 
     # secondly search for similar name forms:
     similar_author_names = {}

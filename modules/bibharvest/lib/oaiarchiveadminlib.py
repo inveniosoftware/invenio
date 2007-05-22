@@ -32,7 +32,6 @@ import ConfigParser
 import time
 import random
 import urllib
-import sre
 from mod_python import apache
 
 from invenio.config import \

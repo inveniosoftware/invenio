@@ -28,7 +28,6 @@ import cgi
 import gettext
 import string
 import locale
-import sre
 
 from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \

@@ -25,7 +25,7 @@ argument washing, redirection, etc.
 
 __revision__ = "$Id$"
 
-import sre
+import re
 from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
 from cgi import parse_qs, escape
@@ -239,7 +239,7 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     ## construct new URL arguments:
     urlargsdictnew = {}
     for key in urlargsdict.keys():
-        if sre.match(regexp_argname, key): # replace `arg' by new values
+        if re.match(regexp_argname, key): # replace `arg' by new values
             urlargsdictnew[key] = []
             for parg in urlargsdict[key]:
                 urlargsdictnew[key].append(parg.replace(text_old, text_new))

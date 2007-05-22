@@ -28,7 +28,7 @@ import getopt
 import getpass
 import string
 import os
-import sre
+import re
 import sys
 import time
 import signal
@@ -49,9 +49,9 @@ from invenio.access_control_engine import acc_authorize_action
 options = {} # global variable to hold task options
 
 ## precompile some often-used regexp for speed reasons:
-sre_subfields = sre.compile('\$\$\w');
-sre_html = sre.compile("(?s)<[^>]*>|&#?\w+;")
-sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+re_subfields = re.compile('\$\$\w');
+re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
+re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 tmpHARVESTpath = tmpdir + '/oaiharvest'
 
@@ -138,7 +138,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        to now."""
     date = time.time()
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = sre_datetime_shift.match(var)
+    m = re_datetime_shift.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
@@ -272,7 +272,7 @@ def task_run(row):
             elif dateflag != 1 and repos[0][8] != 0:
                 ### check that update is actually needed, i.e. lastrun+frequency>today
                 timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                lastrundate = sre.sub(r'\.[0-9]+$', '', str(repos[0][7]))        # remove trailing .00
+                lastrundate = re.sub(r'\.[0-9]+$', '', str(repos[0][7]))        # remove trailing .00
                 timeinsec = int(repos[0][8])*60*60
                 updatedue = add_timestamp_and_timelag(lastrundate, timeinsec)
                 proceed = compare_timestamps_with_tolerance(updatedue, timenow)
@@ -408,7 +408,7 @@ def add_timestamp_and_timelag(timestamp,
                               timelag):
     """ Adds a time lag in seconds to a given date (timestamp). Returns the resulting date. """
     # remove any trailing .00 in timestamp:
-    timestamp = sre.sub(r'\.[0-9]+$', '', timestamp)
+    timestamp = re.sub(r'\.[0-9]+$', '', timestamp)
     # first convert timestamp to Unix epoch seconds:
     timestamp_seconds = calendar.timegm(time.strptime(timestamp, "%Y-%m-%d %H:%M:%S"))
     # now add them:
@@ -566,8 +566,8 @@ def compare_timestamps_with_tolerance(timestamp1,
        and 1 if TIMESTAMP1 is greater than TIMESTAMP2 plus TOLERANCE.
     """
     # remove any trailing .00 in timestamps:
-    timestamp1 = sre.sub(r'\.[0-9]+$', '', timestamp1)
-    timestamp2 = sre.sub(r'\.[0-9]+$', '', timestamp2)
+    timestamp1 = re.sub(r'\.[0-9]+$', '', timestamp1)
+    timestamp2 = re.sub(r'\.[0-9]+$', '', timestamp2)
     # first convert timestamps to Unix epoch seconds:
     timestamp1_seconds = calendar.timegm(time.strptime(timestamp1, "%Y-%m-%d %H:%M:%S"))
     timestamp2_seconds = calendar.timegm(time.strptime(timestamp2, "%Y-%m-%d %H:%M:%S"))

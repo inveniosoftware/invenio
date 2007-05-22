@@ -24,7 +24,6 @@ import time
 import cgi
 import gettext
 import traceback
-import sre
 import urllib
 import sys
 
@@ -43,17 +42,17 @@ class Template:
         return navtrail
 
     def tmpl_draw_titlebar(self, ln, weburl, title, guideurl, extraname="", extraurl=""):
-        """Draws an html title bar 
+        """Draws an html title bar
           - 'title' *string* - The name of the titlebar
           - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
           - 'guideurl' *string* - The relative url of the guide relative to this section
           - 'extraname' *string* - The name of an extra function
-          - 'extraurl' *string* - The relative url to an extra function 
+          - 'extraurl' *string* - The relative url to an extra function
           """
 
         _ = gettext_set_language(ln)
         guidetitle = _("See Guide")
-        
+
         titlebar = """ <table class="admin_wvar_nomargin"><th class="adminheader">"""
         titlebar += """%s&nbsp;&nbsp&nbsp;<small>[<a title="%s" href="%s/%s">?</a>]</small>""" % (title, guidetitle, weburl, guideurl)
         if extraname and extraurl:
@@ -63,7 +62,7 @@ class Template:
 
 
     def tmpl_draw_subtitle(self, ln, weburl, title, subtitle, guideurl):
-        """Draws an html title bar 
+        """Draws an html title bar
           - 'title' *string* - The name of the titlebar
           - 'subtitle' *string* - The header name of the subtitle
           - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
@@ -71,14 +70,14 @@ class Template:
           """
         _ = gettext_set_language(ln)
         guidetitle = _("See Guide")
-        
+
         titlebar = """<a name="%s">""" % title
         titlebar += """ </a>%s&nbsp;&nbsp;&nbsp;<small>""" % subtitle
         titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, weburl, guideurl)
         return titlebar
 
     def tmpl_link_with_args(self, ln, weburl, funcurl, title, args):
-        """Draws an html title bar 
+        """Draws an html title bar
           - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
           - 'funcurl' *string* - The relative url to this section
           - 'title' *string* - The name of the link
@@ -90,7 +89,7 @@ class Template:
         noargs = len(args)
         if noargs==0:
             # there are no arguments, close link and return
-            return initurl + endurl    
+            return initurl + endurl
         else:
             # we have args. list them in the link, then close it and return it
             argsurl = '?'
@@ -110,10 +109,10 @@ class Template:
         present = _("OAI sources currently present in the database")
         notpresent = _("No OAI sources currently present in the database")
         if (numbersources>0):
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br><br>""" % (numbersources, present) 
+            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br><br>""" % (numbersources, present)
             return output
         else:
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % notpresent 
+            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % notpresent
             return output
 
     def tmpl_output_schedule(self, ln, schtime, schstatus):
@@ -125,10 +124,10 @@ class Template:
         if schtime and schstatus:
             output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong>%s<br>
                          &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s <br>
-                         &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s </strong><br><br>""" % (msg_next, msg_sched, schtime, msg_cur, schstatus) 
+                         &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s </strong><br><br>""" % (msg_next, msg_sched, schtime, msg_cur, schstatus)
             return output
         else:
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % msg_notask 
+            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % msg_notask
             return output
 
     def tmpl_admin_w200_text(self, ln, title, name, value):
@@ -138,9 +137,9 @@ class Template:
           - 'value' *string* - The value in the textbox"""
         _ = gettext_set_language(ln)
         text = """<span class="adminlabel">%s""" % title
-        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br>""" % (cgi.escape(name,1), cgi.escape(value, 1))  
+        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br>""" % (cgi.escape(name,1), cgi.escape(value, 1))
         return text
-    
+
     def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states):
         """Draws a list of HTML checkboxes
           - 'title' *string* - The name of the list of checkboxes
@@ -156,7 +155,7 @@ class Template:
         text += """<table><tr><td>"""
         text += '&nbsp;&nbsp; <small><i>(Leave all unchecked for non-selective' \
                 ' harvesting)</i></small><br/>'
-        
+
         for i in range(len(values)):
             value = values[i]
             label = labels[i]
@@ -165,13 +164,13 @@ class Template:
             text += '&nbsp;&nbsp; <input type="checkbox"' \
                     'name="%s" id="%s" value="%s" ' % (name, chk_box_id, value)
             if state:
-                text += 'checked="checked "' 
+                text += 'checked="checked "'
             text += "/>"
-            
-            text += """<label for="%s">%s</label><br/>""" % (chk_box_id, label) 
+
+            text += """<label for="%s">%s</label><br/>""" % (chk_box_id, label)
         text += "</td></tr></table></div>"
         return text
-    
+
     def tmpl_admin_w200_select(self, ln, title, name, valuenil, values, lastval=""):
         """Draws an html w200 drop-down box
           - 'title' *string* - The name of the dd box
@@ -188,7 +187,7 @@ class Template:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-            text += """</select><br>"""            
+            text += """</select><br>"""
         except StandardError, e:
             for val in values:
                 if lastval==val[0]:
@@ -203,7 +202,7 @@ class Template:
         _ = gettext_set_language(ln)
         text = """<br><b><span class="info">%s</span></b>""" % infotext
         return text
-    
+
     def tmpl_print_warning(self, ln, warntext):
         """Outputs some info"""
         _ = gettext_set_language(ln)

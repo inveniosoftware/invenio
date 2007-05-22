@@ -27,7 +27,7 @@ import getopt
 import getpass
 import string
 import os
-import sre
+import re
 import sys
 import time
 import Numeric
@@ -72,7 +72,7 @@ class MyFancyURLopener(urllib.FancyURLopener):
 #urllib._urlopener = MyFancyURLopener()
 
 ## precompile some often-used regexp for speed reasons:
-re_subfields = sre.compile('\$\$\w');
+re_subfields = re.compile('\$\$\w');
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -197,7 +197,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re=sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+    shift_re=re.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
     m = shift_re.match(var)
     if m:

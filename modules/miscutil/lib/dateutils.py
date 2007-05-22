@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## 
+##
 ## Some functions about dates
 ##
 ## This file is part of CDS Invenio.
@@ -27,7 +27,7 @@ Lexicon
         textual format => 'YEAR-MONTH-DAY HOUR:MINUTE:SECOND'
         e.g. '2005-11-16 15:11:44'
         default value: '0000-00-00 00:00:00'
-        
+
     datestruct:
         tuple format => see http://docs.python.org/lib/module-time.html
         (YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEKDAY, YEARDAY, DAYLIGHT)
@@ -43,7 +43,6 @@ Lexicon
 __revision__ = "$Id$"
 
 from time import strptime, strftime, localtime
-import sre
 
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
@@ -56,8 +55,8 @@ def convert_datetext_to_dategui(datetext, ln=cdslang):
     """
     Convert:
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
-    Month is internationalized 
-    """ 
+    Month is internationalized
+    """
     try:
         datestruct = convert_datetext_to_datestruct(datetext)
         if datestruct == datestruct_default:
@@ -78,7 +77,7 @@ def convert_datetext_to_datestruct(datetext):
         return strptime(datetext, datetext_format)
     except:
         return datestruct_default
-    
+
 def convert_datestruct_to_dategui(datestruct, ln=cdslang):
     """
     Convert:
@@ -94,7 +93,7 @@ def convert_datestruct_to_dategui(datestruct, ln=cdslang):
             raise ValueError
     except:
         _ = gettext_set_language(ln)
-        return _("N/A") 
+        return _("N/A")
 
 def convert_datestruct_to_datetext(datestruct):
     """
@@ -140,7 +139,7 @@ def get_datestruct(year, month, day):
         return strptime("%i-%i-%i"% (year, month, day), input_format)
     except ValueError or TypeError:
         return datestruct_default
-    
+
 def get_i18n_day_name(day_nb, display='short', ln=cdslang):
     """
     get the string representation of a weekday, internationalized
@@ -166,7 +165,7 @@ def get_i18n_day_name(day_nb, display='short', ln=cdslang):
                 4: _("Thursday"),
                 5: _("Friday"),
                 6: _("Saturday")}
-            
+
     return days[day_nb]
 
 def get_i18n_month_name(month_nb, display='short', ln=cdslang):

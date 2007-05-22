@@ -29,7 +29,7 @@ import getopt
 import getpass
 import string
 import os
-import sre
+import re
 import sys
 import time
 import Numeric
@@ -306,7 +306,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+    shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
     m = shift_re.match(var)
     if m:

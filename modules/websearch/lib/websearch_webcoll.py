@@ -29,7 +29,7 @@ import marshal
 import signal
 import sys
 import cgi
-import sre
+import re
 import os
 import string
 import zlib
@@ -707,7 +707,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+    shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
     m = shift_re.match(var)
     if m:
@@ -735,8 +735,8 @@ def compare_timestamps_with_tolerance(timestamp1,
        and 1 if TIMESTAMP1 is greater than TIMESTAMP2 plus TOLERANCE.
     """
     # remove any trailing .00 in timestamps:
-    timestamp1 = sre.sub(r'\.[0-9]+$', '', timestamp1)
-    timestamp2 = sre.sub(r'\.[0-9]+$', '', timestamp2)
+    timestamp1 = re.sub(r'\.[0-9]+$', '', timestamp1)
+    timestamp2 = re.sub(r'\.[0-9]+$', '', timestamp2)
     # first convert timestamps to Unix epoch seconds:
     timestamp1_seconds = calendar.timegm(time.strptime(timestamp1, "%Y-%m-%d %H:%M:%S"))
     timestamp2_seconds = calendar.timegm(time.strptime(timestamp2, "%Y-%m-%d %H:%M:%S"))

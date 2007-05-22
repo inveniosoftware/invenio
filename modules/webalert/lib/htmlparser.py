@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,14 +22,14 @@
 
 __revision__ = "$Id$"
 
-import sre
+import re
 from HTMLParser import HTMLParser
 from string import split
 import textwrap
 
 from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
 from invenio.search_engine import print_record
-from invenio.bibindex_engine import sre_html
+from invenio.bibindex_engine import re_html
 
 def wrap(text):
     lines = textwrap.wrap(text, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
@@ -54,11 +54,11 @@ class RecordHTMLParser(HTMLParser):
     invenio.search_engine.print_record into plain text, with some
     minor formatting.
     """
-    
+
     def __init__(self):
         HTMLParser.__init__(self)
         self.result = ''
-        
+
     def handle_starttag(self, tag, attrs):
         if tag == 'strong':
             # self.result += '*'
@@ -75,10 +75,10 @@ class RecordHTMLParser(HTMLParser):
                     self.printURL = 1
                 if (self.printURL == 1) and (f[0] == 'href'):
                     self.result += '<' + f[1] + '>'
-                
+
         elif tag == 'br':
             self.result += '\n'
-        
+
     def handle_endtag(self, tag):
         if tag == 'strong':
             # self.result += '\n'
@@ -96,7 +96,7 @@ class RecordHTMLParser(HTMLParser):
 
     def handle_comment(self, data):
         pass
-    
+
 
 def get_as_text(record_id):
     """Return the plain text from RecordHTMLParser of the record."""
@@ -107,9 +107,9 @@ def get_as_text(record_id):
         htparser.feed(rec_in_hb)
         out = htparser.result
     except:
-        out = sre_html.sub(' ', rec_in_hb)
-    out = sre.sub(r"[\-:]?\s*Detailed record\s*[\-:]?", "", out)
-    out = sre.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
+        out = re_html.sub(' ', rec_in_hb)
+    out = re.sub(r"[\-:]?\s*Detailed record\s*[\-:]?", "", out)
+    out = re.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
     return out
 
 if __name__ == "__main__":

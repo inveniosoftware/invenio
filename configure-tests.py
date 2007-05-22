@@ -80,7 +80,6 @@ try:
     import md5
     import os
     import signal
-    import sre
     import string
     import tempfile
     import time

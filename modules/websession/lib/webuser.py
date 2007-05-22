@@ -41,7 +41,7 @@ import os
 import crypt
 import string
 import smtplib
-import sre
+import re
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -73,7 +73,7 @@ from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
 tmpl = invenio.template.load('websession')
 
-sre_invalid_nickname = sre.compile(""".*[,'@]+.*""")
+re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
 # pylint: disable-msg=C0301
 
@@ -277,13 +277,13 @@ def nickname_valid_p(nickname):
        At the moment we just check whether it is not empty, does not
        contain blanks or @, is not equal to `guest', etc.
 
-       This check relies on sre_invalid_nickname regexp (see above)
+       This check relies on re_invalid_nickname regexp (see above)
        Return 1 if nickname is okay, return 0 if it is not.
     """
     if nickname and \
        not(nickname.startswith(' ') or nickname.endswith(' ')) and \
        nickname.lower() != 'guest':
-        if not sre_invalid_nickname.match(nickname):
+        if not re_invalid_nickname.match(nickname):
             return 1
     return 0
 

@@ -32,7 +32,7 @@ import string
 import getopt
 import getpass
 import os
-import sre
+import re
 import sys
 import time
 import Numeric
@@ -85,13 +85,13 @@ def write_message(msg, stream=sys.stdout):
     return
 
 ## precompile some often-used regexp for speed reasons:
-sre_subfields = sre.compile('\$\$\w');
-sre_html = sre.compile("(?s)<[^>]*>|&#?\w+;")
-sre_block_punctuation_begin = sre.compile(r"^"+CFG_BIBINDEX_CHARS_PUNCTUATION+"+")
-sre_block_punctuation_end = sre.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
-sre_punctuation = sre.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
-sre_separators = sre.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
-sre_datetime_shift = sre.compile("([-\+]{0,1})([\d]+)([dhms])")
+re_subfields = re.compile('\$\$\w');
+re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
+re_block_punctuation_begin = re.compile(r"^"+CFG_BIBINDEX_CHARS_PUNCTUATION+"+")
+re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
+re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
+re_separators = re.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
+re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -223,13 +223,13 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
        """
     out = []
     for ext in CONV_PROGRAMS.keys():
-        expr = sre.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
+        expr = re.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
                            ext + r")\"")
         match =  expr.search(htmlpagebody)
         if match:
             out.append([ext,match.group(1)])
         else: # FIXME: workaround for getfile, should use bibdoc tables
-            expr_getfile = sre.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
+            expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
             if match:
                 out.append([ext,match.group(1)])
@@ -413,24 +413,24 @@ def get_words_from_phrase(phrase, split=string.split):
     """
     words = {}
     if CFG_BIBINDEX_REMOVE_HTML_MARKUP and string.find(phrase, "</") > -1:
-        phrase = sre_html.sub(' ', phrase)
+        phrase = re_html.sub(' ', phrase)
     phrase = string.lower(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
         # 2nd remove leading/trailing punctuation and add block:
-        block = sre_block_punctuation_begin.sub("", block)
-        block = sre_block_punctuation_end.sub("", block)
+        block = re_block_punctuation_begin.sub("", block)
+        block = re_block_punctuation_end.sub("", block)
         if block:
             block = apply_stemming_and_stopwords_and_length_check(block)
             if block:
                 words[block] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
-            for subblock in sre_punctuation.split(block):
+            for subblock in re_punctuation.split(block):
                 subblock = apply_stemming_and_stopwords_and_length_check(subblock)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:
-                    for alphanumeric_group in sre_separators.split(subblock):
+                    for alphanumeric_group in re_separators.split(subblock):
                         alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
@@ -453,7 +453,7 @@ def apply_stemming_and_stopwords_and_length_check(word):
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
-    return sre_subfields.sub(' ', s)
+    return re_subfields.sub(' ', s)
 
 def get_index_id(indexname):
     """Returns the words/phrase index id for INDEXNAME.
@@ -621,7 +621,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
        to now."""
     date = time.time()
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = sre_datetime_shift.match(var)
+    m = re_datetime_shift.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]

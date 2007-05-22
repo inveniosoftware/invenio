@@ -29,7 +29,10 @@ import os
 import ConfigParser
 from zlib import compress,decompress
 import marshal
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 from invenio.config import \
      cdslang, \

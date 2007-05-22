@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,7 +26,7 @@
 __revision__ = "$Id$"
 
 try:
-    import sys, sre
+    import sys, re
     import os, getopt
     from time import mktime, localtime, ctime
     from invenio.refextract_config \
@@ -73,7 +73,7 @@ def get_url_repair_patterns():
     """Initialise and return a list of precompiled regexp patterns that
        are used to try to re-assemble URLs that have been broken during
        a document's conversion to plain-text.
-       @return: (list) of compiled sre regexp patterns used for finding
+       @return: (list) of compiled re regexp patterns used for finding
         various broken URLs.
     """
     file_types_list = []
@@ -96,32 +96,32 @@ def get_url_repair_patterns():
     file_types_list.append(r't\s*?e\s*?x')           ## tex
     file_types_list.append(r's\s*?h\s*?t\s*?m\s*?l') ## shtml
     pattern_list = []
-    pattern_list.append(sre.compile(r'(h\s*t\s*t\s*p\s*\:\s*\/\s*\/)', \
-                                    sre.I|sre.UNICODE))
-    pattern_list.append(sre.compile(r'(f\s*t\s*p\s*\:\s*\/\s*\/\s*)', \
-                                    sre.I|sre.UNICODE))
-    pattern_list.append(sre.compile(r'((http|ftp):\/\/\s*[\w\d])', \
-                                    sre.I|sre.UNICODE))
-    pattern_list.append(sre.compile(r'((http|ftp):\/\/([\w\d\s\._\-])+?\s*\/)', \
-                                    sre.I|sre.UNICODE))
-    pattern_list.append(sre.compile(r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\s\.\-])+?\/)+)', \
-                                    sre.I|sre.UNICODE))
+    pattern_list.append(re.compile(r'(h\s*t\s*t\s*p\s*\:\s*\/\s*\/)', \
+                                    re.I|re.UNICODE))
+    pattern_list.append(re.compile(r'(f\s*t\s*p\s*\:\s*\/\s*\/\s*)', \
+                                    re.I|re.UNICODE))
+    pattern_list.append(re.compile(r'((http|ftp):\/\/\s*[\w\d])', \
+                                    re.I|re.UNICODE))
+    pattern_list.append(re.compile(r'((http|ftp):\/\/([\w\d\s\._\-])+?\s*\/)', \
+                                    re.I|re.UNICODE))
+    pattern_list.append(re.compile(r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\s\.\-])+?\/)+)', \
+                                    re.I|re.UNICODE))
     p_url = \
-     sre.compile(r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\s\.\-])+?\/)*([\w\d\_\s\-]+\.\s?[\w\d]+))', \
-      sre.I|sre.UNICODE)
+     re.compile(r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\s\.\-])+?\/)*([\w\d\_\s\-]+\.\s?[\w\d]+))', \
+      re.I|re.UNICODE)
     pattern_list.append(p_url)
     ## some possible endings for URLs:
     for x in file_types_list:
         p_url = \
-            sre.compile(\
+            re.compile(\
               r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\.\-])+?\/)*([\w\d\_\-]+\.' + x + u'))', \
-              sre.I|sre.UNICODE)
+              re.I|re.UNICODE)
         pattern_list.append(p_url)
     ## if url last thing in line, and only 10 letters max, concat them
     p_url = \
-        sre.compile(\
+        re.compile(\
           r'((http|ftp):\/\/([\w\d\_\.\-])+\/(([\w\d\_\.\-])+?\/)*\s*?([\w\d\_\.\-]\s?){1,10}\s*)$', \
-          sre.I|sre.UNICODE)
+          re.I|re.UNICODE)
     pattern_list.append(p_url)
     return pattern_list
 
@@ -494,21 +494,21 @@ def get_bad_char_replacements():
     return replacements
 
 ## precompile some often-used regexp for speed reasons:
-sre_regexp_character_class = sre.compile(r'\[[^\]]+\]', sre.UNICODE)
-sre_space_comma = sre.compile(r'\s,', sre.UNICODE)
-sre_space_semicolon = sre.compile(r'\s;', sre.UNICODE)
-sre_space_period = sre.compile(r'\s\.', sre.UNICODE)
-sre_colon_space_colon = sre.compile(r':\s:', sre.UNICODE)
-sre_comma_space_colon = sre.compile(r',\s:', sre.UNICODE)
-sre_space_closing_square_bracket = sre.compile(r'\s\]', sre.UNICODE)
-sre_opening_square_bracket_space = sre.compile(r'\[\s', sre.UNICODE)
-sre_hyphens = sre.compile(\
-    r'(\\255|\u02D7|\u0335|\u0336|\u2212|\u002D|\uFE63|\uFF0D)', sre.UNICODE)
-sre_multiple_hyphens = sre.compile(r'-{2,}', sre.UNICODE)
-sre_multiple_space = sre.compile(r'\s{2,}', sre.UNICODE)
-sre_group_captured_multiple_space = sre.compile(r'(\s{2,})', sre.UNICODE)
-sre_colon_not_followed_by_numeration_tag = \
-                               sre.compile(r':(?!\s*<cds)', sre.UNICODE|sre.I)
+re_regexp_character_class = re.compile(r'\[[^\]]+\]', re.UNICODE)
+re_space_comma = re.compile(r'\s,', re.UNICODE)
+re_space_semicolon = re.compile(r'\s;', re.UNICODE)
+re_space_period = re.compile(r'\s\.', re.UNICODE)
+re_colon_space_colon = re.compile(r':\s:', re.UNICODE)
+re_comma_space_colon = re.compile(r',\s:', re.UNICODE)
+re_space_closing_square_bracket = re.compile(r'\s\]', re.UNICODE)
+re_opening_square_bracket_space = re.compile(r'\[\s', re.UNICODE)
+re_hyphens = re.compile(\
+    r'(\\255|\u02D7|\u0335|\u0336|\u2212|\u002D|\uFE63|\uFF0D)', re.UNICODE)
+re_multiple_hyphens = re.compile(r'-{2,}', re.UNICODE)
+re_multiple_space = re.compile(r'\s{2,}', re.UNICODE)
+re_group_captured_multiple_space = re.compile(r'(\s{2,})', re.UNICODE)
+re_colon_not_followed_by_numeration_tag = \
+                               re.compile(r':(?!\s*<cds)', re.UNICODE|re.I)
 
 
 ## In certain papers, " bf " appears just before the volume of a
@@ -521,61 +521,61 @@ sre_colon_not_followed_by_numeration_tag = \
 ## and/or numeration and thus breaks the citation.
 ## The pattern below is used to identify this situation and remove the
 ## " bf" component:
-sre_identify_bf_before_vol = \
-                sre.compile(r' bf ((\w )?: \<cds\.VOL\>)', \
-                            sre.UNICODE)
+re_identify_bf_before_vol = \
+                re.compile(r' bf ((\w )?: \<cds\.VOL\>)', \
+                            re.UNICODE)
 
 ## Patterns used for creating institutional preprint report-number
 ## recognition patterns (used by function "institute_num_pattern_to_regex"):
    ## Recognise any character that isn't a->z, A->Z, 0->9, /, [, ], ' ', '"':
-sre_report_num_chars_to_escape = \
-                sre.compile(r'([^\]A-Za-z0-9\/\[ "])', sre.UNICODE)
+re_report_num_chars_to_escape = \
+                re.compile(r'([^\]A-Za-z0-9\/\[ "])', re.UNICODE)
    ## Replace "hello" with hello:
-sre_extract_quoted_text = (sre.compile(r'\"([^"]+)\"', sre.UNICODE), r'\g<1>',)
+re_extract_quoted_text = (re.compile(r'\"([^"]+)\"', re.UNICODE), r'\g<1>',)
    ## Replace / [abcd ]/ with /( [abcd])?/ :
-sre_extract_char_class = (sre.compile(r' \[([^\]]+) \]', sre.UNICODE), \
+re_extract_char_class = (re.compile(r' \[([^\]]+) \]', re.UNICODE), \
                           r'( [\g<1>])?')
 ###
 
 
 ## URL recognition:
 ## Stand-alone URL (e.g. http://cdsware.cern.ch/ )
-sre_raw_url = \
- sre.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
-             sre.UNICODE|sre.I)
+re_raw_url = \
+ re.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
+             re.UNICODE|re.I)
 ## HTML marked-up URL (e.g. <a href="http://cdsware.cern.ch/">
 ## CERN Document Server Software Consortium</a> )
-sre_html_tagged_url = \
- sre.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
-             sre.UNICODE|sre.I)
+re_html_tagged_url = \
+ re.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
+             re.UNICODE|re.I)
 
 
 ## Numeration recognition pattern - used to identify numeration
 ## associated with a title when marking the title up into MARC XML:
-sre_recognised_numeration_for_title = \
-     sre.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', sre.UNICODE)
+re_recognised_numeration_for_title = \
+     re.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', re.UNICODE)
 
 ## Another numeration pattern. This one is designed to match marked-up
 ## numeration that is essentially an IBID, but without the word "IBID". E.g.:
 ## <cds.TITLE>J. Phys. A</cds.TITLE> : <cds.VOL>31</cds.VOL>
 ## <cds.YR>(1998)</cds.YR> <cds.PG>2391</cds.PG>; : <cds.VOL>32</cds.VOL>
 ## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
-sre_numeration_no_ibid_txt = \
-          sre.compile(r"""
+re_numeration_no_ibid_txt = \
+          re.compile(r"""
           ^((\s*;\s*|\s+and\s+):?\s                   ## Leading ; : or " and :"
           \<cds\.VOL\>(\d+)\<\/cds\.VOL>\s            ## Volume
           \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s   ## year
           \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)     ## page
-          """, sre.UNICODE|sre.VERBOSE)
+          """, re.UNICODE|re.VERBOSE)
 
-sre_title_followed_by_series_markup_tags = \
-     sre.compile(r'(\<cds.TITLE\>([^\<]+)\<\/cds.TITLE\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', sre.UNICODE)
+re_title_followed_by_series_markup_tags = \
+     re.compile(r'(\<cds.TITLE\>([^\<]+)\<\/cds.TITLE\>\s*.?\s*\<cds\.SER\>([A-H]|(I{1,3}V?|VI{0,3}))\<\/cds\.SER\>)', re.UNICODE)
 
-sre_punctuation = sre.compile(r'[\.\,\;\'\(\)\-]', sre.UNICODE)
+re_punctuation = re.compile(r'[\.\,\;\'\(\)\-]', re.UNICODE)
 
 ## The following pattern is used to recognise "citation items" that have been
 ## identified in the line, when building a MARC XML representation of the line:
-sre_tagged_citation = sre.compile(r"""
+re_tagged_citation = re.compile(r"""
           \<cds\.                ## open tag: <cds.
           (TITLE                 ## a TITLE tag
           |VOL                   ## or a VOL tag
@@ -587,30 +587,30 @@ sre_tagged_citation = sre.compile(r"""
           (\s\/)?                ## optional /
           \>                     ## closing of tag (>)
           """, \
-                                  sre.UNICODE|sre.VERBOSE)
+                                  re.UNICODE|re.VERBOSE)
 
 
 ## is there pre-recognised numeration-tagging within a
 ## few characters of the start if this part of the line?
-sre_tagged_numeration_near_line_start = \
-                         sre.compile(r'^.{0,4}?<CDS (VOL|SER)>', sre.UNICODE)
+re_tagged_numeration_near_line_start = \
+                         re.compile(r'^.{0,4}?<CDS (VOL|SER)>', re.UNICODE)
 
 
-sre_ibid = \
-   sre.compile(r'(-|\b)(IBID\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
-               sre.UNICODE)
+re_ibid = \
+   re.compile(r'(-|\b)(IBID\.?( ([A-H]|(I{1,3}V?|VI{0,3})|[1-3]))?)\s?:', \
+               re.UNICODE)
 
-sre_matched_ibid = sre.compile(r'IBID\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
-                               sre.UNICODE)
+re_matched_ibid = re.compile(r'IBID\.?\s?([A-H]|(I{1,3}V?|VI{0,3})|[1-3])?', \
+                               re.UNICODE)
 
-sre_title_series = sre.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', \
-                               sre.UNICODE)
+re_title_series = re.compile(r'\.,? +([A-H]|(I{1,3}V?|VI{0,3}))$', \
+                               re.UNICODE)
 
 ## After having processed a line for titles, it may be possible to find more
 ## numeration with the aid of the recognised titles. The following 2 patterns
 ## are used for this:
 
-sre_correct_numeration_2nd_try_ptn1 = (sre.compile(r"""
+re_correct_numeration_2nd_try_ptn1 = (re.compile(r"""
   \(?([12]\d{3})([A-Za-z]?)\)?,?\s*        ## Year
   (<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>)   ## Recognised, tagged title
   ,?\s*
@@ -622,12 +622,12 @@ sre_correct_numeration_2nd_try_ptn1 = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode('\\g<3> : <cds.VOL>\\g<6></cds.VOL> ' \
                                       '<cds.YR>(\\g<1>)</cds.YR> ' \
                                       '<cds.PG>\\g<8></cds.PG>'))
 
-sre_correct_numeration_2nd_try_ptn2 = (sre.compile(r"""
+re_correct_numeration_2nd_try_ptn2 = (re.compile(r"""
   \(?([12]\d{3})([A-Za-z]?)\)?,?\s*        ## Year
   (<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>)   ## Recognised, tagged title
   ,?\s*
@@ -639,7 +639,7 @@ sre_correct_numeration_2nd_try_ptn2 = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode('\\g<3> <cds.SER>\\g<7></cds.SER> : ' \
                                       '<cds.VOL>\\g<6></cds.VOL> ' \
                                       '<cds.YR>(\\g<1>)</cds.YR> ' \
@@ -650,7 +650,7 @@ sre_correct_numeration_2nd_try_ptn2 = (sre.compile(r"""
 
 ## Delete the colon and expressions such as Serie, vol, V. inside the pattern
 ## <serie : volume> E.g. Replace the string """Series A, Vol 4""" with """A 4"""
-sre_strip_series_and_volume_labels = (sre.compile(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)', sre.UNICODE),
+re_strip_series_and_volume_labels = (re.compile(r'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)', re.UNICODE),
                       unicode('\\g<2> \\g<4>'))
 
 
@@ -663,7 +663,7 @@ _sre_non_compiled_pattern_nucphysb_subtitle = \
 ## the 4 main numeration patterns:
 
 ## Pattern 0 (was pattern 3): <x, vol, page, year>
-sre_numeration_vol_nucphys_page_yr = (sre.compile(r"""
+re_numeration_vol_nucphys_page_yr = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   [,:\s]\s?
   """ + \
@@ -675,12 +675,12 @@ sre_numeration_vol_nucphys_page_yr = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   \(?(1\d\d\d|20\d\d)\)?                   ## Year
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
                                       '<cds.PG>\\g<3></cds.PG> '))
 
-sre_numeration_nucphys_vol_page_yr = (sre.compile(r"""
+re_numeration_nucphys_vol_page_yr = (re.compile(r"""
   \b
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -694,14 +694,14 @@ sre_numeration_nucphys_vol_page_yr = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   \(?(1\d\d\d|20\d\d)\)?                   ## Year
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
                                       '<cds.PG>\\g<3></cds.PG> '))
 
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
-sre_numeration_vol_nucphys_yr_page = (sre.compile(r"""
+re_numeration_vol_nucphys_yr_page = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   [,:\s]?\s?
   """ + \
@@ -714,12 +714,12 @@ sre_numeration_vol_nucphys_yr_page = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<3>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
 ## <[FS]?, v, y, p>
-sre_numeration_nucphys_vol_yr_page = (sre.compile(r"""
+re_numeration_nucphys_vol_yr_page = (re.compile(r"""
   \b
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -733,7 +733,7 @@ sre_numeration_nucphys_vol_yr_page = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<3>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
@@ -741,7 +741,7 @@ sre_numeration_nucphys_vol_yr_page = (sre.compile(r"""
 
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
-sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r"""
+re_numeration_vol_series_nucphys_yr_page = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   ([A-H])\s?                               ## The series
   """ + \
@@ -753,13 +753,13 @@ sre_numeration_vol_series_nucphys_yr_page = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
                                       '<cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
-sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
+re_numeration_vol_nucphys_series_yr_page = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -771,7 +771,7 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<4>)</cds.YR> ' \
@@ -781,7 +781,7 @@ sre_numeration_vol_nucphys_series_yr_page = (sre.compile(r"""
 
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
-sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r"""
+re_numeration_vol_series_nucphys_page_yr = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   ([A-H])[,:\s]\s?                         ## The series
   """ + \
@@ -793,14 +793,14 @@ sre_numeration_vol_series_nucphys_page_yr = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   ?\s?\(?(1\d\d\d|20\d\d)\)?               ## Year
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<5>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
 
 ## <v, [FS]?, s, p, y>
-sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r"""
+re_numeration_vol_nucphys_series_page_yr = (re.compile(r"""
   (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -812,29 +812,29 @@ sre_numeration_vol_nucphys_series_page_yr = (sre.compile(r"""
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
   ,?\s?\(?(1\d\d\d|20\d\d)\)?              ## Year
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' \\g<3> : ' \
                                       '<cds.VOL>\\g<2></cds.VOL> ' \
                                       '<cds.YR>(\\g<5>)</cds.YR> ' \
                                       '<cds.PG>\\g<4></cds.PG> '))
 
 ## Pattern 5: <year, vol, page>
-sre_numeration_yr_vol_page = (sre.compile(r"""
+re_numeration_yr_vol_page = (re.compile(r"""
   (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)      ## The year (optional brackets)
   ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)[,:\s]\s? ## The Volume (optional 'vol.' word
-  [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp. 
+  [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
   (?:\-|\255)?                             ## optional separatr between pagenums
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
                                            ## preceeded by optional R/L,followed
                                            ## by optional c
-  """, sre.UNICODE|sre.VERBOSE), \
+  """, re.UNICODE|re.VERBOSE), \
                               unicode(' : <cds.VOL>\\g<5></cds.VOL> ' \
                                       '<cds.YR>(\\g<2>)</cds.YR> ' \
                                       '<cds.PG>\\g<6></cds.PG> '))
 
 ## a list of patterns used to try to repair broken URLs within reference lines:
-sre_list_url_repair_patterns = get_url_repair_patterns()
+re_list_url_repair_patterns = get_url_repair_patterns()
 
 ## a dictionary of undesirable characters and their replacements:
 undesirable_char_replacements = get_bad_char_replacements()
@@ -874,7 +874,7 @@ def repair_broken_urls(line):
         """Suppresses spaces in a matched URL.
         """
         return m.group(1).replace(" ", "")
-    for ptn in sre_list_url_repair_patterns:
+    for ptn in re_list_url_repair_patterns:
         line = ptn.sub(_chop_spaces_in_url_match, line)
     return line
 
@@ -911,14 +911,14 @@ def remove_and_record_multiple_spaces_in_line(line):
     removed_spaces = {}
     ## get a collection of match objects for all instances of
     ## multiple-spaces found in the line:
-    multispace_matches = sre_group_captured_multiple_space.finditer(line)
+    multispace_matches = re_group_captured_multiple_space.finditer(line)
     ## record the number of spaces found at each match position:
     for multispace in multispace_matches:
         removed_spaces[multispace.start()] = (multispace.end() \
                                               - multispace.start() - 1)
     ## now remove the multiple-spaces from the line, replacing with a
     ## single space at each position:
-    line = sre_group_captured_multiple_space.sub(u' ', line)
+    line = re_group_captured_multiple_space.sub(u' ', line)
     return (removed_spaces, line)
 
 def wash_line(line):
@@ -928,16 +928,16 @@ def wash_line(line):
        @param line: (string) the line to be washed.
        @return: (string) the washed line.
     """
-    line = sre_space_comma.sub(',', line)
-    line = sre_space_semicolon.sub(';', line)
-    line = sre_space_period.sub('.', line)
-    line = sre_colon_space_colon.sub(':', line)
-    line = sre_comma_space_colon.sub(':', line)
-    line = sre_space_closing_square_bracket.sub(']', line)
-    line = sre_opening_square_bracket_space.sub('[', line)
-    line = sre_hyphens.sub('-', line)
-    line = sre_colon_not_followed_by_numeration_tag.sub(' ', line)
-    line = sre_multiple_space.sub(' ', line)
+    line = re_space_comma.sub(',', line)
+    line = re_space_semicolon.sub(';', line)
+    line = re_space_period.sub('.', line)
+    line = re_colon_space_colon.sub(':', line)
+    line = re_comma_space_colon.sub(':', line)
+    line = re_space_closing_square_bracket.sub(']', line)
+    line = re_opening_square_bracket_space.sub('[', line)
+    line = re_hyphens.sub('-', line)
+    line = re_colon_not_followed_by_numeration_tag.sub(' ', line)
+    line = re_multiple_space.sub(' ', line)
     return line
 
 def order_reportnum_patterns_bylen(numeration_patterns):
@@ -962,7 +962,7 @@ def order_reportnum_patterns_bylen(numeration_patterns):
             return -1
     pattern_list = []
     for pattern in numeration_patterns:
-        base_pattern = sre_regexp_character_class.sub('1', pattern)
+        base_pattern = re_regexp_character_class.sub('1', pattern)
         pattern_list.append((len(base_pattern), pattern))
     pattern_list.sort(_compfunc_bylen)
     return pattern_list
@@ -1015,7 +1015,7 @@ def institute_num_pattern_to_regex(pattern):
                             (r'/',   r'\/')
                           ]
     ## first, escape certain characters that could be sensitive to a regexp:
-    pattern = sre_report_num_chars_to_escape.sub(r'\\\g<1>', pattern)
+    pattern = re_report_num_chars_to_escape.sub(r'\\\g<1>', pattern)
 
     ## now loop through and carry out the simple replacements:
     for repl in simple_replacements:
@@ -1024,9 +1024,9 @@ def institute_num_pattern_to_regex(pattern):
     ## now replace a couple of regexp-like paterns:
     ## quoted string with non-quoted version ("hello" with hello);
     ## Replace / [abcd ]/ with /( [abcd])?/ :
-    pattern = sre_extract_quoted_text[0].sub(sre_extract_quoted_text[1], \
+    pattern = re_extract_quoted_text[0].sub(re_extract_quoted_text[1], \
                                              pattern)
-    pattern = sre_extract_char_class[0].sub(sre_extract_char_class[1], \
+    pattern = re_extract_char_class[0].sub(re_extract_char_class[1], \
                                             pattern)
 
     ## the pattern has been transformed
@@ -1058,7 +1058,7 @@ def build_reportnum_knowledge_base(fpath):
        right hand side, with the two phrases being separated by 3 hyphens.)
        E.g.:
          ASTRO PH        ---astro-ph
-         
+
        The left-hand side term is a non-standard version of the preprint
        reference category; the right-hand side term is the standard version.
 
@@ -1125,11 +1125,11 @@ def build_reportnum_knowledge_base(fpath):
                 search_pattern_str = r'[^a-zA-Z0-9\/\.\-]((?P<categ>' \
                                      + classification[0] + u')' \
                                      + numeration_regexp + r')'
-                sre_search_pattern = sre.compile(search_pattern_str, \
-                                                 sre.UNICODE)
+                re_search_pattern = re.compile(search_pattern_str, \
+                                                 re.UNICODE)
                 preprint_reference_search_regexp_patterns[(kb_line_num, \
                                                           classification[0])] =\
-                                                          sre_search_pattern
+                                                          re_search_pattern
                 standardised_preprint_reference_categories[(kb_line_num, \
                                                           classification[0])] =\
                                                           classification[1]
@@ -1151,14 +1151,14 @@ def build_reportnum_knowledge_base(fpath):
                                                      ## read from the KB
 
     ## pattern to recognise an institute name line in the KB
-    sre_institute_name = sre.compile(r'^\#{5}\s*(.+)\s*\#{5}$', sre.UNICODE)
+    re_institute_name = re.compile(r'^\#{5}\s*(.+)\s*\#{5}$', re.UNICODE)
 
     ## pattern to recognise an institute preprint categ line in the KB
-    sre_preprint_classification = \
-                sre.compile(r'^\s*(\w.*?)\s*---\s*(\w.*?)\s*$', sre.UNICODE)
+    re_preprint_classification = \
+                re.compile(r'^\s*(\w.*?)\s*---\s*(\w.*?)\s*$', re.UNICODE)
 
     ## pattern to recognise a preprint numeration-style line in KB
-    sre_numeration_pattern      = sre.compile(r'^\<(.+)\>$', sre.UNICODE)
+    re_numeration_pattern      = re.compile(r'^\<(.+)\>$', re.UNICODE)
 
     kb_line_num = 0    ## when making the dictionary of patterns, which is
                        ## keyed by the category search string, this counter
@@ -1177,7 +1177,7 @@ def build_reportnum_knowledge_base(fpath):
                                  % (fpath, str(kb_line_num)))
                 sys.exit(1)
 
-            m_institute_name = sre_institute_name.search(rawline)
+            m_institute_name = re_institute_name.search(rawline)
             if m_institute_name is not None:
                 ## This KB line is the name of an institute
                 ## append the last institute's pattern list to the list of
@@ -1196,7 +1196,7 @@ def build_reportnum_knowledge_base(fpath):
                 continue
 
             m_preprint_classification = \
-                                     sre_preprint_classification.search(rawline)
+                                     re_preprint_classification.search(rawline)
             if m_preprint_classification is not None:
                 ## This KB line contains a preprint classification for
                 ## the current institute
@@ -1209,7 +1209,7 @@ def build_reportnum_knowledge_base(fpath):
                 ## move on to the next line
                 continue
 
-            m_numeration_pattern = sre_numeration_pattern.search(rawline)
+            m_numeration_pattern = re_numeration_pattern.search(rawline)
             if m_numeration_pattern is not None:
                 ## This KB line contains a preprint item numeration pattern
                 ## for the current institute
@@ -1295,14 +1295,14 @@ def build_titles_knowledge_base(fpath):
     ## "seek terms" later, if they were not already explicitly added
     ## by the KB:
     repl_terms = {}
-    
+
     ## Pattern to recognise a correct knowledge base line:
-    p_kb_line = sre.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', \
-                            sre.UNICODE)
+    p_kb_line = re.compile('^\s*(?P<seek>\w.*?)\s*---\s*(?P<repl>\w.*?)\s*$', \
+                            re.UNICODE)
 
     try:
         fh = open(fpath, "r")
-        count = 0	      
+        count = 0
         for rawline in fh:
             count += 1
             ## Test line to ensure that it is a correctly formatted
@@ -1328,9 +1328,9 @@ def build_titles_knowledge_base(fpath):
                     ## add the phrase from the KB if the 'seek' phrase is longer
                     ## than 1 character:
                     ## compile the seek phrase into a pattern:
-                    seek_ptn = sre.compile(r'(?<!\/)\b(' + \
-                                           sre.escape(seek_phrase) + \
-                                           r')[^A-Z0-9]', sre.UNICODE)
+                    seek_ptn = re.compile(r'(?<!\/)\b(' + \
+                                           re.escape(seek_phrase) + \
+                                           r')[^A-Z0-9]', re.UNICODE)
                     if not kb.has_key(seek_phrase):
                         kb[seek_phrase] = seek_ptn
                         standardised_titles[seek_phrase] = \
@@ -1349,17 +1349,17 @@ def build_titles_knowledge_base(fpath):
         ## not already in the KB as a "search term", add it:
         for repl_term in repl_terms.keys():
             raw_repl_phrase = repl_term.upper()
-            raw_repl_phrase = sre_punctuation.sub(u' ', raw_repl_phrase)
+            raw_repl_phrase = re_punctuation.sub(u' ', raw_repl_phrase)
             raw_repl_phrase = \
-                 sre_group_captured_multiple_space.sub(u' ', \
+                 re_group_captured_multiple_space.sub(u' ', \
                                                        raw_repl_phrase)
             raw_repl_phrase = raw_repl_phrase.strip()
             if not kb.has_key(raw_repl_phrase):
                 ## The replace-phrase was not in the KB as a seek phrase
                 ## It should be added.
-                seek_ptn = sre.compile(r'(?<!\/)\b(' + \
-                                       sre.escape(raw_repl_phrase) + \
-                                       r')[^A-Z0-9]', sre.UNICODE)
+                seek_ptn = re.compile(r'(?<!\/)\b(' + \
+                                       re.escape(raw_repl_phrase) + \
+                                       r')[^A-Z0-9]', re.UNICODE)
                 kb[raw_repl_phrase] = seek_ptn
                 standardised_titles[raw_repl_phrase] = \
                                                  repl_term
@@ -1406,16 +1406,16 @@ def standardize_and_markup_numeration_of_citations_in_line(line):
        @return: (string) the reference line after numeration has been checked
         and possibly recognized/marked-up.
     """
-    line = sre_strip_series_and_volume_labels[0].sub(sre_strip_series_and_volume_labels[1], line)
-    line = sre_numeration_vol_nucphys_page_yr[0].sub(sre_numeration_vol_nucphys_page_yr[1], line)
-    line = sre_numeration_nucphys_vol_page_yr[0].sub(sre_numeration_nucphys_vol_page_yr[1], line)
-    line = sre_numeration_vol_nucphys_yr_page[0].sub(sre_numeration_vol_nucphys_yr_page[1], line)
-    line = sre_numeration_nucphys_vol_yr_page[0].sub(sre_numeration_nucphys_vol_yr_page[1], line)
-    line = sre_numeration_vol_series_nucphys_yr_page[0].sub(sre_numeration_vol_series_nucphys_yr_page[1], line)
-    line = sre_numeration_vol_nucphys_series_yr_page[0].sub(sre_numeration_vol_nucphys_series_yr_page[1], line)
-    line = sre_numeration_vol_series_nucphys_page_yr[0].sub(sre_numeration_vol_series_nucphys_page_yr[1], line)
-    line = sre_numeration_vol_nucphys_series_page_yr[0].sub(sre_numeration_vol_nucphys_series_page_yr[1], line)
-    line = sre_numeration_yr_vol_page[0].sub(sre_numeration_yr_vol_page[1], \
+    line = re_strip_series_and_volume_labels[0].sub(re_strip_series_and_volume_labels[1], line)
+    line = re_numeration_vol_nucphys_page_yr[0].sub(re_numeration_vol_nucphys_page_yr[1], line)
+    line = re_numeration_nucphys_vol_page_yr[0].sub(re_numeration_nucphys_vol_page_yr[1], line)
+    line = re_numeration_vol_nucphys_yr_page[0].sub(re_numeration_vol_nucphys_yr_page[1], line)
+    line = re_numeration_nucphys_vol_yr_page[0].sub(re_numeration_nucphys_vol_yr_page[1], line)
+    line = re_numeration_vol_series_nucphys_yr_page[0].sub(re_numeration_vol_series_nucphys_yr_page[1], line)
+    line = re_numeration_vol_nucphys_series_yr_page[0].sub(re_numeration_vol_nucphys_series_yr_page[1], line)
+    line = re_numeration_vol_series_nucphys_page_yr[0].sub(re_numeration_vol_series_nucphys_page_yr[1], line)
+    line = re_numeration_vol_nucphys_series_page_yr[0].sub(re_numeration_vol_nucphys_series_page_yr[1], line)
+    line = re_numeration_yr_vol_page[0].sub(re_numeration_yr_vol_page[1], \
                                              line)
     return line
 
@@ -1478,7 +1478,7 @@ def identify_preprint_report_numbers(line,
             numeration_match = repnum_match.group('numn')
             ## clean/standardise this numeration text:
             numeration_match = numeration_match.replace(" ", "-")
-            numeration_match = sre_multiple_hyphens.sub("-", numeration_match)
+            numeration_match = re_multiple_hyphens.sub("-", numeration_match)
             numeration_match = numeration_match.replace("/-", "/")
             numeration_match = numeration_match.replace("-/", "/")
             numeration_match = numeration_match.replace("-/-", "/")
@@ -1549,7 +1549,7 @@ def identify_and_tag_URLs(line):
     identified_urls = []
 
     ## Attempt to identify and tag all HTML-MARKED-UP URLs in the line:
-    m_tagged_url_iter = sre_html_tagged_url.finditer(line)
+    m_tagged_url_iter = re_html_tagged_url.finditer(line)
     for m_tagged_url in m_tagged_url_iter:
         startposn = m_tagged_url.start()       ## start position of matched URL
         endposn   = m_tagged_url.end()         ## end position of matched URL
@@ -1565,7 +1565,7 @@ def identify_and_tag_URLs(line):
 
     ## Attempt to identify and tag all RAW (i.e. not
     ## HTML-marked-up) URLs in the line:
-    m_raw_url_iter = sre_raw_url.finditer(line)
+    m_raw_url_iter = re_raw_url.finditer(line)
     for m_raw_url in m_raw_url_iter:
         startposn = m_raw_url.start()       ## start position of matched URL
         endposn   = m_raw_url.end()         ## end position of matched URL
@@ -1693,7 +1693,7 @@ def identify_ibids(line):
     """
     ibid_match_len = {}
     ibid_match_txt = {}
-    ibid_matches_iter = sre_ibid.finditer(line)
+    ibid_matches_iter = re_ibid.finditer(line)
     ## Record details of each matched ibid:
     for m_ibid in ibid_matches_iter:
         ibid_match_len[m_ibid.start()] = len(m_ibid.group(2))
@@ -2333,7 +2333,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
     ## into MARC XML segments:
     cur_misc_txt = u""  ## a marker to hold gathered miscellaneous text before
                         ## a citation
-    tag_match = sre_tagged_citation.search(processed_line)
+    tag_match = re_tagged_citation.search(processed_line)
     while tag_match is not None:
         ## found a tag - process it:
         tag_match_start = tag_match.start()
@@ -2362,7 +2362,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_TITLE):]
 
                 ## Was this title followed by the tags of recognised VOLUME, YEAR and PAGE objects?
-                numeration_match = sre_recognised_numeration_for_title.match(processed_line)
+                numeration_match = re_recognised_numeration_for_title.match(processed_line)
                 if numeration_match is not None:
                     ## recognised numeration immediately after the title - extract it:
                     reference_volume = numeration_match.group(2)
@@ -2463,7 +2463,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## <cds.YR>(1998)</cds.YR> <cds.PG>2391</cds.PG>;
                     ## : <cds.VOL>32</cds.VOL> <cds.YR>(1999)</cds.YR>
                     ## <cds.PG>6119</cds.PG>.   title_text_for_ibid
-                    numeration_match = sre_numeration_no_ibid_txt.match(processed_line)
+                    numeration_match = re_numeration_no_ibid_txt.match(processed_line)
                     while numeration_match is not None:
                         reference_volume = numeration_match.group(3)
                         reference_year   = numeration_match.group(4)
@@ -2527,7 +2527,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                             ## previously cited item was a REPORT NUMBER.
                             ## ****NOTE: This should NEVER happen when we have
                             ## just matched a TITLE.****
-                            
+
                             ## Add previously cited REPORT NUMBER to XML string:
                             prev_report_num = previously_cited_item['report_num']
                             prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
@@ -2562,7 +2562,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
 
                         ## Look again for another following IBID numeration
                         ## match (without the word "IBID"):
-                        numeration_match = sre_numeration_no_ibid_txt.match(\
+                        numeration_match = re_numeration_no_ibid_txt.match(\
                             processed_line)
                     title_text_for_ibid = ""
 
@@ -2752,7 +2752,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             processed_line = processed_line[tag_match.end():]
 
         ## Look for the next tag in the processed line:
-        tag_match = sre_tagged_citation.search(processed_line)
+        tag_match = re_tagged_citation.search(processed_line)
 
     ## If a previously cited item remains, convert it into MARC XML:
     if previously_cited_item is not None:
@@ -2804,7 +2804,7 @@ def move_tagged_series_into_tagged_title(line):
         into the title tags.
     """
     ## Seek a marked-up series occurrence in line:
-    m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
+    m_tagged_series = re_title_followed_by_series_markup_tags.search(line)
     while m_tagged_series is not None:
         ## tagged series found in line - try to remove it and put it into the title:
         entire_match = m_tagged_series.group(0) ## the entire match (e.g.<cds.TITLE>xxxxx</cds.TITLE> <cds.SER>A</cds.SER>)
@@ -2822,16 +2822,16 @@ def move_tagged_series_into_tagged_title(line):
             ## Add a full-stop followed by a space, then the series letter:
             corrected_title_text += ". %s" % series_match
 
-        line = sre.sub("%s" % sre.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
-        m_tagged_series = sre_title_followed_by_series_markup_tags.search(line)
+        line = re.sub("%s" % re.escape(entire_match), "<cds.TITLE>%s</cds.TITLE>" % corrected_title_text, line, 1)
+        m_tagged_series = re_title_followed_by_series_markup_tags.search(line)
     return line
 
 def _re_identify_numeration(line):
     """Look for other numeration in line.
     """
     ## First, attempt to use marked-up titles
-    line = sre_correct_numeration_2nd_try_ptn1[0].sub(sre_correct_numeration_2nd_try_ptn1[1], line)
-    line = sre_correct_numeration_2nd_try_ptn2[0].sub(sre_correct_numeration_2nd_try_ptn2[1], line)
+    line = re_correct_numeration_2nd_try_ptn1[0].sub(re_correct_numeration_2nd_try_ptn1[1], line)
+    line = re_correct_numeration_2nd_try_ptn2[0].sub(re_correct_numeration_2nd_try_ptn2[1], line)
     return line
 
 def add_tagged_report_number(reading_line,
@@ -2858,7 +2858,7 @@ def add_tagged_report_number(reading_line,
     """
     rebuilt_line = u""  ## The segment of the line that's being rebuilt to
                         ## include the tagged & standardised REPORT-NUMBER
-    
+
     ## Fill rebuilt_line with the contents of the reading_line up to the point
     ## of the institutional REPORT-NUMBER. However, stop 1 character before the
     ## replacement index of this REPORT-NUMBER to allow for removal of braces,
@@ -2888,7 +2888,7 @@ def add_tagged_report_number(reading_line,
     except IndexError:
         ## moved past end of line - ignore
         pass
-    
+
     ## return the rebuilt-line segment and the pointer to the next position in
     ## the reading-line from  which to start rebuilding up to the next match:
     return (rebuilt_line, startpos)
@@ -2913,7 +2913,7 @@ def add_tagged_title_in_place_of_IBID(previous_match,
         ## had a series letter and that series letter differs to the one
         ## carried by this IBID, the series letter stored in the previous-match
         ## must be updated to that of this IBID:
-        m_previous_series = sre_title_series.search(previous_match)
+        m_previous_series = re_title_series.search(previous_match)
 
         if m_previous_series is not None:
             ## Previous match had a series:
@@ -2926,7 +2926,7 @@ def add_tagged_title_in_place_of_IBID(previous_match,
             else:
                 ## Previous match and this IBID do not have the same series
                 previous_match = \
-                      sre.sub("(\\.?)(,?) +%s$" % previous_series, \
+                      re.sub("(\\.?)(,?) +%s$" % previous_series, \
                               "\\g<1>\\g<2> %s" % ibid_series, \
                               previous_match)
                 rebuilt_line += " <cds.TITLE>%(previous-match)s</cds.TITLE>" \
@@ -2994,7 +2994,7 @@ def add_tagged_title(reading_line,
             ## A title has already been replaced in this line - IBID can be
             ## replaced meaninfully First, try to get the series number/letter
             ## of this IBID:
-            m_ibid = sre_matched_ibid.search(matched_title)
+            m_ibid = re_matched_ibid.search(matched_title)
             try:
                 series = m_ibid.group(1)
             except IndexError:
@@ -3160,7 +3160,7 @@ def create_marc_xml_reference_section(ref_sect,
 
         ## Now that numeration has been marked-up, check for and remove any
         ## ocurrences of " bf ":
-        working_line1 = sre_identify_bf_before_vol.sub(r" \1", working_line1)
+        working_line1 = re_identify_bf_before_vol.sub(r" \1", working_line1)
 
         ## Clean the line once more:
         working_line1 = wash_line(working_line1)
@@ -3169,7 +3169,7 @@ def create_marc_xml_reference_section(ref_sect,
         working_line2 = working_line1.upper()
 
         ## Strip punctuation from the line:
-        working_line2 = sre_punctuation.sub(u' ', working_line2)
+        working_line2 = re_punctuation.sub(u' ', working_line2)
 
         ## Remove multiple spaces from the line, recording
         ## information about their coordinates:
@@ -3304,7 +3304,7 @@ def check_boundary_lines_similar(l_1, l_2):
     if (type(l_1) != list) or (type(l_2) != list) or (len(l_1) != len(l_2)):
         ## these 'boundaries' are not similar
         return 0
-    
+
     num_elements = len(l_1)
     for i in xrange(0, num_elements):
         if l_1[i].isdigit() and l_2[i].isdigit():
@@ -3334,7 +3334,7 @@ def get_number_header_lines(docbody, page_break_posns):
     remaining_breaks = (len(page_break_posns) - 1)
     num_header_lines = empty_line = 0
     ## pattern to search for a word in a line:
-    p_wordSearch = sre.compile(unicode(r'([A-Za-z0-9-]+)'), sre.UNICODE)
+    p_wordSearch = re.compile(unicode(r'([A-Za-z0-9-]+)'), re.UNICODE)
     if remaining_breaks > 2:
         if remaining_breaks > 3:
             # Only check odd page headers
@@ -3349,13 +3349,13 @@ def get_number_header_lines(docbody, page_break_posns):
                         + num_header_lines + 1)].isspace():
                 ## this is a blank line
                 empty_line = 1
-            
+
             if (page_break_posns[cur_break] + num_header_lines + 1) \
                    == (page_break_posns[(cur_break + 1)]):
                 ## Have reached next page-break: document has no
                 ## body - only head/footers!
                 keep_checking = 0
-            
+
             grps_headLineWords = \
                 p_wordSearch.findall(docbody[(page_break_posns[cur_break] \
                                               + num_header_lines + 1)])
@@ -3400,7 +3400,7 @@ def get_number_footer_lines(docbody, page_break_posns):
     num_footer_lines = 0
     empty_line = 0
     keep_checking = 1
-    p_wordSearch = sre.compile(unicode(r'([A-Za-z0-9-]+)'), sre.UNICODE)
+    p_wordSearch = re.compile(unicode(r'([A-Za-z0-9-]+)'), re.UNICODE)
     if num_breaks > 2:
         while keep_checking:
             cur_break = 1
@@ -3446,7 +3446,7 @@ def get_page_break_positions(docbody):
         position (in the document body) of a page-break.
     """
     page_break_posns = []
-    p_break = sre.compile(unicode(r'^\s*?\f\s*?$'), sre.UNICODE)
+    p_break = re.compile(unicode(r'^\s*?\f\s*?$'), re.UNICODE)
     num_document_lines = len(docbody)
     for i in xrange(num_document_lines):
         if p_break.match(docbody[i]) != None:
@@ -3484,10 +3484,10 @@ def remove_page_boundary_lines(docbody):
         ## document contains only whitespace - cannot safely
         ## strip headers/footers
         return docbody
-    
+
     ## Get list of index posns of pagebreaks in document:
     page_break_posns = get_page_break_positions(docbody)
-    
+
     ## Get num lines making up each header if poss:
     number_head_lines = get_number_header_lines(docbody, page_break_posns)
 
@@ -3546,9 +3546,9 @@ def get_reference_section_title_patterns():
     for t in titles:
         if len(t) > 0:
             ## don't append empty titles:
-            t_ptn = sre.compile(sect_marker + \
+            t_ptn = re.compile(sect_marker + \
                                 _create_regex_pattern_add_optional_spaces_to_word_characters(t) + \
-                                line_end, sre.I|sre.UNICODE)
+                                line_end, re.I|re.UNICODE)
             patterns.append(t_ptn)
     return patterns
 
@@ -3581,7 +3581,7 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
         space + title + g_name + unicode(r'\[\s*?\]') + g_close,
         space + title + g_name + unicode(r'\*') + g_close ]
     for p in patterns:
-        compiled_ptns.append(sre.compile(p, sre.I|sre.UNICODE))
+        compiled_ptns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_ptns
 
 def get_first_reference_line_numeration_marker_patterns():
@@ -3599,7 +3599,7 @@ def get_first_reference_line_numeration_marker_patterns():
         g_name + unicode(r'(?P<left>\{)\s*?(?P<num>\d+)\s*?(?P<right>\})') \
           + g_close ]
     for p in patterns:
-        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
 def get_post_reference_section_title_patterns():
@@ -3629,7 +3629,7 @@ def get_post_reference_section_title_patterns():
                  r'^\s*?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'tab') + unicode(r'\.\s*?') + numatn,
                  r'^\s*?' + _create_regex_pattern_add_optional_spaces_to_word_characters(u'tab') + unicode(r'\.?\s*?\d\w?\b') ]
     for p in patterns:
-        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
 def get_post_reference_section_keyword_patterns():
@@ -3648,25 +3648,25 @@ def get_post_reference_section_keyword_patterns():
                                  _create_regex_pattern_add_optional_spaces_to_word_characters(u'This article was processed by the author using Springer-Verlag') + \
                                  u' LATEX' ]
     for p in patterns:
-        compiled_patterns.append(sre.compile(p, sre.I|sre.UNICODE))
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
 def perform_regex_match_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "sre.match" operation
+    """Given a list of COMPILED regex patters, perform the "re.match" operation
        on the line for every pattern.
        Break from searching at the first match, returning the match object.
        In the case that no patterns match, the None type will be returned.
        @param line: (unicode string) to be searched in.
        @param patterns: (list) of compiled regex patterns to search  "line"
         with.
-       @return: (None or an sre.match object), depending upon whether one of
+       @return: (None or an re.match object), depending upon whether one of
         the patterns matched within line or not.
     """
     if type(patterns) not in (list, tuple):
         raise TypeError()
     if type(line) not in (str, unicode):
         raise TypeError()
-    
+
     m = None
     for ptn in patterns:
         m = ptn.match(line)
@@ -3675,20 +3675,20 @@ def perform_regex_match_upon_line_with_pattern_list(line, patterns):
     return m
 
 def perform_regex_search_upon_line_with_pattern_list(line, patterns):
-    """Given a list of COMPILED regex patters, perform the "sre.search"
+    """Given a list of COMPILED regex patters, perform the "re.search"
        operation on the line for every pattern. Break from searching at the
        first match, returning the match object.  In the case that no patterns
        match, the None type will be returned.
        @param line: (unicode string) to be searched in.
        @param patterns: (list) of compiled regex patterns to search "line" with.
-       @return: (None or an sre.match object), depending upon whether one of the
+       @return: (None or an re.match object), depending upon whether one of the
         patterns matched within line or not.
     """
     if type(patterns) not in (list, tuple):
         raise TypeError()
     if type(line) not in (str, unicode):
         raise TypeError()
-    
+
     m = None
     for ptn in patterns:
         m = ptn.search(line)
@@ -3724,8 +3724,8 @@ def find_reference_section(docbody):
     if len(docbody) > 0:
         title_patterns = get_reference_section_title_patterns()
         marker_patterns = get_reference_line_numeration_marker_patterns()
-        p_num = sre.compile(unicode(r'(\d+)'))
-        
+        p_num = re.compile(unicode(r'(\d+)'))
+
         ## Try to find refs section title:
         x = len(docbody) - 1
         found_title = 0
@@ -3925,9 +3925,9 @@ def find_end_of_reference_section(docbody,
     ## Get patterns for testing line:
     t_patterns = get_post_reference_section_title_patterns()
     kw_patterns = get_post_reference_section_keyword_patterns()
-    
+
     if None not in (ref_line_marker, ref_line_marker_ptn):
-        mk_patterns = [sre.compile(ref_line_marker_ptn, sre.I|sre.UNICODE)]
+        mk_patterns = [re.compile(ref_line_marker_ptn, re.I|re.UNICODE)]
     else:
         mk_patterns = get_reference_line_numeration_marker_patterns()
 
@@ -4043,7 +4043,7 @@ def remove_leading_garbage_lines_from_reference_section(ref_sectn):
        @return: (list) of strings - the reference section without leading
         blank lines or email addresses.
     """
-    p_email = sre.compile(unicode(r'^\s*e\-?mail'), sre.UNICODE)
+    p_email = re.compile(unicode(r'^\s*e\-?mail'), re.UNICODE)
     while (len(ref_sectn) > 0) and (ref_sectn[0].isspace() or \
                                     p_email.match(ref_sectn[0]) is not None):
         ref_sectn[0:1] = []
@@ -4112,7 +4112,7 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
     ## [2] Brown, N blah blah see reference [56] for more info
     ## [3] Wills, A blah blah
     ## ...
-    
+
     ## first line is correct, to put it into fixed:
     fixed.append(rebuilt_lines[0])
     for x in xrange(1, len(rebuilt_lines)):
@@ -4159,7 +4159,7 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         ##
                         ## as that would be unsafe.
                         m_test_nxt_mark_not_eol = \
-                          sre.search(sre.escape(m_next_mark.group()) \
+                          re.search(re.escape(m_next_mark.group()) \
                                      + '\s*[A-Za-z]', current_line)
                         if m_test_nxt_mark_not_eol is not None:
                             ## move this section back to its real line:
@@ -4222,7 +4222,7 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         current_line = current_line[m_next_mark.end():]
 
 
-                        
+
                     ## Get next match:
                     m_next_mark = p_refmarker.search(current_line)
 
@@ -4254,7 +4254,7 @@ def wash_and_repair_reference_line(line):
     line = replace_undesirable_characters(line)
     ## remove instances of multiple spaces from line, replacing with a
     ## single space:
-    line = sre_multiple_space.sub(u' ', line)
+    line = re_multiple_space.sub(u' ', line)
     return line
 
 def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
@@ -4288,7 +4288,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
     working_line = u''
 
     len_ref_sectn = len(ref_sectn)
-    
+
     if ref_line_marker_ptn is None or \
            type(ref_line_marker_ptn) not in (str, unicode):
         if test_for_blank_lines_separating_reference_lines(ref_sectn):
@@ -4297,7 +4297,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
         else:
             ## No ref line dividers: unmatchable pattern
             ref_line_marker_ptn = unicode(r'^A$^A$$')
-    p_ref_line_marker = sre.compile(ref_line_marker_ptn, sre.I|sre.UNICODE)
+    p_ref_line_marker = re.compile(ref_line_marker_ptn, re.I|re.UNICODE)
 
     for x in xrange(len_ref_sectn - 1, -1, -1):
         current_string = ref_sectn[x].strip()
@@ -4335,7 +4335,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
                     ## no space or hyphenated word at the end of this
                     ## line - add in a space
                     working_line = current_string + u' ' + working_line
-    
+
     if working_line != u'':
         ## Append last line
         working_line = working_line.rstrip()
@@ -4467,9 +4467,9 @@ def _pdftotext_conversion_is_bad(txtlines):
     ## Numbers of 'words' and 'whitespaces' found in document:
     numWords = numSpaces = 0
     ## whitespace character pattern:
-    p_space = sre.compile(unicode(r'(\s)'), sre.UNICODE)
+    p_space = re.compile(unicode(r'(\s)'), re.UNICODE)
     ## non-whitespace 'word' pattern:
-    p_noSpace = sre.compile(unicode(r'(\S+)'), sre.UNICODE)
+    p_noSpace = re.compile(unicode(r'(\S+)'), re.UNICODE)
     for txtline in txtlines:
         numWords = numWords + len(p_noSpace.findall(txtline))
         numSpaces = numSpaces + len(p_space.findall(txtline))
@@ -4492,7 +4492,7 @@ def convert_PDF_to_plaintext(fpath):
     ## If this pattern is matched, we want to split the page-break into
     ## its own line because we rely upon this for trying to strip headers
     ## and footers, and for some other pattern matching.
-    p_break_in_line = sre.compile(unicode(r'^\s*?(\f)(?!$)(.*?)$'), sre.UNICODE)
+    p_break_in_line = re.compile(unicode(r'^\s*?(\f)(?!$)(.*?)$'), re.UNICODE)
     ## build pdftotext command:
     cmd_pdftotext = """%(pdftotext)s -raw -q -enc UTF-8 '%(filepath)s' -""" \
                     % { 'pdftotext' : CFG_PATH_PDFTOTEXT,
@@ -4550,7 +4550,7 @@ def get_plaintext_document_body(fpath):
                         % (CFG_PATH_GFILE, fpath.replace("'", "\\'")), "r")
         res_gfile = pipe_gfile.readline()
         pipe_gfile.close()
-        
+
         if res_gfile.lower().find("text") != -1 and \
            res_gfile.lower().find("pdf") == -1:
             ## plain-text file: don't convert - just read in:
@@ -4610,13 +4610,13 @@ def usage(wmsg="", err_code=0):
   refextract tries to extract the reference section from a full-text document.
   Extracted reference lines are processed and any recognised citations are
   marked up using MARC XML. Results are output to the standard output stream.
-  
-  Options: 
+
+  Options:
    -h, --help     print this help
    -V, --version  print version information
    -v, --verbose  verbosity level (0=mute, 1=default info msg,
 		  2=display reference section extraction analysis,
-                  3=display reference line citation processing analysis, 
+                  3=display reference line citation processing analysis,
 		  9=max information)
    -r, --output-raw-refs
                   output raw references, as extracted from the document.

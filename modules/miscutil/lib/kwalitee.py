@@ -30,7 +30,7 @@ Examples:
 """
 
 import os
-import sre
+import re
 import sys
 import time
 
@@ -129,7 +129,7 @@ def get_pylint_results(filename):
     
     # detect pylint score:
     pylint_score = -999999999
-    pylint_score_matched = sre.search(r'Your code has been rated at ([0-9\.\-]+)\/10', pylint_output)
+    pylint_score_matched = re.search(r'Your code has been rated at ([0-9\.\-]+)\/10', pylint_output)
     if pylint_score_matched:
         pylint_score = pylint_score_matched.group(1)
     else:

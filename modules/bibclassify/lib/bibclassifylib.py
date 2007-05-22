@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import getopt
 import string
 import os
-import sre
+import re
 import sys
 import time
 
@@ -212,7 +212,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 regex = True
                 pattern = makePattern(candidate, 3)                
                 wildcard = pattern
-                hideOUT += len(sre.findall(pattern,text_string))
+                hideOUT += len(re.findall(pattern,text_string))
                 # print "HIDEOUT: " + str(candidate) + " " + str(hideOUT)
 
         for candidate in candidates:
@@ -222,7 +222,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 # We have already taken care of this
                 continue
             
-            elif regex and candidate.find("/", 0, 1) == -1 and len(sre.findall(wildcard," " + candidate + " ")) > 0:
+            elif regex and candidate.find("/", 0, 1) == -1 and len(re.findall(wildcard," " + candidate + " ")) > 0:
                 # The wildcard in hiddenLabel matches this candidate: skip it
                 # print "\ncase 2 touched\n"
                 continue
@@ -241,14 +241,14 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
             if len(candidate) < 3:
                 # We have a short keyword
-                if len(sre.findall(pattern,abstract))> 0:
+                if len(re.findall(pattern,abstract))> 0:
                     # The short keyword appears in the abstract/title, retain it
-                    dictOUT += len(sre.findall(pattern,text_string))
-                    safeOUT += len(sre.findall(pattern,safe_keys))
+                    dictOUT += len(re.findall(pattern,text_string))
+                    safeOUT += len(re.findall(pattern,safe_keys))
 
             else:
-                dictOUT += len(sre.findall(pattern,text_string))
-                safeOUT += len(sre.findall(pattern,safe_keys))
+                dictOUT += len(re.findall(pattern,text_string))
+                safeOUT += len(re.findall(pattern,safe_keys))
 
         dictOUT += hideOUT
 
@@ -350,14 +350,14 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                         phrases.append([phrase1, patterns[0]])
                         phrases.append([phrase2, patterns[1]])
 
-                    THIScomp = len(sre.findall(patterns[0],text_string)) + len(sre.findall(patterns[1],text_string))
+                    THIScomp = len(re.findall(patterns[0],text_string)) + len(re.findall(patterns[1],text_string))
                     compOUT += THIScomp
 
             if len(wildcards)>0:
                 for wild in wildcards:
                     for phrase in phrases:
-                        if len(sre.findall(wild," " + phrase[0] + " ")) > 0:
-                            compOUT = compOUT - len(sre.findall(phrase[1],text_string))
+                        if len(re.findall(wild," " + phrase[0] + " ")) > 0:
+                            compOUT = compOUT - len(re.findall(phrase[1],text_string))
 
             # Add extra results due to altLabels, calculated in the first part
             if ckwlist.get(s_CompositeOf, 0) > 0:
@@ -542,10 +542,10 @@ def makeCompPattern(candidates, modes):
     for i in range(2):
 
         if modes[i] == 0:
-            pattern_text.append(str(sre.escape(candidates[i]) + 's?'))
+            pattern_text.append(str(re.escape(candidates[i]) + 's?'))
 
         if modes[i] == 1:
-            pattern_text.append(str(sre.escape(candidates[i])))
+            pattern_text.append(str(re.escape(candidates[i])))
 
         if modes[i] == 2:
             hyphen = True
@@ -555,17 +555,17 @@ def makeCompPattern(candidates, modes):
                 if len(part)<1 or part.find(" ", 0, 1)> -1:
                     # This is not really a hyphen, maybe a minus sign: treat as isupper().
                     hyphen = False
-                pattern_string = pattern_string + sre.escape(part) + "[- \t]?"
+                pattern_string = pattern_string + re.escape(part) + "[- \t]?"
             if hyphen:
                 pattern_text.append(pattern_string)
             else:
-                pattern_text.append(sre.escape(candidates[i]))
+                pattern_text.append(re.escape(candidates[i]))
 
         if modes[i] == 3:
             pattern_text.append(candidates[i].replace("/","")) 
 
-    pattern_one = sre.compile(begREGEX + pattern_text[0] + "s?[ \s,-]*" + pattern_text[1] + endREGEX, sre.I)
-    pattern_two = sre.compile(begREGEX + pattern_text[1] + "s?[ \s,-]*" + pattern_text[0] + endREGEX, sre.I)
+    pattern_one = re.compile(begREGEX + pattern_text[0] + "s?[ \s,-]*" + pattern_text[1] + endREGEX, re.I)
+    pattern_two = re.compile(begREGEX + pattern_text[1] + "s?[ \s,-]*" + pattern_text[0] + endREGEX, re.I)
 
     patterns.append(pattern_one)
     patterns.append(pattern_two)
@@ -589,10 +589,10 @@ def makePattern(candidate, mode):
     endREGEX = ')(?=[^A-Za-z0-9\+-])'
     try:
         if mode == 0:
-            pattern = sre.compile(begREGEX + sre.escape(candidate) + 's?' + endREGEX, sre.I)
+            pattern = re.compile(begREGEX + re.escape(candidate) + 's?' + endREGEX, re.I)
 
         if mode == 1:
-            pattern = sre.compile(begREGEX + sre.escape(candidate) + endREGEX)
+            pattern = re.compile(begREGEX + re.escape(candidate) + endREGEX)
 
         if mode == 2:
             hyphen = True
@@ -602,18 +602,18 @@ def makePattern(candidate, mode):
                 if len(part)<1 or part.find(" ", 0, 1)> -1:
                     # This is not really a hyphen, maybe a minus sign: treat as isupper().
                     hyphen = False
-                pattern_string = pattern_string + sre.escape(part) + "[- \t]?"
+                pattern_string = pattern_string + re.escape(part) + "[- \t]?"
             pattern_string += endREGEX
             if hyphen:
-                pattern = sre.compile(pattern_string, sre.I)
+                pattern = re.compile(pattern_string, re.I)
             else:
-                pattern = sre.compile(begREGEX + sre.escape(candidate) + endREGEX, sre.I)
+                pattern = re.compile(begREGEX + re.escape(candidate) + endREGEX, re.I)
 
         if mode == 3:
-            pattern = sre.compile(begREGEX + candidate.replace("/","") + endREGEX, sre.I) 
+            pattern = re.compile(begREGEX + candidate.replace("/","") + endREGEX, re.I) 
 
     except:
-        print "Invalid thesaurus term: " + sre.escape(candidate) + "<br>"
+        print "Invalid thesaurus term: " + re.escape(candidate) + "<br>"
 
     return pattern
 

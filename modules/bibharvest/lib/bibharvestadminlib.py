@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,7 +29,6 @@ import ConfigParser
 import time
 import random
 import urllib
-import sre
 
 from httplib import InvalidURL
 from invenio.config import \
@@ -76,13 +75,13 @@ dates = [[0, "from beginning"], [1, "from today"]]
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
-    return bibharvest_templates.tmpl_getnavtrail(previous = previous, ln = cdslang)    
+    return bibharvest_templates.tmpl_getnavtrail(previous = previous, ln = cdslang)
 
 def perform_request_index(ln=cdslang):
     """start area for administering harvesting from OAI repositories"""
 
-    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "Overview of sources", guideurl = guideurl, extraname = "add new OAI source" , extraurl = "admin/bibharvest/bibharvestadmin.py/addsource" ) 
-    titlebar2 = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "Harvesting status", guideurl = guideurl) 
+    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "Overview of sources", guideurl = guideurl, extraname = "add new OAI source" , extraurl = "admin/bibharvest/bibharvestadmin.py/addsource" )
+    titlebar2 = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "Harvesting status", guideurl = guideurl)
     header = ['name', 'baseURL', 'metadataprefix', 'frequency', 'bibconvertfile', 'postprocess', 'actions']
     header2 = ['name', 'last update']
     oai_src = get_oai_src()
@@ -91,7 +90,7 @@ def perform_request_index(ln=cdslang):
     sources = []
     for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post,oai_src_bibfilter,oai_src_setspecs) in oai_src:
         namelinked_args = []
-        namelinked_args.append(["oai_src_id", str(oai_src_id)]) 
+        namelinked_args.append(["oai_src_id", str(oai_src_id)])
         namelinked_args.append(["ln", ln])
         namelinked = bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = oai_src_name, args = namelinked_args)
         freq = "Not Set"
@@ -109,21 +108,21 @@ def perform_request_index(ln=cdslang):
         if not upd_status:
             upd_status =  bibharvest_templates.tmpl_print_warning(cdslang, "Never harvested")
         else: #cut away leading zeros
-            upd_status = sre.sub(r'\.[0-9]+$', '', str(upd_status))
+            upd_status = re.sub(r'\.[0-9]+$', '', str(upd_status))
         updates.append([upd_name, upd_status])
 
     (schtime, schstatus) = get_next_schedule()
     if schtime:
-        schtime = sre.sub(r'\.[0-9]+$', '', str(schtime))
+        schtime = re.sub(r'\.[0-9]+$', '', str(schtime))
 
-    output = titlebar 
+    output = titlebar
     output += bibharvest_templates.tmpl_output_numbersources(cdslang, get_tot_oai_src())
     output += tupletotable(header=header, tuple=sources)
     output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
     output += titlebar2
     output += bibharvest_templates.tmpl_output_schedule(cdslang, schtime, str(schstatus))
     output += tupletotable(header=header2, tuple=updates)
-    
+
     return output
 
 def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=cdslang, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
@@ -135,7 +134,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
 
     output  = ""
     subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = cdslang, weburl = weburl, title = "edit source", subtitle = "Edit OAI source", guideurl = guideurl)
-    
+
     if confirm in [-1, "-1"]:
         oai_src = get_oai_src(oai_src_id)
         oai_src_name = oai_src[0][1]
@@ -146,11 +145,11 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         oai_src_post = oai_src[0][6]
         oai_src_sets = oai_src[0][7].split()
         oai_src_bibfilter = oai_src[0][8]
-        
+
     text = bibharvest_templates.tmpl_print_brs(cdslang, 1)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Source name", name = "oai_src_name", value = oai_src_name)
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Base URL", name = "oai_src_baseurl", value = oai_src_baseurl)
-    
+
     sets = findSets(oai_src_baseurl)
     if sets:
         # Show available sets to users
@@ -171,7 +170,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
                                                           title = "Sets",
                                                           name='oai_src_sets',
                                                           value=' '.join(oai_src_sets))
-    
+
     text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
     text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
@@ -187,18 +186,18 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
                                 confirm=1)
 
     if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a name for the source.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a name for the source.")
     elif confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a metadata prefix.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a metadata prefix.")
     elif confirm in [1, "1"] and not oai_src_baseurl:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a base url.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a base url.")
     elif confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting")
     elif confirm in [1, "1"] and not oai_src_post:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode")
     elif confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
-        output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.") 
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.")
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
     elif oai_src_id > -1 and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
@@ -269,7 +268,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                                               title="Metadata prefix",
                                                               name="oai_src_prefix",
                                                               value=oai_src_prefix)
-            
+
         sets = findSets(oai_src_baseurl)
         if sets:
             # Show available sets to users
@@ -291,7 +290,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                                               title = "Sets",
                                                               name='oai_src_sets',
                                                               value=' '.join(oai_src_sets))
-            
+
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
         text += bibharvest_templates.tmpl_admin_w200_select(ln = cdslang, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
@@ -299,7 +298,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         text += bibharvest_templates.tmpl_admin_w200_text(ln = cdslang, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
         text += bibharvest_templates.tmpl_print_brs(cdslang, 2)
 
-        
+
         output += createhiddenform(action="addsource#1",
                                    text=text,
                                    button="Add OAI Source",
@@ -341,30 +340,30 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
 
     if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a name for the source.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a name for the source.")
     if confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a metadata prefix.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a metadata prefix.")
     if confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a frequency of harvesting")
     if confirm in [1, "1"] and not oai_src_lastrun:
         output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose the harvesting starting date")
     if confirm in [1, "1"] and not oai_src_post:
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please choose a postprocess mode")
     if confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
-        output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.") 
-        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.") 
+        output += bibharvest_templates.tmpl_print_info(cdslang, "You selected a postprocess mode which involves conversion.")
+        output += bibharvest_templates.tmpl_print_info(cdslang, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
     elif oai_src_name and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
         if not oai_src_lastrun:
-            oai_src_lastrun = 1        
+            oai_src_lastrun = 1
         if not oai_src_config:
             oai_src_config = "NULL"
         if not oai_src_post:
             oai_src_post = "h"
 
         res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
-        output += write_outcome(res) 
+        output += write_outcome(res)
 
         lnargs = [["ln", ln]]
         output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
@@ -380,7 +379,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
 
     output = ""
     subtitle = ""
-   
+
     if oai_src_id:
         oai_src = get_oai_src(oai_src_id)
         namesrc = (oai_src[0][1])
@@ -399,7 +398,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
                                        oai_src_id=oai_src_id,
                                        confirm=1)
             else:
-                return bibharvest_templates.tmpl_print_info(cdslang, "Source specified does not exist.") 
+                return bibharvest_templates.tmpl_print_info(cdslang, "Source specified does not exist.")
         elif confirm in ["1", 1]:
             res = delete_oai_src(oai_src_id)
             if res[0] == 1:
@@ -408,7 +407,7 @@ def perform_request_delsource(oai_src_id=None, ln=cdslang, callback='yes', confi
                 output += write_outcome(res)
             else:
                 output += write_outcome(res)
-                
+
     lnargs = [["ln", ln]]
     output += bibharvest_templates.tmpl_print_brs(cdslang, 2)
     output += bibharvest_templates.tmpl_link_with_args(ln = cdslang, weburl = weburl, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
@@ -436,7 +435,7 @@ def get_oai_src(oai_src_id=''):
 
 def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
     """Modifies a row's parameters"""
-    
+
     try:
         sql = "UPDATE oaiHARVEST SET name='%s' WHERE id=%s" % (escape_string(oai_src_name), oai_src_id)
         res = run_sql(sql)
@@ -470,7 +469,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
         return (1, "")
     except StandardError, e:
         return (0, e)
-    
+
 def delete_oai_src(oai_src_id):
     """Deletes a row from the database according to its id"""
     try:
@@ -508,7 +507,7 @@ def get_next_schedule():
             return ("", "")
     except StandardError, e:
         return ("","")
-    
+
 
 def validate(oai_src_baseurl):
     """This function validates a baseURL by opening its URL and 'greping' for the <OAI-PMH> and <Identify> tags:
@@ -573,7 +572,7 @@ def validatefile(oai_src_config):
                 return 0
         except StandardError, e:
             pass
-        
+
     # Try to read as complete path
     try:
         ftmp = open(oai_src_config, 'r')
