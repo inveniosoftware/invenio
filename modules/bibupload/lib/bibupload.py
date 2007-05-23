@@ -62,6 +62,7 @@ from zlib import compress
 import MySQLdb
 import re
 import urllib
+import shutil
 
 from invenio.config import CFG_OAI_ID_FIELD
 from invenio.bibupload_config import *
@@ -1166,7 +1167,7 @@ def insert_fft_tags(record, rec_id, cfg_bibupload_wget_sleep_time=1, cfg_bibuplo
                     # Move the file to the good directory
                     try:
                         dest = basedir + "/" + string.split(docpath,"/")[-1] + ";1"
-                        os.rename(docpath, dest )
+                        shutil.copy(docpath, dest )
                         write_message("   -Move the file %s to %s : DONE" % (docpath, dest), verbose=8)
                     except OSError, error:
                         write_message("   Error moving the file : %s " % error, verbose=1, stream=sys.stderr)
@@ -1349,7 +1350,7 @@ def update_fft_tag(record, rec_id,
                             time.sleep(cfg_bibupload_wget_sleep_time)
                             write_message("renaming from " + fname + " // to " + full_filename,
                                           verbose=1, stream=sys.stderr )
-                            os.rename( fname , full_filename)
+                            shutil.copy( fname , full_filename)
                             if file_exists_already:
                                 os.rename(fname + ".renamed_by_bibupload_fft", fname)
                         except OSError:
