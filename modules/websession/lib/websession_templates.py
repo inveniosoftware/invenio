@@ -38,6 +38,7 @@ from invenio.config import \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
+from invenio.urlutils import make_canonical_urlargd
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -56,11 +57,15 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return _("If you have lost password for your CDS Invenio internal account, then please enter your email address below and the lost password will be emailed to you.") +\
-               "<br /><br />" + \
-               _("Note that if you have been using an external login system (such as CERN NICE), then we cannot do anything and you have to ask there.") + " " + \
-               _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }) +\
-               "<br><br>"
+        out = "<p>" + _("If you have lost password for your CDS Invenio internal account, then please enter your email address below and the lost password will be emailed to you.") + "</p>"
+
+        if CFG_CERN_SITE:
+            out += "<p>" + _("Note that if you have been using the CERN login system, then you can recover your password through the %(x_url_open)sCERN authentication system%(x_url_close)s.") % {'x_url_open' : '<a href="https://cern.ch/lightweightregistration/ResetPassword.aspx%s">' \
+            % make_canonical_urlargd({'lf': 'auth', 'returnURL' : sweburl + '/youraccount/login?ln='+ln}, {}), 'x_url_close' : '</a>'} + " "
+        else:
+            out += "<p>" + _("Note that if you have been using an external login system, then we cannot do anything and you have to ask there.") + " "
+        out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }) + "</p>"
+        return out
 
     def tmpl_back_form(self, ln, message, act, link):
         """
@@ -723,12 +728,15 @@ class Template:
                     'please_login' : _("If you already have an account, please login using the form below.")
                 }
 
-            if register_available:
-                out += "<p>"+_("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
-                    {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
-                    'x_url_close': '</a>'} + "</p>"
+            if CFG_CERN_SITE:
+                out += "<p>" + _("If you don't own a CERN account yet, you can register a %(x_url_open)sNew CERN external account%(x_url_close)s.") % {'x_url_open' : '<a href="https://www.cern.ch/lightweightregistration/RegisterAccount.aspx">', 'x_url_close' : '</a>'} + "</p>"
             else:
-                out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) + "</p>"
+                if register_available:
+                    out += "<p>"+_("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\
+                        {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
+                        'x_url_close': '</a>'} + "</p>"
+                else:
+                    out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) + "</p>"
         else:
             out = "<p>%s</p>" % msg
         out += """<form method="post" action="../youraccount/login">
