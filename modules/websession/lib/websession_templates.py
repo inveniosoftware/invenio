@@ -252,6 +252,9 @@ class Template:
                     {'x_url_open' : \
                         '<a href="http://cern.ch/LightweightRegistration/ResetPassword.aspx%s">' \
                         % (make_canonical_urlargd({'email': email, 'returnurl' : sweburl + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})), 'x_url_close' : '</a>'} + "</p>"
+        elif CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
+            out += "<p>" + _("""You can change or reset your CERN account password by means of the %(x_url_open)sCERN account system%(x_url_close)s.""") % \
+                {'x_url_open' : '<a href="https://cern.ch/login/password.aspx">', 'x_url_close' : '</a>'} + "</p>"
         return out
 
 
