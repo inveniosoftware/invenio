@@ -26,15 +26,43 @@ __revision__ = \
 
 import httplib
 import socket
+import re
 
 from invenio.external_authentication import ExternalAuth, \
         WebAccessExternalAuthError
 
 
 # Tunable list of settings to be hidden
-CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS = ['auth', 'respccid', 'personid']
+CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS = ('auth', 'respccid', 'personid')
 # Tunable list of groups to be hidden
-CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = ['All Exchange People']
+CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
+    'All Exchange People',
+    'CERN Users',
+    'cern-computing-postmasters',
+    'cern-nice2000-postmasters',
+    'CMF FrontEnd Users',
+    'CMF_NSC_259_NSU',
+    'Domain Users',
+    'GP Apply Favorites Redirection',
+    'GP Apply NoAdmin',
+    'info-terminalservices',
+    'info-terminalservices-members',
+    'IT Web IT',
+    'NICE Deny Enforce Password-protected Screensaver',
+    'NICE Enforce Password-protected Screensaver',
+    'NICE LightWeight Authentication WS Users',
+    'NICE MyDocuments Redirection (New)',
+    'NICE Profile Redirection',
+    'NICE Terminal Services Users',
+    'NICE Users',
+    'NICE VPN Users',
+    )
+CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
+    re.compile(r'Users by Letter [A-Z]'),
+    re.compile(r'building-[\d]+'),
+    re.compile(r'Users by Home CERNHOME[A-Z]'),
+    )
+
 # Prefix name for Shibboleth variables
 CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME = 'HTTP_ADFS_'
 # Name of the variable containing groups
@@ -102,6 +130,10 @@ class ExternalAuthSSO(ExternalAuth):
                 groups = req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE].split(CFG_EXTERNAL_AUTH_SSO_GROUPS_SEPARATOR)
                 # Filtering out uncomfortable groups
                 groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
+                for regexp in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE:
+                    for group in groups:
+                        if regexp.match(group):
+                            groups.remove(group)
                 return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
                                 or x + ' (Group)'), groups))
         return {}
