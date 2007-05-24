@@ -86,8 +86,8 @@ if CFG_CERN_SITE:
         CFG_EXTERNAL_AUTHENTICATION = {"SSO" : (ea_sso.ExternalAuthSSO(), True)}
     else:
         import external_authentication_cern as ea_cern
-        CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True), \
-        "CERN": (ea_cern.ExternalAuthCern(), False)}
+        CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, False), \
+        "CERN": (ea_cern.ExternalAuthCern(), True)}
 
 
 
