@@ -246,6 +246,12 @@ class Template:
                     'password_disabled' : password_disabled and "disabled" or "",
                     'sweburl': sweburl,
                 }
+        elif not CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
+            out += "<p>" + _("""If you are using a lightweight CERN account you can
+                %(x_url_open)sreset the password%(x_url_close)s.""") % \
+                    {'x_url_open' : \
+                        '<a href="http://cern.ch/LightweightRegistration/ResetPassword.aspx%s">' \
+                        % (make_canonical_urlargd({'email': email, 'returnurl' : sweburl + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})), 'x_url_close' : '</a>'} + "</p>"
         return out
 
 
