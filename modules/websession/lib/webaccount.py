@@ -180,7 +180,7 @@ def perform_set(email,password, ln, verbose=0):
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
-    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and not CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][1]:
+    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][0]:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
     out = websession_templates.tmpl_user_preferences(
