@@ -83,7 +83,7 @@ if CFG_CERN_SITE:
         CFG_EXTERNAL_AUTH_USING_SSO = True
         # Link to reach in order to logout from SSO
         CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
-        CFG_EXTERNAL_AUTHENTICATION = {"SSO" : (ea_sso.ExternalAuthSSO(), True)}
+        CFG_EXTERNAL_AUTHENTICATION = {"CERN SSO" : (ea_sso.ExternalAuthSSO(), True)}
     else:
         import external_authentication_cern as ea_cern
         CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, False), \
