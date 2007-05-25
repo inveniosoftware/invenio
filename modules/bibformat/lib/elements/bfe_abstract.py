@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 #import cgi
 from invenio import bibformat_utils
 
-def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, 
+def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
            highlight='no', print_lang='en,fr'):
     """ Prints the abstract of a record in HTML. By default prints English and French versions.
@@ -36,6 +36,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
     @param prefix_en a prefix for english abstract (printed only if english abstract exists)
     @param prefix_fr a prefix for french abstract (printed only if french abstract exists)
     @param limit the maximum number of sentences of the abstract to display (for each language)
+    @param max_chars the maximum number of chars of the abstract to display (for each language)
     @param extension_en a text printed after english abstracts longer than parameter 'limit'
     @param extension_fr a text printed after french abstracts longer than parameter 'limit'
     @param suffix_en a suffix for english abstract(printed only if english abstract exists)
@@ -77,20 +78,30 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
     if len(abstract_en) > 0 and 'en' in languages:
 
         out += prefix_en
+        print_extension = False
+        
+        if max_char != "" and max_char.isdigit() and \
+               int(max_char) < len(abstract_en):
+            print_extension = True
+            abstract_en = abstract_en[:int(max_char)]
 
         if limit != "" and limit.isdigit():
-            print_extension = False
             s_abstract = abstract_en.split(".")
 
             if int(limit) < len(s_abstract):
                 print_extension = True
                 s_abstract = s_abstract[:int(limit)]
 
-            for sentence in s_abstract:
-                out += sentence+ "."
+            #for sentence in s_abstract:
+            #    out += sentence + "."
+            out = '.'.join(s_abstract)
+
+            # Add final dot if needed
+            if abstract_en.endswith('.'):
+                out += '.'
 
             if print_extension:
-                out += " "+extension_en
+                out += " " + extension_en
 
         else:
             out += abstract_en
@@ -100,18 +111,29 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
     if len(abstract_fr) > 0 and 'fr' in languages:
 
         out += prefix_fr
-
+        
+        print_extension = False
+        
+        if max_char != "" and max_char.isdigit() and \
+               int(max_char) < len(abstract_fr):
+            print_extension = True
+            abstract_fr = abstract_fr[:int(max_char)]
+            
         if limit != "" and limit.isdigit():
-            print_extension = False
             s_abstract = abstract_fr.split(".")
 
             if int(limit) < len(s_abstract):
                 print_extension = True
                 s_abstract = s_abstract[:int(limit)]
         
-            for sentence in s_abstract:
-                out += sentence + "."
+            #for sentence in s_abstract:
+            #    out += sentence + "."
+            out = '.'.join(s_abstract)
 
+            # Add final dot if needed
+            if abstract_fr.endswith('.'):
+                out += '.'
+            
             if print_extension:
                 out += " "+extension_fr
 
