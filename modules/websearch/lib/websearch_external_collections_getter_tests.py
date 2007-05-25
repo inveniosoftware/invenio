@@ -40,10 +40,10 @@ class AsyncDownloadTest(unittest.TestCase):
         ##   - test 1 bad ip : 1.2.3.4
         ## Return the list of errors.
 
-        checks = [  {'url': 'http://public.web.cern.ch/public/', 'content': "<title>CERN - The world's largest particle physics laboratory</title>"}, 
+        checks = [  {'url': 'http://public.web.cern.ch/public/', 'content': "<title>CERN - The world's largest particle physics laboratory</title>"},
                     {'url': 'http://cdsware.cern.ch/invenio/index.html', 'content': '<title>CDS Invenio: Overview</title>'},
                     {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
-                    {'url': 'http://1.2.3.4/'} ] 
+                    {'url': 'http://1.2.3.4/'} ]
 
         def finished(pagegetter, check, current_time):
             """Function called when a page is received."""

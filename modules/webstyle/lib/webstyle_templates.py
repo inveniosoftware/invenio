@@ -30,6 +30,7 @@ import string
 
 from invenio.config import \
      cdslang, \
+     cdsname, \
      cdsnameintl, \
      supportemail, \
      sweburl, \
@@ -71,8 +72,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        if title != cdsnameintl[ln]:
-            out += create_html_link(weburl, {'ln': ln}, 
+        if title != cdsnameintl.get(ln, cdsname):
+            out += create_html_link(weburl, {'ln': ln},
                                     _("Home"), {'class': 'navtrail'})
         if previous_links:
             if out:
@@ -81,7 +82,7 @@ class Template:
         if title:
             if out:
                 out += separator
-            if title == cdsnameintl[ln]: # hide site name, print Home instead
+            if title == cdsnameintl.get(ln, cdsname): # hide site name, print Home instead
                 out += _("Home")
             else:
                 out += title
@@ -96,7 +97,7 @@ class Template:
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid=""):
-        
+
         """Creates a complete page
 
            Parameters:
@@ -152,7 +153,7 @@ class Template:
           - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
 
           - 'navmenuid' *string* - the id of the navigation item to highlight for this page
-          
+
            Output:
 
           - HTML code of the page
@@ -161,7 +162,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = self.tmpl_pageheader(req, 
+        out = self.tmpl_pageheader(req,
                                    ln = ln,
                                    headertitle = title,
                                    description = description,
@@ -207,7 +208,7 @@ class Template:
   'titleprologue' : titleprologue,
   'title' : title,
   'titleepilogue' : titleepilogue,
-  
+
   'body' : body,
 
   } + self.tmpl_pagefooter(req, ln = ln,
@@ -258,7 +259,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if headertitle == cdsnameintl[ln]:
+        if headertitle == cdsnameintl.get(ln, cdsname):
             headertitle = _("Home")
 
         out = """\
@@ -342,7 +343,7 @@ class Template:
           'cssurl' : secure_page_p and sweburl or weburl,
           'ln' : ln,
 
-          'sitename' : cdsnameintl[ln],
+          'sitename' : cdsnameintl.get(ln, cdsname),
           'headertitle' : headertitle,
           'supportemail' : supportemail,
 
@@ -432,7 +433,7 @@ class Template:
           'sweburl' : sweburl,
           'ln' : ln,
 
-          'sitename' : cdsnameintl[ln],
+          'sitename' : cdsnameintl.get(ln, cdsname),
           'supportemail' : supportemail,
 
           'msg_search' : _("Search"),
@@ -473,7 +474,7 @@ class Template:
             argd.update(cgi.parse_qs(req.args))
 
         parts = []
-        
+
         for (lang, lang_namelong) in language_list_long():
             if lang == language:
                 parts.append('<span class="langinfo">%s</span>' % lang_namelong)
@@ -483,7 +484,7 @@ class Template:
                 if req and req.uri:
                     args = req.uri + make_canonical_urlargd(argd, {})
                 else:
-                    args = ""                
+                    args = ""
                 parts.append(create_html_link(args,
                                               {}, lang_namelong,
                                               {'class': "langinfo"}))
@@ -504,10 +505,10 @@ class Template:
 
           - 'req' *object* - the request object
 
-          - 'supportemail' *string* - the supportemail for this installation 
-            
+          - 'supportemail' *string* - the supportemail for this installation
+
           - 'errors' list of tuples (error_code, error_message)
-    
+
           - #! todo
         """
 
@@ -516,9 +517,9 @@ class Template:
         info_not_available = _("N/A")
 
         if title is None:
-            if errors: 
+            if errors:
                 title = _("Error") + ': %s' % errors[0][1]
-            else:    
+            else:
                 title = _("Internal Error")
 
         browser_s = _("Browser")
@@ -530,11 +531,11 @@ class Template:
                     browser_s += ': ' + info_not_available
                 host_s = req.hostname
                 page_s = req.unparsed_uri
-                client_s = req.connection.remote_ip 
+                client_s = req.connection.remote_ip
             except: # FIXME: bad except
                 browser_s += ': ' + info_not_available
                 host_s = page_s = client_s = info_not_available
-        else:    
+        else:
             browser_s += ': ' + info_not_available
             host_s = page_s = client_s = info_not_available
 
@@ -629,5 +630,5 @@ URI: http://%(host)s%(page)s
                                  ("http://" + host_s + page_s) or \
                                  info_not_available
               }
- 
+
         return out

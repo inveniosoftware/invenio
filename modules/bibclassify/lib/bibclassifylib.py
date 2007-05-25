@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -55,7 +55,7 @@ def usage(code, msg=''):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
     usagetext =    """
-Usage: bibclassify [options] 
+Usage: bibclassify [options]
 
  Examples:
       bibclassify -f file.pdf -k thesaurus.txt -o TEXT
@@ -68,9 +68,9 @@ Usage: bibclassify [options]
  -o, --output=HTML|TEXT      output list of keywords in either HTML or text
  -l, --limit=INTEGER         maximum number of keywords that will be processed to generate results (the higher the l, the higher the number of possible composite keywords)
  -n, --nkeywords=INTEGER     maximum number of single keywords that will be generated
- -m, --mode=FULL|PARTIAL     processing mode: PARTIAL (run on abstract and selected pages), FULL (run on whole document - more accurate, but slower) 
+ -m, --mode=FULL|PARTIAL     processing mode: PARTIAL (run on abstract and selected pages), FULL (run on whole document - more accurate, but slower)
  -q, --spires                outputs composite keywords in the SPIRES standard format (ckw1, ckw2)
- 
+
  General options:
  -h,  --help               print this help and exit
  -V,  --version            print version and exit
@@ -91,7 +91,7 @@ def generate_keywords(textfile, dictfile):
         except ValueError:
             dummy = 1
         else:
-            continue                                                    
+            continue
         if len(keyword)<=1: #whitespace or one char - get rid of
             continue
         else:
@@ -131,11 +131,11 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     delimiter = ""
     if spires: delimiter = ","
     else: delimiter = ":"
-    
+
     namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
-    
+
     store = rdflib.Graph()
-    store.parse(dictfile)              
+    store.parse(dictfile)
 
     size = int(os.stat(textfile).st_size)
     rtmp = open(textfile, 'r')
@@ -143,7 +143,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
     # ASSUMPTION: Guessing that the first 10% of file contains title and abstract
     abstract = " " + str(atmp.read(int(size*0.1))) + " "
-    
+
     if mode == 1:
         # Partial mode: analysing only abstract + title + middle portion of document
         # Abstract and title is generally never more than 20% of whole document.
@@ -154,7 +154,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     else:
         # Full mode: get all document
         text_string = " " + str(rtmp.read()) + " "
-        
+
     atmp.close()
     rtmp.close()
 
@@ -185,7 +185,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         wildcard = ""
         regex = False
         nostandalone = False
-        
+
         # For each concept, we gather the candidates (i.e. prefLabel, hiddenLabel and altLabel)
         candidates.append(pref.strip())
 
@@ -195,7 +195,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
         if store.value(s,namespace["note"],any=True) == "nostandalone":
             nostandalone = True
-        
+
         for alt in store.objects(s, namespace["altLabel"]):
             candidates.append(alt.strip())
 
@@ -210,7 +210,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 # We have a wildcard or other regex, do not escape chars
                 # Wildcards matched with '\w*'. These truncations should go into hidden labels in the ontology
                 regex = True
-                pattern = makePattern(candidate, 3)                
+                pattern = makePattern(candidate, 3)
                 wildcard = pattern
                 hideOUT += len(re.findall(pattern,text_string))
                 # print "HIDEOUT: " + str(candidate) + " " + str(hideOUT)
@@ -221,12 +221,12 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             if candidate.find("/", 0, 1) > -1:
                 # We have already taken care of this
                 continue
-            
+
             elif regex and candidate.find("/", 0, 1) == -1 and len(re.findall(wildcard," " + candidate + " ")) > 0:
                 # The wildcard in hiddenLabel matches this candidate: skip it
                 # print "\ncase 2 touched\n"
                 continue
-            
+
             elif candidate.find("-") > -1:
                 # We have an hyphen -> e.g. "word-word". Look for: "word-word", "wordword", "word word" (case insensitive)
                 pattern = makePattern(candidate, 2)
@@ -255,12 +255,12 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         if dictOUT > 0 and store.value(s,namespace["compositeOf"],default=False,any=True):
             # This is a ckw whose altLabel occurs in the text
             ckwlist[s.strip()] = dictOUT
-                                       
+
         elif dictOUT > 0:
             keylist.append([dictOUT, s.strip(), pref.strip(), safeOUT, candidates, nostandalone])
 
         regex = False
-        
+
     keylist.sort()
     keylist.reverse()
 
@@ -271,8 +271,8 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         nkeywords = limit
 
     # Sort out composite keywords based on limit (default=70)
-    # Work out whether among l single keywords, there are possible composite combinations 
-    # Generate compositesIDX dictionary of the form:   s (URI) : keylist 
+    # Work out whether among l single keywords, there are possible composite combinations
+    # Generate compositesIDX dictionary of the form:   s (URI) : keylist
     for i in range(limit):
         try:
             if store.value(rdflib.Namespace(keylist[i][1]),namespace["composite"],default=False,any=True):
@@ -293,9 +293,9 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             print "Problem with composites.. : " + keylist[i][1]
 
     for s_CompositeOf in composites:
-        
+
         if len(composites.get(s_CompositeOf)) > 2:
-            print s_CompositeOf + " - Sorry! Only composite combinations of max 2 keywords are supported at the moment." 
+            print s_CompositeOf + " - Sorry! Only composite combinations of max 2 keywords are supported at the moment."
         elif len(composites.get(s_CompositeOf)) > 1:
             # We have a composite match. Need to look for composite1 near composite2
             comp_one = compositesIDX[composites.get(s_CompositeOf)[0]][2]
@@ -316,7 +316,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 searchables_two = compositesIDX[composites.get(s_CompositeOf)[0]][4]
                 comp_oneOUT = compositesIDX[composites.get(s_CompositeOf)[1]][0]
                 comp_twoOUT = compositesIDX[composites.get(s_CompositeOf)[0]][0]
-                
+
             compOUT = 0
             wildcards = []
             phrases = []
@@ -326,13 +326,13 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 c1 = searchable_one
                 if searchable_one.find("/", 0, 1) > -1: m1 = 3
                 elif searchable_one.find("-") > -1: m1 = 2
-                elif searchable_one[:2].isupper() or len(searchable_one) < 3: m1 = 1 
+                elif searchable_one[:2].isupper() or len(searchable_one) < 3: m1 = 1
                 else: m1 = 0
                 for searchable_two in searchables_two:
                     c2 = searchable_two
                     if searchable_two.find("/", 0, 1) > -1: m2 = 3
                     elif searchable_two.find("-") > -1: m2 = 2
-                    elif searchable_two[:2].isupper() or len(searchable_two) < 3: m2 = 1 
+                    elif searchable_two[:2].isupper() or len(searchable_two) < 3: m2 = 1
                     else: m2 = 0
 
                     c = [c1,c2]
@@ -390,7 +390,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True).replace(":",","), "null", "null", 0, 0])
         else:
             compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True), "null", "null", 0, 0])
-    
+
     compositesOUT.sort()
     compositesOUT.reverse()
 
@@ -430,7 +430,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             safe_mark = "*"
 
         if idx == -1 and nkeywords > 0 and not keylist[i][5]:
-            text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n" 
+            text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n"
             if safe_mark == "*": html_out.append([keylist[i][0], keylist[i][2], 1])
             else: html_out.append([keylist[i][0], keylist[i][2], 0])
             nkeywords = nkeywords - 1
@@ -438,7 +438,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     if output == 0:
         # Output some text
         print text_out
-        
+
     else:
         # Output some HTML
         html_out.sort()
@@ -448,7 +448,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     return 0
 
 def makeTagCloud(entries):
-    """Using the counts for each of the tags, write a simple HTML page to 
+    """Using the counts for each of the tags, write a simple HTML page to
     standard output containing a tag cloud representation. The CSS
     describes ten levels, each of which has differing font-size's,
     line-height's and font-weight's.
@@ -486,7 +486,7 @@ def makeTagCloud(entries):
     cloud = ""
     cloud_list = []
 
-    cloud += '<tr><div class="pagebox" align="top">'    
+    cloud += '<tr><div class="pagebox" align="top">'
     # Generate some ad-hoc count distribution
     for i in range(0, len(entries)):
         count = int(entries[i][0])
@@ -515,10 +515,10 @@ def makeTagCloud(entries):
 
     cloud_list.sort()
     for i in range(0, len(cloud_list)):
-        cloud += '<span class=\"level%s\" ' % cloud_list[i][1] 
+        cloud += '<span class=\"level%s\" ' % cloud_list[i][1]
         if int(cloud_list[i][2]) > 0:
             cloud += 'style="color:red" '
-        cloud += '><a href=""> %s </a></span>' % cloud_list[i][0] 
+        cloud += '><a href=""> %s </a></span>' % cloud_list[i][0]
     cloud += '</div></tr>'
 
     print cloud
@@ -538,7 +538,7 @@ def makeCompPattern(candidates, modes):
 
     pattern_text = []
     patterns = []
-    
+
     for i in range(2):
 
         if modes[i] == 0:
@@ -562,14 +562,14 @@ def makeCompPattern(candidates, modes):
                 pattern_text.append(re.escape(candidates[i]))
 
         if modes[i] == 3:
-            pattern_text.append(candidates[i].replace("/","")) 
+            pattern_text.append(candidates[i].replace("/",""))
 
     pattern_one = re.compile(begREGEX + pattern_text[0] + "s?[ \s,-]*" + pattern_text[1] + endREGEX, re.I)
     pattern_two = re.compile(begREGEX + pattern_text[1] + "s?[ \s,-]*" + pattern_text[0] + endREGEX, re.I)
 
     patterns.append(pattern_one)
     patterns.append(pattern_two)
-        
+
     return patterns
 
 
@@ -583,7 +583,7 @@ def makePattern(candidate, mode):
     # NB. At the moment, some patterns are compiled having an optional trailing "s".
     #     This is a very basic method to find plurals in English.
     #     If this program is to be used in other languages, please remove the "s?" from the REGEX
-    #     Also, inclusion of plurals at the ontology level would be preferred. 
+    #     Also, inclusion of plurals at the ontology level would be preferred.
 
     begREGEX = '(?:[^A-Za-z0-9\+-])('
     endREGEX = ')(?=[^A-Za-z0-9\+-])'
@@ -610,7 +610,7 @@ def makePattern(candidate, mode):
                 pattern = re.compile(begREGEX + re.escape(candidate) + endREGEX, re.I)
 
         if mode == 3:
-            pattern = re.compile(begREGEX + candidate.replace("/","") + endREGEX, re.I) 
+            pattern = re.compile(begREGEX + candidate.replace("/","") + endREGEX, re.I)
 
     except:
         print "Invalid thesaurus term: " + re.escape(candidate) + "<br>"
@@ -643,7 +643,7 @@ def main():
     dict_file = ""
     output = 0
     mode = 0
-    
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
     except getopt.GetoptError, err:
@@ -680,19 +680,19 @@ def main():
                     if errcode == 0 and os.path.exists("%s" % temp_text):
                         input_file = temp_text
                     else:
-                        print "Error while running %s.\n" % cmd 
+                        print "Error while running %s.\n" % cmd
                         sys.exit(1)
                 else:
                     # Treat as text
                     input_file = opt[1]
-                    
+
             elif opt[0] in [ "-k", "--thesaurus" ]:
                 if dict_file=="":
                     dict_file = opt[1]
                 else:
                     print "Either a text thesaurus or an ontology (in .rdf format)"
                     sys.exit(1)
-                    
+
             elif opt[0] in [ "-K", "--taxonomy" ]:
                 if dict_file=="" and opt[1].find(".rdf")!=-1:
                     dict_file = opt[1]
@@ -724,7 +724,7 @@ def main():
 
             elif opt[0] in [ "-q", "--spires" ]:
                 spires = True
-                
+
             elif opt[0] in [ "-l", "--limit" ]:
                 try:
                     num = int(opt[1])
@@ -781,6 +781,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()                                                                                 
+    main()
 
 

@@ -50,7 +50,7 @@ def index(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -81,7 +81,7 @@ def migrate_kb(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -112,7 +112,7 @@ def migrate_behaviours(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -142,7 +142,7 @@ def migrate_formats(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -172,7 +172,7 @@ def migrate_formats_do(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 

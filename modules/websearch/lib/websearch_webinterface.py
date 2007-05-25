@@ -427,7 +427,7 @@ def display_collection(req, c, as, verbose, ln):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req,
                     navmenuid='search')
@@ -438,11 +438,11 @@ def display_collection(req, c, as, verbose, ln):
     colID = get_colID(c)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl[ln] + '</a>')) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl.get(ln, cdsname) + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
                     description=(cdsname + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
-                    keywords="%s, CDS Invenio" % cdsname,
+                    keywords="%s" % cdsname,
                     uid=uid,
                     language=ln,
                     req=req,
@@ -475,7 +475,7 @@ def display_collection(req, c, as, verbose, ln):
         c_last_updated = filedesc.read()
         filedesc.close()
         if c == cdsname:
-            title = cdsnameintl[ln]
+            title = cdsnameintl.get(ln, cdsname)
         else:
             title = get_coll_i18nname(c, ln)
 
@@ -483,7 +483,7 @@ def display_collection(req, c, as, verbose, ln):
                     body=c_body,
                     navtrail=c_navtrail,
                     description="%s - %s" % (cdsname, c),
-                    keywords="%s, CDS Invenio, %s" % (cdsname, c),
+                    keywords="%s, %s" % (cdsname, c),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -503,7 +503,7 @@ def display_collection(req, c, as, verbose, ln):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     uid=uid,
                     language=ln,
                     req=req,

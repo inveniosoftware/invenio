@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ## $Id$
 ## Comments and reviews for records.
-                                              
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -19,7 +19,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""HTML Templates for commenting features """                                           
+"""HTML Templates for commenting features """
 
 __revision__ = "$Id$"
 
@@ -33,18 +33,19 @@ from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import weburl, \
                            sweburl, \
                            cdslang, \
+                           cdsname, \
                            cdsnameintl,\
                            CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW, \
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS, \
                            CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW
-                           
+
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
-    
+
     def tmpl_get_first_comments_without_ranking(self, recID, ln, comments, nb_comments_total, warnings):
         """
         @param recID: record id
@@ -66,7 +67,7 @@ class Template:
         c_id = 4
 
         warnings = self.tmpl_warnings(warnings, ln)
-        
+
         # comments
         comment_rows = ''
         for comment in comments:
@@ -75,22 +76,22 @@ class Template:
                 display = nickname
             else:
                 (uid, nickname, display) = get_user_info(comment[c_user_id])
-            messaging_link = self.create_messaging_link(nickname, display, ln) 
+            messaging_link = self.create_messaging_link(nickname, display, ln)
             comment_rows += """
                     <tr>
                         <td>"""
             report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
             reply_link='%s/comments/add?recid=%s&amp;ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
-            comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link, 
-                                                                  date_creation=comment[c_date_creation], 
-                                                                  body=comment[c_body], 
+            comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link,
+                                                                  date_creation=comment[c_date_creation],
+                                                                  body=comment[c_body],
                                                                   report_link=report_link, reply_link=reply_link)
             comment_rows += """
                             <br />
                             <br />
                         </td>
                     </tr>"""
-        
+
         # write button
         write_button_label = _("Write a comment")
         write_button_link = '%s/comments/add' % (weburl,)
@@ -98,7 +99,7 @@ class Template:
                                 <input type="hidden" name="ln" value="%s"/>
                                 <input type="hidden" name="reviews" value="0"/>""" % (recID, ln)
         write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=write_button_label)
- 
+
         # output
         if nb_comments_total > 0:
             out = warnings
@@ -140,7 +141,7 @@ class Template:
     <td class="blocknote">%(discuss_label)s:</td>
   </tr>
 </table>
-%(detailed_info)s 
+%(detailed_info)s
 <br />
 %(form)s
 <br />""" % {'form': write_button_form,
@@ -168,7 +169,7 @@ class Template:
             body = _("Sorry, no record ID was provided.")
 
         body += "<br /><br />"
-        link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, cdsnameintl[ln])
+        link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, cdsnameintl.get(ln, cdsname))
         body += _("You may want to start browsing from %s") % link
         return body
 
@@ -206,10 +207,10 @@ class Template:
 
         # voting links
         useful_dict =   {   'weburl'        : weburl,
-                            'recID'         : recID, 
+                            'recID'         : recID,
                             'ln'            : ln,
                             'yes_img'       : 'smchk_gr.gif', #'yes.gif',
-                            'no_img'        : 'iconcross.gif' #'no.gif'       
+                            'no_img'        : 'iconcross.gif' #'no.gif'
                         }
         link = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;reviews=1' % useful_dict
         useful_yes = link + '&amp;com_value=1">' + _("Yes") + '</a>'
@@ -223,18 +224,18 @@ class Template:
                 display = nickname
             else:
                 (uid, nickname, display) = get_user_info(comment[c_user_id])
-            messaging_link = self.create_messaging_link(nickname, display, ln) 
+            messaging_link = self.create_messaging_link(nickname, display, ln)
 
             comment_rows += '''
                     <tr>
                         <td>'''
             report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
-            comment_rows += self.tmpl_get_comment_with_ranking(ln=ln, nickname=messaging_link, 
-                                                               date_creation=comment[c_date_creation], 
-                                                               body=comment[c_body], 
-                                                               nb_votes_total=comment[c_nb_votes_total], 
-                                                               nb_votes_yes=comment[c_nb_votes_yes], 
-                                                               star_score=comment[c_star_score], 
+            comment_rows += self.tmpl_get_comment_with_ranking(ln=ln, nickname=messaging_link,
+                                                               date_creation=comment[c_date_creation],
+                                                               body=comment[c_body],
+                                                               nb_votes_total=comment[c_nb_votes_total],
+                                                               nb_votes_yes=comment[c_nb_votes_yes],
+                                                               star_score=comment[c_star_score],
                                                                title=comment[c_title], report_link=report_link)
             comment_rows += '''
                           %s %s / %s<br />''' % (_("Was this review helpful?"), useful_yes % {'comid':comment[c_id]}, useful_no % {'comid':comment[c_id]})
@@ -264,7 +265,7 @@ class Template:
             view_all_comments_link += _("View all %s reviews") % nb_comments_total
             view_all_comments_link += '</a><br />'
 
-            out = warnings + """ 
+            out = warnings + """
                 <!--  review title table -->
                 <table>
                   <tr>
@@ -288,7 +289,7 @@ class Template:
                 'write_comment'         : _("Write a review"),
                 'comment_rows'          : comment_rows,
                 'tab'                   : '&nbsp;'*4,
-                'weburl'                : weburl,   
+                'weburl'                : weburl,
                 'view_all_comments_link': nb_comments_total>0 and view_all_comments_link or "",
                 'write_button_form'     : write_button_form
             }
@@ -316,14 +317,14 @@ class Template:
         @param body: comment body
         @param reply_link: if want reply and report, give the http links
         @param repot_link: if want reply and report, give the http links
-        @return html table of comment 
+        @return html table of comment
         """
         # load the right message language
         _ = gettext_set_language(ln)
         date_creation = convert_datetext_to_dategui(date_creation)
         out = ''
         final_body = email_quoted_txt2html(body)
-        title = _("%(x_name)s wrote on %(x_date)s:") % {'x_name': nickname, 
+        title = _("%(x_name)s wrote on %(x_date)s:") % {'x_name': nickname,
                                                         'x_date': '<i>' + date_creation + '</i>'}
         links = ''
         if reply_link:
@@ -377,7 +378,7 @@ class Template:
         out += """
 <table width="100%%">
   <tr>
-    <td> 
+    <td>
     <img src="%(weburl)s/img/%(star_score_img)s" alt="%(star_score)s" style="margin-right:10px;"/><b>%(title)s</b><br />
       %(reviewed_label)s<br />
       %(useful_label)s
@@ -407,7 +408,7 @@ class Template:
     def tmpl_get_comments(self, recID, ln,
                           nb_per_page, page, nb_pages,
                           display_order, display_since,
-                          CFG_WEBCOMMENT_ALLOW_REVIEWS, 
+                          CFG_WEBCOMMENT_ALLOW_REVIEWS,
                           comments, total_nb_comments,
                           avg_score,
                           warnings,
@@ -460,16 +461,16 @@ class Template:
 
         # voting links
         useful_dict =   {   'weburl'        : weburl,
-                            'recID'         : recID, 
+                            'recID'         : recID,
                             'ln'            : ln,
                             'do'            : display_order,
                             'ds'            : display_since,
                             'nb'            : nb_per_page,
                             'p'             : page,
-                            'reviews'       : reviews   
+                            'reviews'       : reviews
                         }
         useful_yes = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display">' + _("Yes") + '</a>'
-        useful_yes %= useful_dict 
+        useful_yes %= useful_dict
         useful_no = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display">' + _("No") + '</a>'
         useful_no %= useful_dict
         warnings = self.tmpl_warnings(warnings, ln)
@@ -483,7 +484,7 @@ class Template:
                         'function'  : 'index',
                         'arguments' : 'recid=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;reviews=%s' % (recID, display_order, display_since, nb_per_page, reviews),
                         'arg_page'  : '&amp;p=%s' % page,
-                        'page'      : page          }   
+                        'page'      : page          }
 
         ## comments table
         comments_rows = ''
@@ -501,7 +502,7 @@ class Template:
   <td>"""
             if not reviews:
                 report_link = '%(weburl)s/comments/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display' % useful_dict % {'comid':comment[c_id]}
-                reply_link = '%(weburl)s/comments/add?recid=%(recID)s&amp;ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]} 
+                reply_link = '%(weburl)s/comments/add?recid=%(recID)s&amp;ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
                 comments_rows += indent_text(self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], reply_link, report_link), 2)
             else:
                 report_link = '%(weburl)s/comments/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display' % useful_dict % {'comid': comment[c_id]}
@@ -519,7 +520,7 @@ class Template:
       </tr>
     </table>""" \
                 % {'helpful_label': helpful_label,
-                   'yes'          : useful_yes % {'comid':comment[c_id]}, 
+                   'yes'          : useful_yes % {'comid':comment[c_id]},
                    'no'           : useful_no % {'comid':comment[c_id]},
                    'report'       : report_link % {'comid':comment[c_id]},
                    'report_abuse_label': report_abuse_label,
@@ -543,10 +544,10 @@ class Template:
             link_dic['arg_page'] = 'p=%s' % i
             link_dic['page'] = '%s' % i
             if i != page:
-                page_links += ''' 
+                page_links += '''
                 <a href=\"%(weburl)s/%(module)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">%(page)s</a> ''' % link_dic
             else:
-                page_links += ''' <b>%s</b> ''' % i 
+                page_links += ''' <b>%s</b> ''' % i
         # Next
         if page != nb_pages:
             link_dic['arg_page'] = 'p=%s' % (page + 1)
@@ -557,7 +558,7 @@ class Template:
 
         ## stuff for ranking if enabled
         if reviews:
-            if avg_score > 0:  
+            if avg_score > 0:
                 avg_score_img = 'stars-' + str(avg_score).split('.')[0] + '-' + str(avg_score).split('.')[1] + '.png'
             else:
                 avg_score_img = "stars-0-0.png"
@@ -632,7 +633,7 @@ class Template:
             'ranking_avg'               : ranking_average   }
         # form is not currently used. reserved for an eventual purpose
         #form = """
-        #        Display             <select name="nb" size="1"> per page 
+        #        Display             <select name="nb" size="1"> per page
         #                                <option value="all">All</option>
         #                                <option value="10">10</option>
         #                                <option value="25">20</option>
@@ -641,7 +642,7 @@ class Template:
         #                            </select>
         #        comments per page that are    <select name="ds" size="1">
         #                                <option value="all" selected="selected">Any age</option>
-        #                                <option value="1d">1 day old</option>     
+        #                                <option value="1d">1 day old</option>
         #                                <option value="3d">3 days old</option>
         #                                <option value="1w">1 week old</option>
         #                                <option value="2w">2 weeks old</option>
@@ -663,7 +664,7 @@ class Template:
         #                                <option value=\"ls\">lowest star ranking</option>
         #                            </select>''' or '''
         #                            </select>''')
-        #        
+        #
         #form_link = "%(weburl)s/%(module)s/%(function)s" % link_dic
         #form = self.createhiddenform(action=form_link, method="Get", text=form, button='Go', recid=recID, p=1)
         pages = """
@@ -692,8 +693,8 @@ class Template:
             return '<a href="%s" class="maillink">%s</a>' % (link, display_name)
         else:
             return display_name
-        
-        
+
+
     def createhiddenform(self, action="", method="Get", text="", button="confirm", cnfrm='', **hidden):
         """
         create select with hidden values and submit button
@@ -702,10 +703,10 @@ class Template:
         @param text: additional text, can also be used to add non hidden input
         @param button: value/caption on the submit button
         @param cnfrm: if given, must check checkbox to confirm
-        @param **hidden: dictionary with name=value pairs for hidden input 
+        @param **hidden: dictionary with name=value pairs for hidden input
         @return html form
         """
-        
+
         output  = """
 <form action="%s" method="%s">""" % (action, string.lower(method).strip() in ['get','post'] and method or 'Get')
         output += """
@@ -716,7 +717,7 @@ class Template:
         output += text + '\n'
         if cnfrm:
             output += """
-        <input type="checkbox" name="confirm" value="1" />""" 
+        <input type="checkbox" name="confirm" value="1" />"""
         for key in hidden.keys():
             if type(hidden[key]) is list:
                 for value in hidden[key]:
@@ -739,7 +740,7 @@ class Template:
 </form>"""
         return output
 
-    def tmpl_warnings(self, warnings, ln=cdslang): 
+    def tmpl_warnings(self, warnings, ln=cdslang):
         """
         Prepare the warnings list
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
@@ -768,7 +769,7 @@ class Template:
                 out += '''
                     <span class="%(span_class)s">%(warning)s</span><br>''' % \
                     {   'span_class'    :   span_class,
-                        'warning'       :   warning_text         } 
+                        'warning'       :   warning_text         }
             return out
         else:
             return ""
@@ -795,8 +796,8 @@ class Template:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % sweburl
             note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") %\
-                {'x_url_open': link, 
-                 'x_url_close': '</a>', 
+                {'x_url_open': link,
+                 'x_url_close': '</a>',
                  'x_nickname': ' <br /><i>' + display + '</i>'}
 
         from invenio.search_engine import print_record
@@ -817,7 +818,7 @@ class Template:
                                'note': note,
                                'record': record_details,
                                'record_label': _("Article") + ":",
-                               'comment_label': _("Comment") + ":"} 
+                               'comment_label': _("Comment") + ":"}
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="POST", text=form, button='Add comment')
         return warnings + form
@@ -860,7 +861,7 @@ class Template:
                     </tr>
                     <tr>
                       <td style="padding-bottom: 10px;">%(rate_label)s:
-                        <select name=\"score\" size=\"1\"> 
+                        <select name=\"score\" size=\"1\">
                           <option value=\"0\" selected>-%(select_label)s-</option>
                           <option value=\"5\">***** (best)</option>
                           <option value=\"4\">****</option>
@@ -896,14 +897,14 @@ class Template:
                                'title_label': _("Give a title to your review"),
                                'write_label': _("Write your review"),
                                'note_label': note_label,
-                               'note'      : note!='' and note or "", 
+                               'note'      : note!='' and note or "",
                                'msg'       : msg!='' and msg or "",
-                               'record'    : record_details    } 
+                               'record'    : record_details    }
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="Post", text=form, button=_('Add Review'))
         return warnings + form
 
-    def tmpl_add_comment_successful(self, recID, ln, reviews, warnings): 
+    def tmpl_add_comment_successful(self, recID, ln, reviews, warnings):
         """
         @param recID: record id
         @param ln: language
@@ -994,13 +995,13 @@ class Template:
         """
         # load the right message language
         _ = gettext_set_language(ln)
-   
+
         out = '<ol>'
         if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            if CFG_WEBCOMMENT_ALLOW_COMMENTS: 
+            if CFG_WEBCOMMENT_ALLOW_COMMENTS:
                 out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' %\
                     {'weburl': weburl, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
-            if CFG_WEBCOMMENT_ALLOW_REVIEWS: 
+            if CFG_WEBCOMMENT_ALLOW_REVIEWS:
                 out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' %\
                     {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
             out += """
@@ -1031,7 +1032,7 @@ class Template:
         %s<br />
         <br />'''%_("Please enter the ID of the comment/review so that you can view it before deciding whether to delete it or not")
         form = '''
-            <table> 
+            <table>
                 <tr>
                     <td>%s</td>
                     <td><input type=text name="comid" size="10" maxlength="10" value="" /></td>
@@ -1049,7 +1050,7 @@ class Template:
     def tmpl_admin_users(self, ln, users_data):
         """
         @param users_data:  tuple of ct, i.e. (ct, ct, ...)
-                            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, total_nb_votes_yes_of_reported, 
+                            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, total_nb_votes_yes_of_reported,
                                                  total_nb_votes_total_of_reported, user_id, user_email, user_nickname)
                             sorted by order of ct having highest total_number_reported
         """
@@ -1065,7 +1066,7 @@ class Template:
 
         if not users_data:
             return self.tmpl_warnings([(_("There have been no reports so far."), 'green')])
-        
+
         user_rows = ""
         for utuple in users_data:
             com_label = _("View all %s reported comments") % utuple[u_comment_reports]
@@ -1090,7 +1091,7 @@ class Template:
                 review_row = indent_text(review_row, 1)
             else:
                 review_row = ''
-            user_rows += """ 
+            user_rows += """
 <tr>
   <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%(nickname)s</td>
   <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%(email)s</td>
@@ -1107,7 +1108,7 @@ class Template:
              'com_link'  : CFG_WEBCOMMENT_ALLOW_COMMENTS and com_link or "",
              'rev_link'  : CFG_WEBCOMMENT_ALLOW_REVIEWS and rev_link or ""
              }
- 
+
         out = "<br />"
         out += _("Here is a list, sorted by total number of reports, of all users who have had a comment reported at least once.")
         out += """
@@ -1118,7 +1119,7 @@ class Template:
     <tr class="adminheaderleft">
       <th>"""
         out += _("Nickname") + '</th>\n'
-        out += indent_text('<th>' + _("Email") + '</th>\n', 3) 
+        out += indent_text('<th>' + _("Email") + '</th>\n', 3)
         out += indent_text('<th>' + _("User ID") + '</th>\n', 3)
         if CFG_WEBCOMMENT_ALLOW_REVIEWS > 0:
             out += indent_text('<th>' + _("Number positive votes") + '</th>\n', 3)
@@ -1132,13 +1133,13 @@ class Template:
   <tbody>%s
   </tbody>
 </table>
-        """ % indent_text(user_rows, 2) 
+        """ % indent_text(user_rows, 2)
         return out
-    
+
     def tmpl_admin_select_comment_checkbox(self, cmt_id):
         """ outputs a checkbox named "comidXX" where XX is cmt_id """
         return '<input type="checkbox" name="comid%i" />' % int(cmt_id)
-    
+
     def tmpl_admin_user_info(self, ln, nickname, uid, email):
         """ prepares informations about a user"""
         _ = gettext_set_language(ln)
@@ -1151,9 +1152,9 @@ class Template:
                 'uid_label': _("User ID"),
                 'uid': int(uid),
                 'email_label': _("Email"),
-                'email': email} 
+                'email': email}
         return out
-        
+
     def tmpl_admin_review_info(self, ln, reviews, nb_reports, cmt_id, rec_id):
         """ outputs information about a review """
         _ = gettext_set_language(ln)
@@ -1173,7 +1174,7 @@ class Template:
                 'cmt_id_label': _("Comment") + ' #' + str(cmt_id),
                 'ln': ln}
         return out
-        
+
     def tmpl_admin_comments(self, ln, uid, comID, comment_data, reviews):
         """
         @param comment_data: same type of tuple as that
@@ -1224,7 +1225,7 @@ class Template:
                                                              meta_data[3], # cmt_id
                                                              meta_data[4]))# rec_id
             checkboxes.append(self.tmpl_admin_select_comment_checkbox(meta_data[3]))
-                                 
+
         form_link = "%s/admin/webcomment/webcommentadmin.py/del_com?ln=%s" % (weburl, ln)
         out = """
 <table class="admin_wvar" style="width:100%%;">
@@ -1294,7 +1295,7 @@ class Template:
 
     def tmpl_admin_del_com(self, del_res, ln=cdslang):
         """
-        @param del_res: list of the following tuple (comment_id, was_successfully_deleted), 
+        @param del_res: list of the following tuple (comment_id, was_successfully_deleted),
                         was_successfully_deleted is boolean (0=false, >0=true
         """
         _ = gettext_set_language(ln)
@@ -1316,10 +1317,10 @@ class Template:
 
         return out
 
-    
+
     def tmpl_admin_suppress_abuse_report(self, del_res, ln=cdslang):
         """
-        @param del_res: list of the following tuple (comment_id, was_successfully_deleted), 
+        @param del_res: list of the following tuple (comment_id, was_successfully_deleted),
                         was_successfully_deleted is boolean (0=false, >0=true
         """
         _ = gettext_set_language(ln)

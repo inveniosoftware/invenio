@@ -2520,7 +2520,7 @@ class Template:
                                 ('<strong>' + cgi.escape(colname) + '</strong>'),
                       'you_may_want': _("You may want to start browsing from %s.") % \
                                  ('<a href="' + weburl + '?ln=' + ln + '">' + \
-                                        cgi.escape(cdsnameintl[ln]) + '</a>')}
+                                        cgi.escape(cdsnameintl.get(ln, cdsname)) + '</a>')}
         return out
 
     def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln):

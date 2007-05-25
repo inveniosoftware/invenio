@@ -29,9 +29,9 @@ import smtplib
 import invenio.elmsubmit_EZEmail as elmsubmit_EZEmail
 import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 
-# import the config file 
+# import the config file
 
-from invenio.config import tmpdir
+from invenio.config import tmpdir, cdsname
 from invenio.config import storage
 import invenio.elmsubmit_config as elmsubmit_config
 
@@ -44,7 +44,7 @@ import invenio.elmsubmit_generate_marc as elmsubmit_generate_marc
 def process_email(email_string):
     """ main entry point of the module, handles whole processing of the email
     """
-    
+
     # See if we can parse the email:
 
     try:
@@ -65,7 +65,7 @@ def process_email(email_string):
             raise elmsubmitError("Email could not be parsed. Reported to sender.")
         except ValueError:
             raise elmsubmitError("From: field of submission email could not be parsed. Could not report to sender.")
-        
+
     # See if we can parse the submission fields in the email:
 
     try:
@@ -80,20 +80,20 @@ def process_email(email_string):
 
     # Check we have been given the required fields:
     available_fields = submission_dict.keys()
-    
+
     if not len(filter(lambda x: x in available_fields, elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)) == len(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS):
         response = elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_1'] + elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['missing_fields_2'] + "\n\n" + repr(elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)
         _notify(msg=e, response=response)
         raise elmsubmitSubmissionError("Submission does not contain the required fields %s." % (elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS))
 
     # Check that the fields we have been given validate OK:
-    
+
     map(lambda field: validate_submission_field(e, submission_dict, field, submission_dict[field]), elmsubmit_config.CFG_ELMSUBMIT_REQUIRED_FIELDS)
 
     # Get a submission directory:
-    
+
     folder_name = 'elmsubmit_' +  _random_alphanum_string(15)
-    
+
     storage_dir  = os.path.join(tmpdir, folder_name)
 
     try:
@@ -104,7 +104,7 @@ def process_email(email_string):
         raise elmsubmitError("Could not create directory: %s" % (storage_dir))
 
     # Process the files list:
-    
+
     process_files(e, submission_dict, storage_dir)
 
     #generate the appropriate Marc_XML for the submission
@@ -123,12 +123,12 @@ def process_email(email_string):
         admin_response_email = "There was a problem writing data to directory %s." % (storage_dir)
         error = elmsubmitError("There was a problem writing data to directory %s." % (storage_dir))
         return (response_email, admin_response_email, error)
-    
+
     # print  marc_xml
 
     return marc_xml
 
-    
+
 def validate_submission_field(msg, submission_dict, field, value):
 
     try:
@@ -153,7 +153,7 @@ def process_files(msg, submission_dict, storage_dir):
 
     if 'all' in files:
 
-        f = lambda attachment: attachment['filename'] is not None     
+        f = lambda attachment: attachment['filename'] is not None
         g = lambda attachment: attachment['filename'].lower()
         attached_filenames = map(g, filter(f, msg.attachments))
 
@@ -172,16 +172,16 @@ def process_files(msg, submission_dict, storage_dir):
 
     # file list needed to be included in submission_dict
     file_list = []
-    
+
     for filename in files:
 
         # See if we have special keyword self (which uses the mail message itself as the file):
-        if filename == 'self': 
+        if filename == 'self':
             file_attachment = msg.original_message
             filename = _random_alphanum_string(8) + '_' + msg.date_sent_utc.replace(' ', '_').replace(':', '-') + '.msg'
         else:
             nominal_attachments = filter(lambda attachment: attachment['filename'].lower() == filename, msg.attachments)
-            
+
             try:
                 file_attachment = nominal_attachments[0]['file']
             except IndexError:
@@ -189,7 +189,7 @@ def process_files(msg, submission_dict, storage_dir):
                 raise elmsubmitSubmissionError("Submission is missing attached file: %s" % (filename))
 
         file_dict[filename.encode('utf8')] = file_attachment
-        
+
         #merge the file name and the storage dir in the submission_dict
 
         full_file_name = os.path.join(storage_dir, filename.encode('utf8'))
@@ -215,7 +215,7 @@ def process_files(msg, submission_dict, storage_dir):
         """
 
         fullpath = os.path.join(storage_dir, path)
-        
+
         try:
             dictionary_or_data.has_key
         except AttributeError:
@@ -234,7 +234,7 @@ def process_files(msg, submission_dict, storage_dir):
 
 
 def _send_smtp(_from, to, msg):
-    
+
     s = smtplib.SMTP()
     s.connect(host=elmsubmit_config.CFG_ELMSUBMIT_SERVERS['smtp'])
     s.sendmail(_from, to, msg)
@@ -254,7 +254,7 @@ def _notify_admin(response):
     response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                message=response,
-                                               subject="CDS Invenio / elmsubmit problem.",
+                                               subject="%s / elmsubmit problem." % cdsname,
                                                wrap_message=False)
     _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], msg=response)
 

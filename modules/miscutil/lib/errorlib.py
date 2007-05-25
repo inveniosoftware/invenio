@@ -27,8 +27,8 @@ import traceback
 import sys
 import time
 
-from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail
-from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES  
+from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail, cdsname
+from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -51,7 +51,7 @@ def get_client_info(req):
 
 def get_tracestack():
     """
-    If an exception has been caught, return the system tracestack or else return tracestack of what is currently in the stack 
+    If an exception has been caught, return the system tracestack or else return tracestack of what is currently in the stack
     """
     if traceback.format_tb(sys.exc_info()[2]):
         delimiter = "\n"
@@ -109,7 +109,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
     errors_or_warnings_list = wash_url_argument(errors_or_warnings_list, 'list')
     stream = wash_url_argument(stream, 'str')
     for etuple in errors_or_warnings_list:
-        etuple = wash_url_argument(etuple, 'tuple')                        
+        etuple = wash_url_argument(etuple, 'tuple')
     # check stream arg for presence of [error,warning]; when none, add error and default to warning
     if stream == 'error':
         stream = 'err'
@@ -123,7 +123,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
     stream_location = logdir + '/invenio.' + stream
     errors = ''
     for etuple in errors_or_warnings_list:
-        try: 
+        try:
             errors += "%s%s : %s \n " % (' '*4*7+' ', etuple[0], etuple[1])
         except:
             errors += "%s%s \n " % (' '*4*7+' ', etuple)
@@ -182,12 +182,12 @@ def get_msg_associated_to_code(err_code, stream='error'):
         error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
         err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % err_code
         err_code = error
-    return (err_code, err_msg) 
+    return (err_code, err_msg)
 
 def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
     """
     @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
-    
+
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
     as the key for dict with name:  CFG_ + %(module_directory_name)s + _ERROR_MESSAGES
@@ -251,7 +251,7 @@ def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
         except:
             parsing_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
             parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
-            parsing_error_message %= code_tuple[0]           
+            parsing_error_message %= code_tuple[0]
         out.append((err_code, err_msg))
         if parsing_error:
             out.append((parsing_error, parsing_error_message))
@@ -265,8 +265,8 @@ def send_error_report_to_admin(header, url, time_msg,
     """
     Sends an email to the admin with client info and tracestack
     """
-    from_addr =  'CDS Alert Engine <%s>' % alertengineemail
-    to_addr = adminemail 
+    from_addr =  '%s Alert Engine <%s>' % (cdsname, alertengineemail)
+    to_addr = adminemail
     body = """
 The following error was seen by a user and sent to you.
 %(contact)s

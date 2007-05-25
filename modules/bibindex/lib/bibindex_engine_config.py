@@ -13,14 +13,14 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibIndex indexing engine configuration parameters.  
+BibIndex indexing engine configuration parameters.
 """
 
 __revision__ = \
@@ -28,7 +28,7 @@ __revision__ = \
 
 ## configuration parameters read from the general config file:
 from invenio.config import \
-     version, \
+     version, cdsname,\
      CFG_PATH_PDFTOTEXT, \
      CFG_PATH_PSTOTEXT, \
      CFG_PATH_PSTOASCII, \
@@ -45,8 +45,8 @@ BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (version, version)
 
 ## programs used to convert fulltext files to text:
 CONV_PROGRAMS = { ### PS switched off at the moment, since PDF is faster
-    #"ps": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],  
-    #"ps.gz": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],               
+    #"ps": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
+    #"ps.gz": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
     "pdf": [CFG_PATH_PDFTOTEXT, CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
     "doc": [CFG_PATH_ANTIWORD, CFG_PATH_CATDOC, CFG_PATH_WVTEXT],
     "ppt": [CFG_PATH_PPTHTML],
@@ -58,7 +58,7 @@ CONV_PROGRAMS_HELPERS =  {"html": CFG_PATH_HTMLTOTEXT,
                           "gz": CFG_PATH_GZIP}
 
 ## safety parameters concerning DB thread-multiplication problem:
-CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem? 
+CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem?
 CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we
                            # consider as still safe
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping

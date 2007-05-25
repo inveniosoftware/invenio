@@ -542,7 +542,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             description = "%s %s." % (cc, _("Search Results"))
 
         if not keywords:
-            keywords = "CDS Invenio, WebSearch, %s" % cc
+            keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), cc)
 
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=create_navtrail_links(cc, as, ln),
@@ -607,7 +607,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
 
     # some computations
     if cc == cdsname:
-        cc_intl = cdsnameintl[ln]
+        cc_intl = cdsnameintl.get(ln, cdsname)
     else:
         cc_intl = get_coll_i18nname(cc, ln)
 

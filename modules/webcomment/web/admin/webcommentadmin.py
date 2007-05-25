@@ -51,7 +51,7 @@ def index(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -85,7 +85,7 @@ def delete(req, ln=cdslang, comid=""):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -125,7 +125,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -159,7 +159,7 @@ def users(req, ln=cdslang):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 
@@ -196,7 +196,7 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
                     description="%s - Internal Error" % cdsname,
-                    keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                    keywords="%s, Internal Error" % cdsname,
                     language=ln,
                     req=req)
 

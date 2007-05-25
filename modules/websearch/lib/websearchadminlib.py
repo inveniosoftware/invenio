@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -42,7 +42,7 @@ from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIO
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
-    
+
     navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/websearch/">WebSearch Admin</a> """ % (weburl, weburl)
     navtrail = navtrail + previous
     return navtrail
@@ -51,26 +51,26 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
     """Modify the translations of a collection
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
-    
+
     output = ''
     subtitle = ''
     cdslangs = get_languages()
     if confirm in ["2", 2] and colID:
         finresult = modify_translations(colID, cdslangs, sel_type, trans, "collection")
     col_dict = dict(get_def_name('', "collection"))
-        
+
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
         subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/websearch/guide.html#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
-        
+
         if type(trans) is str:
             trans = [trans]
         if sel_type == '':
             sel_type = get_col_nametypes()[0][0]
-            
+
         header = ['Language', 'Translation']
         actions = []
-                            
+
         types = get_col_nametypes()
         if len(types) > 1:
             text  = """
@@ -84,7 +84,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
                     text += ": %s" % trans_names[0][0]
                 text += "</option>"
             text += """</select>"""
-        
+
             output += createhiddenform(action="modifytranslations#3",
                                        text=text,
                                        button="Select",
@@ -116,19 +116,19 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
         if sel_type and len(trans) and confirm in ["2", 2]:
             output += write_outcome(finresult)
-                    
+
     body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_modifytranslations", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-        
+
 def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback='yes'):
     """Modify which rank methods is visible to the collection
     func - remove or add rank method
     rnkID - the id of the rank method."""
-    
+
     output = ""
     subtitle = ""
 
@@ -146,7 +146,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
         """ % col_dict[colID]
-        
+
         rnkmethods = get_col_rnk(colID, ln)
         output += """<dd>"""
         if not rnkmethods:
@@ -157,7 +157,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         output += """</dd>
         </dl>
         """
-     
+
         rnk_list = get_def_name('', "rnkMETHOD")
         rnk_dict_in_col = dict(get_col_rnk(colID, ln))
         rnk_list = filter(lambda x: not rnk_dict_in_col.has_key(x[0]), rnk_list)
@@ -177,7 +177,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
                                        ln=ln,
                                        func=0,
                                        confirm=1)
-            
+
         if confirm in ["1", 1] and func in ["0", 0] and int(rnkID) != -1:
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["0", 0]:
@@ -190,7 +190,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
             <select name="rnkID" class="admin_w200">
             <option value="-1">- select rank method-</option>
             """
-        
+
             for (id, name) in coll_list:
                 text += """<option value="%s" %s>%s</option>""" % (id, (func in ["1", 1] and confirm in ["0", 0] and int(rnkID) == int(id)) and 'selected="selected"' or '' , name)
             text += """</select>"""
@@ -201,12 +201,12 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
                                        ln=ln,
                                        func=1,
                                        confirm=1)
-             
+
         if confirm in ["1", 1] and func in ["1", 1] and int(rnkID) != -1:
             output += write_outcome(finresult)
         elif confirm not in ["0", 0] and func in ["1", 1]:
             output += """<b><span class="info">Please select a rank method.</span></b>"""
-                    
+
     body = [output]
 
     if callback:
@@ -220,7 +220,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     add_son - the collection to add
     rtype - add it as a regular or virtual
     mtype - add it to the regular or virtual tree."""
-    
+
     output = ""
     output2 = ""
     subtitle = """Attach collection to tree&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.2">?</a>]</small>""" % (weburl)
@@ -268,13 +268,13 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     <select name="add_dad" class="admin_w200">
     <option value="">- select parent collection -</option>
     """
-    
+
     for (id, name) in col_list:
         text += """<option value="%s" %s>%s</option>
         """ % (id, str(id)==add_dad and 'selected="selected"' or '', name)
     text += """</select><br>
     """
-    
+
     text += """
     <span class="adminlabel">with relationship:</span>
     <select name="rtype" class="admin_w200">
@@ -298,7 +298,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
         return perform_index(colID, ln, mtype="perform_addcollectiontotree", content=addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+
 def perform_addcollection(colID, ln, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
     """form to add a new collection.
     colNAME - the name of the new collection
@@ -324,7 +324,7 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', rest='', callback="
             output += perform_addcollectiontotree(colID=colID, ln=ln, add_son=res[1], callback='')
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the collection a name.</span></b>"""
-        
+
     body = [output]
 
     if callback:
@@ -335,10 +335,10 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', rest='', callback="
 def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     """form to modify the dbquery of the collection.
     dbquery - the dbquery of the collection."""
- 
+
     subtitle = ''
     output  = ""
-    
+
     col_dict = dict(get_def_name('', "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
@@ -358,7 +358,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
         elif reg_sons <= 1:
             if not dbquery:
                 output += "Warning: This collection does not have any subcollections, and should because of this have a collection query, for further explanation, check the WebSearch Guide<br>"
-            
+
         text = """
         <span class="adminlabel">Query</span>
         <input class="admin_w200" type="text" name="dbquery" value="%s" /><br>
@@ -374,20 +374,20 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
             res = modify_dbquery(colID, dbquery)
             if res:
                 if dbquery == "":
-                    text = """<b><span class="info">Query removed for this collection.</span></b>""" 
+                    text = """<b><span class="info">Query removed for this collection.</span></b>"""
                 else:
-                    text = """<b><span class="info">Query set for this collection.</span></b>""" 
+                    text = """<b><span class="info">Query set for this collection.</span></b>"""
             else:
                 text = """<b><span class="info">Sorry, could not change query.</span></b>"""
             output += text
-          
+
     body = [output]
-        
+
     if callback:
         return perform_editcollection(colID, ln, "perform_modifydbquery", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+
 def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     """modify which apache group is allowed to access the collection.
     rest - the groupname"""
@@ -408,7 +408,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
         <span class="adminlabel">Restricted to:</span>
         <input class="admin_w200" type="text" name="rest" value="%s" /><br>
         """ % rest
-    
+
         output += createhiddenform(action="modifyrestricted",
                                    text=text,
                                    button="Modify",
@@ -420,15 +420,15 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
             res = modify_restricted(colID, rest)
             if res:
                 if rest == "":
-                    text = """<b><span class="info">Removed restriction for this collection.</span></b>""" 
+                    text = """<b><span class="info">Removed restriction for this collection.</span></b>"""
                 else:
-                    text = """<b><span class="info">Restriction set for this collection.</span></b>""" 
+                    text = """<b><span class="info">Restriction set for this collection.</span></b>"""
             else:
                 text = """<b><span class="info">Sorry, could not change the access restrictions.</span></b>"""
             output += text
 
     body = [output]
-        
+
     if callback:
         return perform_editcollection(colID, ln, "perform_modifyrestricted", addadminbox(subtitle, body))
     else:
@@ -443,7 +443,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     move_to - move the move_from collection and set this as it's father. (is not the collection id, but the place in the tree)
     delete - delete this collection from the tree  (is not the collection id, but the place in the tree)
     rtype - the type of the collection in the tree, regular or virtual"""
-    
+
     colID = int(colID)
     tree = get_col_tree(colID, rtype)
     col_dict = dict(get_def_name('', "collection"))
@@ -451,7 +451,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], weburl, weburl, colID, ln)
     fin_output = ""
     output = ""
-    
+
     try:
         if move_up:
             move_up = int(move_up)
@@ -480,7 +480,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                 else:
                     text = """<b>Do you want to remove all subcollections of the %s collection '%s'.</b>
                     """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
-                    
+
                 output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % weburl,
                                            text=text,
                                            button="Confirm",
@@ -502,7 +502,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                     else:
                         output += """<b><span class="info">Removed the subcollections of the %s collection '%s'.</span></b><br><br>
                         """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
-                        
+
                 else:
                     output += """<b><span class="info">Could not remove the collection from the tree.</span></b><br><br>
                     """
@@ -524,7 +524,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
             move_to_id = int(move_to[1:len(move_to)])
             tree_from = get_col_tree(colID, move_from_rtype)
             tree_to = get_col_tree(colID, move_to_rtype)
-            
+
             if confirm in [0, '0']:
                 if move_from_id == move_to_id and move_from_rtype == move_to_rtype:
                     output += """<b><span class="info">Cannot move to itself.</span></b><br><br>
@@ -596,7 +596,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
 
 def perform_showtree(colID, ln):
     """create collection tree/hiarchy"""
-  
+
     col_dict = dict(get_def_name('', "collection"))
     subtitle = "Collection tree: %s" % col_dict[int(colID)]
     output = """<table border ="0" width="100%">
@@ -620,7 +620,7 @@ def perform_showtree(colID, ln):
     body = [output]
 
     return addadminbox(subtitle, body)
-    
+
 def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-1):
     """form to add a new portalbox
     title - the title of the portalbox
@@ -641,7 +641,7 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
                               colID=colID,
                               ln=ln,
                               confirm=1)
-    
+
     if body and confirm in [1, "1"]:
         res = add_pbx(title, body)
         output += write_outcome(res)
@@ -650,7 +650,7 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
     elif confirm not in [-1, "-1"]:
         output  += """<b><span class="info">Body field must be filled.</span></b>
         """
-        
+
     body = [output]
 
     return perform_showportalboxes(colID, ln, content=addadminbox(subtitle, body))
@@ -662,7 +662,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
     score - the importance of the portalbox.
     position - the position of the portalbox on the page
     sel_ln - the language of the portalbox"""
- 
+
     subtitle = """<a name="5.2"></a>Add existing portalbox to collection"""
     output  = ""
 
@@ -714,7 +714,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
     else:
         output  = """No existing portalboxes to add, please create a new one.
         """
-        
+
     if pbxID > -1 and position and sel_ln and confirm in [1, "1"]:
         pbxID = int(pbxID)
         res = add_col_pbx(colID, pbxID, sel_ln, position, '')
@@ -732,7 +732,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
     """form to delete a portalbox which is not in use.
     colID - the current collection.
     pbxID - the id of the portalbox"""
- 
+
     subtitle = """<a name="5.3"></a>Delete an unused portalbox"""
     output  = ""
 
@@ -745,7 +745,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
             ares = delete_pbx(int(pbxID))
         else:
             return """<b><span class="info">This portalbox does not exist</span></b>"""
-                
+
     res = get_pbx()
     col_dict = dict(get_def_name('', "collection"))
     pbx_dict = dict(map(lambda x: (x[0], x[1]), res))
@@ -770,7 +770,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
                                    colID=colID,
                                    ln=ln,
                                    confirm=1)
-        
+
     if pbxID not in [-1, "-1"]:
         pbxID = int(pbxID)
         if confirm in [1, "1"]:
@@ -847,12 +847,12 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
         <span class="adminlabel">Title</span>
         <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br>
         """ % cgi.escape(title)
-        
+
         text += """
         <span class="adminlabel">Body</span>
         <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br>
         """ % cgi.escape(body)
-        
+
         output += createhiddenform(action="modifyportalbox#5.4",
                                    text=text,
                                    button="Modify",
@@ -891,10 +891,10 @@ def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln):
 def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     """show the portalboxes of this collection.
     colID - the portalboxes to show the collection for."""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
-    
+
     subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
     output  = ""
     pos = get_pbx_pos()
@@ -907,7 +907,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
      <dd><a href="addexistingportalbox?colID=%s&amp;ln=%s#5.2">Add existing portalbox to collection</a></dd>
     </dl>
     """  % (colID, ln, colID, ln, colID, ln)
-  
+
     header = ['Position', 'Language', '', 'Title', 'Actions']
     actions = []
     cdslang = get_languages()
@@ -915,25 +915,25 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
 
     pos_list = pos.items()
     pos_list.sort()
-   
+
     if len(get_col_pbx(colID)) > 0:
         for (key, value) in cdslang:
             for (pos_key, pos_value) in pos_list:
                 res = get_col_pbx(colID, key, pos_key)
                 i = 0
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
-                    move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""        
+                    move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
                     if i != 0:
                         move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), weburl)
                     else:
-                        move += "&nbsp;&nbsp;&nbsp;" 
+                        move += "&nbsp;&nbsp;&nbsp;"
                     move += "</td><td>"
                     i += 1
                     if i != len(res):
                         move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (weburl, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), weburl)
                     move += """</td></tr></table>"""
                     actions.append(["%s" % (i==1 and pos[position] or ''), "%s" % (i==1 and lang[tln] or ''), move, "%s" % title])
-                    
+
                     for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
                         actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
                         for (str, function) in col[1:]:
@@ -941,7 +941,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No portalboxes exists for this collection"""
-        
+
     output += content
     body = [output]
 
@@ -955,14 +955,14 @@ def perform_removeportalbox(colID, ln, pbxID='', sel_ln='', callback='yes', conf
     colID - the current collection, remove the portalbox from this collection.
     sel_ln - remove the portalbox with this language
     pbxID - remove the portalbox with this id"""
- 
+
     subtitle = """<a name="5.5"></a>Remove portalbox"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
     res = get_pbx()
     pbx_dict = dict(map(lambda x: (x[0], x[1]), res))
-    
+
     if colID and pbxID and sel_ln:
         colID = int(colID)
         pbxID = int(pbxID)
@@ -1055,7 +1055,7 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>
         """
-        
+
     body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
@@ -1111,7 +1111,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
         output += write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>"""
-        
+
     body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
@@ -1138,7 +1138,7 @@ def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes'
     fld_dict = dict(get_def_name('', "field"))
     res = get_fld_value()
     fldv_dict = dict(map(lambda x: (x[0], x[1]), res))
-    
+
     if colID and fldID:
         colID = int(colID)
         fldID = int(fldID)
@@ -1183,7 +1183,7 @@ def perform_removefieldvalue(colID, ln, fldID='', fldvID='', fmeth='', callback=
     fld_dict = dict(get_def_name('', "field"))
     res = get_fld_value()
     fldv_dict = dict(map(lambda x: (x[0], x[1]), res))
-    
+
     if colID and fldID:
         colID = int(colID)
         fldID = int(fldID)
@@ -1214,7 +1214,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
     colID - the collection
     fldID - the field to rearrange the fieldvalue for
     """
- 
+
     subtitle = "Order values alphabetically"
     output  = ""
     col_fldv = get_col_fld(colID, 'seo', fldID)
@@ -1240,7 +1240,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     """rearrang the fields alphabetically
     colID - the collection
     """
- 
+
     subtitle = "Order fields alphabetically"
     output  = ""
     col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, fmeth)))
@@ -1255,7 +1255,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
         output += write_outcome((1, ""))
     else:
         output += write_outcome((0, (0, "No fields to order")))
-        
+
     body = [output]
 
     output = "<br>" + addadminbox(subtitle, body)
@@ -1271,14 +1271,14 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
     colID - the collection
     fldID - the field to add the fieldvalue to
     fldvID - the fieldvalue to add"""
- 
+
     subtitle = """</a><a name="7.4"></a>Add existing value to search option"""
     output  = ""
 
     if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
-        fldvID = int(fldvID) 
+        fldvID = int(fldvID)
         ares = add_col_fld(colID, fldID, 'seo', fldvID)
-        
+
     colID = int(colID)
     fldID = int(fldID)
     lang = dict(get_languages())
@@ -1294,13 +1294,13 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
     <select name="fldvID" class="admin_w200">
     <option value="-1">- Select value -</option>
     """
-    
+
     res = run_sql("SELECT id,name,value FROM fieldvalue ORDER BY name")
     for (id, name, value) in res:
         text += """<option value="%s" %s>%s - %s</option>
-        """ % (id, id  == int(fldvID) and 'selected="selected"' or '', name, value)            
+        """ % (id, id  == int(fldvID) and 'selected="selected"' or '', name, value)
     text += """</select><br>"""
-    
+
     output += createhiddenform(action="addexistingfieldvalue#7.4",
                                text=text,
                                button="Add",
@@ -1308,7 +1308,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
                                fldID=fldID,
                                ln=ln,
                                confirm=1)
-            
+
     if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
         output += write_outcome(ares)
     elif confirm in [1, "1"]:
@@ -1324,14 +1324,14 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
     colID - the collection to add the field to
     fldID - the field to add
     sel_ln - the language of the field"""
- 
+
     subtitle = """<a name="6.2"></a><a name="7.2"></a><a name="8.2"></a>Add existing field to collection"""
     output  = ""
 
     if fldID not in [-1, "-1"] and confirm in [1, "1"]:
-        fldID = int(fldID) 
+        fldID = int(fldID)
         ares = add_col_fld(colID, fldID, fmeth, fldvID)
-        
+
     colID = int(colID)
     lang = dict(get_languages())
     res =  get_def_name('', "field")
@@ -1340,7 +1340,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
     col_fld = dict(map(lambda x: (x[0], x[1]), get_col_fld(colID, fmeth)))
     fld_value  = get_fld_value()
     fldv_dict = dict(map(lambda x: (x[0], x[1]), fld_value))
-        
+
     if fldvID:
         fldvID = int(fldvID)
     text  = """
@@ -1352,7 +1352,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
         if fmeth == 'seo' or (fmeth != 'seo' and not col_fld.has_key(id)):
             text += """<option value="%s" %s>%s</option>
             """ % (id, '', fld_dict[id])
-                
+
     text += """</select><br>"""
 
     output += createhiddenform(action="addexistingfield#6.2",
@@ -1362,7 +1362,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
                                fmeth=fmeth,
                                ln=ln,
                                confirm=1)
-            
+
     if fldID not in [-1, "-1"] and confirm in [1, "1"]:
         output += write_outcome(ares)
     elif fldID in [-1, "-1"] and confirm not in [-1, "-1"]:
@@ -1381,12 +1381,12 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
 
 def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
-    
+
     subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
@@ -1406,23 +1406,23 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_type_list = fld_type.items()
 
     if len(get_col_fld(colID, 'soo')) > 0:
-        res = get_col_fld(colID, 'soo')      
+        res = get_col_fld(colID, 'soo')
         i = 0
-                    
+
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
             else:
-                move += "&nbsp;&nbsp;&nbsp;&nbsp;"     
+                move += "&nbsp;&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(res):
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
             move += """</td></tr></table>"""
-            
+
             actions.append([move, fld_dict[int(fldID)]])
-                    
+
             for col in [(('Remove sort option', 'removefield'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
@@ -1430,7 +1430,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No sort options exists for this collection"""
-        
+
     output += content
 
     body = [output]
@@ -1442,12 +1442,12 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
 
 def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     """show the search fields of this collection.."""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
-    
+
     subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
@@ -1467,15 +1467,15 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_type_list = fld_type.items()
 
     if len(get_col_fld(colID, 'sew')) > 0:
-        res = get_col_fld(colID, 'sew')      
+        res = get_col_fld(colID, 'sew')
         i = 0
-                    
+
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
             else:
-                move += "&nbsp;&nbsp;&nbsp;"  
+                move += "&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(res):
@@ -1483,7 +1483,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
             move += """</td></tr></table>"""
 
             actions.append([move, fld_dict[int(fldID)]])
-                    
+
             for col in [(('Remove search field', 'removefield'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=sew#6.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
@@ -1491,7 +1491,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No search fields exists for this collection"""
-        
+
     output += content
 
     body = [output]
@@ -1500,15 +1500,15 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
         return perform_editcollection(colID, ln, "perform_showsearchfields", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-        
+
 def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1):
     """show the sort and search options of this collection.."""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
-    
+
     subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
@@ -1527,7 +1527,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
 
     fld_type_list = fld_type.items()
     fld_distinct = run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc" % colID)
-    
+
     if len(fld_distinct) > 0:
         i = 0
         for (id) in fld_distinct:
@@ -1538,12 +1538,12 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
             if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
             else:
-                move += "&nbsp;&nbsp;&nbsp;" 
+                move += "&nbsp;&nbsp;&nbsp;"
 
             i += 1
             if i != len(fld_distinct):
                 move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, fld_distinct[i][0], random.randint(0, 1000), weburl)
-	    
+
             actions.append([move, "%s" % fld_dict[fldID]])
             for col in [(('Modify values', 'modifyfield'), ('Remove search option', 'removefield'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#7.3">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
@@ -1565,7 +1565,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
 
 def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callback='yes', confirm=0):
     """Modify the fieldvalues for a field"""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
@@ -1598,17 +1598,17 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
             if j != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
             else:
-                move += "&nbsp;&nbsp;&nbsp;"            
+                move += "&nbsp;&nbsp;&nbsp;"
 
             j += 1
             if j != len(col_fld):
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), weburl)   
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), weburl)
 
             if fieldvalue[0][1] != fieldvalue[0][2] and fldvID is not None:
                 actions.append([move, "%s - %s" % (fieldvalue[0][1], fieldvalue[0][2])])
             elif fldvID is not None:
-                actions.append([move, "%s" % fieldvalue[0][1]])            
-     
+                actions.append([move, "%s" % fieldvalue[0][1]])
+
             move = ''
             for col in [(('Modify value', 'modifyfieldvalue'), ('Remove value', 'removefieldvalue'),)]:
                 actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s&amp;fmeth=seo#7.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, fldvID, col[0][0]))
@@ -1628,7 +1628,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
 def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1):
     """shows the outputformats of the current collection
     colID - the collection id."""
-    
+
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
@@ -1644,7 +1644,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
 
     header = ['', 'Code', 'Output format', 'Actions']
     actions = []
-    
+
     col_fmt = get_col_fmt(colID)
     fmt_dict = dict(get_def_name('', "format"))
 
@@ -1655,7 +1655,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
             if i != 0:
                 move += """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smallup.gif" title="Move format up"></a>""" % (weburl, colID, ln, id_format, col_fmt[i - 1][0], random.randint(0, 1000), weburl)
             else:
-                move += "&nbsp;&nbsp;&nbsp;" 
+                move += "&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(col_fmt):
@@ -1696,7 +1696,7 @@ def external_collections_build_select(colID, external_collection):
         else:
             selected = ''
         output += '<option value="%(num)d"%(selected)s>%(state_name)s</option>' % {'num': num, 'selected': selected, 'state_name': state_name}
-    
+
     output += '</select>\n'
     return output
 
@@ -1714,7 +1714,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
     external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
     for external_collection in external_collections:
         collection_name = external_collection.name
-        select = external_collections_build_select(colID, external_collection) 
+        select = external_collections_build_select(colID, external_collection)
         recurse = '<input type=checkbox name="recurse" value="%(collection_name)s">' % {'collection_name': collection_name}
         table_content.append([collection_name, select, recurse])
 
@@ -1732,9 +1732,9 @@ def perform_update_external_collections(colID, ln, state_list, recurse_list):
 
     if not state_list:
         return 'Warning : No state found.<br>' + perform_manage_external_collections(colID, ln)
-    
+
     external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
-    
+
     if len(external_collections) != len(state_list):
         return 'Warning : Size of state_list different from external_collections!<br>' + perform_manage_external_collections(colID, ln)
 
@@ -1754,7 +1754,7 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
     """form to add an existing output format to a collection.
     colID - the collection the format should be added to
     fmtID - the format to add."""
- 
+
     subtitle = """<a name="10.2"></a>Add existing output format to collection"""
     output  = ""
 
@@ -1802,7 +1802,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to delete an output format not in use.
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
- 
+
     subtitle = """<a name="10.3"></a>Delete an unused output format"""
     output  = """
     <dl>
@@ -1821,7 +1821,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     col_dict = dict(get_def_name('', "collection"))
     col_fmt = get_col_fmt()
     col_fmt = dict(map(lambda x: (x[0], x[2]), col_fmt))
-    
+
     if len(res) > 0:
         text  = """
         <span class="adminlabel">Output format</span>
@@ -1840,7 +1840,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
                                    colID=colID,
                                    ln=ln,
                                    confirm=0)
-        
+
     if fmtID not in [-1, "-1"]:
         fmtID = int(fmtID)
         if confirm in [0, "0"]:
@@ -1853,7 +1853,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
                                        fmtID=fmtID,
                                        ln=ln,
                                        confirm=1)
-                    
+
         elif confirm in [1, "1"]:
             output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
@@ -1869,13 +1869,13 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     colID - the collection id of the current collection.
     fmtID - the format id.
     """
- 
+
     subtitle = """<a name="10.5"></a>Remove output format"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
     fmt_dict = dict(get_def_name('', "format"))
-    
+
     if colID and fmtID:
         colID = int(colID)
         fmtID = int(fmtID)
@@ -1896,11 +1896,11 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
 
     output = "<br>" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
- 
+
 def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     """The index method, calling methods to show the collection tree, create new collections and add collections to tree.
     """
-    
+
     subtitle = "Overview"
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
@@ -1916,7 +1916,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     if cdsname != run_sql("SELECT name from collection WHERE id=1")[0][0]:
         res = run_sql("update collection set name='%s' where id=1" % cdsname)
         if res:
-            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the CDS Invenio installation name given prior to installing CDS Invenio.</span><b><br>"""
+            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(cdsname)s installation name given prior to installing %(cdsname)s.</span><b><br>""" % {'cdsname' : cdsname}
         else:
             return "Error renaming root collection."
     fin_output += """
@@ -1935,19 +1935,19 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
 
     if mtype == "":
         fin_output += """<br><br><b><span class="info">For managing the collections, select an item from the menu.</span><b><br>"""
-        
+
     if mtype == "perform_addcollection" and content:
         fin_output += content
     elif mtype == "perform_addcollection" or mtype == "perform_showall":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
-        
+
     if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
     elif mtype == "perform_addcollectiontotree" or mtype == "perform_showall":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
         fin_output += "<br>"
-        
+
     if mtype == "perform_modifycollectiontree" and content:
         fin_output += content
     elif mtype == "perform_modifycollectiontree" or mtype == "perform_showall":
@@ -1967,7 +1967,7 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     body = [fin_output]
 
     return addadminbox('<b>Menu</b>', body)
-    
+
 def show_coll_not_in_tree(colID, ln, col_dict):
     """Returns collections not in tree"""
 
@@ -1987,7 +1987,7 @@ def show_coll_not_in_tree(colID, ln, col_dict):
     else:
         output = ""
     return output
-    
+
 def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='', edit=''):
     """Creates the presentation of the collection tree, with the buttons for modifying it.
     tree - the tree to present, from get_tree()
@@ -1997,7 +1997,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
     move_to - the collection which should be set as father of move_from
     rtype - the type of the tree, regular or virtual
     edit - if the method should output the edit buttons."""
-    
+
     if move_from:
         move_from_rtype = move_from[0]
         move_from_id = int(move_from[1:len(move_from)])
@@ -2017,7 +2017,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         dad = tree[i][3]
         reltype = tree[i][4]
         tmove_from = ""
-        
+
         j = i
         while j > 0:
             j = j - 1
@@ -2033,7 +2033,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
                 pass
         text += """<tr><td>
         """
-        
+
         if i > 0 and tree[i][1] == 0:
             tables = tables + 1
             text += """</td><td></td><td></td><td></td><td><table border="0" cellspacing="0" cellpadding="0"><tr><td>
@@ -2043,13 +2043,13 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
             tstack.append((id_son, dad, 1))
         else:
             tstack.append((id_son, dad, tables))
-        
+
         if up == 1 and edit:
             text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
         else:
             text += """&nbsp;"""
         text += "</td><td>"
-        
+
         if down == 1 and edit:
             text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
         else:
@@ -2107,10 +2107,10 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
             text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s""" % (tree[i][0], (reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype, i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype, i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
         except KeyError:
             pass
-        
+
         text += """</td></tr>
         """
-        
+
     while tables > 0:
         text += """</table></td></tr>
         """
@@ -2124,7 +2124,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     """form to delete a collection
     colID - id of collection
     """
-    
+
     subtitle =''
     output  = """
     <span class="warning">
@@ -2144,7 +2144,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
         subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
         res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
-                
+
         if not res and not res2:
             if confirm in ["-1", -1]:
                 text = """Do you want to delete this collection."""
@@ -2169,14 +2169,14 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     else:
         subtitle = """4. Delete collection"""
         output = """<b><span class="info">Not possible to delete the root collection</span></b>"""
-                    
+
     body = [output]
 
     if callback:
         return perform_editcollection(colID, ln, "perform_deletecollection", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+
 def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     """interface to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
     if callback, the method will call perform_editcollection, if not, it will just return its output.
@@ -2189,7 +2189,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     if not col_dict.has_key(colID):
         return """<b><span class="info">Collection deleted.</span></b>
         """
-    
+
     fin_output = """
     <table>
     <tr>
@@ -2229,7 +2229,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     elif mtype == "perform_modifytranslations" or not mtype:
         fin_output += perform_modifytranslations(colID, ln, callback='')
 
-    if mtype == "perform_deletecollection" and content: 
+    if mtype == "perform_deletecollection" and content:
         fin_output += content
     elif mtype == "perform_deletecollection" or not mtype:
         fin_output += perform_deletecollection(colID, ln, callback='')
@@ -2243,7 +2243,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_showsearchfields" or not mtype:
         fin_output += perform_showsearchfields(colID, ln, callback='')
-        
+
     if mtype == "perform_showsearchoptions" and content:
         fin_output += content
     elif mtype == "perform_showsearchoptions" or not mtype:
@@ -2253,7 +2253,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_showsortoptions" or not mtype:
         fin_output += perform_showsortoptions(colID, ln, callback='')
-    
+
     if mtype == "perform_modifyrankmethods" and content:
         fin_output += content
     elif  mtype == "perform_modifyrankmethods" or not mtype:
@@ -2273,7 +2273,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
 
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
- 
+
     subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#4">?</a>]""" % weburl
     output  = ""
 
@@ -2283,7 +2283,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     output += """<br><b>Last updates:</b><br>"""
     collection_table_update_time = ""
     collection_web_update_time = ""
-    
+
     collection_table_update_time = get_table_update_time('collection')
     output += "Collection table last updated: %s<br>" % collection_table_update_time
 
@@ -2324,11 +2324,11 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
     else:
         actions.append(['', 'bibindex', '', '', 'Not executed yet'])
-        
-    output += tupletotable(header=header, tuple=actions) 
+
+    output += tupletotable(header=header, tuple=actions)
     output += """<br><b>Next scheduled BibSched run:</b><br>"""
     actions = []
-    
+
     res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime > now() ORDER by runtime")
 
     webcoll_future = ""
@@ -2339,7 +2339,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         webcoll_future = "yes"
     else:
         actions.append(['', 'webcoll', '', '', 'Not scheduled'])
-        
+
     res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime > now() ORDER by runtime")
 
     bibindex_future = ""
@@ -2356,17 +2356,17 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         output += """<br><b><span class="info">Warning: Webcoll is not scheduled for a future run by bibsched, any updates to the collection will not be processed.</span></b><br>"""
     if bibindex_future == "":
         output += """<br><b><span class="info">Warning: Bibindex is not scheduled for a future run by bibsched, any updates to the records will not be processed.</span></b><br>"""
-        
+
     body = [output]
 
     if callback:
         return perform_index(colID, ln, "perform_checkwebcollstatus", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
-    
+
 def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     """Check the configuration of the collections."""
- 
+
     subtitle = """<a name="11"></a>Collections Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#5">?</a>]""" % weburl
     output  = ""
 
@@ -2386,7 +2386,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
         langs = run_sql("SELECT ln from collectionname where id_collection=%s" % id)
         i8n = ""
-        
+
         if len(langs) > 0:
             for lang in langs:
                 i8n += "%s, " % lang
@@ -2420,11 +2420,11 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
             status = """<b><span class="info">OK</span></b>"""
         actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (weburl, id, ln, name), dbquery, subs, restricted, i8n, status])
 
-    
+
     output += tupletotable(header=header, tuple=actions)
 
     body = [output]
-    
+
     return addadminbox(subtitle, body)
 
     if callback:
@@ -2436,7 +2436,7 @@ def get_col_tree(colID, rtype=''):
     """Returns a presentation of the tree as a list. TODO: Add loop detection
     colID - startpoint for the tree
     rtype - get regular or virtual part of the tree"""
-    
+
     try:
         colID = int(colID)
         stack = [colID]
@@ -2455,14 +2455,14 @@ def get_col_tree(colID, rtype=''):
                 score = res[i][1]
                 rtype = res[i][2]
                 stack.append(id_son)
-                if i == (len(res) - 1):   
+                if i == (len(res) - 1):
                     up = 0
                 else:
                     up = 1
-                if i == 0:   
+                if i == 0:
                     down = 0
                 else:
-                    down = 1 
+                    down = 1
                 ntree.insert(0, (id_son, up, down, ccolID, rtype))
             tree = tree[0:ssize] + ntree + tree[ssize:len(tree)]
         return tree
@@ -2474,7 +2474,7 @@ def add_col_dad_son(add_dad, add_son, rtype):
     add_dad - add to this collection id
     add_son - add this collection id
     rtype - either regular or virtual"""
-    
+
     try:
         res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score ASC" % add_dad)
         highscore = 0
@@ -2486,10 +2486,10 @@ def add_col_dad_son(add_dad, add_son, rtype):
         return (1, highscore)
     except StandardError, e:
         return (0, e)
-        
+
 def compare_on_val(first, second):
     """Compare the two values"""
-    
+
     return cmp(first[1], second[1])
 
 def get_col_fld(colID=-1, type = '', id_field=''):
@@ -2498,7 +2498,7 @@ def get_col_fld(colID=-1, type = '', id_field=''):
     ln - language id"""
 
     sql = "SELECT id_field,id_fieldvalue,type,score,score_fieldvalue FROM collection_field_fieldvalue, field WHERE id_field=field.id"
-    
+
     try:
         if colID > -1:
             sql += " AND id_collection=%s" % colID
@@ -2511,14 +2511,14 @@ def get_col_fld(colID=-1, type = '', id_field=''):
         return res
     except StandardError, e:
         return ""
-    
+
 def get_col_pbx(colID=-1, ln='', position = ''):
     """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
     colID - collection id
     ln - language id"""
 
     sql = "SELECT id_portalbox, id_collection, ln, score, position, title, body FROM collection_portalbox, portalbox WHERE id_portalbox = portalbox.id"
-    
+
     try:
         if colID > -1:
             sql += " AND id_collection=%s" % colID
@@ -2535,7 +2535,7 @@ def get_col_pbx(colID=-1, ln='', position = ''):
 def get_col_fmt(colID=-1):
     """Returns all formats currently associated with a collection, or for one specific collection
     colID - the id of the collection"""
-    
+
     try:
         if colID not in [-1, "-1"]:
             res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id AND id_collection=%s ORDER BY score desc" % colID)
@@ -2548,7 +2548,7 @@ def get_col_fmt(colID=-1):
 def get_col_rnk(colID, ln):
     """ Returns a list of the rank methods the given collection is attached to
     colID - id from collection"""
-    
+
     try:
         res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s" % colID))
         res2 = get_def_name('', "rnkMETHOD")
@@ -2559,7 +2559,7 @@ def get_col_rnk(colID, ln):
 
 def get_pbx():
     """Returns all portalboxes"""
-    
+
     try:
         res = run_sql("SELECT id, title, body FROM portalbox ORDER by title,body")
         return res
@@ -2568,7 +2568,7 @@ def get_pbx():
 
 def get_fld_value(fldvID = ''):
     """Returns fieldvalue"""
-    
+
     try:
         sql = "SELECT id, name, value FROM fieldvalue"
         if fldvID:
@@ -2578,10 +2578,10 @@ def get_fld_value(fldvID = ''):
         return res
     except StandardError, e:
         return ""
-    
+
 def get_pbx_pos():
     """Returns a list of all the positions for a portalbox"""
-    
+
     position = {}
     position["rt"] = "Right Top"
     position["lt"] = "Left Top"
@@ -2593,7 +2593,7 @@ def get_pbx_pos():
 
 def get_sort_nametypes():
     """Return a list of the various translationnames for the fields"""
-    
+
     type = {}
     type['soo'] = 'Sort options'
     type['seo'] = 'Search options'
@@ -2602,28 +2602,28 @@ def get_sort_nametypes():
 
 def get_fmt_nametypes():
     """Return a list of the various translationnames for the output formats"""
-    
+
     type = []
     type.append(('ln', 'Long name'))
     return type
 
 def get_fld_nametypes():
     """Return a list of the various translationnames for the fields"""
-    
+
     type = []
     type.append(('ln', 'Long name'))
     return type
 
 def get_col_nametypes():
     """Return a list of the various translationnames for the collections"""
-    
+
     type = []
     type.append(('ln', 'Long name'))
     return type
 
 def find_last(tree, start_son):
     """Find the previous collection in the tree with the same father as start_son"""
-     
+
     id_dad = tree[start_son][3]
     while start_son > 0:
         start_son -= 1
@@ -2632,7 +2632,7 @@ def find_last(tree, start_son):
 
 def find_next(tree, start_son):
     """Find the next collection in the tree with the same father as start_son"""
-    
+
     id_dad = tree[start_son][3]
     while start_son < len(tree):
         start_son += 1
@@ -2650,7 +2650,7 @@ def remove_col_subcol(id_son, id_dad, type):
             res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
         else:
             tree = get_col_tree(id_son, type)
-            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))  
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))
         if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type='%s'" % (id_son, type)):
             for (id, up, down, dad, rtype) in tree:
                 res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id, dad))
@@ -2662,7 +2662,7 @@ def check_col(add_dad, add_son):
     """Check if the collection can be placed as a son of the dad without causing loops.
     add_dad - collection id
     add_son - collection id"""
-    
+
     try:
         stack = [add_dad]
         res = run_sql("SELECT id_dad FROM collection_collection WHERE id_dad=%s AND id_son=%s" % (add_dad, add_son))
@@ -2679,12 +2679,12 @@ def check_col(add_dad, add_son):
         return (1, "")
     except StandardError, e:
         return (0, e)
-      
+
 def attach_rnk_col(colID, rnkID):
     """attach rank method to collection
     rnkID - id from rnkMETHOD table
     colID - id of collection, as in collection table """
-    
+
     try:
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
         return (1, "")
@@ -2695,7 +2695,7 @@ def detach_rnk_col(colID, rnkID):
     """detach rank method from collection
     rnkID - id from rnkMETHOD table
     colID - id of collection, as in collection table """
-    
+
     try:
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
         return (1, "")
@@ -2717,7 +2717,7 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
     col_from - move this collection from current point
     col_to - and set it as a son of this collection.
     move_to_rtype - either virtual or regular collection"""
-    
+
     try:
         res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score asc" % col_to[0])
         highscore = 0
@@ -2726,7 +2726,7 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
                 highscore = int(score[0])
         highscore += 1
         if not move_to_rtype:
-            move_to_rtype = col_from[4] 
+            move_to_rtype = col_from[4]
         res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (col_from[0], col_from[3]))
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (col_to[0], col_from[0], highscore, move_to_rtype))
         return (1, "")
@@ -2738,7 +2738,7 @@ def remove_pbx(colID, pbxID, ln):
     colID - the collection the format is connected to
     pbxID - the portalbox which should be removed from the collection.
     ln - the language of the portalbox to be removed"""
-    
+
     try:
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln='%s'" % (colID, pbxID, ln))
         return (1, "")
@@ -2749,7 +2749,7 @@ def remove_fmt(colID, fmtID):
     """Removes a format from the collection given.
     colID - the collection the format is connected to
     fmtID - the format which should be removed from the collection."""
-    
+
     try:
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s" % (colID, fmtID))
         return (1, "")
@@ -2760,7 +2760,7 @@ def remove_fld(colID, fldID, fldvID=''):
     """Removes a field from the collection given.
     colID - the collection the format is connected to
     fldID - the field which should be removed from the collection."""
-    
+
     try:
         sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s" % (colID, fldID)
         if fldvID:
@@ -2776,7 +2776,7 @@ def remove_fld(colID, fldID, fldvID=''):
 def delete_fldv(fldvID):
     """Deletes all data for the given fieldvalue
     fldvID - delete all data in the tables associated with fieldvalue and this id"""
-    
+
     try:
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s" % fldvID)
         res = run_sql("DELETE FROM fieldvalue WHERE id=%s" % fldvID)
@@ -2787,18 +2787,18 @@ def delete_fldv(fldvID):
 def delete_pbx(pbxID):
     """Deletes all data for the given portalbox
     pbxID - delete all data in the tables associated with portalbox and this id """
-    
+
     try:
         res = run_sql("DELETE FROM collection_portalbox WHERE id_portalbox=%s" % pbxID)
         res = run_sql("DELETE FROM portalbox WHERE id=%s" % pbxID)
         return (1, "")
     except StandardError, e:
         return (0, e)
-    
+
 def delete_fmt(fmtID):
     """Deletes all data for the given format
     fmtID - delete all data in the tables associated with format and this id """
-    
+
     try:
         res = run_sql("DELETE FROM format WHERE id=%s" % fmtID)
         res = run_sql("DELETE FROM collection_format WHERE id_format=%s" % fmtID)
@@ -2806,11 +2806,11 @@ def delete_fmt(fmtID):
         return (1, "")
     except StandardError, e:
         return (0, e)
-    
+
 def delete_col(colID):
     """Deletes all data for the given collection
     colID - delete all data in the tables associated with collection and this id """
-    
+
     try:
         res = run_sql("DELETE FROM collection WHERE id=%s" % colID)
         res = run_sql("DELETE FROM collectionname WHERE id_collection=%s" % colID)
@@ -2823,13 +2823,13 @@ def delete_col(colID):
         return (1, "")
     except StandardError, e:
         return (0, e)
-    
+
 def add_fmt(code, name, rtype):
     """Add a new output format. Returns the id of the format.
     code - the code for the format, max 6 chars.
     name - the default name for the default language of the format.
     rtype - the default nametype"""
-    
+
     try:
         res = run_sql("INSERT INTO format (code, name) values ('%s','%s')" % (escape_string(code), escape_string(name)))
         fmtID = run_sql("SELECT id FROM format WHERE code='%s'" % escape_string(code))
@@ -2843,7 +2843,7 @@ def update_fldv(fldvID, name, value):
     fldvID - id of fieldvalue to modify
     value - the value of the fieldvalue
     name - the name of the fieldvalue."""
-    
+
     try:
         res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (escape_string(name), fldvID))
         res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (escape_string(value), fldvID))
@@ -2855,7 +2855,7 @@ def add_fldv(name, value):
     """Add a new fieldvalue, returns id of fieldvalue
     value - the value of the fieldvalue
     name - the name of the fieldvalue."""
-    
+
     try:
         res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (escape_string(name), escape_string(value)))
         if not res:
@@ -2918,7 +2918,7 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
     ln - which language the portalbox is for
     score - decides which portalbox is the most important
     position - position on page the portalbox should appear."""
-    
+
     try:
         if score:
             res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,'%s',%s,'%s')" % (pbxID, colID, ln, score, position))
@@ -2940,7 +2940,7 @@ def add_col_fmt(colID, fmtID, score=''):
     colID - the id of the collection involved
     fmtID - the id of the format.
     score - the score of the format, decides sorting, if not given, place the format on top"""
-    
+
     try:
         if score:
             res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)" % (fmtID, colID, score))
@@ -2962,7 +2962,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
     fldvID - the id of the fieldvalue.
     type - which type, seo, sew...
     score - the score of the format, decides sorting, if not given, place the format on top"""
-    
+
     try:
         if fldvID and fldvID not in [-1, "-1"]:
             run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' and id_fieldvalue is NULL" % (colID, fldID, type))
@@ -2979,7 +2979,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
 
             res = run_sql("SELECT * FROM collection_field_fieldvalue where id_field=%s and id_collection=%s and type='%s' and id_fieldvalue=%s" % (fldID, colID, type, fldvID))
             if not res:
-                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=score_fieldvalue+1 WHERE id_field=%s AND id_collection=%s and type='%s'" % (fldID, colID, type))   
+                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=score_fieldvalue+1 WHERE id_field=%s AND id_collection=%s and type='%s'" % (fldID, colID, type))
                 res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, 1))
             else:
                 return (0, (1, "Already exists"))
@@ -2988,17 +2988,17 @@ def add_col_fld(colID, fldID, type, fldvID=''):
             if res:
                 return (0, (1, "Already exists"))
             else:
-                run_sql("UPDATE collection_field_fieldvalue SET score=score+1")         
+                run_sql("UPDATE collection_field_fieldvalue SET score=score+1")
                 res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, 1))
         return (1, "")
     except StandardError, e:
         return (0, e)
-        
+
 def modify_restricted(colID, rest):
     """Modify which apache group is allowed to use the collection.
     colID - the id of the collection involved
     restricted - the new group"""
-    
+
     try:
         sql = "UPDATE collection SET restricted="
         if rest:
@@ -3010,12 +3010,12 @@ def modify_restricted(colID, rest):
         return (1, "")
     except StandardError, e:
         return (0, e)
-        
+
 def modify_dbquery(colID, dbquery):
     """Modify the dbquery of an collection.
     colID - the id of the collection involved
     dbquery - the new dbquery"""
-    
+
     try:
         sql = "UPDATE collection SET dbquery="
         if dbquery:
@@ -3037,7 +3037,7 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
     body - the content
     score - if several portalboxes in one position, who should appear on top.
     position - position on page"""
-    
+
     try:
         if title:
             res = run_sql("UPDATE portalbox SET title='%s' WHERE id=%s" % (escape_string(title), pbxID))
@@ -3056,7 +3056,7 @@ def switch_fld_score(colID, id_1, id_2):
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
-    
+
     try:
         res1 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_1))
         res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_2))
@@ -3064,7 +3064,7 @@ def switch_fld_score(colID, id_1, id_2):
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
-            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))    
+            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3082,17 +3082,17 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
-            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))    
+            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))
         return (1, "")
     except Exception, e:
         return (0, e)
-    
+
 def switch_pbx_score(colID, id_1, id_2, sel_ln):
     """Switch the scores of id_1 and id_2 in the table given by the argument.
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
-    
+
     try:
         res1 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_1, sel_ln))
         res2 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_2, sel_ln))
@@ -3109,7 +3109,7 @@ def switch_score(colID, id_1, id_2, table):
     colID - collection the id_1 or id_2 is connected to
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
-    
+
     try:
         res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_1))
         res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_2))

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -222,12 +222,12 @@ class Template:
                  'notif_no' : (notification == 'n' and "selected" or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
-                 'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>', 
+                 'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>',
                                                                                                   'x_fmt_close': '</b>'},
                  'store_basket' : _("Store results in basket?"),
-                 'baskets': baskets 
+                 'baskets': baskets
                }
-        
+
         out += """  </td>
                    </tr>
                    <tr>
@@ -298,9 +298,9 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular_searches%(x_url2_close)s, or the input form.") + '</p>'
-        out %= {'x_url1_open': '<a href="display?ln=' + ln + '">', 
+        out %= {'x_url1_open': '<a href="display?ln=' + ln + '">',
                 'x_url1_close': '</a>',
-                'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">', 
+                'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">',
                 'x_url2_close': '</a>',
                 }
         if len(alerts):
@@ -361,7 +361,7 @@ class Template:
                     'frequency' : frequency,
                     'notification' : notification,
                     'basketname' : alert['basketname'] and cgi.escape(alert['basketname']) \
-                                                       or "- " + _("no basket") + " -",  
+                                                       or "- " + _("no basket") + " -",
                     'lastrun' : alert['lastrun'],
                     'created' : alert['created'],
                     'textargs' : alert['textargs'],
@@ -378,7 +378,7 @@ class Template:
                   }
 
             out += '</table>'
-              
+
         out += '<p>' + (_("You have defined %s alerts.") % ('<b>' + str(len(alerts)) + '</b>' )) + '</p>'
         if guest:
             out += guesttxt
@@ -423,15 +423,15 @@ class Template:
             return out
 
         out = ''
-        
+
         # display message: number of items in the list
         if permanent == "n":
-            msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total, 
+            msg = _("You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so.") % {'x_nb1': nb_queries_total,
                                                                                                                                'x_nb2': nb_queries_distinct}
             out += '<p>' + msg + '</p>'
         else:
             # permanent="y"
-            msg = _("Here are the %s most popular searches.") 
+            msg = _("Here are the %s most popular searches.")
             msg %= ('<b>' + str(len(queries)) + '</b>')
             out += '<p>' + msg + '</p>'
 
@@ -476,13 +476,13 @@ class Template:
         return out
 
     def tmpl_alert_email_headers(self, name, headers):
-        
+
         headers['Subject'] = 'Alert %s run on %s' % (
             name, time.strftime("%Y-%m-%d"))
-        
-        headers['From'] = 'CDS Alert Engine <%s>' % alertengineemail
 
-    
+        headers['From'] = '%s Alert Engine <%s>' % (cdsname, alertengineemail)
+
+
     def tmpl_alert_email_body(self, name, url, records, pattern,
                               catalogues, frequency):
 
@@ -507,7 +507,7 @@ class Template:
         else:
             total = '%d records' % l
 
-        
+
         body = """\
 Hello:
 
@@ -530,8 +530,8 @@ url: <%(url)s>
        'runtime': time.strftime("%a %Y-%m-%d %H:%M:%S"),
        'total': total,
        'url': url}
-        
-        
+
+
         for index, recid in enumerate(records[:CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL]):
             body += "\n%i) " % (index + 1)
             body += self.tmpl_alert_email_record(recid)
@@ -545,12 +545,12 @@ URL given at the top of this email to see all the results.
 
 
         body += '''
--- 
+--
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
 ''' % (cdsname, weburl, weburl + '/youralerts/list', supportemail)
-        
+
         return body
 
 
@@ -559,4 +559,4 @@ Need human intervention?  Contact <%s>
 
         out = wrap(get_as_text(recid))
         out += "Detailed record: <%s/record/%s>" % (weburl, recid)
-        return out 
+        return out

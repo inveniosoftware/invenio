@@ -1071,6 +1071,6 @@ def error_page(req, ln=cdslang, verbose=1):
     return page(title=_("Internal Error"),
                 body = create_error_box(req, verbose=verbose, ln=ln),
                 description="%s - Internal Error" % cdsname,
-                keywords="%s, CDS Invenio, Internal Error" % cdsname,
+                keywords="%s, Internal Error" % cdsname,
                 language=ln,
                 req=req)

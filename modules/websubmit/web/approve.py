@@ -74,7 +74,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
                     description="%s - Internal Error" % c,
-                    keywords="%s, CDS Invenio, Internal Error" % c,
+                    keywords="%s, Internal Error" % c,
                     language=ln,
                     req=req,
                     navmenuid='yourapprovals')

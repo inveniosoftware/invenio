@@ -29,7 +29,8 @@ import zlib
 import urllib
 from mod_python import apache
 
-from invenio.config import weburl, sweburl, cdslang, cdsname, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import weburl, sweburl, cdslang, cdsname, \
+  CFG_ACCESS_CONTROL_LEVEL_SITE, cdsnameintl
 from invenio.webpage import page
 from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized
@@ -49,7 +50,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
     def index(self, req, form):
         """Index page."""
         redirect_to_url(req, '%s/youralerts/list' % weburl)
-        
+
     def display(self, req, form):
         """Display search history page.  A misnomer."""
 
@@ -72,8 +73,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Display searches",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Display searches") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -114,8 +115,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Set a new alert",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Set a new alert") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -157,8 +158,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Modify alert settings",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Modify alert settings") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -185,8 +186,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Display alerts",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -215,7 +216,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
                                               argd['idb'], argd['idq'], uid, ln=argd['ln'])
         except webalert.AlertError, e:
-            html = e 
+            html = e
             #return self.input(req, form)
         return page(title=_("Display alerts"),
                     body=html,
@@ -224,8 +225,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Display alerts",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -263,8 +264,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Display alerts",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -273,7 +274,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
     def remove(self, req, form):
 
-        argd = wash_urlargd(form, {'name': (str, None),                                   
+        argd = wash_urlargd(form, {'name': (str, None),
                                    'idq': (int, None),
                                    'idb': (int, None),
                                    })
@@ -295,8 +296,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description="CDS Personalize, Display alerts",
-                    keywords="CDS, personalize",
+                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
+                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
                     uid=uid,
                     language=argd['ln'],
                     req=req,

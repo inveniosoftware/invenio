@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import adminemail, \
-     weburl
+     weburl, cdsname
 
 # elmsubmit configuration file:
 CFG_ELMSUBMIT_FILES = {
@@ -44,7 +44,7 @@ CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correct
               'bad_field': 'This field does not validate correctly:',
               'correct_format': 'It must be formatted as follows:',
               'missing_attachment': 'We could not find the following file attached to your submission email:',
-              'temp_problem': 'There is a temporary problem with CDS Invenio\'s email submission interface. Please retry your submission again shortly.'}
+              'temp_problem': 'There is a temporary problem with %s\'s email submission interface. Please retry your submission again shortly.' % cdsname}
 
 CFG_ELMSUBMIT_SERVERS = {'smtp': 'localhost'}
 
@@ -68,7 +68,7 @@ CFG_ELMSUBMIT_MARC_MAPPING = {'author': ['100__a', '700__a'],
                 'subject': '65017a',
                 'secondary_subject': '65027a',
                 'email': '8560_f',
-                'files': ['FFT__a', 'FFT__a'],    
+                'files': ['FFT__a', 'FFT__a'],
                 'affiliation': ['100__u', '700__u'],
                 'language': '041__a',
                 'abstract': '520__a',

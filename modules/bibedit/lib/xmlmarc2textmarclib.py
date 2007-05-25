@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,7 +29,7 @@ from invenio.bibrecord import \
      record_get_field_values, \
      record_order_fields
 
-from invenio.config import CFG_CERN_SITE
+from invenio.config import CFG_CERN_SITE, cdsname
 
 from random import randint, seed
 from os.path import basename
@@ -306,7 +306,7 @@ def create_marc_record(record, sysno, options):
                                          options["aleph-marc"])
 
         ## Now create the formatted MARC lines:
-        out += print_field(field_lines, options["aleph-marc"])        
+        out += print_field(field_lines, options["aleph-marc"])
     ## Return the formatted MARC record:
     return out
 
@@ -423,7 +423,7 @@ def create_field_lines(fieldname, field, sysno, alephmarc=0):
     if alephmarc != 0:
         ## aleph marc record - format indicators properly:
         out += """%(ind1)s%(ind2)s L """ \
-               % { 
+               % {
                    'ind1' : (field[1] not in ("", " ") and field[1]) \
                             or ((field[2] not in ("", " ") and "_") or (" ")),
                    'ind2' : (field[2] not in ("", " ") and field[2]) or (" ")
@@ -517,7 +517,7 @@ def recxml2recmarc(xmltext, options, sysno_generator=get_sysno_generator()):
     rec_count = 0  ## Counter used to record the number of the rec
                    ## that is being processed. Used in error messages
                    ## for the user, when a record cannot be processed
-    
+
     ## create internal records structure from xmltext:
     records = create_records(xmltext, 1, 1)
 
@@ -624,7 +624,7 @@ General options:
   -h, --help   \t\t\t Print this help.
   -V, --version\t\t\t Print version information.
 """ % (basename(sys.argv[0]),))
-    
+
     sys.exit(exitcode)
 
 
@@ -718,8 +718,8 @@ def get_cli_options():
             ## Write out an error mesage and exit with failure.
             sys.stderr.write("Error: ***CFG_ORGANIZATION_IDENTIFIER IS NOT " \
                              "SET!*** Unable to create ALEPH INSERT or " \
-                             "REPLACE records. Please inform your CDS Invenio" \
-                             " Administrator.\n")
+                             "REPLACE records. Please inform your %s" \
+                             " Administrator.\n" % cdsname)
             sys.exit(1)
 
     ## Check that a filename for the MARC XML file was provided:
