@@ -25,7 +25,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Is_Referee(parameters,curdir,form):
-    global uid_email,sysno,rn,uid,req
+    global uid_email,sysno,rn,uid,user_info
     doctype = form['doctype']
     # Get document category
     res = run_sql("SELECT categ FROM sbmAPPROVAL WHERE rn=%s", (rn,))
@@ -34,7 +34,7 @@ def Is_Referee(parameters,curdir,form):
     else:
         categ=""
     # Try to retrieve the referee's email from the referee's database
-    (auth_code, auth_message) = acc_authorize_action(req, "referee",doctype=doctype, categ=categ)
+    (auth_code, auth_message) = acc_authorize_action(user_info, "referee",doctype=doctype, categ=categ)
     if auth_code != 0:
         raise InvenioWebSubmitFunctionStop("""
 <SCRIPT>
