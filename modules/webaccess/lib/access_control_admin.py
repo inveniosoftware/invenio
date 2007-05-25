@@ -180,7 +180,7 @@ def acc_updateAction(id_action=0, name_action='', verbose=0, **update):
 
 # ROLES
 
-def acc_addRole(name_role, description, firerole_def_ser, firerole_def_src):
+def acc_addRole(name_role, description, firerole_def_ser = CFG_ACC_EMPTY_ROLE_DEFINITION_SER, firerole_def_src = CFG_ACC_EMPTY_ROLE_DEFINITION_SRC):
     """add a new role to accROLE in the database.
 
     name_role - name of the role, must be unique
