@@ -39,15 +39,15 @@ CFG_EXTERNAL_AUTH_CERN_HIDDEN_SETTINGS = ['auth', 'respccid', 'ccid']
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
     'All Exchange People',
     'CERN Users',
-    'cern-computing-postmasters',
-    'cern-nice2000-postmasters',
+    'cern-computing-postmasters@cern.ch',
+    'cern-nice2000-postmasters@cern.ch',
     'CMF FrontEnd Users',
     'CMF_NSC_259_NSU',
     'Domain Users',
     'GP Apply Favorites Redirection',
     'GP Apply NoAdmin',
-    'info-terminalservices',
-    'info-terminalservices-members',
+    'info-terminalservices@cern.ch',
+    'info-terminalservices-members@cern.ch',
     'IT Web IT',
     'NICE Deny Enforce Password-protected Screensaver',
     'NICE Enforce Password-protected Screensaver',
@@ -137,9 +137,10 @@ class ExternalAuthCern(ExternalAuth):
             for group in groups:
                 if regexp.match(group):
                     groups.remove(group)
-
-        return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
-                        or x + ' (Group)'), groups))
+        # Produce list of double value: group/mailing list(with stripped @cern.ch) name,
+        # and group/description built from the name.
+        return dict(map(lambda x: (x.find('@') > -1 and x[:x.find('@')] or x, '@' in x and x + ' (CERN Mailing list)' \
+                        or x + ' (CERN Group)'), groups))
 
     def fetch_user_nickname(self, username, password, req=None):
         """Given a username and a password, returns the right nickname belonging
