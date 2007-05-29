@@ -37,13 +37,13 @@ def format(bfo, separator='; '):
     additional_report_numbers = bfo.fields('088__a')
 
     primary_citations = ['<a href="' + weburl + \
-                         '/search?f=reference&p=' + quote(report_number) + \
+                         '/search?f=reference&amp;p=' + quote(report_number) + \
                          '&amp;ln='+ bfo.lang +'">' + \
                          cgi.escape(report_number) + '</a>' \
                          for report_number in primary_report_numbers]
     
     additional_citations = ['<a href="' + weburl + \
-                            '/search?f=reference&p=' + quote(report_number)+ \
+                            '/search?f=reference&amp;p=' + quote(report_number)+ \
                             '&amp;ln='+ bfo.lang + '">' + \
                             cgi.escape(report_number) + '</a>' \
                             for report_number in additional_report_numbers]

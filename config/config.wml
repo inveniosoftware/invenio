@@ -322,11 +322,11 @@ default
 <define-tag CDSPAGEFOOTER>
  <div class="pagefooterstripeleft">
   <!--CDSNAMEINTL-->&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/?ln=<!--LN-->"><!--MSGSEARCH--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/submit?ln=<!--LN-->"><!--MSGSUBMIT--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/youraccount/display?ln=<!--LN-->"><!--MSGPERSONALIZE--></a>&nbsp;::&nbsp;<a class="footer" href="<WEBURL>/help/index.<!--LN-->.html"><!--MSGHELP--></a>
-  <br>
+  <br //>
   <!--POWEREDBY--> <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v<VERSION>
-  <br>
+  <br //>
   <!--MAINTAINEDBY--> <a class="footer" href="mailto:<SUPPORTEMAIL>"><SUPPORTEMAIL></a>
-  <br>
+  <br //>
   <!--LASTUPDATED-->
  </div>
  <div class="pagefooterstriperight">

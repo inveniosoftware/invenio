@@ -73,7 +73,7 @@ def index(req, ln=config.cdslang):
     else:
         is_admin = False
 
-    navtrail = '''<a class=navtrail href="%s/admin/index.%s.html">%s</a>''' % \
+    navtrail = '''<a class="navtrail: href="%s/admin/index.%s.html">%s</a>"''' % \
                (config.weburl,
                 ln,
                 _("Admin Area"))
@@ -503,7 +503,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
             return dialog_box(req=req,
                               ln=ln,
                               title="File Permission on %s" % format_name,
-                              message="You don't have write permission" \
+                              message="You don't have write permission " \
                               "on <i>%s</i>.<br/> You can view the template" \
                               ", but not edit it." % format_name,
                               navtrail=navtrail_previous_links,

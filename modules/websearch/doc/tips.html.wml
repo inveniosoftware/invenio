@@ -28,11 +28,11 @@
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="">
-    <select name="f"><option value="">any field<option>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size=20 type="text" name="p" value="" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -47,16 +47,17 @@ Empty search box returns all records in the database.
 <tr>
 <td width="50%" nowrap>
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="">
-    <select name="f"><option value="">any field<option>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     <p>
     Narrow by collection:
-    <br>
-    <input type="checkbox" name="c" value="Preprints" checked>&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
-    <br>
-    <input type="checkbox" name="c" value="Theses" checked>&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
-    </form>    
+    <br />
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <br />
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
+    </form> 
+    </p>   
 </td>
 <td width="50%">
 Click on a link below the search box to see and select subcollections
@@ -65,18 +66,19 @@ particular collection before doing the search.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="NA60">
-    <select name="f"><option value="">any field<option>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="NA60" />
+    <select name="f"><option value="">any field<option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     <p>
     Narrow by collection:
-    <br>
-    <input type="checkbox" name="c" value="Preprints" checked>&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
-    <br>
-    <input type="checkbox" name="c" value="Theses" checked>&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
-    </form>    
+    <br />
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <br />
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
+    </form>  
+    </p>
 </td>
 <td width="50%">
 If you want documents from a 'collection' not proposed by default,
@@ -90,11 +92,11 @@ such as NA60 documents, then enter it as a search term.
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="higgs boson">
-    <select name="f"><option value="">any field<option>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="higgs boson" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -102,11 +104,11 @@ Returns records containing words <em>higgs</em> and <em>boson</em>.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="'higgs boson'">
-    <select name="f"><option value="">any field<option selected>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="'higgs boson'" />
+    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -114,11 +116,11 @@ Returns records containing phrase <em>'higgs boson'</em> in title.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="&quot;higgs boson&quot;">
-    <select name="f"><option value="">any field<option selected>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
+    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -133,11 +135,11 @@ Returns records entitled exactly <em>"Higgs boson"</em> but not records such as
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="muon*">
-    <select name="f"><option value="">any field<option>title<option>author</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="muon*" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -151,18 +153,18 @@ Returns records containing words <em>muon</em>, <em>muons</em>, <em>muonic</em>,
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="muon kaon">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="muon kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
     or:
-    <br>
+    <br />
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="muon AND kaon">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="muon AND kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -170,11 +172,11 @@ Returns records containing both <em>muon</em> and <em>kaon</em>.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="muon OR kaon">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="muon OR kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -182,11 +184,11 @@ Returns records containing either <em>muon</em> or <em>kaon</em>.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="muon NOT kaon">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="muon NOT kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -200,11 +202,11 @@ Returns records containing <em>muon</em> but not <em>kaon</em>.
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="2003">
-    <select name="f"><option value="">any field<option>title<option>author<option selected>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="2003" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option selected="selected">year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -212,11 +214,11 @@ Type 2003 and select the year field.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="year:2003">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="year:2003" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -224,11 +226,11 @@ Alternatively, type field name colon value.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="year:2003->2004">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="year:2003->2004" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -243,11 +245,11 @@ You can enter specific year range.
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="Ellis">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="Ellis" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -257,11 +259,11 @@ the surname in any field.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="Ellis, J R">
-    <select name="f"><option value="">any field<option>title<option selected>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="Ellis, J R" />
+    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -269,11 +271,11 @@ For better results, type surname comma initial(s) and select the author field.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="Ellis, John Rolfe">
-    <select name="f"><option value="">any field<option>title<option selected>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
+    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
 </td>
 <td width="50%">
@@ -281,11 +283,11 @@ Sometimes authors are indexed with their full name.
 </td>
 </tr>
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993">
-    <select name="f"><option value="">any field<option>title<option>author<option>year</select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH">
+    <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" /> 
     </form>
 </td>
 <td width="50%">

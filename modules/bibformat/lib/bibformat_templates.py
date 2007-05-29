@@ -120,7 +120,7 @@ class Template:
             #Show PHP admin only if PHP is enabled
             out += '''
             <br/><br/><br/><br/>
-            <div style="background-color:rgb(204, 204, 204)";>
+            <div style="background-color:rgb(204, 204, 204);">
 
             <h2><span style="color:rgb(204, 0, 0);">Old</span>
             BibFormat admin interface (in gray box)</h2>

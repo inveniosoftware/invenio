@@ -98,7 +98,7 @@ class Template:
         write_button_form = """ <input type="hidden" name="recid" value="%s"/>
                                 <input type="hidden" name="ln" value="%s"/>
                                 <input type="hidden" name="reviews" value="0"/>""" % (recID, ln)
-        write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=write_button_label)
+        write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=write_button_label)
 
         # output
         if nb_comments_total > 0:
@@ -249,14 +249,14 @@ class Template:
         write_button_form = ''' <input type="hidden" name="recid" value="%s"/>
                                 <input type="hidden" name="ln" value="%s"/>
                                 <input type="hidden" name="reviews" value="1"/>''' % (recID, ln )
-        write_button_form = self.createhiddenform(action=write_button_link, method="Get", text=write_button_form, button=_("Write a review"))
+        write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=_("Write a review"))
 
         if nb_comments_total > 0:
             avg_score_img = str(avg_score_img)
             avg_score = str(avg_score)
             nb_comments_total = str(nb_comments_total)
             score = '<b>'
-            score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+            score += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
@@ -279,7 +279,7 @@ class Template:
                     %(comment_rows)s
                 </table>
                 %(view_all_comments_link)s
-                %(write_button_form)s<br>
+                %(write_button_form)s<br />
             """ % \
             {   'comment_title'         : _("Rate this document"),
                 'score_label'           : score,
@@ -303,7 +303,7 @@ class Template:
                 </table>
                 %s<br />
                 %s
-                <br>''' % (_("Rate this document"),
+                <br />''' % (_("Rate this document"),
                            _("Be the first to review this document."),
                            write_button_form)
         return out
@@ -575,7 +575,7 @@ class Template:
                                 <input type="hidden" name="ln" value="%s"/>
                                 <input type="hidden" name="reviews" value="%s"/>''' % (recID, ln, reviews)
         write_button_form = self.createhiddenform(action=write_button_link,
-                                                  method="Get",
+                                                  method="get",
                                                   text=write_button_form,
                                                   button = reviews and _('Write a review') or _('Write a comment'))
 
@@ -666,7 +666,7 @@ class Template:
         #                            </select>''')
         #
         #form_link = "%(weburl)s/%(module)s/%(function)s" % link_dic
-        #form = self.createhiddenform(action=form_link, method="Get", text=form, button='Go', recid=recID, p=1)
+        #form = self.createhiddenform(action=form_link, method="get", text=form, button='Go', recid=recID, p=1)
         pages = """
 <br />
 %(v_label)s %(comments_or_reviews)s %(results_nb_lower)s-%(results_nb_higher)s <br />
@@ -694,8 +694,7 @@ class Template:
         else:
             return display_name
 
-
-    def createhiddenform(self, action="", method="Get", text="", button="confirm", cnfrm='', **hidden):
+    def createhiddenform(self, action="", method="get", text="", button="confirm", cnfrm='', **hidden):
         """
         create select with hidden values and submit button
         @param action: name of the action to perform on submit
@@ -708,7 +707,7 @@ class Template:
         """
 
         output  = """
-<form action="%s" method="%s">""" % (action, string.lower(method).strip() in ['get','post'] and method or 'Get')
+<form action="%s" method="%s">""" % (action, string.lower(method).strip() in ['get','post'] and method or 'get')
         output += """
   <table>
     <tr>
@@ -767,7 +766,7 @@ class Template:
                 else:
                     span_class = 'important'
                 out += '''
-                    <span class="%(span_class)s">%(warning)s</span><br>''' % \
+                    <span class="%(span_class)s">%(warning)s</span><br />''' % \
                     {   'span_class'    :   span_class,
                         'warning'       :   warning_text         }
             return out
@@ -807,14 +806,14 @@ class Template:
         form = """
                 <table width="100%%">
                     <tr><td>%(record_label)s</td></tr>
-                    <tr><td><blockquote>%(record)s<br><br></blockquote></td></tr>
+                    <tr><td><blockquote>%(record)s<br /><br /></blockquote></td></tr>
                     <tr><td>%(comment_label)s</td></tr>
                     <tr><td>
 <textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
                     </td></tr>
                     <tr><td class="reportabuse">%(note)s</td></tr>
                 </table>
-                <br><br>""" % {'msg': msg,
+                <br /><br />""" % {'msg': msg,
                                'note': note,
                                'record': record_details,
                                'record_label': _("Article") + ":",
@@ -901,7 +900,7 @@ class Template:
                                'msg'       : msg!='' and msg or "",
                                'record'    : record_details    }
         form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
-        form = self.createhiddenform(action=form_link, method="Post", text=form, button=_('Add Review'))
+        form = self.createhiddenform(action=form_link, method="post", text=form, button=_('Add Review'))
         return warnings + form
 
     def tmpl_add_comment_successful(self, recID, ln, reviews, warnings):
@@ -1044,7 +1043,7 @@ class Template:
             <br />
         ''' %_("Comment ID:")
         form_link = "%s/admin/webcomment/webcommentadmin.py/delete?ln=%s" % (weburl, ln)
-        form = self.createhiddenform(action=form_link, method="Get", text=form, button=_('View Comment'))
+        form = self.createhiddenform(action=form_link, method="get", text=form, button=_('View Comment'))
         return warnings + out + form
 
     def tmpl_admin_users(self, ln, users_data):

@@ -30,22 +30,22 @@ interactive="yes"/>
 <BFE_FIELD tag="909CP$t" prefix="<br/><strong>Available pictures</strong>: " suffix="  "/>
 
 <BFE_ABSTRACT 
-prefix_en='<p><table><tr><td class="blocknote"> 
- Caption</td></tr></table> <small>'
+prefix_en='<p><span class="blocknote"> 
+ Caption</span><br /> <small>'
 suffix_en='</small></p>'
 
-prefix_fr='<p><table><tr><td class="blocknote">  
- Légende</td></tr></table><small>'
+prefix_fr='<p><span class="blocknote">  
+ Légende</span><br /><small>'
 suffix_fr='</small></p>'
 />
 
-<BFE_EXTERNAL_PUBLICATIONS prefix='<p><table><tr><td class="blocknote">See also:</td></tr></table><small>' 
+<BFE_EXTERNAL_PUBLICATIONS prefix='<p><span class="blocknote">See also:</span><br /><small>' 
  suffix="</small></p>" />
 
 </td>
 
 <td valign="top">
-<BFE_PHOTO_RESOURCES prefix='<table><tr><td class="blocknote">Resources</td></tr></table>' />
+<BFE_PHOTO_RESOURCES prefix='<span class="blocknote">Resources</span><br />' />
 </td> 
 
 </tr>

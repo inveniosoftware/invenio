@@ -528,8 +528,8 @@ class Template:
             infobox += "<div class=\"infobox\">"
             lines = info.split("\n")
             for line in lines[0:-1]:
-                infobox += line + "<br/>\n"
-            infobox += lines[-1] + "</div><br/>\n"
+                infobox += line + "<br />\n"
+            infobox += lines[-1] + "</div><br />\n"
         return infobox
 
 
@@ -550,9 +550,9 @@ class Template:
                 lines = warning.split("\n")
                 warningbox += "  <p>"
                 for line in lines[0:-1]:
-                    warningbox += line + "    <br/>\n"
+                    warningbox += line + "    <br />\n"
                 warningbox += lines[-1] + "  </p>"
-            warningbox += "</div><br/>\n"
+            warningbox += "</div><br />\n"
         return warningbox
 
 
@@ -567,7 +567,7 @@ class Template:
         quota = float(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES)
         ratio = float(nb_messages) / quota
         out = """
-%(quota_label)s<br/>
+%(quota_label)s<br />
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
 </div>""" %{'quota_label' : _("Quota used: %i messages out of max. %i")%(nb_messages, CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES),
@@ -636,6 +636,9 @@ class Template:
       </td>
     </tr>
   </thead>
+  <tfoot>
+    <tr><td colspan="3"></td></tr>
+  </tfoot>
   <tbody class="mailboxbody">
   <tr class="mailboxsearch">
       <td>

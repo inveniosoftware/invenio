@@ -106,7 +106,7 @@ def mymkdir(newdir, mode=0777):
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
     if var == fld:
-        return " selected"
+        return ' selected="selected"'
     else:
         return ""
 
@@ -406,7 +406,7 @@ class Collection:
                 recid = recIDs[idx]
                 self.latest_additions_info.append({'id': recid,
                                                    'format': format_record(recid, "hb"),
-                                                   'date': get_creation_date(recid, fmt="%Y-%m-%d<br>%H:%i")})
+                                                   'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
     def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=cdslang):

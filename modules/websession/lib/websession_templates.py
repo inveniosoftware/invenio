@@ -60,7 +60,7 @@ class Template:
         out = """
                  <table>
                     <tr>
-                      <td align=left>%(message)s
+                      <td align="left">%(message)s
                        <a href="./%(act)s">%(link)s</a></td>
                     </tr>
                  </table>
@@ -76,7 +76,7 @@ class Template:
         _ = gettext_set_language(ln)
         out = """
         <tr>
-            <td align='right'><strong>%s:</strong></td>
+            <td align="right"><strong>%s:</strong></td>
             <td><i>%s</i></td>
         </tr>""" % (key, value)
         return out
@@ -94,7 +94,7 @@ class Template:
             'external_user_settings' : _('External account settings'),
             'html_settings' : html_settings,
             'consult_external_groups' : _('You can consult the list of your external groups directly in the %(x_url_open)sgroups page%(x_url_close)s.') % {
-                'x_url_open' : '<a href=../yourgroups/display?ln=%s#external_groups>' % ln,
+                'x_url_open' : '<a href="../yourgroups/display?ln=%s#external_groups">' % ln,
                 'x_url_close' : '</a>'
             },
             'external_user_groups' : _('External user groups'),
@@ -129,29 +129,28 @@ class Template:
                 <form method="post" action="%(sweburl)s/youraccount/change" name="edit_logins_settings">
                 <p>%(change_user)s</p>
                 <table>
-                  <tr><td align="right"><strong>
-                      %(nickname_label)s:</strong><br/>
+                  <tr><td align="right" valign="top"><strong>
+                      %(nickname_label)s:</strong><br />
                       <small class="important">(%(mandatory)s)</small>
-                    </td><td>
+                    </td><td valign="top">
                       %(nickname_prefix)s%(nickname)s%(nickname_suffix)s
                     </td>
-                    <td></td>
                   </tr>
                   <tr><td align="right"><strong>
-                      %(new_email)s:</strong><br/>
+                      %(new_email)s:</strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td>
-                      <input type="text" size="25" name="email" %(email_disabled)s value="%(email)s"><br>
+                      <input type="text" size="25" name="email" %(email_disabled)s value="%(email)s" /><br />
                       <small><span class="quicknote">%(example)s:</span>
                         <span class="example">john.doe@example.com</span>
                       </small>
                     </td>
                   </tr>
                   <tr><td></td><td align="left">
-                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s"></code>&nbsp;&nbsp;&nbsp;
+                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s" /></code>&nbsp;&nbsp;&nbsp;
                   </td></tr>
                 </table>
-                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="action" value="edit" />
                 </form>
             """ % {
                 'change_user' : _("If you want to change your email or set for the first time your nickname, please set new values in the form below."),
@@ -159,7 +158,7 @@ class Template:
                 'nickname_label' : _("Nickname"),
                 'nickname' : nickname,
                 'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
-                'nickname_suffix' : nickname=='' and '"><br><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
+                'nickname_suffix' : nickname=='' and '" /><br /><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
                 'new_email' : _("New email address"),
                 'mandatory' : _("mandatory"),
                 'example' : _("Example"),
@@ -176,21 +175,21 @@ class Template:
                 <p>%(change_pass)s</p>
                 <table>
                   <tr>
-                    <td align="right"><strong>%(old_password)s:</strong><br>
+                    <td align="right"><strong>%(old_password)s:</strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td align="left">
-                      <input type="password" size="25" name="old_password" %(password_disabled)s><br>
-                      <small><span class=quicknote>%(note)s:</span>
+                      <input type="password" size="25" name="old_password" %(password_disabled)s /><br />
+                      <small><span class="quicknote">%(note)s:</span>
                        %(old_password_note)s
                       </small>
                     </td>
                   </tr>
                   <tr>
-                    <td align="right"><strong>%(new_password)s:</strong><br>
+                    <td align="right"><strong>%(new_password)s:</strong><br />
                       <small class="quicknote">(%(optional)s)</small>
                     </td><td align="left">
-                      <input type="password" size="25" name="password" %(password_disabled)s><br>
-                      <small><span class=quicknote>%(note)s:</span>
+                      <input type="password" size="25" name="password" %(password_disabled)s /><br />
+                      <small><span class="quicknote">%(note)s:</span>
                        %(password_note)s
                       </small>
                     </td>
@@ -198,14 +197,14 @@ class Template:
                   <tr>
                     <td align="right"><strong>%(retype_password)s:</strong></td>
                     <td align="left">
-                      <input type="password" size="25" name="password2" %(password_disabled)s value="">
+                      <input type="password" size="25" name="password2" %(password_disabled)s value="" />
                     </td>
                   </tr>
                   <tr><td></td><td align="left">
-                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s"></code>&nbsp;&nbsp;&nbsp;
+                    <code class="blocknote"><input class="formbutton" type="submit" value="%(set_values)s" /></code>&nbsp;&nbsp;&nbsp;
                   </td></tr>
                 </table>
-                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="action" value="edit" />
                 </form>
                 """ % {
                     'change_pass' : _("If you want to change your password, please enter the old one and set the new value in the form below."),
@@ -242,27 +241,27 @@ class Template:
             <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch_settings">
               <p><big><strong class="headline">%(edit_websearch_settings)s</strong></big></p>
               <table>
-                <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value=1 name="latestbox"/></td>
+                <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value="1" name="latestbox" /></td>
                 <td valign="top"><b>%(show_latestbox)s</b></td></tr>
-                <tr><td align="right"><input type="checkbox" %(checked_helpbox)s value=1 name="helpbox"/></td>
+                <tr><td align="right"><input type="checkbox" %(checked_helpbox)s value="1" name="helpbox" /></td>
                 <td valign="top"><b>%(show_helpbox)s</b></td></tr>
                 <tr><td align="right"><select name="group_records">
         """ % {
           'sweburl' : sweburl,
           'edit_websearch_settings' : _("Edit search-related settings"),
           'show_latestbox' : _("Show the latest additions box"),
-          'checked_latestbox' : show_latestbox and 'checked' or '',
+          'checked_latestbox' : show_latestbox and 'checked="checked"' or '',
           'show_helpbox' : _("Show collection help boxes"),
-          'checked_helpbox' : show_helpbox and 'checked' or '',
+          'checked_helpbox' : show_helpbox and 'checked="checked"' or '',
         }
         for i in 10, 20, 50, 100, 200:
             out += """<option %(selected)s>%(i)s</option>
                 """ % {
-                    'selected' : current == i and 'selected' or '',
+                    'selected' : current == i and 'selected="selected"' or '',
                     'i' : i
                 }
         out += """</select></td><td valign="top"><b>%(select_group_records)s</b></td></tr>
-              <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s"></td></tr>
+              <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
               </table>
             </form>""" % {
                 'update_settings' : _("Update settings"),
@@ -302,14 +301,14 @@ class Template:
                  'sweburl': sweburl,
                }
         for system in methods:
-            out += """<input type="radio" name="login_method" value="%(system)s" %(disabled)s %(selected)s>%(system)s<br>""" % {
+            out += """<input type="radio" name="login_method" value="%(system)s" %(disabled)s %(selected)s />%(system)s<br />""" % {
                      'system' : system,
-                     'disabled' : method_disabled and "disabled" or "",
-                     'selected' : current == system and "checked" or "",
+                     'disabled' : method_disabled and 'disabled="disabled"' or "",
+                     'selected' : current == system and 'checked="checked"' or "",
                    }
-        out += """  </td><td></td></tr>
-                   <tr><td></td>
-                     <td><input class="formbutton" type="submit" value="%(select_method)s"></td></tr></table>
+        out += """  </td></tr>
+                   <tr><td>&nbsp;</td>
+                     <td><input class="formbutton" type="submit" value="%(select_method)s" /></td></tr></table>
                     </form>""" % {
                      'select_method' : _("Select method"),
                    }
@@ -337,12 +336,13 @@ class Template:
           <table>
                 <tr>
               <td align="right"><strong>%(email)s:</strong></td>
-              <td><input type="text" size="25" name="p_email" value=""></td>
-              <td><input type="hidden" name="ln" value="%(ln)s"></td>
-              <td><input type="hidden" name="action" value="lost"></td>
+              <td><input type="text" size="25" name="p_email" value="" />
+                  <input type="hidden" name="ln" value="%(ln)s" />
+                  <input type="hidden" name="action" value="lost" />
+              </td>
             </tr>
-            <tr><td></td>
-              <td><code class="blocknote"><input class="formbutton" type="submit" value="%(send)s"></code></td>
+            <tr><td>&nbsp;</td>
+              <td><code class="blocknote"><input class="formbutton" type="submit" value="%(send)s" /></code></td>
             </tr>
           </table>
 
@@ -393,17 +393,18 @@ class Template:
             out += """
                    <dt>
                    <a href="./edit?ln=%(ln)s">%(your_settings)s</a>
-                   <dd>%(change_account)s""" % {
+                   </dt>
+                   <dd>%(change_account)s</dd>""" % {
                      'ln' : ln,
                      'your_settings' : _("Your Settings"),
                      'change_account' : _("Set or change your account email address or password. Specify your preferences about the look and feel of the interface.")
                    }
 
         out += """
-        <dt><A href="../youralerts/display?ln=%(ln)s">%(your_searches)s</A>
-        <dd>%(search_explain)s
+        <dt><a href="../youralerts/display?ln=%(ln)s">%(your_searches)s</a></dt>
+        <dd>%(search_explain)s</dd>
 
-        <dt><A href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</A>
+        <dt><a href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</a></dt>
         <dd>%(basket_explain)s""" % {
           'ln' : ln,
           'your_searches' : _("Your Searches"),
@@ -413,8 +414,8 @@ class Template:
         }
         if guest:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
-        out += """
-        <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a>
+        out += """</dd>
+        <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a></dt>
         <dd>%(explain_alerts)s""" % {
           'ln' : ln,
           'your_alerts' : _("Your Alerts"),
@@ -422,11 +423,11 @@ class Template:
         }
         if guest:
             out += self.tmpl_warning_guest_user(type="alerts", ln = ln)
-
+        out += "</dd>"
         if CFG_CERN_SITE:
-            out += """
-            <dt><A href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&version=2">%(your_loans)s</A>
-            <dd>%(explain_loans)s""" % {
+            out += """</dd>
+            <dt><a href="http://weblib.cern.ch/cgi-bin/checkloan?uid=&amp;version=2">%(your_loans)s</a></dt>
+            <dd>%(explain_loans)s</dd>""" % {
               'your_loans' : _("Your Loans"),
               'explain_loans' : _("Check out book you have on loan, submit borrowing requests, etc. Requires CERN ID."),
             }
@@ -457,11 +458,9 @@ class Template:
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
                                                                                                'x_url_close': '</a>'}
         return """<table class="errorbox" summary="">
-                           <thead>
                             <tr>
                              <th class="errorboxheader">%s</th>
                             </tr>
-                           </thead>
                           </table>""" % msg
 
     def tmpl_account_body(self, ln, user):
@@ -503,16 +502,12 @@ class Template:
         out =""
         out +="""
               <table class="searchbox" width="90%%" summary=""  >
-                           <thead>
                             <tr>
                              <th class="searchboxheader">%s</th>
                             </tr>
-                           </thead>
-                           <tbody>
                             <tr>
                              <td class="searchboxbody">%s</td>
                             </tr>
-                           </tbody>
                           </table>""" % (title, body)
         return out
 
@@ -582,7 +577,7 @@ class Template:
         out =""
         out +="""
         <body>
-           %(msg)s <A href="../youraccount/lost?ln=%(ln)s">%(try_again)s</A>
+           %(msg)s <a href="../youraccount/lost?ln=%(ln)s">%(try_again)s</a>
 
               </body>
 
@@ -664,7 +659,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<p>" + _("""Deleting your account""")
+        out = "<p>" + _("""Deleting your account""") + '</p>'
         return out
 
     def tmpl_account_logout(self, ln):
@@ -719,7 +714,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         if msg is None:
-            out = "<p>%(please_login)s</p>" % {
+            out = "<p>%(please_login)s" % {
                     'please_login' : _("If you already have an account, please login using the form below.")
                 }
 
@@ -732,8 +727,10 @@ class Template:
                         'x_url_close': '</a>'} + "</p>"
                 else:
                     out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) + "</p>"
+
         else:
             out = "<p>%s</p>" % msg
+            
         out += """<form method="post" action="../youraccount/login">
                   <table>
 
@@ -744,14 +741,13 @@ class Template:
             for method in methods:
                 login_select += """<option value="%(method)s" %(selected)s>%(method)s</option>""" % {
                                   'method' : method,
-                                  'selected' : (method == selected_method and "selected" or "")
+                                  'selected' : (method == selected_method and 'selected="selected"' or "")
                                 }
             login_select += "</select>"
             out += """
                    <tr>
                       <td align="right"><strong>%(login_title)s</strong></td>
                       <td>%(login_select)s</td>
-                      <td></td>
                    </tr>""" % {
                      'login_title' : _("Login method:"),
                      'login_select' : login_select,
@@ -762,21 +758,19 @@ class Template:
 
         out += """<tr>
                    <td align="right">
-                     <input type="hidden" name="ln" value="%(ln)s">
-                     <input type="hidden" name="referer" value="%(referer)s">
+                     <input type="hidden" name="ln" value="%(ln)s" />
+                     <input type="hidden" name="referer" value="%(referer)s" />
                      <strong>%(username)s:</strong>
                    </td>
-                   <td><input type="text" size="25" name="p_un" value=""></td>
-                   <td></td>
+                   <td><input type="text" size="25" name="p_un" value="" /></td>
                   </tr>
                   <tr>
                    <td align="right"><strong>%(password)s:</strong></td>
-                   <td align="left"><input type="password" size="25" name="p_pw" value=""></td>
-                   <td></td>
+                   <td align="left"><input type="password" size="25" name="p_pw" value="" /></td>
                   </tr>
                   <tr>
                    <td></td>
-                   <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s"></code>""" % {
+                   <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s" /></code>""" % {
                        'ln': ln,
                        'referer' : cgi.escape(referer),
                        'username' : _("Username"),
@@ -788,11 +782,11 @@ class Template:
                      'ln' : ln,
                      'lost_pass' : _("Lost your password?")
                    }
-        out += """</td><td></td>
+        out += """</td>
                     </tr>
                   </table></form>"""
 
-        out += """<p><strong>%(note)s:</strong> %(note_text)s""" % {
+        out += """<p><strong>%(note)s:</strong> %(note_text)s</p>""" % {
                'note' : _("Note"),
                'note_text': _("You can use your nickname or your email address to login.")}
 
@@ -839,41 +833,42 @@ class Template:
                 out += _("It will not be possible to use the account before it has been verified and activated.")
             out += """
               <form method="post" action="../youraccount/register">
-              <input type="hidden" name="referer" value="%(referer)s">
+              <input type="hidden" name="referer" value="%(referer)s" />
               <table>
                 <tr>
-                 <td align="right"><strong>%(email_address)s:</strong><br><small class="important">(%(mandatory)s)</small></td>
-                 <td><input type="text" size="25" name="p_email" value=""><br>
+                 <td align="right"><strong>%(email_address)s:</strong><br /><small class="important">(%(mandatory)s)</small></td>
+                 <td><input type="text" size="25" name="p_email" value="" /><br />
                      <small><span class="quicknote">%(example)s:</span>
                      <span class="example">john.doe@example.com</span></small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
-                 <td align="right"><strong>%(nickname)s:</strong><br><small class="important">(%(mandatory)s)</small></td>
-                 <td><input type="text" size="25" name="p_nickname" value=""><br>
+                 <td align="right"><strong>%(nickname)s:</strong><br /><small class="important">(%(mandatory)s)</small></td>
+                 <td><input type="text" size="25" name="p_nickname" value="" /><br />
                      <small><span class="quicknote">%(example)s:</span>
                      <span class="example">johnd</span></small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
-                 <td align="right"><strong>%(password)s:</strong><br><small class="quicknote">(%(optional)s)</small></td>
-                 <td align="left"><input type="password" size="25" name="p_pw" value=""><br>
+                 <td align="right"><strong>%(password)s:</strong><br /><small class="quicknote">(%(optional)s)</small></td>
+                 <td align="left"><input type="password" size="25" name="p_pw" value="" /><br />
                     <small><span class="quicknote">%(note)s:</span> %(password_contain)s</small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
                  <td align="right"><strong>%(retype)s:</strong></td>
-                 <td align="left"><input type="password" size="25" name="p_pw2" value=""></td>
+                 <td align="left"><input type="password" size="25" name="p_pw2" value="" /></td>
                  <td></td>
                 </tr>
                 <tr>
                  <td></td>
-                 <td align="left" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(register)s"></code></td>
+                 <td align="left" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(register)s" /></code></td>
                 </tr>
               </table>
+              </form>
               <p><strong>%(note)s:</strong> %(explain_acc)s""" % {
                 'referer' : cgi.escape(referer),
                 'email_address' : _("Email address"),
@@ -931,23 +926,23 @@ class Template:
         activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
         for action in activities:
             if action == "runbibedit":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
             if action == "cfgbibformat":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
             if action == "cfgbibharvest":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/">%s</a>""" % (weburl, _("Configure BibHarvest"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/">%s</a>""" % (weburl, _("Configure BibHarvest"))
             if action == "cfgbibindex":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
             if action == "cfgbibrank":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
             if action == "cfgwebaccess":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
             if action == "cfgwebcomment":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
             if action == "cfgwebsearch":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
             if action == "cfgwebsubmit":
-                out += """<br>&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
+                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
         out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
             {'x_url_open': '<a href="' + weburl + '/admin/index.' + ln + '.html">',
              'x_url_close': '</a>'}
@@ -977,7 +972,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<img src="%s/img/head.gif" border="0" alt="">""" % weburl
+        out = """<img src="%s/img/head.gif" border="0" alt=""/>""" % weburl
         if guest:
             out += """%(guest_msg)s ::
                    <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s">%(login)s</a>""" % {
@@ -1051,7 +1046,7 @@ class Template:
                     continue
                 span_class = 'important'
                 out += '''
-                    <span class="%(span_class)s">%(warning)s</span><br>''' % \
+                    <span class="%(span_class)s">%(warning)s</span><br />''' % \
                     {   'span_class'    :   span_class,
                         'warning'       :   warning_text         }
             return out
@@ -1074,9 +1069,9 @@ class Template:
                 lines = warning.split("\n")
                 warningbox += "  <p>"
                 for line in lines[0:-1]:
-                    warningbox += line + "    <br/>\n"
+                    warningbox += line + "    <br />\n"
                 warningbox += lines[-1] + "  </p>"
-            warningbox += "</div><br/>\n"
+            warningbox += "</div><br />\n"
         return warningbox
 
     def tmpl_display_all_groups(self,
@@ -1114,10 +1109,10 @@ class Template:
     <td>%s</td>
 </tr>
 <tr>
-    <td><br/>%s</td>
+    <td><br />%s</td>
 </tr>
 <tr>
-    <td><br/><a name='external_groups'></a>%s</td>
+    <td><br /><a name='external_groups'></a>%s</td>
 </tr>
 </table>""" %(admin_group_html, member_group_html, external_group_html)
         else:
@@ -1127,7 +1122,7 @@ class Template:
     <td>%s</td>
 </tr>
 <tr>
-    <td><br/>%s</td>
+    <td><br />%s</td>
 </tr>
 </table>""" %(admin_group_html, member_group_html)
         return group_text
@@ -1148,7 +1143,7 @@ class Template:
         img_link = """
         <a href="%(weburl)s/yourgroups/%(action)s?grpID=%(grpID)s&amp;ln=%(ln)s">
         <img src="%(weburl)s/img/%(img)s" alt="%(text)s" style="border:0" width="25"
-        height="25"><br/><small>%(text)s</small></img>
+        height="25" /><br /><small>%(text)s</small>
         </a>"""
 
 
@@ -1194,7 +1189,7 @@ class Template:
                                        'grpID' : grpID,
                                        'ln': ln,
                                        'img':"webbasket_usergroup.png",
-                                       'text':_("Edit %s members") % '<br/>',
+                                       'text':_("Edit %s members") % '',
                                        'action':"members"
                                        }
             out += """
@@ -1263,7 +1258,6 @@ class Template:
       <td>%s</td>
     </tr>""" % (cgi.escape(name), cgi.escape(description))
         group_text += """
-    <tr>
     <tr class="mailboxfooter">
       <td>
           <form name="newGroup" action="join?ln=%(ln)s" method="post">
@@ -1369,15 +1363,15 @@ class Template:
             button_label = _("Update group")
             button_name = "update"
             label = _('Edit group %s') % cgi.escape(group_name)
-            delete_text = """<input type="submit" value="%s" class="formbutton" name="%s"/>"""
+            delete_text = """<input type="submit" value="%s" class="formbutton" name="%s" />"""
             delete_text %= (_("Delete group"),"delete")
             if grpID != "":
-                hidden_id = """<input type="hidden" name="grpID" value="%s"/>"""
+                hidden_id = """<input type="hidden" name="grpID" value="%s" />"""
                 hidden_id %= grpID
 
         out = self.tmpl_warning(warnings)
         out += """
-<form name="%(form_name)s" action="%(action)s" method="POST">
+<form name="%(form_name)s" action="%(action)s" method="post">
   <input type="hidden" name="ln" value="%(ln)s" />
   <div style="padding:10px;">
   <table class="bskbasket">
@@ -1391,6 +1385,9 @@ class Template:
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
@@ -1398,13 +1395,13 @@ class Template:
             <tr>
               <td>%(name_label)s</td>
               <td>
-               <input type="text" name="group_name" value="%(group_name)s"/>
+               <input type="text" name="group_name" value="%(group_name)s" />
               </td>
             </tr>
             <tr>
               <td>%(description_label)s</td>
               <td>
-               <input type="text" name="group_description" value="%(group_description)s"/>
+               <input type="text" name="group_description" value="%(group_description)s" />
               </td>
             </tr>
             <tr>
@@ -1422,13 +1419,13 @@ class Template:
   <table>
    <tr>
     <td>
-     <input type="submit" value="%(button_label)s" class="formbutton" name="%(button_name)s"/>
+     <input type="submit" value="%(button_label)s" class="formbutton" name="%(button_name)s" />
     </td>
     <td>
     %(delete_text)s
     </td>
     <td>
-     <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+     <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel" />
     </td>
    </tr>
   </table>
@@ -1491,7 +1488,7 @@ class Template:
             search_content += """</td><td>&nbsp;</td></tr>"""
 
         out += """
-<form name="join_group" action="%(action)s" method="POST">
+<form name="join_group" action="%(action)s" method="post">
   <input type="hidden" name="ln" value="%(ln)s" />
   <div style="padding:10px;">
   <table class="bskbasket">
@@ -1505,6 +1502,9 @@ class Template:
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
@@ -1519,14 +1519,13 @@ class Template:
               </td>
             </tr>
             <tr>
-              <td><br>%(label2)s</td>
-              <td><br><input type="text" name="group_name" value="%(group_name)s"/></td>
-              <td><br>
-               <input type="submit" name="find_button" value="%(find_label)s" class="nonsubmitbutton"/>
+              <td><br />%(label2)s</td>
+              <td><br /><input type="text" name="group_name" value="%(group_name)s" /></td>
+              <td><br />
+               <input type="submit" name="find_button" value="%(find_label)s" class="nonsubmitbutton" />
               </td>
             </tr>
-            %(search_content)s</td>
-
+            %(search_content)s
           </table>
         </td>
       </tr>
@@ -1535,10 +1534,10 @@ class Template:
   <table>
   <tr>
    <td>
-    <input type="submit" name="join_button" value="%(label)s" class="formbutton"/>
+    <input type="submit" name="join_button" value="%(label)s" class="formbutton" />
    </td>
    <td>
-    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel" />
    </td>
    </tr>
   </table>
@@ -1585,7 +1584,7 @@ class Template:
         out = self.tmpl_warning(warnings)
         out += self.tmpl_infobox(infos)
         out += """
-<form name="member" action="%(action)s" method="POST">
+<form name="member" action="%(action)s" method="post">
  <p>%(title)s</p>
  <input type="hidden" name="ln" value="%(ln)s" />
  <input type="hidden" name="grpID" value="%(grpID)s"/>
@@ -1596,15 +1595,18 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="%(imgurl)s/webbasket_usergroup.png" alt="%(header1)s" />
+          <img src="%(imgurl)s/webbasket_usergroup.png" alt="%(img_alt_header1)s" />
         </td>
 
         <td class="bsktitle">
-          <b>%(header1)s</b><br />
+          %(header1)s<br />
           &nbsp;
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
@@ -1625,15 +1627,18 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="%(imgurl)s/webbasket_usergroup_gray.png" alt="%(header2)s" />
+          <img src="%(imgurl)s/webbasket_usergroup_gray.png" alt="%(img_alt_header2)s" />
         </td>
 
         <td class="bsktitle">
-          <b>%(header2)s</b><br />
+          %(header2)s<br />
           &nbsp;
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
@@ -1654,7 +1659,7 @@ class Template:
     <thead class="bskbasketheader">
       <tr>
         <td class="bskactions">
-          <img src="%(imgurl)s/iconpen.gif" alt="%(header3)s" />
+          <img src="%(imgurl)s/iconpen.gif" alt="%(img_alt_header3)s" />
         </td>
 
         <td class="bsktitle">
@@ -1663,12 +1668,15 @@ class Template:
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
           <table>
             <tr>
-             <td collspan="2" style="padding: 0 5 10 5;">%(invite_text)s</td>
+             <td colspan="2" style="padding: 0 5 10 5;">%(invite_text)s</td>
             </tr>
           </table>
         </td>
@@ -1679,7 +1687,7 @@ class Template:
 </tr>
 <tr>
  <td>
-  <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+  <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel" />
  </td>
 </tr>
 </table>
@@ -1694,7 +1702,7 @@ class Template:
             <input type="submit" name="remove_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (member_list,_("Remove member"))
         else :
-            member_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No members.")
+            member_text = """<td style="padding: 0 5 10 5;" colspan="2">%s</td>""" % _("No members.")
         if pending_members :
             pending_list =   self.__create_select_menu("pending_member_id", pending_members, _("Please select:"))
             pending_text = """
@@ -1706,7 +1714,7 @@ class Template:
             <input type="submit" name="reject_member" value="%s" class="nonsubmitbutton"/>
             </td>""" %  (pending_list,_("Accept member"), _("Reject member"))
         else :
-            pending_text = """<td style="padding: 0 5 10 5;" collspan="2">%s</td>""" % _("No members awaiting approval.")
+            pending_text = """<td style="padding: 0 5 10 5;" colspan="2">%s</td>""" % _("No members awaiting approval.")
 
         header1 = self.tmpl_group_table_title(text=_("Current members"))
         header2 = self.tmpl_group_table_title(text=_("Members awaiting approval"))
@@ -1725,6 +1733,9 @@ class Template:
                 'header1': header1,
                 'header2': header2,
                 'header3': header3,
+                'img_alt_header1': _("Current members"),
+                'img_alt_header2': _("Members awaiting approval"),
+                'img_alt_header3': _("Invite new members"),
                 'invite_text': invite_text,
                 'imgurl': weburl + '/img',
                 'cancel_label':_("Cancel"),
@@ -1747,7 +1758,7 @@ class Template:
         _ = gettext_set_language(ln)
         out = self.tmpl_warning(warnings)
         out += """
-<form name="leave" action="%(action)s" method="POST">
+<form name="leave" action="%(action)s" method="post">
  <input type="hidden" name="ln" value="%(ln)s" />
   <div style="padding:10px;">
   <table class="bskbasket">
@@ -1761,6 +1772,9 @@ class Template:
         </td>
       </tr>
     </thead>
+    <tfoot>
+       <tr><td colspan="2"></td></tr>
+    </tfoot>
     <tbody>
       <tr>
         <td colspan="2">
@@ -1785,7 +1799,7 @@ class Template:
     %(submit)s
    </td>
    <td>
-    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel"/>
+    <input type="submit" value="%(cancel_label)s" class="formbutton" name="cancel" />
    </td>
    </tr>
   </table>
@@ -1971,7 +1985,7 @@ class Template:
         out = "<div>"
         if img:
             out += """
-            <img src="%s" />
+            <img src="%s" alt="" />
             """ % (weburl + img)
         out += """
         <b>%s</b>
@@ -1990,7 +2004,7 @@ class Template:
         url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
         # FIXME: which user?  We should show his nickname.
-        body = (_("A user wants to join the group %s.") % group_name) + '<br/>'
+        body = (_("A user wants to join the group %s.") % group_name) + '<br />'
         body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.") % {'x_url_open': '<a href="' + url + '">',
                                                                                                   'x_url_close': '</a>'}
         body += '<br />'
@@ -2032,7 +2046,7 @@ class Template:
         subject = _("Group %s has been deleted") % group_name
         url = weburl + "/yourgroups/display?ln=" + ln
         body = _("Group %s has been deleted by its administrator.") % group_name
-        body += '<br/>'
+        body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
                                                                                               'x_url_close': '</a>'}
         body += '<br />'

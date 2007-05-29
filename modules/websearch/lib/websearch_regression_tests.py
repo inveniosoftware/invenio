@@ -779,7 +779,7 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
         """websearch - no XSS vulnerability in collection interface pages"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
-                                               expected_text='Collection &lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt; Not Found'))
+                                               expected_text='Collection &amp;lt;SCRIPT&amp;gt;alert("XSS");&amp;lt;/SCRIPT&amp;gt; Not Found'))
 
     def test_xss_in_collection_search_page(self):
         """websearch - no XSS vulnerability in collection search pages"""
@@ -825,14 +825,14 @@ class WebSearchResultsOverview(unittest.TestCase):
         if body.find("Results overview") > -1:
             self.fail("Oops, when split by collection is off, "
                       "results overview should not be present.")
-        if body.find('<a name="Atlantis%20Institute%20of%20Fictive%20Science"></a>') == -1:
+        if body.find('<a name="1"></a>') == -1:
             self.fail("Oops, when split by collection is off, "
                       "Atlantis collection should be found.")
-        if body.find('<a name="Multimedia%20%26%20Arts"></a>') > -1:
+        if body.find('<a name="15"></a>') > -1:
             self.fail("Oops, when split by collection is off, "
                       "Multimedia & Arts should not be found.")
         try:
-            browser.find_link(url='#Multimedia%20%26%20Arts')
+            browser.find_link(url='#15')
             self.fail("Oops, when split by collection is off, "
                       "a link to Multimedia & Arts should not be found.")
         except LinkNotFoundError:
@@ -849,11 +849,11 @@ class WebSearchResultsOverview(unittest.TestCase):
         if body.find('<a name="Atlantis%20Institute%20of%20Fictive%20Science"></a>') > -1:
             self.fail("Oops, when split by collection is on, "
                       "Atlantis collection should not be found.")
-        if body.find('<a name="Multimedia%20%26%20Arts"></a>') == -1:
+        if body.find('<a name="15"></a>') == -1:
             self.fail("Oops, when split by collection is on, "
                       "Multimedia & Arts should be found.")
         try:
-            browser.find_link(url='#Multimedia%20%26%20Arts')
+            browser.find_link(url='#15')
         except LinkNotFoundError:
             self.fail("Oops, when split by collection is on, "
                       "a link to Multimedia & Arts should be found.")

@@ -31,43 +31,53 @@ def format(bfo, reference_prefix, reference_suffix):
     """
     from invenio.config import weburl
     
-    references = bfo.fields("999C5")
+    references = bfo.fields("999C5", escape=1)
     out = ""
     
     for reference in references:
-        
-        if reference_prefix is not None:
-            out += reference_prefix
-            
+        ref_out = ''
+
         if reference.has_key('o'):
-            out += "<li><small>"+ reference['o']+ "</small> "
+            if out != "":
+                ref_out = '</li>'
+            ref_out += "<li><small>"+ reference['o']+ "</small> "
 
         if reference.has_key('m'):
-            out += "<small>"+ reference['m']+ "</small> "
+            ref_out += "<small>"+ reference['m']+ "</small> "
 
         if reference.has_key('r'):
-            out += '<small> [<a href="'+weburl+'/search?f=reportnumber&amp;p='+ \
+            ref_out += '<small> [<a href="'+weburl+'/search?f=reportnumber&amp;p='+ \
                    reference['r']+ \
                    '&amp;ln=' + bfo.lang + \
-                   '">'+ reference['r']+ "</a>] </small> <br/>"
+                   '">'+ reference['r']+ "</a>] </small> <br />"
 
         if reference.has_key('t'):
             ejournal = bfo.kb("ejournals", reference.get('t', ""))
             if ejournal != "":
-                out += ' <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='\
+                ref_out += ' <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='\
                       + reference['t'].replace(" ", "+") \
                 +"&amp;volume="+reference.get('v', "")+"&amp;year="+\
                 reference.get('y', "")+"&amp;page="+\
                 reference.get('p',"").split("-")[0]+'">'
-                out += reference['t']+": "+reference.get('v', "")+\
+                ref_out += reference['t']+": "+reference.get('v', "")+\
                        " ("+reference.get('y', "")+") "
-                out += reference.get('p', "")+"</a> </small> <br/>"
+                ref_out += reference.get('p', "")+"</a> </small> <br />"
             else:
-                out += " <small> "+reference['t']+ reference.get('v', "")+\
+                ref_out += " <small> "+reference['t']+ reference.get('v', "")+\
                        reference.get('y',"")+ reference.get('p',"")+ \
-                       " </small> <br/>"
-        if reference_suffix is not None:
-            out += reference_suffix
+                       " </small> <br />"
+
+
+        if reference_prefix is not None and ref_out != '':
+            ref_out = reference_prefix + ref_out
+        if reference_suffix is not None and ref_out != '':
+            ref_out += reference_suffix
+
+        out += ref_out
+
+    if out != '':
+        out += '</li>'
+
     return out
 
 def escape_values(bfo):

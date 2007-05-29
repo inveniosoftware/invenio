@@ -2257,7 +2257,7 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
         out = res[0][0]
     return out
 
-def print_warning(req, msg, type='', prologue='<br>', epilogue='<br>'):
+def print_warning(req, msg, type='', prologue='<br />', epilogue='<br />'):
     "Prints warning message and flushes output."
     if req and msg:
         req.write(websearch_templates.tmpl_print_warning(
@@ -3643,12 +3643,12 @@ def perform_request_cache(req, action="show"):
     # show collection reclist cache:
     out += "<h3>Collection reclist cache</h3>"
     out += "- collection table last updated: %s" % get_table_update_time('collection')
-    out += "<br>- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
-    out += "<br>- reclist cache contents:"
+    out += "<br />- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
+    out += "<br />- reclist cache contents:"
     out += "<blockquote>"
     for coll in collection_reclist_cache.keys():
         if collection_reclist_cache[coll]:
-            out += "%s (%d)<br>" % (coll, get_collection_reclist(coll)._nbhits)
+            out += "%s (%d)<br />" % (coll, get_collection_reclist(coll)._nbhits)
     out += "</blockquote>"
     # show search cache:
     out += "<h3>Search Cache</h3>"
@@ -3672,22 +3672,22 @@ def perform_request_cache(req, action="show"):
     # show field i18nname cache:
     out += "<h3>Field I18N names cache</h3>"
     out += "- fieldname table last updated: %s" % get_table_update_time('fieldname')
-    out += "<br>- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
-    out += "<br>- i18nname cache contents:"
+    out += "<br />- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
+    out += "<br />- i18nname cache contents:"
     out += "<blockquote>"
     for field in field_i18nname_cache.keys():
         for ln in field_i18nname_cache[field].keys():
-            out += "%s, %s = %s<br>" % (field, ln, field_i18nname_cache[field][ln])
+            out += "%s, %s = %s<br />" % (field, ln, field_i18nname_cache[field][ln])
     out += "</blockquote>"
     # show collection i18nname cache:
     out += "<h3>Collection I18N names cache</h3>"
     out += "- collectionname table last updated: %s" % get_table_update_time('collectionname')
-    out += "<br>- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
-    out += "<br>- i18nname cache contents:"
+    out += "<br />- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
+    out += "<br />- i18nname cache contents:"
     out += "<blockquote>"
     for coll in collection_i18nname_cache.keys():
         for ln in collection_i18nname_cache[coll].keys():
-            out += "%s, %s = %s<br>" % (coll, ln, collection_i18nname_cache[coll][ln])
+            out += "%s, %s = %s<br />" % (coll, ln, collection_i18nname_cache[coll][ln])
     out += "</blockquote>"
     req.write("<html>")
     req.write(out)

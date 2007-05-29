@@ -95,9 +95,9 @@
         ## Return HTML-ready language selection box links.
         ## Output example: 
         ($filenamebase, $filenameextension) = split /\./, '$(WML_SRC_BASENAME)';
-        $out = "_(This site is also available in the following languages:)_<br>";
+        $out = "_(This site is also available in the following languages:)_<br //>";
         foreach $ln (split /\s*,\s*/, '<CDSLANGS>') {
-            $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$ln.'.'.$filenameextension.'">'.get_language_name($ln).'</a> &nbsp; ';
+            $out .= ' <a class="langinfo" href="'.$filenamebase.'.'.$ln.'.'.$filenameextension.'">'.get_language_name($ln).'</a> &nbsp;  ';
         }
         return substr($out, 0, -2);
     }

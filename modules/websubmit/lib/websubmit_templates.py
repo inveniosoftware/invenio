@@ -59,28 +59,28 @@ class Template:
         _ = gettext_set_language(ln)
 
         return """
-          <SCRIPT TYPE="text/javascript" LANGUAGE="Javascript1.2">
+          <script type="text/javascript" language="Javascript1.2">
           var allLoaded = 1;
-          </SCRIPT>
+          </script>
            <table class="searchbox" width="100%%" summary="">
               <tr>
                   <th class="portalboxheader">%(document_types)s:</th>
               </tr>
               <tr>
                   <td class="portalboxbody">
-                    <BR>
+                    <br />
                     %(please_select)s:
-                    <BR><BR>
-                    <TABLE width="100%%">
-                    <TR>
-                        <TD width="50%%" class="narrowsearchboxbody">
-                          <FORM method=get action="/submit">
-                            <INPUT type="hidden" name="doctype">
+                    <br /><br />
+                    <table width="100%%">
+                    <tr>
+                        <td width="50%%" class="narrowsearchboxbody">
+                          <form method="get" action="/submit">
+                            <input type="hidden" name="doctype" />
                               %(catalogues)s
-                        </TD>
-                    </TR>
-                    </TABLE>
-                    </FORM>
+                          </form>
+                        </td>
+                    </tr>
+                    </table>
                   </td>
               </tr>
             </table>""" % {
@@ -156,16 +156,16 @@ class Template:
         _ = gettext_set_language(ln)
 
         if catalog['level'] == 1:
-            out = "<LI><font size=\"+1\"><strong>%s</strong></font>\n" % catalog['name']
+            out = "<li><font size=\"+1\"><strong>%s</strong></font>\n" % catalog['name']
         else:
             if catalog['level'] == 2:
-                out = "<LI>%s\n" % catalog['name']
+                out = "<li>%s\n" % catalog['name']
             else:
                 if catalog['level'] > 2:
-                    out = "<LI>%s\n" % catalog['name']
+                    out = "<li>%s\n" % catalog['name']
 
         if len(catalog['docs']) or len(catalog['sons']):
-            out += "<UL>"
+            out += "<ul>\n"
 
         if len(catalog['docs']) != 0:
             for row in catalog['docs']:
@@ -176,8 +176,10 @@ class Template:
                 out += self.tmpl_submit_home_catalogs_sub(ln, row)
 
         if len(catalog['docs']) or len(catalog['sons']):
-            out += "</UL>"
-
+            out += "</ul></li>"
+        else:
+            out += "</li>"
+            
         return out
 
     def tmpl_submit_home_catalogs_doctype(self, ln, doc):
@@ -196,7 +198,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return """<LI><a href="" onClick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a>""" % doc
+        return """<li><a href="" onclick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a></li>""" % doc
 
     def tmpl_action_page(self, ln, uid, guest, pid, now, doctype,
                          description, docfulldesc, snameCateg,
@@ -238,7 +240,7 @@ class Template:
         out = ""
 
         out += """
-              <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+              <script language="JavaScript" type="text/javascript">
               var checked = 0;
               function tester() {
               """
@@ -263,15 +265,15 @@ class Template:
                 function selectdoctype(nb) {
                     document.forms[0].act.value = docname[nb];
                 }
-                </SCRIPT>
-                <FORM method="get" action="/submit">
-                <INPUT type="hidden" name="doctype" value="%(doctype)s">
-                <INPUT type="hidden" name="indir">
-                <input type="hidden" name="access" value="%(now)i_%(pid)s">
+                </script>
+                <form method="get" action="/submit">
+                <input type="hidden" name="doctype" value="%(doctype)s" />
+                <input type="hidden" name="indir" />
+                <input type="hidden" name="access" value="%(now)i_%(pid)s" />
 
-                <INPUT type="hidden" name="act">
-                <INPUT type="hidden" name="startPg" value="1">
-                <INPUT type="hidden" name="mainmenu" value="/submit?doctype=%(doctype)s">
+                <input type="hidden" name="act" />
+                <input type="hidden" name="startPg" value="1" />
+                <input type="hidden" name="mainmenu" value="/submit?doctype=%(doctype)s" />
 
                 <table class="searchbox" width="100%%" summary="">
                   <tr>
@@ -279,13 +281,13 @@ class Template:
                   </tr>
                   <tr>
                       <td class="portalboxbody">%(description)s
-                        <BR>
-                        <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
+                        <br />
+                        <script language="JavaScript" type="text/javascript">
                         var nbimg = document.images.length + 1;
-                        </SCRIPT>
-                        <BR>
-                        <TABLE align="center" cellpadding="0" cellspacing="0" border="0">
-                        <TR valign="top">
+                        </script>
+                        <br />
+                        <table align="center" cellpadding="0" cellspacing="0" border="0">
+                        <tr valign="top">
                 """ % {
                       'select_cat' : _("Please select a category"),
                       'doctype' : doctype,
@@ -296,57 +298,58 @@ class Template:
                     }
 
         if len(snameCateg) :
-            out += """<TD align="right">"""
+            out += """<td align="right">"""
             for i in range(0, len(snameCateg)):
-                out += """%(longname)s<INPUT type="radio" name="combo%(doctype)s" value="%(shortname)s" onClick="clicked();">&nbsp;<BR />""" % {
+                out += """<label for="combo%(shortname)s">%(longname)s</label><input type="radio" name="combo%(doctype)s" id="combo%(shortname)s" value="%(shortname)s" onclick="clicked();" />&nbsp;<br />""" % {
                          'longname' : lnameCateg[i],
                          'doctype' : doctype,
                          'shortname' : snameCateg[i],
                        }
-            out += "</TD>"
+            out += "</td>"
         else:
-            out += "<SCRIPT>checked=1;</SCRIPT>"
-        out += """<TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+            out += "<script>checked=1;</script>"
+        out += """<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                   <td>
-                    <table>
+                    <table><tr><td>
                """
         #display list of actions
         for i in range(0,len(actionShortDesc)):
-            out += """<input type="submit" class="adminbutton" value="%(status)s" onClick="if (tester()) { document.forms[0].indir.value='%(indir)s';document.forms[0].act.value='%(act)s';document.forms[0].submit();}; return false;"><br>""" % {
+            out += """<input type="submit" class="adminbutton" value="%(status)s" onclick="if (tester()) { document.forms[0].indir.value='%(indir)s';document.forms[0].act.value='%(act)s';document.forms[0].submit();}; return false;" /><br />""" % {
                      'status' : statustext[i],
                      'indir' : indir[i],
                      'act' : actionShortDesc[i]
                    }
-        out += """  </TABLE>
-                    </TD>
-                </TR>
-                </TABLE>
-                <BR>"""
+        out += """  </td></tr></table>
+                    </td>
+                </tr>
+                </table>
+                <br />"""
         if len(snameCateg) :
-            out += """<STRONG class="headline">%(notice)s:</STRONG><BR>
+            out += """<strong class="headline">%(notice)s:</strong><br />
                     %(select_cat)s""" % {
                      'notice' : _("Notice"),
                      'select_cat' : _("Select a category and then click on an action button."),
                     }
         out += """
-                <BR><BR>
-                <BR>
-                </FORM>
-                <FORM action="/submit"><HR>
-                  <font color="black"><small>%(continue_explain)s</small></FONT>
-                  <TABLE border=0 bgcolor="#CCCCCC" width="100%%"><TR>
-                    <TD width="100%%">
-                    <small>Access Number: <INPUT size=15 name=AN>
-                      <INPUT type="hidden" name="doctype" value="%(doctype)s">
-                      <INPUT class="adminbutton" type="submit" value=" %(go)s ">
+                <br /><br />
+            
+                </td>
+                </tr>
+                </table>
+                </form>
+                <form action="/submit"><hr />
+                  <font color="black"><small>%(continue_explain)s</small></font>
+                  <table border="0" bgcolor="#CCCCCC" width="100%%"><tr>
+                    <td width="100%%">
+                    <small>Access Number: <input size="15" name="AN" />
+                      <input type="hidden" name="doctype" value="%(doctype)s" />
+                      <input class="adminbutton" type="submit" value=" %(go)s " />
                     </small>
-                    </TD></TR>
-                  </TABLE>
-                  <HR>
-                 </FORM>
-                        </td>
-                    </tr>
-                </table>""" % {
+                    </td></tr>
+                  </table>
+                  <hr />
+                 </form>
+                 """ % {
                 'continue_explain' : _("To continue with a previously interrupted submission, enter an access number into the box below:"),
                   'doctype' : doctype,
                   'go' : _("GO"),
@@ -437,14 +440,14 @@ class Template:
 
         # top menu
         out = """
-                <FORM method="POST" action="/submit" onSubmit="return tester();">
-                <center><TABLE cellspacing="0" cellpadding="0" border="0">
-                  <TR>
-                    <TD class="submitHeader"><B>%(docname)s&nbsp;</B></TD>
-                    <TD class="submitHeader"><small>&nbsp;%(actname)s&nbsp;</small></TD>
-                    <TD valign="bottom">
-                        <TABLE cellspacing="0" cellpadding="0" border="0" width="100%%">
-                        <TR><TD class="submitEmptyPage">&nbsp;&nbsp;</TD>
+                <form method="post" action="/submit" onsubmit="return tester();">
+                <center><table cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td class="submitHeader"><b>%(docname)s&nbsp;</b></td>
+                    <td class="submitHeader"><small>&nbsp;%(actname)s&nbsp;</small></td>
+                    <td valign="bottom">
+                        <table cellspacing="0" cellpadding="0" border="0" width="100%%">
+                        <tr><td class="submitEmptyPage">&nbsp;&nbsp;</td>
               """ % {
                 'docname' : docname,
                 'actname' : actname,
@@ -452,27 +455,27 @@ class Template:
 
         for i in range(1, nbpages+1):
             if i == int(curpage):
-                out += """<TD class="submitCurrentPage"><small>&nbsp;page: %s&nbsp;</small></TD>""" % curpage
+                out += """<td class="submitCurrentPage"><small>&nbsp;page: %s&nbsp;</small></td>""" % curpage
             else:
-                out += """<TD class="submitPage"><small>&nbsp;<A HREF='' onClick="if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }">%s</A>&nbsp;</small></TD>""" % (i,i)
-        out += """        <TD class="submitEmptyPage">&nbsp;&nbsp;
-                        </TD></TR></TABLE>
-                    </TD>
-                    <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('/submit/summary?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>
-                  </TR>
-                  <TR><TD colspan="5" class="submitHeader">
-                    <TABLE border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><TR><TD>
-                     <BR>
-                     <INPUT type="hidden" name="file" value="%(file)s">
-                     <INPUT type="hidden" name="nextPg" value="%(nextPg)s">
-                     <INPUT type="hidden" name="access" value="%(access)s">
-                     <INPUT type="hidden" name="curpage" value="%(curpage)s">
-                     <INPUT type="hidden" name="nbPg" value="%(nbPg)s">
-                     <INPUT type="hidden" name="doctype" value="%(doctype)s">
-                     <INPUT type="hidden" name="act" value="%(act)s">
-                     <INPUT type="hidden" name="indir" value="%(indir)s">
-                     <INPUT type="hidden" name="mode" value="U">
-                     <INPUT type="hidden" name="step" value="0">
+                out += """<td class="submitPage"><small>&nbsp;<a href='' onclick="if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }">%s</a>&nbsp;</small></td>""" % (i,i)
+        out += """        <td class="submitEmptyPage">&nbsp;&nbsp;
+                        </td></tr></table>
+                    </td>
+                    <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>
+                  </tr>
+                  <tr><td colspan="5" class="submitHeader">
+                    <table border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><tr><td>
+                     <br />
+                     <input type="hidden" name="file" value="%(file)s" />
+                     <input type="hidden" name="nextPg" value="%(nextPg)s" />
+                     <input type="hidden" name="access" value="%(access)s" />
+                     <input type="hidden" name="curpage" value="%(curpage)s" />
+                     <input type="hidden" name="nbPg" value="%(nbPg)s" />
+                     <input type="hidden" name="doctype" value="%(doctype)s" />
+                     <input type="hidden" name="act" value="%(act)s" />
+                     <input type="hidden" name="indir" value="%(indir)s" />
+                     <input type="hidden" name="mode" value="U" />
+                     <input type="hidden" name="step" value="0" />
                 """ % {
                  'summary' : _("SUMMARY"),
                  'doctype' : doctype,
@@ -487,64 +490,64 @@ class Template:
 
         for field in fields:
             if field['javascript']:
-                out += """<SCRIPT LANGUAGE="JavaScript1.1"  TYPE="text/javascript">
+                out += """<script language="JavaScript1.1"  type="text/javascript">
                           %s
-                          </SCRIPT>
+                          </script>
                        """ % field['javascript'];
 
             # now displays the html form field(s)
             out += "%s\n%s\n" % (field['fullDesc'], field['text'])
 
         out += javascript
-        out += "<BR>&nbsp;<BR>&nbsp;</TD></TR></TABLE></TD></TR>\n"
+        out += "<br />&nbsp;<br />&nbsp;</td></tr></table></td></tr>\n"
 
         # Display the navigation cell
         # Display "previous page" navigation arrows
-        out += """<TR><TD colspan="5"><TABLE border="0" cellpadding="0" cellspacing="0" width="100%%"><TR>"""
+        out += """<tr><td colspan="5"><table border="0" cellpadding="0" cellspacing="0" width="100%%"><tr>"""
         if int(curpage) != 1:
-            out += """ <TD class="submitHeader" align="left">&nbsp;
-                         <A HREF='' onClick="if (tester2() == 1) {document.forms[0].curpage.value=%(prpage)s;document.forms[0].submit();return false;} else { return false; }">
-                           <IMG SRC="%(images)s/left-trans.gif" alt="%(prevpage)s" border="0">
+            out += """ <td class="submitHeader" align="left">&nbsp;
+                         <a href='' onclick="if (tester2() == 1) {document.forms[0].curpage.value=%(prpage)s;document.forms[0].submit();return false;} else { return false; }">
+                           <img src="%(images)s/left-trans.gif" alt="%(prevpage)s" border="0" />
                              <strong><font color="white">%(prevpage)s</font></strong>
-                         </A>
-                       </TD>
+                         </a>
+                       </td>
             """ % {
               'prpage' : int(curpage) - 1,
               'images' : images,
               'prevpage' : _("Previous page"),
             }
         else:
-            out += """ <TD class="submitHeader">&nbsp;</TD>"""
+            out += """ <td class="submitHeader">&nbsp;</td>"""
         # Display the submission number
-        out += """ <TD class="submitHeader" align="center"><small>%(submission)s: %(access)s</small></TD>\n""" % {
+        out += """ <td class="submitHeader" align="center"><small>%(submission)s: %(access)s</small></td>\n""" % {
                 'submission' : _("Submission number") + '(1)',
                 'access' : access,
               }
         # Display the "next page" navigation arrow
         if int(curpage) != int(nbpages):
-            out += """ <TD class="submitHeader" align="right">
-                         <A HREF='' onClick="if (tester2()){document.forms[0].curpage.value=%(nxpage)s;document.forms[0].submit();return false;} else {return false;}; return false;">
+            out += """ <td class="submitHeader" align="right">
+                         <a href='' onclick="if (tester2()){document.forms[0].curpage.value=%(nxpage)s;document.forms[0].submit();return false;} else {return false;}; return false;">
                           <strong><font color="white">%(nextpage)s</font></strong>
-                          <IMG SRC="%(images)s/right-trans.gif" alt="%(nextpage)s" border="0">
-                        </A>
-                       </TD>
+                          <img src="%(images)s/right-trans.gif" alt="%(nextpage)s" border="0" />
+                        </a>
+                       </td>
             """ % {
               'nxpage' : int(curpage) + 1,
               'images' : images,
               'nextpage' : _("Next page"),
             }
         else:
-            out += """ <TD class="submitHeader">&nbsp;</TD>"""
-        out += """</TR></TABLE></TD></TR></TABLE></center></FORM>
+            out += """ <td class="submitHeader">&nbsp;</td>"""
+        out += """</tr></table></td></tr></table></center></form>
 
-                  <BR>
-                  <BR>
-                 <A HREF="%(mainmenu)s" onClick="return confirm('%(surequit)s')">
-                 <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
-                 <BR><BR>
-                 <HR>
-                  <small>%(take_note)s</small><BR>
-                  <small>%(explain_summary)s</small><BR>
+                  <br />
+                  <br />
+                 <a href="%(mainmenu)s" onclick="return confirm('%(surequit)s')">
+                 <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
+                 <br /><br />
+                 <hr />
+                  <small>%(take_note)s</small><br />
+                  <small>%(explain_summary)s</small><br />
                """ % {
                  'surequit' : _("Are you sure you want to quit this submission?"),
                  'back' : _("Back to main menu"),
@@ -598,18 +601,18 @@ class Template:
         # If the field is a file upload
         elif field['type'] == 'F':
             ## the field is a file input:
-            text = """<input type="file" name="%s" size="%s"%s>""" \
+            text = """<input type="file" name="%s" size="%s"%s />""" \
                    % (field['name'], field['size'], "%s" \
                       % ((field['maxlength'] in (0, None) and " ") or (""" maxlength="%s\"""" % field['maxlength'])) )
         # If the field is a text input
         elif field['type'] == 'I':
             ## Field is a text input:
-            text = """<input type="text" name="%s" size="%s" value="%s"%s>""" \
+            text = """<input type="text" name="%s" size="%s" value="%s"%s />""" \
                    % (field['name'], field['size'], field['val'], "%s" \
                       % ((field['maxlength'] in (0, None) and " ") or (""" maxlength="%s\"""" % field['maxlength'])) )
         # If the field is a hidden input
         elif field['type'] == 'H':
-            text="<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field['name'], field['val'])
+            text="<input type=\"hidden\" name=\"%s\" value=\"%s\" />" % (field['name'], field['val'])
         # If the field is user-defined
         elif field['type'] == 'D':
             text=field['htmlcode']
@@ -664,7 +667,7 @@ class Template:
 
         nbFields = len(upload)
         # if there is a file upload field, we change the encoding type
-        out = """<SCRIPT LANGUAGE="JavaScript1.1" TYPE="text/javascript">
+        out = """<script language="JavaScript1.1" type="text/javascript">
               """
         for i in range(0,nbFields):
             if upload[i] == 1:
@@ -773,7 +776,7 @@ class Template:
                     text = text.replace('"','\"')
                     text = text.replace("\n","\\n")
                     # If the field is not an upload element
-                    out += """<!--INPUT field found-->
+                    out += """<!--input field found-->
                                el = document.forms[0].elements['%(fieldname)s'];
                                el.value="%(text)s";
                            """ % {
@@ -809,7 +812,7 @@ class Template:
                              return false;
                            }
                          }"""
-        out += """</SCRIPT>"""
+        out += """</script>"""
         return out
 
     def tmpl_page_endaction(self, ln, weburl, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action, images):
@@ -861,31 +864,31 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-          <FORM ENCTYPE="multipart/form-data" action="/submit" method="POST">
-          <INPUT type="hidden" name="file" value="%(file)s">
-          <INPUT type="hidden" name="nextPg" value="%(nextPg)s">
-          <INPUT type="hidden" name="startPg" value="%(startPg)s">
-          <INPUT type="hidden" name="access" value="%(access)s">
-          <INPUT type="hidden" name="curpage" value="%(curpage)s">
-          <INPUT type="hidden" name="nbPg" value="%(nbPg)s">
-          <INPUT type="hidden" name="doctype" value="%(doctype)s">
-          <INPUT type="hidden" name="act" value="%(act)s">
-          <INPUT type="hidden" name="indir" value="%(indir)s">
-          <INPUT type="hidden" name="fromdir" value="">
-          <INPUT type="hidden" name="mainmenu" value="%(mainmenu)s">
+          <form ENCTYPE="multipart/form-data" action="/submit" method="post">
+          <input type="hidden" name="file" value="%(file)s" />
+          <input type="hidden" name="nextPg" value="%(nextPg)s" />
+          <input type="hidden" name="startPg" value="%(startPg)s" />
+          <input type="hidden" name="access" value="%(access)s" />
+          <input type="hidden" name="curpage" value="%(curpage)s" />
+          <input type="hidden" name="nbPg" value="%(nbPg)s" />
+          <input type="hidden" name="doctype" value="%(doctype)s" />
+          <input type="hidden" name="act" value="%(act)s" />
+          <input type="hidden" name="indir" value="%(indir)s" />
+          <input type="hidden" name="fromdir" value="" />
+          <input type="hidden" name="mainmenu" value="%(mainmenu)s" />
 
-          <INPUT type="hidden" name="mode" value="U">
-          <INPUT type="hidden" name="step" value="1">
-          <INPUT type="hidden" name="deleted" value="no">
-          <INPUT type="hidden" name="file_path" value="">
-          <INPUT type="hidden" name="userfile_name" value="">
+          <input type="hidden" name="mode" value="U" />
+          <input type="hidden" name="step" value="1" />
+          <input type="hidden" name="deleted" value="no" />
+          <input type="hidden" name="file_path" value="" />
+          <input type="hidden" name="userfile_name" value="" />
 
-          <center><TABLE cellspacing="0" cellpadding="0" border="0"><TR>
-             <TD class="submitHeader"><B>%(docname)s&nbsp;</B></TD>
-             <TD class="submitHeader"><small>&nbsp;%(actname)s&nbsp;</small></TD>
-             <TD valign="bottom">
-                 <TABLE cellspacing="0" cellpadding="0" border="0" width="100%%">
-                 <TR><TD class="submitEmptyPage">&nbsp;&nbsp;</TD>
+          <center><table cellspacing="0" cellpadding="0" border="0"><tr>
+             <td class="submitHeader"><b>%(docname)s&nbsp;</b></td>
+             <td class="submitHeader"><small>&nbsp;%(actname)s&nbsp;</small></td>
+             <td valign="bottom">
+                 <table cellspacing="0" cellpadding="0" border="0" width="100%%">
+                 <tr><td class="submitEmptyPage">&nbsp;&nbsp;</td>
               """ % {
                 'file' : file,
                 'nextPg' : nextPg,
@@ -902,20 +905,20 @@ class Template:
               }
 
         if finished == 1:
-            out += """<TD class="submitCurrentPage">%(finished)s</TD>
-                      <TD class="submitEmptyPage">&nbsp;&nbsp;</TD>
-                     </TR></TABLE>
-                    </TD>
-                    <TD class="submitEmptyPage" align="right">&nbsp;</TD>
+            out += """<td class="submitCurrentPage">%(finished)s</td>
+                      <td class="submitEmptyPage">&nbsp;&nbsp;</td>
+                     </tr></table>
+                    </td>
+                    <td class="submitEmptyPage" align="right">&nbsp;</td>
                    """ % {
                      'finished' : _("finished!"),
                    }
         else:
             for i in range(1, nbpages + 1):
-                out += """<TD class="submitPage"><small>&nbsp;
-                            <A HREF='' onClick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</A>&nbsp;</small></TD>""" % (i,i)
-            out += """<TD class="submitCurrentPage">%(end_action)s</TD><TD class="submitEmptyPage">&nbsp;&nbsp;</TD></TR></TABLE></TD>
-                      <TD class="submitHeader" align="right">&nbsp;<A HREF='' onClick="window.open('/submit/summary?doctype=%(doctype)s&act=%(act)s&access=%(access)s&indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></A>&nbsp;</TD>""" % {
+                out += """<td class="submitPage"><small>&nbsp;
+                            <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
+            out += """<td class="submitCurrentPage">%(end_action)s</td><td class="submitEmptyPage">&nbsp;&nbsp;</td></tr></table></td>
+                      <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
                         'summary' : _("SUMMARY"),
                         'doctype' : doctype,
@@ -923,17 +926,17 @@ class Template:
                         'access' : access,
                         'indir' : indir,
                       }
-        out += """</TR>
-                  <TR>
-                    <TD colspan="5" class="submitBody">
-                      <small><BR><BR>
+        out += """</tr>
+                  <tr>
+                    <td colspan="5" class="submitBody">
+                      <small><br /><br />
                       %(function_content)s
                       %(next_action)s
-                      <BR><BR>
-                    </TD>
-                </TR>
-                <TR class="submitHeader">
-                    <TD class="submitHeader" colspan="5" align="center">""" % {
+                      <br /><br />
+                    </td>
+                </tr>
+                <tr class="submitHeader">
+                    <td class="submitHeader" colspan="5" align="center">""" % {
                        'function_content' : function_content,
                        'next_action' : next_action,
                      }
@@ -946,27 +949,27 @@ class Template:
         else:
             out += "&nbsp;\n"
         out += """
-            </TD>
-        </TR>
-        </TABLE>
+            </td>
+        </tr>
+        </table>
         </center>
         </form>
-        <br>
-        <br>"""
+        <br />
+        <br />"""
         # Add the "back to main menu" button
         if finished == 0:
-            out += """ <A HREF="%(mainmenu)s" onClick="return confirm('%(surequit)s')">
-                       <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
-                       <BR><BR>""" % {
+            out += """ <a href="%(mainmenu)s" onclick="return confirm('%(surequit)s')">
+                       <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
+                       <br /><br />""" % {
                            'surequit' : _("Are you sure you want to quit this submission?"),
                            'back' : _("Back to main menu"),
                            'images' : images,
                            'mainmenu' : mainmenu
                            }
         else:
-            out += """ <A HREF="%(mainmenu)s">
-                       <IMG SRC="%(images)s/mainmenu.gif" border="0" ALT="%(back)s" align="right"></A>
-                       <BR><BR>""" % {
+            out += """ <a href="%(mainmenu)s">
+                       <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
+                       <br /><br />""" % {
                      'back' : _("Back to main menu"),
                      'images' : images,
                      'mainmenu' : mainmenu,
@@ -1006,7 +1009,7 @@ class Template:
 
         out = ""
         if display_on:
-            out += """<br><br>%(function_list)s<P>
+            out += """<br /><br />%(function_list)s<P>
                       <table border="1" cellpadding="15">
                         <tr><th>%(function)s</th><th>%(score)s</th><th>%(running)s</th></tr>
                    """ % {
@@ -1023,7 +1026,7 @@ class Template:
                 out += """<tr><td>%(name)s</td><td>%(score)s</td><td>%(result)s</td></tr>""" % {
                           'name' : function['name'],
                           'score' : function['score'],
-                          'result' : function['error'] and (_("Function %s does not exist.") % function['name'] + "<br>") or function['text']
+                          'result' : function['error'] and (_("Function %s does not exist.") % function['name'] + "<br />") or function['text']
                         }
             out += "</table>"
         else:
@@ -1061,7 +1064,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<BR><BR>%(haveto)s<ul>" % {
+        out = "<br /><br />%(haveto)s<ul>" % {
                 'haveto' : _("You must now"),
               }
         i = 0
@@ -1069,7 +1072,7 @@ class Template:
             if i > 0:
                 out += " <b>" + _("or") + "</b> "
             i += 1
-            out += """<LI><A HREF="" onClick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a>""" % action
+            out += """<li><a href="" onclick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a></li>""" % action
 
         out += "</ul>"
         return out
@@ -1166,7 +1169,7 @@ class Template:
         out = """<table border="0" cellspacing="1" class="searchbox">
                    <tr>
                      <td align="left" colspan="2" class="portalboxheader">
-                       <img src='%(imagepath)s' border=0>&nbsp;&nbsp;%(docname)s
+                       <img src='%(imagepath)s' border="0" />&nbsp;&nbsp;%(docname)s
                      </td>
                    </tr>""" % {
                      'imagepath' : imagepath,
@@ -1174,7 +1177,7 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br>(%(see)s <a href="%(weburl)s/getfile.py?docid=%(id)s&version=all">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(weburl)s/getfile.py?docid=%(id)s&amp;version=all">%(previous)s</a>)""" % {
                                  'see' : _("see"),
                                  'weburl' : weburl,
                                  'id' : id,
@@ -1227,7 +1230,7 @@ class Template:
 
         return """<tr>
                     <td valign="top">
-                      <small><a href="%(weburl)s/getfile.py?docid=%(docid)s&name=%(quotedname)s&format=%(selfformat)s&version=%(version)s">
+                      <small><a href="%(weburl)s/getfile.py?docid=%(docid)s&amp;name=%(quotedname)s&amp;format=%(selfformat)s&amp;version=%(version)s">
                         %(name)s%(format)s
                       </a></small>
                     </td>
@@ -1279,13 +1282,13 @@ class Template:
             out += """<tr>
                         <td align="right">
                           <small>
-                            <A HREF='' onClick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='/submit';window.opener.document.forms[0].submit();return false;">
-                              <FONT color="%(color)s">%(name)s</FONT>
-                            </A>
+                            <a href='' onclick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='/submit';window.opener.document.forms[0].submit();return false;">
+                              <font color="%(color)s">%(name)s</font>
+                            </a>
                           </small>
                         </td>
                         <td>
-                          <I><small><font color="black">%(value)s</font></small></I>
+                          <i><small><font color="black">%(value)s</font></small></i>
                         </td>
                       </tr>""" % {
                         'color' : color,
@@ -1347,16 +1350,15 @@ class Template:
 
         out = ""
         out += """
-                  <BR>
-                  <SMALL>
-                  <form>
-                  <input type="hidden" value='%(order)s' name="order">
-                  <input type="hidden" name="deletedId">
-                  <input type="hidden" name="deletedDoctype">
-                  <input type="hidden" name="deletedAction">
-                  <table class="searchbox" width="100%%" summary="">
+                  <br />
+                  <form action="">
+                  <input type="hidden" value="%(order)s" name="order" />
+                  <input type="hidden" name="deletedId" />
+                  <input type="hidden" name="deletedDoctype" />
+                  <input type="hidden" name="deletedAction" />
+                  <table class="searchbox" width="100%%" summary="" >
                     <tr>
-                      <th class="portalboxheader">%(for)s&nbsp;
+                      <th class="portalboxheader"><small>%(for)s</small>&nbsp;
                         <select name="doctype" onchange="document.forms[0].submit();">
                           <option value="">%(alltype)s</option>
                   """ % {
@@ -1368,7 +1370,7 @@ class Template:
             out += """<option value="%(id)s" %(sel)s>%(name)s</option>""" % {
                      'id' : doctype['id'],
                      'name' : doctype['name'],
-                     'sel' : doctype['selected'] and "SELECTED=\"SELECTED\"" or ""
+                     'sel' : doctype['selected'] and "selected=\"selected\"" or ""
                    }
         out += """     </select>
                       </th>
@@ -1387,29 +1389,29 @@ class Template:
             if submission['docname'] != docname:
                 docname = submission['docname']
                 out += """</table>
-                          %(docname)s<br>
+                          %(docname)s<br />
                           <table border="0" class="searchbox" align="left" width="100%%">
                             <tr>
                               <th class="headerselected">%(action)s&nbsp;&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="actiondown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" border="0"></a>&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="actionup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" border="0"></a>
+                                <a href='' onclick='document.forms[0].order.value="actiondown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" alt="down" border="0" /></a>&nbsp;
+                                <a href='' onclick='document.forms[0].order.value="actionup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" alt="up" border="0" /></a>
                               </th>
                               <th class="headerselected">%(status)s&nbsp;&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="statusdown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" border="0"></a>&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="statusup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" border="0"></a>
+                                <a href='' onclick='document.forms[0].order.value="statusdown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" alt="down" border="0" /></a>&nbsp;
+                                <a href='' onclick='document.forms[0].order.value="statusup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" alt="up" border="0" /></a>
                               </th>
                               <th class="headerselected">%(id)s</th>
                               <th class="headerselected">%(reference)s&nbsp;&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="refdown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" border="0"></a>&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="refup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" border="0"></a>
+                                <a href='' onclick='document.forms[0].order.value="refdown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" alt="down" border="0" /></a>&nbsp;
+                                <a href='' onclick='document.forms[0].order.value="refup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" alt="up" border="0" /></a>
                               </th>
                               <th class="headerselected">%(first)s&nbsp;&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="cddown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" border="0"></a>&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="cdup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" border="0"></a>
+                                <a href='' onclick='document.forms[0].order.value="cddown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" alt="down" border="0" /></a>&nbsp;
+                                <a href='' onclick='document.forms[0].order.value="cdup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" alt="up" border="0" /></a>
                               </th>
                               <th class="headerselected">%(last)s&nbsp;&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="mddown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" border="0"></a>&nbsp;
-                                <a href='' onClick='document.forms[0].order.value="mdup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" border="0"></a>
+                                <a href='' onclick='document.forms[0].order.value="mddown";document.forms[0].submit();return false;'><img src="%(images)s/smalldown.gif" alt="down" border="0" /></a>&nbsp;
+                                <a href='' onclick='document.forms[0].order.value="mdup";document.forms[0].submit();return false;'><img src="%(images)s/smallup.gif" alt="up" border="0" /></a>
                               </th>
                             </tr>
                        """ % {
@@ -1424,7 +1426,7 @@ class Template:
                        }
             if submission['pending']:
                 idtext = """<a href="submit/sub?access=%(id)s@%(action)s%(doctype)s">%(id)s</a>
-                            &nbsp;<a onClick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s'></a>
+                            &nbsp;<a onclick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s' /></a>
                          """ % {
                            'images' : images,
                            'id' : submission['id'],
@@ -1522,22 +1524,22 @@ class Template:
                     }
 
         for doctype in referees:
-            out += """<UL><LI><b>%(docname)s</b><UL><small>""" % doctype
+            out += """<ul><li><b>%(docname)s</b><ul>""" % doctype
 
             if doctype ['categories'] is None:            
-                out += '''<LI><A HREF="publiline.py?doctype=%(doctype)s">%(generalref)s</a><br>''' % {
+                out += '''<li><a href="publiline.py?doctype=%(doctype)s">%(generalref)s</a></li>''' % {
                     'docname' : doctype['docname'],
                     'doctype' : doctype['doctype'],
                     'generalref' : _("You are a general referee")}
 
             else:
                 for category in doctype['categories']:
-                    out += """<LI><A HREF="publiline.py?doctype=%(doctype)s&categ=%(categ)s">%(referee)s</a><br>""" % {
+                    out += """<li><a href="publiline.py?doctype=%(doctype)s&amp;categ=%(categ)s">%(referee)s</a></li>""" % {
                         'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
                         'categ' : category['id']}
                     
-            out += "</small></UL></UL>"
+            out += "</ul><br /></li></ul>"
 
         out += "</td></tr></table>"
         return out
@@ -1575,7 +1577,7 @@ class Template:
             }
 
         for doc in docs:
-            out += "<li><A HREF='publiline.py?doctype=%(doctype)s'>%(docname)s</A><BR>" % doc
+            out += "<li><a href='publiline.py?doctype=%(doctype)s'>%(docname)s</a></li><br />" % doc
 
         out += """</blockquote>
                 </td>
@@ -1620,13 +1622,13 @@ class Template:
                       <td class="portalboxbody">
                       %(choose_categ)s
                       <blockquote>
-                      <FORM action="publiline.py" method="get">
-                          <INPUT type="hidden" name="doctype" value='%(doctype)s'>
-                          <INPUT type="hidden" name="categ" value=''>
-                          </FORM>
-               <TABLE>
-                 <TR>
-                   <TD align=left>""" % {
+                      <form action="publiline.py" method="get">
+                          <input type="hidden" name="doctype" value="%(doctype)s" />
+                          <input type="hidden" name="categ" value="" />
+                          </form>
+               <table>
+                 <tr>
+                 <td align="left">""" % {
                  'title' : title,
                  'doctype' : doctype,
                  'list_categ' : _("List of refereed categories"),
@@ -1641,50 +1643,50 @@ class Template:
             else:
                 classtext = ""
 
-            out += """<A href="" onClick="document.forms[0].categ.value='%(id)s';document.forms[0].submit();return false;"><SMALL %(classtext)s>%(id)s</SMALL></A><SMALL> (%(num)s document(s)</SMALL>""" % {
+            out += """<a href="" onclick="document.forms[0].categ.value='%(id)s';document.forms[0].submit();return false;"><small %(classtext)s>%(id)s</small></a><small> (%(num)s document(s)""" % {
                      'id' : categ['id'],
                      'classtext' : classtext,
                      'num' : num,
                    }
             if categ['waiting'] != 0:
-                out += """| %(waiting)s <IMG ALT="%(pending)s" SRC="%(images)s/waiting_or.gif" border="0">""" % {
+                out += """| %(waiting)s <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" />""" % {
                           'waiting' : categ['waiting'],
                           'pending' : _("Pending"),
                           'images' : images,
                         }
             if categ['approved'] != 0:
-                out += """| %(approved)s<IMG ALT="%(approved_text)s" SRC="%(images)s/smchk_gr.gif" border="0">""" % {
+                out += """| %(approved)s<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" />""" % {
                           'approved' : categ['approved'],
                           'approved_text' : _("Approved"),
                           'images' : images,
                         }
             if categ['rejected'] != 0:
-                out += """| %(rejected)s<IMG ALT="%(rejected_text)s" SRC="%(images)s/cross_red.gif" border="0">""" % {
+                out += """| %(rejected)s<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" />""" % {
                           'rejected' : categ['rejected'],
                           'rejected_text' : _("Rejected"),
                           'images' : images,
                         }
-            out += ")</SMALL><BR>"
+            out += ")</small><br />"
 
         out += """
-                    </TD>
-                    <TD>
+                    </td>
+                    <td>
                      <table class="searchbox" width="100%%" summary="">
                         <tr>
                             <th class="portalboxheader">%(key)s:</th>
-                        <tr>
+                        </tr>
                         <tr>
                             <td>
-                              <IMG ALT="%(pending)s" SRC="%(images)s/waiting_or.gif" border="0"> %(waiting)s<BR>
-                              <IMG ALT="%(approved)s" SRC="%(images)s/smchk_gr.gif" border="0"> %(already_approved)s<BR>
-                              <IMG ALT="%(rejected)s" SRC="%(images)s/cross_red.gif" border="0"> %(rejected_text)s<BR><BR>
-                              <SMALL class="blocknote">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</SMALL> %(somepending)s<BR></SMALL>
+                              <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" /> %(waiting)s<br />
+                              <img alt="%(approved)s" src="%(images)s/smchk_gr.gif" border="0" /> %(already_approved)s<br />
+                              <img alt="%(rejected)s" src="%(images)s/cross_red.gif" border="0" /> %(rejected_text)s<br /><br />
+                              <small class="blocknote">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small> %(somepending)s<br />
                             </td>
                         </tr>
                     </table>
-                  </TD>
-                </TR>
-                </TABLE>
+                  </td>
+                </tr>
+                </table>
               </blockquote>
               </td>
              </tr>
@@ -1736,18 +1738,18 @@ class Template:
                     <td class="portalboxbody">
                     %(choose_report)s
                     <blockquote>
-                      <FORM action="publiline.py" method="get">
-                        <INPUT type="hidden" name="doctype" value='%(doctype)s'>
-                        <INPUT type="hidden" name="categ" value='%(categ)s'>
-                        <INPUT type="hidden" name="RN" value=''>
-                        </FORM>
-                  <TABLE class="searchbox">
-                    <TR>
-                      <TH class="portalboxheader">%(report_no)s</TH>
-                      <TH class="portalboxheader">%(pending)s</TH>
-                      <TH class="portalboxheader">%(approved)s</TH>
-                      <TH class="portalboxheader">%(rejected)s</TH>
-                    </TR>
+                      <form action="publiline.py" method="get">
+                        <input type="hidden" name="doctype" value="%(doctype)s" />
+                        <input type="hidden" name="categ" value="%(categ)s" />
+                        <input type="hidden" name="RN" value="" />
+                        </form>
+                  <table class="searchbox">
+                    <tr>
+                      <th class="portalboxheader">%(report_no)s</th>
+                      <th class="portalboxheader">%(pending)s</th>
+                      <th class="portalboxheader">%(approved)s</th>
+                      <th class="portalboxheader">%(rejected)s</th>
+                    </tr>
               """ % {
                 'doctype' : doctype,
                 'title' : title,
@@ -1764,47 +1766,47 @@ class Template:
             status = doc ['status']
             
             if status == "waiting":
-                out += """<TR>
-                            <TD align="center">
-                              <A HREF="" onClick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</A>
-                            </TD>
-                            <TD align="center">
-                              <IMG ALT="check" SRC="%(images)s/waiting_or.gif">
-                            </TD>
-                            <TD align="center">&nbsp;</TD>
-                            <TD align="center">&nbsp;</TD>
-                          </TR>
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">
+                              <img alt="check" src="%(images)s/waiting_or.gif" />
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                          </tr>
                        """ % {
                          'rn' : doc['RN'],
                          'images' : images,
                        }
             elif status == "rejected":
-                out += """<TR>
-                            <TD align="center">
-                              <A HREF="" onClick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</A>
-                            </TD>
-                            <TD align="center">&nbsp;</TD>
-                            <TD align="center">&nbsp;</TD>
-                            <TD align="center"><IMG ALT="check" SRC="%(images)s/cross_red.gif"></TD>
-                          </TR>
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center"><img alt="check" src="%(images)s/cross_red.gif" /></td>
+                          </tr>
                        """ % {
                          'rn' : doc['RN'],
                          'images' : images,
                        }
             elif status == "approved":
-                out += """<TR>
-                            <TD align="center">
-                              <A HREF="" onClick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</A>
-                            </TD>
-                            <TD align="center">&nbsp;</TD>
-                            <TD align="center"><IMG ALT="check" SRC="%(images)s/smchk_gr.gif"></TD>
-                            <TD align="center">&nbsp;</TD>
-                          </TR>
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center"><img alt="check" src="%(images)s/smchk_gr.gif" /></td>
+                            <td align="center">&nbsp;</td>
+                          </tr>
                        """ % {
                          'rn' : doc['RN'],
                          'images' : images,
                        }
-        out += """  </TABLE>
+        out += """  </table>
                     </blockquote>
                    </td>
                   </tr>
@@ -1858,11 +1860,11 @@ class Template:
         _ = gettext_set_language(ln)
 
         if status == "waiting":
-            image = """<IMG SRC="%s/waiting_or.gif" ALT="" align="right">""" % images
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
         elif status == "approved":
-            image = """<IMG SRC="%s/smchk_gr.gif" ALT="" align="right">""" % images
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
         elif status == "rejected":
-            image = """<IMG SRC="%s/iconcross.gif" ALT="" align="right">""" % images
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
         else:
             image = ""
         out = """
@@ -1876,27 +1878,27 @@ class Template:
                    'rn' : rn,
                  }
         if confirm_send:
-            out += """<I><strong class="headline">%(requestsent)s</strong></I><BR><BR>""" % {
+            out += """<i><strong class="headline">%(requestsent)s</strong></i><br /><br />""" % {
                      'requestsent' : _("Your request has been sent to the referee."),
                    }
 
-        out += """<FORM action="publiline.py">
-                    <INPUT type="hidden" name="RN" value="%(rn)s">
-                    <INPUT type="hidden" name="categ" value="%(categ)s">
-                    <INPUT type="hidden" name="doctype" value="%(doctype)s">
-                  <SMALL>""" % {
+        out += """<form action="publiline.py">
+                    <input type="hidden" name="RN" value="%(rn)s" />
+                    <input type="hidden" name="categ" value="%(categ)s" />
+                    <input type="hidden" name="doctype" value="%(doctype)s" />
+                  <small>""" % {
                  'rn' : rn,
                  'categ' : categ,
                  'doctype' : doctype,
                }
         if title != "unknown":
-            out += """<strong class="headline">%(title_text)s</strong>%(title)s<BR><BR>""" % {
+            out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
                      'title_text' : _("Title:"),
                      'title' : title,
                    }
 
         if authors != "":
-            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<BR><BR>""" % {
+            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<br /><br />""" % {
                      'author_text' : _("Author:"),
                      'authors' : authors,
                    }
@@ -1921,13 +1923,13 @@ class Template:
             else:
                 out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) + '</strong><br />'
             out += "<br />" + _("You can send an approval request email again by clicking the following button:") + " <br />" +\
-                   """<input class="adminbutton" type="submit" name="send" value="%(send)s" onClick="return confirm('%(warning)s')">""" % {
+                   """<input class="adminbutton" type="submit" name="send" value="%(send)s" onclick="return confirm('%(warning)s')" />""" % {
                      'send' : _("Send Again"),
                      'warning' : _("WARNING! Upon confirmation, an email will be sent to the referee.")
                    }
             if auth_code == 0:
                 out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it.") + ":<br />" +\
-                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onClick="window.location='approve.py?%(access)s';return false;">""" % {
+                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?%(access)s';return false;" />""" % {
                          'approve' : _("Approve/Reject"),
                          'access' : access
                        }
@@ -1952,9 +1954,8 @@ class Template:
                 out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) +'</strong><br />'
             out += _("It was rejected on:") + ' <strong class="headline">' + str(dAction) + '</strong><br />'
 
-        out += """    </SMALL></FORM>
-                      <BR></TD></TR></TABLE>
-                     </blockquote>
+        out += """    </small></form>
+                      <br />
                     </td>
                    </tr>
                   </table>"""

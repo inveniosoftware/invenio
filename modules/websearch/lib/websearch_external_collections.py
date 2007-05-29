@@ -124,7 +124,7 @@ def build_seealso_links(basic_search_units, seealso_engines, lang, query):
         url = engine.build_search_url(basic_search_units, lang)
         if url:
             links.append('<a class="google" href="%(url)s">%(query)s %(text_in)s %(name)s</a>' % \
-                {'url': url,
+                {'url': cgi.escape(url),
                  'query': cgi.escape(query),
                  'text_in': _('in'),
                  'name': _(engine.name)})

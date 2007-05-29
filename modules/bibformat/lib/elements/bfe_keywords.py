@@ -40,7 +40,7 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     
     if len(keywords) > 0:
         if link == 'yes':
-            keywords = ['<a href="' + weburl + '/search?f=keyword&p='+ \
+            keywords = ['<a href="' + weburl + '/search?f=keyword&amp;p='+ \
                         quote(keyword) + \
                         '&amp;ln='+ bfo.lang+ \
                         '">' + cgi.escape(keyword) + '</a>'

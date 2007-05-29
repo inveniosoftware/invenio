@@ -40,7 +40,7 @@ def format(bfo):
     source_of_aquisition = cgi.escape(source_of_aquisition)
 
     out = '<table border="0" width="100%"><tr class="blocknote">'
-    out += '''<td valign="left">
+    out += '''<td>
     %s
     <small>''' % collection_indicator
 
@@ -56,7 +56,7 @@ def format(bfo):
     if len(source_of_aquisition) > 0:
         out += '<td align="right"><strong>'+ source_of_aquisition + "</strong></td>"
 
-    out += "</tr></table><br>"
+    out += "</tr></table><br />"
 
     return out
 

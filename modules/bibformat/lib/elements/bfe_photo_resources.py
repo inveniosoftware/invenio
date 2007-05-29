@@ -27,18 +27,18 @@ def format(bfo):
     Prints html image and link to photo resources.
     """
 
-    resources = bfo.fields("8564_")
+    resources = bfo.fields("8564_", escape=1)
     out = ""
     for resource in resources:
 
         if resource.get("x", "") == "icon" and resource.get("u", "") == "": 
-            out += '<br/><br/><img src="' + resource.get("q", "").replace(" ","") + '" alt=""/>' 
+            out += '<br /><br /><img src="' + resource.get("q", "").replace(" ","") + '" alt="" />' 
 
         if resource.get("x", "") == "1":
-            out += '<br/>High resolution: <a href="'+resource.get("q", "") +'">'+ resource.get("q", "") +"</a>"
+            out += '<br />High resolution: <a href="'+resource.get("q", "") +'">'+ resource.get("q", "") +"</a>"
 
-    out += "<br/><font size=-2><b>© CERN Geneva</b></font>" 
-    out += '<br/> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>" 
+    out += '<br /><font size="-2"><b>© CERN Geneva</b></font>'
+    out += '<br /> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>" 
     return out
 
 def escape_values(bfo):

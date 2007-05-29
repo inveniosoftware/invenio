@@ -22,6 +22,8 @@
 
 __revision__ = "$Id$"
 
+import cgi
+
 from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.urlutils import create_html_link
@@ -67,7 +69,6 @@ class Template:
         _ = gettext_set_language(lang)
 
         out = """
-<p>
   <table class="externalcollectionsresultsbox">
     <thead>
       <tr>
@@ -87,7 +88,7 @@ class Template:
       </tr>
     </tbody>
   </table>
-</p>"""
+  """
         return out
 
 def print_info_line(req,
@@ -107,7 +108,7 @@ def print_info_line(req,
     req.write('<small>' + \
               html_external_engine_nb_seconds_box + \
               '</small>')
-    req.write('</td></tr></table><br>')
+    req.write('</td></tr></table><br />')
 
 def print_timeout(req, lang, engine, name, url):
     """Print info line for timeout."""
@@ -167,7 +168,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
 
 def make_url(name, url):
     if url:
-        return '<a href="' + url + '">' + name + '</a>'
+        return '<a href="' + cgi.escape(url) + '">' + name + '</a>'
     else:
         return name
 

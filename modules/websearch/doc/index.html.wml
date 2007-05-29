@@ -45,11 +45,11 @@
    <zh_CN>Find out all about searching</zh_CN>
    <zh_TW>Find out all about searching</zh_TW>
    <CDSNAMEINTL>:
-
+</p>
 <blockquote>
 <dl>
 
-<dt><a href="<lang:star: tips.*.html>">_(Search Tips)_</a>
+<dt><a href="<lang:star: tips.*.html>">_(Search Tips)_</a></dt>
 
 <dd>
     <en>
@@ -132,7 +132,7 @@
       This page presents you with useful tips and techniques in order to
       help you use the <CDSNAMEINTL> site to the full.
     </zh_TW>  
-
+</dd>
 <dt><a href="<lang:star: guide.*.html>">
      <en>Search Guide</en>
      <fr>Guide de Recherche</fr>
@@ -155,7 +155,7 @@
      <zh_CN>Search Guide</zh_CN>
      <zh_TW>Search Guide</zh_TW>
     </a>
-
+</dt>
 <dd><en>Full guide on how to search</en>
     <fr>Le guide complet sur comment rechercher sur</fr>
     <de>Full guide on how to search</de>
@@ -177,6 +177,7 @@
     <zh_CN>Full guide on how to search</zh_CN>
     <zh_TW>Full guide on how to search</zh_TW>
     <CDSNAMEINTL>.
+</dd>
 
 </dl>
 </blockquote>

@@ -83,10 +83,11 @@ class Template:
             if out:
                 out += separator
             if title == cdsnameintl.get(ln, cdsname): # hide site name, print Home instead
-                out += _("Home")
+                out += cgi.escape(_("Home"))
             else:
-                out += title
-        return prolog + out + epilog
+                out += cgi.escape(title)
+
+        return cgi.escape(prolog) + out + cgi.escape(epilog)
 
     def tmpl_page(self, req=None, ln=cdslang, description="",
                   keywords="", userinfobox="", navtrailbox="",
@@ -206,7 +207,7 @@ class Template:
   'boxrightbottomadd' : boxrightbottomadd,
 
   'titleprologue' : titleprologue,
-  'title' : title,
+  'title' : cgi.escape(title),
   'titleepilogue' : titleepilogue,
 
   'body' : body,
@@ -263,16 +264,17 @@ class Template:
             headertitle = _("Home")
 
         out = """\
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
  <title>%(sitename)s: %(headertitle)s</title>
- <link rev="made" href="mailto:%(supportemail)s">
- <link rel="stylesheet" href="%(cssurl)s/img/cds.css">
- <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(weburl)s/rss">
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
- <meta name="description" content="%(description)s">
- <meta name="keywords" content="%(keywords)s">
+ <link rev="made" href="mailto:%(supportemail)s" />
+ <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
+ <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(weburl)s/rss" />
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="description" content="%(description)s" />
+ <meta name="keywords" content="%(keywords)s" />
 </head>
 <body>
 <div class="pageheader">
@@ -344,11 +346,12 @@ class Template:
           'ln' : ln,
 
           'sitename' : cdsnameintl.get(ln, cdsname),
-          'headertitle' : headertitle,
+          'headertitle' : cgi.escape(headertitle),
+
           'supportemail' : supportemail,
 
-          'description' : description,
-          'keywords' : keywords,
+          'description' : cgi.escape(description),
+          'keywords' : cgi.escape(keywords),
 
           'userinfobox' : userinfobox,
           'navtrailbox' : navtrailbox,
@@ -482,7 +485,7 @@ class Template:
                 # Update the 'ln' argument in the initial request
                 argd['ln'] = lang
                 if req and req.uri:
-                    args = req.uri + make_canonical_urlargd(argd, {})
+                    args = urllib.quote(req.uri, '/:?') + make_canonical_urlargd(argd, {})
                 else:
                     args = ""
                 parts.append(create_html_link(args,

@@ -43,6 +43,7 @@ from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
+from invenio.htmlutils import nmtoken_from_string
 
 from invenio.websearch_external_collections import external_collection_get_state
 
@@ -180,7 +181,7 @@ class Template:
         title = get_fieldvalues(recid, "245__a")
 
         if title:
-            title = _("Record") + '#%d: %s' %(recid, title[0])
+            title = _("Record") + '#%d: %s' %(recid, cgi.escape(title[0]))
         else:
             title = _("Record") + ' #%d' % recid
 
@@ -209,7 +210,7 @@ class Template:
         """
         out = []
         for url, name in dads:
-            out.append(create_html_link(self.build_search_interface_url(c=url, as=as, ln=ln), {}, name, {'class': 'navtrail'}))
+            out.append(create_html_link(self.build_search_interface_url(c=url, as=as, ln=ln), {}, cgi.escape(name), {'class': 'navtrail'}))
 
         return ' &gt; '.join(out)
 
@@ -273,7 +274,7 @@ class Template:
         out = """<div class="portalbox">
                     <div class="portalboxheader">%(title)s</div>
                     <div class="portalboxbody">%(body)s</div>
-                 </div>""" % {'title' : title, 'body' : body}
+                 </div>""" % {'title' : cgi.escape(title), 'body' : body}
 
         return out
 
@@ -318,11 +319,11 @@ class Template:
          </thead>
          <tbody>
           <tr valign="baseline">
-           <td class="searchboxbody" align="left"><input type="text" name="p" size="40" value=""></td>
+           <td class="searchboxbody" align="left"><input type="text" name="p" size="40" value="" /></td>
            <td class="searchboxbody" align="left">%(middle_option)s</td>
            <td class="searchboxbody" align="left">
-             <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s">
-             <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s"></td>
+             <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
+             <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s" /></td>
           </tr>
           <tr valign="baseline">
            <td class="searchboxbody" colspan="3" align="right">
@@ -418,21 +419,27 @@ class Template:
          </thead>
          <tbody>
           <tr valign="bottom">
-            <td class="searchboxbody" nowrap>%(matchbox_m1)s<input type="text" name="p1" size="40" value=""></td>
-            <td class="searchboxbody">%(middle_option_1)s</td>
+            <td class="searchboxbody" style="white-space: nowrap;">
+                %(matchbox_m1)s<input type="text" name="p1" size="40" value="" />
+            </td>
+            <td class="searchboxbody" style="white-space: nowrap;">%(middle_option_1)s</td>
             <td class="searchboxbody">%(andornot_op1)s</td>
           </tr>
           <tr valign="bottom">
-            <td class="searchboxbody" nowrap>%(matchbox_m2)s<input type="text" name="p2" size="40" value=""></td>
+            <td class="searchboxbody" style="white-space: nowrap;">
+                %(matchbox_m2)s<input type="text" name="p2" size="40" value="" />
+            </td>
             <td class="searchboxbody">%(middle_option_2)s</td>
             <td class="searchboxbody">%(andornot_op2)s</td>
           </tr>
           <tr valign="bottom">
-            <td class="searchboxbody" nowrap>%(matchbox_m3)s<input type="text" name="p3" size="40" value=""></td>
+            <td class="searchboxbody" style="white-space: nowrap;">
+                %(matchbox_m3)s<input type="text" name="p3" size="40" value="" />
+            </td>
             <td class="searchboxbody">%(middle_option_3)s</td>
-            <td class="searchboxbody" nowrap>
-              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s">
-              <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s"></td>
+            <td class="searchboxbody" style="white-space: nowrap;">
+              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
+              <input class="formbutton" type="submit" name="action_browse" value="%(msg_browse)s" /></td>
           </tr>
           <tr valign="bottom">
             <td colspan="3" class="searchboxbody" align="right">
@@ -478,7 +485,7 @@ class Template:
                        <tr valign="bottom">
                         <td class="searchboxbody">%(searchoptions)s</td>
                        </tr>
-                      <tbody>
+                      </tbody>
                      </table>""" % {
                        'searchheader' : _("Search options:"),
                        'searchoptions' : searchoptions
@@ -559,11 +566,11 @@ class Template:
 
         out = """
         <select name="%(name)s">
-        <option value="a"%(sela)s>%(opta)s
-        <option value="o"%(selo)s>%(opto)s
-        <option value="e"%(sele)s>%(opte)s
-        <option value="p"%(selp)s>%(optp)s
-        <option value="r"%(selr)s>%(optr)s
+        <option value="a"%(sela)s>%(opta)s</option>
+        <option value="o"%(selo)s>%(opto)s</option>
+        <option value="e"%(sele)s>%(opte)s</option>
+        <option value="p"%(selp)s>%(optp)s</option>
+        <option value="r"%(selr)s>%(optr)s</option>
         </select>
         """ % {'name' : name,
                'sela' : self.tmpl_is_selected('a', value),
@@ -581,7 +588,7 @@ class Template:
 
     def tmpl_is_selected(self, var, fld):
         """
-          Checks if *var* and *fld* are equal, and if yes, returns ' selected'.  Useful for select boxes.
+          Checks if *var* and *fld* are equal, and if yes, returns ' selected="selected"'.  Useful for select boxes.
 
           Parameters:
 
@@ -590,7 +597,7 @@ class Template:
           - 'fld' *string* - Second value to compare
         """
         if var == fld:
-            return " selected"
+            return ' selected="selected"'
         else:
             return ""
 
@@ -612,9 +619,9 @@ class Template:
 
         out = """
         <select name="%(name)s">
-        <option value="a"%(sela)s>%(opta)s
-        <option value="o"%(selo)s>%(opto)s
-        <option value="n"%(seln)s>%(optn)s
+        <option value="a"%(sela)s>%(opta)s</option>
+        <option value="o"%(selo)s>%(opto)s</option>
+        <option value="n"%(seln)s>%(optn)s</option>
         </select>
         """ % {'name' : name,
                'sela' : self.tmpl_is_selected('a', value), 'opta' : _("AND"),
@@ -638,19 +645,19 @@ class Template:
 
         box = """
                <select name="%(name)sd">
-                 <option value=""%(sel)s>%(any)s
+                 <option value=""%(sel)s>%(any)s</option>
               """ % {
                 'name' : name,
                 'any' : _("any day"),
                 'sel' : self.tmpl_is_selected(sd, 0)
               }
         for day in range(1, 32):
-            box += """<option value="%02d"%s>%02d""" % (day, self.tmpl_is_selected(sd, day), day)
+            box += """<option value="%02d"%s>%02d</option>""" % (day, self.tmpl_is_selected(sd, day), day)
         box += """</select>"""
         # month
         box += """
                 <select name="%(name)sm">
-                  <option value=""%(sel)s>%(any)s
+                  <option value=""%(sel)s>%(any)s</option>
                """ % {
                  'name' : name,
                  'any' : _("any month"),
@@ -659,12 +666,12 @@ class Template:
         for mm, month in [(1, _("January")), (2, _("February")), (3, _("March")), (4, _("April")), \
                           (5, _("May")), (6, _("June")), (7, _("July")), (8, _("August")), \
                           (9, _("September")), (10, _("October")), (11, _("November")), (12, _("December"))]:
-            box += """<option value="%02d"%s>%s""" % (mm, self.tmpl_is_selected(sm, mm), month)
+            box += """<option value="%02d"%s>%s</option>""" % (mm, self.tmpl_is_selected(sm, mm), month)
         box += """</select>"""
         # year
         box += """
                 <select name="%(name)sy">
-                  <option value=""%(sel)s>%(any)s
+                  <option value=""%(sel)s>%(any)s</option>
                """ % {
                  'name' : name,
                  'any' : _("any year"),
@@ -672,7 +679,7 @@ class Template:
                }
         this_year = int(time.strftime("%Y", time.localtime()))
         for year in range(this_year-20, this_year+1):
-            box += """<option value="%d"%s>%d""" % (year, self.tmpl_is_selected(sy, year), year)
+            box += """<option value="%d"%s>%d</option>""" % (year, self.tmpl_is_selected(sy, year), year)
         box += """</select>"""
         return box
 
@@ -738,24 +745,26 @@ class Template:
 
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
-                    out += """<input type=checkbox name="c" value="%(name)s">&nbsp;</td>""" % {'name' : son.name }
+                    out += """<input type="checkbox" name="c" value="%(name)s" />&nbsp;</td>""" % {'name' : cgi.escape(son.name) }
                 else:
-                    out += """<input type=checkbox name="c" value="%(name)s" checked>&nbsp;</td>""" % {'name' : son.name }
+                    out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" />&nbsp;</td>""" % {'name' : cgi.escape(son.name) }
+            else:
+                out += '</td>'
             out += """<td valign="top">%(link)s%(recs)s """ % {
                 'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, as=as),
-                                         {}, style_prolog + son.get_name(ln) + style_epilog),
+                                         {}, style_prolog + cgi.escape(son.get_name(ln)) + style_epilog),
                 'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
 
             if son.restricted_p():
                 out += """ <small class="warning">[%(msg)s]</small> """ % { 'msg' : _("restricted") }
             if display_grandsons and len(grandsons[i]):
                 # iterate trough grandsons:
-                out += """<br>"""
+                out += """<br />"""
                 for grandson in grandsons[i]:
                     out += """ <small>%(link)s%(nbrec)s</small> """ % {
                         'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, as=as),
                                                  {},
-                                                 grandson.get_name(ln)),
+                                                 cgi.escape(grandson.get_name(ln))),
                         'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
 
             out += """</td></tr>"""
@@ -780,24 +789,25 @@ class Template:
             name = _(internal_name)
             base_url = engine.base_url
             if external_collection_get_state(engine, collection_id) == 3:
-                checked = ' checked'
+                checked = ' checked="checked"'
             else:
                 checked = ''
 
             html += """<tr><td class="searchalsosearchboxbody" valign="top">
-                <input type="checkbox" name="ec" id="extSearch%(name)s" value="%(internal_name)s" %(checked)s>&nbsp;</td>
+                <input type="checkbox" name="ec" id="%(id)s" value="%(internal_name)s" %(checked)s /></td>
                 <td valign="top" class="searchalsosearchboxbody">
-                <div style="white-space: nowrap"><label for="extSearch%(name)s">%(name)s</label>
+                <div style="white-space: nowrap"><label for="%(id)s">%(name)s</label>
                 <a href="%(base_url)s">
-                <img src="%(weburl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/>
-                </a></div></td></tr>""" % \
+                <img src="%(weburl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/></a>
+                </div></td></tr>""" % \
                                  { 'checked': checked,
                                    'base_url': base_url,
                                    'internal_name': internal_name,
-                                   'name': name,
+                                   'name': cgi.escape(name),
+                                   'id': "extSearch" + nmtoken_from_string(name),
                                    'weburl': weburl,}
 
-        html += """</tr></tbody></table></table>"""
+        html += """</tbody></table></td></tr></table>"""
         return html
 
     def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=cdslang):
@@ -900,7 +910,7 @@ class Template:
             <tr>
             <td class="narrowsearchboxbody">%(body)s</td>
             </tr>
-          <tbody>
+          </tbody>
         </table>''' % {'header' : _("Latest additions:"),
                        'body' : body,
                        }
@@ -925,10 +935,10 @@ class Template:
 
         if values:
             for pair in values:
-                out += """<option value="%(value)s"%(selected)s>%(text)s""" % {
-                         'value'    : pair['value'],
+                out += """<option value="%(value)s"%(selected)s>%(text)s</option>""" % {
+                         'value'    : cgi.escape(pair['value']),
                          'selected' : self.tmpl_is_selected(pair['value'], selected),
-                         'text'     : pair['text']
+                         'text'     : cgi.escape(pair['text'])
                        }
         out += """</select>"""
         return out
@@ -958,14 +968,14 @@ class Template:
 
         for pair in values:
             if pair.get('selected', False) or pair['value'] == selected:
-                flag = ' selected'
+                flag = ' selected="selected"'
             else:
                 flag = ''
 
-            out += '<option value="%(value)s"%(selected)s>%(text)s' % {
-                     'value'    : pair['value'],
+            out += '<option value="%(value)s"%(selected)s>%(text)s</option>' % {
+                     'value'    : cgi.escape(str(pair['value'])),
                      'selected' : flag,
-                     'text'     : pair['text']
+                     'text'     : cgi.escape(pair['text'])
                    }
 
         out += """</select>"""
@@ -987,7 +997,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '''<br><span class="moreinfo">%(detailed)s - %(similar)s</span>''' % {
+        out = '''<br /><span class="moreinfo">%(detailed)s - %(similar)s</span>''' % {
             'detailed': create_html_link(self.build_search_url(recid=recid, ln=ln),
                                          {},
                                          _("Detailed record"), {'class': "moreinfo"}),
@@ -1042,9 +1052,9 @@ class Template:
         for rn in rns:
             out += """ <small class="quicknote">[%(rn)s]</small>""" % {'rn' : cgi.escape(rn)}
         for abstract in abstracts:
-            out += "<br><small>%(abstract)s [...]</small>" % {'abstract' : cgi.escape(abstract[:1+string.find(abstract, '.')]) }
+            out += "<br /><small>%(abstract)s [...]</small>" % {'abstract' : cgi.escape(abstract[:1+string.find(abstract, '.')]) }
         for idx in range(0, len(urls_u)):
-            out += """<br><small class="note"><a class="note" href="%(url)s">%(name)s</a></small>""" % {
+            out += """<br /><small class="note"><a class="note" href="%(url)s">%(name)s</a></small>""" % {
                      'url' : urls_u[idx],
                      'name' : urls_u[idx]
                    }
@@ -1223,7 +1233,7 @@ class Template:
                             &nbsp;
                           </td>
                           <td class="normal">
-                            <img src="%(weburl)s/img/sn.gif" alt="" border="0">
+                            <img src="%(weburl)s/img/sn.gif" alt="" border="0" />
                             %(link)s
                           </td>
                       </tr>""" % {'link': create_html_link(self.build_search_url(query, action='browse'),
@@ -1302,7 +1312,7 @@ class Template:
         out = '''
         <h1 class="headline">%(ccname)s</h1>
         <form name="search" action="%(weburl)s/search" method="get">
-        ''' % {'ccname' : cc_intl,
+        ''' % {'ccname' : cgi.escape(cc_intl),
                'weburl' : weburl}
 
         # Only add non-default hidden values
@@ -1330,26 +1340,26 @@ class Template:
              <tbody>
               <tr valign="top">
                 <td class="searchboxbody">%(matchbox1)s
-                  <input type="text" name="p1" size="%(sizepattern)d" value="%(p1)s">
+                  <input type="text" name="p1" size="%(sizepattern)d" value="%(p1)s" />
                 </td>
                 <td class="searchboxbody">%(searchwithin1)s</td>
                 <td class="searchboxbody">%(andornot1)s</td>
               </tr>
               <tr valign="top">
                 <td class="searchboxbody">%(matchbox2)s
-                  <input type="text" name="p2" size="%(sizepattern)d" value="%(p2)s">
+                  <input type="text" name="p2" size="%(sizepattern)d" value="%(p2)s" />
                 </td>
                 <td class="searchboxbody">%(searchwithin2)s</td>
                 <td class="searchboxbody">%(andornot2)s</td>
               </tr>
               <tr valign="top">
                 <td class="searchboxbody">%(matchbox3)s
-                  <input type="text" name="p3" size="%(sizepattern)d" value="%(p3)s">
+                  <input type="text" name="p3" size="%(sizepattern)d" value="%(p3)s" />
                 </td>
                 <td class="searchboxbody">%(searchwithin3)s</td>
                 <td class="searchboxbody">
-                  <input class="formbutton" type="submit" name="action_search" value="%(search)s">
-                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s">&nbsp;
+                  <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
+                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s" />&nbsp;
                 </td>
               </tr>
               <tr valign="bottom">
@@ -1421,11 +1431,11 @@ class Template:
              </thead>
              <tbody>
               <tr valign="top">
-                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s"></td>
+                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" /></td>
                 <td class="searchboxbody">%(searchwithin)s</td>
                 <td class="searchboxbody">
-                  <input class="formbutton" type="submit" name="action_search" value="%(search)s">
-                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s">&nbsp;
+                  <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
+                  <input class="formbutton" type="submit" name="action_browse" value="%(browse)s" />&nbsp;
                 </td>
               </tr>
               <tr valign="bottom">
@@ -1506,7 +1516,7 @@ class Template:
                        <tbody>
                         <tr valign="bottom">
                           <td class="searchboxbody">
-                           <input type="text" name="pl" size="%(sizepattern)d" value="%(pl)s">
+                           <input type="text" name="pl" size="%(sizepattern)d" value="%(pl)s" />
                           </td>
                         </tr>
                        </tbody>
@@ -1618,7 +1628,7 @@ class Template:
             list_input = [self.tmpl_input_hidden(name, val) for val in value]
             return "\n".join(list_input)
 
-        return """<input type="hidden" name="%(name)s" value="%(value)s">""" % {
+        return """<input type="hidden" name="%(name)s" value="%(value)s" />""" % {
                  'name' : cgi.escape(str(name), 1),
                  'value' : cgi.escape(str(value), 1),
                }
@@ -1728,15 +1738,15 @@ class Template:
         # left table cells: print collection name
         if not middle_only:
             out += '''
-                  <a name="%(collection_name)s"></a>
+                  <a name="%(collection_id)s"></a>
                   <form action="%(weburl)s/search" method="get">
                   <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
                   <strong><big>%(collection_link)s</big></strong></td>
                   ''' % {
-                    'collection_name': urllib.quote(collection),
+                    'collection_id': collection_id,
                     'weburl' : weburl,
                     'collection_link': create_html_link(self.build_search_interface_url(c=collection, as=as, ln=ln),
-                                                        {}, collection_name)
+                                                        {}, cgi.escape(collection_name))
                   }
         else:
             out += """
@@ -1773,7 +1783,7 @@ class Template:
 
             # @todo here
             def img(gif, txt):
-                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s" border="0">' % {
+                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s" border="0" />' % {
                     'txt': txt, 'gif': gif, 'weburl': weburl}
 
             if jrec-rg > 1:
@@ -1821,7 +1831,7 @@ class Template:
                     if fieldargs.has_key(fieldcode):
                         for val in fieldargs[fieldcode]:
                             out += self.tmpl_input_hidden(name = fieldcode, value = val)
-            out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d">""" % {
+            out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d" />""" % {
                      'jump' : _("jump to record:"),
                      'jrec' : jrec,
                    }
@@ -1919,18 +1929,19 @@ class Template:
 
         for row in rows:
             out += """
-                    <tr><td valign="top" align="right" nowrap><input name="recid" type="checkbox" value="%(recid)s">
+                    <tr><td valign="top" align="right" style="white-space: nowrap;">
+                        <input name="recid" type="checkbox" value="%(recid)s" />
                     %(number)s.
                    """ % row
             if row['relevance']:
-                out += """<br><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
+                out += """<br /><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
                          'prologue' : relevances_prologue,
                          'epilogue' : relevances_epilogue,
                          'relevance' : row['relevance']
                        }
             out += """</td><td valign="top">%s</td></tr>""" % row['record']
         out += """</table>
-               <br><input class="formbutton" type="submit" name="action" value="%(basket)s">
+               <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
                </form>""" % {
                  'basket' : _("ADD TO BASKET")
                }
@@ -1963,7 +1974,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """ <p><div align="right"><small>%(format)s """ % {
+        out = """ <div align="right"><small>%(format)s """ % {
                 'format' : _("Format:")
               }
 
@@ -1995,12 +2006,12 @@ class Template:
 
                 if row ['creationdate']:
                     out += '''<div class="recordlastmodifiedbox">%(dates)s</div>
-                              <p><span class="moreinfo">%(similar)s</span>
+                              <p><span class="moreinfo">%(similar)s</span></p>
                               <form action="%(weburl)s/yourbaskets/add" method="post">
-                                <input name="recid" type="hidden" value="%(recid)s">
-                                <input name="ln" type="hidden" value="%(ln)s">
-                                <br>
-                                <input class="formbutton" type="submit" name="action" value="%(basket)s">
+                                <input name="recid" type="hidden" value="%(recid)s" />
+                                <input name="ln" type="hidden" value="%(ln)s" />
+                                <br />
+                                <input class="formbutton" type="submit" name="action" value="%(basket)s" />
                               </form>
                            ''' % {
                         'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
@@ -2019,7 +2030,7 @@ class Template:
                         'basket' : _("ADD TO BASKET")
                         }
 
-                out += '<table>'
+                    out += '<table><tr><td></td></tr>' # empty row for xhtml validation
 
                 if row.has_key ('citinglist'):
                     cs = row ['citinglist']
@@ -2030,7 +2041,7 @@ class Template:
                     out += '''
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
-                      <br><br>
+                      <br /><br />
                     </td></tr>''' % {
                         'more': create_html_link(
                                     self.build_search_url(p='recid:%d' % \
@@ -2048,7 +2059,7 @@ class Template:
                     out += '''
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
-                      <br>
+                      <br />
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
@@ -2064,8 +2075,8 @@ class Template:
 
                     out += '''
                     <tr><td>%(graph)s</td></tr>
-                    <tr><td>%(similar)s</td></tr
-                    >''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                    <tr><td>%(similar)s</td></tr>
+                    ''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
                              'similar': similar, 'more': _("more"),
                              'graph': row ['downloadhistory']
                              }
@@ -2073,18 +2084,18 @@ class Template:
                 out += '</table>'
 
                 if row.has_key ('viewsimilarity'):
-                    out += '<p>&nbsp;'
+                    out += '<br />&nbsp;'
                     out += self.tmpl_print_record_list_for_similarity_boxen (
                         _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
 
                 if row.has_key ('reviews'):
-                    out += '<p>&nbsp;'
+                    out += '<br />&nbsp;'
                     out += row['reviews']
 
                 if row.has_key ('comments'):
                     out += row['comments']
 
-            out += "<p>&nbsp;"
+            out += "<br />&nbsp;"
         return out
 
     def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
@@ -2121,7 +2132,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         # first find total number of hits:
-        out = """<p><table class="searchresultsbox">
+        out = """<table class="searchresultsbox">
                 <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
                 <tbody><tr><td class="searchresultsboxbody"> """ % {
                 'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
@@ -2134,9 +2145,9 @@ class Template:
         for coll in colls:
             if results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] > 0:
                 out += '''<strong><a href="#%(coll)s">%(coll_name)s</a></strong>,
-                      <a href="#%(coll)s">%(number)s</a><br>''' % {
-                        'coll' : urllib.quote(coll['code']),
-                        'coll_name' : coll['name'],
+                      <a href="#%(coll)s">%(number)s</a><br />''' % {
+                        'coll' : coll['id'],
+                        'coll_name' : cgi.escape(coll['name']),
                         'number' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')
                       }
         out += "</td></tr></tbody></table>"
@@ -2230,22 +2241,22 @@ class Template:
         # secondly, title:
         titles = get_fieldvalues(recID, "245__a")
         for title in titles:
-            out += "<p><p><center><big><strong>%s</strong></big></center>" % title
+            out += "<p><center><big><strong>%s</strong></big></center></p>" % cgi.escape(title)
         # thirdly, authors:
         authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
         if authors:
-            out += "<p><p><center>"
+            out += "<p><center>"
             for author in authors:
                 out += '%s; ' % create_html_link(self.build_search_url(
                                                                 ln=ln,
                                                                 p=author,
                                                                 f='author'),
                                                  {}, cgi.escape(author))
-            out += "</center>"
+            out += "</center></p>"
         # fourthly, date of creation:
         dates = get_fieldvalues(recID, "260__c")
         for date in dates:
-            out += "<p><center><small>%s</small></center>" % date
+            out += "<p><center><small>%s</small></center></p>" % date
         # fifthly, abstract:
         abstracts = get_fieldvalues(recID, "520__a")
         for abstract in abstracts:
@@ -2263,7 +2274,7 @@ class Template:
                                                           f='keyword'),
                                     {}, cgi.escape(keyword))
 
-            out += '</small>'
+            out += '</small></p>'
         # fifthly bis bis, published in:
         prs_p = get_fieldvalues(recID, "909C4p")
         prs_v = get_fieldvalues(recID, "909C4v")
@@ -2281,7 +2292,7 @@ class Template:
                 out += """, no.%s""" % prs_n[idx]
             if prs_c and prs_c[idx]:
                 out += """, p.%s""" % prs_c[idx]
-            out += """.</small>"""
+            out += """.</small></p>"""
         # sixthly, fulltext link:
         urls_z = get_fieldvalues(recID, "8564_z")
         urls_u = get_fieldvalues(recID, "8564_u")
@@ -2293,9 +2304,9 @@ class Template:
             except IndexError:
                 pass
             out += """<p style="margin-left: 15%%; width: 70%%">
-            <small><strong>%s:</strong> <a href="%s">%s</a></small>""" % (link_text, urls_u[idx], urls_u[idx])
+            <small><strong>%s:</strong> <a href="%s">%s</a></small></p>""" % (link_text, urls_u[idx], urls_u[idx])
         # print some white space at the end:
-        out += "<p><p>"
+        out += "<br /><br />"
         return out
 
     def tmpl_print_record_list_for_similarity_boxen(self, title, recID_score_list, ln=cdslang):
@@ -2320,11 +2331,14 @@ class Template:
 
         # secondly print them:
         out = '''
-        <table><tr><td>
+        <table><tr>
+         <td>
           <table><tr><td class="blocknote">%(title)s</td></tr></table>
-        </td>
-        <tr><td><table>
-        ''' % { 'title': title }
+         </td>
+         </tr>
+         <tr>
+          <td><table>
+        ''' % { 'title': cgi.escape(title) }
         for recid, score in recID_score_list_to_be_printed:
             out += '''
             <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
@@ -2332,7 +2346,7 @@ class Template:
                 'info' : print_record(recid, format="hs", ln=ln),
                 }
 
-        out += """</table></small></td></tr></table> """
+        out += """</table></td></tr></table> """
         return out
 
     def tmpl_print_record_brief(self, ln, recID, weburl):
@@ -2394,19 +2408,19 @@ class Template:
             alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
-                out += '<br><span class="moreinfo">%s</span>' % \
+                out += '<br /><span class="moreinfo">%s</span>' % \
                     create_html_link(self.build_search_url(sysno=alephsysno,
                                                            ln=ln),
                                      {}, _("Detailed record"),
                                      {'class': "moreinfo"})
             else:
-                out += '<br><span class="moreinfo">%s</span>' % \
+                out += '<br /><span class="moreinfo">%s</span>' % \
                     create_html_link(self.build_search_url(recid=recID, ln=ln),
                                      {},
                                      _("Detailed record"),
                                      {'class': "moreinfo"})
         else:
-            out += '<br><span class="moreinfo">%s</span>' % \
+            out += '<br /><span class="moreinfo">%s</span>' % \
                    create_html_link(self.build_search_url(recid=recID, ln=ln),
                                     {}, _("Detailed record"),
                                     {'class': "moreinfo"})
@@ -2537,12 +2551,12 @@ class Template:
         # get query arguments:
         res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
         if res:
-            rssurl = weburl + '/search?of=xr&' + res[0][0]
+            rssurl = weburl + '/search?of=xr&amp;' + cgi.escape(res[0][0])
         else:
             # cannot detect query arguments, use generic RSS URL
             rssurl = weburl + '/rss/'
 
-        alerturl = weburl + '/youralerts/input?ln=%s&idq=%s' % (ln, id_query)
+        alerturl = weburl + '/youralerts/input?ln=%s&amp;idq=%s' % (ln, id_query)
 
         out = '''<a name="googlebox"></a>
                  <table class="googlebox"><tr><th class="googleboxheader">%(similar)s</th></tr>

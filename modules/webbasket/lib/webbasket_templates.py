@@ -311,11 +311,11 @@ class Template:
         nb_views_label = _("Number of views")
         owner_label = _("Owner")
         base_url = weburl + \
-                  '/yourbaskets/list_public_baskets?order=%i&asc=%i&amp;ln=' +\
+                  '/yourbaskets/list_public_baskets?order=%i&amp;asc=%i&amp;ln=' +\
                   ln
         asc_image = '<img src="' + weburl + '/img/webbasket_' + \
                     (asc and 'down.png' or 'up.png') + \
-                    '" style="vertical-align: middle; border: 0px;" />'
+                    '" style="vertical-align: middle; border: 0px;" alt="Reorder basket" />'
         if order == 1:
             name_label = '<a href="' + base_url % (1, int(not(asc))) + '">' + \
                          cgi.escape(name_label) + ' ' + asc_image + '</a>'
@@ -380,7 +380,7 @@ class Template:
         change_page = '<a href="' + weburl + '/yourbaskets/list_public_baskets?'\
                       'inf_limit=%i&amp;order=' + str(order)
         change_page += '&amp;asc=' + str(asc) + '&amp;ln=' + str(ln) + '">'\
-                       '<img src="%s" style="border: 0px;"/></a> '
+                       '<img src="%(public_basket)s" style="border: 0px;" alt="%(public_basket)s"/></a> ' % {'public_basket' : _("Public basket")}
         footer = ''
         if inf_limit > (CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS * 2) - 1:
             footer += change_page % (0, weburl + '/img/sb.gif')
@@ -404,19 +404,19 @@ class Template:
   <thead class="bskbasketheader">
     <tr>
       <td style="vertical-align:middle; padding: 0 20 0 20"><span class="bsktopic">%(name)s</span></td>
-      <td style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic">%(nb_views)s</span></td>
-      <td style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic">%(user)s</span></td>
-      <td colspan="2" style="vertical-align:middle; padding: 0 20 0 20""><span class="bsktopic" style="text-weight:normal;">%(actions)s</span></td>
+      <td style="vertical-align:middle; padding: 0 20 0 20"><span class="bsktopic">%(nb_views)s</span></td>
+      <td style="vertical-align:middle; padding: 0 20 0 20"><span class="bsktopic">%(user)s</span></td>
+      <td colspan="2" style="vertical-align:middle; padding: 0 20 0 20"><span class="bsktopic" style="text-weight:normal;">%(actions)s</span></td>
     </tr>
   </thead>
-  <tbody>
-    %(baskets)s
-  </tbody>
-  <tfooter>
+  <tfoot>
     <tr>
       <td colspan="5" class="bskbasketfooter" style="text-align:center">%(footer)s</td>
     </tr>
-  </tfooter>
+  </tfoot>
+  <tbody>
+    %(baskets)s
+  </tbody>
 </table>""" % {'name': name_label,
                'nb_views': nb_views_label, 
                'user': owner_label, 
@@ -939,7 +939,7 @@ class Template:
         _ = gettext_set_language(ln)
         url = weburl + '/yourbaskets/create_basket?topic_number=%i&amp;ln=%s'
         url %= (selected_topic, ln) 
-        image = '<img src="%s/img/webbasket_create_small.png" style="vertical-align: middle; margin-right: 5px" />' % weburl
+        image = '<img src="%s/img/webbasket_create_small.png" style="vertical-align: middle; margin-right: 5px" alt="Create basket"/>' % weburl
         out = """
 <div class="bsk_create_link">
   <a href="%s">%s%s</a>

@@ -45,11 +45,11 @@
 <lang:hr>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</lang:hr>
 <zh_CN>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_CN>
 <zh_TW>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_TW>
-
+</p>
 <blockquote>
 <dl>
 
-<dt><a href="search/<lang:star: index.*.html>">_(Search Help)_</a>
+<dt><a href="search/<lang:star: index.*.html>">_(Search Help)_</a></dt>
 <dd><en>Get help with searching <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
@@ -70,7 +70,8 @@
     <lang:hr>Get help with searching <CDSNAMEINTL>.</lang:hr>
     <zh_CN>Get help with searching <CDSNAMEINTL>.</zh_CN>
     <zh_TW>Get help with searching <CDSNAMEINTL>.</zh_TW>
-<dt><a href="submit/<lang:star: index.*.html>">_(Submit Help)_</a>
+</dd>
+<dt><a href="submit/<lang:star: index.*.html>">_(Submit Help)_</a></dt>
 <dd><en>Get help with submitting to <CDSNAMEINTL>.</en>
     <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
     <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
@@ -91,5 +92,6 @@
     <lang:hr>Get help with submitting to <CDSNAMEINTL>.</lang:hr>
     <zh_CN>Get help with submitting to <CDSNAMEINTL>.</zh_CN>
     <zh_TW>Get help with submitting to <CDSNAMEINTL>.</zh_TW>
+</dd>
 </dl>
 </blockquote>

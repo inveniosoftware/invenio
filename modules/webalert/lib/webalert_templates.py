@@ -181,7 +181,7 @@ class Template:
               <table style="border: 0px; padding:10px;">
                 <tr>
                    <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s</td>
-                   <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s"></td>
+                   <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s" /></td>
                 </tr>
                 <tr>
                   <td style="text-align: right; font-weight: bold;">%(freq)s</td>
@@ -218,8 +218,8 @@ class Template:
                  'weekly' : _("weekly"),
                  'daily' : _("daily"),
                  'send_email' : _("Send notification email?"),
-                 'notif_yes' : (notification == 'y' and "selected" or ""),
-                 'notif_no' : (notification == 'n' and "selected" or ""),
+                 'notif_yes' : (notification == 'y' and 'selected="selected"' or ""),
+                 'notif_no' : (notification == 'n' and 'selected="selected"' or ""),
                  'yes' : _("yes"),
                  'no' : _("no"),
                  'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>',
@@ -353,7 +353,7 @@ class Template:
                               <td>
                                  <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
                                  <a href="./modify?ln=%(ln)s&amp;idq=%(queryid)d&amp;name=%(alertname)s&amp;freq=%(freq)s&amp;notif=%(notif)s&amp;idb=%(basketid)d&amp;old_idb=%(basketid)d">%(modify)s</a><br />
-                                 <a href="%(weburl)s/search?%(queryargs)s&amp;ln=%(ln)s">%(search)s</a>
+                                 <a href="%(weburl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
                              </td>
                             </tr>""" % {
                     'index' : i,
@@ -374,7 +374,7 @@ class Template:
                     'modify' : _("Modify"),
                     'weburl' : weburl,
                     'search' : _("Execute search"),
-                    'queryargs' : alert['queryargs']
+                    'queryargs' : cgi.escape(alert['queryargs'])
                   }
 
             out += '</table>'
@@ -453,14 +453,14 @@ class Template:
             i += 1
             # id, pattern, base, search url and search set alert, date
             out += """<tr>
-                        <td style="font-style: italic;">#%(index)d</TD>
+                        <td style="font-style: italic;">#%(index)d</td>
                         <td>%(textargs)s</td>
                         <td><a href="%(weburl)s/search?%(args)s">%(execute_query)s</a><br />
-                            <a href="%(weburl)s/youralerts/input?ln=%(ln)s&idq=%(id)d">%(set_alert)s</A></td>""" % {
+                            <a href="%(weburl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d">%(set_alert)s</a></td>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'weburl' : weburl,
-                     'args' : query['args'],
+                     'args' : cgi.escape(query['args']),
                      'id' : query['id'],
                      'ln': ln,
                      'execute_query' : _("Execute search"),

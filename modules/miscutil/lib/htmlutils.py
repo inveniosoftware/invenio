@@ -35,6 +35,26 @@ cfg_html_buffer_allowed_tag_whitelist = ['a',
 # <p style="background: url(myxss_suite.js)">
 cfg_html_buffer_allowed_attribute_whitelist = ['href', 'name']
 
+def nmtoken_from_string(text):
+    """
+    Returns a Nmtoken from a string.
+    It is useful to produce XHTML valid values for the 'name'
+    attribute of an anchor. 
+
+    CAUTION: the function is surjective: 2 different texts might lead to
+    the same result. This is improbable on a single page.
+
+    Nmtoken is the type that is a mixture of characters supported in
+    attributes such as 'name' in HTML 'a' tag. For example,
+    <a name="Articles%20%26%20Preprints"> should be tranformed to
+    <a name="Articles%20%26%20Preprints"> using this function.
+    http://www.w3.org/TR/2000/REC-xml-20001006#NT-Nmtoken
+
+    """
+    text = text.replace('-', '--')
+    return ''.join( [( ((not char.isalnum() and not char in ['.', '-', '_', ':']) and str(ord(char))) or char)
+            for char in text] )
+    
 def escape_html(text, escape_quotes=False):
     """Escape all HTML tags, avoiding XSS attacks.
     < => &lt;
