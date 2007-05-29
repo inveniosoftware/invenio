@@ -323,8 +323,8 @@
   <!-- Preparing data : is this a thesis ? (we can find this in the abstract)-->
   <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
-  <xsl:variable name="abstractlow">
-    <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:abstract,$ucletters,$lcletters)"/>
+  <xsl:variable name="commentslow">
+    <xsl:value-of select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments,$ucletters,$lcletters)"/>
   </xsl:variable>
  
   <xsl:variable name="detectPR">accepted@appear@press@publ@review@submitted"></xsl:variable>
@@ -467,7 +467,7 @@
                   <subfield code="u"><xsl:value-of select="."/></subfield>
                 </xsl:for-each>
              </datafield>
-             </xsl:if>>
+             </xsl:if>
 
 
              <!-- Filling 700$$a,u -->
@@ -529,7 +529,7 @@
              <!-- Filling 962$$b  LKR$$b - conference detection in comments field  -->
              <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
              <xsl:variable name="lkrmatch"><xsl:value-of select="normalize-space(translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments, $ucletters, $lcletters))"/></xsl:variable>
-             <xsl:if test="contains($lkrmatch,'conf') or contains($lkrmatch,'talk') or contains($lkrmatch,'seminar') or contains($lkrmatch,'lecture')  or contains($lkrmatch,'contrib')  or contains($lkrmatch,'forum')  or contains($lkrmatch,'seminar') or contains($lkrmatch,'meeting') or contains($lkrmatch,'symp')or contains($lkrmatch,'rencontre') or contains($lkrmatch,'proc') or contains($lkrmatch,'workshop')   ">
+             <xsl:if test="contains($lkrmatch,' colloquium ') or  contains($lkrmatch,' colloquiums ') or  contains($lkrmatch,' conf ') or  contains($lkrmatch,' conference ') or  contains($lkrmatch,' conferences ') or  contains($lkrmatch,' contrib ') or  contains($lkrmatch,' contributed ') or  contains($lkrmatch,' contribution ') or  contains($lkrmatch,' contributions ') or  contains($lkrmatch,' forum ') or  contains($lkrmatch,' lecture ') or  contains($lkrmatch,' lectures ') or  contains($lkrmatch,' meeting ') or  contains($lkrmatch,' meetings ') or  contains($lkrmatch,' pres ') or  contains($lkrmatch,' presented ') or  contains($lkrmatch,' proc ') or  contains($lkrmatch,' proceeding ') or  contains($lkrmatch,' proceedings ') or  contains($lkrmatch,' rencontre ') or  contains($lkrmatch,' rencontres ') or  contains($lkrmatch,' school ') or  contains($lkrmatch,' schools ') or  contains($lkrmatch,' seminar ') or  contains($lkrmatch,' seminars ') or  contains($lkrmatch,' symp ') or  contains($lkrmatch,' symposium ') or  contains($lkrmatch,' symposiums ') or  contains($lkrmatch,' talk ') or  contains($lkrmatch,' talks ') or  contains($lkrmatch,' workshop ') or  contains($lkrmatch,' workshops ') ">
                <datafield tag="962" ind1=" " ind2=" ">
                  <subfield code="b"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments)"/> </subfield>
                </datafield>
@@ -595,6 +595,14 @@
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
               <datafield tag="500" ind1=" " ind2=" ">
                 <subfield code="a">Comments: <xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments)"/></subfield>
+              </datafield>
+           </xsl:if>
+
+
+           <!-- MARC FIELD 595$$a -->
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
+              <datafield tag="595" ind1=" " ind2=" ">
+                <subfield code="a">LANL EDS</subfield>
               </datafield>
            </xsl:if>
 
@@ -802,7 +810,7 @@
              </xsl:when>
 
              <!-- Base 14 specific treatment -->
-             <xsl:when test="contains($abstractlow,' thesis ') or contains($abstractlow,' dipl') or contains($abstractlow,' licence') or contains($abstractlow,' bachelor ' or contains($abstractlow,' phd '))">
+             <xsl:when test="contains($commentslow,' diploma ') or contains($commentslow,' diplomarbeit ') or contains($commentslow,' diplome ') or contains($commentslow,' dissertation ') or contains($commentslow,' doctoraal ') or contains($commentslow,' doctoral ') or contains($commentslow,' doctorat ') or contains($commentslow,' doctorate ') or contains($commentslow,' doktorarbeit ') or contains($commentslow,' dottorato ') or contains($commentslow,' habilitationsschrift ') or contains($commentslow,' hochschule ') or contains($commentslow,' inauguraldissertation ') or contains($commentslow,' memoire ') or contains($commentslow,' phd ') or contains($commentslow,' proefschrift ') or contains($commentslow,' schlussbericht ') or contains($commentslow,' staatsexamensarbeit ') or contains($commentslow,' tesi ') or contains($commentslow,' thesis ') or contains($commentslow,' travail ')">
 
                    <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
                      <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
@@ -838,13 +846,8 @@
 
              </xsl:when>
 
-             <!-- Otherwise we have to decide between bases 11 and 10 -->
+             <!-- Otherwise we have a bases 11-->
              <xsl:otherwise>
-               <xsl:choose>
-
-
-                 <!-- Base 11 specific treatement -->
-                 <xsl:when test=" ($setspec2 ='solv-int') or ($setspec2 ='quant-ph') or ($setspec2 ='q-alg') or ($setspec2 ='plasm-ph') or ($setspec2 ='physics') or ($setspec2 ='patt-sol') or ($setspec2 ='nucl-th') or ($setspec2 ='nucl-ex') or ($setspec2 ='hep-th') or ($setspec2 ='hep-ph') or ($setspec2 ='hep-lat') or ($setspec2 ='hep-ex') or ($setspec2 ='gr-qc') ">
 
                    <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
                      <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
@@ -873,43 +876,7 @@
                        <subfield code="a">11</subfield>
                    </datafield>
 
-                 </xsl:when>
 
-                 <!-- Base 10 specific treatement -->
-                 <xsl:otherwise>
-
-                   <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
-                     <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
-                     <xsl:variable name="year" select="substring-before($datebase,'-')"/>
-                     <xsl:variable name="month" select="substring-before(substring-after($datebase,'-'),'-')"/>
-                     <xsl:variable name="day" select="substring-after(substring-after($datebase,'-'),'-')"/>
-
-                     <datafield tag="260" ind1=" " ind2=" ">
-                       <subfield code="c"><xsl:value-of select="$year"/></subfield>
-                     </datafield>
-                   </xsl:if>
-
-                      <!-- MARC FIELDS 690C$$a and 980$$a NB: 980$$a enables searching  -->
-                      <datafield tag="690" ind1="C" ind2=" ">
-                        <subfield code="a">PREPRINT</subfield>
-                      </datafield>
-                      <xsl:call-template name="cern-detect"><xsl:with-param name="reportnumber" select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, lcletters, ucletters)"/></xsl:call-template>
-
-                      <datafield tag="980" ind1=" " ind2=" ">
-                        <subfield code="a">PREPRINT</subfield>
-                      </datafield>
-                      <xsl:call-template name="cern-detect9"><xsl:with-param name="reportnumber" select="translate(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, lcletters, ucletters)"/></xsl:call-template>
-
-                      <!-- MARC FIELD 960$$a the base field  -->
-                      <datafield tag="960" ind1=" " ind2=" ">
-                         <subfield code="a">10</subfield>
-                      </datafield>
-
-
-                 </xsl:otherwise>
-
-
-               </xsl:choose>
              </xsl:otherwise>
 
            </xsl:choose>
