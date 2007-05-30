@@ -495,6 +495,9 @@
              <xsl:variable name="knlowkn"><xsl:value-of select="normalize-space(translate(./arXiv:keyname, $ucletters, $lcletters))"/></xsl:variable>
              <xsl:variable name="knlow"><xsl:value-of select="concat($knlowc,$knlowfn,$knlowkn)"/></xsl:variable>
              <xsl:if test="contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group') ">
+               <datafield tag="595" ind1=" " ind2=" ">
+                 <subfield code="a">giva a faire</subfield>
+               </datafield>
                <datafield tag="710" ind1=" " ind2=" ">
                  <subfield code="g">
                    <xsl:choose>
