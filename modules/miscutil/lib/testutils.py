@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -38,11 +38,12 @@ import unittest
 from urllib import urlencode
 
 from invenio.config import weburl, sweburl
+from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
 
 def warn_user_about_tests():
     """ Put a standard warning about running tests that might modify
     user data"""
-    
+
     # Provide a command line option to avoid having to type the
     # confirmation every time during development.
     if '--yes-i-know' in sys.argv:
@@ -82,20 +83,20 @@ def warn_user_about_tests_and_run(testsuite):
     """ Convenience function to embed in test suites """
     warn_user_about_tests()
     unittest.TextTestRunner(verbosity=2).run(testsuite)
-    
+
 
 def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
-    
+
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
 def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
     arguments"""
-    
+
     url = weburl + path
-    
+
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
 
@@ -104,9 +105,9 @@ def make_url(path, **kargs):
 def make_surl(path, **kargs):
     """ Helper to generate an absolute invenio Secure URL with query
     arguments"""
-    
+
     url = sweburl + path
-    
+
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
 
@@ -121,7 +122,8 @@ def test_web_page_content(url,
                           password="",
                           expected_text="</html>",
                           expected_link_target=None,
-                          expected_link_label=None):
+                          expected_link_label=None,
+                          require_validate_p=CFG_TESTS_REQUIRE_HTML_VALIDATION):
     """Test whether web page URL as seen by user USERNAME contains
        text EXPECTED_TEXT and, eventually, contains a link to
        EXPECTED_LINK_TARGET (if set) labelled EXPECTED_LINK_LABEL (if
@@ -137,7 +139,7 @@ def test_web_page_content(url,
        messages that may have been encountered during processing of
        page.
     """
-    
+
     error_messages = []
     try:
         import mechanize
@@ -161,7 +163,7 @@ def test_web_page_content(url,
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
                       'ERROR: Cannot login as %s, test skipped.' % username
-        
+
         # secondly read page body:
         browser.open(url)
         url_body = browser.response().read()
@@ -183,7 +185,14 @@ def test_web_page_content(url,
                 raise InvenioTestUtilsBrowserException, \
                       'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
                                   (url, username, expected_link_target, expected_link_label)
-                  
+
+        if require_validate_p:
+            valid_p, errors, warnings = w3c_validate(url_body)
+            if not valid_p:
+                raise InvenioTestUtilsBrowserException, \
+                      'ERROR: Page %s (login %s) does not validate:\n %s' % \
+                                  (url, username, w3c_errors_to_str(errors, warnings))
+
     except mechanize.HTTPError, msg:
         error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
                               (url, username, msg))
@@ -205,7 +214,7 @@ def test_web_page_content(url,
 def merge_error_messages(error_messages):
     """If the ERROR_MESSAGES list is non-empty, merge them and return nicely
        formatted string suitable for printing.  Otherwise return empty
-       string.   
+       string.
     """
     out = ""
     if error_messages:

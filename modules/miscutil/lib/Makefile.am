@@ -36,7 +36,8 @@ pylib_DATA = __init__.py \
 	     htmlutils_tests.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
-	     urlutils.py             
+	     urlutils.py \
+	     w3c_validator.py
 
 noinst_DATA = testimport.py \
               kwalitee.py
