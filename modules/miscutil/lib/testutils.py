@@ -49,6 +49,7 @@ def warn_user_about_tests():
     if '--yes-i-know' in sys.argv:
         return
 
+
     sys.stderr.write("""\
 **********************************************************************
 **                                                                  **
@@ -140,6 +141,10 @@ def test_web_page_content(url,
        page.
     """
 
+    if '--w3c-validate' in sys.argv:
+        require_validate_p = True
+        sys.stderr.write('Required validation\n')
+
     error_messages = []
     try:
         import mechanize
@@ -186,6 +191,7 @@ def test_web_page_content(url,
                       'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
                                   (url, username, expected_link_target, expected_link_label)
 
+        # now test for validation if required
         if require_validate_p:
             valid_p, errors, warnings = w3c_validate(url_body)
             if not valid_p:
