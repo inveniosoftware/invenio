@@ -39,76 +39,76 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_empty(self):
         """firerole - compiling empty role definitions"""
-        self.assertEqual(compile_role_definition(None), CFG_ACC_EMPTY_ROLE_DEFINITION_SER)
+        self.assertEqual(compile_role_definition(None), deserialize(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
 
     def test_compile_role_definition_allow_any(self):
         """firerole - compiling allow any role definitions"""
-        self.failUnless(compile_role_definition("allow any"))
+        self.failUnless(serialize(compile_role_definition("allow any")))
 
     def test_compile_role_definition_deny_any(self):
         """firerole - compiling deny any role definitions"""
-        self.failUnless(compile_role_definition("deny any"))
+        self.failUnless(serialize(compile_role_definition("deny any")))
 
     def test_compile_role_definition_literal_field(self):
         """firerole - compiling literal field role definitions"""
-        self.failUnless(compile_role_definition("allow email 'cds.support@cern.ch'"))
+        self.failUnless(serialize(compile_role_definition("allow email 'cds.support@cern.ch'")))
 
     def test_compile_role_definition_not(self):
         """firerole - compiling not role definitions"""
-        self.failUnless(compile_role_definition("allow not email 'cds.support@cern.ch'"))
+        self.failUnless(serialize(compile_role_definition("allow not email 'cds.support@cern.ch'")))
 
     def test_compile_role_definition_group_field(self):
         """firerole - compiling group field role definitions"""
-        self.failUnless(compile_role_definition("allow groups 'patata'"))
+        self.failUnless(serialize(compile_role_definition("allow groups 'patata'")))
 
     def test_compile_role_definition_regexp_field(self):
         """firerole - compiling regexp field role definitions"""
-        self.failUnless(compile_role_definition("allow email /.*@cern.ch/"))
+        self.failUnless(serialize(compile_role_definition("allow email /.*@cern.ch/")))
 
     def test_compile_role_definition_literal_list(self):
         """firerole - compiling literal list role definitions"""
-        self.failUnless(compile_role_definition("allow email 'cds.support@cern.ch', 'foo.bar@cern.ch'"))
+        self.failUnless(serialize(compile_role_definition("allow email 'cds.support@cern.ch', 'foo.bar@cern.ch'")))
 
     def test_compile_role_definition_more_rows(self):
         """firerole - compiling more rows role definitions"""
-        self.failUnless(compile_role_definition("allow email /.*@cern.ch/\nallow groups 'patata' # a comment\ndeny any"))
+        self.failUnless(serialize(compile_role_definition("allow email /.*@cern.ch/\nallow groups 'patata' # a comment\ndeny any")))
 
     def test_compile_role_definition_complex(self):
         """firerole - compiling complex role definitions"""
-        self.failUnless(compile_role_definition("allow email /.*@cern.ch/\nallow groups 'patata' # a comment\ndeny remote_ip '127.0.0.0/24'\ndeny any"))
+        self.failUnless(serialize(compile_role_definition("allow email /.*@cern.ch/\nallow groups 'patata' # a comment\ndeny remote_ip '127.0.0.0/24'\ndeny any")))
 
     def test_compile_role_definition_wrong(self):
         """firerole - compiling wrong role definitions"""
-        self.assertRaises(InvenioWebAccessFireroleError, compile_role_definition, "allow all")
+        self.assertRaises(InvenioWebAccessFireroleError, compile_role_definition, "allow al")
         self.assertRaises(InvenioWebAccessFireroleError, compile_role_definition, "fgdfglk  g fgk")
 
     def test_deserialize(self):
         """firerole - deserializing"""
-        self.assertEqual(deserialize(compile_role_definition("allow any")), (True, ()))
+        self.assertEqual(compile_role_definition("allow any"), (True, ()))
 
     def test_firerole_literal_email(self):
         """firerole - firerole core testing literal email matching"""
-        self.failUnless(acc_firerole_check_user(self.user_info, deserialize(compile_role_definition("allow email 'cds.support@cern.ch', 'foo.bar@cern.ch'\ndeny any"))))
+        self.failUnless(acc_firerole_check_user(self.user_info, compile_role_definition("allow email 'cds.support@cern.ch', 'foo.bar@cern.ch'\ndeny any")))
 
     def test_firerole_regexp_email(self):
         """firerole - firerole core testing regexp email matching"""
-        self.failUnless(acc_firerole_check_user(self.user_info, deserialize(compile_role_definition("allow email /.*@cern.ch/\ndeny any"))))
+        self.failUnless(acc_firerole_check_user(self.user_info, compile_role_definition("allow email /.*@cern.ch/\ndeny any")))
 
     def test_firerole_literal_group(self):
         """firerole - firerole core testing literal group matching"""
-        self.failUnless(acc_firerole_check_user(self.user_info, deserialize(compile_role_definition("allow groups 'patata'\ndeny any"))))
+        self.failUnless(acc_firerole_check_user(self.user_info, compile_role_definition("allow groups 'patata'\ndeny any")))
 
     def test_firerole_ip_mask(self):
         """firerole - firerole core testing ip mask matching"""
-        self.failUnless(acc_firerole_check_user(self.user_info, deserialize(compile_role_definition("allow remote_ip '127.0.0.0/24'\ndeny any"))))
+        self.failUnless(acc_firerole_check_user(self.user_info, compile_role_definition("allow remote_ip '127.0.0.0/24'\ndeny any")))
 
     def test_firerole_non_existant_group(self):
         """firerole - firerole core testing non existant group matching"""
-        self.failIf(acc_firerole_check_user(self.user_info, deserialize(compile_role_definition("allow groups 'patat'\ndeny any"))))
+        self.failIf(acc_firerole_check_user(self.user_info, compile_role_definition("allow groups 'patat'\ndeny any")))
 
     def test_firerole_empty(self):
         """firerole - firerole core testing empty matching"""
-        self.assertEqual(False, acc_firerole_check_user(self.user_info, deserialize(compile_role_definition(None))))
+        self.assertEqual(False, acc_firerole_check_user(self.user_info, compile_role_definition(None)))
 
 def create_test_suite():
     """Return test suite for the user handling."""

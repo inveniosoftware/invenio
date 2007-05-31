@@ -34,7 +34,7 @@ from invenio.config import \
      version
 from invenio.access_control_config import *
 from invenio.dbquery import run_sql, ProgrammingError
-from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user, deserialize
+from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user, serialize, deserialize
 from sets import Set
 
 # ACTIONS
@@ -1420,10 +1420,10 @@ def acc_add_default_settings(superusers=[]):
     for (name, description, firerole_def_src) in DEF_ROLES:
         # try to add, don't care if description is different
         id = acc_addRole(name_role=name,
-                         description=description, firerole_def_ser=compile_role_definition(firerole_def_src), firerole_def_src=firerole_def_src)
+                         description=description, firerole_def_ser=serialize(compile_role_definition(firerole_def_src)), firerole_def_src=firerole_def_src)
         if not id:
             id = acc_getRoleId(name_role=name)
-            acc_updateRole(id_role=id, description=description, firerole_def_ser=compile_role_definition(firerole_def_src), firerole_def_src=firerole_def_src)
+            acc_updateRole(id_role=id, description=description, firerole_def_ser=serialize(compile_role_definition(firerole_def_src)), firerole_def_src=firerole_def_src)
         insroles.append([id, name, description, firerole_def_src])
 
     # add users to superadmin

@@ -59,7 +59,7 @@ import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import adderrorbox, addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_config import *
-from invenio.access_control_firerole import compile_role_definition, repair_role_definitions
+from invenio.access_control_firerole import compile_role_definition, repair_role_definitions, serialize
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
@@ -1763,7 +1763,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
             internaldesc = description
 
         try:
-            firerole_def_ser = compile_role_definition(firerole_def_src)
+            firerole_def_ser = serialize(compile_role_definition(firerole_def_src))
         except InvenioWebAccessFireroleError, msg:
             output += "<strong>%s</strong>" % msg
         else:
@@ -1879,7 +1879,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
         text += 'firewall like role definition: <strong>%s</strong>' % firerole_def_src.replace('\n', '<br />')
 
         try:
-            firerole_def_ser = compile_role_definition(firerole_def_src)
+            firerole_def_ser = serialize(compile_role_definition(firerole_def_src))
         except InvenioWebAccessFireroleError, msg:
             subtitle = 'step 2 - role could not be modified'
             output += '<p>sorry, could not modify role because of troubles with            its definition:<br>%s</p>' % msg

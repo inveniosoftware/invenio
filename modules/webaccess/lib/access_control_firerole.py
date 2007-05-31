@@ -100,7 +100,7 @@ def compile_role_definition(firerole_def_src):
                 ret.append((allow_p, not_p, field, expressions_list))
             else:
                 raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line)
-    return (compress(cPickle.dumps((default_allow_p, tuple(ret)), -1)))
+    return (default_allow_p, tuple(ret))
 
 
 def repair_role_definitions():
@@ -109,7 +109,7 @@ def repair_role_definitions():
     """
     definitions = run_sql("SELECT id, firerole_def_src FROM accROLE""")
     for role_id, firerole_def_src in definitions:
-        run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (compile_role_definition(firerole_def_src), role_id))
+        run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (serialize(compile_role_definition(firerole_def_src)), role_id))
 
 def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     """ Store a compiled serialized definition and its source in the database
@@ -197,6 +197,13 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     except Exception, msg:
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenSource project
+
+def serialize(firerole_def_src):
+    """ Serialize and compress a definition."""
+    if firerole_def_src:
+        return compress(cPickle.dumps(firerole_def_src, -1))
+    else:
+        return CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 
 def deserialize(firerole_def_ser):
     """ Deserialize and decompress a definition."""
