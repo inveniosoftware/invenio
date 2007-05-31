@@ -22,7 +22,7 @@
     navbar_name="admin" \
     navbar_select="webaccess-admin-guide"
 
-<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+<p>Version <: print generate_pretty_revision_date_string('$Id$'); :></p>
 
 <h2>Contents</h2>
 
@@ -603,7 +603,7 @@ II. Example - connecting role and user</a>
                <input type="hidden" name="email_user_pattern" value="k">
               </td>
               <td style="vertical-align: bottom">
-               <input class="adminbutton" type="submit" value="confirm">
+               <input class="adminbutton" type="submit" value="confirm" />
               </td>
              </tr>
             </table>
@@ -725,7 +725,7 @@ II. Example - connecting role and user</a>
                <input type="hidden" name="email_user_pattern" value="k">
               </td>
               <td style="vertical-align: bottom">
-               <input class="adminbutton" type="submit" value="confirm">
+               <input class="adminbutton" type="submit" value="confirm" />
               </td>
              </tr>
             </table>
