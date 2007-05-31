@@ -22,9 +22,11 @@
 """
 __revision__ = "$Id$"
 
-from invenio.file import *
-from invenio.config import weburl
+from invenio.file import BibRecDocs, file_strip_ext
+from invenio.config import weburl, CFG_CERN_SITE
 from cgi import escape
+from urlparse import urlparse
+from os.path import basename, splitext
 
 def format(bfo, style, separator='; '):
     """
@@ -36,82 +38,59 @@ def format(bfo, style, separator='; '):
     urls = bfo.fields("8564_")
 
     ret = ""
-    #ret += "%s<br />" % urls
     bibarchive = BibRecDocs(bfo.recID)
     old_version_there = False
-    main_urls = {}
-    others_urls = {}
-    cern_urls = {}
+    main_urls = {} # Urls hosted by Invenio (bibdocs)
+    others_urls = {} # External urls
+    if CFG_CERN_SITE:
+        cern_urls = {} # cern.ch urls
     additionals = False
 
     for complete_url in urls:
         if complete_url.has_key('u'):
             url = complete_url['u']
+            (dontcare, host, path, dontcare, dontcare, dontcare) = urlparse(url)
+            filename = basename(path)
+            name = file_strip_ext(filename)
+            format = filename[len(name):]
+            if format.startswith('.'):
+                format = format[1:]
+
             descr = ''
-            #ret += "1 descr=%s<br />" % descr
-            if complete_url.has_key('z'):
-                #ret += "2 descr=%s<br />" % descr
+            if complete_url.has_key('z'): # Let's take the description
                 descr = complete_url['z']
-                #ret += "3 descr=%s<br />" % descr
             elif complete_url.has_key('y'):
-                #ret += "2 descr=%s<br />" % descr
                 descr = complete_url['y']
-                #ret += "3 descr=%s<br />" % descr
-            #ret += "4 descr=%s<br />" % descr
-            if not url.startswith(weburl):
-                #ret += "%s doesn't start with %s<br />" % (url, weburl)
-                #ret += "5 descr=%s<br />" % descr
-                if not descr:
-                    if '/setlink?' in url:
-                        descr = "Fulltext"
+            if not url.startswith(weburl): # Not a bibdoc?
+                if not descr: # For not bibdoc let's have a description
+                    if '/setlink?' in url: # Setlink (i.e. hosted on doc.cern.ch)
+                        descr = "Fulltext" # Surely a fulltext
                     else:
-                    #ret += "6 descr=%s<br />" % descr
-                        descr = url.split('/')[-1]
-                    #ret += "7 descr=%s<br />" % descr
-                #ret += "8 descr=%s<br />" % descr
-                if 'cern.ch' in url:
-                    cern_urls[url] = descr
+                        #FIXME remove eventual ?parameters
+                        descr = filename or host # Let's take the name from the url
+                if CFG_CERN_SITE and 'cern.ch' in host:
+                    cern_urls[url] = descr # Obsolete cern.ch url (we're migrating)
                 else:
-                    others_urls[url] = descr
-
-            else:
-                #ret += "%s starts with %s!!!<br />" % (url, weburl)
-                filename = url.split('/')[-1]
-                name = file_strip_ext(filename)
-                format = filename[len(name):]
-                if format and format[0] == '.':
-                    format = format[1:]
-                #ret += "%s -> (%s, %s, %s)<br />" % (url, filename, name, format)
-
+                    others_urls[url] = descr # external url
+            else: # It's a bibdoc!
                 assigned = False
                 for doc in bibarchive.listBibDocs():
-
                     if int(doc.getLatestVersion()) > 1:
                         old_version_there = True
-                    #ret += "Sto operando sul file %s" % doc
-                    #ret += "%s<br />" % [f.fullname for f in doc.listAllFiles()]
                     if filename in [f.fullname for f in doc.listAllFiles()]:
                         assigned = True
-                        #ret += " --> ok!!!<br />"
                         if not doc.type == 'Main':
                             additionals = True
-                            #ret += "Additionals?!<br />"
                         else:
-                            #ret += "Main!!!<br />"
-                            #ret += "9 descr=%s<br />" % descr
                             if not descr:
-                                #ret += "10 descr=%s<br />" % descr
                                 descr = 'Main file(s)'
-                                #ret += "11 descr=%s<br />" % descr
-                            #ret += "12 descr=%s<br />" % descr
                             if not main_urls.has_key(descr):
                                 main_urls[descr] = []
-                            #ret += "Appendo a %s (%s, %s)<br />" % (descr, url, format)
                             main_urls[descr].append((url, name, format))
-                if not assigned:
+                if not assigned: # Url is not a bibdoc :-S
                     if not descr:
-                        descr = url.split('/')[-1]
-                    others_urls[url] = descr
+                        descr = filename
+                    others_urls[url] = descr # Let's put it in a general other url
 
     if style != "":
         style = 'class="'+style+'"'
@@ -130,11 +109,11 @@ def format(bfo, style, separator='; '):
     if main_urls:
         last_name = ""
         for descr, urls in main_urls.items():
-            ret += "<strong>"+descr+":</strong> "
+            ret += "<strong>%s:</strong> " % descr
             url_list = []
             urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
             for url, name, format in urls:
-                if not name == last_name and len(urls) > 1:
+                if not name == last_name and len(main_urls) > 1:
                     print_name = "<em>%s</em> - " % name
                 else:
                     print_name = ""
@@ -142,15 +121,17 @@ def format(bfo, style, separator='; '):
                 url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+format.upper()+'</a>')
             ret += separator.join(url_list) + additional_str + versions_str + '<br />'
 
-    if cern_urls:
-        ret += '<strong>CERN links</strong>: '
+    if CFG_CERN_SITE and cern_urls:
+        link_word = len(cern_urls) == 1 and 'link' or 'links'
+        ret += '<strong>CERN %s</strong>: ' % link_word
         url_list = []
         for url,descr in cern_urls.items():
             url_list.append('<a '+style+' href="'+escape(url)+'">'+escape(str(descr))+'</a>')
         ret += separator.join(url_list) + '<br />'
 
     if others_urls:
-        ret += '<strong>External links</strong>: '
+        link_word = len(others_urls) == 1 and 'link' or 'links'
+        ret += '<strong>External %s</strong>: ' % link_word
         url_list = []
         for url,descr in others_urls.items():
             url_list.append('<a '+style+' href="'+escape(url)+'">'+escape(str(descr))+'</a>')
