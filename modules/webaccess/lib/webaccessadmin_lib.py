@@ -1789,8 +1789,9 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
                 if result:
                     subtitle = 'step 3 - role added'
                     output += '<p>role added: </p>'
+                    result[3] = result[3].replace('\n', '<br />')
                     output += tupletotable(header=['id', 'role name', 'description', 'firewall like role definition'],
-                                        tuple=result)
+                                        tuple=[result])
                 else:
                     subtitle = 'step 3 - role could not be added'
                     output += '<p>sorry, could not add role, <br>role with the same name probably exists.</p>'
@@ -1900,7 +1901,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
                     output += '<p>role modified: </p>'
                     output += tupletotable(header=['id', 'role name',
                         'description', 'firewall like role definition'],
-                        tuple=((id_role, name_role, description, firerole_def_src)))
+                        tuple=[(id_role, name_role, description, firerole_def_src.replace('\n', '<br />'))])
                 else:
                     subtitle = 'step 2 - role could not be modified'
                     output += '<p>sorry, could not modify role, <br>please contact the administrator.</p>'
@@ -2032,8 +2033,10 @@ def roledetails(id_role=0):
 
     # show role details
     details  = '<p>role details:</p>'
+    role_details = acca.acc_getRoleDetails(id_role=id_role)
+    role_details[3] = role_details[3].replace('\n', '<br />') # Hack for preformatting firerole rules
     details += tupletotable(header=['id', 'name', 'description', 'firewall like role definition'],
-                            tuple=[acca.acc_getRoleDetails(id_role=id_role)])
+                            tuple=[role_details])
 
     # show connected users
     details += '<p>users connected to %s:</p>' % (headerstrong(role=name_role, query=0), )
