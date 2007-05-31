@@ -213,7 +213,7 @@ _no_comment_re = re.compile(r'[\s]*(?<!\\)#.*')
 # Rule dissecter
 _rule_re = re.compile(r'(?P<command>allow|deny)[\s]+(?:(?P<not>not)[\s]+)?(?P<field>[\w]+)[\s]+(?P<expression>(?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\\)\/.+?(?<!\\)\/)(?P<more_expressions>([\s]*,[\s]*((?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\\)\/.+?(?<!\\)\/))*)(?:[\s]*(?<!\\).*)?', re.I)
 
-_any_rule_re = re.compile(r'(?P<command>allow|deny)[\s]+any[\s]*', re.I)
+_any_rule_re = re.compile(r'(?P<command>allow|deny)[\s]+(any|all)[\s]*', re.I)
 
 # Sub expression finder
 _expressions_re = re.compile(r'(?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\\)\/.+?(?<!\\)\/')
