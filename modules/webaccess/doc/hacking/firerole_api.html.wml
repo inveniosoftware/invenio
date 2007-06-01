@@ -19,16 +19,16 @@
 #include "cdspage.wml" \
     title="FireRole Internals" \
     navbar_name="hacking-webaccess" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>FireRole Internals</a> " \
-    navbar_select="hacking-FireRole-api"
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> &gt;  <a class=navtrail href=<WEBURL>/hacking/webaccess/index.html>WebAccess Internals</a> " \
+    navbar_select="hacking-webaccess-firerole"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <pre>
 The "Firewall like role definition engine" (FireRole) is a tool for describing
-formally set of users and checking users against this description for membership.
+formally sets of users and checking users against this description for their membership.
 
-FireRole rules are strings defined as in the <a href="../admin/firerole.html">FireRole language description</a> page.
+FireRole rules are strings defined as in the <a href="/admin/webaccess/firerole.html">FireRole language description</a> page.
 
 In order to use FireRole rules with the engine you have to compile these strings with
 the <strong>compile_role_definition</strong> function.
@@ -36,14 +36,14 @@ the <strong>compile_role_definition</strong> function.
 The compiled form could be serialized and stored into a database with the provided
 function <strong>serialize</strong> and later loaded with <strong>deserialize</strong>.
 
-To build a user description you have to use the <strong>collect_user_info</strong> in
+To build a user description you have to use the <strong>collect_user_info</strong> from
 the module <em>webuser</em>. This function, given a <em>mod_python request object</em>
-or a <em>uid</em> returns a dictionary with all the collectable user informations (when
-using the request objects these includes the <em>ip address</em> and the <em>host</em>
+or a <em>id_user</em> returns a dictionary with all the collectable user informations (when
+using the request object these includes the <em>ip address</em> and the <em>host</em>
 of the user, too).
 
 Passing both the user_info dictionary and the compiled (deserialized) FireRole
-definition to the <strong>acc_FireRole_check_user</strong> function returns a
+definition to the <strong>acc_firerole_check_user</strong> function returns a
 <em>boolean value</em> stating if the user belong to the set described by this
 definition.
 
@@ -63,7 +63,7 @@ FireRole definitions.
         provided, also the remote_ip and remote_host fields.
         """
 
-<em>from access_control_FireRole</em>
+<em>from access_control_firerole</em>
     def <strong>compile_role_definition</strong>(FireRole_def_src):
         """ Given a text in which every row contains a rule it returns the compiled
         object definition.
@@ -82,13 +82,14 @@ FireRole definitions.
     def <strong>deserialize</strong>(FireRole_def_ser):
         """ Deserialize and decompress a definition."""
 
-    def <strong>acc_FireRole_check_user</strong>(user_info, FireRole_def_obj):
+    def <strong>acc_firerole_check_user</strong>(user_info, firerole_def_obj):
         """ Given a user_info dictionary, it matches the rules inside the deserializez
         compiled definition in order to discover if the current user match the roles
         corresponding to this definition.
         @param user_info a dict produced by collect_user_info which contains every
         info about a user
-        @param definition a compiled deserialized definition produced by compile_role_defintion
+        @param firerole_def_obj a compiled deserialized definition produced by
+        compile_role_defintion
         @return True if the user match the definition, False otherwise.
         """
 </pre>
