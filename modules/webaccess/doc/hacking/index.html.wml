@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,7 +21,7 @@
     title="WebAccess Internals" \
     navbar_name="hacking-webaccess" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a>" \
-    navbar_select="hacking-webaccess-index" 
+    navbar_select="hacking-webaccess-index"
 
 This page summarizes all the information suitable to dig inside
 the WebAccess internals.
@@ -37,5 +37,7 @@ the WebAccess internals.
       represented with signatures, some with additional explanations as well.</dd>
   <dt><a href="table-structure.html">Access Control Table Structure</a> </dt>
   <dd>Explains the structure of the WebAccess tables and how to create authorizations.</dd>
+  <dt><a href="firerole_api.html">FireRole Internals</a> </dt>
+  <dd>Explains how to use the functions concerning firewall like role definitions.</dd>
  </dl>
 </blockquote>

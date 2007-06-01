@@ -19,7 +19,7 @@
 
 docdir = $(localstatedir)/www/hacking/webaccess
 
-doc_DATA=index.html api.html admin-internals.html table-structure.html
+doc_DATA=index.html api.html admin-internals.html table-structure.html firerole_api.html
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
