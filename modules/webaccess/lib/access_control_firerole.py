@@ -147,7 +147,8 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     corresponding to this definition.
     @param user_info a dict produced by collect_user_info which contains every
     info about a user
-    @param definition a compiled deserialized definition produced by compile_role_defintion
+    @param firerole_def_obj a compiled deserialized definition produced by
+    compile_role_defintion
     @return True if the user match the definition, False otherwise.
     """
     try:
