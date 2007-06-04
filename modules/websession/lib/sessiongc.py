@@ -29,6 +29,7 @@ import sys
 try:
     from invenio.dbquery import run_sql
     from invenio.access_control_engine import acc_authorize_action
+    from invenio.config import logdir, tmpdir
     import getopt
     import marshal
     import time
@@ -36,14 +37,70 @@ try:
     import signal
     import re
     import getpass
+    import os
 except ImportError, e:
     print "Error: %s" % (e, )
     sys.exit(1)
 
 # configure variables
-cfg_mysql_argumentlist_size = 100
+CFG_MYSQL_ARGUMENTLIST_SIZE = 100
+# After how many days to remove obsolete log/err files
+CFG_MAX_ATIME_RM_LOG = 28
+# After how many days to zip obsolete log/err files
+CFG_MAX_ATIME_ZIP_LOG = 7
+# After how many days to remove obsolete bibreformat fmt xml files
+CFG_MAX_ATIME_RM_FMT = 28
+# After how many days to zip obsolete bibreformat fmt xml files
+CFG_MAX_ATIME_ZIP_FMT = 7
+# After how many days to remove obsolete bibharvest fmt xml files
+CFG_MAX_ATIME_RM_OAI = 28
+# After how many days to zip obsolete bibharvest fmt xml files
+CFG_MAX_ATIME_ZIP_OAI = 7
+
 # will hold task options
 options = {}
+
+def gc_exec_command(command, verbose=1):
+    """ Exec the command logging in appropriate way its output."""
+    if verbose >= 9:
+        write_message('  %s' % command)
+    (dontcare, output, errors) = os.popen3(command)
+    write_messages(errors.read())
+    if verbose: write_messages(output.read())
+
+def clean_filesystem(verbose=1):
+    """ Clean the filesystem from obsolete files. """
+    if verbose: write_message("""FILESYSTEM CLEANING STARTED""")
+    if verbose: write_message("- deleting/gzipping bibsched empty/old err/log BibSched files")
+    vstr = verbose > 1 and '-v' or ''
+    gc_exec_command('find %s -name "bibsched_task_*" -size 0c -exec rm %s -f {} \;' \
+            % (logdir, vstr), verbose)
+    gc_exec_command('find %s -name "bibsched_task_*" -atime +%s -exec rm %s -f {} \;' \
+            % (logdir, CFG_MAX_ATIME_RM_LOG, vstr), verbose)
+    gc_exec_command('find %s -name "bibsched_task_*" -atime +%s -exec gzip %s -9 {} \;' \
+            % (logdir, CFG_MAX_ATIME_ZIP_LOG, vstr), verbose)
+
+    if verbose: write_message("- deleting/gzipping temporary empty/old BibReformat xml files")
+    gc_exec_command('find %s -name "rec_fmt_*" -size 0c -exec rm %s -f {} \;' \
+            % (tmpdir, vstr), verbose)
+    gc_exec_command('find %s -name "rec_fmt_*" -atime +%s -exec rm %s -f {} \;' \
+            % (tmpdir, CFG_MAX_ATIME_RM_FMT, vstr), verbose)
+    gc_exec_command('find %s -name "rec_fmt_*" -atime +%s -exec gzip %s -9 {} \;' \
+            % (tmpdir, CFG_MAX_ATIME_ZIP_FMT, vstr), verbose)
+
+    if verbose: write_message("- deleting/gzipping temporary old BibHarvest xml files")
+    gc_exec_command('find %s -name "bibharvestadmin.*" -exec rm %s -f {} \;' \
+            % (tmpdir, vstr), verbose)
+    gc_exec_command('find %s -name "bibconvertrun.*" -exec rm %s -f {} \;' \
+            % (tmpdir, vstr), verbose)
+    gc_exec_command('find %s -name "oaiharvest*" -atime +%s -exec gzip %s -9 {} \;' \
+            % (tmpdir, CFG_MAX_ATIME_ZIP_OAI, vstr), verbose)
+    gc_exec_command('find %s -name "oaiharvest*" -atime +%s -exec rm %s -f {} \;' \
+            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr), verbose)
+    gc_exec_command('find %s -name "oai_archive*" -atime +%s -exec rm %s -f {} \;' \
+            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr), verbose)
+    if verbose: write_message("""FILESYSTEM CLEANING FINISHED""")
+
 
 def guest_user_garbage_collector(verbose=1):
     """Session Garbage Collector
@@ -96,10 +153,10 @@ def guest_user_garbage_collector(verbose=1):
 
     if result:
         # work on slices of result list in case of big result
-        for i in range(0, len(result), cfg_mysql_argumentlist_size):
+        for i in range(0, len(result), CFG_MYSQL_ARGUMENTLIST_SIZE):
             # create string of uids
             uidstr = ''
-            for (id_user, ) in result[i:i+cfg_mysql_argumentlist_size]:
+            for (id_user, ) in result[i:i+CFG_MYSQL_ARGUMENTLIST_SIZE]:
                 if uidstr: uidstr += ','
                 uidstr += "%s" % (id_user, )
 
@@ -434,16 +491,21 @@ def task_sig_unknown(sig, frame):
 
 def write_message(msg, stream=sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-    return
+    if msg:
+        if stream == sys.stdout or stream == sys.stderr:
+            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+            try:
+                stream.write("%s\n" % msg)
+            except UnicodeEncodeError:
+                stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
+            stream.flush()
+        else:
+            sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+
+def write_messages(msg, stream=sys.stdout):
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    for message in msg.split('\n'):
+        write_message(message, stream)
 
 def authenticate(user, header="SessionGC Guest User Garbage Collector Task Submission", action="runsessiongc"):
     """Authenticate the user against the user database.
@@ -563,6 +625,8 @@ def task_run(task_id):
     signal.signal(signal.SIGINT, task_sig_unknown)
     # Running the garbace collector
     guest_user_garbage_collector(options["verbose"])
+    if options["filesystem"]:
+        clean_filesystem(options["verbose"])
     # We are done!
     task_update_progress("Done.")
     task_update_status("DONE")
@@ -583,6 +647,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.stderr.write("  -v, --verbose=LEVEL   \t Verbose level (from 0 to 9, default 1).\n")
+    sys.stderr.write("  -f, --filesystem\t\t Clean up the filesystem.\n")
     sys.stderr.write("""Description: %s garbage collects all the guests users sessions\n""" % sys.argv[0])
     sys.exit(exitcode)
 
@@ -607,12 +672,13 @@ def main():
         # set default values:
         options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
         options["verbose"] = 1
+        options["filesystem"] = False
         options["sleeptime"] = ""
         # set user-defined options:
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:",
+            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:f",
                                        ["help", "version", "verbose=", "user=",
-                                        "sleeptime=", "runtime="])
+                                        "sleeptime=", "runtime=", "filesystem"])
         except getopt.GetoptError, err:
             usage(1, err)
         try:
@@ -622,15 +688,17 @@ def main():
                 elif opt[0] in ["-V", "--version"]:
                     print __revision__
                     sys.exit(0)
-                elif opt[0] in [ "-u", "--user"]:
+                elif opt[0] in ["-u", "--user"]:
                     options["user"] = opt[1]
                 elif opt[0] in ["-v", "--verbose"]:
                     options["verbose"] = int(opt[1])
-                elif opt[0] in [ "-s", "--sleeptime" ]:
+                elif opt[0] in ["-s", "--sleeptime"]:
                     get_datetime(opt[1]) # see if it is a valid shift
                     options["sleeptime"] = opt[1]
-                elif opt[0] in [ "-t", "--runtime" ]:
+                elif opt[0] in ["-t", "--runtime"]:
                     options["runtime"] = get_datetime(opt[1])
+                elif opt[0] in ["-f", "--filesystem"]:
+                    options["filesystem"] = True
                 else:
                     usage(1)
         except StandardError, e:

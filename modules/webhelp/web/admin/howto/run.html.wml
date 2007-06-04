@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,6 +30,7 @@ Version <: print generate_pretty_revision_date_string('$Id$'); :>
 <p>This HOWTO guide intends to give you ideas on how to run your
 CDS Invenio installation and how to take care of its normal operation day
 by day.
+</p>
 
 <h2>BibSched Periodical Tasks</h2>
 
@@ -39,6 +40,7 @@ indexing engine to scan periodically for newly arrived documents to
 index them as soon as they enter into the system.  It is the role of
 the BibSched system to take care of the task scheduling and the task
 execution.
+</p>
 
 <p>Periodical tasks (such as regular metadata indexing) as well as
 one-time tasks (such as a batch upload of newly acquired metadata
@@ -47,6 +49,7 @@ task queue.  BibSched daemon looks periodically in the queue and
 launches the tasks according to their order or the date of programmed
 runtime.  You can consider BibSched to be a kind of cron daemon for
 bibliographic tasks.
+</p>
 
 <p>This means that after having installed CDS Invenio you will want to
 have the BibSched daemon running permanently.  To launch BibSched
@@ -57,10 +60,11 @@ daemon, do:
  $ bibsched start
 </pre>
 </blockquote>
-     
-To setup indexing, ranking, formatting, and collection cache updating
+</p>
+
+<p>To setup indexing, ranking, formatting, and collection cache updating
 daemons to run periodically with a sleeping period of, say, 1 hour:
- 
+
 <blockquote>
 <pre>
 $ bibindex -f50000 -s1h
@@ -69,10 +73,12 @@ $ webcoll -v0 -s1h
 $ bibrank -f50000 -s1h
 </pre>
 </blockquote>
+</p>
 
 <p>It is imperative to have the above four tasks permanently in your
 BibSched queue so that newly submitted documents will be processed
 automatically.
+</p>
 
 <p>You may also want to set up periodical recalculating of word
 similarity ranking weights every, say, thirty days:
@@ -82,9 +88,11 @@ similarity ranking weights every, say, thirty days:
 $ bibrank -f50000 -R -wwrd -s30d
 </pre>
 </blockquote>
+</p>
 
 Please consult the section below entitled "Recalculate ranking
 weights" for more details.
+</p>
 
 <p>Note that the BibSched daemon automatic mode stops as soon as some
 of the tasks ends with an error.  It it therefore a good idea to
@@ -96,12 +104,14 @@ This can be done by running the BibSched command-line monitor:
 $ bibsched
 </pre>
 </blockquote>
+</p>
 
 <p>The monitor will permit you to stop/start the daemon mode, to
 delete the tasks already submitted, to run some of the tasks manually,
 etc.  Note also that BibSched daemon writes log and error files on its
 operation and on the operation of its tasks.  The log and error files
 can be found at <code>@prefix@/var/log</code>.
+</p>
 
 <p>You may want to clean up the old BibSched tasks with the DONE
 status, let us say once per month, to make the task table slim and the
@@ -112,6 +122,7 @@ bibsched daemon both faster and less memory hungry:
 $ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 7 DAY);" | dbexec
 </pre>
 </blockquote>
+</p>
 
 <h2>Recalculate ranking weights</h2>
 
@@ -124,7 +135,7 @@ while by doing:
 
 <blockquote>
 <pre>
-$ bibrank -R -wwrd 
+$ bibrank -R -wwrd
 </pre>
 </blockquote>
 
@@ -132,23 +143,33 @@ You may want to do this either (i) periodically, say once per month
 (see the previous section), or (ii) depending on the frequency of new
 additions to the record database, say when the size grows by 2-3
 percent.
+</p>
 
 <h2>Guest Users Cleanup</h2>
 
 <p>Guest users create a lot of entries in CDS Invenio tables that are
 related to their web sessions, their search history, personal baskets,
-etc.  This data has to be garbage-collected periodically.  At the
-moment this is done via a command line program:
+etc.  This data has to be garbage-collected periodically.  You can run this,
+say every day, via:
 
 <blockquote>
 <pre>
-$ sessiongc
+$ sessiongc -s1d
 </pre>
 </blockquote>
+</p>
 
-<p>You may want to launch this command every day.  In the future the
-garbage collection task may be done via BibSched task
-queue. <!--FIXME-->
+<h2>Cleaning Up the Filesystem</h2>
+
+<p>Different temporary log and err files  are created in <code>@prefix@/var/log</code>
+and <code>@prefix@/var/tmp</code> directory that is good to clean up from time to time.  The previous command could be used to clean those files, too, via:
+
+<blockquote>
+<pre>
+$ sessiongc -s1d -f
+</pre>
+</blockquote>
+</p>
 
 <h2>Alert Engine</h2>
 
@@ -162,47 +183,9 @@ engine to do this.  The alert engine has to be run every day:
 $ alertengine
 </pre>
 </blockquote>
+</p>
 
 <p>You may want to set up an external cron job to call
 <code>alertengine</code> each day.
+</p>
 
-<h2>Cleaning Up the Filesystem</h2>
-
-<p>BibSched creates log and err files in <code>@prefix@/var/log</code>
-directory that is good to clean up from time to time.  For example:
-
-<blockquote>
-<pre>
-$ find /opt/cds-invenio/var/log -name "bibsched_task_*" -size 0c -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/log -name "bibsched_task_*" -atime +28 -exec \rm -f {} \;
-$ find /opt/cds-invenio/var/log -name "bibsched_task_*" -atime +7 -exec gzip -9 {} \;
-</pre>
-</blockquote>
-
-<p>BibReformat creates temporary XML files in
-<code>@prefix@/var/tmp</code> that may be deleted after they are
-uploaded.  For example:
-
-<blockquote>
-<pre>
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -size 0c -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -atime +28 -exec \rm -f {} \;
-$ find /opt/cds-invenio/var/tmp -name "rec_fmt_*" -atime +7 -exec gzip -9 {} \;
-</pre>
-</blockquote>
-
-<p>The BibHarvest admin tool (oaiharvest) creates temporary XML files in
-<code>@prefix@/var/tmp</code> that may be deleted after they are
-uploaded.  For example:
-
-<blockquote>
-<pre>
-$ find /opt/cds-invenio/var/tmp -name "bibharvestadmin.*" -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/tmp -name "bibconvertrun*" -exec \rm -f {} \;   
-$ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -atime +7 -exec gzip -9 {} \;
-$ find /opt/cds-invenio/var/tmp -name "oaiharvest*" -atime +28 -exec \rm -f {} \;
-$ find /opt/cds-invenio/var/tmp -name "oai_archive*" -atime +28 -exec \rm -f {} \;
-</pre>
-</blockquote>
-
-<p>FIXME: Thoughts on WebSubmit log archives, what to keep, what not.
