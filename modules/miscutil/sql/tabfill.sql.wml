@@ -1334,7 +1334,7 @@ INSERT INTO accACTION VALUES (19,'cfgwebcomment','configure WebComment','','no')
 INSERT INTO accACTION VALUES (20,'runoaiarchive','run BibHarvest oaiarchive','','no');
 INSERT INTO accACTION VALUES (21,'runbibedit','run BibEdit','','no');
 INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');
-
+INSERT INTO accACTION VALUSE (23,'runsessiongc','run SessionGC','','no');
 
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
 

@@ -186,6 +186,7 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_ser tinyblob NULL;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
 	
 drop-tables: local-dbexec 
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
