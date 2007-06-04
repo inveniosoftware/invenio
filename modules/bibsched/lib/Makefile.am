@@ -21,7 +21,7 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
 	bibsched.py \
-	bibtaskex.py
+	bibtask.py 
 
 EXTRA_DIST = $(pylib_DATA)
 
