@@ -24,7 +24,7 @@ pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
 	webgroup.py webgroup_dblayer.py websession_config.py \
 	webaccount.py websession_regression_tests.py \
 	webgroup_regression_tests.py webuser_regression_tests.py \
-	webgroup_tests.py
+	webgroup_tests.py sessiongc.py
 
 EXTRA_DIST = $(pylib_DATA)
 

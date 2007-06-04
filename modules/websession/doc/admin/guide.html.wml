@@ -39,7 +39,7 @@
      manual recipes.  We are in the process of developing both the
      guide as well as the web admin interface.  If you are interested
      in seeing some specific things implemented with high priority,
-     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!     
+     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!
    </td>
    </tr>
    </tbody>
@@ -51,15 +51,12 @@
 
 <p>Guest users create a lot of entries in <CDSNAME> tables that are
 related to their web sessions, their search history, personal baskets,
-etc.  This data has to be garbage-collected periodically.  At the
-moment this is done via a command line program:
+etc.  This data has to be garbage-collected periodically. This is done
+via a bibsched program:
 
    <blockquote>
    <pre>
-   $ sessiongc
+   $ sessiongc -s 1d
    </pre>
    </blockquote>
 
-<strong>HINT:</strong> You may want to launch this command every day.
-In the future the garbage collection task may be done via BibSched task
-queue. 
