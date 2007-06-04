@@ -1055,7 +1055,7 @@ def main():
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:fp:l:",
                                        ["help", "version", "verbose=", "user=",
-                                        "sleep=", "time=", "collection=",
+                                        "sleeptime=", "runtime=", "collection=",
                                         "force", "part=", "language="])
         except getopt.GetoptError, err:
             usage(1, err)
