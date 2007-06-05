@@ -46,3 +46,11 @@ CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = '035__a' # useful for matching when
                                             # stored in this tag (kind
                                             # of like external system
                                             # number too)
+
+CFG_BIBUPLOAD_STRONG_TAGS = ['964'] # The list of tags that are strong
+                                    # enough to resist the replace
+                                    # mode.  Useful for tags that
+                                    # might be created from an
+                                    # external non-metadata-like
+                                    # source, e.g. the information
+                                    # about the number of copies left.

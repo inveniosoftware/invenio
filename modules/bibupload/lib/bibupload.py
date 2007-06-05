@@ -461,7 +461,8 @@ def bibupload(record):
     error = None
     # If there are special tags to proceed check if it exists in the record
     if options['tag'] is not None and not(record.has_key(options['tag'])):
-        write_message("    Failed: Tag not found, enter a valid tag to update.", verbose=1, stream=sys.stderr)
+        write_message("    Failed: Tag not found, enter a valid tag to update.",
+                      verbose=1, stream=sys.stderr)
         return (1, -1)
 
     # Extraction of the Record Id from 001, SYSNO or OAIID tags:
@@ -489,7 +490,8 @@ def bibupload(record):
     if options['mode'] == 'reference':
         error = extract_tag_from_record(record, CFG_BIBUPLOAD_REFERENCE_TAG)
         if error is None:
-            write_message("   Failed: No reference tags has been found...", verbose=1, stream=sys.stderr)
+            write_message("   Failed: No reference tags has been found...",
+                          verbose=1, stream=sys.stderr)
             return (1, -1)
         else:
             error = None
@@ -512,24 +514,33 @@ def bibupload(record):
         else:
             error = None
 
-    elif options['mode'] != 'insert' and options['mode'] != 'format' and options['stage_to_start_from'] != 5:
+    elif options['mode'] != 'insert' and options['mode'] != 'format' and \
+             options['stage_to_start_from'] != 5:
         insert_mode_p = False
         # Update Mode
         # Retrieve the old record to update
         rec_old = create_record(format_record(int(rec_id), 'xm'), 2)[0]
         if rec_old is None:
-            write_message("   Failed during the creation of the old record!", verbose=1, stream=sys.stderr)
+            write_message("   Failed during the creation of the old record!",
+                          verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
         else:
             write_message("   -Retrieve the old record to update: DONE", verbose=2)
 
+        # In Replace mode, take over old strong tags if applicable:
+        if options['mode'] == 'replace' or \
+               options['mode'] == 'replace_or_insert':
+            copy_strong_tags_from_old_record(record, rec_old)
+
         # Delete tags to correct in the record
         if options['mode'] == 'correct' or options['mode'] == 'reference':
             delete_tags_to_correct(record, rec_old)
-            write_message("   -Delete the old tags to correct in the old record: DONE", verbose=2)
+            write_message("   -Delete the old tags to correct in the old record: DONE",
+                          verbose=2)
 
         # Append new tag to the old record and update the new record with the old_record modified
-        if options['mode'] == 'append' or options['mode'] == 'correct' or options['mode'] == 'reference':
+        if options['mode'] == 'append' or options['mode'] == 'correct' or \
+               options['mode'] == 'reference':
             record = append_new_tag_to_old_record(record, rec_old)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
 
@@ -542,10 +553,12 @@ def bibupload(record):
 
     # Have a look if we have FMT tags
     write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 1 and  extract_tag_from_record(record, 'FMT') is not None:
+    if options['stage_to_start_from'] <= 1 and \
+           extract_tag_from_record(record, 'FMT') is not None:
         record = insert_fmt_tags(record, rec_id)
         if record is None:
-            write_message("   Stage 1 failed: Error while inserting FMT tags", verbose=1, stream=sys.stderr)
+            write_message("   Stage 1 failed: Error while inserting FMT tags",
+                          verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
         elif record == 0:
             # Mode format finished
@@ -557,7 +570,8 @@ def bibupload(record):
 
     # Have a look if we have FFT tags
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
-    if options['stage_to_start_from'] <= 2 and  extract_tag_from_record(record, 'FFT') is not None:
+    if options['stage_to_start_from'] <= 2 and \
+           extract_tag_from_record(record, 'FFT') is not None:
 
         if insert_mode_p or options['mode'] == 'append':
             record = insert_fft_tags(record, rec_id)
@@ -576,12 +590,14 @@ def bibupload(record):
         if options['mode'] != 'format':
             error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
         if error == 1:
-            write_message("   Failed: error during update_bibfmt_format", verbose=1, stream=sys.stderr)
+            write_message("   Failed: error during update_bibfmt_format",
+                          verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
         write_message("   -Stage COMPLETED", verbose=2)
 
     # Update the database MetaData
-    write_message("Stage 4: Start (Update the database with the metadata).", verbose=2)
+    write_message("Stage 4: Start (Update the database with the metadata).",
+                  verbose=2)
     if options['stage_to_start_from'] <= 4:
         if options['mode'] == 'insert' or \
            options['mode'] == 'replace' or \
@@ -591,13 +607,15 @@ def bibupload(record):
            options['mode'] == 'reference':
             update_database_with_metadata(record, rec_id)
         else:
-            write_message("   -Stage NOT NEEDED in mode %s" % options['mode'], verbose=2)
+            write_message("   -Stage NOT NEEDED in mode %s" % options['mode'],
+                          verbose=2)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
 
     # Finally we update the bibrec table with the current date
-    write_message("Stage 5: Start (Update bibrec table with current date).", verbose=2)
+    write_message("Stage 5: Start (Update bibrec table with current date).",
+                  verbose=2)
     if options['stage_to_start_from'] <= 5 and \
        options['notimechange'] == 0 and \
        not insert_mode_p:
@@ -1595,7 +1613,20 @@ def append_new_tag_to_old_record(record, rec_old):
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     return rec_old
 
-
+def copy_strong_tags_from_old_record(record, rec_old):
+    """
+    Look for strong tags in RECORD and REC_OLD.  If no strong tags are
+    found in RECORD, then copy them over from REC_OLD.  This function
+    modifies RECORD structure on the spot.
+    """
+    for strong_tag in CFG_BIBUPLOAD_STRONG_TAGS:
+        if not record_get_field_instances(record, strong_tag):
+            strong_tag_old_field_instances = record_get_field_instances(rec_old, strong_tag)
+            if strong_tag_old_field_instances:
+                for strong_tag_old_field_instance in strong_tag_old_field_instances:
+                    sf_vals, fi_ind1, fi_ind2, controlfield, fieldnumber = strong_tag_old_field_instance
+                    record_add_field(record, strong_tag, fi_ind1, fi_ind2, controlfield, sf_vals)
+    return
 
 ### Delete functions
 
@@ -1663,12 +1694,15 @@ def wipe_out_record_from_all_tables(recid):
 
 def delete_bibdoc(id_bibrec):
     """Delete document from bibdoc which correspond to the bibrec id given in parameter"""
-    query = """UPDATE bibdoc SET status='deleted' WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s)"""
+    query = """UPDATE bibdoc SET status='deleted'
+                WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc
+                              WHERE id_bibrec=%s)"""
     params = (id_bibrec,)
     try:
         run_sql(query, params)
     except Error, error:
-        write_message("   Error during the delete_bibdoc function : %s " % error, verbose=1, stream=sys.stderr)
+        write_message("   Error during the delete_bibdoc function : %s " % error,
+                      verbose=1, stream=sys.stderr)
 
 def delete_bibrec_bibdoc(id_bibrec):
     """Delete the bibrec record from the table bibrec_bibdoc given in parameter"""
@@ -1678,7 +1712,8 @@ def delete_bibrec_bibdoc(id_bibrec):
     try:
         run_sql(query, params)
     except Error, error:
-        write_message("   Error during the delete_bibrec_bibdoc function : %s " % error, verbose=1, stream=sys.stderr)
+        write_message("   Error during the delete_bibrec_bibdoc function : %s " % error,
+                      verbose=1, stream=sys.stderr)
 
 def main():
     """main entry point for bibupload"""
