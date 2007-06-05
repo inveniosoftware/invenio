@@ -39,50 +39,52 @@ import time
 import traceback
 import os
 
+# Which tasks don't need to ask the user for authorization?
+cfg_valid_processes_no_auth_needed = ["bibupload"]
+
+
 _task_self = None
 
 class BibTask:
-    def __init__(self, header, task_name, action, description, output=sys.stdout):
+    """Abstract class for implementing a Bibliographic task."""
+    def __init__(self, authorization_action, authorization_msg="",
+            description="", help_specific_usage="",
+            specific_params=("", [])):
         """ Construct a BibTask.
-        @param header is the header to print in logs.
-        @param task_name is the name of the task
-        @param action is the action name connected with this task and checked
+        @param authorization_msg is the authorization_msg to print in logs.
+        @param authorization_action is the authorization_action name connected
+        with this task and checked
         by acc_authorize_action
-        @param description will be printed in the help page.
-        @param output is the stream to which to output log strings.
-        #"""
+        @param description will be printed in the help page as the description
+        of the task
+        @param help_specific_usage will be printed in the help page as the list
+        of additional parameters accepted by this task:
+        eg. "  -n,--number\t\tnumber to print\n"
+        @param specific_params must be a touple with first field the string
+        for representing short form parameters in getopt and as a second field
+        the list representing the long form parameters in getopt
+        eg. ("n:", ["number="])
+        """
         self.options = {} # global variable to hold task options
-        self.output = output
-        self.header = header
-        self.task_name = task_name
-        self.action = action
+        self.authorization_msg = authorization_msg
+        self.task_name = os.path.basename(sys.argv[0])
+        self.authorization_action = authorization_action
+        self.help_specific_usage = help_specific_usage
+        self.specific_params = specific_params
         self.description = description
         self._check_command_line()
 
-    def flush_cache(self):
+    def task_stop_cache_flush_fnc(self):
         """ Reimplement to flush cashes to STOP."""
         pass
 
-    def close_tables(self):
+    def task_stop_table_close_fnc(self):
         """ Reimplement to close tables to STOP. """
         pass
 
-    def get_specific_usage(self):
-        """ Reimplement to return the string for this task specific CLI params
-        e.g. "  -n, --number      \t\t Fibonacci number to reach.\n"
-        """
-        return ""
-
-    def get_specific_parameters(self):
-        """ Reimplement to return a touple containing the short string form of
-        additional CLI parameters and the long list form, with the syntax understood
-        by getopt: e.g. ('n:', ['number='])
-        """
-        return ("", [])
-
-    def elaborate_specific_parameter(self, key, value):
-        """ Given the string key it checks it's meaning, eventually using the value.
-        Usually it fills some key in the options dict.
+    def task_submit_elaborate_specific_parameter(self, key, value):
+        """ Given the string key it checks it's meaning, eventually using the
+        value. Usually it fills some key in the options dict.
         It must return True if it has elaborated the key, False, if it doesn't
         know that key.
         eg:
@@ -93,27 +95,30 @@ class BibTask:
         """
         return False
 
-    def task_core(self):
+    def task_run_core(self):
         """ Reimplement to add the body of the task."""
         pass
 
     def _authenticate(self, user):
         """Authenticate the user against the user database.
         Check for its password, if it exists.
-        Check for action access rights.
+        Check for authorization_action access rights.
         Return user name upon authorization success,
         do system exit upon authorization failure.
         """
-        print self.header
-        print "=" * len(self.header)
+        if self.authorization_msg:
+            print self.authorization_msg
+            print "=" * len(self.authorization_msg)
         if user == "":
             print >> sys.stdout, "\rUsername: ",
             user = sys.stdin.readline().lower().strip()
         else:
             print >> sys.stdout, "\rUsername:", user
         ## first check user pw:
-        res = run_sql("select id,password from user where email=%s", (user,), 1) + \
-            run_sql("select id,password from user where nickname=%s", (user,), 1)
+        res = run_sql("select id,password from user where email=%s",
+            (user,), 1) + \
+            run_sql("select id,password from user where nickname=%s",
+            (user,), 1)
         if not res:
             print "Sorry, %s does not exist." % user
             sys.exit(1)
@@ -126,15 +131,16 @@ class BibTask:
                 else:
                     print "Sorry, wrong credentials for %s." % user
                     sys.exit(1)
-            ## secondly check authorization for the action:
-            (auth_code, auth_message) = acc_authorize_action(uid_db, self.action)
+            ## secondly check authorization for the authorization_action:
+            (auth_code, auth_message) = acc_authorize_action(uid_db, self.authorization_action)
             if auth_code != 0:
                 print auth_message
                 sys.exit(1)
         return user
 
     def _task_submit(self):
-        """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
+        """Submits task to the BibSched task queue.  This is what people will
+            be invoking via command line."""
         ## sanity check: remove eventual "task" option:
         if self.options.has_key("task"):
             del self.options["task"]
@@ -144,12 +150,16 @@ class BibTask:
         if self.options["verbose"] >= 9:
             print ""
             write_message("storing task options %s\n" % self.options)
-        self.task_id = run_sql("""INSERT INTO schTASK (id,proc,user,runtime,sleeptime,status,arguments)
-                            VALUES (NULL,%s,%s,%s,%s,'WAITING',%s)""",
-                        (self.task_name, self.user, self.options["runtime"], self.options["sleeptime"], marshal.dumps(self.options)))
+        self.task_id = run_sql("""INSERT INTO schTASK
+            (id,proc,user,runtime,sleeptime,status,arguments)
+            VALUES (NULL,%s,%s,%s,%s,'WAITING',%s)""",
+            (self.task_name, self.user, self.options["runtime"],
+            self.options["sleeptime"],
+            marshal.dumps(self.options)))
         ## update task number:
         self.options["task"] = self.task_id
-        run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(self.options), self.task_id))
+        run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
+            (marshal.dumps(self.options), self.task_id))
         write_message("Task #%d submitted." % self.task_id)
         return self.task_id
 
@@ -157,17 +167,20 @@ class BibTask:
         """Updates progress information in the BibSched task table."""
         if self.options["verbose"] >= 9:
             write_message("Updating task progress to %s." % msg)
-        return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, self.options["task"]))
+        return run_sql("UPDATE schTASK SET progress=%s where id=%s",
+            (msg, self.options["task"]))
 
     def task_update_status(self, val):
         """Updates status information in the BibSched task table."""
         if self.options["verbose"] >= 9:
             write_message("Updating task status to %s." % val)
-        return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, self.options["task"]))
+        return run_sql("UPDATE schTASK SET status=%s where id=%s",
+            (val, self.options["task"]))
 
     def task_read_status(self):
         """Read status information in the BibSched task table."""
-        res = run_sql("SELECT status FROM schTASK where id=%s", (self.task_id,), 1)
+        res = run_sql("SELECT status FROM schTASK where id=%s",
+            (self.task_id,), 1)
         try:
             out = res[0][0]
         except:
@@ -175,9 +188,11 @@ class BibTask:
         return out
 
     def task_get_options(self):
-        """Returns options for the task 'id' read from the BibSched task queue table."""
+        """Returns options for the task 'id' read from the BibSched task
+        queue table."""
         out = {}
-        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc=%s", (self.task_id, self.task_name))
+        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc=%s",
+            (self.task_id, self.task_name))
         try:
             out = marshal.loads(res[0][0])
         except:
@@ -187,26 +202,30 @@ class BibTask:
         return out
 
     def _task_run(self):
-        """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call.
-        The task prints Fibonacci numbers for up to NUM on the stdout, and some messages on stderr.
+        """Runs the task by fetching arguments from the BibSched task queue.
+        This is what BibSched will be invoking via daemon call.
+        The task prints Fibonacci numbers for up to NUM on the stdout, and some
+        messages on stderr.
         Return 1 in case of success and 0 in case of failure."""
         global _task_self
         assert(_task_self is None)
         ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
-        pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run', '%s_%d.pid' % (self.task_name, self.task_id))
+        pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
+            'bibsched_task_%d.pid' % self.task_id)
         pidfile = open(pidfile_name, 'w')
         pidfile.write(str(os.getpid()))
         pidfile.close()
         self.options = self.task_get_options() # get options from BibSched task table
         ## check task id:
         if not self.options.has_key("task"):
-            write_message("Error: The task #%d does not seem to be a %s task." \
+            write_message("Error: The task #%d does not seem to be a %s task."
                 % (self.task_id, self.task_name), sys.stderr)
             return 0
         ## check task status:
         task_status = self.task_read_status()
         if task_status != "WAITING":
-            write_message("Error: The task #%d is %s.  I expected WAITING." % (self.task_id, task_status), sys.stderr)
+            write_message("Error: The task #%d is %s.  I expected WAITING." %
+                (self.task_id, task_status), sys.stderr)
             return 0
         ## we can run the task now:
         if self.options["verbose"]:
@@ -220,7 +239,7 @@ class BibTask:
         signal.signal(signal.SIGCONT, _task_sig_wakeup)
         signal.signal(signal.SIGINT, _task_sig_unknown)
         ## run the task:
-        self.task_core()
+        self.task_run_core()
         ## we are done:
         self.task_update_status("DONE")
         if self.options["verbose"]:
@@ -234,24 +253,28 @@ class BibTask:
         if msg:
             sys.stderr.write("Error: %s.\n" % msg)
         sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-        specific_usage = self.get_specific_usage()
-        if specific_usage:
+        if self.help_specific_usage:
             sys.stderr.write("Command options:\n")
-            sys.stderr.write(specific_usage)
+            sys.stderr.write(self.help_specific_usage)
         sys.stderr.write("Scheduling options:\n")
-        sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
-        sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
-        sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d\n")
+        sys.stderr.write("  -u, --user=USER \t User name to submit the"
+            " task as, password needed.\n")
+        sys.stderr.write("  -t, --runtime=TIME \t Time to execute the"
+            " task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
+        sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after"
+            " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
         sys.stderr.write("General options:\n")
         sys.stderr.write("  -h, --help      \t\t Print this help.\n")
         sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-        sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
+        sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min,"
+            " 1=default, 9=max).\n")
         if self.description:
             sys.stderr.write(self.description)
         sys.exit(exitcode)
 
     def _check_command_line(self):
-        """Main function that analyzes command line input and calls whatever is appropriate.
+        """Main function that analyzes command line input and calls whatever
+        is appropriate.
         Useful for learning on how to write BibSched tasks."""
         ## parse command line:
         # set default values:
@@ -276,8 +299,17 @@ class BibTask:
             ## B - submit the task
             # set user-defined options:
             try:
-                (short_params, long_params) = self.get_specific_parameters()
-                opts, args = getopt.getopt(sys.argv[1:], "hVv:n:u:s:t:"+short_params, ["help", "version", "verbose=", "number=", "user=", "sleep=", "time="]+long_params)
+                (short_params, long_params) = self.specific_params
+                opts, args = getopt.getopt(sys.argv[1:], "hVv:n:u:s:t:" +
+                    short_params, [
+                        "help",
+                        "version",
+                        "verbose=",
+                        "number=",
+                        "user=",
+                        "sleep=",
+                        "time="
+                    ] + long_params)
             except getopt.GetoptError, err:
                 self.usage(1, err)
             try:
@@ -296,7 +328,8 @@ class BibTask:
                         self.options["sleeptime"] = opt[1]
                     elif opt[0] in [ "-t", "--runtime" ]:
                         self.options["runtime"] = get_datetime(opt[1])
-                    elif self.elaborate_specific_parameter(opt[0], opt.get(1, None)):
+                    elif self.task_submit_elaborate_specific_parameter(opt[0],
+                            opt[1]):
                         pass
                     else:
                         self.usage(1)
@@ -306,14 +339,17 @@ class BibTask:
         return
 
 def write_messages(msgs, stream=sys.stdout):
+    """Write many messages through write_message"""
     for msg in msgs.split('\n'):
         write_message(msg, stream)
 
 def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).
+    Useful for debugging stuff."""
     if msg:
         if stream == sys.stdout or stream == sys.stderr:
-            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
+            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
+                time.localtime()))
             try:
                 stream.write("%s\n" % msg)
             except UnicodeEncodeError:
@@ -326,7 +362,8 @@ def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     task_self = frame.f_globals._task_self
     if task_self.options["verbose"] >= 9:
-        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
+        write_message("task_sig_sleep(), got signal %s frame %s"
+            % (sig, frame))
     write_message("sleeping...")
     task_self.task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -335,7 +372,8 @@ def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     task_self = frame.f_globals._task_self
     if task_self.options["verbose"] >= 9:
-        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
+        write_message("task_sig_wakeup(), got signal %s frame %s"
+            % (sig, frame))
     write_message("continuing...")
     task_self.task_update_status("CONTINUING")
 
@@ -343,7 +381,8 @@ def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     task_self = frame.f_globals._task_self
     if task_self.options["verbose"] >= 9:
-        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
+        write_message("task_sig_stop(), got signal %s frame %s"
+            % (sig, frame))
     write_message("stopping...")
     task_self.task_update_status("STOPPING")
     if callable(task_self.flush_cache):
@@ -362,7 +401,8 @@ def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     task_self = frame.f_globals._task_self
     if task_self.options["verbose"] >= 9:
-        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
+        write_message("task_sig_suicide(), got signal %s frame %s"
+            % (sig, frame))
     write_message("suiciding myself now...")
     task_self.task_update_status("SUICIDING")
     write_message("suicided")
@@ -372,7 +412,6 @@ def _task_sig_suicide(sig, frame):
 def _task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
     # do nothing for unknown signals:
-    task_self = frame.f_globals._task_self
     write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
