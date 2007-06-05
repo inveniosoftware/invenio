@@ -56,12 +56,12 @@ from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
+from invenio.bibtask import BibTask, write_message, write_messages
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
-options = {} # will hold task options
 
 # cfg_cache_last_updated_timestamp_tolerance -- cache timestamp
 # tolerance (in seconds), to account for the fact that an admin might
@@ -242,7 +242,7 @@ class Collection:
             descendants += col_desc.get_descendants()
         return descendants
 
-    def write_cache_file(self, filename='', filebody=''):
+    def write_cache_file(self, options, filename='', filebody=''):
         "Write a file inside collection cache."
         # open file:
         dirname = "%s/collections/%d" % (cachedir, self.id)
@@ -260,7 +260,7 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        if options["verbose"] >= 6:
+        if options['verbose'] >= 6:
             write_message("... creating %s" % fullfilename)
         sys.stdout.flush()
         # print page body:
@@ -268,7 +268,7 @@ class Collection:
         # close file:
         f.close()
 
-    def update_webpage_cache(self):
+    def update_webpage_cache(self, options):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
 
@@ -288,7 +288,7 @@ class Collection:
 
                 ## first, update navtrail:
                 for as in range(0, 2):
-                    self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
+                    self.write_cache_file(options, "navtrail-as=%s-ln=%s" % (as, lang),
                                           self.create_navtrail_links(as, lang))
                 ## second, update page body:
                 for as in range(0, 2): # do both simple search and advanced search pages:
@@ -303,14 +303,14 @@ class Collection:
                              instantbrowse = self.create_instant_browse(as=as, ln=lang),
                              ne_portalbox = self.create_portalbox(lang, 'ne')
                            )
-                    self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
+                    self.write_cache_file(options, "body-as=%s-ln=%s" % (as, lang), body)
                 ## third, write portalboxes:
-                self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
-                self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
-                self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
-                self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
+                self.write_cache_file(options, "portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
+                self.write_cache_file(options, "portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
+                self.write_cache_file(options, "portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
+                self.write_cache_file(options, "portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
                 ## fourth, write 'last updated' information:
-                self.write_cache_file("last-updated-ln=%s" % lang,
+                self.write_cache_file(options, "last-updated-ln=%s" % lang,
                                       convert_datestruct_to_dategui(time.localtime(),
                                                                     ln=lang))
         return
@@ -641,7 +641,7 @@ class Collection:
           formatoptions = self.create_formatoptions(ln)
         )
 
-    def calculate_reclist(self):
+    def calculate_reclist(self, options):
         """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""
         if self.calculate_reclist_run_already:
             # do we have to recalculate?
@@ -655,7 +655,7 @@ class Collection:
             # A - collection does not have dbquery, so query recursively all its sons
             #     that are either non-restricted or that have the same restriction rules
             for coll in self.get_sons():
-                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
+                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist(options)
                 if ((coll.restricted_p() is None) or
                     (coll.restricted_p() == self.restricted_p())):
                     # add this reclist ``for real'' only if it is public
@@ -682,7 +682,7 @@ class Collection:
         # return the two sets:
         return (self.reclist, self.reclist_with_nonpublic_subcolls)
 
-    def update_reclist(self):
+    def update_reclist(self, options):
         "Update the record universe for given collection; nbrecs, reclist of the collection table."
         if self.update_reclist_run_already:
             # do we have to reupdate?
@@ -783,313 +783,122 @@ def set_cache_last_updated_timestamp(timestamp):
     f.close()
     return timestamp
 
-def task_sig_sleep(sig, frame):
-    """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
-    write_message("sleeping...")
-    task_update_status("SLEEPING")
-    signal.pause() # wait for wake-up signal
-
-def task_sig_wakeup(sig, frame):
-    """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
-    write_message("continuing...")
-    task_update_status("CONTINUING")
-
-def task_sig_stop(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
-    write_message("stopping...")
-    task_update_status("STOPPING")
-    pass # FIXME: is there anything to be done?
-    task_update_status("STOPPED")
-    sys.exit(0)
-
-def task_sig_suicide(sig, frame):
-    """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
-    write_message("suiciding myself now...")
-    task_update_status("SUICIDING")
-    write_message("suicided")
-    task_update_status("SUICIDED")
-    sys.exit(0)
-
-def task_sig_unknown(sig, frame):
-    """Signal handler for the other unknown signals sent by shell or user."""
-    # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
-
-def authenticate(user, header="WebColl Task Submission", action="runwebcoll"):
-    """Authenticate the user against the user database.
-       Check for its password, if it exists.
-       Check for action access rights.
-       Return user name upon authorization success,
-       do system exit upon authorization failure.
-       """
-    print header
-    print "=" * len(header)
-    if user == "":
-        print >> sys.stdout, "\rUsername: ",
-        user = string.strip(string.lower(sys.stdin.readline()))
-    else:
-        print >> sys.stdout, "\rUsername:", user
-    ## first check user pw:
-    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
-          run_sql("select id,password from user where nickname=%s", (user,), 1)
-    if not res:
-        print "Sorry, %s does not exist." % user
-        sys.exit(1)
-    else:
-        (uid_db, password_db) = res[0]
-        if password_db:
-            password_entered = getpass.getpass()
-            if password_db == password_entered:
-                pass
-            else:
-                print "Sorry, wrong credentials for %s." % user
-                sys.exit(1)
-        ## secondly check authorization for the action:
-        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
-        if auth_code != 0:
-            print auth_message
-            sys.exit(1)
-    return user
-
-def task_submit():
-    """Submits task to the BibSched task queue.  This is what people will be invoking via command line."""
-    global options
-    ## sanity check: remove eventual "task" option:
-    if options.has_key("task"):
-        del options["task"]
-    ## authenticate user:
-    user = authenticate(options.get("user", ""))
-    ## submit task:
-    if options["verbose"] >= 9:
-        print ""
-        write_message("storing task options %s\n" % options)
-    task_id = run_sql("""INSERT INTO schTASK (id,proc,user,runtime,sleeptime,status,arguments)
-                         VALUES (NULL,'webcoll',%s,%s,%s,'WAITING',%s)""",
-                      (user, options["runtime"], options["sleeptime"], marshal.dumps(options)))
-    ## update task number:
-    options["task"] = task_id
-    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), task_id))
-    write_message("Task #%d submitted." % task_id)
-    return task_id
-
-def task_update_progress(msg):
-    """Updates progress information in the BibSched task table."""
-    global options
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
-
-def task_update_status(val):
-    """Updates status information in the BibSched task table."""
-    global options
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
-
-def task_read_status(task_id):
-    """Read status information in the BibSched task table."""
-    res = run_sql("SELECT status FROM schTASK where id=%s", (task_id,), 1)
-    try:
-        out = res[0][0]
-    except:
-        out = 'UNKNOWN'
-    return out
-
-def task_get_options(id):
-    """Returns options for the task 'id' read from the BibSched task queue table."""
-    out = {}
-    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc='webcoll'", (id,))
-    try:
-        out = marshal.loads(res[0][0])
-    except:
-        write_message("Error: WebColl task %d does not seem to exist." % id)
-        sys.exit(1)
-    return out
-
-def task_run(task_id):
-    """Run the WebColl task by fetching arguments from the BibSched task queue.
-       This is what BibSched will be invoking via daemon call.
-       The task will update collection reclist cache and collection web pages for
-       given collection. (default is all).
-       Arguments described in usage() function.
-       Return 1 in case of success and 0 in case of failure."""
-    global options
-    task_run_start_timestamp = get_current_time_timestamp()
-    options = task_get_options(task_id) # get options from BibSched task table
-    ## check task id:
-    if not options.has_key("task"):
-        write_message("Error: The task #%d does not seem to be a WebColl task." % task_id)
-        return 0
-    ## check task status:
-    task_status = task_read_status(task_id)
-    if task_status != "WAITING":
-        write_message("Error: The task #%d is %s.  I expected WAITING." % (task_id, task_status))
-        return 0
-    ## we can run the task now:
-    if options["verbose"]:
-        write_message("Task #%d started." % task_id)
-    task_update_status("RUNNING")
-    ## initialize signal handler:
-    signal.signal(signal.SIGUSR1, task_sig_sleep)
-    signal.signal(signal.SIGTERM, task_sig_stop)
-    signal.signal(signal.SIGABRT, task_sig_suicide)
-    signal.signal(signal.SIGCONT, task_sig_wakeup)
-    signal.signal(signal.SIGINT, task_sig_unknown)
-    colls = []
-    # decide whether we need to run or not, by comparing last updated timestamps:
-    if options["verbose"] >= 3:
-        write_message("Database timestamp is %s." % get_database_last_updated_timestamp())
-        write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp())
-        if options.has_key("part"):
-            write_message("Running cache update part %s only." % options["part"])
-    if options.has_key("force") or \
-       compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
-                                         get_cache_last_updated_timestamp(),
-                                         cfg_cache_last_updated_timestamp_tolerance) >= 0:
-        ## either forced update was requested or cache is not up to date, so recreate it:
-        # firstly, decide which collections to do:
-        if options.has_key("collection"):
-            coll = get_collection(options["collection"])
-            if coll.id is None:
-                usage(1, 'Collection %s does not exist' % coll.name)
-            colls.append(coll)
-        else:
-            res = run_sql("SELECT name FROM collection ORDER BY id")
-            for row in res:
-                colls.append(get_collection(row[0]))
-        # secondly, update collection reclist cache:
-        if options.get("part", 1) == 1:
-            i = 0
-            for coll in colls:
-                i += 1
-                if options["verbose"]:
-                    write_message("%s / reclist cache update" % coll.name)
-                coll.calculate_reclist()
-                coll.update_reclist()
-                task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
-        # thirdly, update collection webpage cache:
-        if options.get("part", 2) == 2:
-            i = 0
-            for coll in colls:
-                i += 1
-                if options["verbose"]:
-                    write_message("%s / webpage cache update" % coll.name)
-                coll.update_webpage_cache()
-                task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
-
-        # finally update the cache last updated timestamp:
-        # (but only when all collections were updated, not when only
-        # some of them were forced-updated as per admin's demand)
-        if not options.has_key("collection"):
-            set_cache_last_updated_timestamp(task_run_start_timestamp)
-            if options["verbose"] >= 3:
-                write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp())
-    else:
-        ## cache up to date, we don't have to run
-        if options["verbose"]:
-            write_message("Collection cache is up to date, no need to run.")
-        pass
-    ## we are done:
-    task_update_progress("Done.")
-    task_update_status("DONE")
-    if options["verbose"]:
-        write_message("Task #%d finished." % task_id)
-    return 1
-
-def usage(exitcode=1, msg=""):
-    """Prints usage info."""
-    if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-    sys.stderr.write("Command options:\n")
-    sys.stderr.write("  -c, --collection\t Update cache for the given collection only. [all]\n")
-    sys.stderr.write("  -f, --force\t Force update even if cache is up to date. [no]\n")
-    sys.stderr.write("  -p, --part\t Update only certain cache parts (1=reclist, 2=webpage). [both]\n")
-    sys.stderr.write("  -l, --language\t Update pages in only certain language (e.g. fr). [all]\n")
-    sys.stderr.write("Scheduling options:\n")
-    sys.stderr.write("  -u, --user=USER \t User name to submit the task as, password needed.\n")
-    sys.stderr.write("  -t, --runtime=TIME \t Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
-    sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d\n")
-    sys.stderr.write("General options:\n")
-    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("  -v, --verbose=LEVEL   \t Verbose level (from 0 to 9, default 1).\n")
-    sys.stderr.write("""Description: %s updates the collection cache
+class WebCollBibTask(BibTask):
+    def __init__(self):
+        """ Construct a BibTask.
+        @param header is the header to print in logs.
+        @param action is the action name connected with this task and checked
+        by acc_authorize_action
+        @param output is the stream to which to output log strings.
+        #"""
+        BibTask.__init__(self, authorization_msg="WebColl Task Submission",
+                authorization_action="runwebcoll",
+                specific_params=("c:fp:l:", [
+                    "collection=",
+                    "force",
+                    "part=",
+                    "language="
+                ]),
+                help_specific_usage="  -c, --collection\t Update cache for the given"
+                     "collection only. [all]\n"
+                    "  -f, --force\t Force update even if cache is up to date. [no]\n"
+                    "  -p, --part\t Update only certain cache parts (1=reclist,"
+                    " 2=webpage). [both]\n"
+                    "  -l, --language\t Update pages in only certain language"
+                    " (e.g. fr). [all]\n",
+                description="""Description: %s updates the collection cache
     (record universe for a given collection plus web page elements)
     based on WML and DB configuration parameters.
     If the collection name is passed as the second argument, it'll update
     this collection only.  If the collection name is immediately followed
     by a plus sign, it will also update all its desdendants.  The
     top-level collection name may be entered as the void string.\n""" % sys.argv[0])
-    sys.exit(exitcode)
+
+    def task_submit_elaborate_specific_parameter(self, key, value):
+        """ Given the string key it checks it's meaning, eventually using the value.
+        Usually it fills some key in the options dict.
+        It must return True if it has elaborated the key, False, if it doesn't
+        know that key.
+        eg:
+        if key in ['-n', '--number']:
+            self.options['number'] = value
+            return True
+        return False
+        """
+        if key in [ "-c", "--collection"]:
+            self.options["collection"] = value
+        elif key in [ "-f", "--force"]:
+            self.options["force"] = 1
+        elif key in [ "-p", "--part"]:
+            self.options["part"] = int(value)
+        elif key in [ "-l", "--language"]:
+            options["language"] = value
+        else:
+            return False
+        return True
+
+    def task_run_core(self):
+        """ Reimplement to add the body of the task."""
+        task_run_start_timestamp = get_current_time_timestamp()
+        colls = []
+        # decide whether we need to run or not, by comparing last updated timestamps:
+        if self.options["verbose"] >= 3:
+            write_message("Database timestamp is %s." % get_database_last_updated_timestamp())
+            write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp())
+            if self.options.has_key("part"):
+                write_message("Running cache update part %s only." % self.options["part"])
+        if self.options.has_key("force") or \
+        compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
+                                            get_cache_last_updated_timestamp(),
+                                            cfg_cache_last_updated_timestamp_tolerance) >= 0:
+            ## either forced update was requested or cache is not up to date, so recreate it:
+            # firstly, decide which collections to do:
+            if self.options.has_key("collection"):
+                coll = get_collection(self.options["collection"])
+                if coll.id is None:
+                    self.usage(1, 'Collection %s does not exist' % coll.name)
+                colls.append(coll)
+            else:
+                res = run_sql("SELECT name FROM collection ORDER BY id")
+                for row in res:
+                    colls.append(get_collection(row[0]))
+            # secondly, update collection reclist cache:
+            if self.options.get("part", 1) == 1:
+                i = 0
+                for coll in colls:
+                    i += 1
+                    if self.options["verbose"]:
+                        write_message("%s / reclist cache update" % coll.name)
+                    coll.calculate_reclist(self.options)
+                    coll.update_reclist(self.options)
+                    self.task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+            # thirdly, update collection webpage cache:
+            if self.options.get("part", 2) == 2:
+                i = 0
+                for coll in colls:
+                    i += 1
+                    if self.options["verbose"]:
+                        write_message("%s / webpage cache update" % coll.name)
+                    coll.update_webpage_cache(self.options)
+                    self.task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
+
+            # finally update the cache last updated timestamp:
+            # (but only when all collections were updated, not when only
+            # some of them were forced-updated as per admin's demand)
+            if not self.options.has_key("collection"):
+                set_cache_last_updated_timestamp(task_run_start_timestamp)
+                if self.options["verbose"] >= 3:
+                    write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp())
+        else:
+            ## cache up to date, we don't have to run
+            if self.options["verbose"]:
+                write_message("Collection cache is up to date, no need to run.")
+            pass
+        ## we are done:
 
 def main():
-    """Main function that analyzes command line input and calls whatever is appropriate.
-       Useful for learning on how to write BibSched tasks."""
-    global options
-
-    ## parse command line:
-    if len(sys.argv) == 2 and sys.argv[1].isdigit():
-        ## A - run the task
-        task_id = int(sys.argv[1])
-        try:
-            if not task_run(task_id):
-                write_message("Error occurred.  Exiting.", sys.stderr)
-        except StandardError, e:
-            write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            write_message("Traceback is:", sys.stderr)
-            traceback.print_tb(sys.exc_info()[2])
-            write_message("Exiting.", sys.stderr)
-            task_update_status("ERROR")
-    else:
-        ## B - submit the task
-        # set default values:
-        options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
-        options["verbose"] = 1
-        options["sleeptime"] = ""
-        # set user-defined options:
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:c:fp:l:",
-                                       ["help", "version", "verbose=", "user=",
-                                        "sleeptime=", "runtime=", "collection=",
-                                        "force", "part=", "language="])
-        except getopt.GetoptError, err:
-            usage(1, err)
-        try:
-            for opt in opts:
-                if opt[0] in ["-h", "--help"]:
-                    usage(0)
-                elif opt[0] in ["-V", "--version"]:
-                    print __revision__
-                    sys.exit(0)
-                elif opt[0] in [ "-u", "--user"]:
-                    options["user"] = opt[1]
-                elif opt[0] in ["-v", "--verbose"]:
-                    options["verbose"] = int(opt[1])
-                elif opt[0] in [ "-s", "--sleeptime" ]:
-                    get_datetime(opt[1]) # see if it is a valid shift
-                    options["sleeptime"] = opt[1]
-                elif opt[0] in [ "-t", "--runtime" ]:
-                    options["runtime"] = get_datetime(opt[1])
-                elif opt[0] in [ "-c", "--collection"]:
-                    options["collection"] = opt[1]
-                elif opt[0] in [ "-f", "--force"]:
-                    options["force"] = 1
-                elif opt[0] in [ "-p", "--part"]:
-                    options["part"] = int(opt[1])
-                elif opt[0] in [ "-l", "--language"]:
-                    options["language"] = opt[1]
-                else:
-                    usage(1)
-        except StandardError, e:
-            usage(e)
-        task_submit()
-    return
+    WebCollBibTask()
 
 ### okay, here we go:
 if __name__ == '__main__':
-    main()
+    WebCollBibTask()
