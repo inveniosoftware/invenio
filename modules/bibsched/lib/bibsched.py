@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,10 +26,10 @@ __revision__ = "$Id$"
 
 ### -- local configuration section starts here ---
 
-# which tasks are reconized as valid?
+# which tasks are recognized as valid?
 cfg_valid_processes = ["bibindex", "bibupload", "bibreformat",
                        "webcoll", "bibtaskex", "bibrank",
-                       "oaiharvest", "oaiarchive"]
+                       "oaiharvest", "oaiarchive", "sessiongc"]
 
 ### -- local configuration section ends here ---
 
@@ -85,18 +85,33 @@ def get_my_pid(process, args=''):
     else:
         answer = answer[:string.find(answer,' ')]
     return int(answer)
-        
+
+def get_task_pid(task_name, task_id):
+    """Return the pid of task_name/task_id"""
+    try:
+        pid = open(os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)).read()
+    except IOError:
+        return get_my_pid(task_name, str(task_id))
+
+    try:
+        os.kill(pid, signal.SIGCONT)
+    except OSError:
+        return get_my_pid(task_name, str(task_id))
+
+    return int(pid)
+
+
 def get_output_channelnames(task_id):
     "Construct and return filename for stdout and stderr for the task 'task_id'."
     filenamebase = "%s/bibsched_task_%d" % (logdir, task_id)
     return [filenamebase + ".log", filenamebase + ".err"]
-        
+
 class Manager:
     def __init__(self):
         self.helper_modules = cfg_valid_processes
         self.running = 1
         self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [Q Quit]"
+        self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [P Purge Done] [Q Quit]"
         self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
@@ -112,14 +127,15 @@ class Manager:
         self.auto_mode = 0
         self.currentrow = ["", "", "", "", "", "", ""]
         wrapper(self.start)
-        
+
     def handle_keys(self, chr):
         if chr == -1:
             return
         if self.auto_mode and (chr not in (curses.KEY_UP, curses.KEY_DOWN,
                                            curses.KEY_PPAGE, curses.KEY_NPAGE,
                                            ord("q"), ord("Q"), ord("a"),
-                                           ord("A"), ord("1"), ord("2"))):
+                                           ord("A"), ord("1"), ord("2"),
+                                           ord("p"), ord("P"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
         elif self.move_mode and (chr not in (curses.KEY_UP, curses.KEY_DOWN,
@@ -169,6 +185,8 @@ class Manager:
                 self.init()
             elif chr in (ord("m"), ord("M")):
                 self.change_select_mode()
+            elif chr in (ord("p"), ord("P")):
+                self.purge_done()
             elif chr == ord("1"):
                 self.display = 1
                 self.first_visible_line = 0
@@ -189,18 +207,30 @@ class Manager:
 
     def set_status(self, task_id, status):
         return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, task_id))
-        
+
     def set_progress(self, task_id, progress):
         return run_sql("UPDATE schTASK set progress=%s WHERE id=%s", (progress, task_id))
-        
+
     def openlog(self):
-        self.win = curses.newwin( self.height-2, self.width-2, 1, 1 )
-        self.panel = curses.panel.new_panel( self.win )
-        self.panel.top()
-        self.win.border()
-        self.win.addstr(1, 1, "Not implemented yet...")
-        self.win.refresh()
-        curses.panel.update_panels()
+        task_id = self.currentrow[0]
+        status = self.currentrow[5]
+        if status != 'WAITING':
+            tmpname = os.tmpnam()
+            tmpfile = open(tmpname, "w")
+            try:
+                tmpfile.write(open(os.path.join(logdir, 'bibsched_task_%d.log' % task_id)).read())
+            except IOError:
+                pass
+            try:
+                tmpfile.write(open(os.path.join(logdir, 'bibsched_task_%d.err' % task_id)).read())
+            except IOError:
+                pass
+            tmpfile.close()
+            pager = os.environ.get('PAGER', '/bin/more')
+            curses.endwin()
+            os.spawnlp(os.P_WAIT, pager, pager, tmpname)
+            os.remove(tmpname)
+            curses.panel.update_panels()
 
     def count_processes(self, status):
         out = 0
@@ -218,13 +248,48 @@ class Manager:
         if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             self.display_in_footer("a process is already running!")
         elif status == "SLEEPING":
-            mypid = get_my_pid(process, str(task_id))
+            mypid = get_task_pid(process, task_id)
             if mypid != 0:
                 os.kill(mypid, signal.SIGCONT)
             self.display_in_footer("process woken up")
         else:
             self.display_in_footer("process is not sleeping")
         self.stdscr.refresh()
+
+    def _display_YN_box(self, msg):
+        msg += ' (Y/N)'
+        rows = msg.split('\n')
+        height = len(rows) + 2
+        width = max([len(row) for row in rows]) + 4
+        self.win = curses.newwin(
+            height,
+            width,
+            (self.height - height) / 2 + 1,
+            (self.width - width) / 2 + 1
+            )
+        self.panel = curses.panel.new_panel( self.win )
+        self.panel.top()
+        self.win.border()
+        i = 1
+        for row in rows:
+            self.win.addstr(i, 2, row)
+            i += 1
+        self.win.refresh()
+        while 1:
+            c = self.win.getch()
+            if c in (ord('y'), ord('Y')):
+                return True
+            elif c in (ord('n'), ord('N')):
+                return False
+
+    def purge_done(self):
+        if self._display_YN_box("You are going to purge all the list of DONE tasks.\n"
+            "This will definitely alter your task history.\nAre you sure?"):
+            run_sql("DELETE FROM schTASK WHERE status='DONE'")
+            curses.panel.update_panels()
+            self.display_in_footer("DONE processes purged")
+        else:
+            curses.panel.update_panels()
 
     def run(self):
         task_id = self.currentrow[0]
@@ -263,7 +328,7 @@ class Manager:
         if status != 'RUNNING' and status != 'CONTINUING':
             self.display_in_footer("this process is not running!")
         else:
-            mypid = get_my_pid(process, str(task_id))
+            mypid = get_task_pid(process, task_id)
             if mypid != 0:
                 os.kill(mypid, signal.SIGUSR1)
                 self.display_in_footer("USR1 signal sent to process #%s" % mypid)
@@ -271,12 +336,12 @@ class Manager:
                 self.set_status(task_id, 'STOPPED')
                 self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
-        
+
     def kill(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         #status = self.currentrow[5]
-        mypid = get_my_pid(process, str(task_id))
+        mypid = get_task_pid(process, task_id)
         if mypid != 0:
             os.kill(mypid, signal.SIGKILL)
             self.set_status(task_id, 'STOPPED')
@@ -285,12 +350,12 @@ class Manager:
             self.set_status(task_id, 'STOPPED')
             self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
-    
+
     def stop(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         #status = self.currentrow[5]
-        mypid = get_my_pid(process, str(task_id))
+        mypid = get_task_pid(process, task_id)
         if mypid != 0:
             os.kill(mypid, signal.SIGTERM)
             self.display_in_footer("TERM signal sent to process #%s" % mypid)
@@ -298,7 +363,7 @@ class Manager:
             self.set_status(task_id, 'STOPPED')
             self.display_in_footer("cannot find process...")
         self.stdscr.refresh()
-    
+
     def delete(self):
         task_id = self.currentrow[0]
         #process = self.currentrow[1]
@@ -310,7 +375,7 @@ class Manager:
         else:
             self.display_in_footer("cannot delete running processes")
         self.stdscr.refresh()
-    
+
     def init(self):
         task_id = self.currentrow[0]
         #process = self.currentrow[1]
@@ -357,7 +422,7 @@ class Manager:
     def move_down(self):
         self.display_in_footer("not implemented yet")
         self.stdscr.refresh()
-    
+
     def put_line(self, row):
         col_w = [ 5 , 11 , 21 , 21 , 7 , 11 , 25 ]
         maxx = self.width
@@ -412,7 +477,7 @@ class Manager:
         else:
             colorpair = 1
         self.stdscr.addnstr(self.y - i, 0, footer, maxx - 1, curses.A_STANDOUT + curses.color_pair(colorpair) + curses.A_BOLD )
-        
+
     def repaint(self):
         self.y = 0
         self.stdscr.clear()
@@ -446,7 +511,7 @@ class Manager:
                 footer2 += self.footer_waiting_item
             self.display_in_footer(footer2, 1)
         self.stdscr.refresh()
-        
+
     def start(self, stdscr):
         ring = 0
         if curses.has_colors():
@@ -459,7 +524,7 @@ class Manager:
             curses.init_pair(5, curses.COLOR_BLUE, curses.COLOR_BLACK)
             curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
             curses.init_pair(7, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        
+
         self.stdscr = stdscr
         self.base_panel = curses.panel.new_panel( self.stdscr )
         self.base_panel.bottom()
@@ -513,7 +578,7 @@ class Manager:
                 ring = 0
                 self.repaint()
 
-            
+
 class BibSched:
     def __init__(self):
         self.helper_modules = cfg_valid_processes
@@ -522,13 +587,13 @@ class BibSched:
         self.sleep_sent = {}
         self.stop_sent = {}
         self.suicide_sent = {}
-        
+
     def set_status(self, task_id, status):
         return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, task_id))
-        
+
     def can_run( self, proc ):
         return len( self.running.keys() ) == 0
-    
+
     def get_running_processes(self):
         row = None
         res = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK "\
@@ -582,7 +647,7 @@ class BibSched:
                 Log("task #%d (%s) started" % (task_id, proc))
                 os.system(COMMAND)
                 Log("task #%d (%s) ended" % (task_id, proc))
-                self.running[task_id] = get_my_pid(proc, str(task_id))
+                self.running[task_id] = get_task_pid(proc, task_id)
             if sleeptime:
                 new_runtime = get_datetime(sleeptime)
                 new_task_arguments = marshal.loads(arguments)
@@ -593,14 +658,14 @@ class BibSched:
                 new_task_arguments["task"] = new_task_id
                 run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
                         (marshal.dumps(new_task_arguments), new_task_id))
-                
+
     def watch_loop(self):
         running_process = self.get_running_processes()
         if running_process:
             proc = running_process[ 1 ]
             task_id   = running_process[ 0 ]
-            if get_my_pid(proc, str(task_id)):
-                self.running[task_id] = get_my_pid(proc, str(task_id))
+            if get_task_pid(proc, task_id):
+                self.running[task_id] = get_task_pid(proc, task_id)
             else:
                 self.set_status(task_id,"ERROR")
         rows = []
@@ -619,7 +684,7 @@ class TimedOutExc(Exception):
 def timed_out(f, timeout, *args, **kwargs):
     def handler(signum, frame):
         raise TimedOutExc()
-    
+
     old = signal.signal(signal.SIGALRM, handler)
     signal.alarm(timeout)
     try:
@@ -640,8 +705,8 @@ def Log(message):
 def redirect_stdout_and_stderr():
     "This function redirects stdout and stderr to bibsched.log and bibsched.err file."
     sys.stdout = open(logdir + "/bibsched.log", "a")
-    sys.stderr = open(logdir + "/bibsched.err", "a")            
-    
+    sys.stderr = open(logdir + "/bibsched.err", "a")
+
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
@@ -656,14 +721,14 @@ The following commands are available for bibsched:
   - stop:    stop a running bibsched
   - restart: restart a running bibsched
   - monitor: enter the interactive monitor
-  
+
 Command options:
   -d, --daemon\t Launch BibSched in the daemon mode (deprecated, use 'start')
 General options:
   -h, --help      \t\t Print this help.
   -V, --version   \t\t Print version information.
   """ % sys.argv [0])
-    
+
     #sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
     sys.exit(exitcode)
 
@@ -703,20 +768,20 @@ def start (verbose = True):
     pid = server_pid ()
     if pid:
         error ("another instance of bibsched (pid %d) is running" % pid)
-    
+
     # start the child process using the "double fork" technique
     pid = os.fork ()
     if pid > 0: sys.exit (0)
 
     os.setsid ()
     os.chdir ('/')
-    
+
     pid = os.fork ()
-    
+
     if pid > 0:
         if verbose:
             sys.stdout.write ('pid %d\n' % pid)
-        
+
         Log ("daemon started (pid %d)" % pid)
         open (pidfile, 'w').write ('%d' % pid)
         return
@@ -726,7 +791,7 @@ def start (verbose = True):
 
     sched = BibSched()
     sched.watch_loop ()
-    
+
     return
 
 def stop (verbose = True):
@@ -734,7 +799,7 @@ def stop (verbose = True):
     pid = server_pid ()
     if not pid:
         error ('bibsched seems not to be running.')
-    
+
     try: os.kill (pid, signal.SIGKILL)
     except OSError:
         print >> sys.stderr, 'no bibsched process found'
@@ -796,8 +861,8 @@ def main():
 
     except KeyError:
         usage (1, 'unkown command: %s' % `cmd`)
-            
+
     return
-    
+
 if __name__ == '__main__':
     main()
