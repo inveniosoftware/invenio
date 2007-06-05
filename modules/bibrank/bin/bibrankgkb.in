@@ -46,7 +46,6 @@ try:
     import getpass
     import string
     import os
-    import sre
     import sys
     import time
     import Numeric
@@ -79,7 +78,7 @@ except:
 
 opts_dict = {}
 task_id = -1
-      
+
 def bibrankgkb(config):
     """Generates a .kb file based on input from the configuration file"""
 
@@ -88,7 +87,7 @@ def bibrankgkb(config):
     journals = {}
     journal_src = {}
     i = 0
- 
+
     #Reading the configuration file
     while config.has_option("bibrankgkb","create_%s" % i):
         cfg = split(config.get("bibrankgkb", "create_%s" % i),",,")
@@ -115,7 +114,7 @@ def bibrankgkb(config):
         else:
             if opts_dict["verbose"] >= 9:
                 write_message("Using last resource for converting values.")
-            
+
         #Input source 2, either file, www or from db
         if cfg[0] == "file":
             temp = get_from_source(cfg[0], cfg[1])
@@ -159,7 +158,7 @@ def bibrankgkb(config):
         for key in journals.keys():
             write_message("%s---%s" % (key,journals[key]))
         write_message("Total nr of lines: %s" % len(journals))
-        
+
 def showtime(timeused):
     if opts_dict["verbose"] >= 9:
         write_message("Time used: %d second(s)." % timeused)
@@ -313,7 +312,7 @@ def command_line():
         startCreate = time.time()
         file = opts_dict["input"]
         config = ConfigParser.ConfigParser()
-        config.readfp(open(file)) 
+        config.readfp(open(file))
         bibrankgkb(config)
         if opts_dict["verbose"] >= 9:
             showtime((time.time() - startCreate))
@@ -324,6 +323,6 @@ def command_line():
 
 def main():
     command_line()
-    
+
 if __name__ == "__main__":
     main()
