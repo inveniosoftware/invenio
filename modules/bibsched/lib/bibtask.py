@@ -360,53 +360,49 @@ def write_message(msg, stream=sys.stdout):
 
 def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
-    task_self = frame.f_globals._task_self
-    if task_self.options["verbose"] >= 9:
+    if _task_self.options["verbose"] >= 9:
         write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame))
     write_message("sleeping...")
-    task_self.task_update_status("SLEEPING")
+    _task_self.task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
 
 def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    task_self = frame.f_globals._task_self
-    if task_self.options["verbose"] >= 9:
+    if _task_self.options["verbose"] >= 9:
         write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame))
     write_message("continuing...")
-    task_self.task_update_status("CONTINUING")
+    _task_self.task_update_status("CONTINUING")
 
 def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
-    task_self = frame.f_globals._task_self
-    if task_self.options["verbose"] >= 9:
+    if _task_self.options["verbose"] >= 9:
         write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame))
     write_message("stopping...")
-    task_self.task_update_status("STOPPING")
-    if callable(task_self.flush_cache):
+    _task_self.task_update_status("STOPPING")
+    if callable(_task_self.flush_cache):
         write_message("flushing cache or whatever...")
-        task_self.flush_cache()
+        _task_self.flush_cache()
         time.sleep(3)
-    if callable(task_self.close_tables):
+    if callable(_task_self.close_tables):
         write_message("closing tables or whatever...")
-        task_self.close_tables()
+        _task_self.close_tables()
         time.sleep(1)
     write_message("stopped")
-    task_self.task_update_status("STOPPED")
+    _task_self.task_update_status("STOPPED")
     sys.exit(0)
 
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
-    task_self = frame.f_globals._task_self
-    if task_self.options["verbose"] >= 9:
+    if _task_self.options["verbose"] >= 9:
         write_message("task_sig_suicide(), got signal %s frame %s"
             % (sig, frame))
     write_message("suiciding myself now...")
-    task_self.task_update_status("SUICIDING")
+    _task_self.task_update_status("SUICIDING")
     write_message("suicided")
-    task_self.task_update_status("SUICIDED")
+    _task_self.task_update_status("SUICIDED")
     sys.exit(0)
 
 def _task_sig_unknown(sig, frame):
