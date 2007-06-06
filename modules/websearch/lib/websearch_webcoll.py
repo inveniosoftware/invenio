@@ -110,19 +110,6 @@ def is_selected(var, fld):
     else:
         return ""
 
-def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr).  Useful for debugging stuff."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-    return
-
 def get_field(recID, tag):
     "Gets list of field 'tag' for the record with 'recID' system number."
 
@@ -832,7 +819,7 @@ class WebCollBibTask(BibTask):
         elif key in [ "-p", "--part"]:
             self.options["part"] = int(value)
         elif key in [ "-l", "--language"]:
-            options["language"] = value
+            self.options["language"] = value
         else:
             return False
         return True
@@ -897,7 +884,8 @@ class WebCollBibTask(BibTask):
         ## we are done:
 
 def main():
-    WebCollBibTask()
+    task = WebCollBibTask()
+    task.main()
 
 ### okay, here we go:
 if __name__ == '__main__':

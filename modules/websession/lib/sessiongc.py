@@ -483,7 +483,8 @@ class SessionGCBibTask(BibTask):
 
 def main():
     """CLI to the session garbage collector."""
-    SessionGCBibTask()
+    task = SessionGCBibTask()
+    task.main()
 
 if __name__ == '__main__':
     main()
