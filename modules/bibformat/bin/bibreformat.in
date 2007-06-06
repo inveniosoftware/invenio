@@ -78,7 +78,7 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 
 ### Query the database
 ###
-
+    task_update_progress('Fetching records to process')
     if process_format:
         print "Querying database for records with missing format ..."
         without_format = without_fmt(sql)
@@ -240,7 +240,8 @@ def iterate_over_new(list, fmt):
     for recID in list:
         total_rec += 1
         n_it_rec += 1
-
+        task_update_progress('Formatting %s out of %s' %(total_rec, len(list)))
+        
         if options["verbose"] >= 9:
             message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
             print message
