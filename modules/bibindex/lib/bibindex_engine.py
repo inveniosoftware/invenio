@@ -27,17 +27,13 @@ BibIndex indexing engine implementation.  See bibindex executable for entry poin
 __revision__ = "$Id$"
 
 import marshal
-from zlib import compress,decompress
-import string
-import getopt
-import getpass
+from zlib import compress, decompress
 import os
 import re
 import sys
 import time
 import Numeric
 import urllib2
-import signal
 import tempfile
 import traceback
 import cStringIO
@@ -50,14 +46,14 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
      CFG_MAX_RECID, \
-     version, \
      weburl
 from invenio.bibindex_engine_config import *
 from invenio.search_engine import perform_request_search, strip_accents
 from invenio.dbquery import run_sql, escape_string, DatabaseError
-from invenio.access_control_engine import acc_authorize_action
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
+from invenio.bibtask import BibTask, write_message, VERBOSE_LEVEL, \
+    get_datetime, get_task_self
 
 ## import optional modules:
 try:
@@ -71,21 +67,8 @@ try:
 except:
     pass
 
-def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr)."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-    return
-
 ## precompile some often-used regexp for speed reasons:
-re_subfields = re.compile('\$\$\w');
+re_subfields = re.compile('\$\$\w')
 re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
 re_block_punctuation_begin = re.compile(r"^"+CFG_BIBINDEX_CHARS_PUNCTUATION+"+")
 re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
@@ -97,7 +80,7 @@ nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 wordTables = []
 base_process_size = 4500 # process base size
-options = {} # will hold task options
+_last_word_table = None
 
 ## Dictionary merging functions
 def intersection(dict1, dict2):
@@ -151,10 +134,10 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
     res = run_sql("SHOW FULL PROCESSLIST")
     if len(res) > max_threads:
         for row in res:
-            r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
+            r_id, dummy, dummy, dummy, r_command, r_time, dummy, dontcare = row
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
-                if options["verbose"] >= 1:
+                if VERBOSE_LEVEL >= 1:
                     write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
@@ -227,17 +210,17 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
                            ext + r")\"")
         match =  expr.search(htmlpagebody)
         if match:
-            out.append([ext,match.group(1)])
+            out.append([ext, match.group(1)])
         else: # FIXME: workaround for getfile, should use bibdoc tables
             expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
             if match:
-                out.append([ext,match.group(1)])
+                out.append([ext, match.group(1)])
     return out
 
 def get_words_from_fulltext(url_direct_or_indirect,
-                            split=string.split,
-                            lower=string.lower,
+                            split=str.split,
+                            lower=str.lower,
                             force_file_extension=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
@@ -252,9 +235,10 @@ def get_words_from_fulltext(url_direct_or_indirect,
        specified by global CONV_PROGRAMS config variable.
     """
 
-    if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY and string.find(url_direct_or_indirect, weburl) < 0:
+    if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY and \
+        url_direct_or_indirect.find(weburl) < 0:
         return []
-    if options["verbose"] >= 2:
+    if VERBOSE_LEVEL >= 2:
         write_message("... reading fulltext files from %s started" % url_direct_or_indirect)
 
     fulltext_urls = None
@@ -265,7 +249,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         url_direct_or_indirect_ext = lower(split(url_direct_or_indirect,".")[-1])
 
         if url_direct_or_indirect_ext in CONV_PROGRAMS.keys():
-            fulltext_urls = [(url_direct_or_indirect_ext,url_direct_or_indirect)]
+            fulltext_urls = [(url_direct_or_indirect_ext, url_direct_or_indirect)]
 
         # Indirect url. Try to fetch the real fulltext(s)
         if not fulltext_urls:
@@ -276,7 +260,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                 sys.stderr.write("Error: Cannot read %s.\n" % url_direct_or_indirect)
                 return []
             fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
-            if options["verbose"] >= 9:
+            if VERBOSE_LEVEL >= 9:
                 write_message("... fulltext_urls = %s" % fulltext_urls)
     else:
         fulltext_urls = [[force_file_extension, url_direct_or_indirect]]
@@ -284,14 +268,14 @@ def get_words_from_fulltext(url_direct_or_indirect,
     words = {}
 
     # process as many urls as they were found:
-    for (ext,url_direct) in fulltext_urls:
+    for (ext, url_direct) in fulltext_urls:
 
-        if options["verbose"] >= 2:
-            write_message(".... processing %s from %s started" % (ext,url_direct))
+        if VERBOSE_LEVEL >= 2:
+            write_message(".... processing %s from %s started" % (ext, url_direct))
 
         # sanity check:
         if not url_direct:
-            break;
+            break
 
         # read fulltext file:
         try:
@@ -363,7 +347,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
                     sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
                 # try to run it:
                 try:
-                    if options["verbose"] >= 9:
+                    if VERBOSE_LEVEL >= 9:
                         write_message("..... launching %s" % cmd)
                     errcode = os.system(cmd)
                     if errcode == 0 and os.path.exists("%s.txt" % tmp_name):
@@ -380,10 +364,10 @@ def get_words_from_fulltext(url_direct_or_indirect,
             for phrase in tmp_name_txt_file.xreadlines():
                 for word in get_words_from_phrase(phrase):
                     if not words.has_key(word):
-                        words[word] = 1;
+                        words[word] = 1
             tmp_name_txt_file.close()
         else:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("No conversion success for %s.\n" % (url_direct), sys.stderr)
 
         # delete temp files (they might not exist):
@@ -393,11 +377,11 @@ def get_words_from_fulltext(url_direct_or_indirect,
         except StandardError:
             write_message("Error: Could not delete file. It didn't exist", sys.stderr)
 
-        if options["verbose"] >= 2:
-            write_message(".... processing %s from %s ended" % (ext,url_direct))
+        if VERBOSE_LEVEL >= 2:
+            write_message(".... processing %s from %s ended" % (ext, url_direct))
 
 
-    if options["verbose"] >= 2:
+    if VERBOSE_LEVEL >= 2:
         write_message("... reading fulltext files from %s ended" % url_direct_or_indirect)
 
     return words.keys()
@@ -406,15 +390,15 @@ def get_words_from_fulltext(url_direct_or_indirect,
 # indexing fulltext. The default is get_words_from_phrase
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
-def get_words_from_phrase(phrase, split=string.split):
+def get_words_from_phrase(phrase, split=str.split):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
     """
     words = {}
-    if CFG_BIBINDEX_REMOVE_HTML_MARKUP and string.find(phrase, "</") > -1:
+    if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
         phrase = re_html.sub(' ', phrase)
-    phrase = string.lower(phrase)
+    phrase = phrase.lower()
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
         # 2nd remove leading/trailing punctuation and add block:
@@ -492,88 +476,12 @@ def get_all_indexes():
         out.append(row[0])
     return out
 
-def usage(code, msg=''):
-    "Prints usage for this module."
-    if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    print >> sys.stderr, \
-    """ Usage: %s [options]
-     Examples:
-       %s -a -i 234-250,293,300-500 -u admin@localhost
-       %s -a -w author,fulltext -M 8192 -v3
-       %s -d -m +4d -A on --flush=10000
-
- Indexing options:
- -a,  --add                add or update words for selected records
- -d,  --del                delete words for selected records
- -i,  --id=low[-high]      select according to doc recID
- -m,  --modified=from[,to] select according to modification date
- -c,  --collection=c1[,c2] select according to collection
-
- Repairing options:
- -k,  --check              check consistency for all records in the table(s)
- -r,  --repair             try to repair all records in the table(s)
-
- Specific options:
- -w,  --windex=w1[,w2]     word/phrase indexes to consider (all)
- -M,  --maxmem=XXX         maximum memory usage in kB (no limit)
- -f,  --flush=NNN          full consistent table flush after NNN records (10000)
-
- Scheduling options:
- -u,  --user=USER          user name to store task, password needed
- -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
-                           e.g.: 1s, 30m, 24h, 7d
- -t,  --time=TIME          moment for the task to be active (now)
-                           e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
-
- General options:
- -h,  --help               print this help and exit
- -V,  --version            print version and exit
- -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
-    """ % ((sys.argv[0],) * 4)
-    sys.exit(code)
-
-def authenticate(user, header="BibIndex Task Submission", action="runbibindex"):
-    """Authenticate the user against the user database.
-       Check for its password, if it exists.
-       Check for action access rights.
-       Return user name upon authorization success,
-       do system exit upon authorization failure.
-       """
-    print header
-    print "=" * len(header)
-    if user == "":
-        print >> sys.stdout, "\rUsername: ",
-        user = string.strip(string.lower(sys.stdin.readline()))
-    else:
-        print >> sys.stdout, "\rUsername:", user
-    ## first check user pw:
-    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
-          run_sql("select id,password from user where nickname=%s", (user,), 1)
-    if not res:
-        print "Sorry, %s does not exist." % user
-        sys.exit(1)
-    else:
-        (uid_db, password_db) = res[0]
-        if password_db:
-            password_entered = getpass.getpass()
-            if password_db == password_entered:
-                pass
-            else:
-                print "Sorry, wrong credentials for %s." % user
-                sys.exit(1)
-        ## secondly check authorization for the action:
-        (auth_code, auth_message) = acc_authorize_action(uid_db, action)
-        if auth_code != 0:
-            print auth_message
-            sys.exit(1)
-    return user
-
 def split_ranges(parse_string):
+    """Parse a string a return the list or ranges."""
     recIDs = []
-    ranges = string.split(parse_string, ",")
+    ranges = parse_string.split(",")
     for arange in ranges:
-        tmp_recIDs = string.split(arange, "-")
+        tmp_recIDs = arange.split("-")
 
         if len(tmp_recIDs)==1:
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
@@ -588,7 +496,7 @@ def split_ranges(parse_string):
 def get_word_tables(tables):
     global wordTables
     if tables:
-        indexes = string.split(tables, ",")
+        indexes = tables.split(",")
         for index in indexes:
             index_id = get_index_id(index)
             if index_id:
@@ -605,33 +513,15 @@ def get_word_tables(tables):
 
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
-    limits = string.split(var, ",")
+    limits = var.split(",")
     if len(limits)==1:
         low = get_datetime(limits[0])
-        return low,None
+        return low, None
     if len(limits)==2:
         low = get_datetime(limits[0])
         high = get_datetime(limits[1])
-        return low,high
-    return None,None
-
-def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
-    """Returns a date string according to the format string.
-       It can handle normal date strings and shifts with respect
-       to now."""
-    date = time.time()
-    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = re_datetime_shift.match(var)
-    if m:
-        sign = m.groups()[0] == "-" and -1 or 1
-        factor = factors[m.groups()[2]]
-        value = float(m.groups()[1])
-        date = time.localtime(date + sign * factor * value)
-        date = time.strftime(format_string, date)
-    else:
-        date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)
-    return date
+        return low, high
+    return None, None
 
 def create_range_list(res):
     """Creates a range list from a recID select query result contained
@@ -642,13 +532,13 @@ def create_range_list(res):
     if not row:
         return []
     else:
-        range_list = [[row[0],row[0]]]
+        range_list = [[row[0], row[0]]]
     for row in res[1:]:
         row_id = row[0]
         if row_id == range_list[-1][1] + 1:
             range_list[-1][1] = row_id
         else:
-            range_list.append([row_id,row_id])
+            range_list.append([row_id, row_id])
     return range_list
 
 def beautify_range_list(range_list):
@@ -712,18 +602,18 @@ class WordTable:
 
     def clean(self):
         "Cleans the words table."
-        self.value={}
+        self.value = {}
 
     def put_into_db(self, mode="normal"):
         """Updates the current words table in the corresponding DB
            idxFOO table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
-        if options["verbose"]:
-            write_message("%s %s wordtable flush started" % (self.tablename,mode))
+        if VERBOSE_LEVEL:
+            write_message("%s %s wordtable flush started" % (self.tablename, mode))
             write_message('...updating %d words into %s started' % \
                 (len(self.value), self.tablename))
-        task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
+        get_task_self().task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
 
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
 
@@ -732,7 +622,7 @@ class WordTable:
                 query = """UPDATE %sR SET type='TEMPORARY' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='CURRENT'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message(query)
                 run_sql(query)
 
@@ -742,58 +632,58 @@ class WordTable:
         for word in self.value.keys():
             self.put_word_into_db(word)
             nb_words_done += 1
-            if nb_words_report!=0 and ((nb_words_done % nb_words_report) == 0):
-                if options["verbose"]:
+            if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
+                if VERBOSE_LEVEL:
                     write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
-                task_update_progress("%s flushed %d/%d words" % (self.tablename, nb_words_done, nb_words_total))
-        if options["verbose"] >= 9:
+                get_task_self().task_update_progress("%s flushed %d/%d words" % (self.tablename, nb_words_done, nb_words_total))
+        if VERBOSE_LEVEL >= 9:
             write_message('...updating %d words into %s ended' % \
                 (nb_words_total, self.tablename))
 
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message('...updating reverse table %sR started' % self.tablename[:-1])
         if mode == "normal":
             for group in self.recIDs_in_mem:
                 query = """UPDATE %sR SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message(query)
                 run_sql(query)
                 query = """DELETE FROM %sR WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message(query)
                 run_sql(query)
-            if options["verbose"] >= 9:
+            if VERBOSE_LEVEL >= 9:
                 write_message('End of updating wordTable into %s' % self.tablename)
         elif mode == "emergency":
             for group in self.recIDs_in_mem:
                 query = """UPDATE %sR SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message(query)
                 run_sql(query)
                 query = """DELETE FROM %sR WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message(query)
                 run_sql(query)
-            if options["verbose"] >= 9:
+            if VERBOSE_LEVEL >= 9:
                 write_message('End of emergency flushing wordTable into %s' % self.tablename)
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message('...updating reverse table %sR ended' % self.tablename[:-1])
 
         self.clean()
         self.recIDs_in_mem = []
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message("%s %s wordtable flush ended" % (self.tablename, mode))
-        task_update_progress("%s flush ended" % (self.tablename))
+        get_task_self().task_update_progress("%s flush ended" % (self.tablename))
 
-    def load_old_recIDs(self,word):
+    def load_old_recIDs(self, word):
         """Load existing hitlist for the word from the database index files."""
         query = "SELECT hitlist FROM %s WHERE term=%%s" % self.tablename
         res = run_sql(query, (word,))
@@ -828,12 +718,12 @@ class WordTable:
         if set: # merge the word recIDs found in memory:
             if self.merge_with_old_recIDs(word,set) == 0:
                 # nothing to update:
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message("......... unchanged hitlist for ``%s''" % word)
                 pass
             else:
                 # yes there were some new words:
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message("......... updating hitlist for ``%s''" % word)
                 run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
                         (serialize_via_numeric_array(set), word))
@@ -841,7 +731,7 @@ class WordTable:
         else: # the word is new, will create new set:
             set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
             Numeric.put(set, self.value[word].keys(), 1)
-            if options["verbose"] >= 9:
+            if VERBOSE_LEVEL >= 9:
                 write_message("......... inserting hitlist for ``%s''" % word)
             run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
                     (word, serialize_via_numeric_array(set)))
@@ -857,7 +747,7 @@ class WordTable:
         keys = self.value.keys()
         keys.sort()
         for k in keys:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("%s: %s" % (k, self.value[k]))
 
     def count(self):
@@ -866,7 +756,7 @@ class WordTable:
 
     def info(self):
         "Prints some information on the words table."
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message("The words table contains %d words." % self.count())
 
     def lookup_words(self, word=""):
@@ -882,11 +772,11 @@ class WordTable:
                     return
 
         if self.value.has_key(word):
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("The word '%s' is found %d times." \
                 % (word, len(self.value[word])))
         else:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("The word '%s' does not exist in the word file."\
                               % word)
 
@@ -896,17 +786,17 @@ class WordTable:
         the records will be reindexed next time."""
         if starting_time is None:
             return None
-        if options["verbose"] >= 9:
+        if VERBOSE_LEVEL >= 9:
             write_message("updating last_updated to %s...", starting_time)
         return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
                        (starting_time, self.tablename[-3:-1],))
 
-    def add_recIDs(self, recIDs):
+    def add_recIDs(self, recIDs, opt_flush):
         """Fetches records which id in the recIDs range list and adds
         them to the wordTable.  The recIDs range list is of the form:
         [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
         """
-        global chunksize
+        global chunksize, _last_word_table
         flush_count = 0
         records_done = 0
         records_to_go = 0
@@ -920,39 +810,39 @@ class WordTable:
             chunksize_count = 0
             while i_low <= arange[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,arange[1])
+                i_high = min(i_low+opt_flush-flush_count-1,arange[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:
+                    if VERBOSE_LEVEL >= 9:
                         traceback.print_tb(sys.exc_info()[2])
-                    task_update_status("ERROR")
-                    task_sig_stop_commands()
+                    get_task_self().task_update_status("ERROR")
+                    self.put_into_db()
                     sys.exit(1)
-                if options["verbose"]:
+                if VERBOSE_LEVEL:
                     write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
                 if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
-                task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
+                get_task_self().task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
                 self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
                 records_done = records_done + just_processed
-                if options["verbose"]:
+                if VERBOSE_LEVEL:
                     write_message("%s adding records #%d-#%d ended  " % \
                         (self.tablename, i_low, i_high))
 
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
                 # flush if necessary:
-                if flush_count >= options["flush"]:
+                if flush_count >= opt_flush:
                     self.put_into_db()
                     self.clean()
-                    if options["verbose"]:
+                    if VERBOSE_LEVEL:
                         write_message("%s backing up" % (self.tablename))
                     flush_count = 0
                     self.log_progress(time_started,records_done,records_to_go)
@@ -962,7 +852,7 @@ class WordTable:
             self.put_into_db()
             self.log_progress(time_started,records_done,records_to_go)
 
-    def add_recIDs_by_date(self, dates):
+    def add_recIDs_by_date(self, dates, opt_flush):
         """Add records that were modified between DATES[0] and DATES[1].
            If DATES is not set, then add records that were modified since
            the last update of the index.
@@ -993,10 +883,10 @@ class WordTable:
                           (dates[0], dates[1]))
         alist = create_range_list(res)
         if not alist:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message( "No new records added. %s is up to date" % self.tablename)
         else:
-            self.add_recIDs(alist)
+            self.add_recIDs(alist, opt_flush)
 
     def add_recID_range(self, recID1, recID2):
         empty_list_string = serialize_via_marshal([])
@@ -1004,9 +894,9 @@ class WordTable:
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
         for tag in self.fields_to_index:
-	    if tag in tagToWordsFunctions.keys():
+            if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[tag]
-	    else:
+            else:
                 get_words_function = get_words_from_phrase
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
@@ -1029,7 +919,7 @@ class WordTable:
                     # content in order to decide how to index them
                     # (directly for Indico, indirectly for Setlink).
                     filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
-                    filename_extension = string.lower(string.split(filename, ".")[-1])
+                    filename_extension = filename.split('.')[-1].lower()
                     if filename_extension in CONV_PROGRAMS.keys():
                         new_words = get_words_function(phrase, force_file_extension=filename_extension) # ,self.separators
                     else:
@@ -1045,9 +935,9 @@ class WordTable:
             # was this record marked as deleted?
             if "DELETED" in self.get_field(recID, "980__c"):
                 wlist[recID] = []
-                if options["verbose"] >= 9:
+                if VERBOSE_LEVEL >= 9:
                     write_message("... record %d was declared deleted, removing its word list" % recID)
-            if options["verbose"] >= 9:
+            if VERBOSE_LEVEL >= 9:
                 write_message("... record %d, termlist: %s" % (recID, wlist[recID]))
 
         # Using cStringIO for speed.
@@ -1116,19 +1006,19 @@ class WordTable:
             return
 
         time_recs_per_min = done/(time_elapsed/60.0)
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
                 % (done, time_elapsed, time_recs_per_min))
 
         if time_recs_per_min:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("Estimated runtime: %.1f minutes" % \
                     ((todo-done)/time_recs_per_min))
 
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."
         try:
-            word = string.lower(word[:50])
+            word = word[:50].lower()
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
@@ -1151,7 +1041,7 @@ class WordTable:
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
-        if options["verbose"] > 2:
+        if VERBOSE_LEVEL > 2:
             write_message("%s fetching existing words for records #%d-#%d started" % \
                 (self.tablename, low, high))
         self.recIDs_in_mem.append([low,high])
@@ -1163,7 +1053,7 @@ class WordTable:
             wlist = deserialize_via_marshal(recID_row[1])
             for word in wlist:
                 self.put(recID, word, -1)
-        if options["verbose"] > 2:
+        if VERBOSE_LEVEL > 2:
             write_message("%s fetching existing words for records #%d-#%d ended" % \
                 (self.tablename, low, high))
 
@@ -1189,7 +1079,7 @@ class WordTable:
             nb_records = 0
 
         # report stats:
-        if options["verbose"]:
+        if VERBOSE_LEVEL:
             write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
 
         # find possible bad states in reverse tables:
@@ -1203,12 +1093,12 @@ class WordTable:
             write_message("EMERGENCY: %s needs to repair %d of %d records" % \
                 (self.tablename, nb_bad_records, nb_records))
         else:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("%s is in consistent state" % (self.tablename))
 
         return nb_bad_records
 
-    def repair(self):
+    def repair(self, opt_flush):
         """Repair the whole table"""
         # find possible bad states in reverse tables:
         query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
@@ -1239,17 +1129,17 @@ class WordTable:
             chunksize_count = 0
             while i_low <= arange[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,arange[1])
+                i_high = min(i_low+opt_flush-flush_count-1,arange[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
 
                 try:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:
+                    if VERBOSE_LEVEL >= 9:
                         traceback.print_tb(sys.exc_info()[2])
-                    task_update_status("ERROR")
-                    task_sig_stop_commands()
+                    get_task_self().task_update_status("ERROR")
+                    self.put_into_db()
                     sys.exit(1)
 
                 flush_count = flush_count + i_high - i_low + 1
@@ -1258,7 +1148,7 @@ class WordTable:
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
                 # flush if necessary:
-                if flush_count >= options["flush"]:
+                if flush_count >= opt_flush:
                     self.put_into_db("emergency")
                     self.clean()
                     flush_count = 0
@@ -1277,7 +1167,7 @@ class WordTable:
         AND id_bibrec BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
         res = run_sql(query, None, 1)
         if res[0][0]==0:
-            if options["verbose"]:
+            if VERBOSE_LEVEL:
                 write_message("%s for %d-%d is in consistent state"%(self.tablename,low,high))
             return # okay, words table is consistent
 
@@ -1331,12 +1221,12 @@ class WordTable:
                     # Get the words file
                     query = """SELECT type,termlist FROM %sR
                     WHERE id_bibrec='%d'""" % (self.tablename[:-1], recID)
-                    if options["verbose"] >= 9:
+                    if VERBOSE_LEVEL >= 9:
                         write_message(query)
                     res = run_sql(query)
                     for row in res:
                         wlist = deserialize_via_marshal(row[1])
-                        if options["verbose"] >= 9:
+                        if VERBOSE_LEVEL >= 9:
                             write_message("Words are %s " % wlist)
                         if row[0] == 'TEMPORARY':
                             sign = 1
@@ -1355,275 +1245,12 @@ class WordTable:
                 is recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
 
-def task_run(row):
-    """Run the indexing task.  The row argument is the BibSched task
-    queue row, containing if, arguments, etc.
-    Return 1 in case of success and 0 in case of failure.
-    """
-
-    global options, wordTables, stemmer, stopwords
-
-    # read from SQL row:
-    task_id = row[0]
-    task_proc = row[1]
-    options = marshal.loads(row[6])
-    task_status = row[7]
-
-    # sanity check:
-    if task_proc != "bibindex":
-        write_message("The task #%d does not seem to be a BibIndex task." % task_id, sys.stderr)
-        return 0
-    if task_status != "WAITING":
-        write_message("The task #%d is %s.  I expected WAITING." % (task_id, task_status), sys.stderr)
-        return 0
-
-    # we can run the task now:
-    if options["verbose"]:
-        write_message("Task #%d started." % task_id)
-    task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    task_update_status("RUNNING")
-
-    # install signal handlers
-    signal.signal(signal.SIGUSR1, task_sig_sleep)
-    signal.signal(signal.SIGTERM, task_sig_stop)
-    signal.signal(signal.SIGABRT, task_sig_suicide)
-    signal.signal(signal.SIGCONT, task_sig_wakeup)
-    signal.signal(signal.SIGINT, task_sig_unknown)
-
-    ## go ahead and treat each table :
-    for table in options["windex"]:
-        wordTable = WordTable(table.keys()[0], table.values()[0])
-        wordTable.report_on_table_consistency()
-        try:
-            if options["cmd"] == "del":
-                if options["id"]:
-                    wordTable.del_recIDs(options["id"])
-                elif options["collection"]:
-                    l_of_colls = string.split(options["collection"], ",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID,recID])
-                    wordTable.del_recIDs(recIDs_range)
-                else:
-                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
-                                  sys.stderr)
-                    raise StandardError
-            elif options["cmd"] == "add":
-                if options["id"]:
-                    wordTable.add_recIDs(options["id"])
-                elif options["collection"]:
-                    l_of_colls = string.split(options["collection"], ",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID,recID])
-                    wordTable.add_recIDs(recIDs_range)
-                else:
-                    wordTable.add_recIDs_by_date(options["modified"])
-                    # only update last_updated if run via automatic mode:
-                    wordTable.update_last_updated(task_starting_time)
-
-            elif options["cmd"] == "repair":
-                wordTable.repair()
-            else:
-                write_message("Invalid command found processing %s" % \
-                     wordTable.tablename, sys.stderr)
-                raise StandardError
-
-        except StandardError, e:
-            write_message("Exception caught: %s" % e, sys.stderr)
-            if options["verbose"] >= 9:
-                traceback.print_tb(sys.exc_info()[2])
-            task_update_status("ERROR")
-            task_sig_stop_commands()
-            sys.exit(1)
-
-        wordTable.report_on_table_consistency()
-
-    # We are done. State it in the database, close and quit
-    task_update_status("DONE")
-    if options["verbose"]:
-        write_message("Task #%d finished." % task_id)
-    return 1
-
-def command_line():
-    global options
-    long_flags =["add","del","id=","modified=","collection=", "windex=",
-                 "check","repair","maxmem=", "flush=","user=","sleeptime=",
-                 "time=","help", "version", "verbose="]
-    short_flags ="adi:m:c:w:krM:f:u:s:t:hVv:"
-    format_string = "%Y-%m-%d %H:%M:%S"
-    tables = None
-    sleeptime = ""
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
-    except getopt.GetoptError, err:
-        write_message(err, sys.stderr)
-        usage(1)
-    if args:
-        usage(1)
-
-    options={"cmd":"add", "id":[], "modified":[], "collection":[], "maxmem":0,
-               "flush":10000, "sleeptime":0, "verbose":1 }
-    sched_time = time.strftime(format_string)
-
-    user = ""
-    # Check for key options
-
-    try:
-        for opt in opts:
-            if opt == ("-h","")  or opt == ("--help",""):
-                usage(1)
-            elif opt == ("-V","")  or opt == ("--version",""):
-                print BIBINDEX_ENGINE_VERSION
-                sys.exit(1)
-            elif opt[0] in ["--verbose", "-v"]:
-                options["verbose"] = int(opt[1])
-            elif opt == ("-a","") or opt == ("--add",""):
-                options["cmd"] = "add"
-                if ("-x","") in opts or ("--del","") in opts:
-                    usage(1)
-            elif opt == ("-k","") or opt == ("--check",""):
-                options["cmd"] = "check"
-            elif opt == ("-r","") or opt == ("--repair",""):
-                options["cmd"] = "repair"
-            elif opt == ("-d","") or opt == ("--del",""):
-                options["cmd"]="del"
-            elif opt[0] in [ "-i", "--id" ]:
-                options["id"] = options["id"] + split_ranges(opt[1])
-            elif opt[0] in [ "-m", "--modified" ]:
-                options["modified"] = get_date_range(opt[1])
-            elif opt[0] in [ "-c", "--collection" ]:
-                options["collection"] = opt[1]
-            elif opt[0] in [ "-w", "--windex" ]:
-                tables = opt[1]
-            elif opt[0] in [ "-M", "--maxmem"]:
-                options["maxmem"]=int(opt[1])
-                if options["maxmem"] < base_process_size + 1000:
-                    raise StandardError, "Memory usage should be higher than %d kB" % (base_process_size + 1000)
-            elif opt[0] in [ "-f", "--flush"]:
-                options["flush"]=int(opt[1])
-            elif opt[0] in [ "-u", "--user"]:
-                user = opt[1]
-            elif opt[0] in [ "-s", "--sleeptime" ]:
-                get_datetime(opt[1])    # see if it is a valid shift
-                sleeptime= opt[1]
-            elif opt[0] in [ "-t", "--time" ]:
-                sched_time= get_datetime(opt[1])
-            else: usage(1)
-    except StandardError, e:
-        write_message(e, sys.stderr)
-        sys.exit(1)
-
-    options["windex"]=get_word_tables(tables)
-
-    if options["cmd"] == "check":
-        for table in options["windex"]:
-            wordTable = WordTable(table.keys()[0], table.values()[0])
-            wordTable.report_on_table_consistency()
-        return
-
-    user = authenticate(user)
-
-    if options["verbose"] >= 9:
-        print ""
-        write_message("storing task options %s\n" % options)
-
-    ## sanity check: remove eventual "task" option:
-    if options.has_key("task"):
-        del options["task"]
-
-    new_task_id = run_sql("""INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)
-                             VALUES ('bibindex',%s,%s,%s,%s,'WAITING')""",
-                      (user, sched_time, sleeptime, marshal.dumps(options)))
-
-    ## update task number:
-    options["task"] = new_task_id
-    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""", (marshal.dumps(options), new_task_id))
-
-    print "Task #%d was successfully scheduled for execution." % new_task_id
-    return
-
-def task_sig_sleep(sig, frame):
-    """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
-    write_message("sleeping...")
-    task_update_status("SLEEPING")
-    signal.pause() # wait for wake-up signal
-
-def task_sig_wakeup(sig, frame):
-    """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
-    write_message("continuing...")
-    task_update_status("CONTINUING")
-
-def task_sig_stop(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
-    write_message("stopping...")
-    task_update_status("STOPPING")
-    errcode = 0
-    try:
-        task_sig_stop_commands()
-        write_message("stopped")
-        task_update_status("STOPPED")
-    except StandardError, err:
-        write_message("Error during stopping! %e" % err)
-        task_update_status("STOPPINGFAILED")
-        errcode = 1
-    sys.exit(errcode)
-
-def task_sig_stop_commands():
-    """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.
-    """
-    write_message("stopping commands started")
-    for table in wordTables:
-        table.put_into_db()
-    write_message("stopping commands ended")
-
-def task_sig_suicide(sig, frame):
-    """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
-    write_message("suiciding myself now...")
-    task_update_status("SUICIDING")
-    write_message("suicided")
-    task_update_status("SUICIDED")
-    sys.exit(0)
-
-def task_sig_unknown(sig, frame):
-    """Signal handler for the other unknown signals sent by shell or user."""
-    # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
-
-def task_update_progress(msg):
-    """Updates progress information in the BibSched task table."""
-    global options
-    if options["verbose"] >= 9:
-        write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
-
-def task_update_status(val):
-    """Updates state information in the BibSched task table."""
-    global options
-    if options["verbose"] >= 9:
-        write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
-
 def test_fulltext_indexing():
     """Tests fulltext indexing programs on PDF, PS, DOC, PPT,
     XLS.  Prints list of words and word table on the screen.  Does not
     integrate anything into the database.  Useful when debugging
     problems with fulltext indexing: call this function instead of main().
     """
-    global options
-    options["verbose"] = 9
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=atlnot&categ=Communication&id=com-indet-2002-012") # protected URL
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=agenda&categ=a00388&id=a00388s2t7") # XLS
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=agenda&categ=a02883&id=a02883s1t6/transparencies") # PPT
@@ -1637,27 +1264,168 @@ def test_word_separators(phrase="hep-th/0101001"):
     for word in get_words_from_phrase(phrase):
         print "\t-> %s" % word
 
-def main():
-    """Reads arguments and either runs the task, or starts user-interface (command line)."""
-    if len(sys.argv) == 2:
-        try:
-            task_id = int(sys.argv[1])
-        except StandardError:
-            command_line()
-            sys.exit()
+class BibIndexBibTask(BibTask):
+    """Bibliographic Index Task."""
+    def __init__(self):
+        BibTask.__init__(self, authorization_action='runbibindex',
+            authorization_msg="BibIndex Task Submission",
+            description="""Examples:
+\t%s -a -i 234-250,293,300-500 -u admin@localhost
+\t%s -a -w author,fulltext -M 8192 -v3
+\t%s -d -m +4d -A on --flush=10000\n""" % ((sys.argv[0],) * 3), help_specific_usage=""" Indexing options:
+  -a, --add\t\tadd or update words for selected records
+  -d, --del\t\tdelete words for selected records
+  -i, --id=low[-high]\t\tselect according to doc recID
+  -m, --modified=from[,to]\tselect according to modification date
+  -c, --collection=c1[,c2]\tselect according to collection
 
-        res = run_sql("SELECT * FROM schTASK WHERE id='%d'" % (task_id), None, 1)
-        if not res:
-            write_message("Selected task not found.", sys.stderr)
-            sys.exit(1)
-        try:
-            if not task_run(res[0]):
-                write_message("Error occurred.  Exiting.", sys.stderr)
-        except StandardError, e:
-            write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            if options["verbose"] >= 9:
-                traceback.print_tb(sys.exc_info()[2])
-            write_message("Exiting.")
-            task_update_status("ERROR")
-    else:
-        command_line()
+ Repairing options:
+  -k, --check\t\tcheck consistency for all records in the table(s)
+  -r, --repair\t\ttry to repair all records in the table(s)
+
+ Specific options:
+  -w, --windex=w1[,w2]\tword/phrase indexes to consider (all)
+  -M, --maxmem=XXX\tmaximum memory usage in kB (no limit)
+  -f, --flush=NNN\t\tfull consistent table flush after NNN records (10000)
+""",
+            specific_params=("adi:m:c:w:krM:f:", [
+                "add",
+                "del",
+                "id=",
+                "modified=",
+                "collection=",
+                "windex=",
+                "check",
+                "repair",
+                "maxmem=",
+                "flush=",
+            ]))
+        self.options["cmd"] = "add"
+        self.options["id"] = []
+        self.options["modified"] = []
+        self.options["collection"] = []
+        self.options["maxmem"] = 0,
+        self.options["flush"] = 10000
+        self.options["windex"] = get_word_tables(None)
+
+
+    def task_submit_elaborate_specific_parameter(self, key, value):
+        """ Given the string key it checks it's meaning, eventually using the
+        value. Usually it fills some key in the options dict.
+        It must return True if it has elaborated the key, False, if it doesn't
+        know that key.
+        eg:
+        if key in ['-n', '--number']:
+            self.options['number'] = value
+            return True
+        return False
+        """
+        if key in ("-a", "--add"):
+            self.options["cmd"] = "add"
+            if ("-x","") in self.opts or ("--del","") in self.opts:
+                raise StandardError, "Can not have --add and --del at the same time!"
+        elif key in ("-k", "--check"):
+            self.options["cmd"] = "check"
+        elif key in ("-r", "--repair"):
+            self.options["cmd"] = "repair"
+        elif key in ("-d", "--del"):
+            self.options["cmd"]="del"
+        elif key in ("-i", "--id"):
+            self.options["id"] = self.options["id"] + split_ranges(value)
+        elif key in ("-m", "--modified"):
+            self.options["modified"] = get_date_range(value)
+        elif key in ("-c", "--collection"):
+            self.options["collection"] = value
+        elif key in ("-w", "--windex"):
+            self.options["windex"]=get_word_tables(value)
+        elif key in ("-M", "--maxmem"):
+            self.options["maxmem"] = int(value)
+            if self.options["maxmem"] < base_process_size + 1000:
+                raise StandardError, "Memory usage should be higher than %d kB" % \
+                    (base_process_size + 1000)
+        elif key in ("-f", "--flush"):
+            self.options["flush"] = int(value)
+        else:
+            return False
+        return True
+
+    def task_stop_table_close_fnc(self):
+        """ Close tables to STOP. """
+        global _last_word_table
+        if _last_word_table:
+            _last_word_table.put_into_db()
+
+    def task_run_core(self):
+        """Runs the task by fetching arguments from the BibSched task queue.  This is
+        what BibSched will be invoking via daemon call.
+        The task prints Fibonacci numbers for up to NUM on the stdout, and some
+        messages on stderr.
+        Return 1 in case of success and 0 in case of failure."""
+        global _last_word_table
+        if self.options["cmd"] == "check":
+            for table in self.options["windex"]:
+                wordTable = WordTable(table.keys()[0], table.values()[0])
+                _last_word_table = wordTable
+                wordTable.report_on_table_consistency()
+            _last_word_table = None
+            return True
+
+        for table in self.options["windex"]:
+            wordTable = WordTable(table.keys()[0], table.values()[0])
+            _last_word_table = wordTable
+            wordTable.report_on_table_consistency()
+            try:
+                if self.options["cmd"] == "del":
+                    if self.options["id"]:
+                        wordTable.del_recIDs(self.options["id"])
+                    elif self.options["collection"]:
+                        l_of_colls = self.options["collection"].split(",")
+                        recIDs = perform_request_search(c=l_of_colls)
+                        recIDs_range = []
+                        for recID in recIDs:
+                            recIDs_range.append([recID,recID])
+                        wordTable.del_recIDs(recIDs_range)
+                    else:
+                        write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
+                                    sys.stderr)
+                        raise StandardError
+                elif self.options["cmd"] == "add":
+                    if self.options["id"]:
+                        wordTable.add_recIDs(self.options["id"], self.options["flush"])
+                    elif self.options["collection"]:
+                        l_of_colls = self.options["collection"].split(",")
+                        recIDs = perform_request_search(c=l_of_colls)
+                        recIDs_range = []
+                        for recID in recIDs:
+                            recIDs_range.append([recID,recID])
+                        wordTable.add_recIDs(recIDs_range, self.options["flush"])
+                    else:
+                        wordTable.add_recIDs_by_date(self.options["modified"], self.options["flush"])
+                        # only update last_updated if run via automatic mode:
+                        wordTable.update_last_updated(self.task_starting_time)
+                elif self.options["cmd"] == "repair":
+                    wordTable.repair(self.options["flush"])
+                else:
+                    write_message("Invalid command found processing %s" % \
+                        wordTable.tablename, sys.stderr)
+                    raise StandardError
+            except StandardError, e:
+                write_message("Exception caught: %s" % e, sys.stderr)
+                if self.options["verbose"] >= 9:
+                    traceback.print_tb(sys.exc_info()[2])
+                self.task_update_status("ERROR")
+                if _last_word_table:
+                    _last_word_table.put_into_db()
+                sys.exit(1)
+
+            wordTable.report_on_table_consistency()
+        _last_word_table = None
+
+
+def main():
+    task = BibIndexBibTask()
+    task.main()
+
+### okay, here we go:
+if __name__ == '__main__':
+    main()
