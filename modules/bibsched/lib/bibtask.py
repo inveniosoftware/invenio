@@ -40,13 +40,19 @@ import traceback
 import os
 
 # Which tasks don't need to ask the user for authorization?
-cfg_valid_processes_no_auth_needed = ["bibupload"]
+cfg_valid_processes_no_auth_needed = ("bibupload")
 
+# Global verbose level used for backward compatibility
+VERBOSE_LEVEL = 1
 
 _task_self = None
 
 class BibTask:
     """Abstract class for implementing a Bibliographic task."""
+
+    # Will hold all the options of the BibTask
+    options = {}
+
     def __init__(self, authorization_action, authorization_msg="",
             description="", help_specific_usage="",
             specific_params=("", [])):
@@ -65,14 +71,15 @@ class BibTask:
         the list representing the long form parameters in getopt
         eg. ("n:", ["number="])
         """
-        self.options = {} # global variable to hold task options
+        global _task_self
+        assert(_task_self is None)
+        _task_self = self
         self.authorization_msg = authorization_msg
         self.task_name = os.path.basename(sys.argv[0])
         self.authorization_action = authorization_action
         self.help_specific_usage = help_specific_usage
         self.specific_params = specific_params
         self.description = description
-        self._check_command_line()
 
     def task_stop_cache_flush_fnc(self):
         """ Reimplement to flush cashes to STOP."""
@@ -95,9 +102,78 @@ class BibTask:
         """
         return False
 
+    def task_submit_check_options(self):
+        """ Reimplement this method for having the possibility to check options
+        before submitting the task, in order for example to provide default
+        values. It must return False if there are errors in the options.
+        """
+        return True
+
     def task_run_core(self):
         """ Reimplement to add the body of the task."""
         pass
+
+    def main(self):
+        """Main body of a BibTask, method to be called after BibTask initialization"""
+        global VERBOSE_LEVEL
+        self.options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.options["sleeptime"] = ""
+        self.options["verbose"] = 1
+        if len(sys.argv) == 2 and sys.argv[1].isdigit():
+            ## A - run the task
+            self.task_id = int(sys.argv[1])
+            self.options["task"] = self.task_id
+            try:
+                if not self._task_run():
+                    write_message("Error occurred.  Exiting.", sys.stderr)
+            except StandardError, e:
+                write_message("Unexpected error occurred: %s." % e, sys.stderr)
+                write_message("Traceback is:", sys.stderr)
+                traceback.print_tb(sys.exc_info()[2])
+                write_message("Exiting.", sys.stderr)
+                self.task_update_status("ERROR")
+        else:
+            ## B - submit the task
+            # set user-defined options:
+            try:
+                (short_params, long_params) = self.specific_params
+                self.opts, args = getopt.getopt(sys.argv[1:], "hVv:n:u:s:t:" +
+                    short_params, [
+                        "help",
+                        "version",
+                        "verbose=",
+                        "number=",
+                        "user=",
+                        "sleep=",
+                        "time="
+                    ] + long_params)
+            except getopt.GetoptError, err:
+                self.usage(1, err)
+            try:
+                for opt in self.opts:
+                    if opt[0] in ["-h", "--help"]:
+                        self.usage(0)
+                    elif opt[0] in ["-V", "--version"]:
+                        print __revision__
+                        sys.exit(0)
+                    elif opt[0] in [ "-u", "--user"]:
+                        self.options["user"] = opt[1]
+                    elif opt[0] in ["-v", "--verbose"]:
+                        self.options["verbose"] = int(opt[1])
+                    elif opt[0] in [ "-s", "--sleeptime" ]:
+                        get_datetime(opt[1]) # see if it is a valid shift
+                        self.options["sleeptime"] = opt[1]
+                    elif opt[0] in [ "-t", "--runtime" ]:
+                        self.options["runtime"] = get_datetime(opt[1])
+                    elif not self.task_submit_elaborate_specific_parameter(opt[0],
+                            opt[1]):
+                        self.usage(1)
+            except StandardError, e:
+                self.usage(e)
+            if not self.task_submit_check_options():
+                self.usage(1)
+            self._task_submit()
+        VERBOSE_LEVEL = self.options['verbose']
 
     def _authenticate(self, user):
         """Authenticate the user against the user database.
@@ -145,7 +221,10 @@ class BibTask:
         if self.options.has_key("task"):
             del self.options["task"]
         ## authenticate user:
-        self.user = self._authenticate(self.options.get("user", ""))
+        if not self.task_name in cfg_valid_processes_no_auth_needed:
+            self.user = self._authenticate(self.options.get("user", ""))
+        else:
+            self.user = ''
         ## submit task:
         if self.options["verbose"] >= 9:
             print ""
@@ -207,8 +286,6 @@ class BibTask:
         The task prints Fibonacci numbers for up to NUM on the stdout, and some
         messages on stderr.
         Return 1 in case of success and 0 in case of failure."""
-        global _task_self
-        assert(_task_self is None)
         ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
         pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
             'bibsched_task_%d.pid' % self.task_id)
@@ -231,7 +308,6 @@ class BibTask:
         if self.options["verbose"]:
             write_message("Task #%d started." % self.task_id)
         self.task_update_status("RUNNING")
-        _task_self = self
         ## initialize signal handler:
         signal.signal(signal.SIGUSR1, _task_sig_sleep)
         signal.signal(signal.SIGTERM, _task_sig_stop)
@@ -239,6 +315,7 @@ class BibTask:
         signal.signal(signal.SIGCONT, _task_sig_wakeup)
         signal.signal(signal.SIGINT, _task_sig_unknown)
         ## run the task:
+        self.task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         self.task_run_core()
         ## we are done:
         self.task_update_status("DONE")
@@ -278,75 +355,16 @@ class BibTask:
         Useful for learning on how to write BibSched tasks."""
         ## parse command line:
         # set default values:
-        self.options = {}
-        self.options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.options["sleeptime"] = ""
-        self.options["verbose"] = 1
-        if len(sys.argv) == 2 and sys.argv[1].isdigit():
-            ## A - run the task
-            self.task_id = int(sys.argv[1])
-            self.options["task"] = self.task_id
-            try:
-                if not self._task_run():
-                    write_message("Error occurred.  Exiting.", sys.stderr)
-            except StandardError, e:
-                write_message("Unexpected error occurred: %s." % e, sys.stderr)
-                write_message("Traceback is:", sys.stderr)
-                traceback.print_tb(sys.exc_info()[2])
-                write_message("Exiting.", sys.stderr)
-                self.task_update_status("ERROR")
-        else:
-            ## B - submit the task
-            # set user-defined options:
-            try:
-                (short_params, long_params) = self.specific_params
-                opts, args = getopt.getopt(sys.argv[1:], "hVv:n:u:s:t:" +
-                    short_params, [
-                        "help",
-                        "version",
-                        "verbose=",
-                        "number=",
-                        "user=",
-                        "sleep=",
-                        "time="
-                    ] + long_params)
-            except getopt.GetoptError, err:
-                self.usage(1, err)
-            try:
-                for opt in opts:
-                    if opt[0] in ["-h", "--help"]:
-                        self.usage(0)
-                    elif opt[0] in ["-V", "--version"]:
-                        print __revision__
-                        sys.exit(0)
-                    elif opt[0] in [ "-u", "--user"]:
-                        self.options["user"] = opt[1]
-                    elif opt[0] in ["-v", "--verbose"]:
-                        self.options["verbose"] = int(opt[1])
-                    elif opt[0] in [ "-s", "--sleeptime" ]:
-                        get_datetime(opt[1]) # see if it is a valid shift
-                        self.options["sleeptime"] = opt[1]
-                    elif opt[0] in [ "-t", "--runtime" ]:
-                        self.options["runtime"] = get_datetime(opt[1])
-                    elif self.task_submit_elaborate_specific_parameter(opt[0],
-                            opt[1]):
-                        pass
-                    else:
-                        self.usage(1)
-            except StandardError, e:
-                self.usage(e)
-            self._task_submit()
-        return
 
-def write_messages(msgs, stream=sys.stdout):
+def write_messages(msgs, stream=sys.stdout, verbose=1):
     """Write many messages through write_message"""
     for msg in msgs.split('\n'):
-        write_message(msg, stream)
+        write_message(msg, stream, verbose)
 
-def write_message(msg, stream=sys.stdout):
+def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
-    if msg:
+    if msg and VERBOSE_LEVEL >= verbose:
         if stream == sys.stdout or stream == sys.stderr:
             stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
                 time.localtime()))
@@ -382,17 +400,23 @@ def _task_sig_stop(sig, frame):
             % (sig, frame))
     write_message("stopping...")
     _task_self.task_update_status("STOPPING")
-    if callable(_task_self.flush_cache):
-        write_message("flushing cache or whatever...")
-        _task_self.flush_cache()
-        time.sleep(3)
-    if callable(_task_self.close_tables):
-        write_message("closing tables or whatever...")
-        _task_self.close_tables()
-        time.sleep(1)
-    write_message("stopped")
-    _task_self.task_update_status("STOPPED")
-    sys.exit(0)
+    try:
+        if callable(_task_self.task_stop_cache_flush_fnc):
+            write_message("flushing cache or whatever...")
+            _task_self.task_stop_cache_flush_fnc()
+            time.sleep(3)
+        if callable(_task_self.task_stop_table_close_fnc):
+            write_message("closing tables or whatever...")
+            _task_self.task_stop_table_close_fnc()
+            time.sleep(1)
+    except StandardError, err:
+        write_message("Error during stopping! %e" % err)
+        _task_self.task_update_status("STOPPINGFAILED")
+        sys.exit(1)
+    else:
+        write_message("stopped")
+        _task_self.task_update_status("STOPPED")
+        sys.exit(0)
 
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
@@ -429,3 +453,6 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
+def get_task_self():
+    global _task_self
+    return _task_self

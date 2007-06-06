@@ -33,8 +33,6 @@ import getopt
 import getpass
 import marshal
 import signal
-import re
-import string
 import time
 import traceback
 
@@ -54,6 +52,22 @@ class BibTaskExBibTask(BibTask):
         BibTask.__init__(self, authorization_action='runbibtaskex', authorization_msg="BibTaskEx Task Submission",
             description="", help_specific_usage="  -n, --number=NUM       Print Fibonacci numbers for up to NUM.  [default=30]",
             specific_params=("n:", ["number="]))
+
+    def task_submit_elaborate_specific_parameter(self, key, value):
+        """ Given the string key it checks it's meaning, eventually using the
+        value. Usually it fills some key in the options dict.
+        It must return True if it has elaborated the key, False, if it doesn't
+        know that key.
+        eg:
+        if key in ('-n', '--number'):
+            self.options['number'] = value
+            return True
+        return False
+        """
+        if key in ('-n', '--number'):
+            self.options['number'] = value
+            return True
+        return False
 
     def task_run_core(self):
         """Runs the task by fetching arguments from the BibSched task queue.  This is
@@ -84,7 +98,8 @@ class BibTaskExBibTask(BibTask):
         return 1
 
 def main():
-    BibTaskExBibTask()
+    task = BibTaskExBibTask()
+    task.main()
 
 ### okay, here we go:
 if __name__ == '__main__':

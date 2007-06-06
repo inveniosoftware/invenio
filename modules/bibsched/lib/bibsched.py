@@ -90,7 +90,6 @@ def get_task_pid(task_name, task_id):
     """Return the pid of task_name/task_id"""
     try:
         pid = int(open(os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)).read())
-        open('/tmp/dbg', 'a').write('trovato pid %s\n' % pid)
     except IOError:
         return get_my_pid(task_name, str(task_id))
 
