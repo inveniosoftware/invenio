@@ -68,6 +68,12 @@ def _db_login(relogin = 0):
             DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
             return DB_CONN
 
+def _db_logout():
+    """Close a connection."""
+    global DB_CONN
+    del DB_CONN
+
+
 try:
     _db_cache
 except NameError:
