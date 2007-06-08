@@ -38,6 +38,7 @@ from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run
+from invenio.bibtask import task_set_option
 
 # helper functions:
 
@@ -180,24 +181,21 @@ class BibUploadInsertModeTest(unittest.TestCase):
 
     def test_no_retrieve_record_id(self):
         """bibupload - insert mode, detection of record ID in the input file"""
-        # Initialize the global variable
-        bibupload.options['mode'] = 'insert'
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test)
         # We call the function which should retrieve the record id
-        rec_id = bibupload.retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0], 'insert')
         # We compare the value found with None
         self.assertEqual(None, rec_id)
 
     def test_insert_complete_xmlmarc(self):
         """bibupload - insert mode, trying to insert complete MARCXML file"""
         # Initialize the global variable
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test)
         # We call the main function with the record as a parameter
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # We retrieve the inserted xml
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
@@ -244,12 +242,11 @@ class BibUploadAppendModeTest(unittest.TestCase):
         100__ $$aTester, U$$uCERN
         """
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+
         test_to_upload =  self.test_existing.replace('<controlfield tag="001">123456789</controlfield>',
                                                      '')
         recs = bibupload.xml_marc_to_records(test_to_upload)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         self.test_recid = recid
         # replace test buffers with real recid of inserted test record:
         self.test_existing = self.test_existing.replace('123456789',
@@ -263,13 +260,11 @@ class BibUploadAppendModeTest(unittest.TestCase):
 
     def test_retrieve_record_id(self):
         """bibupload - append mode, the input file should contain a record ID"""
-        # Initialize the global variable
-        bibupload.options['mode'] = 'append'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_to_append)
         # We call the function which should retrieve the record id
-        rec_id = bibupload.retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0], 'append')
         # We compare the value found with None
         self.assertEqual(str(self.test_recid), rec_id)
         # clean up after ourselves:
@@ -279,12 +274,11 @@ class BibUploadAppendModeTest(unittest.TestCase):
     def test_update_modification_record_date(self):
         """bibupload - append mode, checking the update of the modification date"""
         # Initialize the global variable
-        bibupload.options['mode'] = 'append'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_existing)
         # We call the function which should retrieve the record id
-        rec_id = bibupload.retrieve_rec_id(recs[0])
+        rec_id = bibupload.retrieve_rec_id(recs[0], opt_mode='append')
         # Retrieve current localtime
         now = time.localtime()
         # We update the modification date
@@ -300,13 +294,11 @@ class BibUploadAppendModeTest(unittest.TestCase):
 
     def test_append_complete_xml_marc(self):
         """bibupload - append mode, appending complete MARCXML file"""
-        # Initialize the global variable
         # Now we append a datafield
-        bibupload.options['mode'] = 'append'
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_to_append)
         # We call the main function with the record as a parameter
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='append')
         # We retrieve the inserted xm
         after_append_xm = print_record(recid, 'xm')
         after_append_hm = print_record(recid, 'hm')
@@ -400,12 +392,11 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         10047 $$aTest2, Joseph$$uTest2 Academy
         """
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         test_record_xm = self.testrec1_xm.replace('<controlfield tag="001">123456789</controlfield>',
                                                   '')
         recs = bibupload.xml_marc_to_records(test_record_xm)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recID:
         self.testrec1_xm = self.testrec1_xm.replace('123456789', str(recid))
         self.testrec1_hm = self.testrec1_hm.replace('123456789', str(recid))
@@ -421,9 +412,8 @@ class BibUploadCorrectModeTest(unittest.TestCase):
     def test_record_correction(self):
         """bibupload - correct mode, similar MARCXML tags/indicators"""
         # correct some tags:
-        bibupload.options['mode'] = 'correct'
         recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_correct)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='correct')
         corrected_xm = print_record(recid, 'xm')
         corrected_hm = print_record(recid, 'hm')
         # did it work?
@@ -499,12 +489,11 @@ class BibUploadReplaceModeTest(unittest.TestCase):
         10047 $$aTest2, Joseph$$uTest2 Academy
         """
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         test_record_xm = self.testrec1_xm.replace('<controlfield tag="001">123456789</controlfield>',
                                                   '')
         recs = bibupload.xml_marc_to_records(test_record_xm)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recID:
         self.testrec1_xm = self.testrec1_xm.replace('123456789', str(recid))
         self.testrec1_hm = self.testrec1_hm.replace('123456789', str(recid))
@@ -520,9 +509,8 @@ class BibUploadReplaceModeTest(unittest.TestCase):
     def test_record_replace(self):
         """bibupload - replace mode, similar MARCXML tags/indicators"""
         # replace some tags:
-        bibupload.options['mode'] = 'replace'
         recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_replace)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='replace')
         replaced_xm = print_record(recid, 'xm')
         replaced_hm = print_record(recid, 'hm')
         # did it work?
@@ -573,12 +561,11 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         %(reference_tag)sC5 $$mM. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,$$sJ. High Energy Phys. 07 (2004) 014
         """ % {'reference_tag': bibupload.CFG_BIBUPLOAD_REFERENCE_TAG}
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         test_insert = self.test_insert.replace('<controlfield tag="001">123456789</controlfield>',
                                                '')
         recs = bibupload.xml_marc_to_records(test_insert)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recID:
         self.test_insert = self.test_insert.replace('123456789', str(recid))
         self.test_insert_hm = self.test_insert_hm.replace('123456789', str(recid))
@@ -594,12 +581,10 @@ class BibUploadReferencesModeTest(unittest.TestCase):
 
     def test_reference_complete_xml_marc(self):
         """bibupload - reference mode, inserting references MARCXML file"""
-        # Now we append reference datafields
-        bibupload.options['mode'] = 'reference'
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_reference)
         # We call the main function with the record as a parameter
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='reference')
         # We retrieve the inserted xml
         reference_xm = print_record(recid, 'xm')
         reference_hm = print_record(recid, 'hm')
@@ -699,10 +684,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
            (see self.recid3_xm_before_all_the_tests).
            Does not restore HB and HD formats.
         """
-        bibupload.options['mode'] = 'replace'
-        bibupload.options['verbose'] = 0
         recs = bibupload.xml_marc_to_records(self.recid3_xm_before_all_the_tests)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='replace')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(compare_xmbuffers(inserted_xm, self.recid3_xm_before_all_the_tests))
@@ -710,10 +693,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_inserting_new_record_containing_fmt_tag(self):
         """bibupload - FMT tag, inserting new record containing FMT tag"""
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
         recs = bibupload.xml_marc_to_records(self.new_xm_with_fmt)
-        (dummy, new_recid) = bibupload.bibupload(recs[0])
+        (dummy, new_recid) = bibupload.bibupload(recs[0], opt_mode='insert')
         xm_after = print_record(new_recid, 'xm')
         hm_after = print_record(new_recid, 'hm')
         hb_after = print_record(new_recid, 'hb')
@@ -725,13 +706,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_format_mode(self):
         """bibupload - FMT tag, updating existing record via format mode"""
-        bibupload.options['mode'] = 'format'
-        bibupload.options['verbose'] = 0
         xm_before = print_record(3, 'xm')
         hm_before = print_record(3, 'hm')
         # insert first format value:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_first)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='format')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -740,7 +719,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_second)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='format')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -754,13 +733,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_correct_mode(self):
         """bibupload - FMT tag, updating existing record via correct mode"""
-        bibupload.options['mode'] = 'correct'
-        bibupload.options['verbose'] = 0
         xm_before = print_record(3, 'xm')
         hm_before = print_record(3, 'hm')
         # insert first format value:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_first)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='correct')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -769,7 +746,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_second)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='correct')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -783,11 +760,9 @@ class BibUploadFMTModeTest(unittest.TestCase):
 
     def test_updating_existing_record_formats_in_replace_mode(self):
         """bibupload - FMT tag, updating existing record via replace mode"""
-        bibupload.options['mode'] = 'replace'
-        bibupload.options['verbose'] = 0
         # insert first format value:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_first)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='replace')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -798,7 +773,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_second)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='replace')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -812,7 +787,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # final insertion and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='replace')
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
@@ -990,15 +965,13 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     def test_insert_the_same_sysno_record(self):
         """bibupload - SYSNO tag, refuse to insert the same SYSNO record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = self.verbose
         if self.verbose:
             print "test_insert_the_same_sysno_record() started"
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID when comparing whether it worked:
@@ -1012,7 +985,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid2, 'xm')
         inserted_hm = print_record(recid2, 'hm')
         # use real recID when comparing whether it worked:
@@ -1024,7 +997,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
                                            self.hm_testrec2))
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
         self.assertEqual(-1, recid1_updated)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1036,15 +1009,14 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     def test_insert_or_replace_the_same_sysno_record(self):
         """bibupload - SYSNO tag, allow to insert or replace the same SYSNO record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         if self.verbose:
             print "test_insert_or_replace_the_same_sysno_record() started"
         # insert/replace record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1055,10 +1027,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           self.hm_testrec1))
         # try to insert/replace updated record 1, it should be okay:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0],
+            opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1_updated, 'xm')
         inserted_hm = print_record(recid1_updated, 'hm')
         self.assertEqual(recid1, recid1_updated)
@@ -1078,15 +1050,14 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     def test_replace_nonexisting_sysno_record(self):
         """bibupload - SYSNO tag, refuse to replace non-existing SYSNO record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         if self.verbose:
             print "test_replace_nonexisting_sysno_record() started"
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1097,12 +1068,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                            self.hm_testrec1))
         # try to replace record 2 it should fail:
-        bibupload.options['mode'] = 'replace'
-        bibupload.options['verbose'] = self.verbose
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='replace')
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1259,15 +1228,14 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
     def test_insert_the_same_extoaiid_record(self):
         """bibupload - EXTOAIID tag, refuse to insert the same EXTOAIID record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         if self.verbose:
             print "test_insert_the_same_extoaiid_record() started"
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID when comparing whether it worked:
@@ -1281,7 +1249,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid2, 'xm')
         inserted_hm = print_record(recid2, 'hm')
         # use real recID when comparing whether it worked:
@@ -1293,7 +1261,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                                            self.hm_testrec2))
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
         self.assertEqual(-1, recid1_updated)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1305,15 +1273,14 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
     def test_insert_or_replace_the_same_extoaiid_record(self):
         """bibupload - EXTOAIID tag, allow to insert or replace the same EXTOAIID record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         if self.verbose:
             print "test_insert_or_replace_the_same_extoaiid_record() started"
         # insert/replace record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1324,10 +1291,8 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           self.hm_testrec1))
         # try to insert/replace updated record 1, it should be okay:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1_updated, 'xm')
         inserted_hm = print_record(recid1_updated, 'hm')
         self.assertEqual(recid1, recid1_updated)
@@ -1347,15 +1312,14 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
     def test_replace_nonexisting_extoaiid_record(self):
         """bibupload - EXTOAIID tag, refuse to replace non-existing EXTOAIID record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         if self.verbose:
             print "test_replace_nonexisting_extoaiid_record() started"
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1366,12 +1330,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                            self.hm_testrec1))
         # try to replace record 2 it should fail:
-        bibupload.options['mode'] = 'replace'
-        bibupload.options['verbose'] = self.verbose
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='replace')
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1527,14 +1489,12 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
 
     def test_insert_the_same_oai_record(self):
         """bibupload - OAIID tag, refuse to insert the same OAI record"""
-        # initialize bibupload mode:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID when comparing whether it worked:
@@ -1548,7 +1508,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid2, 'xm')
         inserted_hm = print_record(recid2, 'hm')
         # use real recID when comparing whether it worked:
@@ -1560,7 +1520,7 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
                                            self.hm_testrec2))
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
         self.assertEqual(-1, recid1_updated)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1570,13 +1530,12 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
     def test_insert_or_replace_the_same_oai_record(self):
         """bibupload - OAIID tag, allow to insert or replace the same OAI record"""
         # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         # insert/replace record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1587,10 +1546,8 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                            self.hm_testrec1))
         # try to insert/replace updated record 1, it should be okay:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
-        err1_updated, recid1_updated = bibupload.bibupload(recs[0])
+        err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1_updated, 'xm')
         inserted_hm = print_record(recid1_updated, 'hm')
         self.assertEqual(recid1, recid1_updated)
@@ -1607,14 +1564,12 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
 
     def test_replace_nonexisting_oai_record(self):
         """bibupload - OAIID tag, refuse to replace non-existing OAI record"""
-        # initialize bibupload mode:
-        bibupload.options['mode'] = 'replace_or_insert'
-        bibupload.options['verbose'] = self.verbose
+        task_set_option('verbose', self.verbose)
         # insert record 1 first time:
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
         # use real recID in test buffers when comparing whether it worked:
@@ -1625,12 +1580,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                            self.hm_testrec1))
         # try to replace record 2 it should fail:
-        bibupload.options['mode'] = 'replace'
-        bibupload.options['verbose'] = self.verbose
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
-        err2, recid2 = bibupload.bibupload(recs[0])
+        err2, recid2 = bibupload.bibupload(recs[0], opt_mode='replace')
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
@@ -1674,10 +1627,9 @@ class BibUploadIndicatorsTest(unittest.TestCase):
 
     def test_record_with_spaces_in_indicators(self):
         """bibupload - inserting MARCXML with spaces in indicators"""
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(self.testrec1_xm)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
@@ -1688,10 +1640,9 @@ class BibUploadIndicatorsTest(unittest.TestCase):
 
     def test_record_with_no_spaces_in_indicators(self):
         """bibupload - inserting MARCXML with no spaces in indicators"""
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(self.testrec2_xm)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
@@ -1737,16 +1688,15 @@ class BibUploadUpperLowerCaseTest(unittest.TestCase):
 
     def test_record_with_upper_lower_case_letters(self):
         """bibupload - inserting similar MARCXML records with upper/lower case"""
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         # insert test record #1:
         recs = bibupload.xml_marc_to_records(self.testrec1_xm)
-        err1, recid1 = bibupload.bibupload(recs[0])
+        err1, recid1 = bibupload.bibupload(recs[0], opt_mode='insert')
         recid1_inserted_xm = print_record(recid1, 'xm')
         recid1_inserted_hm = print_record(recid1, 'hm')
         # insert test record #2:
         recs = bibupload.xml_marc_to_records(self.testrec2_xm)
-        err1, recid2 = bibupload.bibupload(recs[0])
+        err1, recid2 = bibupload.bibupload(recs[0], opt_mode='insert')
         recid2_inserted_xm = print_record(recid2, 'xm')
         recid2_inserted_hm = print_record(recid2, 'hm')
         # let us compare stuff now:
@@ -1819,12 +1769,11 @@ class BibUploadStrongTagsTest(unittest.TestCase):
         %(strong_tag)s__ $$aA value$$bAnother value
         """ % {'strong_tag': bibupload.CFG_BIBUPLOAD_STRONG_TAGS[0]}
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         test_record_xm = self.testrec1_xm.replace('<controlfield tag="001">123456789</controlfield>',
                                                   '')
         recs = bibupload.xml_marc_to_records(test_record_xm)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recID:
         self.testrec1_xm = self.testrec1_xm.replace('123456789', str(recid))
         self.testrec1_hm = self.testrec1_hm.replace('123456789', str(recid))
@@ -1840,9 +1789,8 @@ class BibUploadStrongTagsTest(unittest.TestCase):
     def test_strong_tags_persistence(self):
         """bibupload - strong tags, persistence in replace mode"""
         # replace all metadata tags; will the strong tags be kept?
-        bibupload.options['mode'] = 'replace'
         recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_replace)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='replace')
         replaced_xm = print_record(recid, 'xm')
         replaced_hm = print_record(recid, 'hm')
         # did it work?
@@ -1892,10 +1840,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         8564_ $$u%(weburl)s/record/123456789/files/cds.gif
         """ % { 'weburl': weburl}
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
@@ -1969,10 +1916,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
         """ % { 'weburl': weburl}
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
@@ -2033,10 +1979,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         8564_ $$u%(weburl)s/record/123456789/files/cds.gif
         """ % { 'weburl': weburl}
         # insert test record:
-        bibupload.options['mode'] = 'insert'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
-        err, recid = bibupload.bibupload(recs[0])
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
@@ -2045,10 +1990,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         test_to_correct = test_to_correct.replace('123456789',
                                                           str(recid))
         # correct test record with new FFT:
-        bibupload.options['mode'] = 'correct'
-        bibupload.options['verbose'] = 0
+        task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
-        bibupload.bibupload(recs[0])
+        bibupload.bibupload(recs[0], opt_mode='correct')
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
