@@ -29,7 +29,8 @@ import sys
 try:
     from invenio.dbquery import run_sql
     from invenio.config import logdir, tmpdir
-    from invenio.bibtask import BibTask, write_message, write_messages
+    from invenio.bibtask import task_init, task_set_option, task_get_option, \
+        write_message, write_messages
     import time
     import os
 except ImportError, e:
@@ -51,63 +52,62 @@ CFG_MAX_ATIME_RM_OAI = 28
 # After how many days to zip obsolete bibharvest fmt xml files
 CFG_MAX_ATIME_ZIP_OAI = 7
 
-def gc_exec_command(command, verbose=1):
+def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
-    if verbose >= 9:
-        write_message('  %s' % command)
+    write_message('  %s' % command, verbose=9)
     (dontcare, output, errors) = os.popen3(command)
     write_messages(errors.read())
-    if verbose: write_messages(output.read())
+    write_messages(output.read())
 
-def clean_filesystem(verbose=1):
+def clean_filesystem():
     """ Clean the filesystem from obsolete files. """
-    if verbose: write_message("""FILESYSTEM CLEANING STARTED""")
-    if verbose: write_message("- deleting/gzipping bibsched empty/old err/log "
+    write_message("""FILESYSTEM CLEANING STARTED""")
+    write_message("- deleting/gzipping bibsched empty/old err/log "
             "BibSched files")
-    vstr = verbose > 1 and '-v' or ''
+    vstr = task_get_option('verbose') > 1 and '-v' or ''
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (logdir, vstr), verbose)
+            % (logdir, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (logdir, CFG_MAX_ATIME_RM_LOG, vstr), verbose)
+            % (logdir, CFG_MAX_ATIME_RM_LOG, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (logdir, CFG_MAX_ATIME_ZIP_LOG, vstr), verbose)
+            % (logdir, CFG_MAX_ATIME_ZIP_LOG, vstr))
 
-    if verbose: write_message("- deleting/gzipping temporary empty/old "
+    write_message("- deleting/gzipping temporary empty/old "
             "BibReformat xml files")
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (tmpdir, vstr), verbose)
+            % (tmpdir, vstr))
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_FMT, vstr), verbose)
+            % (tmpdir, CFG_MAX_ATIME_RM_FMT, vstr))
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_ZIP_FMT, vstr), verbose)
+            % (tmpdir, CFG_MAX_ATIME_ZIP_FMT, vstr))
 
-    if verbose: write_message("- deleting/gzipping temporary old "
+    write_message("- deleting/gzipping temporary old "
             "BibHarvest xml files")
     gc_exec_command('find %s -name "bibharvestadmin.*"'
         ' -exec rm %s -f {} \;' \
-            % (tmpdir, vstr), verbose)
+            % (tmpdir, vstr))
     gc_exec_command('find %s -name "bibconvertrun.*"'
         ' -exec rm %s -f {} \;' \
-            % (tmpdir, vstr), verbose)
+            % (tmpdir, vstr))
     gc_exec_command('find %s -name "oaiharvest*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_ZIP_OAI, vstr), verbose)
+            % (tmpdir, CFG_MAX_ATIME_ZIP_OAI, vstr))
     gc_exec_command('find %s -name "oaiharvest*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr), verbose)
+            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
     gc_exec_command('find %s -name "oai_archive*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr), verbose)
-    if verbose: write_message("""FILESYSTEM CLEANING FINISHED""")
+            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
+    write_message("""FILESYSTEM CLEANING FINISHED""")
 
 
-def guest_user_garbage_collector(verbose=1):
+def guest_user_garbage_collector():
     """Session Garbage Collector
 
     program flow/tasks:
@@ -135,29 +135,29 @@ def guest_user_garbage_collector(verbose=1):
                 'bskEXTFMT':0,
                 'user_query_basket': 0}
 
-    if verbose: write_message("GUEST USER SESSIONS GARBAGE"
+    write_message("GUEST USER SESSIONS GARBAGE"
         " COLLECTOR STARTED")
 
     # 1 - DELETE EXPIRED SESSIONS
-    if verbose: write_message("- deleting expired sessions")
+    write_message("- deleting expired sessions")
     timelimit = time.time()
-    if verbose >= 9: write_message("  DELETE FROM session WHERE"
-        " session_expiry < %d \n" % (timelimit, ))
+    write_message("  DELETE FROM session WHERE"
+        " session_expiry < %d \n" % (timelimit, ), verbose=9)
     delcount['session'] += run_sql("DELETE FROM session WHERE"
         " session_expiry < %s """ % (timelimit, ))
 
 
     # 1b - DELETE GUEST USERS WITHOUT SESSION
-    if verbose: write_message("- deleting guest users without session")
+    write_message("- deleting guest users without session")
 
     # get uids
-    if verbose >= 9: write_message("""  SELECT u.id\n  FROM user AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""")
+    write_message("""  SELECT u.id\n  FROM user AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""", verbose=9)
 
     result = run_sql("""SELECT u.id
     FROM user AS u LEFT JOIN session AS s
     ON u.id = s.uid
     WHERE s.uid IS NULL AND u.email = ''""")
-    if verbose >= 9: write_message(result)
+    write_message(result, verbose=9)
 
     if result:
         # work on slices of result list in case of big result
@@ -169,8 +169,8 @@ def guest_user_garbage_collector(verbose=1):
                 uidstr += "%s" % (id_user, )
 
             # delete users
-            if verbose >= 9: write_message("  DELETE FROM user WHERE"
-                " id IN (TRAVERSE LAST RESULT) AND email = '' \n")
+            write_message("  DELETE FROM user WHERE"
+                " id IN (TRAVERSE LAST RESULT) AND email = '' \n", verbose=9)
             delcount['user'] += run_sql("DELETE FROM user WHERE"
                 " id IN (%s) AND email = ''" % (uidstr, ))
 
@@ -178,50 +178,50 @@ def guest_user_garbage_collector(verbose=1):
     # 2 - DELETE QUERIES NOT ATTACHED TO ANY USER
 
     # first step, delete from user_query
-    if verbose: write_message("- deleting user_queries referencing"
+    write_message("- deleting user_queries referencing"
         " non-existent users")
 
     # find user_queries referencing non-existent users
-    if verbose >= 9: write_message("  SELECT DISTINCT uq.id_user\n"
+    write_message("  SELECT DISTINCT uq.id_user\n"
         "  FROM user_query AS uq LEFT JOIN user AS u\n"
-        "  ON uq.id_user = u.id\n  WHERE u.id IS NULL")
+        "  ON uq.id_user = u.id\n  WHERE u.id IS NULL", verbose=9)
     result = run_sql("""SELECT DISTINCT uq.id_user
         FROM user_query AS uq LEFT JOIN user AS u
         ON uq.id_user = u.id
         WHERE u.id IS NULL""")
-    if verbose >= 9: write_message(result)
+    write_message(result, verbose=9)
 
 
     # delete in user_query one by one
-    if verbose >= 9: write_message("  DELETE FROM user_query WHERE"
-        " id_user = 'TRAVERSE LAST RESULT' \n")
+    write_message("  DELETE FROM user_query WHERE"
+        " id_user = 'TRAVERSE LAST RESULT' \n", verbose=9)
     for (id_user, ) in result:
         delcount['user_query'] += run_sql("""DELETE FROM user_query
             WHERE id_user = %s""" % (id_user, ))
 
     # delete the actual queries
-    if verbose: write_message("- deleting queries not attached to any user")
+    write_message("- deleting queries not attached to any user")
 
     # select queries that must be deleted
-    if verbose >= 9: write_message("""  SELECT DISTINCT q.id\n  FROM query AS q LEFT JOIN user_query AS uq\n  ON uq.id_query = q.id\n  WHERE uq.id_query IS NULL AND\n  q.type <> 'p' """)
+    write_message("""  SELECT DISTINCT q.id\n  FROM query AS q LEFT JOIN user_query AS uq\n  ON uq.id_query = q.id\n  WHERE uq.id_query IS NULL AND\n  q.type <> 'p' """, verbose=9)
     result = run_sql("""SELECT DISTINCT q.id
                         FROM query AS q LEFT JOIN user_query AS uq
                         ON uq.id_query = q.id
                         WHERE uq.id_query IS NULL AND
                               q.type <> 'p'""")
-    if verbose >= 9: write_message(result)
+    write_message(result, verbose=9)
 
     # delete queries one by one
-    if verbose >= 9: write_message("""  DELETE FROM query WHERE id = 'TRAVERSE LAST RESULT \n""")
+    write_message("""  DELETE FROM query WHERE id = 'TRAVERSE LAST RESULT \n""", verbose=9)
     for (id_user, ) in result:
         delcount['query'] += run_sql("""DELETE FROM query WHERE id = %s""" % (id_user, ))
 
 
     # 3 - DELETE BASKETS NOT OWNED BY ANY USER
-    if verbose: write_message("- deleting baskets not owned by any user")
+    write_message("- deleting baskets not owned by any user")
 
     # select basket ids
-    if verbose >= 9: write_message(""" SELECT ub.id_bskBASKET\n  FROM user_bskBASKET AS ub LEFT JOIN user AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""")
+    write_message(""" SELECT ub.id_bskBASKET\n  FROM user_bskBASKET AS ub LEFT JOIN user AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""", verbose=9)
     try:
         result = run_sql("""SELECT ub.id_bskBASKET
                               FROM user_bskBASKET AS ub LEFT JOIN user AS u
@@ -229,64 +229,61 @@ def guest_user_garbage_collector(verbose=1):
                              WHERE u.id IS NULL""")
     except:
         result = []
-    if verbose >= 9: write_message(result)
+    write_message(result, verbose=9)
 
     # delete from user_basket and basket one by one
-    if verbose >= 9:
-        write_message("""  DELETE FROM user_bskBASKET WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' """)
-        write_message("""  DELETE FROM bskBASKET WHERE id = 'TRAVERSE LAST RESULT' """)
-        write_message("""  DELETE FROM bskREC WHERE id_bskBASKET = 'TRAVERSE LAST RESULT'""")
-        write_message("""  DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' \n""")
+    write_message("""  DELETE FROM user_bskBASKET WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' """, verbose=9)
+    write_message("""  DELETE FROM bskBASKET WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
+    write_message("""  DELETE FROM bskREC WHERE id_bskBASKET = 'TRAVERSE LAST RESULT'""", verbose=9)
+    write_message("""  DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket, ) in result:
         delcount['user_bskBASKET'] += run_sql("""DELETE FROM user_bskBASKET WHERE id_bskBASKET = %s""" % (id_basket, ))
         delcount['bskBASKET'] += run_sql("""DELETE FROM bskBASKET WHERE id = %s""" % (id_basket, ))
         delcount['bskREC'] += run_sql("""DELETE FROM bskREC WHERE id_bskBASKET = %s""" % (id_basket, ))
         delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = %s""" % (id_basket, ))
-    if verbose >= 9: write_message(""" SELECT DISTINCT ext.id, rec.id_bibrec_or_bskEXTREC FROM bskEXTREC AS ext \nLEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC WHERE id_bibrec_or_bskEXTREC is NULL""")
+    write_message(""" SELECT DISTINCT ext.id, rec.id_bibrec_or_bskEXTREC FROM bskEXTREC AS ext \nLEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC WHERE id_bibrec_or_bskEXTREC is NULL""", verbose=9)
     try:
         result = run_sql("""SELECT DISTINCT ext.id FROM bskEXTREC AS ext
                             LEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC
                             WHERE id_bibrec_or_bskEXTREC is NULL""")
     except:
         result = []
-    if verbose >= 9:
-        write_message(result)
-        write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """)
-        write_message("""  DELETE FROM bskEXTFMT WHERE id_bskEXTREC = 'TRAVERSE LAST RESULT' \n""")
+    write_message(result, verbose=9)
+    write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
+    write_message("""  DELETE FROM bskEXTFMT WHERE id_bskEXTREC = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket, ) in result:
         delcount['bskEXTREC'] += run_sql("""DELETE FROM bskEXTREC WHERE id=%s""" % (id_basket,))
         delcount['bskEXTFMT'] += run_sql("""DELETE FROM bskEXTFMT WHERE id_bskEXTREC=%s""" % (id_basket,))
 
     # 4 - DELETE ALERTS NOT OWNED BY ANY USER
-    if verbose: write_message('- deleting alerts not owned by any user')
+    write_message('- deleting alerts not owned by any user')
 
     # select user ids in uqb that reference non-existent users
-    if verbose >= 9: write_message("""SELECT DISTINCT uqb.id_user FROM user_query_basket AS uqb LEFT JOIN user AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
+    write_message("""SELECT DISTINCT uqb.id_user FROM user_query_basket AS uqb LEFT JOIN user AS u ON uqb.id_user = u.id WHERE u.id IS NULL""", verbose=9)
     result = run_sql("""SELECT DISTINCT uqb.id_user FROM user_query_basket AS uqb LEFT JOIN user AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
-    if verbose >= 9: write_message(result)
+    write_message(result, verbose=9)
 
     # delete all these entries
     for (id_user, ) in result:
-        if verbose >= 9: write_message("""DELETE FROM user_query_basket WHERE id_user = 'TRAVERSE LAST RESULT """)
+        write_message("""DELETE FROM user_query_basket WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
         delcount['user_query_basket'] += run_sql("""DELETE FROM user_query_basket WHERE id_user = %s """ % (id_user, ))
 
 
     # print STATISTICS
 
-    if verbose:
-        write_message("""STATISTICS - DELETED DATA: """)
-        write_message("""- %7s sessions.""" % (delcount['session'], ))
-        write_message("""- %7s users.""" % (delcount['user'], ))
-        write_message("""- %7s user_queries.""" % (delcount['user_query'], ))
-        write_message("""- %7s queries.""" % (delcount['query'], ))
-        write_message("""- %7s baskets.""" % (delcount['bskBASKET'], ))
-        write_message("""- %7s user_baskets.""" % (delcount['user_bskBASKET'], ))
-        write_message("""- %7s basket_records.""" % (delcount['bskREC'], ))
-        write_message("""- %7s basket_external_records.""" % (delcount['bskEXTREC'], ))
-        write_message("""- %7s basket_external_formats.""" % (delcount['bskEXTFMT'], ))
-        write_message("""- %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
-        write_message("""- %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
-        write_message("""GUEST USER SESSIONS GARBAGE COLLECTOR FINISHED""")
+    write_message("""STATISTICS - DELETED DATA: """)
+    write_message("""- %7s sessions.""" % (delcount['session'], ))
+    write_message("""- %7s users.""" % (delcount['user'], ))
+    write_message("""- %7s user_queries.""" % (delcount['user_query'], ))
+    write_message("""- %7s queries.""" % (delcount['query'], ))
+    write_message("""- %7s baskets.""" % (delcount['bskBASKET'], ))
+    write_message("""- %7s user_baskets.""" % (delcount['user_bskBASKET'], ))
+    write_message("""- %7s basket_records.""" % (delcount['bskREC'], ))
+    write_message("""- %7s basket_external_records.""" % (delcount['bskEXTREC'], ))
+    write_message("""- %7s basket_external_formats.""" % (delcount['bskEXTFMT'], ))
+    write_message("""- %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
+    write_message("""- %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
+    write_message("""GUEST USER SESSIONS GARBAGE COLLECTOR FINISHED""")
 
     return
 
@@ -436,7 +433,8 @@ def test_runtest_guest_user_garbage_collector():
 
     test_insertdata()
     test_showdata()
-    guest_user_garbage_collector(verbose=9)
+    task_set_option('verbose', 9)
+    guest_user_garbage_collector()
     test_showdata()
     if test_checkdata():
         print '\n\nGARBAGE COLLECTOR CLEANED ' \
@@ -447,44 +445,39 @@ def test_runtest_guest_user_garbage_collector():
     test_deletedata_nooutput()
     return
 
-class SessionGCBibTask(BibTask):
-    def __init__(self):
-        """Construct a SessionGCBibTask"""
-        BibTask.__init__(self,
-            authorization_msg='SessionGC',
-            authorization_action='runsessiongc',
-            specific_params=("f", ["filesystem"]),
+def main():
+    """Main that construct all the bibtask."""
+    task_set_option('filesystem', False)
+    task_init(authorization_action='runsessiongc',
+            authorization_msg="SessionGC Task Submission",
             help_specific_usage="  -f, --filesystem\t\t Clean up the"
                 " filesystem.\n",
-            description="Description: %s garbage collects all the"
-                " guests users sessions\n" % sys.argv[0])
+            specific_params=("f", ["filesystem"]),
+            task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+            task_run_fnc=task_run_core)
 
-    def task_submit_elaborate_specific_parameter(self, key, value):
-        """ Given the string key it checks it's meaning, eventually using the
-        value. Usually it fills some key in the options dict.
-        It must return True if it has elaborated the key, False, if it doesn't
-        know that key.
-        eg:
-        if key in ['-n', '--number']:
-            self.options['number'] = value
-            return True
-        return False
-        """
-        if key in ['-f', '--filesystem']:
-            self.options['filesystem'] = True
-            return True
-        return False
+def task_submit_elaborate_specific_parameter(key, value, opts, args):
+    """ Given the string key it checks it's meaning, eventually using the
+    value. Usually it fills some key in the options dict.
+    It must return True if it has elaborated the key, False, if it doesn't
+    know that key.
+    eg:
+    if key in ['-n', '--number']:
+        self.options['number'] = value
+        return True
+    return False
+    """
+    if key in ('-f', '--filesystem'):
+        task_set_option('filesystem', True)
+        return True
+    return False
 
-    def task_run_core(self):
-        """ Reimplement to add the body of the task."""
-        guest_user_garbage_collector(self.options["verbose"])
-        if self.options.get("filesystem", False):
-            clean_filesystem(self.options["verbose"])
-
-def main():
-    """CLI to the session garbage collector."""
-    task = SessionGCBibTask()
-    task.main()
+def task_run_core():
+    """ Reimplement to add the body of the task."""
+    guest_user_garbage_collector()
+    if task_get_option('filesystem'):
+        clean_filesystem()
+    return True
 
 if __name__ == '__main__':
     main()

@@ -23,10 +23,6 @@ __revision__ = "$Id$"
 
 import calendar
 import copy
-import getopt
-import getpass
-import marshal
-import signal
 import sys
 import cgi
 import re
@@ -35,7 +31,6 @@ import string
 import zlib
 import Numeric
 import time
-import traceback
 
 from invenio.config import \
      CFG_CERN_SITE, \
@@ -56,7 +51,8 @@ from invenio.websearch_external_collections import \
      external_collection_load_states, \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
-from invenio.bibtask import BibTask, write_message, write_messages
+from invenio.bibtask import task_init, task_get_option, task_set_option, \
+    write_message, task_has_option, task_update_progress
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
@@ -229,7 +225,7 @@ class Collection:
             descendants += col_desc.get_descendants()
         return descendants
 
-    def write_cache_file(self, options, filename='', filebody=''):
+    def write_cache_file(self, filename='', filebody=''):
         "Write a file inside collection cache."
         # open file:
         dirname = "%s/collections/%d" % (cachedir, self.id)
@@ -247,15 +243,14 @@ class Collection:
             print "I/O Error: " + str(message) + " (" + str(code) + ")"
             sys.exit(1)
         # print user info:
-        if options['verbose'] >= 6:
-            write_message("... creating %s" % fullfilename)
+        write_message("... creating %s" % fullfilename, verbose=6)
         sys.stdout.flush()
         # print page body:
         f.write(filebody)
         # close file:
         f.close()
 
-    def update_webpage_cache(self, options):
+    def update_webpage_cache(self):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
 
@@ -268,14 +263,14 @@ class Collection:
         for lang, lang_fullname in language_list_long():
 
             # but only if some concrete language was not chosen only:
-            if options.get("language", lang) == lang:
+            if task_get_option("language", lang) == lang:
 
                 # load the right message language
                 _ = gettext_set_language(lang)
 
                 ## first, update navtrail:
                 for as in range(0, 2):
-                    self.write_cache_file(options, "navtrail-as=%s-ln=%s" % (as, lang),
+                    self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
                                           self.create_navtrail_links(as, lang))
                 ## second, update page body:
                 for as in range(0, 2): # do both simple search and advanced search pages:
@@ -290,14 +285,14 @@ class Collection:
                              instantbrowse = self.create_instant_browse(as=as, ln=lang),
                              ne_portalbox = self.create_portalbox(lang, 'ne')
                            )
-                    self.write_cache_file(options, "body-as=%s-ln=%s" % (as, lang), body)
+                    self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
                 ## third, write portalboxes:
-                self.write_cache_file(options, "portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
-                self.write_cache_file(options, "portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
-                self.write_cache_file(options, "portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
-                self.write_cache_file(options, "portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
+                self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
+                self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
+                self.write_cache_file("portalbox-lt-ln=%s" % lang, self.create_portalbox(lang, "lt"))
+                self.write_cache_file("portalbox-rt-ln=%s" % lang, self.create_portalbox(lang, "rt"))
                 ## fourth, write 'last updated' information:
-                self.write_cache_file(options, "last-updated-ln=%s" % lang,
+                self.write_cache_file("last-updated-ln=%s" % lang,
                                       convert_datestruct_to_dategui(time.localtime(),
                                                                     ln=lang))
         return
@@ -628,13 +623,12 @@ class Collection:
           formatoptions = self.create_formatoptions(ln)
         )
 
-    def calculate_reclist(self, options):
+    def calculate_reclist(self):
         """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""
         if self.calculate_reclist_run_already:
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
-        if options["verbose"] >= 6:
-            write_message("... calculating reclist of %s" % self.name)
+        write_message("... calculating reclist of %s" % self.name, verbose=6)
         reclist = HitSet() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = HitSet() # will hold results for both public and nonpublic sons; good for deducing total
                                                    # number of documents
@@ -642,7 +636,7 @@ class Collection:
             # A - collection does not have dbquery, so query recursively all its sons
             #     that are either non-restricted or that have the same restriction rules
             for coll in self.get_sons():
-                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist(options)
+                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
                 if ((coll.restricted_p() is None) or
                     (coll.restricted_p() == self.restricted_p())):
                     # add this reclist ``for real'' only if it is public
@@ -669,13 +663,12 @@ class Collection:
         # return the two sets:
         return (self.reclist, self.reclist_with_nonpublic_subcolls)
 
-    def update_reclist(self, options):
+    def update_reclist(self):
         "Update the record universe for given collection; nbrecs, reclist of the collection table."
         if self.update_reclist_run_already:
             # do we have to reupdate?
             return 0
-        if options["verbose"] >= 6:
-            write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs))
+        write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs), verbose=6)
         sys.stdout.flush()
         try:
             query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
@@ -770,123 +763,116 @@ def set_cache_last_updated_timestamp(timestamp):
     f.close()
     return timestamp
 
-class WebCollBibTask(BibTask):
-    def __init__(self):
-        """ Construct a BibTask.
-        @param header is the header to print in logs.
-        @param action is the action name connected with this task and checked
-        by acc_authorize_action
-        @param output is the stream to which to output log strings.
-        #"""
-        BibTask.__init__(self, authorization_msg="WebColl Task Submission",
-                authorization_action="runwebcoll",
-                specific_params=("c:fp:l:", [
-                    "collection=",
-                    "force",
-                    "part=",
-                    "language="
-                ]),
-                help_specific_usage="  -c, --collection\t Update cache for the given"
+def main():
+    """Main that construct all the bibtask."""
+    task_init(authorization_action="runwebcoll",
+            authorization_msg="WebColl Task Submission",
+            description="""Description: %s updates the collection cache
+    (record universe for a given collection plus web page elements)
+    based on WML and DB configuration parameters.
+    If the collection name is passed as the second argument, it'll update
+    this collection only.  If the collection name is immediately followed
+    by a plus sign, it will also update all its desdendants.  The
+    top-level collection name may be entered as the void string.\n""", help_specific_usage="  -c, --collection\t Update cache for the given"
                      "collection only. [all]\n"
                     "  -f, --force\t Force update even if cache is up to date. [no]\n"
                     "  -p, --part\t Update only certain cache parts (1=reclist,"
                     " 2=webpage). [both]\n"
                     "  -l, --language\t Update pages in only certain language"
                     " (e.g. fr). [all]\n",
-                description="""Description: %s updates the collection cache
-    (record universe for a given collection plus web page elements)
-    based on WML and DB configuration parameters.
-    If the collection name is passed as the second argument, it'll update
-    this collection only.  If the collection name is immediately followed
-    by a plus sign, it will also update all its desdendants.  The
-    top-level collection name may be entered as the void string.\n""" % sys.argv[0])
+            specific_params=("c:fp:l:", [
+                    "collection=",
+                    "force",
+                    "part=",
+                    "language="
+                ]),
+            task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+            task_submit_check_options_fnc=task_submit_check_options,
+            task_run_fnc=task_run_core)
 
-    def task_submit_elaborate_specific_parameter(self, key, value):
-        """ Given the string key it checks it's meaning, eventually using the value.
-        Usually it fills some key in the options dict.
-        It must return True if it has elaborated the key, False, if it doesn't
-        know that key.
-        eg:
-        if key in ['-n', '--number']:
-            self.options['number'] = value
-            return True
-        return False
-        """
-        if key in [ "-c", "--collection"]:
-            self.options["collection"] = value
-        elif key in [ "-f", "--force"]:
-            self.options["force"] = 1
-        elif key in [ "-p", "--part"]:
-            self.options["part"] = int(value)
-        elif key in [ "-l", "--language"]:
-            self.options["language"] = value
-        else:
-            return False
+
+def task_submit_elaborate_specific_parameter(key, value, opts, args):
+    """ Given the string key it checks it's meaning, eventually using the value.
+    Usually it fills some key in the options dict.
+    It must return True if it has elaborated the key, False, if it doesn't
+    know that key.
+    eg:
+    if key in ['-n', '--number']:
+        self.options['number'] = value
         return True
+    return False
+    """
+    if key in ("-c", "--collection"):
+        task_set_option("collection", value)
+    elif key in ("-f", "--force"):
+        task_set_option("force", 1)
+    elif key in ("-p", "--part"):
+        task_set_option("part", int(value))
+    elif key in ("-l", "--language"):
+        task_set_option("language", value)
+    else:
+        return False
+    return True
 
-    def task_run_core(self):
-        """ Reimplement to add the body of the task."""
-        task_run_start_timestamp = get_current_time_timestamp()
-        colls = []
-        # decide whether we need to run or not, by comparing last updated timestamps:
-        if self.options["verbose"] >= 3:
-            write_message("Database timestamp is %s." % get_database_last_updated_timestamp())
-            write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp())
-            if self.options.has_key("part"):
-                write_message("Running cache update part %s only." % self.options["part"])
-        if self.options.has_key("force") or \
-        compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
-                                            get_cache_last_updated_timestamp(),
-                                            cfg_cache_last_updated_timestamp_tolerance) >= 0:
-            ## either forced update was requested or cache is not up to date, so recreate it:
-            # firstly, decide which collections to do:
-            if self.options.has_key("collection"):
-                coll = get_collection(self.options["collection"])
-                if coll.id is None:
-                    self.usage(1, 'Collection %s does not exist' % coll.name)
-                colls.append(coll)
-            else:
-                res = run_sql("SELECT name FROM collection ORDER BY id")
-                for row in res:
-                    colls.append(get_collection(row[0]))
-            # secondly, update collection reclist cache:
-            if self.options.get("part", 1) == 1:
-                i = 0
-                for coll in colls:
-                    i += 1
-                    if self.options["verbose"]:
-                        write_message("%s / reclist cache update" % coll.name)
-                    coll.calculate_reclist(self.options)
-                    coll.update_reclist(self.options)
-                    self.task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
-            # thirdly, update collection webpage cache:
-            if self.options.get("part", 2) == 2:
-                i = 0
-                for coll in colls:
-                    i += 1
-                    if self.options["verbose"]:
-                        write_message("%s / webpage cache update" % coll.name)
-                    coll.update_webpage_cache(self.options)
-                    self.task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
+def task_submit_check_options():
+    if task_has_option('collection'):
+        coll = get_collection(task_get_option("collection"))
+        if coll.id is None:
+            raise StandardError, 'Collection %s does not exist' % coll.name
+    return True
 
-            # finally update the cache last updated timestamp:
-            # (but only when all collections were updated, not when only
-            # some of them were forced-updated as per admin's demand)
-            if not self.options.has_key("collection"):
-                set_cache_last_updated_timestamp(task_run_start_timestamp)
-                if self.options["verbose"] >= 3:
-                    write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp())
+def task_run_core():
+    """ Reimplement to add the body of the task."""
+    task_run_start_timestamp = get_current_time_timestamp()
+    colls = []
+    # decide whether we need to run or not, by comparing last updated timestamps:
+    write_message("Database timestamp is %s." % get_database_last_updated_timestamp(), verbose=3)
+    write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp(), verbose=3)
+    if task_has_option("part"):
+        write_message("Running cache update part %s only." % task_get_option("part"), verbose=3)
+    if task_has_option("force") or \
+    compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
+                                        get_cache_last_updated_timestamp(),
+                                        cfg_cache_last_updated_timestamp_tolerance) >= 0:
+        ## either forced update was requested or cache is not up to date, so recreate it:
+        # firstly, decide which collections to do:
+        if task_has_option("collection"):
+            coll = get_collection(task_get_option("collection"))
+            colls.append(coll)
         else:
-            ## cache up to date, we don't have to run
-            if self.options["verbose"]:
-                write_message("Collection cache is up to date, no need to run.")
-            pass
-        ## we are done:
+            res = run_sql("SELECT name FROM collection ORDER BY id")
+            for row in res:
+                colls.append(get_collection(row[0]))
+        # secondly, update collection reclist cache:
+        if task_get_option('part', 1) == 1:
+            i = 0
+            for coll in colls:
+                i += 1
+                write_message("%s / reclist cache update" % coll.name)
+                coll.calculate_reclist()
+                coll.update_reclist()
+                task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+        # thirdly, update collection webpage cache:
+        if task_get_option("part", 2) == 2:
+            i = 0
+            for coll in colls:
+                i += 1
+                write_message("%s / webpage cache update" % coll.name)
+                coll.update_webpage_cache()
+                task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
 
-def main():
-    task = WebCollBibTask()
-    task.main()
+        # finally update the cache last updated timestamp:
+        # (but only when all collections were updated, not when only
+        # some of them were forced-updated as per admin's demand)
+        if not task_has_option("collection"):
+            set_cache_last_updated_timestamp(task_run_start_timestamp)
+            write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp(), verbose=3)
+    else:
+        ## cache up to date, we don't have to run
+        write_message("Collection cache is up to date, no need to run.")
+    ## we are done:
+    return True
 
 ### okay, here we go:
 if __name__ == '__main__':
-    WebCollBibTask()
+    main()

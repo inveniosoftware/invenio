@@ -28,13 +28,10 @@ error handling, etc.
 __revision__ = "$Id$"
 
 import sys
-from invenio.bibtask import BibTask, write_message
-import getopt
-import getpass
-import marshal
-import signal
 import time
-import traceback
+from invenio.bibtask import task_init, write_message, task_set_option, \
+        task_get_option, task_update_progress, task_has_option, task_get_task_param
+
 
 cfg_n_default = 30 # how many Fibonacci numbers to calculate if none submitted?
 
@@ -45,61 +42,52 @@ def fib(n):
         out = fib(n-2) + fib(n-1)
     return out
 
+def task_submit_elaborate_specific_parameter(key, value, opts, args):
+    """ Given the string key it checks it's meaning, eventually using the
+    value. Usually it fills some key in the options dict.
+    It must return True if it has elaborated the key, False, if it doesn't
+    know that key.
+    eg:
+    if key in ('-n', '--number'):
+        self.options['number'] = value
+        return True
+    return False
+    """
+    if key in ('-n', '--number'):
+        task_set_option('number', value)
+        return True
+    return False
 
-class BibTaskExBibTask(BibTask):
-    """Abstract class for implementing a Bibliographic task."""
-    def __init__(self):
-        BibTask.__init__(self, authorization_action='runbibtaskex', authorization_msg="BibTaskEx Task Submission",
-            description="", help_specific_usage="  -n, --number=NUM       Print Fibonacci numbers for up to NUM.  [default=30]",
-            specific_params=("n:", ["number="]))
-
-    def task_submit_elaborate_specific_parameter(self, key, value):
-        """ Given the string key it checks it's meaning, eventually using the
-        value. Usually it fills some key in the options dict.
-        It must return True if it has elaborated the key, False, if it doesn't
-        know that key.
-        eg:
-        if key in ('-n', '--number'):
-            self.options['number'] = value
-            return True
-        return False
-        """
-        if key in ('-n', '--number'):
-            self.options['number'] = value
-            return True
-        return False
-
-    def task_run_core(self):
-        """Runs the task by fetching arguments from the BibSched task queue.  This is
-        what BibSched will be invoking via daemon call.
-        The task prints Fibonacci numbers for up to NUM on the stdout, and some
-        messages on stderr.
-        Return 1 in case of success and 0 in case of failure."""
-        if self.options.has_key("number"):
-            n = self.options["number"]
-        else:
-            n = cfg_n_default
-        if self.options["verbose"] >= 9:
-            write_message("Printing %d Fibonacci numbers." % n)
-        for i in range(0, n):
-            if i > 0 and i % 4 == 0:
-                if self.options["verbose"] >= 3:
-                    write_message("Error: water in the CPU.  Ignoring and continuing.", sys.stderr)
-            elif i > 0 and i % 5 == 0:
-                if self.options["verbose"]:
-                    write_message("Error: floppy drive dropped on the floor.  Ignoring and continuing.", sys.stderr)
-            if self.options["verbose"]:
-                write_message("fib(%d)=%d" % (i, fib(i)))
-            self.task_update_progress("Done %d out of %d." % (i, n))
-            time.sleep(1)
-        self.task_update_progress("Done %d out of %d." % (n, n))
-        if self.options["verbose"]:
-            write_message("Task #%d finished." % self.task_id)
-        return 1
+def task_run_core():
+    """Runs the task by fetching arguments from the BibSched task queue.  This is
+    what BibSched will be invoking via daemon call.
+    The task prints Fibonacci numbers for up to NUM on the stdout, and some
+    messages on stderr.
+    Return 1 in case of success and 0 in case of failure."""
+    n = task_get_option('number')
+    write_message("Printing %d Fibonacci numbers." % n, verbose=9)
+    for i in range(0, n):
+        if i > 0 and i % 4 == 0:
+            write_message("Error: water in the CPU.  Ignoring and continuing.", sys.stderr, verbose=3)
+        elif i > 0 and i % 5 == 0:
+            write_message("Error: floppy drive dropped on the floor.  Ignoring and continuing.", sys.stderr)
+        write_message("fib(%d)=%d" % (i, fib(i)))
+        task_update_progress("Done %d out of %d." % (i, n))
+        time.sleep(1)
+    task_update_progress("Done %d out of %d." % (n, n))
+    write_message("Task #%d finished." % task_get_task_param('task_id'))
+    return 1
 
 def main():
-    task = BibTaskExBibTask()
-    task.main()
+    """Main that construct all the bibtask."""
+    task_set_option('number', cfg_n_default)
+    task_init(authorization_action='runbibtaskex',
+            authorization_msg="BibTaskEx Task Submission",
+            help_specific_usage="""  -n,  --number            Print Fibonacci numbers for up to NUM. [default=30]\n""",
+            specific_params=("n:",
+                ["number="]),
+            task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+            task_run_fnc=task_run_core)
 
 ### okay, here we go:
 if __name__ == '__main__':
