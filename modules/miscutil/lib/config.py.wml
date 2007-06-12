@@ -187,3 +187,8 @@ CFG_WEBSTYLE_CDSPAGEFOOTER = """<CDSPAGEFOOTER>"""
 
 # for task scheduler:
 CFG_BIBSCHED_REFRESHTIME = 5
+# CFG_BIBSCHED_LOG_PAGER = "/bin/more"
+CFG_BIBSCHED_LOG_PAGER = None # will use the environment defined one
+
+# for db engine:
+CFG_MISCUTIL_USE_SQLALCHEMY = <CFG_MISCUTIL_USE_SQLALCHEMY>

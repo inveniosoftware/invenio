@@ -43,8 +43,20 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
 
 import string
 import time
-from MySQLdb import connect
-from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_MAX_CACHED_QUERIES
+from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
+    CFG_MAX_CACHED_QUERIES, CFG_MISCUTIL_USE_SQLALCHEMY
+
+if CFG_MISCUTIL_USE_SQLALCHEMY:
+    try:
+        import sqlalchemy.pool as pool
+        import MySQLdb as mysqldb
+        mysqldb = pool.manage(mysqldb, use_threadlocal=True)
+        connect = mysqldb.connect
+    except ImportError:
+        CFG_MISCUTIL_USE_SQLALCHEMY = False
+        from MySQLdb import connect
+else:
+    from MySQLdb import connect
 
 ## Configured MySQL credentials are read here and not in config.py in
 ## order to prevent them from appearing elsewhere, as no-one should
@@ -57,7 +69,9 @@ dbpass = "<DBPASS>"
 def _db_login(relogin = 0):
     """Login to the database."""
     global DB_CONN
-    if relogin:
+    if CFG_MISCUTIL_USE_SQLALCHEMY:
+        return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+    elif relogin:
         DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
         return DB_CONN
     else:
@@ -71,7 +85,10 @@ def _db_login(relogin = 0):
 def _db_logout():
     """Close a connection."""
     global DB_CONN
-    del DB_CONN
+    try:
+        del DB_CONN
+    except NameError:
+        pass
 
 
 try:

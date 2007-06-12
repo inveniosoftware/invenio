@@ -161,6 +161,23 @@ cds.support@cern.ch
 10000
 </define-tag>
 
+## CFG_MISCUTIL_USE_SQLALCHEMY -- whethever to use SQLAlchemy.pool
+## in the db engine of CDS Invenio. This is necessary if
+## you are working with a multi-threaded installation of Apache
+## (e.g. mpm-worker). Beware that even if you enable this flag, but
+## sqlalchemy.pool is not installed and you are using a multi-threaded
+## Apache, then you will have unpredictable synchronization errors.
+## If you are going to use a multi-threaded Apache then install
+## SQLAlchemy and enable this flag.
+## It is ok to enable this flag even if you have not installed
+## SQLAlchemy, as long as you are running a preforked Apache.
+## So, if you decide not to use SQLAlchemy at all, then please, run
+## CDS Invenio on a preforked Apache Installation.
+## Note that for the moment Invenio will loose some perfomance
+## if you enable the usage of SQLAlchemy when it is not necessary.
+<define-tag CFG_MISCUTIL_USE_SQLALCHEMY whitespace=delete>
+True
+</define-tag>
 
 ## CFG_APACHE_PASSWORD_FILE -- the file where Apache user credentials
 ## are stored.  Must be an absolute pathname.  If the value does not
