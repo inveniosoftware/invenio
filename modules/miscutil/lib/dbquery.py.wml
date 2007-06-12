@@ -43,6 +43,7 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
 
 import string
 import time
+from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MAX_CACHED_QUERIES, CFG_MISCUTIL_USE_SQLALCHEMY
 
@@ -66,28 +67,28 @@ dbname = "<DBNAME>"
 dbuser = "<DBUSER>"
 dbpass = "<DBPASS>"
 
+_DB_CONN = {}
+_thread_ident = get_ident()
+
 def _db_login(relogin = 0):
     """Login to the database."""
-    global DB_CONN
     if CFG_MISCUTIL_USE_SQLALCHEMY:
         return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
     elif relogin:
-        DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-        return DB_CONN
+        _DB_CONN[_thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+        return _DB_CONN[_thread_ident]
     else:
-        try:
-            d = DB_CONN
-            return d
-        except NameError:
-            DB_CONN = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-            return DB_CONN
+        if _DB_CONN.has_key(_thread_ident):
+            return _DB_CONN[_thread_ident]
+        else:
+            _DB_CONN[_thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+            return _DB_CONN[_thread_ident]
 
 def _db_logout():
     """Close a connection."""
-    global DB_CONN
     try:
-        del DB_CONN
-    except NameError:
+        del DB_CONN[_thread_ident]
+    except KeyError:
         pass
 
 

@@ -240,22 +240,3 @@ if Numeric.__version__ < cfg_min_numeric_version:
 
     wait_for_user("Press ENTER to continue the installation anyhow...")
 
-try:
-    import sqlalchemy.pool
-except ImportError, e:
-    print """
-    *****************************************************
-    ** IMPORT WARNING %s
-    *****************************************************
-    ** Note that sqlalchemy.pool is not really         **
-    ** required if you're not running a multi-threaded **
-    ** Apache.                                         **
-    **                                                 **
-    ** You can safely continue installing CDS Invenio  **
-    ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
-    ** into production, if you are using a preforked   **
-    ** Apache installation.)                           **
-    *****************************************************
-    """ % e
-    wait_for_user("Press ENTER to continue the installation...")

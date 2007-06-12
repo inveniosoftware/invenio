@@ -67,8 +67,6 @@ Contents
         optionally with SSL support for HTTPS-secure user
         authentication.  Tested mainly with version 2.0.43 and above.
         Apache 2.x is required for the mod_python module (see below).
-        If you are going to use a multi-treaded installation of
-        Apache then see point m).
           <http://httpd.apache.org/>
 
      d) Python v2.3 or above:
@@ -168,11 +166,6 @@ Contents
 	translate the application in multiple languages. 
            <http://www.gnu.org/software/gettext/>
 	This is available by default on many systems.
-
-     m) SQLAlchemy, a set of Python tools for interacting with databases.
-        This is only necessary if you are going to use a multi-threaded
-        installation of Apache.
-           <http://www.sqlalchemy.org/>
 
    Note that the configure script checks whether you have all the
    prerequisite software installed and that it won't let you continue
