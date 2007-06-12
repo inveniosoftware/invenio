@@ -69,18 +69,18 @@ def perform_request_index(ln=cdslang):
                                                        extraname = "add new OAI set",
                                                        extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset")
 
-    header = ['id','setSpec','setName','setCollection','p1','f1','m1','p2','f2','m2','p3','f3','m3','','','']
+    header = ['id','setSpec','setName','setCollection','p1','f1','m1', 'op1', 'p2','f2','m2', 'op2','p3','f3','m3','','','']
 
     oai_set = get_oai_set()
     sets = []
 
-    for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3) in oai_set:
+    for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3, op1, op2) in oai_set:
 
         del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&oai_set_id=" + str(id) + '">delete</a>'
 
         edit_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&oai_set_id=" + str(id) + '">edit</a>'
 
-        sets.append([id, setSpec, setName, setCollection, p1,f1,m1, p2,f2,m2, p3,f3,m3, del_request, edit_request])
+        sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1,  p2,f2,m2, op2,  p3,f3,m3, del_request, edit_request])
 
     add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
 
@@ -93,13 +93,13 @@ def perform_request_index(ln=cdslang):
     return out
 
 
-def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
+def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=cdslang, func=0):
     """add a new OAI set"""
 
     out  = ""
 
     if func in ["0", 0]:
-        text   = input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, ln=cdslang)
+        text   = input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2, ln=cdslang)
         out = createform(action="addset",
                          text=text,
                          ln=ln,
@@ -110,7 +110,7 @@ def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection=
     if func in ["1", 1]:
         out += "<br />"
 
-        res = add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3)
+        res = add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2)
         if res[0] == 1:
             out += bibharvest_templates.tmpl_print_info(cdslang,
                                                         "OAI set definition %s added." % oai_set_name)
@@ -125,7 +125,7 @@ def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection=
     return nice_box("", body)
 
 
-def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', ln=cdslang, func=0):
+def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=cdslang, func=0):
     """creates html form to edit an OAI set."""
 
     if oai_set_id is None:
@@ -151,6 +151,8 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
         oai_set_p3 = oai_set[0][11]
         oai_set_f3 = oai_set[0][12]
         oai_set_m3 = oai_set[0][13]
+        oai_set_op1 = oai_set[0][14]
+        oai_set_op2 = oai_set[0][15]
 
         text = input_form(oai_set_name,
                           oai_set_spec,
@@ -167,6 +169,8 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
                           oai_set_p3,
                           oai_set_f3,
                           oai_set_m3,
+                          oai_set_op1,
+                          oai_set_op2,
                           ln=cdslang)
 
         out += extended_input_form(action="editset",
@@ -190,7 +194,9 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
                              oai_set_m2,
                              oai_set_p3,
                              oai_set_f3,
-                             oai_set_m3)
+                             oai_set_m3,
+                             oai_set_op1,
+                             oai_set_op2)
         out += "<br />"
         if res[0] == 1:
             out += bibharvest_templates.tmpl_print_info(cdslang,
@@ -235,20 +241,24 @@ def perform_request_delset(oai_set_id=None, ln=cdslang, callback='yes', func=0):
             oai_set_p3 = oai_set[0][11]
             oai_set_f3 = oai_set[0][12]
             oai_set_m3 = oai_set[0][13]
+            oai_set_op1 = oai_set[0][14]
+            oai_set_op2 = oai_set[0][15]
 
             if oai_set:
                 question = """Do you want to delete the OAI definition #%s?""" % oai_set_id
                 text = bibharvest_templates.tmpl_print_info(cdslang, question)
                 text += "<br /><br /><br />"
-                text += pagebody_text("%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s" % (oai_set_spec,
+                text += pagebody_text("%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s-%s" % (oai_set_spec,
                                                                                oai_set_name,
                                                                                oai_set_collection,
                                                                                oai_set_p1,
                                                                                oai_set_f1,
                                                                                oai_set_m1,
+                                                                               oai_set_op1,
                                                                                oai_set_p2,
                                                                                oai_set_f2,
                                                                                oai_set_m2,
+                                                                               oai_set_op2,
                                                                                oai_set_p3,
                                                                                oai_set_f3,
                                                                                oai_set_m3))
@@ -286,7 +296,7 @@ def get_oai_set(id=''):
         sql += " ORDER BY setSpec asc"
         res = run_sql(sql)
         for row in res:
-            set = ['']*14
+            set = ['']*16
             set[0] = row[0]
             set[1] = row[1]
             set[2] = row[2]
@@ -301,25 +311,29 @@ def get_oai_set(id=''):
             set[11] = params.get('p3', '')
             set[12] = params.get('f3', '')
             set[13] = params.get('m3', '')
+            set[14] = params.get('op1', 'a')
+            set[15] = params.get('op2', 'a')
             sets.append(set)
         return sets
     except StandardError, e:
         return str(e)
 
-def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3):
+def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2):
     """Modifies a row's parameters"""
 
     try:
         set_definition = 'c=' + oai_set_collection + ';' + \
-                         'p1=' + oai_set_p1 + ';' + \
-                         'f1=' + oai_set_f1 + ';' + \
-                         'm1=' + oai_set_m1 + ';' + \
-                         'p2=' + oai_set_p2 + ';' + \
-                         'f2=' + oai_set_f2 + ';' + \
-                         'm2=' + oai_set_m2 + ';' + \
-                         'p3=' + oai_set_p3 + ';' + \
-                         'f3=' + oai_set_f3 + ';' + \
-                         'm3=' + oai_set_m3 + ';'
+                         'p1=' + oai_set_p1  + ';' + \
+                         'f1=' + oai_set_f1  + ';' + \
+                         'm1=' + oai_set_m1  + ';' + \
+                         'op1='+ oai_set_op1 + ';' + \
+                         'p2=' + oai_set_p2  + ';' + \
+                         'f2=' + oai_set_f2  + ';' + \
+                         'm2=' + oai_set_m2  + ';' + \
+                         'op2='+ oai_set_op2 + ';' + \
+                         'p3=' + oai_set_p3  + ';' + \
+                         'f3=' + oai_set_f3  + ';' + \
+                         'm3=' + oai_set_m3  + ';'
         sql = """UPDATE oaiARCHIVE SET
         setName='%s',
         setSpec='%s',
@@ -359,19 +373,20 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
     except StandardError, e:
         return (0, e)
 
-def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3):
+def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2):
     """Add a definition into the OAI archive"""
     try:
         set_definition = 'c=' + oai_set_collection + ';' + \
-                         'p1=' + oai_set_p1 + ';' + \
-                         'f1=' + oai_set_f1 + ';' + \
-                         'm1=' + oai_set_m1 + ';' + \
-                         'p2=' + oai_set_p2 + ';' + \
-                         'f2=' + oai_set_f2 + ';' + \
-                         'm2=' + oai_set_m2 + ';' + \
-                         'p3=' + oai_set_p3 + ';' + \
-                         'f3=' + oai_set_f3 + ';' + \
-                         'm3=' + oai_set_m3 + ';'
+                         'p1=' + oai_set_p1  + ';' + \
+                         'f1=' + oai_set_f1  + ';' + \
+                         'm1=' + oai_set_m1  + ';' + \
+                         'op1='+ oai_set_op1 + ';' + \
+                         'p2=' + oai_set_p2  + ';' + \
+                         'f2=' + oai_set_f2  + ';' + \
+                         'm2=' + oai_set_m2  + ';' + \
+                         'p3=' + oai_set_p3  + ';' + \
+                         'f3=' + oai_set_f3  + ';' + \
+                         'm3=' + oai_set_m3  + ';'
         sql = "insert into oaiARCHIVE values (0, '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (
             escape_string(oai_set_name), \
             escape_string(oai_set_spec), \
@@ -453,14 +468,14 @@ def oai_table(ln=cdslang):
     """"""
 
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = cdslang, weburl = weburl, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
-    header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'p2', 'f2', 'm2', 'p3', 'f3', 'm3', '', '']
+    header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'op1', 'p2', 'f2', 'm2', 'p3', 'op2', 'f3', 'm3', '', '']
     oai_set = get_oai_set()
 
     sets = []
-    for (id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3) in oai_set:
+    for (id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, op1, op2) in oai_set:
         del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&oai_set_id=" + str(id) + '">delete</a>'
 
-        sets.append([id, setSpec, setName, setCollection, p1,f1,m1, p2,f2,m2, p3,f3,m3, del_request])
+        sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1, p2,f2,m2, op2, p3,f3,m3, del_request])
 
     add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
     sets.append(['',add_request,'','','','','','','','','','','',''])
@@ -490,7 +505,7 @@ def bar_text(title):
     text = """<span class="adminlabel">%s</span>""" % title
     return text
 
-def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, ln=cdslang):
+def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2, ln=cdslang):
     """"""
 
     modes = {
@@ -507,6 +522,22 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
                      ['a','',modes['a']],
                      ['y','',modes['y']],
                      ['','','']]
+
+    operators = {
+    'a' : 'AND',
+    'o' : 'OR',
+    'n' : 'AND NOT',
+        }
+
+    mode_operators_1 = [['a','',operators['a']],
+                        ['o','',operators['o']],
+                        ['n','',operators['n']],
+                        ['a','','']]
+
+    mode_operators_2 = [['a','',operators['a']],
+                        ['o','',operators['o']],
+                        ['n','',operators['n']],
+                        ['a','','']]
 
     text = "<br />"
     text += "<table><tr><td>"
@@ -552,7 +583,11 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text += drop_down_menu("oai_set_m1", mode_dropdown)
 
     text += "</td><td>"
-    text += bar_text(" and")
+    if (oai_set_op1):
+        mode_operators_1.append([oai_set_op1,'selected',operators[oai_set_op1]])
+    else:
+        mode_operators_1.append(['','selected','Operators'])
+    text += drop_down_menu("oai_set_op1", mode_operators_1)
     text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p2", value = oai_set_p2)
     text += "</td><td>"
@@ -573,7 +608,11 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text += drop_down_menu("oai_set_m2", mode_dropdown)
 
     text += "</td><td>"
-    text += bar_text(" and")
+    if (oai_set_op2):
+        mode_operators_2.append([oai_set_op2,'selected',operators[oai_set_op2]])
+    else:
+        mode_operators_2.append(['','selected','Operators'])
+    text += drop_down_menu("oai_set_op2", mode_operators_2)
     text += "</td></tr><tr><td>"
     text += input_text(ln = cdslang, title = "Phrase:", name = "oai_set_p3", value = oai_set_p3)
     text += "</td><td>"

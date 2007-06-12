@@ -103,6 +103,9 @@ def all_sets():
     Each set is [id, setName, setSpec, setCollection, 
                  setDescription, setDefinition, setRecList, 
                  p1, f1, m1, p2, f2, m2, p3, f3, m3]
+
+    but parameters p1, f1, m1, p2, f2, m2, p3, f3, m3 should not be used.
+    Use parse_set_definition(setDefinition) instead.
     """
     sets = []
     query = "select * from oaiARCHIVE"
@@ -145,7 +148,8 @@ def parse_set_definition(set_definition):
     params = {'c':'',
               'p1':'', 'f1':'', 'm1':'',
               'p2':'', 'f2':'', 'm2':'',
-              'p3':'', 'f3':'', 'm3':''}
+              'p3':'', 'f3':'', 'm3':'',
+              'op1':'a', 'op2':'a'}
     definitions = set_definition.split(';')
     for definition in definitions:
         arguments = definition.split('=')
@@ -223,19 +227,20 @@ def get_recID_list(oai_set_descriptions, set):
             setName = oai['setName']
             setCoverage += oai['c']
             setCoverage += " "
-
+            
             recID_list_ = perform_request_search(c=[coll.strip() for coll in oai['c'].split(',')],
                                                  p1=oai['p1'],
                                                  f1=oai['f1'],
                                                  m1=oai['m1'],
-                                                 op1='a',
+                                                 op1=oai['op1'],
                                                  p2=oai['p2'],
                                                  f2=oai['f2'],
                                                  m2=oai['m2'],
-                                                 op2='a',
+                                                 op2=oai['op2'],
                                                  p3=oai['p3'],
                                                  f3=oai['f3'],
                                                  m3=oai['m3'])
+            
             for recID in recID_list_:
                 if recID in recID_list:
                     pass
