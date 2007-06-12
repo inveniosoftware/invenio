@@ -68,26 +68,27 @@ dbuser = "<DBUSER>"
 dbpass = "<DBPASS>"
 
 _DB_CONN = {}
-_thread_ident = get_ident()
 
 def _db_login(relogin = 0):
     """Login to the database."""
     if CFG_MISCUTIL_USE_SQLALCHEMY:
         return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-    elif relogin:
-        _DB_CONN[_thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-        return _DB_CONN[_thread_ident]
     else:
-        if _DB_CONN.has_key(_thread_ident):
-            return _DB_CONN[_thread_ident]
+        thread_ident = get_ident()
+    if relogin:
+        _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+        return _DB_CONN[thread_ident]
+    else:
+        if _DB_CONN.has_key(thread_ident):
+            return _DB_CONN[thread_ident]
         else:
-            _DB_CONN[_thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
-            return _DB_CONN[_thread_ident]
+            _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+            return _DB_CONN[thread_ident]
 
 def _db_logout():
     """Close a connection."""
     try:
-        del DB_CONN[_thread_ident]
+        del DB_CONN[get_ident()]
     except KeyError:
         pass
 
