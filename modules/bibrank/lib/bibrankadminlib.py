@@ -902,7 +902,7 @@ def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
 
     **hidden - dictionary with name=value pairs for hidden input """
 
-    output  = '<form action="%s" method="POST">\n' % (action, )
+    output  = '<form action="%s" method="post">\n' % (action, )
     output += '<table>\n<tr><td style="vertical-align: top">'
     output += text
     if cnfrm:
