@@ -76,9 +76,9 @@ def perform_request_index(ln=cdslang):
 
     for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3, op1, op2) in oai_set:
 
-        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&oai_set_id=" + str(id) + '">delete</a>'
+        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
 
-        edit_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&oai_set_id=" + str(id) + '">edit</a>'
+        edit_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">edit</a>'
 
         sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1,  p2,f2,m2, op2,  p3,f3,m3, del_request, edit_request])
 
@@ -426,8 +426,9 @@ def drop_down_menu(boxname, list=['Select', 'selected', 'select']):
     for (value, selectedflag, txt) in list:
         text += "<option value=\""
         text += "%s\"" % value
-        text += " selected=\"%s\">" % selectedflag
-        text += "%s" % txt
+        if selectedflag:
+            text += ' selected="selected"'
+        text += ">%s</option>" % txt
     text += "</select>"
     return text
 
@@ -446,7 +447,7 @@ def create_drop_down_menu(sql):
 
 def createform(action="", text="", button="func", cnfrm='', **hidden):
     """"""
-    out  = '<form action="%s" method="POST">\n' % (action, )
+    out  = '<form action="%s" method="post">\n' % (action, )
 
     out += text
     if cnfrm:
@@ -473,7 +474,7 @@ def oai_table(ln=cdslang):
 
     sets = []
     for (id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, op1, op2) in oai_set:
-        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&oai_set_id=" + str(id) + '">delete</a>'
+        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
 
         sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1, p2,f2,m2, op2, p3,f3,m3, del_request])
 
@@ -491,8 +492,8 @@ def input_text(ln, title, name, value):
         name = ""
     if value is None:
         value = ""
-    text = """<table><tr><td width=100><span class="adminlabel">%s</span></td>""" % title
-    text += """<td align=left><input class="admin_w200" type="text" name="%s" value="%s" /></td></tr></table>""" % (cgi.escape(name,1), cgi.escape(value, 1))
+    text = """<table><tr><td width="100%%"><span class="adminlabel">%s</span></td>""" % title
+    text += """<td align="left"><input class="admin_w200" type="text" name="%s" value="%s" /></td></tr></table>""" % (cgi.escape(name,1), cgi.escape(value, 1))
     return text
 
 def pagebody_text(title):
@@ -738,7 +739,7 @@ def nice_box(header='', datalist=[], cls="admin_wvar"):
 def extended_input_form(action="", text="", button="func", cnfrm='', **hidden):
     """"""
 
-    out  = '<form action="%s" method="POST">\n' % (action, )
+    out  = '<form action="%s" method="post">\n' % (action, )
     out += '<table>\n<tr><td style="vertical-align: top">'
     out += text
     if cnfrm:

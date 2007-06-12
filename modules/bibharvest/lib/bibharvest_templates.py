@@ -31,13 +31,14 @@ from invenio.config import \
      version, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
+from invenio.htmlutils import nmtoken_from_string
 
 class Template:
     def tmpl_getnavtrail(self, ln, previous):
         """Get the navigation trail
           - 'previous' *string* - The previous navtrail"""
         _ = gettext_set_language(ln)
-        navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/bibharvest/">BibHarvest Admin</a> """ % (weburl, weburl)
+        navtrail = """<a class="navtrail" href="%s/admin/">Admin Area</a> &gt; <a class="navtrail" href="%s/admin/bibharvest/">BibHarvest Admin</a> """ % (weburl, weburl)
         navtrail = navtrail + previous
         return navtrail
 
@@ -53,11 +54,11 @@ class Template:
         _ = gettext_set_language(ln)
         guidetitle = _("See Guide")
 
-        titlebar = """ <table class="admin_wvar_nomargin"><th class="adminheader">"""
-        titlebar += """%s&nbsp;&nbsp&nbsp;<small>[<a title="%s" href="%s/%s">?</a>]</small>""" % (title, guidetitle, weburl, guideurl)
+        titlebar = """ <table class="admin_wvar_nomargin"><tr><th class="adminheader">"""
+        titlebar += """%s&nbsp;&nbsp;&nbsp;<small>[<a title="%s" href="%s/%s">?</a>]</small>""" % (title, guidetitle, weburl, guideurl)
         if extraname and extraurl:
-            titlebar += """&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;<small>[<a href="%s/%s">%s</a>]</small>""" % (weburl, extraurl, extraname)
-        titlebar += """</th></table>"""
+            titlebar += """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="%s/%s">%s</a>]</small>""" % (weburl, extraurl, extraname)
+        titlebar += """</th></tr></table>"""
         return titlebar
 
 
@@ -71,7 +72,7 @@ class Template:
         _ = gettext_set_language(ln)
         guidetitle = _("See Guide")
 
-        titlebar = """<a name="%s">""" % title
+        titlebar = """<a name="%s">""" % nmtoken_from_string(title)
         titlebar += """ </a>%s&nbsp;&nbsp;&nbsp;<small>""" % subtitle
         titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, weburl, guideurl)
         return titlebar
@@ -109,10 +110,10 @@ class Template:
         present = _("OAI sources currently present in the database")
         notpresent = _("No OAI sources currently present in the database")
         if (numbersources>0):
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br><br>""" % (numbersources, present)
+            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="info">%s %s</span></strong><br /><br />""" % (numbersources, present)
             return output
         else:
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % notpresent
+            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % notpresent
             return output
 
     def tmpl_output_schedule(self, ln, schtime, schstatus):
@@ -122,12 +123,12 @@ class Template:
         msg_cur = _("current status:")
         msg_notask = _("No oaiharvest task currently scheduled.")
         if schtime and schstatus:
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong>%s<br>
-                         &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s <br>
-                         &nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp; - %s %s </strong><br><br>""" % (msg_next, msg_sched, schtime, msg_cur, schstatus)
+            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong>%s<br />
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - %s %s <br />
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - %s %s </strong><br /><br />""" % (msg_next, msg_sched, schtime, msg_cur, schstatus)
             return output
         else:
-            output  = """&nbsp;&nbsp&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br><br>""" % msg_notask
+            output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % msg_notask
             return output
 
     def tmpl_admin_w200_text(self, ln, title, name, value):
@@ -137,7 +138,7 @@ class Template:
           - 'value' *string* - The value in the textbox"""
         _ = gettext_set_language(ln)
         text = """<span class="adminlabel">%s""" % title
-        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br>""" % (cgi.escape(name,1), cgi.escape(value, 1))
+        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br />""" % (cgi.escape(name,1), cgi.escape(value, 1))
         return text
 
     def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states):
@@ -187,20 +188,20 @@ class Template:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-            text += """</select><br>"""
+            text += """</select><br />"""
         except StandardError, e:
             for val in values:
                 if lastval==val[0]:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-            text += """</select><br>"""
+            text += """</select><br />"""
         return text
 
     def tmpl_print_info(self, ln, infotext):
         """Outputs some info"""
         _ = gettext_set_language(ln)
-        text = """<br><b><span class="info">%s</span></b>""" % infotext
+        text = """<br /><b><span class="info">%s</span></b>""" % infotext
         return text
 
     def tmpl_print_warning(self, ln, warntext):
@@ -210,11 +211,11 @@ class Template:
         return text
 
     def tmpl_print_brs(self, ln, howmany):
-        """Outputs some <br>s"""
+        """Outputs some <br />s"""
         _ = gettext_set_language(ln)
         text = ""
         while howmany>0:
-            text += """<br>"""
+            text += """<br />"""
             howmany = howmany - 1
         return text
 
@@ -226,15 +227,15 @@ class Template:
         msg_success = _("successfully validated")
         msg_nosuccess = _("does not seem to be a OAI-compliant baseURL")
         if outcome==0:
-            output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
+            output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
             return output
         else:
-            output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_nosuccess)
+            output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_nosuccess)
             return output
 
     def tmpl_output_error_info(self, ln, base, error):
         """Prints a http error message"""
         _ = gettext_set_language(ln)
         msg_error = "returns the following HTTP error: "
-        output = """<BR><span class="info">baseURL <strong>%s</strong> %s</span><BR><blockquote>%s</blockquote>""" % (base, msg_error, error)
+        output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span><br /><blockquote>%s</blockquote>""" % (base, msg_error, error)
         return output
