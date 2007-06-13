@@ -809,6 +809,10 @@ def collect_user_info(req):
     user_info['nickname'] = get_nickname(uid) or None
     user_info['email'] = get_email(uid) or None
     user_info['group'] = []
+    user_info['guest'] = isGuestUser(uid)
+    user_info['submitter'] = True # FIXME isUserSubmitter(uid),
+    user_info['referee'] = True # FIXME isUserReferee(req),
+    user_info['admin'] = True # FIXME isUserAdmin(req),
     if uid:
         user_info['group'] = [group[1] for group in get_groups(uid)]
         prefs = get_user_preferences(uid)
