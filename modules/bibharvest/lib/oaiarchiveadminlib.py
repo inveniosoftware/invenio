@@ -69,7 +69,7 @@ def perform_request_index(ln=cdslang):
                                                        extraname = "add new OAI set",
                                                        extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset")
 
-    header = ['id','setSpec','setName','setCollection','p1','f1','m1', 'op1', 'p2','f2','m2', 'op2','p3','f3','m3','','','']
+    header = ['id','setSpec','setName','setCollection','p1','f1','m1', 'op1', 'p2','f2','m2', 'op2','p3','f3','m3','','']
 
     oai_set = get_oai_set()
     sets = []
@@ -84,7 +84,7 @@ def perform_request_index(ln=cdslang):
 
     add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
 
-    sets.append(['',add_request,'','','','','','','','','','','',''])
+    sets.append(['',add_request,'','','','','','','','','','','','','','',''])
 
     out += transform_tuple(header=header, tuple=sets)
 
@@ -646,7 +646,6 @@ def check_user(req, role, adminarea=2, authorized=0):
 
 def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
     """"""
-
     align = []
     try:
         firstrow = tuple[0]
@@ -663,9 +662,8 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
                     align.append('admintdleft')
     except IndexError:
         firstrow = []
-
     tblstr = ''
-    for h in header + ['']:
+    for h in header:
         tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
     if tblstr: tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
 
@@ -678,18 +676,25 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
             for i in range(len(firstrow)): extra += '<td class="%s">%s</td>\n' % (align[i], firstrow[i])
         else:
             extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
-        extra += '<td rowspan="%s" style="vertical-align: top">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
+        #extra += '<td rowspan="%s" style="vertical-align: top">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
+        extra += '</tr>\n'
     except IndexError:
         extra = ''
     tblstr += extra
 
+    j = 1
     for row in tuple[1:]:
-        tblstr += ' <tr>\n'
+        style = ''
+        if j % 2:
+            style = ' style="background-color: rgb(235, 247, 255);"'
+        j += 1
+        tblstr += ' <tr%s>\n' % style
         if type(row) not in [int, long, str, dict]:
-            for i in range(len(row)): tblstr += '<td class="%s">%s</td>\n' % (align[i], row[i])
+            for i in range(len(row)): tblstr += '<td class="%s" style="padding:5px 10px;">%s</td>\n' % (align[i], row[i])
         else:
-            tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
+            tblstr += '  <td class="%s" style="padding:5px 10px;">%s</td>\n' % (align[0], row)
         tblstr += ' </tr> \n'
+        
 
     tblstr += '</table> \n '
     tblstr += end
