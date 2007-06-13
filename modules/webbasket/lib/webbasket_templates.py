@@ -758,7 +758,7 @@ class Template:
 %(total_label)s<br />"""
         if user_can_add_comment:
             body += """
-<form name="write_comment" method="POST" action="%(action)s">
+<form name="write_comment" method="post" action="%(action)s">
   <input type="submit" value="%(button_label)s" style="margin: 10px;" class="formbutton" />
 </form>"""
         if user_can_view_comments:
@@ -913,7 +913,7 @@ class Template:
   %(record)s
   <hr />
   <h2>%(write_label)s</h2>
-  <form name="write_comment" method="POST" action="%(action)s">
+  <form name="write_comment" method="post" action="%(action)s">
     <p class="bsklabel">%(title_label)s:</p>
     <input type="text" name="title" size="80" />
     <p class="bsklabel">%(comment_label)s:</p>
@@ -1006,6 +1006,7 @@ class Template:
   <td style="padding: 10 5 0 5;">%s</td>
   <td style="padding: 10 5 0 0;">%s</td>
 </tr>
+<tr>
   <td style="padding: 10 5 0 5;">%s</td>
   <td style="padding: 10 5 0 0;"><input type="text" name="new_topic_name" value="%s"/></td>
 </tr>""" % (_("Basket's name"), new_basket_name,
@@ -1026,7 +1027,7 @@ class Template:
         @param ln: language"""
         _ = gettext_set_language(ln)
         out = """
-<form name="create_basket" action="%(action)s" method="POST">
+<form name="create_basket" action="%(action)s" method="post">
   <input type="hidden" name="ln" value="%(ln)s" />
   <div style="padding:10px;">
     %(create_box)s
@@ -1131,7 +1132,7 @@ class Template:
         while (len(fields) != 4): 
             fields.append('')
         out = """
-<form name="add_to_basket" action="%(action)s" method="POST">
+<form name="add_to_basket" action="%(action)s" method="post">
   <p>%(label)s:</p>
   <input type="hidden" name="referer" value="%(referer)s" />
   %(out_hidden_recids)s
@@ -1307,7 +1308,7 @@ class Template:
             delete_button = '<input type="submit" class="nonsubmitbutton" name="delete" value="%s" />'
             delete_button %=  _("Delete basket")
         out = """
-<form name="edit" action="%(action)s" method="POST">
+<form name="edit" action="%(action)s" method="post">
   <p>%(label)s</p>
   <input type="hidden" name="ln" value="%(ln)s" />
   <input type="hidden" name="bskid" value="%(bskid)i" />
@@ -1415,7 +1416,7 @@ class Template:
                                             title=_("Add group"),
                                             body=groups_body)
         out = """
-<form name="add_group" action="%(action)s" method="POST">
+<form name="add_group" action="%(action)s" method="post">
   <p>%(label)s</p>
   <input type="hidden" name="ln" value="%(ln)s" />
   <input type="hidden" name="bskid" value="%(bskid)i" />
@@ -1467,11 +1468,9 @@ class Template:
              'x_url_close': '</a>'}
         out = """
 <table class="errorbox">
-  <thead>
     <tr>
       <th class="errorboxheader">%s</th>
     </tr>
-  </thead>
 </table>"""
         return out % message
           
