@@ -68,17 +68,17 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 ### Query the database
 ###
     task_update_progress('Fetching records to process')
-    if process_format:
-        write_message("Querying database for records with missing format ...")
+    if process_format: # '-without' parameter
+        write_message("Querying database for records without cache...")
         without_format = without_fmt(sql)
 
     recIDs = []
 
-    if  cds_query['field']      != "" or  \
-        cds_query['collection'] != "" or  \
-        cds_query['pattern']    != "":
+    if cds_query['field']      != "" or  \
+       cds_query['collection'] != "" or  \
+       cds_query['pattern']    != "":
 
-        write_message("Querying database for records with old format (CDS query)...")
+        write_message("Querying database (CDS query)...")
 
         res = perform_request_search(req=None, of='id', c=cds_query['collection'], p=cds_query['pattern'], f=cds_query['field'])
 
@@ -86,18 +86,18 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
             recIDs.append(item)
 
     for sql_query in sql_queries:
-        write_message("Querying database for records with old format (SQL query) ...")
+        write_message("Querying database (SQL query) ...")
         res = run_sql(sql_query)
         for item in res:
             recIDs.append(item[0])
 
 ### list of corresponding record IDs was retrieved
-### bibformat the records selected
+### now format the selected records
 
     if process_format:
         write_message("Records to be processed: %d" % (len(recIDs) \
                                                + len(without_format)))
-        write_message("Out of it records without created format: %d" % len(without_format))
+        write_message("Out of it records without existing cache: %d" % len(without_format))
     else:
         write_message("Records to be processed: %d" % (len(recIDs)))
 
@@ -192,24 +192,19 @@ def ldiff(l1, l2):
 def without_fmt(sql):
     "List of record IDs to be reformated, not having the specified format yet"
 
-    format2 = []
+    rec_ids_with_cache = []
     all_rec_ids = []
 
     q1 = sql['q1']
     q2 = sql['q2']
 
     ## get complete recID list
-    all_rec_ids = run_sql(q1)
+    all_rec_ids = [x[0] for x in run_sql(q1)]
 
     ## get complete recID list of formatted records
-    format1 = run_sql(q2)
+    rec_ids_with_cache = [x[0] for x in run_sql(q2)]
 
-    for item in format1:
-        format2.append(item[0])
-
-    all_rec_ids = map(lambda x: x[0], all_rec_ids)
-
-    return lhdiff(all_rec_ids, format2)
+    return lhdiff(all_rec_ids, rec_ids_with_cache)
 
 
 ### Bibreformat all selected records (using new python bibformat)
@@ -469,22 +464,49 @@ def main():
     task_set_option('format', 'hb')
     task_init(authorization_action='runbibformat',
             authorization_msg="BibReformat Task Submission",
-            description="""Example: bibreformat -n  Show how many records are to be bibreformated.\n""", help_specific_usage="""  -a,  --all            \t\t All records
-  -c,  --collection     \t\t Select records by collection
-  -f,  --field          \t\t Select records by field
-  -p,  --pattern        \t\t Select records by pattern
-  -o,  --format         \t\t Specify output format to be (re-)created. (default HB)
-  -n,  --noprocess      \t\t Count records to be processed only (no processing done)
+            description="""
+BibReformat formats the records and saves the produced outputs for
+later retrieval.
+
+BibReformat is usually run periodically via BibSched in order to (1)
+format new records in the database and to (2) reformat records for
+which the meta data has been modified.
+
+BibReformat has to be run manually when (3) format config files have
+been modified, in order to see the changes in the web interface.
+
+Although it is not necessary to run BibReformat to display formatted
+records in the web interface, BibReformat allows to improve serving
+speed by precreating the outputs. It is suggested to run
+BibReformat for 'HB' output.
+
+Examples:
+  bibreformat                    Format all new or modified records (in HB).
+  bibreformat -o HD              Format all new or modified records in HD.
+
+  bibreformat -a                 Force reformatting all records (in HB).
+  bibreformat -c 'Photos'        Force reformatting all records in 'Photos' collection (in HB).
+  bibreformat -c 'Photos' -o HD  Force reformatting all records in 'Photos' collection in HD.
+
+  bibreformat -n                 Show how many records are to be (re)formatted.
+  bibreformat -n -c 'Articles'   Show how many records are to be (re)formatted in 'Articles' collection.
+
+  bibreformat -oHB -s1h          Format all new and modified records every hour, in HB.
+""", help_specific_usage="""  -o,  --format         \t Specify output format (default HB)
+  -n,  --noprocess      \t Count records to be formatted (no processing done)
+Reformatting options:
+  -a,  --all            \t Force reformatting all records
+  -c,  --collection     \t Force reformatting records by collection
+  -f,  --field          \t Force reformatting records by field
+  -p,  --pattern        \t Force reformatting records by pattern
 """,
-            specific_params=("ac:f:p:lo:nwl",
+            specific_params=("ac:f:p:lo:n",
                 ["all",
                 "collection=",
                 "field=",
                 "pattern=",
                 "format=",
-                "noprocess",
-                "without",
-                "last"]),
+                "noprocess"]),
             task_submit_check_options_fnc=task_submit_check_options,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
