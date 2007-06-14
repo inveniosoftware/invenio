@@ -2713,8 +2713,23 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                            (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\"\" ind2=\"\"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
+                # controlfields
+                query = "SELECT b.tag,b.value,bb.field_number FROM bib00x AS b, bibrec_bib00x AS bb "\
+                        "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '00%%' "\
+                        "ORDER BY bb.field_number, b.tag ASC" % recID
+                res = run_sql(query)
+                for row in res:
+                    field, value = row[0], row[1]
+                    value = encode_for_xml(value)
+                    out += """        <controlfield tag="%s" >%s</controlfield>\n""" % \
+                           (encode_for_xml(field[0:3]), value)
+                # datafields
+                i = 1 # Do not process bib00x and bibrec_bib00x, as
+                      # they are controlfields. So start at bib01x and
+                      # bibrec_bib00x (and set i = 0 at the end of
+                      # first loop)
                 for digit1 in range(0, 10):
-                    for digit2 in range(0, 10):
+                    for digit2 in range(i, 10):
                         bx = "bib%d%dx" % (digit1, digit2)
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
@@ -2726,30 +2741,29 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                         for row in res:
                             field, value, field_number = row[0], row[1], row[2]
                             ind1, ind2 = field[3], field[4]
-                            if ind1 == "_":
-                                ind1 = ""
-                            if ind2 == "_":
-                                ind2 = ""
+                            if ind1 == "_" or ind1 == "":
+                                ind1 = " "
+                            if ind2 == "_" or ind2 == "":
+                                ind2 = " "
                             # print field tag
                             if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                                if format.startswith("xm") or format == "marcxml":
-                                    if field_number_old != -999:
-                                        out += """        </datafield>\n"""
-                                    out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
+                                if field_number_old != -999:
+                                    out += """        </datafield>\n"""
+                                out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
                                            (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
                                 field_number_old = field_number
                                 field_old = field
                             # print subfield value
-                            if format.startswith("xm") or format == "marcxml":
-                                value = encode_for_xml(value)
-                                out += """            <subfield code="%s">%s</subfield>\n""" % (encode_for_xml(field[-1:]), value)
+                            value = encode_for_xml(value)
+                            out += """            <subfield code="%s">%s</subfield>\n""" % \
+                                   (encode_for_xml(field[-1:]), value)
 
                         # all fields/subfields printed in this run, so close the tag:
-                        if (format.startswith("xm") or format == "marcxml") and field_number_old != -999:
+                        if field_number_old != -999:
                             out += """        </datafield>\n"""
+                    i = 0 # Next loop should start looking at bib%0 and bibrec_bib00x
             # we are at the end of printing the record:
-            if format.startswith("xm") or format == "marcxml":
-                out += "    </record>\n"
+            out += "    </record>\n"
 
     elif format == "xd" or format == "oai_dc":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
