@@ -565,7 +565,8 @@
 
 
            <!-- MARC FIELD 300$$a / pagination -->
-               <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
+           <xsl:choose>
+             <xsl:when test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
                <xsl:choose>
                <xsl:when test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments, 'pages')">
                  <xsl:variable name="beforepages">
@@ -581,7 +582,13 @@
                  </datafield>
                </xsl:otherwise>
                </xsl:choose>
-               </xsl:if>
+             </xsl:when>
+             <xsl:otherwise>
+                  <datafield tag="300" ind1=" " ind2=" ">
+                   <subfield code="a">mult. p</subfield>
+                 </datafield>
+             </xsl:otherwise>
+           </xsl:choose>
 
 
            <!-- MARC FIELD 520$$a  -->
@@ -625,6 +632,12 @@
                 </xsl:call-template>
            </xsl:if>
 
+           <!-- MARC FIELD 773$$p  - publication detection in comments field -->
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
+               <datafield tag="773" ind1=" " ind2=" ">
+                    <subfield code="p"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
+               </datafield>
+           </xsl:if>
 
              <!-- MARC FIELD 773$$p  - publication detection in comments field
              <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
@@ -635,18 +648,16 @@
              </xsl:if> -->
 
 
-           <!-- MARC FIELD 773 - using journal-ref field -->
+           <!-- MARC FIELD 773 - using journal-ref field  OLD
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
 
-             <!-- typically something like: A)  Phys. Rev. B 58, 10648 (1998)
-                                        or:  B)  Astron.J. 133 (2007) 1236-1242-->
 
              <xsl:variable name="jref">
                <xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref"/>
              </xsl:variable>
 
              <xsl:choose>
-               <xsl:when test="contains($jref,',')"> <!-- case A -->
+               <xsl:when test="contains($jref,',')"> 
 
                <xsl:variable name="jref-beforecoma">
                  <xsl:value-of select="normalize-space(substring-before($jref,','))"/>
@@ -705,7 +716,7 @@
 
 
              </xsl:when>
-             <xsl:otherwise> <!-- case B -->
+             <xsl:otherwise>
                <xsl:variable name="jref-beforedate">
                  <xsl:value-of select="normalize-space(substring-before($jref,'('))"/>
                </xsl:variable>
@@ -777,7 +788,7 @@
 
 
            </xsl:if>
-
+           -->
 
 
            <!-- MARC FIELDS which are treated differently according to the base  -->
@@ -813,7 +824,7 @@
              </xsl:when>
 
              <!-- Base 14 specific treatment -->
-             <xsl:when test="contains($commentslow,' diploma ') or contains($commentslow,' diplomarbeit ') or contains($commentslow,' diplome ') or contains($commentslow,' dissertation ') or contains($commentslow,' doctoraal ') or contains($commentslow,' doctoral ') or contains($commentslow,' doctorat ') or contains($commentslow,' doctorate ') or contains($commentslow,' doktorarbeit ') or contains($commentslow,' dottorato ') or contains($commentslow,' habilitationsschrift ') or contains($commentslow,' hochschule ') or contains($commentslow,' inauguraldissertation ') or contains($commentslow,' memoire ') or contains($commentslow,' phd ') or contains($commentslow,' proefschrift ') or contains($commentslow,' schlussbericht ') or contains($commentslow,' staatsexamensarbeit ') or contains($commentslow,' tesi ') or contains($commentslow,' thesis ') or contains($commentslow,' travail ')">
+             <xsl:when test="contains($commentslow,' diploma ') or contains($commentslow,' diplomarbeit ') or contains($commentslow,' diplome ') or contains($commentslow,' dissertation ') or contains($commentslow,' doctoraal ') or contains($commentslow,' doctoral ') or contains($commentslow,' doctorat ') or contains($commentslow,' doctorate ') or contains($commentslow,' doktorarbeit ') or contains($commentslow,' dottorato ') or contains($commentslow,' habilitationsschrift ') or contains($commentslow,' hochschule ') or contains($commentslow,' inauguraldissertation ') or contains($commentslow,' memoire ') or contains($commentslow,' phd ') or contains($commentslow,' proefschrift ') or contains($commentslow,' schlussbericht ') or contains($commentslow,' staatsexamensarbeit ') or contains($commentslow,' tesi ') or contains($commentslow,' thesis ') or contains($commentslow,' travail ') or contains($commentslow,' diploma,') or contains($commentslow,' diplomarbeit,') or contains($commentslow,' diplome,') or contains($commentslow,' dissertation,') or contains($commentslow,' doctoraal,') or contains($commentslow,' doctoral,') or contains($commentslow,' doctorat,') or contains($commentslow,' doctorate,') or contains($commentslow,' doktorarbeit,') or contains($commentslow,' dottorato,') or contains($commentslow,' habilitationsschrift,') or contains($commentslow,' hochschule,') or contains($commentslow,' inauguraldissertation,') or contains($commentslow,' memoire,') or contains($commentslow,' phd,') or contains($commentslow,' proefschrift,') or contains($commentslow,' schlussbericht,') or contains($commentslow,' staatsexamensarbeit,') or contains($commentslow,' tesi,') or contains($commentslow,' thesis,') or contains($commentslow,' travail,') or contains($commentslow,' diploma.') or contains($commentslow,' diplomarbeit.') or contains($commentslow,' diplome.') or contains($commentslow,' dissertation.') or contains($commentslow,' doctoraal.') or contains($commentslow,' doctoral.') or contains($commentslow,' doctorat.') or contains($commentslow,' doctorate.') or contains($commentslow,' doktorarbeit.') or contains($commentslow,' dottorato.') or contains($commentslow,' habilitationsschrift.') or contains($commentslow,' hochschule.') or contains($commentslow,' inauguraldissertation.') or contains($commentslow,' memoire.') or contains($commentslow,' phd.') or contains($commentslow,' proefschrift.') or contains($commentslow,' schlussbericht.') or contains($commentslow,' staatsexamensarbeit.') or contains($commentslow,' tesi.') or contains($commentslow,' thesis.') or contains($commentslow,' travail.') or contains($commentslow,' diploma;') or contains($commentslow,' diplomarbeit;') or contains($commentslow,' diplome;') or contains($commentslow,' dissertation;') or contains($commentslow,' doctoraal;') or contains($commentslow,' doctoral;') or contains($commentslow,' doctorat;') or contains($commentslow,' doctorate;') or contains($commentslow,' doktorarbeit;') or contains($commentslow,' dottorato;') or contains($commentslow,' habilitationsschrift;') or contains($commentslow,' hochschule;') or contains($commentslow,' inauguraldissertation;') or contains($commentslow,' memoire;') or contains($commentslow,' phd;') or contains($commentslow,' proefschrift;') or contains($commentslow,' schlussbericht;') or contains($commentslow,' staatsexamensarbeit;') or contains($commentslow,' tesi;') or contains($commentslow,' thesis;') or contains($commentslow,' travail;')">
 
                    <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
                      <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
