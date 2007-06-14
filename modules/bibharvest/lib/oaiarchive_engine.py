@@ -340,10 +340,10 @@ def oaiarchive_task(arg):
     else:
         task_update_progress("Fetching records in %s." % set)
         if mode == 1 or mode == 4:
-            filename = tmpdir + "/oai_archive_%s" % time.strftime("%H%M%S", time.localtime())
+            filename = tmpdir + "/oai_archive_%s" % time.strftime("%Y%m%d_%H%M%S", time.localtime())
             oai_out = open(filename,"w")
         if mode == 2 or mode == 4:
-            filename2 = tmpdir + "/oai_archive_%s_2" % time.strftime("%H%M%S", time.localtime())
+            filename2 = tmpdir + "/oai_archive_%s_2" % time.strftime("%Y%m%d_H%M%S", time.localtime())
             oai_out2 = open(filename2,"w")
             
         oai_sets = get_set_descriptions(set)
@@ -377,11 +377,11 @@ def oaiarchive_task(arg):
                 oaiIDentrycount += 1
 
             datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_SET_FIELD[0:3],
-                                                                                     CFG_OAI_SET_FIELD[3:4],
-                                                                                     CFG_OAI_SET_FIELD[4:5])
+                                                                                     CFG_OAI_SET_FIELD[3:4].replace('_', ' '),
+                                                                                     CFG_OAI_SET_FIELD[4:5].replace('_', ' '))
             datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_ID_FIELD[0:3],
-                                                                                     CFG_OAI_ID_FIELD[3:4],
-                                                                                     CFG_OAI_ID_FIELD[4:5])
+                                                                                     CFG_OAI_ID_FIELD[3:4].replace('_', ' '),
+                                                                                     CFG_OAI_ID_FIELD[4:5].replace('_', ' '))
 
             oaisetentry = "<subfield code=\"%s\">%s</subfield>\n" % (CFG_OAI_SET_FIELD[5:6],
                                                                      set)
@@ -508,11 +508,11 @@ def oaiarchive_task(arg):
             
 
             datafield_set_head = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_SET_FIELD[0:3],
-                                                                                     CFG_OAI_SET_FIELD[3:4],
-                                                                                     CFG_OAI_SET_FIELD[4:5])
+                                                                                     CFG_OAI_SET_FIELD[3:4].replace('_', ' '),
+                                                                                     CFG_OAI_SET_FIELD[4:5].replace('_', ' '))
             datafield_id_head  = "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % (CFG_OAI_ID_FIELD[0:3],
-                                                                                     CFG_OAI_ID_FIELD[3:4],
-                                                                                     CFG_OAI_ID_FIELD[4:5])
+                                                                                     CFG_OAI_ID_FIELD[3:4].replace('_', ' '),
+                                                                                     CFG_OAI_ID_FIELD[4:5].replace('_', ' '))
 
             for recID in records_to_update:
                 oaiIDentry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % (CFG_OAI_ID_FIELD[5:6],
