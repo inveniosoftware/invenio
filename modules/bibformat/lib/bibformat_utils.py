@@ -37,10 +37,8 @@ import re
 import zlib
 
 from invenio.config import \
-     CFG_OAI_ID_FIELD, \
-     version
+     CFG_OAI_ID_FIELD
 from invenio.dbquery import run_sql
-from invenio import bibformat_dblayer
 
 def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     """
@@ -96,7 +94,7 @@ def get_contextual_content(text, keywords, max_lines=2):
     #Grade each line according to the keywords
     lines = text.split('.')
     #print 'lines: ',lines
-    weights = [grade_line(x, keywords) for x in lines]
+    weights = [grade_line(line, keywords) for line in lines]
     
     #print 'line weights: ', weights
     def grade_region(lines_weight):
@@ -133,7 +131,8 @@ def get_contextual_content(text, keywords, max_lines=2):
     else:
         return lines[index_with_highest_weight:index_with_highest_weight+max_lines]
 
-def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=False):
+def record_get_xml(recID, format='xm', decompress=zlib.decompress,
+                   on_the_fly=False):
     """
     Returns an XML string of the record given by recID.
 
@@ -201,8 +200,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=Fa
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"
-        for id in get_fieldvalues(recID, CFG_OAI_ID_FIELD):
-            out += "    <identifier>%s</identifier>\n" % id
+        for identifier in get_fieldvalues(recID, CFG_OAI_ID_FIELD):
+            out += "    <identifier>%s</identifier>\n" % identifier
         out += "    <datestamp>%s</datestamp>\n" % get_modification_date(recID)
         out += "   </header>\n"
         out += "   <metadata>\n"
@@ -232,7 +231,11 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=Fa
                 oai_ids = get_fieldvalues(recID, CFG_OAI_ID_FIELD)
                 if oai_ids:
                     out += "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\"><subfield code=\"%s\">%s</subfield></datafield>\n" % \
-                           (CFG_OAI_ID_FIELD[0:3], CFG_OAI_ID_FIELD[3:4], CFG_OAI_ID_FIELD[4:5], CFG_OAI_ID_FIELD[5:6], oai_ids[0])
+                           (CFG_OAI_ID_FIELD[0:3],
+                            CFG_OAI_ID_FIELD[3:4],
+                            CFG_OAI_ID_FIELD[4:5],
+                            CFG_OAI_ID_FIELD[5:6],
+                            oai_ids[0])
                 out += "<datafield tag=\"980\" ind1=\" \" ind2=\" \"><subfield code=\"c\">DELETED</subfield></datafield>\n"
             else:
                 # controlfields
@@ -242,7 +245,6 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=Fa
                 res = run_sql(query)
                 for row in res:
                     field, value = row[0], row[1]
-                    fieldid = encode_for_xml(field[0:3])
                     value = encode_for_xml(value)
                     out += """        <controlfield tag="%s" >%s</controlfield>\n""" % \
                            (encode_for_xml(field[0:3]), value)
@@ -257,7 +259,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=Fa
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
                                 "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
+                                "ORDER BY bb.field_number, b.tag ASC" % (bx,
+                                                                         bibx,
+                                                                         recID,
+                                                                         str(digit1)+str(digit2))
                         res = run_sql(query)
                         field_number_old = -999
                         field_old = ""
@@ -269,16 +274,14 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress, on_the_fly=Fa
                             if ind2 == "_" or ind2 == "":
                                 ind2 = " "
                             # print field tag
-                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                                
-                                fieldid = encode_for_xml(field[0:3])
-
+                            if field_number != field_number_old or \
+                                   field[:-1] != field_old[:-1]:
                                 if field_number_old != -999:
                                     out += """        </datafield>\n"""
-
                                 out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
-                                       (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
-
+                                       (encode_for_xml(field[0:3]),
+                                        encode_for_xml(ind1),
+                                        encode_for_xml(ind2))
                                 field_number_old = field_number
                                 field_old = field
                             # print subfield value
