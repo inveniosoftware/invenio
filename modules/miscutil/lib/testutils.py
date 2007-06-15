@@ -36,6 +36,7 @@ import time
 import unittest
 
 from urllib import urlencode
+from itertools import chain, repeat
 
 from invenio.config import weburl, sweburl
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
@@ -131,6 +132,10 @@ def test_web_page_content(url,
        set).  The EXPECTED_TEXT is checked via substring matching, the
        EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL via exact string
        matching.
+       
+       EXPECTED_TEXT, EXPECTED_LINK_LABEL and EXPECTED_LINK_TARGET can
+       either be strings or list of strings (in order to check multiple
+       values inside same page).
 
        Before doing the tests, login as USERNAME with password
        PASSWORD.  E.g. interesting values for USERNAME are "guest" or
@@ -174,22 +179,47 @@ def test_web_page_content(url,
         url_body = browser.response().read()
 
         # now test for EXPECTED_TEXT:
-        try:
-            string.index(url_body, expected_text)
-        except ValueError:
-            raise InvenioTestUtilsBrowserException, \
-                  'ERROR: Page %s (login %s) does not contain %s.' % \
-                              (url, username, expected_text)
+        # first normalize expected_text
+        if isinstance(expected_text, str):
+            expected_texts = [expected_text]
+        else:
+            expected_texts = expected_text
+        # then test
+        for cur_expected_text in expected_texts:
+            try:
+                string.index(url_body, cur_expected_text)
+            except ValueError:
+                raise InvenioTestUtilsBrowserException, \
+                      'ERROR: Page %s (login %s) does not contain %s.' % \
+                      (url, username, cur_expected_text)
 
         # now test for EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL:
         if expected_link_target or expected_link_label:
-            try:
-                browser.find_link(url=expected_link_target,
-                                  text=expected_link_label)
-            except mechanize.LinkNotFoundError:
-                raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
-                                  (url, username, expected_link_target, expected_link_label)
+            # first normalize expected_link_target and expected_link_label
+            if isinstance(expected_link_target, str) or \
+                   expected_link_target is None:
+                expected_link_targets = [expected_link_target]
+            else:
+                expected_link_targets = expected_link_target
+            if isinstance(expected_link_label, str) or \
+                   expected_link_label is None:
+                expected_link_labels = [expected_link_label]
+            else:
+                expected_link_labels = expected_link_label
+            max_links = max(len(expected_link_targets), len(expected_link_labels))
+            expected_link_labels = chain(expected_link_labels, repeat(None))
+            expected_link_targets = chain(expected_link_targets, repeat(None))
+            # then test
+            for i in range(0, max_links):
+                cur_expected_link_target = expected_link_targets.next()
+                cur_expected_link_label = expected_link_labels.next()
+                try:
+                    browser.find_link(url=cur_expected_link_target,
+                                      text=cur_expected_link_label)
+                except mechanize.LinkNotFoundError:
+                    raise InvenioTestUtilsBrowserException, \
+                          'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
+                          (url, username, cur_expected_link_target, cur_expected_link_label)
 
         # now test for validation if required
         if require_validate_p:
