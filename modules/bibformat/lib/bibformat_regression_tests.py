@@ -82,103 +82,90 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
     def setUp(self):
         """Prepare some ideal outputs"""
         
-        self.record_74_hd = '''<table border="0" width="100%%"><tr class="blocknote"><td>
+        # Record 7 (Article)
+        self.record_74_hd_header = '''<table border="0" width="100%"><tr class="blocknote"><td>
     Published Article
-    <small> / Particle Physics - Theory</small></td><td align="right"><strong>hep-th/0003295</strong></td></tr></table><br />
-<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>
-<p align="center">
-<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />
+    <small> / Particle Physics - Theory</small></td><td align="right"><strong>hep-th/0003295</strong></td></tr></table>'''
 
+        self.record_74_hd_title = '''<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>'''
+        
+        self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
+                                     {'weburl' : weburl,
+                                      'lang': cdslang}
+        
+        self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
 
+        self.record_74_hd_pubinfo = '''<strong>Published in: </strong><a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.%20Lett.%2C%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>'''
 
+        self.record_74_hd_fulltext = '''<strong>External link</strong>: <a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295">Fulltext</a>'''
 
+        self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
+                                      {'weburl' : weburl,
+                                       'lang': cdslang}
+        self.record_74_hd_references = '''<li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </li>'''
 
-
-</p>
-
-<p style="margin-left: 15%%; width: 70%%">
-
-<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />
-
-
-
-
-<br /><br /><strong>Published in: </strong><a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.%%20Lett.%%2C%%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>
-<br />
-<strong>External link</strong>: <a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295">Fulltext</a>
-<br /><br /><strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>
-</p>
-<blockquote><strong>References:</strong><ul><li><small>[1]</small> <small>K. D. Kokkotas, B. G. Schmidt</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=gr-qc/9909058&amp;ln=%(lang)s">gr-qc/9909058</a>] </small> <br /><small>and references therein</small> </li><li><small>[2]</small> <small>W. Krivan</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=101501">Phys. Rev., D: 60 (1999) 101501</a> </small> <br /></li><li><small>[3]</small> <small>S. Hod</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=gr-qc/9902072&amp;ln=%(lang)s">gr-qc/9902072</a>] </small> <br /></li><li><small>[4]</small> <small>P. R. Brady, C. M. Chambers, W. G. Laarakkers and E. Poisson</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=064003">Phys. Rev., D: 60 (1999) 064003</a> </small> <br /></li><li><small>[5]</small> <small>P. R. Brady, C. M. Chambers, W. Krivan and P. Laguna</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=55&amp;year=1997&amp;page=7538">Phys. Rev., D: 55 (1997) 7538</a> </small> <br /></li><li><small>[6]</small> <small>G. T. Horowitz and V. E. Hubeny</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=hep-th/9909056&amp;ln=%(lang)s">hep-th/9909056</a>] </small> <br /><small>G. T. Horowitz</small> <small> [<a href="%(weburl)s/search?f=reportnumber&amp;p=hep-th/9910082&amp;ln=%(lang)s">hep-th/9910082</a>] </small> <br /></li><li><small>[7]</small> <small>E. S. C. Ching, P. T. Leung, W. M. Suen and K. Young</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=52&amp;year=1995&amp;page=2118">Phys. Rev., D: 52 (1995) 2118</a> </small> <br /></li><li><small>[8]</small> <small>J. M. Maldacena</small>  <small> Adv. Theor. Math. Phys.21998231 </small> <br /></li><li><small>[9]</small> <small>E. Witten</small>  <small> Adv. Theor. Math. Phys.21998253 </small> <br /></li><li><small>[10]</small> <small>S. S. Gubser, I. R. Klebanov and A. M. Polyakov</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Lett.,+B&amp;volume=428&amp;year=1998&amp;page=105">Phys. Lett., B: 428 (1998) 105</a> </small> <br /></li><li><small>[11]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=60&amp;year=1999&amp;page=064018">Phys. Rev., D: 60 (1999) 064018</a> </small> <br /></li><li><small>[12]</small> <small>E. W. Leaver</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=J.+Math.+Phys.&amp;volume=27&amp;year=1986&amp;page=1238">J. Math. Phys.: 27 (1986) 1238</a> </small> <br /></li><li><small>[13]</small> <small>E. W. Leaver</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=41&amp;year=1990&amp;page=2986">Phys. Rev., D: 41 (1990) 2986</a> </small> <br /></li><li><small>[14]</small> <small>C. O. Lousto</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=51&amp;year=1995&amp;page=1733">Phys. Rev., D: 51 (1995) 1733</a> </small> <br /></li><li><small>[15]</small> <small>O. Kaburaki</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Lett.,+A&amp;volume=217&amp;year=1996&amp;page=316">Phys. Lett., A: 217 (1996) 316</a> </small> <br /></li><li><small>[16]</small> <small>R. K. Su, R. G. Cai and P. K. N. Yu</small>  <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=50&amp;year=1994&amp;page=2932">Phys. Rev., D: 50 (1994) 2932</a> </small> <br /> <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=48&amp;year=1993&amp;page=3473">Phys. Rev., D: 48 (1993) 3473</a> </small> <br /> <small> <a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.+Rev.,+D&amp;volume=52&amp;year=1995&amp;page=6186">Phys. Rev., D: 52 (1995) 6186</a> </small> <br /><small>B. Wang, J. M. Zhu</small>  <small> Mod. Phys. Lett., A1019951269 </small> <br /></li><li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </li></ul><p><small><i><b>Warning</b>: references are automatically extracted and standardized from the PDF document and may therefore contain errors. If you think they are incorrect or incomplete, look at the fulltext document itself.<br /></i></small></p></blockquote>''' % \
-        {'weburl' : weburl,
-         'lang': cdslang}
-
-        self.record_7_hd = '''<table border="0" width="100%"><tr class="blocknote"><td>
+        # Record 7 (Picture)
+        self.record_7_hd_header = '''<table border="0" width="100%"><tr class="blocknote"><td>
     Pictures
-    <small> / Life at CERN</small></td><td align="right"><strong>CERN-GE-9806033</strong></td></tr></table><br />
-<center><big><big><strong>Tim Berners-Lee</strong></big></big></center> 
+    <small> / Life at CERN</small></td><td align="right"><strong>CERN-GE-9806033</strong></td></tr></table>'''
 
+        self.record_7_hd_title = '''<center><big><big><strong>Tim Berners-Lee</strong></big></big></center>'''
 
-<center>28 Jun 1998</center>
+        self.record_7_hd_date = '''<center>28 Jun 1998</center>'''
 
-<center>
-
-
-
-</center>
-<br/>
-
-
-
-<table> <tr>
-<td valign="top" align="left"> 
-
-
-
-<p><span class="blocknote"> 
+        self.record_7_hd_abstract = '''<p><span class="blocknote"> 
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">  
- Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>
-
-<p><span class="blocknote">See also:</span><br /><small><a href="http://www.cern.ch/CERN/Announcements/1998/WebNext.html">"Internet, Web, What's next?" 26 June 1998</a><br/><a href="http://Bulletin.cern.ch/9828/art2/Text_E.html">CERN Bulletin no 28/98 (6 July 1998) (English)</a><br/><a href="http://Bulletin.cern.ch/9828/art2/Text_F.html">CERN Bulletin no 28/98 (6 juillet 1998) (French)</a><br/><a href="http://www.w3.org/People/Berners-Lee/">Biography</a></small></p>
-
-</td>
-
-<td valign="top">
-<span class="blocknote">Resources</span><br /><br />High resolution: <a href="http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033</a><br /><br /><img src="http://preprints.cern.ch/photo/photo-ge/9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font><br /> <a href=""></a>
-</td> 
-
-</tr>
-
-<tr><td colspan="2" class="blocknote">
- <strong>© CERN Geneva: </strong>
-<small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>). 
-The words CERN Photo must be quoted for each use. </small>
-</td>
-</tr>
-
-</table>'''
-
+ Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
+        self.record_7_hd_resource = '''<span class="blocknote">Resources</span><br /><br />High resolution: <a href="http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033</a><br /><br /><img src="http://preprints.cern.ch/photo/photo-ge/9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>'''
+        
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
 
         # Test record 74 (Article)
         pageurl = weburl + '/record/74?of=hd'
         result = test_web_page_content(pageurl,
-                                       expected_text=self.record_74_hd)
+                                       expected_text=[self.record_74_hd_header,
+                                                      self.record_74_hd_title,
+                                                      self.record_74_hd_authors,
+                                                      self.record_74_hd_abstract,
+                                                      self.record_74_hd_pubinfo,
+                                                      self.record_74_hd_fulltext,
+                                                      self.record_74_hd_citations,
+                                                      self.record_74_hd_references])
         self.assertEqual([], result)
 
         # Test record 7 (Picture)
         pageurl = weburl + '/record/7?of=hd'
         result = test_web_page_content(pageurl,
-                                       expected_text=self.record_7_hd)
+                                       expected_text=[self.record_7_hd_header,
+                                                      self.record_7_hd_title,
+                                                      self.record_7_hd_date,
+                                                      self.record_7_hd_abstract,
+                                                      self.record_7_hd_resource])
         self.assertEqual([], result)
 
     def test_detailed_html_edit_record(self):
         """bibformat - Detailed HTML output edit record link presence"""
         pageurl = weburl + '/record/74?of=hd'
-        result = test_web_page_content(pageurl, username='admin', expected_text="Edit This Record")
+        result = test_web_page_content(pageurl, username='admin',
+                                       expected_text="Edit This Record")
         self.assertEqual([], result)
-                                            
 
+    def test_detailed_html_no_error_message(self):
+        """bibformat - Detailed HTML output without error message"""
+        # No error message should be displayed in the web interface, whatever happens
+        pageurl = weburl + '/record/74?of=hd'
+        result = test_web_page_content(pageurl, username='admin',
+                                       expected_text=["Exception",
+                                                      "Could not"])
+        self.assertNotEqual([], result)
+
+        pageurl = weburl + '/record/7?of=hd'
+        result = test_web_page_content(pageurl, username='admin',
+                                       expected_text=["Exception",
+                                                      "Could not"])
+        self.assertNotEqual([], result)
+        
 class BibFormatNLMTest(unittest.TestCase):
     """Check output produced by BibFormat for NLM output for various
     records"""
