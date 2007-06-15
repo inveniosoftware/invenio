@@ -2415,7 +2415,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             else:
                 # no sort pattern defined, so join them all together
                 val = string.join(vals)
-            val = val.lower()
+            val = strip_accents(val.lower()) # sort values regardless of accents and case
             if recIDs_dict.has_key(val):
                 recIDs_dict[val].append(recID)
             else:
