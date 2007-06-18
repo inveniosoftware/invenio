@@ -396,11 +396,13 @@ def oaiarchive_task(arg):
             if(res):
                 for item in res:
                     if (item[0]==set):
-                        # The record will be removed from this set
+                        # No need to add set to metadata if already there
                         oaisetentry = ''
                         oaisetentrycount -= 1
                     elif item[0]:
-                        # Collect name of sets to which the record must still belong
+                        # Collect name of the other sets to which the
+                        # record must also belong (in case we are in
+                        # mode == 2)
                         remaining_sets.append(item[0])
     
             if (mode==2):
@@ -583,7 +585,7 @@ def oaiarchive_task(arg):
             oai_out2.close()
     
     if upload:
-        if (mode == 1 or mode == 4) and oaisetentrycount:
+        if (mode == 1 or mode == 4) and oaisetentrycount > 0:
             command = "%s/bibupload -a %s" % (bindir, filename)
             os.system(command)
         if mode == 2 or mode == 4:
