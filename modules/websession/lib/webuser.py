@@ -71,7 +71,6 @@ from invenio.webinterface_handler import http_get_credentials
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
-import invenio.access_control_engine as ace
 tmpl = invenio.template.load('websession')
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
@@ -250,17 +249,18 @@ def isUserSubmitter(user_info):
 
 def isUserReferee(user_info):
     """Return True if the user is a referee for something; False otherwise."""
+    from invenio.access_control_engine import acc_authorize_action
     res = run_sql("select sdocname from sbmDOCTYPE")
     for row in res:
         doctype = row[0]
         categ = "*"
-        (auth_code, auth_message) = ace.acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
+        (auth_code, auth_message) = acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
         if auth_code == 0:
             return 1
         res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
         for row2 in res2:
             categ = row2[0]
-            (auth_code, auth_message) = ace.acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
+            (auth_code, auth_message) = acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
             if auth_code == 0:
                 return 1
     return 0
@@ -546,7 +546,7 @@ def update_Uid(req, p_email):
 
 def givePassword(email):
     """ It checks in the database the password for a given email. It is used to send the password to the email of the user.It returns
-	the password if the user exists, otherwise it returns -999
+        the password if the user exists, otherwise it returns -999
     """
 
     query_pass = run_sql("select password from user where email =%s", (email,))
