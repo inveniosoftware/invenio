@@ -214,7 +214,7 @@ def guest_user_garbage_collector():
     # delete queries one by one
     write_message("""  DELETE FROM query WHERE id = 'TRAVERSE LAST RESULT \n""", verbose=9)
     for (id_user, ) in result:
-        delcount['query'] += run_sql("""DELETE FROM query WHERE id = %s""" % (id_user, ))
+        delcount['query'] += run_sql("""DELETE FROM query WHERE id = %s""", (id_user, ))
 
 
     # 3 - DELETE BASKETS NOT OWNED BY ANY USER
@@ -237,10 +237,10 @@ def guest_user_garbage_collector():
     write_message("""  DELETE FROM bskREC WHERE id_bskBASKET = 'TRAVERSE LAST RESULT'""", verbose=9)
     write_message("""  DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket, ) in result:
-        delcount['user_bskBASKET'] += run_sql("""DELETE FROM user_bskBASKET WHERE id_bskBASKET = %s""" % (id_basket, ))
-        delcount['bskBASKET'] += run_sql("""DELETE FROM bskBASKET WHERE id = %s""" % (id_basket, ))
-        delcount['bskREC'] += run_sql("""DELETE FROM bskREC WHERE id_bskBASKET = %s""" % (id_basket, ))
-        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = %s""" % (id_basket, ))
+        delcount['user_bskBASKET'] += run_sql("""DELETE FROM user_bskBASKET WHERE id_bskBASKET = %s""", (id_basket, ))
+        delcount['bskBASKET'] += run_sql("""DELETE FROM bskBASKET WHERE id = %s""", (id_basket, ))
+        delcount['bskREC'] += run_sql("""DELETE FROM bskREC WHERE id_bskBASKET = %s""", (id_basket, ))
+        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = %s""", (id_basket, ))
     write_message(""" SELECT DISTINCT ext.id, rec.id_bibrec_or_bskEXTREC FROM bskEXTREC AS ext \nLEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC WHERE id_bibrec_or_bskEXTREC is NULL""", verbose=9)
     try:
         result = run_sql("""SELECT DISTINCT ext.id FROM bskEXTREC AS ext
@@ -252,8 +252,8 @@ def guest_user_garbage_collector():
     write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
     write_message("""  DELETE FROM bskEXTFMT WHERE id_bskEXTREC = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket, ) in result:
-        delcount['bskEXTREC'] += run_sql("""DELETE FROM bskEXTREC WHERE id=%s""" % (id_basket,))
-        delcount['bskEXTFMT'] += run_sql("""DELETE FROM bskEXTFMT WHERE id_bskEXTREC=%s""" % (id_basket,))
+        delcount['bskEXTREC'] += run_sql("""DELETE FROM bskEXTREC WHERE id=%s""", (id_basket,))
+        delcount['bskEXTFMT'] += run_sql("""DELETE FROM bskEXTFMT WHERE id_bskEXTREC=%s""", (id_basket,))
 
     # 4 - DELETE ALERTS NOT OWNED BY ANY USER
     write_message('- deleting alerts not owned by any user')
@@ -266,7 +266,7 @@ def guest_user_garbage_collector():
     # delete all these entries
     for (id_user, ) in result:
         write_message("""DELETE FROM user_query_basket WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
-        delcount['user_query_basket'] += run_sql("""DELETE FROM user_query_basket WHERE id_user = %s """ % (id_user, ))
+        delcount['user_query_basket'] += run_sql("""DELETE FROM user_query_basket WHERE id_user = %s """, (id_user, ))
 
 
     # print STATISTICS
@@ -297,9 +297,9 @@ def test_insertdata():
 
     print 'insert into session 6'
     for (key, uid) in [('23A', 2000), ('24B', 2100), ('25C', 2200), ('26D', 2300)]:
-        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """ % (key, time.time(), uid))
+        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """, (key, time.time(), uid))
     for (key, uid) in [('27E', 2400), ('28F', 2500)]:
-        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """ % (key, time.time()+20000, uid))
+        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """, (key, time.time()+20000, uid))
 
     print 'insert into user 6'
     for id in range(2000, 2600, 100):
@@ -307,23 +307,23 @@ def test_insertdata():
 
     print 'insert into user_query 6'
     for (id_user, id_query) in [(2000, 155), (2100, 231), (2200, 155), (2300, 574), (2400, 155), (2500, 988)]:
-        run_sql("""INSERT INTO user_query (id_user, id_query) values (%s, %s) """ % (id_user, id_query))
+        run_sql("""INSERT INTO user_query (id_user, id_query) values (%s, %s) """, (id_user, id_query))
 
     print 'insert into query 4'
     for (id, urlargs) in [(155, 'p=cern'), (231, 'p=muon'), (574, 'p=physics'), (988, 'cc=Atlantis+Institute+of+Science&as=0&p=')]:
-        run_sql("""INSERT INTO query (id, type, urlargs) values (%s, 'r', '%s') """ % (id, urlargs))
+        run_sql("""INSERT INTO query (id, type, urlargs) values (%s, 'r', '%s') """, (id, urlargs))
 
     print 'insert into basket 4'
     for (id, name) in [(6, 'general'), (7, 'physics'), (8, 'cern'), (9, 'diverse')]:
-        run_sql("""INSERT INTO basket (id, name, public) values (%s, '%s', 'n')""" % (id, name))
+        run_sql("""INSERT INTO basket (id, name, public) values (%s, '%s', 'n')""", (id, name))
 
     print 'insert into user_basket 4'
     for (id_user, id_basket) in [(2000, 6), (2200, 7), (2200, 8), (2500, 9)]:
-        run_sql("""INSERT INTO user_basket (id_user, id_basket) values (%s, %s) """ % (id_user, id_basket))
+        run_sql("""INSERT INTO user_basket (id_user, id_basket) values (%s, %s) """, (id_user, id_basket))
 
     print 'insert into user_query_basket 2'
     for (id_user, id_query, id_basket) in [(2200, 155, 6), (2500, 988, 9)]:
-        run_sql("""INSERT INTO user_query_basket (id_user, id_query, id_basket) values (%s, %s, %s) """ % (id_user, id_query, id_basket))
+        run_sql("""INSERT INTO user_query_basket (id_user, id_query, id_basket) values (%s, %s, %s) """, (id_user, id_query, id_basket))
 
 def test_deletedata():
     """deletes all the testdata inserted in the insert function.
