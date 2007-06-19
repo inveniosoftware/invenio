@@ -71,6 +71,7 @@ from invenio.webinterface_handler import http_get_credentials
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import WebAccessExternalAuthError
 import invenio.template
+import invenio.access_control_engine as ace
 tmpl = invenio.template.load('websession')
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
@@ -241,36 +242,32 @@ def isGuestUser(uid):
         pass
     return out
 
-#def isUserSubmitter(uid):
-    #u_email = get_email(uid)
-    #res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
-    #if len(res) > 0:
-        #return 1
-    #else:
-        #return 0
+def isUserSubmitter(user_info):
+    """Return True if the user is a submitter for something; False otherwise."""
+    u_email = get_email(user_info['uid'])
+    res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
+    return len(res) > 0
 
-#def isUserReferee(req):
-    #res = run_sql("select sdocname from sbmDOCTYPE")
-    #for row in res:
-        #doctype = row[0]
-        #categ = "*"
-        #(auth_code, auth_message) = ace.acc_authorize_action_req(req, "referee", doctype=doctype, categ=categ)
-        #if auth_code == 0:
-            #return 1
-        #res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
-        #for row2 in res2:
-            #categ = row2[0]
-            #(auth_code, auth_message) = ace.acc_authorize_action_req(req, "referee", doctype=doctype, categ=categ)
-            #if auth_code == 0:
-                #return 1
-    #return 0
+def isUserReferee(user_info):
+    """Return True if the user is a referee for something; False otherwise."""
+    res = run_sql("select sdocname from sbmDOCTYPE")
+    for row in res:
+        doctype = row[0]
+        categ = "*"
+        (auth_code, auth_message) = ace.acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
+        if auth_code == 0:
+            return 1
+        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
+        for row2 in res2:
+            categ = row2[0]
+            (auth_code, auth_message) = ace.acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
+            if auth_code == 0:
+                return 1
+    return 0
 
-#def isUserAdmin(req):
-    #"Return 1 if the user UID has some admin rights; 0 otherwise."
-    #out = 0
-    #if acc_findUserRoleActions_req(req):
-        #out = 1
-    #return out
+def isUserAdmin(user_info):
+    """Return True if the user has some admin rights; False otherwise."""
+    return acc_findUserRoleActions(user_info)
 
 def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
@@ -810,9 +807,6 @@ def collect_user_info(req):
     user_info['email'] = get_email(uid) or None
     user_info['group'] = []
     user_info['guest'] = isGuestUser(uid)
-    user_info['submitter'] = True # FIXME isUserSubmitter(uid),
-    user_info['referee'] = True # FIXME isUserReferee(req),
-    user_info['admin'] = True # FIXME isUserAdmin(req),
     if uid:
         user_info['group'] = [group[1] for group in get_groups(uid)]
         prefs = get_user_preferences(uid)
