@@ -48,6 +48,7 @@ import signal
 from invenio.config import \
      CFG_PREFIX, \
      CFG_BIBSCHED_REFRESHTIME, \
+     CFG_BIBSCHED_LOG_PAGER, \
      bindir, \
      logdir
 from invenio.dbquery import run_sql
@@ -226,7 +227,10 @@ class Manager:
             except IOError:
                 pass
             tmpfile.close()
-            pager = os.environ.get('PAGER', '/bin/more')
+            if CFG_BIBSCHED_LOG_PAGER:
+                pager = CFG_BIBSCHED_LOG_PAGER
+            else:
+                pager = os.environ.get('PAGER', '/bin/more')
             curses.endwin()
             os.spawnlp(os.P_WAIT, pager, pager, tmpname)
             os.remove(tmpname)
@@ -538,7 +542,7 @@ class Manager:
         else:
             where = "and status!='DONE'"
             order = "ASC"
-        self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where, order))
+        self.rows = run_sql(""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s"", (where, order))
         self.repaint()
         ring = 0
         while self.running:
@@ -574,7 +578,7 @@ class Manager:
                 else:
                     where = "and status!='DONE'"
                     order = "ASC"
-                self.rows = run_sql("SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s" % (where, order))
+                self.rows = run_sql(""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s"", (where, order))
                 ring = 0
                 self.repaint()
 
