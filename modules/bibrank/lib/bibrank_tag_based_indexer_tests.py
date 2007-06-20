@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import bibrank_tag_based_indexer
+from invenio.bibrank import split_ranges
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
@@ -36,7 +37,7 @@ class TestListSetOperations(unittest.TestCase):
 
     def test_split_ranges(self):
         """bibrank tag based indexer - split ranges"""
-        self.assertEqual([[0, 500], [600, 1000]], bibrank_tag_based_indexer.split_ranges("0-500,600-1000"))
+        self.assertEqual([[0, 500], [600, 1000]], split_ranges("0-500,600-1000"))
 
 def create_test_suite():
     """Return test suite for the indexing engine."""

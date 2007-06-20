@@ -51,6 +51,8 @@ from invenio.dbquery import run_sql, escape_string, DatabaseError
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_config import CONV_PROGRAMS, CONV_PROGRAMS_HELPERS
+from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+    get_datetime, task_update_status, task_set_option
 
 options = {} # global variable to hold task options
 
@@ -89,8 +91,8 @@ def dict_union(list1, list2):
     for (e, count) in list2.iteritems():
         if not union_dict.has_key(e):
             union_dict[e] = count
-	else:
-	    union_dict[e] = (union_dict[e][0] + count[0], count[1])
+        else:
+            union_dict[e] = (union_dict[e][0] + count[0], count[1])
 
     #for (e, count) in list2.iteritems():
     #    list1[e] = (list1.get(e, (0, 0))[0] + count[0], count[1])
@@ -113,8 +115,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
             r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
-                if options["verbose"] >= 1:
-                    write_message("WARNING: too many DB threads, killing thread %s" % r_id)
+                write_message("WARNING: too many DB threads, killing thread %s" % r_id)
     return
 
 # tagToFunctions mapping. It offers an indirection level necesary for
@@ -163,53 +164,6 @@ def get_words_from_phrase(phrase, weight, lang="",
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
     return words
-
-def split_ranges(parse_string):
-    recIDs = []
-    ranges = string.split(parse_string, ",")
-    for range in ranges:
-        tmp_recIDs = string.split(range, "-")
-
-        if len(tmp_recIDs)==1:
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
-        else:
-            if int(tmp_recIDs[0]) > int(tmp_recIDs[1]): # sanity check
-                tmp = tmp_recIDs[0]
-                tmp_recIDs[0] = tmp_recIDs[1]
-                tmp_recIDs[1] = tmp
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[1])])
-    return recIDs
-
-def get_date_range(var):
-    "Returns the two dates contained as a low,high tuple"
-    limits = string.split(var, ",")
-    if len(limits)==1:
-        low = get_datetime(limits[0])
-        return low,None
-    if len(limits)==2:
-        low = get_datetime(limits[0])
-        high = get_datetime(limits[1])
-        return low,high
-    return None,None
-
-def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
-    """Returns a date string according to the format string.
-       It can handle normal date strings and shifts with respect
-       to now."""
-    date = time.time()
-    shift_re=re.compile("([-\+]{0,1})([\d]+)([dhms])")
-    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = shift_re.match(var)
-    if m:
-        sign = m.groups()[0] == "-" and -1 or 1
-        factor = factors[m.groups()[2]]
-        value = float(m.groups()[1])
-        date = time.localtime(date + sign * factor * value)
-        date = time.strftime(format_string, date)
-    else:
-        date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)
-    return date
 
 def create_range_list(res):
     """Creates a range list from a recID select query result contained
@@ -303,9 +257,8 @@ class WordTable:
            rnkWORD table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
-        if options["verbose"]:
-            write_message("%s %s wordtable flush started" % (self.tablename,mode))
-            write_message('...updating %d words into %sR started' % \
+        write_message("%s %s wordtable flush started" % (self.tablename,mode))
+        write_message('...updating %d words into %sR started' % \
                 (len(self.value), self.tablename[:-1]))
         task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
 
@@ -316,23 +269,20 @@ class WordTable:
                 query = """UPDATE %sR SET type='TEMPORARY' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='CURRENT'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
-                    write_message(query)
+                write_message(query, verbose=9)
                 run_sql(query)
 
         nb_words_total = len(self.value)
         nb_words_report = int(nb_words_total/10)
         nb_words_done = 0
         for word in self.value.keys():
-	    self.put_word_into_db(word, self.value[word])
+            self.put_word_into_db(word, self.value[word])
             nb_words_done += 1
             if nb_words_report!=0 and ((nb_words_done % nb_words_report) == 0):
-                if options["verbose"]:
-                    write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
+                write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
                 task_update_progress("%s flushed %d/%d words" % (self.tablename, nb_words_done, nb_words_total))
-        if options["verbose"] >= 9:
-            write_message('...updating %d words into %s ended' % \
-                (nb_words_total, self.tablename))
+        write_message('...updating %d words into %s ended' % \
+                (nb_words_total, self.tablename), verbose=9)
 
         #if options["verbose"]:
         #    write_message('...updating reverse table %sR started' % self.tablename[:-1])
@@ -341,41 +291,34 @@ class WordTable:
                 query = """UPDATE %sR SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
-                    write_message(query)
+                write_message(query, verbose=9)
                 run_sql(query)
                 query = """DELETE FROM %sR WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
-                    write_message(query)
+                write_message(query, verbose=9)
                 run_sql(query)
-            if options["verbose"] >= 9:
-                write_message('End of updating wordTable into %s' % self.tablename)
+            write_message('End of updating wordTable into %s' % self.tablename, verbose=9)
         elif mode == "emergency":
-	    write_message("emergency")
+            write_message("emergency")
             for group in self.recIDs_in_mem:
                 query = """UPDATE %sR SET type='CURRENT' WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='TEMPORARY'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
-                    write_message(query)
+                write_message(query, verbose=9)
                 run_sql(query)
                 query = """DELETE FROM %sR WHERE id_bibrec
                 BETWEEN '%d' AND '%d' AND type='FUTURE'""" % \
                 (self.tablename[:-1], group[0], group[1])
-                if options["verbose"] >= 9:
-                    write_message(query)
+                write_message(query, verbose=9)
                 run_sql(query)
-            if options["verbose"] >= 9:
-                write_message('End of emergency flushing wordTable into %s' % self.tablename)
+            write_message('End of emergency flushing wordTable into %s' % self.tablename, verbose=9)
         #if options["verbose"]:
         #    write_message('...updating reverse table %sR ended' % self.tablename[:-1])
 
         self.clean()
         self.recIDs_in_mem = []
-        if options["verbose"]:
-            write_message("%s %s wordtable flush ended" % (self.tablename, mode))
+        write_message("%s %s wordtable flush ended" % (self.tablename, mode))
         task_update_progress("%s flush ended" % (self.tablename))
 
     def load_old_recIDs(self,word):
@@ -405,7 +348,7 @@ class WordTable:
                 # add recID if not existent in set and if marked as to be added
                 set[recID] = sign
                 set_changed_p = 1
-	    elif sign[0] > -1 and sign[0] != set[recID][0]:
+            elif sign[0] > -1 and sign[0] != set[recID][0]:
                 set[recID] = sign
                 set_changed_p = 1
 
@@ -414,27 +357,24 @@ class WordTable:
     def put_word_into_db(self, word, recIDs, split=string.split):
         """Flush a single word to the database and delete it from memory"""
         set = self.load_old_recIDs(word)
-	#write_message("%s %s" % (word, self.value[word]))
+        #write_message("%s %s" % (word, self.value[word]))
         if set: # merge the word recIDs found in memory:
             options["modified_words"][word] = 1
             if self.merge_with_old_recIDs(word, recIDs, set) == 0:
                 # nothing to update:
-                if options["verbose"] >= 9:
-                    write_message("......... unchanged hitlist for ``%s''" % word)
+                write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
                 pass
             else:
                 # yes there were some new words:
-                if options["verbose"] >= 9:
-                    write_message("......... updating hitlist for ``%s''" % word)
-		run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), escape_string(word)))
+                write_message("......... updating hitlist for ``%s''" % word, verbose=9)
+                run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), escape_string(word)))
         else: # the word is new, will create new set:
-            if options["verbose"] >= 9:
-                write_message("......... inserting hitlist for ``%s''" % word)
-	    set = self.value[word]
-	    if len(set) > 0:
+            write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
+            set = self.value[word]
+            if len(set) > 0:
                 #new word, add to list
                 options["modified_words"][word] = 1
-	        run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))
+                run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
@@ -446,8 +386,7 @@ class WordTable:
         keys = self.value.keys()
         keys.sort()
         for k in keys:
-            if options["verbose"]:
-                write_message("%s: %s" % (k, self.value[k]))
+            write_message("%s: %s" % (k, self.value[k]))
 
     def count(self):
         "Returns the number of words in the table."
@@ -455,8 +394,7 @@ class WordTable:
 
     def info(self):
         "Prints some information on the words table."
-        if options["verbose"]:
-            write_message("The words table contains %d words." % self.count())
+        write_message("The words table contains %d words." % self.count())
 
     def lookup_words(self, word=""):
         "Lookup word from the words table."
@@ -471,12 +409,10 @@ class WordTable:
                     return
 
         if self.value.has_key(word):
-            if options["verbose"]:
-                write_message("The word '%s' is found %d times." \
+            write_message("The word '%s' is found %d times." \
                 % (word, len(self.value[word])))
         else:
-            if options["verbose"]:
-                write_message("The word '%s' does not exist in the word file."\
+            write_message("The word '%s' does not exist in the word file."\
                               % word)
 
     def update_last_updated(self, rank_method_code, starting_time=None):
@@ -485,8 +421,7 @@ class WordTable:
         the records will be reindexed next time."""
         if starting_time is None:
             return None
-        if options["verbose"] >= 9:
-            write_message("updating last_updated to %s...", starting_time)
+        write_message("updating last_updated to %s..." % starting_time, verbose=9)
         return run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s",
                        (starting_time, rank_method_code,))
 
@@ -509,39 +444,35 @@ class WordTable:
             chunksize_count = 0
             while i_low <= range[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,range[1])
+                i_high = min(i_low+task_get_option("flush")-flush_count-1,range[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:
+                    if task_get_option('verbose') >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
-                    task_sig_stop_commands()
                     sys.exit(1)
-                if options["verbose"]:
-                    write_message("%s adding records #%d-#%d started" % \
+                write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
                 if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
                 task_update_progress("%s adding recs %d-%d" % (self.tablename, i_low, i_high))
-		self.del_recID_range(i_low, i_high)
+                self.del_recID_range(i_low, i_high)
                 just_processed = self.add_recID_range(i_low, i_high)
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
                 records_done = records_done + just_processed
-                if options["verbose"]:
-                    write_message("%s adding records #%d-#%d ended  " % \
+                write_message("%s adding records #%d-#%d ended  " % \
                         (self.tablename, i_low, i_high))
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
                 # flush if necessary:
-                if flush_count >= options["flush"]:
+                if flush_count >= task_get_option("flush"):
                     self.put_into_db()
                     self.clean()
-                    if options["verbose"]:
-                        write_message("%s backing up" % (self.tablename))
+                    write_message("%s backing up" % (self.tablename))
                     flush_count = 0
                     self.log_progress(time_started,records_done,records_to_go)
                 # iterate:
@@ -572,13 +503,12 @@ class WordTable:
         '%s'""" % dates[0]
         if dates[1]:
             query += "and b.modification_date <= '%s'" % dates[1]
-        query += "ORDER BY b.id ASC"""
+        query += " ORDER BY b.id ASC"""
         res = run_sql(query)
 
         list = create_range_list(res)
         if not list:
-            if options["verbose"]:
-                write_message( "No new records added. %s is up to date" % self.tablename)
+            write_message( "No new records added. %s is up to date" % self.tablename)
         else:
             self.add_recIDs(list)
         return list
@@ -593,19 +523,19 @@ class WordTable:
         # secondly fetch all needed tags:
 
         for (tag, weight, lang) in self.fields_to_index:
-	    if tag in tagToWordsFunctions.keys():
+            if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[ tag ]
-	    else: get_words_function = get_words_from_phrase
+            else: get_words_function = get_words_from_phrase
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
                     WHERE bb.id_bibrec BETWEEN %d AND %d
                     AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)
             res = run_sql(query)
-	    nb_total_to_read = len(res)
+            nb_total_to_read = len(res)
             verbose_idx = 0     # for verbose pretty printing
             for row in res:
-		recID, phrase = row
+                recID, phrase = row
                 if options["validset"].contains(recID):
                     if not wlist.has_key(recID): wlist[recID] = {}
                     new_words = get_words_function(phrase, weight, lang) # ,self.separators
@@ -618,10 +548,8 @@ class WordTable:
             # was this record marked as deleted?
             if "DELETED" in self.get_field(recID, "980__c"):
                 wlist[recID] = {}
-                if options["verbose"] >= 9:
-                    write_message("... record %d was declared deleted, removing its word list" % recID)
-            if options["verbose"] >= 9:
-                write_message("... record %d, termlist: %s" % (recID, wlist[recID]))
+                write_message("... record %d was declared deleted, removing its word list" % recID, verbose=9)
+            write_message("... record %d, termlist: %s" % (recID, wlist[recID]), verbose=9)
         query_factory = cStringIO.StringIO()
         qwrite = query_factory.write
         qwrite( "INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
@@ -681,13 +609,11 @@ class WordTable:
             return
 
         time_recs_per_min = done/(time_elapsed/60.0)
-        if options["verbose"]:
-            write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
+        write_message("%d records took %.1f seconds to complete.(%1.f recs/min)"\
                 % (done, time_elapsed, time_recs_per_min))
 
         if time_recs_per_min:
-            if options["verbose"]:
-                write_message("Estimated runtime: %.1f minutes" % \
+            write_message("Estimated runtime: %.1f minutes" % \
                     ((todo-done)/time_recs_per_min))
 
     def put(self, recID, word, sign):
@@ -718,9 +644,8 @@ class WordTable:
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
            and high from memory words index table."""
-        if options["verbose"] > 2:
-            write_message("%s fetching existing words for records #%d-#%d started" % \
-                (self.tablename, low, high))
+        write_message("%s fetching existing words for records #%d-#%d started" % \
+                (self.tablename, low, high), verbose=3)
         self.recIDs_in_mem.append([low,high])
         query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
         BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
@@ -730,9 +655,8 @@ class WordTable:
             wlist = deserialize_via_marshal(recID_row[1])
             for word in wlist:
                 self.put(recID, word, (-1, 0))
-        if options["verbose"] > 2:
-            write_message("%s fetching existing words for records #%d-#%d ended" % \
-                (self.tablename, low, high))
+        write_message("%s fetching existing words for records #%d-#%d ended" % \
+                (self.tablename, low, high), verbose=3)
 
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. rnkWORD01R) for
@@ -756,8 +680,7 @@ class WordTable:
             nb_records = 0
 
         # report stats:
-        if options["verbose"]:
-            write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
+        write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
 
         # find possible bad states in reverse tables:
         query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
@@ -770,8 +693,7 @@ class WordTable:
             write_message("EMERGENCY: %s needs to repair %d of %d records" % \
                 (self.tablename, nb_bad_records, nb_records))
         else:
-            if options["verbose"]:
-                write_message("%s is in consistent state" % (self.tablename))
+            write_message("%s is in consistent state" % (self.tablename))
 
         return nb_bad_records
 
@@ -813,16 +735,15 @@ class WordTable:
             chunksize_count = 0
             while i_low <= range[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+options["flush"]-flush_count-1,range[1])
+                i_high = min(i_low+task_get_option("flush")-flush_count-1,range[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if options["verbose"] >= 9:
+                    if task_get_option("verbose") >= 9:
                         traceback.print_tb(sys.exc_info()[2])
                     task_update_status("ERROR")
-                    task_sig_stop_commands()
                     sys.exit(1)
 
                 flush_count = flush_count + i_high - i_low + 1
@@ -831,7 +752,7 @@ class WordTable:
                 if chunksize_count >= chunksize:
                     chunksize_count = 0
                 # flush if necessary:
-                if flush_count >= options["flush"]:
+                if flush_count >= task_get_option("flush"):
                     self.put_into_db("emergency")
                     self.clean()
                     flush_count = 0
@@ -850,8 +771,7 @@ class WordTable:
         AND id_bibrec BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
         res = run_sql(query, None, 1)
         if res[0][0]==0:
-            if options["verbose"]:
-                write_message("%s for %d-%d is in consistent state"%(self.tablename,low,high))
+            write_message("%s for %d-%d is in consistent state"%(self.tablename,low,high))
             return # okay, words table is consistent
 
         ## inconsistency detected!
@@ -902,13 +822,11 @@ class WordTable:
                     # Get the words file
                     query = """SELECT type,termlist FROM %sR
                     WHERE id_bibrec='%d'""" % (self.tablename[:-1], recID)
-                    if options["verbose"] >= 9:
-                        write_message(query)
+                    write_message(query, verbose=9)
                     res = run_sql(query)
                     for row in res:
                         wlist = deserialize_via_marshal(row[1])
-                        if options["verbose"] >= 9:
-                            write_message("Words are %s " % wlist)
+                        write_message("Words are %s " % wlist, verbose=9)
                         if row[0] == 'TEMPORARY':
                             sign = 1
                         else:
@@ -926,7 +844,7 @@ class WordTable:
                 recommended.""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
 
-def word_index(row, run):
+def word_index(run):
     """Run the indexing task.  The row argument is the BibSched task
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
@@ -947,20 +865,8 @@ def word_index(row, run):
         print "Warning: Psyco", e
         pass
 
-    global options, wordTables, languages
+    global wordTables, languages
 
-    # read from SQL row:
-    task_id = row[0]
-    task_proc = row[1]
-    options = marshal.loads(row[6])
-
-    # install signal handlers
-    signal.signal(signal.SIGUSR1, task_sig_sleep)
-    signal.signal(signal.SIGTERM, task_sig_stop)
-    signal.signal(signal.SIGABRT, task_sig_suicide)
-    signal.signal(signal.SIGCONT, task_sig_wakeup)
-    signal.signal(signal.SIGINT, task_sig_unknown)
-    ## go ahead and treat each table:
 
     options["run"] = []
     options["run"].append(run)
@@ -986,11 +892,11 @@ def word_index(row, run):
         wordTable = WordTable(options["table"], tags)
         wordTable.report_on_table_consistency()
         try:
-            if options["cmd"] == "del":
-                if options["id"]:
-                    wordTable.del_recIDs(options["id"])
-                elif options["collection"]:
-                    l_of_colls = string.split(options["collection"], ",")
+            if task_get_option("cmd") == "del":
+                if task_get_option("id"):
+                    wordTable.del_recIDs(task_get_option("id"))
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
                     recIDs = perform_request_search(c=l_of_colls)
                     recIDs_range = []
                     for recID in recIDs:
@@ -1000,31 +906,31 @@ def word_index(row, run):
                     write_message("Missing IDs of records to delete from index %s.", wordTable.tablename,
                                   sys.stderr)
                     raise StandardError
-            elif options["cmd"] == "add":
-                if options["id"]:
-                    wordTable.add_recIDs(options["id"])
-                elif options["collection"]:
-                    l_of_colls = string.split(options["collection"], ",")
+            elif task_get_option("cmd") == "add":
+                if task_get_option("id"):
+                    wordTable.add_recIDs(task_get_option("id"))
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
                     recIDs = perform_request_search(c=l_of_colls)
                     recIDs_range = []
                     for recID in recIDs:
                         recIDs_range.append([recID,recID])
                     wordTable.add_recIDs(recIDs_range)
-                elif options["last_updated"]:
+                elif task_get_option("last_updated"):
                     wordTable.add_recIDs_by_date("")
                     # only update last_updated if run via automatic mode:
                     wordTable.update_last_updated(rank_method_code, method_starting_time)
-                elif options["modified"]:
-                    wordTable.add_recIDs_by_date(options["modified"])
+                elif task_get_option("modified"):
+                    wordTable.add_recIDs_by_date(task_get_option("modified"))
                 else:
                     wordTable.add_recIDs([[0,CFG_MAX_RECID]])
-            elif options["cmd"] == "repair":
+            elif task_get_option("cmd") == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])
-            elif options["cmd"] == "check":
+            elif task_get_option("cmd") == "check":
                 check_rnkWORD(options["table"])
                 options["modified_words"] = {}
-            elif options["cmd"] == "stat":
+            elif task_get_option("cmd") == "stat":
                 rank_method_code_statistics(options["table"])
             else:
                 write_message("Invalid command found processing %s" % \
@@ -1033,7 +939,7 @@ def word_index(row, run):
             update_rnkWORD(options["table"], options["modified_words"])
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
-            if options["verbose"] >= 9:
+            if task_get_option("verbose") >= 9:
                 traceback.print_tb(sys.exc_info()[2])
             sys.exit(1)
         wordTable.report_on_table_consistency()
@@ -1089,23 +995,11 @@ def get_valid_range(rank_method_code):
     #valid.addlist(recIDs)
     return valid
 
-def write_message(msg, stream=sys.stdout):
-    """Prints message and flush output stream (may be sys.stdout or sys.stderr)."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-
 def check_term(term, termlength):
     """Check if term contains not allowed characters, or for any other reasons for not using this term."""
     try:
         if len(term) <= termlength:
-	    return False
+            return False
         reg = re.compile(r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]")
         if re.search(reg, term):
             return False
@@ -1115,7 +1009,7 @@ def check_term(term, termlength):
         if int(term):
             return False
     except StandardError, e:
-	pass
+        pass
     return True
 
 def check_rnkWORD(table):
@@ -1150,7 +1044,7 @@ def check_rnkWORD(table):
                     write_message("ERROR: Gi missing for record %s and term: %s (%s) in %s" % (j,t,repr(t), table))
                     terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (table, t))
                     termlist = deserialize_via_marshal(terms_docs[0][1])
-    	i += 5000
+            i += 5000
 
     if len(errors) == 0:
         write_message("No direct errors found, but nonconsistent data may exist.")
@@ -1195,10 +1089,10 @@ def update_rnkWORD(table, terms):
     Nj = {}
     N = run_sql("select count(id_bibrec) from %sR" % table[:-1])[0][0]
 
-    if len(terms) == 0 and options["quick"] == "yes":
+    if len(terms) == 0 and task_get_option("quick") == "yes":
         write_message("No terms to process, ending...")
         return ""
-    elif options["quick"] == "yes": #not used -R option, fast calculation (not accurate)
+    elif task_get_option("quick") == "yes": #not used -R option, fast calculation (not accurate)
         write_message("Beginning post-processing of %s terms" % len(terms))
 
         #Locating all documents related to the modified/new/deleted terms, if fast update,
@@ -1213,8 +1107,8 @@ def update_rnkWORD(table, terms):
                 term_docs = deserialize_via_marshal(hitlist)
                 if term_docs.has_key("Gi"):
                     del term_docs["Gi"]
-	        for (j, tf) in term_docs.iteritems():
-                    if (options["quick"] == "yes" and tf[1] == 0) or options["quick"] == "no":
+                for (j, tf) in term_docs.iteritems():
+                    if (task_get_option("quick") == "yes" and tf[1] == 0) or task_get_option("quick") == "no":
                         Nj[j] = 0
             write_message("Phase 1: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
             i += 5000
@@ -1231,7 +1125,7 @@ def update_rnkWORD(table, terms):
                 for (t, tf) in doc_terms.iteritems():
                     Gi[t] = 0
             write_message("Phase 2: ......processed %s/%s records " % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
-    	    i += 5000
+            i += 5000
         write_message("Phase 2: Finished finding all terms in affected records")
 
     else: #recalculate
@@ -1259,7 +1153,7 @@ def update_rnkWORD(table, terms):
     terms = Gi.keys()
     Gi = {}
     i = 0
-    if options["quick"] == "no":
+    if task_get_option("quick") == "no":
         #Calculating Fi and Gi value for each term
         write_message("Phase 3: Calculating importance of all affected terms")
         while i < len(terms):
@@ -1270,7 +1164,7 @@ def update_rnkWORD(table, terms):
                     del term_docs["Gi"]
                 Fi = 0
                 Gi[t] = 1
-	        for (j, tf) in term_docs.iteritems():
+                for (j, tf) in term_docs.iteritems():
                     Fi += tf[0]
                 for (j, tf) in term_docs.iteritems():
                     if tf[0] != Fi:
@@ -1292,7 +1186,7 @@ def update_rnkWORD(table, terms):
                 else:
                     Fi = 0
                     Gi[t] = 1
-	            for (j, tf) in term_docs.iteritems():
+                    for (j, tf) in term_docs.iteritems():
                         Fi += tf[0]
                     for (j, tf) in term_docs.iteritems():
                         if tf[0] != Fi:
@@ -1324,7 +1218,7 @@ def update_rnkWORD(table, terms):
                 Nj[j] += 1
             run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], serialize_via_marshal(doc_terms), j))
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
-	i += 5000
+        i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
     write_message("Phase 5: Updating %s with new normalization values" % table)
     i = 0
@@ -1336,7 +1230,7 @@ def update_rnkWORD(table, terms):
             term_docs = deserialize_via_marshal(hitlist)
             if term_docs.has_key("Gi"):
                 del term_docs["Gi"]
-	    for (j, tf) in term_docs.iteritems():
+            for (j, tf) in term_docs.iteritems():
                 if Nj.has_key(j):
                     term_docs[j] = (tf[0], Nj[j])
             Git = int(math.floor(Gi[t]*100))
@@ -1365,85 +1259,15 @@ def get_from_forward_index_with_id(start, stop, table):
 def get_from_reverse_index(records, start, stop, table):
     current_recs = "%s" % records[start:stop]
     current_recs = current_recs[1:-1]
-    docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec IN (%s)" % (table[:-1],current_recs))
+    docs_terms = run_sql("SELECT id_bibrec, termlist FROM %sR WHERE id_bibrec IN (%s)" % (table[:-1], current_recs))
     return docs_terms
 
-def test_word_separators(phrase="hep-th/0101001"):
-    """Tests word separating policy on various input."""
-    print "%s:" % phrase
-    gwfp = get_words_from_phrase(phrase)
-    for (word, count) in gwfp.iteritems():
-        print "\t-> %s - %s" % (word, count)
-
-def task_sig_sleep(sig, frame):
-    """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
-    write_message("sleeping...")
-    task_update_status("SLEEPING")
-    signal.pause() # wait for wake-up signal
-
-def task_sig_wakeup(sig, frame):
-    """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
-    write_message("continuing...")
-    task_update_status("CONTINUING")
-
-def task_sig_stop(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
-    write_message("stopping...")
-    task_update_status("STOPPING")
-    errcode = 0
-    try:
-        task_sig_stop_commands()
-        write_message("stopped")
-        task_update_status("STOPPED")
-    except StandardError, err:
-        write_message("Error during stopping! %e" % err)
-        task_update_status("STOPPINGFAILED")
-        errcode = 1
-    sys.exit(errcode)
-
-def task_sig_stop_commands():
-    """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.
-    """
-    write_message("stopping commands started")
-    for table in wordTables:
-        table.put_into_db()
-    write_message("stopping commands ended")
-
-def task_sig_suicide(sig, frame):
-    """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
-    write_message("suiciding myself now...")
-    task_update_status("SUICIDING")
-    write_message("suicided")
-    task_update_status("SUICIDED")
-    sys.exit(0)
-
-def task_sig_unknown(sig, frame):
-    """Signal handler for the other unknown signals sent by shell or user."""
-    # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
-
-def task_update_progress(msg):
-    """Updates progress information in the BibSched task table."""
-    global options
-    if options["verbose"] >= 9:
-        write_message("Updating task progress to %s." % msg)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s", (msg, options["task"]))
-
-def task_update_status(val):
-    """Updates state information in the BibSched task table."""
-    global options
-    if options["verbose"] >= 9:
-        write_message("Updating task status to %s." % val)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s", (val, options["task"]))
+#def test_word_separators(phrase="hep-th/0101001"):
+    #"""Tests word separating policy on various input."""
+    #print "%s:" % phrase
+    #gwfp = get_words_from_phrase(phrase)
+    #for (word, count) in gwfp.iteritems():
+        #print "\t-> %s - %s" % (word, count)
 
 def getName(methname, ln=cdslang, type='ln'):
     """Returns the name of the rank method, either in default language or given language.
@@ -1467,6 +1291,6 @@ def getName(methname, ln=cdslang, type='ln'):
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
 
-def word_similarity(row, run):
+def word_similarity(run):
     """Call correct method"""
-    return word_index(row, run)
+    return word_index(run)

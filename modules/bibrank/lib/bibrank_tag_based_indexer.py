@@ -23,37 +23,22 @@
 __revision__ = "$Id$"
 
 import marshal
-from zlib import compress,decompress
-from string import split,translate,lower,upper
-import getopt
-import getpass
-import string
-import os
-import re
+from zlib import compress, decompress
 import sys
 import time
 import Numeric
-import urllib
-import signal
-import tempfile
-import unicodedata
 import traceback
-import cStringIO
-import re
-import copy
-import types
 import ConfigParser
 
 from invenio.config import \
      CFG_MAX_RECID, \
      cdslang, \
-     etcdir, \
-     version
-from invenio.search_engine import perform_request_search, strip_accents, HitSet
-from invenio.search_engine import get_index_id, create_basic_search_units
+     etcdir
+from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, escape_string
+from invenio.bibtask import task_get_option, write_message
 
 options = {}
 
@@ -62,26 +47,16 @@ def citation_exec(rank_method_code, name, config):
     dict = get_citation_weight(rank_method_code, config)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if dict: intoDB(dict, date, rank_method_code)
-    else: print "no need to update the indexes for citations"
+    else: write_message("no need to update the indexes for citations")
 
-def single_tag_rank_method_exec(rank_method_code, name, config):
-    """Creating the rank method data"""
-    startCreate = time.time()
-    rnkset = {}
-    rnkset_old = fromDB(rank_method_code)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    rnkset_new = single_tag_rank(config)
-    rnkset = union_dicts(rnkset_old, rnkset_new)
-    intoDB(rnkset, date, rank_method_code)
+def download_weight_filtering_user(run):
+    return bibrank_engine(run)
 
-def download_weight_filtering_user(row,run):
-    return bibrank_engine(row,run)
+def download_weight_total(run):
+    return bibrank_engine(run)
 
-def download_weight_total(row,run):
-    return bibrank_engine(row,run)
-
-def file_similarity_by_times_downloaded(row,run):
-    return bibrank_engine(row,run)
+def file_similarity_by_times_downloaded(run):
+    return bibrank_engine(run)
 
 def download_weight_filtering_user_exec (rank_method_code, name, config):
     """Ranking by number of downloads per User.
@@ -90,7 +65,7 @@ def download_weight_filtering_user_exec (rank_method_code, name, config):
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
-    filter_downloads_per_hour(keys,last_updated)
+    filter_downloads_per_hour(keys, last_updated)
     dic = get_download_weight_filtering_user(dic, keys)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     intoDB(dic, date, rank_method_code)
@@ -104,7 +79,7 @@ def download_weight_total_exec(rank_method_code, name, config):
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
-    filter_downloads_per_hour(keys,last_updated)
+    filter_downloads_per_hour(keys, last_updated)
     dic = get_download_weight_total(dic, keys)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     intoDB(dic, date, rank_method_code)
@@ -112,12 +87,12 @@ def download_weight_total_exec(rank_method_code, name, config):
     return {"time":time2-time1}
 
 def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
-    """update dictionnary {recid:[(recid,nb page similarity),()..]}"""
+    """update dictionnary {recid:[(recid, nb page similarity), ()..]}"""
     time1 = time.time()
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
-    filter_downloads_per_hour(keys,last_updated)
+    filter_downloads_per_hour(keys, last_updated)
     dic = get_file_similarity_by_times_downloaded(dic, keys)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     intoDB(dic, date, rank_method_code)
@@ -136,8 +111,7 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
 
 def single_tag_rank(config):
     """Connect the given tag with the data from the kb file given"""
-    if options["verbose"] >= 9:
-        write_message("Loading knowledgebase file")
+    write_message("Loading knowledgebase file", verbose=9)
     kb_data = {}
     records = []
 
@@ -146,22 +120,22 @@ def single_tag_rank(config):
     data = input.readlines()
     for line in data:
         if not line[0:1] == "#":
-            kb_data[string.strip((string.split(string.strip(line),"---"))[0])] = (string.split(string.strip(line), "---"))[1]
+            kb_data[string.strip((string.split(string.strip(line), "---"))[0])] = (string.split(string.strip(line), "---"))[1]
     write_message("Number of lines read from knowledgebase file: %s" % len(kb_data))
 
-    tag = config.get(config.get("rank_method", "function"),"tag")
-    tags = split(config.get(config.get("rank_method", "function"), "check_mandatory_tags"),",")
+    tag = config.get(config.get("rank_method", "function"), "tag")
+    tags = config.get(config.get("rank_method", "function"), "check_mandatory_tags").split(", ")
     if tags == ['']:
-	tags = ""
+        tags = ""
 
     records = []
-    for (recids,recide) in options["recid_range"]:
+    for (recids, recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
-        recs = run_sql("SELECT id_bibrec,value FROM bib%sx,bibrec_bib%sx WHERE tag='%s' AND id_bibxxx=id and id_bibrec >=%s and id_bibrec<=%s" % (tag[0:2], tag[0:2], tag, recids, recide))
+        recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
         valid = HitSet(Numeric.ones(CFG_MAX_RECID + 1))
         for key in tags:
             newset = HitSet()
-            newset.addlist(run_sql("SELECT id_bibrec FROM bib%sx,bibrec_bib%sx WHERE id_bibxxx=id AND tag='%s' AND id_bibxxx=id and id_bibrec >=%s and id_bibrec<=%s" % (tag[0:2], tag[0:2], key, recids, recide)))
+            newset.addlist(run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))
             valid.intersect(newset)
         if tags:
             recs = filter(lambda x: valid.contains(x[0]), recs)
@@ -170,7 +144,7 @@ def single_tag_rank(config):
 
     records = filter(lambda x: options["validset"].contains(x[0]), records)
     rnkset = {}
-    for key,value in records:
+    for key, value in records:
         if kb_data.has_key(value):
             if not rnkset.has_key(key):
                 rnkset[key] = float(kb_data[value])
@@ -185,7 +159,7 @@ def single_tag_rank(config):
 
 def get_lastupdated(rank_method_code):
     """Get the last time the rank method was updated"""
-    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name='%s'" % rank_method_code)
+    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name=%s", (rank_method_code, ))
     if res:
         return res[0][0]
     else:
@@ -193,15 +167,15 @@ def get_lastupdated(rank_method_code):
 
 def intoDB(dict, date, rank_method_code):
     """Insert the rank method data into the database"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
+    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
     del_rank_method_codeDATA(rank_method_code)
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES ('%s','%s')" % (id[0][0], serialize_via_marshal(dict)))
-    run_sql("UPDATE rnkMETHOD SET last_updated='%s' WHERE name='%s'" % (date, rank_method_code))
+    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%%s, '%s')" % serialize_via_marshal(dict) , (id[0][0], ))
+    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
+    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
     if res:
         return deserialize_via_marshal(res[0][0])
     else:
@@ -209,17 +183,17 @@ def fromDB(rank_method_code):
 
 def del_rank_method_codeDATA(rank_method_code):
     """Delete the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
-    res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
+    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
 
 def del_recids(rank_method_code, range_rec):
     """Delete some records from the rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name='%s'" % rank_method_code)
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % id[0][0])
+    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0] ))
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
         write_message("Old size: %s" % len(rec_dict))
-        for (recids,recide) in range_rec:
+        for (recids, recide) in range_rec:
             for i in range(int(recids), int(recide)):
                 if rec_dict.has_key(i):
                     del rec_dict[i]
@@ -227,7 +201,7 @@ def del_recids(rank_method_code, range_rec):
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, date, rank_method_code)
     else:
-        print "Create before deleting!"
+        write_message("Create before deleting!")
 
 def union_dicts(dict1, dict2):
     "Returns union of the two dicts."
@@ -242,9 +216,9 @@ def rank_method_code_statistics(rank_method_code):
     """Print statistics"""
 
     method = fromDB(rank_method_code)
-    max = ('',-999999)
+    max = ('', -999999)
     maxcount = 0
-    min = ('',999999)
+    min = ('', 999999)
     mincount = 0
 
     for (recID, value) in method.iteritems():
@@ -267,7 +241,7 @@ def rank_method_code_statistics(rank_method_code):
     write_message("Lowest value: %s - Number of records: %s" % (min, mincount))
     write_message("Highest value: %s - Number of records: %s" % (max, maxcount))
     write_message("Divided into 10 sets:")
-    for i in range(1,11):
+    for i in range(1, 11):
         setcount = 0
         distinct_values = {}
         lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
@@ -288,127 +262,8 @@ def check_method(rank_method_code):
         else:
             write_message("No records modified, update not necessary")
 
-def write_message(msg, stream = sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr). Useful for debugging stuff."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s. [must be sys.stdout or sys.stderr]\n" % stream)
-    return
-
-def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
-    """Returns a date string according to the format string.
-       It can handle normal date strings and shifts with respect
-       to now."""
-    date = time.time()
-    shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
-    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = shift_re.match(var)
-    if m:
-        sign = m.groups()[0] == "-" and -1 or 1
-        factor = factors[m.groups()[2]]
-        value = float(m.groups()[1])
-        date = time.localtime(date + sign * factor * value)
-        date = time.strftime(format_string, date)
-    else:
-        date = time.strptime(var, format_string)
-        date = time.strftime(format_string, date)
-    return date
-
-def task_sig_sleep(sig, frame):
-    """Signal handler for the 'sleep' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_sleep(), got signal %s frame %s" % (sig, frame))
-    write_message("sleeping...")
-    task_update_status("SLEEPING")
-    signal.pause() # wait for wake-up signal
-
-def task_sig_wakeup(sig, frame):
-    """Signal handler for the 'wakeup' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_wakeup(), got signal %s frame %s" % (sig, frame))
-    write_message("continuing...")
-    task_update_status("CONTINUING")
-
-def task_sig_stop(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_stop(), got signal %s frame %s" % (sig, frame))
-    write_message("stopping...")
-    task_update_status("STOPPING")
-    errcode = 0
-    try:
-        task_sig_stop_commands()
-        write_message("stopped")
-        task_update_status("STOPPED")
-    except StandardError, err:
-        write_message("Error during stopping! %e" % err)
-        task_update_status("STOPPINGFAILED")
-        errcode = 1
-    sys.exit(errcode)
-
-def task_sig_stop_commands():
-    """Do all the commands necessary to stop the task before quitting.
-    Useful for task_sig_stop() handler.
-    """
-    write_message("stopping commands started")
-    write_message("stopping commands ended")
-
-def task_sig_suicide(sig, frame):
-    """Signal handler for the 'suicide' signal sent by BibSched."""
-    if options["verbose"] >= 9:
-        write_message("task_sig_suicide(), got signal %s frame %s" % (sig, frame))
-    write_message("suiciding myself now...")
-    task_update_status("SUICIDING")
-    write_message("suicided")
-    task_update_status("SUICIDED")
-    sys.exit(0)
-
-def task_sig_unknown(sig, frame):
-    """Signal handler for the other unknown signals sent by shell or user."""
-    # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
-
-def task_update_progress(msg):
-    """Updates progress information in the BibSched task table."""
-    query = "UPDATE schTASK SET progress='%s' where id=%d" % (escape_string(msg), options["task"])
-    if options["verbose"]>= 9:
-        write_message(query)
-    run_sql(query)
-    return
-
-def task_update_status(val):
-    """Updates state information in the BibSched task table."""
-    query = "UPDATE schTASK SET status='%s' where id=%d" % (escape_string(val), options["task"])
-    if options["verbose"]>= 9:
-        write_message(query)
-    run_sql(query)
-    return
-
-def split_ranges(parse_string):
-    recIDs = []
-    ranges = string.split(parse_string, ",")
-    for arange in ranges:
-        tmp_recIDs = string.split(arange, "-")
-
-        if len(tmp_recIDs)==1:
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
-        else:
-            if int(tmp_recIDs[0]) > int(tmp_recIDs[1]): # sanity check
-                tmp = tmp_recIDs[0]
-                tmp_recIDs[0] = tmp_recIDs[1]
-                tmp_recIDs[1] = tmp
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[1])])
-    return recIDs
-
-def bibrank_engine(row, run):
-    """Run the indexing task. The row argument is the BibSched task
-    queue row, containing if, arguments, etc.
+def bibrank_engine(run):
+    """Run the indexing task.
     Return 1 in case of success and 0 in case of failure.
     """
 
@@ -416,32 +271,19 @@ def bibrank_engine(row, run):
         import psyco
         psyco.bind(single_tag_rank)
         psyco.bind(single_tag_rank_method_exec)
-        psyco.bind(serialize_via_numeric_array)
-        psyco.bind(deserialize_via_numeric_array)
+        psyco.bind(serialize_via_marshal)
+        psyco.bind(deserialize_via_marshal)
     except StandardError, e:
-        print "Psyco ERROR",e
+        print "Psyco ERROR", e
 
     startCreate = time.time()
-    global options
-    task_id = row[0]
-    task_proc = row[1]
-    options = marshal.loads(row[6])
-
-    task_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    signal.signal(signal.SIGUSR1, task_sig_sleep)
-    signal.signal(signal.SIGTERM, task_sig_stop)
-    signal.signal(signal.SIGABRT, task_sig_suicide)
-    signal.signal(signal.SIGCONT, task_sig_wakeup)
-    signal.signal(signal.SIGINT, task_sig_unknown)
-
     sets = {}
     try:
         options["run"] = []
         options["run"].append(run)
         for rank_method_code in options["run"]:
             cfg_name = getName(rank_method_code)
-            if options["verbose"] >= 0:
-                write_message("Running rank method: %s." % cfg_name)
+            write_message("Running rank method: %s." % cfg_name)
 
             file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
@@ -456,59 +298,57 @@ def bibrank_engine(row, run):
             cfg_name = getName(cfg_short)
             options["validset"] = get_valid_range(rank_method_code)
 
-            if options["collection"]:
-                l_of_colls = string.split(options["collection"], ",")
+            if task_get_option("collection"):
+                l_of_colls = string.split(task_get_option("collection"), ", ")
                 recIDs = perform_request_search(c=l_of_colls)
                 recIDs_range = []
                 for recID in recIDs:
-                    recIDs_range.append([recID,recID])
+                    recIDs_range.append([recID, recID])
                 options["recid_range"] = recIDs_range
-            elif options["id"]:
-                options["recid_range"] = options["id"]
-            elif options["modified"]:
-                options["recid_range"] = add_recIDs_by_date(rank_method_code, options["modified"])
-            elif options["last_updated"]:
+            elif task_get_option("id"):
+                options["recid_range"] = task_get_option("id")
+            elif task_get_option("modified"):
+                options["recid_range"] = add_recIDs_by_date(rank_method_code, task_get_option("modified"))
+            elif task_get_option("last_updated"):
                 options["recid_range"] = add_recIDs_by_date(rank_method_code)
             else:
-                if options["verbose"] > 1:
-                    write_message("No records specified, updating all")
+                write_message("No records specified, updating all", verbose=2)
                 min_id = run_sql("SELECT min(id) from bibrec")[0][0]
                 max_id = run_sql("SELECT max(id) from bibrec")[0][0]
                 options["recid_range"] = [[min_id, max_id]]
 
-            if options["quick"] == "no" and options["verbose"] >= 9:
-                write_message("Recalculate parameter not used, parameter ignored.")
+            if task_get_option("quick") == "no":
+                write_message("Recalculate parameter not used, parameter ignored.", verbose=9)
 
-            if options["cmd"] == "del":
+            if task_get_option("cmd") == "del":
                 del_recids(cfg_short, options["recid_range"])
-            elif options["cmd"] == "add":
+            elif task_get_option("cmd") == "add":
                 func_object = globals().get(cfg_function)
                 func_object(rank_method_code, cfg_name, config)
-            elif options["cmd"] == "stat":
+            elif task_get_option("cmd") == "stat":
                 rank_method_code_statistics(rank_method_code)
-            elif options["cmd"] == "check":
+            elif task_get_option("cmd") == "check":
                 check_method(rank_method_code)
-            elif options["cmd"] == "repair":
+            elif task_get_option("cmd") == "repair":
                 pass
             else:
                 write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
                 raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
-        if options["verbose"] >= 9:
+        if task_get_option("verbose") >= 9:
             traceback.print_tb(sys.exc_info()[2])
         raise StandardError
 
-    if options["verbose"]:
+    if task_get_option("verbose"):
         showtime((time.time() - startCreate))
     return 1
 
 def get_valid_range(rank_method_code):
     """Return a range of records"""
-    if options["verbose"] >=9:
-        write_message("Getting records from collections enabled for rank method.")
+    write_message("Getting records from collections enabled for rank method.", verbose=9)
 
-    res = run_sql("SELECT collection.name FROM collection,collection_rnkMETHOD,rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name='%s'" %  rank_method_code)
+    res = run_sql("SELECT collection.name FROM collection, collection_rnkMETHOD, rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s",  (rank_method_code, ))
     l_of_colls = []
     for coll in res:
         l_of_colls.append(coll[0])
@@ -527,30 +367,32 @@ def add_recIDs_by_date(rank_method_code, dates=""):
     """
     if not dates:
         try:
-            dates = (get_lastupdated(rank_method_code),'')
+            dates = (get_lastupdated(rank_method_code), '')
         except Exception, e:
             dates = ("0000-00-00 00:00:00", '')
-    query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= '%s'""" % dates[0]
+    query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s"""
     if dates[1]:
-        query += "and b.modification_date <= '%s'" % dates[1]
-    query += "ORDER BY b.id ASC"""
-    res = run_sql(query)
+        query += " and b.modification_date <= %s"
+    query += " ORDER BY b.id ASC"""
+    if dates[1]:
+        res = run_sql(query, (dates[0], dates[1]))
+    else:
+        res = run_sql(query, (dates[0], ))
     list = create_range_list(res)
     if not list:
-        if options["verbose"]:
-            write_message("No new records added since last time method was run")
+        write_message("No new records added since last time method was run")
     return list
 
 def getName(rank_method_code, ln=cdslang, type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
-        rnkid = run_sql("SELECT id FROM rnkMETHOD where name='%s'" % rank_method_code)
+        rnkid = run_sql("SELECT id FROM rnkMETHOD where name=%s", (rank_method_code, ))
         if rnkid:
             rnkid = str(rnkid[0][0])
-            res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
+            res = run_sql("SELECT value FROM rnkMETHODNAME where type=%s and ln=%s and id_rnkMETHOD=%s", (type, ln, rnkid))
             if not res:
-                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
+                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (cdslang, rnkid, type))
             if not res:
                 return rank_method_code
             return res[0][0]
@@ -569,34 +411,17 @@ def create_range_list(res):
     if not row:
         return []
     else:
-        range_list = [[row[0],row[0]]]
+        range_list = [[row[0], row[0]]]
     for row in res[1:]:
         id = row[0]
         if id == range_list[-1][1] + 1:
             range_list[-1][1] = id
         else:
-            range_list.append([id,id])
+            range_list.append([id, id])
     return range_list
 
-def single_tag_rank_method(row, run):
-    return bibrank_engine(row, run)
-
-def serialize_via_numeric_array_dumps(arr):
-    return Numeric.dumps(arr)
-
-def serialize_via_numeric_array_compr(str):
-    return compress(str)
-
-def serialize_via_numeric_array_escape(str):
-    return escape_string(str)
-
-def serialize_via_numeric_array(arr):
-    """Serialize Numeric array into a compressed string."""
-    return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
-
-def deserialize_via_numeric_array(string):
-    """Decompress and deserialize string into a Numeric array."""
-    return Numeric.loads(decompress(string))
+def single_tag_rank_method(run):
+    return bibrank_engine(run)
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
@@ -608,8 +433,7 @@ def deserialize_via_marshal(string):
 
 def showtime(timeused):
     """Show time used for method"""
-    if options["verbose"] >= 9:
-        write_message("Time used: %d second(s)." % timeused)
+    write_message("Time used: %d second(s)." % timeused, verbose=9)
 
-def citation(row,run):
-    return bibrank_engine(row, run)
+def citation(run):
+    return bibrank_engine(run)
