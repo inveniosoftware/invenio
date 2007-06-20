@@ -216,7 +216,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
-def _authenticate(user, authorization_action, authorization_msg=""):
+def authenticate(user, authorization_action, authorization_msg=""):
     """Authenticate the user against the user database.
     Check for its password, if it exists.
     Check for authorization_action access rights.
@@ -248,11 +248,11 @@ def _authenticate(user, authorization_action, authorization_msg=""):
             else:
                 print "Sorry, wrong credentials for %s." % user
                 sys.exit(1)
-        ## secondly check authorization for the authorization_action:
+    ## secondly check authorization for the authorization_action:
         (auth_code, auth_message) = acc_authorize_action(uid_db, authorization_action)
-        if auth_code != 0:
-            print auth_message
-            sys.exit(1)
+    if auth_code != 0:
+        print auth_message
+        sys.exit(1)
     return user
 
 def _task_submit(authorization_action, authorization_msg):
@@ -263,7 +263,7 @@ def _task_submit(authorization_action, authorization_msg):
         del _options["task"]
     ## authenticate user:
     if not _task_params['task_name'] in cfg_valid_processes_no_auth_needed:
-        _options['user'] = _authenticate(_options.get("user", ""), authorization_action, authorization_msg)
+        _options['user'] = authenticate(_options.get("user", ""), authorization_action, authorization_msg)
     else:
         _options['user'] = ''
     ## submit task:
