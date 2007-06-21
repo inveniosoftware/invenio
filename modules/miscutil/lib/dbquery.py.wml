@@ -88,7 +88,7 @@ def _db_login(relogin = 0):
 def _db_logout():
     """Close a connection."""
     try:
-        del DB_CONN[get_ident()]
+        del _DB_CONN[get_ident()]
     except KeyError:
         pass
 
