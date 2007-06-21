@@ -38,6 +38,7 @@ import re
 import time
 import traceback
 import os
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 
 # Which tasks don't need to ask the user for authorization?
 cfg_valid_processes_no_auth_needed = ("bibupload")
@@ -223,6 +224,8 @@ def authenticate(user, authorization_action, authorization_msg=""):
     Return user name upon authorization success,
     do system exit upon authorization failure.
     """
+    if CFG_EXTERNAL_AUTH_USING_SSO: # With SSO there's no internal account.
+        return user
     if authorization_msg:
         print authorization_msg
         print "=" * len(authorization_msg)
