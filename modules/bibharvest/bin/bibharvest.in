@@ -20,8 +20,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Call BibFormat engine and create HTML brief (and other) formats for
-   bibliographic records.  Upload formats via BibUpload."""
+"""Call CDS Invenio OAI harvestor."""
 
 __revision__ = "$Id$"
 
