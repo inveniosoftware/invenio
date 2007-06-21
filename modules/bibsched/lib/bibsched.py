@@ -542,7 +542,7 @@ class Manager:
         else:
             where = "and status!='DONE'"
             order = "ASC"
-        self.rows = run_sql(""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s"", (where, order))
+        self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (where, order))
         self.repaint()
         ring = 0
         while self.running:
@@ -578,7 +578,7 @@ class Manager:
                 else:
                     where = "and status!='DONE'"
                     order = "ASC"
-                self.rows = run_sql(""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s"", (where, order))
+                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (where, order))
                 ring = 0
                 self.repaint()
 
