@@ -79,28 +79,28 @@ create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
 
 update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
-	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE collectionname CHANGE id_collection id_collection mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE formatname CHANGE id_format id_format mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE fieldname CHANGE id_field id_field mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE collectionname CHANGE id_collection id_collection mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE formatname CHANGE id_format id_format mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE fieldname CHANGE id_field id_field mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ./modules/miscutil/bin/dbexec
 
 update-v0.3.2-tables: local-dbexec
-	echo "ALTER TABLE sbmCOLLECTION_sbmDOCTYPE CHANGE id_son id_son char(10) NOT NULL default '0';" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE sbmCOLLECTION_sbmDOCTYPE CHANGE id_son id_son char(10) NOT NULL default '0';" | ./modules/miscutil/bin/dbexec
 
-update-v0.3.3-tables: local-dbexec 
+update-v0.3.3-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE flxLINKTYPEPARAMS CHANGE pname pname varchar(78) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE flxLINKTYPEPARAMS CHANGE pname pname varchar(78) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE rnkMETHOD DROP star_category_ranges;" | ./modules/miscutil/bin/dbexec
 	echo "DROP TABLE rnkSET;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments LONGTEXT;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE status status varchar(50);" | ./modules/miscutil/bin/dbexec
 
-update-v0.5.0-tables: local-dbexec 
+update-v0.5.0-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE session ADD INDEX uid (uid);" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE session ADD INDEX uid (uid);" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE idxINDEXNAME SET ln='cs' WHERE ln='cz';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE rnkMETHODNAME SET ln='cs' WHERE ln='cz';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE collectionname SET ln='cs' WHERE ln='cz';" | ./modules/miscutil/bin/dbexec
@@ -115,23 +115,23 @@ update-v0.5.0-tables: local-dbexec
 	echo "UPDATE fieldname SET ln='sv' WHERE ln='se';" | ./modules/miscutil/bin/dbexec
 
 update-v0.7.1-tables: local-dbexec
-	echo "DROP TABLE oaiHARVEST;" | ./modules/miscutil/bin/dbexec 
+	echo "DROP TABLE oaiHARVEST;" | ./modules/miscutil/bin/dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgwebcomment','configure WebComment','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiarchive','run BibHarvest oaiarchive','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibedit','run BibEdit','','no');" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE user ADD nickname varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ./modules/miscutil/bin/dbexec 
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgwebcomment','configure WebComment','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiarchive','run BibHarvest oaiarchive','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibedit','run BibEdit','','no');" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD nickname varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user_query_basket CHANGE alert_name alert_name varchar(30) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "TRUNCATE TABLE session;" | ./modules/miscutil/bin/dbexec
 	@echo "**********************************************************"
 	@echo "** Do not forget to run the basket migration now:       **"
 	@echo "**    @PYTHON@ modules/webbasket/lib/webbasket_migration_kit.py "
-	@echo "** Please see the RELEASE-NOTES for details.           **"         
+	@echo "** Please see the RELEASE-NOTES for details.           **"
 	@echo "**********************************************************"
 	@echo "INSERT INTO oaiARCHIVE (id, setName, setSpec, setDescription, setDefinition, setRecList) SELECT id, setName, setSpec, CONCAT_WS('', setDescription), setDefinition, setRecList FROM oaiSET;"
 
@@ -142,8 +142,8 @@ update-v0.90.0-tables: local-dbexec
 
 update-v0.90.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ./modules/miscutil/bin/dbexec 
-	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ./modules/miscutil/bin/dbexec 
+	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE sbmCATEGORIES ADD COLUMN score TINYINT UNSIGNED NOT NULL DEFAULT 0;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE sbmCATEGORIES ADD PRIMARY KEY (doctype, sname);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE sbmCATEGORIES ADD KEY doctype (doctype);" | ./modules/miscutil/bin/dbexec
@@ -187,17 +187,21 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
-	
-drop-tables: local-dbexec 
+	echo "ALTER TABLE user CHANGE password password TINYBLOB NULL default NULL;" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE user SET password=AES_ENCRYPT(email,password);" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD COLUMN reset_date DATE NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD COLUMN reset_key BINARY(32) NULL;" | ./modules/miscutil/bin/dbexec
+
+drop-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 
-local-dbexec: 
+local-dbexec:
 	(cd ./modules/miscutil/bin; make)
 
 local-tabfill: $(srcdir)/modules/miscutil/sql/tabfill.sql.wml
 	(cd ./modules/miscutil/sql; make)
 
-create-demo-site: 
+create-demo-site:
 # 	for f in $(sbmdat); do \
 # 	    if [ ! -e $(sbmdir)/$$f.shtml ]; then \
 # 		ln -s $(sbmdir)/go.shtml $(sbmdir)/$$f.shtml ; \
@@ -207,7 +211,7 @@ create-demo-site:
 # 	done
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
 	./modules/webaccess/bin/webaccessadmin -u admin -c
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 	@echo "***********************************************************************"
@@ -222,11 +226,11 @@ create-demo-site:
 	@echo "** To drop the demo site, you can run 'make drop-demo-site'.         **"
 	@echo "***********************************************************************"
 
-load-demo-records: 
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+load-demo-records:
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/bibupload -i $(srcdir)/modules/miscutil/demo/demobibdata.xml
 	${prefix}/bin/bibupload 1
-	${prefix}/bin/bibindex -uadmin 
+	${prefix}/bin/bibindex -uadmin
 	${prefix}/bin/bibindex 2
 	${prefix}/bin/bibreformat -uadmin -oHB
 	${prefix}/bin/bibreformat 3
@@ -247,11 +251,11 @@ load-demo-records:
 	@echo "** you can run 'make drop-demo-site'.                                **"
 	@echo "***********************************************************************"
 
-drop-demo-site: 
+drop-demo-site:
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 #	for f in $(sbmdat); do rm -f $(sbmdir)/$$f.shtml ; done
@@ -259,9 +263,9 @@ drop-demo-site:
 	@echo "** The demo site and records have been successfully dropped. **"
 	@echo "***************************************************************"
 
-remove-demo-records: 
+remove-demo-records:
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec 
+	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
 	@echo "**********************************************************"

@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,23 +27,23 @@ __revision__ = \
 import unittest
 
 from mechanize import Browser
-
 from invenio.config import sweburl, adminemail
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
+from invenio.dbquery import run_sql
 
 class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def test_your_account_pages_availability(self):
-        """websession - availability of Your Account pages""" 
+        """websession - availability of Your Account pages"""
 
         baseurl = sweburl + '/youraccount/'
 
         _exports = ['', 'edit', 'change', 'lost', 'display',
                     'send_email', 'youradminactivities',
                     'delete', 'logout', 'login', 'register']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -52,12 +52,12 @@ class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_your_groups_pages_availability(self):
-        """websession - availability of Your Groups pages""" 
+        """websession - availability of Your Groups pages"""
 
         baseurl = sweburl + '/yourgroups/'
 
         _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -78,7 +78,16 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
         browser.open(sweburl + "/youraccount/lost")
         browser.select_form(nr=0)
         browser['p_email'] = try_with_account
-        browser.submit()        
+        try:
+            browser.submit()
+        except Exception, e:
+            # Restore the admin password (send_email set it to random number)
+            run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
+                "WHERE id=1")
+            self.fail("Obtained %s: probably the email server is not installed"
+                "correctly." % e)
+
+
 
         # verify the response:
         expected_response = "Okay, password has been emailed to " + \
@@ -87,9 +96,16 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
         try:
             lost_password_response_body.index(expected_response)
         except ValueError:
+            # Restore the admin password (send_email set it to random number)
+            run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
+                "WHERE id=1")
             self.fail("Expected to see %s, got %s." % \
                       (expected_response, lost_password_response_body))
 
+    def tearDown(self):
+        # Restore the admin password (send_email set it to random number)
+        run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
+            "WHERE id=1")
 
 test_suite = make_test_suite(WebSessionWebPagesAvailabilityTest,
                              WebSessionLostYourPasswordTest)

@@ -46,13 +46,13 @@ def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
                       g.name,
                       g.description
                FROM usergroup g, user_usergroup ug
-               WHERE ug.id_user=%i AND
+               WHERE ug.id_user=%s AND
                      ug.id_usergroup=g.id AND
-                     ug.user_status='%s' AND
-                     g.login_method = '%s'
+                     ug.user_status=%s AND
+                     g.login_method = %s
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query % (uid, escape_string(user_status), escape_string(login_method)))
+    res = run_sql(query, (uid, user_status, login_method))
     return res
 
 def get_groups_by_login_method(uid, login_method):
@@ -67,13 +67,13 @@ def get_groups_by_login_method(uid, login_method):
                       g.name,
                       g.description
                FROM usergroup g, user_usergroup ug
-               WHERE ug.id_user=%i AND
+               WHERE ug.id_user=%s AND
                      ug.id_usergroup=g.id AND
-                     g.login_method='%s'
+                     g.login_method=%s
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query % (uid, escape_string(login_method)))
+    res = run_sql(query, (uid, login_method))
     return res
 
 def get_groups(uid):
@@ -107,13 +107,13 @@ def get_external_groups(uid):
                       g.name,
                       g.description
                FROM usergroup g, user_usergroup ug
-               WHERE ug.id_user=%i AND
+               WHERE ug.id_user=%s AND
                      ug.id_usergroup=g.id AND
                      g.login_method != 'INTERNAL'
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query % uid)
+    res = run_sql(query, (uid, ))
     return res
 
 def get_groups(uid):
@@ -225,10 +225,10 @@ def insert_new_group(uid,
     uid = int(uid)
     query2 = """INSERT INTO user_usergroup
                 VALUES
-                (%i,'%i','A','%s')
+                (%s,%s,'A',%s)
                 """
     params2 = (uid, res1, date)
-    res2 = run_sql(query2 % params2)
+    res2 = run_sql(query2, params2)
     return res1
 
 def insert_only_new_group(new_group_name,
@@ -263,9 +263,9 @@ def insert_new_member(uid,
 def get_group_infos(grpID):
     """Get group infos."""
     query = """SELECT * FROM usergroup
-                WHERE id = %i"""
+                WHERE id = %s"""
     grpID = int(grpID)
-    res = run_sql(query % grpID)
+    res = run_sql(query, (grpID, ))
     return res
 
 def get_all_groups_description(login_method):
@@ -378,10 +378,10 @@ def leave_group(grpID, uid):
 def drop_external_groups(userId):
     """Drops all the external groups memberships of userid."""
     query = """DELETE user_usergroup FROM user_usergroup, usergroup
-               WHERE user_usergroup.id_user=%i
+               WHERE user_usergroup.id_user=%s
                AND usergroup.id = user_usergroup.id_usergroup
                AND usergroup.login_method <> 'INTERNAL'"""
-    return run_sql(query % (userId,))
+    return run_sql(query, (userId,))
 
 def group_name_exist(group_name, login_method='INTERNAL'):
     """Get all group id whose name like group_name and login_method."""
@@ -396,8 +396,8 @@ def get_group_login_method(grpID):
     """Return the login_method of the group or None if the grpID doesn't exist."""
     query = """SELECT login_method
                FROM usergroup
-               WHERE id=%i"""
-    res = run_sql(query % grpID)
+               WHERE id=%s"""
+    res = run_sql(query, (grpID, ))
     if res:
         return res[0][0]
     else:
@@ -440,9 +440,9 @@ def get_users_in_group(grpID):
     grpID = int(grpID)
     query = """SELECT id_user
                FROM user_usergroup
-               WHERE id_usergroup = %i
+               WHERE id_usergroup = %s
             """
-    res = run_sql(query % grpID)
+    res = run_sql(query, (grpID, ))
     return [uid[0] for uid in res]
 
 ########################## helpful functions ##################################

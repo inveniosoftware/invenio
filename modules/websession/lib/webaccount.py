@@ -165,7 +165,7 @@ def warning_guest_user(type, ln=cdslang):
 def perform_delete(ln):
     return websession_templates.tmpl_account_delete(ln = ln)
 
-def perform_set(email,password, ln, verbose=0):
+def perform_set(email, ln, verbose=0):
     """Perform_set(email,password): edit your account parameters, email and
     password.
     """
@@ -187,7 +187,6 @@ def perform_set(email,password, ln, verbose=0):
              ln = ln,
              email = email,
              email_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 2),
-             password = password,
              password_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL >= 3),
              nickname = nickname,
            )

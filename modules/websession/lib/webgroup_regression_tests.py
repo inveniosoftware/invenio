@@ -42,12 +42,12 @@ class WebGroupTest(unittest.TestCase):
         self.email = 'ciccio@pasticcio.it'
         self.pwd = '123'
         self.login_method = 'PATATA'
-        self.uid = run_sql("""INSERT INTO user (email, password) VALUES (%s, %s)""", (self.email, self.pwd, ))
+        self.uid = run_sql("""INSERT INTO user (email, password) VALUES (%s, AES_ENCRYPT(email,%s))""", (self.email, self.pwd, ))
         self.uid = int(self.uid)
 
         self.email2 = 'ghero@boll.ch'
         self.pwd2 = '1234'
-        self.uid2 = run_sql("""INSERT INTO user (email, password) VALUES (%s, %s)""", (self.email2, self.pwd2, ))
+        self.uid2 = run_sql("""INSERT INTO user (email, password) VALUES (%s, AES_ENCRYPT(email,%s))""", (self.email2, self.pwd2, ))
         self.uid2 = int(self.uid2)
 
         self.goodgroup = 'bla'
@@ -188,10 +188,10 @@ class WebGroupTest(unittest.TestCase):
         run_sql("""DELETE FROM user WHERE email=%s""", (self.email,))
         run_sql("""DELETE FROM user WHERE email=%s""", (self.email2,))
         run_sql("""DELETE FROM usergroup WHERE login_method=%s""", (self.login_method,))
-        run_sql("""DELETE FROM user_usergroup WHERE id_user=%i""" % self.uid)
-        run_sql("""DELETE FROM user_usergroup WHERE id_user=%i""" % self.uid2)
+        run_sql("""DELETE FROM user_usergroup WHERE id_user=%s""", (self.uid, ))
+        run_sql("""DELETE FROM user_usergroup WHERE id_user=%s""", (self.uid2, ))
         run_sql("""DELETE FROM usergroup WHERE name=%s OR name=%s""", (self.goodgroup, self.badgroup,))
-        run_sql("""DELETE FROM user_usergroup WHERE id_usergroup=%i OR id_usergroup=%i""" % (self.goodid, self.badid,))
+        run_sql("""DELETE FROM user_usergroup WHERE id_usergroup=%s OR id_usergroup=%s""", (self.goodid, self.badid,))
 
 test_suite = make_test_suite(WebGroupTest)
 

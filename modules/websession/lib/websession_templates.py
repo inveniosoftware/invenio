@@ -101,7 +101,7 @@ class Template:
         }
         return out
 
-    def tmpl_user_preferences(self, ln, email, email_disabled, password, password_disabled, nickname):
+    def tmpl_user_preferences(self, ln, email, email_disabled, password_disabled, nickname):
         """
         Displays a form for the user to change his email/password.
 
@@ -112,8 +112,6 @@ class Template:
           - 'email' *string* - The email of the user
 
           - 'email_disabled' *boolean* - If the user has the right to edit his email
-
-          - 'password' *string* - The password of the user
 
           - 'password_disabled' *boolean* - If the user has the right to edit his password
 
@@ -217,7 +215,6 @@ class Template:
                     'old_password_note' : _("You must fill the old password in order to set a new one."),
                     'retype_password' : _("Retype password"),
                     'set_values' : _("Set new password"),
-                    'password' : password,
                     'password_disabled' : password_disabled and "disabled" or "",
                     'sweburl': sweburl,
                 }
@@ -328,7 +325,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form and the lost password will be emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form and having a new password emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -351,7 +348,7 @@ class Template:
           """ % {
             'ln': ln,
             'email' : _("Email address"),
-            'send' : _("Send lost password"),
+            'send' : _("Send new password"),
           }
 
         if CFG_CERN_SITE:
@@ -730,7 +727,7 @@ class Template:
 
         else:
             out = "<p>%s</p>" % msg
-            
+
         out += """<form method="post" action="../youraccount/login">
                   <table>
 

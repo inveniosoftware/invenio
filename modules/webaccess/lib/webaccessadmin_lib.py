@@ -617,7 +617,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     if confirm in [1, "1"] and email and email_valid_p(email):
         res = run_sql("SELECT * FROM user WHERE email='%s'" % escape_string(email))
         if not res:
-            res = run_sql("INSERT INTO user (email,password, note) values('%s','%s', '1')" % (escape_string(email), escape_string(password)))
+            res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
                 emailsent = sendNewUserAccountWarning(email, email, password)
             if password:
@@ -650,7 +650,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = run_sql("SELECT id, email, note, password FROM user WHERE id=%s", (userID, ))
+    res = run_sql("SELECT id, email, note FROM user WHERE id=%s", (userID, ))
     subtitle = ""
     output = ""
     if res:
@@ -658,7 +658,10 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
             res2 = run_sql("UPDATE user SET note=1 WHERE id=%s" % userID)
             output += """<b><span class="info">The account '%s' has been activated.</span></b>""" % res[0][1]
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1:
-                emailsent = sendAccountActivatedMessage(res[0][1], res[0][1], res[0][3])
+                password = int(random.random() * 1000000)
+                run_sql("UPDATE user SET password=AES_ENCRYPT(email, %s) "
+                    "WHERE id=%s", (password, userID))
+                emailsent = sendAccountActivatedMessage(res[0][1], res[0][1], password)
                 if emailsent:
                     output += """<br><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
                 else:
@@ -711,11 +714,9 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     <tr>
     <td>0.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifylogindata">Modify login-data</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifybasket">Modify baskets</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifyalerts">Modify alerts</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifypreferences">Modify preferences</a></small></td>
+    <td>2.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_modifypreferences">Modify preferences</a></small></td>
     </tr><tr>
-    <td>5.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
     </tr>
     </table>
     """ % (weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID)
@@ -725,20 +726,20 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     elif mtype == "perform_modifylogindata" or not mtype:
         fin_output += perform_modifylogindata(req, userID, callback='')
 
-    if mtype == "perform_modifybasket" and content:
-        fin_output += content
-    elif mtype == "perform_modifybasket" or not mtype:
-        fin_output += perform_modifybasket(req, userID, callback='')
+    #if mtype == "perform_modifybasket" and content:
+        #fin_output += content
+    #elif mtype == "perform_modifybasket" or not mtype:
+        #fin_output += perform_modifybasket(req, userID, callback='')
 
     if mtype == "perform_modifypreferences" and content:
         fin_output += content
     elif mtype == "perform_modifypreferences" or not mtype:
         fin_output += perform_modifypreferences(req, userID, callback='')
 
-    if mtype == "perform_modifyalerts" and content:
-        fin_output += content
-    elif mtype == "perform_modifyalerts" or not mtype:
-        fin_output += perform_modifyalerts(req, userID, callback='')
+    #if mtype == "perform_modifyalerts" and content:
+        #fin_output += content
+    #elif mtype == "perform_modifyalerts" or not mtype:
+        #fin_output += perform_modifyalerts(req, userID, callback='')
 
     if mtype == "perform_deleteaccount" and content:
         fin_output += content
@@ -752,46 +753,47 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
                  adminarea=7,
                  authorized=1)
 
-def perform_modifybasket(req, userID, callback='yes', confirm=0):
-    """modify email and password of an account"""
+# Disabled because not secure and maybe not needed.
+#def perform_modifybasket(req, userID, callback='yes', confirm=0):
+    #"""modify email and password of an account"""
 
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
+    #(auth_code, auth_message) = is_adminuser(req)
+    #if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    #subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s", (userID, ))
-    output = ""
-    if res:
-        text = """To modify the baskets for this account, you have to login as the user."""
-        output += createhiddenform(action="%s/youraccount/login?" % sweburl,
-                                   text=text,
-                                   p_email=res[0][1],
-                                   p_pw=res[0][2],
-                                   referer="%s/yourbaskets/display" % weburl,
-                                   button="Login")
-        output += "Remember that you will be logged out as the current user."
+    #res = run_sql("SELECT id, email, FROM user WHERE id=%s", (userID, ))
+    #output = ""
+    #if res:
+        #text = """To modify the baskets for this account, you have to login as the user."""
+        #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
+                                   #text=text,
+                                   #p_email=res[0][1],
+                                   #p_pw=res[0][2],
+                                   #referer="%s/yourbaskets/display" % weburl,
+                                   #button="Login")
+        #output += "Remember that you will be logged out as the current user."
 
-        #baskets = run_sql("SELECT basket.id, basket.name, basket.public FROM basket, user_basket WHERE id_user=%s and user_basket.id_basket=basket.id" % userID)
-        #output += "<table><tr>"
-        #for (id, name, public) in baskets:
-        #    output += "<tr><td>%s<br>Public: %s</td></tr>" % (name, (public=="y" and "Yes" or "No"))
-        #    basket_records = run_sql("SELECT id_record, nb_order FROM basket_record WHERE id_basket=%s" % id)
-        #    for (id_record, nb_order) in basket_records:
-        #        output += "<tr><td></td><td>"
-        #        output += print_record(id_record)
-        #        output += "</td></tr>"
-        #
-        #output += "</tr></table>"
-    else:
-        output += '<b><span class="info">The account id given does not exist.</span></b>'
+        ##baskets = run_sql("SELECT basket.id, basket.name, basket.public FROM basket, user_basket WHERE id_user=%s and user_basket.id_basket=basket.id" % userID)
+        ##output += "<table><tr>"
+        ##for (id, name, public) in baskets:
+        ##    output += "<tr><td>%s<br>Public: %s</td></tr>" % (name, (public=="y" and "Yes" or "No"))
+        ##    basket_records = run_sql("SELECT id_record, nb_order FROM basket_record WHERE id_basket=%s" % id)
+        ##    for (id_record, nb_order) in basket_records:
+        ##        output += "<tr><td></td><td>"
+        ##        output += print_record(id_record)
+        ##        output += "</td></tr>"
+        ##
+        ##output += "</tr></table>"
+    #else:
+        #output += '<b><span class="info">The account id given does not exist.</span></b>'
 
-    body = [output]
+    #body = [output]
 
-    if callback:
-        return perform_editaccount(req, userID, mtype='perform_modifybasket', content=addadminbox(subtitle, body), callback='yes')
-    else:
-        return addadminbox(subtitle, body)
+    #if callback:
+        #return perform_editaccount(req, userID, mtype='perform_modifybasket', content=addadminbox(subtitle, body), callback='yes')
+    #else:
+        #return addadminbox(subtitle, body)
 
 def perform_modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
     """modify email and password of an account"""
@@ -801,12 +803,12 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
 
     subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email FROM user WHERE id=%s" % userID)
     output = ""
     if res:
         if not email and not password:
             email = res[0][1]
-            password = res[0][2]
+            #password = res[0][2]
         text =  ' <span class="adminlabel">Account id:</span>%s<br>\n' % userID
         text += ' <span class="adminlabel">Email:</span>\n'
         text += ' <input class="admin_wvar" type="text" name="email" value="%s" /><br>' % (email, )
@@ -819,8 +821,8 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
                                    confirm=1,
                                    button="Modify")
         if confirm in [1, "1"] and email and email_valid_p(email):
-            res = run_sql("UPDATE user SET email='%s' WHERE id=%s" % (escape_string(email), userID))
-            res = run_sql("UPDATE user SET password='%s' WHERE id=%s" % (escape_string(password), userID))
+            res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
+            res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
             output += '<b><span class="info">Email and/or password modified.</span></b>'
         elif confirm in [1, "1"]:
             output += '<b><span class="info">Please specify an valid email-address.</span></b>'
@@ -834,46 +836,46 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
     else:
         return addadminbox(subtitle, body)
 
+# Disabled because not secure and maybe not needed.
+#def perform_modifyalerts(req, userID, callback='yes', confirm=0):
+    #"""modify email and password of an account"""
 
-def perform_modifyalerts(req, userID, callback='yes', confirm=0):
-    """modify email and password of an account"""
+    #(auth_code, auth_message) = is_adminuser(req)
+    #if auth_code != 0: return mustloginpage(req, auth_message)
 
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
+    #subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
+    #res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    #output = ""
+    #if res:
+        #text = """To modify the alerts for this account, you have to login as the user."""
+        #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
+                                   #text=text,
+                                   #p_email=res[0][1],
+                                   #p_pw=res[0][2],
+                                   #referer="%s/youralerts/display" % weburl,
+                                   #button="Login")
+        #output += "Remember that you will be logged out as the current user."
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
-    output = ""
-    if res:
-        text = """To modify the alerts for this account, you have to login as the user."""
-        output += createhiddenform(action="%s/youraccount/login?" % sweburl,
-                                   text=text,
-                                   p_email=res[0][1],
-                                   p_pw=res[0][2],
-                                   referer="%s/youralerts/display" % weburl,
-                                   button="Login")
-        output += "Remember that you will be logged out as the current user."
+        #res = """ SELECT q.id, q.urlargs, a.id_basket,
+                 #a.alert_name, a.frequency, a.notification,
+                 #DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
+                 #DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
+                 #FROM query q, user_query_basket a
+                 #WHERE a.id_user='%s' AND a.id_query=q.id
+                 #ORDER BY a.alert_name ASC """ % userID
+        ##res = run_sql(res)
+        ##for (qID, qurlargs,  id_basket, alertname, frequency, notification, date_creation, date_lastrun) in res:
+        ##    output += "%s - %s - %s - %s - %s - %s - %s<br>" % (qID,  id_basket, alertname, frequency, notification, date_creation, date_lastrun)
+    #else:
+        #output += '<b><span class="info">The account id given does not exist.</span></b>'
 
-        res = """ SELECT q.id, q.urlargs, a.id_basket,
-                 a.alert_name, a.frequency, a.notification,
-                 DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
-                 DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
-                 FROM query q, user_query_basket a
-                 WHERE a.id_user='%s' AND a.id_query=q.id
-                 ORDER BY a.alert_name ASC """ % userID
-        #res = run_sql(res)
-        #for (qID, qurlargs,  id_basket, alertname, frequency, notification, date_creation, date_lastrun) in res:
-        #    output += "%s - %s - %s - %s - %s - %s - %s<br>" % (qID,  id_basket, alertname, frequency, notification, date_creation, date_lastrun)
-    else:
-        output += '<b><span class="info">The account id given does not exist.</span></b>'
+    #body = [output]
 
-    body = [output]
-
-    if callback:
-        return perform_editaccount(req, userID, mtype='perform_modifyalerts', content=addadminbox(subtitle, body), callback='yes')
-    else:
-        return addadminbox(subtitle, body)
+    #if callback:
+        #return perform_editaccount(req, userID, mtype='perform_modifyalerts', content=addadminbox(subtitle, body), callback='yes')
+    #else:
+        #return addadminbox(subtitle, body)
 
 def perform_modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
     """modify email and password of an account"""
@@ -883,7 +885,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
 
     subtitle = """<a name="4"></a>4. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, FROM user WHERE id=%s" % userID)
     output = ""
     if res:
         user_pref = get_user_preferences(userID)
@@ -929,7 +931,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 
     subtitle = """<a name="5"></a>5. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, FROM user WHERE id=%s" % userID)
     output = ""
     if res:
         if confirm in [0, "0"]:
@@ -961,16 +963,16 @@ def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, pa
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = run_sql("SELECT id, email, password, note FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, note FROM user WHERE id=%s" % userID)
     output = ""
     subtitle = ""
     if res:
         res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
         output += '<b><span class="info">Account rejected and deleted.</span></b>'
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
-            if not res[0][3] or res[0][3] == "0":
+            if not res[0][2] or res[0][2] == "0":
                 emailsent = sendAccountRejectedMessage(res[0][1], res[0][1])
-            elif res[0][3] == "1":
+            elif res[0][2] == "1":
                 emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
             if emailsent:
                 output += """<br><b><span class="info">An email has been sent to the owner of the account.</span></b>"""

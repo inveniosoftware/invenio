@@ -42,6 +42,7 @@ import crypt
 import string
 import smtplib
 import re
+import random
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -345,7 +346,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
 
     user_preference = get_default_user_preferences()
 
-    setUid(req, run_sql("INSERT INTO user (nickname, email, password, note, settings) VALUES (%s,%s,%s,%s,%s)",
+    setUid(req, run_sql("INSERT INTO user (nickname, email, password, note, settings) VALUES (%s,%s,AES_ENCRYPT(email,%s),%s,%s)",
                         (nickname, email, passw, activated, serialize_via_marshal(user_preference),)))
 
     if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
@@ -374,7 +375,7 @@ def updateDataUser(uid, email, nickname):
 def updatePasswordUser(uid, password):
     """Update the password of a user."""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-        run_sql("update user set password=%s where id=%s", (password, uid))
+        run_sql("update user set password=AES_ENCRYPT(email,%s) where id=%s", (password, uid))
     return 1
 
 def loginUser(req, p_un, p_pw, login_method):
@@ -457,7 +458,9 @@ def loginUser(req, p_un, p_pw, login_method):
         else:
             return ([], p_un, p_pw, 10)
     else: # Internal Authenthication
-        query_result = run_sql("SELECT id,email from user where email=%s and password=%s", (p_email, p_pw,))
+        if not p_pw:
+            p_pw = ''
+        query_result = run_sql("SELECT id,email from user where email=%s and password=AES_ENCRYPT(email,%s)", (p_email, p_pw,))
         if query_result:
             #FIXME drop external groups and settings
             preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
@@ -549,9 +552,12 @@ def givePassword(email):
         the password if the user exists, otherwise it returns -999
     """
 
-    query_pass = run_sql("select password from user where email =%s", (email,))
-    if len(query_pass)>0:
-        return query_pass[0][0]
+    query_pass = run_sql("select email from user where email =%s", (email,))
+    if query_pass:
+        password = int(random.random() * 1000000)
+        run_sql("UPDATE user SET password=AES_ENCRYPT(email, %s) "
+            "WHERE email=%s", (password, email))
+        return p_pw_local
     return -999
 
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
@@ -636,14 +642,14 @@ def get_email_from_username(username):
         out = res[0][0]
     return out
 
-def get_password(uid):
-    """Return password of the user uid.  Return None in case
-    the user is not found."""
-    out = None
-    res = run_sql("SELECT password FROM user WHERE id=%s", (uid,), 1)
-    if res and res[0][0] != None:
-        out = res[0][0]
-    return out
+#def get_password(uid):
+    #"""Return password of the user uid.  Return None in case
+    #the user is not found."""
+    #out = None
+    #res = run_sql("SELECT password FROM user WHERE id=%s", (uid,), 1)
+    #if res and res[0][0] != None:
+        #out = res[0][0]
+    #return out
 
 def get_nickname(uid):
     """Return nickname of the user uid.  Return None in case

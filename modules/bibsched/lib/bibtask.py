@@ -234,25 +234,34 @@ def authenticate(user, authorization_action, authorization_msg=""):
         user = sys.stdin.readline().lower().strip()
     else:
         print >> sys.stdout, "\rUsername:", user
-    ## first check user pw:
-    res = run_sql("select id,password from user where email=%s",
-        (user,), 1) + \
-        run_sql("select id,password from user where nickname=%s",
-        (user,), 1)
+    ## first check user:
+    res = run_sql("select id from user where email=%s", (user,), 1) + \
+        run_sql("select id from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
         sys.exit(1)
     else:
-        (uid_db, password_db) = res[0]
-        if password_db:
+        ## check if password is needed
+        res = run_sql("select id from user where email=%s"
+                "and password=AES_ENCRYPT(email,'')",
+        (user,), 1) + \
+        run_sql("select id from user where nickname=%s"
+                "and password=AES_ENCRYPT(email, '')",
+        (user,), 1)
+        if not res:
             password_entered = getpass.getpass()
-            if password_db == password_entered:
-                pass
-            else:
+            res = run_sql("select id from user where email=%s"
+                    "and password=AES_ENCRYPT(email,%s)",
+            (user, password_entered), 1) + \
+            run_sql("select id from user where nickname=%s"
+                    "and password=AES_ENCRYPT(email,%s)",
+            (user, password_entered), 1)
+
+            if not res:
                 print "Sorry, wrong credentials for %s." % user
                 sys.exit(1)
     ## secondly check authorization for the authorization_action:
-        (auth_code, auth_message) = acc_authorize_action(uid_db, authorization_action)
+    (auth_code, auth_message) = acc_authorize_action(res[0][0], authorization_action)
     if auth_code != 0:
         print auth_message
         sys.exit(1)

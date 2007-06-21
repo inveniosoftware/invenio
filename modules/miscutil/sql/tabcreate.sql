@@ -2372,7 +2372,7 @@ CREATE TABLE IF NOT EXISTS session (
 CREATE TABLE IF NOT EXISTS user (
   id int(15) unsigned NOT NULL auto_increment,
   email varchar(255) NOT NULL default '',
-  password varchar(20) default NULL,
+  password tinyblob default NULL,
   note varchar(255) default NULL,
   settings blob default NULL,
   nickname varchar(255) NOT NULL default '',

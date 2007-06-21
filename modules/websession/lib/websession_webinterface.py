@@ -123,7 +123,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title= _("Your Settings"),
                     body=webaccount.perform_set(webuser.get_email(uid),
-                                                webuser.get_password(uid),
                                                 args['ln'], verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % cdsnameintl.get(args['ln'], cdsname),
@@ -149,10 +148,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             })
 
         uid = webuser.getUid(req)
-
-        current_password = webuser.get_password(uid)
-        if current_password == None:
-            current_password = ""
 
         # load the right message language
         _ = gettext_set_language(args['ln'])
@@ -260,7 +255,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
         elif args['old_password'] != None and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-            if args['old_password'] == current_password:
+            res = run_sql("SELECT id FROM user "
+                "WHERE AES_ENCRYPT(email,%s)=password AND id=%s",
+                (args['old_password'], uid))
+            if res:
                 if args['password'] == args['password2']:
                     webuser.updatePasswordUser(uid, args['password'])
                     mess = _("Password successfully edited.")

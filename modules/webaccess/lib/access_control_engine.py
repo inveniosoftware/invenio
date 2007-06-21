@@ -63,7 +63,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
 
     #TASK -1: Checking external source if user is authorized:
     #if CFG_:
-    #    em_pw = run_sql("SELECT email, password FROM user WHERE id=%s", (id_user,))
+    #    em_pw = run_sql("SELECT email, FROM user WHERE id=%s", (id_user,))
     #    if em_pw:
     #        if not CFG_EXTERNAL_ACCESS_CONTROL.loginUser(em_pw[0][0], em_pw[0][1]):
     #            return (10, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[10], (called_from and CFG_WEBACCESS_MSGS[1] or "")))
