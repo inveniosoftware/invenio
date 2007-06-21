@@ -26,18 +26,11 @@ __lastupdated__ = """$Date$"""
 
 ## fill config variables:
 
-import cgi
 import re
 import random
 import smtplib
 import getopt
 import sys
-
-try:
-    from mod_python import apache
-except ImportError:
-    pass
-
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -52,19 +45,18 @@ from invenio.config import \
      cdsname, \
      supportemail, \
      sweburl, \
-     version, \
      weburl
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
-from invenio.bibrankadminlib import adderrorbox, addadminbox, tupletotable, \
+from invenio.bibrankadminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_config import *
 from invenio.access_control_firerole import compile_role_definition, repair_role_definitions, serialize
 from invenio.dbquery import run_sql, escape_string
-from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.webuser import getUid, isGuestUser, get_email, page_not_authorized
-from invenio.search_engine import print_record
+from invenio.webpage import page
+from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, set_user_preferences
+from invenio.bibtask import authenticate
 from cgi import escape
 
 
@@ -658,7 +650,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = run_sql("SELECT id, email, note, password FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, note, password FROM user WHERE id=%s", (userID, ))
     subtitle = ""
     output = ""
     if res:
@@ -768,7 +760,7 @@ def perform_modifybasket(req, userID, callback='yes', confirm=0):
 
     subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, password FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
         text = """To modify the baskets for this account, you have to login as the user."""
@@ -2024,10 +2016,10 @@ def roledetails(id_role=0):
 
     actionshlp = acca.acc_getRoleActions(id_role)
     actions = []
-    for (id, name, dummy) in actionshlp:
+    for (action_id, name, dummy) in actionshlp:
         actions.append([id, name,
-                        '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, id),
-                        '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>' % (id_role, id)])
+                        '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, action_id),
+                        '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>' % (id_role, action_id)])
 
     actiontable = tupletotable(header=['id', 'name', '', ''], tuple=actions)
 
@@ -2117,10 +2109,10 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
 
                 users = []
                 extrausers = []
-                for (id, email) in users1:
-                    if (id, email) not in users2: users.append([id,email,''])
-                for (id, email) in users2:
-                    extrausers.append([-id, email,''])
+                for (user_id, email) in users1:
+                    if (user_id, email) not in users2: users.append([user_id,email,''])
+                for (user_id, email) in users2:
+                    extrausers.append([-user_id, email,''])
 
                 output += createuserselect(id_user=id_user,
                                            action="adduserrole",
@@ -3285,8 +3277,8 @@ def perform_showroleusers(req, id_role=0):
 
     if res:
         users = []
-        for (id, name, dummy) in res: users.append([id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
-                                                       % (id, )])
+        for (role_id, name, dummy) in res: users.append([role_id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
+                                                       % (role_id, )])
         output  = '<p>users connected to %s:</p>' % (headerstrong(role=id_role), )
         output += tupletotable(header=['id', 'name', ''], tuple=users)
     else:
@@ -3341,18 +3333,18 @@ def createselect(id_input="0", label="", step=0, name="",
     else:
         output += '  <option value="0">*** %s ***</option>\n' % (label, )
         for elem in list:
-            id = elem[0]
+            elem_id = elem[0]
             email = elem[1]
-            if str(id) == id_input: output += '  <option value="%s" selected="selected">%s</option>\n' % (id, email)
-            else: output += '  <option value="%s">%s</option>\n' % (id, email)
+            if str(elem_id) == id_input: output += '  <option value="%s" selected="selected">%s</option>\n' % (elem_id, email)
+            else: output += '  <option value="%s">%s</option>\n' % (elem_id, email)
         for elem in extralist:
-            id = elem[0]
+            elem_id = elem[0]
             email = elem[1]
-            if str(id) == id_input:
-                if not extrastamp: output += '  <option value="%s" selected="selected">(%s)</option>\n' % (id, email)
-                else: output += '  <option value="%s">%s %s</option>\n' % (id, email, extrastamp)
-            elif not extrastamp: output += '  <option value="%s">(%s)</option>\n' % (id, email)
-            else: output += '  <option value="%s">%s %s</option>\n' % (id, email, extrastamp)
+            if str(elem_id) == id_input:
+                if not extrastamp: output += '  <option value="%s" selected="selected">(%s)</option>\n' % (elem_id, email)
+                else: output += '  <option value="%s">%s %s</option>\n' % (elem_id, email, extrastamp)
+            elif not extrastamp: output += '  <option value="%s">(%s)</option>\n' % (elem_id, email)
+            else: output += '  <option value="%s">%s %s</option>\n' % (elem_id, email, extrastamp)
 
     output += ' </select>\n'
     for key in hidden.keys():
@@ -3393,7 +3385,7 @@ def createuserselect(id_user="0", label="select user", step=0, name="id_user",
                         button=button, **hidden)
 
 
-def cleanstring(str='', comma=0):
+def cleanstring(txt='', comma=0):
     """clean all the strings before submitting to access control admin.
     remove characters not letter, number or underscore, also remove leading
     underscores and numbers. return cleaned string.
@@ -3404,51 +3396,51 @@ def cleanstring(str='', comma=0):
             0 -> wash commas as well """
 
     # remove not allowed characters
-    str = re.sub(r'[^a-zA-Z0-9_,]', '', str)
+    txt = re.sub(r'[^a-zA-Z0-9_,]', '', txt)
 
     # split string on commas
-    items = str.split(',')
-    str = ''
+    items = txt.split(',')
+    txt = ''
     for item in items:
         if not item: continue
-        if comma and str: str += ','
+        if comma and txt: txt += ','
         # create valid variable names
-        str += re.sub(r'^([0-9_])*', '', item)
+        txt += re.sub(r'^([0-9_])*', '', item)
 
-    return str
+    return txt
 
 
-def cleanstring_argumentvalue(str=''):
+def cleanstring_argumentvalue(txt=''):
     """clean the value of an argument before submitting it.
     allowed characters: a-z A-Z 0-9 _ and space
 
-      str - string to be cleaned """
+      txt - string to be cleaned """
 
     # remove not allowed characters
-    str = re.sub(r'[^a-zA-Z0-9_ .]', '', str)
+    txt = re.sub(r'[^a-zA-Z0-9_ .]', '', txt)
     # trim leading and ending spaces
-    str = re.sub(r'^ *| *$', '', str)
+    txt = re.sub(r'^ *| *$', '', txt)
 
-    return str
+    return txt
 
 
-def cleanstring_email(str=''):
+def cleanstring_email(txt=''):
     """clean the string and return a valid email address.
 
-      str - string to be cleaned """
+      txt - string to be cleaned """
 
     # remove not allowed characters
-    str = re.sub(r'[^a-zA-Z0-9_.@-]', '', str)
+    txt = re.sub(r'[^a-zA-Z0-9_.@-]', '', txt)
 
-    return str
+    return txt
 
 
-def check_email(str=''):
+def check_email(txt=''):
     """control that submitted emails are correct.
     this little check is not very good, but better than nothing. """
 
     r = re.compile(r'(.)+\@(.)+\.(.)+')
-    return r.match(str) and 1 or 0
+    return r.match(txt) and 1 or 0
 
 def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
     """Send an email to the address given by sendTo about the new activated account."""
@@ -3552,42 +3544,6 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
     server.quit()
     return 1
 
-def authenticate(user, header="WebAccess Administration", action="cfgwebaccess"):
-    """Authenticate the user against the user database.
-       Check for its password, if it exists.
-       Check for action access rights.
-       Return user name upon authorization success,
-       do system exit upon authorization failure.
-       """
-    print header
-    print "=" * len(header)
-    if user == "":
-        print >> sys.stdout, "\rUsername: ",
-        user = sys.stdin.readline().lower().strip()
-    else:
-        print >> sys.stdout, "\rUsername:", user
-    ## first check user pw:
-    res = run_sql("select id,password from user where email=%s", (user,), 1) + \
-          run_sql("select id,password from user where nickname=%s", (user,), 1)
-    if not res:
-        print "Sorry, %s does not exist." % user
-        sys.exit(1)
-    else:
-        (uid_db, password_db) = res[0]
-        if password_db:
-            password_entered = getpass.getpass()
-            if password_db == password_entered:
-                pass
-            else:
-                print "Sorry, wrong credentials for %s." % user
-                sys.exit(1)
-        ## secondly check authorization for the action:
-        (auth_code, auth_message) = acce.acc_authorize_action(uid_db, action)
-        if auth_code != 0:
-            print auth_message
-            sys.exit(1)
-    return user
-
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -3638,7 +3594,7 @@ def main():
             else:
                 usage(1)
         if options['add'] or options['reset'] or options['compile']:
-            options['user'] = authenticate(options['user'])
+            options['user'] = authenticate(options['user'],  authorization_msg="WebAccess Administration", authorization_action="cfgwebaccess")
             if options['reset']:
                 acca.acc_reset_default_settings([supportemail])
                 print "Reset default settings."
