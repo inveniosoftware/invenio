@@ -187,10 +187,10 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user CHANGE password password TINYBLOB NULL default NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user CHANGE password password tinyblob NULL default NULL;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET password=AES_ENCRYPT(email,password);" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user ADD COLUMN reset_date DATE NULL;" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user ADD COLUMN reset_key BINARY(32) NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD COLUMN reset_date date NOT NULL default '0000-00-00';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD COLUMN reset_key binary(32) NULL default NULL;" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql

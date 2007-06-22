@@ -38,6 +38,7 @@ from invenio.config import \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
+from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
@@ -61,13 +62,14 @@ class Template:
                  <table>
                     <tr>
                       <td align="left">%(message)s
-                       <a href="./%(act)s">%(link)s</a></td>
+                       <a href="./%(act)s?ln=%(ln)s">%(link)s</a></td>
                     </tr>
                  </table>
              """% {
                'message' : message,
                'act'     : act,
-               'link'    : link
+               'link'    : link,
+               'ln'      : ln
              }
 
         return out
@@ -325,7 +327,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form and having a new password emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form and having a request link for a new password emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -585,7 +587,7 @@ class Template:
           }
         return out
 
-    def tmpl_account_lost_password_email_body(self, username, password, ln=cdslang):
+    def tmpl_account_reset_password_email_body(self, email, reset_key, ip_address, ln=cdslang):
         """
         The body of the email that sends lost internal account
         passwords to users.
@@ -596,14 +598,15 @@ class Template:
         out = """\
 %(hello)s:
 
-%(here_are_your_user_credentials_for)s %(cdsnameintl)s:
+%(intro)s
 
-   %(label_username)s: %(username)s
-   %(label_password)s: %(password)s
+%(intro2)s
 
-%(you_can_login_at)s:
+<%(link)s>
 
-   <%(login_url)s>
+%(outro)s
+
+%(outro2)s
 
 %(best_regards)s
 --
@@ -611,19 +614,29 @@ class Template:
 %(need_intervention_please_contact)s <%(supportemail)s>
         """ % {
             'hello': _("Hello"),
-            'here_are_your_user_credentials_for': _("Here are your user credentials for"),
-            'cdsnameintl': cdsnameintl.get(ln, cdsname),
-            'label_username': _("username"),
-            'username': username,
-            'label_password': _("password"),
-            'password': password,
-            'you_can_login_at': _("You can login at"),
-            'login_url': "%s/youraccount/login?ln=%s" % (sweburl, ln),
+            'intro': _("Somebody (possibly you) coming from %(ip_address)s "
+                "have asked for a\npassword reset for %(cdsname)s for "
+                "the account \"%(email)s\"." % {
+                    'cdsname' :cdsnameintl.get(ln, cdsname),
+                    'email' : email,
+                    'ip_address' : ip_address,
+                    }
+                ),
+            'intro2' : _("If you want to reset the password for this account, please go to:"),
+            'link' : "%s/youraccount/resetpassword%s" %
+                (sweburl, make_canonical_urlargd({
+                    'ln' : ln,
+                    'e' : email,
+                    'k' : reset_key
+                }, {})),
+            'outro' : _("and follow the instructions presented there."),
+            'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
             'best_regards': _("Best regards"),
+            'cdsnameintl' :cdsnameintl.get(ln, cdsname),
             'weburl': weburl,
             'need_intervention_please_contact': _("Need human intervention?  Contact"),
             'supportemail': supportemail
-            }
+        }
         return out
 
     def tmpl_account_emailSent(self, ln, email):
@@ -641,7 +654,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out =""
-        out += _("Okay, password has been emailed to %s.") % email
+        out += _("Okay, request for a new password has been emailed to %s.") % email
         return out
 
     def tmpl_account_delete(self, ln):
@@ -801,6 +814,42 @@ class Template:
                      'ln' : ln,
                      'maybe_lost_pass': ("Maybe you have lost your password?")
                      }
+        return out
+
+    def tmpl_reset_password_form(self, ln, email, reset_key, msg=''):
+        """Display a form to reset the password."""
+
+        _ = gettext_set_language(ln)
+
+        out = ""
+        out = "<p>%s</p>" % _("Your request is valid. Please set the new "
+            "desired password in the following form.")
+        if msg:
+            out += """<p class='warning'>%s</p>""" % msg
+        out += """
+<form method='post' action='../youraccount/resetpassword?ln=%(ln)s'>
+<input type='hidden' name='k' value='%(reset_key)s' />
+<input type='hidden' name='e' value='%(email)s' />
+<input type='hidden' name='reset' value='1' />
+<table>
+<tr><td align='right'><strong>%(set_password_for)s</strong>:</td><td><em>%(email)s</em></td></tr>
+<tr><td align='right'><strong>%(type_new_password)s</strong>:</td>
+<td><input type='password' name='password' value='123' /></td></tr>
+<tr><td align='right'><strong>%(type_it_again)s</strong>:</td>
+<td><input type='password' name='password2' value='' /></td></tr>
+<tr><td align="center" colspan="2">
+<input class="formbutton" type="submit" name="action" value="%(set_new_password)s" />
+</td></tr>
+</table>
+</form>""" % {
+            'ln' : ln,
+            'reset_key' : reset_key,
+            'email' : email,
+            'set_password_for' : _('Set a new password for'),
+            'type_new_password' : _('Type the new password'),
+            'type_it_again' : _('Type again the new password'),
+            'set_new_password' : _('Set the new password')
+        }
         return out
 
     def tmpl_register_page(self, ln, referer, level, supportemail, cdsname):

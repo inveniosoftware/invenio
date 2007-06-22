@@ -84,13 +84,13 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
             # Restore the admin password (send_email set it to random number)
             run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
                 "WHERE id=1")
-            self.fail("Obtained %s: probably the email server is not installed"
+            self.fail("Obtained %s: probably the email server is not installed "
                 "correctly." % e)
 
 
 
         # verify the response:
-        expected_response = "Okay, password has been emailed to " + \
+        expected_response = "Okay, request for a new password has been emailed to " + \
                             try_with_account
         lost_password_response_body = browser.response().read()
         try:

@@ -304,6 +304,10 @@ def perform_logout(req, ln):
 def perform_lost(ln):
     return websession_templates.tmpl_lost_password_form(ln)
 
+#def perform_reset_password: ask the user for a new password to reset the lost one
+def perform_reset_password(ln, email, reset_key, msg=''):
+    return websession_templates.tmpl_reset_password_form(ln, email, reset_key, msg)
+
 # perform_emailSent(email): confirm that the password has been emailed to 'email' address
 def perform_emailSent(email, ln):
     return websession_templates.tmpl_account_emailSent(ln = ln, email = email)

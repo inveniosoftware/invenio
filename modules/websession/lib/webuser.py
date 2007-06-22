@@ -316,6 +316,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
        """
 
     # is email valid?
+    email = email.lower()
     if not email_valid_p(email):
         return 1
 
@@ -360,7 +361,7 @@ def updateDataUser(uid, email, nickname):
     Update user data.  Used when a user changed his email or password
     or nickname.
     """
-
+    email = email.lower()
     if email == 'guest':
         return 0
 
@@ -557,8 +558,22 @@ def givePassword(email):
         password = int(random.random() * 1000000)
         run_sql("UPDATE user SET password=AES_ENCRYPT(email, %s) "
             "WHERE email=%s", (password, email))
-        return p_pw_local
+        return password
     return -999
+
+def request_reset_password(email):
+    """ Create a request for resetting the password. That means that a random
+    MD5 hash is created and the date is stored, in the given email. This hash
+    will be sent to the owner of the email, and the owner should need to
+    reach a link with this email and this hash.
+    """
+    rnd = int(random.random() * 1000000)
+    run_sql("UPDATE user SET reset_key=MD5(%s), reset_date=DATE(NOW()) WHERE email=%s",
+        (rnd, email))
+    res = run_sql("SELECT reset_key FROM user WHERE email=%s", (email, ))
+    if res:
+        return res[0][0]
+    return None
 
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""

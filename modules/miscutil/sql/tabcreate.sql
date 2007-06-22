@@ -2377,6 +2377,8 @@ CREATE TABLE IF NOT EXISTS user (
   settings blob default NULL,
   nickname varchar(255) NOT NULL default '',
   last_login datetime NOT NULL default '0000-00-00 00:00:00',
+  reset_date date NOT NULL default '0000-00-00',
+  reset_key BINARY(32) NULL default NULL,
   UNIQUE KEY id (id),
   KEY email (email),
   KEY nickname (nickname)

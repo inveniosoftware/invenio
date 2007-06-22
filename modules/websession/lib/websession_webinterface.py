@@ -37,6 +37,7 @@ from invenio.config import \
      supportemail, \
      sweburl, \
      weburl
+from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -57,12 +58,70 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities',
-                'delete', 'logout', 'login', 'register']
+                'delete', 'logout', 'login', 'register', 'resetpassword']
 
     _force_https = True
 
     def index(self, req, form):
         redirect_to_url(req, '%s/youraccount/display' % sweburl)
+
+    def resetpassword(self, req, form):
+        args = wash_urlargd(form, {
+            'e' : (str, ''),
+            'k' : (str, ''),
+            'reset' : (int, 0),
+            'password' : (str, ''),
+            'password2' : (str, '')
+            })
+
+        _ = gettext_set_language(args['ln'])
+
+        email = args['e'].lower()
+        reset_key = args['k']
+
+        title = _('Reset password')
+
+        res = run_sql('SELECT email FROM user WHERE email=%s AND reset_key=%s'
+            'AND DATE_SUB(CURDATE(), INTERVAL %s DAY)<=reset_date',
+            (email, reset_key,
+            CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+
+        if not res or CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
+            return webuser.page_not_authorized(req, "../youraccount/resetpassword",
+                    text=_("This request for resetting the password is not valid or"
+                    " is expired."), navmenuid='youraccount')
+
+        if not args['reset']:
+            return page(title=title,
+                    body=webaccount.perform_reset_password(args['ln'], email, reset_key),
+                    req=req,
+                    secure_page_p = 1,
+                    language=args['ln'],
+                    lastupdated=__lastupdated__,
+                    navmenuid='youraccount')
+
+        elif args['password'] != args['password2']:
+            msg = _('The two provided passwords aren\'t equal.')
+            return page(title=title,
+                body=webaccount.perform_reset_password(args['ln'], email, reset_key, msg),
+                req=req,
+                secure_page_p = 1,
+                language=args['ln'],
+                lastupdated=__lastupdated__,
+                navmenuid='youraccount')
+
+        run_sql('UPDATE user SET password=AES_ENCRYPT(email,%s), '
+        'reset_key=NULL, reset_date=\'0000-00-00\' WHERE reset_key=%s AND email=%s', (args['password'], reset_key, email))
+
+        return page(title=title,
+            body=webaccount.perform_back(
+                _("The password was successfully set! "
+                "You can now proceed with the login."),
+                'login', _('login'), args['ln']),
+            req=req,
+            language=args['ln'],
+            lastupdated=__lastupdated__,
+            navmenuid='youraccount')
 
     def display(self, req, form):
         args = wash_urlargd(form, {})
@@ -356,8 +415,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             lastupdated=__lastupdated__,
                             navmenuid='login')
 
-        passw = webuser.givePassword(args['p_email'])
-        if passw == -999:
+        reset_key = webuser.request_reset_password(args['p_email'])
+        if reset_key is None:
             eMsg = _("The entered email address does not exist in the database.")
             return page(title=_("Your Account"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -371,9 +430,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         fromaddr = "From: %s" % supportemail
         toaddr  = "To: " + args['p_email']
-        subject = "Subject: %s %s" % (_("Credentials for"), cdsname)
-        body = websession_templates.tmpl_account_lost_password_email_body(args['p_email'],
-                                                                          passw,
+        subject = "Subject: %s %s" % (_("Password reset request for"), cdsnameintl.get(args['ln'], cdsname))
+        ip_address = req.connection.remote_host or req.connection.remote_ip
+        body = websession_templates.tmpl_account_reset_password_email_body(args['p_email'],
+                                                                          reset_key,
+                                                                          ip_address,
                                                                           args['ln'])
         msg = toaddr + "\n" + subject + "\n\n" + body
 
@@ -397,7 +458,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         navmenuid='login')
 
         server.quit()
-        return page(title=_("Lost password sent"),
+        return page(title=_("Reset password link sent"),
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
                     description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),

@@ -37,6 +37,7 @@ CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'PENDING':'P'
                                    }
 
+CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS = 3
 
 CFG_WEBSESSION_ERROR_MESSAGES = {
     'ERR_WEBSESSION_DB_ERROR': '_("Sorry there was an error with the database.")',
