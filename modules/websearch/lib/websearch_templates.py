@@ -2088,6 +2088,10 @@ class Template:
                     out += self.tmpl_print_record_list_for_similarity_boxen (
                         _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
 
+                if row.has_key('downloadhistory'):
+                    out += '<br />&nbsp;'
+                    out += row['downloadhistory']
+
                 if row.has_key ('reviews'):
                     out += '<br />&nbsp;'
                     out += row['reviews']
