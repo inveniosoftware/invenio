@@ -1761,7 +1761,7 @@ class BibFormatObject:
         else:
             return ""
 
-    def fields(self, tag, escape=0):
+    def fields(self, tag, escape=0, repeatable_subfields_p=False):
         """
         Returns the list of values corresonding to "tag".
 
@@ -1770,16 +1770,50 @@ class BibFormatObject:
         are the subcodes and the values are the values of tag.subcode.
         If the tag has a subcode, simply returns list of values
         corresponding to tag.
-
+        Eg. for given MARC:
+            999C5 $a value_1a $b value_1b
+            999C5 $b value_2b
+            999C5 $b value_3b $b value_3b_bis
+            
+            >> bfo.fields('999C5b')
+            >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
+            >> bfo.fields('999C5')
+            >> [{'a':'value_1a', 'b':'value_1b'}, 
+                {'b':'value_2b'},
+                {'b':'value_3b'}]
+        
+        By default the function returns only one value for each
+        subfield (that is it considers that repeatable subfields are
+        not allowed). It is why in the above example 'value3b_bis' is
+        not shown for bfo.fields('999C5').  (Note that it is not
+        defined which of value_3b or value_3b_bis is returned).  This
+        is to simplify the use of the function, as most of the time
+        subfields are not repeatable (in that way we get a string
+        instead of a list).  You can allow repeatable subfields by
+        setting 'repeatable_subfields_p' parameter to True. In
+        this mode, the above example would return:
+            >> bfo.fields('999C5b')
+            >> ['value_1b', 'value_2b', 'value_3b']
+            >> bfo.fields('999C5')
+            >> [{'a':['value_1a'], 'b':['value_1b']}, 
+                {'b':['value_2b']},
+                {'b':['value_3b', 'value3b_bis']}]
+        NOTICE THAT THE RETURNED STRUCTURE IS DIFFERENT.  Also note
+        that whatever the value of 'repeatable_subfields_p' is,
+        bfo.fields('999C5b') always show all fields, even repeatable
+        ones. This is because the parameter has no impact on the
+        returned structure (it is always a list).
+        
         'escape' parameter allows to escape special characters
         of the fields. The value of escape can be:
                       0 - no escaping
                       1 - escape all HTML characters
                       2 - escape all HTML characters by default. If field starts with <!--HTML-->,
                           escape only unsafe characters, but leave basic HTML tags.
-
+        
         @param tag the marc code of a field
         @param escape 1 if returned values should be escaped. Else 0.
+        @repeatable_subfields_p if True, returns the list of subfields in the dictionary
         @return values of field tag in record
         """
         if self.get_record() is None:
@@ -1807,12 +1841,26 @@ class BibFormatObject:
                                                    p_tag[0],
                                                    p_tag[1],
                                                    p_tag[2])
-            if escape == 0:
-                return [dict(instance[0]) for instance in instances]
+            if repeatable_subfields_p:
+                 list_of_instances = []
+                 for instance in instances:
+                     instance_dict = {}
+                     for subfield in instance[0]:
+                         if not instance_dict.has_key(subfield[0]):
+                             instance_dict[subfield[0]] = []
+                         if escape == 0:
+                             instance_dict[subfield[0]].append(subfield[1])
+                         else:
+                             instance_dict[subfield[0]].append(escape_field(subfield[1], escape))
+                     list_of_instances.append(instance_dict)
+                 return list_of_instances
             else:
-                return [dict([ (subfield[0], escape_field(subfield[1], escape)) \
-                               for subfield in instance[0] ]) \
-                        for instance in instances]
+                if escape == 0:
+                    return [dict(instance[0]) for instance in instances]
+                else:
+                    return [dict([ (subfield[0], escape_field(subfield[1], escape)) \
+                                   for subfield in instance[0] ]) \
+                            for instance in instances]
 
     def kb(self, kb, string, default=""):
         """
