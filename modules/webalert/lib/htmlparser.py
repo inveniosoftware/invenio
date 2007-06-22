@@ -28,10 +28,13 @@ from string import split
 import textwrap
 
 from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
-from invenio.search_engine import print_record
+from invenio.bibformat import format_record
 from invenio.bibindex_engine import re_html
 
 def wrap(text):
+    """Limits the number of characters per line in given text.
+    The function does not preserve new lines.
+    """
     lines = textwrap.wrap(text, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
     r = ''
     for l in lines:
@@ -39,6 +42,8 @@ def wrap(text):
     return r
 
 def wrap_records(text):
+    """Limits the number of characters per line in given text.
+    The function preserves new lines."""
     lines = split(text, '\n')
     result = ''
     for l in lines:
@@ -54,6 +59,8 @@ class RecordHTMLParser(HTMLParser):
     invenio.search_engine.print_record into plain text, with some
     minor formatting.
     """
+
+    silent = False
 
     def __init__(self):
         HTMLParser.__init__(self)
@@ -78,6 +85,8 @@ class RecordHTMLParser(HTMLParser):
 
         elif tag == 'br':
             self.result += '\n'
+        elif tag == 'style' or tag == 'script':
+            self.silent = True
 
     def handle_endtag(self, tag):
         if tag == 'strong':
@@ -87,11 +96,13 @@ class RecordHTMLParser(HTMLParser):
             if self.unclosedBracket == 1:
                 self.result += '>'
                 self.unclosedBracket = 0
+        elif tag == 'style' or tag == 'script':
+            self.silent = False
 
     def handle_data(self, data):
         if data == 'Detailed record':
             pass
-        else:
+        elif self.silent == False:
             self.result += data
 
     def handle_comment(self, data):
@@ -101,7 +112,8 @@ class RecordHTMLParser(HTMLParser):
 def get_as_text(record_id):
     """Return the plain text from RecordHTMLParser of the record."""
     out = ""
-    rec_in_hb = print_record(record_id)
+    rec_in_hb = format_record(record_id, of="hb")
+    rec_in_hb = rec_in_hb.replace('\n', ' ')
     htparser = RecordHTMLParser()
     try:
         htparser.feed(rec_in_hb)
@@ -110,7 +122,7 @@ def get_as_text(record_id):
         out = re_html.sub(' ', rec_in_hb)
     out = re.sub(r"[\-:]?\s*Detailed record\s*[\-:]?", "", out)
     out = re.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
-    return out
+    return out.strip()
 
 if __name__ == "__main__":
     test_recID = 11
