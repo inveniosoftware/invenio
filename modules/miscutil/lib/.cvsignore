@@ -6,6 +6,7 @@ z_*
 messages.py
 dbquery.py
 config.py
+mailutils.py
 *.pyc
 *.shtml
 *.php
