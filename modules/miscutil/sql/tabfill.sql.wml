@@ -46,7 +46,7 @@ INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
 <zh_CN>INSERT INTO collectionname VALUES (1,'zh_CN','ln',"<CDSNAMEINTL>");</zh_CN>
 <zh_TW>INSERT INTO collectionname VALUES (1,'zh_TW','ln',"<CDSNAMEINTL>");</zh_TW>
 
-INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '', '0000-00-00', NULL);
+INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=author&p=\" urlencode($author)','EXT','','');
@@ -1310,8 +1310,8 @@ INSERT INTO accROLE VALUES (1,'superadmin','superuser with all rights', NULL, NU
 INSERT INTO accROLE VALUES (2,'photoadmin','Photo collection administrator', NULL, NULL);
 INSERT INTO accROLE VALUES (3,'webaccessadmin','WebAccess administrator', NULL, NULL);
 
-INSERT INTO user_accROLE VALUES (1,1);
-INSERT INTO user_accROLE VALUES (1,3);
+INSERT INTO user_accROLE VALUES (1,1,'9999-12-31 23:59:59');
+INSERT INTO user_accROLE VALUES (1,3,'9999-12-31 23:59:59');
 
 INSERT INTO accACTION VALUES (1,'cfgwebsearch','configure WebSearch','','no');
 INSERT INTO accACTION VALUES (2,'cfgbibformat','configure BibFormat','','no');

@@ -108,51 +108,6 @@ def get_query(alert_id):
     r = run_sql('select urlargs from query where id=%s', (alert_id,))
     return r[0][0]
 
-def send_email(fromaddr, toaddr, body,
-               attempt_times=1,
-               attempt_sleeptime=10):
-    """Send email to TOADDR from FROMADDR with message BODY.
-
-       If sending fails, try to send it ATTEMPT_TIMES, and wait for
-       ATTEMPT_SLEEPTIME seconds in between tries.
-
-       Return 0 if email was sent okay, 1 if it was not.
-    """
-
-    if attempt_times < 1:
-        log('Not attempting to send email to %s.' % toaddr)
-        return 1
-
-    try:
-        server = smtplib.SMTP('localhost')
-        if CFG_WEBALERT_DEBUG_LEVEL > 2:
-            server.set_debuglevel(1)
-        else:
-            server.set_debuglevel(0)
-        server.sendmail(fromaddr, toaddr, body)
-        server.quit()
-    except:
-        if attempt_times > 1:
-            if (CFG_WEBALERT_DEBUG_LEVEL > 1):
-                print 'Error connecting to SMTP server, retrying in %d seconds. Exception raised: %s' % (attempt_sleeptime, sys.exc_info()[0])
-            sleep(attempt_sleeptime)
-            return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
-        else:
-            log('Error sending email to %s.  Giving up.' % toaddr)
-            return 1
-
-    return 0
-
-def forge_email(fromaddr, toaddr, subject, content):
-    msg = MIMEText(content, _charset='utf-8')
-
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    msg['Subject'] = Header(subject, 'utf-8')
-
-    return msg.as_string()
-
-
 def email_notify(alert, records, argstr):
 
     if len(records) == 0:
@@ -200,13 +155,13 @@ def email_notify(alert, records, argstr):
         print "********************************************************************************"
 
     if CFG_WEBALERT_DEBUG_LEVEL < 2:
-        send_email(sender, email, body,
-                   CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
-                   CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
+        send_email(sender, email, content=body,
+                   attempt_time=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+                   attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
     if CFG_WEBALERT_DEBUG_LEVEL == 4:
-        send_email(sender, supportemail, body,
-                   CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
-                   CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
+        send_email(sender, supportemail, content=body,
+                   attempt_time=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+                   attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
 
 def get_argument(args, argname):
     if args.has_key(argname):

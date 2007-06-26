@@ -293,6 +293,6 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % \
             'logdir'    : logdir,
             'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
         }
-    from invenio.alert_engine import send_email
-    send_email(from_addr, to_addr, body)
+    from invenio.mailutils import send_email
+    send_email(from_addr, to_addr, content=body)
 

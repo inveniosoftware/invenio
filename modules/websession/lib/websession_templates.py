@@ -596,8 +596,6 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """\
-%(hello)s:
-
 %(intro)s
 
 %(intro2)s
@@ -607,12 +605,7 @@ class Template:
 %(outro)s
 
 %(outro2)s
-
-%(best_regards)s
---
-%(cdsnameintl)s <%(weburl)s>
-%(need_intervention_please_contact)s <%(supportemail)s>
-        """ % {
+""" % {
             'hello': _("Hello"),
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
                 "have asked for a\npassword reset for %(cdsname)s for "
@@ -623,11 +616,10 @@ class Template:
                     }
                 ),
             'intro2' : _("If you want to reset the password for this account, please go to:"),
-            'link' : "%s/youraccount/resetpassword%s" %
+            'link' : "%s/youraccount/mailcookie%s" %
                 (sweburl, make_canonical_urlargd({
                     'ln' : ln,
-                    'e' : email,
-                    'k' : reset_key
+                    'cookie' : reset_key
                 }, {})),
             'outro' : _("and follow the instructions presented there."),
             'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},

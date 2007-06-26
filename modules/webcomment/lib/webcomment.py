@@ -47,6 +47,7 @@ from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext
+from invenio.mailutils import send_email
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
 from invenio.webuser import isGuestUser
@@ -335,9 +336,7 @@ Please go to the WebComment Admin interface %(comment_admin_link)s to delete thi
         #FIXME to be added to email when websession module is over:
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
 
-        from invenio.alert_engine import send_email, forge_email
-        body = forge_email(from_addr, to_addr, subject, body)
-        send_email(from_addr, to_addr, body)
+        send_email(from_addr, to_addr, subject, body)
     return 1
 
 def check_user_can_report(cmt_id, client_ip_address, uid=-1):
@@ -926,9 +925,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
     to_addr = adminemail
     subject = "A new comment/review has just been posted"
 
-    from invenio.alert_engine import send_email, forge_email
-    out = forge_email(from_addr, to_addr, subject, out)
-    send_email(from_addr, to_addr, out)
+    send_email(from_addr, to_addr, subject, out)
 
 def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
     """

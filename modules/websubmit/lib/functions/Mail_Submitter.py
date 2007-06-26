@@ -48,9 +48,9 @@ from invenio.config import \
      supportemail
 
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
-def Mail_Submitter (parameters,curdir,form): 
+def Mail_Submitter (parameters,curdir,form):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     # retrieve report number
     edsrn = parameters['edsrn']
@@ -91,7 +91,7 @@ def Mail_Submitter (parameters,curdir,form):
         m_recipient = ""
     # create email body
     email_txt = "The document %s\nTitle: %s\nAuthor(s): %s\n\nhas been correctly received\n\n" % (fullrn,m_title,m_author)
-    # The user is either informed that the document has been added to the database, or sent for approval 
+    # The user is either informed that the document has been added to the database, or sent for approval
     if parameters['status'] == "APPROVAL":
         email_txt =  email_txt + "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.\n\n"
     elif parameters['status'] == "ADDED":
@@ -99,16 +99,6 @@ def Mail_Submitter (parameters,curdir,form):
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
 
     # send the mail
-    tostring = m_recipient.strip()
-    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        # Copy mail to admins:
-        if len(tostring) > 0:
-            tostring += ",%s" % (adminemail,)
-        else:
-            tostring = adminemail
-    body = forge_email(FROMADDR,m_recipient,"","%s: Document Received" % fullrn,email_txt)
-    tolist = tostring.split(",")
-    if len(tolist[0]) > 0:
-        send_email(FROMADDR,tolist,body,0)
+    send_email(FROMADDR,tostring,"%s: Document Received" % fullrn,email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
 

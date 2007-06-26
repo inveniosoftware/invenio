@@ -2377,8 +2377,6 @@ CREATE TABLE IF NOT EXISTS user (
   settings blob default NULL,
   nickname varchar(255) NOT NULL default '',
   last_login datetime NOT NULL default '0000-00-00 00:00:00',
-  reset_date date NOT NULL default '0000-00-00',
-  reset_key BINARY(32) NULL default NULL,
   UNIQUE KEY id (id),
   KEY email (email),
   KEY nickname (nickname)
@@ -2422,7 +2420,17 @@ CREATE TABLE IF NOT EXISTS accROLE (
 CREATE TABLE IF NOT EXISTS user_accROLE (
   id_user int(15) unsigned NOT NULL,
   id_accROLE int(15) unsigned NOT NULL,
+  expiration datetime NOT NULL default '9999-12-31 23:59:59',
   PRIMARY KEY (id_user, id_accROLE)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
+  id int(15) unsigned NOT NULL auto_increment,
+  data blob NOT NULL,
+  expiration datetime NOT NULL default '9999-12-31 23:59:59',
+  kind varchar(32) NOT NULL,
+  onetime boolean NOT NULL default false,
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS accACTION (

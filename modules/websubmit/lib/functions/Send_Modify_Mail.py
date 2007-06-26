@@ -40,7 +40,7 @@ from invenio.config import \
      supportemail, \
      weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
 def Send_Modify_Mail (parameters,curdir,form):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
@@ -72,22 +72,7 @@ def Send_Modify_Mail (parameters,curdir,form):
         email_txt += "<%s/record/%s>\n\n" % (weburl,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % cdsname
     # send the mail
-    tostring = sub.strip()
-    if len(addresses) > 0:
-        if len(tostring) > 0:
-            tostring += ",%s" % (addresses,)
-        else:
-            tostring = addresses
-    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        # Copy mail to admins:
-        if len(tostring) > 0:
-            tostring += ",%s" % (adminemail,)
-        else:
-            tostring = adminemail
-    body = forge_email(FROMADDR,sub,"","%s modified" % rn,email_txt)
-    tolist = tostring.split(",")
-    if len(tolist[0]) > 0:
-        send_email(FROMADDR,tolist,body,0)
+    send_email(FROMADDR,sub,"%s modified" % rn,email_txt,copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
-   
+
 

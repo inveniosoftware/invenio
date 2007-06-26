@@ -27,6 +27,7 @@ __lastupdated__ = """$Date$"""
 
 from mod_python import apache
 import smtplib
+from datetime import timedelta
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -51,13 +52,17 @@ from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
 from invenio.messages import gettext_set_language
+from invenio.mailutils import send_email
+from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
+    mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
+    mail_cookie_create_pw_reset, mail_cookie_check_role
 import invenio.template
 websession_templates = invenio.template.load('websession')
 
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     _exports = ['', 'edit', 'change', 'lost', 'display',
-                'send_email', 'youradminactivities',
+                'send_email', 'youradminactivities', 'mailcookie',
                 'delete', 'logout', 'login', 'register', 'resetpassword']
 
     _force_https = True
@@ -65,9 +70,38 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     def index(self, req, form):
         redirect_to_url(req, '%s/youraccount/display' % sweburl)
 
+    def mailcookie(self, req, form):
+        args = wash_urlargd(form, {'cookie' : (str, '')})
+        _ = gettext_set_language(args['ln'])
+        kind = mail_cookie_retrieve_kind(args['cookie'])
+        if kind == 'pw_reset':
+            redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['cookie'], args['ln']))
+        elif kind == 'role':
+            uid = webuser.getUid(req)
+            try:
+                (role_name, expiration) = mail_cookie_check_role(args['cookie'], uid)
+            except TypeError:
+                return webuser.page_not_authorized(req, "../youraccount/resetpassword",
+                        text=_("This request for an authorization is not valid or"
+                        " is expired."), navmenuid='youraccount')
+            return page(title=title,
+            body=webaccount.perform_back(
+                _("You have successfully obtained an authorization as %(role)s! "
+                "This authorization will last until %(expiration)s and until "
+                "you close your browser if you are a guest user.") %
+                {'role' : '<strong>%s</strong>' % role_name,
+                 'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
+                'login', _('login'), args['ln']),
+            req=req,
+            language=args['ln'],
+            lastupdated=__lastupdated__,
+            navmenuid='youraccount')
+        return webuser.page_not_authorized(req, "../youraccount/resetpassword",
+                text=_("This request for an authorization is not valid or"
+                " is expired."), navmenuid='youraccount')
+
     def resetpassword(self, req, form):
         args = wash_urlargd(form, {
-            'e' : (str, ''),
             'k' : (str, ''),
             'reset' : (int, 0),
             'password' : (str, ''),
@@ -76,17 +110,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(args['ln'])
 
-        email = args['e'].lower()
+        email = mail_cookie_check_pw_reset(args['k'])
         reset_key = args['k']
 
         title = _('Reset password')
 
-        res = run_sql('SELECT email FROM user WHERE email=%s AND reset_key=%s'
-            'AND DATE_SUB(CURDATE(), INTERVAL %s DAY)<=reset_date',
-            (email, reset_key,
-            CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
-
-        if not res or CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
+        if email is None or CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
             return webuser.page_not_authorized(req, "../youraccount/resetpassword",
                     text=_("This request for resetting the password is not valid or"
                     " is expired."), navmenuid='youraccount')
@@ -110,8 +139,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 lastupdated=__lastupdated__,
                 navmenuid='youraccount')
 
-        run_sql('UPDATE user SET password=AES_ENCRYPT(email,%s), '
-        'reset_key=NULL, reset_date=\'0000-00-00\' WHERE reset_key=%s AND email=%s', (args['password'], reset_key, email))
+        run_sql('UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE email=%s', (args['password'], email))
+
+        mail_cookie_delete_cookie(reset_key)
 
         return page(title=title,
             body=webaccount.perform_back(
@@ -415,7 +445,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             lastupdated=__lastupdated__,
                             navmenuid='login')
 
-        reset_key = webuser.request_reset_password(args['p_email'])
+        reset_key = mail_cookie_create_pw_reset(args['p_email'], cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
         if reset_key is None:
             eMsg = _("The entered email address does not exist in the database.")
             return page(title=_("Your Account"),
@@ -428,23 +458,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         lastupdated=__lastupdated__,
                         navmenuid='login')
 
-        fromaddr = "From: %s" % supportemail
-        toaddr  = "To: " + args['p_email']
-        subject = "Subject: %s %s" % (_("Password reset request for"), cdsnameintl.get(args['ln'], cdsname))
         ip_address = req.connection.remote_host or req.connection.remote_ip
-        body = websession_templates.tmpl_account_reset_password_email_body(args['p_email'],
-                                                                          reset_key,
-                                                                          ip_address,
-                                                                          args['ln'])
-        msg = toaddr + "\n" + subject + "\n\n" + body
 
-        server = smtplib.SMTP('localhost')
-        server.set_debuglevel(1)
-
-        try:
-            server.sendmail(fromaddr, toaddr, msg)
-
-        except smtplib.SMTPRecipientsRefused:
+        if not send_email(supportemail, args['p_email'], "%s %s"
+                % (_("Password reset request for"),
+                cdsnameintl.get(args['ln'], cdsname)),
+                websession_templates.tmpl_account_reset_password_email_body(
+                    args['p_email'], reset_key, ip_address, args['ln']),
+                header='', footer=''):
             eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
             return page(title=_("Incorrect email address"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -456,8 +477,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         language=args['ln'],
                         lastupdated=__lastupdated__,
                         navmenuid='login')
-
-        server.quit()
         return page(title=_("Reset password link sent"),
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
                     description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),

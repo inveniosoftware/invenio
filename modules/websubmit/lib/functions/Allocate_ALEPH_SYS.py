@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -34,7 +34,7 @@ from invenio.config import \
      counters, \
      supportemail
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
 CFG_WARNING_MAX_SYS_APPROACHING = 2000
 CFG_MAX_AGE_LOCKFILE = 300 ## (300 seconds is the maximum age that we allow for a lockfile)
@@ -96,9 +96,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
                         """last modification time of [%s]. It was therefore not possible to allocate the SYS.""" \
                         % (database, strftime("%d/%m/%Y %H:%M:%S", localtime(time_now)),
                            strftime("%d/%m/%Y %H:%M:%S", localtime(lockfile_modtime)))
-            mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - OLD ALEPH SYS LOCKFILE ENCOUNTERED!", content="\n\n"+admin_msg)
-            send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+            send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - OLD ALEPH SYS LOCKFILE ENCOUNTERED!", content=admin_msg)
             user_msg = """ERROR: When trying to allocate an ALEPH SYS for a record in the [%s] DB, it was not possible""" \
                        """ to create a lockfile. It was therefore not possible to allocate the SYS.""" \
                        % database
@@ -114,9 +112,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         ## unable to create lockfile!
         msg = """ERROR: When trying to allocate an ALEPH SYS for a record in the [%s] DB, it was not possible"""\
               """ to create a lockfile within 60 seconds. It was therefore not possible to allocate the SYS.""" % database
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT CREATE LOCKFILE!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT CREATE LOCKFILE!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
     ## test that counter files exist for "database":
@@ -131,9 +127,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT ACCESS ALEPH SYS COUNTER(S)!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT ACCESS ALEPH SYS COUNTER(S)!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
 
@@ -153,9 +147,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT ACCESS ALEPH SYS COUNTER(S)!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT ACCESS ALEPH SYS COUNTER(S)!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
 
@@ -171,9 +163,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - ALEPH SYS COUNTER(S) CONTAINS INVALID DATA!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - ALEPH SYS COUNTER(S) CONTAINS INVALID DATA!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
 
@@ -184,9 +174,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
               """value of [%s -> %d]. It was therefore not possible to allocate the SYS. A new SYS range must be allocated!"""\
               % (counter_lastsys, lastsys, counter_maxsys, maxsys)
         ## mail admin:
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - MAXIMUM ALEPH SYS COUNTER VALUE EXCEEDED!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - MAXIMUM ALEPH SYS COUNTER VALUE EXCEEDED!", content=msg)
         lockfile_removed = _unlink_SYS_counter_lockfile(database)
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
@@ -225,9 +213,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT CREATE TEMPORARY ALEPH SYS COUNTER FILE!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT CREATE TEMPORARY ALEPH SYS COUNTER FILE!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
     ## copy old counter file to backup version:
@@ -242,9 +228,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT WRITE BACK-UP ALEPH SYS COUNTER!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT WRITE BACK-UP ALEPH SYS COUNTER!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
     ## rename temp counter file to final counter file:
@@ -260,9 +244,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
             _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
-        mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                               subject="WebSubmit ERROR - CANNOT WRITE ALEPH SYS COUNTER FILE!", content="\n\n"+msg)
-        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+        send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT WRITE ALEPH SYS COUNTER FILE!", content=msg)
         raise InvenioWebSubmitFunctionError(msg)
 
 
@@ -301,10 +283,8 @@ def _warn_admin_counterlimit_approaching(db, lastsys, maxsys):
               """The last SYS allocated was [%d]; The maximum SYS allowed is [%d].\n\n"""\
               """You should be thinking about allocating a new range of SYS now!\n"""\
               % (db, lastsys, maxsys)
-    mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                           subject="WebSubmit WARNING - MAXIMUM SYS IN [%s] APPROACHING!" % db,
+    send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit WARNING - MAXIMUM SYS IN [%s] APPROACHING!" % db,
                            content=mailtxt)
-    send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
 
 
 def _mail_admin_because_lockfile_not_removeable(lockfilename, extramsg=""):
@@ -314,9 +294,7 @@ def _mail_admin_because_lockfile_not_removeable(lockfilename, extramsg=""):
               """ possible to allocate them a SYS in ALEPH. Please investigate and remove the lockfile ASAP.\n\n"""\
               % (lockfilename,)
     mailtxt += extramsg
-    mailbody = forge_email(fromaddr=mailfrom_addr, toaddr=adminemail, bcc="",
-                           subject="WebSubmit ERROR - CANNOT REMOVE ALEPH SYS LOCKFILE!", content=mailtxt)
-    send_email(fromaddr=mailfrom_addr, toaddr=adminemail, body=mailbody)
+    send_email(fromaddr=mailfrom_addr, toaddr=adminemail, subject="WebSubmit ERROR - CANNOT REMOVE ALEPH SYS LOCKFILE!", content=mailtxt)
 
 
 def _create_SYS_counter_lockfile(database):

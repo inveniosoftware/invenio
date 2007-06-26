@@ -173,6 +173,7 @@ update-v0.92.0-tables: local-dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ./modules/miscutil/bin/dbexec
 
 update-v0.92.1-tables: local-dbexec
+	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ./modules/miscutil/bin/dbexec
@@ -189,8 +190,7 @@ update-v0.92.1-tables: local-dbexec
 	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user CHANGE password password tinyblob NULL default NULL;" | ./modules/miscutil/bin/dbexec
 	echo "UPDATE user SET password=AES_ENCRYPT(email,password);" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user ADD COLUMN reset_date date NOT NULL default '0000-00-00';" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user ADD COLUMN reset_key binary(32) NULL default NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql

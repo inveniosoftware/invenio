@@ -40,7 +40,7 @@ from invenio.config import \
      supportemail, \
      weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
 def Send_SRV_Mail(parameters,curdir,form):
@@ -69,22 +69,6 @@ def Send_SRV_Mail(parameters,curdir,form):
     message = "A revised version of document %s has been submitted.\n\nTitle: %s\nAuthor(s): %s\nURL: <%s/record/%s>%s" % (rn,title,author,weburl,sysno,note)
 
     # send the email
-    tostring = SuE.strip()
-    if len(addresses) > 0:
-        if len(tostring) > 0:
-            tostring += ",%s" % (addresses,)
-        else:
-            tostring = addresses
-
-    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        # Copy mail to admins:
-        if len(tostring) > 0:
-            tostring += ",%s" % (adminemail,)
-        else:
-            tostring = adminemail
-    body = forge_email(FROMADDR,SuE,"","%s revised" % rn,message)
-    tolist = re.split(",",tostring)
-    if len(tolist[0]) > 0:
-        send_email(FROMADDR,tolist,body,0)
+    send_email(FROMADDR, SuE, "%s revised" % rn, message, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
 

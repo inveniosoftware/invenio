@@ -20,12 +20,12 @@
 __revision__ = "$Id$"
 
    ## Description:   function Send_APP_Mail
-   ##                This function send an email informing the original 
+   ##                This function send an email informing the original
    ##             submitter of a document that the referee has approved/
    ##             rejected the document. The email is also sent to the
    ##             referee for checking.
    ## Author:         T.Baron
-   ## PARAMETERS:  
+   ## PARAMETERS:
    ##                newrnin: name of the file containing the 2nd reference
    ##             addressesAPP: email addresses to which the email will
    ##                    be sent (additionally to the author)
@@ -43,7 +43,7 @@ from invenio.config import \
 from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
 def Send_APP_Mail (parameters,curdir,form):
     global emailvalue,titlevalue,authorvalue,sysno,rn
@@ -116,16 +116,6 @@ def Send_APP_Mail (parameters,curdir,form):
     if comment != "":
         mailbody += "Comments from the referee:\n%s\n" % comment
     mailbody += "---------------------------------------------\nBest regards.\nThe submission team.\n"
-    #Send mail to referee
-    tostring = addresses.strip()
-    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        # Copy mail to admins:
-        if len(tostring) > 0:
-            tostring += ",%s" % (adminemail,)
-        else:
-            tostring = adminemail
-    body = forge_email(FROMADDR,addresses,"",mailtitle,mailbody)
-    tolist = re.split(",",tostring)
-    if len(tolist[0]) > 0:
-        send_email(FROMADDR,tolist,body,0)
+    # Send mail to referee
+    send_email(FROMADDR,addresses,mailtitle,mailbody, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""

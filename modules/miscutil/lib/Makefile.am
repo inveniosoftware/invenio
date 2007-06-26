@@ -27,6 +27,7 @@ pylib_DATA = __init__.py \
              data_cacher.py \
              dbquery.py \
              dbquery_tests.py \
+             mailutils.py \
 	     miscutil_config.py \
              messages.py \
              textutils.py \
@@ -81,6 +82,10 @@ dbquery.py: dbquery.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/confi
 	$(WML) -o $@ $<
 
 messages.py: messages.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
+      $(top_srcdir)/config/cdswmllib.wml
+	$(WML) -o $@ $<
+
+mailutils.py: mailutils.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
       $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 

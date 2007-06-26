@@ -11,7 +11,7 @@
 -- CDS Invenio is distributed in the hope that it will be useful, but
 -- WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
--- General Public License for more details.  
+-- General Public License for more details.
 --
 -- You should have received a copy of the GNU General Public License
 -- along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -293,6 +293,7 @@ DROP TABLE IF EXISTS publreq;
 DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS accROLE;
+DROP TABLE IF EXISTS accMAILCOOKIE;
 DROP TABLE IF EXISTS user_accROLE;
 DROP TABLE IF EXISTS accACTION;
 DROP TABLE IF EXISTS accARGUMENT;

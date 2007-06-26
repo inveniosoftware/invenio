@@ -43,7 +43,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
 def Send_Approval_Request (parameters,curdir,form):
     global rn,sysno
@@ -109,15 +109,5 @@ def Send_Approval_Request (parameters,curdir,form):
     mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (urlpath,access)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
-    tostring = addresses.strip()
-    if CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        # Copy mail to admins:
-        if len(tostring) > 0:
-            tostring += ",%s" % (adminemail,)
-        else:
-            tostring = adminemail
-    body = forge_email(FROMADDR,addresses,"",title_referee,mail_referee)
-    tolist = re.split(",",tostring)
-    if len(tolist[0]) > 0:
-        send_email(FROMADDR,tolist,body,0)
+    send_email(FROMADDR, addresses, title_referee, mail_referee, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""

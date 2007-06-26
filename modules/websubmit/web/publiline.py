@@ -50,7 +50,7 @@ from invenio.messages import gettext_set_language, wash_language
 from invenio.websubmit_config import *
 from invenio.search_engine import search_pattern
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
-from invenio.websubmit_functions.mail import forge_email, send_email
+from invenio.mailutils import send_email
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
 execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
@@ -351,16 +351,14 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     Best regards.
     The submission team.""" % (RN,title,authors,urlpath,sysno,urlpath,access)
     # send the mail
-    body = forge_email(FROMADDR,addresses,adminemail,"Request for Approval of %s" % RN,message)
-    send_email(FROMADDR,addresses,body,0)
+    send_email(FROMADDR,addresses,"Request for Approval of %s" % RN, message,footer="")
     return ""
 
 def SendWarning(doctype,categ,RN,title,authors,access):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     message = "Failed sending approval email request for %s" % RN
     # send the mail
-    body = forge_email(FROMADDR,adminemail,"","Failed sending approval email request",message)
-    send_email(FROMADDR,adminemail,body,0)
+    send_email(FROMADDR,adminemail,"Failed sending approval email request",message)
     return ""
 
 def errorMsg(title,req,c=cdsname,ln=cdslang):
