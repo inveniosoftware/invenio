@@ -1,4 +1,4 @@
-    ## $Id$
+## $Id$
 ## Administrator interface for WebAccess
 
 ## This file is part of CDS Invenio.

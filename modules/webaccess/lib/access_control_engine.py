@@ -117,7 +117,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 FROM accROLE r LEFT JOIN user_accROLE ur
                 ON r.id = ur.id_accROLE
                 WHERE r.name = '%s' AND
-                ur.id_user = '%s' """ % (SUPERADMINROLE, id_user), affected_tables=['accROLE', 'user_accROLE']):
+                ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, id_user), affected_tables=['accROLE', 'user_accROLE']):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
     else:
         if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(aca.acc_getRoleId(SUPERADMINROLE))):
@@ -140,7 +140,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 else:
                     raise Exception
         if check_only_uid_p:
-            query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s ORDER BY ur.id_accROLE """ % id_user
+            query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s AND ur.expiration>=NOW() ORDER BY ur.id_accROLE """ % id_user
             res2 = run_sql_cached(query2, affected_tables=['user_accROLE'])
     except Exception: return (6, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[6], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
 

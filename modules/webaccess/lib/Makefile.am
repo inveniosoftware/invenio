@@ -22,6 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = access_control_engine.py \
              access_control_config.py \
              access_control_admin.py \
+             access_control_mailcookie.py \
              access_control_firerole.py \
              access_control_firerole_tests.py \
              webaccessadmin_lib.py \

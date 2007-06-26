@@ -343,7 +343,7 @@ def acc_updateRole(id_role=0, name_role='', verbose=0, description='', \
 
 # CONNECTIONS BETWEEN USER AND ROLE
 
-def acc_addUserRole(id_user=0, id_role=0, email='', name_role=''):
+def acc_addUserRole(id_user=0, id_role=0, email='', name_role='', expiration='9999-12-31 23:59:59'):
     """ this function adds a new entry to table user_accROLE and returns it
 
       id_user, id_role - self explanatory
@@ -363,9 +363,10 @@ def acc_addUserRole(id_user=0, id_role=0, email='', name_role=''):
 
     # control if existing entry
     if run_sql("""SELECT * FROM user_accROLE WHERE id_user = %s AND id_accROLE = %s""" % (id_user, id_role)):
+        run_sql("""UPDATE user_accROLE SET expiration=%s WHERE id_user=%s AND id_accROLE=%s AND expiration<%s""", (expiration, id_user, id_role, expiration) )
         return id_user, id_role, 0
     else:
-        run_sql("""INSERT INTO user_accROLE (id_user, id_accROLE) VALUES (%s, %s) """ % (id_user, id_role))
+        run_sql("""INSERT INTO user_accROLE (id_user, id_accROLE, expiration) VALUES (%s, %s, %s) """ % (id_user, id_role, expiration))
         return id_user, id_role, 1
 
 
@@ -1006,6 +1007,7 @@ def acc_getRoleUsers(id_role):
     return run_sql("""SELECT DISTINCT(u.id), u.email, u.settings
     FROM user_accROLE ur, user u
     WHERE ur.id_accROLE = %s AND
+    ur.expiration >= NOW() AND
     u.id = ur.id_user
     ORDER BY u.email""", (id_role, ))
 
@@ -1043,7 +1045,7 @@ def acc_getUserRoles(id_user=0):
 
     res = run_sql("""SELECT ur.id_accROLE
     FROM user_accROLE ur
-    WHERE ur.id_user = %s
+    WHERE ur.id_user = %s AND ur.expiration >= NOW()
     ORDER BY ur.id_accROLE""", (id_user, ))
 
     return res
@@ -1055,7 +1057,7 @@ def acc_findUserInfoIds(id_user=0):
     res1 = run_sql("""SELECT ur.id_user, raa.*
     FROM user_accROLE ur LEFT JOIN accROLE_accACTION_accARGUMENT raa
     ON ur.id_accROLE = raa.id_accROLE
-    WHERE ur.id_user = %s """, (id_user, ))
+    WHERE ur.id_user = %s AND ur.expiration >= NOW()""", (id_user, ))
 
     res2 = []
     for res in res1: res2.append(res)
@@ -1066,7 +1068,7 @@ def acc_findUserInfoIds(id_user=0):
 def acc_findUserInfoNames(id_user=0):
     query = """ SELECT ur.id_user, r.name, ac.name, raa.argumentlistid, ar.keyword, ar.value
     FROM accROLE_accACTION_accARGUMENT raa, user_accROLE ur, accROLE r, accACTION ac, accARGUMENT ar
-    WHERE ur.id_user = %s and
+    WHERE ur.id_user = %s and ur.expiration >= NOW() and
     ur.id_accROLE = raa.id_accROLE and
     raa.id_accROLE = r.id and
     raa.id_accACTION = ac.id and
@@ -1091,6 +1093,7 @@ def acc_findUserRoleActions(user_info):
     query = """SELECT DISTINCT r.name, a.name
     FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a, accROLE r
     WHERE ur.id_user = %s and
+    ur.expiration >= NOW() and
     ur.id_accROLE = raa.id_accROLE and
     raa.id_accACTION = a.id and
     raa.id_accROLE = r.id """ % (uid, )
@@ -1538,6 +1541,9 @@ def acc_cleanupUserRoles():
     # delete unreferenced arguments
     count = run_sql("""DELETE FROM user_accROLE
     WHERE id_accROLE in (%s)""" % (idstr, ))
+
+    # delete expired memberships
+    counts += run_sql("""DELETE FROM user_accROLE WHERE expiration<NOW()""")
 
     # return count and ids of deleted arguments
     return (count, ids2)
