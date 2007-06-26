@@ -351,7 +351,7 @@
 
 
 
-     <xsl:if test=" contains($allsets, 'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'cs') or contains($allsets,'astro-ph') or contains($allsets,'acc-phys')  ">
+     <xsl:if test=" contains($allsets, 'quant-ph') or contains($allsets,'q-alg') or contains($allsets,'plasm-ph') or contains($allsets,'physics') or contains($allsets,'nucl-th') or contains($allsets,'nucl-ex') or contains($allsets,'math') or contains($allsets,'math-ph') or contains($allsets,'hep-th') or contains($allsets,'hep-ph') or contains($allsets,'hep-lat') or contains($allsets,'hep-ex') or contains($allsets,'gr-qc') or contains($allsets,'cs') or contains($allsets,'astro-ph') or contains($allsets,'acc-ph')  ">
 
 
 
@@ -804,6 +804,18 @@
 
              <!-- Base 13 specific treatment -->
              <xsl:when test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
+
+                   <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
+                     <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
+                     <xsl:variable name="year" select="substring-before($datebase,'-')"/>
+                     <xsl:variable name="month" select="substring-before(substring-after($datebase,'-'),'-')"/>
+                     <xsl:variable name="day" select="substring-after(substring-after($datebase,'-'),'-')"/>
+
+                     <datafield tag="260" ind1=" " ind2=" ">
+                       <subfield code="c"><xsl:value-of select="$year"/></subfield>
+                     </datafield>
+                   </xsl:if>
+
 
                    <!-- MARC FIELDS 690C$$a and 980$$a NB: 980$$a enables searching  -->
                    <datafield tag="690" ind1="C" ind2=" ">
