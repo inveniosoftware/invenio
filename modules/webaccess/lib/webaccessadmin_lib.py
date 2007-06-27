@@ -719,7 +719,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
     </tr>
     </table>
-    """ % (weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID, weburl, userID)
+    """ % (weburl, userID, weburl, userID, weburl, userID, weburl, userID)
 
     if mtype == "perform_modifylogindata" and content:
         fin_output += content
