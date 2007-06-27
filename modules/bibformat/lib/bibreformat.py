@@ -32,7 +32,7 @@ try:
          tmpdir,\
          bindir
 
-    from invenio.search_engine import perform_request_search
+    from invenio.search_engine import perform_request_search, search_pattern
     from invenio.search_engine import print_record, encode_for_xml
     from invenio.bibformat import format_record
     from invenio.bibformat_utils import encode_for_xml
@@ -80,7 +80,20 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
 
         write_message("Querying database (CDS query)...")
 
-        res = perform_request_search(req=None, of='id', c=cds_query['collection'], p=cds_query['pattern'], f=cds_query['field'])
+        if cds_query['collection'] == "":
+            # use search_pattern() whenever possible, as it can search
+            # even in private collections
+            res = search_pattern(p=cds_query['pattern'],
+                                 f=cds_query['field'],
+                                 m=cds_query['matching']).tolist()
+        else:
+            # use perform_request_search when '-c' argument has been
+            # defined, as it is not supported by search_pattern()
+            res = perform_request_search(req=None, of='id',
+                                         c=cds_query['collection'],
+                                         p=cds_query['pattern'],
+                                         f=cds_query['field'])
+        
 
         for item in res:
             recIDs.append(item)
@@ -451,6 +464,10 @@ def task_run_core():
     else:
         cds_query['pattern']      = ""
 
+    if task_has_option("matching"):
+        cds_query['matching']      = task_get_option('matching')
+    else:
+        cds_query['matching']      = ""
 
 ### sql commands to be executed during the script run
 ###
@@ -480,6 +497,9 @@ records in the web interface, BibReformat allows to improve serving
 speed by precreating the outputs. It is suggested to run
 BibReformat for 'HB' output.
 
+Option -m cannot be used at the same time as option -c.
+Option -c prevents from finding records in private collections.
+
 Examples:
   bibreformat                    Format all new or modified records (in HB).
   bibreformat -o HD              Format all new or modified records in HD.
@@ -499,10 +519,14 @@ Reformatting options:
   -c,  --collection     \t Force reformatting records by collection
   -f,  --field          \t Force reformatting records by field
   -p,  --pattern        \t Force reformatting records by pattern
+Pattern options:  
+  -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
+                        \t partial (p), any of the words (o) or all of the words (a)
 """,
-            specific_params=("ac:f:p:lo:n",
+            specific_params=("ac:f:p:lo:nm:",
                 ["all",
                 "collection=",
+                "matching=",
                 "field=",
                 "pattern=",
                 "format=",
@@ -514,7 +538,8 @@ Reformatting options:
 def task_submit_check_options():
     """Last checks and updating on the options..."""
     if not (task_has_option('all') or task_has_option('collection') \
-            or task_has_option('field') or task_has_option('pattern')):
+            or task_has_option('field') or task_has_option('pattern') \
+            or task_has_option('matching')):
         task_set_option('without', 1)
         task_set_option('last', 1)
     return True
@@ -532,6 +557,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("field", value)
     elif key in ("-p","--pattern"):
         task_set_option("pattern", value)
+    elif key in ("-m", "--matching"):
+        task_set_option("matching", value)
     elif key in ("-o","--format"):
         task_set_option("format", value)
     else:
