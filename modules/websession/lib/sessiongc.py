@@ -31,6 +31,7 @@ try:
     from invenio.config import logdir, tmpdir
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
+    from invenio.access_control_mailcookie import mail_cookie_gc
     import time
     import os
 except ImportError, e:
@@ -116,6 +117,8 @@ def guest_user_garbage_collector():
     2: delete queries not attached to any user
     3: delete baskets not attached to any user
     4: delete alerts not attached to any user
+    5: delete expired mailcookies
+    6: delete expired roles memberships
 
     verbose - level of program output.
               0 - nothing
@@ -130,10 +133,12 @@ def guest_user_garbage_collector():
                 'bskBASKET': 0,
                 'user_bskBASKET': 0,
                 'bskREC': 0,
-                'bskRECORDCOMMENT':0,
-                'bskEXTREC':0,
-                'bskEXTFMT':0,
-                'user_query_basket': 0}
+                'bskRECORDCOMMENT': 0,
+                'bskEXTREC': 0,
+                'bskEXTFMT': 0,
+                'user_query_basket': 0,
+                'mail_cookie': 0,
+                'role_membership' : 0}
 
     write_message("GUEST USER SESSIONS GARBAGE"
         " COLLECTOR STARTED")
@@ -268,6 +273,13 @@ def guest_user_garbage_collector():
         write_message("""DELETE FROM user_query_basket WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
         delcount['user_query_basket'] += run_sql("""DELETE FROM user_query_basket WHERE id_user = %s """, (id_user, ))
 
+    # 5 - delete expired mailcookies
+    write_message("""mail_cookie_gc()""", verbose=9)
+    delcount['mail_cookie'] = mail_cookie_gc()
+
+    # 6 - delete expired roles memberships
+    write_message("""DELETE FROM user_accROLE WHERE expiration<NOW()""", verbose=9)
+    delcount['role_membership'] = run_sql("""DELETE FROM user_accROLE WHERE expiration<NOW()""")
 
     # print STATISTICS
 
@@ -283,6 +295,8 @@ def guest_user_garbage_collector():
     write_message("""- %7s basket_external_formats.""" % (delcount['bskEXTFMT'], ))
     write_message("""- %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
     write_message("""- %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
+    write_message("""- %7s mail_cookies.""" % (delcount['mail_cookie'], ))
+    write_message("""- %7s role_memberships.""" % (delcount['role_membership'], ))
     write_message("""GUEST USER SESSIONS GARBAGE COLLECTOR FINISHED""")
 
     return
