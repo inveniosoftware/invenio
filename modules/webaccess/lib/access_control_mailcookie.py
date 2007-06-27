@@ -56,7 +56,7 @@ def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), o
     cookie = password[:16]+hex(cookie_id)[2:-1]+password[-16:]
     return cookie
 
-def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3), onetime=True):
+def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3), cookie_timeout=timedelta(days=1), onetime=True):
     """Create a unique url to be sent via email to belong temporaly to a role."""
     assert(acc_getRoleId(role_name) != 0)
     kind = 'role'
@@ -161,5 +161,4 @@ def mail_cookie_delete_cookie(cookie):
 
 def mail_cookie_gc():
     """Clean the table for expired cookies"""
-    run_sql("DELETE FROM accMAILCOOKIE WHERE expiration<NOW()")
-    return True
+    return run_sql("DELETE FROM accMAILCOOKIE WHERE expiration<NOW()")
