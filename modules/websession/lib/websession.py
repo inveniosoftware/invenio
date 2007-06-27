@@ -71,12 +71,16 @@ class pSession(Session):
         Session.__init__( self, request, id )
         self.__uid = uid
         self.__dirty = 0
+        self.__apache_user = None
 
     def is_dirty( self ):
         return self.__dirty
 
     def getUid( self ):
         return self.__uid
+
+    def getApacheUser( self ):
+        return self.__apache_user
 
     def setUid( self, newUid ):
         if newUid:
@@ -85,6 +89,15 @@ class pSession(Session):
         else:
             # something bad happened, e.g. database down, so return user id -1
             self.__uid = -1
+            self.__dirty = 1
+
+    def setApacheUser( self, newApacheUser ):
+        if newApacheUser:
+            self.__apache_user = str(newApacheUser)
+            self.__dirty = 1
+        else:
+            # something bad happened, e.g. database down, so return user id -1
+            self.__apache_user = None
             self.__dirty = 1
 
     def retrieve( cls, sessionId ):
