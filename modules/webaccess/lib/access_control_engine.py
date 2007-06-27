@@ -24,19 +24,50 @@ __revision__ = "$Id$"
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     version
+     version, sweburl
 from invenio.dbquery import run_sql_cached, ProgrammingError
 import invenio.access_control_admin as aca
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio import webuser
 from invenio import access_control_firerole
-
+from invenio.urlutils import make_canonical_urlargd
 
 called_from = 1 #1=web,0=cli
 try:
     import _apache
 except ImportError, e:
     called_from = 0
+
+def _make_list_apache_firerole(name_action):
+    res = run_sql_cached('SELECT r.name, r.description, r.firerole_def_ser FROM accACTION a JOIN accROLE_accACTION_accARGUMENT raa ON a.id=raa.id_accACTION JOIN accROLE r ON raa.id_accROLE=r.id WHERE a.name=%s', (name_action, ), affected_tables=['accACTION', 'accROLE_accACTION_accARGUMENT', 'accROLE'])
+    if res:
+        roles = [(row[0], row[1]) for row in res if access_control_firerole.acc_firerole_suggest_apache_p(access_control_firerole.deserialize(row[2]))]
+        return roles
+    else:
+        return []
+
+def _format_list_of_apache_firerole(roles, referer):
+    out = ""
+    if roles:
+        out += "<p>Here's a list of administrative roles you may have " \
+        "received authorization to, via an Apache password. If you are aware " \
+        "of such a password, please follow the corresponding link."
+        out += "<table>"
+        for name, description in roles:
+            out += "<tr>"
+            out += "<td><a href='%s'>%s</a></td><td> - <em>%s</em></td>" % \
+            ('%s%s' % (sweburl, make_canonical_urlargd({'realm' : name, 'referer' : referer}, {})), name, description)
+            out += "</tr>"
+        out += "</table>"
+        out += "</p>"
+    return out
+
+def make_apache_message(name_action, referer='%s/youraccount/youradminactivities' % sweburl):
+    roles = _make_list_apache_firerole(name_action)
+    if roles:
+        return _format_list_of_apache_firerole(roles, referer)
+    else:
+        return ""
 
 ## access controle engine function
 def acc_authorize_action(req, name_action, verbose=0, check_only_uid_p=False, **arguments):
@@ -183,7 +214,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
-                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer'])))
 
         # 3.2
         if optional == 'yes':
@@ -209,7 +240,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 for id_accROLE in connection:
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer'])))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
@@ -271,7 +302,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
             if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(row[0])):
                 res5.append(row)
         if not res5:
-            return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) # no entries at all
+            return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer']))) # no entries at all
 
     res5.sort()
 
