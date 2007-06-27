@@ -144,6 +144,18 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
                 req=req,
                 navmenuid=navmenuid)
 
+def getApacheUser(req):
+    """Return the ApacheUser taking it from the cookie of the request."""
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie (req)
+        s = sm.get_session(req)
+    apache_user = s.getApacheUser()
+    sm.maintain_session(req, s)
+    return apache_user
+
 def getUid (req):
     """Return user ID taking it from the cookie of the request.
        Includes control mechanism for the guest users, inserting in
@@ -192,6 +204,19 @@ def getUid (req):
             return userId
         else:
             return -1
+
+def setApacheUser(req, apache_user):
+    """It sets the apache_user into the session, and raise the cookie to the client.
+    """
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
+    s.setApacheUser(apache_user)
+    sm.maintain_session(req, s)
+    return apache_user
 
 def setUid(req, uid):
     """It sets the userId into the session, and raise the cookie to the client.
@@ -400,7 +425,6 @@ def loginUser(req, p_un, p_pw, login_method):
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
             if not query_result: # First time user
-                import random
                 p_pw_local = int(random.random() * 1000000)
                 p_nickname = ''
                 if CFG_EXTERNAL_AUTHENTICATION[login_method][0].enforce_external_nicknames:
@@ -724,39 +748,6 @@ def list_users_in_roles(role_list):
         return map(lambda x: int(x[0]), res)
     return []
 
-## --- follow some functions for Apache user/group authentication
-
-def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
-    """Check whether user-supplied credentials correspond to valid
-    Apache password data file.  Return 0 in case of failure, 1 in case
-    of success."""
-    try:
-        if not apache_password_file.startswith("/"):
-            apache_password_file = tmpdir + "/" + apache_password_file
-        dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
-        line =  pipe_output.readlines()[0]
-        password_apache = string.split(string.strip(line),":")[1]
-    except: # no pw found, so return not-allowed status
-        return 0
-    salt = password_apache[:2]
-    if crypt.crypt(password, salt) == password_apache:
-        return 1
-    else:
-        return 0
-
-def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
-    """Return list of Apache groups to which Apache user belong."""
-    out = []
-    try:
-        if not apache_group_file.startswith("/"):
-            apache_group_file = tmpdir + "/" + apache_group_file
-        dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
-        for line in pipe_output.readlines():
-            out.append(string.split(string.strip(line),":")[0])
-    except: # no groups found, so return empty list
-        pass
-    return out
-
 def get_user_preferences(uid):
     pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
     if pref:
@@ -786,7 +777,9 @@ def collect_user_info(req):
     containing at least the keys uid, nickname, email, groups, plus any external keys in
     the user preferences (collected at login time and built by the different
     external authentication plugins) and if the mod_python request object is
-    provided, also the remote_ip and remote_host fields.
+    provided, also the remote_ip, remote_host, referer, agent fields.
+    If the user is authenticated with Apache should provide also
+    apache_user and apache_group.
     """
     user_info = {}
 
@@ -796,6 +789,15 @@ def collect_user_info(req):
         uid = getUid(req)
         user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
         user_info['remote_host'] = req.connection.remote_host or None
+        user_info['referer'] = req.headers_in.get('Referer', None)
+        user_info['uri'] = req.unparsed_uri or None
+        user_info['agent'] = req.headers_in.get('User-Agent', None)
+        try:
+            user_info['apache_user'] = getApacheUser(req)
+            if user_info['apache_user']:
+                user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
+        except AttributeError:
+            pass
     user_info['uid'] = uid
     user_info['nickname'] = get_nickname(uid) or None
     user_info['email'] = get_email(uid) or None
@@ -809,6 +811,38 @@ def collect_user_info(req):
                 user_info[key.lower()] = value
     return user_info
 
+## --- follow some functions for Apache user/group authentication
+
+def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
+    """Check whether user-supplied credentials correspond to valid
+    Apache password data file.  Return 0 in case of failure, 1 in case
+    of success."""
+    try:
+        if not apache_password_file.startswith("/"):
+            apache_password_file = tmpdir + "/" + apache_password_file
+        dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
+        line =  pipe_output.readlines()[0]
+        password_apache = string.split(string.strip(line),":")[1]
+    except: # no pw found, so return not-allowed status
+        return False
+    salt = password_apache[:2]
+    if crypt.crypt(password, salt) == password_apache:
+        return True
+    else:
+        return False
+
+def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
+    """Return list of Apache groups to which Apache user belong."""
+    out = []
+    try:
+        if not apache_group_file.startswith("/"):
+            apache_group_file = tmpdir + "/" + apache_group_file
+        dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
+        for line in pipe_output.readlines():
+            out.append(string.split(string.strip(line),":")[0])
+    except: # no groups found, so return empty list
+        pass
+    return out
 
 def serialize_via_marshal(obj):
     """Serialize Python object via marshal into a compressed string."""
