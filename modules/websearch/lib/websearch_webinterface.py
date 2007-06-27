@@ -25,12 +25,13 @@ import cgi
 from urllib import quote
 from mod_python import apache
 
-from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang, adminemail
+from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang, adminemail, sweburl
 from invenio.dbquery import Error
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, \
+    http_check_credentials, http_get_credentials
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
-from invenio.webuser import getUid, page_not_authorized, \
-     get_user_preferences, collect_user_info
+from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
+    collect_user_info, auth_apache_user_p, auth_apache_user_in_groups, setApacheUser
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webpage import page, create_error_box
@@ -110,19 +111,16 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
         if collection_restricted_p(record_primary_collection):
             user_info = collect_user_info(req)
-            (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
             if auth_code and user_info['email'] == 'guest':
                 target = '/youraccount/login' + \
-                        make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
+                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
                         weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                         search_results_default_urlargd)}, {'ln' : cdslang})
                 return redirect_to_url(req, target)
             elif auth_code:
                 return page_not_authorized(req, "../", \
-                    text = _("""You are not authorized to access this resource.
-                        If you think this is a mistake, please contact the
-                        %(x_url_open)sadministrators%(x_url_close)s.""") % \
-                        {'x_url_open' : '<a href="mailto:%s">' % adminemail, 'x_url_close' : '</a>'}, \
+                    text = auth_msg,\
                     navmenuid='search')
 
             #del argd['recid'] # not wanted argument for detailed record page
@@ -223,19 +221,16 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         # to the authentication form.
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
-                (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code and user_info['email'] == 'guest':
                     target = '/youraccount/login' + \
-                    make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
+                    make_canonical_urlargd({'action' : VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
                     weburl + '/search' + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : cdslang})
                     return redirect_to_url(req, target)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
-                        text = _("""You are not authorized to access this resource.
-                            If you think this is a mistake, please contact the
-                            %(x_url_open)sadministrators%(x_url_close)s.""") % \
-                            {'x_url_open' : '<a href="mailto:%s">' % adminemail, 'x_url_close' : '</a>'}, \
+                        text = auth_msg,\
                         navmenuid='search')
 
 
@@ -362,10 +357,25 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         return None, []
 
+    def _apache_authentication(self, req, referer, realm):
+        http_check_credentials(req, realm, auth_apache_user_p)
+        (user, passwd) = http_get_credentials(req, realm)
+        setApacheUser(req, user)
+        return redirect_to_url(req, referer or '%s/youraccount/youradminactivities' % sweburl)
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
-        argd = wash_urlargd(form, legacy_collection_default_urlargd)
+        accepted_args = dict(legacy_collection_default_urlargd)
+        accepted_args.update({'referer' : (str, '%s/youraccount/your'),
+             'realm' : (str, '')})
+        argd = wash_urlargd(form, accepted_args)
+
+        # Apache authentication stuff
+        if argd['realm']:
+            return self._apache_authentication(req, argd['referer'], argd['realm'])
+
+        del argd['referer']
+        del argd['realm']
 
         # If we specify no collection, then we don't need to redirect
         # the user, so that accessing <http://yoursite/> returns the
