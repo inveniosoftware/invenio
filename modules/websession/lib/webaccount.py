@@ -255,20 +255,24 @@ def create_register_page_box(referer='', ln=cdslang):
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
-def create_login_page_box(referer='', ln=cdslang):
+def create_login_page_box(referer='', apache_msg="", ln=cdslang):
     # List of referer regexep and message to print
 
     _ = gettext_set_language(ln)
 
     login_referrer2msg = (
-        (re.compile(r"/search"), _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.")),
+        (re.compile(r"/search"), "<p>" + _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
     )
 
-    msg = None
+    msg = ""
     for regexp, txt in login_referrer2msg:
         if regexp.search(referer):
             msg = txt
             break
+
+    if apache_msg:
+        msg += apache_msg + "<p>Otherwise please, provide the correct authorization" \
+        " data in the following form.</p>"
 
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():

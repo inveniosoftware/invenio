@@ -25,7 +25,10 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 import smtplib
 from datetime import timedelta
 
@@ -47,6 +50,7 @@ from invenio import webalert
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_config import *
+from invenio.access_control_engine import make_apache_message
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
@@ -73,6 +77,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     def mailcookie(self, req, form):
         args = wash_urlargd(form, {'cookie' : (str, '')})
         _ = gettext_set_language(args['ln'])
+        title = _("Mail Cookie Service")
         kind = mail_cookie_retrieve_kind(args['cookie'])
         if kind == 'pw_reset':
             redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['cookie'], args['ln']))
@@ -562,7 +567,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'p_un': (str, None),
             'p_pw': (str, None),
             'login_method': (str, None),
-            'action': (str, 'login'),
+            'action': (str, None),
             'referer': (str, '')})
 
         locals().update(args)
@@ -576,47 +581,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(args['ln'])
 
-        #return action+_("login")
-        if args['action'] == "login" or args['action'] == _("login") or CFG_EXTERNAL_AUTH_USING_SSO:
-            if not CFG_EXTERNAL_AUTH_USING_SSO:
-                if args['p_un'] is None or not args['login_method']:
-                    return page(title=_("Login"),
-                                body=webaccount.create_login_page_box(args['referer'], args['ln']),
-                                navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                                description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
-                                keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
-                                uid=uid,
-                                req=req,
-                                secure_page_p = 1,
-                                language=args['ln'],
-                                lastupdated=__lastupdated__,
-                                navmenuid='login')
-                (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
-            else:
-                # Fake parameters for p_un & p_pw because SSO takes them from the environment
-                (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', 'SSO')
-            if len(iden)>0:
-                uid = webuser.update_Uid(req, args['p_un'])
-                uid2 = webuser.getUid(req)
-                if uid2 == -1:
-                    webuser.logoutUser(req)
-                    return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
-                                                       navmenuid='login')
+        apache_msg = ""
+        if args['action']:
+            apache_msg = make_apache_message(args['action'], args['referer'])
 
-                # login successful!
-                if args['referer']:
-                    req.err_headers_out.add("Location", args['referer'])
-                    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-                else:
-                    return self.display(req, form)
-            else:
-                mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % args['login_method']
-                if msgcode == 14:
-                    if webuser.username_exists_p(args['p_un']):
-                        mess = CFG_WEBACCESS_WARNING_MSGS[15] % args['login_method']
-                act = "login"
+        if not CFG_EXTERNAL_AUTH_USING_SSO:
+            if args['p_un'] is None or not args['login_method']:
                 return page(title=_("Login"),
-                            body=webaccount.perform_back(mess, act, _("login"), args['ln']),
+                            body=webaccount.create_login_page_box(args['referer'], apache_msg, args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                             description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
                             keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
@@ -626,8 +598,41 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             language=args['ln'],
                             lastupdated=__lastupdated__,
                             navmenuid='login')
+            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
         else:
-            return "This should have never happened.  Please contact %s." % supportemail
+            # Fake parameters for p_un & p_pw because SSO takes them from the environment
+            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', 'SSO')
+        if len(iden)>0:
+            uid = webuser.update_Uid(req, args['p_un'])
+            uid2 = webuser.getUid(req)
+            if uid2 == -1:
+                webuser.logoutUser(req)
+                return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
+                                                    navmenuid='login')
+
+            # login successful!
+            if args['referer']:
+                req.err_headers_out.add("Location", args['referer'])
+                raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+            else:
+                return self.display(req, form)
+        else:
+            mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % args['login_method']
+            if msgcode == 14:
+                if webuser.username_exists_p(args['p_un']):
+                    mess = CFG_WEBACCESS_WARNING_MSGS[15] % args['login_method']
+            act = "login"
+            return page(title=_("Login"),
+                        body=webaccount.perform_back(mess, act, _("login"), args['ln']),
+                        navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                        description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                        keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
+                        uid=uid,
+                        req=req,
+                        secure_page_p = 1,
+                        language=args['ln'],
+                        lastupdated=__lastupdated__,
+                        navmenuid='login')
 
     def register(self, req, form):
         args = wash_urlargd(form, {
