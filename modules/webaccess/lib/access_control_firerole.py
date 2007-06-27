@@ -56,6 +56,7 @@ def compile_role_definition(firerole_def_src):
     line = 0
     ret = []
     default_allow_p = False
+    suggest_apache_p = False
     if not firerole_def_src or not firerole_def_src.strip():
         firerole_def_src = CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
     for row in firerole_def_src.split('\n'):
@@ -97,10 +98,12 @@ def compile_role_definition(firerole_def_src):
                         else:
                             expressions_list.append((False, expr[1:-1]))
                 expressions_list = tuple(expressions_list)
+                if field in ('apache_group', 'apache_user'):
+                    suggest_apache_p = True
                 ret.append((allow_p, not_p, field, expressions_list))
             else:
                 raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line)
-    return (default_allow_p, tuple(ret))
+    return (default_allow_p, suggest_apache_p, tuple(ret))
 
 
 def repair_role_definitions():
@@ -141,6 +144,15 @@ def load_role_definition(role_id):
     else:
         return (False, ())
 
+def acc_firerole_suggest_apache_p(firerole_def_obj):
+    """Return True if the given firerole definition suggest the authentication
+    through Apache."""
+    try:
+        default_allow_p, suggest_apache_p, rules = firerole_def_obj
+        return suggest_apache_p
+    except Exception, msg:
+        raise InvenioWebAccessFireroleError, msg
+
 def acc_firerole_check_user(user_info, firerole_def_obj):
     """ Given a user_info dictionary, it matches the rules inside the deserializez
     compiled definition in order to discover if the current user match the roles
@@ -152,7 +164,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     @return True if the user match the definition, False otherwise.
     """
     try:
-        default_allow_p, rules = firerole_def_obj
+        default_allow_p, suggest_apache_p, rules = firerole_def_obj
         for (allow_p, not_p, field, expressions_list) in rules: # for every rule
             group_p = field in ['group', 'apache_group'] # Is it related to group?
             ip_p = field == 'remote_ip' # Is it related to Ips?

@@ -59,7 +59,7 @@ MAXSELECTUSERS = 25
 MAXPAGEUSERS = 25
 
 """ Serialized compiled default role definition"""
-CFG_ACC_EMPTY_ROLE_DEFINITION_SER=compress(cPickle.dumps((False, ()), -1))
+CFG_ACC_EMPTY_ROLE_DEFINITION_SER=compress(cPickle.dumps((False, False, ()), -1))
 
 """ Source of the default role definition"""
 CFG_ACC_EMPTY_ROLE_DEFINITION_SRC='deny any'
