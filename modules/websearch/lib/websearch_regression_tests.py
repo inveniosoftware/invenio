@@ -165,8 +165,9 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
             self.failUnless(same_urls_p(got, new), got)
 
         # /search.py is redirected on /search
-        check(make_url('/search.py', p='nuclear', as=1),
-              make_url('/search', p='nuclear', as=1))
+        # Note that `as' is a reserved word in Python 2.5
+        check(make_url('/search.py', p='nuclear') + 'as=1',
+              make_url('/search', p='nuclear') + 'as=1')
 
         # direct recid searches are redirected to /record
         check(make_url('/search.py', recid=1, ln='es'),
@@ -718,7 +719,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser['p_pw'] = 'h123yde'
         browser.submit()
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find("You are not authorized to access this resource.") <= -1:
+        if browser.response().read().find("You are not authorized") <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
 
@@ -726,7 +727,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         """websearch - restricted detailed record page not accessible to guests"""
         browser = Browser()
         browser.open(weburl + '/record/35')
-        if browser.response().read().find("If you already have an account, please login using the form below") > -1:
+        if browser.response().read().find("You can use your nickname or your email address to login.") > -1:
             pass
         else:
             self.fail("Oops, searching restricted collection without password should have redirected to login dialog.")
@@ -759,7 +760,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser.submit()
         browser.open(weburl + '/record/35')
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find('You are not authorized to access this resource.') <= -1:
+        if browser.response().read().find('You are not authorized') <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
 
