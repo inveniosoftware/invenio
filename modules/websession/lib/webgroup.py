@@ -25,8 +25,7 @@ from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      CFG_WEBSESSION_WARNING_MESSAGES
+      CFG_WEBSESSION_GROUP_JOIN_POLICY
 from invenio.webuser import nickname_valid_p, get_user_info
 from invenio.webmessage import perform_request_send
 import invenio.webgroup_dblayer as db
@@ -46,7 +45,8 @@ except NameError:
     set = Set
 
 
-def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], ln=cdslang):
+def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
+        ln=cdslang):
     """Display all the groups the user belongs to.
     @param uid:   user id
     @param info: info about last user action
@@ -67,11 +67,11 @@ def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], ln
         errors.extend(errors_external)
 
     body = websession_templates.tmpl_display_all_groups(infos=infos,
-                                                        admin_group_html=body_admin,
-                                                        member_group_html=body_member,
-                                                        external_group_html=body_external,
-                                                        warnings=warnings,
-                                                        ln=ln)
+        admin_group_html=body_admin,
+        member_group_html=body_member,
+        external_group_html=body_external,
+        warnings=warnings,
+        ln=ln)
     return (body, errors, warnings)
 
 
@@ -85,9 +85,9 @@ def display_admin_groups(uid, ln=cdslang):
     body = ""
     errors = []
     record = db.get_groups_by_user_status(uid=uid,
-                                          user_status=CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
+        user_status=CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
     body = websession_templates.tmpl_display_admin_groups(groups=record,
-                                                         ln=ln)
+        ln=ln)
     return (body, errors)
 
 
@@ -101,10 +101,10 @@ def display_member_groups(uid, ln=cdslang):
     body = ""
     errors = []
     records = db.get_groups_by_user_status(uid,
-                                           user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"] )
+        user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"] )
 
     body = websession_templates.tmpl_display_member_groups(groups=records,
-                                                          ln=ln)
+        ln=ln)
     return (body, errors)
 
 
@@ -120,7 +120,7 @@ def display_external_groups(uid, ln=cdslang):
     record = db.get_external_groups(uid)
     if record:
         body = websession_templates.tmpl_display_external_groups(groups=record,
-                                                         ln=ln)
+            ln=ln)
     else:
         body = None
 
@@ -144,18 +144,18 @@ def perform_request_input_create_group(group_name,
     body = ""
     errors = []
     body = websession_templates.tmpl_display_input_group_info(group_name,
-                                                              group_description,
-                                                              join_policy,
-                                                              act_type="create",
-                                                              warnings=warnings,
-                                                              ln=ln)
+        group_description,
+        join_policy,
+        act_type="create",
+        warnings=warnings,
+        ln=ln)
     return (body, errors, warnings)
 
 def perform_request_create_group(uid,
-                                 group_name,
-                                 group_description,
-                                 join_policy,
-                                 ln=cdslang):
+        group_name,
+        group_description,
+        join_policy,
+        ln=cdslang):
     """Create new group.
     @param group_name: name of the group entered
     @param group_description: description of the group entered
@@ -173,41 +173,45 @@ def perform_request_create_group(uid,
     infos = []
     if group_name == "":
         warnings.append(('WRN_WEBSESSION_NO_GROUP_NAME',))
-        (body, errors, warnings) = perform_request_input_create_group(group_name,
-                                                                      group_description,
-                                                                      join_policy,
-                                                                      warnings=warnings)
+        (body, errors, warnings) = perform_request_input_create_group(
+            group_name,
+            group_description,
+            join_policy,
+            warnings=warnings)
     elif not group_name_valid_p(group_name):
         warnings.append('WRN_WEBSESSION_NOT_VALID_GROUP_NAME')
-        (body, errors, warnings) = perform_request_input_create_group(group_name,
-                                                                      group_description,
-                                                                      join_policy,
-                                                                      warnings=warnings)
+        (body, errors, warnings) = perform_request_input_create_group(
+            group_name,
+            group_description,
+            join_policy,
+            warnings=warnings)
 
     elif join_policy=="-1":
         warnings.append('WRN_WEBSESSION_NO_JOIN_POLICY')
-        (body, errors, warnings) = perform_request_input_create_group(group_name,
-                                                                      group_description,
-                                                                      join_policy,
-                                                                      warnings=warnings)
+        (body, errors, warnings) = perform_request_input_create_group(
+            group_name,
+            group_description,
+            join_policy,
+            warnings=warnings)
     elif db.group_name_exist(group_name):
         warnings.append('WRN_WEBSESSION_GROUP_NAME_EXISTS')
-        (body, errors, warnings) = perform_request_input_create_group(group_name,
-                                                                      group_description,
-                                                                      join_policy,
-                                                                      warnings=warnings)
+        (body, errors, warnings) = perform_request_input_create_group(
+            group_name,
+            group_description,
+            join_policy,
+            warnings=warnings)
 
     else:
         db.insert_new_group(uid,
-                            group_name,
-                            group_description,
-                            join_policy)
+            group_name,
+            group_description,
+            join_policy)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_CREATED"])
         (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                 infos=infos,
-                                                                 errors=errors,
-                                                                 warnings=warnings,
-                                                                 ln=cdslang)
+            infos=infos,
+            errors=errors,
+            warnings=warnings,
+            ln=cdslang)
     return (body, errors, warnings)
 
 
@@ -229,11 +233,11 @@ def perform_request_input_join_group(uid,
     if search:
         group_from_search = db.get_visible_group_list(uid, group_name)
     body = websession_templates.tmpl_display_input_join_group(records.items(),
-                                                              group_name,
-                                                              group_from_search.items(),
-                                                              search,
-                                                              warnings=warnings,
-                                                              ln=ln)
+        group_name,
+        group_from_search.items(),
+        search,
+        warnings=warnings,
+        ln=ln)
 
     return (body, errors, warnings)
 
@@ -261,57 +265,59 @@ def perform_request_join_group(uid,
         grpID.remove("-1")
     if len(grpID)==1 :
         grpID = grpID[0]
-        """test if user is already member or pending"""
+        # test if user is already member or pending
         status = db.get_user_status(uid, grpID)
         if status:
             warnings.append('WRN_WEBSESSION_ALREADY_MEMBER')
 
             (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                     infos=infos,
-                                                                     errors=errors,
-                                                                     warnings=warnings,
-                                                                     ln=cdslang)
-            """insert new user of group"""
+                infos=infos,
+                errors=errors,
+                warnings=warnings,
+                ln=cdslang)
+            # insert new user of group
         else:
             group_infos = db.get_group_infos(grpID)
             group_type = group_infos[0][3]
             if group_type == CFG_WEBSESSION_GROUP_JOIN_POLICY["VISIBLEMAIL"]:
                 db.insert_new_member(uid,
-                                     grpID,
-                                     CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
+                    grpID,
+                    CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
                 admin = db.get_users_by_status(grpID,
-                                               CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])[0][1]
+                    CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])[0][1]
                 group_name = group_infos[0][1]
-                msg_subjet, msg_body = websession_templates.tmpl_admin_msg(group_name=group_name,
-                                                                           grpID=grpID,
-                                                                           ln=ln)
-                (body, errors, warnings, title, navtrail) = perform_request_send(uid,
-                                                                                 msg_to_user=admin,
-                                                                                 msg_to_group="",
-                                                                                 msg_subject=msg_subjet,
-                                                                                 msg_body=msg_body,
-                                                                                 ln=ln)
+                msg_subjet, msg_body = websession_templates.tmpl_admin_msg(
+                    group_name=group_name,
+                    grpID=grpID,
+                    ln=ln)
+                (body, errors, warnings, dummy, dummy) = \
+                    perform_request_send(uid,
+                        msg_to_user=admin,
+                        msg_to_group="",
+                        msg_subject=msg_subjet,
+                        msg_body=msg_body,
+                        ln=ln)
                 infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_REQUEST"])
 
 
             elif group_type == CFG_WEBSESSION_GROUP_JOIN_POLICY["VISIBLEOPEN"]:
                 db.insert_new_member(uid,
-                                     grpID,
-                                     CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+                    grpID,
+                    CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
 
                 infos.append(CFG_WEBSESSION_INFO_MESSAGES["JOIN_GROUP"])
             (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                     infos=infos,
-                                                                     errors=errors,
-                                                                     warnings=warnings,
-                                                                     ln=cdslang)
+                infos=infos,
+                errors=errors,
+                warnings=warnings,
+                ln=cdslang)
     else:
         warnings.append('WRN_WEBSESSION_MULTIPLE_GROUPS')
         (body, errors, warnings) = perform_request_input_join_group(uid,
-                                                                    group_name,
-                                                                    search,
-                                                                    warnings,
-                                                                    ln)
+            group_name,
+            search,
+            warnings,
+            ln)
     return (body, errors, warnings)
 
 def perform_request_input_leave_group(uid,
@@ -319,7 +325,8 @@ def perform_request_input_leave_group(uid,
                                       ln=cdslang):
     """Return html for leaving group.
     @param uid: user ID
-    @param warnings: warnings != [] if 0 group is selected or if not admin of the
+    @param warnings: warnings != [] if 0 group is selected or if not admin
+        of the
     @param ln: language
     @return a (body, errors[], warnings[]) formed tuple
     """
@@ -327,18 +334,15 @@ def perform_request_input_leave_group(uid,
     errors = []
     groups = []
     records = db.get_groups_by_user_status(uid=uid,
-                                           user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+        user_status=CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
     map(lambda x: groups.append((x[0], x[1])), records)
     body = websession_templates.tmpl_display_input_leave_group(groups,
-                                                               warnings=warnings,
-                                                               ln=ln)
+        warnings=warnings,
+        ln=ln)
 
     return (body, errors, warnings)
 
-def perform_request_leave_group(uid,
-                                grpID,
-                                confirmed=0,
-                                ln=cdslang):
+def perform_request_leave_group(uid, grpID, confirmed=0, ln=cdslang):
 
     """Leave group.
     @param uid: user ID
@@ -358,25 +362,22 @@ def perform_request_leave_group(uid,
             db.leave_group(grpID, uid)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"])
             (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                     infos=infos,
-                                                                     errors=errors,
-                                                                     warnings=warnings,
-                                                                     ln=cdslang)
+                infos=infos, errors=errors, warnings=warnings, ln=cdslang)
 
         else:
             body = websession_templates.tmpl_confirm_leave(uid, grpID, ln)
     else:
         warnings.append('WRN_WEBSESSION_NO_GROUP_SELECTED')
         (body, errors, warnings) = perform_request_input_leave_group(uid,
-                                                                    warnings= warnings,
-                                                                    ln=ln)
+            warnings= warnings,
+            ln=ln)
     return (body, errors, warnings)
 
 
 def perform_request_edit_group(uid,
-                               grpID,
-                               warnings=[],
-                               ln=cdslang):
+        grpID,
+        warnings=[],
+        ln=cdslang):
     """Return html for group editing.
     @param uid: user ID
     @param grpID: ID of the group
@@ -400,22 +401,19 @@ def perform_request_edit_group(uid,
         errors.append('ERR_WEBSESSION_DB_ERROR')
         return (body, errors, warnings)
 
-    body = websession_templates.tmpl_display_input_group_info(group_name=group_infos[1],
-                                                              group_description=group_infos[2],
-                                                              join_policy=group_infos[3],
-                                                              act_type="update",
-                                                              grpID=grpID,
-                                                              warnings=warnings,
-                                                              ln=ln)
+    body = websession_templates.tmpl_display_input_group_info(
+        group_name=group_infos[1],
+        group_description=group_infos[2],
+        join_policy=group_infos[3],
+        act_type="update",
+        grpID=grpID,
+        warnings=warnings,
+        ln=ln)
 
     return (body, errors, warnings)
 
-def perform_request_update_group(uid,
-                                 grpID,
-                                 group_name,
-                                 group_description,
-                                 join_policy,
-                                 ln=cdslang):
+def perform_request_update_group(uid, grpID, group_name, group_description,
+        join_policy, ln=cdslang):
     """Update group datas in database.
     @param uid: user ID
     @param grpID: ID of the group
@@ -434,47 +432,44 @@ def perform_request_update_group(uid,
     if group_name == "":
         warnings.append('WRN_WEBSESSION_NO_GROUP_NAME')
         (body, errors, warnings) = perform_request_edit_group(uid,
-                                                              grpID,
-                                                              warnings=warnings,
-                                                              ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
     elif not group_name_valid_p(group_name):
         warnings.append('WRN_WEBSESSION_NOT_VALID_GROUP_NAME')
         (body, errors, warnings) = perform_request_edit_group(uid,
-                                                              grpID,
-                                                              warnings=warnings,
-                                                              ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
     elif join_policy == "-1":
         warnings.append('WRN_WEBSESSION_NO_JOIN_POLICY')
         (body, errors, warnings) = perform_request_edit_group(uid,
-                                                              grpID,
-                                                              warnings=warnings,
-                                                              ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
     elif (group_name_available and group_name_available[0][0]!= int(grpID)):
         warnings.append('WRN_WEBSESSION_GROUP_NAME_EXISTS')
         (body, errors, warnings) = perform_request_edit_group(uid,
-                                                              grpID,
-                                                              warnings=warnings,
-                                                              ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
 
     else:
         grpID = db.update_group_infos(grpID,
-                                      group_name,
-                                      group_description,
-                                      join_policy)
+            group_name,
+            group_description,
+            join_policy)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_UPDATED"])
         (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                 infos=infos,
-                                                                 errors=errors,
-                                                                 warnings=warnings,
-                                                                 ln=cdslang)
+            infos=infos,
+            errors=errors,
+            warnings=warnings,
+            ln=cdslang)
 
     return (body, errors, warnings)
 
 
-def  perform_request_delete_group(uid,
-                                  grpID,
-                                  confirmed=0,
-                                  ln=cdslang):
+def  perform_request_delete_group(uid, grpID, confirmed=0, ln=cdslang):
     """First display confirm message(confirmed=0).
     then(confirmed=1) delete group and all its members
     @param uid: user ID
@@ -493,31 +488,32 @@ def  perform_request_delete_group(uid,
     if not group_infos:
         warnings.append('WRN_WEBSESSION_GROUP_ALREADY_DELETED')
         (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                 infos=infos,
-                                                                 errors=errors,
-                                                                 warnings=warnings,
-                                                                 ln=cdslang)
+            infos=infos,
+            errors=errors,
+            warnings=warnings,
+            ln=cdslang)
     else:
         if not len(user_status):
             errors.append('ERR_WEBSESSION_DB_ERROR')
         elif confirmed:
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
-            msg_subjet, msg_body = websession_templates.tmpl_delete_msg(group_name=group_name,
-                                                                        ln=ln)
-            (body, errors, warnings, title, navtrail) = perform_request_send(uid,
-                                                                             msg_to_user="",
-                                                                             msg_to_group=group_name,
-                                                                             msg_subject=msg_subjet,
-                                                                             msg_body=msg_body,
-                                                                             ln=ln)
+            msg_subjet, msg_body = websession_templates.tmpl_delete_msg(
+                group_name=group_name, ln=ln)
+            (body, errors, warnings, dummy, dummy) = perform_request_send(
+                uid,
+                msg_to_user="",
+                msg_to_group=group_name,
+                msg_subject=msg_subjet,
+                msg_body=msg_body,
+                ln=ln)
             db.delete_group_and_members(grpID)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["GROUP_DELETED"])
             (body, errors, warnings) = perform_request_groups_display(uid,
-                                                                     infos=infos,
-                                                                     errors=errors,
-                                                                            warnings=warnings,
-                                                                     ln=cdslang)
+                infos=infos,
+                errors=errors,
+                warnings=warnings,
+                ln=cdslang)
         else:
             body = websession_templates.tmpl_confirm_delete(grpID, ln)
 
@@ -525,10 +521,10 @@ def  perform_request_delete_group(uid,
 
 
 def perform_request_manage_member(uid,
-                                  grpID,
-                                  infos=[],
-                                  warnings=[],
-                                  ln=cdslang):
+        grpID,
+        infos=[],
+        warnings=[],
+        ln=cdslang):
     """Return html for managing group's members.
     @param uid: user ID
     @param grpID: ID of the group
@@ -551,22 +547,21 @@ def perform_request_manage_member(uid,
     if not len(group_infos):
         errors.append('ERR_WEBSESSION_DB_ERROR')
         return (body, errors, warnings)
-    members = db.get_users_by_status(grpID, CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
-    pending_members = db.get_users_by_status(grpID, CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
+    members = db.get_users_by_status(grpID,
+        CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+    pending_members = db.get_users_by_status(grpID,
+        CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
 
     body = websession_templates.tmpl_display_manage_member(grpID=grpID,
-                                                           group_name=group_infos[0][1],
-                                                           members=members,
-                                                           pending_members=pending_members,
-                                                           warnings=warnings,
-                                                           infos=infos,
-                                                           ln=ln)
+        group_name=group_infos[0][1],
+        members=members,
+        pending_members=pending_members,
+        warnings=warnings,
+        infos=infos,
+        ln=ln)
     return (body, errors, warnings)
 
-def perform_request_remove_member(uid,
-                                  grpID,
-                                  member_id,
-                                  ln=cdslang):
+def perform_request_remove_member(uid, grpID, member_id, ln=cdslang):
     """Remove member from a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -587,24 +582,21 @@ def perform_request_remove_member(uid,
     if member_id == -1:
         warnings.append('WRN_WEBSESSION_NO_MEMBER_SELECTED')
         (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                 grpID,
-                                                                 warnings=warnings,
-                                                                 ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
 
     else:
         db.delete_member(grpID, member_id)
         infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_DELETED"])
         (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                 grpID,
-                                                                 infos=infos,
-                                                                 warnings=warnings,
-                                                                 ln=ln)
+            grpID,
+            infos=infos,
+            warnings=warnings,
+            ln=ln)
     return (body, errors, warnings)
 
-def perform_request_add_member(uid,
-                               grpID,
-                               user_id,
-                               ln=cdslang):
+def perform_request_add_member(uid, grpID, user_id, ln=cdslang):
     """Add waiting member to a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -624,52 +616,48 @@ def perform_request_add_member(uid,
     if user_id == -1:
         warnings.append('WRN_WEBSESSION_NO_USER_SELECTED_ADD')
         (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                 grpID,
-                                                                 warnings=warnings,
-                                                                 ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
     else :
-        """test if user is already member or pending"""
+        # test if user is already member or pending
         status = db.get_user_status(user_id, grpID)
         if status and status[0][0] == 'M':
             warnings.append('WRN_WEBSESSION_ALREADY_MEMBER_ADD')
             (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                     grpID,
-                                                                     infos=infos,
-                                                                     warnings=warnings,
-                                                                     ln=ln)
+                grpID,
+                infos=infos,
+                warnings=warnings,
+                ln=ln)
 
 
         else:
             db.add_pending_member(grpID,
-                                  user_id,
-                                  CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+                user_id,
+                CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
 
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_ADDED"])
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
-            msg_subjet, msg_body = websession_templates.tmpl_member_msg(group_name=group_name,
-                                                                        accepted=1,
-                                                                        ln=ln)
-            (body, errors, warnings, title, navtrail) = perform_request_send(uid,
-                                                                             msg_to_user=user,
-                                                                             msg_to_group="",
-                                                                             msg_subject=msg_subjet,
-                                                                             msg_body=msg_body,
-                                                                             ln=ln)
+            msg_subjet, msg_body = websession_templates.tmpl_member_msg(
+                group_name=group_name, accepted=1, ln=ln)
+            (body, errors, warnings, dummy, dummy) = perform_request_send(
+                uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
+                msg_body=msg_body, ln=ln)
             (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                     grpID,
-                                                                     infos=infos,
-                                                                     warnings=warnings,
-                                                                     ln=ln)
+                grpID,
+                infos=infos,
+                warnings=warnings,
+                ln=ln)
 
 
     return (body, errors, warnings)
 
 def perform_request_reject_member(uid,
-                                  grpID,
-                                  user_id,
-                                  ln=cdslang):
+        grpID,
+        user_id,
+        ln=cdslang):
     """Reject waiting member and delete it from the list.
     @param uid: user ID
     @param grpID: ID of the group
@@ -689,40 +677,41 @@ def perform_request_reject_member(uid,
     if user_id == -1:
         warnings.append('WRN_WEBSESSION_NO_USER_SELECTED_DEL')
         (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                 grpID,
-                                                                 warnings=warnings,
-                                                                 ln=ln)
+            grpID,
+            warnings=warnings,
+            ln=ln)
     else :
-        """test if user is already member or pending"""
+        # test if user is already member or pending
         status = db.get_user_status(user_id, grpID)
         if not status:
             warnings.append('WRN_WEBSESSION_ALREADY_MEMBER_REJECT')
             (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                     grpID,
-                                                                     infos=infos,
-                                                                     warnings=warnings,
-                                                                     ln=ln)
+                grpID,
+                infos=infos,
+                warnings=warnings,
+                ln=ln)
         else:
-            db.delete_member(grpID,
-                             user_id)
+            db.delete_member(grpID, user_id)
             group_infos = db.get_group_infos(grpID)
             group_name = group_infos[0][1]
             user = get_user_info(user_id, ln)[2]
-            msg_subjet, msg_body = websession_templates.tmpl_member_msg(group_name=group_name,
-                                                                        accepted=0,
-                                                                        ln=ln)
-            (body, errors, warnings, title, navtrail) = perform_request_send(uid,
-                                                                             msg_to_user=user,
-                                                                             msg_to_group="",
-                                                                             msg_subject=msg_subjet,
-                                                                             msg_body=msg_body,
-                                                                             ln=ln)
+            msg_subjet, msg_body = websession_templates.tmpl_member_msg(
+                group_name=group_name,
+                accepted=0,
+                ln=ln)
+            (body, errors, warnings, dummy, dummy) = perform_request_send(
+                uid,
+                msg_to_user=user,
+                msg_to_group="",
+                msg_subject=msg_subjet,
+                msg_body=msg_body,
+                ln=ln)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["MEMBER_REJECTED"])
             (body, errors, warnings) = perform_request_manage_member(uid,
-                                                                     grpID,
-                                                                     infos=infos,
-                                                                     warnings=warnings,
-                                                                     ln=ln)
+                grpID,
+                infos=infos,
+                warnings=warnings,
+                ln=ln)
 
 
     return (body, errors, warnings)
@@ -733,13 +722,15 @@ def account_group(uid, ln=cdslang):
     @param ln: language
     @return html body
     """
-    nb_admin_groups = db.count_nb_group_user(uid, CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
-    nb_member_groups = db.count_nb_group_user(uid, CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+    nb_admin_groups = db.count_nb_group_user(uid,
+        CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
+    nb_member_groups = db.count_nb_group_user(uid,
+        CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
     nb_total_groups = nb_admin_groups + nb_member_groups
     return websession_templates.tmpl_group_info(nb_admin_groups,
-                                                nb_member_groups,
-                                                nb_total_groups,
-                                                ln=ln)
+        nb_member_groups,
+        nb_total_groups,
+        ln=ln)
 def get_navtrail(ln=cdslang, title=""):
     """Gets the navtrail for title.
     @param title: title of the page
@@ -775,11 +766,12 @@ def synchronize_external_groups(userid, groups, login_method):
     for group in potential_new_groups:
         groupid = db.get_group_id(group, login_method)
         if groupid: # Adding the user to an already existent group
-            db.insert_new_member(userid, groupid[0][0], CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
+            db.insert_new_member(userid, groupid[0][0],
+                CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
         else: # Adding a new group
-            groupid = db.insert_new_group(userid, group, groups[group],\
-            CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEEXTERNAL'], \
-            login_method)
+            groupid = db.insert_new_group(userid, group, groups[group], \
+                CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEEXTERNAL'], \
+                login_method)
             db.add_pending_member(groupid, userid,
             CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
 
@@ -794,13 +786,15 @@ def synchronize_groups_with_login_method():
     for login_method, authorizer in CFG_EXTERNAL_AUTHENTICATION.items():
         if authorizer[0]:
             try:
-                    usersgroups = authorizer[0].fetch_all_users_groups_membership()
-                    synchronize_all_external_groups(usersgroups, login_method)
+                usersgroups = authorizer[0].fetch_all_users_groups_membership()
+                synchronize_all_external_groups(usersgroups, login_method)
             except (NotImplementedError, NameError):
-                users = db.get_all_users_with_groups_with_login_method(login_method)
+                users = db.get_all_users_with_groups_with_login_method(
+                    login_method)
                 for email, uid in users.items():
                     try:
-                        groups = authorizer[0].fetch_user_groups_membership(email)
+                        groups = authorizer[0].fetch_user_groups_membership(
+                            email)
                         synchronize_external_groups(uid, groups, login_method)
                     except (NotImplementedError, NameError):
                         pass
@@ -808,11 +802,13 @@ def synchronize_groups_with_login_method():
 
 def synchronize_all_external_groups(usersgroups, login_method):
     """Merges all the groups vs users memberships.
-    @param usersgroups is {'mygroup': ('description', ['email1', 'email2', ...]), ...}
+    @param usersgroups is {'mygroup': ('description',
+        ['email1', 'email2', ...]), ...}
     @return True in case everythings is ok, False otherwise
     """
     db_users = db.get_all_users() # All users of the database {email:uid, ...}
-    db_users_set = set(db_users.keys()) # Set of all users set('email1', 'email2', ...)
+    db_users_set = set(db_users.keys()) # Set of all users set('email1',
+                                        # 'email2', ...)
     for key, value in usersgroups.items():
         # cleaning users not in db
         cleaned_user_list = set()
@@ -826,8 +822,10 @@ def synchronize_all_external_groups(usersgroups, login_method):
             del usersgroups[key] # cleaning not interesting groups
 
     # now for each group we got a description and a set of uid
-    groups_already_known = db.get_all_login_method_groups(login_method) # groups in the db {groupname: id}
-    groups_already_known_set = set(groups_already_known.keys()) # set of the groupnames in db
+    groups_already_known = db.get_all_login_method_groups(login_method)
+        # groups in the db {groupname: id}
+    groups_already_known_set = set(groups_already_known.keys())
+        # set of the groupnames in db
     usersgroups_set = set(usersgroups.keys()) # set of groupnames to be merged
 
     # deleted groups!
@@ -852,7 +850,8 @@ def synchronize_all_external_groups(usersgroups, login_method):
     changed_groups = usersgroups_set & groups_already_known_set
     groups_description = db.get_all_groups_description(login_method)
     for group_name in changed_groups:
-        users_already_in_group = db.get_users_in_group(groups_already_known[group_name])
+        users_already_in_group = db.get_users_in_group(
+            groups_already_known[group_name])
         users_already_in_group_set = set(users_already_in_group)
         users_in_group_set = usersgroups[group_name][1]
 

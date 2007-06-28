@@ -33,29 +33,31 @@ import getopt
 import sys
 
 from invenio.config import \
-     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
-     CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
-     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION, \
-     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION, \
-     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-     cdslang, \
-     cdsname, \
-     supportemail, \
-     sweburl, \
-     weburl
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+    CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE, \
+    CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
+    CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION, \
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION, \
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+    cdslang, \
+    cdsname, \
+    supportemail, \
+    sweburl, \
+    weburl
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.bibrankadminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_config import *
-from invenio.access_control_firerole import compile_role_definition, repair_role_definitions, serialize
+from invenio.access_control_firerole import compile_role_definition, \
+    repair_role_definitions, serialize
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
-from invenio.webuser import email_valid_p, get_user_preferences, set_user_preferences
+from invenio.webuser import email_valid_p, get_user_preferences, \
+    set_user_preferences
 from invenio.bibtask import authenticate
 from cgi import escape
 
@@ -81,20 +83,44 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 
     authorized - if 1, don't check if the user is allowed to be webadmin """
 
-    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
+    navtrail_previous_links = '<a class=navtrail href="%s/admin/">Admin Area' \
+        '</a> &gt; <a class=navtrail href="%s/admin/webaccess/">' \
+        'WebAccess Admin</a>' % (weburl, weburl)
 
     if body:
-        if adminarea == 1: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>Delegate Rights</a> ' % (weburl, )
-        if adminarea >= 2 and adminarea < 7: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py>Manage WebAccess</a> ' % (weburl, )
-        if adminarea == 3: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/rolearea>Role Administration</a> ' % (weburl, )
-        elif adminarea == 4: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/actionarea>Action Administration</a> ' % (weburl, )
-        elif adminarea == 5: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/userarea>User Administration</a> ' % (weburl, )
-        elif adminarea == 6: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/resetarea>Reset Authorizations</a> ' % (weburl, )
-        elif adminarea == 7: navtrail_previous_links += '&gt; <a class=navtrail href=%s/admin/webaccess/webaccessadmin.py/manageaccounts>Manage Accounts</a> ' % (weburl, )
+        if adminarea == 1:
+            navtrail_previous_links += '&gt; <a class=navtrail ' \
+            ' href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>' \
+            'Delegate Rights</a> ' % (weburl, )
+        if adminarea >= 2 and adminarea < 7:
+            navtrail_previous_links += '&gt; ' \
+            '<a class=navtrail href=%s/admin/webaccess/webaccessadmin.py>' \
+            'Manage WebAccess</a> ' % (weburl, )
+        if adminarea == 3:
+            navtrail_previous_links += '&gt; <a class=navtrail ' \
+            'href=%s/admin/webaccess/webaccessadmin.py/rolearea>' \
+            'Role Administration</a> ' % (weburl, )
+        elif adminarea == 4:
+            navtrail_previous_links += '&gt; ' \
+            '<a class=navtrail href=%s/admin/webaccess/webaccessadmin.py' \
+            '/actionarea>Action Administration</a> ' % (weburl, )
+        elif adminarea == 5:
+            navtrail_previous_links += '&gt; ' \
+            '<a class=navtrail href=%s/admin/webaccess/webaccessadmin.py' \
+            '/userarea>User Administration</a> ' % (weburl, )
+        elif adminarea == 6:
+            navtrail_previous_links += '&gt; ' \
+            '<a class=navtrail href=%s/admin/webaccess/webaccessadmin.py' \
+            '/resetarea>Reset Authorizations</a> ' % (weburl, )
+        elif adminarea == 7:
+            navtrail_previous_links += '&gt; ' \
+            '<a class=navtrail href=%s/admin/webaccess/webaccessadmin.py' \
+            '/manageaccounts>Manage Accounts</a> ' % (weburl, )
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
-    if not authorized and auth_code != 0: return mustloginpage(req, auth_message)
+    if not authorized and auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     elif not body:
         title = 'Manage WebAccess'
@@ -111,9 +137,12 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
 def mustloginpage(req, message):
     """show a page asking the user to login."""
 
-    navtrail_previous_links = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">WebAccess Admin</a> """ % (weburl, weburl)
+    navtrail_previous_links = '<a class=navtrail href="%s/admin/">' \
+        'Admin Area</a> &gt; <a class=navtrail href="%s/admin/webaccess/">' \
+        'WebAccess Admin</a> ' % (weburl, weburl)
 
-    return page_not_authorized(req=req, text=message, navtrail=navtrail_previous_links)
+    return page_not_authorized(req=req, text=message,
+        navtrail=navtrail_previous_links)
 
 def is_adminuser(req):
     """check if user is a registered administrator. """
@@ -126,35 +155,42 @@ def perform_rolearea(req):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    header = ['id', 'name', 'description', 'firewall like role definition', 'users', 'authorizations / actions', 'role', '']
+    header = ['id', 'name', 'description', 'firewall like role definition',
+        'users', 'authorizations / actions', 'role', '']
     roles = acca.acc_get_all_roles()
 
     roles2 = []
     for (id, name, desc, dummy, firerole_def_src) in roles:
-        if len(desc) > 30: desc = desc[:30] + '...'
-        if firerole_def_src and len(firerole_def_src) > 30: firerole_def_src = firerole_def_src[:30] + '...'
+        if len(desc) > 30:
+            desc = desc[:30] + '...'
+        if firerole_def_src and len(firerole_def_src) > 30:
+            firerole_def_src = firerole_def_src[:30] + '...'
         roles2.append([id, name, desc, firerole_def_src])
         for col in [(('add', 'adduserrole'),
-                     ('delete', 'deleteuserrole'),),
+                    ('delete', 'deleteuserrole'),),
                     (('add', 'addauthorization'),
-                     ('modify', 'modifyauthorizations'),
-                     ('remove', 'deleteroleaction')),
+                    ('modify', 'modifyauthorizations'),
+                    ('remove', 'deleteroleaction')),
                     (('modify', 'modifyrole'),
-                     ('delete', 'deleterole')),
+                    ('delete', 'deleterole')),
                     (('show details', 'showroledetails'), )]:
-            roles2[-1].append('<a href="%s?id_role=%s">%s</a>' % (col[0][1], id, col[0][0]))
+            roles2[-1].append('<a href="%s?id_role=%s">%s</a>' %
+                (col[0][1], id, col[0][0]))
             for (str, function) in col[1:]:
-                roles2[-1][-1] += ' / <a href="%s?id_role=%s">%s</a>' % (function, id, str)
+                roles2[-1][-1] += ' / <a href="%s?id_role=%s">%s</a>' % \
+                    (function, id, str)
 
     output  = """
     <dl>
-     <dt>Users:</dt>
-     <dd>add or remove users from the access to a role and its priviliges.</dd>
-     <dt>Authorizations/Actions:</dt>
-     <dd>these terms means almost the same, but an authorization is a <br>
-         connection between a role and an action (possibly) containing arguments.</dd>
-     <dt>Roles:</dt>
-     <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
+    <dt>Users:</dt>
+    <dd>add or remove users from the access to a role and its priviliges.</dd>
+    <dt>Authorizations/Actions:</dt>
+    <dd>these terms means almost the same, but an authorization is a <br>
+    connection between a role and an action (possibly) containing arguments.
+    </dd>
+    <dt>Roles:</dt>
+    <dd>see all the information attached to a role and decide if you want
+    to<br>delete it.</dd>
     </dl>
     """
 
@@ -162,18 +198,18 @@ def perform_rolearea(req):
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a></dt>
-     <dd>go here to add a new role.</dd>
-     <dt><a href="addaction">Create new action</a></dt>
-     <dd>go here to add a new action.</dd>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
+    <dt><a href="addaction">Create new action</a></dt>
+    <dd>go here to add a new action.</dd>
     </dl>
     """
 
     return index(req=req,
-                 title='Role Administration',
-                 subtitle='administration with roles as access point',
-                 body=[output, extra],
-                 adminarea=2)
+                title='Role Administration',
+                subtitle='administration with roles as access point',
+                body=[output, extra],
+                adminarea=2)
 
 
 def perform_actionarea(req):
@@ -190,21 +226,25 @@ def perform_actionarea(req):
     for (id, name, dummy) in actions:
         actions2.append([id, name])
         for col in [(('add', 'addauthorization'),
-                     ('modify', 'modifyauthorizations'),
-                     ('remove', 'deleteroleaction')),
+                    ('modify', 'modifyauthorizations'),
+                    ('remove', 'deleteroleaction')),
                     (('delete', 'deleteaction'), ),
                     (('show details', 'showactiondetails'), )]:
-            actions2[-1].append('<a href="%s?id_action=%s&amp;reverse=1">%s</a>' % (col[0][1], id, col[0][0]))
+            actions2[-1].append('<a href="%s?id_action=%s&amp;reverse=1">%s'
+                '</a>' % (col[0][1], id, col[0][0]))
             for (str, function) in col[1:]:
-                actions2[-1][-1] += ' / <a href="%s?id_action=%s&amp;reverse=1">%s</a>' % (function, id, str)
+                actions2[-1][-1] += ' / <a href="%s?id_action=%s&amp;' \
+                    'reverse=1">%s</a>' % (function, id, str)
 
     output  = """
     <dl>
-     <dt>Authorizations/Roles:</dt>
-     <dd>these terms means almost the same, but an authorization is a <br>
-         connection between a role and an action (possibly) containing arguments.</dd>
-     <dt>Actions:</dt>
-     <dd>see all the information attached to an action and decide if you want to<br>delete it.</dd>
+    <dt>Authorizations/Roles:</dt>
+    <dd>these terms means almost the same, but an authorization is a <br>
+        connection between a role and an action (possibly) containing
+        arguments.</dd>
+    <dt>Actions:</dt>
+    <dd>see all the information attached to an action and decide if you
+        want to<br>delete it.</dd>
     </dl>
     """
 
@@ -212,18 +252,18 @@ def perform_actionarea(req):
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a>
-     <dd>go here to add a new role.
-     <dt><a href="addaction">Create new action</a>
-     <dd>go here to add a new action.
+    <dt><a href="addrole">Create new role</a>
+    <dd>go here to add a new role.
+    <dt><a href="addaction">Create new action</a>
+    <dd>go here to add a new action.
     </dl>
     """
 
     return index(req=req,
-                 title='Action Administration',
-                 subtitle='administration with actions as access point',
-                 body=[output, extra],
-                 adminarea=2)
+                title='Action Administration',
+                subtitle='administration with actions as access point',
+                body=[output, extra],
+                adminarea=2)
 
 
 def perform_userarea(req, email_user_pattern=''):
@@ -236,21 +276,23 @@ def perform_userarea(req, email_user_pattern=''):
 
     output = """
     <p>
-     search for users to display.
+    search for users to display.
     </p> """
 
     # remove letters not allowed in an email
     email_user_pattern = cleanstring_email(email_user_pattern)
 
     text  = ' <span class="adminlabel">1. search for user</span>\n'
-    text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
+    text += ' <input class="admin_wvar" type="text" name="email_user_pattern"'\
+        ' value="%s" />\n' % (email_user_pattern, )
 
     output += createhiddenform(action="userarea",
-                               text=text,
-                               button="search for users")
+                            text=text,
+                            button="search for users")
 
     if email_user_pattern:
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email LIMIT %s""" % (email_user_pattern, MAXPAGEUSERS+1))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' '
+            'ORDER BY email LIMIT %s""" % (email_user_pattern, MAXPAGEUSERS+1))
 
         if not users1:
             output += '<p>no matching users</p>'
@@ -261,23 +303,30 @@ def perform_userarea(req, email_user_pattern=''):
             for (id, email) in users1[:MAXPAGEUSERS]:
                 users.append([id, email])
                 for col in [(('add', 'addroleuser'),
-                             ('remove', 'deleteuserrole')),
+                            ('remove', 'deleteuserrole')),
                             (('show details', 'showuserdetails'), )]:
-                    users[-1].append('<a href="%s?email_user_pattern=%s&amp;id_user=%s">%s</a>' % (col[0][1], email_user_pattern, id, col[0][0]))
+                    users[-1].append('<a href="%s?email_user_pattern=%s&amp;'
+                        'id_user=%s">%s</a>' % (col[0][1],
+                        email_user_pattern, id, col[0][0]))
                     for (str, function) in col[1:]:
-                        users[-1][-1] += ' / <a href="%s?email_user_pattern=%s&amp;id_user=%s&amp;reverse=1">%s</a>' % (function, email_user_pattern, id, str)
+                        users[-1][-1] += ' / <a href="%s?email_user_pattern' \
+                            '=%s&amp;id_user=%s&amp;reverse=1">%s</a>' % \
+                            (function, email_user_pattern, id, str)
 
-            output += '<p>found <strong>%s</strong> matching users:</p>' % (len(users1), )
-            output += tupletotable(header=['id', 'email', 'roles', ''], tuple=users)
+            output += '<p>found <strong>%s</strong> matching users:</p>' % \
+                (len(users1), )
+            output += tupletotable(header=['id', 'email', 'roles', ''],
+                tuple=users)
 
             if len(users1) > MAXPAGEUSERS:
-                output += '<p><strong>only showing the first %s users, narrow your search...</strong></p>' % (MAXPAGEUSERS, )
+                output += '<p><strong>only showing the first %s users, ' \
+                    'narrow your search...</strong></p>' % (MAXPAGEUSERS, )
 
     return index(req=req,
-                 title='User Administration',
-                 subtitle=subtitle,
-                 body=[output],
-                 adminarea=2)
+                title='User Administration',
+                subtitle=subtitle,
+                body=[output],
+                adminarea=2)
 
 
 def perform_resetarea(req):
@@ -288,19 +337,19 @@ def perform_resetarea(req):
 
     output = """
     <dl>
-     <dt><a href="resetdefaultsettings">Reset to Default Authorizations</a>
-     <dd>remove all changes that has been done to the roles and <br>
-     add only the default authorization settings.
-     <dt><a href="adddefaultsettings">Add Default Authorizations</a>
-     <dd>keep all changes and add the default authorization settings.
+    <dt><a href="resetdefaultsettings">Reset to Default Authorizations</a>
+    <dd>remove all changes that has been done to the roles and <br>
+    add only the default authorization settings.
+    <dt><a href="adddefaultsettings">Add Default Authorizations</a>
+    <dd>keep all changes and add the default authorization settings.
     </dl>
     """
 
     return index(req=req,
-                 title='Reset Authorizations',
-                 subtitle='reseting to or adding default authorizations',
-                 body=[output],
-                 adminarea=2)
+                title='Reset Authorizations',
+                subtitle='reseting to or adding default authorizations',
+                body=[output],
+                adminarea=2)
 
 
 def perform_resetdefaultsettings(req, superusers=[], confirm=0):
@@ -321,11 +370,11 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
     # instructions
     output  = """
     <p>
-     before you reset the settings, we need some users<br>
-     to connect to <strong>%s</strong>.<br>
-     enter as many e-mail addresses you want and press <strong>reset</strong>.<br>
-     <strong>confirm reset settings</strong> when you have added enough e-mails.<br>
-     <strong>%s</strong> is added as default.
+    before you reset the settings, we need some users<br>
+    to connect to <strong>%s</strong>.<br>
+    enter as many e-mail addresses you want and press <strong>reset</strong>.<br>
+    <strong>confirm reset settings</strong> when you have added enough e-mails.<br>
+    <strong>%s</strong> is added as default.
     </p>""" % (SUPERADMINROLE, supportemail)
 
     # add more superusers
@@ -337,9 +386,9 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
         output += '      <input type="hidden" name="superusers" value="%s" />' % (email, )
 
     output += """
-     <span class="adminlabel">e-mail</span>
-     <input class="admin_wvar" type="text" name="superusers" />
-     <input class="adminbutton" type="submit" value="add e-mail" />
+    <span class="adminlabel">e-mail</span>
+    <input class="admin_wvar" type="text" name="superusers" />
+    <input class="adminbutton" type="submit" value="add e-mail" />
     </form>"""
 
 
@@ -347,8 +396,8 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
         # remove emails
         output += """
         <form action="resetdefaultsettings" method="POST">
-         have you entered wrong data?
-         <input class="adminbutton" type="submit" value="remove all e-mails" />
+        have you entered wrong data?
+        <input class="adminbutton" type="submit" value="remove all e-mails" />
         </form>
         """
 
@@ -364,10 +413,10 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
 
         output += '<p><strong>reset default settings</strong> with the users below? </p>'
         output += tupletotable(header=['e-mail address'],
-                               tuple=superusers,
-                               start=start,
-                               extracolumn=extra,
-                               end=end)
+                            tuple=superusers,
+                            start=start,
+                            extracolumn=extra,
+                            end=end)
 
         if confirm in [1, "1"]:
             res = acca.acc_reset_default_settings(superusers)
@@ -377,10 +426,10 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
                 output += '<p>sorry, could not reset default settings</p>'
 
     return index(req=req,
-                 title='Reset Default Settings',
-                 subtitle='reset settings',
-                 body=[output],
-                 adminarea=6)
+                title='Reset Default Settings',
+                subtitle='reset settings',
+                body=[output],
+                adminarea=6)
 
 
 def perform_adddefaultsettings(req, superusers=[], confirm=0):
@@ -400,11 +449,11 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
     # instructions
     output  = """
     <p>
-     before you add the settings, we need some users<br>
-     to connect to <strong>%s</strong>.<br>
-     enter as many e-mail addresses you want and press <strong>add</strong>.<br>
-     <strong>confirm add settings</strong> when you have added enough e-mails.<br>
-     <strong>%s</strong> is added as default.
+    before you add the settings, we need some users<br>
+    to connect to <strong>%s</strong>.<br>
+    enter as many e-mail addresses you want and press <strong>add</strong>.<br>
+    <strong>confirm add settings</strong> when you have added enough e-mails.<br>
+    <strong>%s</strong> is added as default.
     </p>""" % (SUPERADMINROLE, supportemail)
 
     # add more superusers
@@ -416,9 +465,9 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
         output += '      <input type="hidden" name="superusers" value="%s" />' % (email, )
 
     output += """
-     <span class="adminlabel">e-mail</span>
-     <input class="admin_wvar" type="text" name="superusers" />
-     <input class="adminbutton" type="submit" value="add e-mail" />
+    <span class="adminlabel">e-mail</span>
+    <input class="admin_wvar" type="text" name="superusers" />
+    <input class="adminbutton" type="submit" value="add e-mail" />
     </form>
     """
 
@@ -426,8 +475,8 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
         # remove emails
         output += """
         <form action="adddefaultsettings" method="POST">
-         have you entered wrong data?
-         <input class="adminbutton" type="submit" value="remove all e-mails" />
+        have you entered wrong data?
+        <input class="adminbutton" type="submit" value="remove all e-mails" />
         </form>
         """
 
@@ -443,10 +492,10 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
 
         output += '<p><strong>add default settings</strong> with the users below? </p>'
         output += tupletotable(header=['e-mail address'],
-                               tuple=superusers,
-                               start=start,
-                               extracolumn=extra,
-                               end=end)
+                            tuple=superusers,
+                            start=start,
+                            extracolumn=extra,
+                            end=end)
 
         if confirm in [1, "1"]:
             res = acca.acc_add_default_settings(superusers)
@@ -456,10 +505,10 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
                 output += '<p>sorry, could not add default settings</p>'
 
     return index(req=req,
-                 title='Add Default Settings',
-                 subtitle='add settings',
-                 body=[output],
-                 adminarea=6)
+                title='Add Default Settings',
+                subtitle='add settings',
+                body=[output],
+                adminarea=6)
 
 def perform_manageaccounts(req, mtype='', content='', confirm=0):
     """start area for managing accounts."""
@@ -515,11 +564,11 @@ td>
         fin_output += "<br>"
 
     return index(req=req,
-                 title='Manage Accounts',
-                 subtitle=subtitle,
-                 body=[fin_output],
-                 adminarea=0,
-                 authorized=1)
+                title='Manage Accounts',
+                subtitle=subtitle,
+                body=[fin_output],
+                adminarea=0,
+                authorized=1)
 
 def perform_accesspolicy(req, callback='yes', confirm=0):
     """Modify default behaviour of a guest user or if new accounts should automatically/manually be modified."""
@@ -700,11 +749,11 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
             text = """<b><span class="info">The selected accounts does not exist, please go back and select an account to edit.</span></b>"""
 
         return index(req=req,
-                 title='Edit Account',
-                 subtitle="Edit account",
-                 body=[text],
-                 adminarea=7,
-                 authorized=1)
+                title='Edit Account',
+                subtitle="Edit account",
+                body=[text],
+                adminarea=7,
+                authorized=1)
 
     fin_output = """
     <table>
@@ -747,11 +796,11 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
         fin_output += perform_deleteaccount(req, userID, callback='')
 
     return index(req=req,
-                 title='Edit Account',
-                 subtitle="Edit account '%s'" % res[0][1],
-                 body=[fin_output],
-                 adminarea=7,
-                 authorized=1)
+                title='Edit Account',
+                subtitle="Edit account '%s'" % res[0][1],
+                body=[fin_output],
+                adminarea=7,
+                authorized=1)
 
 # Disabled because not secure and maybe not needed.
 #def perform_modifybasket(req, userID, callback='yes', confirm=0):
@@ -767,11 +816,11 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     #if res:
         #text = """To modify the baskets for this account, you have to login as the user."""
         #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
-                                   #text=text,
-                                   #p_email=res[0][1],
-                                   #p_pw=res[0][2],
-                                   #referer="%s/yourbaskets/display" % weburl,
-                                   #button="Login")
+                                #text=text,
+                                #p_email=res[0][1],
+                                #p_pw=res[0][2],
+                                #referer="%s/yourbaskets/display" % weburl,
+                                #button="Login")
         #output += "Remember that you will be logged out as the current user."
 
         ##baskets = run_sql("SELECT basket.id, basket.name, basket.public FROM basket, user_basket WHERE id_user=%s and user_basket.id_basket=basket.id" % userID)
@@ -816,10 +865,10 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
         text += ' <input class="admin_wvar" type="text" name="password" value="%s" /><br>' % (password, )
 
         output += createhiddenform(action="modifylogindata",
-                                   text=text,
-                                   userID=userID,
-                                   confirm=1,
-                                   button="Modify")
+                                text=text,
+                                userID=userID,
+                                confirm=1,
+                                button="Modify")
         if confirm in [1, "1"] and email and email_valid_p(email):
             res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
             res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
@@ -850,20 +899,20 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
     #if res:
         #text = """To modify the alerts for this account, you have to login as the user."""
         #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
-                                   #text=text,
-                                   #p_email=res[0][1],
-                                   #p_pw=res[0][2],
-                                   #referer="%s/youralerts/display" % weburl,
-                                   #button="Login")
+                                #text=text,
+                                #p_email=res[0][1],
+                                #p_pw=res[0][2],
+                                #referer="%s/youralerts/display" % weburl,
+                                #button="Login")
         #output += "Remember that you will be logged out as the current user."
 
         #res = """ SELECT q.id, q.urlargs, a.id_basket,
-                 #a.alert_name, a.frequency, a.notification,
-                 #DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
-                 #DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
-                 #FROM query q, user_query_basket a
-                 #WHERE a.id_user='%s' AND a.id_query=q.id
-                 #ORDER BY a.alert_name ASC """ % userID
+                #a.alert_name, a.frequency, a.notification,
+                #DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
+                #DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
+                #FROM query q, user_query_basket a
+                #WHERE a.id_user='%s' AND a.id_query=q.id
+                #ORDER BY a.alert_name ASC """ % userID
         ##res = run_sql(res)
         ##for (qID, qurlargs,  id_basket, alertname, frequency, notification, date_creation, date_lastrun) in res:
         ##    output += "%s - %s - %s - %s - %s - %s - %s<br>" % (qID,  id_basket, alertname, frequency, notification, date_creation, date_lastrun)
@@ -903,10 +952,10 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
 
 
         output += createhiddenform(action="modifypreferences",
-                                   text=text,
-                                   confirm=1,
-                                   userID=userID,
-                                   button="Select")
+                                text=text,
+                                confirm=1,
+                                userID=userID,
+                                button="Select")
 
         if confirm in [1, "1"]:
             if login_method:
@@ -937,10 +986,10 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
         if confirm in [0, "0"]:
             text = '<b><span class="important">Are you sure you want to delete the account with email: "%s"?</span></b>' % res[0][1]
             output += createhiddenform(action="deleteaccount",
-                                       text=text,
-                       userID=userID,
-                                       confirm=1,
-                                       button="Delete")
+                                    text=text,
+                    userID=userID,
+                                    confirm=1,
+                                    button="Delete")
 
         elif confirm in [1, "1"]:
             res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
@@ -1032,8 +1081,8 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
     </select><br>""" % ((maxpage==25 and "selected" or ""), (maxpage==50 and "selected" or ""), (maxpage==100 and "selected" or ""), (maxpage==250 and "selected" or ""), (maxpage==500 and "selected" or ""), (maxpage==1000 and "selected" or ""))
 
     output += createhiddenform(action="modifyaccounts",
-                               text=text,
-                               button="search for accounts")
+                            text=text,
+                            button="search for accounts")
 
     if limit_to not in [-1, "-1"] and maxpage:
         users1 = "SELECT id,email,note FROM user WHERE "
@@ -1095,9 +1144,9 @@ def perform_delegate_startarea(req):
     uid = getUid(req)
     if isGuestUser(uid):
         return index(req=req,
-                     title='Delegate Rights',
-                     adminarea=0,
-                     authorized=0)
+                    title='Delegate Rights',
+                    adminarea=0,
+                    authorized=0)
 
     subtitle = 'select what to do'
 
@@ -1106,41 +1155,41 @@ def perform_delegate_startarea(req):
     if is_adminuser(req)[0] == 0:
         output += """
         <p>
-         You are also allowed to be in the <a href="../webaccessadmin.py">Main Admin Area</a> which gives you<br>
-         the access to the full functionality of WebAccess.
+        You are also allowed to be in the <a href="../webaccessadmin.py">Main Admin Area</a> which gives you<br>
+        the access to the full functionality of WebAccess.
         </p>
         """
 
     output += """
     <dl>
-     <dt><a href="delegate_adduserrole">Connect users to roles</a></dt>
-     <dd>add users to the roles you have delegation rights to.</dd>
-     <dt><a href="delegate_deleteuserrole">Remove users from roles</a></dt>
-     <dd>remove users from the roles you have delegation rights to.</dd>
+    <dt><a href="delegate_adduserrole">Connect users to roles</a></dt>
+    <dd>add users to the roles you have delegation rights to.</dd>
+    <dt><a href="delegate_deleteuserrole">Remove users from roles</a></dt>
+    <dd>remove users from the roles you have delegation rights to.</dd>
     </dl>
     <dl>
-     <dt><a href="delegate_adminsetup">Set up delegation rights</a></dt>
-     <dd>specialized area to set up the delegation rights used in the areas above. <br>
-         you need to be a web administrator to access the area.</dd>
+    <dt><a href="delegate_adminsetup">Set up delegation rights</a></dt>
+    <dd>specialized area to set up the delegation rights used in the areas above. <br>
+        you need to be a web administrator to access the area.</dd>
     </dl>
     """
 
     return index(req=req,
-                 title='Delegate Rights',
-                 subtitle=subtitle,
-                 body=[output],
-                 adminarea=0,
-                 authorized=1)
+                title='Delegate Rights',
+                subtitle=subtitle,
+                body=[output],
+                adminarea=0,
+                authorized=1)
 
 
 def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confirm=0):
     """lets the webadmins set up the delegation rights for the other roles
 
-       id_role_admin - the role to be given delegation rights
+    id_role_admin - the role to be given delegation rights
 
     id_role_delegate - the role over which the delegation rights are given
 
-             confirm - make the connection happen """
+            confirm - make the connection happen """
 
     subtitle = 'step 1 - select admin role'
 
@@ -1148,22 +1197,22 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
 
     output = """
     <p>
-     This is a specialized area to handle a task that also can be handled<br>
-     from the &quot;add authorization&quot; interface.
+    This is a specialized area to handle a task that also can be handled<br>
+    from the &quot;add authorization&quot; interface.
     </p>
     <p>
-     By handling the delegation rights here you get the advantage of<br>
-     not having to select the correct action <i>(%s)</i> or<br>
-     remembering the names of available roles.
+    By handling the delegation rights here you get the advantage of<br>
+    not having to select the correct action <i>(%s)</i> or<br>
+    remembering the names of available roles.
     </p>
     """ % (DELEGATEADDUSERROLE, )
 
     output += createroleselect(id_role=id_role_admin,
-                              step=1,
-                              button='select admin role',
-                              name='id_role_admin',
-                              action='delegate_adminsetup',
-                              roles=admin_roles)
+                            step=1,
+                            button='select admin role',
+                            name='id_role_admin',
+                            action='delegate_adminsetup',
+                            roles=admin_roles)
 
     if str(id_role_admin) != '0':
         subtitle = 'step 2 - select delegate role'
@@ -1190,9 +1239,9 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
 
             extra = """
             <dl>
-             <dt><a href="modifyauthorizations?id_role=%s&amp;id_action=%s">Remove delegated roles</a></dt>
-             <dd>use the standard administration area to remove delegation rights
-                 you no longer want to be available.</dd>
+            <dt><a href="modifyauthorizations?id_role=%s&amp;id_action=%s">Remove delegated roles</a></dt>
+            <dd>use the standard administration area to remove delegation rights
+                you no longer want to be available.</dd>
             </dl>
             """ % (id_role_admin, acca.acc_get_action_id(name_action=DELEGATEADDUSERROLE))
 
@@ -1200,12 +1249,12 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
             output += '<p>no previously selected roles.</p>'
 
         output += createroleselect(id_role=id_role_delegate,
-                                   step=2,
-                                   button='select delegate role',
-                                   name='id_role_delegate',
-                                   action='delegate_adminsetup',
-                                   roles=delegate_roles,
-                                   id_role_admin=id_role_admin)
+                                step=2,
+                                button='select delegate role',
+                                name='id_role_delegate',
+                                action='delegate_adminsetup',
+                                roles=delegate_roles,
+                                id_role_admin=id_role_admin)
 
         if str(id_role_delegate) != '0':
             subtitle = 'step 3 - confirm to add delegation right'
@@ -1214,14 +1263,14 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
 
             output += """
             <p>
-             <span class="warning"><strong>Warning:</strong> don't hand out delegation rights that can harm the system (e.g. delegating superrole).</span>
+            <span class="warning"><strong>Warning:</strong> don't hand out delegation rights that can harm the system (e.g. delegating superrole).</span>
             </p> """
 
             output += createhiddenform(action="delegate_adminsetup",
-                                       text='let role <strong>%s</strong> delegate rights over role <strong>%s</strong>?' % (name_role_admin, name_role_delegate),
-                                       id_role_admin=id_role_admin,
-                                       id_role_delegate=id_role_delegate,
-                                       confirm=1)
+                                    text='let role <strong>%s</strong> delegate rights over role <strong>%s</strong>?' % (name_role_admin, name_role_delegate),
+                                    id_role_admin=id_role_admin,
+                                    id_role_delegate=id_role_delegate,
+                                    confirm=1)
 
             if int(confirm):
                 subtitle = 'step 4 - confirm delegation right added'
@@ -1231,9 +1280,9 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
                 #                                              optional=0,
                 #                                              role=name_role_delegate)
                 res1 = acca.acc_add_authorization(name_role=name_role_admin,
-                                                 name_action=DELEGATEADDUSERROLE,
-                                                 optional=0,
-                                                 role=name_role_delegate)
+                                                name_action=DELEGATEADDUSERROLE,
+                                                optional=0,
+                                                role=name_role_delegate)
 
                 if res1:
                     output += '<p>confirm: role <strong>%s</strong> delegates role <strong>%s</strong>.' % (name_role_admin, name_role_delegate)
@@ -1245,10 +1294,10 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
     except NameError: body = [output]
 
     return index(req=req,
-                 title='Delegate Rights',
-                 subtitle=subtitle,
-                 body=body,
-                 adminarea=1)
+                title='Delegate Rights',
+                subtitle=subtitle,
+                body=body,
+                adminarea=1)
 
 
 def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=0, confirm=0):
@@ -1279,8 +1328,8 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
         subtitle = 'no delegation rights'
         output += """
         <p>
-         You do not have the delegation rights over any roles.<br>
-         If you think you should have such rights, contact a WebAccess Administrator.
+        You do not have the delegation rights over any roles.<br>
+        If you think you should have such rights, contact a WebAccess Administrator.
         </p>"""
         extra = ''
     else:
@@ -1288,15 +1337,15 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
 
         output += """
         <p>
-         Lower level delegation of access rights to roles.<br>
-         An administrator with all rights have to give you these rights.
+        Lower level delegation of access rights to roles.<br>
+        An administrator with all rights have to give you these rights.
         </p>"""
 
         email_out = acca.acc_get_user_email(id_user=id_user)
         name_role = acca.acc_get_role_name(id_role=id_role)
 
         output += createroleselect(id_role=id_role, step=1, name='id_role',
-                                   action='delegate_adduserrole', roles=allowed_roles)
+                                action='delegate_adduserrole', roles=allowed_roles)
 
         if str(id_role) != '0' and str(id_role) in allowed_id_roles:
             subtitle = 'step 2 - search for users'
@@ -1308,9 +1357,9 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
             output += createhiddenform(action="delegate_adduserrole",
-                                       text=text,
-                                       button="search for users",
-                                       id_role=id_role)
+                                    text=text,
+                                    button="search for users",
+                                    id_role=id_role)
 
             # pattern is entered
             if email_user_pattern:
@@ -1341,13 +1390,13 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
                         extrausers.append([-id, email,''])
 
                     output += createuserselect(id_user=id_user,
-                                               action="delegate_adduserrole",
-                                               step=3,
-                                               users=users,
-                                               extrausers=extrausers,
-                                               button="add this user",
-                                               id_role=id_role,
-                                               email_user_pattern=email_user_pattern)
+                                            action="delegate_adduserrole",
+                                            step=3,
+                                            users=users,
+                                            extrausers=extrausers,
+                                            button="add this user",
+                                            id_role=id_role,
+                                            email_user_pattern=email_user_pattern)
 
                     try: id_user = int(id_user)
                     except ValueError: pass
@@ -1359,11 +1408,11 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
                         subtitle = "step 4 - confirm to add user"
 
                         output += createhiddenform(action="delegate_adduserrole",
-                                                   text='add user <strong>%s</strong> to role <strong>%s</strong>?' % (email_out, name_role),
-                                                   id_role=id_role,
-                                                   email_user_pattern=email_user_pattern,
-                                                   id_user=id_user,
-                                                   confirm=1)
+                                                text='add user <strong>%s</strong> to role <strong>%s</strong>?' % (email_out, name_role),
+                                                id_role=id_role,
+                                                email_user_pattern=email_user_pattern,
+                                                id_user=id_user,
+                                                confirm=1)
 
                         # it is confirmed that this user should be added
                         if confirm:
@@ -1379,17 +1428,17 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
 
         extra = """
         <dl>
-         <dt><a href="delegate_deleteuserrole?id_role=%s">Remove users from role</a></dt>
-         <dd>remove users from the roles you have delegating rights to.</dd>
+        <dt><a href="delegate_deleteuserrole?id_role=%s">Remove users from role</a></dt>
+        <dd>remove users from the roles you have delegating rights to.</dd>
         </dl>
         """ % (id_role, )
 
     return index(req=req,
-                 title='Connect users to roles',
-                 subtitle=subtitle,
-                 body=[output, extra],
-                 adminarea=1,
-                 authorized=1)
+                title='Connect users to roles',
+                subtitle=subtitle,
+                body=[output, extra],
+                adminarea=1,
+                authorized=1)
 
 
 def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
@@ -1416,8 +1465,8 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
         subtitle = 'no delegation rights'
         output += """
         <p>
-         You do not have the delegation rights over any roles.<br>
-         If you think you should have such rights, contact a WebAccess Administrator.
+        You do not have the delegation rights over any roles.<br>
+        If you think you should have such rights, contact a WebAccess Administrator.
         </p>"""
         extra = ''
     else:
@@ -1425,8 +1474,8 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
 
         output += """
         <p>
-         Lower level delegation of access rights to roles.<br>
-         An administrator with all rights have to give you these rights.
+        Lower level delegation of access rights to roles.<br>
+        An administrator with all rights have to give you these rights.
         </p>"""
 
         email_out = acca.acc_get_user_email(id_user=id_user)
@@ -1442,7 +1491,7 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
                 allowed_id_roles.append(str(id_role_help))
 
         output += createroleselect(id_role=id_role, step=1,
-                                   action='delegate_deleteuserrole', roles=allowed_roles)
+                                action='delegate_deleteuserrole', roles=allowed_roles)
 
         if str(id_role) != '0' and str(id_role) in allowed_id_roles:
             subtitle = 'step 2 - select user'
@@ -1450,21 +1499,21 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
             users = acca.acc_get_role_users(id_role)
 
             output += createuserselect(id_user=id_user,
-                                       step=2,
-                                       action='delegate_deleteuserrole',
-                                       users=users,
-                                       id_role=id_role)
+                                    step=2,
+                                    action='delegate_deleteuserrole',
+                                    users=users,
+                                    id_role=id_role)
 
             if str(id_user) != '0':
                 subtitle = 'step 3 - confirm delete of user'
                 email_user = acca.acc_get_user_email(id_user=id_user)
 
                 output += createhiddenform(action="delegate_deleteuserrole",
-                                           text='delete user %s from %s?'
-                                           % (headerstrong(user=id_user), headerstrong(role=id_role)),
-                                           id_role=id_role,
-                                           id_user=id_user,
-                                           confirm=1)
+                                        text='delete user %s from %s?'
+                                        % (headerstrong(user=id_user), headerstrong(role=id_role)),
+                                        id_role=id_role,
+                                        id_user=id_user,
+                                        confirm=1)
 
                 if confirm:
                     res = acca.acc_delete_user_role(id_user=id_user, id_role=id_role)
@@ -1477,17 +1526,17 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
 
         extra = """
         <dl>
-         <dt><a href="delegate_adduserrole?id_role=%s">Connect users to role</a></dt>
-         <dd>add users to the roles you have delegating rights to.</dd>
+        <dt><a href="delegate_adduserrole?id_role=%s">Connect users to role</a></dt>
+        <dd>add users to the roles you have delegating rights to.</dd>
         </dl>
         """ % (id_role, )
 
     return index(req=req,
-                 title='Remove users from roles',
-                 subtitle=subtitle,
-                 body=[output, extra],
-                 adminarea=1,
-                 authorized=1)
+                title='Remove users from roles',
+                subtitle=subtitle,
+                body=[output, extra],
+                adminarea=1,
+                authorized=1)
 
 
 def perform_addaction(req, name_action='', arguments='', optional='no', description='put description here.', confirm=0):
@@ -1495,7 +1544,7 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
 
     name_action - name of the new action
 
-      arguments - allowedkeywords, separated by whitespace
+    arguments - allowedkeywords, separated by whitespace
 
     description - optional description of the action"""
 
@@ -1510,19 +1559,19 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
 
     output  = """
     <form action="addaction" method="POST">
-     <span class="adminlabel">action name </span>
-     <input class="admin_wvar" type="text" name="name_action" value="%s" /> <br>
-     <span class="adminlabel">arguments </span>
-     <input class="admin_wvar" type="text" name="arguments" value="%s" />
-     <small>keywords for arguments, separate with comma, no whitespace.</small> <br>
-     <span class="adminlabel">optional arguments</span>
-     <select name="optional" class="admin_w200">
-      <option value="no" selected="selected">no, not allowed</option>
-      <option value="yes" %s>yes, allowed</option>
-     </select><br>
-     <span class="adminlabel">description </span>
-     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
-     <input class="adminbutton" type="submit" value="add action" />
+    <span class="adminlabel">action name </span>
+    <input class="admin_wvar" type="text" name="name_action" value="%s" /> <br>
+    <span class="adminlabel">arguments </span>
+    <input class="admin_wvar" type="text" name="arguments" value="%s" />
+    <small>keywords for arguments, separate with comma, no whitespace.</small> <br>
+    <span class="adminlabel">optional arguments</span>
+    <select name="optional" class="admin_w200">
+    <option value="no" selected="selected">no, not allowed</option>
+    <option value="yes" %s>yes, allowed</option>
+    </select><br>
+    <span class="adminlabel">description </span>
+    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
+    <input class="adminbutton" type="submit" value="add action" />
     </form>
     """ % (name_action, arguments, optional == 'yes' and 'selected="selected"' or '', description)
 
@@ -1549,12 +1598,12 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
             else: text += '?\n'
 
         output += createhiddenform(action="addaction",
-                                   text=text,
-                                   name_action=name_action,
-                                   arguments=arguments,
-                                   optional=optional,
-                                   description=description,
-                                   confirm=1)
+                                text=text,
+                                name_action=name_action,
+                                arguments=arguments,
+                                optional=optional,
+                                description=description,
+                                confirm=1)
 
         if confirm not in ["0", 0]:
             arguments = arguments.split(',')
@@ -1567,25 +1616,25 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
                 subtitle = 'step 3 - action added'
                 output += '<p>action added:</p>'
                 output += tupletotable(header=['id', 'action name', 'description', 'allowedkeywords', 'optional'],
-                                      tuple=[result])
+                                    tuple=[result])
             else:
                 subtitle = 'step 3 - action could not be added'
                 output += '<p>sorry, could not add action, <br>action with the same name probably exists.</p>'
 
             extra = """
             <dl>
-             <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
-             <dd>start adding new authorizations to action %s.</dd>
+            <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
+            <dd>start adding new authorizations to action %s.</dd>
             </dl> """ % (acca.acc_get_action_id(name_action=name_action), name_action)
 
     try: body = [output, extra]
     except NameError: body = [output]
 
     return index(req=req,
-                 title=title,
-                 body=body,
-                 subtitle=subtitle,
-                 adminarea=4)
+                title=title,
+                body=body,
+                subtitle=subtitle,
+                adminarea=4)
 
 
 def perform_deleteaction(req, id_action="0", confirm=0):
@@ -1613,16 +1662,16 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
         if acca.acc_get_action_roles(id_action=id_action):
             output += createhiddenform(action="deleteroleaction",
-                                       text="""rather delete only connection between action %s
-                                       and a selected role?""" % (name_action, ),
-                                       id_action=id_action,
-                                       reverse=1,
-                                       button='go there')
+                                    text="""rather delete only connection between action %s
+                                    and a selected role?""" % (name_action, ),
+                                    id_action=id_action,
+                                    reverse=1,
+                                    button='go there')
 
         output += createhiddenform(action="deleteaction",
-                                   text=' delete action <strong>%s</strong> and all connections?' % (name_action, ),
-                                   confirm=1,
-                                   id_action=id_action)
+                                text=' delete action <strong>%s</strong> and all connections?' % (name_action, ),
+                                confirm=1,
+                                id_action=id_action)
 
         if confirm:
             subtitle = 'step 3 - confirm delete of action'
@@ -1636,10 +1685,10 @@ def perform_deleteaction(req, id_action="0", confirm=0):
         output += '<p>the action has been deleted...</p>'
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=[output],
-                 adminarea=4)
+                title=title,
+                subtitle=subtitle,
+                body=[output],
+                adminarea=4)
 
 
 def perform_showactiondetails(req, id_action):
@@ -1659,12 +1708,12 @@ def perform_showactiondetails(req, id_action):
 
         extra = """
         <dl>
-         <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add new authorization</a></dt>
-         <dd>add an authorization.</dd>
-         <dt><a href="modifyauthorizations?id_action=%s&amp;reverse=1">Modify authorizations</a></dt>
-         <dd>modify existing authorizations.</dd>
-         <dt><a href="deleteroleaction?id_action=%s&amp;reverse=1">Remove role</a></dt>
-         <dd>remove all authorizations from action and a role.</dd>
+        <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add new authorization</a></dt>
+        <dd>add an authorization.</dd>
+        <dt><a href="modifyauthorizations?id_action=%s&amp;reverse=1">Modify authorizations</a></dt>
+        <dd>modify existing authorizations.</dd>
+        <dt><a href="deleteroleaction?id_action=%s&amp;reverse=1">Remove role</a></dt>
+        <dd>remove all authorizations from action and a role.</dd>
         </dl>
         """ % (id_action, id_action, id_action)
         body = [output, extra]
@@ -1674,10 +1723,10 @@ def perform_showactiondetails(req, id_action):
         body = [output]
 
     return index(req=req,
-                 title='Show Action Details',
-                 subtitle='show action details',
-                 body=body,
-                 adminarea=4)
+                title='Show Action Details',
+                subtitle='show action details',
+                body=body,
+                adminarea=4)
 
 
 def actiondetails(id_action=0):
@@ -1690,16 +1739,16 @@ def actiondetails(id_action=0):
 
         output += '<p>action details:</p>'
         output += tupletotable(header=['id', 'name', 'description', 'allowedkeywords', 'optional'],
-                               tuple=[acca.acc_get_action_details(id_action=id_action)])
+                            tuple=[acca.acc_get_action_details(id_action=id_action)])
 
         roleshlp = acca.acc_get_action_roles(id_action=id_action)
         if roleshlp:
             roles = []
             for (id, name, dummy) in roleshlp:
                 roles.append([id, name,
-                              '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>'
-                              % (id, id_action),
-                              '<a href="showroleusers?id_role=%s">show connected users</a>' % (id, )])
+                            '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>'
+                            % (id, id_action),
+                            '<a href="showroleusers?id_role=%s">show connected users</a>' % (id, )])
             roletable = tupletotable(header=['id', 'name', '', ''], tuple=roles)
 
             output += '<p>roles connected to %s:</p>\n' % (headerstrong(action=name_action, query=0), )
@@ -1717,7 +1766,7 @@ def actiondetails(id_action=0):
 def perform_addrole(req, id_role=0, name_role='', description='put description here.', firerole_def_src=CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, confirm=0):
     """form to add a new role with these values:
 
-      name_role - name of the new role
+    name_role - name of the new role
 
     description - optional description of the role """
 
@@ -1731,21 +1780,21 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
 
     output = """
     <form action="addrole" method="POST">
-     <table><tbody><tr><td align='right' valign='top'>
-     <span class="adminlabel">role name </span>
-     </td><td>
-     <input class="admin_wvar" type="text" name="name_role" value="%s" />
-     </td></tr><tr><td align='right' valign='top'>
-     <span class="adminlabel">description </span>
-     </td><td>
-     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
-     </td></tr><tr><td align='right' valign='top'>
-     <span class="adminlabel">firewall like role definition [<a href="/admin/webaccess/firerole.html">?</a>]</span>
-     </td><td>
-     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea>
-     </td></tr><tr><td></td><td>
-     <input class="adminbutton" type="submit" value="add role" />
-     </td></tr></tbody></table>
+    <table><tbody><tr><td align='right' valign='top'>
+    <span class="adminlabel">role name </span>
+    </td><td>
+    <input class="admin_wvar" type="text" name="name_role" value="%s" />
+    </td></tr><tr><td align='right' valign='top'>
+    <span class="adminlabel">description </span>
+    </td><td>
+    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
+    </td></tr><tr><td align='right' valign='top'>
+    <span class="adminlabel">firewall like role definition [<a href="/admin/webaccess/firerole.html">?</a>]</span>
+    </td><td>
+    <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea>
+    </td></tr><tr><td></td><td>
+    <input class="adminbutton" type="submit" value="add role" />
+    </td></tr></tbody></table>
     </form>
     """ % (escape(name_role, '"'), escape(description),  escape(firerole_def_src))
 
@@ -1805,15 +1854,15 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
     except NameError: body = [output]
 
     return index(req=req,
-                 title=title,
-                 body=body,
-                 subtitle=subtitle,
-                 adminarea=3)
+                title=title,
+                body=body,
+                subtitle=subtitle,
+                adminarea=3)
 
 def perform_modifyrole(req, id_role='0', name_role='', description='put description here.', firerole_def_src='', modified='0', confirm=0):
     """form to add a new role with these values:
 
-      name_role - name of the role to be changed
+    name_role - name of the role to be changed
 
     description - optional description of the role
 
@@ -1839,23 +1888,23 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
 
     output = """
     <form action="modifyrole" method="POST">
-     <table><tbody><tr><td align='right' valign='top'>
-     <input type="hidden" name="id_role" value="%s" />
-     <span class="adminlabel">role name </span>
-     </td><td>
-     <input class="admin_wvar" type="text" name="name_role" value="%s" /> <br />
-     </td></tr><tr><td align='right' valign='top'>
-     <span class="adminlabel">description </span>
-     </td><td>
-     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea> <br />
-     </td></tr><tr><td align='right' valign='top'>
-     <span class="adminlabel">firewall like role definition</span> [<a href="/admin/webaccess/firerole.html">?</a>]
-     </td><td>
-     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
-     </td></tr><tr><td></td><td>
-     <input class="adminbutton" type="submit" value="modify role" />
-     <input type="hidden" name="modified" value="1" />
-     </td></tr></tbody></table>
+    <table><tbody><tr><td align='right' valign='top'>
+    <input type="hidden" name="id_role" value="%s" />
+    <span class="adminlabel">role name </span>
+    </td><td>
+    <input class="admin_wvar" type="text" name="name_role" value="%s" /> <br />
+    </td></tr><tr><td align='right' valign='top'>
+    <span class="adminlabel">description </span>
+    </td><td>
+    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea> <br />
+    </td></tr><tr><td align='right' valign='top'>
+    <span class="adminlabel">firewall like role definition</span> [<a href="/admin/webaccess/firerole.html">?</a>]
+    </td><td>
+    <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
+    </td></tr><tr><td></td><td>
+    <input class="adminbutton" type="submit" value="modify role" />
+    <input type="hidden" name="modified" value="1" />
+    </td></tr></tbody></table>
     </form>
     """ % (id_role, escape_string(name_role), escape(description), escape(firerole_def_src))
 
@@ -1914,7 +1963,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
 def perform_deleterole(req, id_role="0", confirm=0):
     """select a role and show all connected information,
 
-      users - users that can access the role.
+    users - users that can access the role.
 
     actions - actions with possible authorizations."""
 
@@ -1926,10 +1975,10 @@ def perform_deleterole(req, id_role="0", confirm=0):
 
     name_role = acca.acc_get_role_name(id_role=id_role)
     output = createroleselect(id_role=id_role,
-                              action="deleterole",
-                              step=1,
-                              roles=acca.acc_get_all_roles(),
-                              button="delete role")
+                            action="deleterole",
+                            step=1,
+                            roles=acca.acc_get_all_roles(),
+                            button="delete role")
 
     if id_role != "0" and name_role:
         subtitle = 'step 2 - confirm delete of role'
@@ -1937,9 +1986,9 @@ def perform_deleterole(req, id_role="0", confirm=0):
         output += roledetails(id_role=id_role)
 
         output += createhiddenform(action="deleterole",
-                                   text='delete role <strong>%s</strong> and all connections?' % (name_role, ),
-                                   id_role=id_role,
-                                   confirm=1)
+                                text='delete role <strong>%s</strong> and all connections?' % (name_role, ),
+                                id_role=id_role,
+                                confirm=1)
 
         if confirm:
             res = acca.acc_delete_role(id_role=id_role)
@@ -1953,10 +2002,10 @@ def perform_deleterole(req, id_role="0", confirm=0):
         output += '<p>the role has been deleted...</p>'
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=[output],
-                 adminarea=3)
+                title=title,
+                subtitle=subtitle,
+                body=[output],
+                adminarea=3)
 
 
 def perform_showroledetails(req, id_role):
@@ -1966,10 +2015,10 @@ def perform_showroledetails(req, id_role):
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     output = createroleselect(id_role=id_role,
-                              action="showroledetails",
-                              step=1,
-                              roles=acca.acc_get_all_roles(),
-                              button="select role")
+                            action="showroledetails",
+                            step=1,
+                            roles=acca.acc_get_all_roles(),
+                            button="select role")
 
     if id_role not in [0, '0']:
         name_role = acca.acc_get_role_name(id_role=id_role)
@@ -1978,18 +2027,18 @@ def perform_showroledetails(req, id_role):
 
         extra = """
         <dl>
-         <dt><a href="modifyrole?id_role=%(id_role)s">Modify role</a><dt>
-         <dd>modify the role you are seeing</dd>
-         <dt><a href="addauthorization?id_role=%(id_role)s">Add new authorization</a></dt>
-         <dd>add an authorization.</dd>
-         <dt><a href="modifyauthorizations?id_role=%(id_role)s">Modify authorizations</a></dt>
-         <dd>modify existing authorizations.</dd>
+        <dt><a href="modifyrole?id_role=%(id_role)s">Modify role</a><dt>
+        <dd>modify the role you are seeing</dd>
+        <dt><a href="addauthorization?id_role=%(id_role)s">Add new authorization</a></dt>
+        <dd>add an authorization.</dd>
+        <dt><a href="modifyauthorizations?id_role=%(id_role)s">Modify authorizations</a></dt>
+        <dd>modify existing authorizations.</dd>
         </dl>
         <dl>
-         <dt><a href="adduserrole?id_role=%(id_role)s">Connect user</a></dt>
-         <dd>connect a user to role %(name_role)s.</dd>
-         <dt><a href="deleteuserrole?id_role=%(id_role)s">Remove user</a></dt>
-         <dd>remove a user from role %(name_role)s.</dd>
+        <dt><a href="adduserrole?id_role=%(id_role)s">Connect user</a></dt>
+        <dd>connect a user to role %(name_role)s.</dd>
+        <dt><a href="deleteuserrole?id_role=%(id_role)s">Remove user</a></dt>
+        <dd>remove a user from role %(name_role)s.</dd>
         </dl>
         """ % {'id_role' : id_role, 'name_role' : name_role}
         body = [output, extra]
@@ -1999,10 +2048,10 @@ def perform_showroledetails(req, id_role):
         body = [output]
 
     return index(req=req,
-                 title='Show Role Details',
-                 subtitle='show role details',
-                 body=body,
-                 adminarea=3)
+                title='Show Role Details',
+                subtitle='show role details',
+                body=body,
+                adminarea=3)
 
 
 def roledetails(id_role=0):
@@ -2052,11 +2101,11 @@ def roledetails(id_role=0):
 def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', confirm=0):
     """create connection between user and role.
 
-               id_role - id of the role to add user to
+            id_role - id of the role to add user to
 
     email_user_pattern - search for users using this pattern
 
-               id_user - id of user to add to the role. """
+            id_user - id of user to add to the role. """
 
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
@@ -2068,9 +2117,9 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
     subtitle = 'step 1 - select a role'
 
     output = createroleselect(id_role=id_role,
-                              action="adduserrole",
-                              step=1,
-                              roles=acca.acc_get_all_roles())
+                            action="adduserrole",
+                            step=1,
+                            roles=acca.acc_get_all_roles())
 
     # role is selected
     if id_role != "0":
@@ -2085,9 +2134,9 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
         output += createhiddenform(action="adduserrole",
-                                   text=text,
-                                   button="search for users",
-                                   id_role=id_role)
+                                text=text,
+                                button="search for users",
+                                id_role=id_role)
 
         # pattern is entered
         if email_user_pattern:
@@ -2117,13 +2166,13 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
                     extrausers.append([-user_id, email,''])
 
                 output += createuserselect(id_user=id_user,
-                                           action="adduserrole",
-                                           step=3,
-                                           users=users,
-                                           extrausers=extrausers,
-                                           button="add this user",
-                                           id_role=id_role,
-                                           email_user_pattern=email_user_pattern)
+                                        action="adduserrole",
+                                        step=3,
+                                        users=users,
+                                        extrausers=extrausers,
+                                        button="add this user",
+                                        id_role=id_role,
+                                        email_user_pattern=email_user_pattern)
 
                 try: id_user = int(id_user)
                 except ValueError: pass
@@ -2135,11 +2184,11 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
                     subtitle = "step 4 - confirm to add user"
 
                     output += createhiddenform(action="adduserrole",
-                                               text='add user <strong>%s</strong> to role <strong>%s</strong>?' % (email_out, name_role),
-                                               id_role=id_role,
-                                               email_user_pattern=email_user_pattern,
-                                               id_user=id_user,
-                                               confirm=1)
+                                            text='add user <strong>%s</strong> to role <strong>%s</strong>?' % (email_out, name_role),
+                                            id_role=id_role,
+                                            email_user_pattern=email_user_pattern,
+                                            id_user=id_user,
+                                            confirm=1)
 
                     # it is confirmed that this user should be added
                     if confirm:
@@ -2155,29 +2204,29 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a></dt>
-     <dd>go here to add a new role.</dd>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
     </dl>
     """
     if str(id_role) != "0":
         extra += """
     <dl>
-     <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
-     <dd>remove users from role %s.</dd>
-     <dt><a href="showroleusers?id_role=%s">Connected users</a></dt>
-     <dd>show all users connected to role %s.</dd>
+    <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
+    <dd>remove users from role %s.</dd>
+    <dt><a href="showroleusers?id_role=%s">Connected users</a></dt>
+    <dd>show all users connected to role %s.</dd>
     </dl>
     <dl>
-     <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
-     <dd>start adding new authorizations to role %s.</dd>
+    <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
+    <dd>start adding new authorizations to role %s.</dd>
     </dl>
     """ % (id_role, name_role, id_role, name_role, id_role, name_role)
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=[output, extra],
-                 adminarea=3)
+                title=title,
+                subtitle=subtitle,
+                body=[output, extra],
+                adminarea=3)
 
 
 def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', confirm=0):
@@ -2206,9 +2255,9 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     text += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
 
     output = createhiddenform(action='addroleuser',
-                               text=text,
-                               button='search for users',
-                               id_role=id_role)
+                            text=text,
+                            button='search for users',
+                            id_role=id_role)
 
     if email_user_pattern:
         subtitle = 'step 2 - select user'
@@ -2226,11 +2275,11 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
         # ok number of users
         else:
             output += createuserselect(id_user=id_user,
-                                       action='addroleuser',
-                                       step=2,
-                                       users=users,
-                                       button='select user',
-                                       email_user_pattern=email_user_pattern)
+                                    action='addroleuser',
+                                    step=2,
+                                    users=users,
+                                    button='select user',
+                                    email_user_pattern=email_user_pattern)
 
             if int(id_user):
                 subtitle = 'step 3 - select role'
@@ -2247,14 +2296,14 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
                 # create roleselect
                 output += createroleselect(id_role=id_role,
-                                           action='addroleuser',
-                                           step=3,
-                                           roles=not_roles,
-                                           extraroles=con_roles,
-                                           extrastamp='(connected)',
-                                           button='add this role',
-                                           email_user_pattern=email_user_pattern,
-                                           id_user=id_user)
+                                        action='addroleuser',
+                                        step=3,
+                                        roles=not_roles,
+                                        extraroles=con_roles,
+                                        extrastamp='(connected)',
+                                        button='add this role',
+                                        email_user_pattern=email_user_pattern,
+                                        id_user=id_user)
 
                 if int(id_role) < 0:
                     name_role = acca.acc_get_role_name(id_role=-int(id_role))
@@ -2263,11 +2312,11 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                     subtitle = 'step 4 - confirm to add role to user'
 
                     output += createhiddenform(action='addroleuser',
-                                               text='add role <strong>%s</strong> to user <strong>%s</strong>?' % (name_role, email_out),
-                                               email_user_pattern=email_user_pattern,
-                                               id_user=id_user,
-                                               id_role=id_role,
-                                               confirm=1)
+                                            text='add role <strong>%s</strong> to user <strong>%s</strong>?' % (name_role, email_out),
+                                            email_user_pattern=email_user_pattern,
+                                            id_user=id_user,
+                                            id_role=id_role,
+                                            confirm=1)
 
                     if confirm:
                         # add role
@@ -2282,31 +2331,31 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a></dt>
-     <dd>go here to add a new role.</dd>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
     """
     if int(id_user) and con_roles:
         extra += """
     </dl>
     <dl>
-     <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove roles</a></dt>
-     <dd>disconnect roles from user %s.</dd>
+    <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove roles</a></dt>
+    <dd>disconnect roles from user %s.</dd>
     </dl>
     """ % (id_user, email_out)
         if int(id_role):
             if int(id_role) < 0: id_role = -int(id_role)
             extra += """
             <dl>
-             <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
-             <dd>disconnect users from role %s.<dd>
+            <dt><a href="deleteuserrole?id_role=%s">Remove users</a></dt>
+            <dd>disconnect users from role %s.<dd>
             </dl>
             """ % (id_role, name_role)
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=[output, extra],
-                 adminarea=5)
+                title=title,
+                subtitle=subtitle,
+                body=[output, extra],
+                adminarea=5)
 
 
 def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
@@ -2329,17 +2378,17 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
         adminarea = 3
         subtitle = 'step 1 - select the role'
         output += createroleselect(id_role=id_role,
-                                   action="deleteuserrole",
-                                   step=1,
-                                   roles=acca.acc_get_all_roles())
+                                action="deleteuserrole",
+                                step=1,
+                                roles=acca.acc_get_all_roles())
 
         if id_role != "0":
             subtitle = 'step 2 - select the user'
             output += createuserselect(id_user=id_user,
-                                       action="deleteuserrole",
-                                       step=2,
-                                       users=acca.acc_get_role_users(id_role=id_role),
-                                       id_role=id_role)
+                                    action="deleteuserrole",
+                                    step=2,
+                                    users=acca.acc_get_role_users(id_role=id_role),
+                                    id_role=id_role)
 
     else:
         adminarea = 5
@@ -2364,10 +2413,10 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
         # user connected to roles
         if has_roles:
             output += createuserselect(id_user=id_user,
-                                       action="deleteuserrole",
-                                       step=1,
-                                       users=users,
-                                       reverse=reverse)
+                                    action="deleteuserrole",
+                                    step=1,
+                                    users=users,
+                                    reverse=reverse)
 
             if id_user != "0":
                 subtitle = 'step 2 - select the role'
@@ -2379,20 +2428,20 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
                     if (id, ) in role_ids: roles.append([id, name, desc])
 
                 output += createroleselect(id_role=id_role,
-                                           action="deleteuserrole",
-                                           step=2,
-                                           roles=roles,
-                                           id_user=id_user,
-                                           reverse=reverse)
+                                        action="deleteuserrole",
+                                        step=2,
+                                        roles=roles,
+                                        id_user=id_user,
+                                        reverse=reverse)
 
     if id_role != '0' and id_user != '0':
         subtitle = 'step 3 - confirm delete of user'
         output += createhiddenform(action="deleteuserrole",
-                                   text='delete user %s from %s?' % (headerstrong(user=id_user), headerstrong(role=id_role)),
-                                   id_role=id_role,
-                                   id_user=id_user,
-                                   reverse=reverse,
-                                   confirm=1)
+                                text='delete user %s from %s?' % (headerstrong(user=id_user), headerstrong(role=id_role)),
+                                id_role=id_role,
+                                id_user=id_user,
+                                reverse=reverse,
+                                confirm=1)
 
         if confirm:
             res = acca.acc_delete_user_role(id_user=id_user, id_role=id_role)
@@ -2407,34 +2456,34 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
     if str(id_role) != "0":
         extra += """
         <dl>
-         <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-         <dd>add users to role %s.</dd>
+        <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
+        <dd>add users to role %s.</dd>
         """ % (id_role, name_role)
         if int(reverse):
             extra += """
-             <dt><a href="deleteuserrole?id_role=%s">Remove user</a></dt>
-             <dd>remove users from role %s.</dd> """ % (id_role, name_role)
+            <dt><a href="deleteuserrole?id_role=%s">Remove user</a></dt>
+            <dd>remove users from role %s.</dd> """ % (id_role, name_role)
         extra += '</dl>'
     if str(id_user) != "0":
         extra += """
         <dl>
-         <dt><a href="addroleuser?email_user_pattern=%s&amp;id_user=%s">Connect role</a></dt>
-         <dd>add roles to user %s.</dd>
+        <dt><a href="addroleuser?email_user_pattern=%s&amp;id_user=%s">Connect role</a></dt>
+        <dd>add roles to user %s.</dd>
         """ % (email_user, id_user, email_user)
         if not int(reverse):
             extra += """
-             <dt><a href="deleteuserrole?id_user=%s&amp;email_user_pattern=%s&amp;reverse=1">Remove role</a></dt>
-             <dd>remove roles from user %s.</dd> """ % (id_user, email_user, email_user)
+            <dt><a href="deleteuserrole?id_user=%s&amp;email_user_pattern=%s&amp;reverse=1">Remove role</a></dt>
+            <dd>remove roles from user %s.</dd> """ % (id_user, email_user, email_user)
         extra += '</dl>'
 
     if extra: body = [output, extra]
     else: body = [output]
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=body,
-                 adminarea=adminarea)
+                title=title,
+                subtitle=subtitle,
+                body=body,
+                adminarea=adminarea)
 
 
 def perform_showuserdetails(req, id_user=0):
@@ -2449,10 +2498,10 @@ def perform_showuserdetails(req, id_user=0):
 
         extra = """
         <dl>
-         <dt><a href="addroleuser?id_user=%s&amp;email_user_pattern=%s">Connect role</a></dt>
-         <dd>connect a role to user %s.</dd>
-         <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove role</a></dt>
-         <dd>remove a role from user %s.</dd>
+        <dt><a href="addroleuser?id_user=%s&amp;email_user_pattern=%s">Connect role</a></dt>
+        <dd>connect a role to user %s.</dd>
+        <dt><a href="deleteuserrole?id_user=%s&amp;reverse=1">Remove role</a></dt>
+        <dd>remove a role from user %s.</dd>
         </dl>
         """ % (id_user, email_user, email_user, id_user, email_user)
 
@@ -2461,10 +2510,10 @@ def perform_showuserdetails(req, id_user=0):
         body = ['<p>no details to show</p>']
 
     return index(req=req,
-                 title='Show User Details',
-                 subtitle='show user details',
-                 body=body,
-                 adminarea=5)
+                title='Show User Details',
+                subtitle='show user details',
+                body=body,
+                adminarea=5)
 
 
 def userdetails(id_user=0):
@@ -2494,11 +2543,11 @@ def userdetails(id_user=0):
 def perform_addauthorization(req, id_role="0", id_action="0", optional=0, reverse="0", confirm=0, **keywords):
     """ form to add new connection between user and role:
 
-      id_role - role to connect
+    id_role - role to connect
 
     id_action - action to connect
 
-      reverse - role or action first? """
+    reverse - role or action first? """
 
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
@@ -2511,10 +2560,10 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a></dt>
-     <dd>go here to add a new role.</dd>
-     <dt><a href="addaction">Create new action</a></dt>
-     <dd>go here to add a new action.</dd>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
+    <dt><a href="addaction">Create new action</a></dt>
+    <dd>go here to add a new action.</dd>
     </dl>
     """
 
@@ -2524,10 +2573,10 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         adminarea = 3
         subtitle = 'step 1 - select role'
         output = createroleselect(id_role=id_role,
-                                  action="addauthorization",
-                                  step=1,
-                                  roles=acca.acc_get_all_roles(),
-                                  reverse=reverse)
+                                action="addauthorization",
+                                step=1,
+                                roles=acca.acc_get_all_roles(),
+                                reverse=reverse)
 
         if str(id_role) != "0":
             subtitle = 'step 2 - select action'
@@ -2537,12 +2586,12 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             for r in allhelp:
                 if r not in rolacts: allacts.append(r)
             output += createactionselect(id_action=id_action,
-                                         action="addauthorization",
-                                         step=2,
-                                         actions=rolacts,
-                                         extraactions=allacts,
-                                         id_role=id_role,
-                                         reverse=reverse)
+                                        action="addauthorization",
+                                        step=2,
+                                        actions=rolacts,
+                                        extraactions=allacts,
+                                        id_role=id_role,
+                                        reverse=reverse)
 
     # action -> role -> arguments
     else:
@@ -2561,12 +2610,12 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             for r in allhelp:
                 if r not in actroles: allroles.append(r)
             output += createroleselect(id_role=id_role,
-                                       action="addauthorization",
-                                       step=2,
-                                       roles=actroles,
-                                       extraroles=allroles,
-                                       id_action=id_action,
-                                       reverse=reverse)
+                                    action="addauthorization",
+                                    step=2,
+                                    roles=actroles,
+                                    extraroles=allroles,
+                                    id_action=id_action,
+                                    reverse=reverse)
 
     # ready for step 3 no matter which direction we took to get here
     if id_action != "0" and id_role != "0":
@@ -2574,23 +2623,23 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         if str(reverse) == "0":
             extra += """
             <dl>
-             <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
-             <dd>add authorizations to action %s.</dd>
+            <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
+            <dd>add authorizations to action %s.</dd>
             </dl> """ % (id_action, name_action)
         else:
             extra += """
             <dl>
-             <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
-             <dd>add authorizations to role %s.</dd>
+            <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
+            <dd>add authorizations to role %s.</dd>
             </dl> """ % (id_role, name_role)
 
         subtitle = 'step 3 - enter values for the keywords\n'
 
         output += """
         <form action="addauthorization" method="POST">
-         <input type="hidden" name="id_role" value="%s">
-         <input type="hidden" name="id_action" value="%s">
-         <input type="hidden" name="reverse" value="%s">
+        <input type="hidden" name="id_role" value="%s">
+        <input type="hidden" name="id_action" value="%s">
+        <input type="hidden" name="reverse" value="%s">
         """  % (id_role, id_action, reverse)
 
         # the actions argument keywords
@@ -2604,9 +2653,9 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             # action without arguments
             if not res_auths:
                 output += """
-                 <input type="hidden" name="confirm" value="1">
-                  create connection between %s?
-                 <input class="adminbutton" type="submit" value="confirm">
+                <input type="hidden" name="confirm" value="1">
+                create connection between %s?
+                <input class="adminbutton" type="submit" value="confirm">
                 </form>
                 """ % (headerstrong(role=name_role, action=name_action, query=0), )
             else:
@@ -2621,10 +2670,10 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                 # optional arguments
                 output += """
                 <p>
-                 <input type="radio" name="optional" value="1" %s />
-                 connect %s to %s for any arguments <br>
-                 <input type="radio" name="optional" value="0" %s />
-                 connect %s to %s for only these argument cases:
+                <input type="radio" name="optional" value="1" %s />
+                connect %s to %s for any arguments <br>
+                <input type="radio" name="optional" value="0" %s />
+                connect %s to %s for only these argument cases:
                 </p>
                 """ % (optional and 'checked="checked"' or '', name_role, name_action, not optional and 'checked="checked"' or '', name_role, name_action)
 
@@ -2660,13 +2709,13 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                         text += '<strong>%s</strong>: %s \n' % (key, keywords[key])
 
                 output += createhiddenform(action="addauthorization",
-                                           text=text,
-                                           id_role=id_role,
-                                           id_action=id_action,
-                                           reverse=reverse,
-                                           confirm=1,
-                                           optional=optional,
-                                           **keywords)
+                                        text=text,
+                                        id_role=id_role,
+                                        id_action=id_action,
+                                        reverse=reverse,
+                                        confirm=1,
+                                        optional=optional,
+                                        **keywords)
 
         # show existing authorizations, found authorizations further up in the code...
         # res_auths = acca.acc_find_possible_actions(id_role, id_action)
@@ -2676,8 +2725,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             # shortcut to modifying authorizations
             extra += """
             <dl>
-             <dt><a href="modifyauthorizations?id_role=%s&amp;id_action=%s&amp;reverse=%s">Modify authorizations</a></dt>
-             <dd>modify the existing authorizations.</dd>
+            <dt><a href="modifyauthorizations?id_role=%s&amp;id_action=%s&amp;reverse=%s">Modify authorizations</a></dt>
+            <dd>modify the existing authorizations.</dd>
             </dl> """ % (id_role, id_action, reverse)
 
         else:   output += '<p>no details to show</p>'
@@ -2687,9 +2736,9 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     if confirm:
         subtitle = 'step 5 - confirm authorization added'
         res1 = acca.acc_add_authorization(name_role=name_role,
-                                         name_action=name_action,
-                                         optional=optional,
-                                         **keywords)
+                                        name_action=name_action,
+                                        optional=optional,
+                                        **keywords)
 
         if res1:
             res2 = acca.acc_find_possible_actions(id_role, id_action)
@@ -2705,8 +2754,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             output += """
             <p>new authorization and entries:</p>
             <table><tr>
-             <td class="admintd" %s>%s</td>
-             <td class="admintd" %s>%s</td>
+            <td class="admintd" %s>%s</td>
+            <td class="admintd" %s>%s</td>
             </tr></table> """ % (st, newauths, st, newentries)
 
         else: output += '<p>sorry, authorization could not be added,<br>it probably already exists</p>'
@@ -2716,20 +2765,20 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     except NameError: body = [output]
 
     return index(req=req,
-                 title = 'Create entry for new authorization',
-                 subtitle=subtitle,
-                 body=body,
-                 adminarea=adminarea)
+                title = 'Create entry for new authorization',
+                subtitle=subtitle,
+                body=body,
+                adminarea=adminarea)
 
 
 def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm=0):
     """delete all connections between a role and an action.
 
-      id_role - id of the role
+    id_role - id of the role
 
     id_action - id of the action
 
-      reverse - 0: ask for role first
+    reverse - 0: ask for role first
                 1: ask for action first"""
 
     (auth_code, auth_message) = is_adminuser(req)
@@ -2742,21 +2791,21 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
         adminarea = 3
         subtitle = 'step 1 - select a role'
         output  = createroleselect(id_role=id_role,
-                                   action="deleteroleaction",
-                                   step=1,
-                                   roles=acca.acc_get_all_roles(),
-                                   reverse=reverse)
+                                action="deleteroleaction",
+                                step=1,
+                                roles=acca.acc_get_all_roles(),
+                                reverse=reverse)
 
         if id_role != "0":
             rolacts = acca.acc_get_role_actions(id_role=id_role)
             subtitle = 'step 2 - select the action'
             output += createactionselect(id_action=id_action,
-                                         action="deleteroleaction",
-                                         step=2,
-                                         actions=rolacts,
-                                         reverse=reverse,
-                                         id_role=id_role,
-                                         button="remove connection and all authorizations")
+                                        action="deleteroleaction",
+                                        step=2,
+                                        actions=rolacts,
+                                        reverse=reverse,
+                                        id_role=id_role,
+                                        button="remove connection and all authorizations")
     else:
         # select action -> role
         adminarea = 4
@@ -2771,12 +2820,12 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
             actroles = acca.acc_get_action_roles(id_action=id_action)
             subtitle = 'step 2 - select the role'
             output += createroleselect(id_role=id_role,
-                                       action="deleteroleaction",
-                                       step=2,
-                                       roles=actroles,
-                                       button="remove connection and all authorizations",
-                                       id_action=id_action,
-                                       reverse=reverse)
+                                    action="deleteroleaction",
+                                    step=2,
+                                    roles=actroles,
+                                    button="remove connection and all authorizations",
+                                    id_action=id_action,
+                                    reverse=reverse)
 
     if id_action != "0" and id_role != "0":
         subtitle = 'step 3 - confirm to remove authorizations'
@@ -2789,11 +2838,11 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
             output += tupletotable(header=res[0], tuple=res[1:])
 
             output += createhiddenform(action="deleteroleaction",
-                                       text='remove %s from %s' % (headerstrong(action=id_action), headerstrong(role=id_role)),
-                                       confirm=1,
-                                       id_role=id_role,
-                                       id_action=id_action,
-                                       reverse=reverse)
+                                    text='remove %s from %s' % (headerstrong(action=id_action), headerstrong(role=id_role)),
+                                    confirm=1,
+                                    id_role=id_role,
+                                    id_action=id_action,
+                                    reverse=reverse)
         else:
             output += 'no authorizations'
 
@@ -2808,28 +2857,28 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
                 output += '<p>sorry, no entries could be removed.</p>'
 
     return index(req=req,
-                 title=title,
-                 subtitle=subtitle,
-                 body=[output],
-                 adminarea=adminarea)
+                title=title,
+                subtitle=subtitle,
+                body=[output],
+                adminarea=adminarea)
 
 
 def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, confirm=0, errortext='', sel='', authids=[]):
     """given ids of a role and an action, show all possible action combinations
     with checkboxes and allow user to access other functions.
 
-      id_role - id of the role
+    id_role - id of the role
 
     id_action - id of the action
 
-      reverse - 0: ask for role first
+    reverse - 0: ask for role first
                 1: ask for action first
 
-          sel - which button and modification that is selected
+        sel - which button and modification that is selected
 
     errortext - text to print when no connection exist between role and action
 
-      authids - ids of checked checkboxes """
+    authids - ids of checked checkboxes """
 
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
@@ -2844,26 +2893,26 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
 
     extra = """
     <dl>
-     <dt><a href="addrole">Create new role</a></dt>
-     <dd>go here to add a new role.</dd>
-     <dt><a href="addaction">Create new action</a></dt>
-     <dd>go here to add a new action.</dd>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
+    <dt><a href="addaction">Create new action</a></dt>
+    <dd>go here to add a new action.</dd>
     </dl>
     """
     if id_role or id_action:
         extra += '\n<dl>\n'
         if id_role and id_action:
             extra += """
-             <dt><a href="addauthorization?id_role=%s&amp;id_action=%s&amp;reverse=%s">Add authorizations</a></dt>
-             <dd>add an authorization to the existing ones.</dd> """ % (id_role, id_action, reverse)
+            <dt><a href="addauthorization?id_role=%s&amp;id_action=%s&amp;reverse=%s">Add authorizations</a></dt>
+            <dd>add an authorization to the existing ones.</dd> """ % (id_role, id_action, reverse)
         if id_role:
             extra += """
-             <dt><a href="addauthorization?id_role=%s">Add authorizations</a></dt>
-             <dd>add to role %s.</dd> """ % (id_role, name_role)
+            <dt><a href="addauthorization?id_role=%s">Add authorizations</a></dt>
+            <dd>add to role %s.</dd> """ % (id_role, name_role)
         if id_action:
             extra += """
-             <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorizations</a></dt>
-             <dd>add to action %s.</dd> """ % (id_action, name_action)
+            <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorizations</a></dt>
+            <dd>add to action %s.</dd> """ % (id_action, name_action)
         extra += '\n</dl>\n'
 
 
@@ -2872,38 +2921,38 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
         adminarea = 3
         subtitle = 'step 1 - select the role'
         output += createroleselect(id_role=str(id_role),
-                                   action="modifyauthorizations",
-                                   step=1,
-                                   roles=acca.acc_get_all_roles(),
-                                   reverse=reverse)
+                                action="modifyauthorizations",
+                                step=1,
+                                roles=acca.acc_get_all_roles(),
+                                reverse=reverse)
 
         if id_role:
             rolacts = acca.acc_get_role_actions(id_role=id_role)
             subtitle = 'step 2 - select the action'
             output += createactionselect(id_action=str(id_action),
-                                         action="modifyauthorizations",
-                                         step=2,
-                                         actions=rolacts,
-                                         id_role=id_role,
-                                         reverse=reverse)
+                                        action="modifyauthorizations",
+                                        step=2,
+                                        actions=rolacts,
+                                        id_role=id_role,
+                                        reverse=reverse)
     else:
         adminarea = 4
         # action -> role
         subtitle = 'step 1 - select the action'
         output += createactionselect(id_action=str(id_action),
-                                     action="modifyauthorizations",
-                                     step=1,
-                                     actions=acca.acc_get_all_actions(),
-                                     reverse=reverse)
+                                    action="modifyauthorizations",
+                                    step=1,
+                                    actions=acca.acc_get_all_actions(),
+                                    reverse=reverse)
         if id_action:
             actroles = acca.acc_get_action_roles(id_action=id_action)
             subtitle = 'step 2 - select the role'
             output += createroleselect(id_role=str(id_role),
-                                       action="modifyauthorizations",
-                                       step=2,
-                                       roles=actroles,
-                                       id_action=id_action,
-                                       reverse=reverse)
+                                    action="modifyauthorizations",
+                                    step=2,
+                                    roles=actroles,
+                                    id_action=id_action,
+                                    reverse=reverse)
 
     if errortext: output += '<p>%s</p>' % (errortext, )
 
@@ -2977,10 +3026,14 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
                                                 selected=hiddenids,
                                                 extracolumn=extracolumn)
 
-            output += '<input type="hidden" name="id_role" value="%s" />\n' % (id_role, )
-            output += '<input type="hidden" name="id_action" value="%s" />\n' % (id_action, )
-            output += '<input type="hidden" name="sel" value="%s" />\n' % (sel, )
-            output += '<input type="hidden" name="reverse" value="%s" />\n' % (reverse, )
+            output += '<input type="hidden" name="id_role" value="%s" />\n' \
+                % (id_role, )
+            output += '<input type="hidden" name="id_action" value="%s" />\n' \
+                % (id_action, )
+            output += '<input type="hidden" name="sel" value="%s" />\n' \
+                % (sel, )
+            output += '<input type="hidden" name="reverse" value="%s" />\n' \
+                % (reverse, )
             output += '</form>'
 
         # tried to perform modification without something selected
@@ -2993,25 +3046,26 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
 
     # Display the page
     return index(req=req,
-                 title='Modify Authorizations',
-                 subtitle=subtitle,
-                 body=body,
-                 adminarea=adminarea)
+                title='Modify Authorizations',
+                subtitle=subtitle,
+                body=body,
+                adminarea=adminarea)
 
 
-def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[], checked=[], reverse=0):
+def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[],
+        checked=[], reverse=0):
     """create table with header and checkboxes, used for multiple choice.
     makes use of tupletotable to add the actual table
 
-      id_role - selected role, hidden value in the form
+    id_role - selected role, hidden value in the form
 
     id_action - selected action, hidden value in the form
 
         tuple - all rows to be put in the table (with checkboxes)
 
-       header - column headers, empty strings added at start and end
+    header - column headers, empty strings added at start and end
 
-      checked - ids of rows to be checked """
+    checked - ids of rows to be checked """
 
     if not tuple:
         return 'no authorisations...'
@@ -3019,23 +3073,33 @@ def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[], checked=[]
     argnum = len(acca.acc_get_action_keywords(id_action=id_action))
 
     tuple2 = []
-    for t in tuple: tuple2.append(t[:])
+    for t in tuple:
+        tuple2.append(t[:])
 
-    tuple2 = addcheckboxes(datalist=tuple2, name='authids', startindex=1, checked=checked)
+    tuple2 = addcheckboxes(datalist=tuple2, name='authids', startindex=1,
+        checked=checked)
 
-    hidden  = '<input type="hidden" name="id_role" value="%s" /> \n' % (id_role, )
-    hidden += '<input type="hidden" name="id_action" value="%s" /> \n' % (id_action, )
-    hidden += '<input type="hidden" name="reverse" value="%s" /> \n' % (reverse, )
+    hidden  = '<input type="hidden" name="id_role" value="%s" /> \n' \
+        % (id_role, )
+    hidden += '<input type="hidden" name="id_action" value="%s" /> \n' \
+        % (id_action, )
+    hidden += '<input type="hidden" name="reverse" value="%s" /> \n' \
+        % (reverse, )
 
 
-    button = '<input type="submit" class="adminbutton" value="delete selected" name="sel" />\n'
+    button = '<input type="submit" class="adminbutton" ' \
+        'value="delete selected" name="sel" />\n'
     if argnum > 1:
-        button += '<input type="submit" class="adminbutton" value="split groups" name="sel" />\n'
-        button += '<input type="submit" class="adminbutton" value="merge groups" name="sel" />\n'
+        button += '<input type="submit" class="adminbutton" ' \
+            'value="split groups" name="sel" />\n'
+        button += '<input type="submit" class="adminbutton" ' \
+            'value="merge groups" name="sel" />\n'
 
     hdrstr = ''
-    for h in [''] + header + ['']: hdrstr += '  <th class="adminheader">%s</th>\n' % (h, )
-    if hdrstr: hdrstr = ' <tr>\n%s\n </tr>\n' % (hdrstr, )
+    for h in [''] + header + ['']:
+        hdrstr += '  <th class="adminheader">%s</th>\n' % (h, )
+    if hdrstr:
+        hdrstr = ' <tr>\n%s\n </tr>\n' % (hdrstr, )
 
     output  = '<form action="modifyauthorizations" method="POST">\n'
     output += '<table class="admin_wvar_nomargin"> \n'
@@ -3043,17 +3107,22 @@ def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[], checked=[]
     output += '<tr><td>%s</td></tr>\n' % (hidden, )
 
     align = ['admintdleft'] * len(tuple2[0])
-    try: align[1] = 'admintdright'
-    except IndexError: pass
+    try:
+        align[1] = 'admintdright'
+    except IndexError:
+        pass
 
     output += '<tr>'
-    for i in range(len(tuple2[0])): output += '<td class="%s">%s</td>\n' % (align[i], tuple2[0][i])
-    output += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n' % (len(tuple2), button)
+    for i in range(len(tuple2[0])):
+        output += '<td class="%s">%s</td>\n' % (align[i], tuple2[0][i])
+    output += '<td rowspan="%s" style="vertical-align: bottom">\n%s\n</td>\n' \
+        % (len(tuple2), button)
 
     output += '</tr>\n'
     for row in tuple2[1:]:
         output += ' <tr>\n'
-        for i in range(len(row)): output += '<td class="%s">%s</td>\n' % (align[i], row[i])
+        for i in range(len(row)):
+            output += '<td class="%s">%s</td>\n' % (align[i], row[i])
         output += ' </tr>\n'
 
     output += '</table>\n</form>\n'
@@ -3087,7 +3156,8 @@ def splitgroups(id_role=0, id_action=0, authids=[]):
     # split groups and return success or failure
     result = 1
     for splitgroup in splitgrps:
-        result = 1 and acca.acc_split_argument_group(id_role, id_action, splitgroup)
+        result = 1 and acca.acc_split_argument_group(id_role, id_action,
+            splitgroup)
 
     return result
 
@@ -3164,7 +3234,8 @@ def headeritalic(**ids):
             output += ' %s <i>%s</i>' % (key, ids[key])
             continue
 
-        res = run_sql("""SELECT %s FROM %s WHERE id = %s""" % (value, table, ids[key]))
+        res = run_sql("""SELECT %s FROM %s WHERE id = %s""" \
+            % (value, table, ids[key]))
 
         if res:
             if output: output += ' and '
@@ -3198,7 +3269,8 @@ def headerstrong(query=1, **ids):
             continue
 
         if query:
-            res = run_sql("""SELECT %s FROM %s WHERE id = %s""" % (value, table, ids[key]))
+            res = run_sql("""SELECT %s FROM %s WHERE id = %s""" \
+                % (value, table, ids[key]))
             if res:
                 if output: output += ' and '
                 output += ' %s <strong>%s</strong>' % (key, res[0][0])
@@ -3213,29 +3285,29 @@ def startpage():
     """create the menu for the startpage"""
 
     body = """
-    <table class="admin_wvar" width="100%" summary="">
-     <thead>
-      <tr>
-       <th class="adminheaderleft">selection for WebAccess Admin</th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        <dl>
-         <dt><a href="webaccessadmin.py/rolearea">Role Area</a>
-         <dd>main area to configure administration rights and authorization rules.
-         <dt><a href="webaccessadmin.py/actionarea">Action Area</a>
-         <dd>configure administration rights with the actions as starting point.
-         <dt><a href="webaccessadmin.py/userarea">User Area</a>
-         <dd>configure administration rights with the users as starting point.
-         <dt><a href="webaccessadmin.py/resetarea">Reset Area</a>
-         <dd>reset roles, actions and authorizations.
-        </dl>
-       </td>
-      </tr>
-     </tbody>
-    </table>"""
+<table class="admin_wvar" width="100%" summary="">
+<thead>
+<tr>
+<th class="adminheaderleft">selection for WebAccess Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+    <dl>
+    <dt><a href="webaccessadmin.py/rolearea">Role Area</a>
+    <dd>main area to configure administration rights and authorization rules.
+    <dt><a href="webaccessadmin.py/actionarea">Action Area</a>
+    <dd>configure administration rights with the actions as starting point.
+    <dt><a href="webaccessadmin.py/userarea">User Area</a>
+    <dd>configure administration rights with the users as starting point.
+    <dt><a href="webaccessadmin.py/resetarea">Reset Area</a>
+    <dd>reset roles, actions and authorizations.
+    </dl>
+</td>
+</tr>
+</tbody>
+</table>"""
 
     return body
 
@@ -3252,20 +3324,21 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
     res = acca.acc_find_possible_actions(id_role, id_action)
     if res:
         extra = createhiddenform(action='modifyauthorizations',
-                                 button='modify authorizations',
-                                 id_role=id_role,
-                                 id_action=id_action)
+            button='modify authorizations',
+            id_role=id_role,
+            id_action=id_action)
 
-        output  = '<p>authorizations for %s:</p>' % (headerstrong(action=id_action, role=id_role), )
+        output  = '<p>authorizations for %s:</p>' \
+            % (headerstrong(action=id_action, role=id_role), )
         output += tupletotable(header=res[0], tuple=res[1:], extracolumn=extra)
     else:
         output = 'no details to show'
 
     return index(req=req,
-                 title='Simple authorization details',
-                 subtitle='simple authorization details',
-                 body=[output],
-                 adminarea=3)
+                title='Simple authorization details',
+                subtitle='simple authorization details',
+                body=[output],
+                adminarea=3)
 
 
 def perform_showroleusers(req, id_role=0):
@@ -3279,51 +3352,54 @@ def perform_showroleusers(req, id_role=0):
 
     if res:
         users = []
-        for (role_id, name, dummy) in res: users.append([role_id, name, '<a href="showuserdetails?id_user=%s">show user details</a>'
-                                                       % (role_id, )])
-        output  = '<p>users connected to %s:</p>' % (headerstrong(role=id_role), )
+        for (role_id, name, dummy) in res:
+            users.append([role_id, name, '<a href="showuserdetails?'
+                'id_user=%s">show user details</a>' % (role_id, )])
+        output  = '<p>users connected to %s:</p>' \
+            % (headerstrong(role=id_role), )
         output += tupletotable(header=['id', 'name', ''], tuple=users)
     else:
-        output = 'no users connected to role <strong>%s</strong>' % (name_role, )
+        output = 'no users connected to role <strong>%s</strong>' \
+            % (name_role, )
 
     extra = """
     <dl>
-     <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
-     <dd>connect users to the role.</dd>
+    <dt><a href="adduserrole?id_role=%s">Connect user</a></dt>
+    <dd>connect users to the role.</dd>
     </dl>
     """ % (id_role, )
 
     return index(req=req,
-                 title='Users connected to role %s' % (name_role, ),
-                 subtitle='simple details',
-                 body=[output, extra],
-                 adminarea=3)
+                title='Users connected to role %s' % (name_role, ),
+                subtitle='simple details',
+                body=[output, extra],
+                adminarea=3)
 
 
 
 
 
 def createselect(id_input="0", label="", step=0, name="",
-                 action="", list=[], extralist=[], extrastamp='',
-                 button="", **hidden):
+                action="", list=[], extralist=[], extrastamp='',
+                button="", **hidden):
     """create form with select and hidden values
 
             id - the one to choose as selected if exists
 
-         label - label shown to the left of the select
+        label - label shown to the left of the select
 
-          name - the name of the select on which to reference it
+        name - the name of the select on which to reference it
 
-          list - primary list to select from
+        list - primary list to select from
 
-     extralist - list of options to be put in paranthesis
+    extralist - list of options to be put in paranthesis
 
     extrastamp - stamp extralist entries with this if not ''
-                 usually paranthesis around the entry
+                usually paranthesis around the entry
 
         button - the value/text to be put on the button
 
-      **hidden - name=value pairs to be put as hidden in the form. """
+    **hidden - name=value pairs to be put as hidden in the form. """
 
     step = step and '%s. ' % step or ''
 
@@ -3331,60 +3407,75 @@ def createselect(id_input="0", label="", step=0, name="",
     output += ' <span class="adminlabel">%s</span>\n' % (step + label, )
     output += ' <select name="%s" class="admin_w200">\n' % (name, )
     if not list and not extralist:
-        output += '  <option value="0">*** no %ss to select from ***</option>\n' % (label.split()[-1], )
+        output += '  <option value="0">*** no %ss to select from ***' \
+            '</option>\n' % (label.split()[-1], )
     else:
         output += '  <option value="0">*** %s ***</option>\n' % (label, )
         for elem in list:
             elem_id = elem[0]
             email = elem[1]
-            if str(elem_id) == id_input: output += '  <option value="%s" selected="selected">%s</option>\n' % (elem_id, email)
-            else: output += '  <option value="%s">%s</option>\n' % (elem_id, email)
+            if str(elem_id) == id_input:
+                output += '  <option value="%s" selected="selected">' \
+                    '%s</option>\n' % (elem_id, email)
+            else:
+                output += '  <option value="%s">%s</option>\n' \
+                    % (elem_id, email)
         for elem in extralist:
             elem_id = elem[0]
             email = elem[1]
             if str(elem_id) == id_input:
-                if not extrastamp: output += '  <option value="%s" selected="selected">(%s)</option>\n' % (elem_id, email)
-                else: output += '  <option value="%s">%s %s</option>\n' % (elem_id, email, extrastamp)
-            elif not extrastamp: output += '  <option value="%s">(%s)</option>\n' % (elem_id, email)
-            else: output += '  <option value="%s">%s %s</option>\n' % (elem_id, email, extrastamp)
+                if not extrastamp:
+                    output += '  <option value="%s" selected="selected">' \
+                        '(%s)</option>\n' % (elem_id, email)
+                else:
+                    output += '  <option value="%s">%s %s</option>\n' \
+                        % (elem_id, email, extrastamp)
+            elif not extrastamp:
+                output += '  <option value="%s">(%s)</option>\n' \
+                    % (elem_id, email)
+            else:
+                output += '  <option value="%s">%s %s</option>\n' \
+                    % (elem_id, email, extrastamp)
 
     output += ' </select>\n'
     for key in hidden.keys():
-        output += ' <input type="hidden" name="%s" value="%s" />\n' % (key, hidden[key])
-    output += ' <input class="adminbutton" type="submit" value="%s" />\n' % (button, )
+        output += ' <input type="hidden" name="%s" value="%s" />\n' \
+            % (key, hidden[key])
+    output += ' <input class="adminbutton" type="submit" value="%s" />\n' \
+        % (button, )
     output += '</form>\n'
 
     return output
 
 
-def createactionselect(id_action="0", label="select action", step=0, name="id_action",
-                       action="", actions=[], extraactions=[], extrastamp='',
-                       button="select action", **hidden):
+def createactionselect(id_action="0", label="select action", step=0,
+        name="id_action", action="", actions=[], extraactions=[],
+        extrastamp='', button="select action", **hidden):
     """create a select for roles in a form. see createselect."""
 
     return createselect(id_input=id_action, label=label, step=step, name=name,
-                        action=action, list=actions, extralist=extraactions, extrastamp=extrastamp,
-                        button=button, **hidden)
+        action=action, list=actions, extralist=extraactions,
+        extrastamp=extrastamp, button=button, **hidden)
 
 
 def createroleselect(id_role="0", label="select role", step=0, name="id_role",
-                     action="", roles=[], extraroles=[], extrastamp='',
-                     button="select role", **hidden):
+        action="", roles=[], extraroles=[], extrastamp='',
+        button="select role", **hidden):
     """create a select for roles in a form. see createselect."""
 
     return createselect(id_input=id_role, label=label, step=step, name=name,
-                        action=action, list=roles, extralist=extraroles, extrastamp=extrastamp,
-                        button=button, **hidden)
+        action=action, list=roles, extralist=extraroles, extrastamp=extrastamp,
+        button=button, **hidden)
 
 
 def createuserselect(id_user="0", label="select user", step=0, name="id_user",
-                     action="", users=[], extrausers=[], extrastamp='(connected)',
-                     button="select user", **hidden):
+        action="", users=[], extrausers=[], extrastamp='(connected)',
+        button="select user", **hidden):
     """create a select for users in a form.see createselect."""
 
     return createselect(id_input=id_user, label=label, step=step, name=name,
-                        action=action, list=users, extralist=extrausers, extrastamp=extrastamp,
-                        button=button, **hidden)
+        action=action, list=users, extralist=extrausers, extrastamp=extrastamp,
+        button=button, **hidden)
 
 
 def cleanstring(txt='', comma=0):
@@ -3392,7 +3483,7 @@ def cleanstring(txt='', comma=0):
     remove characters not letter, number or underscore, also remove leading
     underscores and numbers. return cleaned string.
 
-      str - string to be cleaned
+    str - string to be cleaned
 
     comma - 1 -> allow the comma to divide multiple arguments
             0 -> wash commas as well """
@@ -3416,7 +3507,7 @@ def cleanstring_argumentvalue(txt=''):
     """clean the value of an argument before submitting it.
     allowed characters: a-z A-Z 0-9 _ and space
 
-      txt - string to be cleaned """
+    txt - string to be cleaned """
 
     # remove not allowed characters
     txt = re.sub(r'[^a-zA-Z0-9_ .]', '', txt)
@@ -3429,7 +3520,7 @@ def cleanstring_argumentvalue(txt=''):
 def cleanstring_email(txt=''):
     """clean the string and return a valid email address.
 
-      txt - string to be cleaned """
+    txt - string to be cleaned """
 
     # remove not allowed characters
     txt = re.sub(r'[^a-zA-Z0-9_.@-]', '', txt)
@@ -3445,13 +3536,15 @@ def check_email(txt=''):
     return r.match(txt) and 1 or 0
 
 def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
-    """Send an email to the address given by sendTo about the new activated account."""
+    """Send an email to the address given by sendTo about the new activated
+    account."""
 
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Your account on '%s' has been activated\n\n" % cdsname
-    body = "Your account earlier created on '%s' has been activated:\n\n" % cdsname
+    body = "Your account earlier created on '%s' has been activated:\n\n" \
+        % cdsname
     body += "   Username/Email: %s\n" % AccountEmail
     body += "   Password: %s\n" % ("*" * len(password))
     body += "\n---------------------------------"
@@ -3471,7 +3564,8 @@ def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
     return 1
 
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
-    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+    """Send an email to the address given by sendTo about the new account
+    newAccountEmail."""
 
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
@@ -3497,13 +3591,15 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     return 1
 
 def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
-    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+    """Send an email to the address given by sendTo about the new account
+    newAccountEmail."""
 
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Account rejected on '%s'\n\n" % cdsname
-    body = "Your request for an account has been rejected on '%s':\n\n" % cdsname
+    body = "Your request for an account has been rejected on '%s':\n\n" \
+        % cdsname
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "\n---------------------------------"
     body += "\n%s" % cdsname
@@ -3522,7 +3618,8 @@ def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
     return 1
 
 def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
-    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+    """Send an email to the address given by sendTo about the new account
+    newAccountEmail."""
 
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
@@ -3557,17 +3654,19 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -c, --compile\t\t compile role definitions\n")
     sys.stderr.write("  -h, --help\t\t Print this help.\n")
     sys.stderr.write("  -r, --reset\t\t reset default settings\n")
-    sys.stderr.write("  -u, --user=USER\t User name to submit the task as, password needed.\n")
+    sys.stderr.write("  -u, --user=USER\t User name to submit the task as, "
+        "password needed.\n")
     sys.stderr.write("  -V, --version\t\t Print version information.\n")
     sys.stderr.write("""Description: %s is used to reset the access settings,
 or to just add default values, or to compile firewall like
-role definition manually set in the accROLE table in the firerole_def_src field.\n""" % sys.argv[0])
+role definition manually set in the accROLE table in the
+firerole_def_src field.\n""" % sys.argv[0])
     sys.exit(exitcode)
 
 
 def main():
-    """Main function that analyzes command line input and calls whatever is appropriate.
-    """
+    """Main function that analyzes command line input and calls whatever
+    is appropriate. """
 
     ## parse command line:
     # set user-defined options:
@@ -3596,7 +3695,9 @@ def main():
             else:
                 usage(1)
         if options['add'] or options['reset'] or options['compile']:
-            options['user'] = authenticate(options['user'],  authorization_msg="WebAccess Administration", authorization_action="cfgwebaccess")
+            options['user'] = authenticate(options['user'],
+                authorization_msg="WebAccess Administration",
+                authorization_action="cfgwebaccess")
             if options['reset']:
                 acca.acc_reset_default_settings([supportemail])
                 print "Reset default settings."
