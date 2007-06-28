@@ -393,7 +393,7 @@ def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    _db_logout()
+    # _db_logout() #FIXME Not sure this can do more evil than good things.
     write_message("sleeping...")
     task_update_status("SLEEPING")
     signal.pause() # wait for wake-up signal
@@ -402,7 +402,7 @@ def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    _db_login(1)
+    # _db_login(1) #FIXME Not sure this can do more evil than good things.
     write_message("continuing...")
     task_update_status("CONTINUING")
 
@@ -421,7 +421,7 @@ def _task_sig_stop(sig, frame):
             write_message("Error during stopping! %e" % err)
             task_update_status("STOPPINGFAILED")
             sys.exit(1)
-    _db_logout()
+    # _db_logout() #FIXME Not sure this can do more evil than good things.
     write_message("stopped")
     task_update_status("STOPPED")
     sys.exit(0)
