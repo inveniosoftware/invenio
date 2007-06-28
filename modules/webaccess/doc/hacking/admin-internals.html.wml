@@ -37,7 +37,7 @@ CONTENTS
 
 1. Adding Information
 
-acc_addAction(name_action='', description='', optional='no', *allowedkeywords)
+acc_add_action(name_action='', description='', optional='no', *allowedkeywords)
     function to create new entry in accACTION for an action
 
     name_action     - name of the new action, must be unique
@@ -53,7 +53,7 @@ acc_addAction(name_action='', description='', optional='no', *allowedkeywords)
 
 
 
-acc_addRole(name_role, description, firerole_def_ser, firerole_def_src)
+acc_add_role(name_role, description, firerole_def_ser, firerole_def_src)
     add a new role to accROLE in the database.
 
        name_role - name of the role, must be unique
@@ -66,7 +66,7 @@ firerole_def_src - definition text source for repairing after Python upgrades
 
 
 
-acc_addUserRole(id_user=0, id_role=0, email='', name_role='')
+acc_add_user_role(id_user=0, id_role=0, email='', name_role='')
      this function adds a new entry to table user_accROLE and returns it
 
       id_user, id_role - self explanatory
@@ -77,7 +77,7 @@ acc_addUserRole(id_user=0, id_role=0, email='', name_role='')
 
 
 
-acc_addRoleActionArguments_names(name_role='', name_action='', arglistid=-1, optional=0, verbose=0, **keyval)
+acc_add_role_action_arguments_names(name_role='', name_action='', arglistid=-1, optional=0, verbose=0, **keyval)
      this function makes it possible to pass names when creating new entries instead of ids.
     get ids for all the names,
     create entries in accARGUMENT that does not exist,
@@ -97,7 +97,7 @@ acc_addRoleActionArguments_names(name_role='', name_action='', arglistid=-1, opt
 
 2. Finding Information
 
-acc_findPossibleActions(id_role, id_action)
+acc_find_possible_actions(id_role, id_action)
     Role based function to find all action combinations for a
     give role and action.
 
@@ -112,7 +112,7 @@ acc_findPossibleActions(id_role, id_action)
 
 3. Deleting Information
 
-acc_deleteAction(id_action=0, name_action=0)
+acc_deletea_ction(id_action=0, name_action=0)
     delete action in accACTION according to id, or secondly name.
     entries in accROLE_accACTION_accARGUMENT will also be removed.
 
@@ -124,7 +124,7 @@ acc_deleteAction(id_action=0, name_action=0)
 
 
 
-acc_deleteRole(id_role=0, name_role=0)
+acc_delete_role(id_role=0, name_role=0)
      delete role entry in table accROLE and all references from other tables.
 
       id_role - id of role to be deleted, prefered variable
@@ -133,7 +133,7 @@ acc_deleteRole(id_role=0, name_role=0)
 
 
 
-acc_deleteUserRole(id_user, id_role=0, name_role=0)
+acc_delete_user_role(id_user, id_role=0, name_role=0)
      function deletes entry from user_accROLE and reports the success.
 
       id_user - user in database
@@ -144,7 +144,7 @@ acc_deleteUserRole(id_user, id_role=0, name_role=0)
 
 
 
-acc_deleteRoleActionArguments_names(name_role='', name_action='', arglistid=1, **keyval)
+acc_delete_role_action_arguments_names(name_role='', name_action='', arglistid=1, **keyval)
     utilize the function on ids by first finding all ids and redirecting the function call.
     break of and return 0 if any of the ids can't be found.
 

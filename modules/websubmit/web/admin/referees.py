@@ -55,47 +55,47 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
         return errorMsg(auth_message, req, uid)
     # request for deleting a user
     if todo == "deleteuser":
-        acc_deleteUserRole(id,name_role=role)
+        acc_delete_user_role(id,name_role=role)
     # request for adding user(s)
     if todo == "adduser":
         role = "referee_%s_%s" % (doctype,categ[1])
-        roleId = acc_getRoleId(role)
+        roleId = acc_get_role_id(role)
         # if the role does not exists, we create it
         if roleId == 0:
-            if acc_addRole(role,"referees for document type %s category %s" % (doctype,categ[1])) == 0:
+            if acc_add_role(role,"referees for document type %s category %s" % (doctype,categ[1])) == 0:
                 return errorMsg("Cannot create referee role",req)
             else:
-                roleId = acc_getRoleId(role)
+                roleId = acc_get_role_id(role)
             # if the action does not exist, we create it
-            actionId = acc_getActionId("referee")
+            actionId = acc_get_action_id("referee")
             if actionId == 0:
-                if acc_addAction("referee","","no",("doctype","categ")) == 0:
+                if acc_add_action("referee","","no",("doctype","categ")) == 0:
                     return errorMsg("Cannot create action 'referee'",req)
                 else:
-                    actionId = acc_getActionId("referee")
+                    actionId = acc_get_action_id("referee")
             #create arguments
-            arg1Id = acc_addArgument("doctype",doctype)
-            arg2Id = acc_addArgument("categ",categ[1])
+            arg1Id = acc_add_argument("doctype",doctype)
+            arg2Id = acc_add_argument("categ",categ[1])
             # then link the role with the action
-            if acc_addRoleActionArguments(roleId,actionId,-1,0,0,[arg1Id,arg2Id]) == 0:
+            if acc_add_role_action_arguments(roleId,actionId,-1,0,0,[arg1Id,arg2Id]) == 0:
                 return errorMsg("Cannot link role with action",req)
-        roleId = acc_getRoleId(role)
+        roleId = acc_get_role_id(role)
         # For each id in the array
         if isinstance(addusers,types.ListType):
             for adduser in addusers:
                 # First check  whether this id is not already associated with this rule
-                myRoles = acc_getUserRoles(adduser)
+                myRoles = acc_get_user_roles(adduser)
                 if not roleId in myRoles:
                     # Actually add the role to the user
-                    acc_addUserRole(adduser,roleId)
+                    acc_add_user_role(adduser,roleId)
                 else:
                     warningText = "<font color=red>Sorry... This user is already a referee for this category.</font>"
         else:
             # First check  whether this id is not already associated with this rule
-            myRoles = acc_getUserRoles(addusers)
+            myRoles = acc_get_user_roles(addusers)
             if not roleId in myRoles:
                 # Actually add the role to the user
-                acc_addUserRole(addusers,roleId)
+                acc_add_user_role(addusers,roleId)
             else:
                 warningText = "<font color=red>Sorry... This user is already a referee for this category.</font>"
     return page(title="websubmit admin - referee selection",
@@ -145,15 +145,15 @@ def displayUserTable(doctype):
         <tr>
             <th class="portalboxheader" colspan="2">Referees</th>
         </tr>"""
-    roles = acc_getAllRoles()
+    roles = acc_get_all_roles()
     referees = {}
     for role in roles:
         role_name = role[1]
         role_id = role[0]
         if re.match("^referee_%s_" % doctype,role_name):
             # Try to retrieve the referee's email from the referee's database
-            if acc_getRoleUsers(role_id) is not None:
-                referees[role_name] = acc_getRoleUsers(role_id)
+            if acc_get_role_users(role_id) is not None:
+                referees[role_name] = acc_get_role_users(role_id)
 
     if len(referees) == 0:
         t+= "<TR><TD align=center colspan=2><IMG SRC=\"%s/noway.gif\" height=16 width=16></TD></TR>" % images

@@ -38,7 +38,7 @@ from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
         set_user_preferences, collect_user_info
-from invenio.access_control_admin import acc_findUserRoleActions
+from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.messages import gettext_set_language
 from invenio.external_authentication import WebAccessExternalAuthError
 
@@ -77,7 +77,7 @@ def perform_youradminactivities(user_info, ln):
        whether user UID has some admin roles, and if yes, then print
        suitable links for the actions he can do.  If he's not admin,
        print a simple non-authorized message."""
-    your_role_actions = acc_findUserRoleActions(user_info)
+    your_role_actions = acc_find_user_role_actions(user_info)
     your_roles = []
     your_admin_activities = []
     guest = isGuestUser(user_info['uid'])

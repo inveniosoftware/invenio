@@ -312,10 +312,10 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     # Build referee's email address
     refereeaddress = ""
     # Try to retrieve the referee's email from the referee's database
-    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_%s" % (doctype,categ))):
+    for user in acc_get_role_users(acc_getRoleId("referee_%s_%s" % (doctype,categ))):
         refereeaddress += user[1] + ","
     # And if there are general referees
-    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_*" % doctype)):
+    for user in acc_get_role_users(acc_getRoleId("referee_%s_*" % doctype)):
         refereeaddress += user[1] + ","
     refereeaddress = re.sub(",$","",refereeaddress)
     # Creation of the mail for the referee

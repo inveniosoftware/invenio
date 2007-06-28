@@ -66,7 +66,7 @@ from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
-from invenio.access_control_admin import acc_getActionId
+from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 
 if CFG_EXPERIMENTAL_FEATURES:
@@ -138,7 +138,7 @@ class RestrictedCollectionDataCacher(DataCacher):
         def cache_filler():
             ret = []
             try:
-                viewcollid = acc_getActionId(VIEWRESTRCOLL)
+                viewcollid = acc_get_action_id(VIEWRESTRCOLL)
                 res = run_sql("""SELECT DISTINCT ar.value
                     FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
                     WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (viewcollid,))

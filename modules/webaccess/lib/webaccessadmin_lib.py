@@ -127,7 +127,7 @@ def perform_rolearea(req):
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     header = ['id', 'name', 'description', 'firewall like role definition', 'users', 'authorizations / actions', 'role', '']
-    roles = acca.acc_getAllRoles()
+    roles = acca.acc_get_all_roles()
 
     roles2 = []
     for (id, name, desc, dummy, firerole_def_src) in roles:
@@ -183,7 +183,7 @@ def perform_actionarea(req):
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     header = ['id', 'name', 'authorizations/roles', 'action', '']
-    actions = acca.acc_getAllActions()
+    actions = acca.acc_get_all_actions()
 
     actions2 = []
     roles2 = []
@@ -1144,7 +1144,7 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
 
     subtitle = 'step 1 - select admin role'
 
-    admin_roles = acca.acc_getAllRoles()
+    admin_roles = acca.acc_get_all_roles()
 
     output = """
     <p>
@@ -1168,7 +1168,7 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
     if str(id_role_admin) != '0':
         subtitle = 'step 2 - select delegate role'
 
-        name_role_admin = acca.acc_getRoleName(id_role=id_role_admin)
+        name_role_admin = acca.acc_get_role_name(id_role=id_role_admin)
 
         delegate_roles_old = acca.acc_find_delegated_roles(id_role_admin=id_role_admin)
 
@@ -1194,7 +1194,7 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
              <dd>use the standard administration area to remove delegation rights
                  you no longer want to be available.</dd>
             </dl>
-            """ % (id_role_admin, acca.acc_getActionId(name_action=DELEGATEADDUSERROLE))
+            """ % (id_role_admin, acca.acc_get_action_id(name_action=DELEGATEADDUSERROLE))
 
         else:
             output += '<p>no previously selected roles.</p>'
@@ -1210,7 +1210,7 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
         if str(id_role_delegate) != '0':
             subtitle = 'step 3 - confirm to add delegation right'
 
-            name_role_delegate = acca.acc_getRoleName(id_role=id_role_delegate)
+            name_role_delegate = acca.acc_get_role_name(id_role=id_role_delegate)
 
             output += """
             <p>
@@ -1225,12 +1225,12 @@ def perform_delegate_adminsetup(req, id_role_admin=0, id_role_delegate=0, confir
 
             if int(confirm):
                 subtitle = 'step 4 - confirm delegation right added'
-                # res1 = acca.acc_addRoleActionArguments_names(name_role=name_role_admin,
+                # res1 = acca.acc_add_role_action_arguments_names(name_role=name_role_admin,
                 #                                              name_action=DELEGATEADDUSERROLE,
                 #                                              arglistid=-1,
                 #                                              optional=0,
                 #                                              role=name_role_delegate)
-                res1 = acca.acc_addAuthorization(name_role=name_role_admin,
+                res1 = acca.acc_add_authorization(name_role=name_role_admin,
                                                  name_action=DELEGATEADDUSERROLE,
                                                  optional=0,
                                                  role=name_role_delegate)
@@ -1262,13 +1262,13 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
 
     # finding the allowed roles for this user
     id_admin = getUid(req)
-    id_action = acca.acc_getActionId(name_action=DELEGATEADDUSERROLE)
-    actions = acca.acc_findPossibleActionsUser(id_user=id_admin, id_action=id_action)
+    id_action = acca.acc_get_action_id(name_action=DELEGATEADDUSERROLE)
+    actions = acca.acc_find_possible_actions_user(id_user=id_admin, id_action=id_action)
 
     allowed_roles = []
     allowed_id_roles = []
     for (id, arglistid, name_role_help) in actions[1:]:
-        id_role_help = acca.acc_getRoleId(name_role=name_role_help)
+        id_role_help = acca.acc_get_role_id(name_role=name_role_help)
         if id_role_help and [id_role_help, name_role_help, ''] not in allowed_roles:
             allowed_roles.append([id_role_help, name_role_help, ''])
             allowed_id_roles.append(str(id_role_help))
@@ -1292,8 +1292,8 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
          An administrator with all rights have to give you these rights.
         </p>"""
 
-        email_out = acca.acc_getUserEmail(id_user=id_user)
-        name_role = acca.acc_getRoleName(id_role=id_role)
+        email_out = acca.acc_get_user_email(id_user=id_user)
+        name_role = acca.acc_get_role_name(id_role=id_role)
 
         output += createroleselect(id_role=id_role, step=1, name='id_role',
                                    action='delegate_adduserrole', roles=allowed_roles)
@@ -1368,7 +1368,7 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
                         # it is confirmed that this user should be added
                         if confirm:
                             # add user
-                            result = acca.acc_addUserRole(id_user=id_user, id_role=id_role)
+                            result = acca.acc_add_user_role(id_user=id_user, id_role=id_role)
 
                             if result and result[2]:
                                 subtitle = 'step 5 - confirm user added'
@@ -1407,8 +1407,8 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
 
     # finding the allowed roles for this user
     id_admin = getUid(req)
-    id_action = acca.acc_getActionId(name_action=DELEGATEADDUSERROLE)
-    actions = acca.acc_findPossibleActionsUser(id_user=id_admin, id_action=id_action)
+    id_action = acca.acc_get_action_id(name_action=DELEGATEADDUSERROLE)
+    actions = acca.acc_find_possible_actions_user(id_user=id_admin, id_action=id_action)
 
     output = ''
 
@@ -1429,14 +1429,14 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
          An administrator with all rights have to give you these rights.
         </p>"""
 
-        email_out = acca.acc_getUserEmail(id_user=id_user)
-        name_role = acca.acc_getRoleName(id_role=id_role)
+        email_out = acca.acc_get_user_email(id_user=id_user)
+        name_role = acca.acc_get_role_name(id_role=id_role)
 
         # create list of allowed roles
         allowed_roles = []
         allowed_id_roles = []
         for (id, arglistid, name_role_help) in actions[1:]:
-            id_role_help = acca.acc_getRoleId(name_role=name_role_help)
+            id_role_help = acca.acc_get_role_id(name_role=name_role_help)
             if id_role_help and [id_role_help, name_role_help, ''] not in allowed_roles:
                 allowed_roles.append([id_role_help, name_role_help, ''])
                 allowed_id_roles.append(str(id_role_help))
@@ -1447,7 +1447,7 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
         if str(id_role) != '0' and str(id_role) in allowed_id_roles:
             subtitle = 'step 2 - select user'
 
-            users = acca.acc_getRoleUsers(id_role)
+            users = acca.acc_get_role_users(id_role)
 
             output += createuserselect(id_user=id_user,
                                        step=2,
@@ -1457,7 +1457,7 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
 
             if str(id_user) != '0':
                 subtitle = 'step 3 - confirm delete of user'
-                email_user = acca.acc_getUserEmail(id_user=id_user)
+                email_user = acca.acc_get_user_email(id_user=id_user)
 
                 output += createhiddenform(action="delegate_deleteuserrole",
                                            text='delete user %s from %s?'
@@ -1467,7 +1467,7 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
                                            confirm=1)
 
                 if confirm:
-                    res = acca.acc_deleteUserRole(id_user=id_user, id_role=id_role)
+                    res = acca.acc_delete_user_role(id_user=id_user, id_role=id_role)
                     if res:
                         subtitle = 'step 4 - confirm user deleted from role'
                         output += '<p>confirm: deleted user <strong>%s</strong> from role <strong>%s</strong>.</p>' % (email_user, name_role)
@@ -1558,7 +1558,7 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
 
         if confirm not in ["0", 0]:
             arguments = arguments.split(',')
-            result = acca.acc_addAction(name_action,
+            result = acca.acc_add_action(name_action,
                                         internaldesc,
                                         optional,
                                         *arguments)
@@ -1576,7 +1576,7 @@ def perform_addaction(req, name_action='', arguments='', optional='no', descript
             <dl>
              <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
              <dd>start adding new authorizations to action %s.</dd>
-            </dl> """ % (acca.acc_getActionId(name_action=name_action), name_action)
+            </dl> """ % (acca.acc_get_action_id(name_action=name_action), name_action)
 
     try: body = [output, extra]
     except NameError: body = [output]
@@ -1598,12 +1598,12 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
     title='Delete action'
     subtitle='step 1 - select action to delete'
-    name_action = acca.acc_getActionName(id_action=id_action)
+    name_action = acca.acc_get_action_name(id_action=id_action)
 
     output = createactionselect(id_action=id_action,
                                 action="deleteaction",
                                 step=1,
-                                actions=acca.acc_getAllActions(),
+                                actions=acca.acc_get_all_actions(),
                                 button="delete action")
 
     if id_action != "0" and name_action:
@@ -1611,7 +1611,7 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
         output += actiondetails(id_action=id_action)
 
-        if acca.acc_getActionRoles(id_action=id_action):
+        if acca.acc_get_action_roles(id_action=id_action):
             output += createhiddenform(action="deleteroleaction",
                                        text="""rather delete only connection between action %s
                                        and a selected role?""" % (name_action, ),
@@ -1626,7 +1626,7 @@ def perform_deleteaction(req, id_action="0", confirm=0):
 
         if confirm:
             subtitle = 'step 3 - confirm delete of action'
-            res = acca.acc_deleteAction(id_action=id_action)
+            res = acca.acc_delete_action(id_action=id_action)
             if res:
                 output += '<p>confirm: action <strong>%s</strong> deleted.<br>\n' % (name_action, )
                 output += '%s entries deleted all in all.</p>\n' % (res, )
@@ -1651,7 +1651,7 @@ def perform_showactiondetails(req, id_action):
     output = createactionselect(id_action=id_action,
                                 action="showactiondetails",
                                 step=1,
-                                actions=acca.acc_getAllActions(),
+                                actions=acca.acc_get_all_actions(),
                                 button="select action")
 
     if id_action not in [0, '0']:
@@ -1686,13 +1686,13 @@ def actiondetails(id_action=0):
     output = ''
 
     if id_action not in [0, '0']:
-        name_action = acca.acc_getActionName(id_action=id_action)
+        name_action = acca.acc_get_action_name(id_action=id_action)
 
         output += '<p>action details:</p>'
         output += tupletotable(header=['id', 'name', 'description', 'allowedkeywords', 'optional'],
-                               tuple=[acca.acc_getActionDetails(id_action=id_action)])
+                               tuple=[acca.acc_get_action_details(id_action=id_action)])
 
-        roleshlp = acca.acc_getActionRoles(id_action=id_action)
+        roleshlp = acca.acc_get_action_roles(id_action=id_action)
         if roleshlp:
             roles = []
             for (id, name, dummy) in roleshlp:
@@ -1775,7 +1775,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
                                     confirm=1)
 
             if confirm not in ["0", 0]:
-                result = acca.acc_addRole(name_role=name_role,
+                result = acca.acc_add_role(name_role=name_role,
                                         description=internaldesc,
                                         firerole_def_ser=firerole_def_ser,
                                         firerole_def_src=firerole_def_src)
@@ -1790,7 +1790,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
                     subtitle = 'step 3 - role could not be added'
                     output += '<p>sorry, could not add role, <br>role with the same name probably exists.</p>'
 
-                id_role = acca.acc_getRoleId(name_role=name_role)
+                id_role = acca.acc_get_role_id(name_role=name_role)
                 extra = """
                 <dl>
                 <dt><a href="addauthorization?id_role=%s">Add authorization</a></dt>
@@ -1823,7 +1823,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    ret = acca.acc_getRoleDetails(id_role)
+    ret = acca.acc_get_role_details(id_role)
     if ret and modified =='0':
         name_role = ret[1]
         description = ret[2]
@@ -1887,7 +1887,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
                                         modified=1,
                                         confirm=1)
             if confirm not in ["0", 0]:
-                result = acca.acc_updateRole(id_role, name_role=name_role,
+                result = acca.acc_update_role(id_role, name_role=name_role,
                                             description=internaldesc, firerole_def_ser=firerole_def_ser, firerole_def_src=firerole_def_src)
 
                 if result:
@@ -1924,11 +1924,11 @@ def perform_deleterole(req, id_role="0", confirm=0):
     title = 'Delete role'
     subtitle = 'step 1 - select role to delete'
 
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    name_role = acca.acc_get_role_name(id_role=id_role)
     output = createroleselect(id_role=id_role,
                               action="deleterole",
                               step=1,
-                              roles=acca.acc_getAllRoles(),
+                              roles=acca.acc_get_all_roles(),
                               button="delete role")
 
     if id_role != "0" and name_role:
@@ -1942,7 +1942,7 @@ def perform_deleterole(req, id_role="0", confirm=0):
                                    confirm=1)
 
         if confirm:
-            res = acca.acc_deleteRole(id_role=id_role)
+            res = acca.acc_delete_role(id_role=id_role)
             subtitle = 'step 3 - confirm role deleted'
             if res:
                 output += "<p>confirm: role <strong>%s</strong> deleted.<br>" % (name_role, )
@@ -1968,11 +1968,11 @@ def perform_showroledetails(req, id_role):
     output = createroleselect(id_role=id_role,
                               action="showroledetails",
                               step=1,
-                              roles=acca.acc_getAllRoles(),
+                              roles=acca.acc_get_all_roles(),
                               button="select role")
 
     if id_role not in [0, '0']:
-        name_role = acca.acc_getRoleName(id_role=id_role)
+        name_role = acca.acc_get_role_name(id_role=id_role)
 
         output += roledetails(id_role=id_role)
 
@@ -2008,15 +2008,15 @@ def perform_showroledetails(req, id_role):
 def roledetails(id_role=0):
     """create the string to show details about a role. """
 
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    name_role = acca.acc_get_role_name(id_role=id_role)
 
-    usershlp = acca.acc_getRoleUsers(id_role)
+    usershlp = acca.acc_get_role_users(id_role)
     users = []
     for (id, email, dummy) in usershlp:
         users.append([id, email, '<a href="showuserdetails?id_user=%s">show user details</a>' % (id, )])
     usertable = tupletotable(header=['id', 'email'], tuple=users)
 
-    actionshlp = acca.acc_getRoleActions(id_role)
+    actionshlp = acca.acc_get_role_actions(id_role)
     actions = []
     for (action_id, name, dummy) in actionshlp:
         actions.append([id, name,
@@ -2027,7 +2027,7 @@ def roledetails(id_role=0):
 
     # show role details
     details  = '<p>role details:</p>'
-    role_details = acca.acc_getRoleDetails(id_role=id_role)
+    role_details = acca.acc_get_role_details(id_role=id_role)
     role_details[3] = role_details[3].replace('\n', '<br />') # Hack for preformatting firerole rules
     details += tupletotable(header=['id', 'name', 'description', 'firewall like role definition'],
                             tuple=[role_details])
@@ -2061,8 +2061,8 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    email_out = acca.acc_getUserEmail(id_user=id_user)
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    email_out = acca.acc_get_user_email(id_user=id_user)
+    name_role = acca.acc_get_role_name(id_role=id_role)
 
     title = 'Connect user to role '
     subtitle = 'step 1 - select a role'
@@ -2070,7 +2070,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
     output = createroleselect(id_role=id_role,
                               action="adduserrole",
                               step=1,
-                              roles=acca.acc_getAllRoles())
+                              roles=acca.acc_get_all_roles())
 
     # role is selected
     if id_role != "0":
@@ -2144,7 +2144,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
                     # it is confirmed that this user should be added
                     if confirm:
                         # add user
-                        result = acca.acc_addUserRole(id_user=id_user, id_role=id_role)
+                        result = acca.acc_add_user_role(id_user=id_user, id_role=id_role)
 
                         if result and result[2]:
                             subtitle = 'step 5 - confirm user added'
@@ -2190,8 +2190,8 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    email_out = acca.acc_getUserEmail(id_user=id_user)
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    email_out = acca.acc_get_user_email(id_user=id_user)
+    name_role = acca.acc_get_role_name(id_role=id_role)
     # used to sort roles, and also to determine right side links
     con_roles = []
     not_roles = []
@@ -2236,9 +2236,9 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                 subtitle = 'step 3 - select role'
 
                 # roles the user is connected to
-                role_ids = acca.acc_getUserRoles(id_user=id_user)
+                role_ids = acca.acc_get_user_roles(id_user=id_user)
                 # all the roles, lists are sorted on the background of these...
-                all_roles = acca.acc_getAllRoles()
+                all_roles = acca.acc_get_all_roles()
 
                 # sort the roles in connected and not connected roles
                 for (id, name, description) in all_roles:
@@ -2257,7 +2257,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                                            id_user=id_user)
 
                 if int(id_role) < 0:
-                    name_role = acca.acc_getRoleName(id_role=-int(id_role))
+                    name_role = acca.acc_get_role_name(id_role=-int(id_role))
                     output += '<p>role %s already connected to the user, try another one...<p>' % (name_role, )
                 elif int(id_role):
                     subtitle = 'step 4 - confirm to add role to user'
@@ -2271,7 +2271,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
                     if confirm:
                         # add role
-                        result = acca.acc_addUserRole(id_user=id_user, id_role=id_role)
+                        result = acca.acc_add_user_role(id_user=id_user, id_role=id_role)
 
                         if result and result[2]:
                             subtitle = 'step 5 - confirm role added'
@@ -2320,8 +2320,8 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     title = 'Remove user from role'
-    email_user = acca.acc_getUserEmail(id_user=id_user)
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    email_user = acca.acc_get_user_email(id_user=id_user)
+    name_role = acca.acc_get_role_name(id_role=id_role)
 
     output = ''
 
@@ -2331,14 +2331,14 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
         output += createroleselect(id_role=id_role,
                                    action="deleteuserrole",
                                    step=1,
-                                   roles=acca.acc_getAllRoles())
+                                   roles=acca.acc_get_all_roles())
 
         if id_role != "0":
             subtitle = 'step 2 - select the user'
             output += createuserselect(id_user=id_user,
                                        action="deleteuserrole",
                                        step=2,
-                                       users=acca.acc_getRoleUsers(id_role=id_role),
+                                       users=acca.acc_get_role_users(id_role=id_role),
                                        id_role=id_role)
 
     else:
@@ -2372,8 +2372,8 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
             if id_user != "0":
                 subtitle = 'step 2 - select the role'
 
-                role_ids = acca.acc_getUserRoles(id_user=id_user)
-                all_roles = acca.acc_getAllRoles()
+                role_ids = acca.acc_get_user_roles(id_user=id_user)
+                all_roles = acca.acc_get_all_roles()
                 roles = []
                 for (id, name, desc) in all_roles:
                     if (id, ) in role_ids: roles.append([id, name, desc])
@@ -2395,7 +2395,7 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
                                    confirm=1)
 
         if confirm:
-            res = acca.acc_deleteUserRole(id_user=id_user, id_role=id_role)
+            res = acca.acc_delete_user_role(id_user=id_user, id_role=id_role)
             if res:
                 subtitle = 'step 4 - confirm delete of user'
                 output += '<p>confirm: deleted user <strong>%s</strong> from role <strong>%s</strong>.</p>' % (email_user, name_role)
@@ -2445,7 +2445,7 @@ def perform_showuserdetails(req, id_user=0):
 
     if id_user not in [0, '0']:
         output = userdetails(id_user=id_user)
-        email_user = acca.acc_getUserEmail(id_user=id_user)
+        email_user = acca.acc_get_user_email(id_user=id_user)
 
         extra = """
         <dl>
@@ -2471,13 +2471,13 @@ def userdetails(id_user=0):
     """create the string to show details about a user. """
 
     # find necessary details
-    email_user = acca.acc_getUserEmail(id_user=id_user)
+    email_user = acca.acc_get_user_email(id_user=id_user)
 
-    userroles = acca.acc_getUserRoles(id_user=id_user)
+    userroles = acca.acc_get_user_roles(id_user=id_user)
     conn_roles = []
 
     # find connected roles
-    for (id, name, desc, dummy, dummy) in acca.acc_getAllRoles():
+    for (id, name, desc, dummy, dummy) in acca.acc_get_all_roles():
         if (id, ) in userroles:
             conn_roles.append([id, name, desc])
             conn_roles[-1].append('<a href="showroledetails?id_role=%s">show details</a>' % (id, ))
@@ -2504,8 +2504,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     if auth_code != 0: return mustloginpage(req, auth_message)
 
     # values that might get used
-    name_role = acca.acc_getRoleName(id_role=id_role) or id_role
-    name_action = acca.acc_getActionName(id_action=id_action) or id_action
+    name_role = acca.acc_get_role_name(id_role=id_role) or id_role
+    name_action = acca.acc_get_action_name(id_action=id_action) or id_action
 
     optional = optional == 'on' and 1 or int(optional)
 
@@ -2526,13 +2526,13 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         output = createroleselect(id_role=id_role,
                                   action="addauthorization",
                                   step=1,
-                                  roles=acca.acc_getAllRoles(),
+                                  roles=acca.acc_get_all_roles(),
                                   reverse=reverse)
 
         if str(id_role) != "0":
             subtitle = 'step 2 - select action'
-            rolacts = acca.acc_getRoleActions(id_role)
-            allhelp = acca.acc_getAllActions()
+            rolacts = acca.acc_get_role_actions(id_role)
+            allhelp = acca.acc_get_all_actions()
             allacts = []
             for r in allhelp:
                 if r not in rolacts: allacts.append(r)
@@ -2551,12 +2551,12 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         output = createactionselect(id_action=id_action,
                                     action="addauthorization",
                                     step=1,
-                                    actions=acca.acc_getAllActions(),
+                                    actions=acca.acc_get_all_actions(),
                                     reverse=reverse)
         if str(id_action) != "0":
             subtitle = 'step 2 - select role'
-            actroles = acca.acc_getActionRoles(id_action)
-            allhelp = acca.acc_getAllRoles()
+            actroles = acca.acc_get_action_roles(id_action)
+            allhelp = acca.acc_get_all_roles()
             allroles = []
             for r in allhelp:
                 if r not in actroles: allroles.append(r)
@@ -2594,11 +2594,11 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
         """  % (id_role, id_action, reverse)
 
         # the actions argument keywords
-        res_keys = acca.acc_getActionKeywords(id_action=id_action)
+        res_keys = acca.acc_get_action_keywords(id_action=id_action)
 
         # res used to display existing authorizations
         # res used to determine if showing "create connection without arguments"
-        res_auths = acca.acc_findPossibleActions(id_role, id_action)
+        res_auths = acca.acc_find_possible_actions(id_role, id_action)
 
         if not res_keys:
             # action without arguments
@@ -2614,7 +2614,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
 
         else:
             # action with arguments
-            optionalargs = acca.acc_getActionIsOptional(id_action=id_action)
+            optionalargs = acca.acc_get_action_is_optional(id_action=id_action)
 
             output += '<span class="adminlabel">3. authorized arguments</span><br>'
             if optionalargs:
@@ -2669,7 +2669,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                                            **keywords)
 
         # show existing authorizations, found authorizations further up in the code...
-        # res_auths = acca.acc_findPossibleActions(id_role, id_action)
+        # res_auths = acca.acc_find_possible_actions(id_role, id_action)
         output += '<p>existing authorizations:</p>'
         if res_auths:
             output += tupletotable(header=res_auths[0], tuple=res_auths[1:])
@@ -2686,13 +2686,13 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     # user confirmed to add entries
     if confirm:
         subtitle = 'step 5 - confirm authorization added'
-        res1 = acca.acc_addAuthorization(name_role=name_role,
+        res1 = acca.acc_add_authorization(name_role=name_role,
                                          name_action=name_action,
                                          optional=optional,
                                          **keywords)
 
         if res1:
-            res2 = acca.acc_findPossibleActions(id_role, id_action)
+            res2 = acca.acc_find_possible_actions(id_role, id_action)
             arg = res1[0][3] # the arglistid
             new = [res2[0]]
             for row in res2[1:]:
@@ -2744,11 +2744,11 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
         output  = createroleselect(id_role=id_role,
                                    action="deleteroleaction",
                                    step=1,
-                                   roles=acca.acc_getAllRoles(),
+                                   roles=acca.acc_get_all_roles(),
                                    reverse=reverse)
 
         if id_role != "0":
-            rolacts = acca.acc_getRoleActions(id_role=id_role)
+            rolacts = acca.acc_get_role_actions(id_role=id_role)
             subtitle = 'step 2 - select the action'
             output += createactionselect(id_action=id_action,
                                          action="deleteroleaction",
@@ -2764,11 +2764,11 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
         output = createactionselect(id_action=id_action,
                                     action="deleteroleaction",
                                     step=1,
-                                    actions=acca.acc_getAllActions(),
+                                    actions=acca.acc_get_all_actions(),
                                     reverse=reverse)
 
         if id_action != "0":
-            actroles = acca.acc_getActionRoles(id_action=id_action)
+            actroles = acca.acc_get_action_roles(id_action=id_action)
             subtitle = 'step 2 - select the role'
             output += createroleselect(id_role=id_role,
                                        action="deleteroleaction",
@@ -2782,7 +2782,7 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
         subtitle = 'step 3 - confirm to remove authorizations'
         # ask for confirmation
 
-        res = acca.acc_findPossibleActions(id_role, id_action)
+        res = acca.acc_find_possible_actions(id_role, id_action)
 
         if res:
             output += '<p>authorizations that will be deleted:</p>'
@@ -2800,7 +2800,7 @@ def perform_deleteroleaction(req, id_role="0", id_action="0", reverse=0, confirm
         # confirmation is given
         if confirm:
             subtitle = 'step 4 - confirm authorizations removed '
-            res = acca.acc_deleteRoleAction(id_role=id_role, id_action=id_action)
+            res = acca.acc_delete_role_action(id_role=id_role, id_action=id_action)
             if res:
                 output += '<p>confirm: removed %s from %s<br>' % (headerstrong(action=id_action), headerstrong(role=id_role))
                 output += '<strong>%s</strong> entries were removed.</p>' % (res, )
@@ -2834,8 +2834,8 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    name_role = acca.acc_getRoleName(id_role)
-    name_action = acca.acc_getActionName(id_action)
+    name_role = acca.acc_get_role_name(id_role)
+    name_action = acca.acc_get_action_name(id_action)
 
     output = ''
 
@@ -2874,11 +2874,11 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
         output += createroleselect(id_role=str(id_role),
                                    action="modifyauthorizations",
                                    step=1,
-                                   roles=acca.acc_getAllRoles(),
+                                   roles=acca.acc_get_all_roles(),
                                    reverse=reverse)
 
         if id_role:
-            rolacts = acca.acc_getRoleActions(id_role=id_role)
+            rolacts = acca.acc_get_role_actions(id_role=id_role)
             subtitle = 'step 2 - select the action'
             output += createactionselect(id_action=str(id_action),
                                          action="modifyauthorizations",
@@ -2893,10 +2893,10 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
         output += createactionselect(id_action=str(id_action),
                                      action="modifyauthorizations",
                                      step=1,
-                                     actions=acca.acc_getAllActions(),
+                                     actions=acca.acc_get_all_actions(),
                                      reverse=reverse)
         if id_action:
-            actroles = acca.acc_getActionRoles(id_action=id_action)
+            actroles = acca.acc_get_action_roles(id_action=id_action)
             subtitle = 'step 2 - select the role'
             output += createroleselect(id_role=str(id_role),
                                        action="modifyauthorizations",
@@ -2913,7 +2913,7 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
         subtitle = 'step 3 - select groups and modification'
 
         # get info
-        res = acca.acc_findPossibleActions(id_role, id_action)
+        res = acca.acc_find_possible_actions(id_role, id_action)
 
         # clean the authids
         hiddenids = []
@@ -2934,7 +2934,7 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
             elif sel == 'delete selected':
                 res = deleteselected(id_role, id_action, authids)
             authids = []
-            res = acca.acc_findPossibleActions(id_role, id_action)
+            res = acca.acc_find_possible_actions(id_role, id_action)
             output += 'authorizations after <strong>%s</strong>.<br>\n' % (sel, )
 
         elif sel and authids:
@@ -3016,7 +3016,7 @@ def modifyauthorizationsmenu(id_role, id_action, tuple=[], header=[], checked=[]
     if not tuple:
         return 'no authorisations...'
 
-    argnum = len(acca.acc_getActionKeywords(id_action=id_action))
+    argnum = len(acca.acc_get_action_keywords(id_action=id_action))
 
     tuple2 = []
     for t in tuple: tuple2.append(t[:])
@@ -3072,7 +3072,7 @@ def splitgroups(id_role=0, id_action=0, authids=[]):
         return 0
 
     # find all the actions
-    datalist = acca.acc_findPossibleActions(id_role, id_action)
+    datalist = acca.acc_find_possible_actions(id_role, id_action)
 
     if type(authids) is str: authids = [authids]
     for i in range(len(authids)): authids[i] = int(authids[i])
@@ -3087,7 +3087,7 @@ def splitgroups(id_role=0, id_action=0, authids=[]):
     # split groups and return success or failure
     result = 1
     for splitgroup in splitgrps:
-        result = 1 and acca.acc_splitArgumentGroup(id_role, id_action, splitgroup)
+        result = 1 and acca.acc_split_argument_group(id_role, id_action, splitgroup)
 
     return result
 
@@ -3102,7 +3102,7 @@ def mergegroups(id_role=0, id_action=0, authids=[]):
     if not id_role or not id_action or not authids:
         return 0
 
-    datalist = acca.acc_findPossibleActions(id_role, id_action)
+    datalist = acca.acc_find_possible_actions(id_role, id_action)
 
     if type(authids) is str: authids = [authids]
     for i in range(len(authids)): authids[i] = int(authids[i])
@@ -3115,7 +3115,7 @@ def mergegroups(id_role=0, id_action=0, authids=[]):
             mergegroups.append(hlp)
 
     # merge groups and return success or failure
-    if acca.acc_mergeArgumentGroups(id_role, id_action, mergegroups):
+    if acca.acc_merge_argument_groups(id_role, id_action, mergegroups):
         return 1
     else:
         return 0
@@ -3137,7 +3137,7 @@ def deleteselected(id_role=0, id_action=0,  authids=[]):
     if type(authids) in [str, int]: authids = [authids]
     for i in range(len(authids)): authids[i] = int(authids[i])
 
-    result = acca.acc_deletePossibleActions(id_role=id_role,
+    result = acca.acc_delete_possible_actions(id_role=id_role,
                                             id_action=id_action,
                                             authids=authids)
 
@@ -3249,7 +3249,7 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = acca.acc_findPossibleActions(id_role, id_action)
+    res = acca.acc_find_possible_actions(id_role, id_action)
     if res:
         extra = createhiddenform(action='modifyauthorizations',
                                  button='modify authorizations',
@@ -3274,8 +3274,8 @@ def perform_showroleusers(req, id_role=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = acca.acc_getRoleUsers(id_role=id_role)
-    name_role = acca.acc_getRoleName(id_role=id_role)
+    res = acca.acc_get_role_users(id_role=id_role)
+    name_role = acca.acc_get_role_name(id_role=id_role)
 
     if res:
         users = []

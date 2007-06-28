@@ -27,7 +27,7 @@ from os import access, F_OK, R_OK, W_OK, getpid, rename, unlink
 from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
-from invenio.access_control_admin import acc_getAllRoles, acc_getRoleUsers, acc_deleteUserRole
+from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import cdslang, bibconvertconf
 from invenio.access_control_engine import acc_authorize_action
 import invenio.template
@@ -2058,7 +2058,7 @@ def _delete_referee_doctype(errors, warnings, doctype, categid, refereeid):
     """
     user_msg = []
     role_name = """referee_%s_%s""" % (doctype, categid)
-    error_code = acc_deleteUserRole(id_user=refereeid, name_roll=role_name)
+    error_code = acc_delete_user_role(id_user=refereeid, name_roll=role_name)
     if error_code > 0:
         ## referee was deleted from category
         user_msg.append(""" "%s".""" % (doctype,))
@@ -2067,12 +2067,12 @@ def _create_list_referees_doctype(doctype):
     referees = {}
     referees_details = {}
     ## get all CDS Invenio roles:
-    all_roles = acc_getAllRoles()
+    all_roles = acc_get_all_roles()
     for role in all_roles:
         (roleid, rolename) = (role[0], role[1])
         if re.match("^referee_%s_" % (doctype,), rolename):
             ## this is a "referee" role - get users of this role:
-            role_users = acc_getRoleUsers(roleid)
+            role_users = acc_get_role_users(roleid)
             if role_users is not None and (type(role_users) in (tuple, list) and len(role_users) > 0):
                 ## this role has users, record them in dictionary:
                 referees[rolename] = role_users

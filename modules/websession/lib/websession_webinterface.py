@@ -66,7 +66,7 @@ websession_templates = invenio.template.load('websession')
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     _exports = ['', 'edit', 'change', 'lost', 'display',
-                'send_email', 'youradminactivities', 'mailcookie',
+                'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword']
 
     _force_https = True
@@ -74,17 +74,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     def index(self, req, form):
         redirect_to_url(req, '%s/youraccount/display' % sweburl)
 
-    def mailcookie(self, req, form):
-        args = wash_urlargd(form, {'cookie' : (str, '')})
+    def access(self, req, form):
+        args = wash_urlargd(form, {'mailcookie' : (str, '')})
         _ = gettext_set_language(args['ln'])
         title = _("Mail Cookie Service")
-        kind = mail_cookie_retrieve_kind(args['cookie'])
+        kind = mail_cookie_retrieve_kind(args['mailcookie'])
         if kind == 'pw_reset':
-            redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['cookie'], args['ln']))
+            redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['mailcookie'], args['ln']))
         elif kind == 'role':
             uid = webuser.getUid(req)
             try:
-                (role_name, expiration) = mail_cookie_check_role(args['cookie'], uid)
+                (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
             except TypeError:
                 return webuser.page_not_authorized(req, "../youraccount/resetpassword",
                         text=_("This request for an authorization is not valid or"

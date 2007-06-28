@@ -66,7 +66,7 @@ from invenio.dbquery import run_sql, escape_string, OperationalError
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.access_control_config import *
-from invenio.access_control_admin import acc_findUserRoleActions
+from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import http_get_credentials
 from invenio.webgroup_dblayer import get_groups
@@ -293,7 +293,7 @@ def isUserReferee(user_info):
 
 def isUserAdmin(user_info):
     """Return True if the user has some admin rights; False otherwise."""
-    return acc_findUserRoleActions(user_info)
+    return acc_find_user_role_actions(user_info)
 
 def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.

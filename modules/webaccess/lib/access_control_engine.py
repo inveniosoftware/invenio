@@ -62,7 +62,9 @@ def _format_list_of_apache_firerole(roles, referer):
         out += "</p>"
     return out
 
-def make_apache_message(name_action, referer='%s/youraccount/youradminactivities' % sweburl):
+def make_apache_message(name_action, referer=None):
+    if not referer:
+        referer = '%s/youraccount/youradminactivities' % sweburl
     roles = _make_list_apache_firerole(name_action)
     if roles:
         return _format_list_of_apache_firerole(roles, referer)
@@ -151,7 +153,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, id_user), affected_tables=['accROLE', 'user_accROLE']):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
     else:
-        if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(aca.acc_getRoleId(SUPERADMINROLE))):
+        if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(aca.acc_get_role_id(SUPERADMINROLE))):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
 
@@ -214,7 +216,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer'])))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
 
         # 3.2
         if optional == 'yes':
@@ -240,7 +242,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 for id_accROLE in connection:
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer'])))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info('referer', None))))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
@@ -302,7 +304,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
             if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(row[0])):
                 res5.append(row)
         if not res5:
-            return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info['referer']))) # no entries at all
+            return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None)))) # no entries at all
 
     res5.sort()
 

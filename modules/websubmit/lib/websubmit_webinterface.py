@@ -39,7 +39,7 @@ from invenio.config import \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_isRole
+from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.websubmit_config import *

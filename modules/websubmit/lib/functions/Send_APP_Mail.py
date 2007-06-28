@@ -40,7 +40,7 @@ from invenio.config import \
      cdsname, \
      htdocsurl, \
      supportemail
-from invenio.access_control_admin import acc_getRoleUsers,acc_getRoleId
+from invenio.access_control_admin import acc_get_role_users,acc_getRoleId
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
@@ -88,10 +88,10 @@ def Send_APP_Mail (parameters,curdir,form):
     # Build referee's email address
     refereeaddress = ""
     # Try to retrieve the referee's email from the referee's database
-    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_%s" % (doctype,category))):
+    for user in acc_get_role_users(acc_getRoleId("referee_%s_%s" % (doctype,category))):
         refereeaddress += user[1] + ","
     # And if there is a general referee
-    for user in acc_getRoleUsers(acc_getRoleId("referee_%s_*" % doctype)):
+    for user in acc_get_role_users(acc_getRoleId("referee_%s_*" % doctype)):
         refereeaddress += user[1] + ","
     refereeaddress = re.sub(",$","",refereeaddress)
     # Creation of the mail for the referee

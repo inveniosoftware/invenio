@@ -45,7 +45,7 @@ from invenio.config import \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_isRole
+from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
@@ -297,7 +297,7 @@ def interface(req,
         fp.close()
     # is user authorized to perform this action?
     (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act)
-    if acc_isRole("submit", doctype=doctype, act=act) and auth_code != 0:
+    if acc_is_role("submit", doctype=doctype, act=act) and auth_code != 0:
         return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
 
     ## update the "journal of submission":

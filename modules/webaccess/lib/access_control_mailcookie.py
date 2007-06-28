@@ -30,7 +30,7 @@ unique urls sent by email.
 
 from invenio.config import cdslang, sweburl
 from invenio.dbquery import run_sql
-from invenio.access_control_admin import acc_getRoleId, acc_addUserRole
+from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
 from datetime import datetime, timedelta
 from random import random
 from cPickle import dumps, loads
@@ -58,7 +58,7 @@ def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), o
 
 def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3), cookie_timeout=timedelta(days=1), onetime=True):
     """Create a unique url to be sent via email to belong temporaly to a role."""
-    assert(acc_getRoleId(role_name) != 0)
+    assert(acc_get_role_id(role_name) != 0)
     kind = 'role'
     params = (role_name, role_timeout)
     return mail_cookie_create_generic(kind, params, cookie_timeout, onetime)
@@ -118,13 +118,13 @@ def mail_cookie_check_role(cookie, uid):
         (kind, params) = mail_cookie_check_generic(cookie)
         assert(kind == 'role')
         (role_name, role_timeout) = params
-        role_id = acc_getRoleId(role_name)
+        role_id = acc_get_role_id(role_name)
         assert(role_id != 0)
         assert(type(role_timeout) is timedelta)
     except (TypeError, AssertionError, StandardError):
         return None
     expiration = (datetime.today()+role_timeout).strftime(_datetime_format)
-    acc_addUserRole(uid, role_id, expiration)
+    acc_add_user_role(uid, role_id, expiration)
     return (role_name, expiration)
 
 def mail_cookie_check_pw_reset(cookie):

@@ -606,7 +606,6 @@ class Template:
 
 %(outro2)s
 """ % {
-            'hello': _("Hello"),
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
                 "have asked for a\npassword reset for %(cdsname)s for "
                 "the account \"%(email)s\"." % {
@@ -616,10 +615,10 @@ class Template:
                     }
                 ),
             'intro2' : _("If you want to reset the password for this account, please go to:"),
-            'link' : "%s/youraccount/mailcookie%s" %
+            'link' : "%s/youraccount/access%s" %
                 (sweburl, make_canonical_urlargd({
                     'ln' : ln,
-                    'cookie' : reset_key
+                    'mailcookie' : reset_key
                 }, {})),
             'outro' : _("and follow the instructions presented there."),
             'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
@@ -715,7 +714,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if msg is None:
+        if msg is "":
             out = "<p>%(please_login)s" % {
                     'please_login' : _("If you already have an account, please login using the form below.")
                 }
