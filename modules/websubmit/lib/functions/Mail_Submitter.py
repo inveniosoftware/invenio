@@ -99,6 +99,6 @@ def Mail_Submitter (parameters,curdir,form):
     email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
 
     # send the mail
-    send_email(FROMADDR,tostring,"%s: Document Received" % fullrn,email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+    send_email(FROMADDR, m_recipient.strip(), "%s: Document Received" % fullrn, email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
 
