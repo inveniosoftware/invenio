@@ -2377,7 +2377,7 @@ CREATE TABLE IF NOT EXISTS user (
   settings blob default NULL,
   nickname varchar(255) NOT NULL default '',
   last_login datetime NOT NULL default '0000-00-00 00:00:00',
-  encrypted boolean NOT NULL default true,
+  encrypted boolean NOT NULL default 1,
   UNIQUE KEY id (id),
   KEY email (email),
   KEY nickname (nickname)
@@ -2430,7 +2430,7 @@ CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
   data blob NOT NULL,
   expiration datetime NOT NULL default '9999-12-31 23:59:59',
   kind varchar(32) NOT NULL,
-  onetime boolean NOT NULL default false,
+  onetime boolean NOT NULL default 0,
   PRIMARY KEY (id)
 ) TYPE=MyISAM;
 

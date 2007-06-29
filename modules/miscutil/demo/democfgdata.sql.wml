@@ -5,8 +5,8 @@ INSERT INTO accROLE VALUES (4,'thesesviewer','theses viewer',NULL,'allow group "
 INSERT INTO accARGUMENT VALUES (2,'collection','Theses');
 INSERT INTO accROLE_accACTION_accARGUMENT VALUES (4,22,2,1);
 INSERT INTO user_accROLE VALUES (1,4,'9999-12-31 23:59:59');
-INSERT INTO user VALUES (2,'jekyll@cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll',NOW(), true);
-INSERT INTO user VALUES (3,'hyde@cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde',NOW(), true);
+INSERT INTO user VALUES (2,'jekyll@cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll',NOW(), 1);
+INSERT INTO user VALUES (3,'hyde@cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde',NOW(), 1);
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
