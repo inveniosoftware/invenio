@@ -53,7 +53,6 @@ from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.mailutils import send_email
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
-execfile("%s/invenio/websubmit_functions/mail.py" % pylibdir)
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
