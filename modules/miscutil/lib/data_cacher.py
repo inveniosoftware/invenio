@@ -18,9 +18,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable-msg=C0301
-
-"""Tool for caching important infos, which are slow to rebuild, but that rarely change"""
+"""Tool for caching important infos, which are slow to rebuild, but that rarely
+   change"""
 
 from invenio.dbquery import run_sql, get_table_update_time
 import time
@@ -34,8 +33,8 @@ class DataCacher:
     that are slow to retrieve but that don't change too much during time."""
     def __init__(self, cache_filler, timestamp_getter):
         """ @param cache_filler a function that receives the cache dictionary.
-            @param timestamp_getter a function that returns a timestamp for checking
-             if something has changed after cache creation.
+            @param timestamp_getter a function that returns a timestamp for
+            checking if something has changed after cache creation.
         """
         self.timestamp = 0
         self.cache = {}
@@ -53,7 +52,8 @@ class DataCacher:
         self.create_cache()
 
     def create_cache(self):
-        """Create cache. Called on startup and used later during the search time."""
+        """Create cache. Called on startup and used later during the search
+        time."""
         # populate field I18 name cache:
         self.cache = self.cache_filler()
         self.timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -65,22 +65,24 @@ class DataCacher:
         return self.cache
 
 class SQLDataCacher(DataCacher):
-    """ DataCacher is an abstract cacher system, for caching informations
-    that are slow to retrieve but that don't change too much during time."""
-    def __init__(self, query, affected_tables):
-        """ @param cache_filler a function that receives the cache dictionary.
-            @param timestamp_getter a function that returns a timestamp for checking
-             if something has changed after cache creation.
+    """ SqlDataCacher is a cacher system, for caching single queries and
+    their results."""
+    def __init__(self, query, param=None, affected_tables=()):
+        """ @param query the query to cache
+            @param param its optional parameters as a tuple
+            @param affected_tables the list of tables queried by the query.
         """
         self.query = query
         self.affected_tables = affected_tables
+        assert(affected_tables)
         def cache_filler():
             """Standard SQL filler, with results from sql query."""
-            return run_sql(self.query)
+            return run_sql(self.query, param)
 
         def timestamp_getter():
             """Standard timestamp getter from affected tables by query."""
-            return max([get_table_update_time(table) for table in self.affected_tables])
+            return max([get_table_update_time(table)
+                for table in self.affected_tables])
         DataCacher.__init__(self, cache_filler, timestamp_getter)
 
 
