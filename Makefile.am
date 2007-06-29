@@ -188,9 +188,12 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user CHANGE password password tinyblob NULL default NULL;" | ./modules/miscutil/bin/dbexec
-	echo "UPDATE user SET password=AES_ENCRYPT(email,password);" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE user SET password='' WHERE password=NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user CHANGE password password tinyblob NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user ADD COLUMN encrypted boolean NOT NULL default false;" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE user SET password=AES_ENCRYPT(email,password), encrypted=true WHERE encrypted=false;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
+	./modules/webaccess/bin/webaccessadmin -u admin -c
 
 drop-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
