@@ -26,6 +26,8 @@ pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
 	webgroup_regression_tests.py webuser_regression_tests.py \
 	webgroup_tests.py sessiongc.py
 
+noinst_DATA = password_migration_kit.py
+
 EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

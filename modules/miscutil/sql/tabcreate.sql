@@ -2372,13 +2372,12 @@ CREATE TABLE IF NOT EXISTS session (
 CREATE TABLE IF NOT EXISTS user (
   id int(15) unsigned NOT NULL auto_increment,
   email varchar(255) NOT NULL default '',
-  password tinyblob NOT NULL default '',
+  password blob NOT NULL,
   note varchar(255) default NULL,
   settings blob default NULL,
   nickname varchar(255) NOT NULL default '',
   last_login datetime NOT NULL default '0000-00-00 00:00:00',
-  encrypted boolean NOT NULL default 1,
-  UNIQUE KEY id (id),
+  PRIMARY KEY id (id),
   KEY email (email),
   KEY nickname (nickname)
 ) TYPE=MyISAM;

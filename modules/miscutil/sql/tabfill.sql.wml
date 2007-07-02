@@ -46,7 +46,7 @@ INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
 <zh_CN>INSERT INTO collectionname VALUES (1,'zh_CN','ln',"<CDSNAMEINTL>");</zh_CN>
 <zh_TW>INSERT INTO collectionname VALUES (1,'zh_TW','ln',"<CDSNAMEINTL>");</zh_TW>
 
-INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '', true);
+INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=author&p=\" urlencode($author)','EXT','','');
