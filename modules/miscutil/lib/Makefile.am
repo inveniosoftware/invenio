@@ -41,7 +41,8 @@ pylib_DATA = __init__.py \
 	     w3c_validator.py
 
 noinst_DATA = testimport.py \
-              kwalitee.py
+              kwalitee.py \
+              api_migration_kit.sh
 
 phplibdir = $(libdir)/php/invenio/errors
 phplib_DATA = errorHandling.php
