@@ -76,8 +76,11 @@ class ExternalAuthCern(ExternalAuth):
         ExternalAuth.__init__(self)
         try:
             self.connection = AuthCernWrapper()
-        except (httplib.CannotSendRequest, socket.error, AttributeError, IOError, TypeError): # Let the user note that no connection is available
+        except (httplib.CannotSendRequest, socket.error, AttributeError,
+                IOError, TypeError), msg: # Let the user note that
+                                     # no connection is available
             self.connection = None
+            raise WebAccessExternalAuthError, msg
 
 
     def _try_twice(self, funct, params):
@@ -86,11 +89,13 @@ class ExternalAuthCern(ExternalAuth):
         """
         try:
             ret = funct(self.connection, **params)
-        except (httplib.CannotSendRequest, socket.error, AttributeError, IOError, TypeError):
+        except (httplib.CannotSendRequest, socket.error, AttributeError,
+                IOError, TypeError):
             try:
                 self.connection = AuthCernWrapper()
                 ret = funct(self.connection, **params)
-            except (httplib.CannotSendRequest, socket.error, AttributeError, IOError, TypeError):
+            except (httplib.CannotSendRequest, socket.error, AttributeError,
+                    IOError, TypeError):
                 self.connection = None
                 raise WebAccessExternalAuthError
         return ret
@@ -132,21 +137,23 @@ class ExternalAuthCern(ExternalAuth):
         groups = self._try_twice(funct=AuthCernWrapper.get_groups_for_user, \
                 params={"user_name":email})
         # Filtering out uncomfortable groups
-        groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
+        groups = [group for group in groups if group not in
+            CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
         for regexp in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE:
             for group in groups:
                 if regexp.match(group):
                     groups.remove(group)
-        # Produce list of double value: group/mailing list(with stripped @cern.ch) name,
-        # and group/description built from the name.
-        return dict(map(lambda x: (x.find('@') > -1 and x[:x.find('@')] or x, '@' in x and x + ' (CERN Mailing list)' \
+        # Produce list of double value: group/mailing list(with stripped
+        # @cern.ch) name, and group/description built from the name.
+        return dict(map(lambda x: (x.find('@') > -1 and x[:x.find('@')] or x,
+                        '@' in x and x + ' (CERN Mailing list)'
                         or x + ' (CERN Group)'), groups))
 
     def fetch_user_nickname(self, username, password, req=None):
-        """Given a username and a password, returns the right nickname belonging
-        to that user (username could be an email).
+        """Given a username and a password, returns the right nickname
+        belonging to that user (username could be an email).
         """
-        infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \
+        infos = self._try_twice(funct=AuthCernWrapper.get_user_info,
                 params={"user_name":username, "password":password})
         if "login" in infos:
             return infos["login"]

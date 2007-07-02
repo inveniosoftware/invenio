@@ -49,7 +49,8 @@ class AuthCernWrapper:
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
-        self._conn.close()
+        if self._conn:
+            self._conn.close()
 
     def _request(self, name, params):
         """Call the name request with a dictionary parms.
