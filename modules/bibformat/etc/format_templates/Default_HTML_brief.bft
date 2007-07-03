@@ -3,9 +3,10 @@
 <strong><BFE_TITLE_BRIEF highlight="no"/></strong> 
 <BFE_AUTHORS limit="4" prefix=" / " extension=" ;<em> et al</em> " highlight="no"/>
 
-<BFE_ADDITIONAL_REPORT_NUMBER
+<BFE_ADDITIONAL_REPORT_NUMBERS
 prefix = '<small class="quicknote"> ['
-suffix="]</small> " />
+suffix="]</small> " 
+separator=" "/>
 
 <BFE_PRIMARY_REPORT_NUMBER 
 prefix = '<small class="quicknote"> ['
