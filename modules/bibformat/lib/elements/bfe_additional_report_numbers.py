@@ -23,7 +23,7 @@
 
 __revision__ = "$Id$"
 
-def format(bfo, separator, limit):
+def format(bfo, limit, separator=" "):
     """
     Prints the additional report numbers of the record
     
