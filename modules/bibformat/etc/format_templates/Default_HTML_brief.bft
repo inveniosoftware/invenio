@@ -6,7 +6,7 @@
 <BFE_ADDITIONAL_REPORT_NUMBERS
 prefix = '<small class="quicknote"> ['
 suffix="]</small> " 
-separator=" "/>
+separator="] ["/>
 
 <BFE_PRIMARY_REPORT_NUMBER 
 prefix = '<small class="quicknote"> ['
