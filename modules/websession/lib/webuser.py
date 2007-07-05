@@ -325,7 +325,8 @@ def email_valid_p(email):
             return 0
     return 1
 
-def registerUser(req, email, passw, nickname, register_without_nickname=False):
+def registerUser(req, email, passw, nickname, register_without_nickname=False,
+        login_method=None):
     """Register user with the desired values of NICKNAME, EMAIL and
        PASSW.
 
@@ -338,6 +339,10 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
        valid, 2 if nickname is not valid, 3 if email is already in the
        database, 4 if nickname is already in the database, 5 when
        users cannot register themselves because of the site policy.
+
+       If login_method is None or is equal to the key corresponding to local
+       authentication, then CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS is taken
+       in account for deciding the behaviour about registering.
        """
 
     # is email valid?
@@ -362,14 +367,17 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False):
         if len(res) > 0:
             return 4
 
-    # okay, go on and register the user:
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+    if not login_method or not CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # local login
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+            activated = 1
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+            activated = 0
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+            return 5
+    else:
         activated = 1
-    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
-        activated = 0
-    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
-        return 5
 
+    # okay, go on and register the user:
     user_preference = get_default_user_preferences()
 
     setUid(req, run_sql("INSERT INTO user (nickname, email, password, note, settings) VALUES (%s,%s,AES_ENCRYPT(email,%s),%s,%s)",
@@ -432,10 +440,13 @@ def loginUser(req, p_un, p_pw, login_method):
                         p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw, req)
                     except (AttributeError, NotImplementedError):
                         pass
-                res = registerUser(req, p_email, p_pw_local, p_nickname, \
-                        register_without_nickname=p_nickname == '')
+                res = registerUser(req, p_email, p_pw_local, p_nickname,
+                        register_without_nickname=p_nickname == '',
+                        login_method=login_method)
                 if res == 4 or res == 2: # The nickname was already taken
-                    res = registerUser(req, p_email, p_pw_local, '', register_without_nickname=True)
+                    res = registerUser(req, p_email, p_pw_local, '',
+                    register_without_nickname=True,
+                    login_method=login_method)
                 if res == 0: # Everything was ok, with or without nickname.
                     query_result = run_sql("SELECT id from user where email=%s", (p_email,))
                 else:
