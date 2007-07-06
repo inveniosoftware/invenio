@@ -24,11 +24,12 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo):
+def format(bfo,
+           kb_name="dbcollid2coll"):
     """
     HTML top page banner containing category, rep. number, etc
     """
-    collection_indicator = bfo.kb("dbcollid2coll", bfo.field("980__a"))
+    collection_indicator = bfo.kb(kb, bfo.field("980__a"))
     collection_indicator = cgi.escape(collection_indicator)
     subject = bfo.field("65017a")
     subject = cgi.escape(subject)
