@@ -29,7 +29,7 @@ def format(bfo,
     """
     HTML top page banner containing category, rep. number, etc
     """
-    collection_indicator = bfo.kb(kb, bfo.field("980__a"))
+    collection_indicator = bfo.kb(kb_name, bfo.field("980__a"))
     collection_indicator = cgi.escape(collection_indicator)
     subject = bfo.field("65017a")
     subject = cgi.escape(subject)
