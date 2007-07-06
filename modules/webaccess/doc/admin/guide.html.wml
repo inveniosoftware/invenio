@@ -876,17 +876,23 @@ II. Example - connecting role and user</a>
    local account is randomly generated.
 
    If you want the user to be unable to change login method and account username / password, forcing use
-   of certain external systems, set CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS to 4 as mentioned in the last paragraph.
+   of certain external systems, set <strong>CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS</strong> to <em>4</em> as mentioned in the last paragraph.
 
-   If a user is changing login method from an external one to the internal, he also need to either change the
-   password before logging out, or ask to get the password sent by email, since the password is randomly
-   generated for the local account when using an external login method.
+   If a user is changing login method from an <em>external</em> one to the <em>internal</em>, he also need to either change the
+   password before logging out, or set the password via the lost password email service.
 
-   If a external login system is used, you may want to protect the users username / password using HTTPS.
+   If you are using <strong>CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS</strong> with a value greater than <em>1</em> note
+   that, even if the first login of a user through an external authentication technically means registering
+   the user into the system, this is not the semantic expected behaviour by the user. The user is already
+   <em>registered</em> at an authority that we trust, so there's no need to prevent the user from being imported
+   into the system. That's why for external authentication <strong>CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS</strong> is not
+   considered apart from what said above.
+
+   If a external login system is used, you may want to protect the users username / password using <strong>HTTPS</strong>.
 
    To add new system, two changes must be made (for the time being):
    - The name of the method, if it is default or not, and the classname must be added to the variable
-     CFG_EXTERNAL_AUTHENTICATION in access_control_config.py. Atleast one method must be marked as the
+     <strong>CFG_EXTERNAL_AUTHENTICATION</strong> in <em>access_control_config.py</em>. Atleast one method must be marked as the
      default one. The internal login method should be given with None as classname.
 
      Example:
@@ -894,16 +900,16 @@ II. Example - connecting role and user</a>
                                                         (AuthCernWrapper(), False)}
 
    - A class must be created derived from the class external_authentication inside file
-     external_authentication.py. This class must include at least the
-     function auth_user. This function returns a valid email-address in CDS Invenio if the user
+     <em>external_authentication.py</em>. This class must include at least the
+     function <strong>auth_user</strong>. This function returns a valid email-address in <em>CDS Invenio</em> if the user
      is authenticated, not necessarily the same entered by the user as username. If the user
-     is not authenticated, return None.
-     The class could also provide five more methods: fetch_user_preferences, user_exists,
-     fetch_user_groups_membership and fetch_all_users_groups_membership.
+     is not authenticated, return <em>None</em>.
+     The class could also provide five more methods: <strong>fetch_user_preferences</strong>, <strong>user_exists</strong>,
+     <strong>fetch_user_groups_membership</strong> and <strong>fetch_all_users_groups_membership</strong>.
      The first should take an email and eventually a password and should return a dictionary of keys
      and value representing external preferences, infos or settings. If, for some reasons, you like
      to force some kind of hiding for some particular field you should export the related key
-     prefixed by "HIDDEN_". Those fields won't be displayed in tables and pages regarding external
+     prefixed by <em>"HIDDEN_"</em>. Those fields won't be displayed in tables and pages regarding external
      settings.
      The second method should check through the external system if a particular email exists. If you
      provide such a method then a user will be able to switch from and to this authorization method.
@@ -912,7 +918,7 @@ II. Example - connecting role and user</a>
      the user has a membership. Those groups will be merged into the groups system.
      The user will be a member of those groups and will be able to use them in any place
      where groups are useful, but won't be able to unsubscribe or to administrate them.
-     The fourth method should just return a dictionary of external groups as keys and touples containing
+     The fourth method should just return a dictionary of external groups as keys and tuples containing
      a group description and a list of email of users belonging to each groups. Those memberships
      will be merged into the database in the way done by the previous method, but could
      provide batch synchronization of groups.
@@ -921,8 +927,16 @@ II. Example - connecting role and user</a>
      Note: if your system has more than one external login methods then incoherence in the groups
      memberships could happen when a user switch his login method. This will be fixed some times in the
      future.
-     Note every method will receive as last parameter the mod_python request object, that could
+     If you add as an attribute of your class the <strong>enforce_external_nicknames</strong> and set it to <em>True</em>, this will enforce
+     the system to import external nicknames whenever the user login with the external login method for the
+     first time. Since a nickname is not changable this will stay fixed forever. If this nickname is
+     already registered in the system (suppose that is linked with a local account) then it will not be
+     imported. If this variable doesn't exist or is set to <em>False</em> then no nickname will be
+     imported and the user will be free to choose a nickname in the future (and then this will again
+     stay forever).
+     Note: every method will receive as last parameter the <em>mod_python request object</em>, that could
      be used for particular purposes.
+
 
      Example template:
      from invenio.external_authentication import ExternalAuth, WebAccessExternalAuthError
@@ -933,6 +947,7 @@ II. Example - connecting role and user</a>
          def __init__ (self):
              """Initialize stuff here."""
              self.name = None
+             self.enforce_external_nicknames = False
              pass
 
          def auth_user(self, username, password, req=None):
