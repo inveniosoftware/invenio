@@ -767,7 +767,7 @@ def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action="runwebcoll",
             authorization_msg="WebColl Task Submission",
-            description="""Description: %s updates the collection cache
+            description="""Description: webcoll updates the collection cache
     (record universe for a given collection plus web page elements)
     based on WML and DB configuration parameters.
     If the collection name is passed as the second argument, it'll update
