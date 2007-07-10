@@ -110,7 +110,7 @@ def repair_role_definitions():
     """ Try to rebuild compiled serialized definitions from their respectives
     sources. This is needed in case Python break back compatibility.
     """
-    definitions = run_sql("SELECT id, firerole_def_src FROM accROLE""")
+    definitions = run_sql("SELECT id, firerole_def_src FROM accROLE")
     for role_id, firerole_def_src in definitions:
         run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (serialize(compile_role_definition(firerole_def_src)), role_id))
 

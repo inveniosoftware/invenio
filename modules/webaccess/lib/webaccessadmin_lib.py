@@ -934,7 +934,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
 
     subtitle = """<a name="4"></a>4. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
         user_pref = get_user_preferences(userID)
@@ -980,7 +980,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 
     subtitle = """<a name="5"></a>5. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/webaccess/guide.html#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email, FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
         if confirm in [0, "0"]:

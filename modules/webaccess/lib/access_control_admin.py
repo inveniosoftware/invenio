@@ -1732,7 +1732,7 @@ def acc_find_delegated_roles(id_role_admin=0):
     rolenames = run_sql("""SELECT DISTINCT(ar.value)
         FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accARGUMENT ar
         ON raa.id_accARGUMENT = ar.id
-        WHERE raa.id_accROLE = '%s AND
+        WHERE raa.id_accROLE = %s AND
         raa.id_accACTION = %s""", (id_role_admin, id_action_delegate))
 
     result = []
