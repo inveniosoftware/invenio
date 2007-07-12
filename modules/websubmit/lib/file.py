@@ -49,7 +49,8 @@ _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 _extensions = _mimes.encodings_map.keys() + \
               _mimes.suffix_map.keys() + \
               _mimes.types_map[1].keys()
-_extensions.sort(reverse=True)
+_extensions.sort()
+_extensions.reverse()
 
 def file_strip_ext(file):
     """Strip in the best way the extension from a filename"""
