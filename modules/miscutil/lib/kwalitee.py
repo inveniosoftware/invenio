@@ -61,6 +61,7 @@ def get_list_of_python_code_files(modulesdir, modulename):
     # last, remove Makefile, test files, z_ files:
     # pylint: disable-msg=W0141
     out = filter(lambda x: not x.endswith("Makefile.in"), out)
+    out = filter(lambda x: not x.endswith("dbexec.in"), out)
     out = filter(lambda x: not x.endswith("_tests.py"), out)
     out = filter(lambda x: x.find("/z_") == -1, out)
     # return list:
@@ -75,7 +76,7 @@ def wash_list_of_python_files_for_pylinting(filenames):
     filenames = filter(lambda x: x.endswith(".py"),
                                  filenames)
     # remove empty __init__.py files (FIXME: we may check for file size here
-    # in case we shall have non-empty __init__.py files one day)    
+    # in case we shall have non-empty __init__.py files one day)
     filenames = filter(lambda x: not x.endswith("__init__.py"),
                                  filenames)
     # take out unloadable bibformat test files:
@@ -119,14 +120,14 @@ def get_nb_test_cases_in_file(filename):
 def get_pylint_results(filename):
     """Run pylint and return the tuple of (nb_missing_docstrings,
        score) for FILENAME.  If score cannot be detected, print an
-       error and return (-999999999, -999999999).       
+       error and return (-999999999, -999999999).
     """
     (dummy, pipe, dummy) = os.popen3("pylint %s" % filename)
     pylint_output = pipe.read()
 
     # detect number of missing docstrings:
     nb_missing_docstrings = pylint_output.count(": Missing docstring")
-    
+
     # detect pylint score:
     pylint_score = -999999999
     pylint_score_matched = re.search(r'Your code has been rated at ([0-9\.\-]+)\/10', pylint_output)
@@ -150,11 +151,11 @@ def get_nb_pychecker_warnings(filename):
     (dummy, pipe, dummy) = os.popen3("pychecker --limit=10000 %s" % filename)
     pychecker_output_lines = pipe.readlines()
     for line in pychecker_output_lines:
-        if line.find(filename_to_watch_for + ":") > -1:            
-            nb_warnings_found += 1            
+        if line.find(filename_to_watch_for + ":") > -1:
+            nb_warnings_found += 1
     if verbose >= 9:
         print "get_nb_pychecker_warnings(%s) = %s" % (filename, nb_warnings_found)
-    return nb_warnings_found    
+    return nb_warnings_found
 
 def calculate_module_kwalitee(modulesdir, modulename):
     """Run kwalitee tests for MODULENAME in MODULESDIR
@@ -185,7 +186,7 @@ def calculate_module_kwalitee(modulesdir, modulename):
     for filename in files_for_pylinting:
         filename_nb_missing_docstrings, filename_pylint_score = get_pylint_results(filename)
         total_nb_missing_docstrings += filename_nb_missing_docstrings
-        total_pylint_score += filename_pylint_score        
+        total_pylint_score += filename_pylint_score
     # pylint: disable-msg=W0704
     try:
         avg_pylint_score = total_pylint_score / len(files_for_pylinting)
@@ -304,7 +305,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
     print """
 Legend:
   #LOC = number of lines of code (excl. test files, incl. comments/blanks)
-  #UnitT = number of unit test cases  
+  #UnitT = number of unit test cases
   #RegrT = number of regression test cases
   #T/1kLOC = number of tests per 1k lines of code [desirable: > 10]
   #MissDoc = number of missing docstrings [desirable: 0]
@@ -339,11 +340,11 @@ def generate_kwalitee_stats_for_some_files(filenames):
                               'nb_pychecker_warnings': 0,
                               'avg_pylint_score': 0,
                               }
-        kwalitee[filename]['nb_loc'] = get_nb_lines_in_file(filename) 
+        kwalitee[filename]['nb_loc'] = get_nb_lines_in_file(filename)
         kwalitee[filename]['nb_pychecker_warnings'] = get_nb_pychecker_warnings(filename)
-        kwalitee[filename]['nb_missing_docstrings'], kwalitee[filename]['avg_pylint_score'] = get_pylint_results(filename) 
+        kwalitee[filename]['nb_missing_docstrings'], kwalitee[filename]['avg_pylint_score'] = get_pylint_results(filename)
         # add it to the total results:
-        kwalitee['TOTAL']['nb_loc'] += kwalitee[filename]['nb_loc'] 
+        kwalitee['TOTAL']['nb_loc'] += kwalitee[filename]['nb_loc']
         kwalitee['TOTAL']['nb_pychecker_warnings'] += kwalitee[filename]['nb_pychecker_warnings']
         kwalitee['TOTAL']['nb_missing_docstrings'] += kwalitee[filename]['nb_missing_docstrings']
         kwalitee['TOTAL']['avg_pylint_score'] += kwalitee[filename]['avg_pylint_score']
@@ -354,7 +355,7 @@ def generate_kwalitee_stats_for_some_files(filenames):
             'nb_missing_docstrings': kwalitee[filename]['nb_missing_docstrings'],
             'nb_pychecker_warnings': kwalitee[filename]['nb_pychecker_warnings'],
             'avg_pylint_score': kwalitee[filename]['avg_pylint_score'],
-            }        
+            }
     # print totals:
     print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11
     print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10" % {
@@ -402,7 +403,7 @@ def main():
             usage()
             sys.exit(0)
     elif os.path.isfile(first_argument) and first_argument.endswith(".py"):
-        generate_kwalitee_stats_for_some_files(sys.argv[1:])            
+        generate_kwalitee_stats_for_some_files(sys.argv[1:])
     else:
         print "ERROR: don't know what to do with %s." % first_argument
         usage()
@@ -412,7 +413,7 @@ def main():
 def test():
     """Test some stuff."""
     print get_pylint_results("/opt/cds-invenio/lib/python/invenio/bibrecord.py")
-    
+
 if __name__ == "__main__":
     #test()
     main()
