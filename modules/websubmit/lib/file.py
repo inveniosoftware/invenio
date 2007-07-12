@@ -20,13 +20,8 @@
 __revision__ = "$Id$"
 
 ## import interesting modules:
-import string
 import os
-import sys
-import time
-import types
 import re
-import mimetypes
 import shutil
 import md5
 import urllib
@@ -37,168 +32,192 @@ from invenio.config import \
      filedir, \
      filedirsize, \
      images, \
-     storage, \
-     version, \
      weburl
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
-from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import *
+#from invenio.websubmit_config import *s
+from mimetypes import MimeTypes
 
-from invenio.messages import gettext_set_language
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-archivepath = filedir
-archivesize = filedirsize
+_archive_path = filedir
+_archive_size = filedirsize
 
-# sort compressed file extensions list to get lengthy ones first:
-CFG_COMPRESSED_FILE_EXTENSIONS_SORTED = CFG_COMPRESSED_FILE_EXTENSIONS
-CFG_COMPRESSED_FILE_EXTENSIONS_SORTED.sort()
+_mimes = MimeTypes()
+_mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
+_mimes.encodings_map.update({'.bz2' : 'bzip2'})
+_extensions = _mimes.encodings_map.keys() + \
+              _mimes.suffix_map.keys() + \
+              _mimes.types_map[1].keys()
+_extensions.sort(reverse=True)
 
 def file_strip_ext(file):
-    for c_ext in CFG_KNOWN_FILE_EXTENSIONS:
-        if file[-len(c_ext):len(file)]==c_ext and file[-len(c_ext)-1]==".":
-            file = file[0:-len(c_ext)-1]
+    """Strip in the best way the extension from a filename"""
+    ext = '.'
+    while ext:
+        ext = ''
+        for c_ext in _extensions:
+            if file.endswith(c_ext):
+                file = file[0:-len(c_ext)]
+                ext = c_ext
+                break
     return file
+
+_path_re = re.compile(r'.*[\\/:]')
+def decompose_file(file):
+    """Decompose a file into dirname, basename and extension"""
+    basename = _path_re.sub('', file)
+    dirname = file[:-len(basename)-1]
+    base = file_strip_ext(basename)
+    extension = basename[len(base) + 1:]
+    return (dirname, base, extension)
+
+def propose_unique_name(file, use_version=False):
+    """Propose a unique name, taking in account the version"""
+    if use_version:
+        version = ';'+re.sub('.*;', '', file)
+        file = file[:-len(version)]
+    else:
+        version = ''
+    (basedir, basename, extension) = decompose_file(file)
+    if extension: # Sometimes the extension wasn't guessed
+        extension = '.' + extension
+    goodname = "%s%s%s" % (basename, extension, version)
+    i = 1
+    listdir = os.listdir(basedir)
+    while goodname in listdir:
+        i += 1
+        goodname = "%s_%s%s%s" % (basename, i, extension, version)
+    return "%s/%s" % (basedir, goodname)
 
 class BibRecDocs:
     """this class represents all the files attached to one record"""
-    def __init__(self,recid):
+    def __init__(self, recid):
         self.id = recid
         self.bibdocs = []
         self.buildBibDocList()
 
     def buildBibDocList(self):
         self.bibdocs = []
-        res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc where id=id_bibdoc and id_bibrec=%s", (self.id,))
+        res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc "
+            "where id=id_bibdoc and id_bibrec=%s", (self.id,))
         for row in res:
             if row[2] == "":
                 status = 0
             else:
                 status = int(row[2])
             if status & 1 == 0:
-                self.bibdocs.append(BibDoc(bibdocid=row[0],recid=self.id))
+                self.bibdocs.append(BibDoc(bibdocid=row[0], recid=self.id))
 
-    def listBibDocs(self,type=""):
+    def listBibDocs(self, type=""):
         """Returns the list all bibdocs object belonging to a recid.
         If type is set, it returns just the bibdocs of that type.
         """
-        tmp=[]
+        tmp = []
         for bibdoc in self.bibdocs:
-            if type=="" or type == bibdoc.getType():
+            if type == "" or type == bibdoc.getType():
                 tmp.append(bibdoc)
         return tmp
 
-    def getBibDocNames(self,type="Main"):
-        """Returns the names of the files associated with the bibdoc of a paritcular type"""
+    def getBibDocNames(self, type="Main"):
+        """Returns the names of the files associated with the bibdoc of a
+        paritcular type"""
         names = []
         for bibdoc in self.listBibDocs(type):
             names.append(bibdoc.getDocName())
         return names
 
-    def getBibDoc(self,bibdocid):
-        """Returns the bibdoc with a particular bibdocid associated with this recid"""
+    def getBibDoc(self, bibdocid):
+        """Returns the bibdoc with a particular bibdocid associated with
+        this recid"""
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 return bibdoc
         return None
 
-    def deleteBibDoc(self,bibdocid):
+    def deleteBibDoc(self, bibdocid):
         """Delete a bibdocid associated with the recid."""
         for bibdoc in self.bibdocs:
             if bibdoc.getId() == bibdocid:
                 bibdoc.delete()
         self.buildBibDocList()
 
-    def addBibDoc(self,type="Main",docname="file"):
-        """Creates a new bibdoc associated with the recid, with a file called docname
-        and a paritcular type. It returns the bibdoc object which was just created.
-        If it already exists a bibdoc with docname name, it appends _2 the necessary
-        number of times for having a unique name.
+    def addBibDoc(self, type="Main", docname="file"):
+        """Creates a new bibdoc associated with the recid, with a file
+        called docname and a particular type. It returns the bibdoc object
+        which was just created.
+        If it already exists a bibdoc with docname name, it appends a _number
+        to have a unique name.
         """
-        while docname in self.getBibDocNames(type):
-            match = re.match("(.*_)([^_]*)",docname)
-            if match:
-                try:
-                    docname = match.group(1)+str(int(match.group(2)) + 1)
-                except:
-                    docname = docname + "_2"
-            else:
-                docname = docname + "_2"
-        bibdoc = BibDoc(recid=self.id,type=type,docname=docname)
+        goodname = docname
+        i = 1
+        while goodname in self.getBibDocNames(type):
+            i += 1
+            goodname = "%s_%s" % (docname, i)
+        bibdoc = BibDoc(recid=self.id, type=type, docname=goodname)
         if bibdoc is not None:
             self.bibdocs.append(bibdoc)
         return bibdoc
 
-    def addNewFile(self,fullpath,type="Main"):
+    def addNewFile(self, fullpath, type="Main"):
         """Creates a new bibdoc given a fullpath file and store the file in it.
         It returns the bibdoc object.
         """
-        filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
-        bibdoc = self.addBibDoc(type,filename)
+        basename = decompose_file(fullpath)[1]
+        bibdoc = self.addBibDoc(type, basename)
         if bibdoc is not None:
-            bibdoc.addFilesNewVersion(files=[fullpath])
+            bibdoc.addFilesNewVersion([fullpath])
             return bibdoc
         return None
 
-    def addNewVersion(self,fullpath,bibdocid):
-        """Adds a new fullpath file to an already existent bibdocid making the previous
-        files associated with the same bibdocids obsolete.
+    def addNewVersion(self, fullpath, bibdocid):
+        """Adds a new fullpath file to an already existent bibdocid making the
+        previous files associated with the same bibdocids obsolete.
         It returns the bibdoc object.
         """
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc is not None:
-            bibdoc.addFilesNewVersion(files=[fullpath])
-            docname = re.sub("\..*","",re.sub(r".*[\\/:]", "", fullpath))
-            if docname != bibdoc.getDocName():
-                while docname in self.getBibDocNames(bibdoc.getType()):
-                    match = re.match("(.*_)([^_]*)",docname)
-                    if match:
-                        try:
-                            docname = match.group(1)+str(int(match.group(2)) + 1)
-                        except:
-                            docname = docname + "_2"
-                    else:
-                        docname = docname + "_2"
-                bibdoc.changeName(docname)
+            bibdoc.addFilesNewVersion([fullpath])
             return bibdoc
         return None
 
-    def addNewFormat(self,fullpath,bibdocid):
-        """Adds a new format for a fullpath file to an already existent bibdocid
-        along side already there files.
+    def addNewFormat(self, fullpath, bibdocid):
+        """Adds a new format for a fullpath file to an already existent
+        bibdocid along side already there files.
         It returns the bibdoc object.
         """
         bibdoc = self.getBibDoc(bibdocid)
         if bibdoc is not None:
-            bibdoc.addFilesNewFormat(files=[fullpath])
+            bibdoc.addFilesNewFormat([fullpath])
             return bibdoc
         return None
 
-    def listLatestFiles(self,type=""):
+    def listLatestFiles(self, type=""):
         docfiles = []
         for bibdoc in self.listBibDocs(type):
             for docfile in bibdoc.listLatestFiles():
                 docfiles.append(docfile)
         return docfiles
 
-    def checkFileExists(self,fullpath,type=""):
+    def checkFileExists(self, fullpath, type=""):
+        """Check if the file pointed by fullpath corresponds to some existant
+        file, either by name or by content."""
+        basename = decompose_file(fullpath)[1]
         if os.path.exists(fullpath):
             docfiles = self.listLatestFiles(type)
             for docfile in docfiles:
-                if md5.new(readfile(fullpath)).digest() == md5.new(readfile(docfile.getPath())).digest():
+                if docfile.name == basename or \
+                        md5.new(readfile(fullpath)).digest() == \
+                        md5.new(readfile(docfile.getPath())).digest():
                     return docfile.getBibDocId()
         else:
             return 0
 
 
-    def display(self,bibdocid="",version="",type="", ln = cdslang):
-        t=""
+    def display(self, bibdocid="", version="", type="", ln = cdslang):
+        t = ""
         bibdocs = []
-        if bibdocid!="":
+        if bibdocid != "":
             for bibdoc in self.bibdocs:
                 if bibdoc.getId() == bibdocid:
                     bibdocs.append(bibdoc)
@@ -214,7 +233,8 @@ class BibRecDocs:
                            }
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.getType():
-                        fulltype['content'].append(bibdoc.display(version, ln = ln))
+                        fulltype['content'].append(bibdoc.display(version,
+                            ln = ln))
                 fulltypes.append(fulltype)
 
             t = websubmit_templates.tmpl_bibrecdoc_filelist(
@@ -228,11 +248,12 @@ class BibDoc:
         there is a one to one mapping between an instance of this class and
         an entry in the bibdoc db table"""
 
-    def __init__ (self,bibdocid="",recid="",docname="file",type="Main"):
+    def __init__ (self, bibdocid="", recid="", docname="file", type="Main"):
         # bibdocid is known, the document already exists
         if bibdocid != "":
             if recid == "":
-                res = run_sql("select id_bibrec,type from bibrec_bibdoc where id_bibdoc=%s",(bibdocid,))
+                res = run_sql("select id_bibrec,type from bibrec_bibdoc "
+                    "where id_bibdoc=%s", (bibdocid,))
                 if len(res) > 0:
                     recid = res[0][0]
                     self.type = res[0][1]
@@ -240,18 +261,20 @@ class BibDoc:
                     recid = None
                     self.type = ""
             else:
-                res = run_sql("select type from bibrec_bibdoc where id_bibrec=%s and id_bibdoc=%s",(recid,bibdocid,))
+                res = run_sql("select type from bibrec_bibdoc "
+                    "where id_bibrec=%s and id_bibdoc=%s", (recid, bibdocid,))
                 self.type = res[0][0]
             # gather the other information
-            res = run_sql("select * from bibdoc where id=%s", (bibdocid,))
+            res = run_sql("select id,status,docname,creation_date,"
+                "modification_date from bibdoc where id=%s", (bibdocid,))
             self.cd = res[0][3]
             self.md = res[0][4]
             self.recid = recid
             self.docname = res[0][2]
             self.id = bibdocid
             self.status = int(res[0][1])
-            group = "g"+str(int(int(self.id)/archivesize))
-            self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
+            group = "g" + str(int(int(self.id) / _archive_size))
+            self.basedir = "%s/%s/%s" % (_archive_path, group, self.id)
         # else it is a new document
         else:
             if docname == "" or type == "":
@@ -261,22 +284,30 @@ class BibDoc:
                 self.type = type
                 self.docname = docname
                 self.status = 0
-                self.id = run_sql("insert into bibdoc (status,docname,creation_date,modification_date) values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
+                self.id = run_sql("insert into bibdoc "
+                    "(status,docname,creation_date,modification_date) "
+                    "values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
                 if self.id is not None:
-                    #we link the document to the record if a recid was specified
+                    # we link the document to the record if a recid was
+                    # specified
                     if self.recid != "":
-                        run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (recid,self.id,self.type,))
+                        run_sql("insert into bibrec_bibdoc values(%s,%s,%s)",
+                            (recid, self.id, self.type,))
                 else:
                     return None
-                group = "g"+str(int(int(self.id)/archivesize))
-                self.basedir = "%s/%s/%s" % (archivepath,group,self.id)
+                group = "g" + str(int(int(self.id) / _archive_size))
+                self.basedir = "%s/%s/%s" % (_archive_path, group, self.id)
                 # we create the corresponding storage directory
                 if not os.path.exists(self.basedir):
                     os.makedirs(self.basedir)
                     # and save the father record id if it exists
-                    if self.recid!="":
-                        fp = open("%s/.recid" % self.basedir,"w")
+                    if self.recid != "":
+                        fp = open("%s/.recid" % self.basedir, "w")
                         fp.write(str(self.recid))
+                        fp.close()
+                    if self.type != "":
+                        fp = open("%s/.type" % self.basedir, "w")
+                        fp.write(str(self.type))
                         fp.close()
         # build list of attached files
         self.docfiles = {}
@@ -285,27 +316,36 @@ class BibDoc:
         self.relatedFiles = {}
         self.BuildRelatedFileList()
 
-    def addFilesNewVersion(self,files=[]):
+    def addFilesNewVersion(self, files=[]):
         """add a new version of a file to an archive"""
         latestVersion = self.getLatestVersion()
         if latestVersion == "0":
             myversion = "1"
         else:
-            myversion = str(int(latestVersion)+1)
+            myversion = str(int(latestVersion) + 1)
         for file in files:
             if os.path.exists(file):
-                filename = re.sub(r".*[\\/:]", "", file)
-                shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,myversion))
+                dummy, basename, extension = decompose_file(file)
+                if extension:
+                    extension = '.' + extension
+                self.changeName(basename)
+                destination = propose_unique_name("%s/%s%s;%s" %
+                    (self.basedir, basename, extension, myversion), True)
+                shutil.copy(file, destination)
         self.BuildFileList()
 
-    def addFilesNewFormat(self,files=[],version=""):
+    def addFilesNewFormat(self, files=[], version=""):
         """add a new format of a file to an archive"""
         if version == "":
             version = self.getLatestVersion()
         for file in files:
             if os.path.exists(file):
-                filename = re.sub(r".*[\\/:]", "", file)
-                shutil.copy(file,"%s/%s;%s" % (self.basedir,filename,version))
+                dummy, basename, extension = decompose_file(file)
+                if extension:
+                    extension = '.' + extension
+                destination = propose_unique_name("%s/%s%s;%s" %
+                    (self.basedir, basename, extension, version), True)
+                shutil.copy(file, destination)
         self.BuildFileList()
 
     def getIcon(self):
@@ -314,21 +354,25 @@ class BibDoc:
         else:
             return None
 
-    def addIcon(self,file):
+    def addIcon(self, file):
         """link an icon with the bibdoc object"""
         #first check if an icon already exists
         existingIcon = self.getIcon()
         if existingIcon is not None:
             existingIcon.delete()
         #then add the new one
-        filename = re.sub("\..*","",re.sub(r".*[\\/:]", "", file))
-        newicon = BibDoc(type='Icon',docname=filename)
+        basename = decompose_file(file)[1]
+        newicon = BibDoc(type='Icon', docname=basename)
         if newicon is not None:
-            newicon.addFilesNewVersion(files=[file])
-            run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')", (self.id,newicon.getId(),))
+            newicon.addFilesNewVersion([file])
+            run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
+                (self.id, newicon.getId(),))
             if os.path.exists(newicon.getBaseDir()):
-                fp = open("%s/.docid" % newicon.getBaseDir(),"w")
+                fp = open("%s/.docid" % newicon.getBaseDir(), "w")
                 fp.write(str(self.id))
+                fp.close()
+                fp = open("%s/.type" % newicon.getBaseDir(), "w")
+                fp.write(str(self.type))
                 fp.close()
         self.BuildRelatedFileList()
 
@@ -338,8 +382,8 @@ class BibDoc:
             existingIcon.delete()
         self.BuildRelatedFileList()
 
-    def display(self,version="", ln = cdslang):
-        t=""
+    def display(self, version="", ln = cdslang):
+        t = ""
         if version == "all":
             docfiles = self.listAllFiles()
         elif version != "":
@@ -348,7 +392,9 @@ class BibDoc:
             docfiles = self.listLatestFiles()
         existingIcon = self.getIcon()
         if existingIcon is not None:
-            imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % (weburl,existingIcon.getId(),urllib.quote(existingIcon.getDocName()))
+            imagepath = "%s/getfile.py?docid=%s&name=%s&format=gif" % \
+                (weburl, existingIcon.getId(),
+                urllib.quote(existingIcon.getDocName()))
         else:
             imagepath = "%s/smallfiles.gif" % images
 
@@ -376,8 +422,8 @@ class BibDoc:
             )
         return t
 
-    def changeName(self,newname):
-        run_sql("update bibdoc set docname=%s where id=%s",(newname,self.id,))
+    def changeName(self, newname):
+        run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
         self.docname = newname
 
     def getDocName(self):
@@ -400,13 +446,13 @@ class BibDoc:
         """retrieve bibdoc id"""
         return self.id
 
-    def getFile(self,name,format,version):
+    def getFile(self, name, format, version):
         if version == "":
             docfiles = self.listLatestFiles()
         else:
             docfiles = self.listVersionFiles(version)
         for docfile in docfiles:
-            if docfile.getName()==name and docfile.getFormat()==format:
+            if docfile.getName()==name and (docfile.getFormat()==format or not format):
                 return docfile
         return None
 
@@ -420,40 +466,31 @@ class BibDoc:
     def delete(self):
         """delete the current bibdoc instance"""
         self.status = self.status | 1
-        run_sql("update bibdoc set status='" + str(self.status) + "' where id=%s",(self.id,))
+        run_sql("update bibdoc set status='" + str(self.status) +
+            "' where id=%s",(self.id,))
 
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
         self.docfiles = []
         if os.path.exists(self.basedir):
+            self.md5s = Md5Folder(self.basedir)
             for fil in os.listdir(self.basedir):
-                if fil != ".recid" and fil != ".docid" and fil != "." and fil != "..":
-                    filepath = "%s/%s" % (self.basedir,fil)
-                    fileversion = re.sub(".*;","",fil)
-                    fullname = fil.replace(";%s" % fileversion,"")
-                    # detect fullname's basename and extension:
-                    fullname_lowercase = fullname.lower()
-                    fullname_extension_postition = -1
-                    # first try to detect compressed file extensions:
-                    for compressed_file_extension in CFG_COMPRESSED_FILE_EXTENSIONS_SORTED:
-                        if fullname_lowercase.endswith("." + compressed_file_extension):
-                            fullname_extension_postition = fullname[:-len(compressed_file_extension)-1].rfind(".")
-                            break
-                    if fullname_extension_postition == -1:
-                        # okay, no compressed extension found, so try to find last dot:
-                        fullname_extension_postition = len(file_strip_ext(fullname))
-                    # okay, fullname_extension_postition should now indicate where extension starts (incl. compressed ones)
-                    if fullname_extension_postition == -1:
-                        fullname_basename = fullname
-                        fullname_extension = ""
-                    else:
-                        fullname_basename = fullname[:fullname_extension_postition]
-                        fullname_extension = fullname[fullname_extension_postition+1:]
+                if fil not in (".recid", ".docid", ".", "..",
+                        '.doc_checksum', '.type'):
+                    filepath = "%s/%s" % (self.basedir, fil)
+                    fileversion = re.sub(".*;", "", fil)
+                    fullname = fil.replace(";%s" % fileversion, "")
+                    checksum = self.md5s.get_checksum(fil)
+                    (dirname, basename, extension) = decompose_file(fullname)
                     # we can append file:
-                    self.docfiles.append(BibDocFile(filepath,self.type,fileversion,fullname_basename,fullname_extension,self.id,self.status))
+                    self.docfiles.append(BibDocFile(filepath, self.type,
+                        fileversion, basename, extension,
+                        self.id, self.status, checksum))
 
     def BuildRelatedFileList(self):
-        res = run_sql("select ln.id_bibdoc2,ln.type,bibdoc.status from bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and ln.id_bibdoc1=%s",(self.id,))
+        res = run_sql("select ln.id_bibdoc2,ln.type,bibdoc.status from "
+            "bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and "
+            "ln.id_bibdoc1=%s", (self.id,))
         for row in res:
             bibdocid = row[0]
             type = row[1]
@@ -472,10 +509,10 @@ class BibDoc:
     def listLatestFiles(self):
         return self.listVersionFiles(self.getLatestVersion())
 
-    def listVersionFiles(self,version):
+    def listVersionFiles(self, version):
         tmp = []
         for docfile in self.docfiles:
-            if docfile.getVersion() == version:
+            if docfile.getVersion() == str(version):
                 tmp.append(docfile)
         return tmp
 
@@ -487,21 +524,26 @@ class BibDoc:
             return 0
 
     def getFileNumber(self):
-        return len(self.files)
+        return len(self.docfiles)
 
-    def registerDownload(self,addressIp,version,format,userid=0):
-        return run_sql("INSERT INTO rnkDOWNLOADS (id_bibrec,id_bibdoc,file_version,file_format,id_user,client_host,download_time) VALUES (%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
-                       (self.recid,self.id,version,string.upper(format),userid,addressIp,))
+    def registerDownload(self, addressIp, version, format, userid=0):
+        return run_sql("INSERT INTO rnkDOWNLOADS "
+            "(id_bibrec,id_bibdoc,file_version,file_format,"
+            "id_user,client_host,download_time) VALUES "
+            "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
+            (self.recid, self.id, version, format.upper(),
+            userid, addressIp,))
 
 class BibDocFile:
     """this class represents a physical file in the CDS Invenio filesystem"""
 
-    def __init__(self,fullpath,type,version,name,format,bibdocid,status):
+    def __init__(self, fullpath, type, version, name, format, bibdocid, status, checksum):
         self.fullpath = fullpath
         self.type = type
         self.bibdocid = bibdocid
         self.version = version
         self.status = status
+        self.checksum = checksum
         self.size = os.path.getsize(fullpath)
         self.md = os.path.getmtime(fullpath)
         try:
@@ -516,8 +558,8 @@ class BibDocFile:
             self.encoding = ""
             self.fullname = name
         else:
-            self.fullname = "%s.%s" % (name,format)
-            (self.mime,self.encoding) = mimetypes.guess_type(self.fullname)
+            self.fullname = "%s.%s" % (name, format)
+            (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
                 self.mime = "text/plain"
 
@@ -564,17 +606,22 @@ class BibDocFile:
     def getVersion(self):
         return self.version
 
-    def getRecid(self):
-        return run_sql("select id_bibrec from bibrec_bibdoc where id_bibdoc=%s",(self.bibdocid,))[0][0]
+    def getChecksum(self):
+        return self.checksum
 
-    def stream(self,req):
+    def getRecid(self):
+        return run_sql("select id_bibrec from bibrec_bibdoc where "
+            "id_bibdoc=%s",(self.bibdocid,))[0][0]
+
+    def stream(self, req):
         if os.path.exists(self.fullpath):
             req.content_type = self.mime
             req.encoding = self.encoding
             req.filename = self.fullname
-            req.headers_out["Content-Disposition"] = "attachment; filename=%s" % quoteattr(self.fullname)
+            req.headers_out["Content-Disposition"] = \
+                "attachment; filename=%s" % quoteattr(self.fullname)
             req.send_http_header()
-            fp = file(self.fullpath,"r")
+            fp = file(self.fullpath, "r")
             content = fp.read()
             fp.close()
             return content
@@ -610,9 +657,65 @@ def listVersionsFromArray(docfiles):
             versions.append(docfile.getVersion())
     return versions
 
-def orderFilesWithVersion(docfile1,docfile2):
+def orderFilesWithVersion(docfile1, docfile2):
     """order docfile objects according to their version"""
     version1 = int(docfile1.getVersion())
     version2 = int(docfile2.getVersion())
-    return cmp(version2,version1)
+    return cmp(version2, version1)
+
+class Md5Folder:
+    """Manage all the Md5 checksum about a folder"""
+    def __init__(self, folder):
+        """Initialize the class from the md5 checksum of a given path"""
+        self.folder = folder
+        self.load()
+
+    def update(self, only_new = True):
+        """Update the .doc_checksum file with the current files. If only_new
+        is specified then only not already calculated file are calculated."""
+        self.md5s = {}
+        for filename in os.listdir(self.folder):
+            if not only_new or self.md5s.get(filename, None) is None and \
+                not filename.startswith('.'):
+                self.md5s[filename] = md5.new(open("%s/%s" %
+                    (self.folder, filename), "rb").read()).hexdigest()
+        self.store()
+
+    def store(self):
+        """Store the current md5 dictionary into .doc_checksum"""
+        md5file = open("%s/.doc_checksum" % self.folder, "w")
+        for key, value in self.md5s.items():
+            md5file.write('%s *%s\n' % (value, key))
+
+    def load(self):
+        """Load .doc_checksum into the md5 dictionary"""
+        self.md5s = {}
+        try:
+            for row in open("%s/.doc_checksum" % self.folder, "r"):
+                md5hash = row[:32]
+                filename = row[34:].strip()
+                self.md5s[filename] = md5hash
+        except IOError:
+            pass
+
+    def check(self, filename = ''):
+        """Check the specified file or all the files for which it exists a hash
+        for being coherent with the stored hash."""
+        if filename and filename in self.md5s.keys():
+            return self.md5s[filename] == md5.new(open("%s/%s" %
+                    (self.folder, filename), "rb").read()).hexdigest()
+        else:
+            for filename, md5hash in self.md5s.items():
+                if md5.new(open("%s/%s" % (self.folder, filename),
+                    "rb").read()).hexdigest() != md5hash:
+                        return False
+            return True
+
+    def get_checksum(self, filename):
+        md5hash = self.md5s.get(filename, None)
+        if md5hash is None:
+            self.update()
+        # Now it should not fail!
+        md5hash = self.md5s[filename]
+        return md5hash
 
