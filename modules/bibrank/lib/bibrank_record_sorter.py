@@ -169,11 +169,11 @@ def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
 
     try:
         if is_stopword(term, 1) or (len(term) <= termlength) or ((float(term_rec) / float(col_size)) >= max_occ) or ((float(term_rec) / float(col_size)) <= min_occ):
-	    return ""
+            return ""
         if int(term):
             return ""
     except StandardError, e:
-	pass
+        pass
     return "true"
 
 def create_rnkmethod_cache():
@@ -469,7 +469,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     tf_values = {}
     #Calculate all term frequencies
     for (term, tf) in rec_terms.iteritems():
-	if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
+        if len(term) >= methods[rank_method_code]["min_word_length"] and terms_recs.has_key(term) and tf[1] != 0:
             tf_values[term] =  int((1 + math.log(tf[0])) * tf[1]) #calculate term weigth
     tf_values = tf_values.items()
     tf_values.sort(lambda x, y: cmp(y[1], x[1])) #sort based on weigth
@@ -534,15 +534,15 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
                 if methods[rank_method_code].has_key("stemmer"): # stem word
                     term = stem(string.replace(term, ' ', ''), methods[rank_method_code]["stemmer"])
                 if lwords_old[i] != term: #add if stemmed word is different than original word
-	            lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
+                    lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
 
     (recdict, rec_termcount, lrecIDs_remove) = ({}, {}, {})
     #For each term, if accepted, get a list of the records using the term
     #calculate then relevance for each term before sorting the list of records
     for (term, table) in lwords:
-	term_recs = run_sql("""SELECT term, hitlist FROM %s WHERE term=%s""", (methods[rank_method_code]["rnkWORD_table"], term))
+        term_recs = run_sql("""SELECT term, hitlist FROM %s WHERE term=%%s""" % methods[rank_method_code]["rnkWORD_table"], (term,))
         if term_recs: #if term exists in database, use for ranking
-	    term_recs = deserialize_via_marshal(term_recs[0][1])
+            term_recs = deserialize_via_marshal(term_recs[0][1])
             (recdict, rec_termcount) = calculate_record_relevance((term, int(term_recs["Gi"][1])) , term_recs, hitset, recdict, rec_termcount, verbose, quick=None)
             del term_recs
 
@@ -654,7 +654,7 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
-	if w >= rank_limit_relevance:
+        if w >= rank_limit_relevance:
             reclist.append((j, w))
 
     #sort scores
@@ -687,7 +687,7 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
         w = int(w * 100 / divideby)
-	if w >= rank_limit_relevance:
+        if w >= rank_limit_relevance:
             reclist.append((j, w))
 
     #sort scores
@@ -706,15 +706,15 @@ def rank_method_stat(rank_method_code, reclist, lwords):
 
     global voutput
     if len(reclist) > 20:
-	j = 20
+        j = 20
     else:
-	j = len(reclist)
+        j = len(reclist)
 
     voutput += "<br>Rank statistics:<br>"
     for i in range(1, j + 1):
-   	voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
+        voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
         for (term, table) in lwords:
-	    term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%s""", (table, term))
+            term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%s""", (table, term))
             if term_recs:
                 term_recs = deserialize_via_marshal(term_recs[0][0])
                 if term_recs.has_key(reclist[len(reclist) - i][0]):
