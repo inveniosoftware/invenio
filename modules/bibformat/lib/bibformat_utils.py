@@ -246,7 +246,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
                 for row in res:
                     field, value = row[0], row[1]
                     value = encode_for_xml(value)
-                    out += """        <controlfield tag="%s" >%s</controlfield>\n""" % \
+                    out += """        <controlfield tag="%s">%s</controlfield>\n""" % \
                            (encode_for_xml(field[0:3]), value)
                 # datafields
                 i = 1 # Do not process bib00x and bibrec_bib00x, as
