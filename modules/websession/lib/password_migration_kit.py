@@ -91,7 +91,7 @@ def __check_update_possibility():
     """"""
     res = run_sql("SHOW COLUMNS FROM user LIKE 'password'");
     if res:
-        return res[0][1] in ('tinyblob', 'blob')
+        return res[0][1] not in ('tinyblob', 'blob')
     print "User table is broken or CDS Invenio Database is not functional."
 
 def __count_current_passwords():
