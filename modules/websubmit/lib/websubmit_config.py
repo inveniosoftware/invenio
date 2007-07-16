@@ -125,7 +125,7 @@ class InvenioWebSubmitFunctionError(Exception):
            self.value).
            @return: (string)
         """
-        return repr(self.value)
+        return str(self.value)
 
 
 class InvenioWebSubmitFunctionStop(Exception):
@@ -157,7 +157,7 @@ class InvenioWebSubmitFunctionStop(Exception):
            self.value).
            @return: (string)
         """
-        return repr(self.value)
+        return str(self.value)
 
 
 class InvenioWebSubmitFunctionWarning(Exception):
@@ -180,4 +180,5 @@ class InvenioWebSubmitFunctionWarning(Exception):
            self.value).
            @return: (string)
         """
-        return repr(self.value)
+        return str(self.value)
+
