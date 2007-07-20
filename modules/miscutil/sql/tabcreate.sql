@@ -2267,6 +2267,14 @@ CREATE TABLE IF NOT EXISTS formatname (
   PRIMARY KEY  (id_format,ln,type)
 ) TYPE=MyISAM;
 
+-- tables for collection detailed page options
+ 
+CREATE TABLE IF NOT EXISTS collectiondetailedpagetabs (
+  id_collection mediumint(9) unsigned NOT NULL,
+  tabs varchar(255) NOT NULL default '',
+  PRIMARY KEY (id_collection)
+) TYPE=MyISAM;
+
 -- tables for search options and MARC tags:
 
 CREATE TABLE IF NOT EXISTS collection_field_fieldvalue (

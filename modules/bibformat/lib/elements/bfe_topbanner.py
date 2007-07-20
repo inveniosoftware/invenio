@@ -24,8 +24,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo,
-           kb_name="dbcollid2coll"):
+def format(bfo, kb_name="dbcollid2coll"):
     """
     HTML top page banner containing category, rep. number, etc
     """
@@ -40,26 +39,41 @@ def format(bfo,
     source_of_aquisition = bfo.field("037__a")
     source_of_aquisition = cgi.escape(source_of_aquisition)
 
-    out = '<table border="0" width="100%"><tr class="blocknote">'
-    out += '''<td>
-    %s
-    <small>''' % collection_indicator
 
-    if subject != "XX":
-        out += " / "+ subject
-
-    out += subject_2
-    out += "</small></td>"
-
-    for report_number in additional_report_numbers:
-        out += "<td><small><strong>" +cgi.escape(report_number) +" </strong></small></td>"
-
+    if subject != "XX" and subject:
+        subject = " / " + subject
+    
     if len(source_of_aquisition) > 0:
-        out += '<td align="right"><strong>'+ source_of_aquisition + "</strong></td>"
+        source_of_aquisition = '<td align="right"><strong>'+ source_of_aquisition + "</strong></td>"
 
-    out += "</tr></table><br />"
+    report_numbers_out = ''
+    for report_number in additional_report_numbers:
+        report_numbers_out += "<td><small><strong>" + \
+                              cgi.escape(report_number) + \
+                              " </strong></small></td>"
 
-    return out
+    out = '''
+    <table border="0" width="100%%">
+      <tr>
+        <td>%(collection_indicator)s<small>%(subject)s %(subject)s</small></td>
+        <td><small><strong>%(report_number)s</strong></small></td>
+        %(source_of_aquisition)s
+      </tr>
+    </table>
+    ''' % {'collection_indicator': collection_indicator,
+           'subject': subject,
+           'subject2': subject_2,
+           'report_number': report_numbers_out,
+           'source_of_aquisition': source_of_aquisition}
+
+    if collection_indicator or \
+           subject or \
+           subject2 or \
+           source_of_aquisition or \
+           report_numbers_out:
+        return out
+    else:
+        return ''
 
 def escape_values(bfo):
     """

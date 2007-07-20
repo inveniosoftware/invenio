@@ -1338,7 +1338,7 @@ class Template:
               </tr>
              </thead>
              <tbody>
-              <tr valign="top">
+              <tr valign="top" style="white-space:nowrap;">
                 <td class="searchboxbody">%(matchbox1)s
                   <input type="text" name="p1" size="%(sizepattern)d" value="%(p1)s" />
                 </td>
@@ -1357,7 +1357,7 @@ class Template:
                   <input type="text" name="p3" size="%(sizepattern)d" value="%(p3)s" />
                 </td>
                 <td class="searchboxbody">%(searchwithin3)s</td>
-                <td class="searchboxbody">
+                <td class="searchboxbody"  style="white-space:nowrap;">
                   <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
                   <input class="formbutton" type="submit" name="action_browse" value="%(browse)s" />&nbsp;
                 </td>
@@ -1416,7 +1416,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
-              'search_tips': _("Search Tips"),
+              'search_tips': _("Search Tips")
             }
         else:
             # print Simple Search form:
@@ -1472,7 +1472,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
-              'search_tips': _("Search Tips"),
+              'search_tips': _("Search Tips")
             }
 
         ## secondly, print Collection(s) box:
@@ -1762,7 +1762,7 @@ class Template:
         else:
             out += "<small>"
             if nb_found > rg:
-                out += "" + collection_name + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
+                out += "" + cgi.escape(collection_name) + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
 
         if nb_found > rg: # navig.arrows are needed, since we have many hits
 
@@ -1864,7 +1864,7 @@ class Template:
         chars_in = list(str(number))
         number = len(chars_in)
         chars_out = []
-        for i in range(0,number):
+        for i in range(0, number):
             if i % 3 == 0 and i != 0:
                 chars_out.append(thousands_separator)
             chars_out.append(chars_in[number-i-1])
@@ -1945,161 +1945,6 @@ class Template:
                </form>""" % {
                  'basket' : _("ADD TO BASKET")
                }
-        return out
-
-    def tmpl_records_format_other(self, ln, weburl, rows, format, url_argd):
-        """Returns other formats of the records
-
-        Parameters:
-
-          - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
-
-          - 'rows' *array* - Parts of the interface to display, in the format:
-
-          - 'rows[record]' *string* - The formatted record
-
-          - 'rows[number]' *int* - The order number
-
-          - 'rows[recid]' *int* - The recID
-
-          - 'rows[relevance]' *string* - The relevance of the record
-
-          - 'format' *string* - The current format
-
-          - 'url_argd' *string* - Parameters of the search query
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """ <div align="right"><small>%(format)s """ % {
-                'format' : _("Format:")
-              }
-
-        result = []
-
-        for abbrev, name in (('hd', 'HTML'),
-                             ('hx', 'BibTeX'),
-                             ('xd', 'DC'),
-                             ('xe', 'EndNote'),
-                             ('xn', 'NLM'),
-                             ('hm', 'MARC'),
-                             ('xm', 'MARCXML'),
-                             ):
-            if format == abbrev:
-                result.append(name)
-            else:
-                result.append(create_html_link(self.build_search_url(url_argd, of=abbrev),
-                                               {}, name))
-
-        out += " | ".join(result)
-
-        out += "</small></div>"
-
-        for row in rows:
-            out += row ['record']
-
-            if format.startswith("hd"):
-                # do not print further information but for HTML detailed formats
-
-                if row ['creationdate']:
-                    out += '''<div class="recordlastmodifiedbox">%(dates)s</div>
-                              <p><span class="moreinfo">%(similar)s</span></p>
-                              <form action="%(weburl)s/yourbaskets/add" method="post">
-                                <input name="recid" type="hidden" value="%(recid)s" />
-                                <input name="ln" type="hidden" value="%(ln)s" />
-                                <br />
-                                <input class="formbutton" type="submit" name="action" value="%(basket)s" />
-                              </form>
-                           ''' % {
-                        'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
-                                {'x_date_creation': row['creationdate'],
-                                 'x_date_modification': row['modifydate']},
-                        'weburl': weburl,
-                        'recid': row['recid'],
-                        'ln': ln,
-                        'similar': create_html_link(
-                                    self.build_search_url(p='recid:%d' % \
-                                                            row['recid'],
-                                                          rm='wrd',
-                                                          ln=ln),
-                                                    {}, _("Similar records"),
-                                                    {'class': "moreinfo"}),
-                        'basket' : _("ADD TO BASKET")
-                        }
-
-                    out += '<table><tr><td></td></tr>' # empty row for xhtml validation
-
-                if row.has_key ('citinglist'):
-                    cs = row ['citinglist']
-
-                    similar = self.tmpl_print_record_list_for_similarity_boxen(
-                        _("Cited by: %s records") % len (cs), cs, ln)
-
-                    out += '''
-                    <tr><td>
-                      %(similar)s&nbsp;%(more)s
-                      <br /><br />
-                    </td></tr>''' % {
-                        'more': create_html_link(
-                                    self.build_search_url(p='recid:%d' % \
-                                                             row['recid'],
-                                                          rm='cit', ln=ln),
-                                    {}, _("more")),
-                        'similar': similar}
-
-                if row.has_key ('cociting'):
-                    cs = row ['cociting']
-
-                    similar = self.tmpl_print_record_list_for_similarity_boxen (
-                        _("Co-cited with: %s records") % len (cs), cs, ln)
-
-                    out += '''
-                    <tr><td>
-                      %(similar)s&nbsp;%(more)s
-                      <br />
-                    </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln),
-                                                                {}, _("more")),
-                                      'similar': similar}
-
-                if row.has_key ('citationhistory'):
-                    out += '<tr><td>%s</td></tr>' % row ['citationhistory']
-
-                if row.has_key ('downloadsimilarity'):
-                    cs = row ['downloadsimilarity']
-
-                    similar = self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who downloaded this document also downloaded:"), cs, ln)
-
-                    out += '''
-                    <tr><td>%(graph)s</td></tr>
-                    <tr><td>%(similar)s</td></tr>
-                    ''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
-                             'similar': similar, 'more': _("more"),
-                             'graph': row ['downloadhistory']
-                             }
-
-                out += '</table>'
-
-                if row.has_key ('viewsimilarity'):
-                    out += '<br />&nbsp;'
-                    out += self.tmpl_print_record_list_for_similarity_boxen (
-                        _("People who viewed this page also viewed:"), row ['viewsimilarity'], ln)
-
-                if row.has_key('downloadhistory'):
-                    out += '<br />&nbsp;'
-                    out += row['downloadhistory']
-
-                if row.has_key ('reviews'):
-                    out += '<br />&nbsp;'
-                    out += row['reviews']
-
-                if row.has_key ('comments'):
-                    out += row['comments']
-
-            out += "<br />&nbsp;"
         return out
 
     def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
@@ -2575,4 +2420,136 @@ class Template:
                          'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, weburl) + ' <a class="google" href="%s">' % rssurl,
                          'x_url2_close': '</a>',
                          }}
+        return out
+
+    def tmpl_detailed_record_metadata(self, recID, ln, format,
+                                      content,
+                                      creationdate=None,
+                                      modifydate=None):
+        """Returns the main detailed page of a record
+
+        Parameters:
+        
+          - 'recID' *int* - The ID of the printed record
+        
+          - 'ln' *string* - The language to display
+
+          - 'format' *string* - The format in used to print the record
+
+          - 'content' *string* - The main content of the page
+
+          - 'creationdate' *string* - The creation date of the printed record
+
+          - 'modifydate' *string* - The last modification date of the printed record
+        """
+        _ = gettext_set_language(ln)
+        
+        out = content
+
+        return out
+        
+    def tmpl_detailed_record_statistics(self, recID, ln,
+                                        citinglist, citationhistory,
+                                        cociting, downloadsimilarity,
+                                        downloadhistory, viewsimilarity):
+        """Returns the statistics page of a record
+
+        Parameters:
+        
+          - 'recID' *int* - The ID of the printed record
+        
+          - 'ln' *string* - The language to display
+
+          - citinglist *string* - citinglist box
+
+          - citationhistory *string* - citationhistory box
+
+          - cociting *string* - cociting box
+
+          - downloadsimilarity *string* - downloadsimilarity box
+
+          - downloadhistory *string* - downloadhistory box
+          
+          - viewsimilarity *string* - viewsimilarity box
+          
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+        
+        out = ''
+        if citinglist is not None:
+            similar = self.tmpl_print_record_list_for_similarity_boxen(
+                _("Cited by: %s records") % len (citinglist), citinglist, ln)
+
+            out += '''
+                    <tr><td>
+                      %(similar)s&nbsp;%(more)s
+                      <br /><br />
+                    </td></tr>''' % {
+                'more': create_html_link(
+                self.build_search_url(p='recid:%d' % \
+                                      row['recid'],
+                                      rm='cit', ln=ln),
+                                      {}, _("more")),
+                'similar': similar}
+            out += '<br />'
+      
+        if cociting is not None:
+            similar = self.tmpl_print_record_list_for_similarity_boxen (
+                _("Co-cited with: %s records") % len (cociting), cociting, ln)
+
+            out += '''
+                    <tr><td>
+                      %(similar)s&nbsp;%(more)s
+                      <br />
+                    </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln),
+                                                                {}, _("more")),
+                                      'similar': similar}
+            out += '<br />'
+
+        if citationhistory is not None:
+            out += '<tr><td>%s</td></tr>' % citationhistory
+
+        if downloadsimilarity is not None:
+            similar = self.tmpl_print_record_list_for_similarity_boxen (
+                _("People who downloaded this document also downloaded:"), downloadsimilarity, ln)
+
+            out += '''
+                    <tr><td>%(graph)s</td></tr>
+                    <tr><td>%(similar)s</td></tr>
+                    ''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                             'similar': similar, 'more': _("more"),
+                             'graph': downloadsimilarity
+                             }
+
+            out += '</table>'
+            out +=  '<br />'
+          
+        if viewsimilarity is not None:
+            out += self.tmpl_print_record_list_for_similarity_boxen (
+                _("People who viewed this page also viewed:"), viewsimilarity, ln)
+          
+        if downloadhistory is not None:
+            out += downloadhistory + '<br />'
+
+        return out
+
+    def tmpl_detailed_record_references(self, recID, ln, content):
+        """Returns the discussion page of a record
+        
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+        
+          - 'ln' *string* - The language to display
+
+          - 'content' *string* - The main content of the page
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+        
+        out = ''
+        if content is not None:
+            out += content
+    
         return out

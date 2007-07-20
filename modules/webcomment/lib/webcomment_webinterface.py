@@ -21,6 +21,8 @@
 
 """ Comments and reviews for records: web interface """
 
+__lastupdated__ = """$Date$"""
+
 __revision__ = """$Id$"""
 
 import urllib
@@ -35,25 +37,35 @@ from invenio.config import cdslang, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
-from invenio.webpage import page
-from invenio.search_engine import create_navtrail_links, guess_primary_collection_of_a_record
+from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.search_engine import create_navtrail_links, \
+     guess_primary_collection_of_a_record, \
+     get_colID
 from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
                              wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.websearchadminlib import get_detailed_page_tabs
+import invenio.template
+webstyle_templates = invenio.template.load('webstyle')
+websearch_templates = invenio.template.load('websearch')
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
 
-    _exports = ['', 'display', 'add', 'vote', 'report']
+    _exports = ['', 'display', 'add', 'vote', 'report', 'index']
+
+    def __init__(self, recid=-1, reviews=0):
+        self.recid = recid
+        self.discussion = reviews # 0:comments, 1:reviews
 
     def index(self, req, form):
         """
         Redirects to display function
         """
-        redirect_to_url(req, "%s/comments/display?%s" % (weburl, req.args))
-
+        return self.display(req, form)
+            
     def display(self, req, form):
         """
         Display comments (reviews if enabled) associated with record having id recid where recid>0.
@@ -80,23 +92,21 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @return the full html page.
         """
         
-        argd = wash_urlargd(form, {'recid': (int, -1),
-                                   'do': (str, "od"),
+        argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
                                    'p': (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
-                                   'reviews': (int, 0),
                                    })
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
         check_warnings = []
 
-        (ok, problem) = check_recID_is_in_range(argd['recid'], check_warnings, argd['ln']) 
+        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln']) 
         if ok:
-            (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=argd['recid'],
+            (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=self.recid,
                                                                                    display_order=argd['do'],
                                                                                    display_since=argd['ds'],
                                                                                    nb_per_page=argd['nb'],
@@ -104,23 +114,43 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                    ln=argd['ln'],
                                                                                    voted=argd['voted'],
                                                                                    reported=argd['reported'],
-                                                                                   reviews=argd['reviews'])
-
-            navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(argd['recid']))
-            navtrail += '&gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, argd['recid'], argd['ln'])
-            navtrail += _("Detailed record") + " #%s" % argd['recid'] 
+                                                                                   reviews=self.discussion,
+                                                                                   uid=uid)
+            
+            unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+                                                    self.recid)
+            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+            ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+            tabs = [(unordered_tabs[tab_id]['label'], \
+                     '%s/record/%s/%s' % (weburl, self.recid, tab_id), \
+                     tab_id in ['comments', 'reviews'],
+                     unordered_tabs[tab_id]['enabled']) \
+                    for (tab_id, order) in ordered_tabs_id
+                    if unordered_tabs[tab_id]['visible'] == True]
+            body = webstyle_templates.detailed_record_container(body,
+                                                                self.recid,
+                                                                tabs,
+                                                                argd['ln'])
+            
+            title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+            navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
+            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, self.recid, argd['ln'])
+            navtrail += title
             navtrail += '</a>'
-            navtrail += ' &gt; <a class="navtrail">%s</a>' % (argd['reviews']==1 and _("Reviews") or _("Comments"))
+            navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
 
-            return page(title="",
-                        body=body,
+            return pageheaderonly(title=title,
                         navtrail=navtrail,
                         uid=uid,
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        errors=errors, warnings=warnings,
-                        navmenuid='search')
+                        navmenuid='search',
+                        navtrail_append_title_p=0) + \
+                    websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+                    body + \
+                    websearch_templates.tmpl_search_pageend(argd['ln']) + \
+                    pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
         else:
             return page(title=_("Record Not Found"),
                         body=problem,
@@ -130,7 +160,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         language=argd['ln'],
                         warnings=check_warnings, errors=[],
                         navmenuid='search')
-
+        
+    # Return the same page wether we ask for /record/123 or /record/123/
+    __call__ = index
+    
     def add(self, req, form):
         """
         Add a comment (review) to record with id recid where recid>0
@@ -147,12 +180,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @return the full html page.
         """
 
-        argd = wash_urlargd(form, {'recid': (int, -1),
-                                   'action': (str, "DISPLAY"),
+        argd = wash_urlargd(form, {'action': (str, "DISPLAY"),
                                    'msg': (str, ""),
                                    'note': (str, ''),
                                    'score': (int, 0),
-                                   'reviews': (int, 0),
                                    'comid': (int, -1),
                                    })
 
@@ -162,16 +193,20 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
-        (ok, problem) = check_recID_is_in_range(argd['recid'], check_warnings, argd['ln']) 
+        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln']) 
         if ok:
-            navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(argd['recid']))
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, argd['recid'], argd['ln'])
-            navtrail += _("Detailed record") + " #%s" % argd['recid']
+            title, description, keywords = websearch_templates.tmpl_record_page_header_content(req,
+                                                                                               self.recid,
+                                                                                               argd['ln'])
+            navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid))
+            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, self.recid, argd['ln'])
+            navtrail += title
             navtrail += '</a>'
-            navtrail += '&gt; <a class="navtrail" href="%s/comments/display?recid=%s&ln=%s">%s</a>' % (weburl,
-                                                                                                       argd['recid'],
-                                                                                                       argd['ln'],
-                                                                                                       argd['reviews']==1 and _('Reviews') or _('Comments')) 
+            navtrail += '&gt; <a class="navtrail" href="%s/record/%s/%s/?ln=%s">%s</a>' % (weburl,
+                                                                                           self.recid,
+                                                                                           self.discussion==1 and 'reviews' or 'comments',
+                                                                                           argd['ln'],
+                                                                                           self.discussion==1 and _('Reviews') or _('Comments')) 
 
             if argd['action'] not in actions:
                 argd['action'] = 'DISPLAY'
@@ -183,12 +218,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             # if guest, must log in first 
             if isGuestUser(uid):
-                referer = "%s/comments/add?recid=%s&amp;ln=%s&amp;reviews=%s&amp;comid=%s&amp;action=%s" % (weburl,
-                                                                                                            argd['recid'],
-                                                                                                            argd['ln'],
-                                                                                                            argd['reviews'],
-                                                                                                            argd['comid'],
-                                                                                                            argd['action'])
+                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s" % (weburl,
+                                                                                    self.recid,
+                                                                                    self.discussion == 1 and 'reviews' or 'comments',
+                                                                                    argd['ln'],
+                                                                                    argd['comid'],
+                                                                                    argd['action'])
                 msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
                           'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
                                         (sweburl, urllib.quote(referer)),
@@ -203,17 +238,17 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             navmenuid='search')
             # user logged in
             else:
-                (body, errors, warnings) = perform_request_add_comment_or_remark(recID=argd['recid'],
+                (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
                                                                                  ln=argd['ln'],
                                                                                  uid=uid,
                                                                                  action=argd['action'],
                                                                                  msg=argd['msg'],
                                                                                  note=argd['note'],
                                                                                  score=argd['score'],
-                                                                                 reviews=argd['reviews'],
+                                                                                 reviews=self.discussion,
                                                                                  comID=argd['comid'],
                                                                                  client_ip_address=client_ip_address)
-                if argd['reviews']:
+                if self.discussion:
                     title = _("Add Review")
                 else:
                     title = _("Add Comment")
@@ -270,27 +305,24 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
                                    'p': (int, 1),
-                                   'referer': (str, None),
-                                   'reviews': (int, 0),
+                                   'referer': (str, None)
                                    })
 
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
-            argd['referer'] += "?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;reviews=%s" % (argd['recid'],
-                                                                                                                           argd['ln'],
-                                                                                                                           argd['do'],
-                                                                                                                           argd['ds'],
-                                                                                                                           argd['nb'],
-                                                                                                                           argd['p'],
-                                                                                                                           success,
-                                                                                                                           argd['reviews'])
+            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (argd['ln'],
+                                                                                                    argd['do'],
+                                                                                                    argd['ds'],
+                                                                                                    argd['nb'],
+                                                                                                    argd['p'],
+                                                                                                    success)
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/comments/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1"
-            referer %= (weburl, argd['recid'], argd['ln'])
+            referer = "%s/%s/display?amp;ln=%s&amp;voted=1"
+            referer %= (weburl, self.discussion == 1 and 'reviews' or 'comments', self.recid, argd['ln'])
             redirect_to_url(req, referer)
 
     def report(self, req, form):
@@ -323,25 +355,23 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
                                    'p': (int, 1),
-                                   'referer': (str, None),
-                                   'reviews': (int, 0),
+                                   'referer': (str, None)
                                    })
         
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:
-            argd['referer'] += "?recid=%s&amp;ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;reviews=%s" % (argd['recid'],
-                                                                                                                              argd['ln'],
-                                                                                                                              argd['do'],
-                                                                                                                              argd['ds'],
-                                                                                                                              argd['nb'],
-                                                                                                                              argd['p'],
-                                                                                                                              str(success),
-                                                                                                                              argd['reviews'])
+            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'],
+                                                                                                       argd['do'],
+                                                                                                       argd['ds'],
+                                                                                                       argd['nb'],
+                                                                                                       argd['p'],
+                                                                                                       str(success))
+                                                                                                       
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display 
-            referer = "%s/comments/display?recid=%s&amp;ln=%s&amp;reviews=1&amp;voted=1"
-            referer %= (weburl, argd['recid'], argd['ln'])
+            referer = "%s/record/%s/%s/display?ln=%s&amp;voted=1"
+            referer %= (weburl, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)

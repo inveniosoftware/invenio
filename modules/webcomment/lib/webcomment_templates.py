@@ -35,10 +35,8 @@ from invenio.config import weburl, \
                            cdslang, \
                            cdsname, \
                            cdsnameintl,\
-                           CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW, \
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-                           CFG_WEBCOMMENT_ALLOW_COMMENTS, \
-                           CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW
+                           CFG_WEBCOMMENT_ALLOW_COMMENTS
 
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
@@ -80,8 +78,8 @@ class Template:
             comment_rows += """
                     <tr>
                         <td>"""
-            report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
-            reply_link='%s/comments/add?recid=%s&amp;ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
+            report_link = '%s/record/%s/comments/report?ln=%s&amp;comid=%s' % (weburl, recID, ln, comment[c_id])
+            reply_link='%s/record/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
             comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link,
                                                                   date_creation=comment[c_date_creation],
                                                                   body=comment[c_body],
@@ -94,18 +92,15 @@ class Template:
 
         # write button
         write_button_label = _("Write a comment")
-        write_button_link = '%s/comments/add' % (weburl,)
-        write_button_form = """ <input type="hidden" name="recid" value="%s"/>
-                                <input type="hidden" name="ln" value="%s"/>
-                                <input type="hidden" name="reviews" value="0"/>""" % (recID, ln)
+        write_button_link = '%s/record/%s/comments/add' % (weburl, recID)
+        write_button_form = '<input type="hidden" name="ln" value="%s"/>' % ln
         write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=write_button_label)
 
         # output
         if nb_comments_total > 0:
             out = warnings
-            comments_label = CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW and \
-                             CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and \
-                             _("Showing the latest %i comments:")% CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW or ""
+            comments_label = len(comments) > 1 and _("Showing the latest %i comments:") % len(comments) \
+                             or ""
             out += """
 <table>
   <tr>
@@ -127,11 +122,11 @@ class Template:
              'comment_rows': comment_rows,
              'tab': '&nbsp;'*4,
              'weburl': weburl,
-             's': CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and 's' or "",
-             'view_all_comments_link': nb_comments_total>0 and '''<a href="%s/comments/display?recid=%s&amp;reviews=0">View all %s comments</a>''' \
+             's': nb_comments_total>1 and 's' or "",
+             'view_all_comments_link': nb_comments_total>0 and '''<a href="%s/record/%s/comments/display">View all %s comments</a>''' \
                                                                   % (weburl, recID, nb_comments_total) or "",
              'write_button_form': write_button_form,
-             'nb_comments': CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW>1 and CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW or ""
+             'nb_comments': len(comments)
             }
         else:
             out = """
@@ -212,7 +207,7 @@ class Template:
                             'yes_img'       : 'smchk_gr.gif', #'yes.gif',
                             'no_img'        : 'iconcross.gif' #'no.gif'
                         }
-        link = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;reviews=1' % useful_dict
+        link = '<a href="%(weburl)s/record/%(recID)s/reviews/vote?ln=%(ln)s&amp;comid=%%(comid)s' % useful_dict
         useful_yes = link + '&amp;com_value=1">' + _("Yes") + '</a>'
         useful_no = link + '&amp;com_value=-1">' + _("No") + '</a>'
 
@@ -229,7 +224,7 @@ class Template:
             comment_rows += '''
                     <tr>
                         <td>'''
-            report_link = '%s/comments/report?recid=%s&amp;ln=%s&amp;comid=%s&amp;reviews=0' % (weburl, recID, ln, comment[c_id])
+            report_link = '%s/record/%s/reviews/report?ln=%s&amp;comid=%s' % (weburl, recID, ln, comment[c_id])
             comment_rows += self.tmpl_get_comment_with_ranking(ln=ln, nickname=messaging_link,
                                                                date_creation=comment[c_date_creation],
                                                                body=comment[c_body],
@@ -245,10 +240,8 @@ class Template:
                       </tr>'''
 
         # write button
-        write_button_link = '''%s/comments/add''' % (weburl,)
-        write_button_form = ''' <input type="hidden" name="recid" value="%s"/>
-                                <input type="hidden" name="ln" value="%s"/>
-                                <input type="hidden" name="reviews" value="1"/>''' % (recID, ln )
+        write_button_link = '''%s/record/%s/reviews/add''' % (weburl, recID)
+        write_button_form = ' <input type="hidden" name="ln" value="%s"/>' % ln
         write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=_("Write a review"))
 
         if nb_comments_total > 0:
@@ -260,8 +253,8 @@ class Template:
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
-            useful_label %= CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW > 1 and CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW or ""
-            view_all_comments_link ='<a href="%s/comments/display?recid=%s&amp;ln=%s&amp;do=hh&amp;reviews=1">' % (weburl, recID, ln)
+            useful_label %= len(comments) > 1 and len(comments) or ""
+            view_all_comments_link ='<a href="%s/record/%s/reviews/display?ln=%s&amp;do=hh">' % (weburl, recID, ln)
             view_all_comments_link += _("View all %s reviews") % nb_comments_total
             view_all_comments_link += '</a><br />'
 
@@ -324,7 +317,7 @@ class Template:
         date_creation = convert_datetext_to_dategui(date_creation)
         out = ''
         final_body = email_quoted_txt2html(body)
-        title = _("%(x_name)s wrote on %(x_date)s:") % {'x_name': nickname,
+        title = _('%(x_name)s wrote on %(x_date)s:') % {'x_name': nickname,
                                                         'x_date': '<i>' + date_creation + '</i>'}
         links = ''
         if reply_link:
@@ -334,14 +327,14 @@ class Template:
         if report_link:
             links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
         out += """
-<div style="margin-bottom: 20px;">%(title)s<br />
+<div style="margin-bottom:20px;background:#F9F9F9;border:1px solid #DDD">%(title)s<br />
     <blockquote>
 %(body)s
     </blockquote>
 <br />
-%(links)s
+<div style="float:right">%(links)s</div>
 </div>""" % \
-                {'title'         : title,
+                {'title'         : '<div style="background-color:#EEE;padding:2px;"><img src="%s/img/user-icon-1-24x24.png" alt="" />&nbsp;%s</div>' % (weburl, title),
                  'body'          : final_body,
                  'links'         : links}
         return out
@@ -375,32 +368,29 @@ class Template:
         links = ''
         if report_link:
             links += '<a href="' + report_link +'">' + _("Report abuse") + '</a>'
-        out += """
-<table width="100%%">
-  <tr>
-    <td>
+        _body = ''
+        if body != '':
+            _body = '''
+      <blockquote>
+%s
+      </blockquote>''' % email_quoted_txt2html(body)
+    
+        out += '''
+<div style="background:#F9F9F9;border:1px solid #DDD">
+  <div style="background-color:#EEE;padding:2px;">
     <img src="%(weburl)s/img/%(star_score_img)s" alt="%(star_score)s" style="margin-right:10px;"/><b>%(title)s</b><br />
       %(reviewed_label)s<br />
       %(useful_label)s
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <blockquote>
-%(body)s
-      </blockquote>
-    </td>
-    </tr>
-    <tr>
-      <td>%(abuse)s</td>
-  </tr>
-</table>""" % {'weburl'        : weburl,
+  </div>
+  %(body)s
+</div>
+%(abuse)s''' % {'weburl'        : weburl,
                'star_score_img': star_score_img,
                'star_score'    : star_score,
                'title'         : title,
                'reviewed_label': reviewed_label,
                'useful_label'  : useful_label,
-               'body'          : email_quoted_txt2html(body),
+               'body'          : _body,
                'abuse'         : links
                }
         return out
@@ -412,7 +402,9 @@ class Template:
                           comments, total_nb_comments,
                           avg_score,
                           warnings,
-                          border=0, reviews=0):
+                          border=0, reviews=0,
+                          total_nb_reviews=0,
+                          nickname='', uid=-1, note='',score=5):
         """
         Get table of all comments
         @param recID: record id
@@ -452,12 +444,20 @@ class Template:
             c_star_score = 6
             c_title = 7
             c_id = 8
+            discussion = 'reviews'
+            comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (weburl, recID, _('Comments'), total_nb_comments)
+            reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
+            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score ,note, warnings, show_title_p=True)
         else:
             c_nickname = 0
             c_user_id = 1
             c_date_creation = 2
             c_body = 3
             c_id = 4
+            discussion = 'comments'
+            comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
+            reviews_link = '<a href="%s/record/%s/reviews/">%s</a> (%i)' % (weburl, recID, _('Reviews'), total_nb_reviews)
+            add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings)
 
         # voting links
         useful_dict =   {   'weburl'        : weburl,
@@ -467,45 +467,49 @@ class Template:
                             'ds'            : display_since,
                             'nb'            : nb_per_page,
                             'p'             : page,
-                            'reviews'       : reviews
+                            'reviews'       : reviews,
+                            'discussion'    : discussion 
                         }
-        useful_yes = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display">' + _("Yes") + '</a>'
+        useful_yes = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("Yes") + '</a>'
         useful_yes %= useful_dict
-        useful_no = '<a href="%(weburl)s/comments/vote?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display">' + _("No") + '</a>'
+        useful_no = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("No") + '</a>'
         useful_no %= useful_dict
         warnings = self.tmpl_warnings(warnings, ln)
 
         ## record details
-        from search_engine import print_record
-        record_details = print_record(recID=recID, format='hb', ln=ln)
+        from invenio.bibformat import format_record
+        record_details = format_record(recID=recID, of='hs', ln=ln)
 
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
                         'function'  : 'index',
-                        'arguments' : 'recid=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;reviews=%s' % (recID, display_order, display_since, nb_per_page, reviews),
+                        'discussion': discussion,
+                        'arguments' : 'do=%s&amp;ds=%s&amp;nb=%s' % (display_order, display_since, nb_per_page),
                         'arg_page'  : '&amp;p=%s' % page,
-                        'page'      : page          }
+                        'page'      : page,
+                        'rec_id'    : recID}
+
 
         ## comments table
         comments_rows = ''
         for comment in comments:
             if comment[c_nickname]:
-                nickname = comment[c_nickname]
-                display = nickname
+                _nickname = comment[c_nickname]
+                display = _nickname
             else:
-                (uid, nickname, display) = get_user_info(comment[c_user_id])
-            messaging_link = self.create_messaging_link(nickname, display, ln)
+                (uid, _nickname, display) = get_user_info(comment[c_user_id])
+            messaging_link = self.create_messaging_link(_nickname, display, ln)
             # do NOT delete the HTML comment below. It is used for parsing... (I plead unguilty!)
             comments_rows += """
 <!-- start comment row -->
 <tr>
   <td>"""
             if not reviews:
-                report_link = '%(weburl)s/comments/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display' % useful_dict % {'comid':comment[c_id]}
-                reply_link = '%(weburl)s/comments/add?recid=%(recID)s&amp;ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
+                report_link = '%(weburl)s/record/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
+                reply_link = '%(weburl)s/record/%(recID)s/comments/add?ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
                 comments_rows += indent_text(self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], reply_link, report_link), 2)
             else:
-                report_link = '%(weburl)s/comments/report?recid=%(recID)s&amp;ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;reviews=%(reviews)s&amp;referer=%(weburl)s/comments/display' % useful_dict % {'comid': comment[c_id]}
+                report_link = '%(weburl)s/record/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
                 comments_rows += indent_text(self.tmpl_get_comment_with_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title]), 2)
                 helpful_label = _("Was this review helpful?")
                 report_abuse_label = "(" + _("Report abuse") + ")"
@@ -536,7 +540,7 @@ class Template:
         # Previous
         if page != 1:
             link_dic['arg_page'] = 'p=%s' % (page - 1)
-            page_links += '<a href=\"%(weburl)s/%(module)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&lt;&lt;</a> ' % link_dic
+            page_links += '<a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&lt;&lt;</a> ' % link_dic
         else:
             page_links += ' %s ' % ('&nbsp;'*(len(_('Previous'))+7))
         # Page Numbers
@@ -545,14 +549,14 @@ class Template:
             link_dic['page'] = '%s' % i
             if i != page:
                 page_links += '''
-                <a href=\"%(weburl)s/%(module)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">%(page)s</a> ''' % link_dic
+                <a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">%(page)s</a> ''' % link_dic
             else:
                 page_links += ''' <b>%s</b> ''' % i
         # Next
         if page != nb_pages:
             link_dic['arg_page'] = 'p=%s' % (page + 1)
             page_links += '''
-                <a href=\"%(weburl)s/%(module)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&gt;&gt;</a> ''' % link_dic
+                <a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&gt;&gt;</a> ''' % link_dic
         else:
             page_links += '%s' % ('&nbsp;'*(len(_('Next'))+7))
 
@@ -565,15 +569,13 @@ class Template:
             ranking_average = '<br /><b>'
             ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + str(avg_score) + '" />',
-                 'x_nb_reviews': str(total_nb_comments)}
+                 'x_nb_reviews': str(total_nb_reviews)}
             ranking_average += '<br />'
         else:
             ranking_average = ""
 
-        write_button_link = '''%s/comments/add''' % (weburl, )
-        write_button_form = ''' <input type="hidden" name="recid" value="%s"/>
-                                <input type="hidden" name="ln" value="%s"/>
-                                <input type="hidden" name="reviews" value="%s"/>''' % (recID, ln, reviews)
+        write_button_link = '''%s/record/%s/%s/add''' % (weburl, recID, discussion)
+        write_button_form = '<input type="hidden" name="ln" value="%s"/>'
         write_button_form = self.createhiddenform(action=write_button_link,
                                                   method="get",
                                                   text=write_button_form,
@@ -585,36 +587,22 @@ class Template:
             total_label = _("There is a total of %s comments")
         total_label %= total_nb_comments
         # do NOT remove the HTML comments below. Used for parsing
-        body = """
-<table style="width: 100%%;">
-  <tr>
-    <td>
-      <h1>%(record_label)s %(recid)s</h1>
-    </td>
-    <td style="vertical-align:top; align=right" class="backtosearch">
-      <a href="%(weburl)s/record/%(recid)s?ln=%(ln)s">%(back_label)s</a>
-    </td>
-  </tr>
-</table>
-<br />
+        body = '''
+<div id="commentHB">
+<div id="clip">&nbsp;</div>
+<div id="HB">
 %(record_details)s
-<h2>%(comments_or_reviews_title)s</h2>
-%(total_label)s %(ranking_avg)s<br />
-%(write_button_form)s<br />
+</div>
+</div>
+<div style="clear:both">&nbsp;</div>
+%(comments_and_review_tabs)s
 <!-- start comments table -->
-<table style="border: %(border)spx solid black; width: 100%%">
+<table style="border: %(border)spx solid black; width: 95%%; margin:10px;font-size:small">
   %(comments_rows)s
 </table>
 <!-- end comments table -->
-<table style="width:100%%">
-  <tr>
-    <td>%(write_button_form_again)s</td>
-    <td style="align:right;" class="reportabuse">
-      <a href="%(weburl)s/record/%(recid)s?ln=%(ln)s">%(back_label)s</a>
-    </td>
-  </tr>
-</table>
-<br />""" % \
+%(review_or_comment_first)s
+<br />''' % \
         {   'record_label': _("Record"),
             'back_label': _("Back to search results"),
             'total_label': total_label,
@@ -630,7 +618,16 @@ class Template:
             'recid'                     : recID,
             'ln'                        : ln,
             'border'                    : border,
-            'ranking_avg'               : ranking_average   }
+            'ranking_avg'               : ranking_average,
+            'comments_and_review_tabs'  : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
+                                       CFG_WEBCOMMENT_ALLOW_COMMENTS and \
+                                       '%s | %s <br />' % \
+                                       (comments_link, reviews_link) or '',
+            'review_or_comment_first'   : total_nb_comments > 0 and ' ' or \
+                                      (reviews==1 and _("Be the first to review this document.") or \
+                                      _("Start a discussion about any aspect of this document."))
+        }
+
         # form is not currently used. reserved for an eventual purpose
         #form = """
         #        Display             <select name="nb" size="1"> per page
@@ -668,23 +665,24 @@ class Template:
         #form_link = "%(weburl)s/%(module)s/%(function)s" % link_dic
         #form = self.createhiddenform(action=form_link, method="get", text=form, button='Go', recid=recID, p=1)
         pages = """
-<br />
+<div>
 %(v_label)s %(comments_or_reviews)s %(results_nb_lower)s-%(results_nb_higher)s <br />
-%(page_links)s <br />
+%(page_links)s
+</div>
 """ % \
         {'v_label': _("Viewing"),
          'page_links': _("Page:") + page_links ,
          'comments_or_reviews': reviews and _('review') or _('comment'),
          'results_nb_lower': len(comments)>0 and ((page-1) * nb_per_page)+1 or 0,
-         'results_nb_higher': page == nb_pages and (((page-1) * nb_per_page) + len(comments)) or (page * nb_per_page)   }
+         'results_nb_higher': page == nb_pages and (((page-1) * nb_per_page) + len(comments)) or (page * nb_per_page)}
 
         if nb_pages > 1:
             #body = warnings + body + form + pages
-            body = warnings + body + pages
+            body = warnings + body + pages + add_comment_or_review
         else:
-            body = warnings + body
+            body = warnings + body + add_comment_or_review
 
-        return body
+        return '<div style="margin-left:10px;margin-right:10px;">' + body + '</div>'
 
     def create_messaging_link(self, to, display_name, ln=cdslang):
         """prints a link to the messaging system"""
@@ -709,7 +707,7 @@ class Template:
         output  = """
 <form action="%s" method="%s">""" % (action, string.lower(method).strip() in ['get','post'] and method or 'get')
         output += """
-  <table>
+  <table style="width:90%">
     <tr>
       <td style="vertical-align: top">
 """
@@ -787,7 +785,8 @@ class Template:
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
                         'function'  : 'add',
-                        'arguments' : 'recid=%s&amp;ln=%s&amp;action=%s&amp;reviews=0' % (recID, ln, 'SUBMIT')  }
+                        'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
+                        'recID'     : recID}
 
         if nickname:
             note = _("Note: Your nickname, %s, will be displayed as author of this comment") % ('<i>' + nickname + '</i>')
@@ -799,30 +798,28 @@ class Template:
                  'x_url_close': '</a>',
                  'x_nickname': ' <br /><i>' + display + '</i>'}
 
-        from invenio.search_engine import print_record
-        record_details = print_record(recID=recID, format='hb', ln=ln)
+        #from invenio.search_engine import print_record
+        #record_details = print_record(recID=recID, format='hb', ln=ln)
 
         warnings = self.tmpl_warnings(warnings, ln)
-        form = """
-                <table width="100%%">
-                    <tr><td>%(record_label)s</td></tr>
-                    <tr><td><blockquote>%(record)s<br /><br /></blockquote></td></tr>
-                    <tr><td>%(comment_label)s</td></tr>
-                    <tr><td>
-<textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
-                    </td></tr>
-                    <tr><td class="reportabuse">%(note)s</td></tr>
-                </table>
-                <br /><br />""" % {'msg': msg,
+        form = """<div><h2>%(add_comment)s</h2>
+        
+<textarea name="msg" rows="20" style="width:90%%">%(msg)s</textarea>
+<br />
+                <span class="reportabuse">%(note)s</span>
+                </div>
+                """ % {'msg': msg,
                                'note': note,
-                               'record': record_details,
+                               #'record': record_details,
                                'record_label': _("Article") + ":",
-                               'comment_label': _("Comment") + ":"}
-        form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
-        form = self.createhiddenform(action=form_link, method="POST", text=form, button='Add comment')
+                               'comment_label': _("Comment") + ":",
+                               'add_comment': _('Add comment')}
+        form_link = "%(weburl)s/record/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
+        form = self.createhiddenform(action=form_link, method="post", text=form, button='Add comment')
         return warnings + form
 
-    def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note, warnings):
+    def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note,
+                                           warnings, show_title_p=False):
         """
         Add form for reviews
         @param recID: record id
@@ -832,41 +829,59 @@ class Template:
         @param score: review score
         @param note: review title
         @param warnings: list of warning tuples (warning_msg, color)
+        @param show_title_p: if True, prefix the form with "Add Review" as title
         @return html add review form
         """
         _ = gettext_set_language(ln)
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
                         'function'  : 'add',
-                        'arguments' : 'recid=%s&amp;ln=%s&amp;action=%s&amp;reviews=1' % (recID, ln, 'SUBMIT')  }
+                        'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
+                        'recID'     : recID}
         warnings = self.tmpl_warnings(warnings, ln)
 
-        from search_engine import print_record
-        record_details = print_record(recID=recID, format='hb', ln=ln)
+        #from search_engine import print_record
+        #record_details = print_record(recID=recID, format='hb', ln=ln)
+        if nickname:
+            note_label = _("Note: Your nickname, %s, will be displayed as the author of this review.")
+            note_label %= ('<i>' + nickname + '</i>')
+        else:
+            (uid, nickname, display) = get_user_info(uid)
+            link = '<a href="%s/youraccount/edit">' % sweburl
+            note_label = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") %\
+                {'x_url_open': link,
+                 'x_url_close': '</a>',
+                 'x_nickname': ' <br /><i>' + display + '</i>'}
 
-        note_label = _("Note: Your nickname, %s, will be displayed as the author of this review.")
-        note_label %= ('<i>' + nickname + '</i>')
-        form = """
+        selected0 = ''
+        selected1 = ''
+        selected2 = ''
+        selected3 = ''
+        selected4 = ''
+        selected5 = ''
+        if score == 0:
+            selected0 = ' selected="selected"'
+        elif score == 1:
+            selected1 = ' selected="selected"'
+        elif score == 2:
+            selected2 = ' selected="selected"'
+        elif score == 3:
+            selected3 = ' selected="selected"'
+        elif score == 4:
+            selected4 = ' selected="selected"'
+        elif score == 5:
+            selected5 = ' selected="selected"'
+        form = """%(add_review)s
                 <table style="width: 100%%">
-                    <tr>
-                      <td>%(article_label)s: </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <blockquote>%(record)s<br />
-                          <br />
-                        </blockquote>
-                      </td>
-                    </tr>
                     <tr>
                       <td style="padding-bottom: 10px;">%(rate_label)s:
                         <select name=\"score\" size=\"1\">
-                          <option value=\"0\" selected>-%(select_label)s-</option>
-                          <option value=\"5\">***** (best)</option>
-                          <option value=\"4\">****</option>
-                          <option value=\"3\">***</option>
-                          <option value=\"2\">**</option>
-                          <option value=\"1\">*     (worst)</option>
+                          <option value=\"0\"%(selected0)s>-%(select_label)s-</option>
+                          <option value=\"5\"%(selected5)s>***** (best)</option>
+                          <option value=\"4\"%(selected4)s>****</option>
+                          <option value=\"3\"%(selected3)s>***</option>
+                          <option value=\"2\"%(selected2)s>**</option>
+                          <option value=\"1\"%(selected1)s>*     (worst)</option>
                         </select>
                       </td>
                     </tr>
@@ -875,7 +890,7 @@ class Template:
                     </tr>
                     <tr>
                       <td style="padding-bottom: 10px;">
-                        <input type="text" name="note" size="80" maxlength="250" value="%(note)s" />
+                        <input type="text" name="note" maxlength="250" style="width:90%%" value="%(note)s" />
                       </td>
                     </tr>
                     <tr>
@@ -883,13 +898,12 @@ class Template:
                     </tr>
                     <tr>
                       <td>
-<textarea name="msg" rows="20" cols="80">%(msg)s</textarea>
+<textarea name="msg" rows="20" style="width:90%%">%(msg)s</textarea>
                       </td>
                     </tr>
                     <tr>
                       <td class="reportabuse">%(note_label)s</td></tr>
                 </table>
-                <br /><br />
                 """ % {'article_label': _('Article'),
                                'rate_label': _("Rate this article"),
                                'select_label': _("Select a score"),
@@ -898,8 +912,16 @@ class Template:
                                'note_label': note_label,
                                'note'      : note!='' and note or "",
                                'msg'       : msg!='' and msg or "",
-                               'record'    : record_details    }
-        form_link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
+                               #'record'    : record_details
+                               'add_review': show_title_p and ('<h2>'+_('Add review')+'</h2>') or '',
+                               'selected0': selected0,
+                               'selected1': selected1,
+                               'selected2': selected2,
+                               'selected3': selected3,
+                               'selected4': selected4,
+                               'selected5': selected5
+                               }
+        form_link = "%(weburl)s/record/%(recID)s/reviews/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button=_('Add Review'))
         return warnings + form
 
@@ -913,8 +935,10 @@ class Template:
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
                         'function'  : 'display',
-                        'arguments' : 'recid=%s&amp;ln=%s&amp;do=od&amp;reviews=%s' % (recID, ln, reviews)  }
-        link = "%(weburl)s/%(module)s/%(function)s?%(arguments)s" % link_dic
+                        'arguments' : 'ln=%s&amp;do=od' % ln,
+                        'recID'     : recID,
+                        'discussion': reviews==1 and 'reviews' or 'comments'}
+        link = "%(weburl)s/record/%(recID)s/%(discussion)s/%(function)s?%(arguments)s" % link_dic
         if warnings:
             out = self.tmpl_warnings(warnings, ln)  + '<br /><br />'
         else:
@@ -929,7 +953,7 @@ class Template:
     def tmpl_create_multiple_actions_form(self,
                                           form_name="",
                                           form_action="",
-                                          method="GET",
+                                          method="get",
                                           action_display={},
                                           action_field_name="",
                                           button_label="",
@@ -1264,7 +1288,7 @@ class Template:
 
         form = self.tmpl_create_multiple_actions_form(form_name="admin_comment",
                                                       form_action=form_link,
-                                                      method="POST",
+                                                      method="post",
                                                       action_display=action_display,
                                                       action_field_name='action',
                                                       button_label=_("OK"),
@@ -1339,4 +1363,37 @@ class Template:
   </tr>%s
 <table>""" % (_("comment ID"), _("successfully suppressed abuse report"), table_rows)
 
+        return out
+
+    def tmpl_mini_review(self, recID, ln=cdslang, action='SUBMIT',
+                         avg_score=0, nb_comments_total=0):
+        """Display the mini version of reviews (only the grading part)"""
+
+        _ = gettext_set_language(ln)
+        
+        url = '%s/record/%s/reviews/add?ln=%s&amp;action=%s' % (weburl, recID, ln, action)
+
+        if avg_score > 0:
+            score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+                    {'x_nb_score':  '<b>%.1f</b>' % avg_score,
+                     'x_nb_reviews': nb_comments_total}
+        else:
+            score = '(' +_("No yet reviewed") + ')'
+        
+        out = '''
+<small class="detailedRecordActions">%(rate)s:</small><br /><br />
+<div style="margin:auto;width:160px;">
+<span style="display:none;">Rate this document:</span>
+<div class="star" ><a href="%(url)s&amp;score=1">1</a>
+<div class="star" ><a href="%(url)s&amp;score=2">2</a>
+<div class="star" ><a href="%(url)s&amp;score=3">3</a>
+<div class="star" ><a href="%(url)s&amp;score=4">4</a>
+<div class="star" ><a href="%(url)s&amp;score=5">5</a></div></div></div></div></div>
+<div style="clear:both">&nbsp;</div>
+</div>
+<small>%(score)s</small>
+''' % {'url': url,
+        'score': score,
+        'rate': _("Rate this document")
+        }
         return out

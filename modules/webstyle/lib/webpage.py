@@ -62,7 +62,8 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=cdslang, verbose=1, titleprologue="",
-         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin"):
+         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
+         navtrail_append_title_p=1):
 
     """page(): display CDS web page
         input: title of the page
@@ -85,6 +86,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                log is the string of data that should be appended to the log file (errors automatically logged)
                secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not
                navmenuid the section of the website this page belongs (search, submit, baskets, etc.)
+               navtrail_append_title_p is 0 or 1 and tells whether page title is appended to navtrail
        output: the final cds page with header, footer, etc.
     """
 
@@ -105,7 +107,9 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                       description = description,
                       keywords = keywords,
                       userinfobox = create_userinfobox_body(req, uid, language),
-                      navtrailbox = create_navtrailbox_body(title, navtrail,
+                      navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
+                                                            and title or '',
+                                                            navtrail,
                                                             language=language),
                       uid = uid,
                       secure_page_p = secure_page_p,
@@ -130,7 +134,8 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
 
 def pageheaderonly(title, navtrail="", description="", keywords="",
                    uid=0, cdspageheaderadd="", language=cdslang,
-                   req=None, secure_page_p=0, verbose=1, navmenuid="admin"):
+                   req=None, secure_page_p=0, verbose=1, navmenuid="admin",
+                   navtrail_append_title_p=1):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -140,7 +145,9 @@ def pageheaderonly(title, navtrail="", description="", keywords="",
                       description = description,
                       keywords = keywords,
                       userinfobox = create_userinfobox_body(req, uid, language),
-                      navtrailbox = create_navtrailbox_body(title, navtrail,
+                      navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
+                                                            and title or '',
+                                                            navtrail,
                                                             language=language),
                       uid = uid,
                       secure_page_p = secure_page_p,

@@ -32,6 +32,7 @@ from invenio.config import weburl, sweburl, cdslang, cdsname
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
+from invenio.urlutils import wash_url_argument
 
 def switchfmtscore(req, colID, type, id_1, id_2, ln=cdslang):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
@@ -503,6 +504,29 @@ def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def update_detailed_record_options(req, colID, ln=cdslang, tabs=[], recurse=0):
+    """Update the preferences for the tab to show/hide in the detailed record page. """
+    
+    _tabs = wash_url_argument(tabs, 'list')
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
+    
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return error_page(req)
+
+    auth = check_user(req,'cfgwebsearch')
+    if not auth[0]:
+        return page(title="Edit Collection",
+                    body = wsc.perform_update_detailed_record_options(colID, ln, _tabs, recurse),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+    
 def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 

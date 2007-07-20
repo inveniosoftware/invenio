@@ -420,6 +420,7 @@ class BibDoc:
               imagepath = imagepath,
               docname = self.docname,
               id = self.id,
+              recid = self.recid
             )
         return t
 

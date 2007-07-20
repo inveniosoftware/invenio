@@ -1,9 +1,11 @@
 <name>Default HTML detailed</name>
 <description>This is the default HTML detailed format.</description>
-<BFE_EDIT_RECORD style='color:rgb(255,0,0)'
-prefix='<div style="text-align:right;font-size:small;">'
-suffix='</div>'/>
-<BFE_TOPBANNER />
+
+<BFE_TOPBANNER 
+prefix='<div style="padding-left:10px;padding-right:10px">' 
+suffix='</div><hr/>'/>
+
+<div style="padding-left:10px;padding-right:10px">
 <BFE_TITLE prefix="<center><big><big><strong>" separator="<br /><br />" suffix="</strong></big></big></center>" />
 <p align="center">
 <BFE_AUTHORS suffix="<br />" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
@@ -36,9 +38,4 @@ suffix="<br />" />
 
 <BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/>
 <br />
-<BFE_FULLTEXT />
-<BFE_CITED_BY prefix="<br /><br /><strong>Cited by:</strong> try citation search for "/>
-</p>
-<BFE_REFERENCES
-prefix='<blockquote><strong>References:</strong><ul>'
-suffix='</ul><p><small><i><b>Warning</b>: references are automatically extracted and standardized from the PDF document and may therefore contain errors. If you think they are incorrect or incomplete, look at the fulltext document itself.<br /></i></small></p></blockquote>'/>
+</div>

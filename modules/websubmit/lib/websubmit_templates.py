@@ -1103,10 +1103,11 @@ class Template:
         if version != "":
             title += ' ' + _("version") + ' #' + str(version)
 
-        out = """<center><table class="searchbox" summary="" width="500"><tr><th class="portalboxheader">Access&nbsp;to&nbsp;Fulltext&nbsp;&nbsp;&nbsp;&nbsp;<font size=-2>[%s]</font></th></tr><tr><td class="portalboxbody"><!--start file list-->
+        out = """<div style="width:90%%;margin:auto;min-height:100px;">
+                <!--start file list-->
                   %s
-                <!--end file list--></td></tr></table></center>
-              """ % (title, filelist)
+                <!--end file list--></div>
+              """ % (filelist)
 
         return out
 
@@ -1137,7 +1138,7 @@ class Template:
             out += "</ul>"
         return out
 
-    def tmpl_bibdoc_filelist(self, ln, weburl, versions, imagepath, docname, id):
+    def tmpl_bibdoc_filelist(self, ln, weburl, versions, imagepath, docname, id, recid):
         """
         Displays the file list for a record.
 
@@ -1161,6 +1162,8 @@ class Template:
 
          - 'id' *int* - The id of the document
 
+         - 'recid' *int* - The record id
+
         """
 
         # load the right message language
@@ -1177,10 +1180,11 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(weburl)s/getfile.py?docid=%(id)s&amp;version=all">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(weburl)s/record/%(recID)s/files/getfile.py?docid=%(id)s&amp;version=all">%(previous)s</a>)""" % {
                                  'see' : _("see"),
                                  'weburl' : weburl,
                                  'id' : id,
+                                 'recID': recid,
                                  'previous': _("previous"),
                                }
             else:

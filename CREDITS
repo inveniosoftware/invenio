@@ -87,4 +87,8 @@ The indexer engine uses the Martin Porter Stemming Algorithm and its
 Vivake Gupta free Python implementation.
 <http://tartarus.org/~martin/PorterStemmer/>
 
+The CSS style for rounded corners box used in detailed record pages 
+adapted from Francky Lleyneman liquidcorners CSS.
+<http://home.tiscali.nl/developerscorner/liquidcorners/liquidcorners.htm>
+
 - end of file -

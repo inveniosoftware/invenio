@@ -370,5 +370,6 @@ DROP TABLE IF EXISTS user_bskBASKET;
 DROP TABLE IF EXISTS usergroup_bskBASKET;
 DROP TABLE IF EXISTS collection_externalcollection;
 DROP TABLE IF EXISTS externalcollection;
+DROP TABLE IF EXISTS collectiondetailedpagetabs;
 
 -- end of file

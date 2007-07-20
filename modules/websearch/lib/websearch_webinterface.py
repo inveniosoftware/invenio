@@ -34,6 +34,7 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, auth_apache_user_p, auth_apache_user_in_groups, setApacheUser
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
+from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, collection_restricted_p
@@ -45,6 +46,7 @@ websearch_templates = invenio.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
+output_formats = ['xm', 'xd', 'hm', 'hx', 'hd', 'hb', 'xe', 'xn']
 
 def wash_search_urlargd(form):
     """
@@ -79,19 +81,31 @@ def wash_search_urlargd(form):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files']
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references']
+    
+    _exports.extend(output_formats)
 
-    def __init__(self, recid):
+    def __init__(self, recid, tab, format=None):
         self.recid = recid
+        self.tab = tab
+        self.format = format
+        
+        for output_format in output_formats:
+            self.__dict__[output_format] = self
         self.files = WebInterfaceFilesPages(self.recid)
+        self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
+        self.comments = WebInterfaceCommentsPages(self.recid)
+        self.statistics = self
+        self.references = self
         return
-
+        
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
+        argd['tab'] = self.tab
 
-        _ = gettext_set_language(argd['ln'])
-
+        if self.format is not None:
+            argd['of'] = self.format
         req.argd = argd
         uid = getUid(req)
         if uid == -1:
@@ -104,7 +118,6 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
-
 
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
@@ -141,17 +154,30 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files']
-
-    def __init__(self, recid):
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references']
+        
+    _exports.extend(output_formats)
+    
+    def __init__(self, recid, tab, format=None):
         self.recid = recid
+        self.tab = tab
+        self.format = format
+
+        for output_format in output_formats:
+            self.__dict__[output_format] = self
         self.files = WebInterfaceFilesPages(self.recid)
+        self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
+        self.comments = WebInterfaceCommentsPages(self.recid)
+        self.statistics = self
+        self.references = self
         return
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
-
+        if self.format is not None:
+            argd['of'] = self.format
+            
         req.argd = argd
 
         uid = getUid(req)
@@ -345,15 +371,33 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 else:
                     # display page not found for URLs like /record/foo
                     return None, []
-
+        
             if recid <= 0:
                 # display page not found for URLs like /record/-5 or /record/0
                 return None, []
+            
+            format = None
+            tab = ''
+            try:
+                if path[1] in ['', 'files', 'reviews', 'comments', 'statistics', 'references']:
+                    tab = path[1]
+                    format = None
+                elif path[1] in output_formats:
+                    tab = ''
+                    format = path[1]
+                else:
+                    # display page not found for URLs like /record/references
+                    # for a collection where 'references' tabs is not visible
+                    return None, []
+                
+            except IndexError:
+                # Keep normal url if tabs is not specified
+                pass
 
             if component == 'record-restricted':
-                return WebInterfaceRecordRestrictedPages(recid), path[1:]
+                return WebInterfaceRecordRestrictedPages(recid, tab, format), path[1:]
             else:
-                return WebInterfaceRecordPages(recid), path[1:]
+                return WebInterfaceRecordPages(recid, tab, format), path[1:]
 
         return None, []
 

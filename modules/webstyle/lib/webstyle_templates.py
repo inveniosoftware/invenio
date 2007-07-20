@@ -40,6 +40,8 @@ from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
+from invenio import template
+websearch_templates = template.load('websearch')
 
 class Template:
 
@@ -590,7 +592,7 @@ URI: http://%(host)s%(page)s
                   </tr>
                   <tr>
                     <td>
-                      <form action="%(weburl)s/error/send" method="POST">
+                      <form action="%(weburl)s/error/send" method="post">
                         %(send_error_label)s
                         <input class="adminbutton" type="submit" value="%(send_label)s" />
                         <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
@@ -634,4 +636,141 @@ URI: http://%(host)s%(page)s
                                  info_not_available
               }
 
+        return out
+    
+    def detailed_record_container(self, content, recid, tabs, ln=cdslang,
+                                  show_similar_rec_p=True,
+                                  creationdate=None,
+                                  modifydate=None):
+        """Prints the box displayed in detailed records pages, with tabs at the top.
+
+           Parameters:
+
+         - content *string* - the content displayed inside the box
+         - recid *int* - the id of the displayed record
+         - tabs ** - the tabs displayed at the top of the box. 
+         - ln *string* - the language of the page in which the box is displayed
+         - show_similar_rec_p *bool* print 'similar records' link in the box
+         - creationdate *string* - the creation date of the displayed record
+         - modifydate *string* - the last modification date of the displayed record
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        # If no tabs, simply returns the content
+        if len(tabs) == 0:
+            return content
+
+        # Build the tabs at the top of the page
+        out_tabs = ''
+        if len(tabs) > 1:
+            first_tab = True
+            for (label, url, selected, enabled) in tabs:
+                css_class = []
+                if selected:
+                    css_class.append('on')
+                if first_tab:
+                    css_class.append('first')
+                    first_tab = False
+                if not enabled:
+                    css_class.append('disabled')
+                css_class = ' class="%s"' % ' '.join(css_class)
+                if not enabled:
+                    out_tabs += '<li%(class)s><a>%(label)s</a></li>' % \
+                                {'class':css_class,
+                                 'label':label}
+                else:
+                    out_tabs += '<li%(class)s><a href="%(url)s">%(label)s</a></li>' % \
+                                {'class':css_class,
+                                 'url':url,
+                                 'label':label}
+        if out_tabs != '':
+            out_tabs = '''        <div style="position:absolute;z-index:1;width:100%%;top:0;">
+            <div style="width:100%%;margin:0 auto;">
+                <ul class="tabs">%s</ul>
+            </div>
+        </div>''' % out_tabs
+                                
+        out = """
+    <div class="detailed">
+        %(tabs)s
+        <div class="content">
+            <div class="top-left-folded"></div>
+            <div class="top-right-folded"></div>
+            <div class="inside">
+                <div style="height:0.1em;">&nbsp;</div>
+                <p class="notopgap">&nbsp;</p>
+                %(content)s
+                <p class="nobottomgap" >&nbsp;</p>
+            </div>
+            <div class="bottom-left-folded">%(dates)s</div>
+            <div class="bottom-right-folded"style="text-align:right"><span class="moreinfo" style="margin-right:25px">%(similar)s</span></div>
+        </div>
+    </div>
+    <br/>
+    """ % {
+    'tabs':out_tabs,
+    'content':content,
+    'similar':create_html_link(
+                  websearch_templates.build_search_url(p='recid:%d' % \
+                  recid,
+                  rm='wrd',
+                  ln=ln),
+                  {}, _("Similar records"),
+                  {'class': "moreinfo"}),
+    'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left">&nbsp;%(dates)s</div>' % {
+                   'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
+                   {'x_date_creation': creationdate,
+                    'x_date_modification': modifydate},
+                    } or ''
+    }
+
+        return out
+
+    def detailed_record_mini_panel(self, recid, ln=cdslang,
+                                   format='hd',
+                                   files='',
+                                   reviews='',
+                                   actions=''):
+        """Displays the actions dock at the bottom of the detailed record
+           pages.
+
+           Parameters:
+
+         - recid *int* - the id of the displayed record
+         - format *string* - the format used to display the record
+         - files *string* - the small panel representing the fulltext
+         - reviews *string* - the small panel representing the reviews
+         - actions *string* - the small panel representing the possible user's action
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
+        <br />
+<div class="mini-panel">
+<div class="top-left"></div><div class="top-right"></div>
+		<div class="inside">
+		
+        <div style="width:33%%;float:left;text-align:center;margin-top:0">
+             %(files)s
+        </div>
+	<div style="width:33%%;float:left;text-align:center">
+             %(reviews)s
+	</div>
+	<div style="width:33%%;float:right;text-align:right;">
+             %(actions)s
+	</div>
+	<div style="clear:both;margin-bottom: 0;"></div>
+        </div>
+	<div class="bottom-left"></div><div class="bottom-right"></div>
+        </div>
+        """ % {
+        'weburl': weburl,
+        'ln':ln,
+        'recid':recid,
+        'files': files,
+        'reviews':reviews,
+        'actions': actions,
+        }
         return out

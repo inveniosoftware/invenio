@@ -44,8 +44,7 @@ from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW, \
-     CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW, \
+     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
      CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
@@ -68,10 +67,15 @@ from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.websearchadminlib import get_detailed_page_tabs
 
-if CFG_EXPERIMENTAL_FEATURES:
-    from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
-    from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
+import invenio.template
+webstyle_templates = invenio.template.load('webstyle')
+webcomment_templates = invenio.template.load('webcomment')
+
+#if CFG_EXPERIMENTAL_FEATURES:
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
+from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, get_table_update_time, escape_string, Error
 try:
@@ -504,7 +508,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
     return opfts
 
 def page_start(req, of, cc, as, ln, uid, title_message=None,
-               description='', keywords=''):
+               description='', keywords='', recID=-1, tab=''):
     "Start page according to given output format."
 
     _ = gettext_set_language(ln)
@@ -544,13 +548,22 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         if not keywords:
             keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), cc)
 
+        navtrail = create_navtrail_links(cc, as, ln)
+        navtrail_append_title_p=1
+        if tab != '':
+            tab_label = get_detailed_page_tabs(cc)[tab]['label']
+            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % (weburl, recID, title_message, _(tab_label))
+            navtrail_append_title_p=0
+
         req.write(pageheaderonly(req=req, title=title_message,
-                                 navtrail=create_navtrail_links(cc, as, ln),
+                                 navtrail=navtrail,
                                  description=description,
                                  keywords=keywords,
                                  uid=uid,
                                  language=ln,
-                                 navmenuid='search'))
+                                 navmenuid='search',
+                                 navtrail_append_title_p=\
+                                 navtrail_append_title_p))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
     #    req.send_http_header()
@@ -727,7 +740,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              ec = ec,
            )
 
-def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1):
+def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1, tab=''):
     """Creates navigation trail links, i.e. links to collection
     ancestors (except Home collection).  If as==1, then links to
     Advanced Search interfaces; otherwise Simple Search.
@@ -2436,7 +2449,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0):
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab=''):
 
     """
     Prints list of records 'recIDs' formatted accoding to 'format' in
@@ -2547,58 +2560,106 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                          ))
             else:
                 # HTML detailed format:
-                # print other formatting choices:
 
                 rows = []
                 for irec in range(irec_max, irec_min, -1):
-                    temp = {
-                             'record'      : print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern, uid=uid, verbose=verbose),
-                             'recid'       : recIDs[irec],
-                             'creationdate': '',
-                             'modifydate'  : '',
-                           }
-                    if record_exists(recIDs[irec])==1:
-                        temp['creationdate'] = get_creation_date(recIDs[irec])
-                        temp['modifydate'] = get_modification_date(recIDs[irec])
+                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
+                                                            recIDs[irec])
+                    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+                    ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+                    tabs = [(unordered_tabs[tab_id]['label'], \
+                             '%s/record/%s/%s' % (weburl, recIDs[irec], tab_id), \
+                             tab_id == tab,
+                             unordered_tabs[tab_id]['enabled']) \
+                            for (tab_id, order) in ordered_tabs_id
+                            if unordered_tabs[tab_id]['visible'] == True]
 
-                    if CFG_EXPERIMENTAL_FEATURES:
+                    content = ''
+                    # load content
+                    if tab == 'statistics':
+                        citinglist = None
+                        citationhistory = None
                         r = calculate_cited_by_list(recIDs[irec])
                         if r:
-                            temp ['citinglist'] = r
-                            temp ['citationhistory'] = create_citation_history_graph_and_box(recIDs[irec], ln)
-
+                            citinglist = r
+                            citationhistory = create_citation_history_graph_and_box(recIDs[irec], ln)
+                        
                         r = calculate_co_cited_with_list(recIDs[irec])
+                        cociting = None
                         if r:
-                            temp ['cociting'] = r
-
-                    if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
+                            cociting = r
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
-                        if r:
-                            temp ['downloadsimilarity'] = r
-                            temp ['downloadhistory'] = create_download_history_graph_and_box(recIDs[irec], ln)
+                        downloadsimilarity = None
+                        downloadhistory = None
+                        #if r:
+                        #    downloadsimilarity = r
+                        if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
+                            downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln)
 
-                    # Get comments and reviews for this record if exist
-                    # FIXME: templatize me
-                    if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
-                        from invenio.webcomment import get_first_comments_or_remarks
-                        (comments, reviews) = get_first_comments_or_remarks(recID=recIDs[irec], ln=ln,
-                                                                            nb_comments=CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW,
-                                                                            nb_reviews=CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW)
-                        temp['comments'] = comments
-                        temp['reviews']  = reviews
+                        r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
+                        viewsimilarity = None
+                        if r: viewsimilarity = r
+                        content = websearch_templates.tmpl_detailed_record_statistics(recIDs[irec],
+                                                                                      ln,
+                                                                                      citinglist=citinglist,
+                                                                                      citationhistory=citationhistory,
+                                                                                      cociting=cociting,
+                                                                                      downloadsimilarity=downloadsimilarity,
+                                                                                      downloadhistory=downloadhistory,
+                                                                                      viewsimilarity=viewsimilarity)
+                        req.write(webstyle_templates.detailed_record_container(content,
+                                                                               recIDs[irec],
+                                                                               tabs,
+                                                                               ln))
+                    elif tab == 'references':
+                        content = format_record(recIDs[irec], 'HDREF', ln=ln, uid=uid, verbose=verbose)
+                        req.write(webstyle_templates.detailed_record_container(content,
+                                                                               recIDs[irec],
+                                                                               tabs,
+                                                                               ln))
+                    else:
+                        # Metadata tab
+                        content = print_record(recIDs[irec], format, ot, ln,
+                                               search_pattern=search_pattern,
+                                               uid=uid, verbose=verbose)
 
-                    r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
-                    if r: temp ['viewsimilarity'] = r
+                        creationdate = None
+                        modifydate = None
+                        if record_exists(recIDs[irec]) == 1:
+                            creationdate = get_creation_date(recIDs[irec])
+                            modifydate = get_modification_date(recIDs[irec])
 
-                    rows.append(temp)
+                        content = websearch_templates.tmpl_detailed_record_metadata(
+                            recID = recIDs[irec],
+                            ln = ln,
+                            format = format,
+                            creationdate = creationdate,
+                            modifydate = modifydate,
+                            content = content)
 
-                req.write(websearch_templates.tmpl_records_format_other(
-                           ln = ln,
-                           weburl = weburl,
-                           url_argd = req.argd,
-                           rows = rows,
-                           format = format,
-                         ))
+                        req.write(webstyle_templates.detailed_record_container(content,
+                                                                               recIDs[irec],
+                                                                               tabs,
+                                                                               ln,
+                                                                               creationdate,
+                                                                               modifydate))
+
+                        if len(tabs) > 0:
+                            # Add the mini box at bottom of the page
+                            if CFG_WEBCOMMENT_ALLOW_REVIEWS:
+                                from invenio.webcomment import get_mini_reviews
+                                reviews = get_mini_reviews(recid = recIDs[irec], ln=ln)
+                            else:
+                                reviews = ''
+                            actions = format_record(recIDs[irec], 'HDACT', ln=ln, uid=uid, verbose=verbose)
+                            files = format_record(recIDs[irec], 'HDFILE', ln=ln, uid=uid, verbose=verbose)
+                            req.write(webstyle_templates.detailed_record_mini_panel(recIDs[irec],
+                                                                                    ln,
+                                                                                    format,
+                                                                                    files=files,
+                                                                                    reviews=reviews,
+                                                                                    actions=actions))
+
     else:
         print_warning(req, _("Use different search terms."))
 
@@ -3066,7 +3127,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
-                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang, ec = None):
+                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang, ec = None, tab=''):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -3280,7 +3341,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
-        page_start(req, of, cc, as, ln, uid, title, description, keywords)
+        page_start(req, of, cc, as, ln, uid, title, description, keywords, recid, tab)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"
@@ -3290,7 +3351,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             if of == "id":
                 return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
             else:
-                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose)
+                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab)
             if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                 register_page_view_event(recid, uid, client_ip_address)

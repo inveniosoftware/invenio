@@ -29,7 +29,9 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   NLM.bft NLM.bfx \
 	   RSS.bft RSS.bfx \
 	   MARCXML.bfx \
-	   OAI_DC.xsl DC.xsl
+	   OAI_DC.xsl DC.xsl\
+	   Default_HTML_references.bft Default_HTML_files.bft \
+	   Default_HTML_actions.bft
 
 tmpdir = $(prefix)/var/tmp
 

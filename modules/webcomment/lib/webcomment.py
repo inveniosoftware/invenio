@@ -35,11 +35,10 @@ from invenio.config import cdslang, \
                            weburl,\
                            cdsname,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+                           CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-                           CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW,\
                            CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-                           CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW,\
                            CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
                            CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
 from invenio.webmessage_mailutils import email_quote_txt
@@ -60,7 +59,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0):
+def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -81,12 +80,15 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     @param voted: boolean, active if user voted for a review, see perform_request_vote function
     @param reported: boolean, active if user reported a certain comment/review, perform_request_report function
     @param reviews: boolean, enabled if reviews, disabled for comments
+    @param uid: the id of the user who is reading comments
     @return html body.
     """
 
     errors = []
     warnings = []
-
+    nb_reviews = 0
+    nb_comments = 0
+    
     # wash arguments
     recID = wash_url_argument(recID, 'int')
     ln = wash_language(ln)
@@ -104,8 +106,16 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
         return (error_body, errors, warnings)
     # Query the database and filter results
     res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews)
-    nb_res = len(res)
+    res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews)
 
+    nb_res = len(res)
+    if reviews:
+        nb_reviews = nb_res
+        nb_comments = len(res2)
+    else:
+        nb_reviews = len(res2)
+        nb_comments = nb_res
+        
     # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
     if page < 0:
@@ -156,15 +166,18 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
         elif voted == 0:
             warnings.append(('WRN_WEBCOMMENT_ALREADY_VOTED',))
+
     body = webcomment_templates.tmpl_get_comments(recID,
                                                   ln,
                                                   nb_per_page, page, last_page,
                                                   display_order, display_since,
                                                   CFG_WEBCOMMENT_ALLOW_REVIEWS,
-                                                  res, nb_res, avg_score,
+                                                  res, nb_comments, avg_score,
                                                   warnings,
                                                   border=0,
-                                                  reviews=reviews)
+                                                  reviews=reviews,
+                                                  total_nb_reviews=nb_reviews,
+                                                  uid=uid)
     return (body, errors, warnings)
 
 def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
@@ -471,7 +484,8 @@ def query_record_useful_review(comID, value):
     res2 = run_sql(query2, params2)
     return int(res2)
 
-def query_retrieve_comments_or_remarks (recID, display_order='od', display_since='0000-00-00 00:00:00', ranking=0):
+def query_retrieve_comments_or_remarks (recID, display_order='od', display_since='0000-00-00 00:00:00',
+                                        ranking=0):
     """
     Private function
     Retrieve tuple of comments or remarks from the database
@@ -484,6 +498,7 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                             nd = newest date
     @param display_since: datetime, e.g. 0000-00-00 00:00:00
     @param ranking: boolean, enabled if reviews, disabled for comments
+    @param full_reviews_p: boolean, filter out empty reviews (with score only) if False
     @return tuple of comment where comment is
             tuple (nickname, date_creation, body, id) if ranking disabled or
             tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
@@ -663,10 +678,7 @@ def get_first_comments_or_remarks(recID=-1,
             if type(nb_reviews) is int and nb_reviews < len(res_reviews):
                 first_res_reviews = res_reviews[:nb_reviews]
             else:
-                if nb_res_reviews  > CFG_WEBCOMMENT_NB_REVIEWS_IN_DETAILED_VIEW:
-                    first_res_reviews = res_reviews[:CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN]
-                else:
-                    first_res_reviews = res_reviews
+                first_res_reviews = res_reviews
         if CFG_WEBCOMMENT_ALLOW_COMMENTS:
             res_comments = query_retrieve_comments_or_remarks(recID=recID, display_order="od", ranking=0)
             nb_res_comments = len(res_comments)
@@ -674,10 +686,7 @@ def get_first_comments_or_remarks(recID=-1,
             if type(nb_comments) is int and nb_comments < len(res_comments):
                 first_res_comments = res_comments[:nb_comments]
             else:
-                if nb_res_comments  > CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW:
-                    first_res_comments = res_comments[:CFG_WEBCOMMENT_NB_COMMENTS_IN_DETAILED_VIEW]
-                else:
-                    first_res_comments = res_comments
+                first_res_comments = res_comments
     else: #error
         errors.append(('ERR_WEBCOMMENT_RECID_INVALID', recID)) #!FIXME dont return error anywhere since search page
 
@@ -806,11 +815,11 @@ def perform_request_add_comment_or_remark(recID=0,
     # check before submitting form
     elif action == 'SUBMIT':
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            if note.strip() in ["", "None"]:
+            if note.strip() in ["", "None"] and not CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
                 warnings.append(('WRN_WEBCOMMENT_ADD_NO_TITLE',))
             if score == 0 or score > 5:
                 warnings.append(("WRN_WEBCOMMENT_ADD_NO_SCORE",))
-        if msg.strip() in ["", "None"]:
+        if msg.strip() in ["", "None"] and not CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
             warnings.append(('WRN_WEBCOMMENT_ADD_NO_BODY',))
         # if no warnings, submit
         if len(warnings) == 0:
@@ -997,3 +1006,17 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
             errors.append(('ERR_WEBCOMMENT_ARGUMENT_INVALID', value))
             return 0
     return 1
+
+
+def get_mini_reviews(recid, ln=cdslang):
+
+    if CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
+        action = 'SUBMIT'
+    else:
+        action = 'DISPLAY'
+
+    reviews = query_retrieve_comments_or_remarks(recid, ranking=1)
+    
+    return webcomment_templates.tmpl_mini_review(recid, ln, action=action,
+                                                 avg_score=calculate_avg_score(reviews),
+                                                 nb_comments_total=len(reviews))

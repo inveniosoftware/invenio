@@ -1,0 +1,4 @@
+<name>Default HTML files</name>
+<description>Outputs the available files for a record</description>
+
+<BFE_FULLTEXT show_icons="yes" separator='<br />'/>

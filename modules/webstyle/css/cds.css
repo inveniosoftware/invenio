@@ -1387,4 +1387,224 @@ input.hyperlinkformSubmitButton {
    margin-right: 20px;
 }
 
+/* Start 'detailed record' boxes*/
+
+div.detailed, div.mini-panel {
+    width:90%;
+    margin:auto;
+    position:relative;
+    max-width: 1280px;
+}
+div.detailed div.content {
+   position:relative;
+   top:1em;
+}
+div.detailed img, div.mini-panel img{
+    border:none;
+}
+div.detailed div.content, div.mini-panel {
+   /* Should be removed for future CERN style*/
+   border: 1px solid #36c;
+   padding-top:3px;
+   padding-bottom:3px;
+}
+div.mini-panel{
+   /* Should be removed for future CERN style*/
+   background-color:#F2F2FD;
+   background-image: url(mini_panel_background.gif);
+}
+.notopgap    { margin: 0; height:0;}
+.nobottomgap { margin-bottom: 0; height:0;}
+/* CERN-specific style
+div.detailed .inside, div.mini-panel{
+   border-left: 1px solid #B2B2B2;
+   border-right: 1px solid #B2B2B2;
+   background: #FFF url(gradient-lightgray-1x100.gif) repeat-x left top;
+   color: #000000;
+   padding-left: 0px;
+   padding-right:0px;
+}
+*/
+
+/* mini-panel in detailed record pages*/
+
+/* Future CERN-specific style
+.top-left, .top-right, .bottom-left, .bottom-right { 
+   background-image: url(rcorners-gray-1280x18.gif);
+   height: 9px;
+   font-size: 2px;
+}
+.top-left, .bottom-left { 
+   margin-right: 9px;
+}
+.top-right, .bottom-right { 
+   margin-left: 9px;
+   margin-top: -9px;
+}
+.top-right {
+   background-position: 100% 0;
+}
+.bottom-left  { 
+   background-position: 0 -9px;
+}
+.bottom-right { 
+   background-position: 100% -9px;
+}
+*/
+	
+/* Detailed record box */	
+.top-left-folded { 
+   height: 10px;
+}
+/* Future CERN-specific style
+.top-left-folded, .top-right-folded, .bottom-left-folded, .bottom-right-folded { 
+   background-image: url(rcorners-gray-1280x60-folded.gif);
+   height: 30px;
+   font-size: 2px;
+}
+.top-left-folded, .bottom-left-folded { 
+   margin-right: 21px;
+}
+.top-right-folded, .bottom-right-folded { 
+   margin-left: 21px;
+   margin-top: -30px;
+}
+.top-right-folded {
+   background-position: 100% 0;
+}
+.bottom-left-folded  { 
+   background-position: 0 -30px;
+}
+.bottom-right-folded {
+   background-position: 100% -30px;
+}
+*/
+
+/* tabs as used in detailed record pages */
+ul.tabs{
+   margin-top:5px;
+   margin-bottom:5px;
+   list-style-type:none;
+   text-align:center;
+}
+.tabs li{
+   display:inline;
+}
+.tabs li a{
+   border-top: 1px solid #36c;
+   border-right: 1px solid #36c;
+   border-bottom: 1px solid #36c;
+   border-left: none;
+   background-color: #FFF;
+   padding:4px;
+   color:#36c;
+   font-size:x-small;
+   font-weight:bold;
+   text-decoration:none;
+   zoom:100%; /*We loose CSS validity here, but necessary because of ie7*/
+}
+.tabs li.on a{
+   background-color: #36c;
+   color: #FFF
+}
+.tabs li.disabled a{
+   color:#ccf;
+   cursor:default;
+}
+.tabs li.first a{
+   border-left: 1px solid #36c;
+}    
+
+/*Future CERN-specific style
+ul.tabs{
+   margin-top:5px;
+   margin-bottom:5px;
+   list-style-type:none;
+   text-align:center;
+}
+.tabs li{
+   display:inline;
+}  
+.tabs li a{
+   border-top: 1px solid #B2B2B2;
+   border-right: 1px solid #B2B2B2;
+   border-bottom: 1px solid #B2B2B2;
+   border-left: none;
+   background: #EBEBEB url(gradient_tab-gray-1x23.gif) repeat-x left top;
+   padding:4px;
+   color:#000;
+   text-decoration:none;
+   zoom:100%;
+}
+.tabs li.on a{
+   background: #D6D6D6 url(gradient_tab_on-gray-1x23.gif) repeat-x left top;
+}
+.tabs li.disabled a{
+   color:#999;
+   cursor:default
+}
+.tabs li.first a{
+   border-left: 1px solid #B2B2B2;
+}    
+*/
+
+/* Actions in mini-box in detailed view */
+ul.detailedRecordActions{
+   list-style-image: url(arrow_link-icon-15x11-right.gif) ;
+   padding-left: 1em;
+   text-align:left;
+   margin:0.05em;
+}
+.detailedRecordActions, .detailedRecordActions a{
+   text-decoration:none;
+   color:#555;
+   font-weight:700;
+   font-size:small;
+}
+
+/* Grading stars for mini-panel in detailed view*/
+div.mini-panel div.star a{
+   text-indent:-9000px; /*Hide text*/
+   height:30px;
+   width:30px;
+   float:left;
+}
+div.mini-panel div.star{
+   height:30px !important;
+   float:left;
+   clear:none;
+   width:auto;
+   text-align:left;
+   background:url(star_dot-icon-30x30.gif) no-repeat;
+}
+div.mini-panel div.star:hover{
+   background-image:url(star-icon-30x30.gif) ;
+}
+
+/* Short bib notice displayed as sheet of paper in detailed record pages */
+#commentHB {
+   background: #fff url(paper-texture-128x128.gif) repeat top left;
+   padding:4px;
+   border-bottom: 1px solid #CCC;
+   border-right: 1px solid #CCC;
+   border-top: 1px solid #DDD;
+   border-left: 1px solid #DDD;
+}
+#commentHB #clip {
+   position:relative;
+   clear:none;
+   float:left;
+   left: -45px;
+   top:-15px;
+   height:72px;
+   width:72px;
+   background: transparent url(paper_clip-72x72.gif) no-repeat top left;
+}
+#commentHB #HB{
+   position:relative;
+   left: -50px;
+}
+
+/* end detailed record page*/
+
 /* end of cds.css */

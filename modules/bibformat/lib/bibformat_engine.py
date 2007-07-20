@@ -66,8 +66,10 @@ from bibformat_utils import \
      parse_tag
 from invenio.htmlutils import HTMLWasher
 
-from xml.dom import minidom #Remove when call_old_bibformat is removed
-
+if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
+    from xml.dom import minidom
+    import tempfile
+    
 # Cache for data we have already read and parsed
 format_templates_cache = {}
 format_elements_cache = {}
@@ -211,20 +213,29 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
             out += """\n<br/><span class="quicknote">
             Formatting record %i on-the-fly with old BibFormat.
             </span><br/>""" % recID
-        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
-                                                         "otype=%s" % format],
-                                                        'rw')
+##         pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
+##                                                          "otype=%s" % format],
+##                                                         'rw')
         # Retrieve MARCXML
         # Build it on-the-fly only if 'call_old_bibformat' was called
         # with format=xm and on_the_fly=True
         xm_record = record_get_xml(recID, 'xm',
                                    on_the_fly=(on_the_fly and format == 'xm'))
 
-        pipe_input.write(xm_record)
-        pipe_input.close()
-        bibformat_output = pipe_output.read()
-        pipe_output.close()
-        pipe_error.close()
+        (result_code, result_path) = tempfile.mkstemp()
+        command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
+        (xm_code, xm_path) = tempfile.mkstemp()
+        open(xm_path, "w").write(xm_record)
+        command = command + " <" + xm_path
+        os.system(command)
+        bibformat_output = open(result_path,"r").read()
+        os.remove(result_path)
+        os.remove(xm_path)
+##         pipe_input.write(xm_record)
+##         pipe_input.close()
+##         bibformat_output = pipe_output.read()
+##         pipe_output.close()
+##         pipe_error.close()
         if bibformat_output.startswith("<record>"):
             dom = minidom.parseString(bibformat_output)
             for e in dom.getElementsByTagName('subfield'):

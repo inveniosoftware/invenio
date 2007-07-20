@@ -1,9 +1,10 @@
 <name>Picture HTML detailed</name>
 <description>The detailed HTML format suitable for displaying pictures.</description>
-<BFE_EDIT_RECORD style='color:rgb(255,0,0)'
-prefix='<div style="text-align:right;font-size:small;">' 
-suffix='</div>'/>
+<div style="padding-left:10px;padding-right:10px">
 <BFE_TOPBANNER />
+</div>
+<hr />
+<div style="padding-left:10px;padding-right:10px">
 <BFE_TITLE prefix="<center><big><big><strong>" 
 separator="<br/><br/>" 
 suffix="</strong></big></big></center>" /> 
@@ -50,7 +51,7 @@ suffix_fr='</small></p>'
 
 </tr>
 
-<tr><td colspan="2" class="blocknote">
+<tr><td colspan="2">
  <strong>© CERN Geneva: </strong>
 <small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>). 
 The words CERN Photo must be quoted for each use. </small>
@@ -58,3 +59,4 @@ The words CERN Photo must be quoted for each use. </small>
 </tr>
 
 </table>
+</div>

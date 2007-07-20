@@ -17,6 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__lastupdated__ = """$Date$"""
+
 __revision__ = "$Id$"
 
 import string
@@ -40,17 +42,24 @@ from invenio.config import \
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, create_error_box, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.websubmit_config import *
 from invenio.file import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
+from invenio.search_engine import \
+     guess_primary_collection_of_a_record, \
+     get_colID, \
+     create_navtrail_links
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
-
+from invenio.websearchadminlib import get_detailed_page_tabs
+import invenio.template
+webstyle_templates = invenio.template.load('webstyle')
+websearch_templates = invenio.template.load('websearch')
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
 
@@ -119,17 +128,39 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 docid="",
                 version=args['version'],
                 filelist=filelist)
+            
+            cc = guess_primary_collection_of_a_record(self.recid)
+            unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid)
+            ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+            ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+            tabs = [(unordered_tabs[tab_id]['label'], \
+                     '%s/record/%s/%s' % (weburl, self.recid, tab_id), \
+                     tab_id == 'files',
+                     unordered_tabs[tab_id]['enabled']) \
+                    for (tab_id, order) in ordered_tabs_id
+                    if unordered_tabs[tab_id]['visible'] == True]
+            t = webstyle_templates.detailed_record_container(t,
+                                                             self.recid,
+                                                             tabs,
+                                                             args['ln'])
+            title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, args['ln'])
+            return pageheaderonly(title=title,
+                        navtrail=create_navtrail_links(cc=cc, as=0, ln=ln) + \
+                                        ''' &gt; <a class="navtrail" href="%s/record/%s">%s</a>
+                                        &gt; %s''' % \
+                        (weburl, self.recid, title, _("Access to Fulltext")),
 
-            return page(title="",
-                        body=t,
-                        navtrail=_("Access to Fulltext"),
                         description="",
                         keywords="keywords",
                         uid=uid,
                         language=ln,
                         req=req,
-                        navmenuid='submit')
-
+                        navmenuid='search',
+                        navtrail_append_title_p=0) + \
+                        websearch_templates.tmpl_search_pagestart(ln) + \
+                        t + \
+                        websearch_templates.tmpl_search_pageend(ln) + \
+                        pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req)
         return getfile, []
 
     def __call__(self, req, form):
@@ -223,7 +254,7 @@ def websubmit_legacy_getfile(req, form):
                     uid=uid,
                     language=ln,
                     req=req,
-                    navmenuid='submit')
+                    navmenuid='search')
 
     return _getfile_py(req, **args)
 

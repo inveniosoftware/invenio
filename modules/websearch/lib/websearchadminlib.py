@@ -33,12 +33,34 @@ from invenio.config import \
      cachedir, \
      cdslang, \
      cdsname, \
-     weburl
-from invenio.bibrankadminlib import write_outcome, modify_translations, get_def_name, get_name, get_languages, addadminbox, tupletotable, createhiddenform
-from invenio.dbquery import run_sql, escape_string, get_table_update_time
-from invenio.websearch_external_collections import external_collections_dictionary, external_collection_sort_engine_by_name, \
-     external_collection_get_state, external_collection_get_update_state_list, external_collection_apply_changes
+     weburl,\
+     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+     CFG_WEBCOMMENT_ALLOW_REVIEWS
+from invenio.bibrankadminlib import \
+     write_outcome, \
+     modify_translations, \
+     get_def_name, \
+     get_name, \
+     get_languages, \
+     addadminbox, \
+     tupletotable, \
+     createhiddenform
+from invenio.dbquery import \
+     run_sql, \
+     escape_string, \
+     get_table_update_time
+from invenio.websearch_external_collections import \
+     external_collections_dictionary, \
+     external_collection_sort_engine_by_name, \
+     external_collection_get_state, \
+     external_collection_get_update_state_list, \
+     external_collection_apply_changes
+from invenio.websearch_external_collections_utils import \
+     get_collection_descendants
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
+from invenio.bibformat_elements import bfe_references
+from invenio.bibformat_engine import BibFormatObject
+from invenio.file import BibRecDocs
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -1750,6 +1772,78 @@ def perform_update_external_collections(colID, ln, state_list, recurse_list):
 
     return output + '<br><br>' + perform_manage_external_collections(colID, ln)
 
+def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', confirm=-1):
+    """Show the interface to configure detailed record page to the user."""
+
+    colID = int(colID)
+
+    subtitle = """<a name="12">12. Configuration of detailed record page</a>"""
+    output = '''<form action="update_detailed_record_options" method="post">
+    <table><tr><td>
+    <input type="hidden" name="colID" value="%(colID)d">
+    <dl>
+    <dt><b>Show tabs:</b></dt>
+    <dd>
+    ''' % {'colID': colID}
+    
+    for (tab_id, tab_info) in get_detailed_page_tabs(colID).iteritems():
+        if tab_id == 'comments' and \
+           not CFG_WEBCOMMENT_ALLOW_REVIEWS and \
+           not CFG_WEBCOMMENT_ALLOW_COMMENTS:
+            continue
+        check = ''
+        output += '''<input type="checkbox" id="id%(tabid)s" name="tabs" value="%(tabid)s" %(check)s />
+        <label for="id%(tabid)s">&nbsp;%(label)s</label><br />
+        ''' % {'tabid':tab_id,
+               'check':((tab_info['visible'] and 'checked="checked"') or ''),
+               'label':tab_info['label']}
+
+    output += '</dd></dl></td><td>'
+    output += '</td></tr></table><input class="adminbutton" type="submit" value="Modify"/>'
+    output += '''<input type="checkbox" id="recurse" name="recurse" value="1" />
+        <label for="recurse">&nbsp;Also apply to subcollections</label>'''
+    output += '</form>'
+    
+    return addadminbox(subtitle, [output])
+
+def perform_update_detailed_record_options(colID, ln, tabs, recurse):
+    """Update the preferences for the tab to show/hide in the detailed record page."""
+    colID = int(colID)
+    changes = []
+    output = '<b><span class="info">Operation successfully completed.</span></b>'
+
+    
+    if '' in tabs:
+        tabs.remove('')
+        tabs.append('metadata')
+
+    def update_settings(colID, tabs, recurse):
+        run_sql("DELETE FROM collectiondetailedpagetabs WHERE id_collection='%s'" % colID)
+        run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+                " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
+ ##        for enabled_tab in tabs:
+##             run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
+        if recurse:
+            for descendant_id in get_collection_descendants(colID):
+                update_settings(descendant_id, tabs, recurse)
+        
+    update_settings(colID, tabs, recurse)
+##     for colID in colIDs:
+##         run_sql("DELETE FROM collectiondetailedpagetabs WHERE id_collection='%s'" % colID)
+##         for enabled_tab in tabs:
+##             run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
+        
+    #if callback:
+    return perform_editcollection(colID, ln, "perform_modifytranslations",
+                                  '<br /><br />' + output + '<br /><br />' + \
+                                  perform_showdetailedrecordoptions(colID, ln))
+    #else:
+    #    return addadminbox(subtitle, body)
+    #return output + '<br /><br />' + perform_showdetailedrecordoptions(colID, ln)
+
+    
 def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.
     colID - the collection the format should be added to
@@ -2210,9 +2304,10 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     </tr><tr>
     <td>10.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
     <td>11.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
+    <td>12.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
     </tr>
     </table>
-    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
+    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
 
     if mtype == "perform_modifydbquery" and content:
         fin_output += content
@@ -2268,6 +2363,11 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_manage_external_collections" or not mtype:
         fin_output += perform_manage_external_collections(colID, ln, callback='')
+
+    if mtype == "perform_showdetailedrecordoptions" and content:
+        fin_output += content
+    elif mtype == "perform_showdetailedrecordoptions" or not mtype:
+        fin_output += perform_showdetailedrecordoptions(colID, ln, callback='')
 
     return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
@@ -3120,3 +3220,63 @@ def switch_score(colID, id_1, id_2, table):
         return (1, "")
     except Exception, e:
         return (0, e)
+
+def get_detailed_page_tabs(colID=None, recID=None):
+    """
+    Returns the complete list of tabs to be displayed in the
+    detailed record pages.
+
+    Returned structured is a dict with
+      - key : last component of the url that leads to detailed record tab: http:www.../record/74/key
+      - values: a dictionary with the following keys:
+                                         - label: *string* label to be printed as tab (Not localized here)
+                                         - visible: *boolean* if False, tab should not be shown
+                                         - enabled: *boolean* if True, tab should be disabled
+                                         - order: *int* position of the tab in the list of tabs
+    
+    returns dict
+    """
+    
+    tabs = {'metadata'  : {'label': 'Information',      'visible': False, 'enabled': True, 'order': 1},
+            'references': {'label': 'References',       'visible': False, 'enabled': True, 'order': 2},
+            'comments'  : {'label': 'Discussion',       'visible': False, 'enabled': True, 'order': 3},
+            'statistics': {'label': 'Usage statistics', 'visible': False, 'enabled': True, 'order': 4},
+            'files'     : {'label': 'Fulltext',         'visible': False, 'enabled': True, 'order': 5}
+            }
+
+    res = run_sql("SELECT tabs FROM collectiondetailedpagetabs " + \
+                  "WHERE id_collection='%s'" % colID)
+    
+    if len(res) > 0:
+        tabs_state = res[0][0].split(';')
+        for tab_state in tabs_state:
+            if tabs.has_key(tab_state):
+                tabs[tab_state]['visible'] = True;
+
+    else:
+        # no preference set for this collection.
+        # assume all tabs are displayed
+        for key in tabs.keys():
+            tabs[key]['visible'] = True
+
+
+    if not CFG_WEBCOMMENT_ALLOW_COMMENTS and \
+           not CFG_WEBCOMMENT_ALLOW_REVIEWS:
+        tabs['comments']['visible'] = False
+        tabs['comments']['enabled'] = False
+    
+    if recID is not None:
+        # Disable references if no references found
+        bfo = BibFormatObject(recID)
+        if bfe_references.format(bfo, '', '') == '':
+            tabs['references']['enabled'] = False
+        # Disable fulltext if no file found
+        brd =  BibRecDocs(recID)
+        if len(brd.listBibDocs()) == 0:
+            tabs['files']['enabled'] = False
+
+    tabs[''] = tabs['metadata']
+    del tabs['metadata']
+            
+    return tabs
+    
