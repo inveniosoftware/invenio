@@ -718,7 +718,7 @@ URI: http://%(host)s%(page)s
                   ln=ln),
                   {}, _("Similar records"),
                   {'class': "moreinfo"}),
-    'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left">&nbsp;%(dates)s</div>' % {
+    'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left;margin-left:1px">&nbsp;%(dates)s</div>' % {
                    'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
                    {'x_date_creation': creationdate,
                     'x_date_modification': modifydate},

@@ -1416,7 +1416,7 @@ div.mini-panel{
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
 /* CERN-specific style
-div.detailed .inside, div.mini-panel{
+div.detailed .inside, div.mini-panel .inside{
    border-left: 1px solid #B2B2B2;
    border-right: 1px solid #B2B2B2;
    background: #FFF url(gradient-lightgray-1x100.gif) repeat-x left top;
