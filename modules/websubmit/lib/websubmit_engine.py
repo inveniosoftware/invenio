@@ -1392,7 +1392,11 @@ def print_function_calls (req, doctype, action, step, form, function_log, start_
                         ## There was an unexpected behaviour during the execution.
                         ## Log the message into function's log and go to next function
                         log_function(function_log, "***Warning*** from %s: %s" % (function_name, str(err)), start_time)
-                    log_function(function_log, "End %s" % function_name, start_time)
+                    try:
+                        log_function(function_log, "End %s" % function_name, start_time)
+                    except IOError:
+                        # curdir was moved elsewhere (e.g. Move_to_Done function has been called).
+                        pass
                     if func_returnval is not None:
                         ## Append the returned value as a string:
                         currfunction['text'] = str(func_returnval)
