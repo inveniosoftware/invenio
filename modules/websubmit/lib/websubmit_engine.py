@@ -876,13 +876,11 @@ def endaction(req,
     try:
         ## Handle the execution of the functions for this
         ## submission/step:
-        function_log = '%s/function_log' % curdir
         start_time = time.time()
         function_content = print_function_calls(req=req, doctype=doctype,
                                                 action=act,
                                                 step=step,
                                                 form=form,
-                                                function_log=function_log,
                                                 start_time=start_time,
                                                 ln=ln)
     except InvenioWebSubmitFunctionError, e:
@@ -1346,7 +1344,7 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (req, doctype, action, step, form, function_log, start_time, ln=cdslang):
+def print_function_calls (req, doctype, action, step, form, start_time, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
     global htdocsdir,storage,access,pylibdir,dismode,user_info
@@ -1385,18 +1383,14 @@ def print_function_calls (req, doctype, action, step, form, function_log, start_
                     # Evaluate the parameters, and place them in an array
                     parameters = Get_Parameters(function_name, doctype)
                     # Call function:
-                    log_function(function_log, "Start %s" % function_name, start_time)
+                    log_function(curdir, "Start %s" % function_name, start_time)
                     try:
                         func_returnval = function(parameters, curdir, form)
                     except InvenioWebSubmitFunctionWarning, err:
                         ## There was an unexpected behaviour during the execution.
                         ## Log the message into function's log and go to next function
-                        log_function(function_log, "***Warning*** from %s: %s" % (function_name, str(err)), start_time)
-                    try:
-                        log_function(function_log, "End %s" % function_name, start_time)
-                    except IOError:
-                        # curdir was moved elsewhere (e.g. Move_to_Done function has been called).
-                        pass
+                        log_function(curdir, "***Warning*** from %s: %s" % (function_name, str(err)), start_time)
+                    log_function(curdir, "End %s" % function_name, start_time)
                     if func_returnval is not None:
                         ## Append the returned value as a string:
                         currfunction['text'] = str(func_returnval)
@@ -1487,15 +1481,17 @@ def specialchars(text):
     text = string.replace(text, "&#133;", "\056\056\056");
     return text
 
-def log_function(log_path,  message, start_time):
+def log_function(curdir, message, start_time, filename="function_log"):
     """Write into file the message and the difference of time
     between starttime and current time
-    @param log_path:(string) path to the destination file
+    @param curdir:(string) path to the destination dir
     @param message: (string) message to write into the file
     @param starttime: (float) time to compute from
+    @param filname: (string) name of log file
     """
     time_lap = "%.3f" % (time.time() - start_time)
-    fd = open(log_path, "a+")
-    fd.write("""%s --- %s\n""" % (message, time_lap))
-    fd.close()
+    if os.access(curdir, os.F_OK|os.W_OK):
+        fd = open("%s/%s" % (curdir, filename), "a+")
+        fd.write("""%s --- %s\n""" % (message, time_lap))
+        fd.close()
 
