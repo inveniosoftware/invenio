@@ -260,18 +260,26 @@ class BibDoc:
             else:
                 res = run_sql("select type from bibrec_bibdoc "
                     "where id_bibrec=%s and id_bibdoc=%s", (recid, bibdocid,))
-                self.type = res[0][0]
+                if len(res) > 0:
+                    self.type = res[0][0]
+                else:
+                    #this bibdoc isn't associated with the corresponding bibrec.
+                    return None
             # gather the other information
             res = run_sql("select id,status,docname,creation_date,"
                 "modification_date from bibdoc where id=%s", (bibdocid,))
-            self.cd = res[0][3]
-            self.md = res[0][4]
-            self.recid = recid
-            self.docname = res[0][2]
-            self.id = bibdocid
-            self.status = int(res[0][1])
-            group = "g" + str(int(int(self.id) / filedirsize))
-            self.basedir = "%s/%s/%s" % (filedir, group, self.id)
+            if len(res) > 0:
+                self.cd = res[0][3]
+                self.md = res[0][4]
+                self.recid = recid
+                self.docname = res[0][2]
+                self.id = bibdocid
+                self.status = int(res[0][1])
+                group = "g" + str(int(int(self.id) / filedirsize))
+                self.basedir = "%s/%s/%s" % (filedir, group, self.id)
+            else:
+                # this bibdoc doesn't exist
+                return None
         # else it is a new document
         else:
             if docname == "" or type == "":
