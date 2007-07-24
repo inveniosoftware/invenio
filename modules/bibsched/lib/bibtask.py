@@ -38,7 +38,9 @@ import re
 import time
 import traceback
 import os
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
+    CFG_EXTERNAL_AUTHENTICATION
+from invenio.webuser import get_user_preferences, get_email
 
 # Which tasks don't need to ask the user for authorization?
 cfg_valid_processes_no_auth_needed = ("bibupload")
@@ -224,7 +226,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
     Return user name upon authorization success,
     do system exit upon authorization failure.
     """
-    if CFG_EXTERNAL_AUTH_USING_SSO: # With SSO there's no internal account.
+    if CFG_EXTERNAL_AUTH_USING_SSO: # With SSO it's impossible to check for pwd
         return user
     if authorization_msg:
         print authorization_msg
@@ -235,37 +237,44 @@ def authenticate(user, authorization_action, authorization_msg=""):
     else:
         print >> sys.stdout, "\rUsername:", user
     ## first check user:
+    # p_un passed may be an email or a nickname:
     res = run_sql("select id from user where email=%s", (user,), 1) + \
         run_sql("select id from user where nickname=%s", (user,), 1)
     if not res:
         print "Sorry, %s does not exist." % user
         sys.exit(1)
     else:
-        ## check if password is needed
-        res = run_sql("select id from user where email=%s"
-                "and password=AES_ENCRYPT(email,'')",
-        (user,), 1) + \
-        run_sql("select id from user where nickname=%s"
-                "and password=AES_ENCRYPT(email, '')",
-        (user,), 1)
-        if not res:
+        uid = res[0][0]
+        ok = False
+        login_method = get_user_preferences(uid)['login_method']
+        if not CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
+            #Local authentication, let's see if we want passwords.
+            res = run_sql("select id from user where id=%s "
+                    "and password=AES_ENCRYPT(email,'')",
+            (uid,), 1)
+            if res:
+                ok = True
+        if not ok:
             password_entered = getpass.getpass()
-            res = run_sql("select id from user where email=%s"
-                    "and password=AES_ENCRYPT(email,%s)",
-            (user, password_entered), 1) + \
-            run_sql("select id from user where nickname=%s"
-                    "and password=AES_ENCRYPT(email,%s)",
-            (user, password_entered), 1)
-
-            if not res:
-                print "Sorry, wrong credentials for %s." % user
+            if not CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
+                res = run_sql("select id from user where id=%s "
+                        "and password=AES_ENCRYPT(email, %s)",
+                (uid, password_entered), 1)
+                if res:
+                    ok = True
+            else:
+                if CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(get_email(uid), password_entered):
+                    ok = True
+        if not ok:
+            print "Sorry, wrong credentials for %s." % user
+            sys.exit(1)
+        else:
+            ## secondly check authorization for the authorization_action:
+            (auth_code, auth_message) = acc_authorize_action(uid, authorization_action)
+            if auth_code != 0:
+                print auth_message
                 sys.exit(1)
-    ## secondly check authorization for the authorization_action:
-    (auth_code, auth_message) = acc_authorize_action(res[0][0], authorization_action)
-    if auth_code != 0:
-        print auth_message
-        sys.exit(1)
-    return user
+            return user
 
 def _task_submit(authorization_action, authorization_msg):
     """Submits task to the BibSched task queue.  This is what people will
