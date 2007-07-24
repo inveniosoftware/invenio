@@ -136,6 +136,26 @@ re_unicode_uppercase_u = re.compile(unicode(r"(?u)[ÚÙÜÛ]", "utf-8"))
 re_unicode_uppercase_y = re.compile(unicode(r"(?u)[Ý]", "utf-8"))
 re_unicode_uppercase_c = re.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 re_unicode_uppercase_n = re.compile(unicode(r"(?u)[Ñ]", "utf-8"))
+re_latex_lowercase_a = re.compile("\\\\[\"H'`~^vu=k]\{?a\}?")
+re_latex_lowercase_ae = re.compile("\\\\ae\\{\\}?")
+re_latex_lowercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?e\\}?")
+re_latex_lowercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?i\\}?")
+re_latex_lowercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?o\\}?")
+re_latex_lowercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?u\\}?")
+re_latex_lowercase_y = re.compile("\\\\[\"']\\{?y\\}?")
+re_latex_lowercase_c = re.compile("\\\\['uc]\\{?c\\}?")
+re_latex_lowercase_n = re.compile("\\\\[c'~^vu]\\{?n\\}?")
+re_latex_uppercase_a = re.compile("\\\\[\"H'`~^vu=k]\\{?A\\}?")
+re_latex_uppercase_ae = re.compile("\\\\AE\\{?\\}?")
+re_latex_uppercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?E\\}?")
+re_latex_uppercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?I\\}?")
+re_latex_uppercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?O\\}?")
+re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
+re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
+re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
+re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
+
+
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -1024,6 +1044,25 @@ def strip_accents(x):
     """Strip accents in the input phrase X (assumed in UTF-8) by replacing
     accented characters with their unaccented cousins (e.g. é by e).
     Return such a stripped X."""
+    x = re_latex_lowercase_a.sub("a", x)
+    x = re_latex_lowercase_ae.sub("ae", x)
+    x = re_latex_lowercase_e.sub("e", x)
+    x = re_latex_lowercase_i.sub("i", x)
+    x = re_latex_lowercase_o.sub("o", x)
+    x = re_latex_lowercase_u.sub("u", x)
+    x = re_latex_lowercase_y.sub("x", x)
+    x = re_latex_lowercase_c.sub("c", x)
+    x = re_latex_lowercase_n.sub("n", x)
+    x = re_latex_uppercase_a.sub("A", x)
+    x = re_latex_uppercase_ae.sub("AE", x)
+    x = re_latex_uppercase_e.sub("E", x)
+    x = re_latex_uppercase_i.sub("I", x)
+    x = re_latex_uppercase_o.sub("O", x)
+    x = re_latex_uppercase_u.sub("U", x)
+    x = re_latex_uppercase_y.sub("Y", x)
+    x = re_latex_uppercase_c.sub("C", x)
+    x = re_latex_uppercase_n.sub("N", x)
+
     # convert input into Unicode string:
     try:
         y = unicode(x, "utf-8")
