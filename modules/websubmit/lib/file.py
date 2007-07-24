@@ -34,14 +34,10 @@ from invenio.config import \
      images, \
      weburl
 from invenio.dbquery import run_sql
-#from invenio.websubmit_config import *s
 from mimetypes import MimeTypes
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
-
-_archive_path = filedir
-_archive_size = filedirsize
 
 _mimes = MimeTypes()
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -274,8 +270,8 @@ class BibDoc:
             self.docname = res[0][2]
             self.id = bibdocid
             self.status = int(res[0][1])
-            group = "g" + str(int(int(self.id) / _archive_size))
-            self.basedir = "%s/%s/%s" % (_archive_path, group, self.id)
+            group = "g" + str(int(int(self.id) / filedirsize))
+            self.basedir = "%s/%s/%s" % (filedir, group, self.id)
         # else it is a new document
         else:
             if docname == "" or type == "":
@@ -296,8 +292,8 @@ class BibDoc:
                             (recid, self.id, self.type,))
                 else:
                     return None
-                group = "g" + str(int(int(self.id) / _archive_size))
-                self.basedir = "%s/%s/%s" % (_archive_path, group, self.id)
+                group = "g" + str(int(int(self.id) / filedirsize))
+                self.basedir = "%s/%s/%s" % (filedir, group, self.id)
                 # we create the corresponding storage directory
                 if not os.path.exists(self.basedir):
                     os.makedirs(self.basedir)
@@ -456,7 +452,7 @@ class BibDoc:
         for docfile in docfiles:
             if docfile.getName()==name and (docfile.getFormat()==format or not format):
                 return docfile
-        return None
+        raise StandardError, "No file called '%s' of format '%s', version '%s'" % (name, format, version)
 
     def listVersions(self):
         versions = []
@@ -627,6 +623,8 @@ class BibDocFile:
             content = fp.read()
             fp.close()
             return content
+        else:
+            raise StandardError, "%s does not exists!" % self.fullpath
 
 def readfile(path):
     """Read the contents of a text file and return them as a string.
