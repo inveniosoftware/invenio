@@ -242,7 +242,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 for id_accROLE in connection:
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info('referer', None))))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
