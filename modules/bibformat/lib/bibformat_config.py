@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,6 +33,10 @@ from invenio.config import etcdir, pylibdir
 #new format cannot be found, old format will be used.
 CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
+#Set this to True if you have provided mimetex.cgi (from
+#http://www.forkosh.com/mimetex.html) in your web server cgi-bin directory.
+CFG_BIBFORMAT_HAS_MIMETEX = False
+
 #Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
@@ -48,7 +52,7 @@ CFG_BIBFORMAT_ERROR_MESSAGES = \
     'ERR_BIBFORMAT_NO_TEMPLATE_FOUND'             :  'No template could be found for output format %s.',
     'ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME'   :  'Could not find format element named %s.',
     'ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME'    :  'Could not find output format named %s.',
-    'ERR_BIBFORMAT_CANNOT_RESOLVE_TEMPLATE_FILE'  :  'Could not find format template named %s.', 
+    'ERR_BIBFORMAT_CANNOT_RESOLVE_TEMPLATE_FILE'  :  'Could not find format template named %s.',
     'ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND'      :  'Format element %s could not be found.',
     'ERR_BIBFORMAT_BAD_BFO_RECORD'                :  'Could not initialize new BibFormatObject with record id %s.',
     'ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED'      :  'Could not find a fresh name for output format %s.',
@@ -72,7 +76,7 @@ CFG_BIBFORMAT_ERROR_MESSAGES = \
     'ERR_BIBFORMAT_OUTPUT_WRONG_DEFAULT_CASE'     :  '"default" keyword must be lowercase in "%s" at line %s',
     'ERR_BIBFORMAT_OUTPUT_RULE_DEFAULT_COL'       :  'Missing column ":" after "default" in "%s" at line %s.',
     'ERR_BIBFORMAT_OUTPUT_DEFAULT_MISSING'        :  'Default template specification "%s" must start with "default :" at line %s.',
-    'ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION':  'Format element %s has no function named "format".',       
+    'ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION':  'Format element %s has no function named "format".',
     'ERR_BIBFORMAT_VALIDATE_NO_FORMAT'            :  'No format specified for validation. Please specify one.',
     'ERR_BIBFORMAT_TEMPLATE_HAS_NO_NAME'          :  'Could not find a name specified in tag "<name>" inside format template %s.',
     'ERR_BIBFORMAT_TEMPLATE_HAS_NO_DESCRIPTION'   :  'Could not find a description specified in tag "<description>" inside format template %s.',
