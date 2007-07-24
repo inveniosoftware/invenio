@@ -24,6 +24,8 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 
 __revision__ = "$Id$"
 
+from thread import get_ident
+
 ### Here is the original PorterStemmer class, the "free of charge for
 ### any purpose" implementation of the Porter stemmer algorithm in
 ### Python.  The Invenio API interface follows below.
@@ -366,30 +368,69 @@ class PorterStemmer:
 
 from invenio.config import CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE
 
-def create_stemmers():
-    """Create stemmers dictionary for all possible languages."""
-    languages = {'en': 'english'}
-    stemmers_initialized = {}
-    for (key, value) in languages.iteritems():
-        stemmers_initialized[key] = PorterStemmer()
-    return stemmers_initialized
+try:
+    import Stemmer
 
-stemmers = create_stemmers()
+    def create_stemmers():
+        """Create stemmers dictionary for all possible languages."""
+        languages = {'da' : 'danish',
+                     'nl' : 'dutch',
+                     'en' : 'english',
+                     'fi' : 'finnish',
+                     'fr' : 'french',
+                     'de' : 'german',
+                     'it' : 'italian',
+                     'no' : 'norwegian',
+                     'pt' : 'portuguese',
+                     'ru' : 'russian',
+                     'es' : 'spanish',
+                     'sv' : 'swedish'}
+        stemmers_initialized = {}
+        for (key, value) in languages.iteritems():
+            try:
+                stemmers_initialized[key] = Stemmer.Stemmer(value, 40000)
+            except TypeError:
+                pass
+        return stemmers_initialized
+
+    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
+        """Return WORD stemmed according to language LANG (e.g. 'en')."""
+        global stemmers
+        if lang and is_stemmer_available_for_language(lang):
+            return stemmers[get_ident()][lang].stemWord(word)
+        else:
+            return word
+
+except ImportError:
+    def create_stemmers():
+        """Create stemmers dictionary for all possible languages."""
+        languages = {'en': 'english'}
+        stemmers_initialized = {}
+        for (key, value) in languages.iteritems():
+            stemmers_initialized[key] = PorterStemmer()
+        return stemmers_initialized
+
+    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
+        """Return WORD stemmed according to language LANG (e.g. 'en')."""
+        global stemmers
+        if lang and is_stemmer_available_for_language(lang):
+            return stemmers[get_ident()][lang].stem(word, 0, len(word)-1)
+        else:
+            return word
+
+
+stemmers = {} # A pool of stemmers (for multithreading)
 
 def is_stemmer_available_for_language(lang):
     """Return true if stemmer for language LANG is available.
        Return false otherwise.
     """
     global stemmers
-    return stemmers.has_key(lang)
+    thread_ident = get_ident()
+    if not stemmers.has_key(thread_ident):
+        stemmers[thread_ident] = create_stemmers()
+    return stemmers[thread_ident].has_key(lang)
 
-def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
-    """Return WORD stemmed according to language LANG (e.g. 'en')."""
-    global stemmers
-    if lang and is_stemmer_available_for_language(lang):
-        return stemmers[lang].stem(word, 0, len(word)-1)
-    else:
-        return word
 
 if __name__ == '__main__':
     # when invoked via CLI, simply stem the arguments:
