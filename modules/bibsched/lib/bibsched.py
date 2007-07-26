@@ -107,6 +107,12 @@ def get_output_channelnames(task_id):
     filenamebase = "%s/bibsched_task_%d" % (logdir, task_id)
     return [filenamebase + ".log", filenamebase + ".err"]
 
+def is_task_scheduled(task_name):
+    """Check if a certain task_name is due for execution (WAITING or RUNNING)"""
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = '%s' AND (status = 'WAITING' or status = 'RUNNING')" \
+          % task_name
+    return run_sql(sql)[0][0] > 0
+
 class Manager:
     def __init__(self):
         self.helper_modules = cfg_valid_processes
