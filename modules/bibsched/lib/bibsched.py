@@ -112,9 +112,15 @@ def is_task_scheduled(task_name):
     sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status = 'WAITING' or status = 'RUNNING')"
     return run_sql(sql, (task_name,))[0][0] > 0
 
-def get_task_options(task_name):
-    """Returns options for task_name read from the BibSched task queue table."""
-    res = run_sql("SELECT arguments FROM schTASK WHERE proc=%s", (task_name,))
+def get_task_ids_by_descending_date(task_name, statuses=['SCHEDULED']):
+    """Returns list of task ids, ordered by descending runtime."""
+    sql = "SELECT id FROM schTASK WHERE proc=%s AND (" + \
+          " OR ".join(["status = '%s'" % x for x in statuses]) + ") ORDER BY runtime DESC"
+    return [x[0] for x in run_sql(sql, (task_name,))]
+
+def get_task_options(task_id):
+    """Returns options for task_id read from the BibSched task queue table."""
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s", (task_id,))
     try:
         return marshal.loads(res[0][0])
     except IndexError:
