@@ -109,9 +109,16 @@ def get_output_channelnames(task_id):
 
 def is_task_scheduled(task_name):
     """Check if a certain task_name is due for execution (WAITING or RUNNING)"""
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = '%s' AND (status = 'WAITING' or status = 'RUNNING')" \
-          % task_name
-    return run_sql(sql)[0][0] > 0
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status = 'WAITING' or status = 'RUNNING')"
+    return run_sql(sql, (task_name,))[0][0] > 0
+
+def get_task_options(task_name):
+    """Returns options for task_name read from the BibSched task queue table."""
+    res = run_sql("SELECT arguments FROM schTASK WHERE proc=%s", (task_name,))
+    try:
+        return marshal.loads(res[0][0])
+    except IndexError:
+        return {}
 
 class Manager:
     def __init__(self):
