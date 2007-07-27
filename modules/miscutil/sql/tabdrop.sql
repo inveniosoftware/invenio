@@ -371,5 +371,6 @@ DROP TABLE IF EXISTS usergroup_bskBASKET;
 DROP TABLE IF EXISTS collection_externalcollection;
 DROP TABLE IF EXISTS externalcollection;
 DROP TABLE IF EXISTS collectiondetailedpagetabs;
+DROP TABLE IF EXISTS staEVENT;
 
 -- end of file

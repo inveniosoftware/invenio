@@ -3070,4 +3070,15 @@ CREATE TABLE IF NOT EXISTS externalcollection (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
+-- Webstat main table
+
+CREATE TABLE IF NOT EXISTS staEVENT (
+  id VARCHAR(255) NOT NULL PRIMARY KEY,
+  number INT(2) ZEROFILL NOT NULL UNIQUE AUTO_INCREMENT,
+  name VARCHAR(255) NULL,
+  creation_time TIMESTAMP DEFAULT NOW(), 
+  columns VARCHAR(255) NULL
+) TYPE=MyISAM;
+
 -- end of file
+

@@ -17,11 +17,19 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+pylibdir = $(libdir)/python/invenio
+
+pylib_DATA = webstat.py \
+             webstat_webinterface.py \
+             webstat_templates.py \
+             webstat_engine.py \ 
+             webstatadmin.py
+
 lispimagedir = $(libdir)/lisp/invenio
-lispimage_DATA = webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core
+lispimage_DATA = #webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core
 
 FILESLISP   = $(wildcard $(srcdir)/*.lisp)
-EXTRA_DIST = $(FILESLISP:$(srcdir)/%=%)
+EXTRA_DIST = $(pylib_DATA) $(FILESLISP:$(srcdir)/%=%)
 CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.core
 
 webstat.clisp.mem: $(FILESLISP)
@@ -50,5 +58,3 @@ webstat.sbcl.core: $(FILESLISP)
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
             touch webstat.sbcl.core; \
         fi
-
-
