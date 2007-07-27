@@ -29,7 +29,8 @@ __revision__ = "$Id$"
 # which tasks are recognized as valid?
 cfg_valid_processes = ["bibindex", "bibupload", "bibreformat",
                        "webcoll", "bibtaskex", "bibrank",
-                       "oaiharvest", "oaiarchive", "sessiongc"]
+                       "oaiharvest", "oaiarchive", "sessiongc",
+                       "webstatadmin"]
 
 ### -- local configuration section ends here ---
 
