@@ -622,6 +622,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webstat/Makefile \
 	  modules/webstat/bin/Makefile \
 	  modules/webstat/bin/webstat \
+	  modules/webstat/bin/webstatadmin \
 	  modules/webstat/doc/Makefile \
 	  modules/webstat/doc/admin/Makefile \
 	  modules/webstat/doc/hacking/Makefile \
