@@ -129,6 +129,7 @@ DEF_ACTIONS = (
                ('cfgwebcomment',         'configure WebComment',       '',              'no'),
                ('runoaiarchive',         'run oaiarchive task',       '',              'no'),
                ('runbibedit',         'run BibEdit',       '',              'no'),
+               ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
               )
 
 # authorizations
