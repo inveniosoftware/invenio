@@ -64,13 +64,17 @@ def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
             'curdir'            : curdir,
           }
     ## Perform the conversion of MARC XML record to ALEPH500 record:
-    convert_status = os.system("%s" % convert_cmd)
+    pipe_in, pipe_out, pipe_err = os.popen3("%s" % convert_cmd)
+    pipe_in.close()
+    pipe_out.close()
+    conversion_errors = pipe_err.readlines()
+    pipe_err.close()
 
     ## Check that the conversion was performed without error:
-    if convert_status != 0:
+    if conversion_errors != []:
         ## It was not possible to successfully create the ALEPH500 record, quit:
         msg = """An error was encountered when attempting to """ \
-              """convert %s/recmysql into recaleph500 - stopping""" % curdir
+              """convert %s/recmysql into recaleph500 - stopping [%s]""" % (curdir, "".join(conversion_errors))
         raise InvenioWebSubmitFunctionError(msg)
 
     ## Check for presence of recaleph500 in the current
