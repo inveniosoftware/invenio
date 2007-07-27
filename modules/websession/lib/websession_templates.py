@@ -1028,7 +1028,8 @@ class Template:
                    <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
                    <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> :: """ % {
+                   <a class="userinfo" href="%(weburl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
+                   <a class="userinfo" href="%(weburl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
                      'username' : username,
                      'weburl' : weburl,
                      'sweburl' : sweburl,
@@ -1038,6 +1039,7 @@ class Template:
              'messages': _("messages"),
                      'baskets' : _("baskets"),
                      'groups' : _("groups"),
+                     'stats' : _("statistics"),
                    }
             if submitter:
                 out += """<a class="userinfo" href="%(weburl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
