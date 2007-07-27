@@ -1499,6 +1499,46 @@ def identify_preprint_report_numbers(line,
     ## the newly changed working line:
     return (repnum_matches_matchlen, repnum_matches_repl_str, line)
 
+def limit_m_tags(xml_file, length_limit):
+    """Limit size of miscellaneous tags"""
+    temp_xml_file = xml_file + '.temp'
+    try:
+        ofilehdl = open(xml_file, 'r')
+    except IOError:
+        sys.stdout.write("***%s\n\n" % xml_file)
+        raise IOError("Cannot open %s to read!" % xml_file)
+    try:
+        nfilehdl = open(temp_xml_file, 'w')
+    except IOError:
+        sys.stdout.write("***%s\n\n" % temp_xml_file)
+        raise IOError("Cannot open %s to write!" % temp_xml_file)
+
+    for line in ofilehdl:
+        line_dec = line.decode("utf-8")
+        start_ind = line_dec.find('<subfield code="m">')
+        if start_ind != -1:
+            ## This line is an "m" line:
+            last_ind = line_dec.find('</subfield>')
+            if last_ind != -1:
+                ## This line contains the end-tag for the "m" section
+                leng = last_ind-start_ind - 19 
+                if leng > length_limit:
+                    ## want to truncate on a blank to avoid problems..
+                    end = start_ind + 19 + length_limit
+                    for lett in range(end - 1, last_ind):
+                        xx = line_dec[lett:lett+1]
+                        if xx == ' ':
+                            break
+                        else:
+                            end += 1
+                    middle = line_dec[start_ind+19:end-1]
+                    line_dec = start_ind * ' ' + '<subfield code="m">' + \
+                              middle + '  !Data truncated! '  + '</subfield>\n'
+        nfilehdl.write("%s" % line_dec.encode("utf-8"))
+    nfilehdl.close()
+    ## copy back to original file name
+    os.rename(temp_xml_file, xml_file)
+
 def identify_and_tag_URLs(line):
     """Given a reference line, identify URLs in the line, record the
        information about them, and replace them with a "<cds.URL />" tag.
@@ -4951,6 +4991,8 @@ def main():
             ofilehdl.write("%s\n" \
                           % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
             ofilehdl.close()
+            ## limit m tag data to something less than infinity
+            limit_m_tags(cli_opts['xmlfile'], 2024)
         else:
             sys.stdout.write("%s\n" \
                           % CFG_REFEXTRACT_XML_COLLECTION_CLOSE.encode("utf-8"))
