@@ -3444,6 +3444,11 @@ def get_number_footer_lines(docbody, page_break_posns):
     if num_breaks > 2:
         while keep_checking:
             cur_break = 1
+            if page_break_posns[cur_break] - num_footer_lines - 1 < 0 or \
+               page_break_posns[cur_break] - num_footer_lines - 1 > \
+               len(docbody) - 1:
+                ## Be sure that the docbody list boundary wasn't overstepped:
+                break
             if docbody[(page_break_posns[cur_break] \
                         - num_footer_lines - 1)].isspace():
                 empty_line = 1
