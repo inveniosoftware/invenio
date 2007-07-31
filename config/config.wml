@@ -162,7 +162,7 @@ cds.support@cern.ch
 </define-tag>
 
 ## CFG_MISCUTIL_USE_SQLALCHEMY -- whethever to use SQLAlchemy.pool
-## in the db engine of CDS Invenio. 
+## in the db engine of CDS Invenio.
 ## It is ok to enable this flag even if you have not installed
 ## SQLAlchemy.
 ## Note that for the moment Invenio will loose some perfomance,
@@ -698,7 +698,7 @@ atlantis.cern.ch
 ## change this.
 ##  (example: "\.\,\:\;\?\!\"")
 <define-tag CFG_BIBINDEX_CHARS_PUNCTUATION whitespace=delete>
-\.\,\:\;\?\!\"
+\.\,\:\;\?\!\"\(\)\'\`\<\>
 </define-tag>
 
 ## CFG_BIBINDEX_REMOVE_HTML_MARKUP -- should we attempt to remove HTML markup
@@ -707,6 +707,14 @@ atlantis.cern.ch
 ##  (example: "0")
 <define-tag CFG_BIBINDEX_REMOVE_HTML_MARKUP whitespace=delete>
 0
+</define-tag>
+
+## CFG_BIBINDEX_REMOVE_LATEX_MARKUP -- should we attempt to remove LATEX markup
+## before indexing?  Use 1 if you have LATEX markup inside metadata
+## (e.g. in abstracts), use 0 otherwise.
+##  (example: "0")
+<define-tag CFG_BIBINDEX_REMOVE_LATEX_MARKUP whitespace=delete>
+1
 </define-tag>
 
 ## CFG_BIBINDEX_MIN_WORD_LENGTH -- minimum word length allowed to be added to
