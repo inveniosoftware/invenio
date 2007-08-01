@@ -91,16 +91,15 @@ def acc_delete_action(id_action=0, name_action=0):
 
     if the name or id is wrong, the function does nothing
     """
-
-    if id_action and name_action:
-        return 0
+    id_action = id_action or acc_get_action_id(name_action=name_action)
+    if not id_action:
+        return 0       
 
     # delete the action
-    if run_sql("""DELETE FROM accACTION WHERE id = %s OR name = %s""",
-            (id_action, name_action)):
+    if run_sql("""DELETE FROM accACTION WHERE id=%s""", (id_action, )):
         # delete all entries related
         return 1 + run_sql("""DELETE FROM accROLE_accACTION_accARGUMENT WHERE
-            id_accACTION = %s """, (id_action, ))
+            id_accACTION=%s""", (id_action, ))
     else:
         return 0
 
