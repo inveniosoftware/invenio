@@ -454,7 +454,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     except Exception,e :
         return (None, "Warning: Error in record ID, please check that a number is given.", "", voutput)
 
-    rec_terms = run_sql("""SELECT termlist FROM %sR WHERE id_bibrec=%s""", (methods[rank_method_code]["rnkWORD_table"][:-1], recID))
+    rec_terms = run_sql("""SELECT termlist FROM %sR WHERE id_bibrec=%%s""" % methods[rank_method_code]["rnkWORD_table"][:-1],  (recID,))
     if not rec_terms:
         return (None, "Warning: Requested record does not seem to exist.", "", voutput)
     rec_terms = deserialize_via_marshal(rec_terms[0][0])
@@ -464,7 +464,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         return (None, "Warning: Record specified has no content indexed for use with this method.", "", voutput)
     else:
         terms = "%s" % rec_terms.keys()
-        terms_recs = dict(run_sql("""SELECT term, hitlist FROM %s WHERE term IN (%s)""", (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
+        terms_recs = dict(run_sql("""SELECT term, hitlist FROM %s WHERE term IN (%s)""" % (methods[rank_method_code]["rnkWORD_table"], terms[1:len(terms) - 1])))
 
     tf_values = {}
     #Calculate all term frequencies
@@ -714,7 +714,7 @@ def rank_method_stat(rank_method_code, reclist, lwords):
     for i in range(1, j + 1):
         voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
         for (term, table) in lwords:
-            term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%s""", (table, term))
+            term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%%s""" % table, (term,))
             if term_recs:
                 term_recs = deserialize_via_marshal(term_recs[0][0])
                 if term_recs.has_key(reclist[len(reclist) - i][0]):
