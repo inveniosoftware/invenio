@@ -22,7 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = webstat.py \
              webstat_webinterface.py \
              webstat_templates.py \
-             webstat_engine.py \ 
+             webstat_engine.py \
              webstatadmin.py
 
 lispimagedir = $(libdir)/lisp/invenio
