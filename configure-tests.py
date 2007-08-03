@@ -29,7 +29,6 @@ __revision__ = "$Id$"
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
 cfg_min_mysqldb_version = "0.9.2"
-cfg_min_numeric_version = "21.0"
 
 ## 0) import modules needed for this testing:
 import string
@@ -68,7 +67,6 @@ if sys.version < cfg_min_python_version:
 ## 2) check for required modules:
 try:
     import MySQLdb
-    import Numeric
     import base64
     import cPickle
     import cStringIO
@@ -225,19 +223,6 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** file for more details.                          **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
-
-    wait_for_user("Press ENTER to continue the installation anyhow...")
-
-if Numeric.__version__ < cfg_min_numeric_version:
-    print """
-    *****************************************************
-    ** WARNING: PYTHON MODULE NUMERIC %s DETECTED
-    *****************************************************
-    ** We strongly recommend you to upgrade `Numeric'  **
-    ** to at least version %s.  See the INSTALL      **
-    ** file for more details.                          **
-    *****************************************************
-    """ % (Numeric.__version__, cfg_min_numeric_version)
 
     wait_for_user("Press ENTER to continue the installation anyhow...")
 
