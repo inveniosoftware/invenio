@@ -32,12 +32,26 @@ from invenio.webstat import perform_display_keyevent
 from invenio.webstat import perform_display_customevent
 from invenio.webstat import perform_display_customevent_help
 
+def detect_suitable_graph_format():
+    """
+    Return suitable graph format default argument: gnuplot if it is
+    present, otherwise asciiart.
+    """
+    try:
+        import Gnuplot
+        suitable_graph_format = "gnuplot"
+    except ImportError:
+        suitable_graph_format = "asciiart"
+    return suitable_graph_format
+
+SUITABLE_GRAPH_FORMAT = detect_suitable_graph_format()
+
 class WebInterfaceStatsPages(WebInterfaceDirectory):
     """Defines the set of stats pages."""
 
     _exports = [ '',
-                 'collection_population', 'search_frequency', 'search_type_distribution', 'download_frequency',
-                 'customevent', 'customevent_help', 
+                 'collection_population', 'search_frequency', 'search_type_distribution',
+                 'download_frequency', 'customevent', 'customevent_help',
                  'export' ]
 
     def index(self, req, _):
@@ -56,7 +70,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         """Collection population statistics page."""
         argd = wash_urlargd(form, {'collection': (str, cdsname),
                                    'timespan': (str, "today"),
-                                   'format': (str, "gnuplot")})
+                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
 
         return page(title="Collection population",
                     body=perform_display_keyevent('collection population', argd, req),
@@ -70,7 +84,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
     def search_frequency(self, req, form):
         """Search frequency statistics page."""
         argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, "gnuplot")})
+                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
 
         return page(title="Search frequency",
                     body=perform_display_keyevent('search frequency', argd, req),
@@ -84,7 +98,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
     def search_type_distribution(self, req, form):
         """Search type distribution statistics page."""
         argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, "gnuplot")})
+                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
 
         return page(title="Search type distribution",
                     body=perform_display_keyevent('search type distribution', argd, req),
@@ -98,7 +112,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
     def download_frequency(self, req, form):
         """Download frequency statistics page."""
         argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, "gnuplot")})
+                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
 
         return page(title="Download frequency",
                     body=perform_display_keyevent('download frequency', argd, req),
@@ -115,7 +129,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         """Custom event statistics page"""
         argd = wash_urlargd(form, {'ids': (list, []),
                                    'timespan': (str, ""),
-                                   'format': (str, "gnuplot")})
+                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
 
         return page(title="Custom event",
                     body=perform_display_customevent(argd['ids'], argd, req=req),
