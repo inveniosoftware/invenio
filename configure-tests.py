@@ -165,7 +165,8 @@ except ImportError, e:
     ** IMPORT WARNING %s
     *****************************************************
     ** Note that libxml2 is not really required but    **
-    ** we recommend it for fast XML parsing.           **
+    ** we recommend it for XML metadata conversions    **
+    ** and for fast XML parsing.                       **
     **                                                 **
     ** You can safely continue installing CDS Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
