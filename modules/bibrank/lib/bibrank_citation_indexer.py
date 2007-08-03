@@ -23,10 +23,9 @@ __revision__ = "$Id$"
 
 import time
 import os
-import marshal
 from zlib import decompress, compress
 
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.bibformat_utils import parse_tag
@@ -44,7 +43,7 @@ class memoise:
 
 def get_recids_matching_query(pvalue, fvalue):
     """Return list of recIDs matching query for PVALUE and FVALUE."""
-    rec_id = search_pattern(p=pvalue, f=fvalue, m='e').tolist()
+    rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e'))
     return rec_id
 get_recids_matching_query = memoise(get_recids_matching_query)
 
@@ -313,15 +312,15 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     id = run_sql("SELECT * from rnkCITATIONDATA ")
     if id:
-        run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
-                (get_compressed_dictionary(reference_dic)))
-        run_sql("update rnkCITATIONDATA set citation_data = '%s'" %
-                (get_compressed_dictionary(citation_dic)))
+        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s",
+                (serialize_via_marshal(reference_dic), ))
+        run_sql("update rnkCITATIONDATA set citation_data = %s",
+                (serialize_via_marshal(citation_dic), ))
     else:
-        run_sql("INSERT INTO rnkCITATIONDATA VALUES ('%s', null)" %
-                (get_compressed_dictionary(citation_dic)))
-        run_sql("update rnkCITATIONDATA set citation_data_reversed = '%s'"%
-                (get_compressed_dictionary(reference_dic)))
+        run_sql("INSERT INTO rnkCITATIONDATA VALUES (%s, null)",
+                (serialize_via_marshal(citation_dic), ))
+        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s"%
+                (serialize_via_marshal(reference_dic), ))
 
 def get_compressed_dictionary(dic):
     """Serialize Python object vi a marshal into a compressed string."""

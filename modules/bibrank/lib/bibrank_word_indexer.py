@@ -20,21 +20,9 @@
 
 __revision__ = "$Id$"
 
-from zlib import compress,decompress
-from string import split,translate,lower,upper
-import marshal
-import getopt
-import getpass
-import string
-import os
-import re
 import sys
 import time
-import Numeric
 import urllib
-import signal
-import tempfile
-import unicodedata
 import traceback
 import cStringIO
 import math
@@ -44,15 +32,16 @@ import ConfigParser
 from invenio.config import \
      CFG_MAX_RECID, \
      cdslang, \
-     etcdir, \
-     version
-from invenio.search_engine import perform_request_search, strip_accents, HitSet
-from invenio.dbquery import run_sql, escape_string, DatabaseError
+     etcdir
+from invenio.search_engine import perform_request_search, strip_accents
+from invenio.dbquery import run_sql, escape_string, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibindex_engine_config import CONV_PROGRAMS, CONV_PROGRAMS_HELPERS
+from invenio.bibindex_engine import beautify_range_list, \
+    kill_sleepy_mysql_threads, create_range_list
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
-    get_datetime, task_update_status, task_set_option
+    task_update_status
+from invenio.intbitset import intbitsetfull
 
 options = {} # global variable to hold task options
 
@@ -73,8 +62,6 @@ class MyFancyURLopener(urllib.FancyURLopener):
 
 #urllib._urlopener = MyFancyURLopener()
 
-## precompile some often-used regexp for speed reasons:
-re_subfields = re.compile('\$\$\w');
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -100,24 +87,6 @@ def dict_union(list1, list2):
     #return list1
     return union_dict
 
-## safety function for killing slow DB threads:
-def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=CFG_MYSQL_THREAD_TIMEOUT):
-    """Check the number of DB threads and if there are more than
-       MAX_THREADS of them, lill all threads that are in a sleeping
-       state for more than THREAD_TIMEOUT seconds.  (This is useful
-       for working around the the max_connection problem that appears
-       during indexation in some not-yet-understood cases.)  If some
-       threads are to be killed, write info into the log file.
-    """
-    res = run_sql("SHOW FULL PROCESSLIST")
-    if len(res) > max_threads:
-        for row in res:
-            r_id,r_user,r_host,r_db,r_command,r_time,r_state,r_info = row
-            if r_command == "Sleep" and int(r_time) > thread_timeout:
-                run_sql("KILL %s", (r_id,))
-                write_message("WARNING: too many DB threads, killing thread %s" % r_id)
-    return
-
 # tagToFunctions mapping. It offers an indirection level necesary for
 # indexing fulltext. The default is get_words_from_phrase
 tagToWordsFunctions = {}
@@ -125,11 +94,11 @@ tagToWordsFunctions = {}
 def get_words_from_phrase(phrase, weight, lang="",
                           chars_punctuation=r"[\.\,\:\;\?\!\"]",
                           chars_alphanumericseparators=r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]",
-                          split=string.split):
+                          split=str.split):
     "Returns list of words from phrase 'phrase'."
     words = {}
     phrase = strip_accents(phrase)
-    phrase = lower(phrase)
+    phrase = phrase.lower()
     #Getting rid of strange characters
     phrase = re.sub("&eacute;", 'e', phrase)
     phrase = re.sub("&egrave;", 'e', phrase)
@@ -139,7 +108,7 @@ def get_words_from_phrase(phrase, weight, lang="",
     phrase = re.sub("&raquo;", ' ', phrase)
     phrase = re.sub("&ecirc;", ' ', phrase)
     phrase = re.sub("&amp;", ' ', phrase)
-    if string.find(phrase, "</") > -1:
+    if phrase.find("</") > -1:
         #Most likely html, remove html code
         phrase = re.sub("(?s)<[^>]*>|&#?\w+;", ' ', phrase)
     #removes http links
@@ -151,8 +120,11 @@ def get_words_from_phrase(phrase, weight, lang="",
         if options["remove_stopword"] == "True" and not is_stopword(word, 1) and check_term(word, 0):
             if lang and lang !="none" and options["use_stemming"]:
                 word = stem(word, lang)
-            if not words.has_key(word):
-                words[word] = (0,0)
+                if not words.has_key(word):
+                    words[word] = (0, 0)
+            else:
+                if not words.has_key(word):
+                    words[word] = (0, 0)
             words[word] = (words[word][0] + weight, 0)
         elif options["remove_stopword"] == "True" and not is_stopword(word, 1):
             phrase = re.sub(chars_alphanumericseparators, ' ', word)
@@ -164,63 +136,6 @@ def get_words_from_phrase(phrase, weight, lang="",
                         words[word_] = (0,0)
                     words[word_] = (words[word_][0] + weight, 0)
     return words
-
-def create_range_list(res):
-    """Creates a range list from a recID select query result contained
-    in res. The result is expected to have ascending numerical order."""
-    if not res:
-        return []
-    row = res[0]
-    if not row:
-        return []
-    else:
-        range_list = [[row[0],row[0]]]
-    for row in res[1:]:
-        id = row[0]
-        if id == range_list[-1][1] + 1:
-            range_list[-1][1] = id
-        else:
-            range_list.append([id,id])
-    return range_list
-
-def beautify_range_list(range_list):
-    """Returns a non overlapping, maximal range list"""
-    ret_list = []
-    for new in range_list:
-        found = 0
-        for old in ret_list:
-            if new[0] <= old[0] <= new[1] + 1 or new[0] - 1 <= old[1] <= new[1]:
-                old[0] = min(old[0], new[0])
-                old[1] = max(old[1], new[1])
-                found = 1
-                break
-
-        if not found:
-            ret_list.append(new)
-
-    return ret_list
-
-def serialize_via_numeric_array_dumps(arr):
-    return Numeric.dumps(arr)
-
-def serialize_via_numeric_array_compr(str):
-    return compress(str)
-
-def serialize_via_numeric_array(arr):
-    """Serialize Numeric array into a compressed string."""
-    return serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr))
-
-def deserialize_via_numeric_array(string):
-    """Decompress and deserialize string into a Numeric array."""
-    return Numeric.loads(decompress(string))
-
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(marshal.dumps(obj)))
-
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(string))
 
 class WordTable:
     "A class to hold the words table."
@@ -252,7 +167,7 @@ class WordTable:
         "Cleans the words table."
         self.value={}
 
-    def put_into_db(self, mode="normal", split=string.split):
+    def put_into_db(self, mode="normal"):
         """Updates the current words table in the corresponding DB
            rnkWORD table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
@@ -354,7 +269,7 @@ class WordTable:
 
         return set_changed_p
 
-    def put_word_into_db(self, word, recIDs, split=string.split):
+    def put_word_into_db(self, word, recIDs, split=str.split):
         """Flush a single word to the database and delete it from memory"""
         set = self.load_old_recIDs(word)
         #write_message("%s %s" % (word, self.value[word]))
@@ -367,14 +282,14 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, serialize_via_marshal(set), escape_string(word)))
+                run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, escape_string(serialize_via_marshal(set)), escape_string(word)))
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = self.value[word]
             if len(set) > 0:
                 #new word, add to list
                 options["modified_words"][word] = 1
-                run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), serialize_via_marshal(set)))
+                run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), escape_string(serialize_via_marshal(set))))
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
@@ -524,8 +439,9 @@ class WordTable:
 
         for (tag, weight, lang) in self.fields_to_index:
             if tag in tagToWordsFunctions.keys():
-                get_words_function = tagToWordsFunctions[ tag ]
-            else: get_words_function = get_words_from_phrase
+                get_words_function = tagToWordsFunctions[tag]
+            else:
+                get_words_function = get_words_from_phrase
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -536,7 +452,7 @@ class WordTable:
             verbose_idx = 0     # for verbose pretty printing
             for row in res:
                 recID, phrase = row
-                if options["validset"].contains(recID):
+                if recID in options["validset"]:
                     if not wlist.has_key(recID): wlist[recID] = {}
                     new_words = get_words_function(phrase, weight, lang) # ,self.separators
                     wlist[recID] = dict_union(new_words,wlist[recID])
@@ -556,13 +472,13 @@ class WordTable:
         qwrite( "('" )
         qwrite( str(recIDs[0]) )
         qwrite( "','" )
-        qwrite( serialize_via_marshal(wlist[recIDs[0]]) )
+        qwrite( escape_string(serialize_via_marshal(wlist[recIDs[0]]) ))
         qwrite( "','FUTURE')" )
         for recID in recIDs[1:]:
             qwrite(",('")
             qwrite(str(recID))
             qwrite("','")
-            qwrite(serialize_via_marshal(wlist[recID]))
+            qwrite(escape_string(serialize_via_marshal(wlist[recID])))
             qwrite("','FUTURE')")
 
         query = query_factory.getvalue()
@@ -575,13 +491,13 @@ class WordTable:
         qwrite("('")
         qwrite(str(recIDs[0]))
         qwrite("','")
-        qwrite(serialize_via_marshal(wlist[recIDs[0]]))
+        qwrite(escape_string(serialize_via_marshal(wlist[recIDs[0]])))
         qwrite("','CURRENT')")
         for recID in recIDs[1:]:
             qwrite( ",('" )
             qwrite( str(recID) )
             qwrite( "','" )
-            qwrite( empty_list_string )
+            qwrite( escape_string(empty_list_string ))
             qwrite( "','CURRENT')" )
         query = query_factory.getvalue()
         query_factory.close()
@@ -619,7 +535,7 @@ class WordTable:
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."
         try:
-            word = lower(word[:50])
+            word = word[:50].lower()
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
@@ -855,10 +771,6 @@ def word_index(run):
         import psyco
         psyco.bind(get_words_from_phrase)
         psyco.bind(WordTable.merge_with_old_recIDs)
-        psyco.bind(serialize_via_numeric_array)
-        psyco.bind(serialize_via_marshal)
-        psyco.bind(deserialize_via_numeric_array)
-        psyco.bind(deserialize_via_marshal)
         psyco.bind(update_rnkWORD)
         psyco.bind(check_rnkWORD)
     except StandardError,e:
@@ -958,9 +870,9 @@ def get_tags(config):
     if 1:
         while config.has_option(function,"tag%s"% i):
             tag = config.get(function, "tag%s" % i)
-            tag = string.split(tag, ",")
-            tag[1] = int(string.strip(tag[1]))
-            tag[2] = string.strip(tag[2])
+            tag = tag.split(",")
+            tag[1] = int(tag[1].strip())
+            tag[2] = tag[2].strip()
 
             #check if stemmer for language is available
             if config.get(function,"stemming") and stem("information", "en") != "inform":
@@ -991,7 +903,9 @@ def get_valid_range(rank_method_code):
     #else:
     #    recIDs = []
 
-    valid = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
+    valid = intbitsetfull(CFG_MAX_RECID+1)
+    valid.discard(0)
+
     #valid.addlist(recIDs)
     return valid
 
@@ -1216,7 +1130,7 @@ def update_rnkWORD(table, terms):
             Nj[j] = int(Nj[j] * 100)
             if Nj[j] >= 0:
                 Nj[j] += 1
-            run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], serialize_via_marshal(doc_terms), j))
+            run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], escape_string(serialize_via_marshal(doc_terms)), j))
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
         i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
@@ -1237,7 +1151,7 @@ def update_rnkWORD(table, terms):
             if Git >= 0:
                 Git += 1
             term_docs["Gi"] = (0, Git)
-            run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (table, serialize_via_marshal(term_docs), escape_string(t)))
+            run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (table, escape_string(serialize_via_marshal(term_docs)), escape_string(t)))
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)
@@ -1248,7 +1162,7 @@ def update_rnkWORD(table, terms):
 def get_from_forward_index(terms, start, stop, table):
     current_terms = ""
     for j in range(start, (stop < len(terms) and stop or len(terms))):
-        current_terms += "'%s'," % terms[j]
+        current_terms += "'%s'," % escape_string(terms[j])
     terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table,current_terms[:-1]))
     return terms_docs
 

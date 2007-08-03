@@ -23,7 +23,6 @@
 __revision__ = "$Id$"
 
 import re
-import Numeric
 import os, sys, string
 import ConfigParser
 import time
@@ -52,13 +51,6 @@ from invenio.bibrankadminlib import \
      tupletotable_onlyselected,\
      addcheckboxes,\
      createhiddenform,\
-     serialize_via_numeric_array_dumps,\
-     serialize_via_numeric_array_compr,\
-     serialize_via_numeric_array_escape,\
-     serialize_via_numeric_array,\
-     deserialize_via_numeric_array,\
-     serialize_via_marshal,\
-     deserialize_via_marshal
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email

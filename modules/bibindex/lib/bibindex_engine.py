@@ -26,13 +26,10 @@ BibIndex indexing engine implementation.  See bibindex executable for entry poin
 
 __revision__ = "$Id$"
 
-import marshal
-from zlib import compress, decompress
 import os
 import re
 import sys
 import time
-import Numeric
 import urllib2
 import tempfile
 import traceback
@@ -44,27 +41,25 @@ from invenio.config import \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
+     CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
      CFG_MAX_RECID, \
      weburl
 from invenio.bibindex_engine_config import *
 from invenio.search_engine import perform_request_search, strip_accents
-from invenio.dbquery import run_sql, escape_string, DatabaseError
+from invenio.dbquery import run_sql, escape_string, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress
+from invenio.intbitset import intbitset
 
 ## import optional modules:
 try:
     import psyco
     psyco.bind(get_words_from_phrase)
     psyco.bind(WordTable.merge_with_old_recIDs)
-    psyco.bind(serialize_via_numeric_array)
-    psyco.bind(serialize_via_marshal)
-    psyco.bind(deserialize_via_numeric_array)
-    psyco.bind(deserialize_via_marshal)
 except:
     pass
 
@@ -379,10 +374,24 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
     return words.keys()
 
+latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
+
+def remove_latex_markup(phrase):
+    ret_phrase = ''
+    index = 0
+    for match in latex_markup_re.finditer(phrase):
+        ret_phrase += phrase[index:match.start()]
+        ret_phrase += match.group('inside1') or match.group('inside2') or ''
+        index = match.end()
+    ret_phrase += phrase[index:]
+    return ret_phrase
+
+
 # tagToFunctions mapping. It offers an indirection level necesary for
 # indexing fulltext. The default is get_words_from_phrase
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
+latex_formula_re = re.compile(r'\$.*?\$')
 def get_words_from_phrase(phrase, split=str.split):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
@@ -391,6 +400,10 @@ def get_words_from_phrase(phrase, split=str.split):
     words = {}
     if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
         phrase = re_html.sub(' ', phrase)
+    if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
+        phrase = remove_latex_markup(phrase)
+        formulas = latex_formula_re.findall(phrase)
+        blocks = strip_accents(latex_formula_re.sub(' ', phrase)).split()
     phrase = phrase.lower()
     # 1st split phrase into blocks according to whitespace
     for block in split(strip_accents(phrase)):
@@ -551,22 +564,6 @@ def beautify_range_list(range_list):
 
     return ret_list
 
-def serialize_via_numeric_array(arr):
-    """Serialize Numeric array into a compressed string."""
-    return compress(Numeric.dumps(arr))
-
-def deserialize_via_numeric_array(string):
-    """Decompress and deserialize string into a Numeric array."""
-    return Numeric.loads(decompress(string))
-
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(marshal.dumps(obj)))
-
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(string))
-
 class WordTable:
     "A class to hold the words table."
 
@@ -668,7 +665,7 @@ class WordTable:
         query = "SELECT hitlist FROM %s WHERE term=%%s" % self.tablename
         res = run_sql(query, (word,))
         if res:
-            return deserialize_via_numeric_array(res[0][0])
+            return intbitset(res[0][0])
         else:
             return None
 
@@ -679,17 +676,9 @@ class WordTable:
 
         Return 0 in case no change was done to SET, return 1 in case SET was changed.
         """
-        set_changed_p = 0
-        for recID,sign in self.value[word].items():
-            if sign == -1 and set[recID]==1:
-                # delete recID if existent in set and if marked as to be deleted
-                set[recID] = 0
-                set_changed_p = 1
-            elif set[recID] == 0:
-                # add recID if not existent in set and if marked as to be added
-                set[recID] = 1
-                set_changed_p = 1
-        return set_changed_p
+        oldset = intbitset(set)
+        set.update_with_signs(self.value[word])
+        return set != oldset
 
     def put_word_into_db(self, word):
         """Flush a single word to the database and delete it from memory"""
@@ -704,14 +693,14 @@ class WordTable:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
                 run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
-                        (serialize_via_numeric_array(set), word))
+                    (set.fastdump(), word))
+
 
         else: # the word is new, will create new set:
-            set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
-            Numeric.put(set, self.value[word].keys(), 1)
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
+            set = intbitset(self.value[word].keys(), CFG_MAX_RECID+1)
             run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
-                    (word, serialize_via_numeric_array(set)))
+                (word, set.fastdump()))
 
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
@@ -914,14 +903,14 @@ class WordTable:
         qwrite( "('" )
         qwrite( str(recIDs[0]) )
         qwrite( "','" )
-        qwrite( serialize_via_marshal(wlist[recIDs[0]]) )
+        qwrite( escape_string(serialize_via_marshal(wlist[recIDs[0]]) ))
         qwrite( "','FUTURE')" )
 
         for recID in recIDs[1:]:
             qwrite(",('")
             qwrite(str(recID))
             qwrite("','")
-            qwrite(serialize_via_marshal(wlist[recID]))
+            qwrite(escape_string(serialize_via_marshal(wlist[recID])))
             qwrite("','FUTURE')")
 
         query = query_factory.getvalue()
@@ -935,7 +924,7 @@ class WordTable:
         qwrite("('")
         qwrite(str(recIDs[0]))
         qwrite("','")
-        qwrite(serialize_via_marshal(wlist[recIDs[0]]))
+        qwrite(escape_string(serialize_via_marshal(wlist[recIDs[0]])))
         qwrite("','CURRENT')")
 
         for recID in recIDs[1:]:
@@ -1229,7 +1218,7 @@ def main():
     task_set_option("collection", [])
     task_set_option("maxmem", 0)
     task_set_option("flush", 10000)
-    task_set_option("windex", get_word_tables(None))
+    task_set_option("windex", [])
     task_init(authorization_action='runbibindex',
             authorization_msg="BibIndex Task Submission",
             description="""Examples:
@@ -1321,6 +1310,8 @@ def task_run_core():
     messages on stderr.
     Return 1 in case of success and 0 in case of failure."""
     global _last_word_table
+    if not task_get_option("windex"):
+        task_set_option("windex", get_word_tables(None))
     if task_get_option("cmd") == "check":
         for table in task_get_option("windex"):
             wordTable = WordTable(table.keys()[0], table.values()[0])

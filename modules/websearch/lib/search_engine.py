@@ -35,7 +35,6 @@ import re
 import time
 import urllib
 import zlib
-import Numeric
 
 ## import CDS Invenio stuff:
 from invenio.config import \
@@ -68,6 +67,7 @@ from invenio.websearch_external_collections import print_external_results_overvi
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.intbitset import intbitset as HitSet, intbitsetfull
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -251,9 +251,9 @@ class CollectionRecListDataCacher(DataCacher):
             res = run_sql(query, None, 1)
             if res:
                 try:
-                    set._nbhits, set._set = res[0][0], Numeric.loads(zlib.decompress(res[0][1]))
+                    set = HitSet(res[0][1])
                 except:
-                    set._nbhits = 0
+                    pass
             self.cache[coll] = set
             cache[coll] = set
         # finally, return reclist:
@@ -860,85 +860,6 @@ def is_selected(var, fld):
         return " selected"
     return ""
 
-class HitSet:
-    """Class describing set of records, implemented as bit vectors of recIDs.
-    Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
-    bit vectors to save space."""
-
-    def __init__(self, init_set=None):
-        self._nbhits = -1
-        if init_set:
-            self._set = init_set
-        else:
-            self._set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
-
-    def __repr__(self, join=string.join):
-        return "%s(%s)" % (self.__class__.__name__, join(map(repr, self._set), ', '))
-
-    def add(self, recID):
-        "Adds a record to the set."
-        self._set[recID] = 1
-
-    def addmany(self, recIDs):
-        "Adds several recIDs to the set."
-        for recID in recIDs: self._set[recID] = 1
-
-    def addlist(self, arr):
-        "Adds an array of recIDs to the set."
-        Numeric.put(self._set, arr, 1)
-
-    def remove(self, recID):
-        "Removes a record from the set."
-        self._set[recID] = 0
-
-    def removemany(self, recIDs):
-        "Removes several records from the set."
-        for recID in recIDs:
-            self.remove(recID)
-
-    def intersect(self, other):
-        "Does a set intersection with other.  Keep result in self."
-        self._set = Numeric.bitwise_and(self._set, other._set)
-
-    def union(self, other):
-        "Does a set union with other. Keep result in self."
-        self._set = Numeric.bitwise_or(self._set, other._set)
-
-    def difference(self, other):
-        "Does a set difference with other. Keep result in self."
-        #self._set = Numeric.bitwise_not(self._set, other._set)
-        for recID in Numeric.nonzero(other._set):
-            self.remove(recID)
-
-    def contains(self, recID):
-        "Checks whether the set contains recID."
-        return self._set[recID]
-
-    __contains__ = contains     # Higher performance member-test for python 2.0 and above
-
-    def __getitem__(self, index):
-        "Support for the 'for item in set:' protocol."
-        return Numeric.nonzero(self._set)[index]
-
-    def calculate_nbhits(self):
-        "Calculates the number of records set in the hitset."
-        self._nbhits = Numeric.sum(self._set.copy().astype(Numeric.Int))
-
-    def items(self):
-        "Return an array containing all recID."
-        return Numeric.nonzero(self._set)
-
-    def tolist(self):
-        "Return an array containing all recID."
-        return Numeric.nonzero(self._set).tolist()
-
-# speed up HitSet operations by ~20% if Psyco is installed:
-try:
-    import psyco
-    psyco.bind(HitSet)
-except:
-    pass
-
 def wash_colls(cc, c, split_colls=0):
     """Wash collection list by checking whether user has deselected
     anything under 'Narrow search'.  Checks also if cc is a list or not.
@@ -1282,14 +1203,13 @@ def get_collection_reclist(coll):
     # secondly, read reclist from either the cache or the database:
     if not collection_reclist_cache[coll]:
         # not yet it the cache, so calculate it and fill the cache:
-        set = HitSet()
         query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
         res = run_sql(query, None, 1)
         if res:
             try:
-                set._nbhits, set._set = res[0][0], Numeric.loads(zlib.decompress(res[0][1]))
+                set = HitSet(res[0][1])
             except:
-                set._nbhits = 0
+                set = HitSet()
         collection_reclist_cache[coll] = set
     # finally, return reclist:
     return collection_reclist_cache[coll]
@@ -1439,11 +1359,10 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
             phrase_hitset = HitSet()
             phrase_hitsets = search_pattern("", phrase, f, 'e')
             for coll in colls:
-                phrase_hitset.union(phrase_hitsets[coll])
-            phrase_hitset.calculate_nbhits()
-            if phrase_hitset._nbhits > 0:
+                phrase_hitset.union_update(phrase_hitsets[coll])
+            if len(phrase_hitset) > 0:
                 # okay, this phrase has some hits in colls, so add it:
-                browsed_phrases_in_colls.append([phrase, phrase_hitset._nbhits])
+                browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
 
     ## were there hits in collections?
     if browsed_phrases_in_colls == []:
@@ -1515,11 +1434,10 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     _ = gettext_set_language(ln)
 
     hitset_empty = HitSet()
-    hitset_empty._nbhits = 0
     # sanity check:
     if not p:
-        hitset_full = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
-        hitset_full._nbhits = CFG_MAX_RECID
+        hitset_full = intbitsetfull(CFG_MAX_RECID+1)
+        hitset_full.discard(0)
         # no pattern, so return all universe
         return hitset_full
     # search stage 1: break up arguments into basic search units:
@@ -1538,8 +1456,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
-            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, Numeric.nonzero(basic_search_unit_hitset._set)))
-        if basic_search_unit_hitset._nbhits > 0 or \
+            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, list(basic_search_unit_hitset)))
+        if len(basic_search_unit_hitset) > 0 or \
            ap==0 or \
            bsu_o=="|" or \
            ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
@@ -1559,7 +1477,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if verbose and of.startswith('h') and req:
                     print_warning(req, "trying (%s,%s,%s)" % (bsu_pn, bsu_f, bsu_m))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
-                if basic_search_unit_hitset._nbhits > 0:
+                if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
                         print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
@@ -1588,27 +1506,27 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         t2 = os.times()[4]
         for idx_unit in range(0, len(basic_search_units)):
             print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
-                          (basic_search_units[idx_unit][1:], basic_search_units_hitsets[idx_unit]._nbhits))
+                          (basic_search_units[idx_unit][1:], len(basic_search_units_hitsets[idx_unit])))
         print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
     # search stage 3: apply boolean query for each search unit:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     # let the initial set be the complete universe:
-    hitset_in_any_collection = HitSet(Numeric.ones(CFG_MAX_RECID+1, Numeric.Int0))
+    hitset_in_any_collection = intbitsetfull(CFG_MAX_RECID+1)
+    hitset_in_any_collection.discard(0)
     for idx_unit in range(0, len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
         if this_unit_operation == '+':
-            hitset_in_any_collection.intersect(this_unit_hitset)
+            hitset_in_any_collection.intersection_update(this_unit_hitset)
         elif this_unit_operation == '-':
-            hitset_in_any_collection.difference(this_unit_hitset)
+            hitset_in_any_collection.difference_update(this_unit_hitset)
         elif this_unit_operation == '|':
-            hitset_in_any_collection.union(this_unit_hitset)
+            hitset_in_any_collection.union_update(this_unit_hitset)
         else:
             if of.startswith("h"):
                 print_warning(req, "Invalid set operation %s." % this_unit_operation, "Error")
-    hitset_in_any_collection.calculate_nbhits()
-    if hitset_in_any_collection._nbhits == 0:
+    if len(hitset_in_any_collection) == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
             nearestterms = []
@@ -1616,7 +1534,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
                 if bsu_p.startswith("%") and bsu_p.endswith("%"):
                     bsu_p = "'" + bsu_p[1:-1] + "'"
-                bsu_nbhits = basic_search_units_hitsets[idx_unit]._nbhits
+                bsu_nbhits = len(basic_search_units_hitsets[idx_unit])
 
                 # create a similar query, but with the basic search unit only
                 argd = {}
@@ -1632,7 +1550,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             print_warning(req, text)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        print_warning(req, "Search stage 3: boolean query gave %d hits." % hitset_in_any_collection._nbhits)
+        print_warning(req, "Search stage 3: boolean query gave %d hits." % len(hitset_in_any_collection))
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
     return hitset_in_any_collection
 
@@ -1658,7 +1576,6 @@ def search_unit(p, f=None, m=None):
     else:
         # we are doing bibwords search by default
         set = search_unit_in_bibwords(p, f)
-    set.calculate_nbhits()
     return set
 
 def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
@@ -1694,10 +1611,10 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     res = run_sql(query)
     # fill the result set:
     for word, hitlist in res:
-        hitset_bibwrd = HitSet(Numeric.loads(decompress(hitlist)))
+        hitset_bibwrd = HitSet(hitlist)
         # add the results:
         if set_used:
-            set.union(hitset_bibwrd)
+            set.union_update(hitset_bibwrd)
         else:
             set = hitset_bibwrd
             set_used = 1
@@ -1761,8 +1678,8 @@ def search_unit_in_bibxxx(p, f, type):
     # check no of hits found:
     nb_hits = len(l)
     # okay, return result set:
-    set = HitSet()
-    set.addlist(Numeric.array(l))
+    set = HitSet(l)
+
     return set
 
 def search_unit_in_bibrec(day1, day2, type='creation_date'):
@@ -1775,10 +1692,8 @@ def search_unit_in_bibrec(day1, day2, type='creation_date'):
         type = "creation_date"
     res = run_sql("SELECT id FROM bibrec WHERE %s>=%s AND %s<=%s" % (type, "%s", type, "%s"),
                   (day1, day2))
-    l = []
     for row in res:
-        l.append(row[0])
-    set.addlist(Numeric.array(l))
+        set += row[0]
     return set
 
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
@@ -1791,23 +1706,19 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
     results = {}
     results_nbhits = 0
     for coll in colls:
-        results[coll] = HitSet()
-        results[coll]._set = Numeric.bitwise_and(hitset_in_any_collection._set, get_collection_reclist(coll)._set)
-        results[coll].calculate_nbhits()
-        results_nbhits += results[coll]._nbhits
+        results[coll] = hitset_in_any_collection & get_collection_reclist(coll)
+        results_nbhits += len(results[coll])
     if results_nbhits == 0:
         # no hits found, try to search in Home:
-        results_in_Home = HitSet()
-        results_in_Home._set = Numeric.bitwise_and(hitset_in_any_collection._set, get_collection_reclist(cdsname)._set)
-        results_in_Home.calculate_nbhits()
-        if results_in_Home._nbhits > 0:
+        results_in_Home = hitset_in_any_collection & get_collection_reclist(cdsname)
+        if len(results_in_Home) > 0:
             # some hits found in Home, so propose this search:
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
                               {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
-                               'x_nb_hits': results_in_Home._nbhits,
+                               'x_nb_hits': len(results_in_Home),
                                'x_url_close': '</a>'})
             results = {}
         else:
@@ -1841,9 +1752,8 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         results_ap = {} # will return empty dict in case of no hits found
     nb_total = 0
     for coll in results.keys():
-        results[coll].intersect(hitset)
-        results[coll].calculate_nbhits()
-        nb_total += results[coll]._nbhits
+        results[coll].intersection_update(hitset)
+        nb_total += len(results[coll])
     if nb_total == 0:
         if of.startswith("h"):
             print_warning(req, aptext)
@@ -2078,7 +1988,7 @@ def get_nbhits_in_bibwords(word, f):
         query = "SELECT hitlist FROM %s WHERE term='%s'" % (bibwordsX, escape_string(word))
         res = run_sql(query)
         for hitlist in res:
-            out += Numeric.sum(Numeric.loads(zlib.decompress(hitlist[0])).copy().astype(Numeric.Int))
+            out += len(HitSet(hitlist[0]))
     return out
 
 def get_nbhits_in_bibxxx(p, f):
@@ -2291,7 +2201,7 @@ def record_public_p(recID):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
        Return 0 otherwise.
     """
-    return get_collection_reclist(cdsname).contains(recID)
+    return recID in get_collection_reclist(cdsname)
 
 def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."
@@ -2622,7 +2532,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         if r:
                             citinglist = r
                             citationhistory = create_citation_history_graph_and_box(recIDs[irec], ln)
-                        
+
                         r = calculate_co_cited_with_list(recIDs[irec])
                         cociting = None
                         if r:
@@ -3502,38 +3412,36 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             ## 3A - advanced search
             try:
                 results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
-                if results_in_any_collection._nbhits == 0:
+                if len(results_in_any_collection) == 0:
                     if of.startswith("h"):
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                     return page_end(req, of, ln)
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
-                        results_in_any_collection.intersect(results_tmp)
+                        results_in_any_collection.intersection_update(results_tmp)
                     elif op1 == "o": # or
-                        results_in_any_collection.union(results_tmp)
+                        results_in_any_collection.union_update(results_tmp)
                     elif op1 == "n": # not
-                        results_in_any_collection.difference(results_tmp)
+                        results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
                             print_warning(req, "Invalid set operation %s." % op1, "Error")
-                    results_in_any_collection.calculate_nbhits()
-                    if results_in_any_collection._nbhits == 0:
+                    if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
                             perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                         return page_end(req, of, ln)
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op2 == "a": # add
-                        results_in_any_collection.intersect(results_tmp)
+                        results_in_any_collection.intersection_update(results_tmp)
                     elif op2 == "o": # or
-                        results_in_any_collection.union(results_tmp)
+                        results_in_any_collection.union_update(results_tmp)
                     elif op2 == "n": # not
-                        results_in_any_collection.difference(results_tmp)
+                        results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
                             print_warning(req, "Invalid set operation %s." % op2, "Error")
-                    results_in_any_collection.calculate_nbhits()
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
@@ -3549,7 +3457,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
 
-        if results_in_any_collection._nbhits == 0:
+        if len(results_in_any_collection) == 0:
             if of.startswith("h"):
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             return page_end(req, of, ln)
@@ -3626,7 +3534,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         results_final_nb = {} # will hold number of records found in each collection
                               # (in simple dict to display overview more easily)
         for coll in results_final.keys():
-            results_final_nb[coll] = results_final[coll]._nbhits
+            results_final_nb[coll] = len(results_final[coll])
             #results_final_nb_total += results_final_nb[coll]
 
         # Now let us calculate results_final_nb_total more precisely,
@@ -3644,9 +3552,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             # okay, some work ahead to union hits across collections:
             results_final_for_all_selected_colls = HitSet()
             for coll in results_final.keys():
-               results_final_for_all_selected_colls.union(results_final[coll])
-            results_final_for_all_selected_colls.calculate_nbhits()
-            results_final_nb_total = results_final_for_all_selected_colls._nbhits
+               results_final_for_all_selected_colls.union_update(results_final[coll])
+            results_final_nb_total = len(results_final_for_all_selected_colls)
 
         if results_final_nb_total == 0:
             if of.startswith('h'):
@@ -3660,7 +3567,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             # print results overview:
             if of == "id":
                 # we have been asked to return list of recIDs
-                recIDs = results_final_for_all_selected_colls.items().tolist()
+                recIDs = list(results_final_for_all_selected_colls)
                 if sf: # do we have to sort?
                     recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
                 elif rm: # do we have to rank?
@@ -3679,13 +3586,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 
             print_records_prologue(req, of)
             for coll in colls_to_search:
-                if results_final.has_key(coll) and results_final[coll]._nbhits:
+                if results_final.has_key(coll) and len(results_final[coll]):
                     if of.startswith("h"):
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
                                                     d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
-                    results_final_recIDs = results_final[coll].items()
+                    results_final_recIDs = list(results_final[coll])
                     results_final_relevances = []
                     results_final_relevances_prologue = ""
                     results_final_relevances_epilogue = ""
@@ -3762,7 +3669,7 @@ def perform_request_cache(req, action="show"):
     out += "<blockquote>"
     for coll in collection_reclist_cache.keys():
         if collection_reclist_cache[coll]:
-            out += "%s (%d)<br />" % (coll, get_collection_reclist(coll)._nbhits)
+            out += "%s (%d)<br />" % (coll, len(get_collection_reclist(coll)))
     out += "</blockquote>"
     # show search cache:
     out += "<h3>Search Cache</h3>"
@@ -3776,7 +3683,7 @@ def perform_request_cache(req, action="show"):
             # find out about length of cached data:
             l = 0
             for coll in search_cache[search_cache_key]:
-                l += search_cache[search_cache_key][coll]._nbhits
+                l += len(search_cache[search_cache_key][coll])
             out += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td></tr>" % (p, f, c, l)
         out += "</table>"
     else:

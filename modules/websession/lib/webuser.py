@@ -62,7 +62,8 @@ from invenio.config import \
      version, \
      weburl
 from invenio import session, websession
-from invenio.dbquery import run_sql, escape_string, OperationalError
+from invenio.dbquery import run_sql, escape_string, OperationalError, \
+    serialize_via_marshal, deserialize_via_marshal
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.access_control_config import *
@@ -854,10 +855,3 @@ def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
     except: # no groups found, so return empty list
         pass
     return out
-
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return compress(marshal.dumps(obj))
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(string))

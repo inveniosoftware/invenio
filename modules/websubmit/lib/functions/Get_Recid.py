@@ -77,7 +77,7 @@ def Get_Recid(parameters, curdir, form):
     global rn, sysno
     ## initialize sysno
     sysno = ""
-    
+
     if access("%s/SN" % curdir, F_OK|R_OK):
         ## SN exists and should contain the recid; get it from there.
         try:
@@ -144,10 +144,10 @@ def get_existing_records_for_reportnumber(reportnum):
 
     ## Get list of records with the report-number rn:
     reclist = \
-       search_pattern(req=None, \
+       list(search_pattern(req=None, \
                       p=reportnum, \
                       f="reportnumber", \
-                      m="e").items().tolist()
+                      m="e"))
 
     ## Loop through all recids retrieved and testing to see whether the record
     ## actually exists or not. If none of the records exist, there is no record
@@ -161,4 +161,4 @@ def get_existing_records_for_reportnumber(reportnum):
             ## records found:
             existing_records.append(rec)
     return existing_records
-    
+

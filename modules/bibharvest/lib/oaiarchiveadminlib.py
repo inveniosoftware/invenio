@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 import sys
 import cgi
 import re
-import Numeric
 import os
 import string
 import ConfigParser
@@ -694,7 +693,7 @@ def transform_tuple(header=[], tuple=[], start='', end='', extracolumn=''):
         else:
             tblstr += '  <td class="%s" style="padding:5px 10px;">%s</td>\n' % (align[0], row)
         tblstr += ' </tr> \n'
-        
+
 
     tblstr += '</table> \n '
     tblstr += end

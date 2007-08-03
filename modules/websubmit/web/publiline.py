@@ -277,7 +277,7 @@ def getInPending(doctype,categ,RN):
 def getInAlice(doctype,categ,RN):
     # initialize sysno variable
     sysno = ""
-    searchresults = search_pattern(req=None, p=RN, f="reportnumber").items().tolist()
+    searchresults = list(search_pattern(req=None, p=RN, f="reportnumber"))
     if len(searchresults) == 0:
         return 0
     sysno = searchresults[0]

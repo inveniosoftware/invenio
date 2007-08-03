@@ -28,8 +28,6 @@ import cgi
 import re
 import os
 import string
-import zlib
-import Numeric
 import time
 
 from invenio.config import \
@@ -146,7 +144,7 @@ class Collection:
                     self.dbquery = res[0][2]
                     self.nbrecs = res[0][3]
                     try:
-                        self.reclist = HitSet(Numeric.loads(zlib.decompress(res[0][4])))
+                        self.reclist = HitSet(res[0][4])
                     except:
                         self.reclist = HitSet()
                 else: # collection does not exist!
@@ -379,7 +377,7 @@ class Collection:
         self.latest_additions_info = []
         if self.nbrecs and self.reclist:
             # firstly, get last 'rg' records:
-            recIDs = Numeric.nonzero(self.reclist._set)
+            recIDs = list(self.reclist)
 
             total = len(recIDs)
             to_display = min(rg, total)
@@ -640,8 +638,8 @@ class Collection:
                 if ((coll.restricted_p() is None) or
                     (coll.restricted_p() == self.restricted_p())):
                     # add this reclist ``for real'' only if it is public
-                    reclist.union(coll_reclist)
-                reclist_with_nonpublic_subcolls.union(coll_reclist_with_nonpublic_subcolls)
+                    reclist.union_update(coll_reclist)
+                reclist_with_nonpublic_subcolls.union_update(coll_reclist_with_nonpublic_subcolls)
         else:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
@@ -651,11 +649,8 @@ class Collection:
             else:
                 reclist = search_pattern(None, self.dbquery + ' -collection:"DELETED"')
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
-        # deduce the number of records:
-        reclist.calculate_nbhits()
-        reclist_with_nonpublic_subcolls.calculate_nbhits()
         # store the results:
-        self.nbrecs = reclist_with_nonpublic_subcolls._nbhits
+        self.nbrecs = len(reclist_with_nonpublic_subcolls)
         self.reclist = reclist
         self.reclist_with_nonpublic_subcolls = reclist_with_nonpublic_subcolls
         # last but not least, update the speed-up flag:
@@ -672,7 +667,7 @@ class Collection:
         sys.stdout.flush()
         try:
             query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
-                    (self.nbrecs, escape_string(zlib.compress(Numeric.dumps(self.reclist._set))), self.id)
+                (self.nbrecs, escape_string(self.reclist.fastdump()), self.id)
             run_sql(query)
             self.reclist_updated_since_start = 1
         except Error, e:

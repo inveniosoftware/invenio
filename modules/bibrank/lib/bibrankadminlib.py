@@ -24,7 +24,6 @@ __revision__ = "$Id$"
 
 import cgi
 import re
-import Numeric
 import os
 import ConfigParser
 from zlib import compress,decompress
@@ -939,24 +938,6 @@ def adderrorbox(header='', datalist=[]):
     output += '</tbody></table>'
     return output
 
-def serialize_via_numeric_array_dumps(arr):
-    return Numeric.dumps(arr)
-def serialize_via_numeric_array_compr(str):
-    return compress(str)
-def serialize_via_numeric_array_escape(str):
-    return escape_string(str)
-def serialize_via_numeric_array(arr):
-    """Serialize Numeric array into a compressed string."""
-    return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
-def deserialize_via_numeric_array(string):
-    """Decompress and deserialize string into a Numeric array."""
-    return Numeric.loads(decompress(string))
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(marshal.dumps(obj)))
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(string))
 def get_languages():
     languages = []
     for (lang, lang_namelong) in language_list_long():

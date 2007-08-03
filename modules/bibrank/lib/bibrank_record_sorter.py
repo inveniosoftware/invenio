@@ -23,12 +23,9 @@
 __revision__ = "$Id$"
 
 import sys
-import zlib
-import marshal
 import string
 import time
 import math
-import Numeric
 import re
 import ConfigParser
 import traceback
@@ -39,103 +36,15 @@ from invenio.config import \
      cdslang, \
      etcdir, \
      version
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibrank_citation_searcher import calculate_cited_by_list
 
-class HitSet:
-    """Class describing set of records, implemented as bit vectors of recIDs.
-    Using Numeric arrays for speed (1 value = 8 bits), can use later "real"
-    bit vectors to save space."""
 
-    def __init__(self, init_set=None):
-        self._nbhits = -1
-        if init_set:
-            self._set = init_set
-        else:
-            self._set = Numeric.zeros(CFG_MAX_RECID+1, Numeric.Int0)
-
-    def __repr__(self, join=str.join):
-        return "%s(%s)" % (self.__class__.__name__, join(map(repr, self._set), ', '))
-
-    def add(self, recID):
-        "Adds a record to the set."
-        self._set[recID] = 1
-
-    def addmany(self, recIDs):
-        "Adds several recIDs to the set."
-        for recID in recIDs: self._set[recID] = 1
-
-    def addlist(self, arr):
-        "Adds an array of recIDs to the set."
-        Numeric.put(self._set, arr, 1)
-
-    def remove(self, recID):
-        "Removes a record from the set."
-        self._set[recID] = 0
-
-    def removemany(self, recIDs):
-        "Removes several records from the set."
-        for recID in recIDs:
-            self.remove(recID)
-
-    def intersect(self, other):
-        "Does a set intersection with other.  Keep result in self."
-        self._set = Numeric.bitwise_and(self._set, other._set)
-
-    def union(self, other):
-        "Does a set union with other. Keep result in self."
-        self._set = Numeric.bitwise_or(self._set, other._set)
-
-    def difference(self, other):
-        "Does a set difference with other. Keep result in self."
-        #self._set = Numeric.bitwise_not(self._set, other._set)
-        for recID in Numeric.nonzero(other._set):
-            self.remove(recID)
-
-    def contains(self, recID):
-        "Checks whether the set contains recID."
-        return self._set[recID]
-
-    __contains__ = contains     # Higher performance member-test for python 2.0 and above
-
-    def __getitem__(self, index):
-        "Support for the 'for item in set:' protocol."
-        return Numeric.nonzero(self._set)[index]
-
-    def calculate_nbhits(self):
-        "Calculates the number of records set in the hitset."
-        self._nbhits = Numeric.sum(self._set.copy().astype(Numeric.Int))
-
-    def items(self):
-        "Return an array containing all recID."
-        return Numeric.nonzero(self._set)
-
-    def tolist(self):
-        "Return an array containing all recID."
-        return Numeric.nonzero(self._set).tolist()
 
 def compare_on_val(first, second):
     return cmp(second[1], first[1])
-def serialize_via_numeric_array_dumps(arr):
-    return Numeric.dumps(arr)
-def serialize_via_numeric_array_compr(str):
-    return zlib.compress(str)
-def serialize_via_numeric_array_escape(str):
-    return escape_string(str)
-def serialize_via_numeric_array(arr):
-    """Serialize Numeric array into a compressed string."""
-    return serialize_via_numeric_array_escape(serialize_via_numeric_array_compr(serialize_via_numeric_array_dumps(arr)))
-def deserialize_via_numeric_array(string):
-    """Decompress and deserialize string into a Numeric array."""
-    return Numeric.loads(zlib.decompress(string))
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return escape_string(zlib.compress(marshal.dumps(obj)))
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(zlib.decompress(string))
 
 def adderrorbox(header='', datalist=[]):
     """used to create table around main data on a page, row based"""
@@ -159,7 +68,7 @@ def adderrorbox(header='', datalist=[]):
     return output
 
 def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
-    """Check if the term is valid for use
+    """Check if the tem is valid for use
     term - the term to check
     col_size - the number of records in database
     term_rec - the number of records which contains this term
@@ -391,7 +300,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     if verbose > 0:
         voutput += "<br>Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br>" % rank_method_code
         voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
-    lrecIDs = hitset.items()
+    lrecIDs = list(hitset)
 
     if verbose > 0:
         voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
@@ -408,10 +317,10 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     else: #rank docs in hitset, can this be speed up using something else than for loop?
         lwords_lrecIDs = lwords_hitset.items()
         for recID in lwords_lrecIDs:
-            if rnkdict.has_key(recID) and hitset.contains(recID):
+            if rnkdict.has_key(recID) and recID in hitset:
                 reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
-            elif hitset.contains(recID):
+            elif recID in hitset:
                 reclist_addend.append((recID, 0))
 
     if verbose > 0:
@@ -553,8 +462,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbo
 
     #Add any documents not ranked to the end of the list
     if hitset:
-        hitset.calculate_nbhits()
-        lrecIDs = hitset.tolist()                                #using 2-3mb
+        lrecIDs = list(hitset)                       #using 2-3mb
         reclist = zip(lrecIDs, [0] * len(lrecIDs)) + reclist      #using 6mb
 
     if verbose > 0:
@@ -588,7 +496,7 @@ def calculate_record_relevance(term, invidx, hitset, recdict, rec_termcount, ver
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
-            if hitset.contains(j):#only include docs found by search_engine based on query
+            if j in hitset:#only include docs found by search_engine based on query
                 try: #calculates rank value
                     recdict[j] = recdict.get(j, 0) + int(math.log(tf[0] * Gi * tf[1] * qtf))
                 except:
@@ -624,7 +532,7 @@ def calculate_record_relevance_findsimilar(term, invidx, hitset, recdict, rec_te
     if not quick or (qtf >= 0 or (qtf < 0 and len(recdict) == 0)):
         #Only accept records existing in the hitset received from the search engine
         for (j, tf) in invidx.iteritems():
-            if hitset.contains(j): #only include docs found by search_engine based on query
+            if j in hitset: #only include docs found by search_engine based on query
                 #calculate rank value
                 recdict[j] = recdict.get(j, 0) + int((1 + math.log(tf[0])) * Gi * tf[1] * qtf)
                 rec_termcount[j] = rec_termcount.get(j, 0) + 1 #number of terms from query in document
@@ -648,7 +556,7 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
     reclist = []
 
     #remove all ranked documents so that unranked can be added to the end
-    hitset.removemany(recdict.keys())
+    hitset -= recdict.keys()
 
     #gives each record a score between 0-100
     divideby = max(recdict.values())
@@ -682,7 +590,7 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
         else:
             recdict[j] = 0
 
-    hitset.removemany(recdict.keys())
+    hitset -= recdict.keys()
     #gives each record a score between 0-100
     divideby = max(recdict.values())
     for (j, w) in recdict.iteritems():
@@ -738,10 +646,6 @@ try:
     psyco.bind(calculate_record_relevance)
     psyco.bind(word_similarity)
     psyco.bind(sort_record_relevance)
-    psyco.bind(serialize_via_numeric_array)
-    psyco.bind(serialize_via_marshal)
-    psyco.bind(deserialize_via_numeric_array)
-    psyco.bind(deserialize_via_marshal)
 except StandardError, e:
     pass
 

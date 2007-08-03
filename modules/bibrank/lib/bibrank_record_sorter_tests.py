@@ -34,17 +34,17 @@ class TestListSetOperations(unittest.TestCase):
     def test_record_sorter(self):
         """bibrank record sorter - sorting records"""
         hitset = HitSet()
-        hitset.addlist((1,2,5))
+        hitset += (1,2,5)
         hitset2 = HitSet()
         hitset2.add(5)
         rec_termcount = {1: 1, 2: 1, 5: 1}
         (res1, res2) = bibrank_record_sorter.sort_record_relevance({1: 50, 2:30, 3:70,4:10},rec_termcount,hitset, 50,0)
-        self.assertEqual(([(1, 71), (3, 100)], hitset2.tolist()), (res1, res2.tolist()))
+        self.assertEqual(([(1, 71), (3, 100)], list(hitset2)), (res1, list(res2)))
 
     def test_calculate_record_relevance(self):
         """bibrank record sorter - calculating relevances"""
         hitset = HitSet()
-        hitset.addlist((1,2,5))
+        hitset += (1,2,5)
         self.assertEqual(({1: 7, 2: 7, 5: 5}, {1: 1, 2: 1, 5: 1}),  bibrank_record_sorter.calculate_record_relevance(("testterm", 2.0),
 {"Gi":(0, 50.0), 1: (3, 4.0), 2: (4, 5.0), 5: (1, 3.5)}, hitset, {}, {}, 0, None))
 

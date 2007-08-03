@@ -22,11 +22,8 @@
 
 __revision__ = "$Id$"
 
-import marshal
-from zlib import compress, decompress
 import sys
 import time
-import Numeric
 import traceback
 import ConfigParser
 
@@ -34,10 +31,10 @@ from invenio.config import \
      CFG_MAX_RECID, \
      cdslang, \
      etcdir
-from invenio.search_engine import perform_request_search, HitSet
+from invenio.search_engine import perform_request_search, HitSet, intbitsetfull
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibtask import task_get_option, write_message
 
 options = {}
@@ -132,17 +129,18 @@ def single_tag_rank(config):
     for (recids, recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
-        valid = HitSet(Numeric.ones(CFG_MAX_RECID + 1))
+        valid = intbitsetfull(CFG_MAX_RECID + 1)
+        valid.discard(0)
         for key in tags:
             newset = HitSet()
-            newset.addlist(run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))
-            valid.intersect(newset)
+            newset += [recid[0] for recid in (run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))]
+            valid.intersection_update(newset)
         if tags:
-            recs = filter(lambda x: valid.contains(x[0]), recs)
+            recs = filter(lambda x: x[0] in valid, recs)
         records = records + list(recs)
         write_message("Number of records found with the necessary tags: %s" % len(records))
 
-    records = filter(lambda x: options["validset"].contains(x[0]), records)
+    records = filter(lambda x: x[0] in options["validset"], records)
     rnkset = {}
     for key, value in records:
         if kb_data.has_key(value):
@@ -357,7 +355,7 @@ def get_valid_range(rank_method_code):
     else:
         recIDs = []
     valid = HitSet()
-    valid.addlist(recIDs)
+    valid += recIDs
     return valid
 
 def add_recIDs_by_date(rank_method_code, dates=""):
@@ -422,14 +420,6 @@ def create_range_list(res):
 
 def single_tag_rank_method(run):
     return bibrank_engine(run)
-
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return escape_string(compress(marshal.dumps(obj)))
-
-def deserialize_via_marshal(string):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(string))
 
 def showtime(timeused):
     """Show time used for method"""
