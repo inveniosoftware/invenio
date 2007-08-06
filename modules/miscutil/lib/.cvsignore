@@ -10,3 +10,5 @@ mailutils.py
 *.pyc
 *.shtml
 *.php
+intbitset.c
+build
