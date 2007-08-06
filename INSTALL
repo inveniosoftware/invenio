@@ -325,9 +325,11 @@ Contents
           This configuration step is mandatory.  Usually, you do this
           step only once.
 
-          Note that if you prefer to build CDS Invenio out of its
+          (Note that if you prefer to build CDS Invenio out of its
           source tree, you may run the above configure command like
-          this: (mkdir build && cd build && ../configure --prefix=...).
+          this: mkdir build && cd build && ../configure --prefix=...
+          FIXME: this is not working right now as per the introduction
+          of intbitset_setup.py.)
 
       $ vi ./config/config.wml  ## optional, but strongly recommended
 
