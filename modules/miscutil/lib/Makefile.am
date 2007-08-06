@@ -67,12 +67,23 @@ EXTRA_DIST = __init__.py \
 	     testutils_regression_tests.py \
              urlutils.py \
              testimport.py \
-             kwalitee.py
+             kwalitee.py \
+             intbitset.pyx \
+             intbitset.h \
+             intbitset_impl.c \
+             intbitset_setup.py
+
+all:
+	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
 
 install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
+	$(PYTHON) $(srcdir)/intbitset_setup.py install
 
-CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
+CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) intbitset.c *~ *.tmp *.pyc
+
+clean-local:
+	rm -rf build
 
 config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
       $(top_srcdir)/config/cdswmllib.wml
