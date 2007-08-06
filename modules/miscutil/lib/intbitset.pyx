@@ -17,7 +17,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Fast BitSet C extension to hold unsigned integer."""
+"""
+Defines an intbitset data object to hold unordered sets of unsigned
+integers with ultra fast set operations, implemented via bit vectors
+and Python C extension to optimize speed and memory usage.
+
+Emulates the Python built-in set class interface with some additional
+specific methods such as its own fast dump and load marshalling
+functions.  Uses real bits to optimize memory usage, so may have
+issues with endianness if you transport serialized bitsets between
+various machine architectures.
+"""
 
 import zlib
 from array import array
@@ -67,7 +77,18 @@ cdef extern from "intbitset.h":
     unsigned char intBitSetCmp(IntBitSet *x, IntBitSet *y)
 
 cdef class intbitset:
-    """Fast BitSet C extension to hold unsigned integer."""
+    """
+    Defines an intbitset data object to hold unordered sets of
+    unsigned integers with ultra fast set operations, implemented via
+    bit vectors and Python C extension to optimize speed and memory
+    usage.
+
+    Emulates the Python built-in set class interface with some
+    additional specific methods such as its own fast dump and load
+    marshalling functions.  Uses real bits to optimize memory usage,
+    so may have issues with endianness if you transport serialized
+    bitsets between various machine architectures.
+    """
     cdef IntBitSet *bitset
     #def __init__(intbitset self, rhs=0, int minsize=-1):
 
@@ -306,7 +327,7 @@ cdef class intbitset:
         last = 0
         ret = ''
         for i in self:
-            ret += '0'*(i-last)+'1'
+            ret = ret + '0'*(i-last)+'1'
             last = i+1
         return ret
     def update_with_signs(intbitset self, rhs):
