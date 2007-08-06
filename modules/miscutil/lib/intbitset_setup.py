@@ -24,13 +24,13 @@ from distutils.extension import Extension
 try:
     from Cython.Distutils import build_ext
 except ImportError:
-    try
+    try:
         from Pyrex.Distutils import build_ext
     except ImportError:
-        raise ImportError, "Either Pyrex "
-            "(http://www.cosc.canterbury.ac.nz/greg.ewing/python/Pyrex/) "
-            "or Cython (http://www.cython.org/) must be installed in order "
-            "to compile the intbitset extension."
+        raise ImportError, """Either Pyrex
+            (http://www.cosc.canterbury.ac.nz/greg.ewing/python/Pyrex/)
+            or Cython (http://www.cython.org/) must be installed in order
+            to compile the intbitset extension."""
 
 setup(
     name = 'intbitset',
