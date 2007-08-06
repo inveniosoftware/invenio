@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,7 +21,7 @@
     title="Modules Overview" \
     navbar_name="hacking-modules" \
     navtrail_previous_links="<a class=navtrail href=<WEBURL>/hacking/>Hacking CDS Invenio</a> " \
-    navbar_select="hacking-modules" 
+    navbar_select="hacking-modules"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
@@ -38,7 +38,15 @@ descriptions the module relationship diagram is presented.
 
 <ul>
 
- <li><strong>BibCheck</strong>: FIXME 
+ <li><strong>BibCheck</strong> permits administrators and library
+ cataloguers to automate various kind of tests on the metadata to see
+ whether the metadata comply with quality standards.  For example,
+ that certain metadata fields are of a certain length, that they have
+ numeric content, that they must not be present when other field
+ exists, that their content is governed by an authority base depending
+ on values of other fields, etc.  The module can report its findings
+ or can even automatically correct some kind of errors.  (FIXME: not
+ included in CVS yet.)
 
  <li><strong>BibClassify</strong> allows automatic extraction of
  keywords from fulltext documents, based on the frequency of specific
@@ -71,7 +79,8 @@ descriptions the module relationship diagram is presented.
  several steps including record separation and field extraction upto
  transformation of source field values and their formatting.
 
- <li><strong>BibEdit</strong>: FIXME.
+ <li><strong>BibEdit</strong> permits one to edit the metadata via a
+ Web interface.
 
  <li><strong>BibFormat</strong> presents a powerful module to format
  the bibliographic metadata in numerous ways. This truly enables the
@@ -95,7 +104,7 @@ descriptions the module relationship diagram is presented.
  particularly interesting for institutes that are specialized in
  cross-archive and cross-disciplinary services provision, as for
  example the ARC service provider.
-  
+
  <li><strong>BibIndex</strong> module takes care of the indexation of
  metadata, references and full text files.  Two kinds of indexes --
  word and phrase index -- are being maintained.  The user can define
@@ -111,10 +120,17 @@ descriptions the module relationship diagram is presented.
  were designed with the aim to provide fast user-response search times
  and are faster than native MySQL (full text) indexes.
 
- <li><strong>BibMatch</strong>: FIXME.
+ <li><strong>BibMatch</strong> permits to filter input XML files
+ against the database content, attempting to match records via certain
+ criteria, for example to avoid doubly-inputted records.
 
- <li><strong>BibRank</strong>: FIXME 
-  
+ <li><strong>BibRank</strong> permits to set up various ranking
+ criteria that will be used later by the search engine.  For example,
+ ranking by the word frequency, or by some metadata tag value such as
+ journal name by means of the journal impact factor knowledge base, or
+ even by the number of downloads of a particular paper.  Note that
+ BibRank is independent of BibIndex.
+
  <li><strong>BibSched</strong> The bibliographic task scheduler is
  central unit of the system that allows all other modules to access
  the bibliographic database in a controlled manner, preventing sharing
@@ -123,15 +139,17 @@ descriptions the module relationship diagram is presented.
  allows to monitor the task queue including various possibilities of a
  manual intervention, for example to re-schedule queued tasks, change
  the task order, etc.
-  
+
  <li><strong>BibUpload</strong> allows to load the new bibliographic
  data into the database. To effectuate this task the data must be a
  well-formed XML file that complies with the current metadata tag
  selection schema. Usually, the properly structured input files of
  BibUpload come from the BibConvert utility.
-  
- <li><strong>ElmSubmit</strong>: FIXME
- 
+
+ <li><strong>ElmSubmit</strong> is an email submission gateway that
+ permits for automatic document uploads from trusted sources via
+ email.  (Usually web submission or harvesting is preferred.)
+
  <li><strong>MiscUtil</strong> is a collection of miscellaneous
  utilities that other modules are using, like the international
  messages, etc.
@@ -145,7 +163,7 @@ descriptions the module relationship diagram is presented.
  mainly for the administrative interface.  There are basically two
  kinds of actions: (i) configuration of administrative modules and
  (ii) running administrative tasks.
-  
+
  <li><strong>WebAlert</strong> module allows the end user to be
  alerted whenever a new document matching her personal criteria is
  inserted into the database.  The criteria correspond to a typical
@@ -155,22 +173,28 @@ descriptions the module relationship diagram is presented.
  user may create several alerts with a daily, weekly, or a monthly
  frequency.  The results of alert searches are either sent back to the
  user by email or can also be stored into her baskets.
-  
+
  <li><strong>WebBasket</strong> module enables the end user of the
  system to store the documents she is interested in in a personal
  basket or a personal shelf.  The concept is similar to popular
  shopping carts.  One user may own several baskets.  A basket can be
  either private or public, allowing a simple document sharing
  mechanism within a group.
-  
- <li><strong>WebComment</strong>: FIXME.
+
+ <li><strong>WebComment</strong> provides a community-oriented tool to
+ rank documents by the readers or to share comments on the documents
+ by the readers.  Integrated with the group-aware WebBasket, WebGroup,
+ WebMessage tools, WebComment is at the heart of the social network
+ features of the CDS Invenio software.
 
  <li><strong>WebHelp</strong> presents some global user-level,
  admin-level, and hacker-level documenation on CDS Invenio.  The
  module-specific documentation is included within each particular
  module.
-  
- <li><strong>WebMessage</strong>: FIXME.
+
+ <li><strong>WebMessage</strong> permits the communication between
+ (possibly anonymous) end users via web message boards, to invite
+ readers to join the groups, etc.
 
  <li><strong>WebSearch</strong> module handles user requests to search
  for a certain words or phrases in the database.  Two types of
@@ -192,17 +216,19 @@ descriptions the module relationship diagram is presented.
  to its type (e.g. preprint, book) and according to its Dewey decimal
  classification number.  Such a flexible organization views allows for
  the creation of easy navigation schemata to the end users.
-  
+
  <li><strong>WebSession</strong> is a session and user management
  module that permits to differentiate between users.  Useful for
  personalization of the interface and services like personal baskets
  and alerts.
-  
- <li><strong>WebStat</strong>: FIXME 
-  
+
+ <li><strong>WebStat</strong> is a configurable system that permits to
+ gather statistics about the health of the server, the usage of the
+ system, as well as about some particular system features.
+
  <li><strong>WebStyle</strong> is a library of design-related modules
  that defines look and feel of CDS Invenio pages.
-  
+
  <li><strong>WebSubmit</strong> is a comprehensive submission system
  allowing authorized individuals (authors, secretaries and repository
  maintenance staff) to submit individual documents into the
