@@ -26,11 +26,22 @@ from Pyrex.Distutils import build_ext
 
 setup(
     name = 'intbitset',
-    version = '0.1',
-    description = 'Fast BitSet C extension to hold unsigned integer',
-    author = 'CDS',
-    author_email = 'cds.support@cern.ch',
-    url = 'http://cdsware.cern.ch',
+    version = '$Revision$',
+    description = """
+    Defines an intbitset data object to hold unordered sets of
+    unsigned integers with ultra fast set operations, implemented via
+    bit vectors and Python C extension to optimize speed and memory
+    usage.
+
+    Emulates the Python built-in set class interface with some
+    additional specific methods such as its own fast dump and load
+    marshalling functions.  Uses real bits to optimize memory usage,
+    so may have issues with endianness if you transport serialized
+    bitsets between various machine architectures.
+    """,
+    author = 'CDS Invenio developers (Samuele Kaplun; last updated by $Author$)',
+    author_email = 'project-cdsware-developers@cern.ch',
+    url = 'http://invenio.cern.ch/',
     ext_modules=[
         Extension("invenio.intbitset", ["intbitset.pyx", "intbitset_impl.c"], extra_compile_args=['-O3']),
     ],
