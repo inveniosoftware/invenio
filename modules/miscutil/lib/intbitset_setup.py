@@ -21,8 +21,16 @@ __revision__ = "$Id$"
 
 from distutils.core import setup
 from distutils.extension import Extension
-from Pyrex.Distutils import build_ext
-#from Cython.Distutils import build_ext
+try:
+    from Cython.Distutils import build_ext
+except ImportError:
+    try
+        from Pyrex.Distutils import build_ext
+    except ImportError:
+        raise ImportError, "Either Pyrex "
+            "(http://www.cosc.canterbury.ac.nz/greg.ewing/python/Pyrex/) "
+            "or Cython (http://www.cython.org/) must be installed in order "
+            "to compile the intbitset extension."
 
 setup(
     name = 'intbitset',
