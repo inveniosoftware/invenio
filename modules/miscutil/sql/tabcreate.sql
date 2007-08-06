@@ -3073,11 +3073,13 @@ CREATE TABLE IF NOT EXISTS externalcollection (
 -- Webstat main table
 
 CREATE TABLE IF NOT EXISTS staEVENT (
-  id VARCHAR(255) NOT NULL PRIMARY KEY,
-  number INT(2) ZEROFILL NOT NULL UNIQUE AUTO_INCREMENT,
-  name VARCHAR(255) NULL,
-  creation_time TIMESTAMP DEFAULT NOW(), 
-  columns VARCHAR(255) NULL
+  id varchar(255) NOT NULL,
+  number smallint(2) unsigned ZEROFILL NOT NULL auto_increment,
+  name varchar(255),
+  creation_time TIMESTAMP DEFAULT NOW(),
+  cols varchar(255),
+  PRIMARY KEY  (id),
+  UNIQUE KEY number (number)
 ) TYPE=MyISAM;
 
 -- end of file
