@@ -65,21 +65,6 @@ except ImportError:
     ### the "free of charge for any purpose" implementation of the Porter stemmer
     ### algorithm in Python.  The Invenio API interface follows below.
 
-    def is_stemmer_available_for_language(lang):
-        """Return true if stemmer for language LANG is available.
-        Return false otherwise.
-        """
-        return lang == 'english'
-
-    _stemmers[get_ident()] = PorterStemmer()
-
-    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
-        """Return WORD stemmed according to language LANG (e.g. 'en')."""
-        if lang == 'english':
-            return _stemmers[get_ident()].stem(word, 0, len(word)-1)
-        else:
-            return word
-
     class PorterStemmer:
         """
         This is the Porter stemming algorithm, ported to Python from the
@@ -414,6 +399,20 @@ except ImportError:
             self.step5()
             return self.b[self.k0:self.k+1]
 
+    _stemmers[get_ident()] = PorterStemmer()
+
+    def is_stemmer_available_for_language(lang):
+        """Return true if stemmer for language LANG is available.
+        Return false otherwise.
+        """
+        return lang == 'english'
+
+    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
+        """Return WORD stemmed according to language LANG (e.g. 'en')."""
+        if lang == 'english':
+            return _stemmers[get_ident()].stem(word, 0, len(word)-1)
+        else:
+            return word
 
 if __name__ == '__main__':
     # when invoked via CLI, simply stem the arguments:
