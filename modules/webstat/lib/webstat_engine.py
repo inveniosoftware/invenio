@@ -256,7 +256,7 @@ def get_customevent_dump(args):
              % (args['ids'][0], get_customevent_table(args['ids'][0])))
              
     try:
-        event_cols[args['ids'][0]] = cPickle.loads(run_sql("SELECT columns FROM staEVENT WHERE id = '%s'" % args['ids'][0])[0][0])
+        event_cols[args['ids'][0]] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'" % args['ids'][0])[0][0])
     except TypeError:
         event_cols[args['ids'][0]] = ["Unnamed"]
 
@@ -265,7 +265,7 @@ def get_customevent_dump(args):
         run_sql("INSERT INTO staTEMP SELECT '%s', creation_time, arguments FROM %s"
                 % (id, tbl_name))
         try:
-            event_cols[id] = cPickle.loads(run_sql("SELECT columns FROM staEVENT WHERE id = '%s'" % id)[0][0])
+            event_cols[id] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'" % id)[0][0])
         except TypeError:
             event_cols[id] = ["Unnamed"]
 

@@ -106,7 +106,7 @@ KEYEVENT_REPOSITORY = { 'collection population':
 
 # CLI
 
-def create_customevent(id=None, name=None, columns=[]):
+def create_customevent(id=None, name=None, cols=[]):
     """
     Creates a new custom event by setting up the necessary MySQL tables.
 
@@ -116,8 +116,8 @@ def create_customevent(id=None, name=None, columns=[]):
     @param name: Optionally, a descriptive name.
     @type name: str
 
-    @param columns: Optionally, the name of the additional columns.
-    @type columns: [str]
+    @param cols: Optionally, the name of the additional columns.
+    @type cols: [str]
 
     @return: A status message
     @type: str
@@ -135,9 +135,9 @@ def create_customevent(id=None, name=None, columns=[]):
 
     # Insert a new row into the events table describing the new event
     sql_name = (name is not None) and ("'%s'" % name) or "NULL"
-    sql_columns = (len(columns) != 0) and ('"%s"' % cPickle.dumps(columns)) or "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, columns) VALUES ('%s', %s, %s)"
-            % (id, sql_name, sql_columns))
+    sql_cols = (len(cols) != 0) and ('"%s"' % cPickle.dumps(cols)) or "NULL"
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)"
+            % (id, sql_name, sql_cols))
 
     tbl_name = get_customevent_table(id)
 
