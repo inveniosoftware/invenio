@@ -32,35 +32,75 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_list_dump(self):
         """intbitset - list dump"""
-        set1 = intbitset([30,10,20])
-        self.assertEqual(list(set1), [10,20,30])
+        set1 = intbitset([30, 10, 20])
+        self.assertEqual(list(set1), [10, 20, 30])
+
+    def test_ascii_bit_dump(self):
+        """intbitset - ascii bit dump"""
+        set1 = intbitset([30, 10, 20])
+        self.assertEqual(set1.strbits(), "0000000000100000000010000000001")
+
+    def test_marshalling(self):
+        """intbitset - marshalling"""
+        # serialize an intbitset:
+        set1 = intbitset([30, 10, 20])
+        str1 = set1.fastdump()
+        # load it back via constructor:
+        set2 = intbitset(str1)
+        # load it back via fastload:
+        set3 = intbitset()
+        set3.fastload(str1)
+        # compare results:
+        self.assertEqual(list(set1), [10, 20, 30])
+        self.assertEqual(list(set2), [10, 20, 30])
+        self.assertEqual(list(set3), [10, 20, 30])
 
     def test_set_intersection(self):
         """intbitset - set intersection"""
-        lst1 = [10,20,30]
-        lst2 = [20,30,40,50,70]
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
         set1 = intbitset(lst1)
         set2 = intbitset(lst2)
         setx = set1 & set2
         self.assertEqual(list(set1), lst1)
         self.assertEqual(list(set2), lst2)
-        self.assertEqual(list(setx), [20,30])
+        self.assertEqual(list(setx), [20, 30])
+
+    def test_set_intersection_in_place(self):
+        """intbitset - set intersection in place"""
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
+        set1 = intbitset(lst1)
+        set2 = intbitset(lst2)
+        set1 &= set2
+        self.assertEqual(list(set1), [20, 30])
+        self.assertEqual(list(set2), lst2)
 
     def test_set_union(self):
         """intbitset - set union"""
-        lst1 = [10,20,30]
-        lst2 = [20,30,40,50,70]
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
         set1 = intbitset(lst1)
         set2 = intbitset(lst2)
         setx = set1 | set2
         self.assertEqual(list(set1), lst1)
         self.assertEqual(list(set2), lst2)
-        self.assertEqual(list(setx), [10,20,30,40,50,70])
+        self.assertEqual(list(setx), [10, 20, 30, 40, 50, 70])
+
+    def test_set_union_in_place(self):
+        """intbitset - set union in place"""
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
+        set1 = intbitset(lst1)
+        set2 = intbitset(lst2)
+        set1 |= set2
+        self.assertEqual(list(set1), [10, 20, 30, 40, 50, 70])
+        self.assertEqual(list(set2), lst2)
 
     def test_set_difference(self):
         """intbitset - set difference"""
-        lst1 = [10,20,30]
-        lst2 = [20,30,40,50,70]
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
         set1 = intbitset(lst1)
         set2 = intbitset(lst2)
         setx = set1 - set2
@@ -68,10 +108,20 @@ class IntBitSetTest(unittest.TestCase):
         self.assertEqual(list(set2), lst2)
         self.assertEqual(list(setx), [10])
 
+    def test_set_difference_in_place(self):
+        """intbitset - set difference in place"""
+        lst1 = [10, 20, 30]
+        lst2 = [20, 30, 40, 50, 70]
+        set1 = intbitset(lst1)
+        set2 = intbitset(lst2)
+        set1 -= set2
+        self.assertEqual(list(set1), [10])
+        self.assertEqual(list(set2), lst2)
+
 def create_test_suite():
     """Return test suite for the intbitset data structure."""
     return unittest.TestSuite((
-        unittest.makeSuite(IntBitSetTest,'test'),
+        unittest.makeSuite(IntBitSetTest, 'test'),
         ))
 
 if __name__ == "__main__":
