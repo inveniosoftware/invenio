@@ -663,8 +663,11 @@ atlantis.cern.ch
 </define-tag>
 
 ## CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE -- when indexing, do you want to use
-## stemming?  If so, stem according to which language?  Use '' for
-## no stemming, 'en' for English.
+## stemming?  If so, according to which language do we stem?  Use '' for
+## no stemming, 'english' for English, or one of the languages supported by
+## Snowball's Stemmer: 'danish', 'dutch', 'english', 'finnish', 'french',
+## 'german', 'italian', 'norwegian', 'porter', 'portuguese', 'russian',
+## 'spanish', 'swedish'.
 ##  (example: "")
 <define-tag CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE whitespace=delete>
 </define-tag>
