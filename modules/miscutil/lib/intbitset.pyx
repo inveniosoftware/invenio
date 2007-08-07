@@ -48,7 +48,6 @@ cdef extern from "Python.h":
 cdef extern from "intbitset.h":
     ctypedef struct IntBitSet:
         size_t size
-        int tot
         word_t *bitset
     size_t wordbytesize
     size_t wordbitsize
@@ -90,10 +89,7 @@ cdef class intbitset:
     bitsets between various machine architectures.
     """
     cdef IntBitSet *bitset
-    #def __init__(intbitset self, rhs=0, int minsize=-1):
 
-        #if not self.bitset:
-            #raise ValueError, "Impossible to create intbitset"
     def __new__(intbitset self, rhs=0, int minsize=-1):
         """Initialize intbitset. rhs can be:
         int/long for creating allocating empty intbitset that will hold at least
@@ -120,20 +116,15 @@ cdef class intbitset:
             self.bitset = intBitSetCreate(rhs)
         elif type(rhs) is intbitset:
             self.bitset = intBitSetClone((<intbitset>rhs).bitset)
-        elif type(rhs) is str:
+        elif type(rhs) in (str, array):
             try:
+                if type(rhs) is array:
+                    rhs = rhs.tostring()
                 tmp = zlib.decompress(rhs)
                 PyObject_AsReadBuffer(tmp, &buf, &size)
                 self.bitset = intBitSetCreateFromBuffer(buf, size)
-            except:
-                raise ValueError, "rhs is corrupted"
-        elif type(rhs) is array:
-            try:
-                tmp = zlib.decompress(rhs.tostring())
-                PyObject_AsReadBuffer(tmp, &buf, &size)
-                self.bitset = intBitSetCreateFromBuffer(buf, size)
-            except:
-                raise ValueError, "rhs is corrupted"
+            except Exception, msg:
+                raise ValueError, "rhs is corrupted: %s" % msg
         elif hasattr(rhs, '__iter__'):
             try:
                 if minsize > -1:
@@ -146,17 +137,21 @@ cdef class intbitset:
                 for elem in rhs:
                     intBitSetAddElem(self.bitset, elem)
             except Exception, msg:
-                raise ValueError, "retrieving integers from rhs is impossible :%s" \
+                raise ValueError, "retrieving integers from rhs is impossible: %s" \
                     % msg
         else:
             raise TypeError, "rhs is of unknown type %s" % type(rhs)
+
     def __dealloc__(intbitset self):
         if self.bitset:
             intBitSetDestroy(self.bitset)
+
     def __contains__(intbitset self, unsigned int elem):
         return intBitSetIsInElem(self.bitset, elem) != 0
+
     def __cmp__(intbitset self, intbitset rhs):
         raise TypeError, "cannot compare intbitset using cmp()"
+
     def __richcmp__(intbitset self, intbitset rhs, int op):
         cdef short unsigned int tmp
         tmp = intBitSetCmp(self.bitset, rhs.bitset)
@@ -172,12 +167,16 @@ cdef class intbitset:
             return tmp == 2
         if op == 5: # >=
             return tmp in (0, 2)
+
     def __len__(intbitset self):
         return intBitSetGetTot(self.bitset)
+
     def __hash__(intbitset self):
         return hash(PyString_FromStringAndSize(<char *>self.bitset.bitset, wordbytesize * (intBitSetGetTot(self.bitset) / wordbitsize + 1)))
+
     def __nonzero__(intbitset self):
         return not intBitSetEmpty(self.bitset)
+
     def __iadd__(intbitset self, rhs):
         cdef size_t elem
         if isinstance(rhs, (int, long)):
@@ -188,6 +187,7 @@ cdef class intbitset:
             for elem in rhs:
                 intBitSetAddElem(self.bitset, elem)
         return self
+
     def __isub__(intbitset self, rhs):
         cdef size_t elem
         if isinstance(rhs, (int, long)):
@@ -198,39 +198,49 @@ cdef class intbitset:
             for elem in rhs:
                 intBitSetDelElem(self.bitset, elem)
         return self
+
     def __deepcopy__(intbitset self, memo):
         return intbitset(self)
+
     def __del__(intbitset self, size_t elem):
         intBitSetDelElem(self.bitset, elem)
+
     def __and__(intbitset self, intbitset rhs):
         ret = intbitset()
         intBitSetDestroy((<intbitset>ret).bitset)
         (<intbitset>ret).bitset = intBitSetIntersection(self.bitset, rhs.bitset)
         return ret
+
     def __or__(intbitset self, intbitset rhs):
         ret = intbitset()
         intBitSetDestroy((<intbitset>ret).bitset)
         (<intbitset>ret).bitset = intBitSetUnion(self.bitset, rhs.bitset)
         return ret
+
     def __xor__(intbitset self, intbitset rhs):
         ret = intbitset()
         intBitSetDestroy((<intbitset>ret).bitset)
         (<intbitset>ret).bitset = intBitSetXor(self.bitset, rhs.bitset)
         return ret
+
     def __sub__(intbitset self, intbitset rhs):
         ret = intbitset()
         intBitSetDestroy((<intbitset>ret).bitset)
         (<intbitset>ret).bitset = intBitSetSub(self.bitset, rhs.bitset)
         return ret
+
     def __iand__(intbitset self, intbitset rhs):
         intBitSetIIntersection(self.bitset, rhs.bitset)
         return self
+
     def __ior__(intbitset self, intbitset rhs):
         intBitSetIUnion(self.bitset, rhs.bitset)
         return self
+
     def __ixor__(intbitset self, intbitset rhs):
         intBitSetIXor(self.bitset, rhs.bitset)
         return self
+
     def __repr__(intbitset self):
         ret = "intbitset(["
         last = -1
@@ -242,64 +252,99 @@ cdef class intbitset:
             ret = ret[:-2]
         ret = ret + '])'
         return ret
+
+    def __str__(intbitset self):
+        cdef size_t tot = intBitSetGetTot(self.bitset)
+        if tot > 10:
+            begin_list = self.to_sorted_list(0, 5)
+            end_list = self.to_sorted_list(tot - 5, tot)
+            ret = "intbitset(["
+            for n in begin_list:
+                ret = ret + '%i, ' % n
+            ret = ret + "..., "
+            for n in end_list:
+                ret = ret + '%i, ' % n
+            ret = ret[:-2]
+            ret = ret + '])'
+            return ret
+        else:
+            return self.__repr__()
+
+
     def __iter__(intbitset self):
         return intbitset_iterator(self)
+
     def add(intbitset self, size_t elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
         intBitSetAddElem(self.bitset, elem)
+
     def clear(intbitset self):
         intBitSetReset(self.bitset)
+
     def difference(intbitset self, intbitset rhs):
         """Return the difference of two intbitsets as a new set.
         (i.e. all elements that are in this intbitset but not the other.)
         """
         return self.__sub__(rhs)
+
     def difference_update(intbitset self, intbitset rhs):
         """Remove all elements of another set from this set."""
         self.__isub__(rhs)
+
     def discard(intbitset self, size_t elem):
         """Remove an element from a intbitset if it is a member.
         If the element is not a member, do nothing."""
         intBitSetDelElem(self.bitset, elem)
+
     def intersection(intbitset self, intbitset rhs):
         """Return the intersection of two intbitsets as a new set.
         (i.e. all elements that are in both intbitsets.)
         """
         return self.__and__(rhs)
+
     def intersection_update(intbitset self, intbitset rhs):
         """Update a intbitset with the intersection of itself and another."""
         self.__iand__(rhs)
+
     def union(intbitset self, intbitset rhs):
         """Return the union of two intbitsets as a new set.
         (i.e. all elements that are in either intbitsets.)
         """
         return self.__or__(rhs)
+
     def union_update(intbitset self, intbitset rhs):
         """Update a intbitset with the union of itself and another."""
         self.__ior__(rhs)
+
     def issubset(intbitset self, intbitset rhs):
         """Report whether another set contains this set."""
         return self.__le__(rhs)
+
     def issuperset(intbitset self, intbitset rhs):
         """Report whether this set contains another set."""
         return self.__ge__(rhs)
+
     def symmetric_difference(intbitset self, intbitset rhs):
         """Return the symmetric difference of two sets as a new set.
         (i.e. all elements that are in exactly one of the sets.)
         """
         return self.__xor__(rhs)
+
     def symmetric_difference_update(intbitset self, intbitset rhs):
         """Update an intbitset with the symmetric difference of itself and another.
         """
         self.__ixor__(rhs)
+
     def fastdump(intbitset self):
         """Return a compressed string representation suitable to be saved
         somewhere."""
         return zlib.compress(PyString_FromStringAndSize(<char *>self.bitset.bitset, self.bitset.size * wordbytesize))
+
     def copy(intbitset self):
         """Return a shallow copy of a set."""
         return intbitset(self)
+
     def pop(intbitset self):
         """Remove and return an arbitrary set element."""
         cdef int ret
@@ -308,6 +353,7 @@ cdef class intbitset:
             raise KeyError, "pop from an empty intbitset"
         intBitSetDelElem(self.bitset, ret)
         return ret
+
     def remove(intbitset self, size_t elem):
         """Remove an element from a set; it must be a member.
         If the element is not a member, raise a KeyError.
@@ -316,27 +362,27 @@ cdef class intbitset:
             intBitSetDelElem(self.bitset, elem)
         else:
             raise KeyError, elem
+
     def fastload(intbitset self, strdump):
-        """Return a compressed string representation suitable to be saved
-        somewhere."""
+        """Load a compressed string representation produced by a previous call
+        to the fastdump method into the current intbitset. The previous content
+        will be replaced."""
         cdef size_t size
         cdef void *buf
-        if type(strdump) is str:
-            try:
-                tmp = zlib.decompress(strdump)
-                PyObject_AsReadBuffer(tmp, &buf, &size)
-                intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
-            except:
-                raise ValueError, "rhs is corrupted"
-        elif type(strdump) is array:
-            try:
-                tmp = zlib.decompress(strdump.tostring())
-                PyObject_AsReadBuffer(tmp, &buf, &size)
-                intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
-            except:
-                raise ValueError, "rhs is corrupted"
+        try:
+            if type(strdump) is array:
+                strdump = strdump.tostring()
+            tmp = zlib.decompress(strdump)
+            PyObject_AsReadBuffer(tmp, &buf, &size)
+            intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
+        except:
+            raise ValueError, "strdump is corrupted"
         return self
+
     def strbits(intbitset self):
+        """Return a string of 0s and 1s representing the content in memory
+        of the intbitset.
+        """
         cdef size_t i
         cdef size_t last
         last = 0
@@ -345,6 +391,7 @@ cdef class intbitset:
             ret = ret + '0'*(i-last)+'1'
             last = i+1
         return ret
+
     def update_with_signs(intbitset self, rhs):
         """Given a dictionary rhs whose keys are integers, remove all the integers
         whose value are less than 0 and add every integer whose value is 0 or more"""
@@ -357,6 +404,7 @@ cdef class intbitset:
                     intBitSetAddElem(self.bitset, value)
         except AttributeError:
             raise TypeError, "rhs should be a valid dictionary with integers keys and integer values"
+
 
     def get_sorted_element(intbitset self, int index):
         """Return element at position index in the sorted representation of the
@@ -411,14 +459,17 @@ def intbitsetfull(size_t size):
 cdef class intbitset_iterator:
     cdef int last
     cdef IntBitSet *bitset
+
     def __new__(intbitset_iterator self, intbitset bitset):
         self.last = -1
         self.bitset = bitset.bitset
+
     def __next__(intbitset_iterator self):
         self.last = intBitSetGetNext((<intbitset_iterator>self).bitset, self.last)
         if self.last < 0:
             self.last = -2
             raise StopIteration
         return self.last
+
     def __iter__(intbitset_iterator self):
         return self
