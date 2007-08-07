@@ -253,6 +253,29 @@ cdef class intbitset:
         ret = ret + '])'
         return ret
 
+    def __getreadbuffer__(intbitset self, int i, void **p):
+        if i != 0:
+            return -1
+        p[0] = (<intbitset >self).bitset
+        return (<intbitset >self).size * wordbytesize
+
+    def __getwritebuffer__(intbitset self, int i, void **p):
+        if i != 0:
+            raise SystemError
+        p[0] = (<intbitset >self).bitset
+        return (<intbitset >self).size * wordbytesize
+
+    def __getsegcount__(intbitset self, int *p):
+        if p != NULL:
+            p[0] = (<intbitset >self).size * wordbytesize
+        return 1
+
+    def __getcharbuffer__(intbitset self, int i, char **p):
+        if i != 0:
+            return -1
+        p[0] = <char *> (<intbitset >self).bitset
+        return (<intbitset >self).size * wordbytesize
+
     def __str__(intbitset self):
         cdef size_t tot = intBitSetGetTot(self.bitset)
         if tot > 10:
@@ -269,7 +292,6 @@ cdef class intbitset:
             return ret
         else:
             return self.__repr__()
-
 
     def __iter__(intbitset self):
         return intbitset_iterator(self)
