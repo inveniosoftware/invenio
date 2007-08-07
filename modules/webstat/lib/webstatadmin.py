@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -43,6 +43,7 @@ def main():
                                   "  -l, --event-label=NAME  set a descriptive label to the custom event\n"
                                   "  -a, --args=[NAME]       set column headers for additional custom event arguments\n"
                                   "                          (e.g. -a country,person,car)\n",
+              version=__revision__,
               specific_params=("n:r:Sl:a:c:", ["new-event=", "remove-event=", "show-events",
                                                "event-label", "args", "cache-events="]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
@@ -94,13 +95,13 @@ def task_submit_check_options():
         sys.exit(0)
 
     elif task_has_option("list_events"):
-        events = webstat._get_customevents() 
+        events = webstat._get_customevents()
         if len(events) == 0:
             print "There are no custom events available."
         else:
             print "Available custom events are:\n"
             print '\n'.join([x[0] + ": " + ((x[1] == None) and "No descriptive name" or str(x[1])) for x in events])
-        sys.exit(0) 
+        sys.exit(0)
 
     elif task_has_option("cache_events"):
         events = task_get_option("cache_events")
@@ -150,7 +151,7 @@ def task_run_core():
     if len(keyevents) > 0:
         for i in range(len(keyevents)):
             write_message("Caching key event 1: %s" % keyevents[i])
-            webstat.cache_keyevent_trend(keyevents)        
+            webstat.cache_keyevent_trend(keyevents)
             task_update_progress("Part 1/2: done %d/%d" % (i+1, len(keyevents)))
 
     # Cache custom events
@@ -158,7 +159,7 @@ def task_run_core():
     if len(customevents) > 0:
         for i in range(len(customevents)):
             write_message("Caching custom event 1: %s" % customevents[i])
-            webstat.cache_customevent_trend(customevents)        
+            webstat.cache_customevent_trend(customevents)
             task_update_progress("Part 2/2: done %d/%d" % (i+1, len(customevents)))
 
     write_message("Finished rawdata caching succesfully")

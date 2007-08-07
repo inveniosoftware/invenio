@@ -93,7 +93,7 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
                                          c=cds_query['collection'],
                                          p=cds_query['pattern'],
                                          f=cds_query['field'])
-        
+
 
         for item in res:
             recIDs.append(item)
@@ -519,10 +519,11 @@ Reformatting options:
   -c,  --collection     \t Force reformatting records by collection
   -f,  --field          \t Force reformatting records by field
   -p,  --pattern        \t Force reformatting records by pattern
-Pattern options:  
+Pattern options:
   -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
                         \t partial (p), any of the words (o) or all of the words (a)
 """,
+            version=__revision__,
             specific_params=("ac:f:p:lo:nm:",
                 ["all",
                 "collection=",

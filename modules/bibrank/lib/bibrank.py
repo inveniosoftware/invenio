@@ -191,6 +191,7 @@ def main():
                            check if update of ranking data is necessary
  -r, --repair              try to repair all records in the table(s)
 """,
+            version=__revision__,
             specific_params=("ladSi:m:c:kUrRM:f:w:", [
                 "lastupdate",
                 "add",

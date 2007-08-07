@@ -582,7 +582,8 @@ def main():
                 " oaiarchive --oaiset='setname' --info\n"
                 " oaiarchive -io 'setname'\n\n"
                 " Print OAI repository status\n"
-                " oaiarchive -r\n\n", help_specific_usage="Options:\n"
+                " oaiarchive -r\n\n",
+            help_specific_usage="Options:\n"
                 "  -o --oaiset=    Specify setSpec\n"
                 "Modes\n"
                 "  -a --add        Add records to OAI repository\n"
@@ -591,6 +592,7 @@ def main():
                 "  -i --info       Give info about OAI set (default)\n"
                 "Additional parameters:\n"
                 "  -p --upload     Upload records\n",
+            version=__revision__,
             specific_params=("ado:pirn", [
                 "add",
                 "delete",

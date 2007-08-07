@@ -1375,6 +1375,7 @@ Examples:
 \t\t\t2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
   -n, --notimechange\tdo not change record last modification date when updating
 """,
+            version=__revision__,
             specific_params=("ircazs:fn",
                  [
                    "insert",

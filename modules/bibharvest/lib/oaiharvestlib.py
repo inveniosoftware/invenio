@@ -546,6 +546,7 @@ def main():
                 ' -d, --dates=yyyy-mm-dd:yyyy-mm-dd          '
                 'harvest repositories between specified dates '
                 '(overrides repositories\' last updated timestamps)\n',
+            version=__revision__,
             specific_params=("r:d:", ["repository=", "dates=", ]),
             task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,

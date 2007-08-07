@@ -84,6 +84,7 @@ def main():
     task_init(authorization_action='runbibtaskex',
             authorization_msg="BibTaskEx Task Submission",
             help_specific_usage="""  -n,  --number            Print Fibonacci numbers for up to NUM. [default=30]\n""",
+            version=__revision__,
             specific_params=("n:",
                 ["number="]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,

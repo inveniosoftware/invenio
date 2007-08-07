@@ -466,6 +466,7 @@ def main():
             authorization_msg="SessionGC Task Submission",
             help_specific_usage="  -f, --filesystem\t\t Clean up the"
                 " filesystem.\n",
+            version=__revision__,
             specific_params=("f", ["filesystem"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)

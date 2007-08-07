@@ -55,6 +55,7 @@ def task_init(
     authorization_msg="",
     description="",
     help_specific_usage="",
+    version=__revision__,
     specific_params=("", []),
     task_stop_helper_fnc=None,
     task_submit_elaborate_specific_parameter_fnc=None,
@@ -81,6 +82,7 @@ def task_init(
     _options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
     _options["sleeptime"] = ""
     _options["verbose"] = 1
+    _options["version"] = version
     _task_params["task_name"] = os.path.basename(sys.argv[0])
     _task_params["task_stop_helper_fnc"] = task_stop_helper_fnc
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -117,7 +119,7 @@ def task_init(
                 if opt[0] in ["-h", "--help"]:
                     _usage(0, help_specific_usage=help_specific_usage, description=description)
                 elif opt[0] in ["-V", "--version"]:
-                    print __revision__
+                    print _options["version"]
                     sys.exit(0)
                 elif opt[0] in [ "-u", "--user"]:
                     _options["user"] = opt[1]

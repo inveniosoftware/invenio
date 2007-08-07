@@ -1240,6 +1240,7 @@ def main():
   -M, --maxmem=XXX\tmaximum memory usage in kB (no limit)
   -f, --flush=NNN\t\tfull consistent table flush after NNN records (10000)
 """,
+            version=__revision__,
             specific_params=("adi:m:c:w:krM:f:", [
                 "add",
                 "del",
