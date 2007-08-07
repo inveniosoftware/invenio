@@ -253,6 +253,25 @@ cdef class intbitset:
         ret = ret + '])'
         return ret
 
+    def __str__(intbitset self):
+        cdef size_t tot
+        tot = intBitSetGetTot(self.bitset)
+        if tot > 10:
+            begin_list = self.to_sorted_list(0, 5)
+            end_list = self.to_sorted_list(tot - 5, tot)
+            ret = "intbitset(["
+            for n in begin_list:
+                ret = ret + '%i, ' % n
+            ret = ret + "..., "
+            for n in end_list:
+                ret = ret + '%i, ' % n
+            ret = ret[:-2]
+            ret = ret + '])'
+            return ret
+        else:
+            return self.__repr__()
+
+    # Buffer interface
     def __getreadbuffer__(intbitset self, int i, void **p):
         if i != 0:
             return -1
@@ -276,27 +295,11 @@ cdef class intbitset:
         p[0] = <char *> (<intbitset >self).bitset
         return (<intbitset >self).size * wordbytesize
 
-    def __str__(intbitset self):
-        cdef size_t tot
-        tot = intBitSetGetTot(self.bitset)
-        if tot > 10:
-            begin_list = self.to_sorted_list(0, 5)
-            end_list = self.to_sorted_list(tot - 5, tot)
-            ret = "intbitset(["
-            for n in begin_list:
-                ret = ret + '%i, ' % n
-            ret = ret + "..., "
-            for n in end_list:
-                ret = ret + '%i, ' % n
-            ret = ret[:-2]
-            ret = ret + '])'
-            return ret
-        else:
-            return self.__repr__()
-
+    # Iterator interface
     def __iter__(intbitset self):
         return intbitset_iterator(self)
 
+    # Customized interface
     def add(intbitset self, size_t elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
@@ -359,10 +362,27 @@ cdef class intbitset:
         """
         self.__ixor__(rhs)
 
+    # Dumping & Loading
     def fastdump(intbitset self):
         """Return a compressed string representation suitable to be saved
         somewhere."""
         return zlib.compress(PyString_FromStringAndSize(<char *>self.bitset.bitset, self.bitset.size * wordbytesize))
+
+    def fastload(intbitset self, strdump):
+        """Load a compressed string representation produced by a previous call
+        to the fastdump method into the current intbitset. The previous content
+        will be replaced."""
+        cdef size_t size
+        cdef void *buf
+        try:
+            if type(strdump) is array:
+                strdump = strdump.tostring()
+            tmp = zlib.decompress(strdump)
+            PyObject_AsReadBuffer(tmp, &buf, &size)
+            intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
+        except:
+            raise ValueError, "strdump is corrupted"
+        return self
 
     def copy(intbitset self):
         """Return a shallow copy of a set."""
@@ -385,22 +405,6 @@ cdef class intbitset:
             intBitSetDelElem(self.bitset, elem)
         else:
             raise KeyError, elem
-
-    def fastload(intbitset self, strdump):
-        """Load a compressed string representation produced by a previous call
-        to the fastdump method into the current intbitset. The previous content
-        will be replaced."""
-        cdef size_t size
-        cdef void *buf
-        try:
-            if type(strdump) is array:
-                strdump = strdump.tostring()
-            tmp = zlib.decompress(strdump)
-            PyObject_AsReadBuffer(tmp, &buf, &size)
-            intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
-        except:
-            raise ValueError, "strdump is corrupted"
-        return self
 
     def strbits(intbitset self):
         """Return a string of 0s and 1s representing the content in memory
@@ -427,7 +431,6 @@ cdef class intbitset:
                     intBitSetAddElem(self.bitset, value)
         except AttributeError:
             raise TypeError, "rhs should be a valid dictionary with integers keys and integer values"
-
 
     def get_sorted_element(intbitset self, int index):
         """Return element at position index in the sorted representation of the
