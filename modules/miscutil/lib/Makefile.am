@@ -38,7 +38,8 @@ pylib_DATA = __init__.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
 	     urlutils.py \
-	     w3c_validator.py
+	     w3c_validator.py \
+             intbitset_tests.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \
@@ -71,7 +72,8 @@ EXTRA_DIST = __init__.py \
              intbitset.pyx \
              intbitset.h \
              intbitset_impl.c \
-             intbitset_setup.py
+             intbitset_setup.py \
+             intbitset_tests.py
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
