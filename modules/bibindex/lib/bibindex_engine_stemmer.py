@@ -408,7 +408,7 @@ except ImportError:
         return lang == 'english'
 
     def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
-        """Return WORD stemmed according to language LANG (e.g. 'en')."""
+        """Return WORD stemmed according to language LANG (e.g. 'english')."""
         if lang == 'english':
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
         else:

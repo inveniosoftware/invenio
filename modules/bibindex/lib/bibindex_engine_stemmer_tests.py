@@ -55,7 +55,7 @@ class TestStemmer(unittest.TestCase):
                               ['e^-', 'e^-']]
         for test_word, expected_result in english_test_cases:
             self.assertEqual(expected_result,
-                             bibindex_engine_stemmer.stem(test_word, "en"))
+                             bibindex_engine_stemmer.stem(test_word, "english"))
 
 def create_test_suite():
     """Return test suite for the indexing engine."""
