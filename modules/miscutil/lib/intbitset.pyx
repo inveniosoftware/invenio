@@ -277,7 +277,8 @@ cdef class intbitset:
         return (<intbitset >self).size * wordbytesize
 
     def __str__(intbitset self):
-        cdef size_t tot = intBitSetGetTot(self.bitset)
+        cdef size_t tot
+        tot = intBitSetGetTot(self.bitset)
         if tot > 10:
             begin_list = self.to_sorted_list(0, 5)
             end_list = self.to_sorted_list(tot - 5, tot)
