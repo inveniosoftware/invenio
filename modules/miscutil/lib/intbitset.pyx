@@ -319,7 +319,22 @@ cdef class intbitset:
     def fastload(intbitset self, strdump):
         """Return a compressed string representation suitable to be saved
         somewhere."""
-        self = intbitset(strdump)
+        cdef size_t size
+        cdef void *buf
+        if type(strdump) is str:
+            try:
+                tmp = zlib.decompress(strdump)
+                PyObject_AsReadBuffer(tmp, &buf, &size)
+                intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
+            except:
+                raise ValueError, "rhs is corrupted"
+        elif type(strdump) is array:
+            try:
+                tmp = zlib.decompress(strdump.tostring())
+                PyObject_AsReadBuffer(tmp, &buf, &size)
+                intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
+            except:
+                raise ValueError, "rhs is corrupted"
         return self
     def strbits(intbitset self):
         cdef size_t i
