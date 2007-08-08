@@ -228,7 +228,9 @@ def authenticate(user, authorization_action, authorization_msg=""):
     Return user name upon authorization success,
     do system exit upon authorization failure.
     """
-    if CFG_EXTERNAL_AUTH_USING_SSO: # With SSO it's impossible to check for pwd
+    # With SSO it's impossible to check for pwd
+    if CFG_EXTERNAL_AUTH_USING_SSO or \
+            _task_params['task_name'] in cfg_valid_processes_no_auth_needed:
         return user
     if authorization_msg:
         print authorization_msg
@@ -284,11 +286,10 @@ def _task_submit(authorization_action, authorization_msg):
     ## sanity check: remove eventual "task" option:
     if _options.has_key("task"):
         del _options["task"]
+
     ## authenticate user:
-    if not _task_params['task_name'] in cfg_valid_processes_no_auth_needed:
-        _options['user'] = authenticate(_options.get("user", ""), authorization_action, authorization_msg)
-    else:
-        _options['user'] = ''
+    _options['user'] = authenticate(_options.get("user", ""), authorization_action, authorization_msg)
+
     ## submit task:
     if _options["verbose"] >= 9:
         print ""
@@ -299,6 +300,7 @@ def _task_submit(authorization_action, authorization_msg):
         (_task_params['task_name'], _options['user'], _options["runtime"],
         _options["sleeptime"],
         marshal.dumps(_options)))
+
     ## update task number:
     _options["task"] = _task_params['task_id']
     run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
