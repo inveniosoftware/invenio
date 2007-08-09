@@ -39,10 +39,26 @@ import sys
 import os
 
 from cStringIO import StringIO
-from xml.xpath import Evaluate
-from xml.dom import minidom, Node
-from xml.xpath.Context import Context
+processor_type = -1
+try:
+    # Try to load
+    from xml.xpath import Evaluate
+    from xml.dom import minidom, Node
+    from xml.xpath.Context import Context
+    processor_type = 0
+except ImportError:
+    pass
 
+# TODO: Try to explicitely load 4suite Xpath 
+# <http://4suite.org/docs/howto/UNIX.xml#PyXML>
+# From <http://uche.ogbuji.net/tech/akara/nodes/2003-01-01/basic-xpath>:
+## 1. PyXML usage (do not use with 4Suite)
+##        * import xml.xslt
+##        * import xml.xpath
+## 2. 4Suite usage (use these imports)
+##        * import Ft.Xml.XPath
+##        * import Ft.Xml.Xslt
+    
 from invenio import bibformat_bfx_engine
 from invenio.config import etcdir
 
@@ -59,11 +75,17 @@ def convert(xmltext, template_filename=None, template_source=None):
     for templates. If not found, template_filename will be assumed to be a path to
     a template. If none can be found, return None.
 
+    Raises an exception if cannot find an appropriate XPath module.
+
     @param xmltext The string representation of the XML to process
     @param template_filename The name of the template to use for the processing
     @param template_source The configuration describing the processing.
     @return the transformed XML text.
     """
+    if processor_type == -1:
+        # No XPath processor found
+        raise "No XPath processor could be found"
+    
     # Retrieve template and read it
     if template_source:
         template = template_source

@@ -44,12 +44,15 @@ try:
     from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
     from invenio.config import *
     from invenio import bibconvert
-    from invenio import bibconvert_bfx_engine
-    from invenio import bibconvert_xslt_engine
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
-
+    
+try:
+    from invenio import bibconvert_bfx_engine
+    from invenio import bibconvert_xslt_engine
+except ImportError, e:
+    print "Warning: %s" % e
 
 def printInfo():
     "print out when not enough parmeters given"
@@ -246,12 +249,20 @@ if opt_value.endswith('.'+
                       CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
     # BibConvert for bfx
     source_xml = sys.stdin.read()
-    print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
-    
+    try:
+        print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
+    except:
+        print "Error: cannot use BibConvert BFX engine."
+        print "A compliant XSLT library is needed. See Invenio INSTALL guide."
+        
 elif opt_value.endswith('.xsl'):
     # BibConvert for XSLT
     source_xml = sys.stdin.read()
-    print bibconvert_xslt_engine.convert(source_xml, extract_tpl)
+    try:
+        print bibconvert_xslt_engine.convert(source_xml, extract_tpl)
+    except:
+        print "Error: cannot use BibConvert XSL engine."
+        print "A compliant XML parser is needed. See Invenio INSTALL guide."
 else:
     # BibConvert for cfg
 

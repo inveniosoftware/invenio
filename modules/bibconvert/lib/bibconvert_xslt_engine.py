@@ -77,12 +77,6 @@ if processor_type == -1:
     except ImportError:
         pass
 
-if processor_type == -1:
-    # No XSLT processor found
-    sys.stderr.write('No XSLT processor could be found.\n' \
-                     'No output produced.\n')
-    sys.exit(1)
-
 CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
 
 def bibconvert_function_libxslt(ctx, value, func):
@@ -159,17 +153,18 @@ def convert(xmltext, template_filename=None, template_source=None):
     for templates. If not found, template_filename will be assumed to be a path to
     a template. If none can be found, return None.
 
+    Raises an exception if cannot find an appropriate XSLT processor.
+
+
     @param xmltext The string representation of the XML to process
     @param template_filename The name of the template to use for the processing
     @param template_source The configuration describing the processing.
     @return the transformed XML text.
     """
-    
     if processor_type == -1:
         # No XSLT processor found
-        sys.stderr.write('No XSLT processor could be found.')
-        sys.exit(1)
-
+        raise "No XSLT processor could be found"
+    
     # Retrieve template and read it
     if template_source:
         template = template_source
