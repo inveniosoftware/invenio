@@ -416,7 +416,8 @@ cdef class intbitset:
         try:
             if type(strdump) is array:
                 strdump = strdump.tostring()
-            PyObject_AsReadBuffer(zlib.decompress(strdump), &buf, &size)
+            tmp = zlib.decompress(strdump)
+            PyObject_AsReadBuffer(tmp, &buf, &size)
             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
         except:
             raise ValueError, "strdump is corrupted"
