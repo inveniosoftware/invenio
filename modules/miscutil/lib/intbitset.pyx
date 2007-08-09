@@ -33,35 +33,34 @@ import zlib
 from array import array
 
 ctypedef unsigned long long int word_t
-ctypedef unsigned int size_t
-ctypedef unsigned long int Py_ssize_t
 ctypedef unsigned char bool_t
+ctypedef unsigned long long int Py_ssize_t
 
 cdef extern from "Python.h":
-    object PyString_FromStringAndSize(char *s, int len)
-    int PyObject_AsReadBuffer(object obj, void **buf, int *buf_len)
+    object PyString_FromStringAndSize(char *s, Py_ssize_t len)
+    int PyObject_AsCharBuffer(object obj, char **buf, Py_ssize_t *buf_len)
 
 cdef extern from "intbitset.h":
     ctypedef struct IntBitSet:
         int size
-        size_t allocated
+        int allocated
         word_t universe
         int tot
         word_t *bitset
-    size_t wordbytesize
-    size_t wordbitsize
-    IntBitSet *intBitSetCreate(size_t size, bool_t universe)
-    IntBitSet *intBitSetCreateFromBuffer(void *buf, size_t bufsize)
-    IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, size_t bufsize)
+    int wordbytesize
+    int wordbitsize
+    IntBitSet *intBitSetCreate(int size, bool_t universe)
+    IntBitSet *intBitSetCreateFromBuffer(void *buf, int bufsize)
+    IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, int bufsize)
     IntBitSet *intBitSetReset(IntBitSet *bitset)
     void intBitSetDestroy(IntBitSet *bitset)
     IntBitSet *intBitSetClone(IntBitSet *bitset)
     int intBitSetGetSize(IntBitSet *bitset)
     int intBitSetGetAllocated(IntBitSet *bitset)
-    size_t intBitSetGetTot(IntBitSet * bitset)
-    bool_t intBitSetIsInElem(IntBitSet *bitset, size_t elem)
-    void intBitSetAddElem(IntBitSet *bitset, size_t elem)
-    void intBitSetDelElem(IntBitSet *bitset, size_t elem)
+    int intBitSetGetTot(IntBitSet * bitset)
+    bool_t intBitSetIsInElem(IntBitSet *bitset, int elem)
+    void intBitSetAddElem(IntBitSet *bitset, int elem)
+    void intBitSetDelElem(IntBitSet *bitset, int elem)
     bool_t intBitSetEmpty(IntBitSet *bitset)
     IntBitSet *intBitSetUnion(IntBitSet *x, IntBitSet *y)
     IntBitSet *intBitSetIntersection(IntBitSet *x, IntBitSet *y)
@@ -89,7 +88,7 @@ cdef class intbitset:
     """
     cdef IntBitSet *bitset
 
-    def __new__(self, rhs=0, int minsize=-1, universe=0):
+    def __new__(self, rhs=0, int minsize=-1, object universe=0):
         """Initialize intbitset. rhs can be:
         int/long for creating allocating empty intbitset that will hold at least
             rhs elements, before being resized
@@ -102,21 +101,14 @@ cdef class intbitset:
             enough space to hold up to minsize integers, otherwise the biggest
             element of the sequence will be used.
         """
-        cdef int size
-        cdef void *buf
-        cdef size_t elem
-        cdef char *msg
-        cdef size_t i
-        cdef size_t last
-        cdef size_t remelem
+        cdef Py_ssize_t size
+        cdef char *buf
+        cdef int elem
+        cdef int i
+        cdef int last
+        cdef int remelem
         msg = "Error"
         self.bitset = NULL
-        buf = NULL
-        size = 0
-        elem = 0
-        i = 0
-        last = 0
-        remelem = 0
         if type(rhs) in (int, long):
             if rhs < 0:
                 raise ValueError, "rhs can't be negative"
@@ -128,7 +120,7 @@ cdef class intbitset:
                 if type(rhs) is array:
                     rhs = rhs.tostring()
                 tmp = zlib.decompress(rhs)
-                if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
+                if PyObject_AsCharBuffer(tmp, &buf, &size) < 0:
                     raise Exception, "Buffer error!!!"
                 self.bitset = intBitSetCreateFromBuffer(buf, size)
             except Exception, msg:
@@ -193,7 +185,7 @@ cdef class intbitset:
         return not intBitSetEmpty(self.bitset)
 
     def __iadd__(self, rhs):
-        cdef size_t elem
+        cdef int elem
         if isinstance(rhs, (int, long)):
             intBitSetAddElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
@@ -204,7 +196,7 @@ cdef class intbitset:
         return self
 
     def __isub__(self, rhs):
-        cdef size_t elem
+        cdef int elem
         if isinstance(rhs, (int, long)):
             intBitSetDelElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
@@ -217,7 +209,7 @@ cdef class intbitset:
     def __deepcopy__(self, memo):
         return intbitset(self)
 
-    def __del__(self, size_t elem):
+    def __del__(self, int elem):
         intBitSetDelElem(self.bitset, elem)
 
     def __and__(self, intbitset rhs not None):
@@ -336,7 +328,7 @@ cdef class intbitset:
         return intbitset_iterator(self)
 
     # Customized interface
-    def add(self, size_t elem):
+    def add(self, int elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
         intBitSetAddElem(self.bitset, elem)
@@ -354,7 +346,7 @@ cdef class intbitset:
         """Remove all elements of another set from this set."""
         self.__isub__(rhs)
 
-    def discard(self, size_t elem):
+    def discard(self, int elem):
         """Remove an element from a intbitset if it is a member.
         If the element is not a member, do nothing."""
         intBitSetDelElem(self.bitset, elem)
@@ -402,22 +394,25 @@ cdef class intbitset:
     def fastdump(self):
         """Return a compressed string representation suitable to be saved
         somewhere."""
-        cdef int size
+        cdef Py_ssize_t size
         size = intBitSetGetSize((<intbitset> self).bitset)
         assert(size < self.bitset.allocated)
         return zlib.compress(PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize))
 
-    def fastload(self, strdump):
+    def fastload(self, object strdump):
         """Load a compressed string representation produced by a previous call
         to the fastdump method into the current intbitset. The previous content
         will be replaced."""
-        cdef int size
-        cdef void *buf
+        cdef Py_ssize_t size
+        cdef char *buf
+        buf = NULL
+        size = 0
         try:
             if type(strdump) is array:
                 strdump = strdump.tostring()
+            # tmp needed to not be garbage collected
             tmp = zlib.decompress(strdump)
-            PyObject_AsReadBuffer(tmp, &buf, &size)
+            x = PyObject_AsCharBuffer(tmp, &buf, &size)
             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
         except:
             raise ValueError, "strdump is corrupted"
@@ -436,7 +431,7 @@ cdef class intbitset:
         intBitSetDelElem(self.bitset, ret)
         return ret
 
-    def remove(self, size_t elem):
+    def remove(self, int elem):
         """Remove an element from a set; it must be a member.
         If the element is not a member, raise a KeyError.
         """
@@ -449,8 +444,8 @@ cdef class intbitset:
         """Return a string of 0s and 1s representing the content in memory
         of the intbitset.
         """
-        cdef size_t i
-        cdef size_t last
+        cdef int i
+        cdef int last
         if (<intbitset> self).bitset.universe:
             raise OverflowError, "It's impossible to print universe."
         last = 0
@@ -463,7 +458,7 @@ cdef class intbitset:
     def update_with_signs(self, rhs):
         """Given a dictionary rhs whose keys are integers, remove all the integers
         whose value are less than 0 and add every integer whose value is 0 or more"""
-        cdef size_t value
+        cdef int value
         try:
             for value, sign in rhs.items():
                 if sign < 0:
@@ -483,9 +478,9 @@ cdef class intbitset:
     def get_sorted_element(self, int index):
         """Return element at position index in the sorted representation of the
         set. Note that index must be less than len(self)"""
-        cdef size_t l
+        cdef int l
         cdef int last
-        cdef size_t i
+        cdef int i
         l = intBitSetGetTot(self.bitset)
         if index < 0:
             index = index + l
@@ -500,9 +495,9 @@ cdef class intbitset:
     def to_sorted_list(self, int i, int j):
         """Return a sublist of the sorted representation of the set.
         Note, negative indices are not supported."""
-        cdef size_t l
+        cdef int l
         cdef int last
-        cdef size_t cnt
+        cdef int cnt
         l = intBitSetGetTot(self.bitset)
         if i == 0 and j == -1:
             return intbitset(self)
