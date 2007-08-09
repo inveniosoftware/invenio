@@ -41,7 +41,7 @@ from invenio.bibindex_engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status
-from invenio.intbitset import intbitsetfull
+from invenio.intbitset import intbitset
 
 options = {} # global variable to hold task options
 
@@ -903,7 +903,7 @@ def get_valid_range(rank_method_code):
     #else:
     #    recIDs = []
 
-    valid = intbitsetfull(CFG_MAX_RECID+1)
+    valid = intbitset(universe=True)
     valid.discard(0)
 
     #valid.addlist(recIDs)

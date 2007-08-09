@@ -43,7 +43,6 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
-     CFG_MAX_RECID, \
      weburl
 from invenio.bibindex_engine_config import *
 from invenio.search_engine import perform_request_search, strip_accents
@@ -698,7 +697,7 @@ class WordTable:
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
-            set = intbitset(self.value[word].keys(), CFG_MAX_RECID+1)
+            set = intbitset(self.value[word].keys())
             run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
                 (word, set.fastdump()))
 

@@ -27,24 +27,26 @@ extern const size_t wordbytesize;
 extern const size_t wordbitsize;
 
 typedef struct {
-    size_t size;
+    int size;
+    size_t allocated;
+    word_t universe;
     int tot;
     word_t *bitset;
 } IntBitSet;
 
-IntBitSet *intBitSetCreate(const register size_t size);
-IntBitSet *intBitSetCreateFull(const register size_t size);
+IntBitSet *intBitSetCreate(register const size_t size, const bool_t universe);
 IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const size_t bufsize);
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const size_t bufsize);
 IntBitSet *intBitSetReset(IntBitSet *const bitset);
 void intBitSetDestroy(IntBitSet *const bitset);
 IntBitSet *intBitSetClone(const IntBitSet * const bitset);
-size_t intBitSetGetSize(const IntBitSet * const bitset);
+size_t intBitSetGetSize(IntBitSet * const bitset);
+size_t intBitSetGetAllocated(const IntBitSet * const bitset);
 size_t intBitSetGetTot(IntBitSet * const bitset);
-void intBitSetResize(IntBitSet *const bitset, const register size_t size);
-bool_t intBitSetIsInElem(const IntBitSet * const bitset, const register size_t elem);
-void intBitSetAddElem(IntBitSet *const bitset, const register size_t elem);
-void intBitSetDelElem(IntBitSet *const bitset, const register size_t elem);
+void intBitSetResize(IntBitSet *const bitset, register const size_t allocated);
+bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const size_t elem);
+void intBitSetAddElem(IntBitSet *const bitset, register const size_t elem);
+void intBitSetDelElem(IntBitSet *const bitset, register const size_t elem);
 bool_t intBitSetEmpty(const IntBitSet * const bitset);
 IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y);
 IntBitSet *intBitSetXor(IntBitSet *const x, IntBitSet *const y);
@@ -54,6 +56,7 @@ IntBitSet *intBitSetIUnion(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetIXor(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetIIntersection(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetISub(IntBitSet *const x, IntBitSet *const y);
+size_t intBitSetAdapt(IntBitSet *const x, IntBitSet *const y);
 int intBitSetGetNext(const IntBitSet *const x, register int last);
 /** Compare.
  * Compare two intbitset.

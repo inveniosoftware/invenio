@@ -28,10 +28,9 @@ import traceback
 import ConfigParser
 
 from invenio.config import \
-     CFG_MAX_RECID, \
      cdslang, \
      etcdir
-from invenio.search_engine import perform_request_search, HitSet, intbitsetfull
+from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
@@ -129,7 +128,7 @@ def single_tag_rank(config):
     for (recids, recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
-        valid = intbitsetfull(CFG_MAX_RECID + 1)
+        valid = HitSet(universe=True)
         valid.discard(0)
         for key in tags:
             newset = HitSet()

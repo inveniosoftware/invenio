@@ -29,55 +29,56 @@ const short unsigned int wordbitpow = (sizeof(word_t) == 8) ? 6 : 5;
 const short unsigned int wordbytepow = (sizeof(word_t) == 8) ? 3 : 2;
 
 
-IntBitSet *intBitSetCreate(const register size_t size) {
-    IntBitSet *ret = malloc(sizeof(IntBitSet));
-    ret->size = (size / wordbitsize + 1);
-    ret->bitset = calloc(ret->size, wordbytesize);
-    ret->tot = 0;
-    return ret;
-}
-
-IntBitSet *intBitSetCreateFull(const register size_t size) {
+IntBitSet *intBitSetCreate(register const size_t size, const bool_t universe) {
     register word_t *base;
-    register word_t *end;
-    register word_t i;
+    const register word_t *end;
     IntBitSet *ret = malloc(sizeof(IntBitSet));
-    ret->size = (size / wordbitsize + 1);
-    ret->tot = size;
-    base = ret->bitset = malloc(ret->size * wordbytesize);
-    end = base + ret->size - 1;
-    for (; base < end; ++base)
-        *base = (word_t) ~0;
-    *base = 0;
-    for (i=0; i< (size % wordbitsize); ++i)
-        *base |= ((word_t) 1 << i);
+    // At least one word -> the one who represent the universe
+    ret->allocated = (size / wordbitsize + 1);
+    ret->size = 0; // universe
+    ret->universe = universe ? (word_t) ~0 : 0;
+    if (universe) {
+        base = ret->bitset = malloc(ret->allocated * wordbytesize);
+        end = base + ret->allocated;
+        for (; base < end; ++base)
+            *base = (word_t) ~0;
+        ret->tot = -1;
+    } else {
+        ret->bitset = calloc(ret->allocated, wordbytesize);
+        ret->tot = 0;
+    }
     return ret;
 }
 
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const size_t bufsize) {
-    bitset->size = bufsize/wordbytesize;
+    bitset->allocated = bufsize/wordbytesize;
     bitset->bitset = realloc(bitset->bitset, bufsize);
     bitset->tot = -1;
+    bitset->size = -1;
     memcpy(bitset->bitset, buf, bufsize);
+    bitset->universe = *(bitset->bitset + bitset->allocated - 1);
     return bitset;
 }
 
 IntBitSet *intBitSetReset(IntBitSet *const bitset) {
     register word_t *base = bitset->bitset;
-    const register word_t *end = bitset->bitset+bitset->size;
+    const register word_t *end = bitset->bitset+bitset->allocated;
     for (; base<end; ++base)
-        *base = 0;
-    bitset->tot = 0;
+        *base = bitset->universe;
+    bitset->tot = bitset->universe ? -1 : 0;
+    bitset->size = 0;
     return bitset;
 }
 
 
 IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const size_t bufsize) {
     IntBitSet *ret = malloc(sizeof(IntBitSet));
-    ret->size = bufsize/wordbytesize;
+    ret->allocated = bufsize/wordbytesize;
     ret->bitset = malloc(bufsize);
+    ret->size = -1;
     ret->tot = -1;
     memcpy(ret->bitset, buf, bufsize);
+    ret->universe = ret->bitset[ret->allocated - 1];
     return ret;
 }
 
@@ -91,21 +92,34 @@ IntBitSet *intBitSetClone(const IntBitSet * const bitset) {
     IntBitSet *ret = malloc(sizeof(IntBitSet));
     ret->size = bitset->size;
     ret->tot = bitset->tot;
-    ret->bitset = malloc(ret->size * wordbytesize);
-    memcpy(ret->bitset, bitset->bitset, ret->size * wordbytesize);
+    ret->universe = bitset->universe;
+    ret->allocated = bitset->allocated;
+    ret->bitset = malloc(bitset->allocated * wordbytesize);
+    memcpy(ret->bitset, bitset->bitset, bitset->allocated * wordbytesize);
     return ret;
 }
 
-size_t intBitSetGetSize(const IntBitSet * const bitset) {
-    return bitset->size * wordbitsize;
+size_t intBitSetGetSize(IntBitSet * const bitset) {
+    register word_t *base;
+    register word_t *end;
+    if (bitset->size >= 0)
+        return bitset->size;
+    base = bitset->bitset;
+    end = bitset->bitset + bitset->allocated - 2;
+    for (; base < end && *end == bitset->universe; --end);
+    bitset->size = ((size_t) (end - base) + 1);
+    return bitset->size;
 }
 
 size_t intBitSetGetTot(IntBitSet *const bitset) {
     register word_t* base;
     register unsigned short int i;
     register size_t tot;
-    const register word_t *end = bitset->bitset + bitset->size;
+    register word_t *end;
+    if (bitset->universe)
+        return -1;
     if (bitset->tot < 0) {
+        end = bitset->bitset + bitset->allocated;
         tot = 0;
         for (base = bitset->bitset; base < end; ++base)
             if (*base)
@@ -118,42 +132,69 @@ size_t intBitSetGetTot(IntBitSet *const bitset) {
     return bitset->tot;
 }
 
-void intBitSetResize(IntBitSet *const bitset, const register size_t size) {
-    register size_t i;
-    register size_t newsize = size / wordbitsize + 1;
-    register word_t *ptr;
-    if (newsize > bitset->size) {
-        bitset->bitset = realloc(bitset->bitset, newsize * wordbytesize);
-        for (i=bitset->size, ptr=bitset->bitset+bitset->size; i<newsize; ++i, ++ptr)
-            *(ptr) = 0;
-        bitset->size = newsize;
+size_t intBitSetGetAllocated(const IntBitSet * const bitset) {
+    return bitset->allocated;
+}
+
+void intBitSetResize(IntBitSet *const bitset, register const size_t allocated) {
+    register word_t *base;
+    register word_t *end;
+    if (allocated > bitset->allocated)  {
+        bitset->bitset = realloc(bitset->bitset, allocated * wordbytesize);
+        base = bitset->bitset + bitset->allocated;
+        end = bitset->bitset + allocated;
+        for (; base<end; ++base)
+            *(base) = bitset->universe;
+        bitset->allocated = allocated;
     }
 }
 
-bool_t intBitSetIsInElem(const IntBitSet * const bitset, const register size_t elem) {
-    return ((elem < bitset->size * wordbitsize) ?
-            (bitset->bitset[elem / wordbitsize] & ((word_t) 1 << ((word_t)elem % (word_t)wordbitsize))) != 0 : 0);
+bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const size_t elem) {
+    return ((elem < bitset->allocated * wordbitsize) ?
+            (bitset->bitset[elem / wordbitsize] & ((word_t) 1 << ((word_t)elem % (word_t)wordbitsize))) != 0 : bitset->universe != 0);
 }
 
-void intBitSetAddElem(IntBitSet *const bitset, const register size_t elem) {
-    if (elem >= bitset->size * wordbitsize) intBitSetResize(bitset, elem+elem/10);
+void intBitSetAddElem(IntBitSet *const bitset, register const size_t elem) {
+    if (elem >= (bitset->allocated - 1) * wordbitsize)
+        if (bitset->universe)
+            return;
+        else
+            intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
     bitset->bitset[elem / wordbitsize] |= ((word_t) 1 << (elem % wordbitsize));
     bitset->tot = -1;
+    bitset->size = -1;
 }
 
-void intBitSetDelElem(IntBitSet *const bitset, const register size_t elem) {
-    if (elem >= bitset->size * wordbitsize) return;
-    bitset->bitset[elem / wordbitsize] &= ~ (1 << (elem % wordbitsize));
+void intBitSetDelElem(IntBitSet *const bitset, register const size_t elem) {
+    if (elem >= (bitset->allocated - 1) * wordbitsize)
+        if (!bitset->universe)
+            return;
+        else
+            intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
+    bitset->bitset[elem / wordbitsize] &= (word_t) ~((word_t) 1 << (elem % wordbitsize));
     bitset->tot = -1;
+    bitset->size = -1;
 }
 
 bool_t intBitSetEmpty(const IntBitSet *const bitset) {
     register size_t i;
     register word_t *ptr;
+    if (bitset->universe) return 0;
     if (bitset->tot == 0) return 1;
     for (i = 0, ptr=bitset->bitset; i < bitset->size; ++i, ++ptr)
         if (*ptr) return 0;
     return 1;
+}
+
+size_t intBitSetAdapt(IntBitSet *const x, IntBitSet *const y) {
+    register size_t sizex = intBitSetGetSize(x);
+    register size_t sizey = intBitSetGetSize(y);
+    register size_t sizemax = (sizex > sizey) ? sizex : sizey;
+    if (sizemax > x->allocated-1)
+        intBitSetResize(x, sizemax+1);
+    if (sizemax > y->allocated-1)
+        intBitSetResize(y, sizemax+1);
+    return sizemax+1;
 }
 
 IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y) {
@@ -162,17 +203,16 @@ IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y) {
     register word_t *ybase;
     register word_t *retbase;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
-    if (x->size > y->size)
-        intBitSetResize(y, (x->size-1)*wordbitsize);
-    if (y->size > x->size)
-        intBitSetResize(x, (y->size-1)*wordbitsize);
+    ret->allocated = intBitSetAdapt(x, y);
     xbase = x->bitset;
-    xend = x->bitset+x->size;
+    xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * x->size);
-    ret->size = x->size;
+    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    ret->size = -1;
+    ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) | *(ybase);
+    ret->universe = x->universe | y->universe;
     return ret;
 }
 
@@ -182,37 +222,35 @@ IntBitSet *intBitSetXor(IntBitSet *const x, IntBitSet *const y) {
     register word_t *ybase;
     register word_t *retbase;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
-    if (x->size > y->size)
-        intBitSetResize(y, (x->size-1)*wordbitsize);
-    if (y->size > x->size)
-        intBitSetResize(x, (y->size-1)*wordbitsize);
+    ret->allocated = intBitSetAdapt(x, y);
     xbase = x->bitset;
-    xend = x->bitset+x->size;
+    xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * x->size);
-    ret->size = x->size;
+    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    ret->size = -1;
+    ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
-        *retbase = *xbase ^ *ybase;
+        *(retbase) = *(xbase) ^ *(ybase);
+    ret->universe = x->universe ^ y->universe;
     return ret;
 }
-
-
 
 IntBitSet *intBitSetIntersection(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xbase;
     register word_t *xend;
     register word_t *ybase;
     register word_t *retbase;
-    register size_t minsize = (x->size < y->size) ? x->size : y->size;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
+    ret->allocated = intBitSetAdapt(x, y);
     xbase = x->bitset;
-    xend = x->bitset+minsize;
+    xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * minsize);
-    ret->size = minsize;
+    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    ret->size = -1;
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) & *(ybase);
+    ret->universe = x->universe & y->universe;
     return ret;
 }
 
@@ -222,93 +260,87 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     register word_t *ybase;
     register word_t *retbase;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
-    if (x->size > y->size)
-        intBitSetResize(y, (x->size-1)*wordbitsize);
-    if (y->size > x->size)
-        intBitSetResize(x, (y->size-1)*wordbitsize);
+    ret->allocated = intBitSetAdapt(x, y);
     xbase = x->bitset;
-    xend = x->bitset+x->size;
+    xend = x->bitset+ret->allocated;
     ybase = y->bitset;
-    retbase = ret->bitset = malloc(wordbytesize * x->size);
-    ret->size = x->size;
+    retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    ret->size = -1;
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
-        *retbase = *xbase & ~(*xbase & *ybase);
+        *(retbase) = *(xbase) & ~*(ybase);
+    ret->universe = x->universe & ~y->universe;
     return ret;
 }
 
 IntBitSet *intBitSetIUnion(IntBitSet *const dst, IntBitSet *const src) {
     register word_t *dstbase;
-    register word_t *dstend;
     register word_t *srcbase;
     register word_t *srcend;
-    if (src->size > dst->size)
-        intBitSetResize(dst, (src->size-1)*wordbitsize);
+    register size_t allocated = intBitSetAdapt(dst, src);
     dstbase = dst->bitset;
-    dstend = dst->bitset + dst->size;
     srcbase = src->bitset;
-    srcend = src->bitset + src->size;
+    srcend = src->bitset + allocated;
     for (; srcbase < srcend; ++dstbase, ++srcbase)
         *dstbase |= *srcbase;
+    dst->size = -1;
     dst->tot = -1;
+    dst->universe |= src->universe;
     return dst;
 }
 
 IntBitSet *intBitSetIXor(IntBitSet *const dst, IntBitSet *const src) {
     register word_t *dstbase;
-    register word_t *dstend;
     register word_t *srcbase;
     register word_t *srcend;
-    if (src->size > dst->size)
-        intBitSetResize(dst, (src->size-1)*wordbitsize);
-    if (dst->size > src->size)
-        intBitSetResize(src, (dst->size-1)*wordbitsize);
+    register size_t allocated = intBitSetAdapt(dst, src);
     dstbase = dst->bitset;
-    dstend = dst->bitset + dst->size;
     srcbase = src->bitset;
-    srcend = src->bitset + src->size;
+    srcend = src->bitset + allocated;
     for (; srcbase < srcend; ++dstbase, ++srcbase)
         *dstbase ^= *srcbase;
+    dst->size = -1;
     dst->tot = -1;
+    dst->universe ^= src->universe;
     return dst;
 }
 
-
 IntBitSet *intBitSetIIntersection(IntBitSet *const dst, IntBitSet *const src) {
     register word_t *dstbase;
-    register word_t *dstend;
     register word_t *srcbase;
     register word_t *srcend;
-    if (dst->size > src->size)
-        intBitSetResize(src, (dst->size-1)*wordbitsize);
+    register size_t allocated = intBitSetAdapt(dst, src);
     dstbase = dst->bitset;
-    dstend = dst->bitset + dst->size;
     srcbase = src->bitset;
-    srcend = src->bitset + src->size;
-    for (; dstbase < dstend; ++dstbase, ++srcbase)
+    srcend = src->bitset + allocated;
+    for (; srcbase < srcend; ++dstbase, ++srcbase)
         *dstbase &= *srcbase;
+    dst->size = -1;
     dst->tot = -1;
+    dst->universe &= src->universe;
     return dst;
 }
 
 IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
-    register word_t *dstbase = dst->bitset;
-    register word_t *srcbase = src->bitset;
-    register word_t *dstend = dst->bitset + ((dst->size < src->size) ? dst->size : src->size);
-
-    for (; dstbase < dstend; ++dstbase, ++srcbase)
-        *dstbase &= ~(*dstbase & *srcbase);
+    register word_t *dstbase;
+    register word_t *srcbase;
+    register word_t *srcend;
+    register size_t allocated = intBitSetAdapt(dst, src);
+    dstbase = dst->bitset;
+    srcbase = src->bitset;
+    srcend = src->bitset + allocated;
+    for (; srcbase < srcend; ++dstbase, ++srcbase)
+        *dstbase &= ~*srcbase;
+    dst->size = -1;
     dst->tot = -1;
+    dst->universe &= ~src->universe;
     return dst;
 }
 
-
-
 int intBitSetGetNext(const IntBitSet *const x, register int last) {
-    ++last;
-    register word_t* base = x->bitset + last / wordbitsize;
+    register word_t* base = x->bitset + ++last / wordbitsize;
     register unsigned short int i = last % wordbitsize;
-    const register word_t *end = x->bitset + x->size;
+    const register word_t *end = x->bitset + x->allocated;
     while(base < end) {
         if (*base)
             for (; i<wordbitsize; ++i)
@@ -317,24 +349,20 @@ int intBitSetGetNext(const IntBitSet *const x, register int last) {
         i = 0;
         ++base;
     }
-    return -2;
+    return x->universe ? last : -2;
 }
 
 unsigned char intBitSetCmp(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xbase;
     register word_t *xend;
     register word_t *ybase;
-    register word_t *yend;
     register unsigned char ret = 0;
-    if (x->size > y->size)
-        intBitSetResize(y, (x->size-1)*wordbitsize);
-    if (y->size > x->size)
-        intBitSetResize(x, (y->size-1)*wordbitsize);
+    register size_t allocated = intBitSetAdapt(x, y);
     xbase = x->bitset;
-    xend = x->bitset+x->size;
+    xend = x->bitset+allocated;
     ybase = y->bitset;
-    yend = y->bitset+y->size;
     for (; ret != 3 && xbase<xend; ++xbase, ++ybase)
         ret |= (*ybase != (*xbase | *ybase)) * 2 + (*xbase != (*xbase | *ybase));
+    ret |= (y->universe != (x->universe | y->universe)) * 2 + (x->universe != (x->universe | y->universe));
     return ret;
 }
