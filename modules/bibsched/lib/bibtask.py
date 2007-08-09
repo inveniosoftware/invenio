@@ -230,7 +230,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
     """
     # With SSO it's impossible to check for pwd
     if CFG_EXTERNAL_AUTH_USING_SSO or \
-            _task_params['task_name'] in cfg_valid_processes_no_auth_needed:
+            _task_params.get('task_name', '') in cfg_valid_processes_no_auth_needed:
         return user
     if authorization_msg:
         print authorization_msg
