@@ -175,12 +175,13 @@ void intBitSetDelElem(IntBitSet *const bitset, register const int elem) {
 }
 
 bool_t intBitSetEmpty(const IntBitSet *const bitset) {
-    register int i;
-    register word_t *ptr;
+    register word_t *end;
+    register word_t *base;
     if (bitset->universe) return 0;
     if (bitset->tot == 0) return 1;
-    for (i = 0, ptr=bitset->bitset; i < bitset->size; ++i, ++ptr)
-        if (*ptr) return 0;
+    end = bitset->bitset + bitset->allocated;
+    for (base = bitset->bitset; base < end; ++base)
+        if (*base) return 0;
     return 1;
 }
 
