@@ -118,12 +118,12 @@ class IntBitSetTest(unittest.TestCase):
         self.assertEqual(list(set1), [10])
         self.assertEqual(list(set2), lst2)
 
-    def test_set_emptyness(self):
-        """intbitset - set emptyness"""
+    def test_set_emptiness(self):
+        """intbitset - tests for emptiness"""
         set1 = intbitset()
-        set2 = intbitset(universe=True)
+        set2 = intbitset(trailing_bits=1)
         set3 = intbitset([70])
-        set4 = intbitset([70], universe=True)
+        set4 = intbitset([70], trailing_bits=1)
         self.failUnless(not set1.__nonzero__())
         self.failUnless(set2.__nonzero__())
         self.failUnless(set3.__nonzero__())
@@ -136,10 +136,10 @@ class IntBitSetTest(unittest.TestCase):
         self.assertEqual(list(set1), [])
         self.failUnless(not set1.__nonzero__())
 
-    def test_set_universe(self):
-        """intbitset - universe"""
-        set1 = intbitset(universe=True)
-        set2 = intbitset([10, 20, 30], universe=True)
+    def test_set_infinite(self):
+        """intbitset - infinite sets"""
+        set1 = intbitset(trailing_bits=1)
+        set2 = intbitset([10, 20, 30], trailing_bits=1)
         self.failUnless(0 in set1)
         self.failUnless(100 in set1)
         self.failUnless(10000 in set1)
@@ -153,10 +153,10 @@ class IntBitSetTest(unittest.TestCase):
         self.failUnless('...' in str(set2))
 
     def test_set_repr(self):
-        """intbitset - set representation"""
+        """intbitset - Pythonic representation"""
         set1 = intbitset()
         set2 = intbitset([10, 20, 30])
-        set3 = intbitset([10, 20, 30], universe=True)
+        set3 = intbitset([10, 20, 30], trailing_bits=1)
         self.assertEqual(set1, eval(repr(set1)))
         self.assertEqual(set2, eval(repr(set2)))
         self.assertEqual(set3, eval(repr(set3)))
@@ -165,7 +165,7 @@ class IntBitSetTest(unittest.TestCase):
         """intbitset - set comparison"""
         set1 = intbitset([10, 20, 30, 70])
         set2 = intbitset([20, 30, 40, 70])
-        set3 = intbitset(universe=True)
+        set3 = intbitset(trailing_bits=1)
         self.failUnless(set1 != set2)
         self.failUnless(set1 != set3)
         self.failUnless(set2 != set3)

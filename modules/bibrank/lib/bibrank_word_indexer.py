@@ -903,7 +903,7 @@ def get_valid_range(rank_method_code):
     #else:
     #    recIDs = []
 
-    valid = intbitset(universe=True)
+    valid = intbitset(trailing_bits=1)
     valid.discard(0)
 
     #valid.addlist(recIDs)

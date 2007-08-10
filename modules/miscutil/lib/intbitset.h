@@ -29,12 +29,12 @@ extern const int wordbitsize;
 typedef struct {
     int size;
     int allocated;
-    word_t universe;
+    word_t trailing_bits;
     int tot;
     word_t *bitset;
 } IntBitSet;
 
-IntBitSet *intBitSetCreate(register const int size, const bool_t universe);
+IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits);
 IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const int bufsize);
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const int bufsize);
 IntBitSet *intBitSetReset(IntBitSet *const bitset);

@@ -1435,7 +1435,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     hitset_empty = HitSet()
     # sanity check:
     if not p:
-        hitset_full = HitSet(universe=True)
+        hitset_full = HitSet(trailing_bits=1)
         hitset_full.discard(0)
         # no pattern, so return all universe
         return hitset_full
@@ -1511,7 +1511,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     # let the initial set be the complete universe:
-    hitset_in_any_collection = HitSet(universe=True)
+    hitset_in_any_collection = HitSet(trailing_bits=1)
     hitset_in_any_collection.discard(0)
     for idx_unit in range(0, len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]

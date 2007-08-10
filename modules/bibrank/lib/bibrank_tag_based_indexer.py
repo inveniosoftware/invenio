@@ -128,7 +128,7 @@ def single_tag_rank(config):
     for (recids, recide) in options["recid_range"]:
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
-        valid = HitSet(universe=True)
+        valid = HitSet(trailing_bits=1)
         valid.discard(0)
         for key in tags:
             newset = HitSet()

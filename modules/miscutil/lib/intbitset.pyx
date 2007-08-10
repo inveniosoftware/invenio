@@ -44,12 +44,12 @@ cdef extern from "intbitset.h":
     ctypedef struct IntBitSet:
         int size
         int allocated
-        word_t universe
+        word_t trailing_bits
         int tot
         word_t *bitset
     int wordbytesize
     int wordbitsize
-    IntBitSet *intBitSetCreate(int size, bool_t universe)
+    IntBitSet *intBitSetCreate(int size, bool_t trailing_bits)
     IntBitSet *intBitSetCreateFromBuffer(void *buf, int bufsize)
     IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, int bufsize)
     IntBitSet *intBitSetReset(IntBitSet *bitset)
@@ -85,21 +85,29 @@ cdef class intbitset:
     marshalling functions.  Uses real bits to optimize memory usage,
     so may have issues with endianness if you transport serialized
     bitsets between various machine architectures.
+
+
     """
     cdef IntBitSet *bitset
 
-    def __new__(self, rhs=0, int minsize=-1, object universe=0):
-        """Initialize intbitset. rhs can be:
-        int/long for creating allocating empty intbitset that will hold at least
+    def __new__(self, rhs=0, int minsize=-1, object trailing_bits=0):
+        """
+        Initialize intbitset.
+        * rhs can be:
+         - int/long for creating allocating empty intbitset that will hold at least
             rhs elements, before being resized
-        intbitset for cloning
-        str for retrieving an intbitset that was dumped into a string
-        array for retrieving an intbitset that was dumpeg into a string stored
+         - intbitset for cloning
+         - str for retrieving an intbitset that was dumped into a string
+         - array for retrieving an intbitset that was dumped into a string stored
             in an array
-        a sequence made of integers for copying all the elements from the
+         - sequence made of integers for copying all the elements from the
             sequence. If minsize is specified than it is initially allocated
             enough space to hold up to minsize integers, otherwise the biggest
             element of the sequence will be used.
+        * minsize is a suggested initial upper bound on the numbers that will be
+            stored, by looking at rhs a sequence of number.
+        * trailing_bits is 1, then the set will contain "all" the positive integers
+        after the biggest one added with rhs.
         """
         cdef Py_ssize_t size
         cdef void *buf
@@ -112,7 +120,7 @@ cdef class intbitset:
         if type(rhs) in (int, long):
             if rhs < 0:
                 raise ValueError, "rhs can't be negative"
-            self.bitset = intBitSetCreate(rhs, universe)
+            self.bitset = intBitSetCreate(rhs, trailing_bits)
         elif type(rhs) is intbitset:
             self.bitset = intBitSetClone((<intbitset>rhs).bitset)
         elif type(rhs) in (str, array):
@@ -128,13 +136,13 @@ cdef class intbitset:
         elif hasattr(rhs, '__iter__'):
             try:
                 if minsize > -1:
-                    self.bitset = intBitSetCreate(minsize, universe)
+                    self.bitset = intBitSetCreate(minsize, trailing_bits)
                 else:
                     if rhs:
-                        self.bitset = intBitSetCreate(int(max(rhs)), universe)
+                        self.bitset = intBitSetCreate(int(max(rhs)), trailing_bits)
                     else:
-                        self.bitset = intBitSetCreate(0, universe)
-                if universe:
+                        self.bitset = intBitSetCreate(0, trailing_bits)
+                if trailing_bits:
                     last = 0
                     for elem in rhs:
                         if int(elem) < 0:
@@ -267,7 +275,7 @@ cdef class intbitset:
     def __repr__(self):
         cdef int last
         cdef int maxelem
-        if self.bitset.universe:
+        if self.bitset.trailing_bits:
             maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
             ret = "intbitset(["
             last = -1
@@ -276,7 +284,7 @@ cdef class intbitset:
                 ret = ret + '%i, ' % last
             if ret.endswith(", "):
                 ret = ret[:-2]
-            ret = ret + '], universe=True)'
+            ret = ret + '], trailing_bits=True)'
             return ret
         else:
             ret = "intbitset(["
@@ -341,6 +349,8 @@ cdef class intbitset:
 
     # Iterator interface
     def __iter__(self):
+        if self.bitset.trailing_bits:
+            raise OverflowError, "It's impossible to iterate over an infinite set."
         return intbitset_iterator(self)
 
     # Customized interface
@@ -414,7 +424,9 @@ cdef class intbitset:
         somewhere."""
         cdef Py_ssize_t size
         size = intBitSetGetSize((<intbitset> self).bitset)
-        return zlib.compress(PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize))
+        tmp = PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize)
+        tmp2 = zlib.compress(tmp)
+        return tmp2
 
     def fastload(self, object strdump):
         """Load a compressed string representation produced by a previous call
@@ -466,8 +478,8 @@ cdef class intbitset:
         """
         cdef int i
         cdef int last
-        if (<intbitset> self).bitset.universe:
-            raise OverflowError, "It's impossible to print universe."
+        if (<intbitset> self).bitset.trailing_bits:
+            raise OverflowError, "It's impossible to print an infinite set."
         last = 0
         ret = ''
         for i in self:
@@ -496,7 +508,6 @@ cdef class intbitset:
     def get_allocated(self):
         return intBitSetGetAllocated(self.bitset)
 
-
     def get_sorted_element(self, int index):
         """Return element at position index in the sorted representation of the
         set. Note that index must be less than len(self)"""
@@ -505,6 +516,8 @@ cdef class intbitset:
         cdef int i
         l = intBitSetGetTot(self.bitset)
         if index < 0:
+            if self.bitset.trailing_bits:
+                raise OverflowError, "It's impossible to retrieve a negative item from an infinite set."
             index = index + l
         if 0 <= index < l:
             last = intBitSetGetNext(self.bitset, -1)
@@ -520,6 +533,8 @@ cdef class intbitset:
         cdef int l
         cdef int last
         cdef int cnt
+        if self.bitset.trailing_bits:
+            raise OverflowError, "It's impossible to retrieve a list from an infinite set."
         l = intBitSetGetTot(self.bitset)
         if i == 0 and j == -1:
             return intbitset(self)

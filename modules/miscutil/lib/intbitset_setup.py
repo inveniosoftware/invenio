@@ -51,7 +51,7 @@ setup(
     author_email = 'project-cdsware-developers@cern.ch',
     url = 'http://invenio.cern.ch/',
     ext_modules=[
-        Extension("invenio.intbitset", ["intbitset.pyx", "intbitset_impl.c"], extra_compile_args=['-O3']),
+        Extension("invenio.intbitset", ["intbitset.pyx", "intbitset_impl.c"], extra_compile_args=['-O0', '-g3']),
     ],
     cmdclass = {'build_ext': build_ext},
 )

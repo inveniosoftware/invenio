@@ -27,15 +27,15 @@ const int wordbytesize = sizeof(word_t);
 const int wordbitsize = sizeof(word_t) * 8;
 
 
-IntBitSet *intBitSetCreate(register const int size, const bool_t universe) {
+IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) {
     register word_t *base;
     const register word_t *end;
     IntBitSet *ret = malloc(sizeof(IntBitSet));
-    // At least one word -> the one who represent the universe
+    // At least one word -> the one who represent the trailing_bits
     ret->allocated = (size / wordbitsize + 1);
-    ret->size = 0; // universe
-    ret->universe = universe ? (word_t) ~0 : 0;
-    if (universe) {
+    ret->size = 0; // trailing_bits
+    ret->trailing_bits = trailing_bits ? (word_t) ~0 : 0;
+    if (trailing_bits) {
         base = ret->bitset = malloc(ret->allocated * wordbytesize);
         end = base + ret->allocated;
         for (; base < end; ++base)
@@ -54,7 +54,7 @@ IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const b
     bitset->tot = -1;
     bitset->size = -1;
     memcpy(bitset->bitset, buf, bufsize);
-    bitset->universe = *(bitset->bitset + bitset->allocated - 1);
+    bitset->trailing_bits = *(bitset->bitset + bitset->allocated - 1);
     return bitset;
 }
 
@@ -62,8 +62,8 @@ IntBitSet *intBitSetReset(IntBitSet *const bitset) {
     register word_t *base = bitset->bitset;
     const register word_t *end = bitset->bitset+bitset->allocated;
     for (; base<end; ++base)
-        *base = bitset->universe;
-    bitset->tot = bitset->universe ? -1 : 0;
+        *base = bitset->trailing_bits;
+    bitset->tot = bitset->trailing_bits ? -1 : 0;
     bitset->size = 0;
     return bitset;
 }
@@ -76,7 +76,7 @@ IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const int bufsize) {
     ret->size = -1;
     ret->tot = -1;
     memcpy(ret->bitset, buf, bufsize);
-    ret->universe = ret->bitset[ret->allocated - 1];
+    ret->trailing_bits = ret->bitset[ret->allocated - 1];
     return ret;
 }
 
@@ -90,7 +90,7 @@ IntBitSet *intBitSetClone(const IntBitSet * const bitset) {
     IntBitSet *ret = malloc(sizeof(IntBitSet));
     ret->size = bitset->size;
     ret->tot = bitset->tot;
-    ret->universe = bitset->universe;
+    ret->trailing_bits = bitset->trailing_bits;
     ret->allocated = bitset->allocated;
     ret->bitset = malloc(bitset->allocated * wordbytesize);
     memcpy(ret->bitset, bitset->bitset, bitset->allocated * wordbytesize);
@@ -104,7 +104,7 @@ int intBitSetGetSize(IntBitSet * const bitset) {
         return bitset->size;
     base = bitset->bitset;
     end = bitset->bitset + bitset->allocated - 2;
-    for (; base < end && *end == bitset->universe; --end);
+    for (; base < end && *end == bitset->trailing_bits; --end);
     bitset->size = ((int) (end - base) + 1);
     return bitset->size;
 }
@@ -114,7 +114,7 @@ int intBitSetGetTot(IntBitSet *const bitset) {
     register int i;
     register int tot;
     register word_t *end;
-    if (bitset->universe)
+    if (bitset->trailing_bits)
         return -1;
     if (bitset->tot < 0) {
         end = bitset->bitset + bitset->allocated;
@@ -142,19 +142,19 @@ void intBitSetResize(IntBitSet *const bitset, register const int allocated) {
         base = bitset->bitset + bitset->allocated;
         end = bitset->bitset + allocated;
         for (; base<end; ++base)
-            *(base) = bitset->universe;
+            *(base) = bitset->trailing_bits;
         bitset->allocated = allocated;
     }
 }
 
 bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const int elem) {
     return ((elem < bitset->allocated * wordbitsize) ?
-            (bitset->bitset[elem / wordbitsize] & ((word_t) 1 << ((word_t)elem % (word_t)wordbitsize))) != 0 : bitset->universe != 0);
+            (bitset->bitset[elem / wordbitsize] & ((word_t) 1 << ((word_t)elem % (word_t)wordbitsize))) != 0 : bitset->trailing_bits != 0);
 }
 
 void intBitSetAddElem(IntBitSet *const bitset, register const int elem) {
     if (elem >= (bitset->allocated - 1) * wordbitsize)
-        if (bitset->universe)
+        if (bitset->trailing_bits)
             return;
         else
             intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
@@ -165,7 +165,7 @@ void intBitSetAddElem(IntBitSet *const bitset, register const int elem) {
 
 void intBitSetDelElem(IntBitSet *const bitset, register const int elem) {
     if (elem >= (bitset->allocated - 1) * wordbitsize)
-        if (!bitset->universe)
+        if (!bitset->trailing_bits)
             return;
         else
             intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
@@ -177,7 +177,7 @@ void intBitSetDelElem(IntBitSet *const bitset, register const int elem) {
 bool_t intBitSetEmpty(const IntBitSet *const bitset) {
     register word_t *end;
     register word_t *base;
-    if (bitset->universe) return 0;
+    if (bitset->trailing_bits) return 0;
     if (bitset->tot == 0) return 1;
     end = bitset->bitset + bitset->allocated;
     for (base = bitset->bitset; base < end; ++base)
@@ -211,7 +211,7 @@ IntBitSet *intBitSetUnion(IntBitSet *const x, IntBitSet *const y) {
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) | *(ybase);
-    ret->universe = x->universe | y->universe;
+    ret->trailing_bits = x->trailing_bits | y->trailing_bits;
     return ret;
 }
 
@@ -230,7 +230,7 @@ IntBitSet *intBitSetXor(IntBitSet *const x, IntBitSet *const y) {
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) ^ *(ybase);
-    ret->universe = x->universe ^ y->universe;
+    ret->trailing_bits = x->trailing_bits ^ y->trailing_bits;
     return ret;
 }
 
@@ -249,7 +249,7 @@ IntBitSet *intBitSetIntersection(IntBitSet *const x, IntBitSet *const y) {
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) & *(ybase);
-    ret->universe = x->universe & y->universe;
+    ret->trailing_bits = x->trailing_bits & y->trailing_bits;
     return ret;
 }
 
@@ -268,7 +268,7 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     ret->tot = -1;
     for (; xbase < xend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) & ~*(ybase);
-    ret->universe = x->universe & ~y->universe;
+    ret->trailing_bits = x->trailing_bits & ~y->trailing_bits;
     return ret;
 }
 
@@ -284,7 +284,7 @@ IntBitSet *intBitSetIUnion(IntBitSet *const dst, IntBitSet *const src) {
         *dstbase |= *srcbase;
     dst->size = -1;
     dst->tot = -1;
-    dst->universe |= src->universe;
+    dst->trailing_bits |= src->trailing_bits;
     return dst;
 }
 
@@ -300,7 +300,7 @@ IntBitSet *intBitSetIXor(IntBitSet *const dst, IntBitSet *const src) {
         *dstbase ^= *srcbase;
     dst->size = -1;
     dst->tot = -1;
-    dst->universe ^= src->universe;
+    dst->trailing_bits ^= src->trailing_bits;
     return dst;
 }
 
@@ -316,7 +316,7 @@ IntBitSet *intBitSetIIntersection(IntBitSet *const dst, IntBitSet *const src) {
         *dstbase &= *srcbase;
     dst->size = -1;
     dst->tot = -1;
-    dst->universe &= src->universe;
+    dst->trailing_bits &= src->trailing_bits;
     return dst;
 }
 
@@ -332,7 +332,7 @@ IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
         *dstbase &= ~*srcbase;
     dst->size = -1;
     dst->tot = -1;
-    dst->universe &= ~src->universe;
+    dst->trailing_bits &= ~src->trailing_bits;
     return dst;
 }
 
@@ -348,7 +348,7 @@ int intBitSetGetNext(const IntBitSet *const x, register int last) {
         i = 0;
         ++base;
     }
-    return x->universe ? last : -2;
+    return x->trailing_bits ? last : -2;
 }
 
 unsigned char intBitSetCmp(IntBitSet *const x, IntBitSet *const y) {
@@ -362,6 +362,6 @@ unsigned char intBitSetCmp(IntBitSet *const x, IntBitSet *const y) {
     ybase = y->bitset;
     for (; ret != 3 && xbase<xend; ++xbase, ++ybase)
         ret |= (*ybase != (*xbase | *ybase)) * 2 + (*xbase != (*xbase | *ybase));
-    ret |= (y->universe != (x->universe | y->universe)) * 2 + (x->universe != (x->universe | y->universe));
+    ret |= (y->trailing_bits != (x->trailing_bits | y->trailing_bits)) * 2 + (x->trailing_bits != (x->trailing_bits | y->trailing_bits));
     return ret;
 }
