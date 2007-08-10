@@ -118,6 +118,75 @@ class IntBitSetTest(unittest.TestCase):
         self.assertEqual(list(set1), [10])
         self.assertEqual(list(set2), lst2)
 
+    def test_set_emptyness(self):
+        """intbitset - set emptyness"""
+        set1 = intbitset()
+        set2 = intbitset(universe=True)
+        set3 = intbitset([70])
+        set4 = intbitset([70], universe=True)
+        self.failUnless(not set1.__nonzero__())
+        self.failUnless(set2.__nonzero__())
+        self.failUnless(set3.__nonzero__())
+        self.failUnless(set4.__nonzero__())
+
+    def test_set_clear(self):
+        """intbitset - clearing"""
+        set1 = intbitset([10, 20, 30, 70])
+        set1.clear()
+        self.assertEqual(list(set1), [])
+        self.failUnless(not set1.__nonzero__())
+
+    def test_set_universe(self):
+        """intbitset - universe"""
+        set1 = intbitset(universe=True)
+        set2 = intbitset([10, 20, 30], universe=True)
+        self.failUnless(0 in set1)
+        self.failUnless(100 in set1)
+        self.failUnless(10000 in set1)
+        self.failIf(0 in set2)
+        self.failUnless(10 in set2)
+        self.failIf(15 in set2)
+        self.failUnless(30 in set2)
+        self.failUnless(100 in set2)
+        self.failUnless(10000 in set2)
+        self.failUnless('...' in str(set1))
+        self.failUnless('...' in str(set2))
+
+    def test_set_repr(self):
+        """intbitset - set representation"""
+        set1 = intbitset()
+        set2 = intbitset([10, 20, 30])
+        set3 = intbitset([10, 20, 30], universe=True)
+        self.assertEqual(set1, eval(repr(set1)))
+        self.assertEqual(set2, eval(repr(set2)))
+        self.assertEqual(set3, eval(repr(set3)))
+
+    def test_set_cmp(self):
+        """intbitset - set comparison"""
+        set1 = intbitset([10, 20, 30, 70])
+        set2 = intbitset([20, 30, 40, 70])
+        set3 = intbitset(universe=True)
+        self.failUnless(set1 != set2)
+        self.failUnless(set1 != set3)
+        self.failUnless(set2 != set3)
+        self.failIf(set1 < set2)
+        self.failIf(set1 > set2)
+        self.failIf(set1 == set2)
+        self.failUnless(set1 >= set1)
+        self.failUnless(set1 >= (set1 & set2))
+        self.failUnless(set1 <= (set1 | set2))
+        self.failUnless(set1 <= set3)
+        self.failUnless(set2 <= set3)
+        self.failUnless(set1 < set3)
+        self.failUnless(set2 < set3)
+
+    def test_set_update_with_signs(self):
+        """intbitset - set update with signs"""
+        set1 = intbitset([10, 20, 30])
+        dict1 = {20 : -1, 40 : 1}
+        set1.update_with_signs(dict1)
+        self.assertEqual(list(set1), [10, 30, 40])
+
 def create_test_suite():
     """Return test suite for the intbitset data structure."""
     return unittest.TestSuite((
