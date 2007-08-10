@@ -65,7 +65,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         Redirects to display function
         """
         return self.display(req, form)
-            
+
     def display(self, req, form):
         """
         Display comments (reviews if enabled) associated with record having id recid where recid>0.
@@ -75,9 +75,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param do: display order    hh = highest helpful score, review only
                                     lh = lowest helpful score, review only
                                     hs = highest star score, review only
-                                    ls = lowest star score, review only 
-                                    od = oldest date 
-                                    nd = newest date 
+                                    ls = lowest star score, review only
+                                    od = oldest date
+                                    nd = newest date
         @param ds: display since    all= no filtering by date
                                     nd = n days ago
                                     nw = n weeks ago
@@ -91,7 +91,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param reviews: boolean, enabled for reviews, disabled for comments
         @return the full html page.
         """
-        
+
         argd = wash_urlargd(form, {'do': (str, "od"),
                                    'ds': (str, "all"),
                                    'nb': (int, 100),
@@ -104,7 +104,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
         check_warnings = []
 
-        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln']) 
+        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
             (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=self.recid,
                                                                                    display_order=argd['do'],
@@ -116,7 +116,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                    reported=argd['reported'],
                                                                                    reviews=self.discussion,
                                                                                    uid=uid)
-            
+
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
@@ -131,7 +131,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                 self.recid,
                                                                 tabs,
                                                                 argd['ln'])
-            
+
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
             navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, self.recid, argd['ln'])
@@ -160,17 +160,17 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         language=argd['ln'],
                         warnings=check_warnings, errors=[],
                         navmenuid='search')
-        
+
     # Return the same page wether we ask for /record/123 or /record/123/
     __call__ = index
-    
+
     def add(self, req, form):
         """
         Add a comment (review) to record with id recid where recid>0
         Also works for adding a remark to basket with id recid where recid<-99
         @param ln: languange
         @param recid: record id
-        @param action:  'DISPLAY' to display add form 
+        @param action:  'DISPLAY' to display add form
                         'SUBMIT' to submit comment once form is filled
                         'REPLY' to reply to an already existing comment
         @param msg: the body of the comment/review or remark
@@ -193,7 +193,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
-        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln']) 
+        (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req,
                                                                                                self.recid,
@@ -206,7 +206,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                            self.recid,
                                                                                            self.discussion==1 and 'reviews' or 'comments',
                                                                                            argd['ln'],
-                                                                                           self.discussion==1 and _('Reviews') or _('Comments')) 
+                                                                                           self.discussion==1 and _('Reviews') or _('Comments'))
 
             if argd['action'] not in actions:
                 argd['action'] = 'DISPLAY'
@@ -216,7 +216,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 return page_not_authorized(req, "../comments/add",
                                            navmenuid='search')
 
-            # if guest, must log in first 
+            # if guest, must log in first
             if isGuestUser(uid):
                 referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s" % (weburl,
                                                                                     self.recid,
@@ -227,7 +227,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
                           'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
                                         (sweburl, urllib.quote(referer)),
-                          'x_url_close': '</a>'} 
+                          'x_url_close': '</a>'}
                 return page(title=_("Login"),
                             body=msg,
                             navtrail=navtrail,
@@ -255,7 +255,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 return page(title=title,
                             body=body,
                             navtrail=navtrail,
-                            uid=uid, 
+                            uid=uid,
                             language=cdslang,
                             verbose=1,
                             errors=errors,
@@ -283,9 +283,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param do: display order    hh = highest helpful score, review only
                                     lh = lowest helpful score, review only
                                     hs = highest star score, review only
-                                    ls = lowest star score, review only 
-                                    od = oldest date 
-                                    nd = newest date 
+                                    ls = lowest star score, review only
+                                    od = oldest date
+                                    nd = newest date
         @param ds: display since    all= no filtering by date
                                     nd = n days ago
                                     nw = n weeks ago
@@ -321,8 +321,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
-            referer = "%s/%s/display?amp;ln=%s&amp;voted=1"
-            referer %= (weburl, self.discussion == 1 and 'reviews' or 'comments', self.recid, argd['ln'])
+            referer = "%s/record/%s/%s?&amp;ln=%s&amp;voted=1"
+            referer %= (weburl, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def report(self, req, form):
@@ -334,9 +334,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param do: display order    hh = highest helpful score, review only
                                     lh = lowest helpful score, review only
                                     hs = highest star score, review only
-                                    ls = lowest star score, review only 
-                                    od = oldest date 
-                                    nd = newest date 
+                                    ls = lowest star score, review only
+                                    od = oldest date
+                                    nd = newest date
         @param ds: display since    all= no filtering by date
                                     nd = n days ago
                                     nw = n weeks ago
@@ -357,7 +357,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'referer': (str, None)
                                    })
-        
+
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
         success = perform_request_report(argd['comid'], client_ip_address, uid)
@@ -368,10 +368,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                                        argd['nb'],
                                                                                                        argd['p'],
                                                                                                        str(success))
-                                                                                                       
+
             redirect_to_url(req, argd['referer'])
         else:
-            #Note: sent to comments display 
+            #Note: sent to comments display
             referer = "%s/record/%s/%s/display?ln=%s&amp;voted=1"
             referer %= (weburl, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)

@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebComment web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
-        """webcomment - availability of comments pages""" 
+        """webcomment - availability of comments pages"""
 
-        baseurl = weburl + '/comments/'
+        baseurl = weburl + '/record/10/comments/'
 
         _exports = ['', 'display', 'add', 'vote', 'report']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -47,12 +47,12 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_webcomment_admin_interface_availability(self):
-        """webcomment - availability of WebComment Admin interface pages""" 
+        """webcomment - availability of WebComment Admin interface pages"""
 
         baseurl = weburl + '/admin/webcomment/webcommentadmin.py/'
 
         _exports = ['', 'comments', 'delete', 'users']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
