@@ -50,7 +50,7 @@ from invenio.bibrankadminlib import \
      tupletotable,\
      tupletotable_onlyselected,\
      addcheckboxes,\
-     createhiddenform,\
+     createhiddenform
 from invenio.dbquery import run_sql, escape_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
