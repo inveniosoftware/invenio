@@ -38,7 +38,7 @@ ctypedef unsigned long long int Py_ssize_t
 
 cdef extern from "Python.h":
     object PyString_FromStringAndSize(char *s, Py_ssize_t len)
-    int PyObject_AsCharBuffer(object obj, char **buf, Py_ssize_t *buf_len)
+    int PyObject_AsReadBuffer(object obj, void **buf, Py_ssize_t *buf_len)
 
 cdef extern from "intbitset.h":
     ctypedef struct IntBitSet:
@@ -102,7 +102,7 @@ cdef class intbitset:
             element of the sequence will be used.
         """
         cdef Py_ssize_t size
-        cdef char *buf
+        cdef void *buf
         cdef int elem
         cdef int i
         cdef int last
@@ -120,7 +120,7 @@ cdef class intbitset:
                 if type(rhs) is array:
                     rhs = rhs.tostring()
                 tmp = zlib.decompress(rhs)
-                if PyObject_AsCharBuffer(tmp, &buf, &size) < 0:
+                if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
                     raise Exception, "Buffer error!!!"
                 self.bitset = intBitSetCreateFromBuffer(buf, size)
             except Exception, msg:
@@ -137,11 +137,15 @@ cdef class intbitset:
                 if universe:
                     last = 0
                     for elem in rhs:
+                        if int(elem) < 0:
+                            raise ValueError, "Negative numbers, not allowed"
                         for remelem from last <= remelem < elem:
                             intBitSetDelElem(self.bitset, remelem)
                         last = elem + 1
                 else:
                     for elem in rhs:
+                        if int(elem) < 0:
+                            raise ValueError, "Negative numbers, not allowed"
                         intBitSetAddElem(self.bitset, elem)
             except Exception, msg:
                 raise ValueError, "retrieving integers from rhs is impossible: %s" \
@@ -153,7 +157,9 @@ cdef class intbitset:
         if self.bitset:
             intBitSetDestroy(self.bitset)
 
-    def __contains__(self, unsigned int elem):
+    def __contains__(self, int elem):
+        if elem < 0:
+            raise ValueError, "Negative numbers, not allowed"
         return intBitSetIsInElem(self.bitset, elem) != 0
 
     def __cmp__(self, intbitset rhs not None):
@@ -187,22 +193,30 @@ cdef class intbitset:
     def __iadd__(self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
+            if int(rhs) < 0:
+                raise ValueError, "Negative numbers, not allowed"
             intBitSetAddElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
             intBitSetIUnion(self.bitset, (<intbitset> rhs).bitset)
         else:
             for elem in rhs:
+                if int(elem) < 0:
+                    raise ValueError, "Negative numbers, not allowed"
                 intBitSetAddElem(self.bitset, elem)
         return self
 
     def __isub__(self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
+            if int(rhs) < 0:
+                raise ValueError, "Negative numbers, not allowed"
             intBitSetDelElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
             intBitSetISub(self.bitset, (<intbitset> rhs).bitset)
         else:
             for elem in rhs:
+                if int(elem) < 0:
+                    raise ValueError, "Negative numbers, not allowed"
                 intBitSetDelElem(self.bitset, elem)
         return self
 
@@ -210,6 +224,8 @@ cdef class intbitset:
         return intbitset(self)
 
     def __del__(self, int elem):
+        if int(elem) < 0:
+            raise ValueError, "Negative numbers, not allowed"
         intBitSetDelElem(self.bitset, elem)
 
     def __and__(self, intbitset rhs not None):
@@ -331,6 +347,8 @@ cdef class intbitset:
     def add(self, int elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
+        if int(elem) < 0:
+            raise ValueError, "Negative numbers, not allowed"
         intBitSetAddElem(self.bitset, elem)
 
     def clear(self):
@@ -396,7 +414,6 @@ cdef class intbitset:
         somewhere."""
         cdef Py_ssize_t size
         size = intBitSetGetSize((<intbitset> self).bitset)
-        assert(size < self.bitset.allocated)
         return zlib.compress(PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize))
 
     def fastload(self, object strdump):
@@ -404,7 +421,7 @@ cdef class intbitset:
         to the fastdump method into the current intbitset. The previous content
         will be replaced."""
         cdef Py_ssize_t size
-        cdef char *buf
+        cdef void *buf
         buf = NULL
         size = 0
         try:
@@ -412,7 +429,8 @@ cdef class intbitset:
                 strdump = strdump.tostring()
             # tmp needed to not be garbage collected
             tmp = zlib.decompress(strdump)
-            x = PyObject_AsCharBuffer(tmp, &buf, &size)
+            if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
+                raise Exception
             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
         except:
             raise ValueError, "strdump is corrupted"
@@ -435,6 +453,8 @@ cdef class intbitset:
         """Remove an element from a set; it must be a member.
         If the element is not a member, raise a KeyError.
         """
+        if int(elem) < 0:
+            raise ValueError, "Negative numbers, not allowed"
         if intBitSetIsInElem(self.bitset, elem):
             intBitSetDelElem(self.bitset, elem)
         else:
@@ -461,6 +481,8 @@ cdef class intbitset:
         cdef int value
         try:
             for value, sign in rhs.items():
+                if int(value) < 0:
+                    raise ValueError, "Negative numbers, not allowed"
                 if sign < 0:
                     intBitSetDelElem(self.bitset, value)
                 else:
