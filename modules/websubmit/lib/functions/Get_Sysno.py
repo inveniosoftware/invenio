@@ -55,7 +55,7 @@ def Get_Sysno(parameters,curdir,form):
         sysno = fp.read()
         fp.close()
     else:
-        list(searchresults = search_pattern(req=None, p=rn, f="reportnumber"))
+        searchresults = list(search_pattern(req=None, p=rn, f="reportnumber"))
         if len(searchresults) == 0:
             raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
         elif len(searchresults) > 1:
