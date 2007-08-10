@@ -207,8 +207,7 @@ scheduled for the forthcoming night or weekend.
 The procedure of reindexing is taking place into the real indexes that
 are also used for searching.  Therefore the end users will feel
 immediately any change in the indexes.  If you need to reindex your
-records from scratch (e.g. you would like to increase CFG_MAX_RECID in
-config.wml), then the best procedure is the following: wipe out
+records from scratch, then the best procedure is the following: wipe out
 existing indexes, reindex the collection index only (fast operation),
 recreate collection cache, and only after that reindex all the other
 indexes (slow operation).  This will ensure that the records in your

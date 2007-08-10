@@ -134,25 +134,6 @@ cds.support@cern.ch
 cds.support@cern.ch
 </define-tag>
 
-## CFG_MAX_RECID -- maximum record ID number possible, i.e. the upper
-## estimate of the total number of documents in the database.  A
-## reasonable estimate is: if you have 500,000 records in the database
-## now, and the size is growing by 10,000 records per month, then a
-## value of 700,000 sounds reasonable, as it should suffice for two
-## years.  Note that if in 6 months you'll suddenly have to upload a
-## lot of new input records, so that it may grow past the present
-## CFG_MAX_RECID limit, nothing bad happens: you only have to change
-## this parameter and reindex the full database content.  Note also
-## that the lower CFG_MAX_RECID, the faster the search engine and the
-## indexation engines are, so you have interest not to put it
-## unnecessarily high.  The relation between the speed and the value
-## of CFG_MAX_RECID is about linear, so that cutting CFG_MAX_RECID by
-## half will speed up the indexation about twice.
-##  (example: "8000")
-<define-tag CFG_MAX_RECID whitespace=delete>
-8000
-</define-tag>
-
 ## CFG_MAX_CACHED_QUERIES -- maximum cached queries number possible
 ## after reaching this number of cached queries the cache is pruned
 ## deleting half of the older accessed cached queries.

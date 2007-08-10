@@ -30,7 +30,6 @@ import re
 import ConfigParser
 
 from invenio.config import \
-     CFG_MAX_RECID, \
      cdslang, \
      etcdir
 from invenio.search_engine import perform_request_search, strip_accents
@@ -779,6 +778,7 @@ def word_index(run):
 
     global wordTables, languages
 
+    max_recid = int(run_sql("SELECT max(id) FROM bibrec")[0][0])
 
     options["run"] = []
     options["run"].append(run)
@@ -835,7 +835,7 @@ def word_index(run):
                 elif task_get_option("modified"):
                     wordTable.add_recIDs_by_date(task_get_option("modified"))
                 else:
-                    wordTable.add_recIDs([[0,CFG_MAX_RECID]])
+                    wordTable.add_recIDs([[0,max_recid]])
             elif task_get_option("cmd") == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])

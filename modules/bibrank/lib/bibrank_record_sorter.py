@@ -32,7 +32,6 @@ import traceback
 import copy
 
 from invenio.config import \
-     CFG_MAX_RECID, \
      cdslang, \
      etcdir, \
      version
@@ -279,6 +278,8 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     if not rnkdict:
         return (None, "Warning: Could not load ranking data for method %s." % rank_method_code, "", voutput)
 
+    max_recid = int(run_sql("SELECT max(id) FROM bibrec")[0][0])
+
     lwords_hitset = None
     for j in range(0, len(lwords)): #find which docs to search based on ranges..should be done in search_engine...
         if lwords[j] and lwords[j][:6] == "recid:":
@@ -287,11 +288,11 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             lword = lwords[j][6:]
             if string.find(lword, "->") > -1:
                 lword = string.split(lword, "->")
-                if int(lword[0]) >= CFG_MAX_RECID + 1 or int(lword[1]) >= CFG_MAX_RECID + 1:
+                if int(lword[0]) >= max_recid or int(lword[1]) >= max_recid + 1:
                     return (None, "Warning: Given record IDs are out of range.", "", voutput)
                 for i in range(int(lword[0]), int(lword[1])):
                     lwords_hitset.add(int(i))
-            elif lword < CFG_MAX_RECID + 1:
+            elif lword < max_recid + 1:
                 lwords_hitset.add(int(lword))
             else:
                 return (None, "Warning: Given record IDs are out of range.", "", voutput)
