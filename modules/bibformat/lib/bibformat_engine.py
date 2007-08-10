@@ -225,10 +225,14 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         (result_code, result_path) = tempfile.mkstemp()
         command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
-        open(xm_path, "w").write(xm_record)
+        xm_file.open(xm_path, "w")
+        xm_file.write(xm_record)
+        xm_file.close()
         command = command + " <" + xm_path
         os.system(command)
-        bibformat_output = open(result_path,"r").read()
+        result_file = open(result_path,"r")
+        bibformat_output = result_file.read()
+        result_file.close()
         os.remove(result_path)
         os.remove(xm_path)
 ##         pipe_input.write(xm_record)
@@ -305,7 +309,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
                 </span>""" % (template)
         if CFG_PATH_PHP:
             if verbose == 9:
-                out+= """\n<br/><span class="quicknote">
+                out += """\n<br/><span class="quicknote">
                 Using old BibFormat for record %s.
                 </span>""" % recID
             return out + call_old_bibformat(recID, format=of, on_the_fly=True, verbose=verbose)
@@ -1853,18 +1857,18 @@ class BibFormatObject:
                                                    p_tag[1],
                                                    p_tag[2])
             if repeatable_subfields_p:
-                 list_of_instances = []
-                 for instance in instances:
-                     instance_dict = {}
-                     for subfield in instance[0]:
-                         if not instance_dict.has_key(subfield[0]):
-                             instance_dict[subfield[0]] = []
-                         if escape == 0:
-                             instance_dict[subfield[0]].append(subfield[1])
-                         else:
-                             instance_dict[subfield[0]].append(escape_field(subfield[1], escape))
-                     list_of_instances.append(instance_dict)
-                 return list_of_instances
+                list_of_instances = []
+                for instance in instances:
+                    instance_dict = {}
+                    for subfield in instance[0]:
+                        if not instance_dict.has_key(subfield[0]):
+                            instance_dict[subfield[0]] = []
+                        if escape == 0:
+                            instance_dict[subfield[0]].append(subfield[1])
+                        else:
+                            instance_dict[subfield[0]].append(escape_field(subfield[1], escape))
+                    list_of_instances.append(instance_dict)
+                return list_of_instances
             else:
                 if escape == 0:
                     return [dict(instance[0]) for instance in instances]
