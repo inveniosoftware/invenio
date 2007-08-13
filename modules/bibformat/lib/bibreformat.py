@@ -291,7 +291,7 @@ def iterate_over_new(list, fmt):
 
             #Reset iteration state
             n_it_rec = 0
-            xml_content = ''
+            formatted_records = ''
 
     return (total_rec, tbibformat, tbibupload)
 
