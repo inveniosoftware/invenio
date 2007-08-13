@@ -225,7 +225,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         (result_code, result_path) = tempfile.mkstemp()
         command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
-        xm_file.open(xm_path, "w")
+        xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
         xm_file.close()
         command = command + " <" + xm_path
