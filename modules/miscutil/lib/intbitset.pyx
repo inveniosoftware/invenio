@@ -533,7 +533,7 @@ cdef class intbitset:
         cdef int l
         cdef int last
         cdef int cnt
-        if self.bitset.trailing_bits:
+        if self.bitset.trailing_bits and (i < 0 or j < 0):
             raise OverflowError, "It's impossible to retrieve a list from an infinite set."
         l = intBitSetGetTot(self.bitset)
         if i == 0 and j == -1:

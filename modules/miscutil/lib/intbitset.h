@@ -56,7 +56,10 @@ IntBitSet *intBitSetIUnion(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetIXor(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetIIntersection(IntBitSet *const dst, IntBitSet *const src);
 IntBitSet *intBitSetISub(IntBitSet *const x, IntBitSet *const y);
-int intBitSetAdapt(IntBitSet *const x, IntBitSet *const y);
+int intBitSetAdaptMax(IntBitSet *const x, IntBitSet *const y);
+int intBitSetAdaptMin(IntBitSet *const x, IntBitSet *const y);
+int intBitSetAdaptLeft(IntBitSet *const x, IntBitSet *const y);
+int intBitSetAdaptRight(IntBitSet *const x, IntBitSet *const y);
 int intBitSetGetNext(const IntBitSet *const x, register int last);
 /** Compare.
  * Compare two intbitset.
