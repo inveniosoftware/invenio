@@ -3579,6 +3579,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             elif of.startswith("h"):
                 req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec))
                 selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
+            # print number of hits found for XML outputs:
+            if of.startswith("x"):
+                req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % results_final_nb_total)
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
