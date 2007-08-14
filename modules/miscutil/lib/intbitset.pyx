@@ -555,6 +555,28 @@ cdef class intbitset:
             intBitSetAddElem((<intbitset> ret).bitset, last)
         return ret
 
+    def is_infinite(self):
+        """Return True if the intbitset is infinite. (i.e. trailing_bits=True
+        was used in the constructor.)"""
+        return self.bitset.trailing_bits != 0
+
+    def extract_finite_list(self):
+        """Return a finite list of elements sufficient to be passed to intbitset
+        constructor toghether with the proper value of trailing_bits in order
+        to reproduce this intbitset."""
+        cdef int maxelem
+        cdef int last
+        ret = []
+        maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
+        last = -1
+        while last < maxelem:
+            last = intBitSetGetNext(self.bitset, last)
+            if last == -2:
+                break
+            ret.append(last)
+        return ret
+
+
 cdef class intbitset_iterator:
     cdef int last
     cdef IntBitSet *bitset
