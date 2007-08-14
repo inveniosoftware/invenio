@@ -27,8 +27,41 @@ import unittest
 
 from invenio.intbitset import intbitset
 
+try:
+    set()
+except NameError:
+    from sets import Set as set
+
 class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
+    def setUp(self):
+        self.sets = [
+            intbitset(),
+            intbitset([10, 20]),
+            intbitset([10, 40]),
+            intbitset([60, 70]),
+            intbitset([60, 80]),
+            intbitset([10, 20, 60, 70]),
+            intbitset([10, 40, 60, 80]),
+        ]
+        self.emptiness = [True, False, False, False, False, False, False]
+
+    def _helper_test(self, intbitset_fnc, set_fnc, intbitset1, intbitset2, in_place=False):
+        intbitset1 = intbitset(intbitset1) # Make a copy
+        intbitset2 = intbitset(intbitset2)
+        orig1 = intbitset(intbitset1)
+        orig2 = intbitset(intbitset2)
+        set1 = set(intbitset1)
+        set2 = set(intbitset2)
+        intbitset3 = intbitset_fnc(intbitset1, intbitset2)
+        set3 = set_fnc(set1, set2)
+        self.assertEqual(set(intbitset1), set1, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset1), set1, intbitset_fnc.__name__, orig1, orig2))
+        self.assertEqual(set(intbitset2), set2, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset2), set2, intbitset_fnc.__name__, orig1, orig2))
+        if not in_place:
+            if intbitset3 is None:
+                self.failUnless(not set3, "%s not equal to %s after executing %s(%s, %s)" % (intbitset3, set3, intbitset_fnc.__name__, orig1, orig2))
+            else:
+                self.assertEqual(set(intbitset3), set3, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset3), set3, intbitset_fnc.__name__, orig1, orig2))
 
     def test_list_dump(self):
         """intbitset - list dump"""
@@ -57,77 +90,49 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_intersection(self):
         """intbitset - set intersection"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        setx = set1 & set2
-        self.assertEqual(list(set1), lst1)
-        self.assertEqual(list(set2), lst2)
-        self.assertEqual(list(setx), [20, 30])
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__and__, set.__and__, set1, set2)
+                self._helper_test(intbitset.intersection, set.intersection, set1, set2)
 
     def test_set_intersection_in_place(self):
         """intbitset - set intersection in place"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        set1 &= set2
-        self.assertEqual(list(set1), [20, 30])
-        self.assertEqual(list(set2), lst2)
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__iand__, set.__iand__, set1, set2, True)
+                self._helper_test(intbitset.intersection_update, set.__iand__, set1, set2, True)
 
     def test_set_union(self):
         """intbitset - set union"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        setx = set1 | set2
-        self.assertEqual(list(set1), lst1)
-        self.assertEqual(list(set2), lst2)
-        self.assertEqual(list(setx), [10, 20, 30, 40, 50, 70])
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__or__, set.__or__, set1, set2)
+                self._helper_test(intbitset.union, set.union, set1, set2)
 
     def test_set_union_in_place(self):
         """intbitset - set union in place"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        set1 |= set2
-        self.assertEqual(list(set1), [10, 20, 30, 40, 50, 70])
-        self.assertEqual(list(set2), lst2)
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__ior__, set.__ior__, set1, set2, True)
+                self._helper_test(intbitset.union_update, set.__ior__, set1, set2, True)
 
     def test_set_difference(self):
         """intbitset - set difference"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        setx = set1 - set2
-        self.assertEqual(list(set1), lst1)
-        self.assertEqual(list(set2), lst2)
-        self.assertEqual(list(setx), [10])
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__sub__, set.__sub__, set1, set2)
+                self._helper_test(intbitset.difference, set.difference, set1, set2)
 
     def test_set_difference_in_place(self):
         """intbitset - set difference in place"""
-        lst1 = [10, 20, 30]
-        lst2 = [20, 30, 40, 50, 70]
-        set1 = intbitset(lst1)
-        set2 = intbitset(lst2)
-        set1 -= set2
-        self.assertEqual(list(set1), [10])
-        self.assertEqual(list(set2), lst2)
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test(intbitset.__isub__, set.__isub__, set1, set2, True)
+                self._helper_test(intbitset.difference_update, set.__isub__, set1, set2, True)
 
-    def test_set_emptiness(self):
-        """intbitset - tests for emptiness"""
-        set1 = intbitset()
-        set2 = intbitset(trailing_bits=1)
-        set3 = intbitset([70])
-        set4 = intbitset([70], trailing_bits=1)
-        self.failUnless(not set1.__nonzero__())
-        self.failUnless(set2.__nonzero__())
-        self.failUnless(set3.__nonzero__())
-        self.failUnless(set4.__nonzero__())
+    #def test_set_emptiness(self):
+        #"""intbitset - tests for emptiness"""
+        #map(lambda x, y: self.assertEqual(x.__nonzero__(), y, "%s is %s empty" % (x, not y and 'not' or '')), self.sets. self.emptiness)
 
     def test_set_clear(self):
         """intbitset - clearing"""
@@ -139,7 +144,7 @@ class IntBitSetTest(unittest.TestCase):
     def test_set_infinite(self):
         """intbitset - infinite sets"""
         set1 = intbitset(trailing_bits=1)
-        set2 = intbitset([10, 20, 30], trailing_bits=1)
+        set2 = intbitset([10, 20, 30, 65], trailing_bits=1)
         self.failUnless(0 in set1)
         self.failUnless(100 in set1)
         self.failUnless(10000 in set1)
@@ -155,8 +160,8 @@ class IntBitSetTest(unittest.TestCase):
     def test_set_repr(self):
         """intbitset - Pythonic representation"""
         set1 = intbitset()
-        set2 = intbitset([10, 20, 30])
-        set3 = intbitset([10, 20, 30], trailing_bits=1)
+        set2 = intbitset([10, 20, 30, 65])
+        set3 = intbitset([10, 20, 30, 65], trailing_bits=1)
         self.assertEqual(set1, eval(repr(set1)))
         self.assertEqual(set2, eval(repr(set2)))
         self.assertEqual(set3, eval(repr(set3)))
