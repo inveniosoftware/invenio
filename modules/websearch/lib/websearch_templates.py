@@ -119,6 +119,7 @@ class Template:
         'action_browse': (str, ""),
         'd1y': (int, 0), 'd1m': (int, 0), 'd1d': (int, 0),
         'd2y': (int, 0), 'd2m': (int, 0), 'd2d': (int, 0),
+        'dt': (str, ""),
         'ap': (int, 1),
         'verbose': (int, 0),
         'ec': (list, []),
@@ -504,7 +505,7 @@ class Template:
                    </thead>
                    <tbody>
                     <tr valign="bottom">
-                      <td class="searchboxbody">%(date_added)s</td>
+                      <td class="searchboxbody">%(added_or_modified)s %(date_added)s</td>
                       <td class="searchboxbody">%(date_until)s</td>
                     </tr>
                    </tbody>
@@ -534,8 +535,9 @@ class Template:
                   <!--/create_searchfor_advanced()-->
               """ % {
 
-                    'added' : _("Added since:"),
+                    'added' : _("Added/modified since:"),
                     'until' : _("until:"),
+                    'added_or_modified': self.tmpl_inputdatetype(ln=ln),
                     'date_added' : self.tmpl_inputdate("d1", ln=ln),
                     'date_until' : self.tmpl_inputdate("d2", ln=ln),
 
@@ -681,6 +683,30 @@ class Template:
         for year in range(this_year-20, this_year+1):
             box += """<option value="%d"%s>%d</option>""" % (year, self.tmpl_is_selected(sy, year), year)
         box += """</select>"""
+        return box
+
+    def tmpl_inputdatetype(self, dt='', ln=cdslang):
+        """
+          Produces input date type selection box to choose
+          added-or-modified date search option.
+
+          Parameters:
+
+            - 'dt' *string - date type (c=created, m=modified)
+
+            - 'ln' *string* - the language to display
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        box = """<select name="dt">
+                  <option value="">%(added)s </option>
+                  <option value="m"%(sel)s>%(modified)s </option>
+                 </select>
+              """ % { 'added': _("Added since:"),
+                      'modified': _("Modified since:"),
+                      'sel': self.tmpl_is_selected(dt, 'm'),
+                    }
         return box
 
     def tmpl_narrowsearch(self, as, ln, type, father,
@@ -1246,7 +1272,7 @@ class Template:
     def tmpl_search_box(self, ln, as, cc, cc_intl, ot, sp,
                         action, fieldslist, f1, f2, f3, m1, m2, m3,
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
-                        d1y, d2y, d1m, d2m, d1d, d2d, sort_formats,
+                        d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_formats,
                         sf, so, ranks, sc, rg, formats, of, pl, jrec, ec):
 
         """
@@ -1275,6 +1301,8 @@ class Template:
           - 'coll_selects' *array* - a list of lists, each containing the collections selects to display
 
           - 'd1y, d2y, d1m, d2m, d1d, d2d' *int* - the search between dates
+
+          - 'dt' *string* - the dates' types (creation dates, modification dates)
 
           - 'sort_formats' *array* - the select information for the sorting format
 
@@ -1530,7 +1558,7 @@ class Template:
         if action == _("Browse") or (d1y==0 and d1m==0 and d1d==0 and d2y==0 and d2m==0 and d2d==0):
             pass # do not need it
         else:
-            cell_6_a = self.tmpl_inputdate("d1", ln, d1y, d1m, d1d)
+            cell_6_a = self.tmpl_inputdatetype(dt, ln) + self.tmpl_inputdate("d1", ln, d1y, d1m, d1d)
             cell_6_b = self.tmpl_inputdate("d2", ln, d2y, d2m, d2d)
             out += """<table class="searchbox">
                        <thead>
@@ -1545,13 +1573,14 @@ class Template:
                        </thead>
                        <tbody>
                         <tr valign="bottom">
-                          <td class="searchboxbody">%(date1)s</td>
+                          <td class="searchboxbody">%(added_or_modified)s %(date1)s</td>
                           <td class="searchboxbody">%(date2)s</td>
                         </tr>
                        </tbody>
                       </table>""" % {
-                        'added' : _("Added since:"),
+                        'added' : _("Added/modified since:"),
                         'until' : _("until:"),
+                        'added_or_modified': self.tmpl_inputdatetype(dt, ln),
                         'date1' : self.tmpl_inputdate("d1", ln, d1y, d1m, d1d),
                         'date2' : self.tmpl_inputdate("d2", ln, d2y, d2m, d2d),
                       }
@@ -1679,7 +1708,7 @@ class Template:
                                collection, collection_name, collection_id,
                                as, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
                                f2, f3, m1, m2, m3, op1, op2, p1, p2,
-                               p3, d1y, d1m, d1d, d2y, d2m, d2d,
+                               p3, d1y, d1m, d1d, d2y, d2m, d2d, dt,
                                all_fieldcodes, cpu_time, pl_in_url,
                                jrec, sc, sp):
 
@@ -1726,9 +1755,12 @@ class Template:
 
           - 'd1y, d2y, d1m, d2m, d1d, d2d' *int* - the search between dates
 
+          - 'dt' *string* the dates' type (creation date, modification date)
+
           - 'all_fieldcodes' *array* - all the available fields
 
           - 'cpu_time' *float* - the time of the query in seconds
+
         """
 
         # load the right message language
@@ -1779,6 +1811,7 @@ class Template:
                      'sc': 0,
                      'd1y': d1y, 'd1m': d1m, 'd1d': d1d,
                      'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
+                     'dt': dt,
                 }
 
             # @todo here
@@ -1819,7 +1852,7 @@ class Template:
             # still in the navigation part
             cc = collection
             sc = 0
-            for var in ['p', 'cc', 'f', 'sf', 'so', 'of', 'rg', 'as', 'ln', 'p1', 'p2', 'p3', 'f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'op1', 'op2', 'sc', 'd1y', 'd1m', 'd1d', 'd2y', 'd2m', 'd2d']:
+            for var in ['p', 'cc', 'f', 'sf', 'so', 'of', 'rg', 'as', 'ln', 'p1', 'p2', 'p3', 'f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'op1', 'op2', 'sc', 'd1y', 'd1m', 'd1d', 'd2y', 'd2m', 'd2d', 'dt']:
                 out += self.tmpl_input_hidden(name = var, value = vars()[var])
             for var in ['ot', 'sp', 'rm']:
                 if vars()[var]:
@@ -2429,9 +2462,9 @@ class Template:
         """Returns the main detailed page of a record
 
         Parameters:
-        
+
           - 'recID' *int* - The ID of the printed record
-        
+
           - 'ln' *string* - The language to display
 
           - 'format' *string* - The format in used to print the record
@@ -2443,11 +2476,11 @@ class Template:
           - 'modifydate' *string* - The last modification date of the printed record
         """
         _ = gettext_set_language(ln)
-        
+
         out = content
 
         return out
-        
+
     def tmpl_detailed_record_statistics(self, recID, ln,
                                         citinglist, citationhistory,
                                         cociting, downloadsimilarity,
@@ -2455,9 +2488,9 @@ class Template:
         """Returns the statistics page of a record
 
         Parameters:
-        
+
           - 'recID' *int* - The ID of the printed record
-        
+
           - 'ln' *string* - The language to display
 
           - citinglist *string* - citinglist box
@@ -2469,13 +2502,13 @@ class Template:
           - downloadsimilarity *string* - downloadsimilarity box
 
           - downloadhistory *string* - downloadhistory box
-          
+
           - viewsimilarity *string* - viewsimilarity box
-          
+
         """
         # load the right message language
         _ = gettext_set_language(ln)
-        
+
         out = ''
         if citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
@@ -2493,7 +2526,7 @@ class Template:
                                       {}, _("more")),
                 'similar': similar}
             out += '<br />'
-      
+
         if cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
                 _("Co-cited with: %s records") % len (cociting), cociting, ln)
@@ -2524,11 +2557,11 @@ class Template:
 
             out += '</table>'
             out +=  '<br />'
-          
+
         if viewsimilarity is not None:
             out += self.tmpl_print_record_list_for_similarity_boxen (
                 _("People who viewed this page also viewed:"), viewsimilarity, ln)
-          
+
         if downloadhistory is not None:
             out += downloadhistory + '<br />'
 
@@ -2536,20 +2569,20 @@ class Template:
 
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record
-        
+
         Parameters:
 
           - 'recID' *int* - The ID of the printed record
-        
+
           - 'ln' *string* - The language to display
 
           - 'content' *string* - The main content of the page
         """
         # load the right message language
         _ = gettext_set_language(ln)
-        
+
         out = ''
         if content is not None:
             out += content
-    
+
         return out

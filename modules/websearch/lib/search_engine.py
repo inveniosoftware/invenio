@@ -629,7 +629,7 @@ def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_
 
 def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                       ln, p1, f1, m1, op1, p2, f2, m2, op2, p3, f3,
-                      m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec,
+                      m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec,
                       action=""):
 
     """Create search box for 'search again in the results page' functionality."""
@@ -746,6 +746,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              f = f,
              coll_selects = coll_selects,
              d1y = d1y, d2y = d2y, d1m = d1m, d2m = d2m, d1d = d1d, d2d = d2d,
+             dt = dt,
              sort_formats = sort_formats,
              sf = sf,
              so = so,
@@ -1681,14 +1682,18 @@ def search_unit_in_bibxxx(p, f, type):
 
     return set
 
-def search_unit_in_bibrec(day1, day2, type='creation_date'):
-    """Return hitset of recIDs found that were either created or modified (see 'type' arg)
-       from day1 until day2, inclusive.  Does not pay attention to pattern, collection, anything.
-       Useful to intersect later on with the 'real' query."""
+def search_unit_in_bibrec(day1, day2, type='c'):
+    """
+    Return hitset of recIDs found that were either created or modified
+    (according to 'type' arg being 'c' or 'm') from day1 until day2, inclusive.
+    Does not pay attention to pattern, collection, anything.  Useful
+    to intersect later on with the 'real' query.
+    """
     set = HitSet()
-    if type != "creation_date" and type != "modification_date":
-        # type argument is invalid, so search for creation dates by default
-        type = "creation_date"
+    if type.startswith("m"):
+        type = "modification_date"
+    else:
+        type = "creation_date" # by default we are searching for creation dates
     res = run_sql("SELECT id FROM bibrec WHERE %s>=%s AND %s<=%s" % (type, "%s", type, "%s"),
                   (day1, day2))
     for row in res:
@@ -1744,7 +1749,6 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
        and return the original 'results' set unchanged.  If 'ap' is
        false, then return empty results set.
     """
-
     if ap:
         results_ap = copy.deepcopy(results)
     else:
@@ -2232,7 +2236,7 @@ def print_warning(req, msg, type='', prologue='<br />', epilogue='<br />'):
 def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
                       as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
-                      d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0,
+                      d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
                       cpu_time=-1, middle_only=0):
     """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
        Also, prints navigation links (beg/next/prev/end) inside the results set.
@@ -2282,6 +2286,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found
              d2y = d2y,
              d2m = d2m,
              d2d = d2d,
+             dt = dt,
              jrec = jrec,
              sc = sc,
              sp = sp,
@@ -3075,7 +3080,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
-                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, verbose=0, ap=0, ln=cdslang, ec = None, tab=''):
+                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cdslang, ec=None, tab=""):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -3087,7 +3092,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
           cc - current collection (e.g. "ATLAS").  The collection the
                user started to search/browse from.
 
-           c - collectin list (e.g. ["Theses", "Books"]).  The
+           c - collection list (e.g. ["Theses", "Books"]).  The
                collections user may have selected/deselected when
                starting to search from 'cc'.
 
@@ -3195,23 +3200,28 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
       action - action to do.  "SEARCH" for searching, "Browse" for
                browsing.  Default is to search.
 
-         d1y - first date year (e.g. "1998").  Useful for search
+         d1y - first date's year (e.g. "1998").  Useful for search
                limits on creation date.
 
-         d1m - first date month (e.g. "08").  Useful for search
+         d1m - first date's month (e.g. "08").  Useful for search
                limits on creation date.
 
-         d1d - first date day (e.g. "23").  Useful for search
+         d1d - first date's day (e.g. "23").  Useful for search
                limits on creation date.
 
-         d2y - second date year (e.g. "1998").  Useful for search
+         d2y - second date's year (e.g. "1998").  Useful for search
                limits on creation date.
 
-         d2m - second date month (e.g. "09").  Useful for search
+         d2m - second date's month (e.g. "09").  Useful for search
                limits on creation date.
 
-         d2d - second date day (e.g. "02").  Useful for search limits
+         d2d - second date's day (e.g. "02").  Useful for search limits
                on creation date.
+
+          dt - first and second date's type (e.g. "c").  Specifies
+               whether to search in creation dates ("c") or in
+               modification dates ("m").  When dt is not set and d1*
+               and d2* are set, the default is "c".
 
      verbose - verbose level (0=min, 9=max).  Useful to print some
                internal information on the searching process in case
@@ -3225,7 +3235,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
           ln - language of the search interface (e.g. "en").  Useful
                for internationalization.
 
-          ec - List of external search engines enabled.
+          ec - list of external search engines to search as well
+               (e.g. "SPIRES HEP").
     """
     selected_external_collections_infos = None
 
@@ -3313,7 +3324,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Browse"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         try:
             if as == 1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg)
@@ -3331,7 +3342,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         if record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
@@ -3350,7 +3361,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_similar_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
-                                                d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
+                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
                     print_warning(req, results_similar_comments)
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
                                   results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose)
@@ -3370,7 +3381,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         recID = p[12:]
         if record_exists(recID) != 1:
             # record does not exist
@@ -3389,7 +3400,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_cocited_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
-                                                d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
+                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
                     print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose)
                 elif of=="id":
                     return results_cocited_recIDs
@@ -3404,7 +3415,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, jrec, ec, action))
+                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         t1 = os.times()[4]
         results_in_any_collection = HitSet()
         if as == 1 or (p1 or p2 or p3):
@@ -3489,7 +3500,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
-                                                              search_unit_in_bibrec(day1, day2),
+                                                              search_unit_in_bibrec(day1, day2, dt),
                                                               ap,
                                                               aptext= _("No match within your time limits, "
                                                                         "discarding this condition..."),
@@ -3593,7 +3604,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
-                                                    d1y, d1m, d1d, d2y, d2m, d2d, cpu_time))
+                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
                     results_final_recIDs = list(results_final[coll])
                     results_final_relevances = []
                     results_final_relevances_prologue = ""
@@ -3625,7 +3636,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                         req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                                     jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                     sc, pl_in_url,
-                                                    d1y, d1m, d1d, d2y, d2m, d2d, cpu_time, 1))
+                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
             print_records_epilogue(req, of)
             if f == "author" and of.startswith("h"):
                 req.write(create_similarly_named_authors_link_box(p, ln))
