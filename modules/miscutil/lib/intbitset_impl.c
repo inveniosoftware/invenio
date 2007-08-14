@@ -316,12 +316,12 @@ IntBitSet *intBitSetIXor(IntBitSet *const dst, IntBitSet *const src) {
 IntBitSet *intBitSetIIntersection(IntBitSet *const dst, IntBitSet *const src) {
     register word_t *dstbase;
     register word_t *srcbase;
-    register word_t *srcend;
-    register int allocated = intBitSetAdaptMin(dst, src);
+    register word_t *dstend;
+    dst->allocated = intBitSetAdaptMin(dst, src);
     dstbase = dst->bitset;
     srcbase = src->bitset;
-    srcend = src->bitset + allocated;
-    for (; srcbase < srcend; ++dstbase, ++srcbase)
+    dstend = dst->bitset + dst->allocated;
+    for (; dstbase < dstend; ++dstbase, ++srcbase)
         *dstbase &= *srcbase;
     dst->size = -1;
     dst->tot = -1;
