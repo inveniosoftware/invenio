@@ -717,9 +717,10 @@ def oaigetsysnolist(set, fromdate, untildate):
     "Returns list of system numbers for the OAI set 'set', modified from 'date_from' until 'date_until'."
 
     out_dict = {} # dict to hold list of out sysnos as its keys
-
+    
+    # TODO: Use search engine instead of SQL.
     if set:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_SET_FIELD, set)
+        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx, bibrec_bib%sx AS bib2x, bib%sx as b2x LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s' AND bib2x.id_bibrec = bibx.id_bibrec AND bib2x.id_bibxxx = b2x.id AND b2x.tag = '%s'" % (CFG_OAI_SET_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_SET_FIELD[0:2], CFG_OAI_SET_FIELD, set, CFG_OAI_ID_FIELD)
     else:
         query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD)
 
@@ -800,7 +801,9 @@ def oaicachestatus(resumptionToken):
 
 def get_sets():
     "Returns list of sets."
-
+    # TODO: Try to remove dependency on oaiARCHIVE table, by
+    # determining available sets from data.
+    
     out = {}
     row = ['', '']
 
