@@ -114,13 +114,17 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
 
     while rt_obj is not None and rt_obj != "":
 
-        if output and a.find("</record>") > -1:
-            write_file( "%s.%07d" % (output, i), a)
+        if output:
+            # Write results to a file named 'output'
+            if a.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+                write_file( "%s.%07d" % (output, i), a)
+            else:
+                # hmm, were there no records in output? Do not create
+                # a file and warn user
+                sys.stderr.write("\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: "
+                                 +  "\n" + repr(a) + "\n***\n-->\n")
         else:
-            # hmm, were there no records in output?
             sys.stdout.write(a)
-            sys.stdout.write("\n<!--\n*** WARNING: NO RECORDS IN THE OUTPUT: "
-                + repr(output) +  "\n" + repr(a) + "\n***\n-->\n")
 
         i = i + 1
 
@@ -134,15 +138,17 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
         rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
             a, re.DOTALL)
 
-    if output and a.find("</record>") > -1:
-        write_file("%s.%07d" % (output, i), a)
+    if output:
+        # Write results to a file named 'output'
+        if a.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+            write_file("%s.%07d" % (output, i), a)
+        else:
+            # hmm, were there no records in output? Do not create
+            # a file and warn user
+            sys.stderr.write("\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: "
+                                 +  "\n" + repr(a) + "\n***\n-->\n")
     else:
-        # hmm, were there no records in output?
         sys.stdout.write(a)
-        sys.stdout.write("\n<!--\n*** WARNING: NO RECORDS IN THE OUTPUT: " + \
-                         repr(output) +  "\n" + \
-                         repr(a) + \
-                         "\n***\n-->\n")
 
     return i
 
