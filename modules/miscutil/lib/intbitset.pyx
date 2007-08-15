@@ -560,14 +560,16 @@ cdef class intbitset:
         was used in the constructor.)"""
         return self.bitset.trailing_bits != 0
 
-    def extract_finite_list(self):
+    def extract_finite_list(self, int up_to=-1):
         """Return a finite list of elements sufficient to be passed to intbitset
         constructor toghether with the proper value of trailing_bits in order
-        to reproduce this intbitset."""
+        to reproduce this intbitset. At least up_to integer are looked for when
+        they are inside the intbitset but not necessarily needed to build the
+        intbitset"""
         cdef int maxelem
         cdef int last
         ret = []
-        maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
+        maxelem = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)
         last = -1
         while last < maxelem:
             last = intBitSetGetNext(self.bitset, last)
