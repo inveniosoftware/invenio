@@ -48,7 +48,7 @@ IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) 
     return ret;
 }
 
-IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const int bufsize) {
+IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize) {
     bitset->allocated = bufsize/wordbytesize;
     bitset->bitset = realloc(bitset->bitset, bufsize);
     bitset->tot = -1;
@@ -69,7 +69,7 @@ IntBitSet *intBitSetReset(IntBitSet *const bitset) {
 }
 
 
-IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const int bufsize) {
+IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const Py_ssize_t bufsize) {
     IntBitSet *ret = malloc(sizeof(IntBitSet));
     ret->allocated = bufsize/wordbytesize;
     ret->bitset = malloc(bufsize);
@@ -188,17 +188,21 @@ bool_t intBitSetEmpty(const IntBitSet *const bitset) {
 int intBitSetAdaptMax(IntBitSet *const x, IntBitSet *const y) {
     register int sizex = intBitSetGetSize(x);
     register int sizey = intBitSetGetSize(y);
-    register int sizemax = (sizex > sizey) ? sizex : sizey;
-    if (sizemax > x->allocated-1)
-        intBitSetResize(x, sizemax+1);
-    if (sizemax > y->allocated-1)
-        intBitSetResize(y, sizemax+1);
-    return sizemax+1;
+    register int sizemax = ((sizex > sizey) ? sizex : sizey) + 1;
+    if (sizemax > x->allocated)
+        intBitSetResize(x, sizemax);
+    if (sizemax > y->allocated)
+        intBitSetResize(y, sizemax);
+    return sizemax;
 }
 
 int intBitSetAdaptMin(IntBitSet *const x, IntBitSet *const y) {
-    register int sizex = intBitSetGetSize(x);
-    register int sizey = intBitSetGetSize(y);
+    register int sizex;
+    register int sizey;
+    if (x->trailing_bits || y->trailing_bits)
+        return intBitSetAdaptMax(x, y);
+    sizex = intBitSetGetSize(x);
+    sizey = intBitSetGetSize(y);
     return ((sizex < sizey) ? sizex : sizey) + 1;
 }
 
@@ -261,21 +265,21 @@ IntBitSet *intBitSetIntersection(IntBitSet *const x, IntBitSet *const y) {
 
 IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     register word_t *xbase;
-    register word_t *xend;
     register word_t *ybase;
     register word_t *retbase;
+    register word_t *retend;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
     ret->allocated = x->allocated;
     xbase = x->bitset;
-    xend = x->bitset+intBitSetAdaptMin(x, y);
     ybase = y->bitset;
     retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
+    retend = ret->bitset+intBitSetAdaptMin(x, y);
     ret->size = -1;
     ret->tot = -1;
-    for (; xbase < xend; ++xbase, ++ybase, ++retbase)
+    for (; retbase < retend; ++xbase, ++ybase, ++retbase)
         *(retbase) = *(xbase) & ~*(ybase);
-    xend = x->bitset+x->allocated;
-    for (; xbase < xend; ++xbase, ++retbase)
+    retend = ret->bitset+ret->allocated;
+    for (; retbase < retend; ++xbase, ++retbase)
         *retbase = *xbase & ~y->trailing_bits;
     ret->trailing_bits = x->trailing_bits & ~y->trailing_bits;
     return ret;

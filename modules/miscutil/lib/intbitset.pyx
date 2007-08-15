@@ -32,15 +32,15 @@ various machine architectures.
 import zlib
 from array import array
 
-ctypedef unsigned long long int word_t
-ctypedef unsigned char bool_t
-ctypedef unsigned long long int Py_ssize_t
 
 cdef extern from "Python.h":
+    ctypedef unsigned long long int Py_ssize_t
     object PyString_FromStringAndSize(char *s, Py_ssize_t len)
     int PyObject_AsReadBuffer(object obj, void **buf, Py_ssize_t *buf_len)
 
 cdef extern from "intbitset.h":
+    ctypedef unsigned long long int word_t
+    ctypedef unsigned char bool_t
     ctypedef struct IntBitSet:
         int size
         int allocated
@@ -578,6 +578,11 @@ cdef class intbitset:
             ret.append(last)
         return ret
 
+    def get_wordbitsize(self):
+        return wordbitsize
+
+    def get_wordbytsize(self):
+        return wordbytesize
 
 cdef class intbitset_iterator:
     cdef int last

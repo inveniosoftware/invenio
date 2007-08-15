@@ -20,6 +20,8 @@
 #ifndef INTBITSET_H
 #define INTBITSET_H
 
+#include <Python.h>
+
 typedef unsigned long long int word_t;
 typedef unsigned char bool_t;
 
@@ -35,8 +37,8 @@ typedef struct {
 } IntBitSet;
 
 IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits);
-IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const int bufsize);
-IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const int bufsize);
+IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const Py_ssize_t bufsize);
+IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize);
 IntBitSet *intBitSetReset(IntBitSet *const bitset);
 void intBitSetDestroy(IntBitSet *const bitset);
 IntBitSet *intBitSetClone(const IntBitSet * const bitset);
