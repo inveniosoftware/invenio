@@ -166,7 +166,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         url_list = []
         for url,descr in others_urls.items():
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
-        ret += '<small>' + separator.join(url_list) + '<small><br />'
+        ret += '<small>' + separator.join(url_list) + '</small><br />'
     if ret.endswith('<br />'):
         ret = ret[:-len('<br />')]
 
