@@ -36,32 +36,228 @@ class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
         self.sets = [
-            intbitset(),
-            intbitset([10, 20]),
-            intbitset([10, 40]),
-            intbitset([60, 70]),
-            intbitset([60, 80]),
-            intbitset([10, 20, 60, 70]),
-            intbitset([10, 40, 60, 80]),
+            [10, 20],
+            [10, 40],
+            [60, 70],
+            [60, 80],
+            [10, 20, 60, 70],
+            [10, 40, 60, 80],
         ]
-        self.emptiness = [True, False, False, False, False, False, False]
+        self.fncs_list = [
+            (intbitset.__and__, set.__and__, int.__and__, False),
+            (intbitset.__or__, set.__or__, int.__or__, False),
+            (intbitset.__xor__, set.__xor__, int.__xor__, False),
+            (intbitset.__sub__, set.__sub__, int.__sub__, False),
+            (intbitset.__iand__, set.__iand__, int.__and__, True),
+            (intbitset.__ior__, set.__ior__, int.__or__, True),
+            (intbitset.__ixor__, set.__ixor__, int.__xor__, True),
+            (intbitset.__isub__, set.__isub__, int.__sub__, True),
+        ]
 
-    def _helper_test(self, intbitset_fnc, set_fnc, intbitset1, intbitset2, in_place=False):
-        intbitset1 = intbitset(intbitset1) # Make a copy
-        intbitset2 = intbitset(intbitset2)
+        self.cmp_list = [
+            (intbitset.__eq__, set.__eq__, lambda x, y: cmp(x, y) == 0),
+            (intbitset.__ge__, set.__ge__, lambda x, y: cmp(x, y) >= 0),
+            (intbitset.__gt__, set.__gt__, lambda x, y: cmp(x, y) > 0),
+            (intbitset.__le__, set.__le__, lambda x, y: cmp(x, y) <= 0),
+            (intbitset.__lt__, set.__lt__, lambda x, y: cmp(x, y) < 0),
+            (intbitset.__ne__, set.__ne__, lambda x, y: cmp(x, y) != 0),
+        ]
+
+    def _helper_sanity_test(self, intbitset1):
+        self.failUnless(intbitset1.get_size() < intbitset1.get_allocated(), "%s failed sanity check beacuse size %s >= allocated %s" % (intbitset1, intbitset1.get_size(), intbitset1.get_allocated()))
+
+    def _helper_test_via_fncs_list(self, fncs, intbitset1, intbitset2):
         orig1 = intbitset(intbitset1)
         orig2 = intbitset(intbitset2)
-        set1 = set(intbitset1)
-        set2 = set(intbitset2)
-        intbitset3 = intbitset_fnc(intbitset1, intbitset2)
-        set3 = set_fnc(set1, set2)
-        self.assertEqual(set(intbitset1), set1, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset1), set1, intbitset_fnc.__name__, orig1, orig2))
-        self.assertEqual(set(intbitset2), set2, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset2), set2, intbitset_fnc.__name__, orig1, orig2))
-        if not in_place:
-            if intbitset3 is None:
-                self.failUnless(not set3, "%s not equal to %s after executing %s(%s, %s)" % (intbitset3, set3, intbitset_fnc.__name__, orig1, orig2))
-            else:
-                self.assertEqual(set(intbitset3), set3, "%s not equal to %s after executing %s(%s, %s)" % (set(intbitset3), set3, intbitset_fnc.__name__, orig1, orig2))
+
+        trailing1 = intbitset1.is_infinite()
+        trailing2 = intbitset2.is_infinite()
+
+        if fncs[3]:
+            fncs[0](intbitset1, intbitset2)
+            trailing1 = fncs[2](trailing1, trailing2) > 0
+            up_to = intbitset1.extract_finite_list() and max(intbitset1.extract_finite_list()) or -1
+        else:
+            intbitset3 = fncs[0](intbitset1, intbitset2)
+            trailing3 = fncs[2](trailing1, trailing2) > 0
+            up_to = intbitset3.extract_finite_list() and max(intbitset3.extract_finite_list()) or -1
+
+        set1 = set(orig1.extract_finite_list(up_to))
+        set2 = set(orig2.extract_finite_list(up_to))
+
+        if fncs[3]:
+            fncs[1](set1, set2)
+        else:
+            set3 = fncs[1](set1, set2)
+
+        self._helper_sanity_test(intbitset1)
+        self._helper_sanity_test(intbitset2)
+
+        if fncs[3]:
+            self.assertEqual(set1 & set(intbitset1.extract_finite_list(up_to)), set(intbitset1.extract_finite_list(up_to)), "%s not equal to %s after executing %s(%s, %s)" % (set1, set(intbitset1.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
+            self.assertEqual(set1 | set(intbitset1.extract_finite_list(up_to)), set1, "%s not equal to %s after executing %s(%s, %s)" % (set1, set(intbitset1.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
+            self.assertEqual(trailing1, intbitset1.is_infinite(), "%s is not %s as it is supposed to be after executing %s(%s, %s)" % (intbitset1, trailing1 and 'infinite' or 'finite', fncs[0].__name__, repr(orig1), repr(orig2)))
+        else:
+            self._helper_sanity_test(intbitset3)
+            self.assertEqual(set3 & set(intbitset3.extract_finite_list(up_to)), set(intbitset3.extract_finite_list(up_to)), "%s not equal to %s after executing %s(%s, %s)" % (set3, set(intbitset3.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
+            self.assertEqual(set3 | set(intbitset3.extract_finite_list(up_to)), set3, "%s not equal to %s after executing %s(%s, %s)" % (set3, set(intbitset3.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
+            self.assertEqual(trailing3, intbitset3.is_infinite(), "%s is not %s as it is supposed to be after executing %s(%s, %s)" % (intbitset3, trailing3 and 'infinite' or 'finite', fncs[0].__name__, repr(orig1), repr(orig2)))
+
+
+    def _helper_test_normal_set(self, fncs):
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset(set2))
+
+    def _helper_test_empty_set(self, fncs):
+        for set1 in self.sets:
+            self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset())
+            self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(set1))
+        self._helper_test_via_fncs_list(fncs, intbitset(), intbitset())
+
+    def _helper_test_inifinite_set(self, fncs):
+        for set1 in self.sets:
+            for set2 in self.sets:
+                self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset(set2, trailing_bits=True))
+                self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset(set2))
+                self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset(set2, trailing_bits=True))
+
+    def _helper_test_infinite_vs_empty(self, fncs):
+        for set1 in self.sets:
+            self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset())
+            self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(set1, trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, intbitset(trailing_bits=True), intbitset())
+
+
+    def test_set_intersection(self):
+        """intbitset - set intersection"""
+        self._helper_test_normal_set(self.fncs_list[0])
+
+    def test_set_intersection_empty(self):
+        """intbitset - set intersection empty"""
+        self._helper_test_empty_set(self.fncs_list[0])
+
+    def test_set_intersection_infinite(self):
+        """intbitset - set intersection infinite"""
+        self._helper_test_inifinite_set(self.fncs_list[0])
+
+    def test_set_intersection_infinite_empty(self):
+        """intbitset - set intersection infinite vs empty"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[0])
+
+    def test_set_union(self):
+        """intbitset - set union"""
+        self._helper_test_normal_set(self.fncs_list[1])
+
+    def test_set_union_empty(self):
+        """intbitset - set union empty"""
+        self._helper_test_empty_set(self.fncs_list[1])
+
+    def test_set_union_infinite(self):
+        """intbitset - set union infinite"""
+        self._helper_test_inifinite_set(self.fncs_list[1])
+
+    def test_set_union_infinite_empty(self):
+        """intbitset - set union infinite vs empty"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[1])
+
+    def test_set_simmetric_difference(self):
+        """intbitset - set simmetric_difference"""
+        self._helper_test_normal_set(self.fncs_list[2])
+
+    def test_set_simmetric_difference_empty(self):
+        """intbitset - set simmetric_difference empty"""
+        self._helper_test_empty_set(self.fncs_list[2])
+
+    def test_set_simmetric_difference_infinite(self):
+        """intbitset - set simmetric_difference infinite"""
+        self._helper_test_inifinite_set(self.fncs_list[2])
+
+    def test_set_simmetric_difference_infinite_empty(self):
+        """intbitset - set simmetric_difference infinite vs empty"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[2])
+
+    def test_set_difference(self):
+        """intbitset - set difference"""
+        self._helper_test_normal_set(self.fncs_list[3])
+
+    def test_set_difference_empty(self):
+        """intbitset - set difference empty"""
+        self._helper_test_empty_set(self.fncs_list[3])
+
+    def test_set_difference_infinite(self):
+        """intbitset - set difference infinite"""
+        self._helper_test_inifinite_set(self.fncs_list[3])
+
+    def test_set_difference_infinite_empty(self):
+        """intbitset - set difference infinite vs empty"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[3])
+
+    def test_set_intersection_in_place(self):
+        """intbitset - set intersection in place"""
+        self._helper_test_normal_set(self.fncs_list[4])
+
+    def test_set_intersection_empty_in_place(self):
+        """intbitset - set intersection empty in place"""
+        self._helper_test_empty_set(self.fncs_list[4])
+
+    def test_set_intersection_infinite_in_place(self):
+        """intbitset - set intersection infinite in place"""
+        self._helper_test_inifinite_set(self.fncs_list[4])
+
+    def test_set_intersection_infinite_empty_in_place(self):
+        """intbitset - set intersection infinite vs empty in place"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[4])
+
+    def test_set_union_in_place(self):
+        """intbitset - set union in place"""
+        self._helper_test_normal_set(self.fncs_list[5])
+
+    def test_set_union_empty_in_place(self):
+        """intbitset - set union empty in place"""
+        self._helper_test_empty_set(self.fncs_list[5])
+
+    def test_set_union_infinite_in_place(self):
+        """intbitset - set union infinite in place"""
+        self._helper_test_inifinite_set(self.fncs_list[5])
+
+    def test_set_union_infinite_empty_in_place(self):
+        """intbitset - set union infinite vs empty in place"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[5])
+
+    def test_set_simmetric_difference_in_place(self):
+        """intbitset - set simmetric_difference in place"""
+        self._helper_test_normal_set(self.fncs_list[6])
+
+    def test_set_simmetric_difference_empty_in_place(self):
+        """intbitset - set simmetric_difference empty in place"""
+        self._helper_test_empty_set(self.fncs_list[6])
+
+    def test_set_simmetric_difference_infinite_in_place(self):
+        """intbitset - set simmetric_difference infinite in place"""
+        self._helper_test_inifinite_set(self.fncs_list[6])
+
+    def test_set_simmetric_difference_infinite_empty_in_place(self):
+        """intbitset - set simmetric_difference infinite vs empty in place"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[6])
+
+    def test_set_difference_in_place(self):
+        """intbitset - set difference in place"""
+        self._helper_test_normal_set(self.fncs_list[7])
+
+    def test_set_difference_empty_in_place(self):
+        """intbitset - set difference empty in place"""
+        self._helper_test_empty_set(self.fncs_list[7])
+
+    def test_set_difference_infinite_in_place(self):
+        """intbitset - set difference infinite in place"""
+        self._helper_test_inifinite_set(self.fncs_list[7])
+
+    def test_set_difference_infinite_empty_in_place(self):
+        """intbitset - set difference infinite vs empty in place"""
+        self._helper_test_infinite_vs_empty(self.fncs_list[7])
+
 
     def test_list_dump(self):
         """intbitset - list dump"""
@@ -88,47 +284,6 @@ class IntBitSetTest(unittest.TestCase):
         self.assertEqual(list(set2), [10, 20, 30])
         self.assertEqual(list(set3), [10, 20, 30])
 
-    def test_set_intersection(self):
-        """intbitset - set intersection"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__and__, set.__and__, set1, set2)
-                self._helper_test(intbitset.intersection, set.intersection, set1, set2)
-
-    def test_set_intersection_in_place(self):
-        """intbitset - set intersection in place"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__iand__, set.__iand__, set1, set2, True)
-                self._helper_test(intbitset.intersection_update, set.__iand__, set1, set2, True)
-
-    def test_set_union(self):
-        """intbitset - set union"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__or__, set.__or__, set1, set2)
-                self._helper_test(intbitset.union, set.union, set1, set2)
-
-    def test_set_union_in_place(self):
-        """intbitset - set union in place"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__ior__, set.__ior__, set1, set2, True)
-                self._helper_test(intbitset.union_update, set.__ior__, set1, set2, True)
-
-    def test_set_difference(self):
-        """intbitset - set difference"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__sub__, set.__sub__, set1, set2)
-                self._helper_test(intbitset.difference, set.difference, set1, set2)
-
-    def test_set_difference_in_place(self):
-        """intbitset - set difference in place"""
-        for set1 in self.sets:
-            for set2 in self.sets:
-                self._helper_test(intbitset.__isub__, set.__isub__, set1, set2, True)
-                self._helper_test(intbitset.difference_update, set.__isub__, set1, set2, True)
 
     #def test_set_emptiness(self):
         #"""intbitset - tests for emptiness"""
