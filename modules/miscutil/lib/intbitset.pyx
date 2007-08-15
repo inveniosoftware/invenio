@@ -32,9 +32,10 @@ various machine architectures.
 import zlib
 from array import array
 
+cdef extern from "intbitset.h":
+    ctypedef int Py_ssize_t
 
 cdef extern from "Python.h":
-    ctypedef unsigned long long int Py_ssize_t
     object PyString_FromStringAndSize(char *s, Py_ssize_t len)
     int PyObject_AsReadBuffer(object obj, void **buf, Py_ssize_t *buf_len)
 

@@ -22,6 +22,10 @@
 
 #include <Python.h>
 
+#if PY_VERSION_HEX < 0x02050000
+typedef int Py_ssize_t;
+#endif
+
 typedef unsigned long long int word_t;
 typedef unsigned char bool_t;
 
