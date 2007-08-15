@@ -131,131 +131,131 @@ class IntBitSetTest(unittest.TestCase):
 
 
     def test_set_intersection(self):
-        """intbitset - set intersection"""
+        """intbitset - set intersection, normal set"""
         self._helper_test_normal_set(self.fncs_list[0])
 
     def test_set_intersection_empty(self):
-        """intbitset - set intersection empty"""
+        """intbitset - set intersection, empty set"""
         self._helper_test_empty_set(self.fncs_list[0])
 
     def test_set_intersection_infinite(self):
-        """intbitset - set intersection infinite"""
+        """intbitset - set intersection, infinite set"""
         self._helper_test_inifinite_set(self.fncs_list[0])
 
     def test_set_intersection_infinite_empty(self):
-        """intbitset - set intersection infinite vs empty"""
+        """intbitset - set intersection, infinite vs empty"""
         self._helper_test_infinite_vs_empty(self.fncs_list[0])
 
     def test_set_union(self):
-        """intbitset - set union"""
+        """intbitset - set union, normal set"""
         self._helper_test_normal_set(self.fncs_list[1])
 
     def test_set_union_empty(self):
-        """intbitset - set union empty"""
+        """intbitset - set union, empty set"""
         self._helper_test_empty_set(self.fncs_list[1])
 
     def test_set_union_infinite(self):
-        """intbitset - set union infinite"""
+        """intbitset - set union, infinite set"""
         self._helper_test_inifinite_set(self.fncs_list[1])
 
     def test_set_union_infinite_empty(self):
-        """intbitset - set union infinite vs empty"""
+        """intbitset - set union, infinite vs empty"""
         self._helper_test_infinite_vs_empty(self.fncs_list[1])
 
-    def test_set_simmetric_difference(self):
-        """intbitset - set simmetric_difference"""
+    def test_set_symmetric_difference(self):
+        """intbitset - set symmetric difference, normal set"""
         self._helper_test_normal_set(self.fncs_list[2])
 
-    def test_set_simmetric_difference_empty(self):
-        """intbitset - set simmetric_difference empty"""
+    def test_set_symmetric_difference_empty(self):
+        """intbitset - set symmetric difference, empty set"""
         self._helper_test_empty_set(self.fncs_list[2])
 
-    def test_set_simmetric_difference_infinite(self):
-        """intbitset - set simmetric_difference infinite"""
+    def test_set_symmetric_difference_infinite(self):
+        """intbitset - set symmetric difference, infinite set"""
         self._helper_test_inifinite_set(self.fncs_list[2])
 
-    def test_set_simmetric_difference_infinite_empty(self):
-        """intbitset - set simmetric_difference infinite vs empty"""
+    def test_set_symmetric_difference_infinite_empty(self):
+        """intbitset - set symmetric difference, infinite vs empty"""
         self._helper_test_infinite_vs_empty(self.fncs_list[2])
 
     def test_set_difference(self):
-        """intbitset - set difference"""
+        """intbitset - set difference, normal set"""
         self._helper_test_normal_set(self.fncs_list[3])
 
     def test_set_difference_empty(self):
-        """intbitset - set difference empty"""
+        """intbitset - set difference, empty set"""
         self._helper_test_empty_set(self.fncs_list[3])
 
     def test_set_difference_infinite(self):
-        """intbitset - set difference infinite"""
+        """intbitset - set difference, infinite set"""
         self._helper_test_inifinite_set(self.fncs_list[3])
 
     def test_set_difference_infinite_empty(self):
-        """intbitset - set difference infinite vs empty"""
+        """intbitset - set difference, infinite vs empty"""
         self._helper_test_infinite_vs_empty(self.fncs_list[3])
 
     def test_set_intersection_in_place(self):
-        """intbitset - set intersection in place"""
+        """intbitset - set intersection, normal set in place"""
         self._helper_test_normal_set(self.fncs_list[4])
 
     def test_set_intersection_empty_in_place(self):
-        """intbitset - set intersection empty in place"""
+        """intbitset - set intersection, empty set in place"""
         self._helper_test_empty_set(self.fncs_list[4])
 
     def test_set_intersection_infinite_in_place(self):
-        """intbitset - set intersection infinite in place"""
+        """intbitset - set intersection, infinite set in place"""
         self._helper_test_inifinite_set(self.fncs_list[4])
 
     def test_set_intersection_infinite_empty_in_place(self):
-        """intbitset - set intersection infinite vs empty in place"""
+        """intbitset - set intersection, infinite vs empty in place"""
         self._helper_test_infinite_vs_empty(self.fncs_list[4])
 
     def test_set_union_in_place(self):
-        """intbitset - set union in place"""
+        """intbitset - set union, normal set in place"""
         self._helper_test_normal_set(self.fncs_list[5])
 
     def test_set_union_empty_in_place(self):
-        """intbitset - set union empty in place"""
+        """intbitset - set union, empty set in place"""
         self._helper_test_empty_set(self.fncs_list[5])
 
     def test_set_union_infinite_in_place(self):
-        """intbitset - set union infinite in place"""
+        """intbitset - set union, infinite set in place"""
         self._helper_test_inifinite_set(self.fncs_list[5])
 
     def test_set_union_infinite_empty_in_place(self):
-        """intbitset - set union infinite vs empty in place"""
+        """intbitset - set union, infinite vs empty in place"""
         self._helper_test_infinite_vs_empty(self.fncs_list[5])
 
-    def test_set_simmetric_difference_in_place(self):
-        """intbitset - set simmetric_difference in place"""
+    def test_set_symmetric_difference_in_place(self):
+        """intbitset - set symmetric difference, normal set in place"""
         self._helper_test_normal_set(self.fncs_list[6])
 
-    def test_set_simmetric_difference_empty_in_place(self):
-        """intbitset - set simmetric_difference empty in place"""
+    def test_set_symmetric_difference_empty_in_place(self):
+        """intbitset - set symmetric difference, empty set in place"""
         self._helper_test_empty_set(self.fncs_list[6])
 
-    def test_set_simmetric_difference_infinite_in_place(self):
-        """intbitset - set simmetric_difference infinite in place"""
+    def test_set_symmetric_difference_infinite_in_place(self):
+        """intbitset - set symmetric difference, infinite set in place"""
         self._helper_test_inifinite_set(self.fncs_list[6])
 
-    def test_set_simmetric_difference_infinite_empty_in_place(self):
-        """intbitset - set simmetric_difference infinite vs empty in place"""
+    def test_set_symmetric_difference_infinite_empty_in_place(self):
+        """intbitset - set symmetric difference, infinite vs empty in place"""
         self._helper_test_infinite_vs_empty(self.fncs_list[6])
 
     def test_set_difference_in_place(self):
-        """intbitset - set difference in place"""
+        """intbitset - set difference, normal set in place"""
         self._helper_test_normal_set(self.fncs_list[7])
 
     def test_set_difference_empty_in_place(self):
-        """intbitset - set difference empty in place"""
+        """intbitset - set difference, empty set in place"""
         self._helper_test_empty_set(self.fncs_list[7])
 
     def test_set_difference_infinite_in_place(self):
-        """intbitset - set difference infinite in place"""
+        """intbitset - set difference, infinite set in place"""
         self._helper_test_inifinite_set(self.fncs_list[7])
 
     def test_set_difference_infinite_empty_in_place(self):
-        """intbitset - set difference infinite vs empty in place"""
+        """intbitset - set difference, infinite vs empty in place"""
         self._helper_test_infinite_vs_empty(self.fncs_list[7])
 
 
