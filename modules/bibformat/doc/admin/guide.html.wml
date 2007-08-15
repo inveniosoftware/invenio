@@ -729,6 +729,8 @@ Notice that the call uses (almost) the filename of your element. To find out whi
 <li><code>fields(tag)</code>: Returns the list of values corresonding to MARC <code>tag</code>.If tag has an undefined subcode (such as 999C5), the function returns a list of dictionaries, whoose keys are the subcodes and the values are the values of tag.subcode. If the tag has a subcode, simply returns list of values corresponding to tag.</li>
 <li><code>kb(kb, string, default="")</code>: Returns the value of the <code>string</code> in the knowledge base <code>kb</code>. If kb does not exist or string does not exist in kb, returns <code>default</code> string.</li>
 </ul>
+You can also get access to other information through <code>bfo</code>, such as the language in which the formatting should occur with <code>bfo.lang</code>. To learn more
+about the possibilities offered by the <code>bfo</code>, read the <a href="<WEBURL>/hacking/bibformat/api.html">BibFormat APIs</a>
 </p>
         <p><b>Method 2: Use module <code>BibRecord</code></b>:<br/>
 
@@ -1200,17 +1202,58 @@ However, for more advanced output formats, CDS Invenio
 goes through the regular formatting process and let your formats do the job. This allows you to customize how a record should be displayed once it has been deleted.</p>
 
 <h4>Why are some format elements omitted in the "Knowledge Base Dependencies" page?</h4>
-<p>When you check the dependencies of a knowledge base, the page reminds you that
-format elements using this knowledge base might not be indicated. This is because it is not
-possible (or at least not trivial) to guess that the call to <code>kb(e.upper()+"journal"+"s")</code> in a format element
-is equal to a call to <code>kb("Ejournals")</code>. You should then not completely rely on this indication.</p>
+<p>When you check the dependencies of a knowledge base, the page
+reminds you that format elements using this knowledge base might not
+be indicated. This is because it is not possible (or at least not
+trivial) to guess that the call to
+<code>kb(e.upper()+"journal"+"s")</code> in a format element is equal
+to a call to <code>kb("Ejournals")</code>. You should then not
+completely rely on this indication.</p>
 
 <h4>Why are some format elements defined in field table omitted in the format element documentation?</h4>
-<p>Some format elements defined in the "Logical Fields" management interface of the BibIndex module (the
-basic format elements) are not shown in the format elements documentation pages. We do not show such an element if its name starts with a number.
-This is to reduce the number of elements shown in the documentation as the logical fields
-table contains a lot of not so useful fields to be used in templates.</p>
 
+<p>Some format elements defined in the "Logical Fields" management
+interface of the BibIndex module (the basic format elements) are not
+shown in the format elements documentation pages. We do not show such
+an element if its name starts with a number.  This is to reduce the
+number of elements shown in the documentation as the logical fields
+table contains a lot of not so useful fields to be used in
+templates.</p>
+
+<h4>How can I get access to repeatable subfields from inside a format element?</h4>
+
+<p>Given that repeatable subfields are not frequent, the
+<code>bfo.fields(..)</code> function has been implemented to return the most convenient structure for most cases, that is a '<em>list of strings</em>' (<b>Case 1</b> below) or '<em>list of dict of strings</em>' (<b>Case 2</b> below). For eg. with the following metadata:
+<pre>    999C5 $a value_1a $b value_1b
+    999C5 $b value_2b
+    999C5 $b value_3b $b value_3b_bis
+
+    >> bfo.fields('999C5b')                                   <b>(1)</b>
+    >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
+    >> bfo.fields('999C5')                                    <b>(2)</b>        
+    >> [{'a':'value_1a', 'b':'value_1b'}, 
+        {'b':'value_2b'},
+        {'b':'value_3b'}]
+</pre>
+
+In this example <code>value3b_bis</code> is not shown for
+<code>bfo.fields('999C5')</code> (<b>Case 2</b>).  If it were to be taken into account, the
+returned structure would have to be a '<em>list of dict of list of strings</em>', thus making for most cases
+the access to the data a bit more complex.<br/>
+In order to consider the repeatable subfields, use the additional <code>repeatable_subfields_p</code> parameter:
+
+<pre>    >> bfo.fields('999C5b', repeatable_subfields_p=True)      <b>(1 bis)</b>
+    >> ['value_1b', 'value_2b', 'value_3b']
+    >> bfo.fields('999C5', repeatable_subfields_p=True)       <b>(2 bis)</b>
+    >> [{'a':['value_1a'], 'b':['value_1b']}, 
+        {'b':['value_2b']},
+        {'b':['value_3b', 'value3b_bis']}]
+</pre>
+Another solution would be to access the BibRecord structure with
+<code>bfo.getRecord()</code> and use the lower-level BibRecord module with this structure.
+</p>
+<br/>
+<br/>
 <a name="oldGuide"/>
 <div style="background-color:rgb(204, 204, 204)";>
 <h1><span style="color:rgb(204, 0, 0);">Old</span> PHP BibFormat Aministration Guide</h1>

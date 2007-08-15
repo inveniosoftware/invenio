@@ -240,7 +240,7 @@ functions. This API is to be used only inside format elements.
                    (see above for other modes)
     """
 
- def field(self, tag, escape='0', repeatable_subfields_p=False):
+ def field(self, tag, escape='0'):
     """
     Returns the value of the field corresponding to tag in the
     current record.
@@ -267,7 +267,7 @@ functions. This API is to be used only inside format elements.
     """
 
 
- def fields(self, tag, escape='0'):
+ def fields(self, tag, escape='0', repeatable_subfields_p=False):
     """
     Returns the list of values corresonding to "tag".
 
@@ -298,9 +298,9 @@ functions. This API is to be used only inside format elements.
     instead of a list).  You can allow repeatable subfields by
     setting 'repeatable_subfields_p' parameter to True. In
     this mode, the above example would return:
-        >> bfo.fields('999C5b')
+        >> bfo.fields('999C5b', repeatable_subfields_p=True)
         >> ['value_1b', 'value_2b', 'value_3b']
-        >> bfo.fields('999C5')
+        >> bfo.fields('999C5', repeatable_subfields_p=True)
         >> [{'a':['value_1a'], 'b':['value_1b']}, 
             {'b':['value_2b']},
             {'b':['value_3b', 'value3b_bis']}]

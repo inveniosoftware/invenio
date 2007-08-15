@@ -1807,9 +1807,9 @@ class BibFormatObject:
         instead of a list).  You can allow repeatable subfields by
         setting 'repeatable_subfields_p' parameter to True. In
         this mode, the above example would return:
-            >> bfo.fields('999C5b')
+            >> bfo.fields('999C5b', repeatable_subfields_p=True)
             >> ['value_1b', 'value_2b', 'value_3b']
-            >> bfo.fields('999C5')
+            >> bfo.fields('999C5', repeatable_subfields_p=True)
             >> [{'a':['value_1a'], 'b':['value_1b']}, 
                 {'b':['value_2b']},
                 {'b':['value_3b', 'value3b_bis']}]
