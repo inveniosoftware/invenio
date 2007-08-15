@@ -269,11 +269,12 @@ IntBitSet *intBitSetSub(IntBitSet *const x, IntBitSet *const y) {
     register word_t *retbase;
     register word_t *retend;
     register IntBitSet * ret = malloc(sizeof (IntBitSet));
-    ret->allocated = x->allocated;
+    register int tmpsize = intBitSetAdaptMin(x, y);
+    ret->allocated = x->allocated > tmpsize ? x->allocated : tmpsize;
     xbase = x->bitset;
     ybase = y->bitset;
     retbase = ret->bitset = malloc(wordbytesize * ret->allocated);
-    retend = ret->bitset+intBitSetAdaptMin(x, y);
+    retend = ret->bitset+tmpsize;
     ret->size = -1;
     ret->tot = -1;
     for (; retbase < retend; ++xbase, ++ybase, ++retbase)
