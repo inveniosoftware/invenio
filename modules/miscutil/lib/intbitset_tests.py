@@ -64,7 +64,19 @@ class IntBitSetTest(unittest.TestCase):
         ]
 
     def _helper_sanity_test(self, intbitset1):
-        self.failUnless(intbitset1.get_size() < intbitset1.get_allocated(), "%s failed sanity check beacuse size %s >= allocated %s" % (intbitset1, intbitset1.get_size(), intbitset1.get_allocated()))
+        wordbitsize = intbitset1.get_wordbitsize()
+        size1 = intbitset1.get_size()
+        allocated1 = intbitset1.get_allocated()
+        creator_list = intbitset1.extract_finite_list()
+        up_to1 = creator_list and max(creator_list) or -1
+        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize)
+        tmp = intbitset(intbitset1.fastdump())
+        size1 = intbitset1.get_size()
+        allocated1 = intbitset1.get_allocated()
+        creator_list = intbitset1.extract_finite_list()
+        up_to1 = creator_list and max(creator_list) or -1
+        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize)
+
 
     def _helper_test_via_fncs_list(self, fncs, intbitset1, intbitset2):
         orig1 = intbitset(intbitset1)
@@ -271,19 +283,14 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_marshalling(self):
         """intbitset - marshalling"""
-        # serialize an intbitset:
-        set1 = intbitset([30, 10, 20])
-        str1 = set1.fastdump()
-        # load it back via constructor:
-        set2 = intbitset(str1)
-        # load it back via fastload:
-        set3 = intbitset()
-        set3.fastload(str1)
-        # compare results:
-        self.assertEqual(list(set1), [10, 20, 30])
-        self.assertEqual(list(set2), [10, 20, 30])
-        self.assertEqual(list(set3), [10, 20, 30])
-
+        for set1 in self.sets + []:
+            self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
+        for set1 in self.sets + []:
+            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
+        for set1 in self.sets + []:
+            self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
+        for set1 in self.sets + []:
+            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
 
     #def test_set_emptiness(self):
         #"""intbitset - tests for emptiness"""
