@@ -800,10 +800,10 @@ def collect_user_info(req):
     else:
         uid = getUid(req)
         user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
-        user_info['remote_host'] = req.connection.remote_host or None
-        user_info['referer'] = req.headers_in.get('Referer', None)
-        user_info['uri'] = req.unparsed_uri or None
-        user_info['agent'] = req.headers_in.get('User-Agent', None)
+        user_info['remote_host'] = req.connection.remote_host or ''
+        user_info['referer'] = req.headers_in.get('Referer', '')
+        user_info['uri'] = req.unparsed_uri or ''
+        user_info['agent'] = req.headers_in.get('User-Agent', '')
         try:
             user_info['apache_user'] = getApacheUser(req)
             if user_info['apache_user']:
@@ -811,10 +811,10 @@ def collect_user_info(req):
         except AttributeError:
             pass
     user_info['uid'] = uid
-    user_info['nickname'] = get_nickname(uid) or None
-    user_info['email'] = get_email(uid) or None
+    user_info['nickname'] = get_nickname(uid) or ''
+    user_info['email'] = get_email(uid) or ''
     user_info['group'] = []
-    user_info['guest'] = isGuestUser(uid)
+    user_info['guest'] = str(isGuestUser(uid))
     if uid:
         user_info['group'] = [group[1] for group in get_groups(uid)]
         prefs = get_user_preferences(uid)
