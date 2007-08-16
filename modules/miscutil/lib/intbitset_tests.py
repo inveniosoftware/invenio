@@ -270,16 +270,26 @@ class IntBitSetTest(unittest.TestCase):
         """intbitset - set difference, infinite vs empty in place"""
         self._helper_test_infinite_vs_empty(self.fncs_list[7])
 
-
     def test_list_dump(self):
         """intbitset - list dump"""
-        set1 = intbitset([30, 10, 20])
-        self.assertEqual(list(set1), [10, 20, 30])
+        for set1 in self.sets + []:
+            self.assertEqual(list(intbitset(set1)), set1)
 
     def test_ascii_bit_dump(self):
         """intbitset - ascii bit dump"""
-        set1 = intbitset([30, 10, 20])
-        self.assertEqual(set1.strbits(), "0000000000100000000010000000001")
+        for set1 in self.sets + []:
+            tot = 0
+            count = 0
+            for bit in intbitset(set1).strbits():
+                if bit == '0':
+                    self.failIf(count in set1)
+                elif bit == '1':
+                    self.failIf(count not in set1)
+                    tot += 1
+                else:
+                    self.fail()
+                count += 1
+            self.assertEqual(tot, len(set1))
 
     def test_marshalling(self):
         """intbitset - marshalling"""
@@ -298,61 +308,66 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_clear(self):
         """intbitset - clearing"""
-        set1 = intbitset([10, 20, 30, 70])
-        set1.clear()
-        self.assertEqual(list(set1), [])
-        self.failUnless(not set1.__nonzero__())
-
-    def test_set_infinite(self):
-        """intbitset - infinite sets"""
-        set1 = intbitset(trailing_bits=1)
-        set2 = intbitset([10, 20, 30, 65], trailing_bits=1)
-        self.failUnless(0 in set1)
-        self.failUnless(100 in set1)
-        self.failUnless(10000 in set1)
-        self.failIf(0 in set2)
-        self.failUnless(10 in set2)
-        self.failIf(15 in set2)
-        self.failUnless(30 in set2)
-        self.failUnless(100 in set2)
-        self.failUnless(10000 in set2)
-        self.failUnless('...' in str(set1))
-        self.failUnless('...' in str(set2))
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1)
+            intbitset1.clear()
+            self.assertEqual(list(intbitset1), [])
+            intbitset1 = intbitset(set1, trailing_bits=True)
+            intbitset1.clear()
+            self.assertEqual(list(intbitset1), [])
 
     def test_set_repr(self):
         """intbitset - Pythonic representation"""
-        set1 = intbitset()
-        set2 = intbitset([10, 20, 30, 65])
-        set3 = intbitset([10, 20, 30, 65], trailing_bits=1)
-        self.assertEqual(set1, eval(repr(set1)))
-        self.assertEqual(set2, eval(repr(set2)))
-        self.assertEqual(set3, eval(repr(set3)))
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1)
+            self.assertEqual(intbitset1, eval(repr(intbitset1)))
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1, trailing_bits=True)
+            self.assertEqual(intbitset1, eval(repr(intbitset1)))
 
     def test_set_cmp(self):
-        """intbitset - set comparison"""
-        set1 = intbitset([10, 20, 30, 70])
-        set2 = intbitset([20, 30, 40, 70])
-        set3 = intbitset(trailing_bits=1)
-        self.failUnless(set1 != set2)
-        self.failUnless(set1 != set3)
-        self.failUnless(set2 != set3)
-        self.failIf(set1 < set2)
-        self.failIf(set1 > set2)
-        self.failIf(set1 == set2)
-        self.failUnless(set1 >= set1)
-        self.failUnless(set1 >= (set1 & set2))
-        self.failUnless(set1 <= (set1 | set2))
-        self.failUnless(set1 <= set3)
-        self.failUnless(set2 <= set3)
-        self.failUnless(set1 < set3)
-        self.failUnless(set2 < set3)
+        """intbitset - (non infinte) set comparison"""
+        for set1 in self.sets + []:
+            for set2 in self.sets + []:
+                for op in self.cmp_list:
+                    self.assertEqual(op[0](intbitset(set1), intbitset(set2)), op[1](set(set1), set(set2)), "Error in comparing %s %s with comparing function %s" % (set1, set2, op[0].__name__))
+
 
     def test_set_update_with_signs(self):
         """intbitset - set update with signs"""
-        set1 = intbitset([10, 20, 30])
-        dict1 = {20 : -1, 40 : 1}
-        set1.update_with_signs(dict1)
-        self.assertEqual(list(set1), [10, 30, 40])
+        dict1 = {10 : -1, 20 : 1, 23 : -1, 27 : 1, 33 : -1, 56 : 1, 70 : -1, 74 : 1}
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1)
+            intbitset1.update_with_signs(dict1)
+            up_to = max(dict1.keys() + set1)
+            for i in xrange(up_to + 1):
+                if dict1.get(i, i in set1 and 1 or -1) == 1:
+                    self.failUnless(i in intbitset1, "%s was not correctly updated from %s by %s" % (repr(intbitset1), repr(set1), repr(dict1)))
+                else:
+                    self.failIf(i in intbitset1, "%s was not correctly updated from %s by %s" % (repr(intbitset1), repr(set1), repr(dict1)))
+
+    def test_set_cloning(self):
+        """intbitset - set cloning"""
+        import copy
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1)
+            intbitset2 = intbitset(intbitset1)
+            intbitset3 = copy.deepcopy(intbitset2)
+            self._helper_sanity_test(intbitset1)
+            self._helper_sanity_test(intbitset2)
+            self._helper_sanity_test(intbitset3)
+            self.assertEqual(intbitset1, intbitset2)
+            self.assertEqual(intbitset1, intbitset3)
+
+        for set1 in self.sets + []:
+            intbitset1 = intbitset(set1, trailing_bits=True)
+            intbitset2 = intbitset(intbitset1)
+            intbitset3 = copy.deepcopy(intbitset2)
+            self._helper_sanity_test(intbitset1)
+            self._helper_sanity_test(intbitset2)
+            self._helper_sanity_test(intbitset3)
+            self.assertEqual(intbitset1, intbitset2)
+            self.assertEqual(intbitset1, intbitset3)
 
 def create_test_suite():
     """Return test suite for the intbitset data structure."""

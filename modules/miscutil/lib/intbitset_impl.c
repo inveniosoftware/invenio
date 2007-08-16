@@ -59,12 +59,10 @@ IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const b
 }
 
 IntBitSet *intBitSetReset(IntBitSet *const bitset) {
-    register word_t *base = bitset->bitset;
-    const register word_t *end = bitset->bitset+bitset->allocated;
-    for (; base<end; ++base)
-        *base = bitset->trailing_bits;
-    bitset->tot = bitset->trailing_bits ? -1 : 0;
+    bitset->allocated = 1;
     bitset->size = 0;
+    *bitset->bitset = 0;
+    bitset->trailing_bits = 0;
     return bitset;
 }
 
