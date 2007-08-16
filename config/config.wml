@@ -724,6 +724,15 @@ mysuperuser
 mysuperpass
 </define-tag>
 
+## CFG_INTBITSET_ENABLE_SANITY_CHECKS --
+## Enable sanity checks for integers passed to the intbitset data
+## structures. It is good to enable this during debugging
+## and to disable this value for speed improvements.
+<define-tag CFG_INTBITSET_ENABLE_SANITY_CHECKS whitespace=delete>
+False
+</define-tag>
+
+
 
 ########################################
 ## Part 10: Access control parameters ##

@@ -49,6 +49,15 @@ IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) 
     return ret;
 }
 
+IntBitSet *intBitSetCreateNoAllocate() {
+    IntBitSet *ret = malloc(sizeof(IntBitSet));
+    ret->allocated = 0;
+    ret->size = -1;
+    ret->trailing_bits = 0;
+    ret->bitset = NULL;
+    return ret;
+}
+
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize) {
     bitset->allocated = bufsize/wordbytesize;
     bitset->bitset = realloc(bitset->bitset, bufsize);
