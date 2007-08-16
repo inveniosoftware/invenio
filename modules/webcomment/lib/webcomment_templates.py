@@ -1378,7 +1378,7 @@ class Template:
                     {'x_nb_score':  '<b>%.1f</b>' % avg_score,
                      'x_nb_reviews': nb_comments_total}
         else:
-            score = '(' +_("No yet reviewed") + ')'
+            score = '(' +_("Not yet reviewed") + ')'
         
         out = '''
 <small class="detailedRecordActions">%(rate)s:</small><br /><br />
