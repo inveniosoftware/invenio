@@ -2593,9 +2593,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         req.write(webstyle_templates.detailed_record_container(content,
                                                                                recIDs[irec],
                                                                                tabs,
-                                                                               ln,
-                                                                               creationdate,
-                                                                               modifydate))
+                                                                               ln=ln,
+                                                                               creationdate=creationdate,
+                                                                               modifydate=modifydate))
 
                         if len(tabs) > 0:
                             # Add the mini box at bottom of the page
