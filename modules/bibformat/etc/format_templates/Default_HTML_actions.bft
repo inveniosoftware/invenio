@@ -3,7 +3,7 @@
 
 <ul class="detailedRecordActions">
         <li><a href="<BFE_SERVER_INFO var='weburl'/>yourbaskets/add?ln=<BFE_SERVER_INFO var='lang'/>&amp;recid=<BFE_RECORD_ID/>">Add to personal basket</a></li>
-        <li><a href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/hx">Get the BibTeX</a></li>
+        <li><a href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/hx">Export as BibTeX</a></li>
         <BFE_EDIT_RECORD prefix="<li>" suffix="</li>" />
 </ul>
     
