@@ -31,6 +31,7 @@ typedef unsigned char bool_t;
 
 extern const int wordbytesize;
 extern const int wordbitsize;
+extern const int maxelem;
 
 typedef struct {
     int size;

@@ -50,6 +50,7 @@ cdef extern from "intbitset.h":
         word_t *bitset
     int wordbytesize
     int wordbitsize
+    int maxelem
     IntBitSet *intBitSetCreate(int size, bool_t trailing_bits)
     IntBitSet *intBitSetCreateFromBuffer(void *buf, int bufsize)
     IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, int bufsize)
@@ -91,7 +92,7 @@ cdef class intbitset:
     """
     cdef IntBitSet *bitset
 
-    def __new__(self, rhs=0, int minsize=-1, object trailing_bits=0):
+    def __new__(self, rhs=0, int minsize=-1, int trailing_bits=0):
         """
         Initialize intbitset.
         * rhs can be:
@@ -136,26 +137,35 @@ cdef class intbitset:
                 raise ValueError, "rhs is corrupted: %s" % msg
         elif hasattr(rhs, '__iter__'):
             try:
-                if minsize > -1:
-                    self.bitset = intBitSetCreate(minsize, trailing_bits)
-                else:
-                    if rhs:
-                        self.bitset = intBitSetCreate(int(max(rhs)), trailing_bits)
+                if minsize <= maxelem:
+                    if minsize > -1:
+                        self.bitset = intBitSetCreate(minsize, trailing_bits)
                     else:
-                        self.bitset = intBitSetCreate(0, trailing_bits)
-                if trailing_bits:
-                    last = 0
-                    for elem in rhs:
-                        if int(elem) < 0:
-                            raise ValueError, "Negative numbers, not allowed"
-                        for remelem from last <= remelem < elem:
-                            intBitSetDelElem(self.bitset, remelem)
-                        last = elem + 1
+                        if rhs:
+                            self.bitset = intBitSetCreate(int(max(rhs)), trailing_bits)
+                        else:
+                            self.bitset = intBitSetCreate(0, trailing_bits)
+                    if trailing_bits:
+                        last = 0
+                        for elem in rhs:
+                            elem = int(elem)
+                            if elem < 0:
+                                raise ValueError, "Negative numbers, not allowed"
+                            elif elem > maxelem:
+                                raise OverflowError, "Elements must be <= %s" % maxelem
+                            for remelem from last <= remelem < elem:
+                                intBitSetDelElem(self.bitset, remelem)
+                            last = elem + 1
+                    else:
+                        for elem in rhs:
+                            elem = int(elem)
+                            if elem < 0:
+                                raise ValueError, "Negative numbers, not allowed"
+                            elif elem > maxelem:
+                                raise OverflowError, "Elements must be <= %s" % maxelem
+                            intBitSetAddElem(self.bitset, elem)
                 else:
-                    for elem in rhs:
-                        if int(elem) < 0:
-                            raise ValueError, "Negative numbers, not allowed"
-                        intBitSetAddElem(self.bitset, elem)
+                    raise OverflowError, "minsize must be <= %s" % maxelem
             except Exception, msg:
                 raise ValueError, "retrieving integers from rhs is impossible: %s" \
                     % msg
@@ -169,6 +179,8 @@ cdef class intbitset:
     def __contains__(self, int elem):
         if elem < 0:
             raise ValueError, "Negative numbers, not allowed"
+        elif elem > maxelem:
+            raise OverflowError, "Element must be <= %s" % maxelem
         return intBitSetIsInElem(self.bitset, elem) != 0
 
     def __cmp__(self, intbitset rhs not None):
@@ -202,30 +214,42 @@ cdef class intbitset:
     def __iadd__(self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
-            if int(rhs) < 0:
+            rhs = int(rhs)
+            if rhs < 0:
                 raise ValueError, "Negative numbers, not allowed"
+            elif rhs > maxelem:
+                raise OverflowError, "rhs must be <= %s" % maxelem
             intBitSetAddElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
             intBitSetIUnion(self.bitset, (<intbitset> rhs).bitset)
         else:
             for elem in rhs:
-                if int(elem) < 0:
+                elem = int(elem)
+                if elem < 0:
                     raise ValueError, "Negative numbers, not allowed"
+                elif elem > maxelem:
+                    raise OverflowError, "Elements must be <= %s" % maxelem
                 intBitSetAddElem(self.bitset, elem)
         return self
 
     def __isub__(self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
-            if int(rhs) < 0:
+            if rhs < 0:
                 raise ValueError, "Negative numbers, not allowed"
+            elif rhs > maxelem:
+                raise OverflowError, "rhs must be <= %s" % maxelem
+            intBitSetAddElem(self.bitset, rhs)
             intBitSetDelElem(self.bitset, rhs)
         elif isinstance(rhs, intbitset):
             intBitSetISub(self.bitset, (<intbitset> rhs).bitset)
         else:
             for elem in rhs:
-                if int(elem) < 0:
+                elem = int(elem)
+                if elem < 0:
                     raise ValueError, "Negative numbers, not allowed"
+                elif elem > maxelem:
+                    raise OverflowError, "Elements must be <= %s" % maxelem
                 intBitSetDelElem(self.bitset, elem)
         return self
 
@@ -233,8 +257,10 @@ cdef class intbitset:
         return intbitset(self)
 
     def __del__(self, int elem):
-        if int(elem) < 0:
+        if elem < 0:
             raise ValueError, "Negative numbers, not allowed"
+        elif elem > maxelem:
+            raise OverflowError, "Element must be <= %s" % maxelem
         intBitSetDelElem(self.bitset, elem)
 
     def __and__(self, intbitset rhs not None):
@@ -358,63 +384,69 @@ cdef class intbitset:
     def add(self, int elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
-        if int(elem) < 0:
+        if elem < 0:
             raise ValueError, "Negative numbers, not allowed"
+        elif elem > maxelem:
+            raise OverflowError, "Element must be <= %s" % maxelem
         intBitSetAddElem(self.bitset, elem)
 
     def clear(self):
         intBitSetReset(self.bitset)
 
-    def difference(intbitset self, intbitset rhs):
+    def difference(intbitset self, rhs):
         """Return the difference of two intbitsets as a new set.
         (i.e. all elements that are in this intbitset but not the other.)
         """
         return self.__sub__(rhs)
 
-    def difference_update(self, intbitset rhs):
+    def difference_update(self, rhs):
         """Remove all elements of another set from this set."""
         self.__isub__(rhs)
 
     def discard(self, int elem):
         """Remove an element from a intbitset if it is a member.
         If the element is not a member, do nothing."""
+        if elem < 0:
+            raise ValueError, "Negative numbers, not allowed"
+        elif elem > maxelem:
+            raise OverflowError, "Element must be <= %s" % maxelem
         intBitSetDelElem(self.bitset, elem)
 
-    def intersection(self, intbitset rhs):
+    def intersection(self, rhs):
         """Return the intersection of two intbitsets as a new set.
         (i.e. all elements that are in both intbitsets.)
         """
         return self.__and__(rhs)
 
-    def intersection_update(self, intbitset rhs):
+    def intersection_update(self, rhs):
         """Update a intbitset with the intersection of itself and another."""
         self.__iand__(rhs)
 
-    def union(self, intbitset rhs):
+    def union(self, rhs):
         """Return the union of two intbitsets as a new set.
         (i.e. all elements that are in either intbitsets.)
         """
         return self.__or__(rhs)
 
-    def union_update(self, intbitset rhs):
+    def union_update(self, rhs):
         """Update a intbitset with the union of itself and another."""
         self.__ior__(rhs)
 
-    def issubset(self, intbitset rhs):
+    def issubset(self, rhs):
         """Report whether another set contains this set."""
         return self.__le__(rhs)
 
-    def issuperset(self, intbitset rhs):
+    def issuperset(self, rhs):
         """Report whether this set contains another set."""
         return self.__ge__(rhs)
 
-    def symmetric_difference(self, intbitset rhs):
+    def symmetric_difference(self, rhs):
         """Return the symmetric difference of two sets as a new set.
         (i.e. all elements that are in exactly one of the sets.)
         """
         return self.__xor__(rhs)
 
-    def symmetric_difference_update(self, intbitset rhs):
+    def symmetric_difference_update(self, rhs):
         """Update an intbitset with the symmetric difference of itself and another.
         """
         self.__ixor__(rhs)
@@ -426,10 +458,9 @@ cdef class intbitset:
         cdef Py_ssize_t size
         size = intBitSetGetSize((<intbitset> self).bitset)
         tmp = PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize)
-        tmp2 = zlib.compress(tmp)
-        return tmp2
+        return zlib.compress(tmp)
 
-    def fastload(self, object strdump):
+    def fastload(self, strdump):
         """Load a compressed string representation produced by a previous call
         to the fastdump method into the current intbitset. The previous content
         will be replaced."""
@@ -466,8 +497,10 @@ cdef class intbitset:
         """Remove an element from a set; it must be a member.
         If the element is not a member, raise a KeyError.
         """
-        if int(elem) < 0:
+        if elem < 0:
             raise ValueError, "Negative numbers, not allowed"
+        elif elem > maxelem:
+            raise OverflowError, "Elements must be <= %s" % maxelem
         if intBitSetIsInElem(self.bitset, elem):
             intBitSetDelElem(self.bitset, elem)
         else:
@@ -494,8 +527,12 @@ cdef class intbitset:
         cdef int value
         try:
             for value, sign in rhs.items():
-                if int(value) < 0:
+                value = int(value)
+                if value < 0:
                     raise ValueError, "Negative numbers, not allowed"
+                elif value > maxelem:
+                    raise OverflowError, "Elements must <= %s" % maxelem
+                sign = int(sign)
                 if sign < 0:
                     intBitSetDelElem(self.bitset, value)
                 else:
@@ -520,6 +557,8 @@ cdef class intbitset:
             if self.bitset.trailing_bits:
                 raise OverflowError, "It's impossible to retrieve a negative item from an infinite set."
             index = index + l
+        elif index > maxelem:
+            raise OverflowError, "Index must be <= %s" % maxelem
         if 0 <= index < l:
             last = intBitSetGetNext(self.bitset, -1)
             for i from 0 <= i < index:
@@ -535,7 +574,9 @@ cdef class intbitset:
         cdef int last
         cdef int cnt
         if self.bitset.trailing_bits and (i < 0 or j < 0):
-            raise OverflowError, "It's impossible to retrieve a list from an infinite set."
+            raise OverflowError, "It's impossible to retrieve a sublist using negative indices from an infinite set."
+        elif (i > maxelem or j > maxelem):
+            raise OverflowError, "Indexes must be <= %s" % maxelem
         l = intBitSetGetTot(self.bitset)
         if i == 0 and j == -1:
             return intbitset(self)
@@ -567,12 +608,14 @@ cdef class intbitset:
         to reproduce this intbitset. At least up_to integer are looked for when
         they are inside the intbitset but not necessarily needed to build the
         intbitset"""
-        cdef int maxelem
+        cdef int true_up_to
         cdef int last
+        if up_to > maxelem:
+            raise OverflowError, "up_to must be <= %s" % maxelem
         ret = []
-        maxelem = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)
+        true_up_to = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)
         last = -1
-        while last < maxelem:
+        while last < true_up_to:
             last = intBitSetGetNext(self.bitset, last)
             if last == -2:
                 break

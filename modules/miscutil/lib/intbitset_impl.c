@@ -26,10 +26,11 @@
 const int wordbytesize = sizeof(word_t);
 const int wordbitsize = sizeof(word_t) * 8;
 
+const int maxelem = INT_MAX;
 
 IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits) {
     register word_t *base;
-    const register word_t *end;
+    register word_t *end;
     IntBitSet *ret = malloc(sizeof(IntBitSet));
     // At least one word -> the one who represent the trailing_bits
     ret->allocated = (size / wordbitsize + 1);
@@ -151,22 +152,24 @@ bool_t intBitSetIsInElem(const IntBitSet * const bitset, register const int elem
 }
 
 void intBitSetAddElem(IntBitSet *const bitset, register const int elem) {
-    if (elem >= (bitset->allocated - 1) * wordbitsize)
+    if (elem >= (bitset->allocated - 1) * wordbitsize) {
         if (bitset->trailing_bits)
             return;
         else
             intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
+    }
     bitset->bitset[elem / wordbitsize] |= ((word_t) 1 << (elem % wordbitsize));
     bitset->tot = -1;
     bitset->size = -1;
 }
 
 void intBitSetDelElem(IntBitSet *const bitset, register const int elem) {
-    if (elem >= (bitset->allocated - 1) * wordbitsize)
+    if (elem >= (bitset->allocated - 1) * wordbitsize) {
         if (!bitset->trailing_bits)
             return;
         else
             intBitSetResize(bitset, (elem + elem/10)/wordbitsize+2);
+    }
     bitset->bitset[elem / wordbitsize] &= (word_t) ~((word_t) 1 << (elem % wordbitsize));
     bitset->tot = -1;
     bitset->size = -1;
@@ -354,7 +357,7 @@ IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
 int intBitSetGetNext(const IntBitSet *const x, register int last) {
     register word_t* base = x->bitset + ++last / wordbitsize;
     register int i = last % wordbitsize;
-    const register word_t *end = x->bitset + x->allocated;
+    register word_t *end = x->bitset + x->allocated;
     while(base < end) {
         if (*base)
             for (; i<wordbitsize; ++i)

@@ -22,7 +22,6 @@ __revision__ = "$Id$"
 from distutils.core import setup
 from distutils.extension import Extension
 try:
-    raise ImportError
     from Cython.Distutils import build_ext
 except ImportError:
     try:
