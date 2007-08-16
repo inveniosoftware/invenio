@@ -17,6 +17,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+__revision__ = "$Id$"
+__apilevel__ = 1.0
+
 """
 Defines an intbitset data object to hold unordered sets of unsigned
 integers with ultra fast set operations, implemented via bit vectors
@@ -27,6 +30,10 @@ specific methods such as its own fast dump and load marshalling
 functions.  Uses real bits to optimize memory usage, so may have
 issues with endianness if you transport serialized bitsets between
 various machine architectures.
+
+Please note that no bigger than __maxelem__ elements can be added to
+an intbitset and, if CFG_INTBITSET_ENABLE_SANITY_CHECKS is disabled,
+you will receive unpredictable results.
 """
 
 import zlib
@@ -76,6 +83,8 @@ cdef extern from "intbitset.h":
     IntBitSet *intBitSetIXor(IntBitSet *x, IntBitSet *y)
     int intBitSetGetNext(IntBitSet *x, int last)
     unsigned char intBitSetCmp(IntBitSet *x, IntBitSet *y)
+
+__maxelem__ = maxelem
 
 cdef class intbitset:
     """
