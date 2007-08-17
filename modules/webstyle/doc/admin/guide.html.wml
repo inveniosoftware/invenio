@@ -33,36 +33,36 @@ Invenio installation.
 
 <p>The most obvious modification you may want to do is the
 modification of <a href="<WEBURL>/img/cds.css">CSS style sheet</a>.
-You may also customize default <a href="<WEBURL>/img/">images</a>.
+You may also customize default <a href="<WEBURL>/img/">images</a>.</p>
 
 <h2>HTML Page Layout</h2>
 
-The customization of the general page look and feel is currently
+<p>The customization of the general page look and feel is currently
 different depending on whether you customize HTML-like static pages
 (produced by WML during compile-time) or dynamic Python pages
-(assembled during runtime).
+(assembled during runtime).</p>
 
 <h3>Layout of HTML Static Pages</h3>
 
 <p>(Note: this step will disappear in the future as we plan to release
-the dependency on WML in early 2007.)
+the dependency on WML in early 2007.)</p>
 
 <p>During the compile time, when you edit <code>config.wml</code>, you
 may alter the default page look and feel by editing page elements such
 as <code>CDSPAGEHEADER</code>, <code>CDSPAGEFOOTER</code>,
 <code>CDSPAGEBOXLEFTTOP</code>, <code>CDSPAGEBOXLEFTBOTTOM</code>,
-<code>CDSPAGEBOXRIGHTTOP</code>, <code>CDSPAGEBOXRIGHTBOTTOM</code>.
+<code>CDSPAGEBOXRIGHTTOP</code>, <code>CDSPAGEBOXRIGHTBOTTOM</code>.</p>
 
 <p>This will modify the look and feel of every WML-pregenerated page,
 such as HTML help guides.  However, this will not affect most of the
 pages because they are generated in a dynamic way during runtime,
-without using WML.
+without using WML.</p>
 
 <h3>Layout of Python Dynamic Pages</h3>
 
 <p>The dynamic Python-powered pages can be customized by making use of
 CDS Invenio templating system that uses a notion of a template skin.
-How this works?
+How this works?</p>
 
 <p>During the compile time, when you edit <code>config.wml</code>, you
 may choose to use your own templates instead of the provided default
@@ -74,18 +74,18 @@ instead of CDS Invenio's usual template files such
 as <code>webbasket_templates.py</code> the system will look for file
 named <code>webbasket_templates_ithaca.py</code> and will load the
 template functions from there instead, provided that they exist.
-(Otherwise it would fall back to the default ones.)  
+(Otherwise it would fall back to the default ones.)</p>
 
-How do you create such an <code>ithaca</code> style templates file?
+<p>How do you create such an <code>ithaca</code> style templates file?
 We do not use one of many existing templating frameworks in Python but
 a very simple programmer-friendly templating system that enables you
 to use the full power of Python to inherit from the default templates
 the output generating functions you want to reuse and to write anew
-only the functions you would like to modify.
+only the functions you would like to modify.</p>
 
 <p>Let's show an example of how to modify the page footer.  Create a
 file named <code>webstyle_templates_ithaca.py</code> with the
-following content:
+following content:</p>
 
 <blockquote>
 <pre>
@@ -101,33 +101,33 @@ class Template(DefaultTemplate):
         Ithaca style page footer.  See the default function for
         the meaning of parameters.
         """
-        
+
         return "&lt;hr>This site has no footer."
 </pre>
 </blockquote>
 
-After the file was created, restart Apache and lo, your new ithaca
-style footer will be seen in action.
+<p>After the file was created, restart Apache and lo, your new ithaca
+style footer will be seen in action.</p>
 
-<p>Some further remarks on this templating system:
+<p>Some further remarks on this templating system:</p>
 
 <ul>
 
 <li>We have observed that in practice the HTML page designers were
     ofter Python programmers, therefore we have adopted a
-    programmer-friendly templating system.
+    programmer-friendly templating system.</li>
 
 <li>You have to know a bit of Python in order to use it.  If you don't
     know Python, do not worry, because you can basically copy and
     paste the original <code>tmpl_foo()</code> function definition "as
     is" into the above-cited example and then you would only modify
     its HTML snippets.  The important thing is to preserve the imports
-    (<code>from invenio.config import cdslang</code>) as in the original 
+    (<code>from invenio.config import cdslang</code>) as in the original
     <code>webstyle_templates.py</code> file and to preserve the
     leading whitespace Pythonic indentation.
     <br>(Moreover, in the future, when we shall remove the WML
     dependency, we shall provide an easy way to modify at least the
-    most commonly wanted things such as page header and footer.)
+    most commonly wanted things such as page header and footer.)</li>
 
 <li>You do not have to learn "yet another templating language", you
     can use the full power of Python. The <code>tmpl_foo()</code>
@@ -135,17 +135,17 @@ style footer will be seen in action.
     purpose is to make the HTML presentation of data supplied to them.
     But, should you need to carry out a little data transformation,
     you can do it within the <code>tmpl_foo()</code> function itself,
-    thanks to the full Python power.
+    thanks to the full Python power.</li>
 
 <li>If you feel like doing so, you can modify all
     the <code>tmpl_foo()</code> functions across all CDS Invenio
     modules in a way that will completely change the presentation of
     elements including their content, position and order on the
-    screen.
+    screen.</li>
 
 <li>We expect to provide possibly more than one skin with the default
     distribution, so if you have modified CDS Invenio look and feel in
-    an interesting way, please consider donating us your templates.
+    an interesting way, please consider donating us your templates.</li>
 
 <li>When upgrading from one CDS Invenio release to another, you may
     find out that the default templates have changed in a way that
@@ -158,10 +158,16 @@ style footer will be seen in action.
     whether the function arguments are the same.  A quick check of the
     body would be helpful too, in case the new release fixed some
     display-related problems in these functions.
-    <br>(FIXME: provide some warning tool.)
+    <br>(FIXME: provide some warning tool.)</li>
 
 </ul>
 
+<h2>Look of Bibliographic References</h2>
+
+<p>Bibliographic metadata is formatted using
+<a href="<WEBURL>/admin/bibformat">BibFormat</a>. Read the
+<a href="<WEBURL>/admin/bibformat/guide">BibFormat documentation</a>
+for more information.</p>
 
 <h2>Specific Configurations</h2>
 
@@ -169,6 +175,208 @@ style footer will be seen in action.
 extent in the <a href="<WEBURL>/admin/websearch">WebSearch Admin
 Interface</a> by adding HTML portalboxes on various places on the page
 (right top, before/after page title, before/after narrow by collection
-boxes, etc).
+boxes, etc).</p>
 
+<h2>Detailed Record Pages</h2>
 
+<p>The web pages displaying the details of a record (such as
+<a href="<WEBURL>/record/1"><WEBURL>/record/1</a>) do not only show metadata, but
+also users' comments and reviews, statistics, etc. This information is
+organized into tabs.</p>
+
+<p>The content of these tabs can be customized on a collection basis. It
+is also possible to show/hide tabs depending on the displayed
+collection.</p>
+
+<p>The detailed record pages also feature a mini panel at the bottom of
+the page that links to popular functions (The mini panel is only
+displayed when <em>Information</em> tab is selected).</p>
+
+<pre>
+
+  +--------------Detailed record page-------------+
+  |                    header                     |
+  |nav. breadcrumb                                |
+  |                                               |
+  |   .--------------------------------------.    |
+  | .-|Info.|Ref.|Discussion.|Stats.|Fulltext|-.  |
+  | | '--------------------------------------' |  |
+  | |                                          |  |
+  | |                  content                 |  |
+  | |                                          |  |
+  | '------------------------------------------'  |
+  |                                               |
+  | .---------------(Mini Panel)---------------.  |
+  | |   Mini    |      Mini     |    Mini      |  |
+  | |   File    |     Review    |   Actions    |  |
+  | '------------------------------------------'  |
+  +-----------------------------------------------+
+</pre>
+
+<h3><a name="det_page_avail_tabs">Available tabs</a></h3>
+
+The following tabs are available:
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>URL (eg. for record '10')</th>
+  </tr>
+  <tr>
+    <td>Information</td>
+    <td>Show the formatted metadata of the record</td>
+    <td><a href="<WEBURL>/record/10"><WEBURL>/record/10</a></td>
+  </tr>
+  <tr>
+    <td>References</td>
+    <td>Displays the references (bibliography) of the record</td>
+    <td><a href="<WEBURL>/record/10/references"><WEBURL>/record/10/references</a></td>
+  </tr>
+  <tr>
+    <td>Discussion</td>
+    <td>Displays the users' comments and reviews</td>
+    <td><a href="<WEBURL>/record/10/comments"><WEBURL>/record/10/comments</a><br/>
+        <a href="<WEBURL>/record/10/reviews"><WEBURL>/record/10/reviews</a></td>
+  </tr>
+  <tr>
+    <td>Usage Statistics</td>
+    <td>Statistics data and graph about file downloads/views</td>
+    <td><a href="<WEBURL>/record/10/statistics"><WEBURL>/record/10/statistics</a></td>
+  </tr>
+  <tr><td>Fulltext</td>
+    <td>Link(s) to fulltext file(s)</td>
+    <td><a href="<WEBURL>/record/10/files"><WEBURL>/record/10/files</a></td>
+  </tr>
+</table>
+
+<p>The mini panel is only displayed when the <em>Information</em> tab is
+selected. It is divided into the following sections:</p>
+<ul>
+ <li>Files  : quick access to fulltext file(s)</li>
+ <li>Review : quick access to reviewing feature</li>
+ <li>Actions: quick access to several other features</li>
+</ul>
+
+<h3><a name="det_page_show_hide_tabs">Showing/Hiding tabs</a></h3>
+
+<p>The <a href="<WEBURL>/admin/websearch">WebSearch admin web
+interface</a> lets you decide for each collection which tabs are to be
+displayed. Choose a collection to edit in the collection tree and go
+to its <em>detailed record page options</em>. From there you can select which
+tabs to show for that collection.</p>
+
+<p>If you want to apply these settings to the subcollections, select
+<em><input type="checkbox" checked="checked" disabled="disabled">Also apply to subcollections</input></em>
+before you click on the
+<input type="submit" value="Modify" class="formbutton" disabled="disabled"/>
+button.</p>
+
+<p>Note that these settings only affect the tabs, not the content of the
+tabs: even if a tab is not displayed, it is still possible to access
+its content using its usual url. This is useful if you decide to
+completely change the detailed record pages, dropping the tab-metaphor
+(eg. for a side bar) but still want to access the comments, reviews,
+etc pages.</p>
+
+<p>Here are some behaviours you should expect when changing the tabs
+configuration:</p>
+<ul>
+  <li>Given that search results pages always link to <WEBURL>/record/10,
+  and given the above comment about accessibility of tabs when they
+  are not displayed, the content of the <em>Information</em> will always be
+  show when clicking on <a href="#" class="moreinfo">detailed record</a> link in search results, even
+  if the <em>Information</em> tab is set not to be displayed.</li>
+
+  <li>If you select only 1 tab, none of the tabs will be displayed at the
+  top of the page. This also means that whatever tabs you have
+  selected, you users will always see the content of the 'Information'
+  tabs (see above behaviour).</li>
+
+  <li>If you select 0 tab, only the content of <em>Information</em> tab is shown.
+  None of the tabs, nor the border that usually surrounds the content
+  of the tabs, nor the minipanel are shown. You should choose this
+  option if you decide to drop the tabs metaphor for the detailed
+  record pages. You can then build your own user interface on this
+  almost blank page (See <a href="#det_page_cust_cont_tabs">Customizing content of tabs</a>).</li>
+
+  <li>Note that <em>Discussion</em> tab will not be shown if you have disabled
+  both the commenting and reviewing features in your installation
+  (<code>CFG_WEBCOMMENT_ALLOW_COMMENTS</code> and
+  <code>CFG_WEBCOMMENT_ALLOW_REVIEWS</code> variable in your config file).</li>
+</ul>
+
+<h3><a name="det_page_cust_cont_tabs">Customizing content of tabs</a></h3>
+
+<p>The contents of tabs are defined in the following ways:</p>
+<dl>
+<dt><strong><em>Information</em> tab</strong></dt>
+  <dd>The content of this tab is defined by function
+  <code>tmpl_detailed_record_metadata(..)</code> in <code>websearch_templates.py</code>.
+  By default <code>tmpl_detailed_record_metadata</code> simply returns the result
+  of the formatting of the metadata by BibFormat using the "HD" output
+  format. It can therefore be collection-specific.</dd>
+
+<dt><strong><em>References</em> tab</strong></dt>
+  <dd>The content of this tab is defined by function
+  <code>tmpl_detailed_record_references(..)</code> in <code>websearch_templates.py</code>.
+  By default <code>tmpl_detailed_record_metadata</code> simply returns the result
+  of the formatting of the metadata by BibFormat using the "HDREF"
+  output format. If the result returned by BibFormat is empty, the tab
+  is disabled (visible, but not clickable). It can therefore be
+  collection-specific.</dd>
+
+<dt><strong><em>Discussion</em> tab</strong></dt>
+  <dd>The content of this tab is mainly defined by function
+  <code>tmpl_get_comments(..)</code> in <code>webcomment_templates.py</code>. Other
+  functions in this file are also involved in the display.</dd>
+
+<dt><strong><em>Usage Statistics</em> tab</strong></dt>
+  <dd>The content of this tab is defined by function
+  <code>tmpl_detailed_record_statistics(..)</code> in <code>websearch_templates.py</code>.
+  If the returned content is empty, then the tabs will be disabled
+  (visible, but cannot be clicked).</dd>
+
+<dt><strong><em>Fulltext</em> tab</strong></dt>
+  <dd>The content of this tab is defined by function <code>tmpl_filelist(..)</code>
+  in <code>websubmit_templates.py</code>.</dd>
+</dl>
+<br/>
+<p>The content of the mini panel is defined in the following ways:</p>
+<dl>
+<dt><strong><em>Files</em></strong></dt>
+  <dd>The content of this section is defined by the output format
+  'HDFILE'. It can therefore be collection-specific.</dd>
+
+<dt><strong><em>Review</em></strong></dt>
+  <dd>The content of this section is defined by function
+  <code>tmpl_mini_review(..)</code> inside <code>webcomment_templates.py</code></dd>
+
+<dt><strong><em>Actions</em></strong></dt>
+  <dd>The content of this section is defined by the output format
+  <code>HDACT</code>. It can therefore be collection-specific.</dd>
+</dl>
+
+<h3><a name="det_page_cust_look_tabs">Customizing look of tabs</a></h3>
+
+<p>You can customize how tabs look like, as well change the look of the
+border that surrounds the content of tabs. The mini panel can
+similarly be customized.</p>
+
+<p>Have a look at the following classes in the CDS css stylesheet:</p>
+<ul>
+   <li><code>tabs</code></li>
+   <li><code>mini-panel</code></li>
+   <li><code>detailed</code></li>
+   <li><code>top-left, top-right, bottom-left, bottom-right</code></li>
+   <li><code>commentHB, detailedRecordActions, star</code></li>
+</ul>
+
+<p>Note that a tab might be greyed out (disabled) when its content is
+empty.  This is the case for the <em>References</em> tab (see <a href="#det_page_cust_cont_tabs">Customizing
+content of tabs</a> -&gt; 'References tab') and the <em>Fulltext</em> tab (if no
+file could be found for the record).<p>
+
+<p>For more advanced modifications (like changing the HTML code of the
+tabs), you can modify the <code>detailed_record_container(..)</code> and
+<code>detailed_record_mini_panel(..)</code> functions inside your
+<code>webstyle_templates.py</code> file.</p>
