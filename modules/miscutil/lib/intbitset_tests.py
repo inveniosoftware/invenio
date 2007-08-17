@@ -42,6 +42,10 @@ class IntBitSetTest(unittest.TestCase):
             [60, 80],
             [10, 20, 60, 70],
             [10, 40, 60, 80],
+            [1000],
+            [10000],
+            [23, 45, 67, 89, 110, 130, 174, 1002, 2132, 23434],
+            [700, 2000]
         ]
         self.fncs_list = [
             (intbitset.__and__, set.__and__, int.__and__, False),
@@ -63,24 +67,26 @@ class IntBitSetTest(unittest.TestCase):
             (intbitset.__ne__, set.__ne__, lambda x, y: cmp(x, y) != 0),
         ]
 
-    def _helper_sanity_test(self, intbitset1):
+    def _helper_sanity_test(self, intbitset1, msg=''):
         wordbitsize = intbitset1.get_wordbitsize()
         size1 = intbitset1.get_size()
         allocated1 = intbitset1.get_allocated()
         creator_list = intbitset1.extract_finite_list()
         up_to1 = creator_list and max(creator_list) or -1
-        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize)
+        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize, "up_to1=%s, size1=%s, allocated1=%s while testing %s during %s" % (up_to1, size1 * wordbitsize, allocated1 * wordbitsize, intbitset1, msg))
         tmp = intbitset(intbitset1.fastdump())
         size1 = intbitset1.get_size()
         allocated1 = intbitset1.get_allocated()
         creator_list = intbitset1.extract_finite_list()
         up_to1 = creator_list and max(creator_list) or -1
-        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize)
+        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize, "After serialization up_to1=%s, size1=%s, allocated1=%s while testing %s during %s" % (up_to1, size1 * wordbitsize, allocated1 * wordbitsize, intbitset1, msg))
 
 
     def _helper_test_via_fncs_list(self, fncs, intbitset1, intbitset2):
         orig1 = intbitset(intbitset1)
         orig2 = intbitset(intbitset2)
+
+        msg = "Testing %s(%s, %s)" % (fncs[0].__name__, repr(intbitset1), repr(intbitset2))
 
         trailing1 = intbitset1.is_infinite()
         trailing2 = intbitset2.is_infinite()
@@ -102,15 +108,15 @@ class IntBitSetTest(unittest.TestCase):
         else:
             set3 = fncs[1](set1, set2)
 
-        self._helper_sanity_test(intbitset1)
-        self._helper_sanity_test(intbitset2)
+        self._helper_sanity_test(intbitset1, msg)
+        self._helper_sanity_test(intbitset2, msg)
 
         if fncs[3]:
             self.assertEqual(set1 & set(intbitset1.extract_finite_list(up_to)), set(intbitset1.extract_finite_list(up_to)), "%s not equal to %s after executing %s(%s, %s)" % (set1, set(intbitset1.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
             self.assertEqual(set1 | set(intbitset1.extract_finite_list(up_to)), set1, "%s not equal to %s after executing %s(%s, %s)" % (set1, set(intbitset1.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
             self.assertEqual(trailing1, intbitset1.is_infinite(), "%s is not %s as it is supposed to be after executing %s(%s, %s)" % (intbitset1, trailing1 and 'infinite' or 'finite', fncs[0].__name__, repr(orig1), repr(orig2)))
         else:
-            self._helper_sanity_test(intbitset3)
+            self._helper_sanity_test(intbitset3, msg)
             self.assertEqual(set3 & set(intbitset3.extract_finite_list(up_to)), set(intbitset3.extract_finite_list(up_to)), "%s not equal to %s after executing %s(%s, %s)" % (set3, set(intbitset3.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
             self.assertEqual(set3 | set(intbitset3.extract_finite_list(up_to)), set3, "%s not equal to %s after executing %s(%s, %s)" % (set3, set(intbitset3.extract_finite_list(up_to)), fncs[0].__name__, repr(orig1), repr(orig2)))
             self.assertEqual(trailing3, intbitset3.is_infinite(), "%s is not %s as it is supposed to be after executing %s(%s, %s)" % (intbitset3, trailing3 and 'infinite' or 'finite', fncs[0].__name__, repr(orig1), repr(orig2)))
