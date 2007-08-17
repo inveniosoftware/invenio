@@ -25,24 +25,50 @@
     navbar_select="webstyle-admin-guide"
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
+<h2>Contents</h2>
 
+<ul style="list-style-type:None">
+<li><strong>1. <a href="#overview_page_layout">Overview</a></strong>
+     <ul style="list-style-type:None">
+     <li>1.1&nbsp;&nbsp;<a href="#overview_css">CSS Style Sheet and Images</a></li>
+     <li>1.2&nbsp;&nbsp;<a href="#overview_page_layout">HTML Page Layout</a>
+         <ul style="list-style-type:None">
+             <li>1.2.1&nbsp;&nbsp;&nbsp;&nbsp;<a href="#overview_page_layout_stat">Layout of HTML Static Pages</a></li>
+             <li>1.2.3&nbsp;&nbsp;&nbsp;&nbsp;<a href="#overview_page_layout_dyn">Layout of Python Dynamic Pages</a></li>
+         </ul>
+     </li>
+     <li>1.3&nbsp;&nbsp;<a href="#overview_bib">Look of Bibliographic References</a></li>
+     <li>1.4&nbsp;&nbsp;<a href="#overview_spec_conf">Specific Configurations</a></li>
+    </ul>
+</li>
+<li><strong>2. <a href="#det_page">Detailed Record Pages</a></strong>
+     <ul style="list-style-type:None">
+     <li>2.1&nbsp;&nbsp;<a href="#det_page">Available tabs</a></li>
+     <li>2.2&nbsp;&nbsp;<a href="#det_show_hide_tabs">Showing/Hiding tabs</a></li>
+     <li>2.3&nbsp;&nbsp;<a href="#det_page_cust_cont_tabs">Customizing content of tabs</a></li>
+     <li>2.4&nbsp;&nbsp;<a href="#det_page_cust_look_tabs">Customizing look of tabs</a></li>
+     </ul>
+</li>
+</ul>
+
+<h2><a name="overview">1. Overview</a></h2>
 <p>This document describes how to change the look and feel of your CDS
 Invenio installation.
 
-<h2>CSS Style Sheet and Images</h2>
+<h3><a name="overview_css">1.1 CSS Style Sheet and Images</a></h3>
 
 <p>The most obvious modification you may want to do is the
 modification of <a href="<WEBURL>/img/cds.css">CSS style sheet</a>.
 You may also customize default <a href="<WEBURL>/img/">images</a>.</p>
 
-<h2>HTML Page Layout</h2>
+<h3><a name="overview_page_layout">1.2 HTML Page Layout</a></h3>
 
 <p>The customization of the general page look and feel is currently
 different depending on whether you customize HTML-like static pages
 (produced by WML during compile-time) or dynamic Python pages
 (assembled during runtime).</p>
 
-<h3>Layout of HTML Static Pages</h3>
+<h4><a name="overview_page_layout_stat">1.2.1 Layout of HTML Static Pages</a></h4>
 
 <p>(Note: this step will disappear in the future as we plan to release
 the dependency on WML in early 2007.)</p>
@@ -58,7 +84,7 @@ such as HTML help guides.  However, this will not affect most of the
 pages because they are generated in a dynamic way during runtime,
 without using WML.</p>
 
-<h3>Layout of Python Dynamic Pages</h3>
+<h4><a name="overview_page_layout_dyn">1.2.2 Layout of Python Dynamic Pages</a></h4>
 
 <p>The dynamic Python-powered pages can be customized by making use of
 CDS Invenio templating system that uses a notion of a template skin.
@@ -162,14 +188,14 @@ style footer will be seen in action.</p>
 
 </ul>
 
-<h2>Look of Bibliographic References</h2>
+<h3><a name="overview_bib">1.3 Look of Bibliographic References</a></h3>
 
 <p>Bibliographic metadata is formatted using
 <a href="<WEBURL>/admin/bibformat">BibFormat</a>. Read the
 <a href="<WEBURL>/admin/bibformat/guide">BibFormat documentation</a>
 for more information.</p>
 
-<h2>Specific Configurations</h2>
+<h3><a name="overview_spec_conf">1.4 Specific Configurations</a></h3>
 
 <p>Note that the search interface pages may be modified to a large
 extent in the <a href="<WEBURL>/admin/websearch">WebSearch Admin
@@ -177,7 +203,7 @@ Interface</a> by adding HTML portalboxes on various places on the page
 (right top, before/after page title, before/after narrow by collection
 boxes, etc).</p>
 
-<h2>Detailed Record Pages</h2>
+<h2><a name="det_page">2. Detailed Record Pages</a></h2>
 
 <p>The web pages displaying the details of a record (such as
 <a href="<WEBURL>/record/1"><WEBURL>/record/1</a>) do not only show metadata, but
@@ -213,7 +239,7 @@ displayed when <em>Information</em> tab is selected).</p>
   +-----------------------------------------------+
 </pre>
 
-<h3><a name="det_page_avail_tabs">Available tabs</a></h3>
+<h4><a name="det_page_avail_tabs">2.1 Available tabs</a></h4>
 
 The following tabs are available:
 <table border="1">
@@ -257,7 +283,7 @@ selected. It is divided into the following sections:</p>
  <li>Actions: quick access to several other features</li>
 </ul>
 
-<h3><a name="det_page_show_hide_tabs">Showing/Hiding tabs</a></h3>
+<h4><a name="det_page_show_hide_tabs">2.2 Showing/Hiding tabs</a></h4>
 
 <p>The <a href="<WEBURL>/admin/websearch">WebSearch admin web
 interface</a> lets you decide for each collection which tabs are to be
@@ -305,7 +331,7 @@ configuration:</p>
   <code>CFG_WEBCOMMENT_ALLOW_REVIEWS</code> variable in your config file).</li>
 </ul>
 
-<h3><a name="det_page_cust_cont_tabs">Customizing content of tabs</a></h3>
+<h4><a name="det_page_cust_cont_tabs">2.3 Customizing content of tabs</a></h4>
 
 <p>The contents of tabs are defined in the following ways:</p>
 <dl>
@@ -356,7 +382,7 @@ configuration:</p>
   <code>HDACT</code>. It can therefore be collection-specific.</dd>
 </dl>
 
-<h3><a name="det_page_cust_look_tabs">Customizing look of tabs</a></h3>
+<h4><a name="det_page_cust_look_tabs">2.4 Customizing look of tabs</a></h4>
 
 <p>You can customize how tabs look like, as well change the look of the
 border that surrounds the content of tabs. The mini panel can
