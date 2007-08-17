@@ -154,7 +154,11 @@ cdef class intbitset:
                 raise ValueError, "rhs is corrupted: %s" % msg
         elif hasattr(rhs, '__iter__'):
             try:
-                preallocate = rhs and max(max(rhs), preallocate)
+                if preallocate < 0:
+                    if rhs:
+                        preallocate = max(rhs)
+                    else:
+                        preallocate = 0
                 if self.sanity_checks:
                     if not (0 <= preallocate < maxelem):
                         raise OverflowError, "Can't integers bigger than %s" % maxelem
