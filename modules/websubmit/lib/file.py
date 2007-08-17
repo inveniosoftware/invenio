@@ -104,8 +104,13 @@ class BibRecDocs:
             else:
                 status = int(row[2])
             if status & 1 == 0:
-                self.bibdocs.append(BibDoc(bibdocid=row[0], recid=self.id))
-
+                try:
+                    cur_doc = BibDoc(bibdocid=row[0], recid=self.id)
+                except StandardError:
+                    pass
+                else:
+                    self.bibdocs.append(cur_doc)
+                
     def listBibDocs(self, type=""):
         """Returns the list all bibdocs object belonging to a recid.
         If type is set, it returns just the bibdocs of that type.
@@ -151,10 +156,13 @@ class BibRecDocs:
         while goodname in self.getBibDocNames(type):
             i += 1
             goodname = "%s_%s" % (docname, i)
-        bibdoc = BibDoc(recid=self.id, type=type, docname=goodname)
-        if bibdoc is not None:
+        try:
+            bibdoc = BibDoc(recid=self.id, type=type, docname=goodname)
+        except StandardError:
+            return None
+        else:
             self.bibdocs.append(bibdoc)
-        return bibdoc
+            return bibdoc
 
     def addNewFile(self, fullpath, type="Main"):
         """Creates a new bibdoc given a fullpath file and store the file in it.
@@ -249,14 +257,24 @@ class BibDoc:
         # bibdocid is known, the document already exists
         if bibdocid != "":
             if recid == "":
+                recid = None
+                self.type = ""
                 res = run_sql("select id_bibrec,type from bibrec_bibdoc "
                     "where id_bibdoc=%s", (bibdocid,))
                 if len(res) > 0:
                     recid = res[0][0]
                     self.type = res[0][1]
                 else:
-                    recid = None
-                    self.type = ""
+                    res = run_sql("select id_bibdoc1 from bibdoc_bibdoc "
+                                  "where id_bibdoc2=%s", (bibdocid,))
+                    if len(res) > 0 :
+                        main_bibdoc = res[0][0]
+                        res = run_sql("select id_bibrec,type from bibrec_bibdoc "
+                                      "where id_bibdoc=%s", (main_bibdoc,))
+                        if len(res) > 0:
+                            recid = res[0][0]
+                            self.type = res[0][1]
+                
             else:
                 res = run_sql("select type from bibrec_bibdoc "
                     "where id_bibrec=%s and id_bibdoc=%s", (recid, bibdocid,))
@@ -264,7 +282,7 @@ class BibDoc:
                     self.type = res[0][0]
                 else:
                     #this bibdoc isn't associated with the corresponding bibrec.
-                    return None
+                    raise StandardError, "No docid associated with the recid %s" % recid
             # gather the other information
             res = run_sql("select id,status,docname,creation_date,"
                 "modification_date from bibdoc where id=%s", (bibdocid,))
@@ -279,11 +297,11 @@ class BibDoc:
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
             else:
                 # this bibdoc doesn't exist
-                return None
+                raise StandardError, "The docid %s does not exist." % bibdocid
         # else it is a new document
         else:
             if docname == "" or type == "":
-                return None
+                raise StandardError, "Argument missing for creating a new bibdoc" 
             else:
                 self.recid = recid
                 self.type = type
@@ -299,7 +317,7 @@ class BibDoc:
                         run_sql("insert into bibrec_bibdoc values(%s,%s,%s)",
                             (recid, self.id, self.type,))
                 else:
-                    return None
+                    raise StandardError, "New docid cannot be created" 
                 group = "g" + str(int(int(self.id) / filedirsize))
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
                 # we create the corresponding storage directory
@@ -367,8 +385,11 @@ class BibDoc:
             existingIcon.delete()
         #then add the new one
         basename = decompose_file(file)[1]
-        newicon = BibDoc(type='Icon', docname=basename)
-        if newicon is not None:
+        try:
+            newicon = BibDoc(type='Icon', docname=basename)
+        except StandardError:
+            pass
+        else:
             newicon.addFilesNewVersion([file])
             run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
                 (self.id, newicon.getId(),))
@@ -507,7 +528,12 @@ class BibDoc:
             if status & 1 == 0:
                 if not self.relatedFiles.has_key(type):
                     self.relatedFiles[type] = []
-                self.relatedFiles[type].append(BibDoc(bibdocid=bibdocid))
+                try:
+                    cur_doc = BibDoc(bibdocid=bibdocid)
+                except StandardError:
+                    pass
+                else:
+                    self.relatedFiles[type].append(cur_doc)
 
     def listAllFiles(self):
         return self.docfiles
