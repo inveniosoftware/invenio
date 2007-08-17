@@ -2461,12 +2461,13 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
 
             # print records
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            req.write(format_records(recIDs_to_print,
-                                     format,
-                                     ln=ln,
-                                     search_pattern=search_pattern,
-                                     record_separator="\n",
-                                     uid=uid))
+            format_records(recIDs_to_print,
+                           format,
+                           ln=ln,
+                           search_pattern=search_pattern,
+                           record_separator="\n",
+                           uid=uid,
+                           req=req)
             # print footer if needed
             if print_records_epilogue_p:
                 print_records_epilogue(req, format)
@@ -2491,30 +2492,32 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                            uid=uid, verbose=verbose))
             elif format.startswith("hb"):
                 # HTML brief format:
-                rows = []
+                req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
+                    ln = ln))
                 for irec in range(irec_max, irec_min, -1):
-                    temp = {
-                             'number' : jrec+irec_max-irec,
-                             'recid' : recIDs[irec],
-                           }
+                    row_number = jrec+irec_max-irec
+                    recid = recIDs[irec]
                     if relevances and relevances[irec]:
-                        temp['relevance'] = relevances[irec]
+                        relevance = relevances[irec]
                     else:
-                        temp['relevance'] = ''
-                    temp['record'] = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
+                        relevance = ''
+                    record = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
                                                   uid=uid, verbose=verbose)
-                    rows.append(temp)
-                req.write(websearch_templates.tmpl_records_format_htmlbrief(
-                           ln = ln,
-                           weburl = weburl,
-                           rows = rows,
-                           relevances_prologue = relevances_prologue,
-                           relevances_epilogue = relevances_epilogue,
-                         ))
-            else:
-                # HTML detailed format:
 
-                rows = []
+                    req.write(websearch_templates.tmpl_record_format_htmlbrief_body(
+                        ln = ln,
+                        recid = recid,
+                        row_number = row_number,
+                        relevance = relevance,
+                        record = record,
+                        relevances_prologue = relevances_prologue,
+                        relevances_epilogue = relevances_epilogue,
+                        ))
+                req.write(websearch_templates.tmpl_record_format_htmlbrief_footer(
+                    ln = ln))
+
+            elif format.startswith("hd"):
+                # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec])
@@ -2612,6 +2615,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                     files=files,
                                                                                     reviews=reviews,
                                                                                     actions=actions))
+            else:
+                # Other formats
+                for irec in range(irec_max, irec_min, -1):
+                    req.write(print_record(recIDs[irec], format, ot, ln,
+                                           search_pattern=search_pattern,
+                                           uid=uid, verbose=verbose))
 
     else:
         print_warning(req, _("Use different search terms."))

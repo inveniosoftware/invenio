@@ -1911,7 +1911,7 @@ class Template:
         """
         if number is None:
             return None
-        # Temporarily switch the numeric locale to the requeted one, and format the number
+        # Temporarily switch the numeric locale to the requested one, and format the number
         # In case the system has no locale definition, use the vanilla form
         ol = locale.getlocale(locale.LC_NUMERIC)
         try:
@@ -1925,28 +1925,17 @@ class Template:
         locale.setlocale(locale.LC_NUMERIC, ol)
         return number
 
-    def tmpl_records_format_htmlbrief(self, ln, weburl, rows, relevances_prologue, relevances_epilogue):
-        """Returns the htmlbrief format of the records
+    def tmpl_record_format_htmlbrief_header(self, ln):
+        """Returns the header of the search results list when output
+        is html brief. Note that this function is called for each collection
+        results when 'split by collection' is enabled.
+
+        See also: tmpl_record_format_htmlbrief_footer(..),
+                  tmpl_record_format_htmlbrief_body(..)
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
-
-          - 'rows' *array* - Parts of the interface to display, in the format:
-
-          - 'rows[number]' *int* - The order number
-
-          - 'rows[recid]' *int* - The recID
-
-          - 'rows[relevance]' *string* - The relevance of the record
-
-          - 'rows[record]' *string* - The formatted record
-
-          - 'relevances_prologue' *string* - HTML code to prepend the relevance indicator
-
-          - 'relevances_epilogue' *string* - HTML code to append to the relevance indicator (used mostly for formatting)
 
         """
 
@@ -1960,24 +1949,78 @@ class Template:
                 'weburl' : weburl,
               }
 
-        for row in rows:
-            out += """
-                    <tr><td valign="top" align="right" style="white-space: nowrap;">
-                        <input name="recid" type="checkbox" value="%(recid)s" />
-                    %(number)s.
-                   """ % row
-            if row['relevance']:
-                out += """<br /><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
-                         'prologue' : relevances_prologue,
-                         'epilogue' : relevances_epilogue,
-                         'relevance' : row['relevance']
-                       }
-            out += """</td><td valign="top">%s</td></tr>""" % row['record']
-        out += """</table>
+        return out
+
+    def tmpl_record_format_htmlbrief_footer(self, ln):
+        """Returns the footer of the search results list when output
+        is html brief. Note that this function is called for each collection
+        results when 'split by collection' is enabled.
+
+        See also: tmpl_record_format_htmlbrief_header(..),
+                  tmpl_record_format_htmlbrief_body(..)
+
+        Parameters:
+
+          - 'ln' *string* - The language to display
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """</table>
                <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
                </form>""" % {
                  'basket' : _("ADD TO BASKET")
-               }
+                 }
+
+        return out
+
+    def tmpl_record_format_htmlbrief_body(self, ln, recid,
+                                          row_number, relevance,
+                                          record, relevances_prologue,
+                                          relevances_epilogue):
+        """Returns the html brief format of one record. Used in the
+        search results list for each record.
+
+        See also: tmpl_record_format_htmlbrief_header(..),
+                  tmpl_record_format_htmlbrief_footer(..)
+
+        Parameters:
+
+          - 'ln' *string* - The language to display
+
+          - 'row_number' *int* - The position of this record in the list
+
+          - 'recid' *int* - The recID
+
+          - 'relevance' *string* - The relevance of the record
+
+          - 'record' *string* - The formatted record
+
+          - 'relevances_prologue' *string* - HTML code to prepend the relevance indicator
+
+          - 'relevances_epilogue' *string* - HTML code to append to the relevance indicator (used mostly for formatting)
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
+                <tr><td valign="top" align="right" style="white-space: nowrap;">
+                    <input name="recid" type="checkbox" value="%(recid)s" />
+                %(number)s.
+               """ % {'recid': recid,
+                      'number': row_number}
+        if relevance:
+            out += """<br /><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
+                'prologue' : relevances_prologue,
+                'epilogue' : relevances_epilogue,
+                'relevance' : relevance
+                }
+        out += """</td><td valign="top">%s</td></tr>""" % record
+
         return out
 
     def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
