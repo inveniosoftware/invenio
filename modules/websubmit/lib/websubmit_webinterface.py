@@ -91,7 +91,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             # all the available files. In no case are the docids
             # visible.
             bibarchive = BibRecDocs(self.recid)
-
+            
             if filename:
                 # We know the complete file name, guess which docid it
                 # refers to
@@ -101,13 +101,14 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 		format = filename[len(name):]
                 if format and format[0] == '.':
                     format = format[1:]
-
+                    
                 # search this filename in the complete list of files
                 for doc in bibarchive.listBibDocs():
                     if filename in [f.fullname for f in doc.listAllFiles()]:
-                        docfile=doc.getFile(name,format,args['version'])
-                        if docfile is None:
-                            return warningMsg(_("Unable to find file."), req, cdsname, ln)
+                        try:
+                            docfile = doc.getFile(name,format,args['version'])
+                        except StandardError, msg:
+                            return errorMsg(msg, req, cdsname, ln)
 
                         if docfile.isRestricted():
                             return warningMsg(_("This file is restricted!"), req, cdsname, ln)
@@ -115,10 +116,28 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                             res = doc.registerDownload(ip, version, format, uid)
-
-                        return docfile.stream(req)
-                else:
-                    return warningMsg(_("Unable to find file."), req, cdsname, ln)
+                        try:
+                            return docfile.stream(req)
+                        except StandardError, msg:
+                            return errorMsg(msg, req, c, ln)
+                        
+                    elif doc.getIcon() is not None and doc.getIcon().docname in filename:
+                        icon = doc.getIcon()
+                        try:
+                            iconfile = icon.getFile(icon.docname, 'gif', args['version'])
+                        except StandardError, msg:
+                            return errorMsg(msg, req, cdsname, ln)
+                        
+                        if iconfile.isRestricted():
+                            return warningMsg(_("This Icon is restricted!"), req, cdsname, ln)
+                    
+                        if not readonly:
+                            ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                            res = doc.registerDownload(ip, version, format, uid)
+                        try:
+                            return iconfile.stream(req)
+                        except StandardError, msg:
+                            return errorMsg(msg, req, c, ln)
 
             filelist = bibarchive.display("", args['version'], ln=ln)
 
@@ -205,12 +224,15 @@ def websubmit_legacy_getfile(req, form):
             if docid=="":
                 return errorMsg(_("Parameter docid missing"), req, c, ln)
 
-            doc = BibDoc(bibdocid=docid)
-            docfile=doc.getFile(name,format,version)
-
-            if docfile is None:
-                return warningMsg(_("Unable to find file."),req, c, ln)
-
+            try:
+                doc = BibDoc(bibdocid=docid)
+            except StandardError, msg:
+                return errorMsg(msg, req, c, ln)
+            try:
+                docfile = doc.getFile(name,format,version)
+            except StandardError, msg:
+                return errorMsg(msg, req, c, ln)
+            
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
             if docfile.format:
@@ -234,7 +256,10 @@ def websubmit_legacy_getfile(req, form):
 
         # a precise filename
         elif docid!="":
-            bibdoc = BibDoc(bibdocid=docid)
+            try:
+                bibdoc = BibDoc(bibdocid=docid)
+            except StandardError, msg:
+                return errorMsg(msg, req, cdsname, ln)
             recid = bibdoc.getRecid()
             filelist = bibdoc.display(version, ln=ln)
 
