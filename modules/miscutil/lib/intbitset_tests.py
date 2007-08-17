@@ -123,9 +123,9 @@ class IntBitSetTest(unittest.TestCase):
 
     def _helper_test_empty_set(self, fncs):
         for set1 in self.sets:
-            self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset())
-            self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(set1))
-        self._helper_test_via_fncs_list(fncs, intbitset(), intbitset())
+            self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset([]))
+            self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(set1))
+        self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset([]))
 
     def _helper_test_inifinite_set(self, fncs):
         for set1 in self.sets:
@@ -136,10 +136,10 @@ class IntBitSetTest(unittest.TestCase):
 
     def _helper_test_infinite_vs_empty(self, fncs):
         for set1 in self.sets:
-            self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset())
-            self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(set1, trailing_bits=True))
-        self._helper_test_via_fncs_list(fncs, intbitset(), intbitset(trailing_bits=True))
-        self._helper_test_via_fncs_list(fncs, intbitset(trailing_bits=True), intbitset())
+            self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset([]))
+            self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(set1, trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, intbitset(trailing_bits=True), intbitset([]))
 
 
     def test_set_intersection(self):
@@ -272,12 +272,12 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_list_dump(self):
         """intbitset - list dump"""
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             self.assertEqual(list(intbitset(set1)), set1)
 
     def test_ascii_bit_dump(self):
         """intbitset - ascii bit dump"""
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             tot = 0
             count = 0
             for bit in intbitset(set1).strbits():
@@ -293,13 +293,13 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_marshalling(self):
         """intbitset - marshalling"""
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
 
     #def test_set_emptiness(self):
@@ -308,7 +308,7 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_clear(self):
         """intbitset - clearing"""
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1)
             intbitset1.clear()
             self.assertEqual(list(intbitset1), [])
@@ -318,17 +318,17 @@ class IntBitSetTest(unittest.TestCase):
 
     def test_set_repr(self):
         """intbitset - Pythonic representation"""
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1, trailing_bits=True)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
 
     def test_set_cmp(self):
         """intbitset - (non infinte) set comparison"""
-        for set1 in self.sets + []:
-            for set2 in self.sets + []:
+        for set1 in self.sets + [[]]:
+            for set2 in self.sets + [[]]:
                 for op in self.cmp_list:
                     self.assertEqual(op[0](intbitset(set1), intbitset(set2)), op[1](set(set1), set(set2)), "Error in comparing %s %s with comparing function %s" % (set1, set2, op[0].__name__))
 
@@ -336,7 +336,7 @@ class IntBitSetTest(unittest.TestCase):
     def test_set_update_with_signs(self):
         """intbitset - set update with signs"""
         dict1 = {10 : -1, 20 : 1, 23 : -1, 27 : 1, 33 : -1, 56 : 1, 70 : -1, 74 : 1}
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1)
             intbitset1.update_with_signs(dict1)
             up_to = max(dict1.keys() + set1)
@@ -349,7 +349,7 @@ class IntBitSetTest(unittest.TestCase):
     def test_set_cloning(self):
         """intbitset - set cloning"""
         import copy
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1)
             intbitset2 = intbitset(intbitset1)
             intbitset3 = copy.deepcopy(intbitset2)
@@ -359,7 +359,7 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
 
-        for set1 in self.sets + []:
+        for set1 in self.sets + [[]]:
             intbitset1 = intbitset(set1, trailing_bits=True)
             intbitset2 = intbitset(intbitset1)
             intbitset3 = copy.deepcopy(intbitset2)
