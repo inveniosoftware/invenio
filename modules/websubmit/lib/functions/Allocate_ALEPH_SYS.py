@@ -122,7 +122,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form):
     if not rw_count_lastsys_ok or not rw_count_maxsys_ok:
         ## cannot access the ALEPH counter files - critical error
         msg = """ERROR: When trying to allocate an ALEPH SYS for a record, either [%s] or [%s] (or both) was not"""\
-              """ accessable. It was therefore not possible to allocate the SYS.""" % (counter_lastsys, counter_maxsys)
+              """ accessible. It was therefore not possible to allocate the SYS.""" % (counter_lastsys, counter_maxsys)
         lockfile_removed = _unlink_SYS_counter_lockfile(database)
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
