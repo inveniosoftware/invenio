@@ -1012,7 +1012,7 @@ class Template:
         out = """<img src="%s/img/head.gif" border="0" alt=""/>""" % weburl
         if guest:
             out += """%(guest_msg)s ::
-                   <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s">%(login)s</a>""" % {
+                   <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
                      'weburl' : weburl,
                      'sweburl': sweburl,
                      'ln' : ln,
@@ -1021,6 +1021,7 @@ class Template:
                      'alerts' : _("alerts"),
                      'baskets' : _("baskets"),
                      'login' : _("login"),
+                     'referer' : url_referer and ('&referer=%s' % urllib.quote(url_referer)) or '',
                    }
         else:
             out += """%(username)s ::

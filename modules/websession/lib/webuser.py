@@ -705,6 +705,8 @@ def create_userinfobox_body(req, uid, language="en"):
             url_referer = sweburl + req.unparsed_uri
         else:
             url_referer = weburl + req.unparsed_uri
+        if '/youraccount/logout' in url_referer:
+            url_referer = ''
     else:
         url_referer = weburl
 
