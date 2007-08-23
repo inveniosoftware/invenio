@@ -644,6 +644,24 @@ def calculate_start_date(display_since):
                   start_time[8])
     return convert_datestruct_to_datetext(start_time)
 
+def count_comments(recID):
+    """
+    Returns the number of comments made on a record.
+    """
+    recID = int(recID)
+    query = """SELECT count(id) FROM cmtRECORDCOMMENT 
+                                WHERE id_bibrec=%i AND star_score=0"""
+    return run_sql(query % recID)[0][0]  
+
+def count_reviews(recID):
+    """
+    Returns the number of reviews made on a record.
+    """
+    recID = int(recID)
+    query = """SELECT count(id) FROM cmtRECORDCOMMENT 
+                                WHERE id_bibrec=%i AND star_score>0"""
+    return run_sql(query % recID)[0][0]  
+
 def get_first_comments_or_remarks(recID=-1,
                                   ln=cdslang,
                                   nb_comments='all',
