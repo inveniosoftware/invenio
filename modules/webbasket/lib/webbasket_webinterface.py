@@ -22,7 +22,6 @@
 __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
-
 from mod_python import apache
 
 from invenio.config import weburl, webdir, cdslang, \
@@ -57,7 +56,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'group': (int, 0),
                                    'bsk_to_sort': (int, 0),
                                    'sort_by_title': (str, ""),
-                                   'sort_by_date': (str, "")
+                                   'sort_by_date': (str, ""),
+                                   'of': (str, '')
                                    })
         
         _ = gettext_set_language(argd['ln'])
@@ -89,7 +89,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def display_item(self, req, form):
         """ Display basket item """
@@ -100,7 +101,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'category': 
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
-                                   'group': (int, 0)
+                                   'group': (int, 0),
+                                   'of': (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -137,7 +139,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def write_comment(self, req, form):
         """Write a comment (just interface for writing)"""
@@ -148,7 +151,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'category': 
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
-                                   'group': (int, 0)
+                                   'group': (int, 0),
+                                   'of'   : (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -183,7 +187,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def save_comment(self, req, form):
         """Save comment on record in basket"""
@@ -195,7 +200,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'category': 
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
-                                   'group': (int, 0)
+                                   'group': (int, 0),
+                                   'of'   : (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -239,7 +245,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def delete_comment(self, req, form):
         """Delete a comment
@@ -257,7 +264,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'category': 
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
-                                   'group': (int, 0)
+                                   'group': (int, 0),
+                                   'of'   : (str, '')
                                    })
 
         uid = getUid(req)
@@ -284,7 +292,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         errors      = errors,
                         req         = req,
-                        navmenuid   = 'yourbaskets')
+                        navmenuid   = 'yourbaskets',
+                        of          = argd[of])
     
     def add(self, req, form):
         """Add records to baskets.
@@ -302,6 +311,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'new_basket_name': (str, ""),
                                    'new_topic_name': (str, ""),
                                    'create_in_topic': (int, -1),
+                                   "of" : (str, '')
                                    })
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -337,7 +347,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def delete(self, req, form):
         """Delete basket interface"""
@@ -347,6 +358,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
+                                   'of'   : (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -388,7 +400,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         errors      = errors,
                         warnings    = warnings,
                         req         = req,
-                        navmenuid   = 'yourbaskets')
+                        navmenuid   = 'yourbaskets',
+                        of          = argd['of'])
 
     def modify(self, req, form):
         """Modify basket content interface (reorder, suppress record, etc.)"""
@@ -399,6 +412,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
+                                   'of'   : (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -450,7 +464,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def edit(self, req, form):
         """Edit basket interface"""
@@ -467,6 +482,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'new_topic_name': (str, ""),
                                    'new_group': (str, ""),
                                    'external': (str, ""),
+                                   'of'      : (str, '')
                                    })
 
         uid = getUid(req)
@@ -548,7 +564,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')    
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])    
         
     def create_basket(self, req, form):
         """Create basket interface"""
@@ -557,6 +574,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'new_topic_name': (str, ""),
                                    'create_in_topic': (int, -1),
                                    'topic_number': (int, -1),
+                                   'of'          : (str, ''),
                                    })
 
         uid = getUid(req)
@@ -598,7 +616,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         errors      = errors,
                         warnings    = warnings,
                         req         = req,
-                        navmenuid   = 'yourbaskets')
+                        navmenuid   = 'yourbaskets',
+                        of          = argd['of'])
 
     def display_public(self, req, form):
         """Display public basket. If of is x** then output will be XML"""
@@ -625,7 +644,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         errors      = errors,
                         warnings    = warnings,
-                        req         = req)
+                        req         = req,
+                        of          = argd['of'])
         if len(argd['of']) and argd['of'][0]=='x':
             # XML output
             req.content_type = "text/xml"
@@ -651,13 +671,15 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
                 
     def list_public_baskets(self, req, form):
         """List of public baskets interface"""
         argd = wash_urlargd(form, {'inf_limit': (int, 0),
                                    'order': (int, 1),
                                    'asc': (int, 1),
+                                   'of': (str, '')
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -679,11 +701,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     errors      = errors,
                     warnings    = warnings,
                     req         = req,
-                    navmenuid   = 'yourbaskets')
+                    navmenuid   = 'yourbaskets',
+                    of          = argd['of'])
 
     def unsubscribe(self, req, form):
         """unsubscribe to basket"""
         argd = wash_urlargd(form, {'bskid': (int, 0),
+                                   'of': (str, '')
                                    })
         
         uid = getUid(req)    
@@ -698,6 +722,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
     def subscribe(self, req, form):
         """subscribe to basket"""
         argd = wash_urlargd(form, {'bskid': (int, 0),
+                                    'of': (str, '')
                                    })
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
