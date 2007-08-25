@@ -36,6 +36,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_WARNING_MESSAGES, \
                                      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webuser import isGuestUser
+from invenio.search_engine import record_exists
                             
 import invenio.webbasket_dblayer as db
 try:
@@ -374,13 +375,20 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     warnings = []
     if not(type(recids) == list):
         recids = [recids]
-    if not(len(recids)):
+        
+    validated_recids = []        
+    for recid in recids:
+        recid = int(recid)
+        if record_exists(recid) == 1:
+            validated_recids.append(recid)
+            
+    if not(len(validated_recids)):
         warnings.append('WRN_WEBBASKET_NO_RECORD')
         body += webbasket_templates.tmpl_warnings(warnings, ln)
         if referer and not(referer.find(weburl) == -1):
             body += webbasket_templates.tmpl_back_link(referer, ln)
         return (body, errors, warnings)
-    
+            
     if new_basket_name != '':
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
@@ -402,16 +410,27 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     #it may be useful to add a warning message when no basket is selected : bskids != ['-1']
     if len(bskids) and bskids != ['-1']:       
         # save
-        nb_modified_baskets = db.add_to_basket(uid, recids, bskids)
+        bskids = [int(bskid) for bskid in bskids]
+        for bskid in bskids:
+            if not(__check_user_can_perform_action(uid, 
+                                       bskid, 
+                                       CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
+                errors.append('ERR_WEBBASKET_NO_RIGHTS')
+                break
+        if len(errors):
+            return (body, errors, warnings)
+
+        nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
         body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
         body += webbasket_templates.tmpl_back_link(referer, ln)
+
     else:
         # Display basket_selection
         personal_baskets = db.get_all_personal_baskets_names(uid)
         group_baskets = db.get_all_group_baskets_names(uid)
         external_baskets = db.get_all_external_baskets_names(uid)
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-        body += webbasket_templates.tmpl_add(recids=recids,
+        body += webbasket_templates.tmpl_add(recids=validated_recids,
                                             personal_baskets=personal_baskets,
                                             group_baskets=group_baskets,
                                             external_baskets=external_baskets,
