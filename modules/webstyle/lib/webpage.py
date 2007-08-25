@@ -37,6 +37,8 @@ from invenio.errorlib import get_msgs_for_code_list, register_errors
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 
+from xml.dom.minidom import parseString, getDOMImplementation
+
 def create_navtrailbox_body(title,
                             previous_links,
                             prolog="",
@@ -63,7 +65,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=cdslang, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
-         navtrail_append_title_p=1):
+         navtrail_append_title_p=1, of=""):
 
     """page(): display CDS web page
         input: title of the page
@@ -87,50 +89,87 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                secure_page_p is 0 or 1 and tells whether we are to use HTTPS friendly page elements or not
                navmenuid the section of the website this page belongs (search, submit, baskets, etc.)
                navtrail_append_title_p is 0 or 1 and tells whether page title is appended to navtrail
+               of is an output format (use xx for xml output (e.g. AJAX))
        output: the final cds page with header, footer, etc.
     """
 
     _ = gettext_set_language(language)
+    if of == 'xx':
+        #xml output (e.g. AJAX calls) => of=xx
+        req.content_type = 'text/xml'
+        impl = getDOMImplementation()
+        output = impl.createDocument(None, "invenio-message", None)
+        root = output.documentElement
+        body_node = output.createElement('body')
+        body_text = output.createCDATASection(unicode(body, 'utf_8'))
+        body_node.appendChild(body_text)
+        root.appendChild(body_node)
+        if errors:
+            errors_node = output.createElement('errors')
+            errors = get_msgs_for_code_list(errors, 'error', language)
+            register_errors(errors, 'error', req)
+            for (error_code, error_msg) in errors:
+                error_node = output.createElement('error')
+                error_node.setAttribute('code', error_code)
+                error_text = output.createTextNode(error_msg)
+                error_node.appendChild(error_text)
+                errors_node.appendChild(error_node)
+            root.appendChild(errors_node)
+        if warnings:
+            warnings_node = output.createElement('warnings')
+            warnings = get_msgs_for_code_list(warnings, 'warning', language)
+            register_errors(warnings, 'warning')
+            for (warning_code, warning_msg) in warnings:
+                warning_node = output.createElement('warning')
+                warning_node.setAttribute('code', warning_code)
+                warning_text = output.createTextNode(warning_msg)
+                warning_node.appendChild(warning_text)
+                warnings_node.appendChild(warning_node)    
+            root.appendChild(warnings_node)
+        return output.toprettyxml(encoding="utf-8" )
+        
+    else:
+        #usual output
+        # if there are event
+        if warnings:
+            warnings = get_msgs_for_code_list(warnings, 'warning', language)
+            register_errors(warnings, 'warning')
     
-    # if there are event
-    if warnings:
-        warnings = get_msgs_for_code_list(warnings, 'warning', language)
-        register_errors(warnings, 'warning')
-
-    # if there are errors
-    if errors:
-        errors = get_msgs_for_code_list(errors, 'error', language)
-        register_errors(errors, 'error', req)
-        body = create_error_box(req, errors=errors, ln=language) 
-
-    return webstyle_templates.tmpl_page(req, ln=language,
-                      description = description,
-                      keywords = keywords,
-                      userinfobox = create_userinfobox_body(req, uid, language),
-                      navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
-                                                            and title or '',
-                                                            navtrail,
-                                                            language=language),
-                      uid = uid,
-                      secure_page_p = secure_page_p,
-                      # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
-                      pageheaderadd = cdspageheaderadd,
-                      boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
-                      boxlefttopadd = cdspageboxlefttopadd,
-                      boxleftbottomadd = cdspageboxleftbottomadd,
-                      boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
-                      boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
-                      boxrighttopadd = cdspageboxrighttopadd,
-                      boxrightbottomadd = cdspageboxrightbottomadd,
-                      boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
-                      titleprologue = titleprologue,
-                      title = title,
-                      titleepilogue = titleepilogue,
-                      body = body,                                        
-                      # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
-                      lastupdated = lastupdated,
-                      pagefooteradd = cdspagefooteradd,
-                      navmenuid = navmenuid)
+        # if there are errors
+        if errors:
+            errors = get_msgs_for_code_list(errors, 'error', language)
+            register_errors(errors, 'error', req)
+            body = create_error_box(req, errors=errors, ln=language) 
+    
+        return webstyle_templates.tmpl_page(req, ln=language,
+                          description = description,
+                          keywords = keywords,
+                          userinfobox = create_userinfobox_body(req, uid, language),
+                          navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
+                                                                and title or '',
+                                                                navtrail,
+                                                                language=language),
+                          uid = uid,
+                          secure_page_p = secure_page_p,
+                          # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
+                          pageheaderadd = cdspageheaderadd,
+                          boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
+                          boxlefttopadd = cdspageboxlefttopadd,
+                          boxleftbottomadd = cdspageboxleftbottomadd,
+                          boxleftbottom = CFG_WEBSTYLE_CDSPAGEBOXLEFTBOTTOM,
+                          boxrighttop = CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP,
+                          boxrighttopadd = cdspageboxrighttopadd,
+                          boxrightbottomadd = cdspageboxrightbottomadd,
+                          boxrightbottom = CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM,
+                          titleprologue = titleprologue,
+                          title = title,
+                          titleepilogue = titleepilogue,
+                          body = body,                                        
+                          # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
+                          lastupdated = lastupdated,
+                          pagefooteradd = cdspagefooteradd,
+                          navmenuid = navmenuid)
+        
 
 def pageheaderonly(title, navtrail="", description="", keywords="",
                    uid=0, cdspageheaderadd="", language=cdslang,
