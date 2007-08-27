@@ -54,6 +54,10 @@ regression-test:
 kwalitee-check:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)
 
+etags:
+	\rm -f $(top_srcdir)/TAGS
+	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
+
 install-data-local:
 	for d in / /cache /log /tmp /data /run ; do	\
 		mkdir -p $(localstatedir)$$d &&		\
