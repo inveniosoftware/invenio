@@ -394,8 +394,10 @@ default
 ## Note that "1" will display the record exactly as if it were fully
 ## preformatted, but it may be slow due to on-the-fly processing; "0"
 ## will display a default format very fast, but it may not have all
-## the fields as in the fully preformatted HTML brief format.  When
-## usure, set "0" here.
+## the fields as in the fully preformatted HTML brief format.
+## Note also that this option is active only for old (PHP) formats;
+## the new (Python) formats are called on the fly by default anyway,
+## since they are much faster.  When usure, please set "0" here.
 ##  (example: "0")
 <define-tag CFG_CALL_BIBFORMAT whitespace=delete>
 0
