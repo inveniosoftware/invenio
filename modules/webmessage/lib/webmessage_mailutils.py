@@ -65,6 +65,7 @@ def email_quoted_txt2html(text,
     """
     final_body = ""
     nb_indent = 0
+    text = text.strip('\n')
     lines = text.split(linebreak_txt)
     for line in lines:
         new_nb_indent = 0
@@ -83,7 +84,7 @@ def email_quoted_txt2html(text,
                 tabs_before -= 1 
                 final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
         else:
-            final_body += (tabs_before)*"\t" + linebreak_html
+            final_body += (tabs_before)*"\t"
         final_body += tabs_before*"\t" + line
         final_body += linebreak_html + "\n"
         nb_indent = new_nb_indent
