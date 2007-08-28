@@ -28,6 +28,7 @@ from invenio.config import \
      CFG_PATH_GZIP, \
      images
 from invenio.file import *
+from invenio.websubmit_functions.Shared_Functions import createRelatedFormats, createIcon
 
 def Upload_Files(parameters,curdir,form):
     global doctype,access,act,dir
@@ -223,44 +224,3 @@ function step2()
 </SCRIPT> """
     return t
 
-def createRelatedFormats(fullpath):
-    createdpaths = []
-    filename = re.sub("\..*","",os.path.basename(fullpath))
-    extension = re.sub("^[^\.]*.","",os.path.basename(fullpath)).lower()
-    basedir = os.path.dirname(fullpath)
-    if extension == "pdf":
-        # Create PostScript
-        os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD,fullpath))
-        if os.path.exists("%s/%s.ps" % (basedir,filename)):
-            os.system("%s %s/%s.ps" % (CFG_PATH_GZIP,basedir,filename))
-            createdpaths.append("%s/%s.ps.gz" % (basedir,filename))
-    if extension == "ps":
-        # Create PDF
-        os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER,fullpath,basedir,filename))
-        if os.path.exists("%s/%s.pdf" % (basedir,filename)):
-            createdpaths.append("%s/%s.pdf" % (basedir,filename))
-    if extension == "ps.gz":
-        #gunzip file
-        os.system("%s %s" % (CFG_PATH_GUNZIP,fullpath))
-        # Create PDF
-        os.system("%s %s/%s.ps %s/%s.pdf" % (CFG_PATH_DISTILLER,basedir,filename,basedir,filename))
-        if os.path.exists("%s/%s.pdf" % (basedir,filename)):
-            createdpaths.append("%s/%s.pdf" % (basedir,filename))
-        #gzip file
-        os.system("%s %s/%s.ps" % (CFG_PATH_GZIP,basedir,filename))
-    return createdpaths
-
-def createIcon(fullpath,iconsize):
-    global CFG_PATH_CONVERT
-    basedir = os.path.dirname(fullpath)
-    filename = os.path.basename(fullpath)
-    extension = re.sub("^[^\.]*\.","",filename)
-    if extension == filename:
-        extension == ""
-    iconpath = "%s/icon-%s.gif" % (basedir,re.sub("\..*","",filename))
-    if os.path.exists(fullpath) and extension.lower() in ['pdf','gif','jpg','jpeg','ps']:
-        os.system("%s -scale %s %s %s" % (CFG_PATH_CONVERT,iconsize,fullpath,iconpath))
-    if os.path.exists(iconpath):
-        return iconpath
-    else:
-        return None
