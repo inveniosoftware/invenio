@@ -36,22 +36,23 @@ def createRelatedFormats(fullpath):
     Return a list of the paths to the converted files
     """
     createdpaths = []
-    filename = re.sub("\..*", "", os.path.basename(fullpath))
-    extension = re.sub("^[^\.]*.", "", os.path.basename(fullpath)).lower()
     basedir = os.path.dirname(fullpath)
-    if extension == "pdf":
+    filename = os.path.basename(fullpath)
+    filename, extension = os.path.splitext(filename)
+    extension = extension.lower()
+    if extension == ".pdf":
         # Create PostScript
         os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD, fullpath))
         if os.path.exists("%s/%s.ps" % (basedir, filename)):
             os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
             createdpaths.append("%s/%s.ps.gz" % (basedir, filename))
-    if extension == "ps":
+    if extension == ".ps":
         # Create PDF
         os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER, fullpath, \
                                        basedir, filename))
         if os.path.exists("%s/%s.pdf" % (basedir, filename)):
             createdpaths.append("%s/%s.pdf" % (basedir, filename))
-    if extension == "ps.gz":
+    if extension == ".ps.gz":
         #gunzip file
         os.system("%s %s" % (CFG_PATH_GUNZIP, fullpath))
         # Create PDF
@@ -71,11 +72,11 @@ def createIcon(fullpath, iconsize):
     """
     basedir = os.path.dirname(fullpath)
     filename = os.path.basename(fullpath)
-    extension = re.sub("^[^\.]*\.", "", filename)
+    filename, extension = os.path.splitext(filename)
     if extension == filename:
         extension == ""
-    iconpath = "%s/icon-%s.gif" % (basedir, re.sub("\..*", "", filename))
-    if os.path.exists(fullpath) and extension.lower() in ['pdf', 'gif', 'jpg', 'jpeg', 'ps']:
+    iconpath = "%s/icon-%s.gif" % (basedir, filename)
+    if os.path.exists(fullpath) and extension.lower() in ['.pdf', '.gif', '.jpg', '.jpeg', '.ps']:
         os.system("%s -scale %s %s %s" % (CFG_PATH_CONVERT, iconsize, fullpath, iconpath))
     if os.path.exists(iconpath):
         return iconpath
