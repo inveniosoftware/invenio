@@ -87,7 +87,7 @@ def Move_Files_to_Storage(parameters, curdir, form):
             ## Go through all the files in curdir/files/path
             for current_file in os.listdir("%s/files/%s" % (curdir, path)):
                 ## retrieve filename and extension 
-                filename, extension = os.path.splitext("%s/files/%s/%s" % (curdir, path, current_file))
+                filename, extension = os.path.splitext(current_file)
                 if len(paths_and_suffixes[path]) != 0:
                     extension = "_%s%s" % (paths_and_suffixes[path], extension)
                 ## Build the new file name if rename paramter has been given
