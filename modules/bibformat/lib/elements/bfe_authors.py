@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
@@ -13,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -32,7 +33,7 @@ def format(bfo, limit, separator=' ; ',
            highlight="no"):
     """
     Prints the list of authors of a record.
-    
+
     @param limit the maximum number of authors to display
     @param separator the separator between authors.
     @param extension a text printed if more authors than 'limit' exist
@@ -49,14 +50,14 @@ def format(bfo, limit, separator=' ; ',
     from invenio.messages import gettext_set_language
 
     _ = gettext_set_language(bfo.lang)    # load the right message language
-    
+
     authors = []
     authors_1 = bfo.fields('100__')
     authors_2 = bfo.fields('700__')
-    
+
     authors.extend(authors_1)
     authors.extend(authors_2)
-    
+
     nb_authors = len(authors)
 
     # Process authors to add link, highlight and format affiliation
@@ -86,13 +87,13 @@ def format(bfo, limit, separator=' ; ',
     else:
         authors = [author.get('a', '')
                    for author in authors]
-        
+
     if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
 
     elif limit.isdigit() and nb_authors > int(limit) and interactive == "yes":
         out = '''
-        <script>
+        <script type="text/javascript">
         function toggle_authors_visibility(){
             var more = document.getElementById('more');
             var link = document.getElementById('link');
@@ -114,19 +115,19 @@ def format(bfo, limit, separator=' ; ',
             extension.innerHTML = "%(extension)s";
             toggle_authors_visibility();
         }
-        
+
         </script>
         '''%{'show_less':_("Hide"),
              'show_more':_("Show all %i authors") % nb_authors,
              'extension':extension}
-            
+
         out += '<a name="show_hide" />'
         out += separator.join(authors[:int(limit)])
         out += '<span id="more" style="">' + separator + \
                separator.join(authors[int(limit):]) + '</span>'
         out += ' <span id="extension"></span>'
         out += ' <small><i><a id="link" href="#" onclick="toggle_authors_visibility()" style="color:rgb(204,0,0);"></a></i></small>'
-        out += '<script>set_up()</script>'
+        out += '<script type="text/javascript">set_up()</script>'
         return out
     elif nb_authors > 0:
         return separator.join(authors)
