@@ -3070,7 +3070,7 @@ CREATE TABLE IF NOT EXISTS externalcollection (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
--- Webstat main table
+-- WebStat tables:
 
 CREATE TABLE IF NOT EXISTS staEVENT (
   id varchar(255) NOT NULL,
@@ -3080,6 +3080,17 @@ CREATE TABLE IF NOT EXISTS staEVENT (
   cols varchar(255),
   PRIMARY KEY  (id),
   UNIQUE KEY number (number)
+) TYPE=MyISAM;
+
+-- BibClassify tables:
+
+CREATE TABLE IF NOT EXISTS clsMETHOD (
+  id mediumint(9) unsigned NOT NULL,
+  name varchar(50) NOT NULL default '',
+  description varchar(255) NOT NULL default '',
+  last_updated datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id),
+  UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
 -- end of file
