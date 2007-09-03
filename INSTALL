@@ -485,7 +485,9 @@ Contents
               ServerSignature Off
               ServerTokens Prod
               NameVirtualHost *:443
-              SSLCertificateFile /etc/apache2/ssl/apache.pem
+              #SSLCertificateFile /etc/apache2/ssl/apache.pem
+              SSLCertificateFile /etc/apache2/ssl/server.crt
+              SSLCertificateKeyFile /etc/apache2/ssl/server.key
               <VirtualHost *:443>
                       ServerName webserver.domain.com
                       ServerAlias webserver
