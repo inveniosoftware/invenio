@@ -510,9 +510,10 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibharvest/lib/Makefile \
 	  modules/bibharvest/web/Makefile \
 	  modules/bibharvest/web/admin/Makefile \
-	  modules/bibclassify/Makefile
-	  modules/bibclassify/bin/Makefile
-	  modules/bibclassify/bin/bibclassify
+	  modules/bibclassify/Makefile \
+	  modules/bibclassify/bin/Makefile \
+	  modules/bibclassify/bin/bibclassify \
+	  modules/bibclassify/bin/bibclassifyd \
 	  modules/bibclassify/doc/Makefile \
 	  modules/bibclassify/doc/admin/Makefile \
 	  modules/bibclassify/doc/hacking/Makefile \

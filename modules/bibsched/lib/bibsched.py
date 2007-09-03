@@ -30,7 +30,7 @@ __revision__ = "$Id$"
 cfg_valid_processes = ["bibindex", "bibupload", "bibreformat",
                        "webcoll", "bibtaskex", "bibrank",
                        "oaiharvest", "oaiarchive", "sessiongc",
-                       "webstatadmin"]
+                       "webstatadmin", "bibclassifyd"]
 
 ### -- local configuration section ends here ---
 
