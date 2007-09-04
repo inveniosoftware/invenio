@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -97,11 +97,11 @@ def get_kb_id(kb_name):
     """Returns the id of the kb with given name"""
     if kb_id_name_cache.has_key(kb_name):
         return kb_id_name_cache[kb_name]
-    
+
     query = """SELECT id FROM fmtKNOWLEDGEBASES WHERE name LIKE '%s'""" % escape_string(kb_name)
     res = run_sql(query)
     if len(res) > 0:
-        kb_id_name_cache[kb_name] = res[0][0] 
+        kb_id_name_cache[kb_name] = res[0][0]
         return res[0][0]
     else:
         return None
@@ -126,7 +126,7 @@ def get_kb_mappings(kb_name, sortby="to"):
         sort = "m_value"
     else:
         sort = "m_key"
-        
+
     query = """SELECT * FROM fmtKNOWLEDGEBASEMAPPINGS
     WHERE id_fmtKNOWLEDGEBASES = '%(k_id)s' ORDER BY %(sort)s""" \
     % {'k_id':k_id, 'sort':sort}
@@ -141,7 +141,7 @@ def get_kb_description(kb_name):
     query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % k_id
     res = run_sql(query)
     return res[0][0]
-    
+
 def add_kb(kb_name, kb_description):
     """
     Adds a new kb with given name and description. Returns the id of
@@ -170,7 +170,7 @@ def delete_kb(kb_name):
     # Update cache
     if kb_id_name_cache.has_key(kb_name):
         del kb_id_name_cache[kb_name]
-    
+
     return True
 
 def kb_exists(kb_name):
@@ -182,7 +182,7 @@ def kb_exists(kb_name):
         return True
     else:
         return False
-    
+
 def update_kb(kb_name, new_name, new_description):
     """Updates given kb with new name and new description"""
     k_id = get_kb_id(kb_name)
@@ -193,7 +193,7 @@ def update_kb(kb_name, new_name, new_description):
     # Update cache
     if kb_id_name_cache.has_key(kb_name):
         del kb_id_name_cache[kb_name]
-        
+
     kb_id_name_cache[new_name] = k_id
     return True
 
@@ -203,7 +203,7 @@ def add_kb_mapping(kb_name, key, value):
     query = """REPLACE INTO fmtKNOWLEDGEBASEMAPPINGS (m_key, m_value, id_fmtKNOWLEDGEBASES)
     VALUES('%s', '%s', '%s')""" % (escape_string(key), escape_string(value), k_id)
     run_sql(query)
-    
+
     return True
 
 def remove_kb_mapping(kb_name, key):
@@ -224,7 +224,7 @@ def kb_mapping_exists(kb_name, key):
         rows = run_sql(query)
         if len(rows) > 0:
             return True
-    
+
     return False
 
 def get_kb_mapping_value(kb_name, key):
@@ -344,7 +344,7 @@ def get_name_from_tag(tag):
         return res[0][0]
     else:
         return None
-    
+
 def name_exists_for_tag(tag):
     """
     Returns True if a name exists for tag in 'tag' table.
@@ -354,11 +354,11 @@ def name_exists_for_tag(tag):
     if len(rows) > 0:
         return True
     return False
-    
+
 def get_all_name_tag_mappings():
     """
     Return the list of mappings name<->tag from 'tag' table.
-    
+
     The returned object is a dict with name as key (if 2 names are the same
     we will take the value of one of them, as we cannot make the difference in format
     templates)
@@ -372,7 +372,7 @@ def get_all_name_tag_mappings():
         out[row[1]] = row[0]
     return out
 
-    
+
 ## Output formats related functions
 
 def get_output_format_id(code):
@@ -386,7 +386,7 @@ def get_output_format_id(code):
     f_code = code
     if len(code)>6:
         f_code = code[:6]
-        
+
     query = "SELECT id FROM format WHERE code='%s'" % escape_string(f_code.lower())
     res = run_sql(query)
 
@@ -412,25 +412,25 @@ def add_output_format(code, name="", description="", content_type="text/html"):
         params = (code.lower(), description, content_type)
         run_sql(query, params)
         set_output_format_name(code, name)
-        
+
 def remove_output_format(code):
     """
     Removes the output format with 'code'
 
     If code does not exist in database, do nothing
     The function also removes all localized names in formatname table
-    
+
     @param the code of the output format to remove
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
         return
-    
+
     query = "DELETE FROM formatname WHERE id_format='%s'" % output_format_id
     run_sql(query)
     query = "DELETE FROM format WHERE id='%s'" % output_format_id
     run_sql(query)
-    
+
 def get_output_format_description(code):
     """
     Returns the description of the output format given by code
@@ -440,7 +440,7 @@ def get_output_format_description(code):
     @param code the code of the output format to get the description from
     @return output format description
     """
-    
+
     query = "SELECT description FROM format WHERE code='%s'" % escape_string(code)
     res = run_sql(query)
     if len(res) > 0:
@@ -448,19 +448,19 @@ def get_output_format_description(code):
         if res is not None:
             return res
     return ""
-    
+
 def set_output_format_description(code, description):
     """
     Sets the description of an output format, given by its code
 
     If 'code' does not exist, create format
-    
+
     @param code the code of the output format to update
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
         add_output_format(code, "", description)
-        
+
     query = "UPDATE format SET description=%s WHERE code=%s"
     params = (description, code.lower())
     run_sql(query, params)
@@ -476,7 +476,7 @@ def get_existing_content_types():
     """
     query = "SELECT DISTINCT content_type FROM format GROUP BY content_type"
     res = run_sql(query)
-    
+
     if res is not None:
         res = [val[0] for val in res if len(val) > 0]
         if not 'text/html' in res:
@@ -501,13 +501,13 @@ def get_output_format_content_type(code):
         if res is not None:
             return res
     return ""
-    
+
 def set_output_format_content_type(code, content_type):
     """
     Sets the content_type of an output format, given by its code
 
     If 'code' does not exist, create format
-    
+
     @param code the code of the output format to update
     @param content_type the content type for the format
     """
@@ -515,7 +515,7 @@ def set_output_format_content_type(code, content_type):
     if output_format_id is None:
         # add one if not exist (should not happen)
         add_output_format(code, "", "", content_type)
-        
+
     query = "UPDATE format SET content_type=%s WHERE code=%s"
     params = (content_type, code.lower())
     run_sql(query, params)
@@ -531,13 +531,13 @@ def get_output_format_names(code):
     For eg:  {'ln':{'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
               'sn':{'en': "a name", 'fr': "un nom", 'de': "ein Name"}
               'generic': "a name"}
-              
+
     The returned dictionary is never None. The keys 'ln' and 'sn' are always present. However
     only languages present in the database are in dicts 'sn' and 'ln'. language "cdslang" is always
     in dict.
-    
+
     The localized names of output formats are located in formatname table.
-    
+
     @param code the code of the output format to get the names from
     @return a dict containing output format names
     """
@@ -567,7 +567,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
     if 'code' does not correspond to exisiting output format, create format if "generic" is given as lang
 
     The localized names of output formats are located in formatname table.
-    
+
     @param code the code of an ouput format
     @param type either 'ln' (for long name) and 'sn' (for short name)
     @param lang the language in which the name is given
@@ -584,7 +584,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
         # Happens when the output format was added not through web interface
         add_output_format(code, name)
         output_format_id = get_output_format_id(code) # Reload id, because it was not found previously
-        
+
     if lang =="generic" and type.lower()=="ln":
         # Save inside format table for main name
         query = "UPDATE format SET name=%s WHERE code=%s"
@@ -606,14 +606,15 @@ def change_output_format_code(old_code, new_code):
     output_format_id = get_output_format_id(old_code);
     if output_format_id is None:
         return
-    
-    query = "UPDATE format SET code='%s' WHERE id='%s'" % (new_code, id)
-    run_sql(query)
-    
+
+    query = "UPDATE format SET code=%s WHERE id=%s"
+    params = (new_code.lower(), output_format_id)
+    res = run_sql(query, params)
+
 def get_preformatted_record(recID, of, decompress=zlib.decompress):
     """
     Returns the preformatted record with id 'recID' and format 'of'
-    
+
     If corresponding record does not exist for given output format,
     returns None
 
@@ -635,10 +636,10 @@ def get_preformatted_record_date(recID, of):
     """
     Returns the date of the last update of the cache for the considered
     preformatted record in bibfmt
-    
+
     If corresponding record does not exist for given output format,
     returns None
-    
+
     @param recID the id of the record to fetch
     @param of the output format code
     @return the date of the last update of the cache, or None if not exist
@@ -651,7 +652,7 @@ def get_preformatted_record_date(recID, of):
         return "%s" % res[0][0]
     else:
         return None
-    
+
 ## def keep_formats_in_db(output_formats):
 ##     """
 ##     Remove from db formats that are not in the list
@@ -660,25 +661,25 @@ def get_preformatted_record_date(recID, of):
 ##     query = "SELECT code FROM format"
 ##     res = run_sql(query)
 ##     for row in res:
-##         if not row[0] in output_formats: 
+##         if not row[0] in output_formats:
 ##             query = "DELETE FROM format WHERE code='%s'"%row[0]
-    
+
 ## def add_formats_in_db(output_formats):
 ##     """
 ##     Add given formats in db (if not already there)
 ##     """
 ##     for output_format in output_format:
-        
+
 ##         if get_format_from_db(output_format) is None:
 ##             #Add new
 ##             query = "UPDATE TABLE format "
 ##         else:
 ##             #Update
 ##             query = "UPDATE TABLE format "
-            
+
 ##     query = "UPDATE TABLE format "
 ##     res = run_sql(query)
 ##     for row in res:
-##         if not row[0] in output_formats: 
+##         if not row[0] in output_formats:
 ##             query = "DELETE FROM format WHERE code='%s'"%row[0]
-    
+
