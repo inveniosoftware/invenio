@@ -70,8 +70,11 @@ EXTRA_DIST = __init__.py \
 	     testutils.py \
 	     testutils_regression_tests.py \
              urlutils.py \
+             w3c_validator.py \
              testimport.py \
              kwalitee.py \
+             api_migration_kit.sh \
+             updateapi.data.sed \
              intbitset.pyx \
              intbitset.h \
              intbitset_impl.c \
