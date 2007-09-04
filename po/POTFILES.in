@@ -131,6 +131,7 @@ modules/miscutil/lib/errorlib_tests.py
 modules/miscutil/lib/errorlib_webinterface.py
 modules/miscutil/lib/__init__.py
 modules/miscutil/lib/miscutil_config.py
+modules/miscutil/lib/mailutils.py
 modules/miscutil/lib/messages.py.wml
 modules/miscutil/lib/textutils.py
 modules/miscutil/sql/tabfill.sql.wml
@@ -264,7 +265,6 @@ modules/websubmit/lib/functions/Insert_Modify_Record.py
 modules/websubmit/lib/functions/Insert_Record.py
 modules/websubmit/lib/functions/Is_Original_Submitter.py
 modules/websubmit/lib/functions/Is_Referee.py
-modules/websubmit/lib/functions/mail.py
 modules/websubmit/lib/functions/Mail_Submitter.py
 modules/websubmit/lib/functions/Make_Modify_Record.py
 modules/websubmit/lib/functions/Make_Record.py
