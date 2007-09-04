@@ -85,9 +85,6 @@
 <define-tag DBPASS whitespace=delete>
 @DBPASS@
 </define-tag>
-<define-tag SMTPHOST whitespace=delete>
-@SMTPHOST@
-</define-tag>
 <define-tag LYNX whitespace=delete>
 @LYNX@
 </define-tag>

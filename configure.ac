@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20070816, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20070816)
+AC_INIT(cds-invenio, 0.93.50.20070904, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20070904)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -74,15 +74,6 @@ if test -z "$DBPASS"; then
    You have not used the "--with-dbpass" argument that should define DB user password.  
    Example: "--with-dbpass=myp1ss".])
 fi   
-
-## Define SMTPHOST smtp host:
-AC_ARG_WITH(smtphost, AC_HELP_STRING([--with-smtphost], [specify SMPT server (e.g. mailserver.domain.com)]), SMTPHOST=${withval})
-if test -z "$SMTPHOST"; then
-   SMTPHOST="localhost"
-   AC_MSG_WARN([
-   You have not specified a SMTP server. localhost will be used.])
-fi   
-
 
 ## Check for gettext support
 AM_GNU_GETTEXT(external)
@@ -423,7 +414,6 @@ AC_SUBST(DBHOST)
 AC_SUBST(DBNAME)
 AC_SUBST(DBUSER)
 AC_SUBST(DBPASS)
-AC_SUBST(SMTPHOST)
 AC_SUBST(PDFTOTEXT)
 AC_SUBST(PSTOTEXT)
 AC_SUBST(PSTOASCII)
@@ -697,7 +687,6 @@ AC_MSG_RESULT([**   - DB server: $DBHOST])
 AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
 AC_MSG_RESULT([**   - DB password: $DBPASS])
-AC_MSG_RESULT([**   - SMTP server: $SMTPHOST])
 AC_MSG_RESULT([**   - Python executable: $PYTHON])
 AC_MSG_RESULT([**   - CLISP executable: $CLISP])
 AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
