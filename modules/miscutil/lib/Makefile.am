@@ -55,8 +55,11 @@ EXTRA_DIST = __init__.py \
              errorlib_regression_tests.py \
 	     miscutil_config.py \
              config.py.wml \
+             data_cacher.py \
              dbquery.py.wml \
              dbquery_tests.py \
+             mailutils.py \
+	     miscutil_config.py \
              messages.py.wml \
              errorHandling.php.wml \
              textutils.py \
@@ -96,10 +99,6 @@ dbquery.py: dbquery.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/confi
 	$(WML) -o $@ $<
 
 messages.py: messages.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-
-mailutils.py: mailutils.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
       $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
 

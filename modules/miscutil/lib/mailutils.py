@@ -19,11 +19,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "configbis.wml"
-
-
-## rest of the Python code goes below
-
 __revision__ = "$Id$"
 
 import sys
@@ -38,11 +33,9 @@ from invenio.config import \
      weburl, \
      cdslang, \
      cdsnameintl, \
-     adminemail
-
-CFG_MAILUTILS_SERVER_HOST = "<SMTPHOST>"
-
-CFG_MAILUTILS_SERVER_PORT = 25
+     adminemail, \
+     CFG_MISCUTIL_SMTP_HOST, \
+     CFG_MISCUTIL_SMTP_PORT
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -94,7 +87,7 @@ def send_email(fromaddr,
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
     try:
-        server = smtplib.SMTP(CFG_MAILUTILS_SERVER_HOST, CFG_MAILUTILS_SERVER_PORT)
+        server = smtplib.SMTP(CFG_MISCUTIL_SMTP_HOST, CFG_MISCUTIL_SMTP_PORT)
         if debug_level > 2:
             server.set_debuglevel(1)
         else:

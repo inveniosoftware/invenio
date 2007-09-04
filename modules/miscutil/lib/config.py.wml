@@ -194,3 +194,7 @@ CFG_BIBSCHED_LOG_PAGER = None # will use the environment defined one
 
 # for db engine:
 CFG_MISCUTIL_USE_SQLALCHEMY = <CFG_MISCUTIL_USE_SQLALCHEMY>
+
+# for mail sending:
+CFG_MISCUTIL_SMTP_HOST = "<SMTPHOST>"
+CFG_MISCUTIL_SMTP_PORT = 25
