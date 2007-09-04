@@ -28,6 +28,6 @@ pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
 
 noinst_DATA = password_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
