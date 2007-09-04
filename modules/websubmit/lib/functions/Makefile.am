@@ -56,7 +56,9 @@ pylib_DATA = __init__.py \
              Send_SRV_Mail.py \
              Test_Status.py \
              Update_Approval_DB.py \
-             Upload_Files.py
+             Upload_Files.py \
+             Shared_Functions.py \
+             Move_Files_to_Storage.py
 
 EXTRA_DIST = $(pylib_DATA)
 
