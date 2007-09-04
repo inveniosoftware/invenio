@@ -1228,7 +1228,6 @@ def get_templates_that_use_element(name):
                 format_templates[template_name] = {'name':template_name,
                                                    'filename':possible_template}
             except:
-                print name+" not found in "+str(format_elements)
                 pass
 
     keys = format_templates.keys()
