@@ -1,7 +1,7 @@
 /*
 * -*- mode: text; coding: utf-8; -*-
 
-   $Id$ 
+   $Id$
 
    This file is part of CDS Invenio.
    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -10,12 +10,12 @@
    modify it under the terms of the GNU General Public License as
    published by the Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
-  
+
    CDS Invenio is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.  
-  
+   General Public License for more details.
+
    You should have received a copy of the GNU General Public License
    along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
@@ -182,7 +182,7 @@ a.note:hover {
    width: 75px;
 }
 .headermoduleboxbodyblank {
-   width: 12px; 
+   width: 12px;
    padding: 0px;
    margin: 0px;
 }
@@ -278,7 +278,7 @@ a.navtrail:hover {
 .snapshot {
    color: #000;
    background: transparent;
-   border: 2px solid #999; 
+   border: 2px solid #999;
    margin: 10px 10px 0px 40px;
 }
 .pageheader {
@@ -405,7 +405,7 @@ a.footer:hover {
    padding: 1px;
    margin: 5px 30px 5px 30px;
    border-collapse: collapse;
-   border: 2px solid #900; 
+   border: 2px solid #900;
 }
 .errorboxheader {
    color: #000;
@@ -447,7 +447,7 @@ a.footer:hover {
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c; 
+   border-top: 1px solid #36c;
 }
 .narrowsearchboxheader {
    color: #000;
@@ -468,7 +468,7 @@ a.footer:hover {
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c; 
+   border-top: 1px solid #36c;
 }
 .focusonsearchboxheader {
    color: #000;
@@ -489,7 +489,7 @@ a.footer:hover {
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c; 
+   border-top: 1px solid #36c;
 }
 .searchalsosearchboxheader {
    color: #000;
@@ -694,7 +694,7 @@ a.google:hover {
    padding: 0px;
    margin-top: 15px;
    border-collapse: collapse;
-   border-top: 1px solid #fc0; 
+   border-top: 1px solid #fc0;
    width: 100%;
 }
 .searchresultsboxheader {
@@ -708,8 +708,8 @@ a.google:hover {
 .searchresultsboxbody {
    color: #000;
    background: #ffe;
-   border-top: 1px dotted #fc0; 
-   border-bottom: 1px dotted #fc0; 
+   border-top: 1px dotted #fc0;
+   border-bottom: 1px dotted #fc0;
    padding: 2px;
 }
 .searchresultsboxrecords {
@@ -794,8 +794,8 @@ a.nearesttermsselected:hover {
    color: #039;
    font-size: x-small;
    font-weight: bold;
-   border-top: 1px solid #060; 
-   border-bottom: 1px solid #060; 
+   border-top: 1px solid #060;
+   border-bottom: 1px solid #060;
 }
 .userinfoboxbody {
    color: #039;
@@ -896,7 +896,7 @@ hr {
     height: 1px;
     color: #999;
     background-color: #999;
-    border-width: 0;    
+    border-width: 0;
 }
 input,select {
     color: #000;
@@ -930,12 +930,12 @@ input,select {
     text-decoration: none;
 }
 .submitBody {
-   color: #000; 
-   background: #9cf; 
-} 
+   color: #000;
+   background: #9cf;
+}
 .submitHeader {
-   color: #fff; 
-   background: #006; 
+   color: #fff;
+   background: #006;
 }
 .submitCurrentPage {
    color: #000;
@@ -1007,7 +1007,7 @@ input,select {
    width: auto;
 }
 .mailboxheader tr{
-   background: #ffc;   
+   background: #ffc;
 }
 .inboxheader {
    text-align:center;
@@ -1025,7 +1025,7 @@ input,select {
 }
 .mailboxlabel{
    white-space: nowrap;
-   padding-right: 15px;  
+   padding-right: 15px;
 }
 .mailboxbody{
    background: #ffe;
@@ -1043,10 +1043,10 @@ input,select {
 }
 .mailboxfooter td{
    padding: 10px 0px 0px 0px;
-   border-top: 1px solid #fc0;  
+   border-top: 1px solid #fc0;
    border-bottom: none;
    border-left: none;
-   border-right: none; 
+   border-right: none;
 }
 .mailboxsearch td {
    padding-top: 10px;
@@ -1092,9 +1092,9 @@ input,select {
    margin: 3px 0px 3px 0px;
 }
 .quotabar{
-   background-color: #fc0;     
+   background-color: #fc0;
    border: 0px none black;
-   height: 15px;             
+   height: 15px;
 }
 /* WebBasket module */
 #bskcontainer{
@@ -1120,7 +1120,7 @@ input,select {
 #bsktab_selected{
    background-color: #ffc;
    font-weight: bold;
-   border-bottom: hidden; 
+   border-bottom: hidden;
 }
 .bsktab a{
    color: #000;
@@ -1147,7 +1147,7 @@ input,select {
 .bsktopic{
    white-space: nowrap;
    font-weight: bold;
-   margin: 0px 20px 0px 20px; 
+   margin: 0px 20px 0px 20px;
 }
 .bsktopic a{
    font-weight: normal;
@@ -1233,13 +1233,13 @@ input,select {
 .bskcomment {
    padding: 15px 10px 15px 10px;
    margin-bottom: 5px;
-   border-bottom: 1px solid #fc0;    
+   border-bottom: 1px solid #fc0;
 }
 .bsklabel{
    font-size: small;
    font-weight: bold;
    white-space: nowrap;
-   padding-right: 15px; 
+   padding-right: 15px;
 }
 .bsk_create_link{
    padding-top: 5px;
@@ -1429,50 +1429,50 @@ div.detailed .inside, div.mini-panel .inside{
 /* mini-panel in detailed record pages*/
 
 /* Future CERN-specific style
-.top-left, .top-right, .bottom-left, .bottom-right { 
+.top-left, .top-right, .bottom-left, .bottom-right {
    background-image: url(rcorners-gray-1280x18.gif);
    height: 9px;
    font-size: 2px;
 }
-.top-left, .bottom-left { 
+.top-left, .bottom-left {
    margin-right: 9px;
 }
-.top-right, .bottom-right { 
+.top-right, .bottom-right {
    margin-left: 9px;
    margin-top: -9px;
 }
 .top-right {
    background-position: 100% 0;
 }
-.bottom-left  { 
+.bottom-left  {
    background-position: 0 -9px;
 }
-.bottom-right { 
+.bottom-right {
    background-position: 100% -9px;
 }
 */
-	
-/* Detailed record box */	
-.top-left-folded { 
+
+/* Detailed record box */
+.top-left-folded {
    height: 10px;
 }
 /* Future CERN-specific style
-.top-left-folded, .top-right-folded, .bottom-left-folded, .bottom-right-folded { 
+.top-left-folded, .top-right-folded, .bottom-left-folded, .bottom-right-folded {
    background-image: url(rcorners-gray-1280x60-folded.gif);
    height: 30px;
    font-size: 2px;
 }
-.top-left-folded, .bottom-left-folded { 
+.top-left-folded, .bottom-left-folded {
    margin-right: 21px;
 }
-.top-right-folded, .bottom-right-folded { 
+.top-right-folded, .bottom-right-folded {
    margin-left: 21px;
    margin-top: -30px;
 }
 .top-right-folded {
    background-position: 100% 0;
 }
-.bottom-left-folded  { 
+.bottom-left-folded  {
    background-position: 0 -30px;
 }
 .bottom-right-folded {
@@ -1513,7 +1513,7 @@ ul.tabs{
 }
 .tabs li.first a{
    border-left: 1px solid #36c;
-}    
+}
 
 /*Future CERN-specific style
 ul.tabs{
@@ -1524,7 +1524,7 @@ ul.tabs{
 }
 .tabs li{
    display:inline;
-}  
+}
 .tabs li a{
    border-top: 1px solid #B2B2B2;
    border-right: 1px solid #B2B2B2;
@@ -1545,7 +1545,7 @@ ul.tabs{
 }
 .tabs li.first a{
    border-left: 1px solid #B2B2B2;
-}    
+}
 */
 
 /* Actions in mini-box in detailed view */
@@ -1575,10 +1575,19 @@ div.mini-panel div.star{
    clear:none;
    width:auto;
    text-align:left;
-   background:url(star_dot-icon-30x30.gif) no-repeat;
+   background:url(star_empty-icon-30x30.gif) no-repeat;
 }
 div.mini-panel div.star:hover{
+   background-image:url(star-icon-30x30.gif) !important;
+}
+div.mini-panel:hover div.full, div.mini-panel:hover div.half{
+   background-image:url(star_empty-icon-30x30.gif) ;
+}
+div.mini-panel div.full{
    background-image:url(star-icon-30x30.gif) ;
+}
+div.mini-panel div.half{
+   background-image:url(star_half-icon-30x30.gif) ;
 }
 
 /* Short bib notice displayed as sheet of paper in detailed record pages */

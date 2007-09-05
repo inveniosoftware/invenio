@@ -374,7 +374,7 @@ class Template:
       <blockquote>
 %s
       </blockquote>''' % email_quoted_txt2html(body)
-    
+
         out += '''
 <div style="background:#F9F9F9;border:1px solid #DDD">
   <div style="background-color:#EEE;padding:2px;">
@@ -468,7 +468,7 @@ class Template:
                             'nb'            : nb_per_page,
                             'p'             : page,
                             'reviews'       : reviews,
-                            'discussion'    : discussion 
+                            'discussion'    : discussion
                         }
         useful_yes = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("Yes") + '</a>'
         useful_yes %= useful_dict
@@ -803,7 +803,7 @@ class Template:
 
         warnings = self.tmpl_warnings(warnings, ln)
         form = """<div><h2>%(add_comment)s</h2>
-        
+
 <textarea name="msg" rows="20" style="width:90%%">%(msg)s</textarea>
 <br />
                 <span class="reportabuse">%(note)s</span>
@@ -1370,7 +1370,7 @@ class Template:
         """Display the mini version of reviews (only the grading part)"""
 
         _ = gettext_set_language(ln)
-        
+
         url = '%s/record/%s/reviews/add?ln=%s&amp;action=%s' % (weburl, recID, ln, action)
 
         if avg_score > 0:
@@ -1379,21 +1379,45 @@ class Template:
                      'x_nb_reviews': nb_comments_total}
         else:
             score = '(' +_("Not yet reviewed") + ')'
-        
+
+        if score == 5:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', 'full'
+        elif score >= 4.5:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', 'half'
+        elif score >= 4:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', ''
+        elif score >= 3.5:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'half', ''
+        elif score >= 3:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'full', '', ''
+        elif score >= 2.5:
+            s1, s2, s3, s4, s5 = 'full', 'full', 'half', '', ''
+        elif score >= 2:
+            s1, s2, s3, s4, s5 = 'full', 'full', '', '', ''
+        elif score >= 1.5:
+            s1, s2, s3, s4, s5 = 'full', 'half', '', '', ''
+        elif score == 1:
+            s1, s2, s3, s4, s5 = 'full', '', '', '', ''
+
         out = '''
 <small class="detailedRecordActions">%(rate)s:</small><br /><br />
 <div style="margin:auto;width:160px;">
 <span style="display:none;">Rate this document:</span>
-<div class="star" ><a href="%(url)s&amp;score=1">1</a>
-<div class="star" ><a href="%(url)s&amp;score=2">2</a>
-<div class="star" ><a href="%(url)s&amp;score=3">3</a>
-<div class="star" ><a href="%(url)s&amp;score=4">4</a>
-<div class="star" ><a href="%(url)s&amp;score=5">5</a></div></div></div></div></div>
+<div class="star %(s1)s" ><a href="%(url)s&amp;score=1">1</a>
+<div class="star %(s2)s" ><a href="%(url)s&amp;score=2">2</a>
+<div class="star %(s3)s" ><a href="%(url)s&amp;score=3">3</a>
+<div class="star %(s4)s" ><a href="%(url)s&amp;score=4">4</a>
+<div class="star %(s5)s" ><a href="%(url)s&amp;score=5">5</a></div></div></div></div></div>
 <div style="clear:both">&nbsp;</div>
 </div>
 <small>%(score)s</small>
 ''' % {'url': url,
         'score': score,
-        'rate': _("Rate this document")
+        'rate': _("Rate this document"),
+        's1': s1,
+        's2': s2,
+        's3': s3,
+        's4': s4,
+        's5': s5
         }
         return out
