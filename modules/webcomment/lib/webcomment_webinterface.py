@@ -218,12 +218,13 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             # if guest, must log in first
             if isGuestUser(uid):
-                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s" % (weburl,
+                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s&amp;score=%s" % (weburl,
                                                                                     self.recid,
                                                                                     self.discussion == 1 and 'reviews' or 'comments',
                                                                                     argd['ln'],
                                                                                     argd['comid'],
-                                                                                    argd['action'])
+                                                                                    argd['action'],
+                                                                                    argd['score'])
                 msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
                           'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
                                         (sweburl, urllib.quote(referer)),
