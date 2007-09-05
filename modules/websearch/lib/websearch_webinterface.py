@@ -81,24 +81,25 @@ def wash_search_urlargd(form):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references']
-    
-    _exports.extend(output_formats)
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references', 'export']
+
+    #_exports.extend(output_formats)
 
     def __init__(self, recid, tab, format=None):
         self.recid = recid
         self.tab = tab
         self.format = format
-        
-        for output_format in output_formats:
-            self.__dict__[output_format] = self
+
+        self.export = self
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.statistics = self
         self.references = self
+        self.export = WebInterfaceRecordExport(self.recid, self.format)
+
         return
-        
+
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
         argd['recid'] = self.recid
@@ -154,22 +155,22 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references']
-        
-    _exports.extend(output_formats)
-    
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references', 'export']
+
+    #_exports.extend(output_formats)
+
     def __init__(self, recid, tab, format=None):
         self.recid = recid
         self.tab = tab
         self.format = format
 
-        for output_format in output_formats:
-            self.__dict__[output_format] = self
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.statistics = self
         self.references = self
+        self.export = WebInterfaceRecordExport(self.recid, self.format)
+
         return
 
     def __call__(self, req, form):
@@ -177,7 +178,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         argd['recid'] = self.recid
         if self.format is not None:
             argd['of'] = self.format
-            
+
         req.argd = argd
 
         uid = getUid(req)
@@ -371,25 +372,28 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 else:
                     # display page not found for URLs like /record/foo
                     return None, []
-        
+
             if recid <= 0:
                 # display page not found for URLs like /record/-5 or /record/0
                 return None, []
-            
+
             format = None
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'statistics', 'references']:
                     tab = path[1]
-                    format = None
-                elif path[1] in output_formats:
+                elif path[1] == 'export':
                     tab = ''
-                    format = path[1]
+                    format = path[2]
+#                    format = None
+#                elif path[1] in output_formats:
+#                    tab = ''
+#                    format = path[1]
                 else:
                     # display page not found for URLs like /record/references
                     # for a collection where 'references' tabs is not visible
                     return None, []
-                
+
             except IndexError:
                 # Keep normal url if tabs is not specified
                 pass
@@ -573,4 +577,70 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         # FIXME: currently searching live, should put cache in place via webcoll
         return search_engine.perform_request_search(req, of="xr")
 
+    index = __call__
+
+
+class WebInterfaceRecordExport(WebInterfaceDirectory):
+    """ Handling of a /record/<recid>/export/<format> URL fragment """
+
+    _exports = output_formats
+
+    def __init__(self, recid, format=None):
+        self.recid = recid
+        self.format = format
+
+        for output_format in output_formats:
+            self.__dict__[output_format] = self
+
+        return
+
+    def __call__(self, req, form):
+        argd = wash_search_urlargd(form)
+        argd['recid'] = self.recid
+
+        if self.format is not None:
+            argd['of'] = self.format
+        req.argd = argd
+        uid = getUid(req)
+        if uid == -1:
+            return page_not_authorized(req, "../",
+                text="You are not authorized to view this record.",
+                                       navmenuid='search')
+        elif uid > 0:
+            pref = get_user_preferences(uid)
+            try:
+                argd['rg'] = int(pref['websearch_group_records'])
+            except (KeyError, ValueError):
+                pass
+
+        # Check if the record belongs to a restricted primary
+        # collection.  If yes, redirect to the authenticated URL.
+        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
+        if collection_restricted_p(record_primary_collection):
+            user_info = collect_user_info(req)
+            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+            if auth_code and user_info['email'] == 'guest':
+                target = '/youraccount/login' + \
+                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                        weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                        search_results_default_urlargd)}, {'ln' : cdslang})
+                return redirect_to_url(req, target)
+            elif auth_code:
+                return page_not_authorized(req, "../", \
+                    text = auth_msg,\
+                    navmenuid='search')
+
+            #del argd['recid'] # not wanted argument for detailed record page
+            #target = '/record-restricted/' + str(self.recid) + '/' + \
+                     #make_canonical_urlargd(argd, search_results_default_urlargd)
+            #return redirect_to_url(req, target)
+
+        # mod_python does not like to return [] in case when of=id:
+        out = search_engine.perform_request_search(req, **argd)
+        if out == []:
+            return str(out)
+        else:
+            return out
+
+    # Return the same page wether we ask for /record/123/export/xm or /record/123/export/xm/
     index = __call__

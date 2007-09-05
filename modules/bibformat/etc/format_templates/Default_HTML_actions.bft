@@ -3,7 +3,12 @@
 
 <ul class="detailedRecordActions">
         <li><a href="<BFE_SERVER_INFO var='weburl'/>yourbaskets/add?ln=<BFE_SERVER_INFO var='lang'/>&amp;recid=<BFE_RECORD_ID/>">Add to personal basket</a></li>
-        <li><a href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/hx">Export as BibTeX</a></li>
+        <li>Export as
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/hx">BibTeX</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/hm">MARC</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/xm">MARCXML</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/xd">DC</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/xe">EndNote</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/xn">NLM</a></li>
         <BFE_EDIT_RECORD prefix="<li>" suffix="</li>" />
 </ul>
-    
