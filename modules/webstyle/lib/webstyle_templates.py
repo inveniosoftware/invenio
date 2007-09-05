@@ -637,7 +637,7 @@ URI: http://%(host)s%(page)s
               }
 
         return out
-    
+
     def detailed_record_container(self, content, recid, tabs, ln=cdslang,
                                   show_similar_rec_p=True,
                                   creationdate=None,
@@ -648,7 +648,7 @@ URI: http://%(host)s%(page)s
 
          - content *string* - the content displayed inside the box
          - recid *int* - the id of the displayed record
-         - tabs ** - the tabs displayed at the top of the box. 
+         - tabs ** - the tabs displayed at the top of the box.
          - ln *string* - the language of the page in which the box is displayed
          - show_similar_rec_p *bool* print 'similar records' link in the box
          - creationdate *string* - the creation date of the displayed record
@@ -690,7 +690,7 @@ URI: http://%(host)s%(page)s
                 <ul class="tabs">%s</ul>
             </div>
         </div>''' % out_tabs
-                                
+
         out = """
     <div class="detailed">
         %(tabs)s
@@ -751,7 +751,7 @@ URI: http://%(host)s%(page)s
 <div class="mini-panel">
 <div class="top-left"></div><div class="top-right"></div>
 		<div class="inside">
-		
+
         <div style="width:33%%;float:left;text-align:center;margin-top:0">
              %(files)s
         </div>
