@@ -23,7 +23,9 @@ pylib_DATA = __init__.py \
              Add_Files.py \
              Allocate_ALEPH_SYS.py \
              CaseEDS.py \
+             Check_Group.py \
              Convert_RecXML_to_RecALEPH.py \
+             Create_Cplx_Approval.py \
              Create_Modify_Interface.py \
              Create_Recid.py \
              Finish_Submission.py \
@@ -45,6 +47,7 @@ pylib_DATA = __init__.py \
              Move_to_Pending.py \
              Print_Success.py \
              Print_Success_APP.py \
+             Print_Success_CPLX.py \
              Print_Success_DEL.py \
              Print_Success_MBI.py \
              Print_Success_SRV.py \
@@ -53,6 +56,9 @@ pylib_DATA = __init__.py \
              Send_APP_Mail.py \
              Send_Approval_Request.py \
              Send_Modify_Mail.py \
+             Send_Request_For_Direct_Approval.py \
+             Send_Request_For_Publication.py \
+             Send_Request_For_Refereeing_Process.py \
              Send_SRV_Mail.py \
              Test_Status.py \
              Update_Approval_DB.py \

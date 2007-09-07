@@ -35,6 +35,9 @@ from invenio.config import \
      version, \
      weburl
 from invenio.messages import gettext_set_language
+from invenio.dateutils import convert_datetext_to_dategui
+from invenio.webmessage_mailutils import email_quoted_txt2html
+from invenio.htmlutils import escape_html
 
 class Template:
 
@@ -179,7 +182,7 @@ class Template:
             out += "</ul></li>"
         else:
             out += "</li>"
-            
+
         return out
 
     def tmpl_submit_home_catalogs_doctype(self, ln, doc):
@@ -332,7 +335,7 @@ class Template:
                     }
         out += """
                 <br /><br />
-            
+
                 </td>
                 </tr>
                 </table>
@@ -1277,7 +1280,7 @@ class Template:
 
         out = """<body style="background-image: url(%(images)s/header_background.gif);"><table border="0">""" % \
               { 'images' : images }
-        
+
         for value in values:
             if value['mandatory']:
                 color = "red"
@@ -1530,7 +1533,7 @@ class Template:
         for doctype in referees:
             out += """<ul><li><b>%(docname)s</b><ul>""" % doctype
 
-            if doctype ['categories'] is None:            
+            if doctype ['categories'] is None:
                 out += '''<li><a href="publiline.py?doctype=%(doctype)s">%(generalref)s</a></li>''' % {
                     'docname' : doctype['docname'],
                     'doctype' : doctype['doctype'],
@@ -1542,7 +1545,7 @@ class Template:
                         'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
                         'categ' : category['id']}
-                    
+
             out += "</ul><br /></li></ul>"
 
         out += "</td></tr></table>"
@@ -1586,7 +1589,52 @@ class Template:
         out += """</blockquote>
                 </td>
             </tr>
-        </table>"""
+        </table>
+
+        <a href="publiline.py?flow=cplx">Go to specific approval workflow.</a>"""
+        return out
+
+    def tmpl_publiline_selectcplxdoctype(self, ln, docs):
+        """
+        Displays the doctypes that the user can select in a complex workflow
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'docs' *array* - All the doctypes that the user can select:
+
+              - 'doctype' *string* - The doctype
+
+              - 'docname' *string* - The display name of the doctype
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
+               <table class="searchbox" width="100%%" summary="">
+                  <tr>
+                      <th class="portalboxheader">%(list)s</th>
+                  </tr>
+                  <tr>
+                      <td class="portalboxbody">
+              %(select)s:
+            </small>
+            <blockquote>""" % {
+              'list' : _("List of refereed types of documents"),
+              'select' : _("Select one of the following types of documents to check the documents status."),
+            }
+
+        for doc in docs:
+            out += "<li><a href='publiline.py?flow=cplx&doctype=%(doctype)s'>%(docname)s</a></li><br />" % doc
+
+        out += """</blockquote>
+                </td>
+            </tr>
+        </table>
+
+        <a href="publiline.py">Go to general approval workflow.</a>"""
         return out
 
     def tmpl_publiline_selectcateg(self, ln, doctype, title, categories, images):
@@ -1707,6 +1755,171 @@ class Template:
             }
         return out
 
+    def tmpl_publiline_selectcplxcateg(self, ln, doctype, title, types, images):
+        """
+        Displays the categories from a doctype that the user can select
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'doctype' *string* - The doctype
+
+          - 'title' *string* - The doctype name
+
+          - 'images' *string* - the path to the images
+
+          - 'categories' *array* - All the categories that the user can select:
+
+              - 'id' *string* - The id of the category
+
+              - 'waiting' *int* - The number of documents waiting
+
+              - 'approved' *int* - The number of approved documents
+
+              - 'rejected' *int* - The number of rejected documents
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
+               <table class="searchbox" width="100%%" summary="">
+                  <tr>
+                    <th class="portalboxheader">%(title)s: %(list_type)s</th>
+                  </tr>
+               </table><br />
+               <table class="searchbox" width="100%%" summary="">
+                  <tr>""" % {
+                  'title' : title,
+                  'list_type' : _("List of specific approvals"),
+              }
+
+        columns = []
+        columns.append ({'apptype' : 'RRP',
+                         'list_categ' : _("List of refereing categories"),
+                         'id_form' : 0,
+                       })
+        columns.append ({'apptype' : 'RPB',
+                         'list_categ' : _("List of publication categories"),
+                         'id_form' : 1,
+                       })
+        columns.append ({'apptype' : 'RDA',
+                         'list_categ' : _("List of direct approval categories"),
+                         'id_form' : 2,
+                       })
+
+        for column in columns:
+            out += """
+                      <td>
+                           <table class="searchbox" width="100%%" summary="">
+                              <tr>
+                                <th class="portalboxheader">%(list_categ)s</th>
+                              </tr>
+                              <tr>
+                                  <td class="portalboxbody">
+                                  %(choose_categ)s
+                                  <blockquote>
+                                  <form action="publiline.py" method="get">
+                                      <input type="hidden" name="flow" value="cplx" />
+                                      <input type="hidden" name="doctype" value="%(doctype)s" />
+                                      <input type="hidden" name="categ" value="" />
+                                      <input type="hidden" name="apptype" value="%(apptype)s" />
+                                      </form>
+                           <table>
+                             <tr>
+                             <td align="left">""" % {
+                             'doctype' : doctype,
+                             'apptype' : column['apptype'],
+                             'list_categ' : column['list_categ'],
+                             'choose_categ' : _("Please choose a category"),
+                   }
+
+            for categ in types[column['apptype']]:
+                num = categ['waiting'] + categ['approved'] + categ['rejected'] + categ['cancelled']
+
+                if categ['waiting'] != 0:
+                    classtext = "class=\"blocknote\""
+                else:
+                    classtext = ""
+
+                out += """<a href="" onclick="document.forms[%(id_form)s].categ.value='%(id)s';document.forms[%(id_form)s].submit();return false;"><small %(classtext)s>%(desc)s</small></a><small> (%(num)s document(s)""" % {
+                         'id' : categ['id'],
+                         'id_form' : column['id_form'],
+                         'classtext' : classtext,
+                         'num' : num,
+                         'desc' : categ['desc'],
+                       }
+                if categ['waiting'] != 0:
+                    out += """| %(waiting)s <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" />""" % {
+                              'waiting' : categ['waiting'],
+                              'pending' : _("Pending"),
+                              'images' : images,
+                            }
+                if categ['approved'] != 0:
+                    out += """| %(approved)s<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" />""" % {
+                              'approved' : categ['approved'],
+                              'approved_text' : _("Approved"),
+                              'images' : images,
+                            }
+                if categ['rejected'] != 0:
+                    out += """| %(rejected)s<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" />""" % {
+                              'rejected' : categ['rejected'],
+                              'rejected_text' : _("Rejected"),
+                              'images' : images,
+                            }
+                if categ['cancelled'] != 0:
+                    out += """| %(cancelled)s<img alt="%(cancelled_text)s" src="%(images)s/smchk_rd.gif" border="0" />""" % {
+                              'cancelled' : categ['cancelled'],
+                              'cancelled_text' : _("Cancelled"),
+                              'images' : images,
+                            }
+                out += ")</small><br />"
+
+            out += """
+                                </td>
+                            </tr>
+                            </table>
+                          </blockquote>
+                          </td>
+                         </tr>
+                        </table>
+                      </td>"""
+
+        # Key
+        out += """
+               <table class="searchbox" width="100%%" summary="">
+                        <tr>
+                            <th class="portalboxheader">%(key)s:</th>
+                        </tr>
+                        <tr>
+                            <td>
+                              <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" /> %(waiting)s<br />
+                              <img alt="%(approved)s" src="%(images)s/smchk_gr.gif" border="0" /> %(already_approved)s<br />
+                              <img alt="%(rejected)s" src="%(images)s/cross_red.gif" border="0" /> %(rejected_text)s<br />
+                              <img alt="%(cancelled)s" src="%(images)s/smchk_rd.gif" border="0" /> %(cancelled_text)s<br /><br />
+                              <small class="blocknote">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</small> %(somepending)s<br />
+                            </td>
+                        </tr>
+                </table>
+              </blockquote>
+              </td>
+             </tr>
+            </table>""" % {
+              'key' : _("Key"),
+              'pending' : _("Pending"),
+              'images' : images,
+              'waiting' : _("Waiting for approval"),
+              'approved' : _("Approved"),
+              'already_approved' : _("Already approved"),
+              'rejected' : _("Rejected"),
+              'rejected_text' : _("Rejected"),
+              'cancelled' : _("Cancelled"),
+              'cancelled_text' : _("Cancelled"),
+              'somepending' : _("Some documents are pending."),
+            }
+        return out
+
     def tmpl_publiline_selectdocument(self, ln, doctype, title, categ, images, docs):
         """
         Displays the documents that the user can select in the specified category
@@ -1768,7 +1981,7 @@ class Template:
 
         for doc in docs:
             status = doc ['status']
-            
+
             if status == "waiting":
                 out += """<tr>
                             <td align="center">
@@ -1805,6 +2018,147 @@ class Template:
                             <td align="center">&nbsp;</td>
                             <td align="center"><img alt="check" src="%(images)s/smchk_gr.gif" /></td>
                             <td align="center">&nbsp;</td>
+                          </tr>
+                       """ % {
+                         'rn' : doc['RN'],
+                         'images' : images,
+                       }
+        out += """  </table>
+                    </blockquote>
+                   </td>
+                  </tr>
+                 </table>"""
+        return out
+
+    def tmpl_publiline_selectcplxdocument(self, ln, doctype, title, categ, categname, images, docs, apptype):
+        """
+        Displays the documents that the user can select in the specified category
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'doctype' *string* - The doctype
+
+          - 'title' *string* - The doctype name
+
+          - 'images' *string* - the path to the images
+
+          - 'categ' *string* - the category
+
+          - 'docs' *array* - All the categories that the user can select:
+
+              - 'RN' *string* - The id of the document
+
+              - 'status' *string* - The status of the document
+
+          - 'apptype' *string* - the approval type
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        listtype = ""
+        if apptype == "RRP":
+            listtype = _("List of refereed documents")
+        elif apptype == "RPB":
+            listtype = _("List of publication documents")
+        elif apptype == "RDA":
+            listtype = _("List of direct approval documents")
+
+        out = """
+               <table class="searchbox" width="100%%" summary="">
+                  <tr>
+                    <th class="portalboxheader">%(title)s - %(categname)s: %(list)s</th>
+                  </tr>
+                  <tr>
+                    <td class="portalboxbody">
+                    %(choose_report)s
+                    <blockquote>
+                      <form action="publiline.py" method="get">
+                        <input type="hidden" name="flow" value="cplx" />
+                        <input type="hidden" name="doctype" value="%(doctype)s" />
+                        <input type="hidden" name="categ" value="%(categ)s" />
+                        <input type="hidden" name="RN" value="" />
+                        <input type="hidden" name="apptype" value="%(apptype)s" />
+                        </form>
+                  <table class="searchbox">
+                    <tr>
+                      <th class="portalboxheader">%(report_no)s</th>
+                      <th class="portalboxheader">%(pending)s</th>
+                      <th class="portalboxheader">%(approved)s</th>
+                      <th class="portalboxheader">%(rejected)s</th>
+                      <th class="portalboxheader">%(cancelled)s</th>
+                    </tr>
+              """ % {
+                'doctype' : doctype,
+                'title' : title,
+                'categname' : categname,
+                'categ' : categ,
+                'list' : listtype,
+                'choose_report' : _("Click on a report number for more information."),
+                'apptype' : apptype,
+                'report_no' : _("Report Number"),
+                'pending' : _("Pending"),
+                'approved' : _("Approved"),
+                'rejected' : _("Rejected"),
+                'cancelled' : _("Cancelled"),
+              }
+
+        for doc in docs:
+            status = doc ['status']
+
+            if status == "waiting":
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center"><img alt="check" src="%(images)s/waiting_or.gif" /></td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                          </tr>
+                       """ % {
+                         'rn' : doc['RN'],
+                         'images' : images,
+                       }
+            elif status == "rejected":
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center"><img alt="check" src="%(images)s/cross_red.gif" /></td>
+                            <td align="center">&nbsp;</td>
+                          </tr>
+                       """ % {
+                         'rn' : doc['RN'],
+                         'images' : images,
+                       }
+            elif status == "approved":
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center"><img alt="check" src="%(images)s/smchk_gr.gif" /></td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                          </tr>
+                       """ % {
+                         'rn' : doc['RN'],
+                         'images' : images,
+                       }
+            elif status == "cancelled":
+                out += """<tr>
+                            <td align="center">
+                              <a href="" onclick="document.forms[0].RN.value='%(rn)s';document.forms[0].submit();return false;">%(rn)s</a>
+                            </td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center">&nbsp;</td>
+                            <td align="center"><img alt="check" src="%(images)s/smchk_rd.gif" /></td>
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
@@ -1918,7 +2272,7 @@ class Template:
                    }
 
         if status == "waiting":
-            out += _("This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 
+            out += _("This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
                                                                                                      'x_fmt_close': '</strong>'}
 	    out += "<br /><br />"
 	    out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
@@ -1938,7 +2292,7 @@ class Template:
                          'access' : access
                        }
         if status == "approved":
-            out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 
+            out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
                                                                                          'x_fmt_close': '</strong>'}
             out += '<br />' + _("Its approved reference is:") + ' <strong class="headline">' + str(newrn) + '</strong><br /><br />'
             out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
@@ -1949,7 +2303,7 @@ class Template:
                        _("It was approved on:") + ' <strong class="headline">' + str(dAction) + '</strong><br />'
         if status == "rejected":
             out += _("This document has been %(x_fmt_open)srejected%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
-                                                                                         'x_fmt_close': '</strong>'} 
+                                                                                         'x_fmt_close': '</strong>'}
             out += "<br /><br />"
             out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) +'</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
@@ -1964,3 +2318,648 @@ class Template:
                    </tr>
                   </table>"""
         return out
+
+    def tmpl_publiline_displaycplxdoc(self, ln, doctype, docname, categ, rn, apptype, status, dates, images, accessurl, isPubCom, isEdBoard, isReferee, isProjectLeader, isAuthor, authors, title, sysno, newrn):
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        if status == "waiting":
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+        elif status == "approved":
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+        elif status == "rejected":
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+        elif status == "cancelled":
+            image = """<img src="%s/smchk_rd.gif" alt="" align="right" />""" % images
+        else:
+            image = ""
+        out = """
+                <table class="searchbox" summary="">
+                 <tr>
+                  <th class="portalboxheader">%(image)s %(rn)s</th>
+                 </tr>
+                 <tr>
+                   <td class="portalboxbody">""" % {
+                   'image' : image,
+                   'rn' : rn,
+                 }
+
+        out += """<form action="publiline.py">
+                    <input type="hidden" name="flow" value="cplx" />
+                    <input type="hidden" name="doctype" value="%(doctype)s" />
+                    <input type="hidden" name="categ" value="%(categ)s" />
+                    <input type="hidden" name="RN" value="%(rn)s" />
+                    <input type="hidden" name="apptype" value="%(apptype)s" />
+                    <input type="hidden" name="action" value="" />
+                  <small>""" % {
+                 'rn' : rn,
+                 'categ' : categ,
+                 'doctype' : doctype,
+                 'apptype' : apptype,
+               }
+        if title != "unknown":
+            out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
+                     'title_text' : _("Title:"),
+                     'title' : title,
+                   }
+
+        if authors != "":
+            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<br /><br />""" % {
+                     'author_text' : _("Author:"),
+                     'authors' : authors,
+                   }
+        if sysno != "":
+            out += """<strong class="headline">%(more)s</strong>
+                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <br /><br />
+                   """ % {
+                     'more' : _("More information:"),
+                     'click' : _("Click here"),
+                     'weburl' : weburl,
+                     'sysno' : sysno,
+                   }
+
+        out += "<br /><br />"
+
+        if apptype == "RRP":
+            out += _("It has first been asked for refereing process on the ") + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br />'
+
+            out += _("Last request e-mail was sent to the publication committee chair on the ") + ' <strong class="headline">' + str(dates['dLastReq']) + '</strong><br />'
+
+            if dates['dRefereeSel'] != None:
+                out += _("A referee has been selected by the publication committee on the ") + ' <strong class="headline">' + str(dates['dRefereeSel']) + '</strong><br />'
+            else:
+                out += _("No referee has been selected yet.")
+                if (status != "cancelled") and (isPubCom == 0):
+                    out += displaycplxdoc_displayauthaction (action="RefereeSel", linkText=_("Select a referee"))
+                out += '<br />'
+
+            if dates['dRefereeRecom'] != None:
+                out += _("The referee has sent his final recommendations to the publication committee on the ") + ' <strong class="headline">' + str(dates['dRefereeRecom']) + '</strong><br />'
+            else:
+                out += _("No recommendation from the referee yet.")
+                if (status != "cancelled") and (dates['dRefereeSel'] != None) and (isReferee == 0):
+                    out += displaycplxdoc_displayauthaction (action="RefereeRecom", linkText=_("Send a recommendation"))
+                out += '<br />'
+
+            if dates['dPubComRecom'] != None:
+                out += _("The publication committee has sent his final recommendations to the project leader on the ") + ' <strong class="headline">' + str(dates['dPubComRecom']) + '</strong><br />'
+            else:
+                out += _("No recommendation from the publication committee yet.")
+                if (status != "cancelled") and (dates['dRefereeRecom'] != None) and (isPubCom == 0):
+                    out += displaycplxdoc_displayauthaction (action="PubComRecom", linkText=_("Send a recommendation"))
+                out += '<br />'
+
+            if status == "cancelled":
+                out += _("It has been cancelled by the author on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            elif dates['dProjectLeaderAction'] != None:
+                if status == "approved":
+                    out += _("It has been approved by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                elif status == "rejected":
+                    out += _("It has been rejected by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            else:
+                out += _("No final decision taken yet.")
+                if (dates['dPubComRecom'] != None) and (isProjectLeader == 0):
+                    out += displaycplxdoc_displayauthaction (action="ProjectLeaderDecision", linkText=_("Take a decision"))
+                if isAuthor == 0:
+                    out += displaycplxdoc_displayauthaction (action="AuthorCancel", linkText=_("Cancel"))
+                out += '<br />'
+
+        elif apptype == "RPB":
+            out += _("It has first been asked for refereing process on the ") + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br />'
+
+            out += _("Last request e-mail was sent to the publication committee chair on the ") + ' <strong class="headline">' + str(dates['dLastReq']) + '</strong><br />'
+
+            if dates['dEdBoardSel'] != None:
+                out += _("An editorial board has been selected by the publication committee on the ") + ' <strong class="headline">' + str(dates['dEdBoardSel']) + '</strong>'
+                if (status != "cancelled") and (isEdBoard == 0):
+                    out += displaycplxdoc_displayauthaction (action="AddAuthorList", linkText=_("Add an author list"))
+                out += '<br />'
+            else:
+                out += _("No editorial board has been selected yet.")
+                if (status != "cancelled") and (isPubCom == 0):
+                    out += displaycplxdoc_displayauthaction (action="EdBoardSel", linkText=_("Select an editorial board"))
+                out += '<br />'
+
+            if dates['dRefereeSel'] != None:
+                out += _("A referee has been selected by the editorial board on the ") + ' <strong class="headline">' + str(dates['dRefereeSel']) + '</strong><br />'
+            else:
+                out += _("No referee has been selected yet.")
+                if (status != "cancelled") and (dates['dEdBoardSel'] != None) and (isEdBoard == 0):
+                    out += displaycplxdoc_displayauthaction (action="RefereeSel", linkText=_("Select a referee"))
+                out += '<br />'
+
+            if dates['dRefereeRecom'] != None:
+                out += _("The referee has sent his final recommendations to the editorial board on the ") + ' <strong class="headline">' + str(dates['dRefereeRecom']) + '</strong><br />'
+            else:
+                out += _("No recommendation from the referee yet.")
+                if (status != "cancelled") and (dates['dRefereeSel'] != None) and (isReferee == 0):
+                    out += displaycplxdoc_displayauthaction (action="RefereeRecom", linkText=_("Send a recommendation"))
+                out += '<br />'
+
+            if dates['dEdBoardRecom'] != None:
+                out += _("The editorial board has sent his final recommendations to the publication committee on the ") + ' <strong class="headline">' + str(dates['dRefereeRecom']) + '</strong><br />'
+            else:
+                out += _("No recommendation from the editorial board yet.")
+                if (status != "cancelled") and (dates['dRefereeRecom'] != None) and (isEdBoard == 0):
+                    out += displaycplxdoc_displayauthaction (action="EdBoardRecom", linkText=_("Send a recommendation"))
+                out += '<br />'
+
+            if dates['dPubComRecom'] != None:
+                out += _("The publication committee has sent his final recommendations to the project leader on the ") + ' <strong class="headline">' + str(dates['dPubComRecom']) + '</strong><br />'
+            else:
+                out += _("No recommendation from the publication committee yet.")
+                if (status != "cancelled") and (dates['dEdBoardRecom'] != None) and (isPubCom == 0):
+                    out += displaycplxdoc_displayauthaction (action="PubComRecom", linkText=_("Send a recommendation"))
+                out += '<br />'
+
+            if status == "cancelled":
+                out += _("It has been cancelled by the author on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            elif dates['dProjectLeaderAction'] != None:
+                if status == "approved":
+                    out += _("It has been approved by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                elif status == "rejected":
+                    out += _("It has been rejected by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            else:
+                out += _("No final decision taken yet.")
+                if (dates['dPubComRecom'] != None) and (isProjectLeader == 0):
+                    out += displaycplxdoc_displayauthaction (action="ProjectLeaderDecision", linkText=_("Take a decision"))
+                if isAuthor == 0:
+                    out += displaycplxdoc_displayauthaction (action="AuthorCancel", linkText=_("Cancel"))
+                out += '<br />'
+
+        elif apptype == "RDA":
+            out += _("It has first been asked for refereing process on the ") + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br />'
+
+            out += _("Last request e-mail was sent to the project leader on the ") + ' <strong class="headline">' + str(dates['dLastReq']) + '</strong><br />'
+
+            if status == "cancelled":
+                out += _("It has been cancelled by the author on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            elif dates['dProjectLeaderAction'] != None:
+                if status == "approved":
+                    out += _("It has been approved by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                elif status == "rejected":
+                    out += _("It has been rejected by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+            else:
+                out += _("No final decision taken yet.")
+                if isProjectLeader == 0:
+                    out += displaycplxdoc_displayauthaction (action="ProjectLeaderDecision", linkText=_("Take a decision"))
+                if isAuthor == 0:
+                    out += displaycplxdoc_displayauthaction (action="AuthorCancel", linkText=_("Cancel"))
+                out += '<br />'
+
+        out += """    </small></form>
+                      <br />
+                    </td>
+                   </tr>
+                  </table>"""
+        return out
+
+    def tmpl_publiline_displaycplxdocitem(self,
+                                          doctype, categ, rn, apptype, action,
+                                          comments,
+                                          (user_can_view_comments, user_can_add_comment, user_can_delete_comment),
+                                          selected_category,
+                                          selected_topic, selected_group_id, ln):
+        _ = gettext_set_language(ln)
+
+        if comments and user_can_view_comments:
+
+            comments_text = ''
+            comments_overview = '<ul>'
+            for comment in comments:
+                (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid) = comment
+
+                comments_overview += '<li><a href="#%s">%s - %s</a> (%s)</li>' % (cmtid, cmt_nickname, cmt_title, convert_datetext_to_dategui (cmt_date))
+
+                comments_text += """
+<table class="bskbasket">
+  <thead class="bskbasketheader">
+    <tr><td class="bsktitle"><a name="%s"></a>%s - %s (%s)</td><td><a href="#top">Top</a></td></tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="2">%s</td></tr>
+  </tbody>
+</table>""" % (cmtid, cmt_nickname, cmt_title, convert_datetext_to_dategui (cmt_date), email_quoted_txt2html(cmt_body))
+
+            comments_overview += '</ul>'
+        else:
+            comments_text = ''
+            comments_overview = 'None.'
+
+        body = ''
+        if user_can_view_comments:
+            body += """<h4>%(comments_label)s</h4>"""
+        if user_can_view_comments:
+            body += """%(comments)s"""
+        if user_can_add_comment:
+            validation = """
+    <input type="hidden" name="validate" value="go" />
+    <input type="submit" class="formbutton" value="%(button_label)s" />""" % {'button_label': _("Add Comment")}
+            body += self.tmpl_publiline_displaywritecomment (doctype, categ, rn, apptype, action, _("Add Comment"), "", validation, ln)
+
+        body %= {
+                'comments_label': _("Comments"),
+                'action': action,
+                'button_label': _("Write a comment"),
+                'comments': comments_text}
+        content = '<br />'
+
+        out = """
+<table class="bskbasket">
+  <thead class="bskbasketheader">
+    <tr>
+      <td class="bsktitle">
+        <a name="top"></a>
+        <h4>%(comments_overview_label)s</h4>
+        %(comments_overview)s
+      </td>
+      <td class="bskcmtcol"></td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="2" style="padding: 5px;">
+%(body)s
+      </td>
+    </tr>
+  </tbody>
+</table>""" % {
+               'comments_overview_label' : _('Comments overview'),
+               'comments_overview' : comments_overview,
+               'body' : body,}
+
+        return out
+
+    def tmpl_publiline_displaywritecomment(self, doctype, categ, rn, apptype, action, write_label, title, validation, ln):
+        _ = gettext_set_language(ln)
+        return """
+<div style="width:100%%%%">
+  <hr />
+  <h2>%(write_label)s</h2>
+  <form action="publiline.py">
+    <input type="hidden" name="flow" value="cplx" />
+    <input type="hidden" name="doctype" value="%(doctype)s" />
+    <input type="hidden" name="categ" value="%(categ)s" />
+    <input type="hidden" name="RN" value="%(rn)s" />
+    <input type="hidden" name="apptype" value="%(apptype)s" />
+    <input type="hidden" name="action" value="%(action)s" />
+    <p class="bsklabel">%(title_label)s:</p>
+    <input type="text" name="msg_subject" size="80" value="%(title)s"/>
+    <p class="bsklabel">%(comment_label)s:</p>
+    <textarea name="msg_body" rows="20" cols="80"></textarea><br />
+    %(validation)s
+  </form>
+</div>""" % {'write_label': write_label,
+             'title_label': _("Title"),
+             'title': title,
+             'comment_label': _("Comment"),
+             'rn' : rn,
+             'categ' : categ,
+             'doctype' : doctype,
+             'apptype' : apptype,
+             'action' : action,
+             'validation' : validation,
+            }
+
+    def tmpl_publiline_displaydocplxaction(self, ln, doctype, categ, rn, apptype, action, status, images, authors, title, sysno, subtitle1, email_user_pattern, stopon1, users, extrausers, stopon2, subtitle2, usersremove, stopon3, validate_btn):
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        if status == "waiting":
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+        elif status == "approved":
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+        elif status == "rejected":
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+        else:
+            image = ""
+        out = """
+                <table class="searchbox" summary="">
+                 <tr>
+                  <th class="portalboxheader">%(image)s %(rn)s</th>
+                 </tr>
+                 <tr>
+                   <td class="portalboxbody">
+                     <small>""" % {
+                   'image' : image,
+                   'rn' : rn,
+                 }
+
+        if title != "unknown":
+            out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
+                     'title_text' : _("Title:"),
+                     'title' : title,
+                   }
+
+        if authors != "":
+            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<br /><br />""" % {
+                     'author_text' : _("Author:"),
+                     'authors' : authors,
+                   }
+        if sysno != "":
+            out += """<strong class="headline">%(more)s</strong>
+                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <br /><br />
+                   """ % {
+                     'more' : _("More information:"),
+                     'click' : _("Click here"),
+                     'weburl' : weburl,
+                     'sysno' : sysno,
+                   }
+
+        out += """      </small>
+                      <br />
+                    </td>
+                   </tr>
+                 </table>"""
+
+        if ((apptype == "RRP") or (apptype == "RPB")) and ((action == "EdBoardSel") or (action == "RefereeSel")):
+            out += """
+                    <table class="searchbox" summary="">
+                     <tr>
+                      <th class="portalboxheader">%(subtitle)s</th>
+                     </tr>
+                     <tr>
+                       <td class="portalboxbody">""" % {
+                       'subtitle' : subtitle1,
+                     }
+
+            out += """<form action="publiline.py">
+                        <input type="hidden" name="flow" value="cplx" />
+                        <input type="hidden" name="doctype" value="%(doctype)s" />
+                        <input type="hidden" name="categ" value="%(categ)s" />
+                        <input type="hidden" name="RN" value="%(rn)s" />
+                        <input type="hidden" name="apptype" value="%(apptype)s" />
+                        <input type="hidden" name="action" value="%(action)s" />""" % {
+                     'rn' : rn,
+                     'categ' : categ,
+                     'doctype' : doctype,
+                     'apptype' : apptype,
+                     'action' : action,
+                   }
+
+            out += ' <span class="adminlabel">1. %s </span>\n' % _("search for user")
+            out += ' <input class="admin_wvar" type="text" name="email_user_pattern" value="%s" />\n' % (email_user_pattern, )
+            out += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (_("search for users"), )
+
+            if (stopon1 == "") and (email_user_pattern != ""):
+                out += ' <br /><span class="adminlabel">2. %s </span>\n' % _("select user")
+                out += ' <select name="id_user" class="admin_w200">\n'
+                out += '  <option value="0">*** %s ***</option>\n' % _("select user")
+                for elem in users:
+                    elem_id = elem[0]
+                    email = elem[1]
+                    out += '  <option value="%s">%s</option>\n' % (elem_id, email)
+
+                for elem in extrausers:
+                    elem_id = elem[0]
+                    email = elem[1]
+                    out += '  <option value="%s">%s %s</option>\n' % (elem_id, email, _("connected"))
+
+                out += ' </select>\n'
+                out += ' <input class="adminbutton" type="submit" value="%s" />\n' % (_("add this user"), )
+
+                out += stopon2
+
+            elif stopon1 != "":
+                out += stopon1
+
+            out += """
+                            </form>
+                          <br />
+                        </td>
+                       </tr>
+                     </table>"""
+
+            if action == "EdBoardSel":
+                out += """
+                        <table class="searchbox" summary="">
+                         <tr>
+                          <th class="portalboxheader">%(subtitle)s</th>
+                         </tr>
+                         <tr>
+                           <td class="portalboxbody">""" % {
+                           'subtitle' : subtitle2,
+                         }
+
+                out += """<form action="publiline.py">
+                            <input type="hidden" name="flow" value="cplx" />
+                            <input type="hidden" name="doctype" value="%(doctype)s" />
+                            <input type="hidden" name="categ" value="%(categ)s" />
+                            <input type="hidden" name="RN" value="%(rn)s" />
+                            <input type="hidden" name="apptype" value="%(apptype)s" />
+                            <input type="hidden" name="action" value="%(action)s" />""" % {
+                         'rn' : rn,
+                         'categ' : categ,
+                         'doctype' : doctype,
+                         'apptype' : apptype,
+                         'action' : action,
+                       }
+
+                out += ' <span class="adminlabel">1. %s </span>\n' % _("select user")
+                out += ' <select name="id_user_remove" class="admin_w200">\n'
+                out += '  <option value="0">*** %s ***</option>\n' % _("select user")
+                for elem in usersremove:
+                    elem_id = elem[0]
+                    email = elem[1]
+                    out += '  <option value="%s">%s</option>\n' % (elem_id, email)
+
+                out += ' </select>\n'
+                out += ' <input class="adminbutton" type="submit" value="%s" />\n' % (_("remove this user"), )
+
+                out += stopon3
+
+                out += """
+                                </form>
+                              <br />
+                            </td>
+                           </tr>
+                         </table>"""
+
+            if validate_btn != "":
+                out += """<form action="publiline.py">
+                            <input type="hidden" name="flow" value="cplx" />
+                            <input type="hidden" name="doctype" value="%(doctype)s" />
+                            <input type="hidden" name="categ" value="%(categ)s" />
+                            <input type="hidden" name="RN" value="%(rn)s" />
+                            <input type="hidden" name="apptype" value="%(apptype)s" />
+                            <input type="hidden" name="action" value="%(action)s" />
+                            <input type="hidden" name="validate" value="go" />
+                            <input class="adminbutton" type="submit" value="%(validate_btn)s" />
+                          </form>""" % {
+                         'rn' : rn,
+                         'categ' : categ,
+                         'doctype' : doctype,
+                         'apptype' : apptype,
+                         'action' : action,
+                         'validate_btn' : validate_btn,
+                       }
+
+        return out
+
+    def tmpl_publiline_displaycplxrecom(self, ln, doctype, categ, rn, apptype, action, status, images, authors, title, sysno,  msg_to, msg_to_group, msg_subject):
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        if status == "waiting":
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+        elif status == "approved":
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+        elif status == "rejected":
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+        else:
+            image = ""
+        out = """
+                <table class="searchbox" summary="">
+                 <tr>
+                  <th class="portalboxheader">%(image)s %(rn)s</th>
+                 </tr>
+                 <tr>
+                   <td class="portalboxbody">
+                     <small>""" % {
+                   'image' : image,
+                   'rn' : rn,
+                 }
+
+        if title != "unknown":
+            out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
+                     'title_text' : _("Title:"),
+                     'title' : title,
+                   }
+
+        if authors != "":
+            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<br /><br />""" % {
+                     'author_text' : _("Author:"),
+                     'authors' : authors,
+                   }
+        if sysno != "":
+            out += """<strong class="headline">%(more)s</strong>
+                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <br /><br />
+                   """ % {
+                     'more' : _("More information:"),
+                     'click' : _("Click here"),
+                     'weburl' : weburl,
+                     'sysno' : sysno,
+                   }
+
+        out += """      </small>
+                      <br />
+                    </td>
+                   </tr>
+                 </table>"""
+
+        # escape forbidden character
+        msg_to = escape_html(msg_to)
+        msg_to_group = escape_html(msg_to_group)
+        msg_subject = escape_html(msg_subject)
+
+        write_box = """
+<form action="publiline.py" method="post">
+  <input type="hidden" name="flow" value="cplx" />
+  <input type="hidden" name="doctype" value="%(doctype)s" />
+  <input type="hidden" name="categ" value="%(categ)s" />
+  <input type="hidden" name="RN" value="%(rn)s" />
+  <input type="hidden" name="apptype" value="%(apptype)s" />
+  <input type="hidden" name="action" value="%(action)s" />
+  <input type="hidden" name="validate" value="go" />
+  <div style="float: left; vertical-align:text-top; margin-right: 10px;">
+    <table class="mailbox">
+      <thead class="mailboxheader">
+        <tr>
+          <td class="inboxheader" colspan="2">
+            <table class="messageheader">
+              <tr>
+                <td class="mailboxlabel">%(to_label)s</td>"""
+
+        if msg_to != "":
+            addr_box = """
+                <td class="mailboxlabel">%(users_label)s</td>
+                <td style="width:100%%%%;" class="mailboxlabel">%(to_users)s</td>""" % {'users_label': _("User"),
+                                                                                        'to_users' : msg_to,
+                                                                                       }
+            if msg_to_group != "":
+                addr_box += """
+              </tr>
+              <tr>
+                <td class="mailboxlabel">&nbsp;</td>
+                <td class="mailboxlabel">%(groups_label)s</td>
+                <td style="width:100%%%%;" class="mailboxlabel">%(to_groups)s</td>""" % {'groups_label': _("Group"),
+                                                                                         'to_groups': msg_to_group,
+                                                                                        }
+        elif msg_to_group != "":
+            addr_box = """
+                <td class="mailboxlabel">%(groups_label)s</td>
+                <td style="width:100%%%%;" class="mailboxlabel">%(to_groups)s</td>""" % {'groups_label': _("Group"),
+                                                                                         'to_groups': msg_to_group,
+                                                                                        }
+        else:
+            addr_box = """
+                <td class="mailboxlabel">&nbsp;</td>
+                <td class="mailboxlabel">&nbsp;</td>"""
+
+        write_box += addr_box
+        write_box += """
+              </tr>
+              <tr>
+                <td class="mailboxlabel">&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="mailboxlabel">%(subject_label)s</td>
+                <td colspan="2">
+                  <input class="mailboxinput" type="text" name="msg_subject" value="%(subject)s" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td style="height:0px" colspan="2"></td>
+        </tr>
+      </tfoot>
+      <tbody class="mailboxbody">
+        <tr>
+          <td class="mailboxlabel">%(message_label)s</td>
+          <td>
+            <textarea name="msg_body" rows="10" cols="50"></textarea>
+          </td>
+        </tr>
+        <tr class="mailboxfooter">
+          <td colspan="2" class="mailboxfoot">
+            <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</form>
+"""
+        write_box = write_box % {'rn' : rn,
+                                 'categ' : categ,
+                                 'doctype' : doctype,
+                                 'apptype' : apptype,
+                                 'action' : action,
+                                 'subject' : msg_subject,
+                                 'to_label': _("To:"),
+                                 'subject_label': _("Subject:"),
+                                 'message_label': _("Message:"),
+                                 'send_label': _("SEND"),
+                                }
+
+        out += write_box
+
+        return out
+
+def displaycplxdoc_displayauthaction(action, linkText):
+    return """ <strong class="headline">(<a href="" onclick="document.forms[0].action.value='%(action)s';document.forms[0].submit();return false;">%(linkText)s</a>)</strong>""" % {
+        "action" : action,
+        "linkText" : linkText
+        }

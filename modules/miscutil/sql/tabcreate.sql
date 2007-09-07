@@ -2840,6 +2840,26 @@ CREATE TABLE IF NOT EXISTS sbmAPPROVAL (
   PRIMARY KEY  (rn)
 ) TYPE=MyISAM PACK_KEYS=1;
 
+CREATE TABLE sbmCPLXAPPROVAL (
+  doctype varchar(10) NOT NULL default '',
+  categ varchar(50) NOT NULL default '',
+  rn varchar(50) NOT NULL default '',
+  type varchar(10) NOT NULL,
+  status varchar(10) NOT NULL,
+  id_group int(15) unsigned NOT NULL default '0',
+  id_bskBASKET int(15) unsigned NOT NULL default '0',
+  id_EdBoardGroup int(15) unsigned NOT NULL default '0',
+  dFirstReq datetime NOT NULL default '0000-00-00 00:00:00',
+  dLastReq datetime NOT NULL default '0000-00-00 00:00:00',
+  dEdBoardSel datetime NOT NULL default '0000-00-00 00:00:00',
+  dRefereeSel datetime NOT NULL default '0000-00-00 00:00:00',
+  dRefereeRecom datetime NOT NULL default '0000-00-00 00:00:00',
+  dEdBoardRecom datetime NOT NULL default '0000-00-00 00:00:00',
+  dPubComRecom datetime NOT NULL default '0000-00-00 00:00:00',
+  dProjectLeaderAction datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (rn, type)
+) TYPE=MyISAM PACK_KEYS=1;
+
 CREATE TABLE IF NOT EXISTS sbmCOLLECTION (
   id int(11) NOT NULL auto_increment,
   name varchar(100) NOT NULL default '',
