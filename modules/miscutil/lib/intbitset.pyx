@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.0
+__apilevel__ = 1.01
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -667,6 +667,14 @@ cdef class intbitset:
 
     def get_wordbytsize(self):
         return wordbytesize
+
+    def tolist(self):
+        """Legacy method to retrieve a list of all the elements inside an
+        intbitset.
+        """
+        if self.bitset.trailing_bits:
+            raise OverflowError, "It's impossible to retrieve a list of an infinite set"
+        return self.extract_finite_list()
 
 cdef class intbitset_iterator:
     cdef int last
