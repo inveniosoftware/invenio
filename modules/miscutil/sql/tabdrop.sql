@@ -373,5 +373,6 @@ DROP TABLE IF EXISTS collection_externalcollection;
 DROP TABLE IF EXISTS externalcollection;
 DROP TABLE IF EXISTS collectiondetailedpagetabs;
 DROP TABLE IF EXISTS staEVENT;
+DROP TABLE IF EXISTS clsMETHOD;
 
 -- end of file
