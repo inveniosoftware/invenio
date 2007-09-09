@@ -2840,7 +2840,7 @@ CREATE TABLE IF NOT EXISTS sbmAPPROVAL (
   PRIMARY KEY  (rn)
 ) TYPE=MyISAM PACK_KEYS=1;
 
-CREATE TABLE sbmCPLXAPPROVAL (
+CREATE TABLE IF NOT EXISTS sbmCPLXAPPROVAL (
   doctype varchar(10) NOT NULL default '',
   categ varchar(50) NOT NULL default '',
   rn varchar(50) NOT NULL default '',
@@ -3114,4 +3114,3 @@ CREATE TABLE IF NOT EXISTS clsMETHOD (
 ) TYPE=MyISAM;
 
 -- end of file
-
