@@ -69,7 +69,7 @@ from invenio.htmlutils import HTMLWasher
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
     import tempfile
-    
+
 # Cache for data we have already read and parsed
 format_templates_cache = {}
 format_elements_cache = {}
@@ -220,36 +220,36 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         xm_record = record_get_xml(recID, 'xm',
                                    on_the_fly=(on_the_fly and format == 'xm'))
 
-        import platform
-        # FIXME
-        # Some problem have been found using either popen or os.system command.
-        # Here is a temporary workaround until the issue is solved.
-        if platform.python_compiler().find('Red Hat') > -1:
-            # use os.system
-            (result_code, result_path) = tempfile.mkstemp()
-            command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
-            (xm_code, xm_path) = tempfile.mkstemp()
-            xm_file = open(xm_path, "w")
-            xm_file.write(xm_record)
-            xm_file.close()
-            command = command + " <" + xm_path
-            os.system(command)
-            result_file = open(result_path,"r")
-            bibformat_output = result_file.read()
-            result_file.close()
-            os.remove(result_path)
-            os.remove(xm_path)
-        else:
-            # use popen
-            pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
-                                                             "otype=%s" % format],
-                                                            'rw')
-            pipe_input.write(xm_record)
-            pipe_input.close()
-            bibformat_output = pipe_output.read()
-            pipe_output.close()
-            pipe_error.close()
-            
+##         import platform
+##         # Some problem have been found using either popen or os.system command.
+##         # Here is a temporary workaround until the issue is solved.
+##         if platform.python_compiler().find('Red Hat') > -1:
+##             # use os.system
+##             (result_code, result_path) = tempfile.mkstemp()
+##             command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
+##             (xm_code, xm_path) = tempfile.mkstemp()
+##             xm_file = open(xm_path, "w")
+##             xm_file.write(xm_record)
+##             xm_file.close()
+##             command = command + " <" + xm_path
+##             os.system(command)
+##             result_file = open(result_path,"r")
+##             bibformat_output = result_file.read()
+##             result_file.close()
+##             os.remove(result_path)
+##             os.remove(xm_path)
+##         else:
+##             # use popen
+        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
+                                                         "otype=%s" % format],
+                                                        'rw')
+        pipe_input.write(xm_record)
+        pipe_input.flush()
+        pipe_input.close()
+        bibformat_output = pipe_output.read()
+        pipe_output.close()
+        pipe_error.close()
+
         if bibformat_output.startswith("<record>"):
             dom = minidom.parseString(bibformat_output)
             for e in dom.getElementsByTagName('subfield'):
@@ -514,7 +514,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     default_value = parameters.get('default', "")
     escape = parameters.get('escape', "")
     output_text = ''
-    
+
     # 3 possible cases:
     # a) format element file is found: we execute it
     # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
@@ -1799,14 +1799,14 @@ class BibFormatObject:
             999C5 $a value_1a $b value_1b
             999C5 $b value_2b
             999C5 $b value_3b $b value_3b_bis
-            
+
             >> bfo.fields('999C5b')
             >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
             >> bfo.fields('999C5')
-            >> [{'a':'value_1a', 'b':'value_1b'}, 
+            >> [{'a':'value_1a', 'b':'value_1b'},
                 {'b':'value_2b'},
                 {'b':'value_3b'}]
-        
+
         By default the function returns only one value for each
         subfield (that is it considers that repeatable subfields are
         not allowed). It is why in the above example 'value3b_bis' is
@@ -1820,7 +1820,7 @@ class BibFormatObject:
             >> bfo.fields('999C5b', repeatable_subfields_p=True)
             >> ['value_1b', 'value_2b', 'value_3b']
             >> bfo.fields('999C5', repeatable_subfields_p=True)
-            >> [{'a':['value_1a'], 'b':['value_1b']}, 
+            >> [{'a':['value_1a'], 'b':['value_1b']},
                 {'b':['value_2b']},
                 {'b':['value_3b', 'value3b_bis']}]
         NOTICE THAT THE RETURNED STRUCTURE IS DIFFERENT.  Also note
@@ -1828,14 +1828,14 @@ class BibFormatObject:
         bfo.fields('999C5b') always show all fields, even repeatable
         ones. This is because the parameter has no impact on the
         returned structure (it is always a list).
-        
+
         'escape' parameter allows to escape special characters
         of the fields. The value of escape can be:
                       0 - no escaping
                       1 - escape all HTML characters
                       2 - escape all HTML characters by default. If field starts with <!--HTML-->,
                           escape only unsafe characters, but leave basic HTML tags.
-        
+
         @param tag the marc code of a field
         @param escape 1 if returned values should be escaped. Else 0.
         @repeatable_subfields_p if True, returns the list of subfields in the dictionary
