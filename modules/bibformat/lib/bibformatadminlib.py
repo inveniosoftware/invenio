@@ -156,6 +156,11 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
     # Look for all existing content_types
     content_types = bibformat_dblayer.get_existing_content_types()
 
+    # Add some standard content types if not already there
+    standard_content_types = ['text/xml', 'application/rss+xml', 'text/plain', 'text/html']
+    content_types.extend([content_type for content_type in standard_content_types
+                          if content_type not in content_types])
+
     return bibformat_templates.tmpl_admin_format_template_show(ln, format_template['attrs']['name'],
                                                                format_template['attrs']['description'],
                                                                code, bft,
@@ -1144,7 +1149,7 @@ def get_elements_used_by_template(filename):
                     if not value in format_elements[function_name]['tags']:
                         format_elements[function_name]['tags'].append(value)
                     break
-            
+
     keys = format_elements.keys()
     keys.sort()
     return map(format_elements.get, keys)
