@@ -211,6 +211,44 @@ def oaiarchive_task():
     nice   = task_get_option("nice")
     sets   = task_get_option("oaiset")
 
+    if(mode == 3):
+        # Print repository status
+        all_oai_sets = all_sets()
+        repository_size_s = "%d" % repository_size()
+
+        write_message(cdsname)
+        write_message(" OAI Repository Status")
+        write_message("=" * 73)
+        write_message("  setSpec" + " " * 16 + "  setName" +
+            " " * 29 + "  Volume")
+        write_message("-" * 73)
+
+        for _set in all_oai_sets:
+
+            oai_sets = get_set_descriptions(_set[2])
+            setSpec, setName, setCoverage, recID_list = \
+                get_recID_list(oai_sets, _set)
+
+            oai_has_list = perform_request_search(c=cdsname, p1=_set[2],
+                f1=CFG_OAI_SET_FIELD, m1="e")
+            oai_has_list_len = "%d" % len(oai_has_list)
+
+            set_name = "%s" % _set[1][:32]
+            if (len(set_name) == 32):
+                set_name = "%s..." % set_name
+            write_message("  " + _set[2] + " " * (25 - len(_set[2])) + set_name +
+                " " * (35 - len(set_name)) +
+                " " * (9 - len(oai_has_list_len)) +
+                oai_has_list_len)
+
+        write_message("=" * 73)
+        write_message("  Total" + " " * 55 +
+            " " * (9 - len(repository_size_s)) + repository_size_s)
+
+        return True
+
+    # Mode 1, 2 and 4
+
     if isinstance(sets, str):
         # Backward compatibility with old way of storing 'oaiset' parameter
         sets = list(sets)
@@ -223,42 +261,6 @@ def oaiarchive_task():
         oaisetentrycount = 0
         oaiIDentrycount  = 0
         i                = 0
-
-        if(mode == 3):
-
-            all_oai_sets = all_sets()
-            repository_size_s = "%d" % repository_size()
-
-            write_message(cdsname)
-            write_message(" OAI Repository Status")
-            write_message("=" * 73)
-            write_message("  setSpec" + " " * 16 + "  setName" +
-                " " * 29 + "  Volume")
-            write_message("-" * 73)
-
-            for _set in all_oai_sets:
-
-                oai_sets = get_set_descriptions(_set[2])
-                setSpec, setName, setCoverage, recID_list = \
-                    get_recID_list(oai_sets, _set)
-
-                oai_has_list = perform_request_search(c=cdsname, p1=_set[2],
-                    f1=CFG_OAI_SET_FIELD, m1="e")
-                oai_has_list_len = "%d" % len(oai_has_list)
-
-                set_name = "%s" % _set[1][:32]
-                if (len(set_name) == 32):
-                    set_name = "%s..." % set_name
-                write_message("  " + _set[2] + " " * (25 - len(_set[2])) + set_name +
-                    " " * (35 - len(set_name)) +
-                    " " * (9 - len(oai_has_list_len)) +
-                    oai_has_list_len)
-
-            write_message("=" * 73)
-            write_message("  Total" + " " * 55 +
-                " " * (9 - len(repository_size_s)) + repository_size_s)
-
-            return True
 
         if(mode == 0):
 
