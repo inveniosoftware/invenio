@@ -752,13 +752,13 @@ URI: http://%(host)s%(page)s
 <div class="top-left"></div><div class="top-right"></div>
 		<div class="inside">
 
-        <div style="width:33%%;float:left;text-align:center;margin-top:0">
+        <div id="miniFile" style="width:33%%;float:left;text-align:center;margin-top:0">
              %(files)s
         </div>
-	<div style="width:33%%;float:left;text-align:center">
+	<div id="miniReview" style="width:33%%;float:left;text-align:center">
              %(reviews)s
 	</div>
-	<div style="width:33%%;float:right;text-align:right;">
+	<div id="miniActions" style="width:33%%;float:right;text-align:right;">
              %(actions)s
 	</div>
 	<div style="clear:both;margin-bottom: 0;"></div>

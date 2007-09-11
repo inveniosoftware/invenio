@@ -394,7 +394,7 @@ similarly be customized.</p>
    <li><code>mini-panel</code></li>
    <li><code>detailed</code></li>
    <li><code>top-left, top-right, bottom-left, bottom-right</code></li>
-   <li><code>commentHB, detailedRecordActions, star</code></li>
+   <li><code>commentHB, detailedRecordActions, star, miniReview</code></li>
 </ul>
 
 <p>Note that a tab might be greyed out (disabled) when its content is

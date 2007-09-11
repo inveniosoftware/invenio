@@ -1563,13 +1563,13 @@ ul.detailedRecordActions{
 }
 
 /* Grading stars for mini-panel in detailed view*/
-div.mini-panel div.star a{
+#miniReview div.star a{
    text-indent:-9000px; /*Hide text*/
    height:30px;
    width:30px;
    float:left;
 }
-div.mini-panel div.star{
+#miniReview div.star{
    height:30px !important;
    float:left;
    clear:none;
@@ -1577,16 +1577,16 @@ div.mini-panel div.star{
    text-align:left;
    background:url(star_empty-icon-30x30.gif) no-repeat;
 }
-div.mini-panel div.star:hover{
+#miniReview div.star:hover{
    background-image:url(star-icon-30x30.gif) !important;
 }
-div.mini-panel:hover div.full, div.mini-panel:hover div.half{
+#miniReview:hover div.full, #miniReview:hover div.half{
    background-image:url(star_empty-icon-30x30.gif) ;
 }
-div.mini-panel div.full{
+#miniReview div.full{
    background-image:url(star-icon-30x30.gif) ;
 }
-div.mini-panel div.half{
+#miniReview div.half{
    background-image:url(star_half-icon-30x30.gif) ;
 }
 
