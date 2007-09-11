@@ -215,7 +215,9 @@ def oaiarchive_task():
         # Backward compatibility with old way of storing 'oaiset' parameter
         sets = list(sets)
 
+    set_number = 0
     for set in sets:
+        set_number += 1
 
         # Reset some variables
         oaisetentrycount = 0
@@ -282,7 +284,8 @@ def oaiarchive_task():
                     (len(recID_list) - len(oai_has_list)))
 
         else:
-            task_update_progress("Fetching records in %s." % set)
+            task_update_progress("[%i/%i] Fetching records in %s." % \
+                                 (set_number, len(sets), set))
             if mode == 1 or mode == 4:
                 filename = tmpdir + "/oai_archive_%s" % time.strftime(
                     "%Y%m%d_%H%M%S", time.localtime())
@@ -299,8 +302,8 @@ def oaiarchive_task():
 
             i = 0
             for recID in recID_list:
-                task_update_progress("Set %s: done %s out of %s records." %
-                    (setSpec, i, len(recID_list)))
+                task_update_progress("[%i/%i] Set %s: done %s out of %s records." % \
+                    (set_number, len(sets), setSpec, i, len(recID_list)))
                 i += 1
                 time.sleep(int(nice)/10)
                 ID = "%d" % recID
@@ -628,7 +631,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ("-n", "--nice"):
         task_set_option("nice", value)
     elif key in ("-o", "--oaiset"):
-        sets = value.split(' ')
+        sets = [set for set in value.split(' ') if set != '']
         task_set_option("oaiset", sets)
     elif key in ("-a", "--add"):
         task_set_option("mode", 1)
