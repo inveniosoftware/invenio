@@ -17,6 +17,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0301
+# pylint: disable-msg=E1102
+
 """WebSearch module regression tests."""
 
 __revision__ = "$Id$"
@@ -125,7 +128,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         browser = Browser()
 
-        def check(legacy, new):
+        def check(legacy, new, browser=browser):
             browser.open(legacy)
             got = browser.geturl()
 
@@ -158,7 +161,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         browser = Browser()
 
-        def check(legacy, new):
+        def check(legacy, new, browser=browser):
             browser.open(legacy)
             got = browser.geturl()
 
@@ -496,8 +499,6 @@ class WebSearchTestSearch(unittest.TestCase):
         self.failUnless(same_urls_p(l.url, make_url('/search',
                                                     p="Ellis, R S",
                                                     f='author')))
-
-# pylint: disable-msg=C0301
 
 class WebSearchNearestTermsTest(unittest.TestCase):
     """Check various alternatives of searches leading to the nearest

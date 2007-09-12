@@ -19,6 +19,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=E1102
+
 """WebSession Regression Test Suite."""
 
 __revision__ = \
@@ -32,7 +34,7 @@ from invenio.config import sweburl, adminemail
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
-class WebSessionYorSettingsTest(unittest.TestCase):
+class WebSessionYourSettingsTest(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def test_password_setting(self):
@@ -214,7 +216,7 @@ class WebSessionYorSettingsTest(unittest.TestCase):
 
 
 
-test_suite = make_test_suite(WebSessionYorSettingsTest)
+test_suite = make_test_suite(WebSessionYourSettingsTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
