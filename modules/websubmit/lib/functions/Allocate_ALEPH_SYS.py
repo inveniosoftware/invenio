@@ -26,7 +26,8 @@ from random import randint, seed
 from os import getpid, unlink, access, rename, R_OK, W_OK
 from os.path import getmtime
 from shutil import copyfile
-from time import strftime, localtime, time, mktime, sleep
+from time import strftime, localtime, mktime, sleep
+import time
 
 from invenio.config import \
      adminemail, \
@@ -316,7 +317,7 @@ def _create_SYS_counter_lockfile(database):
     """
     seed()
     counter_lockfile = "last_SYS_%s.lock" % database
-    lockfile_text = """%s->%.7f->%d""" % (getpid(), time(), randint(0,1000000))
+    lockfile_text = """%s->%.7f->%d""" % (getpid(), time.time(), randint(0,1000000))
     got_lock = 0
 
     ## get lock on counter:
