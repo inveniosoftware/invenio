@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -39,7 +39,6 @@ import sys
 import os
 
 from invenio.config import \
-     etcdir, \
      weburl
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH
@@ -88,14 +87,12 @@ def get_creation_date_libxslt(ctx, recID):
     """
     libxslt extension function:
     Bridge between BibFormat and XSL stylesheets.
-    
+    Returns record creation date.
+
     Can be used in that way in XSL stylesheet
-    
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
     <xsl:value-of select="fn:creation_date(445)"/> where 445 is a recID
-    (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
-    using BibConvert ADD function)
-    
+
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value
     """
@@ -106,27 +103,25 @@ def get_creation_date_libxslt(ctx, recID):
             recID_int = recID
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
-             
+
         return get_creation_date(recID_int)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
-        
+
         return ''
-    
+
 def get_creation_date_4suite(ctx, recID):
     """
     libxslt extension function:
     Bridge between BibFormat and XSL stylesheets.
-    
+    Returns record creation date.
+
     Can be used in that way in XSL stylesheet
-    
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
-    <xsl:value-of select="fn:creation_date()"/>
-    (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
-    using BibConvert ADD function)
-     
+    <xsl:value-of select="fn:creation_date(445)"/>
+
     if value is int, value is converted to string
     if value is Node, first child node (text node) is taken as value
     """
@@ -136,16 +131,73 @@ def get_creation_date_4suite(ctx, recID):
             if recID_int is None:
                 return ''
         else:
-            recID_int = int(value)
-             
+            recID_int = int(recID_int)
+
         return get_creation_date(recID_int)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
-        
+
         return ''
 
+def get_modification_date_libxslt(ctx, recID):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns record modification date.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:creation_date(445)"/> where 445 is a recID
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+    """
+    try:
+        if isinstance(recID, str):
+            recID_int = int(recID)
+        elif isinstance(recID, int):
+            recID_int = recID
+        else:
+            recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
+
+        return get_modification_date(recID_int)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
+
+def get_modification_date_4suite(ctx, recID):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns record modification date.
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:modification_date(445)"/>
+
+    if value is int, value is converted to string
+    if value is Node, first child node (text node) is taken as value
+    """
+    try:
+        if len(recID) > 0 and isinstance(recID[0], Node):
+            recID_int = recID[0].firstChild.nodeValue
+            if recID_int is None:
+                return ''
+        else:
+            recID_int = int(recID_int)
+
+        return get_modification_date(recID_int)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
 
 # End of date-related functions                                  #
 ##################################################################
@@ -195,11 +247,14 @@ def format(xmltext, template_filename=None, template_source=None):
     result = ""
     if processor_type == 0:
         # libxml2 & libxslt
-        
+
         # Register BibFormat functions for use in XSL
         libxslt.registerExtModuleFunction("creation_date",
                                           CFG_BIBFORMAT_FUNCTION_NS,
                                           get_creation_date_libxslt)
+        libxslt.registerExtModuleFunction("modification_date",
+                                          CFG_BIBFORMAT_FUNCTION_NS,
+                                          get_modification_date_libxslt)
 
         # Load template and source
         template_xml = libxml2.parseDoc(template)
@@ -220,11 +275,14 @@ def format(xmltext, template_filename=None, template_source=None):
 
         # Init
         processor = Processor.Processor()
-        
+
         # Register BibFormat functions for use in XSL
         processor.registerExtensionFunction(CFG_BIBFORMAT_FUNCTION_NS,
                                             "creation_date",
                                             get_creation_date_4suite)
+        processor.registerExtensionFunction(CFG_BIBFORMAT_FUNCTION_NS,
+                                            "modification_date",
+                                            get_modification_date_4suite)
 
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
@@ -237,9 +295,9 @@ def format(xmltext, template_filename=None, template_source=None):
         result = processor.run(source)
     else:
         sys.stderr.write("No XSLT processor could be found")
-        
+
     return result
-    
+
 if __name__ == "__main__":
     pass
 
