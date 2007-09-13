@@ -40,9 +40,7 @@ import zlib
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_OAI_ID_FIELD, \
-     CFG_WEBCOMMENT_ALLOW_COMMENTS, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
      CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
@@ -568,11 +566,27 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), cc)
 
         navtrail = create_navtrail_links(cc, as, ln)
-        navtrail_append_title_p=1
-        if tab != '':
-            tab_label = get_detailed_page_tabs(cc)[tab]['label']
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % (weburl, recID, title_message, _(tab_label))
-            navtrail_append_title_p=0
+        navtrail_append_title_p = 1
+        if tab != '' or ((of != '' or of.lower() != 'hd') and of != 'hb'):
+            # If we are not in information tab in HD format, customize
+            # the nav. trail to have a link back to main record. (Due
+            # to the way perform_request_search() works, hb
+            # (lowercase) is equal to hd)
+            if (of != '' or of.lower() != 'hd') and of != 'hb':
+                # Export
+                format_name = of
+                query = "SELECT name FROM format WHERE code=%s"
+                res = run_sql(query, (of,))
+                if res:
+                    format_name = res[0][0]
+                navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
+                            (weburl, recID, title_message, format_name)
+            else:
+                # Discussion, statistics, etc. tabs
+                tab_label = get_detailed_page_tabs(cc)[tab]['label']
+                navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
+                            (weburl, recID, title_message, _(tab_label))
+            navtrail_append_title_p = 0
 
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=navtrail,

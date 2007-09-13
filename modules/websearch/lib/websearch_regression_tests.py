@@ -190,23 +190,23 @@ class WebSearchTestRecord(unittest.TestCase):
         for hformat in ('hd', 'hx', 'hm'):
             browser.open(make_url('/record/1', of=hformat))
 
-            # all except the selected links should be present in the
-            # page.
-            for oformat in ('hd', 'hx', 'hm', 'xm', 'xd'):
-                target = make_url('/record/1', of=oformat)
-
-                if oformat == hformat:
-                    try:
-                        browser.find_link(url=target)
-                    except LinkNotFoundError:
-                        continue
-
-                    self.fail('link %r should not be in page' % target)
-                else:
+            if hformat == 'hd':
+                # hd format should have a link to the following
+                # formats
+                for oformat in ('hx', 'hm', 'xm', 'xd'):
+                    target = make_url('/record/1/export/%s' % oformat)
                     try:
                         browser.find_link(url=target)
                     except LinkNotFoundError:
                         self.fail('link %r should be in page' % target)
+            else:
+                # non-hd HTML formats should have a link back to
+                # the main detailed record
+                 target = make_url('/record/1')
+                 try:
+                     browser.find_link(url=target)
+                 except LinkNotFoundError:
+                     self.fail('link %r should be in page' % target)
 
         return
 
