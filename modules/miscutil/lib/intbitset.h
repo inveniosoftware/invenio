@@ -23,7 +23,9 @@
 #include <Python.h>
 
 #if PY_VERSION_HEX < 0x02050000
+#ifndef PY_SSIZE_T_CLEAN
 typedef int Py_ssize_t;
+#endif
 #endif
 
 typedef unsigned long long int word_t;
