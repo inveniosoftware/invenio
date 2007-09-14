@@ -2255,6 +2255,7 @@ CREATE TABLE IF NOT EXISTS format (
   code varchar(6) NOT NULL,
   description varchar(255) default '',
   content_type varchar(255) default '',
+  visibility tinyint NOT NULL default '1',
   PRIMARY KEY  (id),
   UNIQUE KEY code (code)
 ) TYPE=MyISAM;
@@ -2268,7 +2269,7 @@ CREATE TABLE IF NOT EXISTS formatname (
 ) TYPE=MyISAM;
 
 -- tables for collection detailed page options
- 
+
 CREATE TABLE IF NOT EXISTS collectiondetailedpagetabs (
   id_collection mediumint(9) unsigned NOT NULL,
   tabs varchar(255) NOT NULL default '',

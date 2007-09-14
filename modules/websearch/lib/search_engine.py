@@ -722,7 +722,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                      })
 
     formats = []
-    query = """SELECT code,name FROM format ORDER BY name ASC"""
+    query = """SELECT code,name FROM format WHERE visibility='1' ORDER BY name ASC"""
     res = run_sql(query)
     if res:
         # propose found formats:

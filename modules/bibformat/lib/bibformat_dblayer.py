@@ -395,7 +395,7 @@ def get_output_format_id(code):
     else:
         return None
 
-def add_output_format(code, name="", description="", content_type="text/html"):
+def add_output_format(code, name="", description="", content_type="text/html", visibility=1):
     """
     Add output format into format table.
 
@@ -408,8 +408,8 @@ def add_output_format(code, name="", description="", content_type="text/html"):
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
-        query = "INSERT INTO format SET code=%s, description=%s, content_type=%s"
-        params = (code.lower(), description, content_type)
+        query = "INSERT INTO format SET code=%s, description=%s, content_type=%s, visibility=%s"
+        params = (code.lower(), description, content_type, visibility)
         run_sql(query, params)
         set_output_format_name(code, name)
 
@@ -456,6 +456,7 @@ def set_output_format_description(code, description):
     If 'code' does not exist, create format
 
     @param code the code of the output format to update
+    @param description the new description
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -463,6 +464,38 @@ def set_output_format_description(code, description):
 
     query = "UPDATE format SET description=%s WHERE code=%s"
     params = (description, code.lower())
+    run_sql(query, params)
+
+def get_output_format_visibility(code):
+    """
+    Returns the visibility of the output format, given by its code
+
+    If code does not exist, return 0
+    @return output format visibility (0 if not visible, 1 if visible
+    """
+    query = "SELECT visibility FROM format WHERE code='%s'" % escape_string(code)
+    res = run_sql(query)
+    if len(res) > 0:
+        res = res[0][0]
+        if res is not None and int(res) in range(0, 2):
+            return int(res)
+    return 0
+
+def set_output_format_visibility(code, visibility):
+    """
+    Sets the visibility of an output format, given by its code
+
+    If 'code' does not exist, create format
+
+    @param code the code of the output format to update
+    @param visibility the new visibility (0: not visible, 1:visible)
+    """
+    output_format_id = get_output_format_id(code)
+    if output_format_id is None:
+        add_output_format(code, "", "", "", visibility)
+
+    query = "UPDATE format SET visibility=%s WHERE code=%s"
+    params = (visibility, code.lower())
     run_sql(query, params)
 
 def get_existing_content_types():

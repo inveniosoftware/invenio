@@ -1297,7 +1297,8 @@ def get_output_format(code, with_attributes=False, verbose=0):
      'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
                'description': "a description"
                'code': "fnm1",
-               'content_type': "application/ms-excel"
+               'content_type': "application/ms-excel",
+               'visibility': 1
               }
      'default':"filename_b.bft"
     }
@@ -1383,7 +1384,8 @@ def get_output_format_attrs(code, verbose=0):
 
     The attributes contain 'code', which is the short identifier of the output format
     (to be given as parameter in format_record function to specify the output format),
-    'description', a description of the output format, and 'names', the localized names
+    'description', a description of the output format, 'visibility' the visibility of
+    the format in the output format list on public pages and 'names', the localized names
     of the output format. If 'content_type' is specified then the search_engine will
     send a file with this content type and with result of formatting as content to the user.
     The 'names' dict always contais 'generic', 'ln' (for long name) and 'sn' (for short names)
@@ -1394,7 +1396,8 @@ def get_output_format_attrs(code, verbose=0):
     {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
      'description': "a description"
      'code': "fnm1",
-     'content_type': "application/ms-excel"
+     'content_type': "application/ms-excel",
+     'visibility': 1
     }
 
     @param code the short identifier of the format
@@ -1411,7 +1414,8 @@ def get_output_format_attrs(code, verbose=0):
                       'sn':{}},
              'description':'',
              'code':code.upper(),
-             'content_type':""}
+             'content_type':"",
+             'visibility':1}
 
     filename = resolve_output_format_filename(code, verbose)
     if filename is None:
@@ -1420,6 +1424,7 @@ def get_output_format_attrs(code, verbose=0):
     attrs['names'] = bibformat_dblayer.get_output_format_names(code)
     attrs['description'] = bibformat_dblayer.get_output_format_description(code)
     attrs['content_type'] = bibformat_dblayer.get_output_format_content_type(code)
+    attrs['visibility'] = bibformat_dblayer.get_output_format_visibility(code)
 
     return attrs
 

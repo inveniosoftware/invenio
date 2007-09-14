@@ -537,7 +537,8 @@ class Collection:
         box = ""
         values = []
         query = """SELECT f.code,f.name FROM format AS f, collection_format AS cf
-                   WHERE cf.id_collection=%d AND cf.id_format=f.id ORDER BY cf.score DESC, f.name ASC"""  % self.id
+                   WHERE cf.id_collection=%d AND cf.id_format=f.id AND f.visibility='1'
+                   ORDER BY cf.score DESC, f.name ASC"""  % self.id
         res = run_sql(query)
         if res:
             for row in res:

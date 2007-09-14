@@ -13,20 +13,20 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""HTML Templates for BibFormat administration"""                                           
+"""HTML Templates for BibFormat administration"""
 
 __revision__ = "$Id$"
 
 # non Invenio imports
 import cgi
 
-# Invenio imports                
+# Invenio imports
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
 from invenio.config import weburl, sweburl
@@ -81,16 +81,16 @@ class Template:
         </table>
         ''' % {'weburl':weburl,
                'comment_on_php_admin_interface':comment_on_php_admin_interface}
-        
+
         out += '''
         <p>
          This is where you can edit the formatting styles available for the records. '''
-        
+
         if not is_admin:
             out += '''You need to
             <a href="%(weburl)s/youraccount/login?referer=%(weburl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
          ''' % {'weburl':weburl}
-        
+
         out += '''
         </p>
         <dl>
@@ -115,7 +115,7 @@ class Template:
         <dd>Documentation about BibFormat administration</dd>
         </dl>
         '''% {'weburl':weburl, 'ln':ln}
-        
+
         if CFG_PATH_PHP:
             #Show PHP admin only if PHP is enabled
             out += '''
@@ -151,7 +151,7 @@ class Template:
 
             <dd>Define one or more output BibFormat behaviours.  These are then
             passed as parameters to the BibFormat modules while executing
-            formatting. 
+            formatting.
 
             <br><em>Example:</em> You can tell BibFormat that is has to enrich the
             incoming metadata file by the created format, or that it only has to
@@ -167,7 +167,7 @@ class Template:
             should be mapped into <code>$100.a</code> internal variable that you
             could use later.
 
-            <dt><a href="LINK_display.php">Link Rules</a> 
+            <dt><a href="LINK_display.php">Link Rules</a>
 
             <dd>Define rules for automated creation of URI links from mapped
             internal variables.
@@ -183,7 +183,7 @@ class Template:
             used when proposing various fulltext services.
 
             <br><em>Example:</em> You can tell that <code>*.pdf</code> files will
-            be treated as PDF files.  
+            be treated as PDF files.
 
             <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
 
@@ -241,7 +241,7 @@ class Template:
             collections or you can manually enter a search query and the web interface
             will accomplish all necessary formatting steps.
             <br>
-            <i>Example:</i> You can request Photo collections to have their HTML 
+            <i>Example:</i> You can request Photo collections to have their HTML
             brief formats rebuilt, or you can reformat all the records written by Ellis.
 
             <h3>From the command-line interface</h3>
@@ -304,12 +304,12 @@ class Template:
 
         return indent_text(out)
 
-    def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable, 
+    def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable,
 						   all_templates=[], new=False):
         """
         Returns a page to change format template name and description
 
-	If template is new, offer a way to create a duplicate from an 
+	If template is new, offer a way to create a duplicate from an
 	existing template
 
         @param ln language
@@ -344,18 +344,18 @@ class Template:
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies")
                }
-        
+
         disabled = ""
         readonly = ""
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
-            
+
         out += '''
         <form action="format_template_update_attributes?ln=%(ln)s&amp;bft=%(filename)s" method="POST">
 	''' % {'ln':ln,
 	       'filename':filename}
-	       
+
 	if new:
 	    #Offer the possibility to make a duplicate of existing format template code
 	    out += '''
@@ -371,7 +371,7 @@ class Template:
 	    for (o_filename, o_name) in all_templates:
 		out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
 												 'template_filename': o_filename}
-	    out += ''' </select> 
+	    out += ''' </select>
 	    </td></tr></table>'''
 
 	out += '''
@@ -380,7 +380,7 @@ class Template:
         </tr>
         <tr>
         <td class="admintdright">
-        
+
         <input type="hidden" name="key" value="%(name)s"/>
         <label for="name">%(name_label)s</label>:&nbsp;</td>
         <td><input tabindex="2" name="name" type="text" id="name" size="25" value="%(name)s" %(readonly)s/>
@@ -429,7 +429,7 @@ class Template:
         @param tags the tags that are called by format elements this template depends on.
         """
         _ = gettext_set_language(ln)    # load the right message language
-        
+
         out = '''
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
@@ -459,7 +459,7 @@ class Template:
         #Print output formats
         if len(output_formats) == 0:
             out += '<p align="center"><i>No output format uses this format template.</i></p>'
-            
+
         for output_format in output_formats:
             name = output_format['names']['generic']
             filename = output_format['filename']
@@ -469,7 +469,7 @@ class Template:
             if len(output_format['tags']) > 0:
                 out += "("+", ".join(output_format['tags'])+")"
             out += "<br/>"
-            
+
         #Print format elements (and tags)
         out += '</td><td valign="top">&nbsp;<br/>'
         if len(format_elements) == 0:
@@ -495,7 +495,7 @@ class Template:
         <b>*Note</b>: Some tags linked with this format template might not be shown. Check manually.
         '''
         return out
-    
+
     def tmpl_admin_format_template_show(self, ln, name, description, code, filename, ln_for_preview, pattern_for_preview, editable, content_type_for_preview, content_types):
         """
         Returns the editor for format templates. Edit 'format'
@@ -510,14 +510,14 @@ class Template:
         @return editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
-        
+
         out = ""
 
         # If xsl, hide some options in the menu
         nb_menu_options = 4
         if filename.endswith('.xsl'):
             nb_menu_options = 2
-        
+
         out += '''
         <style type="text/css">
             <!--
@@ -528,27 +528,27 @@ class Template:
         </style>
         <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <script type="text/javascript">
- 
-        function getByID( id ) { 
-            if (document.getElementById) 
-                var returnVar = document.getElementById(id); 
-            else if (document.all) 
-                var returnVar = document.all[id]; 
-            else if (document.layers) 
-                var returnVar = document.layers[id]; 
-            
-            return returnVar; 
+
+        function getByID( id ) {
+            if (document.getElementById)
+                var returnVar = document.getElementById(id);
+            else if (document.all)
+                var returnVar = document.all[id];
+            else if (document.layers)
+                var returnVar = document.layers[id];
+
+            return returnVar;
         }
 
         window.onresize= resizeViews;
         window.onload= prepareLayout;
-    
+
         function prepareLayout(){
             resizeViews();
             //getByID("shortDocFrame").style.height="91%%";
             // TODO : Find a way to resize shortDocFrame
         }
-    
+
         function resizeViews(){
             var myWidth = 0, myHeight = 0;
             if( typeof( window.innerWidth ) == 'number' ) {
@@ -564,7 +564,7 @@ class Template:
                 myWidth = document.body.clientWidth;
                 myHeight = document.body.clientHeight;
             }
-  
+
             if (myHeight <= 400) {
                 getByID("code").style.height=10;
                 getByID("previewiframe").style.height=10;
@@ -573,10 +573,10 @@ class Template:
                 getByID("code").style.height=((myHeight-400)/2);
                 getByID("previewiframe").style.height=((myHeight-400)/2);
             }
-    
+
             getByID("previewiframe").style.height=200;
         }
-    
+
         </script>
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="%(nb_menu_options)s" class="adminheaderleft">%(menu)s</th></tr>
@@ -608,7 +608,7 @@ class Template:
                'check_dependencies': _("Check Dependencies"),
                'weburl': sweburl or weburl
                }
-            
+
         out +='''
         </tr>
         </table>
@@ -624,9 +624,9 @@ class Template:
         } else {
         doc.style.display = 'none';
         link.innerHTML = "%(label_show_doc)s"
-        } 
         }
-   
+        }
+
         </script>
 
         ''' % {'ln': ln, 'filename': filename,
@@ -699,26 +699,26 @@ class Template:
         </select></nobr>
         <nobr><label for="ln_for_preview">Language:</label> <select id="ln_for_preview" name="ln_for_preview" style="font-size: x-small;">
         '''
-        
+
         for lang in language_list_long():
             if lang[0] == ln_for_preview:
                 out += '''<option value="%(ln)s" selected="selected">%(language)s</option>''' % {'ln':lang[0],
                                                                                                  'language':lang[1]}
             else:
                 out += '''<option value="%(ln)s">%(language)s</option>''' % {'ln':lang[0], 'language':lang[1]}
-       
+
 
         out += '''
         </select></nobr>
         &nbsp;
         <nobr><label for="pattern_for_preview">Search Pattern: </label><input type="text" value="%(pattern_for_preview)s" size="8" name="pattern_for_preview" id="pattern_for_preview" style="font-size: x-small;"/></nobr>&nbsp;
-        
+
         <input type="submit" class="adminbutton" name="preview_action" value="Reload Preview"/>
         </td>
         </tr>
         <tr><td>
         <iframe src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_preview_or_save?ln=%(ln)s&amp;ln_for_preview=%(ln_for_preview)s&amp;pattern_for_preview=%(pattern_for_preview)s&amp;bft=%(filename)s" name="previewiframe" id="previewiframe" width="100%%" height="400"></iframe>
-   
+
         </td></tr>
         </table>
         </form>
@@ -730,8 +730,8 @@ class Template:
                }
 
 
-        #Second column Print documentation 
-            
+        #Second column Print documentation
+
         out += '''
         <td valign="top" id="docTable">
         <table width="100%%"><tr>
@@ -746,7 +746,7 @@ class Template:
         </td>
         </tr>
         </table>
-        
+
         <iframe name="shortDocFrame" id="shortDocFrame" src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_short_doc?ln=%(ln)s" height="90%%" width="98%%"></iframe>
 
         </td>
@@ -760,7 +760,7 @@ class Template:
         """
         Prints the format element documentation in a condensed way to display
         inside format template editor.
-        
+
         This page is different from others: it is displayed inside a <iframe>
         tag in template tmpl_admin_format_template_show.
 
@@ -795,7 +795,7 @@ class Template:
 	} else {
 	element.style.background="rgb("+r+","+g+","+b+")"
 	child.style.display='none'
-	} 
+	}
 	}
         ///// FROM JS QuickTags ///////
 
@@ -804,7 +804,7 @@ class Template:
         //
         // Licensed under the LGPL license
         // http://www.gnu.org/copyleft/lesser.html
-        
+
         function insertAtCursor(myField, myValue) {
         //IE support
         if (document.selection) {
@@ -824,7 +824,7 @@ class Template:
         }
         }
         ///// END FROM JS QuickTags  /////
-        
+
         function insert_my_code_into_container(code){
         var codeArea = parent.document.getElementById("code");
         if (codeArea.readOnly == false){
@@ -832,17 +832,17 @@ class Template:
         //clean_code = clean_code.replace(# ,'" ');
         insertAtCursor(codeArea, code);
         }
-        }  
+        }
         </script>
         ''' % {'weburl': sweburl or weburl}
-        
+
         if len(format_elements) == 0:
             out += '''
             <em>No format elements found</em>
             '''
         else:
             line = 0
-  
+
             #Print elements doc
             for format_element in format_elements:
                 format_attributes = format_element['attrs']
@@ -852,7 +852,7 @@ class Template:
                 params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['params']]
                 builtin_params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['builtin_params']]
                 code = "<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>"
-                
+
                 if line % 2:
                     row_content += '''<div onmouseover="toggle_visibility(this, 'show', 235, 247, 255);"
                     onmouseout="toggle_visibility(this, 'hide', 235, 247, 255);"
@@ -868,7 +868,7 @@ class Template:
                 params_names = ""
                 for param in format_attributes['params']:
                     params_names += "<b>"+param['name'] +'</b> '
-                    
+
                 row_content += '''
                 <code> <b>&lt;BFE_%(name)s/&gt;</b><br/></code>
                 <small>%(description)s.</small>
@@ -893,23 +893,23 @@ class Template:
                 else:
                     row_content += '</div>'
                 line += 1
-              
+
                 out += row_content
 
 
         out += '''</body></html>'''
         return indent_text(out)
-    
+
     def tmpl_admin_format_templates_management(self, ln, formats):
         """
         Returns the management console for formats. Includes list of formats and
         associated administration tools.
-        
+
         @param ln language
         @param formats a list of dictionaries with formats attributes
         @return format management console as html
         """
-        
+
         _ = gettext_set_language(ln)    # load the right message language
 
 
@@ -929,7 +929,7 @@ class Template:
         Have a look at the <a href="format_elements_doc?ln=%(ln)s">format elements documentation</a> to
         learn which elements you can use in your templates.</p>
 
-  
+
         <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
@@ -951,7 +951,7 @@ class Template:
                'format_elements_documentation':_("Format Elements Documentation"),
                'manage_knowledge_bases':_("Manage Knowledge Bases"),
                'weburl':weburl}
-        
+
         #table content: formats names, description and buttons
         if len(formats) == 0:
             out += '''<tr>
@@ -971,11 +971,11 @@ class Template:
                     description = "&nbsp;"
                 last_mod_date = attrs['last_mod_date']
                 status = attrs['status']
-                
+
                 disabled = ""
                 if not attrs['editable']:
                     disabled = 'disabled="disabled"'
-                     
+
                 style = 'style="vertical-align: middle;'
                 if line % 2:
                     style = 'style="vertical-align: middle;background-color: rgb(235, 247, 255);'
@@ -1004,7 +1004,7 @@ class Template:
                        'delete':_("Delete")
                        }
                 out += row_content
-            
+
         #table footer, buttons and bottom of the page
         out += '''
         <tr>
@@ -1022,13 +1022,13 @@ class Template:
         </td>
         </tr>
         </table>
-        
+
         ''' % {'ln':ln,
                'add_format_template':_("Add New Format Template"),
                'extensive_checking':_("Check Format Templates Extensively")}
 
         return indent_text(out)
-        
+
     def tmpl_admin_output_formats_management(self, ln, output_formats):
         """
         Returns the main management console for formats. Includes list of formats and
@@ -1037,7 +1037,7 @@ class Template:
         @param output_formats a list of output formats
         @return main management console as html
         """
-        
+
         _ = gettext_set_language(ln)    # load the right message language
 
 
@@ -1054,7 +1054,7 @@ class Template:
         </table>
 
         <p>From here you can add, edit or delete output formats available for collections. Output formats define which template to use. <br/>To edit templates go to the <a href="format_templates_manage?ln=%(ln)s">template administration page</a>.</p>
- 
+
         <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
@@ -1078,7 +1078,7 @@ class Template:
                 'manage_knowledge_bases':_("Manage Knowledge Bases"),
                 'menu': _("Menu"),
                 'weburl':weburl}
-        
+
         #table content: formats names, description and buttons
         if len(output_formats) == 0:
             out += '''<tr>
@@ -1097,13 +1097,13 @@ class Template:
                 code = format_attributes['code']
                 if code == "":
                     code = "&nbsp;"
-                    
+
                 last_mod_date = output_format['last_mod_date']
                 status = output_format['status']
                 disabled = ""
                 if not output_format['editable']:
                     disabled = 'disabled="disabled"'
-   
+
                 style = "vertical-align: middle;"
                 if line % 2:
                     style = 'vertical-align: middle; background-color: rgb(235, 247, 255);'
@@ -1135,9 +1135,9 @@ class Template:
                        'disabled':disabled,
                        'last_mod_date':last_mod_date,
                        'status':status}
-                
+
                 out += row_content
-                          
+
         #table footer, buttons and bottom of the page
         out += '''
         <tr>
@@ -1150,7 +1150,7 @@ class Template:
         </table>
         ''' % {'ln':ln,
                'add_output_format':_("Add New Output Format")}
-        
+
         return indent_text(out)
 
     def tmpl_admin_output_format_show(self, ln, code, name, rules, default, format_templates, editable):
@@ -1162,7 +1162,7 @@ class Template:
 
         IMPORTANT: we display rules evaluation index starting at 1 in
         interface, but we start internally at 0
-        
+
         @param ln language
         @param code the code of the output to show
         @param name the name of this output format
@@ -1193,29 +1193,29 @@ class Template:
                'modify_output_format_attributes':_("Modify Output Format Attributes"),
                'check_dependencies':_("Check Dependencies")
                }
-        
+
         out += '''
         <form name="rules" action="output_format_show?ln=%(ln)s&amp;bfo=%(code)s" method="post">
         <table>
         <tr>
         <td>
         ''' % {'ln': ln, 'code':code}
-        
+
         disabled = ""
         readonly = ""
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
-        
+
         if len(rules) == 0:
             out += '''<p align="center"><em>No special rule</em></p>'''
-        
+
         line = 1
         for rule in rules:
             out += '''
             <table align="center" class="admin_wvar" cellspacing="0">
             <tr>
-            '''  
+            '''
 
             out += '''
             <td rowspan="2" class="adminheader" style="vertical-align: middle;">'''
@@ -1223,7 +1223,7 @@ class Template:
                 out += '''
                 <input type="image" src="%(weburl)s/img/smallup.gif" alt="Increase priority of rule %(row)s" name="+ %(row)s" value="+ %(row)s" %(disabled)s/></div>
                 ''' % {'weburl':weburl, 'row':line, 'disabled':disabled}
-              
+
             out += '''<div>%(row)s</div>''' % { 'row':line}
             if line < len(rules):
                 out += '''
@@ -1235,29 +1235,29 @@ class Template:
             out += '''</td>
             <td class="adminheaderleft">&nbsp;</td>
             '''
-    
+
             out += '''
             <td class="adminheaderleft" style="white-space: nowrap;">
             Use template&nbsp;<select name="r_tpl" %(disabled)s>''' % {'disabled':disabled}
 
-           
+
             for template in format_templates:
                 attrs = format_templates[template]['attrs']
                 attrs['template'] = template
                 if template.endswith('.xsl'):
                     attrs['name'] += ' (XSL)'
-                
+
                 if template != rule['template']:
                     out += '''<option value="%(template)s">%(name)s</option>''' % attrs
                 else:
                     out += '''<option value="%(template)s" selected="selected">%(name)s</option>''' % attrs
-            
+
             if not format_templates.has_key(rule['template']) and rule['template'] != "":
                 #case where a non existing format template is use in output format
                 #we need to add it as option
                 out += '''<option value="%s" selected="selected">%s</option>''' % (rule['template'],
                                                                                    rule['template'])
-                
+
             ################ FIXME remove when migration is done ####################
             #Let the user choose a non existing template, that is a placeholder
             #meaning that the template has not been migrated
@@ -1268,7 +1268,7 @@ class Template:
                 out += '''<option disabled="disabled">For Migration:</option>'''
                 out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
             ################               END FIXME             ####################
-            
+
             out += '''</select>&nbsp;if field
             &nbsp;<input type="text" name="r_fld" value="%(field)s" size="10" %(readonly)s/>&nbsp;is equal to&nbsp;<input type="text" value="%(value)s" name="r_val" %(readonly)s/>
             </td>
@@ -1292,7 +1292,7 @@ class Template:
                    'row':line,
                    'disabled':disabled}
             line += 1
-            
+
         out += '''
         <table width="100%" align="center" class="admin_wvar" cellspacing="0">
         <tr>
@@ -1307,7 +1307,7 @@ class Template:
             attrs['template'] = template
             if template.endswith('.xsl'):
                 attrs['name'] += ' (XSL)'
-                    
+
             if template  != default:
                 out += '''<option value="%(template)s">%(name)s</option>''' % attrs
             else:
@@ -1328,7 +1328,7 @@ class Template:
             out += '''<option disabled="disabled">For Migration:</option>'''
             out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
         ################               END FIXME             ####################
-            
+
         out += '''</select></td>
         </tr>
         </table>
@@ -1344,10 +1344,17 @@ class Template:
              'save_changes_label':_("Save Changes"),
              'disabled':disabled
              }
-      
+
         return indent_text(out)
 
-    def tmpl_admin_output_format_show_attributes(self, ln, name, description, content_type, code, names_trans, editable):
+    def tmpl_admin_output_format_show_attributes(self, ln,
+                                                 name,
+                                                 description,
+                                                 content_type,
+                                                 code,
+                                                 names_trans,
+                                                 editable,
+                                                 visible):
         """
         Returns a page to change output format name and description
 
@@ -1360,6 +1367,7 @@ class Template:
         @param content_type the (MIME) content type of the ouput format
         @param names_trans the translations in the same order as the languages from get_languages()
         @param editable True if we let user edit, else False
+        @param visible True if output format should be shown in list of available output formats
         @return editor for output format attributes
         """
         _ = gettext_set_language(ln)    # load the right message language
@@ -1390,7 +1398,7 @@ class Template:
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
-        
+
         out += '''
         <form action="output_format_update_attributes?ln=%(ln)s&amp;bfo=%(code)s" method="POST">
         <table class="admin_wvar" cellspacing="0">
@@ -1400,10 +1408,14 @@ class Template:
         </tr>
         <tr>
         <td class="admintdright"><label for="outputFormatCode">Code</label>:&nbsp;</td>
-        <td><input tabindex="1" name="code" type="text" id="outputFormatCode" maxlength="6" size="6" value="%(code)s" %(readonly)s/></td>
+        <td><input tabindex="0" name="code" type="text" id="outputFormatCode" maxlength="6" size="6" value="%(code)s" %(readonly)s/></td>
+        </tr>
+        <tr>
+        <td class="admintdright">Visibility:&nbsp;</td>
+        <td><input tabindex="1" name="visibility" type="checkbox" id="outputFormatVisibility" %(visibility)s %(disabled)s value="1" /><small><label for="outputFormatVisibility">Show in list of available output formats (on public pages)</label></small></td>
         </tr>
         <td class="admintdright"><label for="outputFormatContentType">Content type</label>:&nbsp;</td>
-        <td><input tabindex="2" name="content_type" type="text" id="outputFormatContentType" size="25"  value="%(content_type)s" %(readonly)s/> <small>Mime content-type. Specifies how the browser should handle this output.</small></td> 
+        <td><input tabindex="2" name="content_type" type="text" id="outputFormatContentType" size="25"  value="%(content_type)s" %(readonly)s/> <small>Mime content-type. Specifies how the browser should handle this output.</small></td>
         <tr>
         <td class="admintdright"><label for="outputFormatName">Name</label>:&nbsp;</td>
         <td><input tabindex="3" name="name" type="text" id="outputFormatName" size="25" value="%(name)s" %(readonly)s/></td>
@@ -1413,8 +1425,10 @@ class Template:
                'code':code,
                'content_type':content_type,
                'readonly':readonly,
-               'weburl':weburl}
-        
+               'weburl':weburl,
+               'visibility': visible==1 and 'checked="checked"' or '',
+               'disabled':disabled}
+
         #Add translated names
         i = 3
         for name_trans in names_trans:
@@ -1438,7 +1452,7 @@ class Template:
         </tr>
         </table>
         </form>
-     
+
         ''' % {'description': description,
                'tabindexdesc': i + 1,
                'tabindexbutton': i + 2,
@@ -1482,11 +1496,11 @@ class Template:
                'check_dependencies':_("Check Dependencies"),
                'menu': _("Menu")
                }
-        
+
         if len(format_templates) == 0:
             out += '''<tr><td colspan="3"><p align="center">
             <i>This output format uses no format template.</i></p></td></tr>'''
-            
+
         for format_template in format_templates:
             name = format_template['name']
             filename = format_template['filename']
@@ -1505,23 +1519,23 @@ class Template:
                 for tag in format_element['tags']:
                     out += '''<tr><td>&nbsp;</td><td>&nbsp;</td>
                     <td>%(tag)s</td></tr>''' % {'tag':tag}
-        
+
         out += '''
         </table>
         <b>*Note</b>: Some tags linked with this format template might not be shown. Check manually.
         '''
         return out
-        
+
     def tmpl_admin_format_elements_documentation(self, ln, format_elements):
         """
         Returns the main management console for format elements. Includes list of formats elements and
         associated administration tools.
-        
+
         @param ln language
         @param formats a list of dictionaries with formats elements attributes
         @return main management console as html
         """
-        
+
         _ = gettext_set_language(ln)    # load the right message language
 
 
@@ -1537,7 +1551,7 @@ class Template:
         </tr>
         </table>
 
-        
+
         <p>Here you can read the APIs of the formats elements, the elementary bricks for formats.</p>
         ''' % {'ln':ln,
                'menu': _("Menu"),
@@ -1547,14 +1561,14 @@ class Template:
                'manage_knowledge_bases':_("Manage Knowledge Bases")
                }
 
- 
+
         #table content: formats names, description and actions
         if len(format_elements) == 0:
             out += '''
             <em>No format elements found</em>
             '''
         else:
-            
+
             #Print summary of elements (name + decription)
             out += '''<h2>Summary table of elements</h2>'''
             out += '''<table width="90%">'''
@@ -1571,16 +1585,16 @@ class Template:
                 </tr>
                 ''' % format_attributes
             out += "</table>"
-            
+
             #Print details of elements
             out += '''<h2>Details of elements</h2>'''
             for format_element in format_elements:
                 format_attributes = format_element['attrs']
                 element_name = format_attributes['name']
                 out += self.tmpl_admin_print_format_element_documentation(ln, element_name, format_attributes)
-            
+
         #table footer, buttons and bottom of the page
-        out += ''' 
+        out += '''
         <table align="center" width="95%">
         </table>'''
         return indent_text(out)
@@ -1633,7 +1647,7 @@ class Template:
                 out += '''
                 Default value is &laquo;<code>%s</code>&raquo;
                 ''' % default
-                
+
             out += '<br/>'
 
         if print_see_also:
@@ -1656,7 +1670,7 @@ class Template:
             ''' % {'ln':ln, 'bfe':name}
 
         return out
-            
+
     def tmpl_admin_format_element_show_dependencies(self, ln, name, format_templates, tags):
         """
         Shows the dependencies of the given format element
@@ -1668,7 +1682,7 @@ class Template:
         out = '''
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
         ''' % {'ln':ln, 'name':name.upper()}
-        
+
         out += ''' <table width="90%" class="admin_wvar" cellspacing="0"><tr>'''
         out += '''
         <th class="adminheaderleft">Format Templates that use %(name)s</th>
@@ -1677,7 +1691,7 @@ class Template:
         <tr>
         <td>&nbsp;<br/>''' % {"name": name}
 
-        
+
         #Print format elements (and tags)
         if len(format_templates) == 0:
             out += '''<p align="center">
@@ -1728,7 +1742,7 @@ class Template:
         <form method="post" action="format_element_test?ln=%(ln)s&amp;bfe=%(bfe)s">
         <table>
         ''' % {'bfe':bfe, 'ln':ln, 'description':description }
-        
+
         for i in range(len(param_names)):
             out += '''
             <tr>
@@ -1748,7 +1762,7 @@ class Template:
         </form>
         <fieldset style="display:inline;margin-left:auto;margin-right:auto;">
         <legend>Result:</legend>%(result)s</fieldset>
-        
+
         ''' % {'result':result}
 
         out += '''
@@ -1757,7 +1771,7 @@ class Template:
         #out += self.tmpl_admin_print_format_element_documentation(ln, bfe, attributes, False)
         out += '''</td></tr></table>'''
         return out
-        
+
     def tmpl_admin_add_format_element(self, ln):
         """
         Shows how to add a format element (mainly doc)
@@ -1772,16 +1786,16 @@ class Template:
         ''' % {'weburl':weburl}
 
         return out
-        
+
     def tmpl_admin_kbs_management(self, ln, kbs):
         """
         Returns the main management console for knowledge bases.
-        
+
         @param ln language
         @param kbs a list of dictionaries with knowledge bases attributes
         @return main management console as html
         """
-        
+
         _ = gettext_set_language(ln)    # load the right message language
 
         #top of the page and table header
@@ -1808,7 +1822,7 @@ class Template:
                     'format_elements_documentation':_("Format Elements Documentation"),
                     'manage_knowledge_bases':_("Manage Knowledge Bases"),
                     'weburl':weburl}
-                
+
         #table content: kb names, description and actions
         if len(kbs) == 0:
             out += '''<tr>
@@ -1836,7 +1850,7 @@ class Template:
                 </tr>
                 ''' % kb_attributes
                 out += row_content
-            
+
         #table footer, buttons and bottom of the page
         out += ''' </table>
         <table align="center" width="95%">
@@ -1851,13 +1865,13 @@ class Template:
         </td>
         </tr>
         </table>''' % {'ln': ln}
-        
+
         return indent_text(out)
 
     def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby):
         """
         Returns the content of a knowledge base.
-        
+
         @param ln language
         @param kb_id the id of the kb
         @param kb_name the name of the kb
@@ -1865,9 +1879,9 @@ class Template:
         @param sortby the sorting criteria ('from' or 'to')
         @return main management console as html
         """
-     
+
         _ = gettext_set_language(ln)    # load the right message language
-        
+
         #top of the page and  main table that split screen in two parts
         out = '''
         <table class="admin_wvar" cellspacing="0">
@@ -1887,7 +1901,7 @@ class Template:
                         'dependencies':_("Knowledge Base Dependencies"),
                         'menu': _("Menu")}
 
-        
+
         out += '''
         <p>Here you can add new mappings to this base and change the base attributes.</p>
         <table width="100%" align="center">
@@ -1897,7 +1911,7 @@ class Template:
         #First column of table: add mapping form
         out += '''
         <td width="300" valign="top">
-        
+
         <form name="addNewMapping"
         action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" method="post">''' % {'ln':ln,
                                                                                                       'kb_id':kb_id,
@@ -1922,12 +1936,12 @@ class Template:
         </form>
         </td>
         ''' % {'weburl':weburl}
-                
+
         #Second column: mappings table
         #header and footer
         out += '''
         <td valign="top">
-            
+
         <table class="admin_wvar">
         <thead>
         <tr>
@@ -1947,7 +1961,7 @@ class Template:
         ''' % {'ln':ln,
                'kb_id':kb_id,
                'weburl':weburl}
-        
+
         #table content: key, value and actions
         if len(mappings) == 0:
             out += '''
@@ -1981,7 +1995,7 @@ class Template:
                 <td class="admintdleft" style="%(style)s">
                     <input type="text" name="mapFrom" size="30" maxlength="255" value="%(key)s" tabindex="%(tabindex_key)s"/>
                 </td>
-                <td class="admintdleft" style="%(style)s white-space: nowrap;" width="5">=&gt;</td> 
+                <td class="admintdleft" style="%(style)s white-space: nowrap;" width="5">=&gt;</td>
                 <td class="admintdleft"style="%(style)s">
                      <input type="text" name="mapTo" size="30" value="%(value)s" tabindex="%(tabindex_value)s">
                 </td>
@@ -1992,15 +2006,15 @@ class Template:
                 ''' % {'key': mapping['key'],
                        'value':mapping['value'],
                        'ln':ln,
-                       'style':style, 
+                       'style':style,
                        'tabindex_key': tabindex_key,
                        'tabindex_value': tabindex_value,
                        'tabindex_save_button': tabindex_save_button,
                        'kb_id':kb_id,
                        'sortby':sortby}
-                
+
                 out += row_content
-            
+
         #End of tables
         out += '''</tbody></table>
         </td>
@@ -2024,7 +2038,7 @@ class Template:
     def tmpl_admin_kb_show_attributes(self, ln, kb_id, kb_name, description, sortby):
         """
         Returns the attributes of a knowledge base.
-        
+
         @param ln language
         @param kb_id the id of the kb
         @param kb_name the name of the kb
@@ -2032,9 +2046,9 @@ class Template:
         @param sortby the sorting criteria ('from' or 'to')
         @return main management console as html
         """
-     
+
         _ = gettext_set_language(ln)    # load the right message language
-        
+
         out = '''
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
@@ -2052,7 +2066,7 @@ class Template:
                         'mappings': _("Knowledge Base Mappings"),
                         'attributes':_("Knowledge Base Attributes"),
                         'dependencies':_("Knowledge Base Dependencies")}
-                
+
         out += '''
         <form name="updateAttributes"
         action="kb_update_attributes?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" method="post">
@@ -2093,16 +2107,16 @@ class Template:
     def tmpl_admin_kb_show_dependencies(self, ln, kb_id, kb_name, sortby, format_elements):
         """
         Returns the attributes of a knowledge base.
-        
+
         @param ln language
         @param kb_id the id of the kb
         @param kb_name the name of the kb
         @param sortby the sorting criteria ('from' or 'to')
         @param format_elements the elements that use this kb
         """
-     
+
         _ = gettext_set_language(ln)    # load the right message language
-        
+
         out = '''
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
@@ -2141,7 +2155,7 @@ class Template:
         </table>
         <b>*Note</b>: Some knowledge base usages might not be shown. Check manually.
         '''
-        
+
         return indent_text(out)
 
     def tmpl_dreamweaver_floater(self, ln, format_elements):
@@ -2155,7 +2169,7 @@ class Template:
         names_list = [] # list of element names such as ['Authors', 'Title']
         codes_list = [] # list of element code such as ['<BFE_AUTHORS limit="" separator="," />', '<BFE_TITLE />']
         docs_list = [] # list of HTML doc for each element
-        
+
         for format_element in format_elements:
             format_attributes = format_element['attrs']
             name = format_attributes['name']
@@ -2164,34 +2178,34 @@ class Template:
             builtin_params = [x['name'] + '="'+x['default']+'"' for x in format_attributes['builtin_params']]
             code = ("<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>").replace("'", r"\'")
             doc = self.tmpl_admin_print_format_element_documentation(ln, name, format_attributes, print_see_also=False).replace("'", r"\'")
-            
+
             names_list.append(name)
             codes_list.append(code)
             docs_list.append(doc)
-                                  
+
         out = '''
         <!DOCTYPE HTML SYSTEM "-//Macromedia//DWExtension layout-engine5.0//floater">
         <html>
         <head>
         <!-- This file is to be used as floating panel for Dreamweaver.
-        
+
              To install, drag and drop inside /Configuration/Floaters of your Dreamweaver
              application directory. You also have to enable a menu to open the floater:
              Edit file Menu.xml located inside /Configuration/Menus of your Dreamweaver
              application directory and copy-paste the following line in the menu you want
-             (typically inside tag 'menu' with attribute id = 'DWMenu_Window_Others'):     
-             <menuitem name="BibFormat Elements" enabled="true" command="dw.toggleFloater('BibFormat_floater.html')" checked="dw.getFloaterVisibility('BibFormat_floater.html')" /> 
+             (typically inside tag 'menu' with attribute id = 'DWMenu_Window_Others'):
+             <menuitem name="BibFormat Elements" enabled="true" command="dw.toggleFloater('BibFormat_floater.html')" checked="dw.getFloaterVisibility('BibFormat_floater.html')" />
          -->
         <title>BibFormat Elements</title>
         <script language="JavaScript">
         var docs = new Array(%(docs)s);
         var codes = new Array(%(codes)s);
         function selectionChanged(){
-            // get the selected node 
+            // get the selected node
             var theDOM = dw.getDocumentDOM();
             var theNode = theDOM.getSelectedNode();
 
-            // check if node is a BibFormat Element 
+            // check if node is a BibFormat Element
             if (theNode.nodeType == Node.COMMENT_NODE && theNode.data.length >= 5  && theNode.data.toLowerCase().substring(0,5) == "<bfe_"){
                 var names = document.elementsList.options;
                 for (i=0;i<names.length; i++){
@@ -2215,15 +2229,15 @@ class Template:
             // insert selection into code
             var element_code = codes[document.elementsList.selectedIndex];
 
-            // get the DOM 
+            // get the DOM
             var theDOM = dw.getDocumentDOM();
             var theDocEl = theDOM.documentElement;
             var theWholeDoc = theDocEl.outerHTML;
             // Get the offsets of the selection
             var theSel = theDOM.getSelection();
-            
+
             theDocEl.outerHTML = theWholeDoc.substring(0,theSel[0]) + element_code + theWholeDoc.substring(theSel[1]);
-            
+
         }
         </script>
         </head>
@@ -2249,7 +2263,7 @@ class Template:
         ''' % {'docs': ', '.join(["'"+x+"'" for x in docs_list]).replace('\n','\\n'),
                'codes': ', '.join(["'"+x+"'" for x in codes_list]).replace('\n','\\n'),
                'names': '\n'.join(['<option>'+x+'</option>' for x in names_list])}
-                        
+
         return out
 
     def tmpl_admin_validate_format(self, ln, errors):
@@ -2262,19 +2276,19 @@ class Template:
         """
         _ = gettext_set_language(ln)    # load the right message language
         out = ""
- 
+
         if len(errors) == 0:
             out += '''<span style="color: rgb(0, 255, 0);" >%s.</span>''' % _('No problem found with format')
         elif len(errors) == 1:
             out += '''<span style="color: rgb(255, 0, 0);" >%s:</span><br/>''' % _('An error has been found')
         else:
             out += '''<span style="color: rgb(255, 0, 0);" >%s:</span><br/>''' % _('The following errors have been found')
-            
+
         for error in errors:
             out += error + "<br/>"
 
         return indent_text(out)
-    
+
     def tmpl_admin_dialog_box(self, url, ln, title, message, options):
         """
         Prints a dialog box with given title, message and options
@@ -2285,7 +2299,7 @@ class Template:
         @param message a formatted message to display inside dialog box
         @param options a list of string options to display as button to the user
         """
-        
+
         out = ""
         out += '''
         <div style="text-align:center;">
@@ -2296,7 +2310,7 @@ class Template:
         ''' % {'title':title,
                'message':message,
                'url':url}
-        
+
         for option in options:
             out += '''<input type="submit" class="adminbutton" name="chosen_option" value="%(value)s" />&nbsp;''' % {'value':option}
 

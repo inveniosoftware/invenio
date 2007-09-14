@@ -613,6 +613,7 @@ def perform_request_output_format_show_attributes(bfo, ln=cdslang):
     name = output_format['attrs']['names']['generic']
     description = output_format['attrs']['description']
     content_type = output_format['attrs']['content_type']
+    visible = output_format['attrs']['visibility']
     # Get translated names. Limit to long names now.
     # Translation are given in order of languages in language_list_long()
     names_trans = []
@@ -628,7 +629,8 @@ def perform_request_output_format_show_attributes(bfo, ln=cdslang):
                                                                         content_type,
                                                                         bfo,
                                                                         names_trans,
-                                                                        editable)
+                                                                        editable,
+                                                                        visible)
 
 
 def perform_request_knowledge_bases_management(ln=cdslang):
@@ -874,7 +876,8 @@ def update_output_format_rules(code, rules=[], default=""):
 
     bibformat_engine.clear_caches()
 
-def update_output_format_attributes(code, name="", description="", new_code="", content_type="", names_trans=[]):
+def update_output_format_attributes(code, name="", description="", new_code="",
+                                    content_type="", names_trans=[], visibility=1):
     """
     Saves name and description inside output format given by filename.
 
@@ -886,11 +889,13 @@ def update_output_format_attributes(code, name="", description="", new_code="", 
     @param code the code of the output format to update
     @param names_trans the translations in the same order as the languages from get_languages()
     @param content_type the new content_type of the output format
+    @param visibility the visibility of the output format in the output formats list (public pages)
     @return the filename of the modified format
     """
 
     bibformat_dblayer.set_output_format_description(code, description)
     bibformat_dblayer.set_output_format_content_type(code, content_type)
+    bibformat_dblayer.set_output_format_visibility(code, visibility)
     bibformat_dblayer.set_output_format_name(code, name, lang="generic")
     i = 0
     for lang in language_list_long():
