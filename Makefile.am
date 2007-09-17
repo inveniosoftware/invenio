@@ -54,6 +54,9 @@ regression-test:
 kwalitee-check:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)
 
+kwalitee-check-errors-only:
+	find $(top_srcdir) -name '*.py' -exec pylint -e {} \; 2> /dev/null
+
 etags:
 	\rm -f $(top_srcdir)/TAGS
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
