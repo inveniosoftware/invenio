@@ -34,9 +34,6 @@ import re
 import sys
 import time
 
-# pylint: disable-msg=C0301
-# pylint: disable-msg=C0103
-
 __revision__ = "$Id$"
 
 verbose = 0
@@ -47,15 +44,18 @@ def get_list_of_python_code_files(modulesdir, modulename):
     """
     out = []
     # firstly, find out *.py files:
-    (dummy, pipe, dummy)= os.popen3("find %s/%s/ -name '*.py'" % (modulesdir, modulename))
+    (dummy, pipe, dummy)= os.popen3("find %s/%s/ -name '*.py'" % \
+                                    (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
     # secondly, find out *.py.wml files:
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*.py.wml'" % (modulesdir, modulename))
+    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*.py.wml'" % \
+                                     (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
     # thirdly, find out bin/*.in files:
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/bin/ -name '*.in'" % (modulesdir, modulename))
+    (dummy, pipe, dummy) = os.popen3("find %s/%s/bin/ -name '*.in'" % \
+                                     (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
     # last, remove Makefile, test files, z_ files:
@@ -93,7 +93,8 @@ def wash_list_of_python_files_for_pylinting(filenames):
 def get_list_of_python_unit_test_files(modulesdir, modulename):
     """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_tests.py'" % (modulesdir, modulename))
+    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_tests.py'" % \
+                                     (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
     # pylint: disable-msg=W0141
@@ -103,7 +104,8 @@ def get_list_of_python_unit_test_files(modulesdir, modulename):
 def get_list_of_python_regression_test_files(modulesdir, modulename):
     """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_regression_tests.py'" % (modulesdir, modulename))
+    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_regression_tests.py'" % \
+                                     (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
     return out
@@ -118,9 +120,11 @@ def get_nb_test_cases_in_file(filename):
     return len(pipe.readlines())
 
 def get_pylint_results(filename):
-    """Run pylint and return the tuple of (nb_missing_docstrings,
-       score) for FILENAME.  If score cannot be detected, print an
-       error and return (-999999999, -999999999).
+    """
+    Run pylint and return the tuple of (nb_missing_docstrings, score,
+    nb_msg_convention, nb_msg_refactor, nb_msg_warning, nb_msg_error,
+    nb_msg_fatal) for FILENAME.  If score cannot be detected, print an
+    error and return (-999999999, -999999999, 0, 0, 0, 0, 0).
     """
     (dummy, pipe, dummy) = os.popen3("pylint %s" % filename)
     pylint_output = pipe.read()
@@ -130,16 +134,30 @@ def get_pylint_results(filename):
 
     # detect pylint score:
     pylint_score = -999999999
-    pylint_score_matched = re.search(r'Your code has been rated at ([0-9\.\-]+)\/10', pylint_output)
+    pylint_score_matched = re.search(r'Your code has been rated at ([0-9\.\-]+)\/10',
+                                     pylint_output)
     if pylint_score_matched:
         pylint_score = pylint_score_matched.group(1)
     else:
         print "ERROR: cannot detect pylint score for %s" % filename
 
+    # detect pylint messages
+    nb_msg_convention = pylint_output.count("\nC:")
+    nb_msg_refactor = pylint_output.count("\nR:")
+    nb_msg_warning = pylint_output.count("\nW:")
+    nb_msg_error = pylint_output.count("\nE:")
+    nb_msg_fatal = pylint_output.count("\nF:")
+
     # return results:
     if verbose >= 9:
-        print "get_pylint_results(%s) = (%d, %s)" % (filename, nb_missing_docstrings, pylint_score)
-    return (nb_missing_docstrings, float(pylint_score))
+        print "get_pylint_results(%s) = (%d, %s, %s, %s, %s, %s, %s)" % \
+              (filename, nb_missing_docstrings, pylint_score,
+               nb_msg_convention, nb_msg_refactor, nb_msg_warning,
+               nb_msg_error, nb_msg_fatal)
+
+    return (nb_missing_docstrings, float(pylint_score),
+            nb_msg_convention, nb_msg_refactor, nb_msg_warning,
+            nb_msg_error, nb_msg_fatal)
 
 def get_nb_pychecker_warnings(filename):
     """Run pychecker for FILENAME and return the number of warnings.
@@ -154,7 +172,8 @@ def get_nb_pychecker_warnings(filename):
         if line.find(filename_to_watch_for + ":") > -1:
             nb_warnings_found += 1
     if verbose >= 9:
-        print "get_nb_pychecker_warnings(%s) = %s" % (filename, nb_warnings_found)
+        print "get_nb_pychecker_warnings(%s) = %s" % (filename,
+                                                      nb_warnings_found)
     return nb_warnings_found
 
 def calculate_module_kwalitee(modulesdir, modulename):
@@ -165,7 +184,8 @@ def calculate_module_kwalitee(modulesdir, modulename):
     """
     files_code = get_list_of_python_code_files(modulesdir, modulename)
     files_unit = get_list_of_python_unit_test_files(modulesdir, modulename)
-    files_regression = get_list_of_python_regression_test_files(modulesdir, modulename)
+    files_regression = get_list_of_python_regression_test_files(modulesdir,
+                                                                modulename)
     # 1 - calculate LOC:
     nb_loc = 0
     for filename in files_code:
@@ -181,12 +201,25 @@ def calculate_module_kwalitee(modulesdir, modulename):
     # 4 - calculate pylint results and score:
     total_nb_missing_docstrings = 0
     total_pylint_score = 0.0
+    total_nb_msg_convention = 0
+    total_nb_msg_refactor = 0
+    total_nb_msg_warning = 0
+    total_nb_msg_error = 0
+    total_nb_msg_fatal = 0
     files_for_pylinting = files_code + files_unit + files_regression
     files_for_pylinting = wash_list_of_python_files_for_pylinting(files_for_pylinting)
     for filename in files_for_pylinting:
-        filename_nb_missing_docstrings, filename_pylint_score = get_pylint_results(filename)
+        (filename_nb_missing_docstrings, filename_pylint_score,
+         filename_nb_msg_convention, filename_nb_msg_refactor,
+         filename_nb_msg_warning, filename_nb_msg_error,
+         filename_nb_msg_fatal) = get_pylint_results(filename)
         total_nb_missing_docstrings += filename_nb_missing_docstrings
         total_pylint_score += filename_pylint_score
+        total_nb_msg_convention += filename_nb_msg_convention
+        total_nb_msg_refactor += filename_nb_msg_refactor
+        total_nb_msg_warning += filename_nb_msg_warning
+        total_nb_msg_error += filename_nb_msg_error
+        total_nb_msg_fatal += filename_nb_msg_fatal
     # pylint: disable-msg=W0704
     try:
         avg_pylint_score = total_pylint_score / len(files_for_pylinting)
@@ -204,6 +237,11 @@ def calculate_module_kwalitee(modulesdir, modulename):
             'nb_missing_docstrings': total_nb_missing_docstrings,
             'nb_pychecker_warnings': nb_pychecker_warnings,
             'avg_pylint_score': avg_pylint_score,
+            'nb_msg_convention': total_nb_msg_convention,
+            'nb_msg_refactor': total_nb_msg_refactor,
+            'nb_msg_warning': total_nb_msg_warning,
+            'nb_msg_error': total_nb_msg_error,
+            'nb_msg_fatal': total_nb_msg_fatal,
             }
 
 def get_invenio_modulenames(dirname="."):
@@ -238,6 +276,11 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                          'nb_missing_docstrings': 0,
                          'nb_pychecker_warnings': 0,
                          'avg_pylint_score': 0,
+                         'nb_msg_convention': 0,
+                         'nb_msg_refactor': 0,
+                         'nb_msg_warning': 0,
+                         'nb_msg_error': 0,
+                         'nb_msg_fatal': 0,
                          }
     # detect CDS Invenio modules:
     modulenames = get_invenio_modulenames(modulesdir)
@@ -250,7 +293,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
     print "CDS Invenio Python Code Kwalitee Check %41s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print "="*80
     print ""
-    print "%(modulename)13s %(nb_loc)8s %(nb_unit)6s %(nb_regression)6s %(nb_tests_per_1k_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)12s %(avg_pylint_score)11s" % \
+    print "%(modulename)13s %(nb_loc)8s %(nb_unit)6s %(nb_regression)6s %(nb_tests_per_1k_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)12s %(avg_pylint_score)11s %(pylint_details)s" % \
           { 'modulename': 'Module',
             'nb_loc': '#LOC',
             'nb_unit': '#UnitT',
@@ -258,8 +301,9 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
             'nb_tests_per_1k_loc': '#T/1kLOC',
             'nb_missing_docstrings': '#MissDoc',
             'nb_pychecker_warnings': '#PyChk/1kSRC',
-            'avg_pylint_score': 'PyLintScore'}
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11
+            'avg_pylint_score': 'PyLintScore',
+            'pylint_details': 'PyLintDetails'}
+    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
     for modulename in modulenames:
         # calculate kwalitee for this modulename:
         kwalitee[modulename] = calculate_module_kwalitee(modulesdir, modulename)
@@ -270,8 +314,13 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
         kwalitee['TOTAL']['nb_pychecker_warnings'] += kwalitee[modulename]['nb_pychecker_warnings']
         kwalitee['TOTAL']['nb_missing_docstrings'] += kwalitee[modulename]['nb_missing_docstrings']
         kwalitee['TOTAL']['avg_pylint_score'] += kwalitee[modulename]['avg_pylint_score']
+        kwalitee['TOTAL']['nb_msg_convention'] += kwalitee[modulename]['nb_msg_convention']
+        kwalitee['TOTAL']['nb_msg_refactor'] += kwalitee[modulename]['nb_msg_refactor']
+        kwalitee['TOTAL']['nb_msg_warning'] += kwalitee[modulename]['nb_msg_warning']
+        kwalitee['TOTAL']['nb_msg_error'] += kwalitee[modulename]['nb_msg_error']
+        kwalitee['TOTAL']['nb_msg_fatal'] += kwalitee[modulename]['nb_msg_fatal']
         # print results for this modulename:
-        print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
+        print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
               { 'modulename': kwalitee[modulename]['modulename'],
                 'nb_loc': kwalitee[modulename]['nb_loc'],
                 'nb_unit': kwalitee[modulename]['nb_unit_tests'],
@@ -284,10 +333,16 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                      (kwalitee[modulename]['nb_pychecker_warnings'] + 0.0 ) / kwalitee[modulename]['nb_loc'] * 1000.0 or \
                      0,
                 'avg_pylint_score': kwalitee[modulename]['avg_pylint_score'],
+                'pylint_details': "%3dF %3dE %3dW %3dR %3dC" % (kwalitee[modulename]['nb_msg_fatal'],
+                                                                kwalitee[modulename]['nb_msg_error'],
+                                                                kwalitee[modulename]['nb_msg_warning'],
+                                                                kwalitee[modulename]['nb_msg_refactor'],
+                                                                kwalitee[modulename]['nb_msg_convention'],)
+
               }
     # print totals:
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11
-    print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10" % \
+    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
+    print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
               { 'modulename': kwalitee['TOTAL']['modulename'],
                 'nb_loc': kwalitee['TOTAL']['nb_loc'],
                 'nb_unit': kwalitee['TOTAL']['nb_unit_tests'],
@@ -299,7 +354,12 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                 'nb_pychecker_warnings': kwalitee['TOTAL']['nb_loc'] != 0 and \
                      (kwalitee['TOTAL']['nb_pychecker_warnings'] + 0.0 ) / kwalitee['TOTAL']['nb_loc'] * 1000.0 or \
                      0,
-                'avg_pylint_score': kwalitee['TOTAL']['avg_pylint_score'] / (len(kwalitee.keys()) - 1)
+                'avg_pylint_score': kwalitee['TOTAL']['avg_pylint_score'] / (len(kwalitee.keys()) - 1),
+                'pylint_details': "%3dF %3dE %3dW %3dR %3dC" % (kwalitee['TOTAL']['nb_msg_fatal'],
+                                                                kwalitee['TOTAL']['nb_msg_error'],
+                                                                kwalitee['TOTAL']['nb_msg_warning'],
+                                                                kwalitee['TOTAL']['nb_msg_refactor'],
+                                                                kwalitee['TOTAL']['nb_msg_convention'],)
               }
     # print legend:
     print """
@@ -311,6 +371,7 @@ Legend:
   #MissDoc = number of missing docstrings [desirable: 0]
   #PyChk/1kSRC = number of PyChecker warnings per 1k sources [desirable: 0]
   PyLintScore = average PyLint score [desirable: > 9.00]
+  PyLintDetails = number of PyLint messages (Fatal, Error, Warning, Refactor, Convention)
   """
     return
 
@@ -322,16 +383,22 @@ def generate_kwalitee_stats_for_some_files(filenames):
                          'nb_missing_docstrings': 0,
                          'nb_pychecker_warnings': 0,
                          'avg_pylint_score': 0,
+                         'nb_msg_convention': 0,
+                         'nb_msg_refactor': 0,
+                         'nb_msg_warning': 0,
+                         'nb_msg_error': 0,
+                         'nb_msg_fatal': 0,
                          }
     # print header:
-    print "%(filename)50s %(nb_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)6s %(avg_pylint_score)11s" % {
+    print "%(filename)50s %(nb_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)6s %(avg_pylint_score)11s %(pylint_details)s" % {
         'filename': 'File',
         'nb_loc': '#LOC',
         'nb_missing_docstrings': '#MissDoc',
         'nb_pychecker_warnings': '#PyChk',
         'avg_pylint_score': 'PyLintScore',
+        'pylint_details': 'PyLintDetails',
         }
-    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11
+    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25
     files_for_pylinting = wash_list_of_python_files_for_pylinting(filenames)
     for filename in files_for_pylinting:
         # calculate the kwalitee of the files:
@@ -339,31 +406,54 @@ def generate_kwalitee_stats_for_some_files(filenames):
                               'nb_missing_docstrings': 0,
                               'nb_pychecker_warnings': 0,
                               'avg_pylint_score': 0,
+                              'nb_msg_convention': 0,
+                              'nb_msg_refactor': 0,
+                              'nb_msg_warning': 0,
+                              'nb_msg_error': 0,
+                              'nb_msg_fatal': 0,
                               }
         kwalitee[filename]['nb_loc'] = get_nb_lines_in_file(filename)
         kwalitee[filename]['nb_pychecker_warnings'] = get_nb_pychecker_warnings(filename)
-        kwalitee[filename]['nb_missing_docstrings'], kwalitee[filename]['avg_pylint_score'] = get_pylint_results(filename)
+        (kwalitee[filename]['nb_missing_docstrings'], kwalitee[filename]['avg_pylint_score'],
+         kwalitee[filename]['nb_msg_convention'], kwalitee[filename]['nb_msg_refactor'],
+         kwalitee[filename]['nb_msg_warning'], kwalitee[filename]['nb_msg_error'],
+         kwalitee[filename]['nb_msg_fatal']) = get_pylint_results(filename)
         # add it to the total results:
         kwalitee['TOTAL']['nb_loc'] += kwalitee[filename]['nb_loc']
         kwalitee['TOTAL']['nb_pychecker_warnings'] += kwalitee[filename]['nb_pychecker_warnings']
         kwalitee['TOTAL']['nb_missing_docstrings'] += kwalitee[filename]['nb_missing_docstrings']
         kwalitee['TOTAL']['avg_pylint_score'] += kwalitee[filename]['avg_pylint_score']
+        kwalitee['TOTAL']['nb_msg_convention'] += kwalitee[filename]['nb_msg_convention']
+        kwalitee['TOTAL']['nb_msg_refactor'] += kwalitee[filename]['nb_msg_refactor']
+        kwalitee['TOTAL']['nb_msg_warning'] += kwalitee[filename]['nb_msg_warning']
+        kwalitee['TOTAL']['nb_msg_error'] += kwalitee[filename]['nb_msg_error']
+        kwalitee['TOTAL']['nb_msg_fatal'] += kwalitee[filename]['nb_msg_fatal']
         # print results for this filename:
-        print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10" % {
+        print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10 %(pylint_details)s" % {
             'filename': filename,
             'nb_loc': kwalitee[filename]['nb_loc'],
             'nb_missing_docstrings': kwalitee[filename]['nb_missing_docstrings'],
             'nb_pychecker_warnings': kwalitee[filename]['nb_pychecker_warnings'],
             'avg_pylint_score': kwalitee[filename]['avg_pylint_score'],
+            'pylint_details': "%3dF %3dE %3dW %3dR %3dC" % (kwalitee[filename]['nb_msg_fatal'],
+                                                            kwalitee[filename]['nb_msg_error'],
+                                                            kwalitee[filename]['nb_msg_warning'],
+                                                            kwalitee[filename]['nb_msg_refactor'],
+                                                            kwalitee[filename]['nb_msg_convention'],)
             }
     # print totals:
-    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11
-    print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10" % {
+    print " ", "-"*48, "-"*8, "-"*8, "-"*6, "-"*11, "-"*25
+    print "%(filename)50s %(nb_loc)8d %(nb_missing_docstrings)8d %(nb_pychecker_warnings)6d %(avg_pylint_score)8.2f/10 %(pylint_details)s" % {
         'filename': 'TOTAL',
         'nb_loc': kwalitee['TOTAL']['nb_loc'],
         'nb_missing_docstrings': kwalitee['TOTAL']['nb_missing_docstrings'],
         'nb_pychecker_warnings': kwalitee['TOTAL']['nb_pychecker_warnings'],
         'avg_pylint_score': kwalitee['TOTAL']['avg_pylint_score'] / (len(kwalitee.keys()) - 1),
+        'pylint_details': "%3dF %3dE %3dW %3dR %3dC" % (kwalitee['TOTAL']['nb_msg_fatal'],
+                                                        kwalitee['TOTAL']['nb_msg_error'],
+                                                        kwalitee['TOTAL']['nb_msg_warning'],
+                                                        kwalitee['TOTAL']['nb_msg_refactor'],
+                                                        kwalitee['TOTAL']['nb_msg_convention'],)
         }
     # print legend:
     print """
@@ -372,6 +462,7 @@ Legend:
   #MissDoc = number of missing docstrings [desirable: 0]
   #PyChk = number of PyChecker warnings [desirable: 0]
   PyLintScore = PyLint score [desirable: > 9.00]
+  PyLintDetails = number of PyLint messages (Fatal, Error, Warning, Refactor, Convention)
   """
     return
 
@@ -411,7 +502,7 @@ def main():
     return
 
 def test():
-    """Test some stuff."""
+    """Test stuff."""
     print get_pylint_results("/opt/cds-invenio/lib/python/invenio/bibrecord.py")
 
 if __name__ == "__main__":
