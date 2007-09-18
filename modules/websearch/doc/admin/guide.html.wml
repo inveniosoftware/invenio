@@ -40,7 +40,7 @@
      manual recipes.  We are in the process of developing both the
      guide as well as the web admin interface.  If you are interested
      in seeing some specific things implemented with high priority,
-     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!     
+     please contact us at <SUPPORTEMAIL>.  Thanks for your interest!
    </td>
    </tr>
    </tbody>
@@ -64,7 +64,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7. <a href="#3.7">Modify search options</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8. <a href="#3.8">Modify sort options</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.9. <a href="#3.9">Modify rank options</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10.<a href="#3.10">Modify output formats</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10. <a href="#3.10">Modify output formats</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.11. <a href="#3.11">Configuration of related external collections</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.12. <a href="#3.12">Detailed record page options</a><br>
 <strong>4. <a href="#4">Webcoll Status</a></strong><br>
 <strong>5. <a href="#5">Collections Status</a></strong><br>
 <strong>6. <a href="#6">Edit Search Engine Parameters</a></strong><br>
@@ -115,12 +117,12 @@ after adding a collection:
         collection.  This is done by defining a search engine query
         that would return all records belonging to this collection.
         See hints on <a href="#3.1">modify collection query</a> below.
-    
+
     <li>In order for the collection to appear in the collection
         navigation tree, you will have to attach it to some existing
         collection in the tree.  See hints on <a href="#2.2">add
         collection to tree</a> below.
-        
+
     </ul>
 
 <p>After you edit these two things, the collection is fully usable for
