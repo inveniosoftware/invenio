@@ -23,9 +23,6 @@
 
 __revision__ = "$Id$"
 
-# non CDS Invenio imports
-import string
-
 # CDS Invenio imports
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
@@ -79,7 +76,7 @@ class Template:
                     <tr>
                         <td>"""
             report_link = '%s/record/%s/comments/report?ln=%s&amp;comid=%s' % (weburl, recID, ln, comment[c_id])
-            reply_link='%s/record/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
+            reply_link = '%s/record/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
             comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link,
                                                                   date_creation=comment[c_date_creation],
                                                                   body=comment[c_body],
@@ -249,7 +246,7 @@ class Template:
             avg_score = str(avg_score)
             nb_comments_total = str(nb_comments_total)
             score = '<b>'
-            score += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+            score += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
@@ -447,7 +444,7 @@ class Template:
             discussion = 'reviews'
             comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (weburl, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
-            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score ,note, warnings, show_title_p=True)
+            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score, note, warnings, show_title_p=True)
         else:
             c_nickname = 0
             c_user_id = 1
@@ -567,7 +564,7 @@ class Template:
             else:
                 avg_score_img = "stars-0-0.png"
             ranking_average = '<br /><b>'
-            ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+            ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
                 {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + str(avg_score) + '" />',
                  'x_nb_reviews': str(total_nb_reviews)}
             ranking_average += '<br />'
@@ -586,6 +583,13 @@ class Template:
         else:
             total_label = _("There is a total of %s comments")
         total_label %= total_nb_comments
+
+        review_or_comment_first = ''
+        if reviews == 0 and total_nb_comments == 0:
+            review_or_comment_first = _("Start a discussion about any aspect of this document.")
+        elif reviews == 1 and total_nb_reviews == 0:
+            review_or_comment_first = _("Be the first to review this document.")
+
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
 <div id="commentHB">
@@ -623,9 +627,7 @@ class Template:
                                        CFG_WEBCOMMENT_ALLOW_COMMENTS and \
                                        '%s | %s <br />' % \
                                        (comments_link, reviews_link) or '',
-            'review_or_comment_first'   : total_nb_comments > 0 and ' ' or \
-                                      (reviews==1 and _("Be the first to review this document.") or \
-                                      _("Start a discussion about any aspect of this document."))
+            'review_or_comment_first'   : review_or_comment_first
         }
 
         # form is not currently used. reserved for an eventual purpose
@@ -705,7 +707,7 @@ class Template:
         """
 
         output  = """
-<form action="%s" method="%s">""" % (action, string.lower(method).strip() in ['get','post'] and method or 'get')
+<form action="%s" method="%s">""" % (action, method.lower().strip() in ['get','post'] and method or 'get')
         output += """
   <table style="width:90%">
     <tr>
@@ -793,7 +795,7 @@ class Template:
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % sweburl
-            note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") %\
+            note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") % \
                 {'x_url_open': link,
                  'x_url_close': '</a>',
                  'x_nickname': ' <br /><i>' + display + '</i>'}
@@ -848,7 +850,7 @@ class Template:
         else:
             (uid, nickname, display) = get_user_info(uid)
             link = '<a href="%s/youraccount/edit">' % sweburl
-            note_label = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") %\
+            note_label = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") % \
                 {'x_url_open': link,
                  'x_url_close': '</a>',
                  'x_nickname': ' <br /><i>' + display + '</i>'}
@@ -1015,6 +1017,7 @@ class Template:
 
     def tmpl_admin_index(self, ln):
         """
+        Index page
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -1022,10 +1025,10 @@ class Template:
         out = '<ol>'
         if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
             if CFG_WEBCOMMENT_ALLOW_COMMENTS:
-                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' %\
+                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' % \
                     {'weburl': weburl, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
-                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' %\
+                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' % \
                     {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
             out += """
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></small></li>
@@ -1374,7 +1377,7 @@ class Template:
         url = '%s/record/%s/reviews/add?ln=%s&amp;action=%s' % (weburl, recID, ln, action)
 
         if avg_score > 0:
-            score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") %\
+            score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
                     {'x_nb_score':  '<b>%.1f</b>' % avg_score,
                      'x_nb_reviews': nb_comments_total}
         else:
