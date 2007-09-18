@@ -1727,7 +1727,8 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
 
     colID = int(colID)
 
-    subtitle = """<a name="11">11. Configuration of related external collections</a>"""
+    subtitle = """<a name="11">11. Configuration of related external collections</a>
+    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.11">?</a>]</small>""" % weburl
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
     table_header = ['External collection', 'Mode', 'Apply also to daughter collections?']
@@ -1777,7 +1778,8 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
 
     colID = int(colID)
 
-    subtitle = """<a name="12">12. Configuration of detailed record page</a>"""
+    subtitle = """<a name="12">12. Configuration of detailed record page</a>
+    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.12">?</a>]</small>""" % weburl
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
     <input type="hidden" name="colID" value="%(colID)d">
@@ -1785,7 +1787,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     <dt><b>Show tabs:</b></dt>
     <dd>
     ''' % {'colID': colID}
-    
+
     for (tab_id, tab_info) in get_detailed_page_tabs(colID).iteritems():
         if tab_id == 'comments' and \
            not CFG_WEBCOMMENT_ALLOW_REVIEWS and \
@@ -1803,7 +1805,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     output += '''<input type="checkbox" id="recurse" name="recurse" value="1" />
         <label for="recurse">&nbsp;Also apply to subcollections</label>'''
     output += '</form>'
-    
+
     return addadminbox(subtitle, [output])
 
 def perform_update_detailed_record_options(colID, ln, tabs, recurse):
@@ -1812,7 +1814,7 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
     changes = []
     output = '<b><span class="info">Operation successfully completed.</span></b>'
 
-    
+
     if '' in tabs:
         tabs.remove('')
         tabs.append('metadata')
@@ -1827,14 +1829,14 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
         if recurse:
             for descendant_id in get_collection_descendants(colID):
                 update_settings(descendant_id, tabs, recurse)
-        
+
     update_settings(colID, tabs, recurse)
 ##     for colID in colIDs:
 ##         run_sql("DELETE FROM collectiondetailedpagetabs WHERE id_collection='%s'" % colID)
 ##         for enabled_tab in tabs:
 ##             run_sql("REPLACE INTO collectiondetailedpagetabs" + \
 ##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
-        
+
     #if callback:
     return perform_editcollection(colID, ln, "perform_modifytranslations",
                                   '<br /><br />' + output + '<br /><br />' + \
@@ -1843,7 +1845,7 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
     #    return addadminbox(subtitle, body)
     #return output + '<br /><br />' + perform_showdetailedrecordoptions(colID, ln)
 
-    
+
 def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     """form to add an existing output format to a collection.
     colID - the collection the format should be added to
@@ -2302,9 +2304,9 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <td>8.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsortoptions#8">Modify sort options</a></small></td>
     <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
     </tr><tr>
-    <td>10.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
-    <td>11.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
-    <td>12.<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
+    <td>10.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
+    <td>11.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
+    <td>12.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
     </tr>
     </table>
     """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
@@ -3233,10 +3235,10 @@ def get_detailed_page_tabs(colID=None, recID=None):
                                          - visible: *boolean* if False, tab should not be shown
                                          - enabled: *boolean* if True, tab should be disabled
                                          - order: *int* position of the tab in the list of tabs
-    
+
     returns dict
     """
-    
+
     tabs = {'metadata'  : {'label': 'Information',      'visible': False, 'enabled': True, 'order': 1},
             'references': {'label': 'References',       'visible': False, 'enabled': True, 'order': 2},
             'comments'  : {'label': 'Discussion',       'visible': False, 'enabled': True, 'order': 3},
@@ -3246,7 +3248,7 @@ def get_detailed_page_tabs(colID=None, recID=None):
 
     res = run_sql("SELECT tabs FROM collectiondetailedpagetabs " + \
                   "WHERE id_collection='%s'" % colID)
-    
+
     if len(res) > 0:
         tabs_state = res[0][0].split(';')
         for tab_state in tabs_state:
@@ -3264,7 +3266,7 @@ def get_detailed_page_tabs(colID=None, recID=None):
            not CFG_WEBCOMMENT_ALLOW_REVIEWS:
         tabs['comments']['visible'] = False
         tabs['comments']['enabled'] = False
-    
+
     if recID is not None:
         # Disable references if no references found
         bfo = BibFormatObject(recID)
@@ -3277,6 +3279,6 @@ def get_detailed_page_tabs(colID=None, recID=None):
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
-            
+
     return tabs
-    
+
