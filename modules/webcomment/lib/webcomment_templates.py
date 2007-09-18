@@ -1383,23 +1383,23 @@ class Template:
         else:
             score = '(' +_("Not yet reviewed") + ')'
 
-        if score == 5:
+        if avg_score == 5:
             s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', 'full'
-        elif score >= 4.5:
+        elif avg_score >= 4.5:
             s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', 'half'
-        elif score >= 4:
+        elif avg_score >= 4:
             s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'full', ''
-        elif score >= 3.5:
+        elif avg_score >= 3.5:
             s1, s2, s3, s4, s5 = 'full', 'full', 'full', 'half', ''
-        elif score >= 3:
+        elif avg_score >= 3:
             s1, s2, s3, s4, s5 = 'full', 'full', 'full', '', ''
-        elif score >= 2.5:
+        elif avg_score >= 2.5:
             s1, s2, s3, s4, s5 = 'full', 'full', 'half', '', ''
-        elif score >= 2:
+        elif avg_score >= 2:
             s1, s2, s3, s4, s5 = 'full', 'full', '', '', ''
-        elif score >= 1.5:
+        elif avg_score >= 1.5:
             s1, s2, s3, s4, s5 = 'full', 'half', '', '', ''
-        elif score == 1:
+        elif avg_score == 1:
             s1, s2, s3, s4, s5 = 'full', '', '', '', ''
 
         out = '''
