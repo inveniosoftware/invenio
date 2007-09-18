@@ -1027,14 +1027,20 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
 
 
 def get_mini_reviews(recid, ln=cdslang):
+    """
+    Returns the web controls to add reviews to a record from the
+    detailed record pages mini-panel.
 
+    @param recid the id of the displayed record
+    @param ln the user's language
+    """
     if CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
         action = 'SUBMIT'
     else:
         action = 'DISPLAY'
 
     reviews = query_retrieve_comments_or_remarks(recid, ranking=1)
-    
+
     return webcomment_templates.tmpl_mini_review(recid, ln, action=action,
                                                  avg_score=calculate_avg_score(reviews),
                                                  nb_comments_total=len(reviews))
