@@ -35,7 +35,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
-from invenio.search_engine import perform_request_search, \
+from invenio.search_engine import search_pattern, \
                                   create_basic_search_units
 
 def index(req, ln=config.cdslang):
@@ -745,7 +745,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
         ln_for_preview = wash_language(ln_for_preview)
         pattern_for_preview = wash_url_argument(pattern_for_preview, 'str')
         if pattern_for_preview == "":
-            recIDs = perform_request_search()
+            recIDs = search_pattern(p='-collection:DELETED').tolist()
             if len(recIDs) == 0:
                 return page(title="No Document Found",
                             body="",
@@ -759,7 +759,8 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                 recID = recIDs[0]
                 pattern_for_preview = "recid:%s" % recID
         else:
-            recIDs = perform_request_search(p=pattern_for_preview)
+            recIDs = search_pattern(p=pattern_for_preview + \
+                                    ' -collection:DELETED').tolist()
             if len(recIDs) == 0:
                 return page(title="No Record Found for %s" % pattern_for_preview,
                             body="",
