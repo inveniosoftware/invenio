@@ -73,7 +73,7 @@ def index(req, ln=config.cdslang):
     else:
         is_admin = False
 
-    navtrail = '''<a class="navtrail: href="%s/admin/index.%s.html">%s</a>"''' % \
+    navtrail = '''<a class="navtrail" href="%s/admin/index.%s.html">%s</a>''' % \
                (config.weburl,
                 ln,
                 _("Admin Area"))
@@ -168,7 +168,7 @@ def output_format_show(req, bfo, ln=config.cdslang,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Output Formats")))
     code = wash_url_argument(bfo, 'str')
 
     try:
@@ -239,7 +239,7 @@ def output_format_show_attributes(req, bfo, ln=config.cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln , _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln , _("Manage Output Formats")))
 
     try:
         uid = getUid(req)
@@ -284,7 +284,7 @@ def output_format_show_dependencies(req, bfo, ln=config.cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s </a>''' % (config.weburl, ln, _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s </a>''' % (config.weburl, ln, _("Manage Output Formats")))
 
     try:
         uid = getUid(req)
@@ -376,7 +376,7 @@ def output_format_delete(req, bfo, ln=config.cdslang, chosen_option=""):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln, _("Manage Output Formats"), _("Delete Output Format")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln, _("Manage Output Formats"), _("Delete Output Format")))
 
     try:
         uid = getUid(req)
@@ -476,7 +476,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
     _ = gettext_set_language(ln)
 
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
-    &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln ,  _("Manage Format Templates")))
+    &gt; <a class"=navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln ,  _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -547,7 +547,7 @@ def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -592,7 +592,7 @@ def format_template_show_dependencies(req, bft, ln=config.cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
@@ -658,7 +658,7 @@ def format_template_delete(req, bft, ln=config.cdslang, chosen_option=""):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
-    &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln ,_("Manage Format Templates"),_("Delete Format Template")))
+    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln ,_("Manage Format Templates"),_("Delete Format Template")))
 
     try:
         uid = getUid(req)
@@ -862,7 +862,7 @@ def format_element_show_dependencies(req, bfe, ln=config.cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (config.weburl, ln , _("Format Elements Documentation")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (config.weburl, ln , _("Format Elements Documentation")))
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
@@ -895,7 +895,7 @@ def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' %( config.weburl, ln , _("Format Elements Documentation")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' %( config.weburl, ln , _("Format Elements Documentation")))
     try:
         uid = getUid(req)
     except MySQLdb.Error, e:
@@ -962,7 +962,7 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
 
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1009,7 +1009,7 @@ def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1054,7 +1054,7 @@ def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1101,7 +1101,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1152,7 +1152,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1205,7 +1205,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1260,7 +1260,7 @@ def kb_add(req, ln=config.cdslang, sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
     try:
         uid = getUid(req)
@@ -1272,7 +1272,7 @@ def kb_add(req, ln=config.cdslang, sortby="to"):
         kb_id = bibformatadminlib.add_kb()
         redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
-        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
+        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Knowledge Bases")))
 
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -1287,7 +1287,7 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln, _("Manage Knowledge Bases"), _("Delete Knowledge Base")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a> &gt; %s''' % (config.weburl, ln, _("Manage Knowledge Bases"), _("Delete Knowledge Base")))
 
     try:
         uid = getUid(req)
@@ -1323,7 +1323,7 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
 
         redirect_to_url(req, "kb_manage?ln=%(ln)s" % {'ln':ln})
     else:
-        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/kb_manage">%s</a>'''%(config.weburl, _("Manage Knowledge Bases")))
+        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage">%s</a>'''%(config.weburl, _("Manage Knowledge Bases")))
 
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
@@ -1355,7 +1355,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
     if not auth_code:
         if bfo is not None: #Output format validation
             bfo = wash_url_argument(bfo, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(config.weburl, ln, _("Manage Output Formats")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>'''%(config.weburl, ln, _("Manage Output Formats")))
 
             if not bibformatadminlib.can_read_output_format(bfo): #No read permission
                 return page(title=_("Restricted Output Format"),
@@ -1376,7 +1376,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
 
         elif bft is not None: #Format template validation
             bft = wash_url_argument(bft, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln, _("Manage Format Templates")))
 
             if not bibformatadminlib.can_read_format_template(bft): #No read permission
                 return page(title=_("Restricted Format Template"),
@@ -1394,7 +1394,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
 
         elif bfe is not None: #Format element validation
             bfe = wash_url_argument(bfe, 'str')
-            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (config.weburl, ln , bfe.upper() , _("Format Elements Documentation")))
+            navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s#%s">%s</a>''' % (config.weburl, ln , bfe.upper() , _("Format Elements Documentation")))
 
             if not bibformatadminlib.can_read_format_element(bfe) and \
                    not bibformat_dblayer.tag_exists_for_name(bfe): #No read permission
@@ -1429,7 +1429,7 @@ def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
                     req=req)
 
     else:
-        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py/?ln=%s'''%(config.weburl, ln))
+        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/?ln=%s'''%(config.weburl, ln))
 
         return page_not_authorized(req=req,
                                    text=auth_msg,
