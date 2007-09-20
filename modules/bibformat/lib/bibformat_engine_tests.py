@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -50,7 +50,7 @@ class FormatTemplateTest(unittest.TestCase):
 
     def test_get_format_template(self):
         """bibformat - format template parsing and returned structure"""
-        
+
         bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
 
         #Test correct parsing and structure
@@ -107,7 +107,7 @@ class FormatTemplateTest(unittest.TestCase):
         self.assert_(filename_and_name_2[0] != "Test1.bft")
         path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename_and_name_2[0]
         self.assert_(not os.path.exists(path))
-        
+
 class FormatElementTest(unittest.TestCase):
     """ bibformat - tests on format templates"""
 
@@ -115,11 +115,11 @@ class FormatElementTest(unittest.TestCase):
         # pylint: disable-msg=C0103
         """bibformat - setting python path to test elements"""
         sys.path.append('%s' % tmpdir)
-        
+
     def test_resolve_format_element_filename(self):
         """bibformat - resolving format elements filename """
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        
+
         #Test elements filename starting without bfe_, with underscore instead of space
         filenames = ["test 1", "test 1.py", "bfe_test 1", "bfe_test 1.py", "BFE_test 1",
                      "BFE_TEST 1", "BFE_TEST 1.py", "BFE_TeST 1.py", "BFE_TeST 1",
@@ -127,7 +127,7 @@ class FormatElementTest(unittest.TestCase):
                      "bfe_test_1.py", "BFE_test_1",
                      "BFE_TEST_1", "BFE_TEST_1.py", "BFE_Test_1.py", "BFE_TeST_1",
                      "BfE_TeST_1.py", "BfE_TeST_1"]
-        
+
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
             self.assert_(filename_1 is not None)
@@ -143,14 +143,14 @@ class FormatElementTest(unittest.TestCase):
                      "bfe_test_2.py", "BFE_test_2",
                      "BFE_TEST_2", "BFE_TEST_2.py", "BFE_TeST_2.py", "BFE_TeST_2",
                      "BfE_TeST_2.py", "BfE_TeST_2"]
-        
+
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
             self.assert_(filename_1 is not None)
 
             filename_2 = bibformat_engine.resolve_format_element_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)
-        
+
         #Test non existing element
         non_existing_element = bibformat_engine.resolve_format_element_filename("BFE_NON_EXISTING_ELEMENT")
         self.assertEqual(non_existing_element, None)
@@ -160,7 +160,7 @@ class FormatElementTest(unittest.TestCase):
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
 
-        
+
         #Test loading with different kind of names, for element with spaces in name, without bfe_
         element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
         self.assert_(element_1 is not None)
@@ -189,7 +189,7 @@ class FormatElementTest(unittest.TestCase):
                      'description':"(no description provided)",
                      'default':""} in element_5['attrs']['params'] )
         self.assertEqual(element_5['attrs']['seealso'], [])
-                         
+
         #Test correct parsing:
 
         #Test type of element
@@ -211,7 +211,7 @@ class FormatElementTest(unittest.TestCase):
                       'default':"default value"} in element_1['attrs']['params'] )
 
 
-        
+
         #Test non existing element
         non_existing_element = bibformat_engine.get_format_element("BFE_NON_EXISTING_ELEMENT")
         self.assertEqual(non_existing_element, None)
@@ -231,12 +231,12 @@ class FormatElementTest(unittest.TestCase):
         self.assertEqual(attrs['description'], "Prints test")
         #Test @see parsing
         self.assertEqual(attrs['seealso'], ["element2.py", "unknown_element.py"])
-        
+
     def test_get_format_elements(self):
         """bibformat - multiple format elements parsing and returned structure"""
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        
+
         elements = bibformat_engine.get_format_elements()
         self.assert_(isinstance(elements, dict))
         self.assertEqual(elements['TEST_1']['attrs']['name'], "TEST_1")
@@ -251,7 +251,7 @@ class FormatElementTest(unittest.TestCase):
         tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
         self.failUnless(len(tags) == 4,
                         'Could not correctly identify tags used in bfe_abstract.py')
-            
+
 class OutputFormatTest(unittest.TestCase):
     """ bibformat - tests on output formats"""
 
@@ -261,7 +261,7 @@ class OutputFormatTest(unittest.TestCase):
 
         filename_1 = bibformat_engine.resolve_output_format_filename("test1")
         output_1 = bibformat_engine.get_output_format(filename_1, with_attributes=True)
-        
+
         self.assertEqual(output_1['attrs']['names']['generic'], "")
         self.assert_(isinstance(output_1['attrs']['names']['ln'], dict))
         self.assert_(isinstance(output_1['attrs']['names']['sn'], dict))
@@ -282,7 +282,7 @@ class OutputFormatTest(unittest.TestCase):
         self.assertEqual(output_1['rules'][3]['value'], 'PUBLICATION ')
         filename_2 = bibformat_engine.resolve_output_format_filename("TEST2")
         output_2 = bibformat_engine.get_output_format(filename_2, with_attributes=True)
-        
+
         self.assertEqual(output_2['attrs']['names']['generic'], "")
         self.assert_(isinstance(output_2['attrs']['names']['ln'], dict))
         self.assert_(isinstance(output_2['attrs']['names']['sn'], dict))
@@ -295,6 +295,7 @@ class OutputFormatTest(unittest.TestCase):
                                           'attrs':{'names':{'generic':"", 'ln':{}, 'sn':{}},
                                                    'description':'',
                                                    'code':"UNKNOW",
+                                                   'visibility': 1,
                                                    'content_type':""}})
 
     def test_get_output_formats(self):
@@ -305,7 +306,7 @@ class OutputFormatTest(unittest.TestCase):
         self.assert_("TEST1.bfo" in outputs.keys())
         self.assert_("TEST2.bfo" in outputs.keys())
         self.assert_("unknow.bfo" not in outputs.keys())
-       
+
         #Test correct parsing
         output_1 = outputs["TEST1.bfo"]
         self.assertEqual(output_1['attrs']['names']['generic'], "")
@@ -319,7 +320,7 @@ class OutputFormatTest(unittest.TestCase):
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
 
         attrs= bibformat_engine.get_output_format_attrs("TEST1")
-        
+
         self.assertEqual(attrs['names']['generic'], "")
         self.assert_(isinstance(attrs['names']['ln'], dict))
         self.assert_(isinstance(attrs['names']['sn'], dict))
@@ -337,7 +338,7 @@ class OutputFormatTest(unittest.TestCase):
 
             filename_2 = bibformat_engine.resolve_output_format_filename(filenames[i+1])
             self.assertEqual(filename_1, filename_2)
-        
+
     def test_get_fresh_output_format_filename(self):
         """ bibformat - getting fresh filename for output format"""
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
@@ -374,7 +375,7 @@ class PatternTest(unittest.TestCase):
         Here ends the middle of my test text
         <lang><en><b>English</b></en><fr><b>Français</b></fr><de><b>Deutsch</b></de></lang>
         <b>Here ends my test text</b></p>'''
-        
+
         result = bibformat_engine.pattern_lang.search(text)
         self.assertEqual(result.group("langs"), "<en><b>Some words</b></en><fr>Quelques mots</fr><de>Einige Wörter</de> garbage ")
 
@@ -383,7 +384,7 @@ class PatternTest(unittest.TestCase):
         <lang><en><b>Some words</b></en><fr>Quelques mots</fr><de>Einige Wörter</de> garbage </lang>" />
 
         '''
-        
+
         result = bibformat_engine.pattern_lang.search(text)
         self.assertEqual(result.group("langs"), "<en><b>Some words</b></en><fr>Quelques mots</fr><de>Einige Wörter</de> garbage ")
 
@@ -482,12 +483,12 @@ class PatternTest(unittest.TestCase):
         a description for my element
         some text
         @param param1 desc1
-        @param param2 desc2 
+        @param param2 desc2
         @see seethis, seethat
         '''
         result = bibformat_engine.pattern_format_element_seealso.search(text)
         self.assertEqual(result.group('see').strip(), 'seethis, seethat')
-        
+
 class MiscTest(unittest.TestCase):
     """ bibformat - tests on various functions"""
 
@@ -522,7 +523,7 @@ class MiscTest(unittest.TestCase):
                                 '2%%%%a',   ['2%%', '%', '%', 'a'],
                                 '2%%__a',   ['2%%', '' , '' , 'a'],
                                 '2%%a',     ['2%%', '' , '' , 'a']]
-        
+
         for i in range(0, len(tags_and_parsed_tags), 2):
             parsed_tag = bibformat_utils.parse_tag(tags_and_parsed_tags[i])
             self.assertEqual(parsed_tag, tags_and_parsed_tags[i+1])
@@ -589,7 +590,7 @@ class FormatTest(unittest.TestCase):
         self.bfo_2 = bibformat_engine.BibFormatObject(recID=None,
                                                       ln='fr',
                                                       xml_record=self.xml_text_2)
-        
+
 
         self.xml_text_3 = '''
         <record>
@@ -623,7 +624,7 @@ class FormatTest(unittest.TestCase):
     def test_decide_format_template(self):
         """ bibformat - choice made by function decide_format_template"""
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-        
+
         result = bibformat_engine.decide_format_template(self.bfo_1, "test1")
         self.assertEqual(result, "Thesis_detailed.bft")
 
@@ -652,7 +653,7 @@ class FormatTest(unittest.TestCase):
         #use output format that has no match TEST DISABLED DURING MIGRATION
         #result = bibformat_engine.format_record(recID=None, of="test2", xml_record=self.xml_text_2)
         #self.assertEqual(result.replace("\n", ""),"")
-        
+
         #use output format that link to unknown template
         result = bibformat_engine.format_record(recID=None, of="test3", xml_record=self.xml_text_2)
         self.assertEqual(result.replace("\n", ""),"")
@@ -664,13 +665,13 @@ class FormatTest(unittest.TestCase):
         #Default formatting
         result = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
         self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
-        
+
     def test_format_with_format_template(self):
         """ bibformat - correct formatting with given template"""
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
-        
+
         template = bibformat_engine.get_format_template("Test3.bft")
         result = bibformat_engine.format_with_format_template(format_template_filename = None,
                                                               bfo=self.bfo_1,
@@ -679,7 +680,7 @@ class FormatTest(unittest.TestCase):
 
         self.assert_(isinstance(result, tuple))
         self.assertEqual(result[0],'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
-        
+
 def create_test_suite():
     """Return test suite for the bibformat module"""
     return unittest.TestSuite((unittest.makeSuite(FormatTemplateTest,'test'),
@@ -688,7 +689,7 @@ def create_test_suite():
                                unittest.makeSuite(PatternTest,'test'),
                                unittest.makeSuite(MiscTest,'test'),
                                unittest.makeSuite(FormatTest,'test')))
-                               
+
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
-  
+
