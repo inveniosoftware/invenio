@@ -191,8 +191,9 @@ Contents
                     --with-dbuser=cdsinvenio \
                     --with-dbpass=my123pass \
                     --with-python=/opt/python/bin/python2.3
-      $ vi ./config/config.wml   ## optional, but strongly recommended
+      $ vi ./config/config.wml     ## optional, but strongly recommended
       $ make
+      $ make check-local-templates ## optional, only when upgrading
       $ make install
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
@@ -200,12 +201,12 @@ Contents
       $ sudo chmod -R g+r /opt/cds-invenio
       $ sudo chmod -R g+rw /opt/cds-invenio/var
       $ sudo find /opt/cds-invenio -type d -exec chmod g+rxw {} \;
-      $ make create-demo-site    ## optional
-      $ make load-demo-records   ## optional
-      $ make test                ## optional
-      $ make regression-test     ## optional
-      $ make remove-demo-records ## optional
-      $ make drop-demo-site      ## optional
+      $ make create-demo-site      ## optional
+      $ make load-demo-records     ## optional
+      $ make test                  ## optional
+      $ make regression-test       ## optional
+      $ make remove-demo-records   ## optional
+      $ make drop-demo-site        ## optional
       $ firefox http://webserver.domain.com/admin/ ## optional
 
 2. Detailed instructions for the patient CDS Invenio admin
@@ -364,6 +365,17 @@ Contents
 
           Note that on systems such as FreeBSD or Mac OS X you have to
           use GNU make ("gmake") instead of "make".
+
+      $ make check-local-templates ## Optional, only when upgrading
+
+          Check if your customized page templates (see WebStyle Admin
+          guide) still conform to the default templates.
+          This gives you a chance to fix your templates before running
+          'make install', by providing a list of incompatibilities of
+          your custom templates with the new versions of the templates.
+
+          This step is only useful if you are upgrading and you have
+          previously customized page templates.
 
       $ make install
 

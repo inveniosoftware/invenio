@@ -33,8 +33,14 @@ sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
 
 all:
 	@echo "**************************************************************"
-	@echo "** CDS Invenio has been successfully built.  Proceed now by **"
-	@echo "** running 'make install'.                                  **"
+	@echo "** CDS Invenio has been successfully built.                 **"
+	@echo "**                                                          **"
+	@echo "** If you are upgrading and you have previously customized  **"
+	@echo "** page templates (see WebStyle Admin guide), please        **"
+	@echo "** run now 'make check-local-templates' in order to ensure  **"
+	@echo "** that they are still valid.                               **"
+	@echo "**                                                          **"
+	@echo "** Otherwise you can proceed to do 'make install' now.      **"
 	@echo "**************************************************************"
 
 test:
@@ -50,6 +56,9 @@ regression-test:
 	else \
 	    echo "Hmm, regressiontestsuite does not seem to be installed.  Please do 'make install' first."; \
 	fi
+
+check-local-templates:
+	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-local-templates $(top_srcdir)
 
 kwalitee-check:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)

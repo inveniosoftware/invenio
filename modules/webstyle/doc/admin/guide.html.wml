@@ -184,11 +184,29 @@ style footer will be seen in action.</p>
     whether the function arguments are the same.  A quick check of the
     body would be helpful too, in case the new release fixed some
     display-related problems in these functions.
-    <br>(FIXME: provide some warning tool.)</li>
+    <br/><br/>
+
+    In order to help you in this task, we provide a tool to check
+    incompatibilities between your customized templates and the default
+    templates.<br/>
+
+    This tool can be run before doing a <code>'make install'</code>,
+    therefore giving you a chance to fix your templates before
+    upgrading. Just run <code>'make check-local-templates'</code> to
+    get the list of problems found with your templates. <br><br>
+
+    You can also run this tool any time after the new default
+    templates have been installed, in order to ensure that
+    modifications you have done to your templates are valid. To do so
+    move to your CDS Invenio installation directory, and run: <br/>
+    <code>$python lib/python/invenio/templates.py
+    --check-local-templates</code>
+</li>
 
 </ul>
 
-<h3><a name="overview_bib">1.3 Look of Bibliographic References</a></h3>
+<h3><a name="overview_bib">1.3 Look of Bibliographic
+References</a></h3>
 
 <p>Bibliographic metadata is formatted using
 <a href="<WEBURL>/admin/bibformat">BibFormat</a>. Read the
