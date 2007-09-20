@@ -1401,6 +1401,8 @@ class Template:
             s1, s2, s3, s4, s5 = 'full', 'half', '', '', ''
         elif avg_score == 1:
             s1, s2, s3, s4, s5 = 'full', '', '', '', ''
+        else:
+            s1, s2, s3, s4, s5 = '', '', '', '', ''
 
         out = '''
 <small class="detailedRecordActions">%(rate)s:</small><br /><br />

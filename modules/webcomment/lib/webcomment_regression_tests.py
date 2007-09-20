@@ -76,6 +76,12 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
+    def test_webcomment_mini_review_availability(self):
+        """webcomment - availability of mini-review panel on detailed record page"""
+        url = weburl + '/record/12'
+        error_messages = test_web_page_content(url,
+                                               expected_text="(Not yet reviewed)")
+
 test_suite = make_test_suite(WebCommentWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
