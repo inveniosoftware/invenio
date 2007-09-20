@@ -1244,7 +1244,8 @@ class Template:
             for template in format_templates:
                 attrs = format_templates[template]['attrs']
                 attrs['template'] = template
-                if template.endswith('.xsl'):
+                if template.endswith('.xsl') and not \
+                   attrs['name'].endswith(' (XSL)'):
                     attrs['name'] += ' (XSL)'
 
                 if template != rule['template']:
@@ -1305,7 +1306,8 @@ class Template:
         for template in format_templates:
             attrs = format_templates[template]['attrs']
             attrs['template'] = template
-            if template.endswith('.xsl'):
+            if template.endswith('.xsl') and not \
+                   attrs['name'].endswith(' (XSL)'):
                 attrs['name'] += ' (XSL)'
 
             if template  != default:
