@@ -174,7 +174,7 @@ a typical workflow:</p>
     <td>
     <img src="guide_url_bar.png" alt="http://cdsweb.cern.ch/search?recid=946417&amp;ln=en&amp;of=hd"/>
     </td>
-    
+
     <td width="50%">When CDS Invenio has to display a record, it
       asks BibFormat to format the record with the given output format
       and language. For example here the requested output format is
@@ -182,7 +182,7 @@ a typical workflow:</p>
       for &quot;HTML Detailed&quot;. This means that somehow a user arrived on
       the page of the record and asked for a detailed view of the
       record.</td>
-      
+
   </tr>
 
   <tr>
@@ -203,20 +203,20 @@ a typical workflow:</p>
     used for formatting by BibFormat.<br/>
     You can add, remove or edit output formats <a href="bibformatadmin.py/output_formats_manage">here</a></td>
     </tr>
-  
+
   <tr>
   <td colspan="2"><hr/><span style="white-space: nowrap;">Step 3:</span></td>
   </tr>
-    <tr valign="top"> 
-    <td> 
+    <tr valign="top">
+    <td>
       <div class="formatTemplateBoxMain"><code>
         &lt;h1 align=&quot;center&quot;&gt;&lt;BFE_MAIN_TITLE/&gt;&lt;/h1&gt;<br />
         &lt;p align=&quot;center&quot;&gt;<br />
-        <span class="formatElementBox">&lt;BFE_AUTHORS separator=&quot;; &quot; 
+        <span class="formatElementBox">&lt;BFE_AUTHORS separator=&quot;; &quot;
         link=&quot;yes&quot;/&gt;</span>&lt;br/&gt;<br />
         &lt;BFE_DATE format=&quot;%d %B %Y&quot;&gt; .- &lt;BFE_NB_PAGES suffix=&quot;p&quot;&gt;<br />
         &lt;/p&gt;</code></div></td>
-        
+
     <td>We see an extract of the Picture HTML Detailed format on the right,
     as it is shown in the template editor.  As you can see it
     is mainly written using HTML. There are however some tags that
@@ -229,7 +229,7 @@ a typical workflow:</p>
     which can take <em>separator</em> and <em>link</em> as
     parameters. The value of separator will be used to separate
     authors' names and the link parameter tells if links to authors'
-    websites have to be created. 
+    websites have to be created.
     All elements are described in the <a href="bibformatadmin.py/format_elements_doc">elements documentation</a>.<br/>
     You can add, remove or edit format templates <a href="bibformatadmin.py/format_templates_manage">here</a>.
     <p>
@@ -237,7 +237,7 @@ a typical workflow:</p>
     Read the <a href="#xslFormatTemplate">XSL Format Templates</a> section to learn more about XSLT support for your format templates.
     </p>
     </td>
-      
+
   </tr>
   <tr><td colspan="2"><hr/><span style="white-space: nowrap;">Step 4:</span></td></tr>
   <tr valign="top">
@@ -253,7 +253,7 @@ a typical workflow:</p>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;authors = map(lambda x: '&lt;a href="'+weburl+'/search?f=author&p='\<br/>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                         + quote(x) +'"&gt;'+x+'&lt;/a&gt;', authors)<br />
-      &nbsp;&nbsp;&nbsp;return authors.split(separator)</code> 
+      &nbsp;&nbsp;&nbsp;return authors.split(separator)</code>
       </div></td>
 
     <td>A format element is written in Python. It acts as a bridge
@@ -278,14 +278,14 @@ the format elements layer.<p>
 
 
 <table width="50%" border="0" align="center" cellpadding="0" cellspacing="2">
-  <tr align="center"> 
+  <tr align="center">
     <td colspan="4"><div class="outputFormatBoxMain">Output Format</div></td>
   </tr>
-  <tr align="center"> 
+  <tr align="center">
     <td colspan="2"><div class="formatTemplateBoxMain">Template</div></td>
     <td colspan="2"><div class="formatTemplateBoxMain">Template</div></td>
   </tr>
-  <tr align="center"> 
+  <tr align="center">
     <td><div class="formatElementBoxMain">Format Element</div></td>
     <td><div class="formatElementBoxMain">Format Element</div></td>
     <td><div class="formatElementBoxMain">Format Element</div></td>
@@ -381,7 +381,7 @@ However you must make sure that it is removed from the tables <code>format</code
     Leading and trailing spaces are ignored too ("  Picture  " will match "PICTURE").
     <br/><b>Tips:</b> you can use a regular expression as text. For example "PICT.*" will match "pictures"
     and "PICTURE".</p>
-    
+
     <p><div style="float:right"><img src="guide_output_format_edit_rule2.png" alt="Reorder rules using arrows"/></div>
     The above configuration will use format template "Default HTML Detailed" if all above rules fail (in that case
     if field 980__a is different from "PICTURE"). If you have more rules, you decide in which order the conditions are evaluated. You can reorder rules by clicking on the small arrows on the left of the rules.
@@ -507,7 +507,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>To edit the code of a format template
     go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page. Click on
     the format template you want to edit to load the template editor.</p>
-   
+
     <p>The format template editor contains three panels. The left upper panel is the code editor. This is were
     you write the code that specifies the formatting of a template. The right-most panel is a short documentation
     on the "bricks" you can use in your format template code. The panel at the bottom of the page allows you to preview the template. </p>
@@ -556,7 +556,7 @@ However you must make sure that it is removed from the tables <code>format</code
         of any field of a record in your templates. This practice is however not
         recommended because it would necessitate to revise all format
         templates if you did change the meaning of the MARC code schema.</p>
-        
+
     <h4><a name="previewFormatTemplate">3.6 Preview a Format Template</a></h4>
     <p>To preview a format template go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the format template you want to preview to open the template editor. The editor contains a preview panel at the bottom of the page.</p>
     <img src="guide_template_preview.png" alt="Preview Panel"/>
@@ -578,7 +578,7 @@ However you must make sure that it is removed from the tables <code>format</code
 available in the &lt;lang&gt; group, your default CDS Invenio language is used.</p>
 
  <h4><a name="escapeFormatTemplate">3.8 Escaping special HTML/XML characters</a></h4>
- 
+
 <p>By default, BibFormat escapes all values returned by format
 elements. As a format template designer, you can assume in almost all
 cases that the values you get from a format element will be escaped
@@ -625,7 +625,7 @@ are not returned by the format elements.</p>
      <strong>For developers and adventurers only:</strong>
      <p>You can change the attributes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
      <p>Also note that the admin web interface tries to keep the name of the template in sync with the filename of the template. If the name is changed through the web interface, the filename of the template is changed, and all output formats that use this template are updated. You have to do update output formats manually if you change the filename of the template without the web interface.</p>
-     
+
     <h3><a name="dependenciesFormatTemplate">3.10 Check the Dependencies of a Format Template</a></h3>
      <p>To check the dependencies of a format template
     go to the <a href="bibformatadmin.py/format_template_manage">Manage Format Template</a> page, click on
@@ -656,12 +656,12 @@ are not returned by the format elements.</p>
 
     <p>Finally, please note that you will need to install a supported XSLT parser in order
     to format using XSL stylesheets.</p>
-    
+
 <h2><a name="FormatElements">4. Format Elements</a></h2>
  <p>Format elements are the bricks used in format templates to provide dynamic content to the formatting process.
  Their purpose is to allow non computer literate persons to easily integrate data from the records in the database into their templates. </p>
  <p>Format elements are typically written in Python (there is an exception to that point which is dicussed in <a href="#addFormatElement">Add a Format Element</a>). This brings great flexibily and power to the formatting process. This however restricts the creation of format elements to developers.</p>
-    
+
     <h3><a name="addFormatElement">4.1 Add a Format Element</a></h3>
     <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
     <p>The most simple way to add a format element is to add a en entry in the "<a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
@@ -680,7 +680,7 @@ def format(bfo, separator=" "):
     @param separator separator between the different titles
     """
     titles = []
-   
+
     title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
 
@@ -752,7 +752,7 @@ about the possibilities offered by the <code>bfo</code>, read the <a href="<WEBU
      default value of the parameter if you do not provide a custom
      value. Click on the "Test!" button to see the result of the
      element with your parameters.</p>
-     
+
 <h3><a name="internationalizationFormatElement">4.5 Internationalization (i18n)</a></h3>
 
     <p>You can follow the standard internationalization procedure in
@@ -830,11 +830,11 @@ translated_welcome =  &#95;("Welcome")
            </ul>
      These modes are the same for  <code>escape_values(bfo)</code> function, excepted '2' which
      cannot (yet?) be returned as a valid mode with the function.
-     <p>      
+     <p>
      You can also decide not to use the <code>escape</code> parameter and escape values
      using any other Python function/library you want to use (such as <code>cgi.escape()</code>).
      </p>
-    
+
 
     <h3><a name="attrsFormatElement">4.7 Edit the Attributes of a Format Element</a></h3>
     <p>A format element has mainly four kinds of attributes: <ul>
@@ -860,7 +860,7 @@ translated_welcome =  &#95;("Welcome")
     <li>A link to a tool to track the dependencies of your element.</li>
     <li>A link to a tool to check the correctness of your element.</li>
     <li>A link to a tool to test your element with custom parameters.</li>
-    
+
     </ul></p>
 
 <h2><a name="KBs">5. Knowledge Bases</a></h2>
@@ -1043,7 +1043,7 @@ of the record to define the format template to use.</p>
     </tr>
     <tr align="center" bgcolor="#cccccc">
       <td colspan="2">&nbsp;
-      
+
       </td>
     </tr>
     <tr bgcolor="#33ccff">
@@ -1100,7 +1100,7 @@ your behaviours, but that you go through the created .bfo files in the /etc/bibf
 <p>The migration kit is available from the main BibFormat admin webpage or
 <a href="bibformat_migration_kit_assistant.py">directly here</a>. The migration
 kit has 3 steps, each migrating some part of your configuration. Just
-click on the links to migrate each part and get the status of the migration.</p> 
+click on the links to migrate each part and get the status of the migration.</p>
 <p>You should note that each migration will create new files or entries in the database, such that
 you will certainly want to click only once on each step (otherwise you will get duplicates).</p>
 <p>The migration kit can:<br/>
@@ -1197,7 +1197,7 @@ is equal to a call to <code>field("980__a")</code>. You should then not complete
 <h4>How are displayed deleted record?</h4>
 <p>By default, CDS Invenio displays a standard "The record has been deleted." message for all
 output formats with a 'text/html' content type. Your output format, format templates and format elements
-are bypassed by the engine. 
+are bypassed by the engine.
 However, for more advanced output formats, CDS Invenio
 goes through the regular formatting process and let your formats do the job. This allows you to customize how a record should be displayed once it has been deleted.</p>
 
@@ -1230,8 +1230,8 @@ templates.</p>
 
     >> bfo.fields('999C5b')                                   <b>(1)</b>
     >> ['value_1b', 'value_2b', 'value_3b', 'value_3b_bis']
-    >> bfo.fields('999C5')                                    <b>(2)</b>        
-    >> [{'a':'value_1a', 'b':'value_1b'}, 
+    >> bfo.fields('999C5')                                    <b>(2)</b>
+    >> [{'a':'value_1a', 'b':'value_1b'},
         {'b':'value_2b'},
         {'b':'value_3b'}]
 </pre>
@@ -1245,7 +1245,7 @@ In order to consider the repeatable subfields, use the additional <code>repeatab
 <pre>    >> bfo.fields('999C5b', repeatable_subfields_p=True)      <b>(1 bis)</b>
     >> ['value_1b', 'value_2b', 'value_3b']
     >> bfo.fields('999C5', repeatable_subfields_p=True)       <b>(2 bis)</b>
-    >> [{'a':['value_1a'], 'b':['value_1b']}, 
+    >> [{'a':['value_1a'], 'b':['value_1b']},
         {'b':['value_2b']},
         {'b':['value_3b', 'value3b_bis']}]
 </pre>
@@ -1276,8 +1276,8 @@ Another solution would be to access the BibRecord structure with
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.1 <a href="#4.9.1">EXTERNAL link conditions</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.2 <a href="#4.9.2">INTERNAL link conditions</a><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.9.3 <a href="#4.9.3">Example</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.10 <a href="#4.10">User management</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.11 <a href="#4.11">Evaluation Language Reference</a></br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.10 <a href="#4.10">User management</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.11 <a href="#4.11">Evaluation Language Reference</a><br/>
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -1307,7 +1307,7 @@ specific metadata structure.
 
 <dd>Define one or more output BibFormat behaviours.  These are then
 passed as parameters to the BibFormat modules while executing
-formatting. 
+formatting.
 
 <br><em>Example:</em> You can tell BibFormat that is has to enrich the
 incoming metadata file by the created format, or that it only has to
@@ -1323,7 +1323,7 @@ in formatting and linking rules.
 should be mapped into <code>$100.a</code> internal variable that you
 could use later.
 
-<dt><a href="LINK_display.php">Link Rules</a> 
+<dt><a href="LINK_display.php">Link Rules</a>
 
 <dd>Define rules for automated creation of URI links from mapped
 internal variables.
@@ -1339,7 +1339,7 @@ in the previous step, see the Extraction Rules.)
 used when proposing various fulltext services.
 
 <br><em>Example:</em> You can tell that <code>*.pdf</code> files will
-be treated as PDF files.  
+be treated as PDF files.
 
 <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
 
@@ -1397,7 +1397,7 @@ When these are ready, you can choose to rebuild formats for selected
 collections or you can manually enter a search query and the web interface
 will accomplish all necessary formatting steps.
 <br>
-<em>Example:</em> You can request Photo collections to have their HTML 
+<em>Example:</em> You can request Photo collections to have their HTML
 brief formats rebuilt, or you can reformat all the records written by Ellis.
 
 <a name="3.2"></a><h3>3.2. From the command-line interface</h3>
@@ -1895,7 +1895,7 @@ identified by a different label. There are two different types of behaviors
 (you can choose the behavior type when you define it):</p>
 
 <ol>
-<li>Normal: 
+<li>Normal:
 Consists in a behavior that outputs exactly the result of its evaluation.</li>
 <li>Input Erich (only for XML inputs): It echoes each xml record
 from the input inserting the behavior result just before the xml closing
@@ -2047,7 +2047,7 @@ have a format called "ex 1" that has a call for itself:</p>
 <tr>
 <td align='center'>
 <pre>
-"hello world" 
+"hello world"
 format("ex_1")
 </pre>
 </td>
@@ -2071,7 +2071,7 @@ recursion:</p>
 <tr>
 <td align='center'>
 <pre>
-"hello world" 
+"hello world"
 format("ex_2")
 </pre>
 </td>
@@ -2821,14 +2821,14 @@ use a function called <em>GT</em> which returns a non-empty string if the first
 parameter is greater than the second one.
 <pre>
 
-format("TITLE") "/" 
+format("TITLE") "/"
 if(gt(count($100.a), "10")!="")
 { $100.a "et al." }
 else
 {
   forall($100.a)
   {
-    link("AUTHOR_SEARCH", $100.a) 
+    link("AUTHOR_SEARCH", $100.a)
      { "&lt;a href=\""$link "\"&gt;"$100.a"&lt;/a&gt;"}
   }
 }
