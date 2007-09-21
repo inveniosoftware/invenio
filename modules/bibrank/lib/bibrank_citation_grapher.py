@@ -28,12 +28,12 @@ from marshal import loads
 from zlib import decompress
 
 from invenio.config import weburl, cdslang
-from invenio.dbquery import run_sql    
+from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
 from invenio.bibrank_citation_searcher import calculate_cited_by_list
 
-cfg_bibrank_print_citation_history = 1 
+cfg_bibrank_print_citation_history = 1
 color_line_list = ['9', '19', '10', '15', '21', '18']
 
 def get_field_values(recID, tag):
@@ -90,7 +90,7 @@ def find_year(recordyear):
             print s
             break
     return s
-    
+
 def get_initial_result(rec_years):
     """return an initial dictionary with year of record publication as key
        and zero as value
@@ -112,12 +112,12 @@ def create_citation_history_graph_and_box(recid, ln=cdslang):
     """
 
     _ = gettext_set_language(ln)
-    
+
     html_result = ""
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """</br><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history")
+            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history")
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)

@@ -19,7 +19,7 @@
 
 #include "cdspage.wml" \
     title="BibRank Admin Guide" \
-    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>BibRank Admin</a>" \ 
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/bibrank/>BibRank Admin</a>" \
     navbar_name="admin" \
     navbar_select="bibrank-admin-guide"
 
@@ -64,15 +64,15 @@ Combined Method
 bibrankgkb - For generating knowledge base files for use with bibrank
 <br><br>
 The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
-to use, and what data you already got. This guide will take you through the necessary steps in detail in 
+to use, and what data you already got. This guide will take you through the necessary steps in detail in
 order to create different kinds of ranking methods for the search engine to use.
 
 <a name="c"></a><h2>2. Configuration Conventions</h2>
 <blockquote>
 <pre>
 - comment line starts with '#' sign in the first column
-- each section in a configuration file is declared inside '[' ']' signs 
-- values in knowledgebasefiles are separated by '---' 
+- each section in a configuration file is declared inside '[' ']' signs
+- values in knowledgebasefiles are separated by '---'
 </blockquote>
 </pre>
 
@@ -82,7 +82,7 @@ let the http-daemon have write/read access to your invenio/etc/bibrank directory
 <a name="mi"></a><h3>3.1 Main interface</h3>
 In the main interface screen, you see a list of all rank methods currently added. Each rank method is identified by the rank method code. To find out about the functionality available, check out the topics below.
 
-</br></br><b>Explanation of concepts</b>
+<br/><br/><b>Explanation of concepts</b>
 <blockquote>
 <pre>
 Rank method:
@@ -181,7 +181,7 @@ J. High Energy Phys.---8.664
 
 <h4>Step 3 - Modify the configuration file</h4>
 The configuration files for the different rank methods has different option, so verify that you are using the correct
-configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDS Invenio. 
+configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDS Invenio.
 For a description of each rank method and the configuration necessary, check section 6 below.
 
 <h4>Step 4 - Add the ranking method as a scheduled task</h4>
@@ -347,7 +347,7 @@ function = word_similarity
 stemming = en
 #the internal table to load the index tables from.
 table = rnkWORD01F
-#remove stopwords? 
+#remove stopwords?
 stopword = True
 #text to show before the rank value when the search result is presented. <-- to hide result
 relevance_number_output_prologue = (
@@ -355,8 +355,8 @@ relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
 
 #MARC tag,tag points, tag language
-#a list of the tags to be used, together with a number describing the importance of the tag, and the 
-#most common language for the content. Not all languages are supported. Among the supported ones are: 
+#a list of the tags to be used, together with a number describing the importance of the tag, and the
+#most common language for the content. Not all languages are supported. Among the supported ones are:
 #fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
 
 #keyword
@@ -418,7 +418,7 @@ relevance_number_output_epilogue = )
 #tells which method to use, do not change
 function = combine_method
 [combine_method]
-#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how 
+#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how
 #much of the total score the method should count.
 method1 = jif,50
 method2 = wrd,50
@@ -442,7 +442,7 @@ Usage: bibrankgkb %s [options]
      Examples:
        bibrankgkb --input=bibrankgkb.cfg --output=test.kb
        bibrankgkb -otest.cfg -v9
-       bibrankgkb 
+       bibrankgkb
 
  Generate options:
  -i,  --input=file          input file, default from /etc/bibrank/bibrankgkb.cfg
@@ -468,7 +468,7 @@ The default configuration file is shown below.
 ##The main section
 [bibrankgkb]
 ##The url to a web page with the data to be read, does not need to have the same name as this one, but if there
-are several links, the url parameter should end with _0-> 
+are several links, the url parameter should end with _0->
 url_0 = http://www.taelinke.land.ru/impact_A.html
 url_1 = http://www.taelinke.land.ru/impact_B.html
 url_2 = http://www.taelinke.land.ru/impact_C.html
@@ -480,7 +480,7 @@ url_7 = http://www.taelinke.land.ru/impact_KN.html
 url_8 = http://www.taelinke.land.ru/impact_QQ.html
 url_9 = http://www.taelinke.land.ru/impact_RZ.html
 ##The regular expression for the url mentioned should be given here
-url_regexp = 
+url_regexp =
 
 ##The various sources that can be read in, can either be a file, web page or from the database
 kb_1 = /home/invenio/modules/bibrank/etc/cern_jif.kb
