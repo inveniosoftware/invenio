@@ -23,19 +23,19 @@ __revision__ = "$Id$"
 
 import os, sys, inspect
 
-from invenio.config import \
-        CFG_WEBSTYLE_TEMPLATE_SKIN
 try:
     # This tool can be run before Invenio is installed:
-    # pylibdir might then not exist.
+    # invenio files might then not exist.
     from invenio.config import \
-         pylibdir
+         CFG_WEBSTYLE_TEMPLATE_SKIN, \
+         CFG_PREFIX
+    CFG_WEBSTYLE_PYLIBDIR = CFG_PREFIX + os.sep + 'lib' + os.sep + 'python'
 except ImportError:
-    pylibdir = None
+    CFG_WEBSTYLE_PYLIBDIR = None
 
 # List of deprecated functions
 # Eg. {'webstyle': {'tmpl_records_format_other':"Replaced by .."}}
-CFG_DEPRECATED_FUNCTIONS = {'webstyle':
+CFG_WEBSTYLE_DEPRECATED_FUNCTIONS = {'webstyle': \
                             {'tmpl_records_format_other': "Replaced by " + \
                              "tmpl_detailed_record_metadata(..), " + \
                              "tmpl_detailed_record_references(..), " + \
@@ -48,7 +48,7 @@ CFG_DEPRECATED_FUNCTIONS = {'webstyle':
 
 # List of deprecated parameter
 # Eg. {'webstyle': {'get_page':{'header': "replaced by 'title'"}}}
-CFG_DEPRECATED_PARAMETERS = {}
+CFG_WEBSTYLE_DEPRECATED_PARAMETERS = {}
 
 def load(module=''):
     """ Load and returns a template class, given a module name (like
@@ -85,8 +85,8 @@ def check():
     """
     messages = []
 
-    if pylibdir is None:
-        # Nothing to check, since pylibdir does not exist
+    if CFG_WEBSTYLE_PYLIBDIR is None:
+        # Nothing to check, since Invenio has not been installed
         messages.append(('C', "Nothing to check. Run 'make install' first.",
                          '',
                          None,
@@ -170,10 +170,10 @@ def check():
                                          inspect.getsourcelines(custom_function)[1]))
                         # If parameter is deprecated, report it
                         module_name = default_tpl_name.split("_")[0]
-                        if CFG_DEPRECATED_PARAMETERS.has_key(module_name) and \
-                               CFG_DEPRECATED_PARAMETERS[module_name].has_key(default_function_name) and \
-                               CFG_DEPRECATED_PARAMETERS[module_name][default_function_name].has_key(cust_arg):
-                            messages.append(('C', CFG_DEPRECATED_PARAMETERS[module_name][default_function_name][cust_arg],
+                        if CFG_WEBSTYLE_DEPRECATED_PARAMETERS.has_key(module_name) and \
+                               CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name].has_key(default_function_name) and \
+                               CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name][default_function_name].has_key(cust_arg):
+                            messages.append(('C', CFG_WEBSTYLE_DEPRECATED_PARAMETERS[module_name][default_function_name][cust_arg],
                                              custom_tpl_name,
                                              custom_function.__name__,
                                              inspect.getsourcelines(custom_function)[1]))
@@ -222,9 +222,9 @@ def check():
 
                 # If the function was deprecated, report it
                 module_name = default_tpl_name.split("_")[0]
-                if CFG_DEPRECATED_FUNCTIONS.has_key(module_name) and \
-                   CFG_DEPRECATED_FUNCTIONS[module_name].has_key(custom_function_name):
-                    messages.append(('C', CFG_DEPRECATED_FUNCTIONS[module_name][custom_function_name],
+                if CFG_WEBSTYLE_DEPRECATED_FUNCTIONS.has_key(module_name) and \
+                       CFG_WEBSTYLE_DEPRECATED_FUNCTIONS[module_name].has_key(custom_function_name):
+                    messages.append(('C', CFG_WEBSTYLE_DEPRECATED_FUNCTIONS[module_name][custom_function_name],
                                  custom_tpl_name,
                                  custom_function_name,
                                  inspect.getsourcelines(custom_function)[1]))
@@ -280,7 +280,9 @@ def get_custom_template(default_template_path):
     exist.
     """
     default_tpl_path, default_tpl_name = os.path.split(default_template_path)
-    custom_path = pylibdir + os.sep + "invenio" + os.sep + \
+
+    custom_path = CFG_WEBSTYLE_PYLIBDIR + \
+                  os.sep + "invenio" + os.sep + \
                   default_tpl_name[:-3] + '_' + \
                   CFG_WEBSTYLE_TEMPLATE_SKIN + '.py'
 
@@ -352,6 +354,6 @@ def print_messages(messages,
                nb_comments, nb_comments > 1 and 's' or '')
 
 if __name__ == "__main__" and \
-       '--check-local-templates' in sys.argv:
+       '--check-custom-templates' in sys.argv:
     messages_ = check()
     print_messages(messages_)

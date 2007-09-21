@@ -192,7 +192,7 @@ style footer will be seen in action.</p>
 
     This tool can be run before doing a <code>'make install'</code>,
     therefore giving you a chance to fix your templates before
-    upgrading. Just run <code>'make check-local-templates'</code> to
+    upgrading. Just run <code>'make check-custom-templates'</code> to
     get the list of problems found with your templates. <br><br>
 
     You can also run this tool any time after the new default
@@ -200,7 +200,7 @@ style footer will be seen in action.</p>
     modifications you have done to your templates are valid. To do so
     move to your CDS Invenio installation directory, and run: <br/>
     <code>$python lib/python/invenio/templates.py
-    --check-local-templates</code>
+    --check-custom-templates</code>
 </li>
 
 </ul>

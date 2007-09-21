@@ -1,3 +1,4 @@
+
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -37,7 +38,7 @@ all:
 	@echo "**                                                          **"
 	@echo "** If you are upgrading and you have previously customized  **"
 	@echo "** page templates (see WebStyle Admin guide), please        **"
-	@echo "** run now 'make check-local-templates' in order to ensure  **"
+	@echo "** run now 'make check-custom-templates' in order to ensure **"
 	@echo "** that they are still valid.                               **"
 	@echo "**                                                          **"
 	@echo "** Otherwise you can proceed to do 'make install' now.      **"
@@ -57,8 +58,8 @@ regression-test:
 	    echo "Hmm, regressiontestsuite does not seem to be installed.  Please do 'make install' first."; \
 	fi
 
-check-local-templates:
-	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-local-templates $(top_srcdir)
+check-custom-templates:
+	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
 
 kwalitee-check:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)
