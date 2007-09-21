@@ -50,23 +50,23 @@
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <h2>Contents</h2>
-<strong>1.<a href="#1">Overview</a></strong></br>
-<strong>2. <a href="#2">Configure Metadata Tags and Fields</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Configure Physical MARC Tags</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Configure Logical Fields</a></br>
-<strong>3. <a href="#3">Configure Word/Phrase Indexes</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Define New Index</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Configure Word-Breaking Procedure</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Configure Stopwords List</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">Configure Stemming</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5 <a href="#3.5">Configure Word Length</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8 <a href="#3.8">Configure Fulltext Indexing</a></br>
-<strong>4. <a href="#4">Run BibIndex Daemon</a></strong></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a></br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Reindexing</a></br>
+<strong>1.<a href="#1">Overview</a></strong><br/>
+<strong>2. <a href="#2">Configure Metadata Tags and Fields</a></strong><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Configure Physical MARC Tags</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Configure Logical Fields</a><br/>
+<strong>3. <a href="#3">Configure Word/Phrase Indexes</a></strong><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Define New Index</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Configure Word-Breaking Procedure</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Configure Stopwords List</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4 <a href="#3.4">Configure Stemming</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5 <a href="#3.5">Configure Word Length</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8 <a href="#3.8">Configure Fulltext Indexing</a><br/>
+<strong>4. <a href="#4">Run BibIndex Daemon</a></strong><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Reindexing</a><br/>
 
 <a name="1"></a><h2>1. Overview</h2>
 <a name="2"></a><h2>2. Configure Metadata Tags and Fields</h2>
@@ -204,7 +204,7 @@ scheduled for the forthcoming night or weekend.
 
 <a name="4.3"></a><h3>4.3 Reindexing</h3>
 
-The procedure of reindexing is taking place into the real indexes that
+<p>The procedure of reindexing is taking place into the real indexes that
 are also used for searching.  Therefore the end users will feel
 immediately any change in the indexes.  If you need to reindex your
 records from scratch, then the best procedure is the following: wipe out
@@ -213,6 +213,8 @@ recreate collection cache, and only after that reindex all the other
 indexes (slow operation).  This will ensure that the records in your
 system will be at least browsable while the indexes are being rebuilt.
 The steps to perform are:
+
+<p>Firstly, we truncate existing indexes:
 
 <blockquote>
 <pre>
@@ -226,10 +228,63 @@ The steps to perform are:
     /opt/cds-invenio/bin/dbexec # rewind the last indexing time
   $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
     /opt/cds-invenio/bin/dbexec # rewind the last ranking time
+</pre>
+</blockquote>
+
+<p>Secondly, if you have been using custom indexes in addition to (or
+instead of) provided demo ones, you have to truncate them too:
+
+<blockquote>
+<pre>
+  \# find out which custom indexes were added:
+  $ echo "SELECT id FROM idxINDEX" | /opt/cds-invenio/bin/dbexec
+  id
+  55
+  [...]
+
+  \# for every index id, truncate corresponding word tables:
+  $ echo "TRUNCATE idxWORD55F" | /opt/cds-invenio/bin/dbexec
+  $ echo "TRUNCATE idxWORD55R" | /opt/cds-invenio/bin/dbexec
+  [...]
+
+  \# repeat the same operation for ranking tables:
+  $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
+  id
+  66
+  67
+  $ echo "TRUNCATE rnkWORD66F" | /opt/cds-invenio/bin/dbexec
+  $ echo "TRUNCATE rnkWORD66R" | /opt/cds-invenio/bin/dbexec
+  $ echo "TRUNCATE rnkWORD67F" | /opt/cds-invenio/bin/dbexec
+  $ echo "TRUNCATE rnkWORD67R" | /opt/cds-invenio/bin/dbexec
+</pre>
+</blockquote>
+
+<p>Thirdly, verify that all word tables have well been truncated:
+
+<blockquote>
+<pre>
+  $ /opt/cds-invenio/bin/bibstat | grep idxWORD
+  idxWORD01F                 0                 0              1024
+  idxWORD01R                 0                 0              1024
+  [...]
+</pre>
+</blockquote>
+
+<p>Fourthly, we launch (fast) reindexing of the collection index:
+
+<blockquote>
+<pre>
   $ bibindex -f50000 -wcollection # reindex the collection index (fast)
   $ webcoll -f # recreate the collection cache
   $ bibsched # run the two above-submitted tasks
   $ sudo apachectl restart
+</pre>
+</blockquote>
+
+<p>At last, we launch (slower) reindexing of the remaining indexes:
+
+<blockquote>
+<pre>
   $ bibindex -f50000 # reindex other indexes (slow)
   $ bibrank -f50000
   $ webcoll -f
@@ -238,7 +293,9 @@ The steps to perform are:
 </pre>
 </blockquote>
 
-In the future CDS Invenio should ideally run indexing into invisible
+and we are done.
+
+<p>In the future CDS Invenio should ideally run indexing into invisible
 tables that would be switched against the production ones once the
 indexing process is successfully over.  For the time being, if
 reindexing takes several hours in your installation (e.g. if you have
