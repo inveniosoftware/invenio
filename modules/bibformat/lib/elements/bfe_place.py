@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,12 +25,12 @@ __revision__ = "$Id$"
 def format(bfo):
     """
     Prints the imprint publication place as HTML
-    @see date.py , publisher.py, reprints.py, imprint.py
+    @see date.py, publisher.py, reprints.py, imprint.py, pagination.py
     """
     place = bfo.field('260__a')
 
     if place != "sine loco":
-        return place  
+        return place
 
 
 

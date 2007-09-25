@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,24 +30,20 @@ def format(bfo, place_label, publisher_label, date_label, separator=', ',):
     @param place_label a label to print before the publication place value
     @param publisher_label a label to print before the publisher name
     @param date_label a a label to print before the publication date
-    @see place.py, publisher.py, date.py, reprints.py
+    @see place.py, publisher.py, date.py, reprints.py, pagination.py
     """
-    
+
     place = bfo.field('260__a')
     publisher = bfo.field('260__b')
     date = bfo.field('260__c')
-    
+
     out = ""
-    
 
     if publisher != "sine nomine":
         out += publisher_label + ' ' + publisher + separator
-        
+
     if place != "sine loco":
         out += place_label + ' ' + place + separator
 
     if len(date) > 0:
         out += date_label + ' ' + date
-
-
-

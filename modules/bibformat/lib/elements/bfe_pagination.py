@@ -18,18 +18,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints publisher name
+"""BibFormat element - Prints pagination
 """
 __revision__ = "$Id$"
 
 def format(bfo):
     """
-    Prints the publisher name
-
-    @see place.py, date.py, reprints.py, imprint.py, pagination.py
+    Prints the record pagination
+    @see date.py, publisher.py, reprints.py, imprint.py, place.py
     """
+    pagination = bfo.field('300__a')
 
-    publisher = bfo.field('260__b')
-
-    if publisher != "sine nomine":
-        return publisher
+    return pagination

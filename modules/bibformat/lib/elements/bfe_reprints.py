@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,16 +23,11 @@ __revision__ = "$Id$"
 def format(bfo, separator):
     """
     Prints the reprinted editions of a record
-    
+
     @param separator a separator between reprinted editions
-    @see place.py, publisher.py , imprint.py, date.py
+    @see place.py, publisher.py, imprint.py, date.py, pagination.py
     """
 
     reprints = bfo.field('260__g')
     if len(reprints) > 0:
         return separator.join(reprints)
-       
-
-
-
-
