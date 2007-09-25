@@ -820,7 +820,7 @@ translated_welcome =  &#95;("Welcome")
      The <code>escape</code> parameter can be one of the following values:
           <ul><li>0 - no escaping</li>
               <li>1 - escape all HTML characters</li>
-              <li>2 - escape all HTML characters by default. If field starts with <!--HTML-->,
+              <li>2 - escape all HTML characters by default. If field starts with &lt;!--HTML--&gt;,
               escape only unsafe characters, but leaves basic HTML tags.
               This is particularly useful if you want to store HTML text in your
               metadata but still want to escape some tags to prevent
@@ -1092,7 +1092,7 @@ your behaviours, but that you go through the created .bfo files in the /etc/bibf
 </ul>
 <p>We recommend that you do not use the migration kit for this part: it can help you create the initial files, but will never be able to provide a working implementation of the formats.</p>
 <h4>Migrating <i>Knowledge Bases</i></h4>
-<p>We recomment yo use the migration kit to migrate your knowledge bases. It should have no problem to migrate this part of your configuration.</p>
+<p>We recommend you use the migration kit to migrate your knowledge bases. It should have no problem to migrate this part of your configuration.</p>
 <h4>Migrating <i>UDFs</i> and <i>Link rules</i></h4>
 <p><i>User Defined Functions</i> and <i>Link rules</i> have been dropped in the new BibFormat. These concepts have no reasons to be as they can be fully implemented in the <i>format elements</i>. For example the <code>AUTHOR_SEARCH</code> link rule can directly be implemented in the <code>Authors.bfe</code> element.</p>
 <p>As for the UDFs, most of them are directly built-in functions of Python. Whenever a special function as to be implemented, it can be defined in a regular Python file and used in any element.</p>
