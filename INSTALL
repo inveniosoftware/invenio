@@ -460,13 +460,19 @@ Contents
               ServerSignature Off
               ServerTokens Prod
               NameVirtualHost *:80
+              <Files *.pyc>
+                 deny from all
+              </Files>
+              <Files *~>
+                 deny from all
+              </Files>              
               <VirtualHost *:80>
                       ServerName webserver.domain.com
                       ServerAlias webserver
                       ServerAdmin cds.support@cern.ch
                       DocumentRoot /opt/cds-invenio/var/www
                       <Directory /opt/cds-invenio/var/www>
-                         Options Indexes FollowSymLinks MultiViews
+                         Options FollowSymLinks MultiViews
                          AllowOverride None
                          Order allow,deny
                          allow from all
@@ -500,6 +506,12 @@ Contents
               #SSLCertificateFile /etc/apache2/ssl/apache.pem
               SSLCertificateFile /etc/apache2/ssl/server.crt
               SSLCertificateKeyFile /etc/apache2/ssl/server.key
+              <Files *.pyc>
+                 deny from all
+              </Files>
+              <Files *~>
+                 deny from all
+              </Files>              
               <VirtualHost *:443>
                       ServerName webserver.domain.com
                       ServerAlias webserver
@@ -507,7 +519,7 @@ Contents
                       SSLEngine on
                       DocumentRoot /opt/cds-invenio/var/www
                       <Directory /opt/cds-invenio/var/www>
-                         Options Indexes FollowSymLinks MultiViews
+                         Options FollowSymLinks MultiViews
                          AllowOverride None
                          Order allow,deny
                          allow from all
