@@ -443,7 +443,7 @@ class Template:
 
         # top menu
         out = """
-                <form method="post" action="/submit" onsubmit="return tester();">
+                <form method="post" action="/submit" enctype="multipart/form-data" onsubmit="return tester();">
                 <center><table cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td class="submitHeader"><b>%(docname)s&nbsp;</b></td>
