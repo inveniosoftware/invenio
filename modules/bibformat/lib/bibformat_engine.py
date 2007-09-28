@@ -591,13 +591,13 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
                                    str(error_string[0][1]) +'</span></b> '
         # (3)
-        if escape in ['0', '1']:
+        if escape in ['0', '1', '2', '3', '4']:
             escape_mode = int(escape)
 
         #If escape is equal to 1, then escape all
         # HTML reserved chars.
-        if escape_mode == 1:
-            output_text = cgi.escape(output_text)
+        if escape_mode > 0:
+            output_text = (output_text, mode=escape_mode)
 
         # Add prefix and suffix if they have been given as parameters and if
         # the evaluation of element is not empty
@@ -1838,8 +1838,10 @@ class BibFormatObject:
         of the fields. The value of escape can be:
                       0 - no escaping
                       1 - escape all HTML characters
-                      2 - escape all HTML characters by default. If field starts with <!--HTML-->,
-                          escape only unsafe characters, but leave basic HTML tags.
+                      2 - escape all dangerous HTML tags.
+                      3 - Mix of mode 1 and 2. If value of field starts with
+                          <!-- HTML -->, then use mode 2. Else use mode 1.
+                      4 - Remove all HTML tags
 
         @param tag the marc code of a field
         @param escape 1 if returned values should be escaped. Else 0.
@@ -1918,11 +1920,14 @@ def escape_field(value, mode=0):
     Utility function used to escape the value of a field in given mode.
 
     - mode 0: no escaping
-    - mode 1: escaping all HTML/XML characters
+    - mode 1: escaping all HTML/XML characters (escaped chars are shown as escaped)
     - mode 2: escaping dangerous HTML tags to avoid XSS, but
               keep basic one (such as <br />)
+              Escaped characters are removed.
     - mode 3: mix of mode 1 and mode 2. If field_value starts with <!--HTML-->,
               then use mode 2. Else use mode 1.
+    - mode 4: escaping all HTML/XML tags (escaped tags are removed)
+    -
     """
     if mode == 1:
         return cgi.escape(value)
@@ -1941,6 +1946,11 @@ def escape_field(value, mode=0):
                                )
         else:
             return cgi.escape(value)
+    elif mode == 4:
+        return washer.wash(value,
+                           allowed_attribute_whitelist=[],
+                           allowed_tag_whitelist=[]
+                           )
     else:
         return value
 
