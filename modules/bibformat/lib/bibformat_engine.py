@@ -597,7 +597,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         #If escape is equal to 1, then escape all
         # HTML reserved chars.
         if escape_mode > 0:
-            output_text = (output_text, mode=escape_mode)
+            output_text = escape_field(output_text, mode=escape_mode)
 
         # Add prefix and suffix if they have been given as parameters and if
         # the evaluation of element is not empty
