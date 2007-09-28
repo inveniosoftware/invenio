@@ -40,7 +40,7 @@ def fix_latex_formulas(text):
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
-           highlight='no', print_lang='en,fr'):
+           highlight='no', print_lang='en,fr', escape="3"):
     """ Prints the abstract of a record in HTML. By default prints English and French versions.
 
     Printed languages can be chosen with the 'print_lang' parameter.
@@ -56,18 +56,19 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
     @parmm contextual if 'yes' prints sentences the most relative to user search keyword (if limit < abstract)
     @param highlight if 'yes' highlights words from user search keyword
     @param print_lang the comma-separated list of languages to print. Now restricted to 'en' and 'fr'
+    @param escape escaping method
     """
     out = ''
 
     languages = print_lang.split(',')
 
-    abstract_en = bfo.fields('520__a', escape=3)
-    abstract_en.extend(bfo.fields('520__b', escape=3))
+    abstract_en = bfo.fields('520__a', escape=int(escape))
+    abstract_en.extend(bfo.fields('520__b', escape=int(escape)))
     #abstract_en = [cgi.escape(val) for val in abstract_en]
     abstract_en = "<br/>".join(abstract_en)
 
-    abstract_fr = bfo.fields('590__a', escape=3)
-    abstract_fr.extend(bfo.fields('590__b', escape=3))
+    abstract_fr = bfo.fields('590__a', escape=int(escape))
+    abstract_fr.extend(bfo.fields('590__b', escape=int(escape)))
     #abstract_fr = [cgi.escape(val) for val in abstract_fr]
     abstract_fr = "<br/>".join(abstract_fr)
 
