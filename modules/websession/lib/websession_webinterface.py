@@ -550,6 +550,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../youraccount/logout",
                                                navmenuid='login')
 
+        if CFG_EXTERNAL_AUTH_USING_SSO:
+            return redirect_to_url(req, CFG_EXTERNAL_AUTH_LOGOUT_SSO)
+
         return page(title=_("Logout"),
                     body=webaccount.perform_logout(req, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
@@ -601,7 +604,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
         else:
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
-            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', 'SSO')
+            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
         if len(iden)>0:
             uid = webuser.update_Uid(req, args['p_un'])
             uid2 = webuser.getUid(req)
