@@ -83,10 +83,9 @@ class ExternalAuthSSO(ExternalAuth):
     """
 
 
-    def __init__(self):
+    def __init__(self, enforce_external_nicknames=False):
         """Initialize stuff here"""
-        ExternalAuth.__init__(self)
-        self.enforce_external_nicknames = True
+        ExternalAuth.__init__(self, enforce_external_nicknames)
 
 
     def auth_user(self, username, password, req=None):

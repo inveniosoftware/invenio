@@ -33,7 +33,7 @@ class WebAccessExternalAuthError(Exception):
 class ExternalAuth:
     """External authentication template example."""
 
-    def __init__(self):
+    def __init__(self, enforce_external_nicknames=False):
         """Initialize stuff here"""
         self.name = None
         # Set the following variable to True in order to import the externally
@@ -41,7 +41,7 @@ class ExternalAuth:
         # through this external authentication system.
         # If the nickname is already taken into Invenio, then it won't be
         # considered.
-        self.enforce_external_nicknames = False
+        self.enforce_external_nicknames = enforce_external_nicknames
         pass
 
     def auth_user(self, username, password, req=None):
