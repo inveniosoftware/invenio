@@ -73,17 +73,17 @@ CFG_ACC_EMPTY_ROLE_DEFINITION_SRC='deny any'
 # must be default
 CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True)}
 
-# Variables to set if using SSO
+# Variables to set to the SSO Authentication name if using SSO
 CFG_EXTERNAL_AUTH_USING_SSO = False
 CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
 
 if CFG_CERN_SITE:
     if False: #FIXME set this to True when we deploy SSO at CERN
         import external_authentication_sso as ea_sso
-        CFG_EXTERNAL_AUTH_USING_SSO = True
+        CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
         # Link to reach in order to logout from SSO
         CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
-        CFG_EXTERNAL_AUTHENTICATION = {"CERN SSO" : (ea_sso.ExternalAuthSSO(), True)}
+        CFG_EXTERNAL_AUTHENTICATION = {CFG_EXTERNAL_AUTH_USING_SSO : (ea_sso.ExternalAuthSSO(), True)}
     else:
         import external_authentication_cern as ea_cern
         CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, False), \
