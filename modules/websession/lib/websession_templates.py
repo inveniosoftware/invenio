@@ -485,7 +485,7 @@ class Template:
              }
         return out + "<br /><br />"
 
-    def tmpl_account_template(self, title, body, ln):
+    def tmpl_account_template(self, title, body, ln, url):
         """
         Displays a block of the your account page
 
@@ -496,18 +496,19 @@ class Template:
           - 'title' *string* - The title of the block
 
           - 'body' *string* - The body of the block
+
+          - 'url' *string* - The URL to go to the proper section
         """
 
-        out =""
-        out +="""
+        out ="""
               <table class="searchbox" width="90%%" summary=""  >
                             <tr>
-                             <th class="searchboxheader">%s</th>
+                             <th class="searchboxheader"><a href="%s">%s</a></th>
                             </tr>
                             <tr>
                              <td class="searchboxbody">%s</td>
                             </tr>
-                          </table>""" % (title, body)
+                          </table>""" % (url, title, body)
         return out
 
     def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, messages, groups, administrative):
@@ -539,24 +540,24 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        out += self.tmpl_account_template(_("Your Account"), accBody, ln)
-        out += self.tmpl_account_template(_("Your Messages"), messages, ln)
-        out += self.tmpl_account_template(_("Your Baskets"), baskets, ln)
-        out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln)
-        out += self.tmpl_account_template(_("Your Searches"), searches, ln)
+        out += self.tmpl_account_template(_("Your Account"), accBody, ln, '/youraccount/edit?ln=%s' % ln)
+        out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
+        out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
+        out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
+        out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
         groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
         groups_description %= {'x_url_open': '<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
                                'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Groups"), groups_description, ln)
+        out += self.tmpl_account_template(_("Your Groups"), groups_description, ln, '/yourgroups/display?ln=%s' % ln)
         submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
         submission_description %= {'x_url_open': '<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">',
                                    'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln)
+        out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln, '/yoursubmissions.py?ln=%s' % ln)
         approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
         approval_description %=  {'x_url_open': '<a href="' + weburl + '/yourapprovals.py?ln=' + ln + '">',
                                   'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln)
-        out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln)
+        out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
+        out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
         return out
 
     def tmpl_account_emailMessage(self, ln, msg):

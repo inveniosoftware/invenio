@@ -140,6 +140,27 @@ a.note:hover {
    color: #666;
    background: transparent;
 }
+
+th.searchboxheader a:link {
+   color: #000;
+   text-decoration: none;
+}
+
+th.searchboxheader a:visited {
+   color: #000;
+   text-decoration: none;
+}
+
+th.searchboxheader a:active {
+   color: #000;
+   text-decoration: none;
+}
+
+th.searchboxheader a:hover {
+   color: #000;
+}
+
+
 .headerbox {
    color: #000;
    background: transparent;
@@ -1309,7 +1330,7 @@ input.hyperlinkformSubmitButton {
    text-align: right;
    vertical-align: top;
    padding: 2px 5px 2px 5px;
-   font-weight: bold; 
+   font-weight: bold;
 }
 /* end of BibEdit module*/
 /* WebAlert module */
