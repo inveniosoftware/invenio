@@ -75,11 +75,11 @@ class IntBitSetTest(unittest.TestCase):
         up_to1 = creator_list and max(creator_list) or -1
         self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize, "up_to1=%s, size1=%s, allocated1=%s while testing %s during %s" % (up_to1, size1 * wordbitsize, allocated1 * wordbitsize, intbitset1, msg))
         tmp = intbitset(intbitset1.fastdump())
-        size1 = intbitset1.get_size()
-        allocated1 = intbitset1.get_allocated()
-        creator_list = intbitset1.extract_finite_list()
-        up_to1 = creator_list and max(creator_list) or -1
-        self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize, "After serialization up_to1=%s, size1=%s, allocated1=%s while testing %s during %s" % (up_to1, size1 * wordbitsize, allocated1 * wordbitsize, intbitset1, msg))
+        size2 = tmp.get_size()
+        allocated2 = tmp.get_allocated()
+        creator_list = tmp.extract_finite_list()
+        up_to2 = creator_list and max(creator_list) or -1
+        self.failUnless(up_to2 <= size2 * wordbitsize < allocated2 * wordbitsize, "After serialization up_to2=%s, size2=%s, allocated2=%s while testing %s during %s" % (up_to2, size2 * wordbitsize, allocated2 * wordbitsize, intbitset1, msg))
 
 
     def _helper_test_via_fncs_list(self, fncs, intbitset1, intbitset2):

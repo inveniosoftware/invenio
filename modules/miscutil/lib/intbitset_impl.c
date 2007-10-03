@@ -145,7 +145,7 @@ int intBitSetGetAllocated(const IntBitSet * const bitset) {
 void intBitSetResize(IntBitSet *const bitset, register const int allocated) {
     register word_t *base;
     register word_t *end;
-    if (allocated > bitset->allocated)  {
+    if (allocated > bitset->allocated) {
         bitset->bitset = realloc(bitset->bitset, allocated * wordbytesize);
         base = bitset->bitset + bitset->allocated;
         end = bitset->bitset + allocated;
@@ -196,14 +196,21 @@ bool_t intBitSetEmpty(const IntBitSet *const bitset) {
 }
 
 int intBitSetAdaptMax(IntBitSet *const x, IntBitSet *const y) {
-    register int sizex = intBitSetGetSize(x);
-    register int sizey = intBitSetGetSize(y);
-    register int sizemax = ((sizex > sizey) ? sizex : sizey) + 1;
-    if (sizemax > x->allocated)
-        intBitSetResize(x, sizemax);
-    if (sizemax > y->allocated)
-        intBitSetResize(y, sizemax);
-    return sizemax;
+    // Good idea but broken, it is kept for better time...
+    // register int sizex = intBitSetGetSize(x);
+    // register int sizey = intBitSetGetSize(y);
+    // register int sizemax = ((sizex > sizey) ? sizex : sizey) + 1;
+    // if (sizemax > x->allocated)
+    //     intBitSetResize(x, sizemax);
+    // if (sizemax > y->allocated)
+    //     intBitSetResize(y, sizemax);
+    // return sizemax;*/
+    register int allocated = (x->allocated > y->allocated) ? x->allocated : y->allocated;
+    if (allocated > x->allocated)
+        intBitSetResize(x, allocated);
+    if (allocated > y->allocated)
+        intBitSetResize(y, allocated);
+    return allocated;
 }
 
 int intBitSetAdaptMin(IntBitSet *const x, IntBitSet *const y) {
