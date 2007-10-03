@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,7 +24,8 @@ __revision__ = "$Id$"
 
 from invenio.bibformat_utils import parse_tag
 
-def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
+def format(bfo, tag, limit, instances_separator=" ",
+           subfields_separator=" ", extension=""):
     """
     Prints the given field of a record.
     If tag is in range [001, 010], this element assumes
@@ -35,38 +36,48 @@ def format(bfo, tag, limit, instances_separator=" ", subfields_separator=" "):
     @param instances_separator a separator between instances of field
     @param subfields_separator a separator between subfields of an instance
     @param limit the maximum number of values to display.
+    @param extension a text printed at the end if 'limit' has been exceeded
     """
-    # check if data or control field
+    # Check if data or control field
     p_tag = parse_tag(tag)
     if p_tag[0].isdigit() and int(p_tag[0]) in range(0, 11):
         return  bfo.control_field(tag)
     elif p_tag[0].isdigit():
-        #Get values without subcode. We will filter unneeded subcode later
+        # Get values without subcode.
+        # We will filter unneeded subcode later
         values = bfo.fields(p_tag[0]+p_tag[1]+p_tag[2])
     else:
         return ''
-    
+
     out = ""
-    
-    if limit == "" or (not limit.isdigit()) or limit > len(values):
+
+    if limit == "" or (not limit.isdigit()) or int(limit) > len(values):
         limit = len(values)
+    else:
+        limit = int(limit)
 
     if len(values) > 0 and isinstance(values[0], dict):
         x = 0
         for instance in values:
             filtered_values = [value for (subcode, value) in instance.iteritems()
-                              if p_tag[3] == '' or p_tag[3] == '%' or p_tag[3] == subcode]
+                              if p_tag[3] == '' or p_tag[3] == '%' \
+                               or p_tag[3] == subcode]
             if filtered_values:
                 x += 1
             out += subfields_separator.join(filtered_values)
             if x >= limit:
+                out += extension
                 break
-            
-            # Print separator between non-empty instances, and if not last instance
+
+            # Print separator between non-empty instances, and if not
+            # last instance
             if x < len(values) and filtered_values:
                 out += instances_separator
 
     else:
         out += subfields_separator.join(values[:int(limit)])
-    
+
+        if int(limit) < len(values):
+            out += extension
+
     return out
