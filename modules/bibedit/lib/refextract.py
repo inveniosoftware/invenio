@@ -25,10 +25,12 @@
 
 __revision__ = "$Id$"
 
+import sys, re
+import os, getopt
+from time import mktime, localtime, ctime
+
+# make refextract runnable without having to have done the full Invenio installation:
 try:
-    import sys, re
-    import os, getopt
-    from time import mktime, localtime, ctime
     from invenio.refextract_config \
            import CFG_REFEXTRACT_VERSION, \
                   CFG_REFEXTRACT_KB_JOURNAL_TITLES, \
@@ -58,14 +60,53 @@ try:
                   CFG_REFEXTRACT_XML_COLLECTION_CLOSE, \
                   CFG_REFEXTRACT_XML_RECORD_OPEN, \
                   CFG_REFEXTRACT_XML_RECORD_CLOSE
+except ImportError:
+    CFG_REFEXTRACT_VERSION = "CDS Invenio/%s refextract/%s" % ('standalone', 'standalone')
+    CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/etc/refextract-journal-titles.kb" % '..'
+    CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/etc/refextract-report-numbers.kb" % '..'
+    CFG_REFEXTRACT_CTRL_FIELD_RECID          = "001" ## control-field recid
+    CFG_REFEXTRACT_TAG_ID_REFERENCE          = "999" ## ref field tag
+    CFG_REFEXTRACT_IND1_REFERENCE            = "C"   ## ref field ind1
+    CFG_REFEXTRACT_IND2_REFERENCE            = "5"   ## ref field ind2
+    CFG_REFEXTRACT_SUBFIELD_MARKER           = "o"   ## ref marker subfield
+    CFG_REFEXTRACT_SUBFIELD_MISC             = "m"   ## ref misc subfield
+    CFG_REFEXTRACT_SUBFIELD_REPORT_NUM       = "r"   ## ref reportnum subfield
+    CFG_REFEXTRACT_SUBFIELD_TITLE            = "s"   ## ref title subfield
+    CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield
+    CFG_REFEXTRACT_SUBFIELD_URL_DESCR        = "z"   ## ref url-text subfield
+    CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS   = "999" ## ref-stats tag
+    CFG_REFEXTRACT_IND1_EXTRACTION_STATS     = "C"   ## ref-stats ind1
+    CFG_REFEXTRACT_IND2_EXTRACTION_STATS     = "6"   ## ref-stats ind2
+    CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS = "a"   ## ref-stats subfield
+    CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM = r"</cds.REPORTNUMBER>"
+    CFG_REFEXTRACT_MARKER_CLOSING_TITLE      = r"</cds.TITLE>"
+    CFG_REFEXTRACT_MARKER_CLOSING_SERIES     = r"</cds.SER>"
+    CFG_REFEXTRACT_MARKER_CLOSING_VOLUME     = r"</cds.VOL>"
+    CFG_REFEXTRACT_MARKER_CLOSING_YEAR       = r"</cds.YR>"
+    CFG_REFEXTRACT_MARKER_CLOSING_PAGE       = r"</cds.PG>"
+    CFG_REFEXTRACT_XML_VERSION          = u"""<?xml version="1.0" encoding="UTF-8"?>"""
+    CFG_REFEXTRACT_XML_COLLECTION_OPEN  = u"""<collection xmlns="http://www.loc.gov/MARC21/slim">"""
+    CFG_REFEXTRACT_XML_COLLECTION_CLOSE = u"""</collection>\n"""
+    CFG_REFEXTRACT_XML_RECORD_OPEN      = u"<record>"
+    CFG_REFEXTRACT_XML_RECORD_CLOSE     = u"</record>"
 
+# make refextract runnable without having to have done the full Invenio installation:
+try:
     from invenio.config import CFG_PATH_GFILE, CFG_PATH_PDFTOTEXT
+except ImportError:
+    CFG_PATH_GFILE='/usr/bin/file'
+    CFG_PATH_PDFTOTEXT='/usr/bin/pdftotext'
+
+# make refextract runnable without having to have done the full Invenio installation:
+try:
     from invenio.search_engine import encode_for_xml
-except ImportError, importerror:
-    import sys
-    sys.stderr.write("Error: %s" % importerror)
-    sys.stderr.flush()
-    sys.exit(1)
+except ImportError:
+    import string
+    def encode_for_xml(s):
+        "Encode special chars in string so that it would be XML-compliant."
+        s = string.replace(s, '&', '&amp;')
+        s = string.replace(s, '<', '&lt;')
+        return s
 
 cli_opts = {}
 
@@ -5080,3 +5121,6 @@ def test_get_reference_lines():
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                ]
     return reflines
+
+if __name__ == '__main__':
+    main()
