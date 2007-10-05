@@ -30,23 +30,127 @@ from os.path import basename, splitext
 
 def format(bfo, style, separator='; ', show_icons='no'):
     """
-    This is the default format for formatting full-text reference.
+    This is the default format for formatting fulltext links.
     @param separator the separator between urls.
     @param style CSS class of the link
     @param show_icons if 'yes', print icons for fulltexts
     """
+    out = ''
 
+    # Retrieve files
+    (parsed_urls, old_versions, additionals) = getFiles(bfo)
+
+    main_urls = parsed_urls['main_urls']
+    others_urls = parsed_urls['others_urls']
+    if parsed_urls.has_key('cern_urls'):
+        cern_urls = parsed_urls['cern_urls']
+
+    # Prepare style and icon
+    if style != "":
+        style = 'class="'+style+'"'
+
+    if show_icons.lower() == 'yes':
+        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="Download fulltext"/>' % weburl
+    else:
+        file_icon = ''
+
+    # Build urls list.
+    # Escape special chars for <a> tag value.
+
+    additional_str = ''
+    if additionals:
+        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
+
+    versions_str = ''
+    if old_versions:
+        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
+
+    if main_urls:
+        last_name = ""
+        for descr, urls in main_urls.items():
+            out += "<strong>%s:</strong> " % descr
+            url_list = []
+            urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
+
+            for url, name, format in urls:
+                if not name == last_name and len(main_urls) > 1:
+                    print_name = "<em>%s</em> - " % name
+                else:
+                    print_name = ""
+                last_name = name
+                url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+ \
+                                file_icon + format.upper()+'</a>')
+            out += separator.join(url_list) + additional_str + versions_str + '<br />'
+
+    if CFG_CERN_SITE and cern_urls:
+        link_word = len(cern_urls) == 1 and 'link' or 'links'
+        out += '<strong>CERN %s</strong>: ' % link_word
+        url_list = []
+        for url,descr in cern_urls.items():
+            url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
+                            file_icon + escape(str(descr))+'</a>')
+        out += separator.join(url_list)
+
+    if others_urls:
+        link_word = len(others_urls) == 1 and 'link' or 'links'
+        out += '<strong>External %s</strong>: ' % link_word
+        url_list = []
+        for url,descr in others_urls.items():
+            url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
+                            file_icon + escape(str(descr))+'</a>')
+        out += separator.join(url_list) + '<br />'
+
+    if out.endswith('<br />'):
+        out = out[:-len('<br />')]
+
+    return out
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
+
+def getFiles(bfo):
+    """
+    Returns the files available for the given record.
+    Returned structure is a tuple (parsed_urls, old_versions, additionals):
+     - parsed_urls: contains categorized URLS (see details below)
+     - old_versions: set to True if we can have access to old versions
+     - additionals: set to True if we have other documents than the 'main' document
+
+    Returned dictionary is of the form:
+    {'main_urls' : {'Main'      : [('http://weburl/record/1/files/aFile.pdf', 'aFile', 'PDF'),
+                                   ('http://weburl/record/1/files/aFile.gif', 'aFile', 'GIF')],
+                    'Additional': [('http://weburl/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
+
+     'other_urls': {'http://externalurl.com/aFile.pdf': 'Fulltext',      # url(8564_u):description(8564_z/y)
+                    'http://externalurl.com/bFile.pdf': 'Fulltext'},
+
+     'cern_urls' : {'http://cern.ch/aFile.pdf': 'Fulltext',              # url(8564_u):description(8564_z/y)
+                    'http://cern.ch/bFile.pdf': 'Fulltext'},
+    }
+
+    Some notes about returned structure:
+    - key 'cern_urls' is only available on CERN site
+    - keys in main_url dictionaries are defined by the BibDoc.
+    - older versions are not part of the parsed urls
+    """
     urls = bfo.fields("8564_")
-
-    ret = ""
     bibarchive = BibRecDocs(bfo.recID)
-    old_version_there = False
-    main_urls = {} # Urls hosted by Invenio (bibdocs)
-    others_urls = {} # External urls
-    if CFG_CERN_SITE:
-        cern_urls = {} # cern.ch urls
-    additionals = False
 
+    old_versions = False  # We can provide link to older files
+    additionals = False        # We have additional files
+
+    # Prepare object to return
+    parsed_urls = {'main_urls':{},    # Urls hosted by Invenio (bibdocs)
+                  'others_urls':{}    # External urls
+                  }
+    if CFG_CERN_SITE:
+        parsed_urls['cern_urls'] = {} # cern.ch urls
+
+    # Parse URLs
     for complete_url in urls:
         if complete_url.has_key('u'):
             url = complete_url['u']
@@ -70,114 +174,28 @@ def format(bfo, style, separator='; ', show_icons='no'):
                         #FIXME remove eventual ?parameters
                         descr = filename or host # Let's take the name from the url
                 if CFG_CERN_SITE and 'cern.ch' in host:
-                    cern_urls[url] = descr # Obsolete cern.ch url (we're migrating)
+                    parsed_urls['cern_urls'][url] = descr # Obsolete cern.ch url (we're migrating)
                 else:
-                    others_urls[url] = descr # external url
+                    parsed_urls['others_urls'][url] = descr # external url
             else: # It's a bibdoc!
                 assigned = False
                 for doc in bibarchive.listBibDocs():
                     if int(doc.getLatestVersion()) > 1:
-                        old_version_there = True
+                        old_versions = True
                     if filename in [f.fullname for f in doc.listAllFiles()]:
                         assigned = True
+                        #doc.getIcon()
                         if not doc.type == 'Main':
                             additionals = True
                         else:
                             if not descr:
                                 descr = 'Main file(s)'
-                            if not main_urls.has_key(descr):
-                                main_urls[descr] = []
-                            main_urls[descr].append((url, name, format))
+                            if not parsed_urls['main_urls'].has_key(descr):
+                                parsed_urls['main_urls'][descr] = []
+                            parsed_urls['main_urls'][descr].append((url, name, format))
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
                         descr = filename
-                    others_urls[url] = descr # Let's put it in a general other url
+                    parsed_url['others_urls'][url] = descr # Let's put it in a general other url
 
-    if style != "":
-        style = 'class="'+style+'"'
-
-    # Build urls list.
-    # Escape special chars for <a> tag value.
-
-    additional_str = ''
-    if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
-
-    versions_str = ''
-    if old_version_there:
-        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
-
-    if main_urls:
-        # Put a big file icon if only one file
-        if len(main_urls) == 1 and len(main_urls[0][1]) == 1 and \
-               (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 0 and \
-               show_icons.lower() == 'yes':
-            file_icon = '<img src="%s/img/file-icon-text-96x128.gif" alt="Download fulltext" height="64px"/><br />' % weburl
-        elif show_icons.lower() == 'yes':
-            file_icon = '<img src="%s/img/file-icon-text-15x20.gif" alt="Download fulltext"/>' % weburl
-        else:
-            file_icon = ''
-            
-        last_name = ""
-        for descr, urls in main_urls.items():
-            ret += "<small>%s:</small> " % descr
-            url_list = []
-            urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
-
-            for url, name, format in urls:
-                if not name == last_name and len(main_urls) > 1:
-                    print_name = "<em>%s</em> - " % name
-                else:
-                    print_name = ""
-                last_name = name
-                url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+file_icon+format.upper()+'</a>')
-            ret += separator.join(url_list) + additional_str + versions_str + '<br />'
-
-    if CFG_CERN_SITE and cern_urls:
-        # Put a big file icon if only one file
-        if len(main_urls) == 0 and \
-               len(cern_urls) == 1 and len(others_urls) == 0 and \
-               show_icons.lower() == 'yes': 
-            file_icon = '<img src="%s/img/file-icon-text-96x128.gif" alt="Download fulltext" height="64px"/><br />' % weburl
-        elif show_icons.lower() == 'yes':
-            file_icon = '<img src="%s/img/file-icon-text-15x20.gif" alt="Download fulltext"/>' % weburl
-        else:
-            file_icon = ''
-            
-        link_word = len(cern_urls) == 1 and 'link' or 'links'
-        ret += '<small>(CERN %s)</small><br />' % link_word
-        url_list = []
-        for url,descr in cern_urls.items():
-            url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
-        ret += separator.join(url_list) + '<br />'
-
-    if others_urls:
-        # Put a big file icon if only one file
-        if len(main_urls) == 0 and \
-               (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 1 and \
-               show_icons.lower() == 'yes':
-            file_icon = '<img src="%s/img/file-icon-text-96x128.gif" alt="Download fulltext" height="64px"/><br />' % weburl
-        elif show_icons.lower() == 'yes':
-            file_icon = '<img src="%s/img/file-icon-text-15x20.gif" alt="Download fulltext"/>' % weburl
-        else:
-            file_icon = ''
-        link_word = len(others_urls) == 1 and 'link' or 'links'
-        ret += '<small>(external %s)</small>:<br/>' % link_word
-        url_list = []
-        for url,descr in others_urls.items():
-            url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
-        ret += '<small>' + separator.join(url_list) + '</small><br />'
-    if ret.endswith('<br />'):
-        ret = ret[:-len('<br />')]
-
-    if ret == '' and show_icons.lower() == 'yes':
-        ret += '<img src="%s/img/file-icon-none-96x128.gif" alt="Download fulltext" height="64px"/><br /><span style="color:#aaa">No fulltext</span>' % weburl
-        
-    return ret
-
-def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
-    return 0
+    return (parsed_urls, old_versions, additionals)
