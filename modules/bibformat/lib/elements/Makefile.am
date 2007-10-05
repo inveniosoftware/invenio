@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -28,8 +28,8 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_collection.py bfe_editors.py bfe_bibtex.py bfe_edit_record.py \
 	     bfe_date.py bfe_xml_record.py bfe_external_publications.py __init__.py \
 	     bfe_bfx_engine.py bfe_creation_date.py bfe_server_info.py bfe_issn.py \
-	     bfe_client_info.py bfe_language.py bfe_record_id.py bfe_comments.py
-
+	     bfe_client_info.py bfe_language.py bfe_record_id.py bfe_comments.py \
+	     bfe_pagination.py
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
