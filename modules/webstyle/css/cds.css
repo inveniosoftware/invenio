@@ -140,7 +140,22 @@ a.note:hover {
    color: #666;
    background: transparent;
 }
-
+a.nodecoration:link {
+   color: #000;
+   text-decoration: none;
+}
+a.nodecoration:visited {
+   color: #000;
+   text-decoration: none;
+}
+a.nodecoration:active {
+   color: #000;
+   text-decoration: none;
+}
+a.nodecoration:hover {
+   color: #000;
+   text-decoration: underline;
+}
 th.searchboxheader a:link {
    color: #000;
    text-decoration: none;
