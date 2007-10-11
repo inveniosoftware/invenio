@@ -76,7 +76,7 @@ def get_groups_by_login_method(uid, login_method):
     res = run_sql(query, (uid, login_method))
     return res
 
-def get_groups(uid):
+def get_groups_with_description(uid):
     """Select all the groups the user is member of.
     @param uid: user id
     @return ((id_usergroup,
