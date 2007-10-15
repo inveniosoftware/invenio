@@ -193,7 +193,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         if store.value(s,namespace["compositeOf"],default=False,any=True) and not store.value(s,namespace["altLabel"],default=False,any=True):
             continue
 
-        if store.value(s,namespace["note"],any=True) == "nostandalone":
+        if str(store.value(s,namespace["note"],any=True)) == "nostandalone":
             nostandalone = True
 
         for alt in store.objects(s, namespace["altLabel"]):
