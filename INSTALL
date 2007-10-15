@@ -86,6 +86,8 @@ Contents
           - (optional) 4suite, slower alternative to PyRXP and
              libxml2-python:
              <http://4suite.org/>
+          - (optional) feedparser, for web journal creation:
+             <http://feedparser.org/>
           - (optional) Psyco, to speed up the code at places:
              <http://psyco.sourceforge.net/>
           - (optional) RDFLib, to use RDF ontologies and thesauri:
