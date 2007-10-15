@@ -29,6 +29,8 @@ import os
 import re
 import sys
 import time
+import copy
+import shelve
 
 # Please point the following variables to the correct paths if using standalone (Invenio-independent) version
 TMPDIR_STANDALONE = "/tmp"
@@ -65,7 +67,7 @@ Usage: bibclassify [options]
  -f, --file=FILENAME         name of the file to be classified (Use '.pdf' extension for PDF files; every other extension is treated as text)
  -k, --thesaurus=FILENAME    name of the text thesaurus (one keyword per line)
  -K, --taxonomy=FILENAME     name of the RDF SKOS taxonomy/ontology (a local file or URL)
- -o, --output=HTML|TEXT      output list of keywords in either HTML or text
+ -o, --output=HTML|TEXT|MARCXML      output list of keywords in either HTML, text, or MARCXML
  -l, --limit=INTEGER         maximum number of keywords that will be processed to generate results (the higher the l, the higher the number of possible composite keywords)
  -n, --nkeywords=INTEGER     maximum number of single keywords that will be generated
  -m, --mode=FULL|PARTIAL     processing mode: PARTIAL (run on abstract and selected pages), FULL (run on whole document - more accurate, but slower)
@@ -74,12 +76,13 @@ Usage: bibclassify [options]
  General options:
  -h,  --help               print this help and exit
  -V,  --version            print version and exit
+ -v, --verbose=LEVEL       Verbose level (0=min, 1=default, 9=max).
 """
     sys.stderr.write(usagetext)
     sys.exit(code)
 
 
-def generate_keywords(textfile, dictfile):
+def generate_keywords(textfile, dictfile, verbose=0):
     """ A method that generates a sorted list of keywords of a document (textfile) based on a simple thesaurus (dictfile). """
     keylist = []
     keyws = []
@@ -110,7 +113,7 @@ def generate_keywords(textfile, dictfile):
 
     return keyws
 
-def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, spires):
+def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, spires, verbose=0, ontology=None):
     """ A method that generates a sorted list of keywords (text or html output) based on a RDF thesaurus. """
 
     import rdflib
@@ -121,23 +124,34 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     compositesTOADD = []
 
     keys2drop = []
-
+    raw = []
     composites = {}
     compositesIDX = {}
 
     text_out = ""
     html_out = []
-
-    delimiter = ""
-    if spires: delimiter = ","
-    else: delimiter = ":"
-
+    store = None
+    reusing_compiled_ontology_p = False
+    compiled_ontology_db = None
+    compiled_ontology_db_file = dictfile + '.db'
     namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
-
-    store = rdflib.Graph()
-    store.parse(dictfile)
+    if not(os.access(dictfile,os.F_OK) and os.access(compiled_ontology_db_file,os.F_OK) and os.path.getmtime(compiled_ontology_db_file) > os.path.getmtime(dictfile)):
+        # changed graph type, recommended by devel team
+        store = rdflib.ConjunctiveGraph()
+        store.parse(dictfile)
+        compiled_ontology_db = shelve.open(compiled_ontology_db_file)
+        compiled_ontology_db['graph'] = store
+        if verbose >= 3:
+            write_message("Creating compiled ontology %s for the first time" % compiled_ontology_db_file, sys.stderr)
+    else:
+        if verbose >= 3:
+            write_message("Reusing compiled ontology %s" % compiled_ontology_db_file, sys.stderr)
+        reusing_compiled_ontology_p = True
+        compiled_ontology_db = shelve.open(compiled_ontology_db_file)
+        store = compiled_ontology_db['graph']
 
     size = int(os.stat(textfile).st_size)
+
     rtmp = open(textfile, 'r')
     atmp = open(textfile, 'r')
 
@@ -174,95 +188,100 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         print "Author keyword string detected: " + safe_keys
 
     # Here we start the big for loop around all concepts in the RDF ontology
+    if not reusing_compiled_ontology_p:
+        # we have to compile ontology first:
+        for s,pref in store.subject_objects(namespace["prefLabel"]):
 
-    for s,pref in store.subject_objects(namespace["prefLabel"]):
+            dictOUT = 0
+            safeOUT = 0
+            hideOUT = 0
+            candidates = []
+            wildcard = ""
+            regex = False
+            nostandalone = False
 
-        dictOUT = 0
-        safeOUT = 0
-        hideOUT = 0
-        candidates = []
+            # For each concept, we gather the candidates (i.e. prefLabel, hiddenLabel and altLabel)
+            candidates.append(pref.strip())
 
-        wildcard = ""
-        regex = False
-        nostandalone = False
-
-        # For each concept, we gather the candidates (i.e. prefLabel, hiddenLabel and altLabel)
-        candidates.append(pref.strip())
-
-        # If the candidate is a ckw and it has no altLabel, we are not interested at this point, go to the next item
-        if store.value(s,namespace["compositeOf"],default=False,any=True) and not store.value(s,namespace["altLabel"],default=False,any=True):
-            continue
-
-        if str(store.value(s,namespace["note"],any=True)) == "nostandalone":
-            nostandalone = True
-
-        for alt in store.objects(s, namespace["altLabel"]):
-            candidates.append(alt.strip())
-
-        for hid in store.objects(s, namespace["hiddenLabel"]):
-            candidates.append(hid.strip())
-
-        # We then create a regex pattern for each candidate and we match it in the document
-        # First we match any possible candidate containing regex. These have to be handled a priori
-        # (because they might cause double matching, e.g. "gauge theor*" will match "gauge theory"
-        for candidate in candidates:
-            if candidate.find("/", 0, 1) > -1:
-                # We have a wildcard or other regex, do not escape chars
-                # Wildcards matched with '\w*'. These truncations should go into hidden labels in the ontology
-                regex = True
-                pattern = makePattern(candidate, 3)
-                wildcard = pattern
-                hideOUT += len(re.findall(pattern,text_string))
-                # print "HIDEOUT: " + str(candidate) + " " + str(hideOUT)
-
-        for candidate in candidates:
-            # Different patterns are created according to the type of candidate keyword encountered
-
-            if candidate.find("/", 0, 1) > -1:
-                # We have already taken care of this
+            # If the candidate is a ckw and it has no altLabel, we are not interested at this point, go to the next item
+            if store.value(s,namespace["compositeOf"],default=False,any=True) and not store.value(s,namespace["altLabel"],default=False,any=True):
                 continue
 
-            elif regex and candidate.find("/", 0, 1) == -1 and len(re.findall(wildcard," " + candidate + " ")) > 0:
-                # The wildcard in hiddenLabel matches this candidate: skip it
-                # print "\ncase 2 touched\n"
-                continue
+            if str(store.value(s,namespace["note"],any=True)) == "nostandalone":
+                nostandalone = True
 
-            elif candidate.find("-") > -1:
-                # We have an hyphen -> e.g. "word-word". Look for: "word-word", "wordword", "word word" (case insensitive)
-                pattern = makePattern(candidate, 2)
+            for alt in store.objects(s, namespace["altLabel"]):
+                candidates.append(alt.strip())
 
-            elif candidate[:2].isupper() or len(candidate) < 3:
-                # First two letters are uppercase or very short keyword. This could be an acronym. Better leave case untouched
-                pattern = makePattern(candidate, 1)
+            for hid in store.objects(s, namespace["hiddenLabel"]):
+                candidates.append(hid.strip())
 
-            else:
-                # Let's do some plain case insensitive search
-                pattern = makePattern(candidate, 0)
+            # We then create a regex pattern for each candidate and we match it in the document
+            # First we match any possible candidate containing regex. These have to be handled a priori
+            # (because they might cause double matching, e.g. "gauge theor*" will match "gauge theory"
+            for candidate in candidates:
+                if candidate.find("/", 0, 1) > -1:
+                    # We have a wildcard or other regex, do not escape chars
+                    # Wildcards matched with '\w*'. These truncations should go into hidden labels in the ontology
+                    regex = True
+                    pattern = makePattern(candidate, 3)
+                    wildcard = pattern
+                    hideOUT += len(re.findall(pattern,text_string))
+                    # print "HIDEOUT: " + str(candidate) + " " + str(hideOUT)
 
-            if len(candidate) < 3:
-                # We have a short keyword
-                if len(re.findall(pattern,abstract))> 0:
-                    # The short keyword appears in the abstract/title, retain it
+            for candidate in candidates:
+                # Different patterns are created according to the type of candidate keyword encountered
+
+                if candidate.find("/", 0, 1) > -1:
+                    # We have already taken care of this
+                    continue
+
+                elif regex and candidate.find("/", 0, 1) == -1 and len(re.findall(wildcard," " + candidate + " ")) > 0:
+                    # The wildcard in hiddenLabel matches this candidate: skip it
+                    # print "\ncase 2 touched\n"
+                    continue
+
+                elif candidate.find("-") > -1:
+                    # We have an hyphen -> e.g. "word-word". Look for: "word-word", "wordword", "word word" (case insensitive)
+                    pattern = makePattern(candidate, 2)
+
+                elif candidate[:2].isupper() or len(candidate) < 3:
+                    # First two letters are uppercase or very short keyword. This could be an acronym. Better leave case untouched
+                    pattern = makePattern(candidate, 1)
+
+                else:
+                    # Let's do some plain case insensitive search
+                    pattern = makePattern(candidate, 0)
+
+                if len(candidate) < 3:
+                    # We have a short keyword
+                    if len(re.findall(pattern,abstract))> 0:
+                        # The short keyword appears in the abstract/title, retain it
+                        dictOUT += len(re.findall(pattern,text_string))
+                        safeOUT += len(re.findall(pattern,safe_keys))
+
+                else:
                     dictOUT += len(re.findall(pattern,text_string))
                     safeOUT += len(re.findall(pattern,safe_keys))
 
-            else:
-                dictOUT += len(re.findall(pattern,text_string))
-                safeOUT += len(re.findall(pattern,safe_keys))
+            dictOUT += hideOUT
 
-        dictOUT += hideOUT
+            if dictOUT > 0 and store.value(s,namespace["compositeOf"],default=False,any=True):
+                # This is a ckw whose altLabel occurs in the text
+                ckwlist[s.strip()] = dictOUT
 
-        if dictOUT > 0 and store.value(s,namespace["compositeOf"],default=False,any=True):
-            # This is a ckw whose altLabel occurs in the text
-            ckwlist[s.strip()] = dictOUT
+            elif dictOUT > 0:
+                keylist.append([dictOUT, s.strip(), pref.strip(), safeOUT, candidates, nostandalone])
 
-        elif dictOUT > 0:
-            keylist.append([dictOUT, s.strip(), pref.strip(), safeOUT, candidates, nostandalone])
-
-        regex = False
-
-    keylist.sort()
-    keylist.reverse()
+            regex = False
+        keylist.sort()
+        keylist.reverse()
+        compiled_ontology_db['keylist'] = keylist
+        compiled_ontology_db.close()
+    else:
+        # we can reuse compiled ontology:
+        keylist = compiled_ontology_db['keylist']
+        compiled_ontology_db.close()
 
     if limit > len(keylist):
         limit = len(keylist)
@@ -393,7 +412,6 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
     compositesOUT.sort()
     compositesOUT.reverse()
-
     # Some more keylist filtering: inclusion, e.g subtract "magnetic" if have "magnetic field"
     for i in keylist:
         pattern_to_match = " " + i[2].strip() + " "
@@ -414,6 +432,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             safe_one_mark = "*"
         if safe_keys.find(comp_two)>-1:
             safe_two_mark = "*"
+        raw.append([str(ncomp),str(pref_cOf_label)])
         text_out += str(ncomp) + safe_comp_mark + " " + str(pref_cOf_label) + " [" + str(comp_oneOUT)  + safe_one_mark + ", " + str(comp_twoOUT) + safe_two_mark + "]\n"
         if safe_comp_mark == "*": html_out.append([ncomp, str(pref_cOf_label), 1])
         else: html_out.append([ncomp, str(pref_cOf_label), 0])
@@ -431,14 +450,26 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
         if idx == -1 and nkeywords > 0 and not keylist[i][5]:
             text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n"
+            raw.append([keylist[i][0], keylist[i][2]])
             if safe_mark == "*": html_out.append([keylist[i][0], keylist[i][2], 1])
             else: html_out.append([keylist[i][0], keylist[i][2], 0])
             nkeywords = nkeywords - 1
+
 
     if output == 0:
         # Output some text
         print text_out
 
+    elif output == 2:
+        # return marc xml output.
+        xml = ""
+        for key in raw:
+            xml += """
+            <datafield tag="653" ind1="1" ind2=" ">
+              <subfield code="a">%s</subfield>
+              <subfield code="9">BibClassify/%s</subfield>
+            </datafield>""" % (key[1],os.path.splitext(os.path.basename(ontology))[0])
+        print xml
     else:
         # Output some HTML
         html_out.sort()
@@ -635,7 +666,7 @@ def main():
                  "thesaurus=","ontology=",
                  "output=","limit=", "nkeywords=", "mode=",
                  "spires", "help", "version"]
-    short_flags ="f:k:K:o:l:n:m:qhV"
+    short_flags ="f:k:K:o:l:n:m:qhVv:"
     spires = False
     limit = 70
     nkeywords = 25
@@ -643,6 +674,7 @@ def main():
     dict_file = ""
     output = 0
     mode = 0
+    verbose = 0
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
@@ -671,7 +703,8 @@ def main():
             elif opt == ("-V","")  or opt == ("--version",""):
                 print bibclassify_engine_version
                 sys.exit(1)
-
+            elif opt[0] in [ "-v", "--verbose" ]:
+                verbose = opt[1]
             elif opt[0] in [ "-f", "--file" ]:
                 if opt[1].find(".pdf")>-1:
                     # Treat as PDF
@@ -706,10 +739,12 @@ def main():
                         output = 1
                     elif str(opt[1]).lower().strip() == "text":
                         output = 0
+                    elif str(opt[1]).lower().strip() == "marcxml":
+                        output = 2
                     else:
-                        write_message('Output mode (-o) can only be "HTML" or "TEXT". Using default output mode (HTML)')
+                        write_message('Output mode (-o) can only be "HTML", "TEXT", or "MARCXML". Using default output mode (HTML)')
                 except:
-                    write_message('Output mode (-o) can only be "HTML" or "TEXT". Using default output mode (HTML)')
+                    write_message('Output mode (-o) can only be "HTML", "TEXT", or "MARCXML". Using default output mode (HTML)')
 
             elif opt[0] in [ "-m", "--mode" ]:
                 try:
@@ -750,17 +785,15 @@ def main():
     except StandardError, e:
         write_message(e, sys.stderr)
         sys.exit(1)
-
     if input_file == "" or dict_file == "":
         write_message("Need to enter the name of an input file AND a thesaurus file \n")
         usage(1)
-
     # Weak method to detect dict_file. Need to improve this (e.g. by looking inside the metadata with rdflib?)
     if dict_file.find(".rdf")!=-1:
-        outcome = generate_keywords_rdf(input_file, dict_file, output, limit, nkeywords, mode, spires)
-
+        outcome = generate_keywords_rdf(input_file, dict_file, output, limit, nkeywords, mode, spires, verbose, dict_file)
     else: # Treat as text
-        outcome = generate_keywords(input_file, dict_file)
+        outcome = generate_keywords(input_file, dict_file, verbose)
+        print outcome
         if limit > len(outcome): limit = len(outcome)
         if output == 0:
             for i in range(limit):
