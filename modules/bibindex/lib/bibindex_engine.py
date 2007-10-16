@@ -192,23 +192,25 @@ def get_field_tags(field):
 
 ## Fulltext word extraction functions
 def get_fulltext_urls_from_html_page(htmlpagebody):
-    """Parses htmlpagebody data looking for url_directs referring to
-       probable fulltexts.
+
+    """Parses htmlpagebody data (the splash page content) looking for
+       url_directs referring to probable fulltexts.
        Returns an array of (ext,url_direct) to fulltexts.
        Note: it looks for file format extensions as defined by global
-       'CONV_PROGRAMS'structure.
+       'CONV_PROGRAMS' structure, minus the HTML ones, because we don't
+       want to index HTML pages that the splash page might point to.
        """
     out = []
     for ext in CONV_PROGRAMS.keys():
         expr = re.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
                            ext + r")\"")
         match =  expr.search(htmlpagebody)
-        if match:
+        if match and ext not in ['htm', 'html']:
             out.append([ext, match.group(1)])
         else: # FIXME: workaround for getfile, should use bibdoc tables
             expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
             match =  expr_getfile.search(htmlpagebody)
-            if match:
+            if match and ext not in ['htm', 'html']:
                 out.append([ext, match.group(1)])
     return out
 
@@ -244,7 +246,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         if url_direct_or_indirect_ext in CONV_PROGRAMS.keys():
             fulltext_urls = [(url_direct_or_indirect_ext, url_direct_or_indirect)]
 
-        # Indirect url. Try to fetch the real fulltext(s)
+        # Indirect URL. Try to discover the real fulltext(s) from this splash page URL.
         if not fulltext_urls:
             # read "setlink" data
             try:
@@ -284,7 +286,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # try all available conversion programs according to their order:
         bingo = 0
-        for conv_program in CONV_PROGRAMS[ext]:
+        for conv_program in CONV_PROGRAMS.get(ext,[])
             if os.path.exists(conv_program):
                 # intelligence on how to run various conversion programs:
                 cmd = ""  # wil keep command to run
@@ -332,6 +334,9 @@ def get_words_from_fulltext(url_direct_or_indirect,
                               (conv_program, tmp_name,
                                CONV_PROGRAMS_HELPERS["html"], tmp_name)
                     else:
+                        cmd = "%s %s > %s.txt" % \
+                              (conv_program, tmp_name, tmp_name)
+                elif os.path.basename(conv_program) == "html2text":
                         cmd = "%s %s > %s.txt" % \
                               (conv_program, tmp_name, tmp_name)
                 else:
