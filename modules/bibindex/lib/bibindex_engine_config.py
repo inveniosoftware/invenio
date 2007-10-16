@@ -50,7 +50,9 @@ CONV_PROGRAMS = { ### PS switched off at the moment, since PDF is faster
     "pdf": [CFG_PATH_PDFTOTEXT, CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
     "doc": [CFG_PATH_ANTIWORD, CFG_PATH_CATDOC, CFG_PATH_WVTEXT],
     "ppt": [CFG_PATH_PPTHTML],
-    "xls": [CFG_PATH_XLHTML]}
+    "xls": [CFG_PATH_XLHTML],
+    "htm": [CFG_PATH_HTMLTOTEXT],
+    "html": [CFG_PATH_HTMLTOTEXT],}
 
 ## helper programs used if the above programs convert only to html or
 ## other intermediate file formats:
