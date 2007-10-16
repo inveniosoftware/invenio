@@ -74,7 +74,7 @@ webcomment_templates = invenio.template.load('webcomment')
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
-from invenio.dbquery import run_sql, get_table_update_time, escape_string, Error
+from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, escape_string, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
@@ -657,6 +657,8 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
     else:
         cc_intl = get_coll_i18nname(cc, ln)
 
+    cc_colID = get_colID(cc)
+
     colls_nicely_ordered = []
     if cfg_nicely_ordered_collection_list:
         colls_nicely_ordered = get_nicely_ordered_collection_list(ln=ln)
@@ -695,7 +697,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                                'text' : '*** %s ***' % _("any collection")
                              }] + colls_nice)
 
-    sort_formats = [{
+    sort_fields = [{
                       'value' : '',
                       'text' : _("latest first")
                     }]
@@ -704,7 +706,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                 ORDER BY cff.score DESC, f.name ASC"""
     res = run_sql(query)
     for code, name in res:
-        sort_formats.append({
+        sort_fields.append({
                               'value' : code,
                               'text' : name,
                             })
@@ -714,7 +716,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                'value' : '',
                'text' : "- %s %s -" % (_("OR").lower (), _("rank by")),
              }]
-    for (code, name) in get_bibrank_methods(get_colID(cc), ln):
+    for (code, name) in get_bibrank_methods(cc_colID, ln):
         # propose found rank methods:
         ranks.append({
                        'value' : code,
@@ -743,7 +745,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              ot = ot,
              sp = sp,
              action = action,
-             fieldslist = get_searchwithin_fields(ln = ln),
+             fieldslist = get_searchwithin_fields(ln=ln, colID=cc_colID),
              f1 = f1,
              f2 = f2,
              f3 = f3,
@@ -761,7 +763,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              coll_selects = coll_selects,
              d1y = d1y, d2y = d2y, d1m = d1m, d2m = d2m, d1d = d1d, d2d = d2d,
              dt = dt,
-             sort_formats = sort_formats,
+             sort_fields = sort_fields,
              sf = sf,
              so = so,
              ranks = ranks,
@@ -791,28 +793,15 @@ def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1, tab=''):
     return websearch_templates.tmpl_navtrail_links(
         as=as, ln=ln, dads=dads)
 
-def create_searchwithin_selection_box(fieldname='f', value='', ln='en'):
-    """Produces 'search within' selection box for the current collection."""
-
-    out = ""
-    out += """<select name="%s">""" % fieldname
-    out += """<option value="">%s""" % get_field_i18nname("any field", ln)
-    query = "SELECT code,name FROM field ORDER BY name ASC"
-    res = run_sql(query)
-    for field_code, field_name in res:
-        if field_code and field_code != "anyfield":
-            out += """<option value="%s"%s>%s""" % (field_code, is_selected(field_code, value),
-                                                    get_field_i18nname(field_name, ln))
-    if value and str(value[0]).isdigit():
-        out += """<option value="%s" selected>%s MARC tag""" % (value, value)
-    out += """</select>"""
-    return out
-
-def get_searchwithin_fields(ln='en'):
-    """Retrieves the fields name used in the 'search within' selection box for the current collection."""
-
-    query = "SELECT code,name FROM field ORDER BY name ASC"
-    res = run_sql(query)
+def get_searchwithin_fields(ln='en', colID=None):
+    """Retrieves the fields name used in the 'search within' selection box for the collection ID colID."""
+    res = None
+    if colID:
+        res = run_sql_cached("""SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
+                                 WHERE cff.type='sew' AND cff.id_collection=%s AND cff.id_field=f.id
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
+    if not res:
+        res = run_sql_cached("SELECT code,name FROM field ORDER BY name ASC")
     fields = [{
                 'value' : '',
                 'text' : get_field_i18nname("any field", ln)
