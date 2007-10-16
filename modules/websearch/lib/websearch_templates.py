@@ -1272,7 +1272,7 @@ class Template:
     def tmpl_search_box(self, ln, as, cc, cc_intl, ot, sp,
                         action, fieldslist, f1, f2, f3, m1, m2, m3,
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
-                        d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_formats,
+                        d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_fields,
                         sf, so, ranks, sc, rg, formats, of, pl, jrec, ec):
 
         """
@@ -1294,7 +1294,7 @@ class Template:
 
           - 'action' *string* - the action demanded by the user
 
-          - 'fieldlist' *list* - the list of all fields available, for use in select within boxes in advanced search
+          - 'fieldslist' *list* - the list of all fields available, for use in select within boxes in advanced search
 
           - 'p, f, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, op3, rm' *strings* - the search parameters
 
@@ -1304,9 +1304,9 @@ class Template:
 
           - 'dt' *string* - the dates' types (creation dates, modification dates)
 
-          - 'sort_formats' *array* - the select information for the sorting format
+          - 'sort_fields' *array* - the select information for the sort fields
 
-          - 'sf' *string* - the currently selected sort format
+          - 'sf' *string* - the currently selected sort field
 
           - 'so' *string* - the currently selected sort order ("a" or "d")
 
@@ -1619,10 +1619,10 @@ class Template:
                   </tr>
                  </tbody>
                 </table>""" % {
-                  'sort_by' : _("Sort by:"),
+                  'sort_by' : _("Sort :"),
                   'display_res' : _("Display results:"),
                   'out_format' : _("Output format:"),
-                  'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_formats, selected = sf, css_class = 'address'),
+                  'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_fields, selected = sf, css_class = 'address'),
                   'select_so' : self.tmpl_select(fieldname = 'so', values = [{
                                     'value' : 'a',
                                     'text' : _("asc.")
