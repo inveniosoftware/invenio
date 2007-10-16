@@ -101,16 +101,34 @@ except NameError:
     _db_cache = {}
 
 def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
-    """Caches whatever SQL command is passed by.
+    """
+    Run the SQL query and cache the SQL command for later reuse.
+
     @param param: tuple of string params to insert in the query
     (see notes below)
+
     @param n: number of tuples in result (0 for unbounded)
+
     @param with_desc: if true, will return a
     DB API 7-tuple describing columns in query
+
+    @param affected_tables is a list of tablenames of affected tables,
+    used to decide whether we should update the cache or whether we
+    can return cached result, depending on the last modification time
+    for corresponding tables.  If empty, and if the cached result is
+    present in the cache, always return the cached result without
+    recomputing it.  (This is useful to speed up queries that operate
+    on objects that virtually never change, e.g. list of defined
+    logical fields, that remain usually constant in between Apache
+    restarts.  Note that this may be a bit dangerous as a default for
+    any query.)
+
     @return the result as provided by run_sql
-    Note, it's pointless and even wrong to use this function with SQL commands
-    different from SELECT
+
+    Note that it is pointless and even wrong to use this function with
+    SQL commands different from SELECT.
     """
+
     global _db_cache
 
     key = repr((sql, param, n, with_desc))
@@ -120,7 +138,8 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
         _db_cache = {}
 
     # Query already in the cache?
-    if not _db_cache.has_key(key) or _db_cache[key][1] < max([get_table_update_time(table) for table in affected_tables]):
+    if not _db_cache.has_key(key) or \
+           (affected_tables and _db_cache[key][1] < max([get_table_update_time(table) for table in affected_tables])):
             # Let's update the cache
             result = run_sql(sql, param, n, with_desc)
             _db_cache[key] = (result, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
