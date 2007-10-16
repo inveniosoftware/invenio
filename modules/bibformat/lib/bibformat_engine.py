@@ -61,7 +61,7 @@ from invenio.bibformat_config import \
      CFG_BIBFORMAT_ELEMENTS_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
      CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-from bibformat_utils import \
+from invenio.bibformat_utils import \
      record_get_xml, \
      parse_tag
 from invenio.htmlutils import HTMLWasher
