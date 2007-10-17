@@ -654,6 +654,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
 	  modules/websubmit/etc/bibconvert/config/Makefile \
+	  modules/websubmit/etc/bibconvert/config/DEMOPICcreate.tpl \
 	  modules/websubmit/etc/bibconvert/config/EDSPICTcreate.tpl \
 	  modules/websubmit/etc/bibconvert/config/EDSRPICTcreate.tpl \
 	  modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl \
