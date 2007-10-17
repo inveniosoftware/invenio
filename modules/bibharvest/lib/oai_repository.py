@@ -180,7 +180,7 @@ def utc_to_localtime(date):
     lyear   = ldate.split("-")[0]
     lmonth  = ldate.split("-")[1]
     lday    = ldate.split("-")[2]
-    
+
     timetoconvert = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime((string.atoi(lyear), string.atoi(lmonth), string.atoi(lday), string.atoi(lhour), string.atoi(lminute), string.atoi(lsec[:-1]), 0, 0, -1)) - time.timezone + (time.daylight)*3600))
 
     return timetoconvert
@@ -239,7 +239,7 @@ def check_date(date, dtime="T00:00:00Z"):
             date = ""
     else:
         date = ""
-    
+
     return date
 
 def print_record(sysno, format='marcxml', record_exists_result=None):
@@ -250,15 +250,15 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
     - if record has been deleted and CFG_OAI_DELETED_POLICY is
       'transient' or 'deleted', then return only header, with status
       'deleted'.
-      
+
     - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
       then return nothing.
-    
+
     Optional parameter 'record_exists_result' has the value of the result
     of the record_exists(sysno) function (in order not to call that function
     again if already done.)
     """
-    
+
     out = ""
 
     # sanity check:
@@ -266,7 +266,7 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
         _record_exists = record_exists_result
     else:
         _record_exists = record_exists(sysno)
-        
+
     if not _record_exists:
         return
 
@@ -274,7 +274,7 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
         format = "xd"
 
     # print record opening tags:
-    
+
     out = out + "  <record>\n"
 
     if _record_exists == -1: # Deleted?
@@ -336,7 +336,7 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
                             if ind1 == "_":
                                 ind1 = " "
                             if ind2 == "_":
-                                ind2 = " "                        
+                                ind2 = " "
                             # print field tag
                             if field_number != field_number_old or field[:-1] != field_old[:-1]:
                                 if format == "marcxml":
@@ -393,10 +393,10 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
 ##                 authors =  "         <dc:creator>%s</dc:creator>\n%s" % (encode_for_xml(field_),
 ##                                                                          authors)
 ##             out += authors
-            
+
 ##             for field_ in get_field(sysno, "245__a"):
 ##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
-                               
+
 ##             for field_ in get_field(sysno, "111__a"):
 ##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
 
@@ -405,17 +405,17 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
 
 ##             for field_ in get_field(sysno, "8564_u"):
 ##                 out =  "%s         <dc:identifier>%s</dc:identifier>\n" % (out, encode_for_xml(escape_space(field_)))
-        
+
 ##             for field_ in get_field(sysno, "520__a"):
 ##                 out = "%s         <dc:description>%s</dc:description>\n" % (out, encode_for_xml(field_))
 
 ##             date = get_creation_date(sysno)
- 
+
 ##             out = "%s         <dc:date>%s</dc:date>\n" % (out, date)
 ##             out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
-    
+
         out = out + "   </metadata>\n"
 
     out = out + "  </record>\n"
@@ -468,10 +468,10 @@ def oailistrecords(args):
     "Generates response to oailistrecords verb."
 
     arg = parse_args(args)
-    
+
     out = ""
     resumptionToken_printed = False
-    
+
     sysnos = []
     sysno  = []
     # check if the resumptionToken did not expire
@@ -489,7 +489,7 @@ def oailistrecords(args):
         sysnos = oaigetsysnolist(arg['set'], arg['from'], arg['until'])
 
     if len(sysnos) == 0: # noRecordsMatch error
-        
+
         out = out + oai_error("noRecordsMatch", "no records correspond to the request")
         out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
         return out
@@ -546,20 +546,20 @@ def oailistsets(args):
 
     return out
 
-    
+
 def oaigetrecord(args):
     """Returns record 'identifier' according to 'metadataPrefix' format for OAI metadata harvesting.
-    
+
     - if record does not exist, return oai_error 'idDoesNotExist'.
 
     - if record has been deleted and CFG_OAI_DELETED_POLICY is
       'transient' or 'deleted', then return only header, with status
       'deleted'.
-      
+
     - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
       then return oai_error 'idDoesNotExist'.
     """
-    
+
     arg = parse_args(args)
     out = ""
     sysno = oaigetsysno(arg['identifier'])
@@ -585,7 +585,7 @@ def oailistidentifiers(args):
 
     out = ""
     resumptionToken_printed = False
-    
+
     sysno  = []
     sysnos = []
 
@@ -621,7 +621,7 @@ def oailistidentifiers(args):
                 sysno.append(sysno_)
             else:
                 _record_exists = record_exists(sysno_)
-                if (not _record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"): 
+                if (not _record_exists == -1 and CFG_OAI_DELETED_POLICY == "no"):
                     i = i + 1 # Increment limit only if record is returned
                 for ident in get_field(sysno_, CFG_OAI_ID_FIELD):
                     if ident != '':
@@ -653,14 +653,14 @@ def oailistidentifiers(args):
 
 def oaiidentify(args):
     "Generates response to oaiidentify verb."
-        
+
     out = ""
 
     repositoryname        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
     baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemail            = "  <adminEmail>%s</adminEmail>\n" % supportemail
-    earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()               
+    earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
     deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % CFG_OAI_DELETED_POLICY
     repositoryidentifier  = "%s" % CFG_OAI_ID_PREFIX
     sampleidentifier      = CFG_OAI_SAMPLE_IDENTIFIER
@@ -680,7 +680,7 @@ def oaiidentify(args):
 
     return out
 
-     
+
 def oaigetrequesturl(args):
     "Generates requesturl tag for OAI."
 
@@ -692,7 +692,7 @@ def oaigetrequesturl(args):
 
 def oaigetresponsedate(delay=0):
     "Generates responseDate tag for OAI."
-    
+
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay))
 
 
@@ -717,7 +717,7 @@ def oaigetsysnolist(set, fromdate, untildate):
     "Returns list of system numbers for the OAI set 'set', modified from 'date_from' until 'date_until'."
 
     out_dict = {} # dict to hold list of out sysnos as its keys
-    
+
     # TODO: Use search engine instead of SQL.
     if set:
         query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx, bibrec_bib%sx AS bib2x, bib%sx as b2x LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s' AND bib2x.id_bibrec = bibx.id_bibrec AND bib2x.id_bibxxx = b2x.id AND b2x.tag = '%s'" % (CFG_OAI_SET_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_SET_FIELD[0:2], CFG_OAI_SET_FIELD, set, CFG_OAI_ID_FIELD)
@@ -725,17 +725,17 @@ def oaigetsysnolist(set, fromdate, untildate):
         query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD)
 
     if untildate:
-        query = query + " AND b.modification_date <= '%s'" % untildate
+        query = query + " AND b.modification_date <= '%s'" % utc_to_localtime(untildate)
     if fromdate:
-        query = query + " AND b.modification_date >= '%s'" % fromdate
+        query = query + " AND b.modification_date >= '%s'" % utc_to_localtime(fromdate)
 
     res = run_sql(query)
 
     for row in res:
         out_dict[row[0]] = 1
-         
+
     return out_dict.keys()
-    
+
 def oaigenresumptionToken():
     "Generates unique ID for resumption token management."
 
@@ -755,7 +755,7 @@ def oaicachein(resumptionToken, sysnos):
 
 def oaicacheout(resumptionToken):
     "Restores string of comma-separated system numbers from cache."
-    
+
     sysnos = []
 
     filename = "%s/RTdata/%s" % (cachedir, resumptionToken)
@@ -771,7 +771,7 @@ def oaicacheout(resumptionToken):
 
 def oaicacheclean():
     "Removes cached resumptionTokens older than specified"
-    
+
     directory = "%s/RTdata" % cachedir
 
     files = os.listdir(directory)
@@ -787,9 +787,9 @@ def oaicacheclean():
 
 def oaicachestatus(resumptionToken):
     "Checks cache status.  Returns 0 for empty, 1 for full."
-    
+
     filename = "%s/RTdata/%s" % (cachedir, resumptionToken)
-    
+
     if os.path.exists(filename):
         if os.path.getsize(filename) > 0:
             return 1
@@ -803,7 +803,7 @@ def get_sets():
     "Returns list of sets."
     # TODO: Try to remove dependency on oaiARCHIVE table, by
     # determining available sets from data.
-    
+
     out = {}
     row = ['', '']
 
@@ -812,7 +812,7 @@ def get_sets():
     for row in res:
         row_bis = [row[0], row[1], row[2]]
         out[row[0]] = row_bis
-        
+
     return out.values()
 
 
@@ -911,7 +911,7 @@ def check_args(arguments):
         if check_date(arguments['until'], "T23:59:59Z") == "":
             out = out + oai_error("badArgument", "Bad datestamp format in until")
     else:
-        until_length = 0 
+        until_length = 0
 
     if from_length != 0:
         if until_length != 0:
@@ -962,9 +962,9 @@ def oai_profile():
     #oailistrecords('set=&from=&metadataPrefix=marcxml&verb=ListRecords&resumptionToken=&identifier=&until=')
     #oailistidentifiers('set=&from=&metadataPrefix=oai_dc&verb=ListIdentifiers&resumptionToken=&identifier=&until=')
 
-    return 
+    return
 
-if __name__ == "__main__":   
+if __name__ == "__main__":
     import profile
     import pstats
     profile.run('oai_profile()', "oai_profile")
