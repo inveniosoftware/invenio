@@ -252,6 +252,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         prefs = webuser.get_user_preferences(uid)
 
+        if args['email']:
+            args['email'] = args['email'].lower()
+
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
             title = _("Settings edited")
@@ -572,6 +575,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'login_method': (str, None),
             'action': (str, None),
             'referer': (str, '')})
+
+        if args['p_un']:
+            args['p_un'] = args['p_un'].strip()
 
         locals().update(args)
 

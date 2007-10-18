@@ -114,7 +114,59 @@ class WebSessionYourSettingsTest(unittest.TestCase):
             self.fail("Expected to see %s, got %s." % \
                     (expected_response, change_password_body))
 
+    def test_email_caseless(self):
+        """webuser - check email caseless"""
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/register")
+        browser.select_form(nr=0)
+        browser['p_email'] = 'foo@bar.org'
+        browser['p_nickname'] = 'foobar'
+        browser['p_pw'] = ''
+        browser['p_pw2'] = ''
+        browser.submit()
 
+        expected_response = "Account created"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
+
+
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/register")
+        browser.select_form(nr=0)
+        browser['p_email'] = 'foo@bar.org'
+        browser['p_nickname'] = 'foobar2'
+        browser['p_pw'] = ''
+        browser['p_pw2'] = ''
+        browser.submit()
+
+        expected_response = "Registration failure"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
+
+        browser = Browser()
+        browser.open(sweburl + "/youraccount/register")
+        browser.select_form(nr=0)
+        browser['p_email'] = 'FOO@bar.org'
+        browser['p_nickname'] = 'foobar2'
+        browser['p_pw'] = ''
+        browser['p_pw2'] = ''
+        browser.submit()
+
+        expected_response = "Registration failure"
+        login_response_body = browser.response().read()
+        try:
+            login_response_body.index(expected_response)
+        except ValueError:
+            self.fail("Expected to see %s, got %s." % \
+                      (expected_response, login_response_body))
 
     def test_select_records_per_group(self):
         """webuser - test of user preferences setting"""

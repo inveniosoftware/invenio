@@ -163,6 +163,7 @@ def warning_guest_user(type, ln=cdslang):
 
 ## perform_delete():delete  the account of the user, not implement yet
 def perform_delete(ln):
+    # TODO
     return websession_templates.tmpl_account_delete(ln = ln)
 
 def perform_set(email, ln, verbose=0):

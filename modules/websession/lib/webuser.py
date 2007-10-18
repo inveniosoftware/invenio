@@ -428,7 +428,7 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req)
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req).lower()
         except WebAccessExternalAuthError:
             return([], p_email, p_pw, 16)
         if p_email: # Authenthicated externally
@@ -501,7 +501,7 @@ def loginUser(req, p_un, p_pw, login_method):
         if query_result:
             #FIXME drop external groups and settings
             preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
-            p_email = query_result[0][1]
+            p_email = query_result[0][1].lower()
             if login_method != preferred_login_method:
                 if CFG_EXTERNAL_AUTHENTICATION.has_key(preferred_login_method):
                     return ([], p_email, p_pw, 11)
@@ -650,7 +650,7 @@ def get_email(uid):
     out = "guest"
     res = run_sql("SELECT email FROM user WHERE id=%s", (uid,), 1)
     if res and res[0][0]:
-        out = res[0][0]
+        out = res[0][0].lower()
     return out
 
 def get_email_from_username(username):
@@ -663,7 +663,7 @@ def get_email_from_username(username):
     res = run_sql("SELECT email FROM user WHERE email=%s", (username,), 1) + \
           run_sql("SELECT email FROM user WHERE nickname=%s", (username,), 1)
     if res and len(res) == 1:
-        out = res[0][0]
+        out = res[0][0].lower()
     return out
 
 #def get_password(uid):
@@ -693,7 +693,7 @@ def get_nickname_or_email(uid):
         if res[0][0]:
             out = res[0][0]
         elif res[0][1]:
-            out = res[0][1]
+            out = res[0][1].lower()
     return out
 
 def create_userinfobox_body(req, uid, language="en"):
