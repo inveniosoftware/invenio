@@ -784,6 +784,7 @@ INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'PICT',3);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'TEXT',0);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'RTEXT',2);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'RPICT',4);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPIC',1);
 
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RPICT','DIAG','Diagrams and Charts');
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RPICT','HIST','Personalities and History of CERN');
@@ -805,11 +806,15 @@ INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RTEXT','POETRY','Poetry
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RTEXT','PREPRINT','Preprint');
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RTEXT','REPORT','Report');
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('RTEXT','THESIS','Thesis');
+INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','LIFE','Life at CERN',3);
+INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','HIST','Personalities and History of CERN',2);
+INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','EXP','Experiments',1);
 
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, Thesis, etc) with simple refereeing','RTEXT','2002-05-06','2002-06-20','');
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, Thesis, etc)','TEXT','2002-05-03','2002-06-21','This is a template for a text type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
 INSERT INTO sbmDOCTYPE VALUES ('pictorial document (Picture)','PICT','2002-05-03','2002-06-20','This is a template for a picture-like type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
 INSERT INTO sbmDOCTYPE VALUES ('pictorial document (Picture) with simple refereeing','RPICT','2002-05-07','2002-06-20','');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Picture Submission','DEMOPIC','2007-09-13','2007-10-17','<br /><br />\r\n<div>This is an example of a submission that could be used to submit pictures into a CDS Invenio collection.</div>\r\n<br /><br />');
 
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,3,'COM','<br //>Enter here your additional comments:<br //>','O','comments','','2002-05-06','2002-05-28','','');
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,2,'decision','<br //><br //>Your decision: ','M','decision','','2002-05-06','2002-05-28','','');
@@ -875,6 +880,18 @@ INSERT INTO sbmFIELD VALUES ('SRVTEXT',1,2,'EndButton2','<br //><br //>','O','',
 INSERT INTO sbmFIELD VALUES ('SRVPICT',1,2,'EndButton2','<br //><br //>','O','','','2002-05-03','2004-02-02','','');
 INSERT INTO sbmFIELD VALUES ('MBIPICT',1,2,'TEXTChange','<br //>Please select all the fields you want to modify:<br //> ','M','fields to modify','','0000-00-00','0000-00-00',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('APPRPICT',1,4,'button_validate','<br //><br //>','O','','','2002-05-07','2002-05-28','','');
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,1,'DEMOPIC_TITLE','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Submit a picture:</b><br /><br />Picture Title <span style=\"color: red;\">*</span>:<br />','M','Picture Title','','2007-09-13','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,2,'DEMOPIC_PHOTOG','<br /><br />Picture Author(s) or Photographers(s)<br /><i>(Optional, <b>one per line</b>)</i>:<br />','O','Photographer(s)','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,3,'DEMOPIC_DATE','<br /><br />Picture Date (dd/mm/yyyy) <span style=\"color: red;\">*</span>:&nbsp;','M','Picture Date','DatCheckNew','2007-09-13','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,4,'DEMOPIC_KW','<br /><br />Keywords<br /><i>(Optional, <b>one keyword/key-phrase per line</b>)</i>:<br />','O','Picture Keywords','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,5,'DEMOPIC_DESCR','<br /><br />Picture Description:<br />','O','Picture Description','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,6,'DEMOPIC_ADD_RN','<br /><br />Your picture will be given a reference number automatically.<br /> However, if the picture has other reference numbers, please enter them here:<br />(one per line)<br />','O','Additional Reference Numbers','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,7,'DEMOPIC_NOTE','<br /><br />Additional Comments or Notes about the Picture:<br />','O','Picture Notes or Comments','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,8,'DEMOPIC_FILE','<br /><br />Provide the path to the picture file to be uploaded <span style=\"color: red;\">*</span>:<br />','M','Picture File','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,9,'DEMOPIC_FINISH','<br /><br /></td></tr></table>','O','','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,1,'DEMOPIC_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a picture\'s bibliographic information:</b><br /><br />Picture Reference Number <span style=\'color: red;\'>*</span>:&nbsp;&nbsp;','M','Reference Number','','2007-10-04','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,2,'DEMOPIC_CHANGE','<br /><br />Choose the fields to be modified <span style=\"color: red;\">*</span>:<br />','M','Fields to Modify','','2007-10-04','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,3,'DEMOPIC_CONT','<br /><br /></td></tr></table>','O','','','2007-10-04','2007-10-04',NULL,NULL);
 
 INSERT INTO sbmFIELDDESC VALUES ('TI','TI','245__a','T',0,5,60,0,'','','1998-08-17','2002-06-11','<br //>Please correct the title:<br //>','',0);
 INSERT INTO sbmFIELDDESC VALUES ('AU','100__a','100__a,700__a','T',0,6,30,0,'','','1998-08-17','2002-02-08','<br //>Please correct the list of authors:<br //>','',0);
@@ -894,6 +911,18 @@ INSERT INTO sbmFIELDDESC VALUES ('button_validate','','','D',NULL,NULL,NULL,NULL
 INSERT INTO sbmFIELDDESC VALUES ('RNTEST2','','marccode','I',30,NULL,NULL,30,'TEST-<COMBO>-<YYYY>-???',NULL,'2001-11-22','2001-11-22',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('RNPHO2','','marccode','I',30,NULL,NULL,0,'PICTURE-TEST-<COMBO>-<YYYY>-???',NULL,'2002-05-06','2002-05-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('TEXTChange','','','S',NULL,NULL,NULL,NULL,NULL,'<select multiple name=\"TEXTChange[]\" size=\"8\">\r\n<option value=\"Select\">Select:</option>\r\n<option value=\"Rep\">Other Report Numbers</option>\r\n<option value=\"TI\">Title</option>\r\n<option value=\"AU\">     Authors</option>\r\n<option value=\"LANG\">   Language</option>\r\n<option value=\"KW\">Keywords</option>\r\n<option value=\"AB\">Abstract</option>\r\n<option value=\"NO\">Note</option>\r\n</select>','0000-00-00','0000-00-00',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2007-09-13','2007-09-13',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_PHOTOG',NULL,'100__a','T',NULL,6,30,NULL,NULL,NULL,'2007-09-13','2007-09-19','<br /><br />Picture Author(s) or Photographers(s)<br /><i>(optional)(<B>one per line</B>)</i>:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_DATE',NULL,'','I',10,NULL,NULL,NULL,NULL,NULL,'2007-09-13','2007-09-19','<br /><br />Date of the picture (dd/mm/yyyy):&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_KW',NULL,'650__a','T',NULL,2,50,NULL,NULL,NULL,'2007-09-13','2007-09-13','<br /><br />Keywords<br /><i>(Optional, <b>one keyword/key-phrase per line</b>)</i>:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_DESCR',NULL,'520__a','T',NULL,12,80,NULL,NULL,NULL,'2007-09-13','2007-09-13','<br /><br />Picture Description:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_ADD_RN',NULL,'088__a','T',NULL,4,30,NULL,NULL,NULL,'2007-09-13','2007-09-13','<br /><br />Additional Reference Numbers:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_NOTE',NULL,'500__a','T',NULL,6,60,NULL,NULL,NULL,'2007-09-13','2007-09-13','<br /><br />Additional Comments or Notes about the Picture:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FILE',NULL,'','F',40,NULL,NULL,NULL,NULL,NULL,'2007-09-13','2007-09-13',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FINISH',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"finish submission\" onclick=\"finish();\" />\r\n</div>','2007-09-13','2007-09-13',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOPIC_CHANGE[]\" size=\"8\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOPIC_TITLE\">Title</option>\r\n <option value=\"DEMOPIC_PHOTOG\">Photographer(s)</option>\r\n <option value=\"DEMOPIC_DATE\">Picture Date</option>\r\n <option value=\"DEMOPIC_KW\">Keywords</option>\r\n <option value=\"DEMOPIC_DESCR\">Picture Description</option>\r\n <option value=\"DEMOPIC_ADD_RN\">Picture Reference Numbers</option>\r\n <option value=\"DEMOPIC_NOTE\">Notes or Comments</option>\r\n</select>','2007-10-04','2007-10-04',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_RN',NULL,'037__a','I',30,NULL,NULL,NULL,'DEMOPIC-<COMBO>-<YYYY>-???',NULL,'2007-10-04','2007-10-04',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2007-10-04','2007-10-04',NULL,NULL,0);
 
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','PICT','Create_Recid',10,1);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','RTEXT','Move_to_Done',90,2);
@@ -1041,6 +1070,25 @@ INSERT INTO sbmFUNCTIONS VALUES ('SRV','PICT','Move_to_Done',100,2);
 INSERT INTO sbmFUNCTIONS VALUES ('SRV','PICT','Get_Report_Number',10,2);
 INSERT INTO sbmFUNCTIONS VALUES ('SRV','PICT','Get_Recid',15,2);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','PICT','Get_Recid',20,2);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Mail_Submitter',70,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Print_Success',60,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Insert_Record',50,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Make_Record',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Move_Files_to_Storage',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Report_Number_Generation',20,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Move_to_Done',80,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Create_Recid',10,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Get_Report_Number',10,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Get_Recid',20,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Is_Original_Submitter',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Create_Modify_Interface',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Get_Report_Number',10,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Get_Recid',20,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Make_Modify_Record',30,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Insert_Modify_Record',40,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Print_Success_MBI',50,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Send_Modify_Mail',60,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Move_to_Done',70,2);
 
 INSERT INTO sbmIMPLEMENT VALUES ('RTEXT','SBI','Y','SBIRTEXT',4,'2002-05-06','2002-06-19',1,'','1',1,1,'');
 INSERT INTO sbmIMPLEMENT VALUES ('RTEXT','MBI','Y','MBIRTEXT',1,'2002-05-06','2004-02-04',2,'','0',0,0,'');
@@ -1055,6 +1103,8 @@ INSERT INTO sbmIMPLEMENT VALUES ('RPICT','MBI','Y','MBIRPICT',1,'2002-05-07','20
 INSERT INTO sbmIMPLEMENT VALUES ('RPICT','SBI','Y','SBIRPICT',4,'2002-05-07','2002-06-20',1,'','1',1,1,'');
 INSERT INTO sbmIMPLEMENT VALUES ('RPICT','APP','Y','APPRPICT',1,'2002-05-07','2002-05-28',4,'0','0',0,1,'0');
 INSERT INTO sbmIMPLEMENT VALUES ('PICT','SRV','Y','SRVPICT',1,'2004-02-26','0000-00-00',3,'','0',0,0,'');
+INSERT INTO sbmIMPLEMENT VALUES ('DEMOPIC','SBI','Y','SBIDEMOPIC',1,'2007-09-13','2007-10-04',1,'','',0,0,'');
+INSERT INTO sbmIMPLEMENT VALUES ('DEMOPIC','MBI','Y','MBIDEMOPIC',1,'2007-10-04','2007-10-04',2,'','',0,0,'');
 
 INSERT INTO sbmPARAMETERS VALUES ('RTEXT','directory','TEST');
 INSERT INTO sbmPARAMETERS VALUES ('RTEXT','categformatDAM','TEST-<CATEG>-.*');
@@ -1217,6 +1267,27 @@ INSERT INTO sbmPARAMETERS VALUES ('RTEXT','type','fulltext');
 INSERT INTO sbmPARAMETERS VALUES ('TEXT','type','fulltext');
 INSERT INTO sbmPARAMETERS VALUES ('PICT','type','picture');
 INSERT INTO sbmPARAMETERS VALUES ('RPICT','type','picture');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','addressesMBI','');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','authorfile','DEMOPIC_PHOTOG');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','autorngen','Y');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','counterpath','lastid_DEMOPIC_<PA>categ</PA>_<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','createTemplate','DEMOPICcreate.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','documenttype','picture');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','edsrn','DEMOPIC_RN');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','emailFile','SuE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','fieldnameMBI','DEMOPIC_CHANGE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','iconsize','180');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','modifyTemplate','DEMOPICmodify.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','newrnin','NEWRN');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','paths_and_suffixes','{\"DEMOPIC_FILE\":\"\"}');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rename','<PA>file:DEMOPIC_RN</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rnformat','DEMOPIC-<PA>categ</PA>-<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rnin','comboDEMOPIC');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','sourceDoc','photos');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','sourceTemplate','DEMOPIC.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','status','ADDED');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','titleFile','DEMOPIC_TITLE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','yeargen','AUTO');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
