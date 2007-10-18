@@ -7,7 +7,6 @@ z_*
 *.O
 *~
 *.shtml
-EDSPICTcreate.tpl
-EDSRPICTcreate.tpl
 EDSRTEXTcreate.tpl
 EDSTEXTcreate.tpl
+DEMOPICcreate.tpl
