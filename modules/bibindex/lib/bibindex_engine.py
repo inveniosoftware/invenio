@@ -286,7 +286,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # try all available conversion programs according to their order:
         bingo = 0
-        for conv_program in CONV_PROGRAMS.get(ext,[])
+        for conv_program in CONV_PROGRAMS.get(ext, []):
             if os.path.exists(conv_program):
                 # intelligence on how to run various conversion programs:
                 cmd = ""  # wil keep command to run
