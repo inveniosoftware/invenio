@@ -1832,7 +1832,9 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
                 if result:
                     subtitle = 'step 3 - role added'
                     output += '<p>role added: </p>'
-                    result[3] = result[3].replace('\n', '<br />')
+                    result = list(result)
+                    result[3] = result[3].replace('\n', '<br/>')
+                    result = tuple(result)
                     output += tupletotable(header=['id', 'role name', 'description', 'firewall like role definition'],
                                         tuple=[result])
                 else:
