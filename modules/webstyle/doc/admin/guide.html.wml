@@ -199,8 +199,9 @@ style footer will be seen in action.</p>
     templates have been installed, in order to ensure that
     modifications you have done to your templates are valid. To do so
     move to your CDS Invenio installation directory, and run: <br/>
-    <code>$python lib/python/invenio/templates.py
-    --check-custom-templates</code>
+    <code>$python $INVENIO$/lib/python/invenio/template.py
+    --check-custom-templates</code> (replace $INVENIO$ with your Invenio
+    installation path)
 </li>
 
 </ul>
