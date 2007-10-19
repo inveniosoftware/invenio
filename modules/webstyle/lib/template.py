@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import os, sys, inspect
+import os, sys, inspect, getopt
 
 try:
     # This tool can be run before Invenio is installed:
@@ -75,7 +75,7 @@ def load(module=''):
 # the default templates functions
 ##
 
-def check():
+def check(default_base_dir=None, custom_base_dir=None):
     """
     Check that installed customized templates are conform to the
     default templates interfaces.
@@ -95,7 +95,7 @@ def check():
 
     # Iterage over all customized templates
     for (default_template_path, custom_template_path) in \
-        get_custom_templates(get_default_templates()):
+        get_custom_templates(get_default_templates(default_base_dir), custom_base_dir):
 
         # Load the custom and default templates
         default_tpl_path, default_tpl_name = os.path.split(default_template_path)
@@ -264,16 +264,16 @@ def get_default_templates(base_dir=None):
 
     return templates_path
 
-def get_custom_templates(default_templates_paths):
+def get_custom_templates(default_templates_paths, base_dir=None):
     """
     Returns the paths to customized templates among the given list of
     templates paths.
     """
-    return [(default, get_custom_template(default)) \
+    return [(default, get_custom_template(default, base_dir)) \
             for default in default_templates_paths \
-            if get_custom_template(default) is not None]
+            if get_custom_template(default, base_dir) is not None]
 
-def get_custom_template(default_template_path):
+def get_custom_template(default_template_path, base_dir=None):
     """
     Returns the path to the customized template of the default
     template given as parameter. Returns None if customized does not
@@ -281,10 +281,15 @@ def get_custom_template(default_template_path):
     """
     default_tpl_path, default_tpl_name = os.path.split(default_template_path)
 
-    custom_path = CFG_WEBSTYLE_PYLIBDIR + \
-                  os.sep + "invenio" + os.sep + \
-                  default_tpl_name[:-3] + '_' + \
-                  CFG_WEBSTYLE_TEMPLATE_SKIN + '.py'
+    if base_dir is None:
+        custom_path = CFG_WEBSTYLE_PYLIBDIR + \
+                      os.sep + "invenio" + os.sep + \
+                      default_tpl_name[:-3] + '_' + \
+                      CFG_WEBSTYLE_TEMPLATE_SKIN + '.py'
+    else:
+        custom_path = os.path.abspath(base_dir) + os.sep + \
+                      default_tpl_name[:-3] + '_' + \
+                      CFG_WEBSTYLE_TEMPLATE_SKIN + '.py'
 
     if os.path.exists(custom_path):
         return custom_path
@@ -292,7 +297,7 @@ def get_custom_template(default_template_path):
         return None
 
 def print_messages(messages,
-                   verbose=3):
+                   verbose=2):
     """
     Report errors and warnings to user.
 
@@ -353,7 +358,54 @@ def print_messages(messages,
                nb_warnings, nb_warnings > 1 and 's' or '',
                nb_comments, nb_comments > 1 and 's' or '')
 
+def usage(exitcode=1):
+    """
+    Print usage of the template checking utility
+    """
+
+    print """Usage: python templates.py --check-custom-templates [options]
+Options:
+  -v, --verbose                Verbose level (0=min, 2=default, 3=max).
+  -d, --default-templates-dir  path to a directory with the default
+                               template(s) (default: Invenio install
+                               dir if run from Invenio install dir, or
+                               Invenio source if run from Invenio sources)
+  -c, --custom-templates-dir   path to a directory with your custom
+                               template(s) (default: Invenio install dir)
+  -h, --help                   Prints this help
+Check that your custom templates are synchronized with default Invenio templates.
+Examples: $ python templates.py --check-custom-templates
+          $ python templates.py --check-custom-templates -c~/webstyle_template_ithaca.py
+"""
+    sys.exit(exitcode)
+
 if __name__ == "__main__" and \
        '--check-custom-templates' in sys.argv:
-    messages_ = check()
-    print_messages(messages_)
+    default_base_dir = None
+    custom_base_dir = None
+    verbose = 2
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hv:d:c:",
+                                   ["help",
+                                    "verbose=",
+                                    "default-templates-dir=",
+                                    "custom-templates-dir=",
+                                    "check-custom-templates"])
+    except getopt.GetoptError, err:
+        usage(1)
+    try:
+        for opt in opts:
+            if opt[0] in ["-h", "--help"]:
+                usage()
+            elif opt[0] in ["-v", "--verbose"]:
+                verbose = opt[1]
+            elif opt[0] in ["-d", "--default-templates-dir"]:
+                default_base_dir = opt[1]
+            elif opt[0] in ["-c", "--custom-templates-dir"]:
+                custom_base_dir = opt[1]
+
+    except StandardError, e:
+        usage(1)
+
+    messages_ = check(default_base_dir, custom_base_dir)
+    print_messages(messages_, verbose=verbose)
