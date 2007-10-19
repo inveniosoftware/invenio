@@ -49,6 +49,23 @@ def get_client_info(req):
     except:
         return {}
 
+def get_pretty_wide_client_info(req):
+    """Return in a pretty way all the avilable information about the current
+    user/client"""
+    if req:
+        from invenio.webuser import collect_user_info
+        user_info = collect_user_info(req)
+        keys = user_info.keys()
+        keys.sort()
+        max_key = max([len(key) for key in keys])
+        ret = ""
+        fmt = "%% %is: %%s\n" % max_key
+        for key in keys:
+            ret += fmt % (key, user_info[key])
+        return ret
+    else:
+        return "No client information available"
+
 def get_tracestack():
     """
     If an exception has been caught, return the system tracestack or else return tracestack of what is currently in the stack
@@ -70,6 +87,58 @@ def get_tracestack():
                 }
     return tracestack_pretty
 
+def register_exception(force_stack=False, stream='error', req=None):
+    """
+    log error exception to invenio.err and warning exception to invenio.log
+    errors will be logged with client information (if req is given)
+
+    @param force_stack: when True stack is always printed, while when False,
+    stack is printed only whenever the Exception type is not containing the
+    word Invenio
+
+    @param stream: 'error' or 'warning'
+
+    @param req = mod_python request
+    @return 1 if successfully wrote to stream, 0 if not
+    """
+    exc_info =  sys.exc_info()
+    if exc_info[0]:
+        if stream=='error':
+            stream='err'
+        else:
+            stream='log'
+        stream_to_write = open(logdir + '/invenio.' + stream, 'a')
+        # <type 'exceptions.StandardError'> -> exceptions.StandardError
+        exc_name = str(exc_info[0])[7:-2]
+        # exceptions.StandardError -> StandardError
+        if exc_name.startswith('exceptions.'):
+            exc_name = exc_name[11:]
+        exc_value = str(exc_info[1])
+        print >> stream_to_write, "%(time)s -> %(name)s %(value)s" % {
+            'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
+            'name' : exc_name,
+            'value' : exc_value
+        }
+        print >> stream_to_write, get_pretty_wide_client_info(req)
+        if not exc_name.startswith('Invenio') or force_stack:
+            tracestack = traceback.extract_stack()[-5:-2] #force traceback except for this call
+            tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
+            for trace_tuple in tracestack:
+                tracestack_pretty += """
+  File "%(file)s", line %(line)s, in %(function)s
+    %(text)s""" % \
+                    {   'file'      : trace_tuple[0],
+                        'line'      : trace_tuple[1],
+                        'function'  : trace_tuple[2],
+                        'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
+                    }
+        print >> stream_to_write, tracestack_pretty
+        traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
+        print >> stream_to_write
+        stream_to_write.close()
+        return 1
+    else:
+        return 0
 
 def register_errors(errors_or_warnings_list, stream, req=None):
     """
