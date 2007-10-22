@@ -73,7 +73,7 @@ from invenio.config import etcdir
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status
-from invenio.bibrank_tag_based_indexer import single_tag_rank_method
+from invenio.bibrank_tag_based_indexer import single_tag_rank_method, citation
 from invenio.bibrank_word_indexer import word_similarity
 
 
