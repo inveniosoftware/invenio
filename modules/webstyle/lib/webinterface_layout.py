@@ -43,11 +43,12 @@ from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 from invenio.errorlib_webinterface import WebInterfaceErrorPages
 from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 from invenio.webstat_webinterface import WebInterfaceStatsPages
+from invenio.webjournal_webinterface import WebInterfaceJournalPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
     the other modules."""
-    
+
     _exports = WebInterfaceSearchInterfacePages._exports + [
         'youraccount',
         'youralerts',
@@ -59,8 +60,9 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'oai2d', ('oai2d.py', 'oai2d'),
         ('getfile.py', 'getfile'),
         'submit',
-        'rss', 
-        'stats'
+        'rss',
+        'stats',
+	'journal'
         ]
 
     def __init__(self):
@@ -88,6 +90,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     rss = WebInterfaceRSSFeedServicePages()
 
     stats = WebInterfaceStatsPages()
+
+    journal = WebInterfaceJournalPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

@@ -1652,4 +1652,18 @@ ul.detailedRecordActions{
 
 /* end detailed record page*/
 
+/* definitions for webjournal module */
+
+.webjournalBoxList{
+/*list-style-image:url("star_dot-icon-30x30.gif");*/
+}
+
+.webjournalBoxList a:visited, a:link, a:active{
+text-decoration: none;
+}
+
+.webjournalBoxList a:hover{
+text-decoration:underline;
+}
+
 /* end of cds.css */
