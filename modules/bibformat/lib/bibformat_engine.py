@@ -103,7 +103,7 @@ for lang in cdslangs:
 ln_pattern_text = ln_pattern_text.rstrip(r"|")
 ln_pattern_text += r")>(.*?)</\1>"
 
-ln_pattern =  re.compile(ln_pattern_text)
+ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
 # Regular expression for finding <name> tag in format templates
 pattern_format_template_name = re.compile(r'''
@@ -735,8 +735,8 @@ def filter_languages(format_template, ln='en'):
         # Try to find tag with current lang. If it does not exists,
         # then current_lang becomes cdslang until the end of this
         # replace
-        pattern_current_lang = re.compile(r"<"+current_lang+ \
-                                          "\s*>(.*?)</"+current_lang+"\s*>")
+        pattern_current_lang = re.compile(r"<("+current_lang+ \
+                                          r")\s*>(.*?)(</"+current_lang+r"\s*>)", re.IGNORECASE | re.DOTALL)
         if re.search(pattern_current_lang, lang_tag_content) is None:
             current_lang = cdslang
 
