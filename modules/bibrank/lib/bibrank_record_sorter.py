@@ -205,18 +205,21 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
             create_rnkmethod_cache()
 
         function = methods[rank_method_code]["function"]
+        #we get 'citation' method correctly here
         func_object = globals().get(function)
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
-        elif rank_method_code == "cit" and pattern and pattern[0][0:6] == "recid:":
+        elif rank_method_code == "citation" and pattern:
             # FIXME: func_object and pattern and pattern[0][0:6] == "recid:" and function == "citation":
+            #we get rank_method_code correctly here. pattern[0] is the search word!
             result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
     except Exception, e:
-        result = (None, "", adderrorbox("An error occured when trying to rank the search result", ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
+        result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
+
 
     if result[0] and result[1]: #split into two lists for search_engine
         results_similar_recIDs = map(lambda x: x[0], result[0])
@@ -228,6 +231,8 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     if verbose > 0:
         print string.replace(voutput, "<br>", "\n")
 
+    #dbg = string.join(map(str,methods[rank_method_code].items()))
+    #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
     return result
 
 def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
@@ -332,7 +337,13 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
 def find_citations(rank_method_code, recID, hitset, verbose):
-    reclist = calculate_cited_by_list(int(recID), "a")
+    """Rank by the amount of citations."""
+    #calculate the cited-by values for all the members of the hitset
+    for m in hitset:
+        reclist = calculate_cited_by_list(int(m), "a")        
+
+    #fix this..
+
     if reclist:
         return (reclist,"(", ")", "Warning: citation search functionality is experimental.")
     else:
