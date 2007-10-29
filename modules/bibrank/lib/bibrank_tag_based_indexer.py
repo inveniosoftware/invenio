@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 
 import sys
 import time
+import marshal
 import traceback
 import ConfigParser
 
@@ -35,6 +36,7 @@ from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibtask import task_get_option, write_message
+
 
 options = {}
 
@@ -164,9 +166,12 @@ def get_lastupdated(rank_method_code):
 
 def intoDB(dict, date, rank_method_code):
     """Insert the rank method data into the database"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    mid = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
     del_rank_method_codeDATA(rank_method_code)
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%%s, '%s')" % serialize_via_marshal(dict) , (id[0][0], ))
+    serdata = serialize_via_marshal(dict);
+    midstr = str(mid[0][0]);
+    sqlstr = "INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES ("+midstr+",'"+serdata+"')";
+    run_sql(sqlstr)
     run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
 def fromDB(rank_method_code):

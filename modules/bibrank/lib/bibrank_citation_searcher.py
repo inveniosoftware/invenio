@@ -48,7 +48,7 @@ def init_reference_list_dictionary():
     except OperationalError:
         compressed_ref_dic = []
     ref_dic = None
-    if compressed_ref_dic and compressed_ref_dic[0]:
+    if compressed_ref_dic and compressed_ref_dic[0] and compressed_ref_dic[0][0]:
         ref_dic = marshal.loads(decompress(compressed_ref_dic[0][0]))
     return ref_dic
 

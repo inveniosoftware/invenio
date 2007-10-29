@@ -23,7 +23,8 @@ __revision__ = "$Id$"
 
 import time
 import os
-from zlib import decompress, compress
+import marshal
+from zlib import decompress, compress, error
 
 from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern
@@ -58,11 +59,12 @@ def get_citation_weight(rank_method_code, config):
     if last_modified_records:
         updated_recid_list = create_recordid_list(last_modified_records)
         result_intermediate = last_updated_result(rank_method_code, updated_recid_list)
+        #result_intermed should be warranted to exists!
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
         citation_informations = get_citation_informations(updated_recid_list, config)
-        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate)
+        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate) #dic is docid-nuberofreferences like {1: 2, 2: 0, 3: 1}
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
     else:
@@ -114,19 +116,27 @@ def last_updated_result(rank_method_code, recid_list):
         initialize the value of last updated records by zero,otherwise an initial dictionary
         with zero as value for all recids
     """
+    result = make_initial_result()
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
                rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.Name = '%s'"""% rank_method_code
     dict = run_sql(query)
-    if dict:
-        dic = marshal.loads(decompress(dict[0][0]))
+    if dict and dict[0] and dict[0][0]:
+        #has to be prepared for corrupted data!
+        try:
+            dic = marshal.loads(decompress(dict[0][0]))
+        except error:
+            return result
         query = "select citation_data from rnkCITATIONDATA"
         cit_compressed = run_sql(query)
-        cit = marshal.loads(decompress(cit_compressed[0][0]))
-        query = "select citation_data_reversed from rnkCITATIONDATA"
-        ref_compressed = run_sql(query)
-        ref = marshal.loads(decompress(ref_compressed[0][0]))
-        result = get_initial_result(dic, cit, ref, recid_list)
-    else: result = make_initial_result()
+        cit = []
+        if cit_compressed and cit_compressed[0] and cit_compressed[0][0]:
+            cit = marshal.loads(decompress(cit_compressed[0][0]))
+            if cit:
+                query = "select citation_data_reversed from rnkCITATIONDATA"
+                ref_compressed = run_sql(query)
+                if ref_compressed and ref_compressed[0] and ref_compressed[0][0]:
+                    ref = marshal.loads(decompress(ref_compressed[0][0]))
+                    result = get_initial_result(dic, cit, ref, recid_list)
     return result
 
 def get_initial_result(dic, cit, ref, recid_list):
@@ -238,7 +248,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     result = initialresult
     d_reports_numbers = citation_informations[0]
     d_references_report_numbers = citation_informations[1]
-    d_references_s = citation_informations[2]
+    d_references_s = citation_informations[2] #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
     for recid, refnumbers in d_references_report_numbers.iteritems():
@@ -247,7 +257,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             f = 'reportnumber'
             rec_id = get_recids_matching_query(p, f)
             if rec_id:
-                result[rec_id[0]] += 1
+                if result.has_key(rec_id[0]):
+                    result[rec_id[0]] += 1
                 citation_list[rec_id[0]].append(recid)
                 reference_list[recid].append(rec_id[0])
     t2 = os.times()[4]
