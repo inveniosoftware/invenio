@@ -91,7 +91,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
     stats = WebInterfaceStatsPages()
 
-    journal = WebInterfaceJournalPages()
+    #journal = WebInterfaceJournalPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
