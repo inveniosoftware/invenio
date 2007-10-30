@@ -110,6 +110,152 @@ except ImportError:
 
 cli_opts = {}
 
+def change_otag_format(out):
+    #
+    # Mark "o" tag lines so can delete and move o tags
+    # This version (using find) slightly faster than compiled expressions..
+    #
+    """ change xml format from (e.g.):
+           <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="o">1.</subfield>
+           </datafield>
+           <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
+                <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
+           </datafield>
+           <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="o">2.</subfield>
+           </datafield>
+           <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
+                <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
+           </datafield>
+        to:
+           <datafield tag="999" ind1="C" ind2="5">
+              <subfield code="o">1.</subfield>
+              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
+              <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
+           </datafield>
+           <datafield tag="999" ind1="C" ind2="5">
+              <subfield code="o">2.</subfield>
+              <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
+              <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
+           </datafield>
+           """
+                                                        
+    tag_lines=[]
+    in_lines = out.split('\n')
+    for line in in_lines:
+        if line.find('<subfield code="o">') != -1:
+            tag_lines.append('o')
+        elif line.find('<subfield code="m">') != -1 or line.find('<subfield code="r">') != -1 or \
+             line.find('<subfield code="s">') != -1 or line.find('<subfield code="z">') != -1 or \
+             line.find('<subfield code="u">') != -1:
+            tag_lines.append('t')
+        elif line.find('<datafield tag="999" ind1="C" ind2="5">') != -1:
+            tag_lines.append('5')
+        else:
+            tag_lines.append('a')
+    o_tag = ''
+    new_rec_lines=[]
+    lc = -1
+    for lane in in_lines:
+        line = lane.rstrip()
+        lc += 1
+        if tag_lines[lc] == 'o': # save o tag (but do not write line to buffer)
+            o_tag=line
+        elif lc > 2 and tag_lines[lc - 2] == '5' and tag_lines[lc - 1] == 'o' and tag_lines[lc] == 'a':
+            new_rec_lines.pop()  # remove previous '5' line and current 'a' line also not written
+        elif lc > 2 and tag_lines[lc -1] == '5' and tag_lines[lc] == 't':                                 
+            new_rec_lines.append(o_tag) # add o_tag here
+            new_rec_lines.append(line)
+        else:
+            new_rec_lines.append(line)
+    new_out = ''
+    for rec in new_rec_lines:                          
+        rec = rec.rstrip()
+        if rec:
+           new_out += rec + '\n'
+    return new_out
+
+def squeeze_m(reference_lines):
+    """squeeze out solitary "m" tags that are too short or too long
+       min and max lengths derived by inspection of actual data """
+    min_length = 12
+    max_length = 1024
+    m_tag=re.compile('\<subfield code=\"m\"\>(.*?)\<\/subfield\>')
+    end_tag=re.compile('<\/datafield\>')
+    filter = []
+    m_squeezed = 0
+    for i in range(len(reference_lines)): ## set up initial filter
+        filter.append(1)                      
+    for i in range(len(reference_lines)):  
+        if m_tag.search(reference_lines[i]):
+            if end_tag.search(reference_lines[i + 1]):  ## If this is true then its a solitary "m" tag
+                    mlength= len(m_tag.search(reference_lines[i]).group(1))
+                    if mlength < min_length or mlength > max_length:
+                        filter[i-1] = filter[i] = filter[i+1] = 0
+                        m_squeezed += 1
+    new_reference_lines = []
+    for i in range(len(reference_lines)):
+        if filter[i]: 
+            new_reference_lines.append(reference_lines[i])
+    return m_squeezed,new_reference_lines
+
+def squeeze_o(reference_lines):
+    """ squeeze out consecutive o tags - which are already present but are made
+        worse by squeezing out m tags """                            
+    o_tag=re.compile('\<subfield code=\"o\"\>(.*?)\<\/subfield\>')
+    o_squeezed = 0
+    filter = []
+    for i in range(len(reference_lines)):  
+        filter.append(1)                      
+    for i in range(len(reference_lines)):  
+        if o_tag.search(reference_lines[i]):
+            if i+3 < len(reference_lines):
+                if  o_tag.search(reference_lines[i+3]): ## if this is true then its 2 "o" tags in a row
+                    filter[i-1] = filter[i] = filter[i+1] = 0
+                    o_squeezed += 1
+    new_reference_lines = []
+    for i in range(len(reference_lines)):
+        if filter[i]: 
+            new_reference_lines.append(reference_lines[i])
+    return o_squeezed,new_reference_lines
+
+def filter_processed_references(out):
+    """ apply filters to reference lines found - to remove junk"""
+    reference_lines = out.split('\n')
+    ## remove too long and too short m tags
+    (m_squeezed,ref_lines) = squeeze_m(reference_lines)
+    ## Now look for consecutive o tags (with no other tag)
+    (o_squeezed,ref_lines) = squeeze_o(ref_lines)
+    if m_squeezed + o_squeezed:
+        a_tag=re.compile('\<subfield code=\"a\"\>(.*?)\<\/subfield\>')
+        for i in range(len(ref_lines)):
+            # <subfield code="a">CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
+            if a_tag.search(ref_lines[i]):  ## remake the "a" tag for new numbe of "m" tags
+                data = a_tag.search(ref_lines[i]).group(1)
+                words1 = data.split()
+                words2 = words1[-1].split('-')
+                old_m = int(words2[-1])
+                words2[-1] = str(old_m - m_squeezed)
+                data1 = '-'.join(words2)
+                words1[-1] = data1
+                new_data = ' '.join(words1)
+                ref_lines[i] = '      <subfield code="a">' + new_data + '</subfield>'
+                break
+    new_out = ''
+    len_filtered = 0
+    for rec in ref_lines:                          
+        rec = rec.rstrip()
+        if rec:
+           new_out += rec + '\n'
+           len_filtered += 1
+    if cli_opts['verbosity'] >= 1 and len(reference_lines) != len_filtered:
+        sys.stdout.write("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
+              %  (len(reference_lines),len_filtered))
+    return new_out
+
 def get_url_repair_patterns():
     """Initialise and return a list of precompiled regexp patterns that
        are used to try to re-assemble URLs that have been broken during
@@ -3613,6 +3759,7 @@ def get_reference_section_title_patterns():
     """
     patterns = []
     titles = [ u'references',
+               u'references.',
                u'r\u00C9f\u00E9rences',
                u'r\u00C9f\u00C9rences',
                u'reference',
@@ -3636,6 +3783,12 @@ def get_reference_section_title_patterns():
                                 _create_regex_pattern_add_optional_spaces_to_word_characters(t) + \
                                 line_end, re.I|re.UNICODE)
             patterns.append(t_ptn)
+    ## allow e.g.  'N References' to be found where N is an integer
+    sect_marker1 = unicode(r'^(\d){1,3}\s*(?P<title>')
+    t_ptn = re.compile(sect_marker1 + \
+                   _create_regex_pattern_add_optional_spaces_to_word_characters(u'references') + \
+                   line_end, re.I|re.UNICODE)
+    patterns.append(t_ptn)
     return patterns
 
 
@@ -3688,6 +3841,37 @@ def get_first_reference_line_numeration_marker_patterns():
         compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
+def get_first_reference_line_numeration_marker_patterns_bis():
+    """Return a list of compiled regex patterns used to search for the first
+       reference line in a full-text document.
+       The line is considered to start with : 1. or 2. or 3. etc
+       @return: (list) of compiled regex patterns.
+    """
+    compiled_patterns = []
+    g_name = unicode(r'(?P<mark>')
+    g_close = u')'
+    patterns = \
+      [ g_name + unicode(r'(?P<left>)\s*?(?P<num>\d+)\s*?(?P<right>\.)')   \
+          + g_close]
+    for p in patterns:
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+    return compiled_patterns
+
+def get_first_reference_line_numeration_marker_patterns_bis_bis():
+    """Return a list of compiled regex patterns used to search for the first
+       reference line in a full-text document.
+       The line is considered to start with : 1 or 2 etc (just a number)
+       @return: (list) of compiled regex patterns.
+    """
+    compiled_patterns = []
+    g_name = unicode(r'(?P<mark>')
+    g_close = u')'
+    patterns = \
+      [ g_name + unicode(r'(?P<left>)\s*?(?P<num>\d+)\s*?(?P<right>)')   \
+          + g_close]
+    for p in patterns:
+        compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
+    return compiled_patterns
 def get_post_reference_section_title_patterns():
     """Return a list of compiled regex patterns used to search for the title
        of the section after the reference section in a full-text document.
@@ -3822,6 +4006,8 @@ def find_reference_section(docbody):
             if title_match is not None:
                 temp_ref_start_line = x
                 temp_title = title_match.group('title')
+                # Need to escape to avoid problems like 'References['
+                temp_title = re.escape(temp_title)
                 mk_with_title_ptns = \
                    get_reference_line_numeration_marker_patterns(temp_title)
                 mk_with_title_match = \
@@ -3980,6 +4166,149 @@ def find_reference_section_no_title(docbody):
         ref_sectn_details = None
     return ref_sectn_details
 
+def find_reference_section_no_title_bis(docbody):
+    """This function would generally be used when it was not possible to locate
+       the start of a document's reference section by means of its title.
+       Instead, this function will look for reference lines that have numeric
+       markers of the format [1], [2], etc.
+       @param docbody: (list) of strings -each string is a line in the document.
+       @return: (dictionary) :
+         { 'start_line' : (integer) - index in docbody of 1st reference line,
+           'title_string' : (None) - title of the reference section
+                                     (None since no title),
+           'marker' : (string) - the marker of the first reference line,
+           'marker_pattern' : (string) - the regexp string used to find the
+                                         marker,
+           'title_marker_same_line' : (integer) 0 - to signal title not on same
+                                       line as marker.
+         }
+                 Much of this information is used by later functions to rebuild
+                 a reference section.
+         -- OR --
+                (None) - when the reference section could not be found.
+    """
+    ref_start_line = ref_line_marker = None
+    if len(docbody) > 0:
+        marker_patterns = get_first_reference_line_numeration_marker_patterns_bis()
+
+        ## try to find first reference line in the reference section:
+        x = len(docbody) - 1
+        found_ref_sect = 0
+        while x >= 0 and not found_ref_sect:
+            mark_match = \
+                perform_regex_match_upon_line_with_pattern_list(docbody[x], \
+                                                                marker_patterns)
+            if mark_match is not None and int(mark_match.group('num')) == 1:
+                ## Get marker recognition pattern:
+                mk_ptn = mark_match.re.pattern
+
+                ## Look for [2] in next 10 lines:
+                next_test_lines = 10
+                y = x + 1
+                temp_found = 0
+                while y < len(docbody) and y < x + next_test_lines and not temp_found:
+                    mark_match2 = perform_regex_match_upon_line_with_pattern_list(docbody[y], marker_patterns)
+                    if (mark_match2 is not None) and \
+                           (int(mark_match2.group('num')) == 2) and \
+                           (mark_match.group('left') == \
+                            mark_match2.group('left')) and \
+                            (mark_match.group('right') == \
+                             mark_match2.group('right')):
+                        ## Found next reference line:
+                        temp_found = 1
+                    elif y == len(docbody) - 1:
+                        temp_found = 1
+                    y = y + 1
+
+                if temp_found:
+                    found_ref_sect = 1
+                    ref_start_line = x
+                    ref_line_marker = mark_match.group('mark')
+                    ref_line_marker_ptn = mk_ptn
+            x = x - 1
+    if ref_start_line is not None:
+        ref_sectn_details = { 'start_line' : ref_start_line,
+                              'title_string' : None,
+                              'marker' : ref_line_marker,
+                              'marker_pattern' : ref_line_marker_ptn,
+                              'title_marker_same_line' : 0
+                            }
+    else:
+        ## didn't manage to find the reference section
+        ref_sectn_details = None
+    return ref_sectn_details
+
+def find_reference_section_no_title_bis_bis(docbody):
+    """This function would generally be used when it was not possible to locate
+       the start of a document's reference section by means of its title.
+       Instead, this function will look for reference lines that have numeric
+       markers of the format [1], [2], etc.
+       @param docbody: (list) of strings -each string is a line in the document.
+       @return: (dictionary) :
+         { 'start_line' : (integer) - index in docbody of 1st reference line,
+           'title_string' : (None) - title of the reference section
+                                     (None since no title),
+           'marker' : (string) - the marker of the first reference line,
+           'marker_pattern' : (string) - the regexp string used to find the
+                                         marker,
+           'title_marker_same_line' : (integer) 0 - to signal title not on same
+                                       line as marker.
+         }
+                 Much of this information is used by later functions to rebuild
+                 a reference section.
+         -- OR --
+                (None) - when the reference section could not be found.
+    """
+    ref_start_line = ref_line_marker = None
+    if len(docbody) > 0:
+        marker_patterns = get_first_reference_line_numeration_marker_patterns_bis_bis()
+
+        ## try to find first reference line in the reference section:
+        x = len(docbody) - 1
+        found_ref_sect = 0
+        while x >= 0 and not found_ref_sect:
+            mark_match = \
+                perform_regex_match_upon_line_with_pattern_list(docbody[x], \
+                                                                marker_patterns)
+            if mark_match is not None and int(mark_match.group('num')) == 1:
+                ## Get marker recognition pattern:
+                mk_ptn = mark_match.re.pattern
+
+                ## Look for [2] in next 10 lines:
+                next_test_lines = 10
+                y = x + 1
+                temp_found = 0
+                while y < len(docbody) and y < x + next_test_lines and not temp_found:
+                    mark_match2 = perform_regex_match_upon_line_with_pattern_list(docbody[y], marker_patterns)
+                    if (mark_match2 is not None) and \
+                           (int(mark_match2.group('num')) == 2) and \
+                           (mark_match.group('left') == \
+                            mark_match2.group('left')) and \
+                            (mark_match.group('right') == \
+                             mark_match2.group('right')):
+                        ## Found next reference line:
+                        temp_found = 1
+                    elif y == len(docbody) - 1:
+                        temp_found = 1
+                    y = y + 1
+
+                if temp_found:
+                    found_ref_sect = 1
+                    ref_start_line = x
+                    ref_line_marker = mark_match.group('mark')
+                    ref_line_marker_ptn = mk_ptn
+            x = x - 1
+    if ref_start_line is not None:
+        ref_sectn_details = { 'start_line' : ref_start_line,
+                              'title_string' : None,
+                              'marker' : ref_line_marker,
+                              'marker_pattern' : ref_line_marker_ptn,
+                              'title_marker_same_line' : 0
+                            }
+    else:
+        ## didn't manage to find the reference section
+        ref_sectn_details = None
+    return ref_sectn_details
 
 def find_end_of_reference_section(docbody,
                                   ref_start_line,
@@ -4502,11 +4831,24 @@ def extract_references_from_fulltext(fulltext):
     ## Try to remove pagebreaks, headers, footers
     fulltext = remove_page_boundary_lines(fulltext)
     status = 0
+    #How ref section found flag
+    how_found_start = 0
     ## Find start of refs section:
     ref_sect_start = find_reference_section(fulltext)
+    if ref_sect_start is not None: how_found_start = 1
     if ref_sect_start is None:
         ## No references found - try with no title option
         ref_sect_start = find_reference_section_no_title(fulltext)
+        if ref_sect_start is not None: how_found_start = 2
+        ## Try weaker set of patterns if needed
+        if ref_sect_start is None:
+            ## No references found - try with no title option (with weaker patterns..)
+            ref_sect_start = find_reference_section_no_title_bis(fulltext)
+            if ref_sect_start is not None: how_found_start = 3
+            if ref_sect_start is None:
+                ## No references found - try with no title option (with even weaker patterns..)
+                ref_sect_start = find_reference_section_no_title_bis_bis(fulltext)
+                if ref_sect_start is not None: how_found_start = 4
     if ref_sect_start is None:
         ## No References
         refs = []
@@ -4535,7 +4877,7 @@ def extract_references_from_fulltext(fulltext):
                                        ref_sect_start["title_string"], \
                                        ref_sect_start["marker_pattern"], \
                                        ref_sect_start["title_marker_same_line"])
-    return (refs, status)
+    return (refs, status, how_found_start)
 
 
 ## Tasks related to conversion of full-text to plain-text:
@@ -4913,6 +5255,7 @@ def main():
                      ## tags have been output
 
     for curitem in extract_jobs:
+        how_found_start = -1  ## flag to indicate how the reference start section was found (or not)
         extract_error = 0  ## extraction was OK unless determined otherwise
         ## reset the stats counters:
         count_misc = count_title = count_reportnum = count_url = 0
@@ -4959,7 +5302,7 @@ def main():
                 reflines = docbody
             else:
                 ## launch search for the reference section in the document body:
-                (reflines, extract_error) = \
+                (reflines, extract_error, how_found_start) = \
                            extract_references_from_fulltext(docbody)
                 if len(reflines) == 0 and extract_error == 0:
                     extract_error = 6
@@ -5009,7 +5352,18 @@ def main():
             except:
                 raise IOError("Cannot open raw ref file: %s to write" \
                               % raw_file)
-
+        ## If found ref section by a weaker method and only found misc/urls then junk it
+        ## studies show that such cases are ~ 100% rubbish. Also allowing only
+        ## urls found greatly increases the level of rubbish accepted..
+        if count_reportnum + count_title == 0 and how_found_start > 2:
+            count_misc = 0
+            count_url = 0
+            processed_references = []
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----Found ONLY miscellaneous/Urls so removed it how_found_start=  %d\n" % (how_found_start))
+        elif  count_reportnum + count_title  > 0 and how_found_start > 2:
+            if cli_opts['verbosity'] >= 1:
+                sys.stdout.write("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start))
         ## Display the processed reference lines:
         out = display_xml_record(extract_error, \
                                  count_reportnum, \
@@ -5018,6 +5372,12 @@ def main():
                                  count_misc, \
                                  recid, \
                                  processed_references)
+        ## Filter the processed reference lines to remove junk
+        out = filter_processed_references(out)  ## Be sure to call this BEFORE change_otag_format
+                                                ## since filter_processed_references expects the
+                                                ## original xml format.
+        ## Change o_tag format
+        out = change_otag_format(out)
         if cli_opts['verbosity'] >= 1:
             lines = out.split('\n')
             sys.stdout.write("-----display_xml_record gave: %s significant " \
