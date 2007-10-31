@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import marshal
-from zlib import decompress
+from zlib import decompress, error
 
 from invenio.dbquery import run_sql, OperationalError
 
@@ -37,6 +37,8 @@ def init_cited_by_dictionary():
     citation_dic = None
     if compressed_citation_dic and compressed_citation_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+    #debug
+    #dstr = str(citation_dic)
     return citation_dic
 
 def init_reference_list_dictionary():
@@ -68,19 +70,26 @@ def calculate_cited_by_list(record_id, sort_order="d"):
     if cache_cited_by_dictionary:
         citation_list = cache_cited_by_dictionary.get(record_id, [])
     # get their weights:
-    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='cit'"
+    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
     compressed_citation_weight_dic = run_sql(query)
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
-        citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
-        for id in citation_list:
-            tmp = [id, citation_dic[id]]
-            result.append(tmp)
+        #has to be prepared for corrupted data!
+        try:
+            citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
+            for id in citation_list:
+                tmp = [id, citation_dic[id]]
+                result.append(tmp)
+        except error:
+            for id in citation_list:
+                tmp = [id, 1]
+                result.append(tmp)
     # sort them:
     if result:
         if sort_order == "d":
             result.sort(lambda x, y: cmp(y[1], x[1]))
         else:
             result.sort(lambda x, y: cmp(x[1], y[1]))
+
     return result
 
 def calculate_co_cited_with_list(record_id, sort_order="d"):

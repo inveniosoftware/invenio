@@ -339,15 +339,23 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 def find_citations(rank_method_code, recID, hitset, verbose):
     """Rank by the amount of citations."""
     #calculate the cited-by values for all the members of the hitset
+    #returns: 
+    voutput = ""
+    recweightdic = {}
     for m in hitset:
-        reclist = calculate_cited_by_list(int(m), "a")        
-
-    #fix this..
-
-    if reclist:
-        return (reclist,"(", ")", "Warning: citation search functionality is experimental.")
+        #put stuff in a dict key -> weight
+        wlist = calculate_cited_by_list(int(m), "a")
+        recweightdic[m] = len(wlist)     #fix this.. should be by weight not by lenght
+        #voutput = voutput + str(m)+":"+str(wlist)+" "
+        
+    ret = [ (key, value) for key, value in recweightdic.iteritems() ] #sort according to values
+    ret.reverse()
+    #voutput = voutput + str(ret)
+    
+    if ret:
+        return (ret,"(", ")", "Warning: citation search functionality is experimental."+voutput)
     else:
-        return (reclist,"", "", "Warning: citation search functionality is experimental.")
+        return (ret,"", "", "Warning: citation search functionality is experimental."+voutput)
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
