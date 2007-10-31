@@ -98,24 +98,6 @@ except ImportError, e:
     """ % e
     sys.exit(1)
 
-try:
-    import Cython
-except ImportError, e1:
-    try:
-        import Pyrex
-    except ImportError, e2:
-        print """
-        *************************************************
-        ** IMPORT ERROR %s %s
-        *************************************************
-        ** As of CDS Invenio v0.93, the Pyrex and/or   **
-        ** Cython module is required.  Please look     **
-        ** at our INSTALL file for more details and    **
-        ** fix the problem before continuing!          **
-        *************************************************
-        """ % (e1, e2)
-        sys.exit(1)
-
 ## 3) check for recommended modules:
 try:
     import psyco

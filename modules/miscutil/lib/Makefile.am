@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -28,17 +28,17 @@ pylib_DATA = __init__.py \
              dbquery.py \
              dbquery_tests.py \
              mailutils.py \
-	     miscutil_config.py \
+             miscutil_config.py \
              messages.py \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
              htmlutils.py \
-	     htmlutils_tests.py \
-	     testutils.py \
-	     testutils_regression_tests.py \
-	     urlutils.py \
-	     w3c_validator.py \
+             htmlutils_tests.py \
+             testutils.py \
+             testutils_regression_tests.py \
+             urlutils.py \
+             w3c_validator.py \
              intbitset_tests.py
 
 noinst_DATA = testimport.py \
@@ -53,22 +53,21 @@ EXTRA_DIST = __init__.py \
              errorlib_tests.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
-	     miscutil_config.py \
              config.py.wml \
              data_cacher.py \
              dbquery.py.wml \
              dbquery_tests.py \
              mailutils.py \
-	     miscutil_config.py \
+             miscutil_config.py \
              messages.py.wml \
              errorHandling.php.wml \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
              htmlutils.py \
-	     htmlutils_tests.py \
-	     testutils.py \
-	     testutils_regression_tests.py \
+             htmlutils_tests.py \
+             testutils.py \
+             testutils_regression_tests.py \
              urlutils.py \
              w3c_validator.py \
              testimport.py \
@@ -76,10 +75,13 @@ EXTRA_DIST = __init__.py \
              api_migration_kit.sh \
              updateapi.data.sed \
              intbitset.pyx \
+             intbitset.c \
              intbitset.h \
              intbitset_impl.c \
              intbitset_setup.py \
-             intbitset_tests.py
+             intbitset_tests.py \
+             intbitset.pyx
+
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
@@ -88,7 +90,7 @@ install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
 	$(PYTHON) $(srcdir)/intbitset_setup.py install
 
-CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) intbitset.c *~ *.tmp *.pyc
+CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
 
 clean-local:
 	rm -rf build

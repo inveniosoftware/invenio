@@ -35,7 +35,7 @@ Contents
 
           $ sudo apt-get install libapache2-mod-python2.3 \
               apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
-              python2.3-mysqldb python2.3-pyrex python2.3-4suite \
+              python2.3-mysqldb python2.3-4suite \
               python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
               rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
@@ -72,9 +72,6 @@ Contents
         as well as the following Python modules:
           - (mandatory) MySQLdb (do *not* use 1.2.1*; see below)
              <http://sourceforge.net/projects/mysql-python>                
-          - (mandatory) Pyrex or Cython (versions above 0.9.3):
-             <http://www.cosc.canterbury.ac.nz/greg.ewing/python/Pyrex/>
-             <http://www.cython.org/>
           - (recommended) PyXML, for XML processing:
              <http://pyxml.sourceforge.net/topics/download.html>
           - (recommended) PyRXP, for very fast XML MARC processing: 
