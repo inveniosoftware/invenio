@@ -25,33 +25,47 @@
 
 <p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
-<h2>Overview</h2>
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br>
+<strong>2. <a href="#2">Configuring BibUpload</a></strong><br>
+<strong>3. <a href="#3">Running BibUpload</a></strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Inserting new records</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Updating existing records</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Inserting and updating at the same time</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Updating preformatted output formats</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Uploading fulltext files</a><br>
+
+<a name="1"></a><h2>1. Overview</h2>
 
 <p>BibUpload enables you to upload bibliographic data in MARCXML
 format into CDS Invenio bibliographic database.  It is also used
 internally by other CDS Invenio modules as the sole entrance of
 metadata into the bibliographic databases.
 
-<p><strong>HINT:</strong> before uploading a MARCXML file, you may
-want to run provided <code>xmlmarclint</code> on it in order to verify
-its correctness.
+<p>Note that before uploading a MARCXML file, you may want to run
+provided <code>/opt/cds-invenio/bin/xmlmarclint</code> on it in order
+to verify its correctness.
 
-<h2>Configuring BibUpload</h2>
+<a name="2"></a><h2>2. Configuring BibUpload</h2>
 
 <p>BibUpload takes a MARCXML file as its input.  There is nothing to
 be configured for these files.  If the files have to be coverted into
 MARCXML from some other format, structured or not, this is usually
 done beforehand via <a href="../bibconvert/">BibConvert</a> module.
 
-<p><strong>NOTE</strong>: If you are using external system numbers for
-your records, such as when your records are being synchronized from an
+<p>Note that if you are using external system numbers for your
+records, such as when your records are being synchronized from an
 external system, then BibUpload knows about the tag 970 as the one
-containing external system number.  To change this tag into something
-else, you would have to edit BibUpload source file.
+containing external system number.  (To change this 970 tag into
+something else, you would have to edit BibUpload config source file.)
 
-<h2>Running BibUpload</h2>
+<p>Note also that in the similar way BibUpload knows about OAI
+identifiers, so that it will refuse to insert the same OAI harvested
+record twice, for example.
 
-<h3>Inserting new records</h3>
+<a name="3"></a><h2>3. Running BibUpload</h2>
+
+<a name="3.1"></a><h3>3.1 Inserting new records</h3>
 
 <p>Consider that you have an MARCXML file containing new records that
 is to be uploaded into the CDS Invenio.  (For example, it might have
@@ -78,16 +92,16 @@ will refuse to continue.
 
 <pre>
     &lt;record&gt;
-        &lt;datafield tag="100" ind1="" ind2=""&gt;
+        &lt;datafield tag="100" ind1=" " ind2=" "&gt;
             &lt;subfield code="a"&gt;Doe, John&lt;/subfield&gt;
         &lt;/datafield&gt;
-        &lt;datafield tag="245" ind1="" ind2=""&gt;
+        &lt;datafield tag="245" ind1=" " ind2=" "&gt;
             &lt;subfield code="a"&gt;On The Foo And Bar&lt;/subfield&gt;
         &lt;/datafield&gt;
     &lt;/record&gt;
 </pre>
 
-<h3>Updating existing records</h3>
+<a name="3.2"></a><h3>3.2 Updating existing records</h3>
 
 When you want to update existing records, with the new content from
 your input MARCXML file, then your input file should contain either
@@ -105,7 +119,7 @@ input file should contain record ID in the 001 tag and the title in
 <pre>
     &lt;record&gt;
         &lt;controlfield tag="001"&gt;123&lt;/controlfield&gt;
-        &lt;datafield tag="245" ind1="" ind2=""&gt;
+        &lt;datafield tag="245" ind1=" " ind2=" "&gt;
             &lt;subfield code="a"&gt;My Newly Updated Title&lt;/subfield&gt;
         &lt;/datafield&gt;
     &lt;/record&gt;
@@ -143,7 +157,7 @@ input file should contain record ID in the 001 tag and the title in
                         matching record IDs or system numbers.
 </pre>
 
-<h3>Inserting and updating at the same time</h3>
+<a name="3.3"></a><h3>3.3 Inserting and updating at the same time</h3>
 
 <p>Note that the insert/update modes can be combined together.  For
 example, if you have a file that contains a mixture of new records
@@ -158,21 +172,97 @@ $ bibupload -i -r file.xml
 In this case BibUpload will try to do an update (for records having
 either 001 or 970 identifiers), or an insert (for the other ones).
 
-<h3>Updating formats</h3>
+<a name="3.4"></a><h3>3.4 Updating preformatted output formats</h3>
 
 BibFormat can use this special upload mode during which metadata will
 not be updated, only the preformatted output formats for records:
 
 <pre>
-    -f, --format        Upload only the format (FMT) fields. 
+    -f, --format        Upload only the format (FMT) fields.
                         The original content is not changed, and neither its modification date.
 </pre>
 
-<h3>Uploading fulltext files</h3>
+This is useful for <code>bibreformat</code> daemon only; human
+administrators don't need to explicitly know about this mode.
 
-For the time being BibUpload manipulates only metadata and the
-formats.  You have to copy the files manually.
+<a name="3.5"></a><h3>3.5 Uploading fulltext files</h3>
 
-<p>FIXME: We plan to extend BibUpload to <a
-href="https://savannah.cern.ch/task/index.php?func=detailitem&item_id=3234">upload
-also fulltext files</a>.
+<p>The fulltext files can be uploaded and revised via a special FFT
+("fulltext file transfer") tag with the following
+semantic:
+
+<pre>
+    FFT $a  ...  location of the docfile to upload (a filesystem path or a URL)
+        $n  ...  docfile name (optional; if not set, deduced from $a)
+        $m  ...  new desired docfile name (optional; used for renaming files)
+        $t  ...  docfile type (e.g. Main, Additional)
+        $d  ...  docfile description (optional)
+</pre>
+
+<p>For example, to upload a new fulltext file <code>thesis.pdf</code>
+associated to record ID 123:
+
+<pre>
+    &lt;record&gt;
+        &lt;controlfield tag="001"&gt;123&lt;/controlfield&gt;
+        &lt;datafield tag="FFT" ind1=" " ind2=" "&gt;
+            &lt;subfield code="a"&gt;/tmp/thesis.pdf&lt;/subfield&gt;
+            &lt;subfield code="t"&gt;Main&lt;/subfield&gt;
+            &lt;subfield code="d"&gt;
+              This is the fulltext version of my thesis in the PDF format.
+              Chapter 5 still needs some revision.
+            &lt;/subfield&gt;
+        &lt;/datafield&gt;
+    &lt;/record&gt;
+</pre>
+
+<p>The FFT tag can be repetitive, so one can pass along another FFT
+tag instance containing a pointer to e.g. the thesis defence slides.
+The subfields of an FFT tag are non-repetitive.
+
+<p>The bibupload process, when it encounters FFT tags, will
+automatically populate fulltext storage space
+(<code>/opt/cds-invenio/var/data/files</code>) and metadata record
+associated tables (<code>bibrec_bibdoc</code>, <code>bibdoc</code>) as
+appropriate.  It will also enrich the 856 tags (URL tags) of the MARC
+metadata of the record in question with references to the latest
+versions of each file.
+
+<p>The bibupload process supports the usual modes correct, append,
+replace, insert with a semantic that is somewhat similar to the
+semantic of the metadata upload:
+
+<blockquote>
+<table border="1">
+<thead>
+<tr>
+<th></th><th>Metadata</th>  <th>Fulltext</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>objects being uploaded</td><td> MARC field instances characterized by tags (010-999) </td> <td>  fulltext files characterized by unique file names (FFT $n)</td>
+</tr>
+<tr>
+<td>   insert  </td><td>     insert new record; must not exist     </td><td>          insert new files; must not exist </td>
+</tr>
+<tr>
+<td>   append  </td><td>     append new tag instances for the given tag XXX, regardless of existing tag instances</td><td>          append new files, if filename not already present </td>
+</tr>
+<tr>
+<td>   correct  </td><td>    correct tag instances for the given tag XXX; delete existing ones and replace with given ones    </td><td>     correct files with the given filename; add new revision or delete file</td>
+</tr>
+<tr>
+<td>   replace   </td><td>   replace all tags, whatever XXX are</td><td> replace all files, whatever filenames are </td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+
+<p>In order to purge previous file revisions (i.e. in order to keep
+only the latest file version), please use the correct mode with $n
+filename and $t PURGE as the special keyword.
+
+<p>In order to delete all existing versions of a file, making it
+effectively disappear, please use the correct mode with $n filename
+and $t DELETE as the special keyword.
