@@ -216,16 +216,13 @@ class WebSearchTestCollections(unittest.TestCase):
     def test_traversal_links(self):
         """ websearch - traverse all the publications of a collection """
 
-        # Ensure that it is possible to traverse a collection as
-        # /collection/My_Collection?jrec=...
-
         browser = Browser()
-
+        
         try:
             for as in (0, 1):
                 browser.open(make_url('/collection/Preprints', as=as))
 
-                for jrec in (11, 21, 11, 23):
+                for jrec in (11, 21, 11, 27):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
                     if as:
                         args['as'] = as
@@ -867,7 +864,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=cern&rg=1',
-                                               expected_text="hep-th/0003295"))
+                                               expected_text="[hep-th/9611103]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
