@@ -809,11 +809,12 @@ False
 </define-tag>
 
 ## CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT -- send a
-## notification email to the user when a new account is created?  Use
+## notification email to the user when a new account is created in order to
+## to verify the validity of the provided email address?  Use
 ## 0 for no, 1 for yes.
 ##  (example: "0")
 <define-tag CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT whitespace=delete>
-0
+1
 </define-tag>
 
 ## CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION -- send a
