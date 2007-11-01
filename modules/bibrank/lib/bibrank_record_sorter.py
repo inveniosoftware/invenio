@@ -343,7 +343,7 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     voutput = ""
     recweightdic = {}
     for m in hitset:
-        #put stuff in a dict key -> weight
+        #put stuff in a dict key -> weight 
         wlist = calculate_cited_by_list(int(m), "a")
         recweightdic[m] = len(wlist)     #fix this.. should be by weight not by lenght
         #voutput = voutput + str(m)+":"+str(wlist)+" "
