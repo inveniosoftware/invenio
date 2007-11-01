@@ -29,7 +29,7 @@ import socket
 import re
 
 from invenio.external_authentication import ExternalAuth, \
-        WebAccessExternalAuthError
+        InvenioWebAccessExternalAuthError
 
 
 # Tunable list of settings to be hidden
@@ -98,7 +98,7 @@ class ExternalAuthSSO(ExternalAuth):
         If it is the first time the user logs in Invenio the nickname is
         stored alongside the email. If this nickname is unfortunatly already
         in use it is discarded. Otherwise it is ignored.
-        Raise WebAccessExternalAuthError in case of external troubles.
+        Raise InvenioWebAccessExternalAuthError in case of external troubles.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """

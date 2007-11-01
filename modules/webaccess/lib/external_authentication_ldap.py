@@ -56,7 +56,7 @@ __revision__ = \
 
 import ldap
 from invenio.external_authentication import ExternalAuth, \
-                                            WebAccessExternalAuthError
+                                            InvenioWebAccessExternalAuthError
 
 
 
@@ -89,7 +89,7 @@ class ExternalAuthLDAP(ExternalAuth):
                 return command(connection)
             except ldap.SERVER_DOWN, error_message:
                 continue
-        raise WebAccessExternalAuthError
+        raise InvenioWebAccessExternalAuthError
 
 
     def auth_user(self, username, password, req=None):
@@ -97,7 +97,7 @@ class ExternalAuthLDAP(ExternalAuth):
         Check USERNAME and PASSWORD against the LDAP system.
         Return None if authentication failed, or the email address of the
         person if the authentication was successful.  
-        Raise WebAccessExternalAuthError in case of external troubles.
+        Raise InvenioWebAccessExternalAuthError in case of external troubles.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """
@@ -175,7 +175,7 @@ class ExternalAuthLDAP(ExternalAuth):
     def fetch_user_groups_membership(self, username, password, req=None):
         """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
-        Raise WebAccessExternalAuthError in case of troubles.
+        Raise InvenioWebAccessExternalAuthError in case of troubles.
         """
         query_person = '(|' + ''.join (['(%s=%s)' % (attrib, username) 
                                  for attrib in 

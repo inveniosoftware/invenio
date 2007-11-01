@@ -939,7 +939,7 @@ II. Example - connecting role and user</a>
 
 
      Example template:
-     from invenio.external_authentication import ExternalAuth, WebAccessExternalAuthError
+     from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 
      class ExternalAuthFoo(ExternalAuth):
          """External authentication template example."""
@@ -956,7 +956,7 @@ II. Example - connecting role and user</a>
              person if the authentication was successful.  In order to do
              this you may perhaps have to keep a translation table between
              usernames and email addresses.
-             Raise WebAccessExternalAuthError in case of external troubles.
+             Raise InvenioWebAccessExternalAuthError in case of external troubles.
              """
              raise NotImplementedError
              #return None
@@ -970,7 +970,7 @@ II. Example - connecting role and user</a>
          def fetch_user_groups_membership(self, username, password=None, req=None):
              """Given a username, returns a dictionary of groups
              and their description to which the user is subscribed.
-             Raise WebAccessExternalAuthError in case of troubles.
+             Raise InvenioWebAccessExternalAuthError in case of troubles.
              """
              raise NotImplementedError
              #return {}

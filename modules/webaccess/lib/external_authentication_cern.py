@@ -29,7 +29,7 @@ import socket
 import re
 
 from invenio.external_authentication import ExternalAuth, \
-        WebAccessExternalAuthError
+        InvenioWebAccessExternalAuthError
 from invenio.external_authentication_cern_wrapper import AuthCernWrapper
 
 
@@ -80,7 +80,7 @@ class ExternalAuthCern(ExternalAuth):
                 IOError, TypeError), msg: # Let the user note that
                                      # no connection is available
             self.connection = None
-            raise WebAccessExternalAuthError, msg
+            raise InvenioWebAccessExternalAuthError, msg
 
 
     def _try_twice(self, funct, params):
@@ -97,7 +97,7 @@ class ExternalAuthCern(ExternalAuth):
             except (httplib.CannotSendRequest, socket.error, AttributeError,
                     IOError, TypeError):
                 self.connection = None
-                raise WebAccessExternalAuthError
+                raise InvenioWebAccessExternalAuthError
         return ret
 
 
@@ -111,7 +111,7 @@ class ExternalAuthCern(ExternalAuth):
         If it is the first time the user logs in Invenio the nickname is
         stored alongside the email. If this nickname is unfortunatly already
         in use it is discarded. Otherwise it is ignored.
-        Raise WebAccessExternalAuthError in case of external troubles.
+        Raise InvenioWebAccessExternalAuthError in case of external troubles.
         """
 
         infos = self._try_twice(funct=AuthCernWrapper.get_user_info, \

@@ -25,7 +25,7 @@ __revision__ = \
     "$Id$"
 
 
-class WebAccessExternalAuthError(Exception):
+class InvenioWebAccessExternalAuthError(Exception):
     """Exception to signaling general external trouble."""
     pass
 
@@ -50,7 +50,7 @@ class ExternalAuth:
         person if the authentication was successful.  In order to do
         this you may perhaps have to keep a translation table between
         usernames and email addresses.
-        Raise WebAccessExternalAuthError in case of external troubles.
+        Raise InvenioWebAccessExternalAuthError in case of external troubles.
         """
         raise NotImplementedError
         #return None
@@ -65,7 +65,7 @@ class ExternalAuth:
     def fetch_user_groups_membership(self, username, password, req=None):
         """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
-        Raise WebAccessExternalAuthError in case of troubles.
+        Raise InvenioWebAccessExternalAuthError in case of troubles.
         """
         raise NotImplementedError
         #return {}
