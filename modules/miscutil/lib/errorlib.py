@@ -87,7 +87,7 @@ def get_tracestack():
                 }
     return tracestack_pretty
 
-def register_exception(force_stack=False, stream='error', req=None, verbose_description=''):
+def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix=''):
     """
     log error exception to invenio.err and warning exception to invenio.log
     errors will be logged with client information (if req is given)
@@ -100,7 +100,10 @@ def register_exception(force_stack=False, stream='error', req=None, verbose_desc
 
     @param req = mod_python request
 
-    @param verbose_description a message to be printed before the exception in
+    @param prefix a message to be printed before the exception in
+    the log
+
+    @param suffix a message to be printed before the exception in
     the log
 
     @return 1 if successfully wrote to stream, 0 if not
@@ -123,8 +126,8 @@ def register_exception(force_stack=False, stream='error', req=None, verbose_desc
             'name' : exc_name,
             'value' : exc_value
         }
-        if verbose_description:
-            print >> stream_to_write, verbose_description
+        if prefix:
+            print >> stream_to_write, prefix
         print >> stream_to_write, get_pretty_wide_client_info(req)
         if not exc_name.startswith('Invenio') or force_stack:
             tracestack = traceback.extract_stack()[-5:-2] #force traceback except for this call
@@ -140,6 +143,8 @@ def register_exception(force_stack=False, stream='error', req=None, verbose_desc
                     }
         print >> stream_to_write, tracestack_pretty
         traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
+        if suffix:
+            print >> stream_to_write, suffix
         print >> stream_to_write
         stream_to_write.close()
         return 1
