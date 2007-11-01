@@ -56,6 +56,7 @@ from invenio.config import \
      adminemail, \
      cdslang, \
      cdsname, \
+     cdsnameintl, \
      supportemail, \
      sweburl, \
      tmpdir, \
@@ -68,10 +69,12 @@ from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.access_control_config import *
 from invenio.access_control_admin import acc_find_user_role_actions
+from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.messages import gettext_set_language
+from invenio.mailutils import send_email
 from invenio.webinterface_handler import http_get_credentials
 from invenio.webgroup_dblayer import get_groups
-from invenio.external_authentication import WebAccessExternalAuthError
+from invenio.external_authentication import InvenioWebAccessExternalAuthError
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -89,8 +92,7 @@ def createGuestUser():
             return run_sql("insert into user (email, note) values ('', '1')")
         except OperationalError:
             return None
-
-    elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
+    else:
         try:
             return run_sql("insert into user (email, note) values ('', '0')")
         except OperationalError:
@@ -326,8 +328,27 @@ def email_valid_p(email):
             return 0
     return 1
 
+def confirm_email(email):
+    """Confirm the email. It returns None when there are problems, otherwise
+    it return the uid involved."""
+    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
+        activated = 1
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+        activated = 0
+    elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        return -1
+    run_sql('UPDATE user SET note=%s where email=%s', (activated, email))
+    res = run_sql('SELECT id FROM user where email=%s', (email, ))
+    if res:
+        if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
+            sendNewAdminAccountWarning(email, adminemail)
+        return res[0][0]
+    else:
+        return None
+
+
 def registerUser(req, email, passw, nickname, register_without_nickname=False,
-        login_method=None):
+        login_method=None, ln=cdslang):
     """Register user with the desired values of NICKNAME, EMAIL and
        PASSW.
 
@@ -351,6 +372,8 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
     if not email_valid_p(email):
         return 1
 
+    _ = gettext_set_language(ln)
+
     # is email already taken?
     res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
     if len(res) > 0:
@@ -368,26 +391,34 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         if len(res) > 0:
             return 4
 
+    activated = 1 # By default activated
+
     if not login_method or not CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # local login
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
-            activated = 1
-        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
-            activated = 0
-        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
+        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
             return 5
-    else:
-        activated = 1
+        elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+            activated = 2 # Email confirmation required
+        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+            activated = 0 # Administrator confirmation required
+
+
+    if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+        address_activation_key = mail_cookie_create_mail_activation(email)
+        ip_address = req.connection.remote_host or req.connection.remote_ip
+
+        if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
+            tmpl.tmpl_account_address_activation_email_body(
+                email, address_activation_key, ip_address, ln),
+            header='', footer=''):
+            return 1
 
     # okay, go on and register the user:
     user_preference = get_default_user_preferences()
-
-    setUid(req, run_sql("INSERT INTO user (nickname, email, password, note, settings) VALUES (%s,%s,AES_ENCRYPT(email,%s),%s,%s)",
-                        (nickname, email, passw, activated, serialize_via_marshal(user_preference),)))
-
-    if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
-        sendNewUserAccountWarning(email, email, passw)
-    if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
-        sendNewAdminAccountWarning(email, adminemail)
+    uid = run_sql("INSERT INTO user (nickname, email, password, note, settings, last_login) "
+        "VALUES (%s,%s,AES_ENCRYPT(email,%s),%s,%s, NOW())",
+        (nickname, email, passw, activated, serialize_via_marshal(user_preference)))
+    if activated == 1: # Ok we consider the user as logged in :-)
+        setUid(req, uid)
     return 0
 
 def updateDataUser(uid, email, nickname):
@@ -428,8 +459,12 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req).lower()
-        except WebAccessExternalAuthError:
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req)
+            if p_email:
+                p_email = p_email.lower()
+            else:
+                raise InvenioWebAccessExternalAuthError
+        except InvenioWebAccessExternalAuthError:
             return([], p_email, p_pw, 16)
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
@@ -461,7 +496,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 groups = new_groups
             except (AttributeError, NotImplementedError):
                 pass
-            except WebAccessExternalAuthError:
+            except InvenioWebAccessExternalAuthError:
                 return([], p_email, p_pw, 16)
             else: # Groups synchronization
                 if groups != 0:
@@ -488,7 +523,7 @@ def loginUser(req, p_un, p_pw, login_method):
                     user_prefs['EXTERNAL_' + key] = value
             except (AttributeError, NotImplementedError):
                 pass
-            except WebAccessExternalAuthError:
+            except InvenioWebAccessExternalAuthError:
                 return([], p_email, p_pw, 16)
             # Storing settings
             set_user_preferences(query_result[0][0], user_prefs)
@@ -497,14 +532,20 @@ def loginUser(req, p_un, p_pw, login_method):
     else: # Internal Authenthication
         if not p_pw:
             p_pw = ''
-        query_result = run_sql("SELECT id,email from user where email=%s and password=AES_ENCRYPT(email,%s)", (p_email, p_pw,))
+        query_result = run_sql("SELECT id,email,note from user where email=%s and password=AES_ENCRYPT(email,%s)", (p_email, p_pw,))
         if query_result:
             #FIXME drop external groups and settings
-            preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
-            p_email = query_result[0][1].lower()
-            if login_method != preferred_login_method:
-                if CFG_EXTERNAL_AUTHENTICATION.has_key(preferred_login_method):
-                    return ([], p_email, p_pw, 11)
+            note = query_result[0][2]
+            if note == '1': # Good account
+                preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
+                p_email = query_result[0][1].lower()
+                if login_method != preferred_login_method:
+                    if CFG_EXTERNAL_AUTHENTICATION.has_key(preferred_login_method):
+                        return ([], p_email, p_pw, 11)
+            elif note == '2': # Email address need to be confirmed by user
+                return ([], p_email, p_pw, 17)
+            elif note == '0': # Account need to be confirmed by administrator
+                return ([], p_email, p_pw, 18)
         else:
             return ([], p_email, p_pw, 14)
     # Login successful! Updating the last access time
@@ -805,7 +846,7 @@ def collect_user_info(req):
         user_info['remote_host'] = req.connection.remote_host or ''
         user_info['referer'] = req.headers_in.get('Referer', '')
         user_info['uri'] = req.unparsed_uri or ''
-        user_info['agent'] = req.headers_in.get('User-Agent', '')
+        user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
         try:
             user_info['apache_user'] = getApacheUser(req)
             if user_info['apache_user']:

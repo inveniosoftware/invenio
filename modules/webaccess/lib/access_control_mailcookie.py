@@ -36,6 +36,14 @@ from random import random
 from cPickle import dumps, loads
 import md5
 
+
+class InvenioWebAccessMailCookieError(Exception):
+    pass
+
+class InvenioWebAccessMailCookieDeletedError(Exception):
+    pass
+
+
 _authorizations_kind = ('pw_reset', 'mail_activation', 'role')
 _datetime_format = "%Y-%m-%d %H:%M:%S"
 
@@ -70,7 +78,7 @@ def mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=1)):
         params = email
         return mail_cookie_create_generic(kind, params, cookie_timeout, False)
     else:
-        return None
+        raise InvenioWebAccessMailCookieError, "Email '%s' doesn't exist" % email
 
 def mail_cookie_create_mail_activation(email, cookie_timeout=timedelta(days=1)):
     """Create a unique url to be sent via email to activate an email address"""
@@ -89,7 +97,7 @@ def mail_cookie_retrieve_kind(cookie):
             assert(kind in _authorizations_kind)
             return kind
     except StandardError:
-        return None
+        raise InvenioWebAccessMailCookieError, "Cookie doesn't exist"
 
 def mail_cookie_check_generic(cookie, delete=False):
     """Retrieve data pointed by a cookie, returning a tuple (kind, params) or None
@@ -97,18 +105,20 @@ def mail_cookie_check_generic(cookie, delete=False):
     password = cookie[:16]+cookie[-16:]
     cookie_id = int(cookie[16:-16], 16)
     try:
-        res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime FROM accMAILCOOKIE WHERE "
+        res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime, status FROM accMAILCOOKIE WHERE "
             "id=%s AND expiration>=NOW()", (password, cookie_id))
         if not res:
              raise StandardError
     except StandardError:
-        return None
-    (kind, data, onetime) = res[0]
+        raise InvenioWebAccessMailCookieError, "Cookie doesn't exist"
+    (kind, data, onetime, status) = res[0]
     (kind_check, params, expiration, onetime_check) = loads(data)
     if not (kind == kind_check and onetime == onetime_check):
-        return None
+        raise InvenioWebAccessMailCookieError, "Cookie is corrupted"
+    if status == 'D':
+        raise InvenioWebAccessMailCookieDeletedError, "Cookie has been deleted"
     if onetime or delete:
-        run_sql("DELETE FROM accMAILCOOKIE WHERE id=%s", (cookie_id, ))
+        run_sql("UPDATE accMAILCOOKIE SET status='D' WHERE id=%s", (cookie_id, ))
     return (kind, params)
 
 def mail_cookie_check_role(cookie, uid):
@@ -121,8 +131,8 @@ def mail_cookie_check_role(cookie, uid):
         role_id = acc_get_role_id(role_name)
         assert(role_id != 0)
         assert(type(role_timeout) is timedelta)
-    except (TypeError, AssertionError, StandardError):
-        return None
+    except (TypeError, AssertionError, StandardError), e:
+        raise InvenioWebAccessMailCookieError, e
     expiration = (datetime.today()+role_timeout).strftime(_datetime_format)
     acc_add_user_role(uid, role_id, expiration)
     return (role_name, expiration)
@@ -135,8 +145,8 @@ def mail_cookie_check_pw_reset(cookie):
         (kind, email) = mail_cookie_check_generic(cookie)
         assert(kind == 'pw_reset')
         return email
-    except (TypeError, AssertionError, StandardError):
-        return None
+    except (TypeError, AssertionError, StandardError), e:
+        raise InvenioWebAccessMailCookieError, e
 
 def mail_cookie_check_mail_activation(cookie):
     """Check a given cookie for a valid authorization to activate a particular email address."""
@@ -145,14 +155,11 @@ def mail_cookie_check_mail_activation(cookie):
         assert(kind == 'mail_activation')
         res = run_sql('SELECT note FROM user WHERE email=%s', (email, ))
         if res:
-            note = res[0][0]
-            if note > 1:
-                res = run_sql('UPDATE user SET note=note & 1 WHERE email=%s', (email))
             return email
         else:
-            return None
-    except (TypeError, AssertionError):
-        return None
+            raise InvenioWebAccessMailCookieError, "email '%s' doesn't exist" % email
+    except (TypeError, AssertionError), e:
+        raise InvenioWebAccessMailCookieError, e
 
 def mail_cookie_delete_cookie(cookie):
     """Remove a particular cookie."""

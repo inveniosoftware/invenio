@@ -29,6 +29,7 @@ import sys
 try:
     from invenio.dbquery import run_sql
     from invenio.config import logdir, tmpdir
+    from invenio.websession_config import CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
@@ -118,6 +119,7 @@ def guest_user_garbage_collector():
     3: delete baskets not attached to any user
     4: delete alerts not attached to any user
     5: delete expired mailcookies
+    5b: delete expired not confirmed email address
     6: delete expired roles memberships
 
     verbose - level of program output.
@@ -138,6 +140,7 @@ def guest_user_garbage_collector():
                 'bskEXTFMT': 0,
                 'user_query_basket': 0,
                 'mail_cookie': 0,
+                'email_addresses': 0,
                 'role_membership' : 0}
 
     write_message("GUEST USER SESSIONS GARBAGE"
@@ -277,6 +280,10 @@ def guest_user_garbage_collector():
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
 
+    # 5b - delete expired not confirmed email address
+    write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
+    delcount['email_addresses'] = run_sql("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS)
+
     # 6 - delete expired roles memberships
     write_message("""DELETE FROM user_accROLE WHERE expiration<NOW()""", verbose=9)
     delcount['role_membership'] = run_sql("""DELETE FROM user_accROLE WHERE expiration<NOW()""")
@@ -296,6 +303,7 @@ def guest_user_garbage_collector():
     write_message("""- %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
     write_message("""- %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
     write_message("""- %7s mail_cookies.""" % (delcount['mail_cookie'], ))
+    write_message("""- %7s non confirmed email addresses.""" % delcount['email_addresses'])
     write_message("""- %7s role_memberships.""" % (delcount['role_membership'], ))
     write_message("""GUEST USER SESSIONS GARBAGE COLLECTOR FINISHED""")
 

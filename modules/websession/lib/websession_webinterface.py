@@ -59,7 +59,10 @@ from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
 from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
-    mail_cookie_create_pw_reset, mail_cookie_check_role
+    mail_cookie_create_pw_reset, mail_cookie_check_role, \
+    mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
+    InvenioWebAccessMailCookieDeletedError
+
 import invenio.template
 websession_templates = invenio.template.load('websession')
 
@@ -78,30 +81,56 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         args = wash_urlargd(form, {'mailcookie' : (str, '')})
         _ = gettext_set_language(args['ln'])
         title = _("Mail Cookie Service")
-        kind = mail_cookie_retrieve_kind(args['mailcookie'])
-        if kind == 'pw_reset':
-            redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['mailcookie'], args['ln']))
-        elif kind == 'role':
-            uid = webuser.getUid(req)
-            try:
-                (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
-            except TypeError:
-                return webuser.page_not_authorized(req, "../youraccount/resetpassword",
-                        text=_("This request for an authorization is not valid or"
-                        " is expired."), navmenuid='youraccount')
-            return page(title=title,
-            body=webaccount.perform_back(
-                _("You have successfully obtained an authorization as %(role)s! "
-                "This authorization will last until %(expiration)s and until "
-                "you close your browser if you are a guest user.") %
-                {'role' : '<strong>%s</strong>' % role_name,
-                 'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
-                'login', _('login'), args['ln']),
-            req=req,
-            language=args['ln'],
-            lastupdated=__lastupdated__,
-            navmenuid='youraccount')
-        return webuser.page_not_authorized(req, "../youraccount/resetpassword",
+        try:
+            kind = mail_cookie_retrieve_kind(args['mailcookie'])
+            if kind == 'pw_reset':
+                redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['mailcookie'], args['ln']))
+            elif kind == 'role':
+                uid = webuser.getUid(req)
+                try:
+                    (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
+                except InvenioWebAccessMailCookieDeletedError:
+                    return webuser.page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), navmenuid='youraccount', language=args['ln'])
+                return page(title=title,
+                body=webaccount.perform_back(
+                    _("You have successfully obtained an authorization as %(role)s! "
+                    "This authorization will last until %(expiration)s and until "
+                    "you close your browser if you are a guest user.") %
+                    {'role' : '<strong>%s</strong>' % role_name,
+                    'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
+                    'login', _('login'), args['ln']),
+                req=req,
+                language=args['ln'],
+                lastupdated=__lastupdated__,
+                navmenuid='youraccount')
+            elif kind == 'mail_activation':
+                try:
+                    email = mail_cookie_check_mail_activation(args['mailcookie'])
+                    if not email:
+                        raise StandardError
+                    webuser.confirm_email(email)
+                    body = "<p>" + _("You have confirmed the validity of your email"
+                        " address!") + "</p>"
+                    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+                        body += "<p>" + _("Please, wait for the administrator to "
+                            "enable your account.") + "</p>"
+                    else:
+                        uid = webuser.update_Uid(req, email)
+                    return page(title=_("Email address successfully activated"),
+                    body=body, req=req, language=args['ln'], lastupdated=__lastupdated__, navmenuid='youraccount')
+                except InvenioWebAccessMailCookieDeletedError, e:
+                    body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
+                    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
+                        body += "<p>" + _("Please, wait for the administrator to "
+                            "enable your account.") + "</p>"
+                    return page(title=_("Email address successfully activated"),
+                        body=body, req=req, language=args['ln'], lastupdated=__lastupdated__, navmenuid='youraccount')
+                return webuser.page_not_authorized(req, "../youraccount/access",
+                    text=_("This request for confirmation of an email "
+                    "address is not valid or"
+                    " is expired."), navmenuid='youraccount')
+        except InvenioWebAccessMailCookieError:
+            return webuser.page_not_authorized(req, "../youraccount/access",
                 text=_("This request for an authorization is not valid or"
                 " is expired."), navmenuid='youraccount')
 
@@ -681,14 +710,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         else:
             ruid = -2
         if ruid == 0:
-            uid = webuser.update_Uid(req, args['p_email'])
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                mess += _("An email has been sent to the given address with the account information.")
+                mess += _("An email has been sent to the given address with istruction to confirm the validity of the email address.")
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
                 mess += _("A second email will be sent when the account has been activated and can be used.")
-            else:
+            elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
+                uid = webuser.update_Uid(req, args['p_email'])
                 mess += " " + _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
                     {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">',
                      'x_url_close': '</a>'}

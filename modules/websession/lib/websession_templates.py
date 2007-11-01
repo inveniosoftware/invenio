@@ -38,7 +38,9 @@ from invenio.config import \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+from invenio.websession_config import \
+        CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
+        CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
 from invenio.messages import gettext_set_language
 from invenio.textutils import indent_text
@@ -630,6 +632,50 @@ class Template:
             'supportemail': supportemail
         }
         return out
+
+    def tmpl_account_address_activation_email_body(self, email, address_activation_key, ip_address, ln=cdslang):
+        """
+        The body of the email that sends email address activation cookie
+        passwords to users.
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """\
+%(intro)s
+
+%(intro2)s
+
+<%(link)s>
+
+%(outro)s
+
+%(outro2)s
+""" % {
+            'intro': _("Somebody (possibly you) coming from %(ip_address)s "
+                "have asked to register an account\nfor %(cdsname)s using the "
+                "email address \"%(email)s\"." % {
+                    'cdsname' :cdsnameintl.get(ln, cdsname),
+                    'email' : email,
+                    'ip_address' : ip_address,
+                    }
+                ),
+            'intro2' : _("If you want to confirm this address, please go to:"),
+            'link' : "%s/youraccount/access%s" %
+                (sweburl, make_canonical_urlargd({
+                    'ln' : ln,
+                    'mailcookie' : address_activation_key
+                }, {})),
+            'outro' : _("and follow the instructions presented there."),
+            'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS},
+            'best_regards': _("Best regards"),
+            'cdsnameintl' :cdsnameintl.get(ln, cdsname),
+            'weburl': weburl,
+            'need_intervention_please_contact': _("Need human intervention?  Contact"),
+            'supportemail': supportemail
+        }
+        return out
+
 
     def tmpl_account_emailSent(self, ln, email):
         """

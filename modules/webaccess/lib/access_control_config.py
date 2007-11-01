@@ -186,5 +186,7 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                14: """Error(14): Could not login using '%s', because this user is unknown.""",
                                15: """Error(15): Could not login using your '%s' account, because you have introduced a wrong password.""",
                                16: """Error(16): External authentication troubles using '%s' (maybe temporary network problems).""",
+                               17: """Error(17): You have not yet confirmed the email address for the '%s' authentication method.""",
+                               18: """Error(18): The administrator has not yet activated your account for the '%s' authentication method.""",
         }
 

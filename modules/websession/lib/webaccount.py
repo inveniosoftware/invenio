@@ -40,7 +40,7 @@ from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
         set_user_preferences, collect_user_info
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.messages import gettext_set_language
-from invenio.external_authentication import WebAccessExternalAuthError
+from invenio.external_authentication import InvenioWebAccessExternalAuthError
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -209,7 +209,7 @@ def perform_set(email, ln, verbose=0):
                 try:
                     if not CFG_EXTERNAL_AUTHENTICATION[method][0].user_exists(email):
                         methods.remove(method)
-                except (AttributeError, WebAccessExternalAuthError):
+                except (AttributeError, InvenioWebAccessExternalAuthError):
                     methods.remove(method)
         methods.sort()
 

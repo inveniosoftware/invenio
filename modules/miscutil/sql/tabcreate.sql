@@ -2439,7 +2439,7 @@ CREATE TABLE IF NOT EXISTS accMAILCOOKIE (
   expiration datetime NOT NULL default '9999-12-31 23:59:59',
   kind varchar(32) NOT NULL,
   onetime boolean NOT NULL default 0,
-  deleted boolean NOT NULL default 0,
+  status char(1) NOT NULL default 'W',
   PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
