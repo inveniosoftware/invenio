@@ -482,7 +482,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             lastupdated=__lastupdated__,
                             navmenuid='login')
 
-        reset_key = mail_cookie_create_pw_reset(args['p_email'], cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+        try:
+            reset_key = mail_cookie_create_pw_reset(args['p_email'], cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+        except InvenioWebAccessMailCookieError:
+            reset_key = None
         if reset_key is None:
             eMsg = _("The entered email address does not exist in the database.")
             return page(title=_("Your Account"),

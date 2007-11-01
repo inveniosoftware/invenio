@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -50,7 +50,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
     def display(self, req, form):
         """Display basket"""
 
-        argd = wash_urlargd(form, {'category': 
+        argd = wash_urlargd(form, {'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -59,10 +59,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'sort_by_date': (str, ""),
                                    'of': (str, '')
                                    })
-        
+
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/display",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings) = perform_request_display(uid,
@@ -98,7 +98,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'format': (str, "hb"),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -107,7 +107,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/display_item",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings) = perform_request_display_item(
@@ -129,7 +129,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               topic=argd['topic'],
                                               group=argd['group'],
                                               bskid=argd['bskid'],
-                                              ln=argd['ln']) 
+                                              ln=argd['ln'])
         return page(title       = _("Details and comments"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -148,7 +148,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'cmtid': (int, 0),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -157,7 +157,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/write_comment",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings) = perform_request_write_comment(
@@ -177,7 +177,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               topic=argd['topic'],
                                               group=argd['group'],
                                               bskid=argd['bskid'],
-                                              ln=argd['ln']) 
+                                              ln=argd['ln'])
         return page(title       = _("Write a comment"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -197,7 +197,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'recid': (int, 0),
                                    'title': (str, ""),
                                    'text': (str, ""),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -206,7 +206,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/save_comment",
                                        navmenuid = 'yourbaskets')
         (errors_saving, infos) = perform_request_save_comment(
@@ -225,7 +225,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                     topic=argd['topic'],
                                                     group_id=argd['group'],
                                                     ln=argd['ln'])
-        body = create_infobox(infos) + body                                                                   
+        body = create_infobox(infos) + body
         errors = errors_saving.extend(errors_displaying)
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
@@ -235,7 +235,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               topic=argd['topic'],
                                               group=argd['group'],
                                               bskid=argd['bskid'],
-                                              ln=argd['ln']) 
+                                              ln=argd['ln'])
         return page(title       = _("Details and comments"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -261,7 +261,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'cmtid': (int, 0),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -269,7 +269,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
 
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/delete_comment",
                                        navmenuid = 'yourbaskets')
 
@@ -279,12 +279,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         url += '&category=%s&topic=%i&group=%i&ln=%s' % \
                             (argd['category'], argd['topic'],
                              argd['group'], argd['ln'])
-        errors = perform_request_delete_comment(uid, 
-                                                argd['bskid'], 
-                                                argd['recid'], 
+        errors = perform_request_delete_comment(uid,
+                                                argd['bskid'],
+                                                argd['recid'],
                                                 argd['cmtid'])
         if not(len(errors)):
-            redirect_to_url(req, url) 
+            redirect_to_url(req, url)
         else:
             return page(uid         = uid,
                         title       = '',
@@ -293,12 +293,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         errors      = errors,
                         req         = req,
                         navmenuid   = 'yourbaskets',
-                        of          = argd[of])
-    
+                        of          = argd['of'])
+
     def add(self, req, form):
         """Add records to baskets.
         @param recid: list of records to add
-        @param bskids: list of baskets to add records to. if not provided, 
+        @param bskids: list of baskets to add records to. if not provided,
                        will return a page where user can select baskets
         @param referer: URL of the referring page
         @param new_basket_name: add record to new basket
@@ -315,7 +315,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/add",
                                        navmenuid = 'yourbaskets')
         if not argd['referer']:
@@ -354,7 +354,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Delete basket interface"""
         argd = wash_urlargd(form, {'bskid': (int, -1),
                                    'confirmed': (int, 0),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -363,7 +363,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/delete",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings)=perform_request_delete(
@@ -375,7 +375,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         selected_group_id=argd['group'],
                                         ln=argd['ln'])
         if argd['confirmed']:
-            url = weburl 
+            url = weburl
             url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
                    (argd['category'], argd['topic'], argd['group'], argd['ln'])
             redirect_to_url(req, url)
@@ -408,7 +408,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'action': (str, ""),
                                    'bskid': (int, -1),
                                    'recid': (int, 0),
-                                   'category': 
+                                   'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
@@ -417,14 +417,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/modify",
                                        navmenuid = 'yourbaskets')
-        url = weburl 
+        url = weburl
         url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
                (argd['category'], argd['topic'], argd['group'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
-            delete_record(uid, argd['bskid'], argd['recid'])       
+            delete_record(uid, argd['bskid'], argd['recid'])
             redirect_to_url(req, url)
         elif argd['action'] == CFG_WEBBASKET_ACTIONS['UP']:
             move_record(uid, argd['bskid'], argd['recid'], argd['action'])
@@ -453,8 +453,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               category=argd['category'],
                                               topic=argd['topic'],
                                               group=argd['group'],
-                                              bskid=argd['bskid'], 
-                                              ln=argd['ln']) 
+                                              bskid=argd['bskid'],
+                                              ln=argd['ln'])
         return page(title = title,
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -486,22 +486,22 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
 
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/edit",
                                        navmenuid = 'yourbaskets')
 
         _ = gettext_set_language(argd['ln'])
         if argd['cancel']:
             url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
-            url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'], 
+            url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
                     argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
-            url = weburl 
+            url = weburl
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%i&ln=%s' %\
-                   (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'], 
+                   (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
-            redirect_to_url(req, url)        
+            redirect_to_url(req, url)
         elif argd['add_group'] and not(argd['new_group']):
             body = perform_request_add_group(uid=uid,
                                              bskid=argd['bskid'],
@@ -530,15 +530,15 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                          new_topic_name=argd['new_topic_name'],
                                          groups=argd['groups'],
                                          external=argd['external'],
-                                         ln=argd['ln'])  
+                                         ln=argd['ln'])
             if argd['new_topic'] != -1:
                 argd['topic'] = argd['new_topic']
             url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s' %\
-                  (CFG_WEBBASKET_CATEGORIES['PRIVATE'], 
+                  (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
         else:
-            (body, errors, warnings) = perform_request_edit(uid=uid, 
+            (body, errors, warnings) = perform_request_edit(uid=uid,
                                                             bskid=argd['bskid'],
                                                             topic=argd['topic'],
                                                             ln=argd['ln'])
@@ -565,8 +565,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])    
-        
+                    of          = argd['of'])
+
     def create_basket(self, req, form):
         """Create basket interface"""
 
@@ -578,7 +578,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
 
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/create_basket",
                                        navmenuid = 'yourbaskets')
 
@@ -627,14 +627,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
 
         _ = gettext_set_language(argd['ln'])
-        uid = getUid(req)    
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/display_public",
                                        navmenuid = 'yourbaskets')
         if argd['bskid'] == 0:
             # No given basket => display list of public baskets
             (body, errors, warnings) = perform_request_list_public_baskets(
-                                            0, 1, 1, 
+                                            0, 1, 1,
                                             argd['ln'])
             return page(title = _("List of public baskets"),
                         body        = body,
@@ -673,7 +673,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'])
-                
+
     def list_public_baskets(self, req, form):
         """List of public baskets interface"""
         argd = wash_urlargd(form, {'inf_limit': (int, 0),
@@ -683,8 +683,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    })
 
         _ = gettext_set_language(argd['ln'])
-        uid = getUid(req)    
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/unsubscribe",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings) = perform_request_list_public_baskets(
@@ -709,9 +709,9 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'of': (str, '')
                                    })
-        
-        uid = getUid(req)    
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/unsubscribe",
                                        navmenuid = 'yourbaskets')
         perform_request_unsubscribe(uid, argd['bskid'])
@@ -725,16 +725,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                     'of': (str, '')
                                    })
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2: 
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/subscribe",
                                        navmenuid = 'yourbaskets')
         errors = perform_request_subscribe(uid, argd['bskid'])
         if len(errors):
-            return page(errors=errors, 
-                        uid=uid, 
-                        language=argd['ln'], 
-                        body = '', 
-                        title = '', 
+            return page(errors=errors,
+                        uid=uid,
+                        language=argd['ln'],
+                        body = '',
+                        title = '',
                         req=req,
                         navmenuid = 'yourbaskets')
         url = weburl + '/yourbaskets/display?category=%s&ln=%s'

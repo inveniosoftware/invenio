@@ -33,9 +33,9 @@ from invenio.config import weburl, sweburl, cdslang, cdsname, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, cdsnameintl
 from invenio.webpage import page
 from invenio import webalert
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 
 from invenio.messages import gettext_set_language
 import invenio.template

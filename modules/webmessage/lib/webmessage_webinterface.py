@@ -187,6 +187,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                    })
         # Check if user is logged
         uid = getUid(req)
+        _ = gettext_set_language(argd['ln'])
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/send" % \
                                              (weburl,),
