@@ -62,9 +62,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(argd['ln'])
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/display",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/display" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/display%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         return page(title=_("Display searches"),
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
@@ -93,9 +102,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/input",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/input" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/input%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -136,9 +154,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/modify",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/modify" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/modify%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -172,9 +199,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/list",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/list" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/list%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -205,9 +241,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/add",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/add" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/add%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -245,9 +290,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/update",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/update" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/update%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
@@ -281,9 +335,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../youralerts/remove",
-                                       navmenuid='youralerts')
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/youralerts/remove" % \
+                                             (weburl,),
+                                       navmenuid="youralerts")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                sweburl,
+                make_canonical_urlargd({
+                    'referer' : "%s/youralerts/remove%s" % (
+                        weburl,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
