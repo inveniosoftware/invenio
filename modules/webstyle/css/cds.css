@@ -1658,7 +1658,7 @@ ul.detailedRecordActions{
 /*list-style-image:url("star_dot-icon-30x30.gif");*/
 }
 
-.webjournalBoxList a:visited, a:link, a:active{
+.webjournalBoxList a:visited, .webjournalBoxList a:link, .webjournalBoxList a:active{
 text-decoration: none;
 }
 
