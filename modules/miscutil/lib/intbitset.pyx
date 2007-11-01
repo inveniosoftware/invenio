@@ -35,10 +35,10 @@ Please note that no bigger than __maxelem__ elements can be added to
 an intbitset and, if CFG_INTBITSET_ENABLE_SANITY_CHECKS is disabled,
 you will receive unpredictable results.
 
-Note: If you make modification to this file you have to manually rigenerate
-intbitset.c by running Cython (http://www.cython.org/):
-$> cython intbitset.pyx
-
+Note to Invenio developers: If you make modification to this file you
+have to manually regenerate intbitset.c by running:
+  $ cython intbitset.pyx
+and then commit generated intbitset.c to CVS.
 """
 
 import zlib
