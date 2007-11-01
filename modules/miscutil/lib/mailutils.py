@@ -37,9 +37,6 @@ from invenio.config import \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT
 
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
-webalert_templates = invenio.template.load('webalert')
 from invenio.messages import wash_language, gettext_set_language
 from invenio.errorlib import get_msgs_for_code_list, register_errors
 
