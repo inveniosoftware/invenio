@@ -60,10 +60,10 @@ import time
 from zlib import compress
 import MySQLdb
 import re
-import urllib
-import shutil
+import urllib2
+import tempfile
 
-from invenio.config import CFG_OAI_ID_FIELD
+from invenio.config import CFG_OAI_ID_FIELD, weburl
 from invenio.bibupload_config import *
 from invenio.dbquery import run_sql, \
                             Error
@@ -85,6 +85,7 @@ from invenio.config import filedir, \
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress
+from invenio.file import BibRecDocs, file_strip_ext
 
 #Statistic variables
 stat = {}
@@ -221,10 +222,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     if opt_stage_to_start_from <= 2 and \
         extract_tag_from_record(record, 'FFT') is not None:
 
-        if insert_mode_p or opt_mode == 'append':
-            record = insert_fft_tags(record, rec_id)
-        else:
-            update_fft_tag(record, rec_id)
+        record = elaborate_fft_tags(record, rec_id, opt_mode)
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -682,7 +680,72 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
             " function 2nd query : %s " % error, verbose=1, stream=sys.stderr)
     return res
 
-def insert_fft_tags(record, rec_id, cfg_bibupload_wget_sleep_time=1, cfg_bibupload_max_download_retires=10):
+def _download_url(url, format):
+    """Download a url (if it corresponds to a remote file) and return a local url
+    to it."""
+    protocol = urllib2.urlparse.urlsplit(url)[0]
+    (tmp, tmppath) = tempfile.mkstemp(suffix=format, dir=tmpdir)
+    if protocol in ('', 'file'):
+        path = urllib2.urlparse.urlsplit(url)[2]
+        ok = False
+        for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS:
+            if path.startswith(allowed_path):
+                tmp.write(open(path).read())
+                ok = True
+        if not ok:
+            raise StandardError, "%s is not in one of the allowed paths." % path
+    tmp.write(urllib2.urlopen(url).read())
+    return tmppath
+
+def make_mark_url(recid, docname, format):
+    """Return a url valid to be used for MARC."""
+    return '%s/record/%s/files/%s%s' % (weburl, recid, docname, format)
+
+def _get_docname_from_local_url(local_url):
+    path = urllib2.urlparse.urlsplit(local_url)[2]
+    filename = os.path.split(path)[-1]
+    return file_strip_ext(filename)
+
+def _synchronize_8564(rec_id, record, descriptions, comments):
+    """Sinchronize the 8564 tags for record with actual files. descriptions
+    should be a dictionary docname:description for the new description to be
+    inserted."""
+    tags8564s = record_get_field_instances(record, '856', '4', ' ')
+    filtered_tags8564s = []
+
+    # Let's discover all the previous internal urls, in order to rebuild them!
+    for field in tags8564s:
+        to_be_removed = False
+        for value in field_get_subfield_values(field, 'u'):
+            if value.startswith('%s/record/%s/files/' % (weburl, rec_id)):
+                to_be_removed = True
+                old_description = field_get_subfield_values(field, 'y')
+                if old_description:
+                    docname = _get_docname_from_local_url(value)
+                    if not descriptions.has_key(docname):
+                        descriptions[docname] = old_description[0]
+        if not to_be_removed:
+            filtered_tags8564s.append(field)
+
+    # Let's keep in the record only external 8564
+    record_delete_field(record, '856', '4', ' ') # First we delete 8564
+    for field in filtered_tags8564s: # Then we readd external ones
+        record_add_field(record, '856', '4', ' ', '', field[0])
+
+    # Now we refresh with existing internal 8564
+    bibrecdocs = BibRecDocs(rec_id)
+    latest_files = bibrecdocs.listLatestFiles()
+    for file in latest_files:
+        new_url = '%s/record/%s/files/%s' % (weburl, rec_id, file.getFullName())
+        new_subfield = [('u', new_url)]
+        if descriptions.get(file.getName(), ''):
+            new_subfield.append(('y', descriptions[file.getName()]))
+        if comments.get(new_url, ''):
+            new_subfield.append(('z', comments[new_url]))
+        record_add_field(record, '856', '4', ' ', '', new_subfield)
+    return record
+
+def elaborate_fft_tags(record, rec_id, mode, cfg_bibupload_wget_sleep_time=1, cfg_bibupload_max_download_retires=10):
     """
     Process FFT tags that should contain $a with file pathes or URLs
     to get the fulltext from.  This function enriches record with
@@ -696,332 +759,234 @@ def insert_fft_tags(record, rec_id, cfg_bibupload_wget_sleep_time=1, cfg_bibuplo
     into different 856 URL tags in the metadata.  See regression test
     case test_multiple_fft_insert_via_http().
     """
-    curdir = os.getcwd()
-    os.chdir(tmpdir)
-    tuple_list = None
     tuple_list = extract_tag_from_record(record, 'FFT')
-    # If there is a FFT TAG
-    add_local_fulltext = True
-    downloads_err_count = {}
-    if tuple_list is not None:
+    if tuple_list:
         write_message("insert_fft_tags, all FFTs: "+str(tuple_list), verbose=9)
-        for aurl in record_get_field_values(record, 'FFT', ' ', ' ', 'a'):
-            file_exists_already = False
-            docuri = aurl.split("//")
-            write_message("now processing FFT: "+str(docuri), verbose=9)
-            # Determine if docuri is a local file or a url
-            if len(docuri) == 1:  # it is something like /dfs/fs/sdfs/sdf.pdf
-                docpath = docuri[0]
-                if not (docpath.find(CFG_PREFIX) > -1 or
-                        docpath.find("/home/") > -1):
-                    write_message("FFT tag contains path to a"
-                        " forbidden directory: " + docpath, stream=sys.stderr)
-                    docpath = ""
-            if len(docuri) == 2:
-                if docuri[0] == "file:": # it is something like file:///dfs/fs/sdfs/sdf.pdf
-                    docpath = docuri[1]
-                    if not (docpath.find(CFG_PREFIX) > -1 or
-                            docpath.find("/home/") > -1):
-                        write_message("FFT tag contains path to a"
-                            " forbidden directory: " + docpath,
-                            stream=sys.stderr)
-                        docpath = ""
-                elif docuri[0] == "http:":  # it is something like http://arXiv.org/sdf/sdf.pdf
-                    base_url = docuri[1].split("/")[0]
-                    fname = docuri[1].split("/")[-1]
-                    if not base_url in downloads_err_count.keys():
-                        downloads_err_count[base_url] = 0
-                    if not downloads_err_count[base_url] > cfg_bibupload_max_download_retires:
-                        try:
-                            if False: # switch to True for testing
-                                aurl = aurl.replace("export.", "")
-                            time.sleep(cfg_bibupload_wget_sleep_time)
-                            write_message("Downloading: " + aurl)
-                            if os.path.exists(fname):
-                                write_message("insert_fft_tags: " + fname + " already exists!",
-                                              verbose=3, stream=sys.stderr)
-                                file_exists_already = True
-                                os.rename(fname , fname + ".renamed_by_bibupload_fft" )
-                            os.system("wget -T 60 --tries 1 -q --user-agent='Mozilla/4.0' " + \
-                                      "http://"+ urllib.quote(aurl[7:]) )
-                        except OSError, errormsg:
-                            add_local_fulltext = False
-                            write_message("Error, pobabily in downloading %s errormsg: %s" % (aurl, errormsg),
-                                          verbose=1, stream=sys.stderr)
-                            downloads_err_count[base_url] += 1
-
-                    docpath = os.getcwd() + "/" + fname
-
-                    if not os.path.exists(fname):
-                        add_local_fulltext = False
-                        write_message("Error in renaming " + docuri[1].split("/")[-1],
-                                      verbose=1, stream=sys.stderr)
-                        # add tag 856 of source if download failed
-                        urlad = aurl
-                        if urlad.find("arxiv.org") > -1 and urlad.find("export.") > -1:
-                            urlad = urlad.replace("export.", "")
-                        subfield_list = [('u', urlad)]
-                        newfield_number = record_add_field(record, "856", "4", "", "", subfield_list)
-
-            if add_local_fulltext and not docpath == "":
-                #if not (string.find(docpath, CFG_PREFIX) > -1  or string.find(docpath, "/home/") > -1):
-                #    write_message("FFT tag contains path to a forbidden directory: " + docpath, stream=sys.stderr)
-                #    docpath = ""
-                docname = re.sub("\..*", "", os.path.basename(docpath))
-                extension = re.sub("^[^\.]*.", "", os.path.basename(docpath)).lower()
-                # Create a new docId
-                try:
-                    bib_doc_id = run_sql("insert into bibdoc (docname,status,creation_date,modification_date) values(%s,0,NOW(),NOW())", (docname,))
-                    write_message("  -Insert of the file %s into bibdoc : DONE" % docname, verbose=2)
-                except Error, error:
-                    write_message("  Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr)
-
-                if bib_doc_id is not None:
-                    # we link the document to the record if a rec_id was specified
-                    if rec_id != "":
-
-                        # FIXME: doc_type : main or additional (with babbage.py , only main is needed)
-                        doc_type = "Main"
-                        try:
-                            res = run_sql("insert into bibrec_bibdoc values(%s,%s,%s)", (rec_id, bib_doc_id, doc_type))
-                            if res is None:
-                                write_message("   Failed during creation of link between doc Id and rec Id).", verbose=1, stream=sys.stderr)
-                            else:
-                                write_message("   -Insert of the link bibrec bibdoc for %s : DONE" % docname, verbose=2)
-                        except Error, error:
-                            write_message("   Error during the insert_fft_tags function : %s " % error, verbose=1, stream=sys.stderr)
-                else:
-                    write_message("   Failed during creation of the new doc Id.", verbose=1, stream=sys.stderr)
-                # Move the file to the correct place
-                # Variables from the config file
-                archivepath = filedir
-                archivesize = filedirsize
-                url_path = None
-
-                group = "g"+str(int(int(bib_doc_id)/archivesize))
-                basedir = "%s/%s/%s" % (archivepath, group, bib_doc_id)
-
-                # we create the corresponding storage directory
-                if not os.path.exists(basedir):
-                    try:
-                        os.makedirs(basedir)
-                        write_message("   -Create a new directory %s : DONE" % basedir, verbose=2)
-                    except OSError, error:
-                        write_message("   Error making the directory : %s " % error, verbose=1, stream=sys.stderr)
-
-
-
-                # and save the father record id if it exists
-                if rec_id != "":
-                    try:
-                        filep = open("%s/.recid" % basedir, "w")
-                        filep.write(str(rec_id))
-                        filep.close()
-                    except IOError, error:
-                        write_message("   Error writing the file : %s " % error, verbose=1, stream=sys.stderr)
-
-                    # Move the file to the good directory
-                    try:
-                        dest = basedir + "/" + docpath.split("/")[-1] + ";1"
-                        shutil.copy(docpath, dest )
-                        write_message("   -Move the file %s to %s : DONE" % (docpath, dest), verbose=8)
-                    except OSError, error:
-                        write_message("   Error moving the file : %s " % error, verbose=1, stream=sys.stderr)
-                    # Renames the orignial file if it had to be moved
-                    if file_exists_already:
-                        try:
-                            os.rename(fname + ".renamed_by_bibupload_fft", fname )
-                        except:
-                            pass
-
-                    # Create the Url Path
-                    url_path = htdocsurl + "/record/" + str(rec_id) + "/files/" + docname + "." + extension
-
-                    # add tag 856 to the xml marc to proceed
-                    subfield_list = [('u', url_path)]
-                    newfield_number = record_add_field(record, "856", "4", " ", "", subfield_list)
-                    if newfield_number is None:
-                        write_message("   Error when adding the field"+ aurl, verbose=1, stream=sys.stderr)
-                    else:
-                        write_message("   -Add the new tag 856 to the record for %s : DONE" % docname, verbose=8)
-
-                # Delete FFT tag :)
-                record_delete_field(record, 'FFT', ' ', ' ')
-                write_message("   -Delete FFT tag from source : DONE", verbose=2)
-    os.chdir(curdir)
-    return record
-
-def update_fft_tag(record, rec_id,
-                   cfg_bibupload_wget_sleep_time=1):
-    """
-      Processes and updates fulltexts documents in FFT tags.
-
-      It tries to match filename and upps version of the file by downloading it
-      (no local file support).
-
-      Important note: There is a fundamental difference with metadata
-      correct mode.  This function does not touch existing files, it just
-      adds the new ones.
-
-      Beware: if no matching filename is found in invenio this will increment the version
-      of an existing file no matter what the new filename is.
-
-    BEFORE:
-    file.pdf;2
-    thesis.ppt;14
-
-    INPUT:
-    thesis.ppt
-
-    AFTER:
-    file.pdf;2
-    thesis.ppt;15
-
-    ***
-
-    BEFORE:
-    thesis.pdf;2
-    thesis.ppt;14
-
-    INPUT:
-    thesis.ppt
-
-    AFTER:
-    ? (devrait pas arriver, mais...)
-
-    ***
-
-    BEFORE:
-    file.pdf;2
-    thesis.ppt;14
-
-    INPUT:
-    my_photo.jpeg
-
-    AFTER:
-    file.jpeg;3   - ???
-    thesis.ppt;14
-
-    ***
-
-
-
-    """
-
-    download_errors = 0
-    rec = record
-
-    if "FFT" in rec.keys():
-
-
-        for uri in record_get_field_values(record, 'FFT', ' ', ' ', 'a'):
-
-            fname = uri.split("/")[-1]
-            file_exists_already = False
-
-            uri_type = "url"
-            if not "http://" in  uri:
-                uri_type = "file"
-                if not ((CFG_PREFIX in uri) or ("/home/" in uri)):
-                    uri = ""
-                    write_message("Local file "+uri+" is not in a permitted path (/home or CFG_PREFIX).", verbose=1, stream=sys.stderr)
-                if "file://" in uri:
-                    uri.replace("file://","")
-
-            # Getting docid for this recid
-            res = run_sql("select id_bibdoc from bibrec_bibdoc where id_bibrec=%s", (rec_id,))
-
-            type_file = ""
-            type_exists = False
-            is_bibdocs = False
-
-            if len(res) == 0:
-                write_message("Error: no id_bibdoc for the rec_id " +
-                    str(rec_id), verbose=1, stream=sys.stderr)
+        docs = {}
+        comments = {}
+        for fft in record_get_field_instances(record, 'FFT', ' ', ' '):
+            doctype = field_get_subfield_values(fft, 't')
+            if doctype:
+                doctype = doctype[0]
             else:
-                is_bibdocs = True
-                for res_s in res:
-                    bib_doc_id = res_s[0]
-                    # Determinig dir for this docid
-                    archivepath = filedir
-                    archivesize = filedirsize
-                    group = "g"+str(int(int(bib_doc_id)/archivesize))
-                    basedir = "%s/%s/%s" % (archivepath, group, bib_doc_id)
+                doctype = 'Main'
 
-                    # Listing and analysing content of this directory: does this type of document exist ?
-                    ls = os.listdir(basedir)
-                    for filename in ls:
-                        if fname in filename:
-                            type_exists = True
-                            type_file = filename
+            url = field_get_subfield_values(fft, 'a')
+            if url:
+                url = url[0]
+            elif doctype not in ('PURGE', 'DELETE'):
+                write_message('url not specified for fft %s' % str(fft), stream=sys.stderr)
 
-            # Atributes an existing filename if the right one was not found, etc.
-            if type_file == "" and is_bibdocs:
-                ls.sort()
-                write_message("Trying to atribute an existing filename to fulltext: the right one was not found.", verbose=9, stream=sys.stderr)
-                for filename in ls:
-                    if filename.find("recid") == -1 :
-                        type_file = filename
-                        type_exists = True
-                write_message("Attributed filename to update: " + type_file, verbose=9, stream=sys.stderr)
-            if type_file == "":
-                write_message("No fulltext to update in this recid.", verbose=1, stream=sys.stderr)
-                type_exists = False
-
-            # Determine the new version, by taking next intger. If there is no vesion: assigning version 1
-            if not  len(res) == 0:
-                version = 0
-                for filename in ls:
-                    if ";" in filename:
-                        version_str = filename.split(";")[1]
-                        is_int = True
-                        try:
-                            version_i = int(version_str)
-                        except:
-                            is_int = False
-                        if is_int:
-                            if version_i > version :
-                                version = version_i
-                version = str(version + 1)
+            description = field_get_subfield_values(fft, 'd')
+            if description:
+                description = description[0]
             else:
-                version = "1"
+                description = ''
 
-            #  determining new filename, if no  fulltext is found, just taking the first file
-            if type_exists:
-                base_filename = type_file.split(";") [0]
-                full_filename = basedir + "/" + base_filename + ";" + version
-                write_message("New filename: " + full_filename, verbose=9)
+            name = field_get_subfield_values(fft, 'n')
+            if name:
+                name = file_strip_ext(name[0])
+            else:
+                name = _get_docname_from_local_url(url)
 
-            # Downloads revised fulltext if it is ok and moves it where it must be stored
-            if not type_file == "" and type_exists:
+            newname = field_get_subfield_values(fft, 'm')
+            if newname:
+                newname = file_strip_ext(newname[0])
+            else:
+                newname = name
 
-                if uri_type == "url":
-                    if download_errors < 10:
-                        cdir = os.getcwd()
-                        os.chdir(tmpdir)
-                        try:
-                            if os.path.exists(fname):
-                                file_exists_already = True
-                                os.rename(fname, fname + ".renamed_by_bibupload_fft")
-                            os.system("wget -T 60 --tries 1 -q --user-agent='CDS' " + uri)
-                            time.sleep(cfg_bibupload_wget_sleep_time)
-                            write_message("renaming from " + fname + " // to " + full_filename,
-                                          verbose=1, stream=sys.stderr )
-                            shutil.copy( fname , full_filename)
-                            if file_exists_already:
-                                os.rename(fname + ".renamed_by_bibupload_fft", fname)
-                        except OSError:
-                            write_message("Error in downloading " + uri, verbose=1, stream=sys.stderr)
-                            download_errors += 1
-                        os.chdir(cdir)
-                else:
+            format = field_get_subfield_values(fft, 'f')
+            if format:
+                format = format[0]
+            else:
+                path = urllib2.urlparse.urlsplit(url)[2]
+                filename = os.path.split(path)[-1]
+                format = filename[len(file_strip_ext(filename)):].lower()
+
+            comment = field_get_subfield_values(fft, 'z')
+            if comment:
+                comment = comment[0]
+            else:
+                comment = ''
+
+            if docs.has_key(name):
+                (description2, doctype2, urls) = docs[name]
+                if description2 != description:
+                    write_message("fft '%s' specifies a different description from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
+                    break
+                if doctype2 != doctype:
+                    write_message("fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
+                    break
+                for (url2, format2) in urls:
+                    if format == format2:
+                        write_message("fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name), stream=sys.stderr)
+                docs[name] = (description, doctype, newname, urls.append((url, format)))
+            else:
+                docs[name] = (description, doctype, newname, [(url, format)])
+            if comment:
+                comments['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = comment
+        bibrecdocs = BibRecDocs(rec_id)
+        descriptions = {}
+        for docname, (description, doctype, newname, urls) in docs.iteritems():
+            descriptions[newname] = description
+            if mode == 'insert': # new bibdocs, new docnames, new marc
+                if newname in bibrecdocs.getBibDocNames(doctype):
+                    write_message("('%s', '%s', '%s', '%s') not inserted because docname already exists." % (description, doctype, newname, urls), stream=sys.stderr)
+                    break
+                bibdoc = bibrecdocs.addBibDoc(doctype, newname)
+                for (url, format) in urls:
                     try:
-                        os.rename(uri , full_filename)
-                    except OSError:
-                        write_message("Local file "+uri+" in FFT field does not exist.", verbose=1, stream=sys.stderr)
-
+                        tmpurl = _download_url(url, format)
+                        try:
+                            bibdoc.addFilesNewFormat([tmpurl])
+                        except StandardError:
+                            write_message("('%s', '%s', '%s', '%s') not inserted because format already exists." % (description, doctype, newname, urls), stream=sys.stderr)
+                        os.remove(tmpurl)
+                    except Exception, e:
+                        write_message("Error in downloading '%s' because of: %s" % (url, e))
+            elif mode == 'replace': # only add new revisions, no new docnames, no marc
+                for bibdoc in bibrecdocs.listBibDocs():
+                    bibdoc.delete()
+                bibrecdocs.buildBibDocList()
+                bibdoc = bibrecdocs.addBibDoc(doctype, newname)
+                for (url, format) in urls:
+                    try:
+                        tmpurl = _download_url(url, format)
+                        try:
+                            bibdoc.addFilesNewFormat([tmpurl])
+                        except StandardError, e:
+                            write_message("('%s', '%s', '%s', '%s') not added because '%s'." % (description, doctype, newname, urls, e))
+                        os.remove(tmpurl)
+                    except Exception, e:
+                        write_message("Error in downloading '%s' because of: %s" % (url, e))
+            elif mode == 'replace_or_insert': # e
+                found_bibdoc = False
+                for bibdoc in bibrecdocs.listBibDocs():
+                    if bibdoc.getDocName() == docname:
+                        found_bibdoc = True
+                        if newname != docname:
+                            try:
+                                bibdoc.changeName(newname)
+                            except StandardError, e:
+                                write_message(e, stream=sys.stderr)
+                                break
+                        (first_url, first_format) = urls[0]
+                        other_urls = urls[1:]
+                        try:
+                            tmpurl = _download_url(first_url, first_format)
+                            try:
+                                bibdoc.addFilesNewVersion(tmpurl)
+                            except StandardError, e:
+                                write_message("('%s', '%s', '%s', '%s') not added because '%s'." % (description, doctype, newname, urls, e), stream=sys.stderr)
+                            os.remove(tmpurl)
+                        except Exception, e:
+                            write_message("Error in downloading '%s' because of: %s" % (first_url, e))
+                            continue
+                        for (url, format) in other_urls:
+                            try:
+                                tmpurl = _download_url(url, format)
+                                try:
+                                    bibdoc.addFilesNewFormat(tmpurl)
+                                except StandardError, e:
+                                    write_message("('%s', '%s', '%s', '%s') not added because '%s'." % (description, doctype, newname, urls, e), stream=sys.stderr)
+                                os.remove(tmpurl)
+                            except Exception, e:
+                                write_message("Error in downloading '%s' because of: %s" % (url, e))
+                                continue
+                        break
+                if not found_bibdoc:
+                    bibdoc = bibrecdocs.addBibDoc(doctype, newname)
+                    for (url, format) in urls:
+                        try:
+                            tmpurl = _download_url(url, format)
+                            try:
+                                bibdoc.addFilesNewFormat([tmpurl])
+                            except StandardError:
+                                write_message("('%s', '%s', '%s', '%s') not inserted because format already exists." % (description, doctype, newname, urls), stream=sys.stderr)
+                                pass
+                            os.remove(tmpurl)
+                        except Exception, e:
+                            write_message("Error in downloading '%s' because of: %s" % (url, e))
+                            continue
+            elif mode == 'correct':
+                found_bibdoc = False
+                for bibdoc in bibrecdocs.listBibDocs():
+                    if bibdoc.getDocName() == docname:
+                        found_bibdoc = True
+                        if doctype == 'PURGE':
+                            bibdoc.purge()
+                        elif doctype == 'DELETE':
+                            bibdoc.delete()
+                        else:
+                            if newname != docname:
+                                try:
+                                    bibdoc.changeName(newname)
+                                except StandardError, e:
+                                    write_message(e, stream=sys.stderr)
+                                    break
+                            (first_url, first_format) = urls[0]
+                            other_urls = urls[1:]
+                            try:
+                                tmpurl = _download_url(first_url, first_format)
+                            except Exception, e:
+                                write_message("Error in downloading '%s' because of: %s" % (first_url, e))
+                                continue
+                            try:
+                                bibdoc.addFilesNewVersion(tmpurl)
+                            except StandardError, e:
+                                write_message("('%s', '%s', '%s', '%s') not added because '%s'." % (description, doctype, newname, urls, e), stream=sys.stderr)
+                            os.remove(tmpurl)
+                            for (url, format) in other_urls:
+                                try:
+                                    tmpurl = _download_url(url, format)
+                                    try:
+                                        bibdoc.addFilesNewFormat(tmpurl)
+                                    except StandardError, e:
+                                        write_message("('%s', '%s', '%s', '%s') not added because '%s'." % (description, doctype, newname, urls, e), stream=sys.stderr)
+                                    os.remove(tmpurl)
+                                except Exception, e:
+                                    write_message("Error in downloading '%s' because of: %s" % (url, e))
+                                    continue
+                            break
+                if not found_bibdoc:
+                    write_message("('%s', '%s', '%s', '%s') not added because '%s' docname didn't existed." % (description, doctype, newname, urls, docname), stream=sys.stderr)
+            elif mode == 'append':
+                found_bibdoc = False
+                for bibdoc in bibrecdocs.listBibDocs():
+                    if bibdoc.getDocName() == docname:
+                        found_bibdoc = True
+                        for (url, format) in urls:
+                            try:
+                                tmpurl = _download_url(url, format)
+                                try:
+                                    bibdoc.addFilesNewFormat([tmpurl])
+                                except StandardError:
+                                    write_message("('%s', '%s', '%s', '%s') not appended because format already exists." % (description, doctype, newname, urls), stream=sys.stderr)
+                                    pass
+                                os.remove(tmpurl)
+                            except Exception, e:
+                                write_message("Error in downloading '%s' because of: %s" % (url, e))
+                                continue
+                if not found_bibdoc:
+                    try:
+                        bibdoc = bibrecdocs.addBibDoc(doctype, docname)
+                        for (url, format) in urls:
+                            try:
+                                tmpurl = _download_url(url, format)
+                                try:
+                                    bibdoc.addFilesNewFormat([tmpurl])
+                                except StandardError:
+                                    write_message("('%s', '%s', '%s', '%s') not appended because format already exists." % (description, doctype, newname, urls), stream=sys.stderr)
+                                    pass
+                                os.remove(tmpurl)
+                            except Exception, e:
+                                write_message("Error in downloading '%s' because of: %s" % (url, e))
+                                continue
+                    except Exception, e:
+                        write_message("('%s', '%s', '%s', '%s') not appended." % (description, doctype, newname, urls), stream=sys.stderr)
+        return _synchronize_8564(rec_id, record, descriptions, comments)
     else:
-        pass # deleted records have no FFT tags
+        return record
 
 def insert_fmt_tags(record, rec_id, opt_mode):
     """Process and insert FMT tags"""
