@@ -170,8 +170,7 @@ def intoDB(dict, date, rank_method_code):
     del_rank_method_codeDATA(rank_method_code)
     serdata = serialize_via_marshal(dict);
     midstr = str(mid[0][0]);
-    #we trust that ids do not need to be escaped
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)",(midstr,serdata,))
+    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
     run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
 def fromDB(rank_method_code):
