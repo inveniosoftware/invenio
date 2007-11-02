@@ -34,7 +34,8 @@ etc_DATA = bibrankgkb.cfg \
            template_download_users.cfg \
            template_single_tag_rank_method.cfg \
            template_word_similarity.cfg \
-           wrd.cfg
+           wrd.cfg \
+           citation.cfg
 
 EXTRA_DIST = bibrankgkb.cfg.in \
              bibrankgkb_jif_conv.kb \
@@ -44,6 +45,7 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              stopwords.de.kb \
              stopwords.el.kb \
              stopwords.kb \
+             citation.cfg \
              template_citation.cfg \
              template_combine_method.cfg \
              template_download_similarity.cfg \
@@ -51,7 +53,7 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              template_download_users.cfg \
              template_single_tag_rank_method.cfg.in \
              template_word_similarity.cfg.wml \
-             wrd.cfg.wml
+             wrd.cfg.wml 
 
 CLEANFILES = template_word_similarity.cfg wrd.cfg *.tmp
 
