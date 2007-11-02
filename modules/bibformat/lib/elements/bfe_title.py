@@ -63,6 +63,10 @@ def format(bfo, separator=" ", highlight='no'):
     if len(title) > 0:
         titles.append( title )
 
+    title = bfo.field('246__b')
+    if len(title) > 0:
+        titles.append( title )
+
     title = bfo.field('246_1a')
     if len(title) > 0:
         titles.append( title )
