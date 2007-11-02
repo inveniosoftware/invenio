@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,16 +20,18 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import accessurl, adminemail, cdslang, cdsname, weburl, version
+from invenio.config import accessurl, adminemail, cdslang, cdsname, weburl, version, cdsnameintl, supportemail
 
 def format(bfo, var=''):
     '''
     Print several server specific variables.
-    @param var the name of the desired variable. Can be one of: name, lang, version, email, weburl, searchurl, recurl
+    @param var the name of the desired variable. Can be one of: name, i18n_name, lang, version, admin_email, support_email, weburl, searchurl, recurl
            name: the name of the server
+           i18n_name: internationalized name
            lang: the default language of the server
            version: the software version
-           email: the admin email
+           admin_email: the admin email
+           support_email: the support email
            weburl: the base url for the server
            searchurl: the search url for the server
            recurl: the base url for the record
@@ -39,12 +41,16 @@ def format(bfo, var=''):
         out =  ''
     elif var == 'name':
         out = cdsname
+    elif var == 'i18n_name':
+        out = cdsnameintl.get(bfo.lang, cdsname)
     elif var == 'lang':
         out = cdslang
     elif var == 'version':
         out = 'CDS Invenio v' + str(version)
-    elif var == 'email':
+    elif var in ['email', 'admin_email']:
         out = adminemail
+    elif var == 'support_email':
+        out = supportemail
     elif var == 'weburl':
         out = weburl
         if not out.endswith('/'):
@@ -52,7 +58,7 @@ def format(bfo, var=''):
     elif var == 'searchurl':
         out = accessurl
         if not out.endswith('/'):
-            out += '/'    
+            out += '/'
     elif var == 'recurl':
         out = weburl
         if not out.endswith('/'):
