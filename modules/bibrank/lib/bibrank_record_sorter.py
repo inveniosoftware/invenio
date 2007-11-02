@@ -210,8 +210,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
         elif rank_method_code == "citation" and pattern:
-            # FIXME: func_object and pattern and pattern[0][0:6] == "recid:" and function == "citation":
-            #we get rank_method_code correctly here. pattern[0] is the search word!
+            #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
             result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
@@ -339,23 +338,22 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 def find_citations(rank_method_code, recID, hitset, verbose):
     """Rank by the amount of citations."""
     #calculate the cited-by values for all the members of the hitset
-    #returns: 
+    #returns: ((recordid,weight),prefix,postfix,message)
     voutput = ""
     recweightdic = {}
     for m in hitset:
         #put stuff in a dict key -> weight 
         wlist = calculate_cited_by_list(int(m), "a")
-        recweightdic[m] = len(wlist)     #fix this.. should be by weight not by lenght
+        recweightdic[m] = len(wlist)     #could be by weight not by lenght, but thats a BD problem
         #voutput = voutput + str(m)+":"+str(wlist)+" "
         
-    ret = [ (key, value) for key, value in recweightdic.iteritems() ] #sort according to values
-    ret.reverse()
+    ret = [ (key,value) for key, value in recweightdic.iteritems() ] #sort according to values
     #voutput = voutput + str(ret)
     
     if ret:
         return (ret,"(", ")", "Warning: citation search functionality is experimental."+voutput)
     else:
-        return (ret,"", "", "Warning: citation search functionality is experimental."+voutput)
+        return ((),"", "", "Warning: citation search functionality is experimental.."+voutput)
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
