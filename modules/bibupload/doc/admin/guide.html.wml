@@ -197,6 +197,8 @@ semantic:
         $m  ...  new desired docfile name (optional; used for renaming files)
         $t  ...  docfile type (e.g. Main, Additional)
         $d  ...  docfile description (optional)
+        $f  ...  format (optional; if not set, deduced from $a)
+        $z  ...  comment (optional)
 </pre>
 
 <p>For example, to upload a new fulltext file <code>thesis.pdf</code>
@@ -208,6 +210,7 @@ associated to record ID 123:
         &lt;datafield tag="FFT" ind1=" " ind2=" "&gt;
             &lt;subfield code="a"&gt;/tmp/thesis.pdf&lt;/subfield&gt;
             &lt;subfield code="t"&gt;Main&lt;/subfield&gt;
+            &lt;subfield code="f"&gt;.pdf&gt;
             &lt;subfield code="d"&gt;
               This is the fulltext version of my thesis in the PDF format.
               Chapter 5 still needs some revision.
@@ -258,6 +261,8 @@ semantic of the metadata upload:
 </tbody>
 </table>
 </blockquote>
+
+<p>Note, in append and insert mode, <pre>$m</pre> is ignored.
 
 <p>In order to purge previous file revisions (i.e. in order to keep
 only the latest file version), please use the correct mode with $n
