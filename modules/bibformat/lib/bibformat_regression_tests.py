@@ -81,27 +81,27 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
     def setUp(self):
         """Prepare some ideal outputs"""
-        
+
         # Record 7 (Article)
         self.record_74_hd_header = '''<table border="0" width="100%">
       <tr>
-        <td>Published Article<small> / Particle Physics - Theory  / Particle Physics - Theory</small></td>
+        <td>Published Article<small> / Particle Physics - Theory</small></td>
         <td><small><strong></strong></small></td>
         <td align="right"><strong>hep-th/0003295</strong></td>
       </tr>
     </table>'''
 
         self.record_74_hd_title = '''<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>'''
-        
+
         self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
                                      {'weburl' : weburl,
                                       'lang': cdslang}
-        
+
         self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
 
         self.record_74_hd_pubinfo = '''<strong>Published in: </strong><a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.%20Lett.%2C%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>'''
 
-        self.record_74_hd_fulltext = '''<small>(external link)</small>:<br/><small><a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295"><img src="http://pcdh23.cern.ch/img/file-icon-text-96x128.gif" alt="Download fulltext" height="64px"/><br />Fulltext</a><small>'''
+        self.record_74_hd_fulltext = '''<small>(external link)</small>:<br /><small><a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295"><img style="border:none" src="http://pcdh23.cern.ch/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />Fulltext</a></small>'''
 
         self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
                                       {'weburl' : weburl,
@@ -111,7 +111,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         # Record 7 (Picture)
         self.record_7_hd_header = '''<table border="0" width="100%">
       <tr>
-        <td>Pictures<small> / Life at CERN  / Life at CERN</small></td>
+        <td>Pictures<small> / Life at CERN</small></td>
         <td><small><strong></strong></small></td>
         <td align="right"><strong>CERN-GE-9806033</strong></td>
       </tr>
@@ -125,7 +125,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">  
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
         self.record_7_hd_resource = '''<span class="blocknote">Resources</span><br /><br />High resolution: <a href="http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033</a><br /><br /><img src="http://preprints.cern.ch/photo/photo-ge/9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>'''
-        
+
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
 
@@ -174,7 +174,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
                                        expected_text=["Exception",
                                                       "Could not"])
         self.assertNotEqual([], result)
-        
+
 class BibFormatNLMTest(unittest.TestCase):
     """Check output produced by BibFormat for NLM output for various
     records"""
