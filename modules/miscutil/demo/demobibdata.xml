@@ -15455,7 +15455,7 @@
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="a">Polyakov, A M</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">213-219</subfield>
     <subfield code="p">Phys. Lett. B</subfield>
     <subfield code="v">550</subfield>
@@ -15720,7 +15720,7 @@
     <subfield code="9">LANL EDS</subfield>
     <subfield code="a">High Energy Physics - Theory</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">301-304</subfield>
     <subfield code="n">3-4</subfield>
     <subfield code="p">Phys. Lett. B</subfield>
@@ -15876,7 +15876,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Mueck, Wolfgang</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">248-276</subfield>
     <subfield code="p">Nucl. Phys. B</subfield>
     <subfield code="v">654</subfield>
@@ -16154,7 +16154,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Ramgoolam, Sanjaye</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">064</subfield>
     <subfield code="p">J. High Energy Phys.</subfield>
     <subfield code="v">10</subfield>
@@ -17118,7 +17118,7 @@
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="a">Trapletti, M</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">85-108</subfield>
     <subfield code="p">Nucl. Phys. B</subfield>
     <subfield code="v">653</subfield>
@@ -17462,7 +17462,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Klebanov, Igor R.</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">23-36</subfield>
     <subfield code="p">Nucl. Phys. B</subfield>
     <subfield code="v">656</subfield>
@@ -17560,7 +17560,7 @@
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="a">Zaffaroni, A</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">289-293</subfield>
     <subfield code="p">Phys. Lett. B</subfield>
     <subfield code="v">561</subfield>
@@ -17827,7 +17827,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Sakai, Tadakatsu</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">489-562</subfield>
     <subfield code="p">Prog. Theor. Phys.</subfield>
     <subfield code="v">109</subfield>
@@ -18653,7 +18653,7 @@
     <subfield code="9">LANL EDS</subfield>
     <subfield code="a">High Energy Physics - Theory</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">109-116</subfield>
     <subfield code="p">Phys. Lett. B</subfield>
     <subfield code="v">572</subfield>
@@ -19252,7 +19252,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Dvali, Gia</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">92-98</subfield>
     <subfield code="p">Phys. Scr. Top. Issues</subfield>
     <subfield code="v">T117</subfield>
@@ -19950,7 +19950,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Papadimitriou, Ioannis</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">008</subfield>
     <subfield code="p">J. High Energy Phys.</subfield>
     <subfield code="v">02</subfield>
@@ -20391,7 +20391,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Siopsis, George</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">006</subfield>
     <subfield code="p">J. High Energy Phys.</subfield>
     <subfield code="v">10</subfield>
@@ -20745,7 +20745,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Yunes, Nicolas</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="p">Phys. Rev. Lett.</subfield>
  </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
@@ -20933,7 +20933,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Periwal, Vipul</subfield>
  </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">1711</subfield>
     <subfield code="n">4</subfield>
     <subfield code="p">Phys. Rev. D</subfield>
