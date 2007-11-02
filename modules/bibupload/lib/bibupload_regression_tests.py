@@ -28,10 +28,11 @@ __revision__ = "$Id$"
 import re
 import unittest
 import time
+from urllib2 import urlopen
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl
 from invenio import bibupload
-from bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
+from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                              CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                              CFG_BIBUPLOAD_STRONG_TAGS
 from invenio.search_engine import print_record
@@ -39,6 +40,7 @@ from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run
 from invenio.bibtask import task_set_option
+
 
 # helper functions:
 
@@ -101,6 +103,16 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
         print "\n=" + hmbuffer2 + "=\n"
 
     return (hmbuffer1 == hmbuffer2)
+
+def try_url_download(url):
+    """Try to download a given URL"""
+    try:
+        open_url = urlopen(url)
+        open_url.read()
+    except Exception, e:
+        raise StandardException, "Downloading %s is impossible because of %s" \
+            % (url, str(e))
+    return True
 
 class BibUploadInsertModeTest(unittest.TestCase):
     """Testing insert mode."""
@@ -1832,13 +1844,15 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % {'weburl': weburl}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        """ % { 'weburl': weburl}
+        """ % {'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" \
+            % {'weburl': weburl}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -1848,6 +1862,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                                           str(recid))
         testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
@@ -1855,6 +1871,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                           testrec_expected_xm))
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
+        self.failUnless(try_url_download(testrec_expected_url))
         # FIXME: compare also var/data/files/.../ content
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
@@ -1916,6 +1933,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
         """ % { 'weburl': weburl}
         # insert test record:
+        testrec_expected_urls = []
+        for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
+            testrec_expected_urls.append('%(weburl)s/record/123456789/files/%(files)s' % {'weburl' : weburl, 'files' : files})
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -1924,6 +1944,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                                           str(recid))
         testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
+        testrec_expected_urls = []
+        for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
+            testrec_expected_urls.append('%(weburl)s/record/%(recid)s/files/%(files)s' % {'weburl' : weburl, 'files' : files, 'recid' : recid})
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
@@ -1931,6 +1954,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                           testrec_expected_xm))
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
+        for url in testrec_expected_urls:
+            self.failUnless(try_url_download(url))
         # FIXME: compare also var/data/files/.../ content
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
