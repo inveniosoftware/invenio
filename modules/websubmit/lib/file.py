@@ -110,7 +110,7 @@ class BibRecDocs:
                     pass
                 else:
                     self.bibdocs.append(cur_doc)
-                
+
     def listBibDocs(self, type=""):
         """Returns the list all bibdocs object belonging to a recid.
         If type is set, it returns just the bibdocs of that type.
@@ -274,7 +274,7 @@ class BibDoc:
                         if len(res) > 0:
                             recid = res[0][0]
                             self.type = res[0][1]
-                
+
             else:
                 res = run_sql("select type from bibrec_bibdoc "
                     "where id_bibrec=%s and id_bibdoc=%s", (recid, bibdocid,))
@@ -301,12 +301,15 @@ class BibDoc:
         # else it is a new document
         else:
             if docname == "" or type == "":
-                raise StandardError, "Argument missing for creating a new bibdoc" 
+                raise StandardError, "Argument missing for creating a new bibdoc"
             else:
                 self.recid = recid
                 self.type = type
                 self.docname = docname
                 self.status = 0
+                res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
+                if res:
+                    raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
                 self.id = run_sql("insert into bibdoc "
                     "(status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
@@ -317,7 +320,7 @@ class BibDoc:
                         run_sql("insert into bibrec_bibdoc values(%s,%s,%s)",
                             (recid, self.id, self.type,))
                 else:
-                    raise StandardError, "New docid cannot be created" 
+                    raise StandardError, "New docid cannot be created"
                 group = "g" + str(int(int(self.id) / filedirsize))
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
                 # we create the corresponding storage directory
@@ -333,7 +336,7 @@ class BibDoc:
                         fp.write(str(self.type))
                         fp.close()
         # build list of attached files
-        self.docfiles = {}
+        self.docfiles = []
         self.BuildFileList()
         # link with relatedFiles
         self.relatedFiles = {}
@@ -351,11 +354,23 @@ class BibDoc:
                 dummy, basename, extension = decompose_file(file)
                 if extension:
                     extension = '.' + extension
-                self.changeName(basename)
-                destination = propose_unique_name("%s/%s%s;%s" %
-                    (self.basedir, basename, extension, myversion), True)
+                #self.changeName(basename)
+                #destination = propose_unique_name("%s/%s%s;%s" %
+                    #(self.basedir, basename, extension, myversion), True)
+                destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, myversion)
                 shutil.copy(file, destination)
         self.BuildFileList()
+
+    def purge(self):
+        """Phisically Remove all the previous version of the given bibdoc"""
+        version = self.getLatestVersion()
+        if version > 1:
+            for file in self.docfiles:
+                if file.getVersion() < version:
+                    os.remove(file.getFullPath())
+            Md5Folder(self.basedir).update()
+            self.BuildFileList()
+            self.BuildRelatedFileList()
 
     def addFilesNewFormat(self, files=[], version=""):
         """add a new format of a file to an archive"""
@@ -366,8 +381,11 @@ class BibDoc:
                 dummy, basename, extension = decompose_file(file)
                 if extension:
                     extension = '.' + extension
-                destination = propose_unique_name("%s/%s%s;%s" %
-                    (self.basedir, basename, extension, version), True)
+                destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, version)
+                if os.path.exists(destination):
+                    raise StandardError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, extension)
+                #destination = propose_unique_name("%s/%s%s;%s" %
+                    #(self.basedir, basename, extension, version), True)
                 shutil.copy(file, destination)
         self.BuildFileList()
 
@@ -450,8 +468,19 @@ class BibDoc:
         return t
 
     def changeName(self, newname):
+        """Rename the bibdoc name. New name must not be already used by the linked
+        bibrecs."""
+        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
+        if res:
+            raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
         run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
+        for f in os.listdir(self.basedir):
+            if f.startswith(self.docname):
+                sh.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
         self.docname = newname
+        Md5Folder(self.basedir).update()
+        self.BuildFileList()
+        self.BuildRelatedFileList()
 
     def getDocName(self):
         """retrieve bibdoc name"""
@@ -494,7 +523,7 @@ class BibDoc:
         """delete the current bibdoc instance"""
         self.status = self.status | 1
         run_sql("update bibdoc set status='" + str(self.status) +
-            "' where id=%s",(self.id,))
+            "' where id=%s", (self.id,))
 
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
@@ -628,6 +657,12 @@ class BibDocFile:
 
     def getName(self):
         return self.name
+
+    def getFullName(self):
+        return self.fullname
+
+    def getFullPath(self):
+        return self.fullpath
 
     def getFormat(self):
         return self.format
