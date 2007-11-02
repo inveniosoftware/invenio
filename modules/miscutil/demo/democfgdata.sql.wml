@@ -1114,6 +1114,27 @@ INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'hr','ln','fakt
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'zh_CN','ln','期刊影响系数');
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'zh_TW','ln','期刊影響系數');
 
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (3,'citation','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,3,90);
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'en','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'fr','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'de','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'es','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ca','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'pt','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'it','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ru','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'sk','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'cs','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'no','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'sv','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'uk','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ja','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'bg','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'hr','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'zh_CN','ln','citation');
+INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'zh_TW','ln','citation');
+
 INSERT INTO externalcollection (id, name) VALUES (1, 'Amazon');
 INSERT INTO externalcollection (id, name) VALUES (2, 'CERN EDMS');
 INSERT INTO externalcollection (id, name) VALUES (3, 'CERN Indico');
