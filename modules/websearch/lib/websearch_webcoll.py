@@ -395,31 +395,35 @@ class Collection:
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
 
-        else:
-            try:
-                self.latest_additions_info
-                latest_additions_info_p = True
-            except:
-                latest_additions_info_p = False
+        # FIXME: temporary hack in order not to display latest
+        # additions box for some CERN collections:
+        if CFG_CERN_SITE and self.name in ['Periodicals', 'Electronic Journals']:
+            return ""
 
-            if latest_additions_info_p:
-                passIDs = []
-                for idx in range(0, min(len(self.latest_additions_info), rg)):
-                    passIDs.append({'id': self.latest_additions_info[idx]['id'],
-                                    'body': self.latest_additions_info[idx]['format'] + \
-                                            websearch_templates.tmpl_record_links(weburl=weburl,
-                                                                                  recid=self.latest_additions_info[idx]['id'],
-                                                                                  ln=ln),
-                                    'date': self.latest_additions_info[idx]['date']})
+        try:
+            self.latest_additions_info
+            latest_additions_info_p = True
+        except:
+            latest_additions_info_p = False
 
-                if self.nbrecs > rg:
-                    url = websearch_templates.build_search_url(
-                        cc=self.name, jrec=rg+1, ln=ln, as=as)
-                else:
-                    url = ""
+        if latest_additions_info_p:
+            passIDs = []
+            for idx in range(0, min(len(self.latest_additions_info), rg)):
+                passIDs.append({'id': self.latest_additions_info[idx]['id'],
+                                'body': self.latest_additions_info[idx]['format'] + \
+                                        websearch_templates.tmpl_record_links(weburl=weburl,
+                                                                              recid=self.latest_additions_info[idx]['id'],
+                                                                              ln=ln),
+                                'date': self.latest_additions_info[idx]['date']})
 
-                return websearch_templates.tmpl_instant_browse(
-                                 as=as, ln=ln, recids=passIDs, more_link=url)
+            if self.nbrecs > rg:
+                url = websearch_templates.build_search_url(
+                    cc=self.name, jrec=rg+1, ln=ln, as=as)
+            else:
+                url = ""
+
+            return websearch_templates.tmpl_instant_browse(
+                as=as, ln=ln, recids=passIDs, more_link=url)
 
         return websearch_templates.tmpl_box_no_records(ln=ln)
 
