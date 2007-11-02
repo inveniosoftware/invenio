@@ -77,7 +77,10 @@ def get_bibrankmethod_lastupdate(rank_method_code):
     """
     query = """select last_updated from rnkMETHOD where name ='%s'""" % rank_method_code
     last_update_time = run_sql(query)
-    return last_update_time[0][0]
+    r = last_update_time[0][0]
+    if (r == None):
+        return "0000-00-00 00:00:00"
+    return r
 
 def get_last_modified_rec(bibrank_method_lastupdate):
     """ return the list of recods which have been modified after the last execution
@@ -330,7 +333,7 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
     else:
         run_sql("INSERT INTO rnkCITATIONDATA VALUES (%s, null)",
                 (serialize_via_marshal(citation_dic), ))
-        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s"%
+        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s",
                 (serialize_via_marshal(reference_dic), ))
 
 def get_compressed_dictionary(dic):
