@@ -371,6 +371,8 @@ def add_recIDs_by_date(rank_method_code, dates=""):
             dates = (get_lastupdated(rank_method_code), '')
         except Exception, e:
             dates = ("0000-00-00 00:00:00", '')
+    if (dates[0] == None):
+            dates = ("0000-00-00 00:00:00", '')        
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s"""
     if dates[1]:
         query += " and b.modification_date <= %s"
