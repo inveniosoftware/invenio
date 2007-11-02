@@ -3823,7 +3823,7 @@ def get_reference_line_numeration_marker_patterns(prefix=u''):
         compiled_ptns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_ptns
 
-def get_first_reference_line_numeration_marker_patterns():
+def get_first_reference_line_numeration_marker_patterns_via_brackets():
     """Return a list of compiled regex patterns used to search for the first
        reference line in a full-text document.
        The line is considered to start with either: [1] or {1}
@@ -3841,7 +3841,7 @@ def get_first_reference_line_numeration_marker_patterns():
         compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
-def get_first_reference_line_numeration_marker_patterns_bis():
+def get_first_reference_line_numeration_marker_patterns_via_dots():
     """Return a list of compiled regex patterns used to search for the first
        reference line in a full-text document.
        The line is considered to start with : 1. or 2. or 3. etc
@@ -3857,7 +3857,7 @@ def get_first_reference_line_numeration_marker_patterns_bis():
         compiled_patterns.append(re.compile(p, re.I|re.UNICODE))
     return compiled_patterns
 
-def get_first_reference_line_numeration_marker_patterns_bis_bis():
+def get_first_reference_line_numeration_marker_patterns_via_numbers():
     """Return a list of compiled regex patterns used to search for the first
        reference line in a full-text document.
        The line is considered to start with : 1 or 2 etc (just a number)
@@ -4094,7 +4094,7 @@ def find_reference_section(docbody):
         ref_sectn_details = None
     return ref_sectn_details
 
-def find_reference_section_no_title(docbody):
+def find_reference_section_no_title_via_brackets(docbody):
     """This function would generally be used when it was not possible to locate
        the start of a document's reference section by means of its title.
        Instead, this function will look for reference lines that have numeric
@@ -4117,7 +4117,7 @@ def find_reference_section_no_title(docbody):
     """
     ref_start_line = ref_line_marker = None
     if len(docbody) > 0:
-        marker_patterns = get_first_reference_line_numeration_marker_patterns()
+        marker_patterns = get_first_reference_line_numeration_marker_patterns_via_brackets()
 
         ## try to find first reference line in the reference section:
         x = len(docbody) - 1
@@ -4166,7 +4166,7 @@ def find_reference_section_no_title(docbody):
         ref_sectn_details = None
     return ref_sectn_details
 
-def find_reference_section_no_title_bis(docbody):
+def find_reference_section_no_title_via_dots(docbody):
     """This function would generally be used when it was not possible to locate
        the start of a document's reference section by means of its title.
        Instead, this function will look for reference lines that have numeric
@@ -4189,7 +4189,7 @@ def find_reference_section_no_title_bis(docbody):
     """
     ref_start_line = ref_line_marker = None
     if len(docbody) > 0:
-        marker_patterns = get_first_reference_line_numeration_marker_patterns_bis()
+        marker_patterns = get_first_reference_line_numeration_marker_patterns_via_dots()
 
         ## try to find first reference line in the reference section:
         x = len(docbody) - 1
@@ -4238,7 +4238,7 @@ def find_reference_section_no_title_bis(docbody):
         ref_sectn_details = None
     return ref_sectn_details
 
-def find_reference_section_no_title_bis_bis(docbody):
+def find_reference_section_no_title_via_numbers(docbody):
     """This function would generally be used when it was not possible to locate
        the start of a document's reference section by means of its title.
        Instead, this function will look for reference lines that have numeric
@@ -4261,7 +4261,7 @@ def find_reference_section_no_title_bis_bis(docbody):
     """
     ref_start_line = ref_line_marker = None
     if len(docbody) > 0:
-        marker_patterns = get_first_reference_line_numeration_marker_patterns_bis_bis()
+        marker_patterns = get_first_reference_line_numeration_marker_patterns_via_numbers()
 
         ## try to find first reference line in the reference section:
         x = len(docbody) - 1
@@ -4838,16 +4838,16 @@ def extract_references_from_fulltext(fulltext):
     if ref_sect_start is not None: how_found_start = 1
     if ref_sect_start is None:
         ## No references found - try with no title option
-        ref_sect_start = find_reference_section_no_title(fulltext)
+        ref_sect_start = find_reference_section_no_title_via_brackets(fulltext)
         if ref_sect_start is not None: how_found_start = 2
         ## Try weaker set of patterns if needed
         if ref_sect_start is None:
             ## No references found - try with no title option (with weaker patterns..)
-            ref_sect_start = find_reference_section_no_title_bis(fulltext)
+            ref_sect_start = find_reference_section_no_title_via_dots(fulltext)
             if ref_sect_start is not None: how_found_start = 3
             if ref_sect_start is None:
                 ## No references found - try with no title option (with even weaker patterns..)
-                ref_sect_start = find_reference_section_no_title_bis_bis(fulltext)
+                ref_sect_start = find_reference_section_no_title_via_numbers(fulltext)
                 if ref_sect_start is not None: how_found_start = 4
     if ref_sect_start is None:
         ## No References
