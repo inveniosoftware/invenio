@@ -279,18 +279,24 @@ def record_add_field(rec, tag, ind1="", ind2="",
     # return new field number:
     return newfield_number
 
-def record_delete_field(rec, tag, ind1="", ind2=""):
+def record_delete_field(rec, tag, ind1="", ind2="", field_number=None):
     """
     delete all fields defined with marc tag 'tag' and indicators 'ind1' and 'ind2'
-    from record 'rec'
+    from record 'rec'. If field_number is specified, delete only the particualar
+    field_number.
     """
     (ind1, ind2) = wash_indicators(ind1, ind2)
 
     newlist = []
     if rec.has_key(tag):
-        for field in rec[tag]:
-            if not (field[1]==ind1 and field[2]==ind2):
-                newlist.append(field)
+        if not field_number:
+            for field in rec[tag]:
+                if not (field[1]==ind1 and field[2]==ind2):
+                    newlist.append(field)
+        else:
+            for field in rec[tag]:
+                if not (field[1]==ind1 and field[2]==ind2 and field[3]==field_number):
+                    newlist.append(field)
         rec[tag] = newlist
 
 def tag_matches_pattern(tag, pattern):
