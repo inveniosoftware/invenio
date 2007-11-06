@@ -24,7 +24,6 @@ import sys
 import time
 import urllib
 import traceback
-import cStringIO
 import math
 import re
 import ConfigParser
@@ -281,14 +280,16 @@ class WordTable:
             else:
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" % word, verbose=9)
-                run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (self.tablename, escape_string(serialize_via_marshal(set)), escape_string(word)))
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
+                        (serialize_via_marshal(set), word))
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = self.value[word]
             if len(set) > 0:
                 #new word, add to list
                 options["modified_words"][word] = 1
-                run_sql("INSERT INTO %s (term, hitlist) VALUES ('%s', '%s')" % (self.tablename, escape_string(word), escape_string(serialize_via_marshal(set))))
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
+                        (word, serialize_via_marshal(set)))
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
@@ -429,7 +430,7 @@ class WordTable:
 
 
     def add_recID_range(self, recID1, recID2):
-        empty_list_string = serialize_via_marshal([])
+        """Add records from RECID1 to RECID2."""
         wlist = {}
         normalize = {}
 
@@ -465,47 +466,20 @@ class WordTable:
                 wlist[recID] = {}
                 write_message("... record %d was declared deleted, removing its word list" % recID, verbose=9)
             write_message("... record %d, termlist: %s" % (recID, wlist[recID]), verbose=9)
-        query_factory = cStringIO.StringIO()
-        qwrite = query_factory.write
-        qwrite( "INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
-        qwrite( "('" )
-        qwrite( str(recIDs[0]) )
-        qwrite( "','" )
-        qwrite( escape_string(serialize_via_marshal(wlist[recIDs[0]]) ))
-        qwrite( "','FUTURE')" )
-        for recID in recIDs[1:]:
-            qwrite(",('")
-            qwrite(str(recID))
-            qwrite("','")
-            qwrite(escape_string(serialize_via_marshal(wlist[recID])))
-            qwrite("','FUTURE')")
 
-        query = query_factory.getvalue()
-        query_factory.close()
-        run_sql(query)
+        # put words into reverse index table with FUTURE status:
+        for recID in recIDs:
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % self.tablename[:-1],
+                    (recID, serialize_via_marshal(wlist[recID])))
+            # ... and, for new records, enter the CURRENT status as empty:
+            try:
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
+                        (recID, serialize_via_marshal([])))
+            except DatabaseError:
+                # okay, it's an already existing record, no problem
+                pass
 
-        query_factory = cStringIO.StringIO()
-        qwrite = query_factory.write
-        qwrite("INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
-        qwrite("('")
-        qwrite(str(recIDs[0]))
-        qwrite("','")
-        qwrite(escape_string(serialize_via_marshal(wlist[recIDs[0]])))
-        qwrite("','CURRENT')")
-        for recID in recIDs[1:]:
-            qwrite( ",('" )
-            qwrite( str(recID) )
-            qwrite( "','" )
-            qwrite( escape_string(empty_list_string ))
-            qwrite( "','CURRENT')" )
-        query = query_factory.getvalue()
-        query_factory.close()
-
-        try:
-            run_sql(query)
-        except DatabaseError:
-            pass
-
+        # put words into memory word list:
         put = self.put
         for recID in recIDs:
             for (w, count) in wlist[recID].iteritems():
@@ -938,7 +912,7 @@ def check_rnkWORD(table):
     while i < len(terms):
         current_terms = ""
         for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-            current_terms += "'%s'," % terms[j]
+            current_terms += "'%s'," % escape_string(terms[j])
         terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table, current_terms[:-1]))
         for (t, hitlist) in terms_docs:
             term_docs = deserialize_via_marshal(hitlist)
@@ -1130,7 +1104,8 @@ def update_rnkWORD(table, terms):
             Nj[j] = int(Nj[j] * 100)
             if Nj[j] >= 0:
                 Nj[j] += 1
-            run_sql("UPDATE %sR SET termlist='%s' WHERE id_bibrec=%s" % (table[:-1], escape_string(serialize_via_marshal(doc_terms)), j))
+            run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
+                    (serialize_via_marshal(doc_terms), j))
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
         i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
@@ -1151,7 +1126,8 @@ def update_rnkWORD(table, terms):
             if Git >= 0:
                 Git += 1
             term_docs["Gi"] = (0, Git)
-            run_sql("UPDATE %s SET hitlist='%s' WHERE term='%s'" % (table, escape_string(serialize_via_marshal(term_docs)), escape_string(t)))
+            run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
+                    (serialize_via_marshal(term_docs), t))
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)
@@ -1160,14 +1136,14 @@ def update_rnkWORD(table, terms):
 
 
 def get_from_forward_index(terms, start, stop, table):
-    current_terms = ""
+    terms_docs = ()
     for j in range(start, (stop < len(terms) and stop or len(terms))):
-        current_terms += "'%s'," % escape_string(terms[j])
-    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table,current_terms[:-1]))
+        terms_docs += run_sql("SELECT term, hitlist FROM %s WHERE term=%%s" % table,
+                              (terms[j],))
     return terms_docs
 
 def get_from_forward_index_with_id(start, stop, table):
-    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE id between %s and %s" % (table, start, stop))
+    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE id BETWEEN %s AND %s" % (table, start, stop))
     return terms_docs
 
 def get_from_reverse_index(records, start, stop, table):

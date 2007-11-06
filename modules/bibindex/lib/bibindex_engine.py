@@ -33,7 +33,6 @@ import time
 import urllib2
 import tempfile
 import traceback
-import cStringIO
 
 from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
@@ -46,7 +45,7 @@ from invenio.config import \
      weburl
 from invenio.bibindex_engine_config import *
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
-from invenio.dbquery import run_sql, escape_string, DatabaseError, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibtask import task_init, write_message, get_datetime, \
@@ -850,7 +849,7 @@ class WordTable:
             self.add_recIDs(alist, opt_flush)
 
     def add_recID_range(self, recID1, recID2):
-        empty_list_string = serialize_via_marshal([])
+        """Add records from RECID1 to RECID2."""
         wlist = {}
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
@@ -899,54 +898,19 @@ class WordTable:
                 write_message("... record %d was declared deleted, removing its word list" % recID, verbose=9)
             write_message("... record %d, termlist: %s" % (recID, wlist[recID]), verbose=9)
 
-        # Using cStringIO for speed.
-        query_factory = cStringIO.StringIO()
-        qwrite = query_factory.write
+        # put words into reverse index table with FUTURE status:
+        for recID in recIDs:
+            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % self.tablename[:-1],
+                    (recID, serialize_via_marshal(wlist[recID])))
+            # ... and, for new records, enter the CURRENT status as empty:
+            try:
+                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
+                        (recID, serialize_via_marshal([])))
+            except DatabaseError:
+                # okay, it's an already existing record, no problem
+                pass
 
-        qwrite( "INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
-        qwrite( "('" )
-        qwrite( str(recIDs[0]) )
-        qwrite( "','" )
-        qwrite( escape_string(serialize_via_marshal(wlist[recIDs[0]]) ))
-        qwrite( "','FUTURE')" )
-
-        for recID in recIDs[1:]:
-            qwrite(",('")
-            qwrite(str(recID))
-            qwrite("','")
-            qwrite(escape_string(serialize_via_marshal(wlist[recID])))
-            qwrite("','FUTURE')")
-
-        query = query_factory.getvalue()
-        query_factory.close()
-        run_sql(query)
-
-        query_factory = cStringIO.StringIO()
-        qwrite = query_factory.write
-
-        qwrite("INSERT INTO %sR (id_bibrec,termlist,type) VALUES" % self.tablename[:-1])
-        qwrite("('")
-        qwrite(str(recIDs[0]))
-        qwrite("','")
-        qwrite(escape_string(serialize_via_marshal(wlist[recIDs[0]])))
-        qwrite("','CURRENT')")
-
-        for recID in recIDs[1:]:
-            qwrite( ",('" )
-            qwrite( str(recID) )
-            qwrite( "','" )
-            qwrite( empty_list_string )
-            qwrite( "','CURRENT')" )
-
-        query = query_factory.getvalue()
-        query_factory.close()
-
-        try:
-            run_sql(query)
-        except DatabaseError:
-            # ok, we tried to add an existent record. No problem
-            pass
-
+        # put words into memory word list:
         put = self.put
         for recID in recIDs:
             for w in wlist[recID]:
