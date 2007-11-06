@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -68,9 +68,21 @@ class TableUpdateTimesTest(unittest.TestCase):
         test_table = "tmpTESTTABLE123"
         dbquery.run_sql("CREATE TABLE IF NOT EXISTS %s (a INT)" % test_table)
         # run the test:
-        self._check_table_update_time(test_table)        
+        self._check_table_update_time(test_table)
         # drop empty test table
         dbquery.run_sql("DROP TABLE %s" % test_table)
+
+    def test_utf8_python_mysqldb_mysql_storage_chain(self):
+        """dbquery - UTF-8 in Python<->MySQLdb<->MySQL storage chain"""
+        # NOTE: This test test creates, uses and destroys a temporary
+        # table called "test__invenio__utf8".
+        x = "β" # Greek beta in UTF-8 is 0xCEB2
+        dbquery.run_sql("CREATE TEMPORARY TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8")
+        dbquery.run_sql("INSERT INTO test__invenio__utf8 VALUES (%s,%s)", (x, x))
+        res = dbquery.run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
+        self.assertEqual(res[0],
+                         ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L))
+        dbquery.run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
 
 def create_test_suite():
     """Return test suite for the user handling."""
