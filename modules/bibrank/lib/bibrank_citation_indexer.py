@@ -78,7 +78,7 @@ def get_bibrankmethod_lastupdate(rank_method_code):
     query = """select last_updated from rnkMETHOD where name ='%s'""" % rank_method_code
     last_update_time = run_sql(query)
     r = last_update_time[0][0]
-    if (r == None):
+    if r is None:
         return "0000-00-00 00:00:00"
     return r
 
