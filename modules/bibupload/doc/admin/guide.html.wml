@@ -199,6 +199,8 @@ semantic:
         $d  ...  docfile description (optional)
         $f  ...  format (optional; if not set, deduced from $a)
         $z  ...  comment (optional)
+        $r  ...  restriction (optional, see below)
+        $x  ...  url/path for an icon (optional)
 </pre>
 
 <p>For example, to upload a new fulltext file <code>thesis.pdf</code>
@@ -210,7 +212,6 @@ associated to record ID 123:
         &lt;datafield tag="FFT" ind1=" " ind2=" "&gt;
             &lt;subfield code="a"&gt;/tmp/thesis.pdf&lt;/subfield&gt;
             &lt;subfield code="t"&gt;Main&lt;/subfield&gt;
-            &lt;subfield code="f"&gt;.pdf&gt;
             &lt;subfield code="d"&gt;
               This is the fulltext version of my thesis in the PDF format.
               Chapter 5 still needs some revision.
@@ -269,5 +270,15 @@ only the latest file version), please use the correct mode with $n
 filename and $t PURGE as the special keyword.
 
 <p>In order to delete all existing versions of a file, making it
+effectively hidden, please use the correct mode with $n filename
+and $t DELETE as the special keyword.
+
+<p>In order to expunge (i.e. remove completely, also from the filesystem) all existing versions of a file, making it
 effectively disappear, please use the correct mode with $n filename
 and $t DELETE as the special keyword.
+
+<p>In order to preserve previous comments and descriptions when correcting, pleas use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
+
+<p>In order to add an icon representing a document, you must use a $x subfields. All the FFT for different format of the document must have then the same $x subfield. You can use KEEP-OLD-VALUE in order to keep the previous icon when correcting.
+
+<p>The $r subfield can contain a keyword that can be use to restrict the given document. The same keyword must be specified for all the format of a given document. The keyword will be used as the status parameter for the "viewrestrdoc" action, which can be used to give access right/restriction to desired user. e.g. if you set the keyword "thesis", you can the connect the "thesisviewer" to the action "viewrestrdoc" with parameter "status" set to "thesis". Then all the user which are linked with the "thesisviewer" role will be able to download the document. Instead any other user will not be allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous restrictions if applicable will be kept.
