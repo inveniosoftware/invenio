@@ -191,8 +191,7 @@ update-v0.92.0-tables: local-dbexec
 
 update-v0.92.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ./modules/miscutil/bin/dbexec
-	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE bibdoc SET status='DELETED' WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
@@ -205,6 +204,7 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION VALUES (24,'viewrestrcoll','view restricted document','status','no');" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE format ADD COLUMN visibility TINYINT NOT NULL default 1;" | ./modules/miscutil/bin/dbexec
@@ -270,6 +270,7 @@ load-demo-records:
 	@echo "***********************************************************************"
 
 drop-demo-site:
+	rm -rf ${prefix}/var/data/files/*
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
