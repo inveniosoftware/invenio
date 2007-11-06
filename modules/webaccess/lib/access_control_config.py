@@ -130,6 +130,7 @@ DEF_ACTIONS = (
                ('runoaiarchive',         'run oaiarchive task',       '',              'no'),
                ('runbibedit',         'run BibEdit',       '',              'no'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
+               ('viewrestrdoc', 'view restricted document', 'status', 'no'),
               )
 
 # authorizations
