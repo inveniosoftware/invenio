@@ -671,9 +671,8 @@ class Collection:
         write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs), verbose=6)
         sys.stdout.flush()
         try:
-            query = "UPDATE collection SET nbrecs=%d, reclist='%s' WHERE id=%d" % \
-                (self.nbrecs, escape_string(self.reclist.fastdump()), self.id)
-            run_sql(query)
+            run_sql("UPDATE collection SET nbrecs=%s, reclist=%s WHERE id=%s",
+                    (self.nbrecs, self.reclist.fastdump(), self.id))
             self.reclist_updated_since_start = 1
         except Error, e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
