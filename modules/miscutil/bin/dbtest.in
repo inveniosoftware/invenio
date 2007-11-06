@@ -50,7 +50,7 @@ except MySQLdb.Error, e:
     ** user and run the following commands now:         **
     **
     **  $ mysql -h %(dbhost)s -u root -p mysql
-    **    mysql> CREATE DATABASE %(dbname)s;
+    **    mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
     **    mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
     **    mysql> QUIT
     **
