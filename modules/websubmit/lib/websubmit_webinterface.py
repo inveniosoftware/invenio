@@ -91,17 +91,17 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             # all the available files. In no case are the docids
             # visible.
             bibarchive = BibRecDocs(self.recid)
-            
+
             if filename:
                 # We know the complete file name, guess which docid it
                 # refers to
-		## TODO: Change the extension system according to ext.py from setlink
-		##       and have a uniform extension mechanism...
-		name = file_strip_ext(filename)
-		format = filename[len(name):]
+                ## TODO: Change the extension system according to ext.py from setlink
+                ##       and have a uniform extension mechanism...
+                name = file_strip_ext(filename)
+                format = filename[len(name):]
                 if format and format[0] == '.':
                     format = format[1:]
-                    
+
                 # search this filename in the complete list of files
                 for doc in bibarchive.listBibDocs():
                     if filename in [f.fullname for f in doc.listAllFiles()]:
@@ -119,18 +119,18 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             return docfile.stream(req)
                         except StandardError, msg:
-                            return errorMsg(msg, req, c, ln)
-                        
+                            return errorMsg(msg, req, cdsname, ln)
+
                     elif doc.getIcon() is not None and doc.getIcon().docname in filename:
                         icon = doc.getIcon()
                         try:
                             iconfile = icon.getFile(icon.docname, 'gif', args['version'])
                         except StandardError, msg:
                             return errorMsg(msg, req, cdsname, ln)
-                        
+
                         if iconfile.isRestricted():
                             return warningMsg(_("This Icon is restricted!"), req, cdsname, ln)
-                    
+
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
                             res = doc.registerDownload(ip, version, format, uid)
@@ -147,7 +147,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 docid="",
                 version=args['version'],
                 filelist=filelist)
-            
+
             cc = guess_primary_collection_of_a_record(self.recid)
             unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
@@ -232,7 +232,7 @@ def websubmit_legacy_getfile(req, form):
                 docfile = doc.getFile(name,format,version)
             except StandardError, msg:
                 return errorMsg(msg, req, c, ln)
-            
+
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
             if docfile.format:
