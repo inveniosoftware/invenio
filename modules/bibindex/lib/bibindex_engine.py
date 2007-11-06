@@ -45,7 +45,7 @@ from invenio.config import \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
      weburl
 from invenio.bibindex_engine_config import *
-from invenio.search_engine import perform_request_search, strip_accents
+from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
 from invenio.dbquery import run_sql, escape_string, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
@@ -975,7 +975,7 @@ class WordTable:
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."
         try:
-            word = word[:50].lower()
+            word = wash_index_term(word)
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign

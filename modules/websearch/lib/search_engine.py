@@ -1015,6 +1015,32 @@ def strip_accents(x):
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
 
+def wash_index_term(term, max_char_length=50):
+    """
+    Return washed form of the index term TERM that would be suitable
+    for storing into idxWORD* tables.  I.e., lower the TERM, and
+    truncate it safely to MAX_CHAR_LENGTH UTF-8 characters (meaning,
+    in principle, 4*MAX_CHAR_LENGTH bytes).
+
+    The function works by an internal conversion of TERM, when needed,
+    from its input Python UTF-8 binary string format into Python
+    Unicode format, and then truncating it safely to the given number
+    of TF-8 characters, without possible mis-truncation in the middle
+    of a multi-byte UTF-8 character that could otherwise happen if we
+    would have been working with UTF-8 binary representation directly.
+
+    Note that MAX_CHAR_LENGTH corresponds to the length of the term
+    column in idxINDEX* tables.
+    """
+    washed_term = term.lower()
+    if len(washed_term) <= max_char_length:
+        # no need to truncate the term, because it will fit
+        # nicely even if it uses four-byte UTF-8 characters
+        return washed_term
+    else:
+        # truncate the term in a safe position:
+        return unicode(washed_term, 'utf-8')[:max_char_length].encode('utf-8')
+
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
     removing wildcards if they are appended to extremely short words
@@ -1602,14 +1628,18 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         word1 = re_word.sub('', words[1])
         word0 = stem(word0)
         word1 = stem(word1)
-        query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX, escape_string(word0[:50]), escape_string(word1[:50]))
+        query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX,
+                                                                                  escape_string(wash_index_term(word0)),
+                                                                                  escape_string(wash_index_term(word1)))
     else:
         word = re_word.sub('', word)
         word = stem(word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
-            query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX, escape_string(word[:50]))
+            query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX,
+                                                                          escape_string(wash_index_term(word)))
         else:
-            query = "SELECT term,hitlist FROM %s WHERE term='%s'" % (bibwordsX, escape_string(word[:50]))
+            query = "SELECT term,hitlist FROM %s WHERE term='%s'" % (bibwordsX,
+                                                                     escape_string(wash_index_term(word)))
     # launch the query:
     res = run_sql(query)
     # fill the result set:
