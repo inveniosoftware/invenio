@@ -110,7 +110,7 @@ def try_url_download(url):
         open_url = urlopen(url)
         open_url.read()
     except Exception, e:
-        raise StandardException, "Downloading %s is impossible because of %s" \
+        raise StandardError, "Downloading %s is impossible because of %s" \
             % (url, str(e))
     return True
 
@@ -1816,7 +1816,6 @@ class BibUploadFFTModeTest(unittest.TestCase):
     """
     Testing treatment of fulltext file transfer import mode.
     """
-
     def test_simple_fft_insert_via_http(self):
         """bibupload - simple FFT insert via HTTP"""
         # define the test case:
@@ -1891,6 +1890,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">http://cdsweb.cern.ch/img/head.gif</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">http://doc.cern.ch/archive/electronic/hep-th/0101/0101001.pdf</subfield>
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
@@ -1910,16 +1911,16 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(weburl)s/record/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(weburl)s/record/123456789/files/0101001.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/demobibdata.xml</subfield>
+          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
         """ % { 'weburl': weburl}
@@ -1927,10 +1928,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
         8564_ $$u%(weburl)s/record/123456789/files/head.gif
-        8564_ $$u%(weburl)s/record/123456789/files/0101001.pdf
         8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
+        8564_ $$u%(weburl)s/record/123456789/files/0101001.pdf
+        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
         """ % { 'weburl': weburl}
         # insert test record:
         testrec_expected_urls = []

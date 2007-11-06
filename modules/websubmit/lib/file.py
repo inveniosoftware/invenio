@@ -35,6 +35,7 @@ from invenio.config import \
      weburl
 from invenio.dbquery import run_sql
 from mimetypes import MimeTypes
+from invenio.access_control_engine import acc_authorize_action
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -99,17 +100,12 @@ class BibRecDocs:
         res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc "
             "where id=id_bibdoc and id_bibrec=%s", (self.id,))
         for row in res:
-            if row[2] == "":
-                status = 0
-            else:
-                status = int(row[2])
-            if status & 1 == 0:
+            if row[2] != 'DELETED':
                 try:
                     cur_doc = BibDoc(bibdocid=row[0], recid=self.id)
+                    self.bibdocs.append(cur_doc)
                 except StandardError:
                     pass
-                else:
-                    self.bibdocs.append(cur_doc)
 
     def listBibDocs(self, type=""):
         """Returns the list all bibdocs object belonging to a recid.
@@ -148,21 +144,23 @@ class BibRecDocs:
         """Creates a new bibdoc associated with the recid, with a file
         called docname and a particular type. It returns the bibdoc object
         which was just created.
-        If it already exists a bibdoc with docname name, it appends a _number
-        to have a unique name.
-        """
-        goodname = docname
-        i = 1
-        while goodname in self.getBibDocNames(type):
-            i += 1
-            goodname = "%s_%s" % (docname, i)
-        try:
-            bibdoc = BibDoc(recid=self.id, type=type, docname=goodname)
-        except StandardError:
-            return None
+        ###"""
+        #goodname = docname
+        #i = 1
+        #while goodname in self.getBibDocNames(type):
+            #i += 1
+            #goodname = "%s_%s" % (docname, i)
+        #try:
+            #bibdoc = BibDoc(recid=self.id, type=type, docname=goodname)
+        #except StandardError, e:
+            #raise
+        #else:
+            #self.bibdocs.append(bibdoc)
+            #return bibdoc
+        if docname in self.getBibDocNames(type):
+            raise StandardError, "%s has already a bibdoc with docname %s" % (self.recid, docname)
         else:
-            self.bibdocs.append(bibdoc)
-            return bibdoc
+            return BibDoc(recid=self.id, type=type, docname=docname)
 
     def addNewFile(self, fullpath, type="Main"):
         """Creates a new bibdoc given a fullpath file and store the file in it.
@@ -292,7 +290,7 @@ class BibDoc:
                 self.recid = recid
                 self.docname = res[0][2]
                 self.id = bibdocid
-                self.status = int(res[0][1])
+                self.status = res[0][1]
                 group = "g" + str(int(int(self.id) / filedirsize))
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
             else:
@@ -306,13 +304,13 @@ class BibDoc:
                 self.recid = recid
                 self.type = type
                 self.docname = docname
-                self.status = 0
+                self.status = ''
                 res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
                 if res:
                     raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
                 self.id = run_sql("insert into bibdoc "
                     "(status,docname,creation_date,modification_date) "
-                    "values(%s,%s,NOW(),NOW())", (str(self.status), docname,))
+                    "values(%s,%s,NOW(),NOW())", (self.status, docname,))
                 if self.id is not None:
                     # we link the document to the record if a recid was
                     # specified
@@ -325,6 +323,7 @@ class BibDoc:
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
                 # we create the corresponding storage directory
                 if not os.path.exists(self.basedir):
+                    old_umask = os.umask(022)
                     os.makedirs(self.basedir)
                     # and save the father record id if it exists
                     if self.recid != "":
@@ -335,11 +334,20 @@ class BibDoc:
                         fp = open("%s/.type" % self.basedir, "w")
                         fp.write(str(self.type))
                         fp.close()
+                    os.umask(old_umask)
         # build list of attached files
-        self.docfiles = []
         self.BuildFileList()
         # link with relatedFiles
-        self.relatedFiles = {}
+        self.BuildRelatedFileList()
+
+    def getStatus(self):
+        """Retrieve the status."""
+        return self.status
+
+    def setStatus(self, new_status):
+        """Set a new status."""
+        run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, id))
+        self.BuildFileList()
         self.BuildRelatedFileList()
 
     def addFilesNewVersion(self, files=[]):
@@ -358,7 +366,8 @@ class BibDoc:
                 #destination = propose_unique_name("%s/%s%s;%s" %
                     #(self.basedir, basename, extension, myversion), True)
                 destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, myversion)
-                shutil.copy(file, destination)
+                shutil.copyfile(file, destination)
+                os.chmod(destination, 0644)
         self.BuildFileList()
 
     def purge(self):
@@ -371,6 +380,15 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.BuildFileList()
             self.BuildRelatedFileList()
+
+    def expunge(self):
+        """Phisically remove all the traces of a given bibdoc"""
+        for file in self.docfiles:
+            os.remove(file.getFullPath())
+        Md5Folder(self.basedir).update()
+        self.BuildFileList()
+        self.BuildRelatedFileList()
+
 
     def addFilesNewFormat(self, files=[], version=""):
         """add a new format of a file to an archive"""
@@ -386,7 +404,8 @@ class BibDoc:
                     raise StandardError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, extension)
                 #destination = propose_unique_name("%s/%s%s;%s" %
                     #(self.basedir, basename, extension, version), True)
-                shutil.copy(file, destination)
+                shutil.copyfile(file, destination)
+                os.chmod(destination, 0644)
         self.BuildFileList()
 
     def getIcon(self):
@@ -395,14 +414,15 @@ class BibDoc:
         else:
             return None
 
-    def addIcon(self, file):
+    def addIcon(self, file, basename=''):
         """link an icon with the bibdoc object"""
         #first check if an icon already exists
         existingIcon = self.getIcon()
         if existingIcon is not None:
             existingIcon.delete()
         #then add the new one
-        basename = decompose_file(file)[1]
+        if not basename:
+            basename = decompose_file(file)[1]
         try:
             newicon = BibDoc(type='Icon', docname=basename)
         except StandardError:
@@ -412,12 +432,14 @@ class BibDoc:
             run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
                 (self.id, newicon.getId(),))
             if os.path.exists(newicon.getBaseDir()):
+                old_umask = os.umask(022)
                 fp = open("%s/.docid" % newicon.getBaseDir(), "w")
                 fp.write(str(self.id))
                 fp.close()
                 fp = open("%s/.type" % newicon.getBaseDir(), "w")
                 fp.write(str(self.type))
                 fp.close()
+                os.umask(old_umask)
         self.BuildRelatedFileList()
 
     def deleteIcon(self):
@@ -521,9 +543,7 @@ class BibDoc:
 
     def delete(self):
         """delete the current bibdoc instance"""
-        self.status = self.status | 1
-        run_sql("update bibdoc set status='" + str(self.status) +
-            "' where id=%s", (self.id,))
+        run_sql("update bibdoc set status='DELETED' where id=%s", (self.id,))
 
     def BuildFileList(self):
         """lists all files attached to the bibdoc"""
@@ -544,25 +564,21 @@ class BibDoc:
                         self.id, self.status, checksum))
 
     def BuildRelatedFileList(self):
+        self.relatedFiles = {}
         res = run_sql("select ln.id_bibdoc2,ln.type,bibdoc.status from "
             "bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and "
             "ln.id_bibdoc1=%s", (self.id,))
         for row in res:
             bibdocid = row[0]
             type = row[1]
-            if row[2] == "":
-                status = 0
-            else:
-                status = int(row[2])
-            if status & 1 == 0:
+            if row[2] != 'DELETED':
                 if not self.relatedFiles.has_key(type):
                     self.relatedFiles[type] = []
                 try:
                     cur_doc = BibDoc(bibdocid=bibdocid)
+                    self.relatedFiles[type].append(cur_doc)
                 except StandardError:
                     pass
-                else:
-                    self.relatedFiles[type].append(cur_doc)
 
     def listAllFiles(self):
         return self.docfiles
@@ -642,9 +658,7 @@ class BibDocFile:
 
     def isRestricted(self):
         """return restriction state"""
-        if int(self.status) & 10 == 10:
-            return 1
-        return 0
+        return self.status != ''
 
     def getType(self):
         return self.type
@@ -681,19 +695,26 @@ class BibDocFile:
             "id_bibdoc=%s",(self.bibdocid,))[0][0]
 
     def stream(self, req):
-        if os.path.exists(self.fullpath):
-            req.content_type = self.mime
-            req.encoding = self.encoding
-            req.filename = self.fullname
-            req.headers_out["Content-Disposition"] = \
-                "attachment; filename=%s" % quoteattr(self.fullname)
-            req.send_http_header()
-            fp = file(self.fullpath, "r")
-            content = fp.read()
-            fp.close()
-            return content
+        if self.status:
+            (auth_code, auth_message) = acc_authorize_action(req, 'viewrestrdoc', status=self.status)
         else:
-            raise StandardError, "%s does not exists!" % self.fullpath
+            auth_code = 0
+        if auth_code == 0:
+            if os.path.exists(self.fullpath):
+                req.content_type = self.mime
+                req.encoding = self.encoding
+                req.filename = self.fullname
+                req.headers_out["Content-Disposition"] = \
+                    "attachment; filename=%s" % quoteattr(self.fullname)
+                req.send_http_header()
+                fp = file(self.fullpath, "r")
+                content = fp.read()
+                fp.close()
+                return content
+            else:
+                raise StandardError, "%s does not exists!" % self.fullpath
+        else:
+            raise StandardError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
 def readfile(path):
     """Read the contents of a text file and return them as a string.
@@ -752,9 +773,11 @@ class Md5Folder:
 
     def store(self):
         """Store the current md5 dictionary into .doc_checksum"""
+        old_umask = os.umask(022)
         md5file = open("%s/.doc_checksum" % self.folder, "w")
         for key, value in self.md5s.items():
             md5file.write('%s *%s\n' % (value, key))
+        os.umask(old_umask)
 
     def load(self):
         """Load .doc_checksum into the md5 dictionary"""
