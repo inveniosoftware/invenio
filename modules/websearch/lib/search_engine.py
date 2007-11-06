@@ -1620,7 +1620,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         else:
             return HitSet() # word index f does not exist
 
-    # wash 'word' argument and construct query:
+    # wash 'word' argument and run query:
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
     words = string.split(word, "->", 1) # check for span query
     if len(words) == 2:
@@ -1628,20 +1628,17 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         word1 = re_word.sub('', words[1])
         word0 = stem(word0)
         word1 = stem(word1)
-        query = "SELECT term,hitlist FROM %s WHERE term BETWEEN '%s' AND '%s'" % (bibwordsX,
-                                                                                  escape_string(wash_index_term(word0)),
-                                                                                  escape_string(wash_index_term(word1)))
+        res = run("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
+                  (wash_index_term(word0), wash_index_term(word1)))
     else:
         word = re_word.sub('', word)
         word = stem(word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
-            query = "SELECT term,hitlist FROM %s WHERE term LIKE '%s'" % (bibwordsX,
-                                                                          escape_string(wash_index_term(word)))
+            res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
+                          (wash_index_term(word),))
         else:
-            query = "SELECT term,hitlist FROM %s WHERE term='%s'" % (bibwordsX,
-                                                                     escape_string(wash_index_term(word)))
-    # launch the query:
-    res = run_sql(query)
+            res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % bibwordsX,
+                          (wash_index_term(word),))
     # fill the result set:
     for word, hitlist in res:
         hitset_bibwrd = HitSet(hitlist)
