@@ -1347,7 +1347,7 @@ INSERT INTO accACTION VALUES (20,'runoaiarchive','run BibHarvest oaiarchive','',
 INSERT INTO accACTION VALUES (21,'runbibedit','run BibEdit','','no');
 INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');
 INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');
-
+INSERT INTO accACTION VALUES (24,'viewrestrdoc','view restricted document','status','no');
 INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
 
 INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,1, 0, 0);
