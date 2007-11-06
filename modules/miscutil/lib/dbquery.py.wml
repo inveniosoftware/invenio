@@ -73,18 +73,35 @@ _DB_CONN = {}
 
 def _db_login(relogin = 0):
     """Login to the database."""
+
+    ## Note: we are using "use_unicode=False", because we want to
+    ## receive strings from MySQL as Python UTF-8 binary string
+    ## objects, not as Python Unicode string objects, as of yet.
+
+    ## Note: "charset='utf8'" is needed for recent MySQLdb versions
+    ## (such as 1.2.1_p2 and above).  For older MySQLdb versions such
+    ## as 1.2.0, an explicit "init_command='SET NAMES utf8'" parameter
+    ## would constitute an equivalent.  But we are not bothering with
+    ## older MySQLdb versions here, since we are recommending to
+    ## upgrade to more recent versions anyway.
+
     if CFG_MISCUTIL_USE_SQLALCHEMY:
-        return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+        return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass,
+                       use_unicode=False, charset='utf8')
     else:
         thread_ident = get_ident()
     if relogin:
-        _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+        _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname,
+                                         user=dbuser, passwd=dbpass,
+                                         use_unicode=False, charset='utf8')
         return _DB_CONN[thread_ident]
     else:
         if _DB_CONN.has_key(thread_ident):
             return _DB_CONN[thread_ident]
         else:
-            _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+            _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname,
+                                             user=dbuser, passwd=dbpass,
+                                             use_unicode=False, charset='utf8')
             return _DB_CONN[thread_ident]
 
 def _db_logout():
@@ -93,7 +110,6 @@ def _db_logout():
         del _DB_CONN[get_ident()]
     except KeyError:
         pass
-
 
 try:
     _db_cache
