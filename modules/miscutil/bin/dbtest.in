@@ -1,5 +1,5 @@
 #!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## $Id$
 ##
@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -71,10 +71,10 @@ except MySQLdb.Error, e:
     sys.exit(1)
 
 ## execute test query:
-try:    
+try:
     cursor = db.cursor()
     cursor.execute("SELECT * FROM collection")
-    row = cursor.fetchone()    
+    row = cursor.fetchone()
 except MySQLdb.Error, e:
     print """
     ******************************************************
@@ -91,6 +91,37 @@ except MySQLdb.Error, e:
     """ % {'errcode': e.args[0],
            'errmsg': e.args[1],
            }
+    sys.exit(1)
+
+## test insert/select of a Unicode string to detect possible
+## Python/MySQL/MySQLdb mis-setup:
+try:
+    db.close()
+    db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass,
+                         use_unicode=False, charset='utf8')
+    cursor = db.cursor()
+    x = "β" # Greek beta in UTF-8 is 0xCEB2
+    cursor.execute("CREATE TEMPORARY TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8")
+    cursor.execute("INSERT INTO test__invenio__utf8 VALUES (%s,%s)", (x, x))
+    cursor.execute("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
+    res = cursor.fetchone()
+    assert res == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
+    cursor.execute("DROP TEMPORARY TABLE test__invenio__utf8")
+except Exception, e:
+    print """
+    ******************************************************
+    ** DATABASE RELATED ERROR: %(errmsg)s
+    ******************************************************
+    ** A problem was detected with the UTF-8 treatment  **
+    ** in the chain between the Python application,     **
+    ** the MySQLdb connector, and the MySQL database.   **
+    ** You may perhaps have installed older versions    **
+    ** of some prerequisite packages?                   **
+    **                                                  **
+    ** Please inspect the above error message and       **
+    ** please fix the problem before continuing.        **
+    ******************************************************
+    """ % { 'errmsg': e }
     sys.exit(1)
 
 ## close connection:
