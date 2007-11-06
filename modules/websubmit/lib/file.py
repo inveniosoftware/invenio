@@ -158,7 +158,7 @@ class BibRecDocs:
             #self.bibdocs.append(bibdoc)
             #return bibdoc
         if docname in self.getBibDocNames(type):
-            raise StandardError, "%s has already a bibdoc with docname %s" % (self.recid, docname)
+            raise StandardError, "%s has already a bibdoc with docname %s" % (self.id, docname)
         else:
             return BibDoc(recid=self.id, type=type, docname=docname)
 
@@ -344,9 +344,13 @@ class BibDoc:
         """Retrieve the status."""
         return self.status
 
+    def touch(self):
+        """Update the modification time of the bibdoc."""
+        run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', self.id)
+
     def setStatus(self, new_status):
         """Set a new status."""
-        run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, id))
+        run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
         self.BuildFileList()
         self.BuildRelatedFileList()
 
@@ -368,6 +372,7 @@ class BibDoc:
                 destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, myversion)
                 shutil.copyfile(file, destination)
                 os.chmod(destination, 0644)
+        self.touch()
         self.BuildFileList()
 
     def purge(self):
@@ -378,6 +383,7 @@ class BibDoc:
                 if file.getVersion() < version:
                     os.remove(file.getFullPath())
             Md5Folder(self.basedir).update()
+            self.touch()
             self.BuildFileList()
             self.BuildRelatedFileList()
 
@@ -386,6 +392,7 @@ class BibDoc:
         for file in self.docfiles:
             os.remove(file.getFullPath())
         Md5Folder(self.basedir).update()
+        self.touch()
         self.BuildFileList()
         self.BuildRelatedFileList()
 
@@ -406,6 +413,7 @@ class BibDoc:
                     #(self.basedir, basename, extension, version), True)
                 shutil.copyfile(file, destination)
                 os.chmod(destination, 0644)
+        self.touch()
         self.BuildFileList()
 
     def getIcon(self):
@@ -440,12 +448,14 @@ class BibDoc:
                 fp.write(str(self.type))
                 fp.close()
                 os.umask(old_umask)
+        self.touch()
         self.BuildRelatedFileList()
 
     def deleteIcon(self):
         existingIcon = self.getIcon()
         if existingIcon is not None:
             existingIcon.delete()
+        self.touch()
         self.BuildRelatedFileList()
 
     def display(self, version="", ln = cdslang):
@@ -492,15 +502,16 @@ class BibDoc:
     def changeName(self, newname):
         """Rename the bibdoc name. New name must not be already used by the linked
         bibrecs."""
-        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
+        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, self.docname))
         if res:
-            raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
+            raise StandardError, "A bibdoc called %s already exists for recid %s" % (self.docname, self.recid)
         run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
         for f in os.listdir(self.basedir):
             if f.startswith(self.docname):
-                sh.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
+                shutil.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
         self.docname = newname
         Md5Folder(self.basedir).update()
+        self.touch()
         self.BuildFileList()
         self.BuildRelatedFileList()
 

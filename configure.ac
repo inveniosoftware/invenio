@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,50 +30,50 @@ AC_PROG_INSTALL
 AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://webserver.domain.com)]), WEBURL=${withval})
 if test -z "$WEBURL"; then
    AC_MSG_ERROR([
-   You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.  
+   You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.
    Example: "--with-weburl=http://webserver.domain.com".])
-fi   
+fi
 
 AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://webserver.domain.com)]), SWEBURL=${withval})
 if test -z "${SWEBURL}"; then
    SWEBURL="${WEBURL}"
    AC_MSG_WARN([
-   You have not specified secure URL for accessing the site (--with-sweburl). 
+   You have not specified secure URL for accessing the site (--with-sweburl).
    User authentication will be done in clear text across the network.
    ])
-fi   
+fi
 
 ## Define DBHOST database host:
 AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. sqlserver.domain.com)]), DBHOST=${withval})
 if test -z "$DBHOST"; then
    AC_MSG_ERROR([
-   You have not used the "--with-dbhost" argument that should define which DB server to use.  
+   You have not used the "--with-dbhost" argument that should define which DB server to use.
    Example: "--with-dbhost=sqlserver.domain.com".])
-fi   
+fi
 
 ## Define DBNAME database name:
 AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsinvenio)]), DBNAME=${withval})
 if test -z "$DBNAME"; then
    AC_MSG_ERROR([
-   You have not used the "--with-dbname" argument that should define DB name.  
+   You have not used the "--with-dbname" argument that should define DB name.
    Example: "--with-dbname=cdsinvenio".])
-fi   
+fi
 
 ## Define DBUSER user name:
 AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsinvenio)]), DBUSER=${withval})
 if test -z "$DBUSER"; then
    AC_MSG_ERROR([
-   You have not used the "--with-dbuser" argument that should define DB user name.  
+   You have not used the "--with-dbuser" argument that should define DB user name.
    Example: "--with-dbuser=cdsinvenio".])
-fi   
+fi
 
 ## Define DBPASS user password:
 AC_ARG_WITH(dbpass, AC_HELP_STRING([--with-dbpass], [specify DB user password (e.g. myp1ss)]), DBPASS=${withval})
 if test -z "$DBPASS"; then
    AC_MSG_ERROR([
-   You have not used the "--with-dbpass" argument that should define DB user password.  
+   You have not used the "--with-dbpass" argument that should define DB user password.
    Example: "--with-dbpass=myp1ss".])
-fi   
+fi
 
 ## Check for gettext support
 AM_GNU_GETTEXT(external)
@@ -83,7 +83,7 @@ AM_GNU_GETTEXT_VERSION(0.14.4)
 AC_PATH_PROG(WML, wml)
 if test -z "$WML"; then
    AC_MSG_ERROR([
-   WML (Website META Language) was not found in your PATH.  Please install it first.  
+   WML (Website META Language) was not found in your PATH.  Please install it first.
    Available from <http://www.engelschall.com/sw/wml/>.])
 fi
 
@@ -107,7 +107,7 @@ else
    AC_PATH_PROG(PYTHON, python)
    if test -z "$PYTHON"; then
       AC_MSG_ERROR([
-      Python was not found in your PATH.  Please either install it 
+      Python was not found in your PATH.  Please either install it
       in your PATH or specify --with-python configure option.
       Python is available from <http://python.org/>.])
    fi
@@ -128,10 +128,10 @@ AC_PATH_PROG(PHP, php)
 AC_PATH_PROG(ACROREAD, acroread)
 if test -z "$ACROREAD"; then
    AC_MSG_WARN([
-   Acrobat Reader was not found in your PATH.  It is used in 
-   the WebSubmit module for automatic conversion of submitted documents.  
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   Acrobat Reader was not found in your PATH.  It is used in
+   the WebSubmit module for automatic conversion of submitted documents.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Acrobat Reader is available from
    <http://www.adobe.com/products/acrobat/readstep.html>.])
 fi
@@ -140,10 +140,10 @@ fi
 AC_PATH_PROG(GZIP, gzip)
 if test -z "$GZIP"; then
    AC_MSG_WARN([
-   Gzip was not found in your PATH.  It is used in 
+   Gzip was not found in your PATH.  It is used in
    the WebSubmit module to compress the data submitted in an archive.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Gzip is available from
    <http://www.gzip.org/>.])
 fi
@@ -152,11 +152,11 @@ fi
 AC_PATH_PROG(GUNZIP, gunzip)
 if test -z "$GUNZIP"; then
    AC_MSG_WARN([
-   Gunzip was not found in your PATH.  It is used in 
+   Gunzip was not found in your PATH.  It is used in
    the WebSubmit module to correctly deal with submitted compressed
    files.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Gunzip is available from
    <http://www.gzip.org/>.])
 fi
@@ -165,10 +165,10 @@ fi
 AC_PATH_PROG(TAR, tar)
 if test -z "$TAR"; then
    AC_MSG_WARN([
-   Tar was not found in your PATH.  It is used in 
+   Tar was not found in your PATH.  It is used in
    the WebSubmit module to pack the submitted data into an archive.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Tar is available from
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
 fi
@@ -177,10 +177,10 @@ fi
 AC_PATH_PROG(PS2PDF, ps2pdf)
 if test -z "$PS2PDF"; then
    AC_MSG_WARN([
-   ps2pdf was not found in your PATH.  It is used in 
+   ps2pdf was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PostScripts into PDF.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  PS2PDF is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
 fi
@@ -189,11 +189,11 @@ fi
 AC_PATH_PROG(PDFTOTEXT, pdftotext)
 if test -z "$PDFTOTEXT"; then
    AC_MSG_WARN([
-   pdftotext was not found in your PATH.  It is used for the fulltext indexation 
+   pdftotext was not found in your PATH.  It is used for the fulltext indexation
    of PDF files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
-   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>. 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
+   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
    ])
 fi
 
@@ -201,10 +201,10 @@ fi
 AC_PATH_PROG(PSTOTEXT, pstotext)
 if test -z "$PSTOTEXT"; then
    AC_MSG_WARN([
-   pstotext was not found in your PATH.  It is used for the fulltext indexation 
+   pstotext was not found in your PATH.  It is used for the fulltext indexation
    of PDF and PostScript files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -213,10 +213,10 @@ fi
 AC_PATH_PROG(PSTOASCII, ps2ascii)
 if test -z "$PSTOASCII"; then
    AC_MSG_WARN([
-   ps2ascii was not found in your PATH.  It is used for the fulltext indexation 
+   ps2ascii was not found in your PATH.  It is used for the fulltext indexation
    of PostScript files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -225,11 +225,11 @@ fi
 AC_PATH_PROG(ANTIWORD, antiword)
 if test -z "$ANTIWORD"; then
    AC_MSG_WARN([
-   antiword was not found in your PATH.  It is used for the fulltext indexation 
+   antiword was not found in your PATH.  It is used for the fulltext indexation
    of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
-   script.  antiword is available from <http://www.winfield.demon.nl/index.html>. 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
+   script.  antiword is available from <http://www.winfield.demon.nl/index.html>.
    ])
 fi
 
@@ -237,10 +237,10 @@ fi
 AC_PATH_PROG(CATDOC, catdoc)
 if test -z "$CATDOC"; then
    AC_MSG_WARN([
-   catdoc was not found in your PATH.  It is used for the fulltext indexation 
+   catdoc was not found in your PATH.  It is used for the fulltext indexation
    of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
    ])
 fi
@@ -249,22 +249,22 @@ fi
 AC_PATH_PROG(WVTEXT, wvText)
 if test -z "$WVTEXT"; then
    AC_MSG_WARN([
-   wvText was not found in your PATH.  It is used for the fulltext indexation 
+   wvText was not found in your PATH.  It is used for the fulltext indexation
    of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  wvText is available from <http://sourceforge.net/projects/wvware>.
    ])
-fi     
+fi
 
 ## Check for ppthtml:
 AC_PATH_PROG(PPTHTML, ppthtml)
 if test -z "$PPTHTML"; then
    AC_MSG_WARN([
-   ppthtml was found in your PATH. It is used for the fulltext indexation 
+   ppthtml was found in your PATH. It is used for the fulltext indexation
    of Microsoft PowerPoint files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  ppthtml is available from <http://www.xlhtml.org/>.
    ])
 fi
@@ -273,10 +273,10 @@ fi
 AC_PATH_PROG(XLHTML, xlhtml)
 if test -z "$XLHTML"; then
    AC_MSG_WARN([
-   xlhtml was found in your PATH. It is used for the fulltext indexation 
+   xlhtml was found in your PATH. It is used for the fulltext indexation
    of Microsoft Excel files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
    ])
 fi
@@ -285,10 +285,10 @@ fi
 AC_PATH_PROG(HTMLTOTEXT, html2text)
 if test -z "$HTMLTOTEXT"; then
    AC_MSG_WARN([
-   html2text was found in your PATH. It is used for the fulltext indexation 
+   html2text was found in your PATH. It is used for the fulltext indexation
    of Microsoft PowerPoint and Excel files.
-   You can continue without it but you may miss fulltext searching capability 
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure 
+   You can continue without it but you may miss fulltext searching capability
+   of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
    ])
 fi
@@ -297,10 +297,10 @@ fi
 AC_PATH_PROG(GIFTEXT, giftext)
 if test -z "$GIFTEXT"; then
    AC_MSG_WARN([
-   Giftext was not found in your PATH.  It is used in 
+   Giftext was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Giftext is available from
    <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
 fi
@@ -309,10 +309,10 @@ fi
 AC_PATH_PROG(FILE, file)
 if test -z "$FILE"; then
    AC_MSG_WARN([
-   File was not found in your PATH.  It is used in 
+   File was not found in your PATH.  It is used in
    the WebSubmit module to check the validity of the submitted files.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  File is available from
    <ftp://ftp.astron.com/pub/file/>.])
 fi
@@ -321,10 +321,10 @@ fi
 AC_PATH_PROG(CONVERT, convert)
 if test -z "$CONVERT"; then
    AC_MSG_WARN([
-   Convert was not found in your PATH.  It is used in 
+   Convert was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDS Invenio 
-   functionality.  We recommend you to install it first and to rerun 
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
    the configure script.  Convert is available from
    <http://www.imagemagick.org/>.])
 fi
@@ -341,9 +341,9 @@ else
       GNU CLISP was not found in your PATH.  It is used by the WebStat
       module to produce statistics about CDS Invenio usage.  (Alternatively,
       SBCL or CMUCL can be used instead of CLISP.)
-      You can continue without it but you will miss this feature.  We 
+      You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CMUCL
-      nor SBCL) and to rerun the configure script.  
+      nor SBCL) and to rerun the configure script.
       GNU CLISP is available from <http://clisp.cons.org/>.])
    fi
 fi
@@ -357,18 +357,18 @@ else
    AC_PATH_PROG(CMUCL, cmucl)
    if test -z "$CMUCL"; then
       AC_MSG_CHECKING(for lisp) # CMUCL can also be installed under `lisp' exec name
-      AC_PATH_PROG(CMUCL, lisp) 
+      AC_PATH_PROG(CMUCL, lisp)
    fi
-   if test -z "$CMUCL"; then   
+   if test -z "$CMUCL"; then
       AC_MSG_WARN([
       CMUCL was not found in your PATH.  It is used by the WebStat
       module to produce statistics about CDS Invenio usage.  (Alternatively,
       CLISP or SBCL can be used instead of CMUCL.)
-      You can continue without it but you will miss this feature.  We 
+      You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CLISP
-      nor SBCL) and to rerun the configure script.  
+      nor SBCL) and to rerun the configure script.
       CMUCL is available from <http://www.cons.org/cmucl/>.])
-   fi    
+   fi
 fi
 
 ## Check for SBCL:
@@ -383,11 +383,11 @@ else
       SBCL was not found in your PATH.  It is used by the WebStat
       module to produce statistics about CDS Invenio usage.  (Alternatively,
       CLISP or CMUCL can be used instead of SBCL.)
-      You can continue without it but you will miss this feature.  We 
+      You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CLISP
-      nor CMUCL) and to rerun the configure script.  
+      nor CMUCL) and to rerun the configure script.
       SBCL is available from <http://sbcl.sourceforge.net/>.])
-   fi    
+   fi
 fi
 
 ## Check for gnuplot:
@@ -396,8 +396,8 @@ if test -z "$GNUPLOT"; then
    AC_MSG_WARN([
    Gnuplot was not found in your PATH.  It is used by the BibRank
    module to produce graphs about download and citation history.
-   You can continue without it but you will miss these graphs.  We 
-   recommend you to install it first and to rerun the configure script.  
+   You can continue without it but you will miss these graphs.  We
+   recommend you to install it first and to rerun the configure script.
    Gnuplot is available from <http://www.gnuplot.info/>.])
 fi
 
@@ -604,7 +604,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websearch/web/admin/Makefile \
 	  modules/websession/Makefile \
 	  modules/websession/bin/Makefile \
-	  modules/websession/bin/sessiongc \
+	  modules/websession/bin/inveniogc \
 	  modules/websession/doc/Makefile \
 	  modules/websession/doc/admin/Makefile \
 	  modules/websession/doc/hacking/Makefile \
@@ -677,8 +677,8 @@ AC_OUTPUT
 
 ## Write help:
 AC_MSG_RESULT([****************************************************************************])
-AC_MSG_RESULT([** Your CDS Invenio installation is now ready for building.               **]) 
-AC_MSG_RESULT([** You have entered the following parameters:                             **]) 
+AC_MSG_RESULT([** Your CDS Invenio installation is now ready for building.               **])
+AC_MSG_RESULT([** You have entered the following parameters:                             **])
 AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
 AC_MSG_RESULT([**   - Web home URL: $WEBURL])
 AC_MSG_RESULT([**   - Secure web home URL: $SWEBURL])

@@ -33,6 +33,7 @@ try:
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
+    from invenio.file import BibDoc
     import time
     import os
 except ImportError, e:
@@ -53,6 +54,8 @@ CFG_MAX_ATIME_ZIP_FMT = 7
 CFG_MAX_ATIME_RM_OAI = 28
 # After how many days to zip obsolete bibharvest fmt xml files
 CFG_MAX_ATIME_ZIP_OAI = 7
+# After how many days to remove deleted bibdocs
+CFG_DELETED_BIBDOC_MAXLIFE = 365*10
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -61,9 +64,9 @@ def gc_exec_command(command):
     write_messages(errors.read())
     write_messages(output.read())
 
-def clean_filesystem():
-    """ Clean the filesystem from obsolete files. """
-    write_message("""FILESYSTEM CLEANING STARTED""")
+def clean_logs():
+    """ Clean the logs from obsolete files. """
+    write_message("""LOGS CLEANING STARTED""")
     write_message("- deleting/gzipping bibsched empty/old err/log "
             "BibSched files")
     vstr = task_get_option('verbose') > 1 and '-v' or ''
@@ -106,8 +109,23 @@ def clean_filesystem():
     gc_exec_command('find %s -name "oai_archive*"'
         ' -atime +%s -exec rm %s -f {} \;' \
             % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
-    write_message("""FILESYSTEM CLEANING FINISHED""")
+    write_message("""LOGS CLEANING FINISHED""")
 
+def clean_documents():
+    """Delete all the bibdocs that have been set as deleted and have not been
+    modified since CFG_DELETED_BIBDOC_MAXLIFE days. Returns the number of
+    bibdocs involved."""
+    write_message("""OBSOLETED DELETED DOCUMENTS CLEANING STARTED""")
+    write_message("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE, verbose=9)
+    records = run_sql("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE)
+    for record in records:
+        bibdoc = BibDoc(record[0])
+        bibdoc.expunge()
+        write_message("DELETE FROM bibdoc WHERE id=%i" % int(record[0]), verbose=9)
+        run_sql("DELETE FROM bibdoc WHERE id=%s", (record[0], ))
+    write_message("""%s Obsoleted deleted documents cleaned""" % len(records))
+    write_message("""OBSOLETED DELETED DOCUMENTS CLEANING FINISHED""")
+    return len(records)
 
 def guest_user_garbage_collector():
     """Session Garbage Collector
@@ -280,7 +298,7 @@ def guest_user_garbage_collector():
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
 
-    # 5b - delete expired not confirmed email address
+    ## 5b - delete expired not confirmed email address
     write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
     delcount['email_addresses'] = run_sql("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS)
 
@@ -309,175 +327,29 @@ def guest_user_garbage_collector():
 
     return
 
-
-def test_insertdata():
-    """insert testdata for the garbage collector.
-    something will be deleted, other data kept.
-    test_checkdata() checks if the remains are correct."""
-
-    test_deletedata_nooutput()
-
-    print 'insert into session 6'
-    for (key, uid) in [('23A', 2000), ('24B', 2100), ('25C', 2200), ('26D', 2300)]:
-        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """, (key, time.time(), uid))
-    for (key, uid) in [('27E', 2400), ('28F', 2500)]:
-        run_sql("""INSERT INTO session (session_key, session_expiry, uid) values ('%s', %d, %s) """, (key, time.time()+20000, uid))
-
-    print 'insert into user 6'
-    for id in range(2000, 2600, 100):
-        run_sql("""INSERT INTO user (id, email) values (%s, '') """ % (id, ))
-
-    print 'insert into user_query 6'
-    for (id_user, id_query) in [(2000, 155), (2100, 231), (2200, 155), (2300, 574), (2400, 155), (2500, 988)]:
-        run_sql("""INSERT INTO user_query (id_user, id_query) values (%s, %s) """, (id_user, id_query))
-
-    print 'insert into query 4'
-    for (id, urlargs) in [(155, 'p=cern'), (231, 'p=muon'), (574, 'p=physics'), (988, 'cc=Atlantis+Institute+of+Science&as=0&p=')]:
-        run_sql("""INSERT INTO query (id, type, urlargs) values (%s, 'r', '%s') """, (id, urlargs))
-
-    print 'insert into basket 4'
-    for (id, name) in [(6, 'general'), (7, 'physics'), (8, 'cern'), (9, 'diverse')]:
-        run_sql("""INSERT INTO basket (id, name, public) values (%s, '%s', 'n')""", (id, name))
-
-    print 'insert into user_basket 4'
-    for (id_user, id_basket) in [(2000, 6), (2200, 7), (2200, 8), (2500, 9)]:
-        run_sql("""INSERT INTO user_basket (id_user, id_basket) values (%s, %s) """, (id_user, id_basket))
-
-    print 'insert into user_query_basket 2'
-    for (id_user, id_query, id_basket) in [(2200, 155, 6), (2500, 988, 9)]:
-        run_sql("""INSERT INTO user_query_basket (id_user, id_query, id_basket) values (%s, %s, %s) """, (id_user, id_query, id_basket))
-
-def test_deletedata():
-    """deletes all the testdata inserted in the insert function.
-    outputs how many entries are deleted"""
-
-    print 'delete from session',
-    print run_sql("DELETE FROM session WHERE uid IN (2000,2100,2200,2300,2400,2500) ")
-    print 'delete from user',
-    print run_sql("DELETE FROM user WHERE id IN (2000,2100,2200,2300,2400,2500) ")
-    print 'delete from user_query',
-    print run_sql("DELETE FROM user_query WHERE id_user IN (2000,2100,2200,2300,2400,2500) OR id_query IN (155,231,574,988) ")
-    print 'delete from query',
-    print run_sql("DELETE FROM query WHERE id IN (155,231,574,988) ")
-    print 'delete from basket',
-    print run_sql("DELETE FROM basket WHERE id IN (6,7,8,9) ")
-    print 'delete from user_basket',
-    print run_sql("DELETE FROM user_basket WHERE id_basket IN (6,7,8,9) OR id_user IN (2000, 2200, 2500) ")
-    print 'delete from user_query_basket',
-    print run_sql("DELETE FROM user_query_basket WHERE id_user IN (2200, 2500) ")
-
-
-def test_deletedata_nooutput():
-    """same as test_deletedata without output."""
-
-    run_sql("DELETE FROM session WHERE uid IN (2000,2100,2200,2300,2400,2500) ")
-    run_sql("DELETE FROM user WHERE id IN (2000,2100,2200,2300,2400,2500) ")
-    run_sql("DELETE FROM user_query WHERE id_user IN (2000,2100,2200,2300,2400,2500) OR id_query IN (155,231,574,988) ")
-    run_sql("DELETE FROM query WHERE id IN (155,231,574,988) ")
-    run_sql("DELETE FROM basket WHERE id IN (6,7,8,9) ")
-    run_sql("DELETE FROM user_basket WHERE id_basket IN (6,7,8,9) OR id_user IN (2000, 2200, 2500) ")
-    run_sql("DELETE FROM user_query_basket WHERE id_user IN (2200, 2500) ")
-
-
-def test_showdata():
-    print '\nshow test data:'
-
-    print '\n- select * from session:'
-    for r in run_sql("SELECT * FROM session WHERE session_key IN ('23A','24B','25C','26D','27E','28F') "): print r
-
-    print '\n- select * from user:'
-    for r in run_sql("SELECT * FROM user WHERE email = '' AND id IN (2000,2100,2200,2300,2400,2500) "): print r
-
-    print '\n- select * from user_query:'
-    for r in run_sql("SELECT * FROM user_query WHERE id_user IN (2000,2100,2200,2300,2400,2500) "): print r
-
-    print '\n- select * from query:'
-    for r in run_sql("SELECT * FROM query  WHERE id IN (155,231,574,988) "): print r
-
-    print '\n- select * from basket:'
-    for r in run_sql("SELECT * FROM basket WHERE id IN (6,7,8,9) "): print r
-
-    print '\n- select * from user_basket:'
-    for r in run_sql("SELECT * FROM user_basket WHERE id_basket IN (6,7,8,9)"): print r
-
-    print '\n- select * from user_query_basket:'
-    for r in run_sql("SELECT * FROM user_query_basket WHERE id_basket IN (6,7,8,9) "): print r
-
-
-def test_checkdata():
-    """checks wether the data in the database is correct after
-    the garbage collector has run.
-    test_insertdata must have been run followed by the gc for this to be true."""
-
-    result = run_sql("SELECT DISTINCT session_key"
-        " FROM session WHERE session_key"
-        " IN ('23A','24B','25C','26D','27E','28F') ")
-    if len(result) != 2: return 0
-    for r in [('27E', ), ('28F', )]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT id FROM user WHERE email = '' AND id IN (2000,2100,2200,2300,2400,2500) ")
-    if len(result) != 2: return 0
-    for r in [(2400, ), (2500, )]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT DISTINCT id_user FROM user_query WHERE id_user IN (2000,2100,2200,2300,2400,2500) ")
-    if len(result) != 2: return 0
-    for r in [(2400, ), (2500, )]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT id FROM query  WHERE id IN (155,231,574,988) ")
-    if len(result) != 2: return 0
-    for r in [(155, ), (988, )]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT id FROM basket WHERE id IN (6,7,8,9) ")
-    if len(result) != 1: return 0
-    for r in [(9, )]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT id_user, id_basket"
-        " FROM user_basket WHERE id_basket IN (6,7,8,9)")
-    if len(result) != 1: return 0
-    for r in [(2500, 9)]:
-        if r not in result: return 0
-
-    result = run_sql("SELECT id_user, id_query, id_basket"
-        " FROM user_query_basket WHERE id_basket IN (6,7,8,9) ")
-    if len(result) != 1: return 0
-    for r in [(2500, 988, 9)]:
-        if r not in result: return 0
-
-    return 1
-
-def test_runtest_guest_user_garbage_collector():
-    """a test to see if the garbage collector works correctly."""
-
-    test_insertdata()
-    test_showdata()
-    task_set_option('verbose', 9)
-    guest_user_garbage_collector()
-    test_showdata()
-    if test_checkdata():
-        print '\n\nGARBAGE COLLECTOR CLEANED ' \
-            'UP THE CORRECT DATA \n\n'
-    else:
-        print '\n\nERROR ERROR ERROR - WRONG DATA CLEANED - ' \
-            'ERROR ERROR ERROR \n\n'
-    test_deletedata_nooutput()
-    return
-
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('filesystem', False)
+    task_set_option('logs', False)
+    task_set_option('user', False)
+    task_set_option('documents', False)
     task_init(authorization_action='runsessiongc',
-            authorization_msg="SessionGC Task Submission",
-            help_specific_usage="  -f, --filesystem\t\t Clean up the"
-                " filesystem.\n",
+            authorization_msg="InvenioGC Task Submission",
+            help_specific_usage="  -l, --logs\t\t Clean up the"
+                " logs.\n" \
+                "  -u, --user\t\t Clean up exipired user related information.\n" \
+                "  -d, --documents\t\t Clean up old delete documents and revisions\n",
             version=__revision__,
-            specific_params=("f", ["filesystem"]),
+            specific_params=("lud", ["logs", "user", "documents"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+            task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
+
+def task_submit_check_options():
+    if not task_get_option('logs') and \
+       not task_get_option('user') and \
+       not task_get_option('documents'):
+        task_set_option('user', True)
+    return True
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key it checks it's meaning, eventually using the
@@ -490,16 +362,25 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         return True
     return False
     """
-    if key in ('-f', '--filesystem'):
-        task_set_option('filesystem', True)
+    if key in ('-l', '--logs'):
+        task_set_option('logs', True)
+        return True
+    elif key in ('-u', '--user'):
+        task_set_option('user', True)
+        return True
+    elif key in ('-d', '--documents'):
+        task_set_option('documents', True)
         return True
     return False
 
 def task_run_core():
     """ Reimplement to add the body of the task."""
-    guest_user_garbage_collector()
-    if task_get_option('filesystem'):
-        clean_filesystem()
+    if task_get_option('user'):
+        guest_user_garbage_collector()
+    if task_get_option('logs'):
+        clean_logs()
+    if task_get_option('documents'):
+        clean_documents()
     return True
 
 if __name__ == '__main__':
