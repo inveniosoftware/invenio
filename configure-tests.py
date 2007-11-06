@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
-cfg_min_mysqldb_version = "0.9.2"
+cfg_min_mysqldb_version = "1.2.1_p2"
 
 ## 0) import modules needed for this testing:
 import string
@@ -218,7 +218,7 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     *****************************************************
     ** WARNING: PYTHON MODULE MYSQLDB %s DETECTED
     *****************************************************
-    ** We strongly recommend you to upgrade `MySQLdb'  **
+    ** We strongly recommend you to upgrade MySQLdb    **
     ** to at least version %s.  See the INSTALL     **
     ** file for more details.                          **
     *****************************************************
