@@ -281,9 +281,10 @@ def record_add_field(rec, tag, ind1="", ind2="",
 
 def record_delete_field(rec, tag, ind1="", ind2="", field_number=None):
     """
-    delete all fields defined with marc tag 'tag' and indicators 'ind1' and 'ind2'
-    from record 'rec'. If field_number is specified, delete only the particualar
-    field_number.
+    Delete all/some fields defined with MARC tag 'tag' and indicators
+    'ind1' and 'ind2' from record 'rec'. If 'field_number' is None,
+    then delete all the field instances.  Otherwise delete only the
+    field instance corresponding to given 'field_number'.
     """
     (ind1, ind2) = wash_indicators(ind1, ind2)
 
