@@ -1017,6 +1017,38 @@ class WebSearchUnicodeQueryTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?of=id&p=title%3A%2F%CE%B7%2F',
                                                expected_text="[76]"))
 
+class WebSearchMARCQueryTest(unittest.TestCase):
+    """Test of the search results for queries containing physical MARC tags."""
+
+    def test_single_marc_tag_exact_phrase_query(self):
+        """websearch - single MARC tag, exact phrase query (100__a)"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=100__a%3A%22Ellis%2C+J%22',
+                                               expected_text="[9, 14, 18]"))
+
+    def test_single_marc_tag_partial_phrase_query(self):
+        """websearch - single MARC tag, partial phrase query (245__b)"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=245__b%3A%27and%27',
+                                               expected_text="[28]"))
+
+    def test_marc_many_tags_partial_phrase_query(self):
+        """websearch - many MARC tags, partial phrase query (245)"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=245%3A%27and%27',
+                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91]"))
+
+    def test_single_marc_tag_regexp_query(self):
+        """websearch - single MARC tag, regexp query"""
+        # NOTE: regexp queries for physical MARC tags (e.g. 245:/and/)
+        # are not treated by the search engine by purpose.  But maybe
+        # we should support them?!
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=245%3A%2Fand%2F',
+                                               expected_text="[]"))
+
+
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1034,7 +1066,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchResultsOverview,
                              WebSearchSortResultsTest,
                              WebSearchSearchResultsXML,
-                             WebSearchUnicodeQueryTest)
+                             WebSearchUnicodeQueryTest,
+                             WebSearchMARCQueryTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
