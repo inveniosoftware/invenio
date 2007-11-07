@@ -32,7 +32,8 @@ from invenio.config import \
      filedir, \
      filedirsize, \
      images, \
-     weburl
+     weburl, \
+     webdir
 from invenio.dbquery import run_sql
 from mimetypes import MimeTypes
 from invenio.access_control_engine import acc_authorize_action
@@ -305,9 +306,10 @@ class BibDoc:
                 self.type = type
                 self.docname = docname
                 self.status = ''
-                res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
-                if res:
-                    raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
+                if recid:
+                    res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
+                    if res:
+                        raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
                 self.id = run_sql("insert into bibdoc "
                     "(status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname,))
@@ -346,7 +348,7 @@ class BibDoc:
 
     def touch(self):
         """Update the modification time of the bibdoc."""
-        run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', self.id)
+        run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', (self.id, ))
 
     def setStatus(self, new_status):
         """Set a new status."""
@@ -431,23 +433,19 @@ class BibDoc:
         #then add the new one
         if not basename:
             basename = decompose_file(file)[1]
-        try:
-            newicon = BibDoc(type='Icon', docname=basename)
-        except StandardError:
-            pass
-        else:
-            newicon.addFilesNewVersion([file])
-            run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
-                (self.id, newicon.getId(),))
-            if os.path.exists(newicon.getBaseDir()):
-                old_umask = os.umask(022)
-                fp = open("%s/.docid" % newicon.getBaseDir(), "w")
-                fp.write(str(self.id))
-                fp.close()
-                fp = open("%s/.type" % newicon.getBaseDir(), "w")
-                fp.write(str(self.type))
-                fp.close()
-                os.umask(old_umask)
+        newicon = BibDoc(type='Icon', docname=basename)
+        newicon.addFilesNewVersion([file])
+        run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
+            (self.id, newicon.getId(),))
+        if os.path.exists(newicon.getBaseDir()):
+            old_umask = os.umask(022)
+            fp = open("%s/.docid" % newicon.getBaseDir(), "w")
+            fp.write(str(self.id))
+            fp.close()
+            fp = open("%s/.type" % newicon.getBaseDir(), "w")
+            fp.write(str(self.type))
+            fp.close()
+            os.umask(old_umask)
         self.touch()
         self.BuildRelatedFileList()
 
@@ -667,9 +665,11 @@ class BibDocFile:
                  size = self.size,
                )
 
-    def isRestricted(self):
+    def isRestricted(self, req):
         """return restriction state"""
-        return self.status != ''
+        if self.status not in ('', 'DELETED'):
+            return acc_authorize_action(req, 'viewrestrdoc', status=self.status)
+        return (0, '')
 
     def getType(self):
         return self.type
@@ -726,6 +726,19 @@ class BibDocFile:
                 raise StandardError, "%s does not exists!" % self.fullpath
         else:
             raise StandardError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
+
+def streamRestrictedIcon(req):
+    req.content_type = 'image/gif'
+    req.encoding = None
+    req.filename = 'restricted'
+    req.headers_out["Content-Disposition"] = \
+        "attachment; filename=%s" % quoteattr('restricted')
+    req.send_http_header()
+    fp = file('%s/img/restricted.gif' % webdir, "r")
+    content = fp.read()
+    fp.close()
+    return content
+
 
 def readfile(path):
     """Read the contents of a text file and return them as a string.

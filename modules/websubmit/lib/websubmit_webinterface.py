@@ -110,8 +110,9 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         except StandardError, msg:
                             return errorMsg(msg, req, cdsname, ln)
 
-                        if docfile.isRestricted():
-                            return warningMsg(_("This file is restricted!"), req, cdsname, ln)
+                        (auth_code, auth_message) = docfile.isRestricted(req)
+                        if auth_code != 0:
+                            return warningMsg(_("This file is restricted: ") + auth_message, req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
@@ -128,8 +129,10 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         except StandardError, msg:
                             return errorMsg(msg, req, cdsname, ln)
 
-                        if iconfile.isRestricted():
-                            return warningMsg(_("This Icon is restricted!"), req, cdsname, ln)
+                        (auth_code, auth_message) = iconfile.isRestricted(req)
+                        if auth_code != 0:
+                            return streamRestrictedIcon(req)
+                            #return warningMsg(_("This Icon is restricted: ") + auth_message, req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
