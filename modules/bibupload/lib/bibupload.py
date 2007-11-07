@@ -785,8 +785,8 @@ def elaborate_fft_tags(record, rec_id, mode):
             tmpurl = download_url(url, format)
             try:
                 bibdoc.addFilesNewFormat([tmpurl])
-            except StandardError:
-                write_message("('%s', '%s', '%s', '%s', '%s') not inserted because format already exists." % (url, format, docname, doctype, newname), stream=sys.stderr)
+            except StandardError, e:
+                write_message("('%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
             os.remove(tmpurl)
             return False
         except Exception, e:
@@ -809,7 +809,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             return False
         return True
 
-    def _add_new_icon(bibdoc, url):
+    def _add_new_icon(bibdoc, url, restriction):
         """Adds a new icon to an existing bibdoc, replacing the previous one if it exists. If url is empty, just remove the current icon."""
         if not url:
             bibdoc.deleteIcon()
@@ -821,8 +821,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                 tmpurl = download_url(url, format)
                 try:
                     bibdoc.addIcon(tmpurl, 'icon-%s' % bibdoc.getDocName())
+                    if restriction and restriction != 'KEEP-OLD-VALUE':
+                        bibdoc.setStatus(restriction)
                 except StandardError, e:
-                    write_message("('%s', '%s') icon added because '%s'." % (url, format, e), stream=sys.stderr)
+                    write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
                 os.remove(tmpurl)
                 return False
             except Exception, e:
@@ -954,7 +956,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 for (url, format) in urls:
                     _add_new_format(bibdoc, url, format, docname, doctype, newname)
                 if icon and not icon == 'KEEP-OLD-VALUE':
-                    _add_new_icon(bibdoc, icon)
+                    _add_new_icon(bibdoc, icon, restriction)
             elif mode == 'replace_or_insert': # more like correct_or_insert
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.listBibDocs():
@@ -985,13 +987,13 @@ def elaborate_fft_tags(record, rec_id, mode):
                             for (url, format) in other_urls:
                                 _add_new_format(bibdoc, url, format, docname, doctype, newname)
                         if icon != 'KEEP-OLD-VALUE':
-                            _add_new_icon(bibdoc, icon)
+                            _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     bibdoc = bibrecdocs.addBibDoc(doctype, newname)
                     for (url, format) in urls:
                         _add_new_format(bibdoc, url, format, docname, doctype, newname)
                     if icon and not icon == 'KEEP-OLD-VALUE':
-                        _add_new_icon(bibdoc, icon)
+                        _add_new_icon(bibdoc, icon, restriction)
             elif mode == 'correct':
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.listBibDocs():
@@ -1019,7 +1021,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                             for (url, format) in other_urls:
                                 _add_new_format(bibdoc, url, format, docname, description, doctype, newname)
                         if icon != 'KEEP-OLD-VALUE':
-                            _add_new_icon(bibdoc, icon)
+                            _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
             elif mode == 'append':
@@ -1030,7 +1032,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                         for (url, format) in urls:
                             _add_new_format(bibdoc, first_url, first_format, docname, doctype, newname)
                         if icon not in ('', 'KEEP-OLD-VALUE'):
-                            _add_new_icon(bibdoc, icon)
+                            _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     try:
                         bibdoc = bibrecdocs.addBibDoc(doctype, docname)
@@ -1038,7 +1040,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                         for (url, format) in urls:
                             _add_new_format(bibdoc, first_url, first_format, docname, doctype, newname)
                         if icon and not icon == 'KEEP-OLD-VALUE':
-                            _add_new_icon(bibdoc, icon)
+                            _add_new_icon(bibdoc, icon, restriction)
                     except Exception, e:
                         write_message("('%s', '%s', '%s') not appended." % (doctype, newname, urls), stream=sys.stderr)
         return _synchronize_8564(rec_id, record, descriptions, comments, changed)
@@ -1095,7 +1097,6 @@ def update_bibrec_modif_date(now, bibrec_id):
 
 def update_bibfmt_format(id_bibrec, format_value, format_name):
     """Update the format in the table bibfmt"""
-
     # We check if the format is already in bibFmt
     nb_found = find_record_format(id_bibrec, format_name)
 
@@ -1352,7 +1353,7 @@ def wipe_out_record_from_all_tables(recid):
 
 def delete_bibdoc(id_bibrec):
     """Delete document from bibdoc which correspond to the bibrec id given in parameter"""
-    query = """UPDATE bibdoc SET status='deleted'
+    query = """UPDATE bibdoc SET status='DELETED'
                 WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc
                               WHERE id_bibrec=%s)"""
     params = (id_bibrec,)
