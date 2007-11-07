@@ -1699,7 +1699,7 @@ def search_unit_in_bibxxx(p, f, type):
             query = "SELECT id FROM bibrec WHERE id %s" % query_addons
         else:
             if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE '%s%%'" % \
+                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE '%s%%%%'" % \
                         (bx, bibx, query_addons, t)
             else:
                 query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag='%s'" % \
