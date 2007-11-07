@@ -1032,7 +1032,7 @@ class WebSearchMARCQueryTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?of=id&p=245__b%3A%27and%27',
                                                expected_text="[28]"))
 
-    def test_marc_many_tags_partial_phrase_query(self):
+    def test_many_marc_tags_partial_phrase_query(self):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?of=id&p=245%3A%27and%27',
@@ -1046,7 +1046,6 @@ class WebSearchMARCQueryTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?of=id&p=245%3A%2Fand%2F',
                                                expected_text="[]"))
-
 
 
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
