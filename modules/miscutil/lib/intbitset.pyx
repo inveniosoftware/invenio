@@ -37,7 +37,7 @@ you will receive unpredictable results.
 
 Note to Invenio developers: If you make modification to this file you
 have to manually regenerate intbitset.c by running:
-  $ cython intbitset.pyx
+  $ pyrexc intbitset.pyx
 and then commit generated intbitset.c to CVS.
 """
 
