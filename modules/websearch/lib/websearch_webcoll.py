@@ -40,7 +40,7 @@ from invenio.config import \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
-from invenio.dbquery import run_sql, escape_string, Error, get_table_update_time
+from invenio.dbquery import run_sql, Error, get_table_update_time
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
@@ -135,9 +135,9 @@ class Collection:
             self.reclist = HitSet()
         else:
             self.name = name
-            query = "SELECT id,name,dbquery,nbrecs,reclist FROM collection WHERE name='%s'" % escape_string(name)
             try:
-                res = run_sql(query, None, 1)
+                res = run_sql("""SELECT id,name,dbquery,nbrecs,reclist FROM collection
+                                  WHERE name=%s""", (name,))
                 if res:
                     self.id = res[0][0]
                     self.name = res[0][1]
