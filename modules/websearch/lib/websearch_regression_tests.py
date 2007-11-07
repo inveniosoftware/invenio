@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
@@ -217,7 +218,7 @@ class WebSearchTestCollections(unittest.TestCase):
         """ websearch - traverse all the publications of a collection """
 
         browser = Browser()
-        
+
         try:
             for as in (0, 1):
                 browser.open(make_url('/collection/Preprints', as=as))
@@ -983,6 +984,39 @@ class WebSearchSearchResultsXML(unittest.TestCase):
             self.fail("Oops, multiple document elements </collection> "
                       "found in search results.")
 
+class WebSearchUnicodeQueryTest(unittest.TestCase):
+    """Test of the search results for queries containing Unicode characters."""
+
+    def test_unicode_word_query(self):
+        """websearch - Unicode word query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=title%3A%CE%99%CE%B8%CE%AC%CE%BA%CE%B7',
+                                               expected_text="[76]"))
+
+    def test_unicode_word_query_not_found_term(self):
+        """websearch - Unicode word query, not found term"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=title%3A%CE%99%CE%B8',
+                                               expected_text="Ιθάκη"))
+
+    def test_unicode_exact_phrase_query(self):
+        """websearch - Unicode exact phrase query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=title%3A%22%CE%99%CE%B8%CE%AC%CE%BA%CE%B7%22',
+                                               expected_text="[76]"))
+
+    def test_unicode_partial_phrase_query(self):
+        """websearch - Unicode partial phrase query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=title%3A%27%CE%B7%27',
+                                               expected_text="[76]"))
+
+    def test_unicode_regexp_query(self):
+        """websearch - Unicode regexp query"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?of=id&p=title%3A%2F%CE%B7%2F',
+                                               expected_text="[76]"))
+
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -999,7 +1033,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchXSSVulnerabilityTest,
                              WebSearchResultsOverview,
                              WebSearchSortResultsTest,
-                             WebSearchSearchResultsXML)
+                             WebSearchSearchResultsXML,
+                             WebSearchUnicodeQueryTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
