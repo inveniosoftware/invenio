@@ -109,7 +109,7 @@ cdef class intbitset:
     cdef IntBitSet *bitset
     cdef bool_t sanity_checks
 
-    def __new__(self, rhs=0, int preallocate=-1, int trailing_bits=0, sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
+    def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bool_t sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
         """
         Initialize intbitset.
         * rhs can be:
@@ -685,7 +685,7 @@ cdef class intbitset_iterator:
     cdef int last
     cdef IntBitSet *bitset
 
-    def __new__(self, intbitset bitset not None):
+    def __cinit__(self, intbitset bitset not None):
         self.last = -1
         self.bitset = bitset.bitset
 
