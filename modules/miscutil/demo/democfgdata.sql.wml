@@ -3,7 +3,9 @@
 
 INSERT INTO accROLE VALUES (4,'thesesviewer','theses viewer',NULL,'allow group "Theses viewers"\nallow apache_group "theses"');
 INSERT INTO accARGUMENT VALUES (2,'collection','Theses');
+INSERT INTO accARGUMENT VALUES (3, 'status', 'RestrictedDoc');
 INSERT INTO accROLE_accACTION_accARGUMENT VALUES (4,22,2,1);
+INSERT INTO accROLE_accACTION_accARGUMENT VALUES (4,24,3,2);
 INSERT INTO user_accROLE VALUES (1,4,'9999-12-31 23:59:59');
 INSERT INTO user VALUES (2,'jekyll@cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll','');
 INSERT INTO user VALUES (3,'hyde@cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde','');
