@@ -191,7 +191,8 @@ update-v0.92.0-tables: local-dbexec
 
 update-v0.92.1-tables: local-dbexec
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "UPDATE bibdoc SET status='DELETED' WHERE status='deleted';" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE bibdoc SET status='DELETED' WHERE status='1';" | ./modules/miscutil/bin/dbexec
+	echo "UPDATE bibdoc SET status='' WHERE status='0';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
