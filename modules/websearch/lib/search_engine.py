@@ -74,7 +74,7 @@ webcomment_templates = invenio.template.load('webcomment')
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
-from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, escape_string, Error
+from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
 try:
     from mod_python import apache
     from invenio.webuser import getUid
@@ -345,10 +345,9 @@ def get_index_id(field):
        Returns zero in case there is no table for this index.
        Example: field='author', output=4."""
     out = 0
-    query = """SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
-                WHERE f.code='%s' AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
-                LIMIT 1""" % escape_string(field)
-    res = run_sql(query, None, 1)
+    res = run_sql("""SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
+                      WHERE f.code=%s AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
+                      LIMIT 1""", (field,))
     if res:
         out = res[0][0]
     return out
@@ -927,8 +926,12 @@ def wash_colls(cc, c, split_colls=0):
         colls = [cc]
 
     # then let us check the list of non-restricted "real" sons of 'cc' and compare it to 'coll':
-    query = "SELECT c.name FROM collection AS c, collection_collection AS cc, collection AS ccc WHERE c.id=cc.id_son AND cc.id_dad=ccc.id AND ccc.name='%s' AND cc.type='r' AND c.restricted IS NULL" % escape_string(cc)
-    res = run_sql(query)
+    res = run_sql("""SELECT c.name FROM collection AS c,
+                                        collection_collection AS cc,
+                                        collection AS ccc
+                     WHERE c.id=cc.id_son AND cc.id_dad=ccc.id
+                       AND ccc.name=%s AND cc.type='r'
+                       AND c.restricted IS NULL""", (cc,))
     l_cc_nonrestricted_sons = []
     l_c = colls
     for row in res:
@@ -1165,12 +1168,11 @@ def get_coll_ancestors(coll):
     coll_ancestors = []
     coll_ancestor = coll
     while 1:
-        query = "SELECT c.name FROM collection AS c "\
-                "LEFT JOIN collection_collection AS cc ON c.id=cc.id_dad "\
-                "LEFT JOIN collection AS ccc ON ccc.id=cc.id_son "\
-                "WHERE ccc.name='%s' ORDER BY cc.id_dad ASC LIMIT 1" \
-                % escape_string(coll_ancestor)
-        res = run_sql(query, None, 1)
+        res = run_sql("""SELECT c.name FROM collection AS c
+                          LEFT JOIN collection_collection AS cc ON c.id=cc.id_dad
+                          LEFT JOIN collection AS ccc ON ccc.id=cc.id_son
+                          WHERE ccc.name=%s ORDER BY cc.id_dad ASC LIMIT 1""",
+                      (coll_ancestor,))
         if res:
             coll_name = res[0][0]
             coll_ancestors.append(coll_name)
@@ -1189,12 +1191,11 @@ def get_coll_sons(coll, type='r', public_only=1):
     query = "SELECT c.name FROM collection AS c "\
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
-            "WHERE cc.type='%s' AND ccc.name='%s'" \
-            % (escape_string(type), escape_string(coll))
+            "WHERE cc.type=%s AND ccc.name=%s"
     if public_only:
         query += " AND c.restricted IS NULL "
     query += " ORDER BY cc.score DESC"
-    res = run_sql(query)
+    res = run_sql(query, (type, coll))
     for name in res:
         coll_sons.append(name[0])
     return coll_sons
@@ -1205,12 +1206,11 @@ def get_coll_real_descendants(coll):
        that "A & B" has no associated database query defined.
     """
     coll_sons = []
-    query = "SELECT c.name,c.dbquery FROM collection AS c "\
-            "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
-            "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
-            "WHERE ccc.name='%s' ORDER BY cc.score DESC" \
-            % escape_string(coll)
-    res = run_sql(query)
+    res = run_sql("""SELECT c.name,c.dbquery FROM collection AS c
+                     LEFT JOIN collection_collection AS cc ON c.id=cc.id_son
+                     LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad
+                     WHERE ccc.name=%s ORDER BY cc.score DESC""",
+                  (coll,))
     for name, dbquery in res:
         if dbquery: # this is 'real' collection, so return it:
             coll_sons.append(name)
@@ -1247,8 +1247,7 @@ def coll_restricted_p(coll):
     "Predicate to test if the collection coll is restricted or not."
     if not coll:
         return 0
-    query = "SELECT restricted FROM collection WHERE name='%s'" % escape_string(coll)
-    res = run_sql(query, None, 1)
+    res = run_sql("SELECT restricted FROM collection WHERE name=%s", (coll,))
     if res and res[0][0] is not None:
         return 1
     else:
@@ -1258,8 +1257,7 @@ def coll_restricted_group(coll):
     "Return Apache group to which the collection is restricted.  Return None if it's public."
     if not coll:
         return None
-    query = "SELECT restricted FROM collection WHERE name='%s'" % escape_string(coll)
-    res = run_sql(query, None, 1)
+    res = run_sql("SELECT restricted FROM collection WHERE name=%s", (coll,))
     if res:
         return res[0][0]
     else:
@@ -1509,8 +1507,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
-                                                                                                                        'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"})
+                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % \
+                                      {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
+                                       'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"})
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
@@ -1655,20 +1654,26 @@ def search_unit_in_bibxxx(p, f, type):
     """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     p_orig = p # saving for eventual future 'no match' reporting
+    query_addons = "" # will hold additional SQL code for the query
+    query_params = () # will hold parameters for the query (their number may vary depending on TYPE argument)
     # wash arguments:
     f = string.replace(f, '*', '%') # replace truncation char '*' in field definition
     if type == 'r':
-        pattern = "REGEXP '%s'" % escape_string(p)
+        query_addons = "REGEXP %s"
+        query_params = (p,)
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
         if len(ps) == 2:
-            pattern = "BETWEEN '%s' AND '%s'" % (escape_string(ps[0]), escape_string(ps[1]))
+            query_addons = "BETWEEN %s AND %s"
+            query_params = (ps[0], ps[1])
         else:
             if string.find(p, '%') > -1:
-                pattern = "LIKE '%s'" % escape_string(ps[0])
+                query_addons = "LIKE %s"
+                query_params = (ps[0],)
             else:
-                pattern = "='%s'" % escape_string(ps[0])
+                query_addons = "=%s"
+                query_params = (ps[0],)
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
@@ -1691,16 +1696,16 @@ def search_unit_in_bibxxx(p, f, type):
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         # construct query:
         if t == "001":
-            query = "SELECT id FROM bibrec WHERE id %s" % pattern
+            query = "SELECT id FROM bibrec WHERE id %s" % query_addons
         else:
             if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
                 query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE '%s%%'" % \
-                        (bx, bibx, pattern, t)
+                        (bx, bibx, query_addons, t)
             else:
                 query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag='%s'" % \
-                        (bx, bibx, pattern, t)
+                        (bx, bibx, query_addons, t)
         # launch the query:
-        res = run_sql(query)
+        res = run_sql(query, query_params)
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
@@ -1822,12 +1827,13 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
             bibx = "bibrec_bib%d%dx" % (digit1, digit2)
             if len(tag) != 6 or tag[-1:]=='%':
                 # only the beginning of field 't' is defined, so add wildcard character:
-                query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag LIKE '%s%%'" \
-                        % (bx, escape_string(name), tag)
+                res = run_sql("""SELECT bx.value FROM %s AS bx
+                                  WHERE bx.value LIKE %%s AND bx.tag LIKE %%s""" % bx,
+                              (name + "%", tag + "%"))
             else:
-                query = "SELECT bx.value FROM %s AS bx WHERE bx.value LIKE '%s%%' AND bx.tag='%s'" \
-                        % (bx, escape_string(name), tag)
-            res = run_sql(query)
+                res = run_sql("""SELECT bx.value FROM %s AS bx
+                                  WHERE bx.value LIKE %%s AND bx.tag=%%s""" % bx,
+                              (name + "%", tag))
             for row in res:
                 similar_author_names[row[0]] = 1
     # remove the original name and sort the list:
@@ -1928,16 +1934,16 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
         else:
             return nearest_words
     # firstly try to get `n' closest words above `p':
-    query = "SELECT term FROM %s WHERE term<'%s' ORDER BY term DESC LIMIT %d" % (bibwordsX, escape_string(p), n_above)
-    res = run_sql(query)
+    res = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % bibwordsX,
+                  (p, n_above))
     for row in res:
         nearest_words.append(row[0])
     nearest_words.reverse()
     # secondly insert given word `p':
     nearest_words.append(p)
     # finally try to get `n' closest words below `p':
-    query = "SELECT term FROM %s WHERE term>'%s' ORDER BY term ASC LIMIT %d" % (bibwordsX, escape_string(p), n_below)
-    res = run_sql(query)
+    res = run_sql("SELECT term FROM %s WHERE term>%%s ORDER BY term ASC LIMIT %%s" % bibwordsX,
+                  (p, n_below))
     for row in res:
         nearest_words.append(row[0])
     return nearest_words
@@ -1973,22 +1979,28 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         # firstly try to get `n' closest phrases above `p':
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value DESC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_fetch)
+            res = run_sql("""SELECT bx.value FROM %s AS bx
+                              WHERE bx.value<%%s AND bx.tag LIKE %%s
+                              ORDER BY bx.value DESC LIMIT %%s""" % bx,
+                          (p, t + "%", n_fetch))
         else:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value<'%s' AND bx.tag='%s' ORDER BY bx.value DESC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_fetch)
-        res = run_sql(query)
+            res = run_sql("""SELECT bx.value FROM %s AS bx
+                              WHERE bx.value<%%s AND bx.tag=%%s
+                              ORDER BY bx.value DESC LIMIT %%s""" % bx,
+                          (p, t, n_fetch))
         for row in res:
             browsed_phrases[row[0]] = 1
         # secondly try to get `n' closest phrases equal to or below `p':
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>='%s' AND bx.tag LIKE '%s%%' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_fetch)
+            res = run_sql("""SELECT bx.value FROM %s AS bx
+                              WHERE bx.value>=%%s AND bx.tag LIKE %%s
+                              ORDER BY bx.value ASC LIMIT %%s""" % bx,
+                          (p, t + "%", n_fetch))
         else:
-            query = "SELECT bx.value FROM %s AS bx WHERE bx.value>='%s' AND bx.tag='%s' ORDER BY bx.value ASC LIMIT %d" \
-                    % (bx, escape_string(p), t, n_fetch)
-        res = run_sql(query)
+            res = run_sql("""SELECT bx.value FROM %s AS bx
+                              WHERE bx.value>=%%s AND bx.tag=%%s
+                              ORDER BY bx.value ASC LIMIT %%s""" % bx,
+                          (p, t, n_fetch))
         for row in res:
             browsed_phrases[row[0]] = 1
     # select first n words only: (this is needed as we were searching
@@ -2018,8 +2030,8 @@ def get_nbhits_in_bibwords(word, f):
         else:
             return 0
     if word:
-        query = "SELECT hitlist FROM %s WHERE term='%s'" % (bibwordsX, escape_string(word))
-        res = run_sql(query)
+        res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % bibwordsX,
+                      (word,))
         for hitlist in res:
             out += len(HitSet(hitlist[0]))
     return out
@@ -2044,14 +2056,15 @@ def get_nbhits_in_bibxxx(p, f):
         bx = "bib%d%dx" % (digit1, digit2)
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
         if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-            query = """SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
-                        WHERE bx.value='%s' AND bx.tag LIKE '%s%%' AND bibx.id_bibxxx=bx.id""" \
-                     % (bibx, bx, escape_string(p), t)
+            res = run_sql("""SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
+                              WHERE bx.value=%%s AND bx.tag LIKE %%s
+                                AND bibx.id_bibxxx=bx.id""" % (bibx, bx),
+                          (p, t + "%"))
         else:
-            query = """SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
-                        WHERE bx.value='%s' AND bx.tag='%s' AND bibx.id_bibxxx=bx.id""" \
-                     % (bibx, bx, escape_string(p), t)
-        res = run_sql(query)
+            res = run_sql("""SELECT bibx.id_bibrec FROM %s AS bibx, %s AS bx
+                              WHERE bx.value=%%s AND bx.tag=%%s
+                                AND bibx.id_bibxxx=bx.id""" % (bibx, bx),
+                          (p, t))
         for row in res:
             recIDs[row[0]] = 1
     return len(recIDs)
@@ -2060,9 +2073,9 @@ def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns DB's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").
        Returns None in case of failure."""
     out = None
-    query = "SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b WHERE b.value='%s' AND b.tag='970__a' AND bb.id_bibxxx=b.id" % \
-            (escape_string(sysno))
-    res = run_sql(query, None, 1)
+    res = run_sql("""SELECT bb.id_bibrec FROM bibrec_bib97x AS bb, bib97x AS b
+                      WHERE b.value=%s AND b.tag='970__a' AND bb.id_bibxxx=b.id""",
+                  (sysno,))
     if res:
         out = res[0][0]
     return out
