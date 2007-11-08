@@ -39,7 +39,7 @@ from invenio.config import \
      version, \
      weburl
 import invenio.access_control_engine as access_manager
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 from invenio.oaiarchive_engine import parse_set_definition
@@ -333,40 +333,37 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
                          'p3=' + oai_set_p3  + ';' + \
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
-        sql = """UPDATE oaiARCHIVE SET
-        setName='%s',
-        setSpec='%s',
-        setCollection='%s',
-        setDescription='%s',
-        setDefinition='%s',
-        p1='%s',
-        f1='%s',
-        m1='%s',
-        p2='%s',
-        f2='%s',
-        m2='%s',
-        p3='%s',
-        f3='%s',
-        m3='%s'
-        WHERE id=%s""" % (
-            escape_string(oai_set_name), \
-            escape_string(oai_set_spec), \
-            escape_string(oai_set_collection), \
-            escape_string(oai_set_description), \
-            escape_string(set_definition), \
-            escape_string(oai_set_p1), \
-            escape_string(oai_set_f1), \
-            escape_string(oai_set_m1), \
-            escape_string(oai_set_p2), \
-            escape_string(oai_set_f2), \
-            escape_string(oai_set_m2), \
-            escape_string(oai_set_p3), \
-            escape_string(oai_set_f3), \
-            escape_string(oai_set_m3),  \
-            oai_set_id \
-            )
-
-        res = run_sql(sql)
+        res = run_sql("""UPDATE oaiARCHIVE SET
+                            setName=%s,
+                            setSpec=%s',
+                            setCollection=%s,
+                            setDescription=%s,
+                            setDefinition=%s,
+                            p1=%s,
+                            f1=%s,
+                            m1=%s,
+                            p2=%s,
+                            f2=%s,
+                            m2=%s,
+                            p3=%s,
+                            f3=%s,
+                            m3=%s
+                         WHERE id=%s""",
+                      (oai_set_name,
+                       oai_set_spec,
+                       oai_set_collection,
+                       oai_set_description,
+                       set_definition,
+                       oai_set_p1,
+                       oai_set_f1,
+                       oai_set_m1,
+                       oai_set_p2,
+                       oai_set_f2,
+                       oai_set_m2,
+                       oai_set_p3,
+                       oai_set_f3,
+                       oai_set_m3,
+                       oai_set_id))
 
         return (1, "")
     except StandardError, e:
@@ -386,24 +383,11 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descript
                          'p3=' + oai_set_p3  + ';' + \
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
-        sql = "insert into oaiARCHIVE values (0, '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (
-            escape_string(oai_set_name), \
-            escape_string(oai_set_spec), \
-            escape_string(oai_set_collection), \
-            escape_string(oai_set_description), \
-            escape_string(set_definition), \
-            escape_string(oai_set_p1), \
-            escape_string(oai_set_f1), \
-            escape_string(oai_set_m1), \
-            escape_string(oai_set_p2), \
-            escape_string(oai_set_f2), \
-            escape_string(oai_set_m2), \
-            escape_string(oai_set_p3), \
-            escape_string(oai_set_f3), \
-            escape_string(oai_set_m3)  \
-            )
-
-        res = run_sql(sql)
+        res = run_sql("INSERT INTO oaiARCHIVE VALUES (0, %s, %s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                      (oai_set_name, oai_set_spec, oai_set_collection,
+                       oai_set_description, set_definition, oai_set_p1,
+                       oai_set_f1, oai_set_m1, oai_set_p2, oai_set_f2,
+                       oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3))
         return (1, "")
     except StandardError, e:
         return (0, e)
