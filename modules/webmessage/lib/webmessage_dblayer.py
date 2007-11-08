@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 from time import localtime, mktime
 
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
@@ -109,12 +109,11 @@ def set_message_status(uid, msgid, new_status):
     @return 1 if succes, 0 if not
     """
 
-    query  = """UPDATE user_msgMESSAGE
-                SET    status='%s'
-                WHERE  id_user_to=%i AND
-                       id_msgMESSAGE=%i"""
-    params = (escape_string(new_status), uid, msgid)
-    return int(run_sql(query%params))
+    return int(run_sql("""UPDATE user_msgMESSAGE
+                             SET    status=%s
+                           WHERE  id_user_to=%s AND
+                                  id_msgMESSAGE=%s""",
+                       (new_status, uid, msgid)))
 
 def get_nb_new_messages_for_user(uid):
     """ Get number of new mails for a given user
@@ -123,12 +122,11 @@ def get_nb_new_messages_for_user(uid):
     """
     update_user_inbox_for_reminders(uid)
     new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
-    query = """SELECT count(id_msgMESSAGE)
-               FROM user_msgMESSAGE
-               WHERE id_user_to=%i AND
-                     BINARY status='%s'"""
-    params = (int(uid), escape_string(new_status))
-    res = run_sql(query% params)
+    res = run_sql("""SELECT count(id_msgMESSAGE)
+                       FROM user_msgMESSAGE
+                      WHERE id_user_to=%s AND
+                       BINARY status=%s""",
+                  (uid, new_status))
     if res:
         return res[0][0]
     return 0
@@ -165,7 +163,7 @@ def get_all_messages_for_user(uid):
     """
     update_user_inbox_for_reminders(uid)
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
-    query = """SELECT  m.id,
+    return run_sql("""SELECT  m.id,
                        m.id_user_from,
                        u.nickname,
                        m.subject,
@@ -174,16 +172,12 @@ def get_all_messages_for_user(uid):
                 FROM   user_msgMESSAGE um,
                        msgMESSAGE m,
                        user u
-                WHERE  um.id_user_to = %(user_to)i AND
-                       !(BINARY um.status='%(status)s') AND
+                WHERE  um.id_user_to = %s AND
+                       !(BINARY um.status=%s) AND
                        um.id_msgMESSAGE=m.id AND
                        u.id=m.id_user_from
                 ORDER BY m.sent_date DESC
-                """
-    params = {'user_to': int(uid),
-               'status': escape_string(reminder_status)
-              }
-    return run_sql(query%params)
+                """, (uid, reminder_status))
 
 def count_nb_messages(uid):
     """
@@ -273,17 +267,22 @@ def get_uids_from_nicks(nicks):
     @param nicks: list or sequence of strings, each string being a nickname
     @return a dictionary {nickname: uid}
     """
+    # FIXME: test case
     if not((type(nicks) is list) or (type(nicks) is tuple)):
         nicks = [nicks]
     users = {}
-    query = "SELECT nickname, id FROM user WHERE BINARY nickname in("
+    query = "SELECT nickname, id FROM user WHERE BINARY nickname IN ("
+    query_params = ()
     if len(nicks)> 0:
         for nick in nicks:
             users[nick] = None
-        for nick in users.keys()[0:-1]:
-            query += "'%s'," % escape_string(nick)
-        query += "'%s')" % escape_string(users.keys()[-1])
-        res = run_sql(query)
+        users_keys = users.keys()
+        for nick in users_keys[0:-1]:
+            query += "%s,"
+            query_params += (nick,)
+        query += "%s)"
+        query_params += (users_keys[-1],)
+        res = run_sql(query, query_params)
         def enter_dict(couple):
             """ takes a a tuple and enters it into dict users """
             users[couple[0]] = int(couple[1])
@@ -317,17 +316,22 @@ def get_gids_from_groupnames(groupnames):
     @param groupnames: list or sequence of strings, each string being a groupname
     @return a dictionary {groupname: gid}
     """
+    # FIXME: test case
     if not((type(groupnames) is list) or (type(groupnames) is tuple)):
         groupnames = [groupnames]
     groups = {}
-    query = "SELECT name, id FROM usergroup WHERE BINARY name in("
+    query = "SELECT name, id FROM usergroup WHERE BINARY name IN ("
+    query_params = ()
     if len(groupnames) > 0:
         for groupname in groupnames:
             groups[groupname] = None
-        for groupname in groups.keys()[0:-1]:
-            query += "'%s'," % escape_string(groupname)
-        query += "'%s')" % escape_string(groups.keys()[-1])
-        res = run_sql(query)
+            groups_keys = groups.keys()
+        for groupname in groups_keys[0:-1]:
+            query += "%s,"
+            query_params += (groupname,)
+        query += "%s)"
+        query_params += (groups_keys[-1],)
+        res = run_sql(query, query_params)
         def enter_dict(couple):
             """ enter a tuple into dictionary groups """
             groups[couple[0]] = int(couple[1])
@@ -380,22 +384,21 @@ def create_message(uid_from,
     @return id of the created message
     """
     now = convert_datestruct_to_datetext(localtime())
-    query = """INSERT INTO msgMESSAGE(id_user_from,
+    msg_id = run_sql("""INSERT INTO msgMESSAGE(id_user_from,
                                       sent_to_user_nicks,
                                       sent_to_group_names,
                                       subject,
                                       body,
                                       sent_date,
                                       received_date)
-             VALUES(%i,'%s','%s','%s','%s','%s','%s')"""
-    params = (int(uid_from),
-              escape_string(users_to_str),
-              escape_string(groups_to_str),
-              escape_string(msg_subject),
-              escape_string(msg_body),
-              escape_string(now),
-              escape_string(msg_send_on_date))
-    msg_id = run_sql(query%params)
+             VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                     (uid_from,
+                      users_to_str,
+                      groups_to_str,
+                      msg_subject,
+                      msg_body,
+                      now,
+                      msg_send_on_date))
     return int(msg_id)
 
 def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
@@ -492,9 +495,7 @@ def update_user_inbox_for_reminders(uid):
 def get_nicknames_like(pattern):
     """get nicknames like pattern"""
     if pattern:
-        query = "SELECT nickname FROM user WHERE nickname RLIKE '%s'"
-        pattern = escape_string(pattern)
-        res = run_sql(query%pattern)
+        res = run_sql("SELECT nickname FROM user WHERE nickname RLIKE %s", (pattern,))
         return res
     return ()
 
@@ -504,9 +505,8 @@ def get_groupnames_like(uid, pattern):
     groups = {}
     if pattern:
         # For this use case external groups are like invisible one
-        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE '%s' AND join_policy like 'V%%' AND        join_policy<>'VE'"
-        pattern = escape_string(pattern)
-        res = run_sql(query1 % pattern)
+        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE %s AND join_policy like 'V%%' AND join_policy<>'VE'"
+        res = run_sql(query1, (pattern,))
         # The line belows inserts into groups dictionary every tuple the database returned,
         # assuming field0=key and field1=value
         map(lambda x: groups.setdefault(x[0], x[1]), res)
