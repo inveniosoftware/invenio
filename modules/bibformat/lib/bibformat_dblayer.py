@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import zlib
 import time
 
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 
 # Cache the mapping name -> id for each kb
 kb_id_name_cache = {}
@@ -98,8 +98,8 @@ def get_kb_id(kb_name):
     if kb_id_name_cache.has_key(kb_name):
         return kb_id_name_cache[kb_name]
 
-    query = """SELECT id FROM fmtKNOWLEDGEBASES WHERE name LIKE '%s'""" % escape_string(kb_name)
-    res = run_sql(query)
+    res = run_sql("""SELECT id FROM fmtKNOWLEDGEBASES WHERE name LIKE %s""",
+                  (kb_name,))
     if len(res) > 0:
         kb_id_name_cache[kb_name] = res[0][0]
         return res[0][0]
@@ -108,8 +108,8 @@ def get_kb_id(kb_name):
 
 def get_kb_name(kb_id):
     """Returns the name of the kb with given id"""
-    query = """SELECT name FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % escape_string(str(kb_id))
-    res = run_sql(query)
+    res = run_sql("""SELECT name FROM fmtKNOWLEDGEBASES WHERE id=%s""",
+                  (kb_id,))
     if len(res) > 0:
         return res[0][0]
     else:
@@ -153,10 +153,8 @@ def add_kb(kb_name, kb_description):
     @param kb_description a description for the kb
     @return the id of the newly created kb
     """
-    query = """REPLACE INTO fmtKNOWLEDGEBASES (name, description)
-    VALUES('%s', '%s')""" % (escape_string(kb_name), escape_string(kb_description))
-    run_sql(query)
-
+    run_sql("""REPLACE INTO fmtKNOWLEDGEBASES (name, description)
+                VALUES (%s,%s)""", (kb_name, kb_description))
     return get_kb_id(kb_name)
 
 def delete_kb(kb_name):
@@ -166,18 +164,15 @@ def delete_kb(kb_name):
     run_sql(query)
     query = """DELETE FROM fmtKNOWLEDGEBASES WHERE id = '%s'""" % (k_id)
     run_sql(query)
-
     # Update cache
     if kb_id_name_cache.has_key(kb_name):
         del kb_id_name_cache[kb_name]
-
     return True
 
 def kb_exists(kb_name):
     """Returns True if a kb with the given name exists"""
-    query = """SELECT id FROM fmtKNOWLEDGEBASES
-    WHERE name = '%s'""" % (escape_string(kb_name))
-    rows = run_sql(query)
+    rows = run_sql("""SELECT id FROM fmtKNOWLEDGEBASES WHERE name = %s""",
+                   (kb_name,))
     if len(rows) > 0:
         return True
     else:
@@ -186,45 +181,39 @@ def kb_exists(kb_name):
 def update_kb(kb_name, new_name, new_description):
     """Updates given kb with new name and new description"""
     k_id = get_kb_id(kb_name)
-    query = """UPDATE fmtKNOWLEDGEBASES
-    SET name = '%s' , description = '%s'
-    WHERE id = '%s'""" % (escape_string(new_name), escape_string(new_description), k_id)
-    run_sql(query)
+    run_sql("""UPDATE fmtKNOWLEDGEBASES
+                  SET name = %s , description = %s
+                WHERE id = %s""", (new_name, new_description, k_id))
     # Update cache
     if kb_id_name_cache.has_key(kb_name):
         del kb_id_name_cache[kb_name]
-
     kb_id_name_cache[new_name] = k_id
     return True
 
 def add_kb_mapping(kb_name, key, value):
     """Adds new mapping key->value in given kb"""
     k_id = get_kb_id(kb_name)
-    query = """REPLACE INTO fmtKNOWLEDGEBASEMAPPINGS (m_key, m_value, id_fmtKNOWLEDGEBASES)
-    VALUES('%s', '%s', '%s')""" % (escape_string(key), escape_string(value), k_id)
-    run_sql(query)
-
+    run_sql("""REPLACE INTO fmtKNOWLEDGEBASEMAPPINGS (m_key, m_value, id_fmtKNOWLEDGEBASES)
+                VALUES (%s, %s, %s)""", (key, value, k_id))
     return True
 
 def remove_kb_mapping(kb_name, key):
     """Removes mapping with given key from given kb"""
     k_id = get_kb_id(kb_name)
-    query = """DELETE FROM fmtKNOWLEDGEBASEMAPPINGS
-    WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'""" \
-    % (escape_string(key), k_id)
-    run_sql(query)
+    run_sql("""DELETE FROM fmtKNOWLEDGEBASEMAPPINGS
+                WHERE m_key = %s AND id_fmtKNOWLEDGEBASES = %s""",
+            (key, k_id))
     return True
 
 def kb_mapping_exists(kb_name, key):
     """Returns true if the mapping with given key exists in the given kb"""
     if kb_exists(kb_name):
         k_id = get_kb_id(kb_name)
-        query = """SELECT id FROM fmtKNOWLEDGEBASEMAPPINGS
-        WHERE m_key = '%s' AND id_fmtKNOWLEDGEBASES = '%s'""" % (escape_string(key), k_id)
-        rows = run_sql(query)
+        rows = run_sql("""SELECT id FROM fmtKNOWLEDGEBASEMAPPINGS
+                           WHERE m_key = %s
+                             AND id_fmtKNOWLEDGEBASES = %s""", (key, k_id))
         if len(rows) > 0:
             return True
-
     return False
 
 def get_kb_mapping_value(kb_name, key):
@@ -237,9 +226,10 @@ def get_kb_mapping_value(kb_name, key):
     #@param default a default value to return if mapping is not found
     """
     k_id = get_kb_id(kb_name)
-    query = """SELECT m_value FROM fmtKNOWLEDGEBASEMAPPINGS
-    WHERE m_key LIKE '%s' AND id_fmtKNOWLEDGEBASES = '%s' LIMIT 1""" % (escape_string(key), k_id)
-    res = run_sql(query)
+    res = run_sql("""SELECT m_value FROM fmtKNOWLEDGEBASEMAPPINGS
+                      WHERE m_key LIKE %s
+                        AND id_fmtKNOWLEDGEBASES = %s LIMIT 1""",
+                  (key, k_id))
     if len(res) > 0:
         return res[0][0]
     else:
@@ -248,14 +238,10 @@ def get_kb_mapping_value(kb_name, key):
 def update_kb_mapping(kb_name, key, new_key, new_value):
     """Updates the mapping given by key with new key and value"""
     k_id = get_kb_id(kb_name)
-    query = """UPDATE fmtKNOWLEDGEBASEMAPPINGS
-    SET m_key = '%s' , m_value = '%s'
-    WHERE m_key = '%s'
-    AND id_fmtKNOWLEDGEBASES  = '%s'""" % (escape_string(new_key),
-                                           escape_string(new_value),
-                                           escape_string(key),
-                                           k_id)
-    run_sql(query)
+    run_sql("""UPDATE fmtKNOWLEDGEBASEMAPPINGS
+                  SET m_key = %s , m_value = %s
+                WHERE m_key = %s AND id_fmtKNOWLEDGEBASES = %s""",
+            (new_key, new_value, key, k_id))
     return True
 
 def create_knowledge_bases_table():
@@ -308,7 +294,7 @@ def get_tag_from_name(name):
     """
     Returns the marc code corresponding the given name
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'" % escape_string(name))
+    res = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
     if len(res)>0:
         return res[0][0]
     else:
@@ -319,7 +305,7 @@ def get_tags_from_name(name):
     Returns the marc codes corresponding the given name,
     ordered by value
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE '%s'ORDER BY value" % escape_string(name))
+    res = run_sql("SELECT value FROM tag WHERE name LIKE %s ORDER BY value", (name,))
     if len(res)>0:
         return list(res[0])
     else:
@@ -329,8 +315,7 @@ def tag_exists_for_name(name):
     """
     Returns True if a tag exists for name in 'tag' table.
     """
-    query = "SELECT value FROM tag WHERE name LIKE '%s'" % escape_string(name)
-    rows = run_sql(query)
+    rows = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
     if len(rows) > 0:
         return True
     return False
@@ -339,7 +324,7 @@ def get_name_from_tag(tag):
     """
     Returns the name corresponding to a marc code
     """
-    res = run_sql("SELECT name FROM tag WHERE value LIKE '%s'" % escape_string(tag))
+    res = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
     if len(res)>0:
         return res[0][0]
     else:
@@ -349,8 +334,7 @@ def name_exists_for_tag(tag):
     """
     Returns True if a name exists for tag in 'tag' table.
     """
-    query = "SELECT name FROM tag WHERE value LIKE '%s'" % escape_string(tag)
-    rows = run_sql(query)
+    rows = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
     if len(rows) > 0:
         return True
     return False
@@ -386,10 +370,7 @@ def get_output_format_id(code):
     f_code = code
     if len(code)>6:
         f_code = code[:6]
-
-    query = "SELECT id FROM format WHERE code='%s'" % escape_string(f_code.lower())
-    res = run_sql(query)
-
+    res = run_sql("SELECT id FROM format WHERE code=%s", (f_code.lower(),))
     if len(res)>0:
         return res[0][0]
     else:
@@ -441,8 +422,7 @@ def get_output_format_description(code):
     @return output format description
     """
 
-    query = "SELECT description FROM format WHERE code='%s'" % escape_string(code)
-    res = run_sql(query)
+    res = run_sql("SELECT description FROM format WHERE code=%s", (code,))
     if len(res) > 0:
         res = res[0][0]
         if res is not None:
@@ -473,8 +453,7 @@ def get_output_format_visibility(code):
     If code does not exist, return 0
     @return output format visibility (0 if not visible, 1 if visible
     """
-    query = "SELECT visibility FROM format WHERE code='%s'" % escape_string(code)
-    res = run_sql(query)
+    res = run_sql("SELECT visibility FROM format WHERE code=%s", (code,))
     if len(res) > 0:
         res = res[0][0]
         if res is not None and int(res) in range(0, 2):
@@ -527,8 +506,7 @@ def get_output_format_content_type(code):
     @param code the code of the output format to get the description from
     @return output format content_type
     """
-    query = "SELECT content_type FROM format WHERE code='%s'" % escape_string(code)
-    res = run_sql(query)
+    res = run_sql("SELECT content_type FROM format WHERE code=%s", (code,))
     if len(res) > 0:
         res = res[0][0]
         if res is not None:
@@ -579,8 +557,7 @@ def get_output_format_names(code):
     if output_format_id is None:
         return out
 
-    query = "SELECT name FROM format WHERE code='%s'" % escape_string(code)
-    res = run_sql(query)
+    res = run_sql("SELECT name FROM format WHERE code=%s", (code,))
     if len(res) > 0:
         out['generic'] = res[0][0]
 
@@ -625,9 +602,8 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
         run_sql(query, params)
     else:
         # Save inside formatname table for name variations
-        query = "REPLACE INTO formatname SET id_format='%s', ln='%s', type='%s', value='%s'" \
-                % (id, escape_string(lang), type.lower(), escape_string(name))
-        run_sql(query)
+        run_sql("REPLACE INTO formatname SET id_format=%s, ln=%s, type=%s, value=%s",
+                (id, lang, type.lower(), name))
 
 def change_output_format_code(old_code, new_code):
     """
