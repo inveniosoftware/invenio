@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## 
-## Every db-related function of module webmessage
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -55,7 +53,7 @@ def migrate_v071_baskets():
     print "There are %i baskets to migrate" % __count_current_baskets()
     print "==============================="
     print "In new WebBasket module, baskets are stored in topics."
-    print 'Name of default topic [Default topic]: ', 
+    print 'Name of default topic [Default topic]: ',
     default_topic_name = raw_input() or "Default topic"
     def choose_share_level():
         print "==============================="
@@ -65,7 +63,7 @@ def migrate_v071_baskets():
         print "  2: people can view content and comments"
         print "  3: people can add comments"
         print "  4: people can add records to baskets"
-        print 'Share level for current public baskets [1]: ', 
+        print 'Share level for current public baskets [1]: ',
         return raw_input() or '1'
     choosed = 0
     while not(choosed):
@@ -74,11 +72,11 @@ def migrate_v071_baskets():
             default_share_level = int(default_share_level)
             if default_share_level in range(0, 5):
                 choosed = 1
-            else: 
+            else:
                 choosed = 0
         except:
             choosed = 0
-    share_levels = [None, 
+    share_levels = [None,
                     CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                     CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
                     CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
@@ -165,7 +163,7 @@ def migrate_v071_baskets():
             delete = str(delete)[0]
             if delete in ('y','n'):
                 choosed = 1
-            else: 
+            else:
                 choosed = 0
         except:
             choosed = 0
@@ -236,15 +234,15 @@ def __check_every_basket_has_one_owner():
     query = "SELECT bsk.id, ubsk.id_user FROM basket bsk LEFT JOIN user_basket ubsk ON bsk.id=ubsk.id_basket"
     res = run_sql(query)
     return filter(lambda x: x[1] is None, res)
-    
+
 def __check_baskets_exist():
     """"""
     query = "SELECT distinct ubsk.id_basket, bsk.id FROM user_basket ubsk LEFT JOIN basket bsk ON bsk.id=ubsk.id_basket"
     res = run_sql(query)
     return filter(lambda x: x[1] is None, res)
-    
-    
-def __update_baskets(default_topic_name="Imported baskets", 
+
+
+def __update_baskets(default_topic_name="Imported baskets",
                      default_share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                      drop_old_tables=0):
     """"""
@@ -254,7 +252,7 @@ def __update_baskets(default_topic_name="Imported baskets",
     if drop_old_tables:
         __drop_baskets()
 
-def __import_baskets(default_topic_name="Imported baskets", 
+def __import_baskets(default_topic_name="Imported baskets",
                      default_share_level=CFG_WEBBASKET_SHARE_LEVELS['READITM']):
     """"""
     query1 = """SELECT bsk.id,
@@ -271,17 +269,17 @@ def __import_baskets(default_topic_name="Imported baskets",
             try:
                 int(bskid)
                 int(id_owner)
-            except: 
+            except:
                 print "#####################"
                 print "id basket:"
                 print bskid
                 print "id user"
                 print id_owner
                 print "#########################"
-                
-            return "(%i,'%s',%i,'%s')" % (int(bskid), 
-                                          escape_string(name), 
-                                          int(id_owner), 
+
+            return "(%i,'%s',%i,'%s')" % (int(bskid),
+                                          escape_string(name),
+                                          int(id_owner),
                                           escape_string(date_modification))
         values = reduce(lambda x, y: x + ',' + y, map(basket_updater, baskets))
         query2 = "INSERT INTO bskBASKET (id, name, id_owner, date_modification) VALUES %s"
@@ -289,8 +287,8 @@ def __import_baskets(default_topic_name="Imported baskets",
         def user_updater(basket):
             """"""
             (bskid, name, is_public, id_owner, date_modification) = basket
-            return "(%i,%i,'%s')" % (int(bskid), 
-                                     int(id_owner), 
+            return "(%i,%i,'%s')" % (int(bskid),
+                                     int(id_owner),
                                      default_topic_name)
         values = reduce(lambda x, y: x + ',' + y, map(user_updater, baskets))
         query3 = "INSERT INTO user_bskBASKET (id_bskBASKET, id_user, topic) VALUES %s"
@@ -299,8 +297,8 @@ def __import_baskets(default_topic_name="Imported baskets",
         def usergroup_updater(basket):
             """"""
             (bskid, name, is_public, id_owner, date_modification) = basket
-            return "(0, %i,'%s','%s')" % (int(bskid), 
-                                          date_modification, 
+            return "(0, %i,'%s','%s')" % (int(bskid),
+                                          date_modification,
                                           default_share_level)
         values = reduce(lambda x, y: x + ',' + y, map(usergroup_updater, shared_baskets))
         query4 = "INSERT INTO usergroup_bskBASKET (id_usergroup, id_bskBASKET, date_shared, share_level) VALUES %s"
@@ -310,11 +308,11 @@ def __import_baskets(default_topic_name="Imported baskets",
 
 def __count_records(bskid):
     query1 = "SELECT count(id_record) FROM basket_record WHERE id_basket=%i GROUP BY id_basket"
-    return run_sql(query1 % int(bskid))[0][0]   
+    return run_sql(query1 % int(bskid))[0][0]
 
 def __import_records():
     """"""
-    query1 = """SELECT bsk.id, 
+    query1 = """SELECT bsk.id,
                        ubsk.id_user,
                        rec.id_record,
                        rec.nb_order,
@@ -327,8 +325,8 @@ def __import_records():
         (bskid, id_owner, id_record, order, date_modification) = record
         return "(%i,%i,%i,%i,'%s')" % (int(id_record), int(bskid), int(id_owner),
                                        int(order), escape_string(date_modification))
-   
-    query2 = """INSERT INTO bskREC 
+
+    query2 = """INSERT INTO bskREC
                 (id_bibrec_or_bskEXTREC, id_bskBASKET, id_user_who_added_item, score, date_added) VALUES %s"""
     iterator = 0
     while iterator < len(records):
@@ -336,19 +334,19 @@ def __import_records():
         run_sql(query2 % temp_val)
         if iterator + 10000 <= len(records):
             last_rec = iterator + 10000
-        else: 
+        else:
             last_rec = len(records)
-        print "  Inserting records %i-%i out of %i" % (iterator, last_rec, len(records)  )          
+        print "  Inserting records %i-%i out of %i" % (iterator, last_rec, len(records)  )
         iterator = iterator + 10000
     return len(records)
-    
+
 def __set_auto_increment_value():
     """"""
     query1 = "SELECT MAX(id) FROM basket"
     value = int(run_sql(query1)[0][0])
     query2 = "ALTER TABLE bskBASKET AUTO_INCREMENT=%i"
     run_sql(query2 % (value + 1))
-    
+
 def __drop_baskets():
     """"""
     query1 = "DROP TABLE basket"
@@ -357,6 +355,6 @@ def __drop_baskets():
     run_sql(query2)
     query3 = "DROP TABLE basket_record"
     run_sql(query3)
-    
+
 if __name__ == '__main__':
     migrate_v071_baskets()
