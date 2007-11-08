@@ -47,7 +47,6 @@ from invenio.bibrankadminlib import \
      createhiddenform
 from invenio.dbquery import \
      run_sql, \
-     escape_string, \
      get_table_update_time
 from invenio.websearch_external_collections import \
      external_collections_dictionary, \
@@ -2933,9 +2932,10 @@ def add_fmt(code, name, rtype):
     rtype - the default nametype"""
 
     try:
-        res = run_sql("INSERT INTO format (code, name) values ('%s','%s')" % (escape_string(code), escape_string(name)))
-        fmtID = run_sql("SELECT id FROM format WHERE code='%s'" % escape_string(code))
-        res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fmtID[0][0], rtype, cdslang, escape_string(name)))
+        res = run_sql("INSERT INTO format (code, name) values (%s,%s)", (code, name))
+        fmtID = run_sql("SELECT id FROM format WHERE code=%s", (code,))
+        res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,%s,%s,%s)",
+                      (fmtID[0][0], rtype, cdslang, name))
         return (1, fmtID)
     except StandardError, e:
         return (0, e)
@@ -2947,8 +2947,8 @@ def update_fldv(fldvID, name, value):
     name - the name of the fieldvalue."""
 
     try:
-        res = run_sql("UPDATE fieldvalue set name='%s' where id=%s" % (escape_string(name), fldvID))
-        res = run_sql("UPDATE fieldvalue set value='%s' where id=%s" % (escape_string(value), fldvID))
+        res = run_sql("UPDATE fieldvalue set name=%s where id=%s", (name, fldvID))
+        res = run_sql("UPDATE fieldvalue set value=%s where id=%s", (value, fldvID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2959,10 +2959,10 @@ def add_fldv(name, value):
     name - the name of the fieldvalue."""
 
     try:
-        res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (escape_string(name), escape_string(value)))
+        res = run_sql("SELECT id FROM fieldvalue WHERE name=%s and value=%s", (name, value))
         if not res:
-            res = run_sql("INSERT INTO fieldvalue (name, value) values ('%s','%s')" % (escape_string(name), escape_string(value)))
-            res = run_sql("SELECT id FROM fieldvalue WHERE name='%s' and value='%s'" % (escape_string(name), escape_string(value)))
+            res = run_sql("INSERT INTO fieldvalue (name, value) values (%s,%s)", (name, value))
+            res = run_sql("SELECT id FROM fieldvalue WHERE name=%s and value=%s", (name, value))
         if res:
             return (1, res[0][0])
         else:
@@ -2972,8 +2972,8 @@ def add_fldv(name, value):
 
 def add_pbx(title, body):
     try:
-        res = run_sql("INSERT INTO portalbox (title, body) values ('%s','%s')" % (escape_string(title), escape_string(body)))
-        res = run_sql("SELECT id FROM portalbox WHERE title='%s' AND body='%s'" % (escape_string(title), escape_string(body)))
+        res = run_sql("INSERT INTO portalbox (title, body) values (%s,%s)", (title, body))
+        res = run_sql("SELECT id FROM portalbox WHERE title=%s AND body=%s", (title, body))
         if res:
             return (1, res[0][0])
         else:
@@ -2981,31 +2981,27 @@ def add_pbx(title, body):
     except StandardError, e:
         return (0, e)
 
-def add_col(colNAME, dbquery, rest):
+def add_col(colNAME, dbquery=None, rest=None):
     """Adds a new collection to collection table
     colNAME - the default name for the collection, saved to collection and collectionname
     dbquery - query related to the collection
     rest - name of apache group allowed to access collection"""
-
+    # BTW, sometimes '' are passed instead of None, so change them to None
+    if not dbquery:
+        dbquery = None
+    if not rest:
+        rest = None
     try:
         rtype = get_col_nametypes()[0][0]
         colID = run_sql("SELECT id FROM collection WHERE id=1")
         if colID:
-            sql = "INSERT INTO collection(name,dbquery,restricted) VALUES('%s'" % escape_string(colNAME)
+            res = run_sql("INSERT INTO collection (name,dbquery,restricted) VALUES (%s,%s,%s)",
+                          (colNAME,dbquery,rest))
         else:
-            sql = "INSERT INTO collection(id,name,dbquery,restricted) VALUES(1,'%s'" % escape_string(colNAME)
-        if dbquery:
-            sql += ",'%s'" % escape_string(dbquery)
-        else:
-            sql += ",null"
-        if rest:
-            sql += ",'%s'" % escape_string(rest)
-        else:
-            sql += ",null"
-        sql += ")"
-        res = run_sql(sql)
-        colID = run_sql("SELECT id FROM collection WHERE name='%s'" % escape_string(colNAME))
-        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,'%s','%s','%s')" % (colID[0][0], rtype, cdslang, escape_string(colNAME)))
+            res = run_sql("INSERT INTO collection (id,name,dbquery,restricted) VALUES (1,%s,%s,%s)",
+                          (colNAME,dbquery,rest))
+        colID = run_sql("SELECT id FROM collection WHERE name=%s", (colNAME,))
+        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,%s,%s,%s)" % (colID[0][0], rtype, cdslang, colNAME))
         if colID:
             return (1, colID[0][0])
         else:
@@ -3096,36 +3092,28 @@ def add_col_fld(colID, fldID, type, fldvID=''):
     except StandardError, e:
         return (0, e)
 
-def modify_restricted(colID, rest):
+def modify_restricted(colID, rest=None):
     """Modify which apache group is allowed to use the collection.
     colID - the id of the collection involved
     restricted - the new group"""
-
+    # BTW, sometimes '' is passed instead of None, so change it to None
+    if not rest:
+        rest = None
     try:
-        sql = "UPDATE collection SET restricted="
-        if rest:
-            sql += "'%s'" % escape_string(rest)
-        else:
-            sql += "null"
-        sql += " WHERE id=%s" % colID
-        res = run_sql(sql)
+        res = run_sql("UPDATE collection SET restricted=%s WHERE id=%s", (rest, colID))
         return (1, "")
     except StandardError, e:
         return (0, e)
 
-def modify_dbquery(colID, dbquery):
+def modify_dbquery(colID, dbquery=None):
     """Modify the dbquery of an collection.
     colID - the id of the collection involved
     dbquery - the new dbquery"""
-
+    # BTW, sometimes '' is passed instead of None, so change it to None
+    if not dbquery:
+        dbquery = None
     try:
-        sql = "UPDATE collection SET dbquery="
-        if dbquery:
-            sql += "'%s'" % escape_string(dbquery)
-        else:
-            sql += "null"
-        sql += " WHERE id=%s" % colID
-        res = run_sql(sql)
+        res = run_sql("UPDATE collection SET dbquery=%s WHERE id=%s", (dbquery, colID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3142,9 +3130,9 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
 
     try:
         if title:
-            res = run_sql("UPDATE portalbox SET title='%s' WHERE id=%s" % (escape_string(title), pbxID))
+            res = run_sql("UPDATE portalbox SET title=%s WHERE id=%s", (title, pbxID))
         if body:
-            res = run_sql("UPDATE portalbox SET body='%s' WHERE id=%s" % (escape_string(body), pbxID))
+            res = run_sql("UPDATE portalbox SET body=%s WHERE id=%s", (body, pbxID))
         if score:
             res = run_sql("UPDATE collection_portalbox SET score='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (score, colID, pbxID, sel_ln))
         if position:
