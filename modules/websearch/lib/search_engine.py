@@ -1672,7 +1672,7 @@ def search_unit_in_bibxxx(p, f, type):
                 query_addons = "LIKE %s"
                 query_params = (ps[0],)
             else:
-                query_addons = "=%s"
+                query_addons = "= %s"
                 query_params = (ps[0],)
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
@@ -1694,20 +1694,22 @@ def search_unit_in_bibxxx(p, f, type):
         digit1, digit2 = int(t[0]), int(t[1])
         bx = "bib%d%dx" % (digit1, digit2)
         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
-        # construct query:
+        # construct and run query:
         if t == "001":
-            query = "SELECT id FROM bibrec WHERE id %s" % query_addons
+            res = run_sql("SELECT id FROM bibrec WHERE id %s" % query_addons,
+                          query_params)
         else:
-            if len(t) != 6 or t[-1:]=='%': # only the beginning of field 't' is defined, so add wildcard character:
-                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag LIKE %%s" % \
-                        (bx, bibx, query_addons)
-                query_params += (t + '%',)
+            query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s" % \
+                    (bx, bibx, query_addons)
+            if len(t) != 6 or t[-1:]=='%':
+                # wildcard query, or only the beginning of field 't'
+                # is defined, so add wildcard character:
+                query += " AND bx.tag LIKE %s"
+                res = run_sql(query, query_params + (t + '%',))
             else:
-                query = "SELECT bibx.id_bibrec FROM %s AS bx LEFT JOIN %s AS bibx ON bx.id=bibx.id_bibxxx WHERE bx.value %s AND bx.tag=%%s" % \
-                        (bx, bibx, query_addons)
-                query_params += (t,)
-        # launch the query:
-        res = run_sql(query, query_params)
+                # exact query for 't':
+                query += " AND bx.tag=%s"
+                res = run_sql(query, query_params + (t,))
         # fill the result set:
         for id_bibrec in res:
             if id_bibrec[0]:
@@ -1716,7 +1718,6 @@ def search_unit_in_bibxxx(p, f, type):
     nb_hits = len(l)
     # okay, return result set:
     set = HitSet(l)
-
     return set
 
 def search_unit_in_bibrec(day1, day2, type='c'):
