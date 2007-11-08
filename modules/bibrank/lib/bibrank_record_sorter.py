@@ -35,7 +35,7 @@ from invenio.config import \
      cdslang, \
      etcdir, \
      version
-from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibrank_citation_searcher import calculate_cited_by_list

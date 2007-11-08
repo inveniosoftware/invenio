@@ -34,7 +34,7 @@ from invenio.config import \
 from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibtask import task_get_option, write_message
 
 
