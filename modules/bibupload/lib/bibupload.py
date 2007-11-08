@@ -58,7 +58,6 @@ import os
 import sys
 import time
 from zlib import compress
-import MySQLdb
 import re
 import urllib2
 import tempfile
@@ -345,24 +344,6 @@ def find_record_format(rec_id, format):
         write_message("   Error during find_record_format() : %s " % error, verbose=1, stream=sys.stderr)
     return out
 
-def find_record_bibfmt(marc):
-    """ receives the xmlmarc containing a record and returns the id in bibrec
-        if the record exists in bibfmt"""
-    # compress the marc value
-    pickled_marc =  MySQLdb.escape_string(compress(marc))
-    query = """SELECT id_bibrec FROM bibfmt WHERE value = %s"""
-    # format for marc xml is xm
-    params = (pickled_marc,)
-    try:
-        res = run_sql(query, params)
-    except Error, error:
-        write_message("   Error during find_record_bibfmt function : %s "
-            % error, verbose=1, stream=sys.stderr)
-    if len(res):
-        return res
-    else:
-        return None
-
 def find_record_from_recid(rec_id):
     """
     Try to find record in the database from the REC_ID number.
@@ -607,7 +588,6 @@ def create_new_record():
 def insert_bibfmt(id_bibrec, marc, format):
     """Insert the format in the table bibfmt"""
     # compress the marc value
-    #pickled_marc =  MySQLdb.escape_string(compress(marc))
     pickled_marc =  compress(marc)
     # get the current time
     now = convert_datestruct_to_datetext(time.localtime())
