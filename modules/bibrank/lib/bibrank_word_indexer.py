@@ -32,7 +32,7 @@ from invenio.config import \
      cdslang, \
      etcdir
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
-from invenio.dbquery import run_sql, escape_string, DatabaseError, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine import beautify_range_list, \
@@ -910,10 +910,11 @@ def check_rnkWORD(table):
     terms = map(lambda x: x[0], termslist)
 
     while i < len(terms):
-        current_terms = ""
+        query_params = ()
         for j in range(i, ((i+5000)< len(terms) and (i+5000) or len(terms))):
-            current_terms += "'%s'," % escape_string(terms[j])
-        terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term in (%s)" % (table, current_terms[:-1]))
+            query_params += (terms[j],)
+        terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term IN (%s)" % (table, (len(query_params)*"%s,")[:-1]),
+                             query_params)
         for (t, hitlist) in terms_docs:
             term_docs = deserialize_via_marshal(hitlist)
             if (term_docs.has_key("Gi") and term_docs["Gi"][1] == 0) or not term_docs.has_key("Gi"):
@@ -930,7 +931,7 @@ def check_rnkWORD(table):
                 if tf[1] == 0 and not errors.has_key(t):
                     errors[t] = 1
                     write_message("ERROR: Gi missing for record %s and term: %s (%s) in %s" % (j,t,repr(t), table))
-                    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term='%s'" % (table, t))
+                    terms_docs = run_sql("SELECT term, hitlist FROM %s WHERE term=%%s" % table, (t,))
                     termlist = deserialize_via_marshal(terms_docs[0][1])
             i += 5000
 
