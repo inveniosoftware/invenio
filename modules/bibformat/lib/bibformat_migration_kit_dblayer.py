@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,10 +29,8 @@ SEE: bibformat_migration_kit.py
 
 __revision__ = "$Id$"
 
-from MySQLdb import escape_string
-
 from invenio.dbquery import run_sql
-    
+
 ## Knowledge Bases Migration related functions
 
 def old_kbs_exist():
@@ -46,7 +44,7 @@ def old_kbs_exist():
         return True
     else:
         return False
-    
+
 def get_old_kbs():
     """
     Returns the list of old kbs
@@ -101,11 +99,10 @@ def get_old_behaviour_condition(otype):
     Returns the list of behaviour conditions
     """
     out = []
-    query = """SELECT eval_order, el_condition
-	FROM flxBEHAVIORCONDITIONS
-	WHERE otype='%s'
-	ORDER BY eval_order""" % escape_string(otype)
-    res = run_sql(query)
+    res = run_sql("""SELECT eval_order, el_condition
+                       FROM flxBEHAVIORCONDITIONS
+                      WHERE otype=%s
+                      ORDER BY eval_order""", (otype,))
     for row in res:
         out.append((row[0], row[1]))
     return out
@@ -115,12 +112,11 @@ def get_old_behaviour_action(otype, eorder):
     Return the behaviour action for given otype and eorder
     """
     out = []
-    query = """SELECT apply_order, el_code
-    FROM flxBEHAVIORCONDITIONSACTIONS
-    WHERE otype='%(otype)s'
-    AND eval_order=%(eorder)s
-    ORDER BY apply_order""" % {'eorder': eorder, 'otype':escape_string(otype)}
-    res = run_sql(query)
+    res = run_sql("""SELECT apply_order, el_code
+                       FROM flxBEHAVIORCONDITIONSACTIONS
+                      WHERE otype=%s
+                        AND eval_order=%s
+                      ORDER BY apply_order""", (otype, eorder))
     for row in res:
         out.append((row[0], row[1]))
     return out
@@ -162,7 +158,7 @@ def adapt_tables():
         PRIMARY KEY  (id),
         UNIQUE KEY name (name)
         ) TYPE=MyISAM;
-        
+
         CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASEMAPPINGS (
         id mediumint(8) unsigned NOT NULL auto_increment,
         m_key varchar(255) NOT NULL default '',
@@ -171,10 +167,10 @@ def adapt_tables():
         PRIMARY KEY  (id),
         KEY id_fmtKNOWLEDGEBASES (id_fmtKNOWLEDGEBASES)
         ) TYPE=MyISAM;
-        
+
         ALTER TABLE format ADD COLUMN (description varchar(255) default '');
         ALTER TABLE format ADD COLUMN (content_type varchar(255) default '');
         ''')
     except:
         pass
-    
+
