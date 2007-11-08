@@ -40,7 +40,7 @@ from invenio.config import \
      weburl
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
@@ -705,7 +705,7 @@ def modify_rnk(rnkID, rnkcode):
     rnkcode - new value for field 'name' in rnkMETHOD """
 
     try:
-        res = run_sql("UPDATE rnkMETHOD set name='%s' WHERE id=%s" % (escape_string(rnkcode), rnkID))
+        res = run_sql("UPDATE rnkMETHOD set name=%s WHERE id=%s", (rnkcode, rnkID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -715,8 +715,8 @@ def add_rnk(rnkcode):
     rnkcode - the "code" for the rank method, to be used by bibrank daemon """
 
     try:
-        res = run_sql("INSERT INTO rnkMETHOD(name) VALUES('%s')" % escape_string(rnkcode))
-        res = run_sql("SELECT id FROM rnkMETHOD WHERE name='%s'" % escape_string(rnkcode))
+        res = run_sql("INSERT INTO rnkMETHOD (name) VALUES (%s)", (rnkcode,))
+        res = run_sql("SELECT id FROM rnkMETHOD WHERE name=%s", (rnkcode,))
         if res:
             return (1, res[0][0])
         else:
@@ -1031,15 +1031,19 @@ def modify_translations(ID, langs, sel_type, trans, table):
 
     try:
         for nr in range(0,len(langs)):
-            res = run_sql("SELECT value FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
+            res = run_sql("SELECT value FROM %s%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+                          (ID, sel_type, langs[nr][0]))
             if res:
                 if trans[nr]:
-                    res = run_sql("UPDATE %s%s SET value='%s' WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, escape_string(trans[nr]), table, ID, sel_type, langs[nr][0]))
+                    res = run_sql("UPDATE %s%s SET value=%%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+                                  (trans[nr], ID, sel_type, langs[nr][0]))
                 else:
-                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%s AND type='%s' AND ln='%s'" % (table, name, table, ID, sel_type, langs[nr][0]))
+                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+                                  (ID, sel_type, langs[nr][0]))
             else:
                 if trans[nr]:
-                    res = run_sql("INSERT INTO %s%s(id_%s, type, ln, value) VALUES (%s,'%s','%s','%s')" % (table, name, table, ID, sel_type, langs[nr][0], escape_string(trans[nr])))
+                    res = run_sql("INSERT INTO %s%s (id_%s, type, ln, value) VALUES (%%s,%%s,%%s,%%s)" % (table, name, table),
+                                  (ID, sel_type, langs[nr][0], trans[nr]))
         return (1, "")
     except StandardError, e:
 	return (0, e)
