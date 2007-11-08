@@ -35,7 +35,7 @@ from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIO
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.websearch_external_collections_templates import print_results, print_timeout
-from invenio.websearch_external_collections_utils import get_collection_id, get_collection_descendants, escape_dictionary, \
+from invenio.websearch_external_collections_utils import get_collection_id, get_collection_descendants, \
     warning, get_verbose_print
 
 import invenio.template
@@ -71,16 +71,16 @@ def print_external_results_overview(req, current_collection, pattern_list, field
 
     return (search_engines, seealso_engines, pattern, basic_search_units)
 
-def perform_external_collection_search(req, current_collection, pattern_list, field, 
+def perform_external_collection_search(req, current_collection, pattern_list, field,
         external_collection, verbosity_level=0, lang=cdslang, selected_external_collections_infos=None):
     """Search external collection and print the seealso box."""
-    
+
     vprint = get_verbose_print(req, 'External collection: ', verbosity_level)
 
     if selected_external_collections_infos:
         (search_engines, seealso_engines, pattern, basic_search_units) = selected_external_collections_infos
     else:
-        (search_engines, seealso_engines, pattern, basic_search_units) = print_external_results_overview(req, 
+        (search_engines, seealso_engines, pattern, basic_search_units) = print_external_results_overview(req,
             current_collection, pattern_list, field, external_collection, verbosity_level, lang)
 
     if not pattern:
@@ -180,7 +180,7 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
     def finished(pagegetter, data, current_time):
         """Function called, each time the download of a web page finish.
         Will parse and print the results of this page."""
-        print_results(req, lang, pagegetter, data, current_time)    
+        print_results(req, lang, pagegetter, data, current_time)
 
     finished_list = async_download(pagegetters_list, finished, engines_list, CFG_EXTERNAL_COLLECTION_TIMEOUT)
 
@@ -257,12 +257,12 @@ def external_collection_get_update_state_list(external_collection, collection_id
     changes = []
 
     if external_collection_get_state(external_collection, collection_id) != state:
-        changes = ['(%(collection_id)d, %(id_externalcollection)d, %(state)d)' % 
+        changes = ['(%(collection_id)d, %(id_externalcollection)d, %(state)d)' %
             {'collection_id': collection_id, 'id_externalcollection': external_collection_getid(external_collection), 'state': state}]
 
     if not recurse:
         return changes
-    
+
     for descendant_id in get_collection_descendants(collection_id):
         changes += external_collection_get_update_state_list(external_collection, descendant_id, state)
 
@@ -275,7 +275,7 @@ def external_collection_apply_changes(changes_list):
     sql_values = ", ".join(changes_list)
     sql = 'INSERT INTO collection_externalcollection (id_collection, id_externalcollection, type) VALUES ' + sql_values + 'ON DUPLICATE KEY UPDATE type=VALUES(type);'
     run_sql(sql)
-    
+
 # Misc functions
 def external_collection_sort_engine_by_name(engines_set):
     """Return a list of sorted (by name) search engines."""
@@ -296,7 +296,7 @@ def external_collection_getid(external_collection):
         query = 'INSERT INTO externalcollection (name) VALUES ("%(name)s");' % {'name': external_collection.name}
         run_sql(query)
         return external_collection_getid(external_collection)
-    
+
     external_collection.id = results[0][0]
     return external_collection.id
 
