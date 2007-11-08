@@ -29,7 +29,7 @@ from zlib import decompress
 from invenio.config import \
      cdslang, \
      version
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -138,13 +138,12 @@ def get_login_method_groups(uid, login_method):
     the user is subscrided.
     @return ((group_name, group_id))
     """
-    uid=int(uid) # FIXME
     return run_sql("""
         SELECT g.name as name, g.id as id
         FROM user_usergroup as u JOIN usergroup as g
         ON u.id_usergroup = g.id
-        WHERE u.id_user = %i and g.login_method = '%s'""" %
-        (uid, escape_string(login_method,)))
+        WHERE u.id_user = %s and g.login_method = %s""",
+        (uid, login_method,))
 
 
 def get_all_login_method_groups(login_method):
@@ -154,8 +153,8 @@ def get_all_login_method_groups(login_method):
     return dict(run_sql("""
         SELECT name, id
         FROM usergroup
-        WHERE login_method = '%s'""" %
-        (escape_string(login_method),)))
+        WHERE login_method = %s""",
+        (login_method,)))
 
 
 def get_all_users_with_groups_with_login_method(login_method):
@@ -166,7 +165,7 @@ def get_all_users_with_groups_with_login_method(login_method):
         SELECT DISTINCT u.email, u.id
         FROM user AS u JOIN user_usergroup AS uu ON u.id = uu.id_user
         JOIN usergroup AS ug ON ug.id = uu.id_usergroup
-        WHERE ug.login_method = %s""", (login_method, )))
+        WHERE ug.login_method = %s""", (login_method,)))
 
 
 
@@ -197,10 +196,10 @@ def get_visible_group_list(uid, pattern=""):
         query2 += """ AND id NOT IN %s""" % str(tuple(grpID))
 
     if pattern:
-        pattern_query = """ AND name RLIKE '%s'""" % escape_string(pattern)
-        query2 += pattern_query
-    query2 += """ ORDER BY name"""
-    res2 = run_sql(query2)
+        res2 = run_sql(query2 + """ AND name RLIKE %s ORDER BY name""", (pattern,))
+    else:
+        res2 = run_sql(query2 + """ ORDER BY name""")
+
     map(lambda x: groups.setdefault(x[0], x[1]), res2)
     return groups
 
@@ -241,7 +240,7 @@ def insert_only_new_group(new_group_name,
 
     query = """INSERT INTO usergroup (name, description, join_policy, login_method)
                VALUES (%s, %s, %s, %s)
-               """
+            """
     res = run_sql(query, (new_group_name, new_group_description, join_policy, login_method))
     return res
 
@@ -250,14 +249,10 @@ def insert_new_member(uid,
                       status):
     """Insert new member."""
     query = """INSERT INTO user_usergroup
-                VALUES
-                (%i,%i,'%s','%s')
-                """
+               VALUES (%s,%s,%s,%s)
+            """
     date = convert_datestruct_to_datetext(localtime())
-    uid = int(uid)
-    grpID = int(grpID)
-    query %= (uid, grpID, escape_string(status), date)
-    res = run_sql(query)
+    res = run_sql(query, (uid, grpID, status, date))
     return res
 
 def get_group_infos(grpID):
@@ -285,13 +280,10 @@ def update_group_infos(grpID,
                        group_description,
                        join_policy):
     """Update group."""
-    query = """UPDATE usergroup
-               SET name="%s", description="%s", join_policy="%s"
-               WHERE id = %i"""
-    grpID = int(grpID)
-    res = run_sql(query% (escape_string(group_name),
-                          escape_string(group_description),
-                          escape_string(join_policy), grpID))
+    res = run_sql("""UPDATE usergroup
+                        SET name=%s, description=%s, join_policy=%s
+                      WHERE id=%s""",
+                  (group_name, group_description, join_policy, grpID))
     return res
 
 def get_user_status(uid, grpID):
@@ -311,13 +303,12 @@ def get_users_by_status(grpID, status, ln=cdslang):
     the user has no nickname
     """
     _ = gettext_set_language(ln)
-    query = """SELECT ug.id_user, u.nickname
-               FROM user_usergroup ug, user u
-               WHERE ug.id_usergroup = %i
-               AND ug.id_user=u.id
-               AND user_status = '%s'"""
-    grpID = int(grpID)
-    res = run_sql(query% (grpID, escape_string(status)))
+    res = run_sql("""SELECT ug.id_user, u.nickname
+                       FROM user_usergroup ug, user u
+                      WHERE ug.id_usergroup = %s
+                        AND ug.id_user=u.id
+                        AND user_status = %s""",
+                  (grpID, status))
     users = []
     if res:
         for (mid, nickname) in res:
@@ -354,14 +345,12 @@ def delete_group_and_members(grpID):
 def add_pending_member(grpID, member_id, user_status):
     """Change user status:
     Pending member becomes normal member"""
-    query = """UPDATE user_usergroup
-               SET user_status = '%s',user_status_date='%s'
-               WHERE id_usergroup = %i
-               AND id_user = %i"""
     date = convert_datestruct_to_datetext(localtime())
-    grpID = int(grpID)
-    member_id = int(member_id)
-    res = run_sql(query% (escape_string(user_status), date, grpID, member_id))
+    res = run_sql("""UPDATE user_usergroup
+                        SET user_status = %s, user_status_date = %s
+                        WHERE id_usergroup = %s
+                        AND id_user = %s""",
+                  (user_status, date, grpID, member_id))
     return res
 
 
@@ -410,13 +399,11 @@ def count_nb_group_user(uid, user_status):
     @return integer of number of groups the user belongs to
     with the given status, 0 if none
     """
-    uid = int(uid)
-    query = """SELECT count(id_user)
-               FROM   user_usergroup
-               WHERE  id_user=%i
-               AND user_status = '%s'
-            """
-    res = run_sql(query%(uid, escape_string(user_status)))
+    res = run_sql("""SELECT count(id_user)
+                       FROM   user_usergroup
+                      WHERE  id_user = %s
+                        AND user_status = %s""",
+                  (uid, user_status))
     if res:
         return int(res[0][0])
     else:
