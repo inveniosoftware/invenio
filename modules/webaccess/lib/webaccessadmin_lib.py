@@ -53,7 +53,7 @@ from invenio.bibrankadminlib import addadminbox, tupletotable, \
 from invenio.access_control_config import *
 from invenio.access_control_firerole import compile_role_definition, \
     repair_role_definitions, serialize
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
@@ -664,7 +664,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
                                 button="Create")
 
     if confirm in [1, "1"] and email and email_valid_p(email):
-        res = run_sql("SELECT * FROM user WHERE email='%s'" % escape_string(email))
+        res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
         if not res:
             res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
@@ -1908,7 +1908,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
     <input type="hidden" name="modified" value="1" />
     </td></tr></tbody></table>
     </form>
-    """ % (id_role, escape_string(name_role), escape(description), escape(firerole_def_src))
+    """ % (id_role, escape(name_role), escape(description), escape(firerole_def_src))
 
     if modified in [1, '1']:
         # description must be changed before submitting
