@@ -34,7 +34,7 @@ from invenio.config import \
      version, \
      weburl
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,adderrorbox,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
-from invenio.dbquery import run_sql, escape_string, get_table_status_info
+from invenio.dbquery import run_sql, get_table_status_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 import invenio.template
@@ -1417,7 +1417,7 @@ def add_idx(idxNAME):
 
     try:
         idxID = 0
-        res = run_sql("SELECT id from idxINDEX WHERE name='%s'" % escape_string(idxNAME))
+        res = run_sql("SELECT id from idxINDEX WHERE name=%s", (idxNAME,))
         if res:
             return (0, (0, "A index with the given name already exists."))
 
@@ -1430,9 +1430,10 @@ def add_idx(idxNAME):
         if idxID == 0:
             return (0, (0, "Not possible to create new indexes, delete an index and try again."))
 
-        res = run_sql("INSERT INTO idxINDEX(id, name) values('%s','%s')" % (idxID, escape_string(idxNAME)))
+        res = run_sql("INSERT INTO idxINDEX (id, name) VALUES (%s,%s)", (idxID, idxNAME))
         type = get_idx_nametypes()[0][0]
-        res = run_sql("INSERT INTO idxINDEXNAME(id_idxINDEX, ln, type, value) VALUES(%s,'%s','%s', '%s')" % (idxID, cdslang, type, escape_string(idxNAME)))
+        res = run_sql("INSERT INTO idxINDEXNAME (id_idxINDEX, ln, type, value) VALUES (%s,%s,%s,%s)",
+                      (idxID, cdslang, type, idxNAME))
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sF (
                          id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1485,9 +1486,9 @@ def add_fld(name, code):
 
     try:
         type = get_fld_nametypes()[0][0]
-        res = run_sql("INSERT INTO field (name, code) values('%s','%s')" % (escape_string(name), escape_string(code)))
-        fldID = run_sql("SELECT id FROM field WHERE code='%s'" % escape_string(code))
-        res = run_sql("INSERT INTO fieldname (id_field, type, ln, value) VALUES (%s,'%s','%s','%s')" % (fldID[0][0], type, cdslang, escape_string(name)))
+        res = run_sql("INSERT INTO field (name, code) VALUES (%s,%s)", (name, code))
+        fldID = run_sql("SELECT id FROM field WHERE code=%s", (code,))
+        res = run_sql("INSERT INTO fieldname (id_field, type, ln, value) VALUES (%s,%s,%s,%s)", (fldID[0][0], type, cdslang, name))
         if fldID:
             return (1, fldID[0][0])
         else:
@@ -1507,12 +1508,12 @@ def add_fld_tag(fldID, name, value):
             score = int(res[0][0]) + 1
         else:
             score = 0
-        res = run_sql("SELECT id FROM tag WHERE value='%s'" % escape_string(value))
+        res = run_sql("SELECT id FROM tag WHERE value=%s", (value,))
         if not res:
             if name == '':
                 name = value
-            res = run_sql("INSERT INTO tag(name, value) values('%s','%s')" % (escape_string(name),  escape_string(value)))
-            res = run_sql("SELECT id FROM tag WHERE value='%s'" % escape_string(value))
+            res = run_sql("INSERT INTO tag (name, value) VALUES (%s,%s)", (name,  value))
+            res = run_sql("SELECT id FROM tag WHERE value=%s", (value,))
 
         res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)" % (fldID, res[0][0], score))
         return (1, "")
@@ -1537,10 +1538,8 @@ def modify_idx(idxID, idxNAME, idxDESC):
     """Modify index name or index description in idxINDEX table"""
 
     try:
-        sql = "UPDATE idxINDEX SET name='%s' WHERE id=%s" % (escape_string(idxNAME), idxID)
-        res = run_sql(sql)
-        sql = "UPDATE idxINDEX SET description='%s' WHERE ID=%s" % (escape_string(idxDESC), idxID)
-        res = run_sql(sql)
+        res = run_sql("UPDATE idxINDEX SET name=%s WHERE id=%s", (idxNAME, idxID))
+        res = run_sql("UPDATE idxINDEX SET description=%s WHERE ID=%s", (idxDESC, idxID))
         return (1, "")
     except StandardError, e:
         return (0, e)
