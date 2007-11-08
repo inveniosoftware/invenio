@@ -45,6 +45,10 @@ def format(bfo, tag, limit, instances_separator=" ",
     elif p_tag[0].isdigit():
         # Get values without subcode.
         # We will filter unneeded subcode later
+        if p_tag[1] == '':
+            p_tag[1] = '_'
+        if p_tag[2] == '':
+            p_tag[2] = '_'
         values = bfo.fields(p_tag[0]+p_tag[1]+p_tag[2])
     else:
         return ''
