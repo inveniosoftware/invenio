@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## 
+##
 ## handles rendering of webmessage module
 ##
 ## This file is part of CDS Invenio.
@@ -43,7 +43,7 @@ from invenio.webuser import get_user_info
 
 class Template:
     """Templates for WebMessage module"""
-    
+
     def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, no_quota=0, ln=cdslang):
         """
         Displays a list of messages, with the appropriate links and buttons
@@ -59,7 +59,7 @@ class Template:
         @param nb_messages: number of messages user has
         @param no_quota: 1 if user has no quota (admin) or 0 else.
         @param ln: language of the page.
-        @return the list in HTML format                                            
+        @return the list in HTML format
         """
         _ = gettext_set_language(ln)
         dummy = 0
@@ -70,7 +70,7 @@ class Template:
         inbox += """
 <table class="mailbox">
   <thead class="mailboxheader">
-    <tr class="inboxheader"> 
+    <tr class="inboxheader">
       <td>%s</td>
       <td>%s</td>
       <td>%s</td>
@@ -85,9 +85,9 @@ class Template:
       <td></td>
     </tr>
   </tfoot>
-  <tbody class="mailboxbody">""" % (_("Subject"), 
-                                    _("Sender"), 
-                                    _("Date"), 
+  <tbody class="mailboxbody">""" % (_("Subject"),
+                                    _("Sender"),
+                                    _("Date"),
                                     _("Action"))
         if len(messages) == 0:
             inbox += """
@@ -96,7 +96,7 @@ class Template:
         <b>%s</b>
       </td>
     </tr>""" %(_("No messages"),)
-        for (msgid, id_user_from, user_from_nick, 
+        for (msgid, id_user_from, user_from_nick,
              subject, sent_date, status) in messages:
             if not(subject):
                 subject = _("No subject")
@@ -118,7 +118,7 @@ class Template:
             s_date = convert_datetext_to_dategui(sent_date, ln)
             stat_style = ''
             if (status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
-                stat_style = ' style="font-weight:bold"' 
+                stat_style = ' style="font-weight:bold"'
             inbox += """
     <tr class="mailboxrecord">
       <td%s>%s</td>
@@ -135,16 +135,16 @@ class Template:
       </td>
       <td>&nbsp;</td>
       <td>
-        <form name="deleteAll" action="url_delete_all" method="post">
+        <form name="deleteAll" action="%(url_delete_all)s" method="post">
           <input type="submit" name="del_all" value="%(delete_all_label)s" class="formbutton" />
         </form>
       </td>
-    </tr> 
+    </tr>
   </tbody>
-</table>""" % {'url_new': create_url(weburl + '/yourmessages/write', 
+</table>""" % {'url_new': create_url(weburl + '/yourmessages/write',
                                      {'ln': ln}),
-               'url_delete_all': create_url(weburl + '/yourmessages/delete_all', 
-                                            {'ln': ln}),                           
+               'url_delete_all': create_url(weburl + '/yourmessages/delete_all',
+                                            {'ln': ln}),
                'write_label': _("Write new message"),
                'delete_all_label': _("Delete All")}
         return indent_text(inbox, 2)
@@ -264,11 +264,11 @@ class Template:
 """
         write_box_part2 = indent_text(write_box_part2, 2)
         write_box += "%(body)s" "</textarea>"+ write_box_part2
-        day_field = create_day_selectbox('msg_send_day', 
+        day_field = create_day_selectbox('msg_send_day',
                                           msg_send_day, ln)
-        month_field = create_month_selectbox('msg_send_month', 
+        month_field = create_month_selectbox('msg_send_month',
                                               msg_send_month, ln)
-        year_field = create_year_selectbox('msg_send_year', -1, 10, 
+        year_field = create_year_selectbox('msg_send_year', -1, 10,
                                             msg_send_year, ln)
         write_box = write_box % {'url_form': create_url(
                                                 weburl + '/yourmessages/send',
@@ -289,13 +289,13 @@ class Template:
                                  'subject_label': _("Subject:"),
                                  'message_label': _("Message:"),
                                  'send_label': _("SEND")}
-        return write_box 
-    
-    def tmpl_display_msg(self, 
+        return write_box
+
+    def tmpl_display_msg(self,
                          msg_id="",
                          msg_from_id="",
                          msg_from_nickname="",
-                         msg_sent_to="", 
+                         msg_sent_to="",
                          msg_sent_to_group="",
                          msg_subject="",
                          msg_body="",
@@ -322,7 +322,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        
+
         sent_to_link = ''
         tos = msg_sent_to.split(CFG_WEBMESSAGE_SEPARATOR)
         if (tos):
@@ -469,7 +469,7 @@ class Template:
         nav_h1 = create_html_link(weburl + '/youraccount/display',
                                   {'ln': ln},
                                   _("Your Account"),
-                                  {'class': 'navtrail'})        
+                                  {'class': 'navtrail'})
         nav_h2 = ""
         if (title != ""):
             nav_h2 += create_html_link(weburl + '/yourmessages/display',
@@ -478,7 +478,7 @@ class Template:
                                        {'class': 'navtrail'})
             return nav_h1 + ' &gt; ' + nav_h2
         return nav_h1
-    
+
     def tmpl_confirm_delete(self, ln=cdslang):
         """
         display a confirm message
@@ -522,7 +522,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         if not((type(infos) is list) or (type(infos) is tuple)):
-            infos = [infos]       
+            infos = [infos]
         infobox = ""
         for info in infos:
             infobox += "<div class=\"infobox\">"
@@ -576,7 +576,7 @@ class Template:
 
         return out
 
-    
+
     def tmpl_multiple_select(self, select_name, tuples_list, ln=cdslang):
         """displays a multiple select environment
         @param tuples_list: a list of (value, isSelected) tuples
@@ -594,7 +594,7 @@ class Template:
                 out += " selected=\"selected\""
             out += ">%s</option>\n"% value
         out += "</select>\n"
-        return out    
+        return out
 
 
     def tmpl_user_or_group_search(self,
@@ -680,12 +680,12 @@ class Template:
         """
         _ = gettext_set_language(ln)
         out = _("You have %s new messages out of %s messages")
-        out %= ('<b>' + str(nb_new_mail) + '</b>', 
-                create_html_link(weburl + '/yourmessages/', 
-                                 {'ln': ln}, 
-                                 str(total_mail), 
-                                 {}, 
+        out %= ('<b>' + str(nb_new_mail) + '</b>',
+                create_html_link(weburl + '/yourmessages/',
+                                 {'ln': ln},
+                                 str(total_mail),
+                                 {},
                                  False, False))
         return out + '.'
 
-    
+
