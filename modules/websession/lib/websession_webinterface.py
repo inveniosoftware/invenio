@@ -716,9 +716,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                mess += _("An email has been sent to the given address with istruction to confirm the validity of the email address.")
+                mess += " " + _("An email has been sent to the given address with instructions how to confirm the email validity.")
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
-                mess += _("A second email will be sent when the account has been activated and can be used.")
+                mess += " " + _("A second email will be sent when the account has been activated and can be used.")
             elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
                 uid = webuser.update_Uid(req, args['p_email'])
                 mess += " " + _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
