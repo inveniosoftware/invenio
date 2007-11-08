@@ -51,7 +51,7 @@ from invenio.bibrankadminlib import \
      tupletotable_onlyselected,\
      addcheckboxes,\
      createhiddenform
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
@@ -427,24 +427,15 @@ def get_oai_src(oai_src_id=''):
 
 def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
     """Modifies a row's parameters"""
-
     try:
-        sql = "UPDATE oaiHARVEST SET name='%s' WHERE id=%s" % (escape_string(oai_src_name), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET baseurl='%s' WHERE id=%s" % (escape_string(oai_src_baseurl), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET metadataprefix='%s' WHERE id=%s" % (escape_string(oai_src_prefix), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET frequency='%s' WHERE id=%s" % (escape_string(oai_src_frequency), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET bibconvertcfgfile='%s' WHERE id=%s" % (escape_string(oai_src_config), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET postprocess='%s' WHERE id=%s" % (escape_string(oai_src_post), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET setspecs='%s' WHERE id=%s" % (escape_string(' '.join(oai_src_sets)), oai_src_id)
-        res = run_sql(sql)
-        sql = "UPDATE oaiHARVEST SET bibfilterprogram='%s' WHERE id=%s" % (escape_string(oai_src_bibfilter), oai_src_id)
-        res = run_sql(sql)
+        res = run_sql("UPDATE oaiHARVEST SET name=%s WHERE id=%s", (oai_src_name, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET baseurl=%s WHERE id=%s", (oai_src_baseurl, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET metadataprefix=%s WHERE id=%s", (oai_src_prefix, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET frequency=%s WHERE id=%s", (oai_src_frequency, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET bibconvertcfgfile=%s WHERE id=%s", (oai_src_config, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET postprocess=%s WHERE id=%s", (oai_src_post, oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET setspecs=%s WHERE id=%s", (' '.join(oai_src_sets), oai_src_id))
+        res = run_sql("UPDATE oaiHARVEST SET bibfilterprogram=%s WHERE id=%s", (oai_src_bibfilter, oai_src_id))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -456,7 +447,7 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
         else:
             lastrun_mode = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # lastrun_mode = "'"+lastrun_mode+"'"
-        sql = "INSERT INTO oaiHARVEST (id, baseurl, metadataprefix, arguments, comment,  bibconvertcfgfile,  name,  lastrun,  frequency,  postprocess,  bibfilterprogram,  setspecs) VALUES (0, '%s', '%s', NULL, NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (escape_string(oai_src_baseurl), escape_string(oai_src_prefix), escape_string(oai_src_config), escape_string(oai_src_name), escape_string(lastrun_mode), escape_string(oai_src_frequency), escape_string(oai_src_post), escape_string(oai_src_bibfilter), escape_string(" ".join(oai_src_sets)))
+        sql = "INSERT INTO oaiHARVEST (id, baseurl, metadataprefix, arguments, comment,  bibconvertcfgfile,  name,  lastrun,  frequency,  postprocess,  bibfilterprogram,  setspecs) VALUES (0, %s, %s, NULL, NULL, %s, %s, %s, %s, %s, %s, %s)", (oai_src_baseurl, oai_src_prefix, oai_src_config, oai_src_name, lastrun_mode, oai_src_frequency, oai_src_post, oai_src_bibfilter, " ".join(oai_src_sets))
         res = run_sql(sql)
         return (1, "")
     except StandardError, e:
