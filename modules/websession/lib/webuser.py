@@ -63,7 +63,7 @@ from invenio.config import \
      version, \
      weburl
 from invenio import session, websession
-from invenio.dbquery import run_sql, escape_string, OperationalError, \
+from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
@@ -772,11 +772,11 @@ def list_users_in_role(role):
     @param role: role of user (string)
     @return list of uids
     """
-    query = """SELECT uacc.id_user
-               FROM user_accROLE uacc JOIN accROLE acc
-                    ON uacc.id_accROLE=acc.id
-               WHERE acc.name='%s'"""
-    res = run_sql(query% escape_string(role))
+    res = run_sql("""SELECT uacc.id_user
+                       FROM user_accROLE uacc JOIN accROLE acc
+                         ON uacc.id_accROLE=acc.id
+                      WHERE acc.name=%s""",
+                  (role,))
     if res:
         return map(lambda x: int(x[0]), res)
     return []
@@ -788,17 +788,19 @@ def list_users_in_roles(role_list):
     """
     if not(type(role_list) is list or type(role_list) is tuple):
         role_list = [role_list]
-    params = ''
-    query = """SELECT distinct(uacc.id_user)
+    query = """SELECT DISTINCT(uacc.id_user)
                FROM user_accROLE uacc JOIN accROLE acc
                     ON uacc.id_accROLE=acc.id
-               %s"""
+               """
+    query_addons = ""
+    query_params = ()
     if len(role_list) > 0:
-        params = 'WHERE '
+        query_params = role_list
+        query_addons = " WHERE "
         for role in role_list[:-1]:
-            params += "acc.name='%s' OR " % escape_string(role)
-        params += "acc.name='%s'" % escape_string(role_list[-1])
-    res = run_sql(query% params)
+            query_addons += "acc.name=%s OR "
+        query_addons += "acc.name=%s"
+    res = run_sql(query + query_addons, query_params)
     if res:
         return map(lambda x: int(x[0]), res)
     return []
