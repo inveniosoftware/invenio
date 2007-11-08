@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import sys
 from copy import copy
 
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql
 
 def get_verbose_print(req, prefix, cur_verbosity_level):
     """Return a function used to print verbose message."""
@@ -41,14 +41,6 @@ def get_verbose_print(req, prefix, cur_verbosity_level):
 def warning(message):
     """Issue a warning alert."""
     sys.stderr.write("WARNING: %(message)s\n" % locals())
-
-def escape_dictionary(dictionary):
-    """Escape values of dictionary of type string with escape_string. Used for building sql query."""
-    dictionary = copy(dictionary)
-    for key in dictionary.keys():
-        if isinstance(dictionary[key], basestring):
-            dictionary[key] = escape_string(dictionary[key])
-    return dictionary
 
 # Collections function
 collections_id = None
@@ -83,8 +75,8 @@ def get_collection_descendants(id_dad):
     "Returns list of all descendants of the collection having for id id_dad."
 
     descendants = []
-    results = run_sql( "SELECT id_son FROM collection_collection WHERE id_dad=%(id_dad)d;" %
-        escape_dictionary({'id_dad' : id_dad}))
+    results = run_sql("SELECT id_son FROM collection_collection WHERE id_dad=%s",
+                      (id_dad,))
     for result in results:
         id_son = int(result[0])
         descendants.append(id_son)
