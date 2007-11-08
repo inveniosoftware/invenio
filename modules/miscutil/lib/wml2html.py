@@ -77,34 +77,31 @@ function_pattern = re.compile(r'''
     ''',\
                                    re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-# Regular expression for finding <!-- %s : %s --> tag in format templates,
+# Regular expression for finding <!-- %s: %s --> tag in format templates,
 # where %s will be replaced at run time
 pattern_tag = r'''
-    <!-- \s* (?P<tag>%s)   #<!-- %%s tag (no matter case)
-    \s*                    #any number of white spaces
-    :
-    \s*
+    <!--\s*(?P<tag>%s)   #<!-- %%s tag (no matter case)
+    \s*:\s*
     (?P<value>.*?)         #description value. any char that is not end tag
-    \s*-->(\n)?            #end tag
+    (\s*-->)            #end tag
     '''
 
 # List of available tags in wml, and the pattern to find it
-pattern_tags = {'title': '',
-                'navtrail_previous_links': '',
-                'navbar_name': '',
-                'navtrail_body': '',
-                'navbar_select': '',
-                'description': '',
-                'keywords': '',
-                'cdspageheaderadd': '',
-                'cdspageboxlefttopadd': '',
-                'cdspageboxleftbottomadd': '',
-                'cdspageboxrighttopadd': '',
-                'cdspageboxrightbottomadd': '',
-                'cdspagefooteradd': ''
+pattern_tags = {'WML-Page-Title': '',
+                'WML-Page-Navtrail-Previous-Links': '',
+                'WML-Page-Navbar-Name': '',
+                'WML-Page-Navtrail-Body': '',
+                'WML-Page-Navbar-Select': '',
+                'WML-Page-Description': '',
+                'WML-Page-Keywords': '',
+                'WML-Page-Header-Add': '',
+                'WML-Page-Box-Left-Top-Add': '',
+                'WML-Page-Box-Left-Bottom-Add': '',
+                'WML-Page-Box-Right-Top-Add': '',
+                'WML-Page-Box-Right-Bottom-Add': '',
+                'WML-Page-Footer-Add': ''
                 }
 for tag in pattern_tags.keys():
-    print pattern_tag % tag
     pattern_tags[tag] = re.compile(pattern_tag % tag, \
                                    re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
@@ -182,7 +179,6 @@ def transform(wml_text, config_text='', lns=[cdslang], verbose=0, req=None, head
         """
         tag = match.group("tag")
         value = match.group("value")
-        print 'found', value
         parameters[tag] = value
         return ''
 
@@ -288,23 +284,23 @@ def transform(wml_text, config_text='', lns=[cdslang], verbose=0, req=None, head
         ## cdspageboxrightbottomadd
         ## cdspagefooteradd
         ##
-        if header_p == True:
+##         if header_p == True:
 ##             localized_body = localized_wml_text
 ##             for tag, pattern in pattern_tags.iteritems():
 ##                 localized_body = pattern.sub(get_param_and_remove, localized_body)
 ##             if page is not None:
-##                 out = page(title=parameters.get('title', ''),
+##                 out = page(title=parameters.get('WML-Page-Title', ''),
 ##                            body=localized_body,
-##                            navtrail=parameters.get('navtrail_previous_links', ''), # or navtrail_body ?
-##                            description=parameters.get('description', ''),
-##                            keywords=parameters.get('keywords', ''),
+##                            navtrail=parameters.get('WML-Page-Navtrail-Previous-Links', ''), # or navtrail_body ?
+##                            description=parameters.get('WML-Page-Description', ''),
+##                            keywords=parameters.get('WML-Page-Keywords', ''),
 ##                            uid=0,
-##                            cdspageheaderadd=parameters.get('cdspageheaderadd', ''),
-##                            cdspageboxlefttopadd=parameters.get('cdspageboxlefttopadd', ''),
-##                            cdspageboxleftbottomadd=parameters.get('cdspageboxleftbottomadd', ''),
-##                            cdspageboxrighttopadd=parameters.get('cdspageboxrighttopadd', ''),
-##                            cdspageboxrightbottomadd=parameters.get('cdspageboxrightbottomadd', ''),
-##                            cdspagefooteradd=parameters.get('cdspagefooteradd', ''),
+##                            cdspageheaderadd=parameters.get('WML-Page-Header-Add', ''),
+##                            cdspageboxlefttopadd=parameters.get('WML-Page-Box-Left-Top-Add', ''),
+##                            cdspageboxleftbottomadd=parameters.get('WML-Page-Box-Left-Bottom-Add', ''),
+##                            cdspageboxrighttopadd=parameters.get('WML-Page-Box-Right-Top-Add', ''),
+##                            cdspageboxrightbottomadd=parameters.get('WML-Page-Box-Right-Bottom-Add', ''),
+##                            cdspagefooteradd=parameters.get('WML-Page-Footer-Add', ''),
 ##                            lastupdated="",
 ##                            language=ln,
 ##                            verbose=verbose,
@@ -314,13 +310,15 @@ def transform(wml_text, config_text='', lns=[cdslang], verbose=0, req=None, head
 ##                            req=req,
 ##                            errors=[],
 ##                            warnings=[],
-##                            navmenuid=parameters.get('navbar_name', ''),
+##                            navmenuid=parameters.get('WML-Page-Navbar-Name', ''),
 ##                            navtrail_append_title_p=1,
 ##                            of="")
 ##             else:
 ##                 out = localized_wml_text
-        else:
-            out = localized_wml_text
+##         else:
+##             out = localized_wml_text
+
+        out = localized_wml_text
 
         html_texts.append((ln, out))
     return html_texts
