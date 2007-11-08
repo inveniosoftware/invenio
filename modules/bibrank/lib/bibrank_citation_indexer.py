@@ -26,7 +26,7 @@ import os
 import marshal
 from zlib import decompress, compress, error
 
-from invenio.dbquery import run_sql, escape_string, serialize_via_marshal, deserialize_via_marshal
+from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.bibformat_utils import parse_tag
@@ -335,7 +335,3 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
                 (serialize_via_marshal(citation_dic), ))
         run_sql("update rnkCITATIONDATA set citation_data_reversed = %s",
                 (serialize_via_marshal(reference_dic), ))
-
-def get_compressed_dictionary(dic):
-    """Serialize Python object vi a marshal into a compressed string."""
-    return escape_string(compress(marshal.dumps(dic)))
