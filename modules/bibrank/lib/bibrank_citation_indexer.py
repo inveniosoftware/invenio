@@ -326,12 +326,12 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic):
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     id = run_sql("SELECT * from rnkCITATIONDATA ")
     if id:
-        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s",
+        run_sql("UPDATE rnkCITATIONDATA SET citation_data_reversed = %s",
                 (serialize_via_marshal(reference_dic), ))
-        run_sql("update rnkCITATIONDATA set citation_data = %s",
+        run_sql("UPDATE rnkCITATIONDATA SET citation_data = %s",
                 (serialize_via_marshal(citation_dic), ))
     else:
-        run_sql("INSERT INTO rnkCITATIONDATA VALUES (%s, null)",
+        run_sql("INSERT INTO rnkCITATIONDATA (citation_data, citation_data_reversed) VALUES (%s, null)",
                 (serialize_via_marshal(citation_dic), ))
-        run_sql("update rnkCITATIONDATA set citation_data_reversed = %s",
+        run_sql("UPDATE rnkCITATIONDATA set citation_data_reversed = %s",
                 (serialize_via_marshal(reference_dic), ))
