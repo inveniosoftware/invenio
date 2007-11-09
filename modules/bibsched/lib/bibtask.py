@@ -294,12 +294,11 @@ def _task_submit(authorization_action, authorization_msg):
     if _options["verbose"] >= 9:
         print ""
         write_message("storing task options %s\n" % _options)
-    _task_params['task_id'] = run_sql("""INSERT INTO schTASK (id,proc,runtime,
-                                            sleeptime,status,arguments)
+    _task_params['task_id'] = run_sql("""INSERT INTO schTASK (id,proc,user,
+                                           runtime,sleeptime,status,arguments)
                                          VALUES (NULL,%s,%s,%s,%s,'WAITING',%s)""",
         (_task_params['task_name'], _options['user'], _options["runtime"],
-        _options["sleeptime"],
-        marshal.dumps(_options)))
+         _options["sleeptime"], marshal.dumps(_options)))
 
     ## update task number:
     _options["task"] = _task_params['task_id']
