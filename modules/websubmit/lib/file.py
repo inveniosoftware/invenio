@@ -310,14 +310,13 @@ class BibDoc:
                     res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
                     if res:
                         raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
-                self.id = run_sql("insert into bibdoc "
-                    "(status,docname,creation_date,modification_date) "
+                self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname,))
                 if self.id is not None:
                     # we link the document to the record if a recid was
                     # specified
                     if self.recid != "":
-                        run_sql("insert into bibrec_bibdoc values(%s,%s,%s)",
+                        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
                             (recid, self.id, self.type,))
                 else:
                     raise StandardError, "New docid cannot be created"
@@ -435,7 +434,7 @@ class BibDoc:
             basename = decompose_file(file)[1]
         newicon = BibDoc(type='Icon', docname=basename)
         newicon.addFilesNewVersion([file])
-        run_sql("insert into bibdoc_bibdoc values(%s,%s,'Icon')",
+        run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
             (self.id, newicon.getId(),))
         if os.path.exists(newicon.getBaseDir()):
             old_umask = os.umask(022)
