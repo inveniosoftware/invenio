@@ -873,15 +873,9 @@ def get_comment(cmtid):
 def save_comment(uid, bskid, recid, title, body):
     """Save a given comment in table bskRECORDCOMMENT"""
     date = convert_datestruct_to_datetext(localtime())
-    res = run_sql("""
-    INSERT INTO bskRECORDCOMMENT
-           (id_user,
-            id_bskBASKET,
-            id_bibrec_or_bskEXTREC,
-            title,
-            body,
-            date_creation)
-    VALUES (%s, %s, %s, %s, %s, %s)""",
+    res = run_sql("""INSERT INTO bskRECORDCOMMENT (id_user, id_bskBASKET,
+                       id_bibrec_or_bskEXTREC, title, body, date_creation)
+                     VALUES (%s, %s, %s, %s, %s, %s)""",
                   (uid, bskid, recid, title, body, date))
     if res:
         return int(res)

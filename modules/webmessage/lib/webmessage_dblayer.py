@@ -414,9 +414,8 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
     user_problem = []
     if len(uids_to) > 0:
         users_quotas = check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
-        query = """INSERT INTO user_msgMESSAGE
-                           (id_user_to, id_msgMESSAGE, status)
-                    VALUES """
+        query = """INSERT INTO user_msgMESSAGE (id_user_to, id_msgMESSAGE,
+                    status) VALUES """
         fixed_value = ",%i,'%s')" % (int(msgid), status)
         def not_users_quotas_has_key(key):
             """ not(is key in users over  quota?)"""

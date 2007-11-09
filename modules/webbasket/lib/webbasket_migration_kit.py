@@ -326,8 +326,9 @@ def __import_records():
         return "(%i,%i,%i,%i,'%s')" % (int(id_record), int(bskid), int(id_owner),
                                        int(order), escape_string(date_modification))
 
-    query2 = """INSERT INTO bskREC
-                (id_bibrec_or_bskEXTREC, id_bskBASKET, id_user_who_added_item, score, date_added) VALUES %s"""
+    query2 = """INSERT INTO bskREC (id_bibrec_or_bskEXTREC, id_bskBASKET,
+                  id_user_who_added_item, score, date_added)
+                VALUES %s"""
     iterator = 0
     while iterator < len(records):
         temp_val = reduce(lambda x, y: x + ',' + y, map(records_updater, records[iterator:iterator+10000]))
