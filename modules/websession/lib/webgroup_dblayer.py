@@ -210,9 +210,9 @@ def insert_new_group(uid,
                       join_policy,
                       login_method='INTERNAL'):
     """Create a new group and affiliate a user."""
-    query1 = """INSERT INTO usergroup
-                VALUES
-                (NULL,%s,%s,%s,%s)
+    query1 = """INSERT INTO usergroup (id, name, description, join_policy,
+                   login_method)
+                VALUES (NULL,%s,%s,%s,%s)
                 """
     params1 = (new_group_name,
                new_group_description,
@@ -222,9 +222,9 @@ def insert_new_group(uid,
 
     date = convert_datestruct_to_datetext(localtime())
     uid = int(uid)
-    query2 = """INSERT INTO user_usergroup
-                VALUES
-                (%s,%s,'A',%s)
+    query2 = """INSERT INTO user_usergroup (id_user, id_usergroup, user_status,
+                   user_status_date)
+                VALUES (%s,%s,'A',%s)
                 """
     params2 = (uid, res1, date)
     res2 = run_sql(query2, params2)
@@ -248,7 +248,8 @@ def insert_new_member(uid,
                       grpID,
                       status):
     """Insert new member."""
-    query = """INSERT INTO user_usergroup
+    query = """INSERT INTO user_usergroup (id_user, id_usergroup, user_status,
+                   user_status_date)
                VALUES (%s,%s,%s,%s)
             """
     date = convert_datestruct_to_datetext(localtime())
