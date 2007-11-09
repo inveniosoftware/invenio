@@ -347,6 +347,9 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         recweightdic[m] = len(wlist)     #could be by weight not by lenght, but thats a BD problem
         #voutput = voutput + str(m)+":"+str(wlist)+" "
         
+    if verbose > 0:
+        voutput = voutput+"\n"+"find_citations retlist "+str(ret)    
+
     ret = [ (key,value) for key, value in recweightdic.iteritems() ] #sort according to values
     #voutput = voutput + str(ret)
     
