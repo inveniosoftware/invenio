@@ -1,0 +1,305 @@
+## -*- mode: html; coding: utf-8; -*-
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: _(Search Tips)_ -->
+<!-- WebDoc-Page-Navbar-Name: search-new -->
+<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>admin/<lang:star: index.*.html>">_(Help Central)_</a> &gt; <a class="navtrail" href="<WEBURL>/help/search/<lang:star: index.*.html>">_(Search Help)_</a> -->
+<!-- WebDoc-Page-Navbar-Select: tips -->
+
+<h5>How to find any value in any field:</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size=20 type="text" name="p" value="" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Empty search box returns all records in the database.
+</td>
+</tr>
+</table>
+
+<h5>How to find documents in a particular collection:</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" nowrap>
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <p>
+    Narrow by collection:
+    <br />
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <br />
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
+    </form>
+    </p>
+</td>
+<td width="50%">
+Click on a link below the search box to see and select subcollections
+such as Preprints or Theses, or select/deselect the tick boxes next to a
+particular collection before doing the search.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="NA60" />
+    <select name="f"><option value="">any field<option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <p>
+    Narrow by collection:
+    <br />
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <br />
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
+    </form>
+    </p>
+</td>
+<td width="50%">
+If you want documents from a 'collection' not proposed by default,
+such as NA60 documents, then enter it as a search term.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#howto-choose-terms>">more on how to wisely choose your search terms...</a></small></div>
+
+<h5>How to search for words/phrases (within titles, abstracts, etc):</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="higgs boson" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing words <em>higgs</em> and <em>boson</em>.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="'higgs boson'" />
+    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing phrase <em>'higgs boson'</em> in title.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
+    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records entitled exactly <em>"Higgs boson"</em> but not records such as
+<em>"Overview of Higgs boson production"</em>.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#words-vs-phrases>">more on word and phrase searches...</a></small></div>
+
+<h5>How to use truncation:</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="muon*" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing words <em>muon</em>, <em>muons</em>, <em>muonic</em>, etc.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#wildcard>">more on truncation...</a></small></div>
+
+<h5>How to use boolean operators:</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="muon kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+    or:
+    <br />
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="muon AND kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing both <em>muon</em> and <em>kaon</em>.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="muon OR kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing either <em>muon</em> or <em>kaon</em>.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="muon NOT kaon" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Returns records containing <em>muon</em> but not <em>kaon</em>.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#boolean>">more on Boolean queries...</a></small></div>
+
+<h5>How to find documents from a certain period:</h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="2003" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option selected="selected">year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Type 2003 and select the year field.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="year:2003" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Alternatively, type field name colon value.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="year:2003->2004" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+You can enter specific year range.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#span>">more on span queries...</a></small></div>
+
+<h5>How to search for authors:</h5>
+
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="Ellis" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Some authors have unique names and
+their publications can be retrieved by searching for
+the surname in any field.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="Ellis, J R" />
+    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+For better results, type surname comma initial(s) and select the author field.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
+    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Sometimes authors are indexed with their full name.
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<WEBURL>/search" method="get">
+    <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
+    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
+    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    </form>
+</td>
+<td width="50%">
+Find papers by J.Ellis written from 1990 until 1993, using truncation
+to match all first names beginning with J.
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="<lang:star: guide.*.html#howto-search-for-author>">more on author searches...</a></small></div>
+
+
+<h5>More information:</h5>
+
+Special characters, regular expressions, fulltext searching, citation
+searching, and other capabilities are fully explained in the complete
+<a href="<lang:star: guide.*.html>">Search Guide</a>.
