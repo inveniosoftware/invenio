@@ -195,7 +195,9 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
     if cmt_id > 0 and value in [-1, 1] and check_user_can_vote(cmt_id, client_ip_address, uid):
         action_date = convert_datestruct_to_datetext(time.localtime())
         action_code = CFG_WEBCOMMENT_ACTION_CODE['VOTE']
-        query = """INSERT INTO cmtACTIONHISTORY
+        query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT,
+                    id_bibrec, id_user, client_host, action_time,
+                    action_code)
                    VALUES (%i, NULL ,%i, inet_aton('%s'), '%s', '%s')"""
         query %= (cmt_id, uid, client_ip_address, action_date, action_code)
         run_sql(query)
@@ -285,7 +287,8 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
         return 0
     action_date = convert_datestruct_to_datetext(time.localtime())
     action_code = CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE']
-    query = """INSERT INTO cmtACTIONHISTORY
+    query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT, id_bibrec,
+                  id_user, client_host, action_time, action_code)
                VALUES (%i, NULL, %i, inet_aton('%s'), '%s', '%s')"""
     query %= (cmt_id, uid, client_ip_address, action_date, action_code)
     run_sql(query)
@@ -586,8 +589,9 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", sco
     if res:
         action_code = CFG_WEBCOMMENT_ACTION_CODE[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
         action_time = convert_datestruct_to_datetext(time.localtime())
-        query2 = """INSERT INTO cmtACTIONHISTORY
-                    values ('', %i, %i, inet_aton('%s'), '%s', '%s')"""
+        query2 = """INSERT INTO cmtACTIONHISTORY  (id_cmtRECORDCOMMENT,
+                     id_bibrec, id_user, client_host, action_time, action_code)
+                    VALUES ('', %i, %i, inet_aton('%s'), '%s', '%s')"""
         params2 = (recID, uid, client_ip_address, action_time, action_code)
         run_sql(query2%params2)
         return int(res)
