@@ -60,6 +60,17 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
+    def test_citations(self):
+        """bibrank - citations"""
+        baseurl = weburl + '/search'
+        error_messages = []
+        _exports = ['?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&rof=hb&verbose=2']
+        for url in [baseurl + page for page in _exports]:
+            error_messages.extend(test_web_page_content(url))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+        
 test_suite = make_test_suite(BibRankWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
