@@ -558,8 +558,9 @@ def acc_add_authorization(name_role='', name_action='', optional=0, **keyval):
                        argumentlistid = %s AND id_accARGUMENT = %s""",
                        (id_role, id_action, 0, 0)):
             # insert new authorization
-            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT values
-                (%s, %s, %s, %s)""", (id_role, id_action, 0, 0))
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
+                         id_accACTION, id_accARGUMENT, argumentlistid)
+                       VALUES (%s, %s, %s, %s)""", (id_role, id_action, 0, 0))
             return [[id_role, id_action, 0, 0], ]
         return []
 
@@ -629,8 +630,9 @@ def acc_add_authorization(name_role='', name_action='', optional=0, **keyval):
 
         # insert
         for id_argument in id_arguments:
-            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT values
-                (%s, %s, %s, %s) """,
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
+                        id_accACTION, id_accARGUMENT, argumentlistid)
+                       VALUES (%s, %s, %s, %s) """,
                 (id_role, id_action, id_argument, arglistid))
             inserted.append([id_role, id_action, id_argument, arglistid])
 
