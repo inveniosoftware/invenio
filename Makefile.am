@@ -67,6 +67,20 @@ kwalitee-check:
 kwalitee-check-errors-only:
 	find $(top_srcdir) -name '*.py' -exec pylint -e {} \; 2> /dev/null
 
+kwalitee-check-sql-queries:
+	@echo "* Listing potentially dangerous SQL queries:"
+	@echo "* 1) SQL INSERT queries without explicit column list:"
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO [[:alnum:]]+[[:space:]]*VALUES' {} \; 2> /dev/null
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO [[:alnum:]]+[[:space:]]*$$' {} \; 2> /dev/null
+	@echo "* 2) SQL queries using charset-ignorant escape_string():"
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'escape_string' {} \; 2> /dev/null
+	@echo "* 3) SQL queries using literal '%s':"
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin "run_sql.*'%[dfis]'" {} \; 2> /dev/null
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.*"%[dfis]"' {} \; 2> /dev/null
+	@echo "* 4) SQL queries with potentially unescaped arguments:"
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.* % ' {} \; 2> /dev/null
+	@echo "* Done."
+
 etags:
 	\rm -f $(top_srcdir)/TAGS
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
