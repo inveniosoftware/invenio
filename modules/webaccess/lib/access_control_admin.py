@@ -220,9 +220,9 @@ def acc_add_role(name_role, description,
     """
 
     if not run_sql("""SELECT * FROM accROLE WHERE name = %s""", (name_role, )):
-        res = run_sql("""INSERT INTO accROLE
-            (name, description, firerole_def_ser, firerole_def_src)
-            VALUES (%s, %s, %s, %s)""",
+        res = run_sql("""INSERT INTO accROLE (name, description,
+                            firerole_def_ser, firerole_def_src)
+                         VALUES (%s, %s, %s, %s)""",
             (name_role, description, firerole_def_ser, firerole_def_src))
         return res, name_role, description, firerole_def_src
     return 0
@@ -479,8 +479,8 @@ def acc_add_argument(keyword='', value=''):
         value = %s""", (keyword, value))[0][0]
     # return id of newly added argument
     except IndexError:
-        return run_sql("""INSERT INTO accARGUMENT
-        (keyword, value) values (%s, %s) """, (keyword, value))
+        return run_sql("""INSERT INTO accARGUMENT (keyword, value)
+                          VALUES (%s, %s) """, (keyword, value))
 
 
 def acc_delete_argument(id_argument):
@@ -857,8 +857,9 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
                 return 0
 
             id_argument = acc_get_argument_id(key, keyval[key])
-            id_argument = id_argument or run_sql("""INSERT INTO accARGUMENT
-                (keyword, value) values (%s, %s) """, (key, keyval[key]))
+            id_argument = id_argument or \
+                          run_sql("""INSERT INTO accARGUMENT (keyword, value)
+                                     VALUES (%s, %s) """, (key, keyval[key]))
 
             id_arguments.append(id_argument) # append the id to the list
     else:
