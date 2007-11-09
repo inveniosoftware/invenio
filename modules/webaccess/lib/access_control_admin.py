@@ -698,9 +698,9 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
                 argumentlistid = -1""", (id_role, id_action, )):
             if verbose:
                 print 'ids: does not exist'
-            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT
-                (id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid)
-                VALUES (%s, %s, -1, -1) """, (id_role, id_action))
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
+                         id_accACTION, id_accARGUMENT, argumentlistid)
+                       VALUES (%s, %s, -1, -1) """, (id_role, id_action))
             return ((id_role, id_action, -1, -1), )
         if verbose:
             print 'ids: exists'
@@ -718,8 +718,9 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
                 (id_role, id_action, 0, 0)):
             if verbose:
                 print 'ids: try to insert'
-            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT
-                values (%s, %s, %s, %s)""", (id_role, id_action, 0, 0))
+            run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
+                         id_accACTION, id_accARGUMENT, argumentlistid)
+                       VALUES (%s, %s, %s, %s)""", (id_role, id_action, 0, 0))
             return ((id_role, id_action, 0, 0), )
         else:
             if verbose:
@@ -784,9 +785,9 @@ def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
                     WHERE id_accROLE = %s AND id_accACTION = %s AND
                     id_accARGUMENT = %s AND argumentlistid = %s""",
                     (id_role, id_action, id_argument, arglistid)):
-                run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT
-                    (id_accROLE, id_accACTION, id_accARGUMENT, argumentlistid)
-                    VALUES (%s, %s, %s, %s)""",
+                run_sql("""INSERT INTO accROLE_accACTION_accARGUMENT (id_accROLE,
+                             id_accACTION, id_accARGUMENT, argumentlistid)
+                           VALUES (%s, %s, %s, %s)""",
                     (id_role, id_action, id_argument, arglistid))
                 inserted.append((id_role, id_action, id_argument, arglistid))
         # [(r, ac, ar1, aid), (r, ac, ar2, aid)]
