@@ -383,7 +383,12 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descript
                          'p3=' + oai_set_p3  + ';' + \
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
-        res = run_sql("INSERT INTO oaiARCHIVE VALUES (0, %s, %s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+
+        res = run_sql("""INSERT INTO oaiARCHIVE (id, setName, setSpec,
+                           setCollection, setDescription, setDefinition,
+                           setRecList, p1, f1, m1, p2, f2, m2, p3, f3, m3)
+                         VALUES (0, %s, %s, %s, %s, %s, NULL, %s, %s, %s,
+                           %s, %s, %s, %s, %s, %s)""",
                       (oai_set_name, oai_set_spec, oai_set_collection,
                        oai_set_description, set_definition, oai_set_p1,
                        oai_set_f1, oai_set_m1, oai_set_p2, oai_set_f2,
