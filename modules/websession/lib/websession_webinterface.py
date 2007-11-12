@@ -90,7 +90,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 try:
                     (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
                 except InvenioWebAccessMailCookieDeletedError:
-                    return webuser.page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), navmenuid='youraccount', language=args['ln'])
+                    return webuser.page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
                 return page(title=title,
                 body=webaccount.perform_back(
                     _("You have successfully obtained an authorization as %(role)s! "
@@ -100,6 +100,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
                     'login', _('login'), args['ln']),
                 req=req,
+                uid=webuser.getUid(uid),
                 language=args['ln'],
                 lastupdated=__lastupdated__,
                 navmenuid='youraccount')
@@ -116,15 +117,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             "enable your account.") + "</p>"
                     else:
                         uid = webuser.update_Uid(req, email)
+                        body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
-                    body=body, req=req, language=args['ln'], lastupdated=__lastupdated__, navmenuid='youraccount')
+                    body=body, req=req, language=args['ln'], uid=webuser.getUid(uid), lastupdated=__lastupdated__, navmenuid='youraccount')
                 except InvenioWebAccessMailCookieDeletedError, e:
                     body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
                         body += "<p>" + _("Please, wait for the administrator to "
                             "enable your account.") + "</p>"
+                    else:
+                        body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
-                        body=body, req=req, language=args['ln'], lastupdated=__lastupdated__, navmenuid='youraccount')
+                        body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount')
                 return webuser.page_not_authorized(req, "../youraccount/access",
                     text=_("This request for confirmation of an email "
                     "address is not valid or"
@@ -721,7 +725,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                mess += " " + _("An email has been sent to the given address with instructions how to confirm the email validity.")
+                mess += " " + _("An email has been sent to the given address with instructions about how to confirm the email validity.")
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
                 mess += " " + _("A second email will be sent when the account has been activated and can be used.")
             elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
@@ -757,6 +761,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             title = _("Registration failure")
         elif ruid == 5:
             mess = _("Users cannot register themselves, only admin can register them.")
+            act = "register"
+            title = _("Registration failure")
+        elif ruid == 6:
+            mess = _("The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken in consideration as soon as possibile.")
             act = "register"
             title = _("Registration failure")
         else:

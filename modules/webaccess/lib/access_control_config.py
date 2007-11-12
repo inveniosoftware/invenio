@@ -189,5 +189,6 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                16: """Error(16): External authentication troubles using '%s' (maybe temporary network problems).""",
                                17: """Error(17): You have not yet confirmed the email address for the '%s' authentication method.""",
                                18: """Error(18): The administrator has not yet activated your account for the '%s' authentication method.""",
+                               19: """Error(19): The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken in consideration as soon as possibile."""
         }
 

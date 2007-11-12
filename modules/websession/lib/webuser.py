@@ -39,7 +39,7 @@ from socket import gethostbyname
 import time
 import os
 import crypt
-import string
+import socket
 import smtplib
 import re
 import random
@@ -321,7 +321,7 @@ def email_valid_p(email):
 
        Return 1 if email is okay, return 0 if it is not.
     """
-    if (string.find(email, "@") <= 0) or (string.find(email, " ") > 0):
+    if (email.find("@") <= 0) or (email.find(" ") > 0):
         return 0
     elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
@@ -360,7 +360,8 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
        Return 0 if the registration is successful, 1 if email is not
        valid, 2 if nickname is not valid, 3 if email is already in the
        database, 4 if nickname is already in the database, 5 when
-       users cannot register themselves because of the site policy.
+       users cannot register themselves because of the site policy, 6 when the
+       site is having problem contacting the user.
 
        If login_method is None or is equal to the key corresponding to local
        authentication, then CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS is taken
@@ -405,12 +406,14 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
             address_activation_key = mail_cookie_create_mail_activation(email)
             ip_address = req.connection.remote_host or req.connection.remote_ip
-
-            if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
-                tmpl.tmpl_account_address_activation_email_body(
-                    email, address_activation_key, ip_address, ln),
-                header='', footer=''):
-                return 1
+            try:
+                if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
+                    tmpl.tmpl_account_address_activation_email_body(
+                        email, address_activation_key, ip_address, ln),
+                    header='', footer=''):
+                    return 1
+            except (smtplib.SMTPException, socket.error):
+                return 6
 
     # okay, go on and register the user:
     user_preference = get_default_user_preferences()
@@ -483,8 +486,10 @@ def loginUser(req, p_un, p_pw, login_method):
                     res = registerUser(req, p_email, p_pw_local, '',
                     register_without_nickname=True,
                     login_method=login_method)
-                if res == 0: # Everything was ok, with or without nickname.
+                elif res == 0: # Everything was ok, with or without nickname.
                     query_result = run_sql("SELECT id from user where email=%s", (p_email,))
+                elif res == 6: # error in contacting the user via email
+                    return([], p_email, p_pw_local, 19)
                 else:
                     return([], p_email, p_pw_local, 13)
             try:
@@ -879,7 +884,7 @@ def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_
             apache_password_file = tmpdir + "/" + apache_password_file
         dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
-        password_apache = string.split(string.strip(line),":")[1]
+        password_apache = line.strip().split(":")[1]
     except: # no pw found, so return not-allowed status
         return False
     salt = password_apache[:2]
@@ -896,7 +901,7 @@ def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
             apache_group_file = tmpdir + "/" + apache_group_file
         dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
         for line in pipe_output.readlines():
-            out.append(string.split(string.strip(line),":")[0])
+            out.append(line.strip().split(":")[0])
     except: # no groups found, so return empty list
         pass
     return out

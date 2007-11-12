@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 import sys
 from time import sleep
 import smtplib
+import socket
 
 from email.Header import Header
 from email.MIMEText import MIMEText
@@ -91,7 +92,7 @@ def send_email(fromaddr,
             server.set_debuglevel(0)
         server.sendmail(fromaddr, toaddr, body)
         server.quit()
-    except:
+    except (smtplib.SMTPException, socket.error), e:
         if attempt_times > 1:
             if (debug_level > 1):
                 log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body)
@@ -99,7 +100,7 @@ def send_email(fromaddr,
             return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
         else:
             log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
-            return False
+            raise e
 
     return True
 
