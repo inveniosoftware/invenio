@@ -121,8 +121,8 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_7_hd_date = '''<center>28 Jun 1998</center>'''
 
-        self.record_7_hd_abstract = '''<p><span class="blocknote"> 
- Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">  
+        self.record_7_hd_abstract = '''<p><span class="blocknote">
+ Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
         self.record_7_hd_resource = '''<span class="blocknote">Resources</span><br /><br />High resolution: <a href="http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033</a><br /><br /><img src="http://preprints.cern.ch/photo/photo-ge/9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>'''
 
@@ -184,7 +184,7 @@ class BibFormatNLMTest(unittest.TestCase):
         self.record_70_xn = '''<?xml version="1.0" encoding="UTF-8"?>
 <articles>
 <article><front><journal-meta><journal-title>J. High Energy Phys.</journal-title><abbrev-journal-title>J. High Energy Phys.</abbrev-journal-title><issn>1126-6708</issn></journal-meta><article-meta><title-group><article-title>AdS/CFT For Non-Boundary Manifolds</article-title></title-group><contrib-group><contrib contrib-type="author"><name><surname>McInnes</surname><given-names>B</given-names></name></contrib></contrib-group><pub-date pub-type="pub"><year>2000</year></pub-date><volume>05</volume><fpage></fpage><lpage></lpage><self-uri xlink:href="%s/record/70" xmlns:xlink="http://www.w3.org/1999/xlink/"/><self-uri xlink:href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003291" xmlns:xlink="http://www.w3.org/1999/xlink/" /></article-meta><abstract>In its Euclidean formulation, the AdS/CFT correspondence begins as a study of Yang-Mills conformal field theories on the sphere, S^4. It has been successfully extended, however, to S^1 X S^3 and to the torus T^4. It is natural tohope that it can be made to work for any manifold on which it is possible to define a stable Yang-Mills conformal field theory. We consider a possible classification of such manifolds, and show how to deal with the most obviousobjection : the existence of manifolds which cannot be represented as boundaries. We confirm Witten's suggestion that this can be done with the help of a brane in the bulk.</abstract></front><article-type>research-article</article-type><ref></ref></article>
-    
+
 
 </articles>''' % weburl
 
@@ -203,7 +203,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
     def setUp(self):
         """Prepare some ideal outputs"""
 
-        self.record_76_hb = '''<strong>Ιθάκη</strong> 
+        self.record_76_hb = '''<strong>Ιθάκη</strong>
  / <a href="%s/search?f=author&amp;p=%%CE%%9A%%CE%%B1%%CE%%B2%%CE%%AC%%CF%%86%%CE%%B7%%CF%%82%%2C%%20%%CE%%9A%%20%%CE%%A0&amp;ln=%s">Καβάφης, Κ Π</a>
 
 
@@ -331,14 +331,41 @@ class BibFormatMARCTest(unittest.TestCase):
                                        expected_text=self.record_29_hm)
         self.assertEqual([], result)
 
+class BibFormatTitleFormattingTest(unittest.TestCase):
+    """Check title formatting produced by BibFormat."""
+
+    def test_subtitle_in_html_brief(self):
+        """bibformat - title subtitle in HTML brief formats"""
+	self.assertEqual([],
+          test_web_page_content(weburl + '/search?p=statistics+computer',
+            expected_text="Statistics: a computer approach"))
+
+    def test_subtitle_in_html_detailed(self):
+        """bibformat - title subtitle in HTML detailed formats"""
+	self.assertEqual([],
+          test_web_page_content(weburl + '/search?p=statistics+computer&of=HD',
+            expected_text="Statistics: a computer approach"))
+
+    def test_title_edition_in_html_brief(self):
+        """bibformat - title edition in HTML brief formats"""
+	self.assertEqual([],
+          test_web_page_content(weburl + '/search?p=2nd',
+            expected_text="Introductory statistics: a decision map; 2nd ed"))
+
+    def test_title_edition_in_html_detailed(self):
+        """bibformat - title edition in HTML detailed formats"""
+	self.assertEqual([],
+          test_web_page_content(weburl + '/search?p=2nd&of=HD',
+            expected_text="Introductory statistics: a decision map; 2nd ed"))
+
 test_suite = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
                              BibFormatBriefHTMLTest,
                              BibFormatNLMTest,
                              BibFormatMARCTest,
                              BibFormatMARCXMLTest,
-                             BibFormatAPITest)
-
+                             BibFormatAPITest,
+                             BibFormatTitleFormattingTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
