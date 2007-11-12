@@ -18,16 +18,3 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 SUBDIRS = admin
-
-webdir=$(localstatedir)/www/bibformat
-
-FILESWML=$(wildcard $(srcdir)/*.wml)
-web_DATA=$(FILESWML:$(srcdir)/%.wml=%)
-
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
-
-CLEANFILES = $(wildcard *.php) *~ *.tmp
-
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
