@@ -20,27 +20,20 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Migration from webbasket [v0.7.1] to [v0.9.0]
-Usage: python webbasket_migration_kit.py
-This utility will copy records and baskets from CDSware 0.7.1 to CDS Invenio 0.9
-It will check for database consistency before copying. Inconsistencies can be:
-    - Baskets that do not belong to a user
-    - Users that posses baskets that do not exist
-    - Baskets that belong to more than one user
-This utility won't erase old baskets unless you choose to do it.
-It needs new tables (bsk*) to be created before. The new tables should be empty before migration (old basket IDs are also copied and could, therefore, cause
-duplicates entries).
-
-Main function: migrate_v071_baskets()
+""" Migration from local clear password [v0.92.1] to local encrypted
+ password_migration_kit
+Usage: python password_migration_kit.py
+This utility will encrypt all the local passwords stored in the database.
+The encryption is not optional with the current Invenio code if local accounts
+are used.
+A backup copy of the user table will be created before the migration just in
+case something goes wrong.
 """
 
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
-from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS
-
 import sys
-
 
 def migrate_passwords():
     print "Password migration kit (for CDS Invenio prior to v0.92.1)"
@@ -88,7 +81,6 @@ def migrate_passwords():
     print "Migration to encrypted local password has been successful."
 
 def __check_update_possibility():
-    """"""
     res = run_sql("SHOW COLUMNS FROM user LIKE 'password'");
     if res:
         return res[0][1] not in ('tinyblob', 'blob')
@@ -190,7 +182,6 @@ def __print_error(restore_backup=False):
         else:
             print "The kit was't unable to restore passwords from the backup"
     sys.exit(1)
-
 
 if __name__ == '__main__':
     migrate_passwords()
