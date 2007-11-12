@@ -28,10 +28,10 @@ Search Engine internals.
 <blockquote>
 <dl>
 
-<dt><a href="stages.html">Search Processing Stages</a> <dd>Explains what
+<dt><a href="search-engine-stages">Search Processing Stages</a> <dd>Explains what
 happens after user hits the SEARCH button.
 
-<dt><a href="api.html">Search Engine API</a> <dd>Explains how to call
+<dt><a href="search-engine-api">Search Engine API</a> <dd>Explains how to call
 search engine from your Python programs, should a need arize.
 
 </dl>
