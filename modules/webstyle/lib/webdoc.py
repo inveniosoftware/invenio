@@ -506,8 +506,8 @@ def write_cache_file(filename, webdoc_cache_dir, filebody):
         except:
             code = 0
             message = v
-        print "I/O Error: " + str(message) + " (" + str(code) + ")"
-        sys.exit(1)
+        raise "I/O Error: " + str(message) + " (" + str(code) + ")"
+        #sys.exit(1)
     # print user info:
     #write_message("... creating %s" % fullfilename, verbose=6)
     #sys.stdout.flush()
