@@ -21,6 +21,13 @@ docdir = $(localstatedir)/www/hacking/websearch
 
 doc_DATA=api.html stages.html index.html
 
+webdoclibdir = $(libdir)/webdoc/hacking
+
+webdoclib_DATA = \
+	search-engine-internals.webdoc \
+	search-engine-api.webdoc \
+	search-engine-stages.webdoc
+
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
 

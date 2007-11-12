@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 <!-- WebDoc-Page-Title: WebSearch Admin -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a> &gt; <a class="navtrail" href="<WEBURL>/admin/websearch/">WebSearch Admin</a> -->
+<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="<WEBURL>/admin/websearch/">WebSearch Admin</a> -->
 <!-- WebDoc-Page-Navbar-Select: websearch -->
 
 <dl>

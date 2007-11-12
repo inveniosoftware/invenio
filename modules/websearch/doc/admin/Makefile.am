@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,6 +20,12 @@
 docdir = $(localstatedir)/www/admin/websearch
 
 doc_DATA = index.html guide.html
+
+webdoclibdir = $(libdir)/webdoc/admin
+
+webdoclib_DATA = \
+	websearch-admin.webdoc \
+	websearch-admin-guide.webdoc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)

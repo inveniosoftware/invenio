@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,6 +24,12 @@ docdir = $(localstatedir)/www/help/search
 doc_DATA=index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.hr.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.bg.html index.zh_CN.html index.zh_TW.html index.uk.html \
 	tips.en.html tips.fr.html tips.de.html tips.pl.html tips.pt.html tips.es.html tips.ca.html tips.hr.html tips.it.html tips.ja.html tips.ru.html tips.sk.html tips.cs.html tips.no.html tips.sv.html tips.el.html tips.bg.html tips.zh_CN.html tips.zh_TW.html tips.uk.html \
 	guide.en.html guide.fr.html guide.de.html guide.pl.html guide.pt.html guide.es.html guide.ca.html guide.hr.html guide.it.html guide.ja.html guide.ru.html guide.sk.html guide.cs.html guide.no.html guide.sv.html guide.el.html guide.bg.html  guide.zh_CN.html guide.zh_TW.html guide.uk.html
+
+webdoclibdir = $(libdir)/webdoc/help
+webdoclib_DATA = \
+	search-help.webdoc \
+	search-tips.webdoc \
+	search-guide.webdoc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
