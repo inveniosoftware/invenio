@@ -21,6 +21,7 @@ pylibdir=$(libdir)/python/invenio
 
 pylib_DATA = 			\
         webdoc.py               \
+        webdoc_webinterface.py  \
 	webpage.py 		\
 	template.py 		\
 	webstyle_templates.py 	\
