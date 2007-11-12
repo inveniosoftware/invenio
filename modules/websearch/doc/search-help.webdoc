@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: _(Search Help)_ -->
 <!-- WebDoc-Page-Navbar-Name: search-new -->
-<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Help Central)_</a> -->
+<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/help/index.<lang:current/>.html">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: tips -->
 
 <p><lang>
@@ -40,7 +40,7 @@
 <blockquote>
 <dl>
 
-<dt><a href="tips.<lang:current/>.html">_(Search Tips)_</a></dt>
+<dt><a href="search-tips?ln=<lang:current/>">_(Search Tips)_</a></dt>
 
 <dd><lang>
       <en>
@@ -85,7 +85,7 @@
       </sv>
     </lang>
 </dd>
-<dt><a href="guide.<lang:current/>.html">
+<dt><a href="search-guide?ln=<lang:current/>">
      <lang>
        <en>Search Guide</en>
        <fr>Guide de Recherche</fr>

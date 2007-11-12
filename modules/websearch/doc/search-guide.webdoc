@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: _(Search Guide)_ -->
 <!-- WebDoc-Page-Navbar-Name: search-new -->
-<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Help Central)_</a> &gt; <a class="navtrail" href="<WEBURL>/help/search/index.<lang:current/>.html">_(Search Help)_</a> -->
+<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/help/index.<lang:current/>.html">_(Help Central)_</a> &gt; <a class="navtrail" href="<WEBURL>/doc/search-help?ln=<lang:current/>">_(Search Help)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: guide -->
 
 <lang>
@@ -1495,7 +1495,6 @@ selected> t&iacute;tol<option>autor</select>
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" ""1" ""1""
    <p><table class="errorbox">
    <thead>
    <tr>
@@ -1513,7 +1512,6 @@ selected> t&iacute;tol<option>autor</select>
    </tr>
    </tbody>
    </table>
-">
 </en>
 <es>
 <p>El motor de búsqueda se basa en el estandar Unicode UTF-8, lo que
@@ -1540,7 +1538,6 @@ escritos por (o sobre) Пушкин, debemos escribir:
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" ""1" ""1""
    <p><table CLASS="errorbox">
    <thead>
    <tr>
@@ -1558,7 +1555,6 @@ recuperarse entrando los caracteres acentuados en la consulta.
    </tr>
    </TBODY>
    </table>
-">
 </es>
 
 <ca>
@@ -1586,7 +1582,6 @@ que contenen paraules accentuades.  Per exemple, escriurem <code>Lemaitre</code>
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" ""1" ""1""
    <p><table CLASS="errorbox">
    <thead>
    <tr>
@@ -1604,7 +1599,6 @@ recuperar entrant els caràcters accentuats a la consulta.
    </tr>
    </TBODY>
    </table>
-">
 </ca>
 </lang>
 
@@ -2375,26 +2369,6 @@ cal escriure:
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
       </form>
-
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   IMPORTANT NOTE
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Currently, fulltext files and references are not fully searchable on the CERN site.
-      Assumed operational time: Q1 2007.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </en>
 <es>
 <p>Toda la sintaxis mencionada anteriormente se puede combinar en una
@@ -2445,24 +2419,6 @@ escribirse:
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" ""1" ""1""
-   <p><table CLASS="errorbox">
-   <thead>
-   <tr>
-   <TH CLASS="errorboxheader">
-   NOTA IMPORTANTE
-   </TH>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Actualmente, los registros con archivos a texto completo y citas no se pueden recuperar en el web de CERN.      Assumed operational time: Q1 2007.
-   </td>
-   </tr>
-   </TBODY>
-   </table>
-">
 </es>
 
 <ca>
@@ -2512,24 +2468,6 @@ les metadades, les referències o el text complet, cal escriure:
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" ""1" ""1""
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <Th class="errorboxheader">
-   NOTA IMPORTANT
-   </TH>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Actualment, els registres amb arxius a text complet i referències no es poden recuperar al web de CERN.      Assumed operational time: Q1 2007.
-   </td>
-   </tr>
-   </TBODY>
-   </table>
-">
 </ca>
 </lang>
 
@@ -3215,25 +3153,6 @@ search engines.
 support it.  For example, SPIRES or KEK cannot search for terms within
 "any field", so we don't link to them in these cases.
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-
-   <p>Note also that KEK has scanned a lot of old CERN reports.  If
-    you find that we don't have fulltext to some old CERN report, it
-    may be worthy to look there.  For example, search for <em>CERN
-    ISR-MA/73-17</em> in our system:
-
-      <form action="<WEBURL>/search" method="get">
-      <blockquote>
-      <input size="40" type="text" name="p" value="CERN ISR-MA/73-17">
-      <select name="f"><option value="">any field<option>title<option>author<option selected>reportnumber</select>
-      <input class="formbutton" type="submit" name="action" value="SEARCH">
-      </blockquote>
-      </form>
-
-   and you will see that CDS contains the document in the archives only, i.e. not in a electronic format.
-   However, if you follow the proposed <a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=CERN%20ISR-MA/73-17">KEK search link</a>,
-   you will see that KEK proposes &quot;scanned images&quot; that you can download.
-">
 </en>
 <ca>
 <p>A la pàgina de resultats de cerca, s'ofereixen automàticament
@@ -3247,21 +3166,6 @@ cercadors.
 
 <p>Observis que els enllaços a altres cercadors no es mostren si el cercador no suporta la cerca.  Per exemple, SPIRES o KEK no poden cercar termes dintre del camp "qualsevol camp", de forma que en aquests casos, el sistema no els enllaçarà.
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-
-<p>Observis també que KEK ha escanejat molts informes antics del CERN. Si es comprova que no es disposa del text complet d'un informe antic del CERN, pot ser interessant cercar aquí.  Per exemple, si es cerca per <em>CERN
-    ISR-MA/73-17</em> dins el sistema:
-
-      <form action="<WEBURL>/search" method="get">
-      <blockquote>
-      <input size="40" type="text" name="p" value="CERN ISR-MA/73-17">
-      <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor<option selected>reportnumber</select>
-      <input class="formbutton" type="submit" name="action" value="CERCA">
-      </blockquote>
-      </form>
-
-es pot comprovar que CDS conté el document únicament als arxius, i.e. no en format electrònic.  Ara bé, si seguim <a href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=CERN%20ISR-MA/73-17">l'enllaç a KEK</a>proposat, podem observar que ens ofereix &quot;imatges escanejades&quot; que podem descarregar.
-">
 </ca>
 
 <es>
@@ -3279,27 +3183,6 @@ buscador no soporta el tipo de búsqueda.  Por ejemplo, SPIRES o KEK no
 pueden buscar términos dentro del campo "cualquier campo", de forma
 que en estos casos, el sistema no los enlazará.
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-
-<p>Obsérvese también que KEK ha escaneado un gran número de informes
-    antiguos del CERN. Si se comprueba que no se dispone del texto
-    completo de un informe antiguo del CERN, puede ser interesante
-    buscar allí.  Por ejemplo, si se busca por <em>CERN
-    ISR-MA/73-17</em> dentro del sistema:
-
-      <form action="<WEBURL>/search" method="get">
-      <blockquote>
-      <input size="40" type="text" name="p" value="CERN ISR-MA/73-17">
-      <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor<option selected>reportnumber</select>
-      <input class="formbutton" type="submit" name="action" value="BUSCAR">
-      </blockquote>
-      </form>
-
-se puede comprobar que CDS contiene el documento únicamente en los
-archivos, i.e. no en formato electrónico.  Sin embargo, si seguimos <a
-href="http://www-lib.kek.jp/cgi-bin/kiss_prepri?RP=CERN%20ISR-MA/73-17">el
-enlace a KEK</a>propuesto, podemos observar que nos ofrece
-&quot;imágenes escaneadas&quot; que podemos descargar.  ">
 </es>
 </lang>
 
@@ -3341,28 +3224,6 @@ metadata or in the fulltext, type:
       </form>
 
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   IMPORTANT NOTE
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Currently, the fulltext indexes aren't available on the CERN site.
-      Assumed operational time: Q1 2007.
-      Please use the
-      <a href="http://weblib.cern.ch/fulltext.shtml">old fulltext interface</a>
-      instead in the meantime.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </en>
 
 <ca>
@@ -3396,26 +3257,6 @@ metadades como all text complet, cal escriure:
       </form>
 
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   NOTA IMPORTANT
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      En aquests moments, els índexs de text complet no estan disponibles al web del CERN.  Assumed operational time: Q1 2007.
-      Sius plau, emprar mentrestant l'antiga
-      <a href="http://weblib.cern.ch/fulltext.shtml">interfície de text complet</a>.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </ca>
 <es>
 <p>Si un registro de metadatos contiene archivos a texto completo
@@ -3449,27 +3290,6 @@ tanto en los metadatos como en el texto completo, debemos escribir:
       </form>
 
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   NOTA IMPORTANTE
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      En estos momentos, los índices de texto completo no están disponibles en el web del CERN.
-      Assumed operational time: Q1 2007.
-      Por favor, utilicen mientras tanto el
-      <a href="http://weblib.cern.ch/fulltext.shtml"> antiguo interfaz de texto completo</a>.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </es>
 </lang>
 
@@ -3533,26 +3353,6 @@ For example, to find all articles on <em>standard model</em> that aren't written
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   IMPORTANT NOTE
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Currently, the reference indexes aren't available on the CERN site.
-      The citation search is therefore impossible at the moment.
-      Assumed operational time: Q1 2007.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </en>
 <es>
 <p>Si un registro de metadatos contiene un fichero de texto asociado,
@@ -3608,24 +3408,6 @@ artículos sobre <em>modelo estándar</em> que no han sido escritos por
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   NOTA IMPORTANTE</th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Actualmente, los índices de citas bibliográficas no estan disponibles en la pàgina web.  La búsqueda por cita bibliográfica es imposible en este momento.
-      Assumed operational time: Q1 2007.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </es>
 
 <ca>
@@ -3684,25 +3466,5 @@ citen, escriurem:
       </blockquote>
       </form>
 
-<ifeq "<CFG_CERN_SITE>" "1" "
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-   NOTA IMPORTANT</th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-      Actualment, els índexs de referències bibliogràfiques no estan
-      disponibles a la pàgina web.  La cerca per cita bibliogràfica no
-      és possible en aquest moment.  Assumed operational time: Q1
-      2007.
-   </td>
-   </tr>
-   </tbody>
-   </table>
-">
 </ca>
 </lang>

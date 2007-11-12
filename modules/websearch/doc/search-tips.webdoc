@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: _(Search Tips)_ -->
 <!-- WebDoc-Page-Navbar-Name: search-new -->
-<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>admin/index.<lang:current/>.html">_(Help Central)_</a> &gt; <a class="navtrail" href="<WEBURL>/help/search/index.<lang:current/>.html">_(Search Help)_</a> -->
+<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/help/index.<lang:current/>.html">_(Help Central)_</a> &gt; <a class="navtrail" href="<WEBURL>/doc/search-help?ln=<lang:current/>">_(Search Help)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: tips -->
 
 <h5>How to find any value in any field:</h5>
@@ -85,7 +85,7 @@ such as NA60 documents, then enter it as a search term.
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#howto-choose-terms">more on how to wisely choose your search terms...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#howto-choose-terms">more on how to wisely choose your search terms...</a></small></div>
 
 <h5>How to search for words/phrases (within titles, abstracts, etc):</h5>
 
@@ -128,7 +128,7 @@ Returns records entitled exactly <em>"Higgs boson"</em> but not records such as
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#words-vs-phrases">more on word and phrase searches...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#words-vs-phrases">more on word and phrase searches...</a></small></div>
 
 <h5>How to use truncation:</h5>
 
@@ -146,7 +146,7 @@ Returns records containing words <em>muon</em>, <em>muons</em>, <em>muonic</em>,
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#wildcard">more on truncation...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#wildcard">more on truncation...</a></small></div>
 
 <h5>How to use boolean operators:</h5>
 
@@ -195,7 +195,7 @@ Returns records containing <em>muon</em> but not <em>kaon</em>.
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#boolean">more on Boolean queries...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#boolean">more on Boolean queries...</a></small></div>
 
 <h5>How to find documents from a certain period:</h5>
 
@@ -237,7 +237,7 @@ You can enter specific year range.
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#span">more on span queries...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#span">more on span queries...</a></small></div>
 
 <h5>How to search for authors:</h5>
 
@@ -295,11 +295,11 @@ to match all first names beginning with J.
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="guide.<lang:current/>.html#howto-search-for-author">more on author searches...</a></small></div>
+<div align="right"><small><a href="search-guide?ln=<lang:current/>#howto-search-for-author">more on author searches...</a></small></div>
 
 
 <h5>More information:</h5>
 
 Special characters, regular expressions, fulltext searching, citation
 searching, and other capabilities are fully explained in the complete
-<a href="guide.<lang:current/>.html>">Search Guide</a>.
+<a href="search-guide?ln=<lang:current/>">Search Guide</a>.
