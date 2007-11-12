@@ -60,14 +60,29 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
+class BibRankWordSimilarityRankingTest(unittest.TestCase):
+    """Check BibRank word similarity ranking tools."""
+
+    def test_search_results_ranked_by_citations(self):
+        """bibrank - search results ranked by word similarity"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=ellis&rm=wrd&of=id',
+                                               expected_text="[10, 8, 11, 12, 13, 15, 17, 47, 16, 18, 9, 14]"))
+
+    def test_similar_records_link(self):
+        """bibrank - 'Similar records' link"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/search?p=recid%3A5&rm=wrd&of=id',
+                                               expected_text="[86, 5]"))
+
 class BibRankCitationRankingTest(unittest.TestCase):
     """Check BibRank citation ranking tools."""
 
     def test_search_results_ranked_by_citations(self):
         """bibrank - search results ranked by number of citations"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&rg=1',
-                                               expected_text="hep-th/0212138"))
+                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&of=id',
+                                               expected_text="[84, 77, 85]"))
 
     def test_search_results_ranked_by_citations_verbose(self):
         """bibrank - search results ranked by number of citations, verbose output"""
@@ -76,6 +91,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
                                                expected_text="find_citations retlist [(84, 3), (77, 2), (85, 0)]"))
 
 test_suite = make_test_suite(BibRankWebPagesAvailabilityTest,
+                             BibRankWordSimilarityRankingTest,
                              BibRankCitationRankingTest)
 
 if __name__ == "__main__":
