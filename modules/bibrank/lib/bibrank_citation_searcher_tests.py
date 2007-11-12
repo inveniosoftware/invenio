@@ -34,7 +34,7 @@ class TestCitationSearcher(unittest.TestCase):
         """Initialize stuff"""
         self.recid = 339705
         self.recids = [339705, 339706]
-        self.rank_method_code = 'cit'
+        self.rank_method_code = 'citation'
        
     def xtest_init_cited_by_dictionary(self):
         """bibrank citation searcher - init cited-by data"""
