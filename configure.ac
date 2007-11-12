@@ -618,6 +618,8 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webstat/etc/Makefile \
 	  modules/webstat/lib/Makefile \
 	  modules/webstyle/Makefile \
+	  modules/webstyle/bin/Makefile \
+	  modules/webstyle/bin/webdoc \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/doc/Makefile \
 	  modules/webstyle/doc/admin/Makefile \
