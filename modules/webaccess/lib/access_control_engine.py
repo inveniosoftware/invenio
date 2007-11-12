@@ -31,6 +31,7 @@ from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_
 from invenio import webuser
 from invenio import access_control_firerole
 from invenio.urlutils import make_canonical_urlargd
+from urllib import quote
 
 called_from = 1 #1=web,0=cli
 try:
@@ -102,6 +103,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
     #            return (10, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[10], (called_from and CFG_WEBACCESS_MSGS[1] or "")))
     # TASK 0: find id and allowedkeywords of action
 
+    user_info = {}
     if check_only_uid_p:
         id_user = req
     else:
@@ -130,12 +132,18 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 from accACTION a
                 where a.name = '%s'""" % (name_action)
 
-    try: id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
-    except (ProgrammingError, IndexError): return (3, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[3] % name_action, (called_from and CFG_WEBACCESS_MSGS[1] or "")))
+    try:
+        id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
+    except (ProgrammingError, IndexError):
+        return (3, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[3] % name_action, (called_from and CFG_WEBACCESS_MSGS[1] or "")))
 
     defkeys = aallowedkeywords.split(',')
     for key in arguments.keys():
-        if key not in defkeys: return (8, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[8], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) #incorrect arguments?
+        if key not in defkeys:
+            if user_info.has_key('uri'):
+                return (8, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[8], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""))) #incorrect arguments?
+            else:
+                return (8, "%s" % (CFG_WEBACCESS_WARNING_MSGS[8]))
     # -------------------------------------------
 
 
@@ -169,17 +177,27 @@ check_only_uid_p - hidden parameter needed to only check against uids without
         if res2:
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res2[0][1] not in [1, "1"]:
                 if res2[0][0]:
-                    return (9, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % res2[0][0], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+                    if user_info.has_key('uri'):
+                        return (9, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % res2[0][0], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+                    else:
+                        return (9, CFG_WEBACCESS_WARNING_MSGS[9] % res2[0][0])
                 else:
                     raise Exception
         if check_only_uid_p:
             query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s AND ur.expiration>=NOW() ORDER BY ur.id_accROLE """ % id_user
             res2 = run_sql_cached(query2, affected_tables=['user_accROLE'])
-    except Exception: return (6, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[6], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+    except Exception:
+        if user_info.has_key('uri'):
+            return (6, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[6], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+        else:
+            return (6, CFG_WEBACCESS_WARNING_MSGS[6])
 
     if check_only_uid_p:
         if not res2:
-            return (2, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[2], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) #user has no roles
+            if user_info.has_key('uri'):
+                return (2, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[2], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""))) #user has no roles
+            else:
+                return (2, CFG_WEBACCESS_WARNING_MSGS[2])
         # -------------------------------------------
 
         # create role string (add default value? roles='(raa.id_accROLE='def' or ')
@@ -204,7 +222,10 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 if connection and 1:
                     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+                    if user_info.has_key('uri'):
+                        return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+                    else:
+                        return (1, "%s" % CFG_WEBACCESS_WARNING_MSGS[1])
             else:
                 connection = run_sql_cached("""SELECT id_accROLE FROM
                         accROLE_accACTION_accARGUMENT
@@ -216,7 +237,10 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                if user_info.has_key('uri'):
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                else:
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
 
         # 3.2
         if optional == 'yes':
@@ -231,7 +255,10 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 if connection and 1:
                     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+                    if user_info.has_key('uri'):
+                        return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+                    else:
+                        return (1, CFG_WEBACCESS_WARNING_MSGS[1])
             else:
                 connection = run_sql_cached("""SELECT id_accROLE FROM
                         accROLE_accACTION_accARGUMENT
@@ -242,7 +269,10 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 for id_accROLE in connection:
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                if user_info.has_key('uri'):
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                else:
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
@@ -293,7 +323,11 @@ check_only_uid_p - hidden parameter needed to only check against uids without
 
     res5 = []
     if check_only_uid_p:
-        if not res4: return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""))) # no entries at all
+        if not res4:
+            if user_info.has_key('uri'):
+                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""))) # no entries at all
+            else:
+                return (1, CFG_WEBACCESS_WARNING_MSGS[1])
 
         res5 = []
         for res in res4:
@@ -304,7 +338,10 @@ check_only_uid_p - hidden parameter needed to only check against uids without
             if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(row[0])):
                 res5.append(row)
         if not res5:
-            return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None)))) # no entries at all
+            if user_info.has_key('uri'):
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+            else:
+                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
 
     res5.sort()
 
@@ -350,4 +387,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
 
     if verbose: print 'finished'
     # authentication failed
-    return (4, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[4], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % name_action[3:], CFG_WEBACCESS_MSGS[1]) or "")))
+    if user_info.has_key('uri'):
+        return (4, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[4], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+    else:
+        return (4, CFG_WEBACCESS_WARNING_MSGS[4])
