@@ -45,9 +45,6 @@ noinst_DATA = testimport.py \
               kwalitee.py \
               api_migration_kit.sh
 
-phplibdir = $(libdir)/php/invenio/errors
-phplib_DATA = errorHandling.php
-
 EXTRA_DIST = __init__.py \
              errorlib.py \
              errorlib_tests.py \
@@ -60,7 +57,6 @@ EXTRA_DIST = __init__.py \
              mailutils.py \
              miscutil_config.py \
              messages.py.wml \
-             errorHandling.php.wml \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
@@ -82,7 +78,6 @@ EXTRA_DIST = __init__.py \
              intbitset_tests.py \
              intbitset.pyx
 
-
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
 
@@ -90,7 +85,7 @@ install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
 	$(PYTHON) $(srcdir)/intbitset_setup.py install
 
-CLEANFILES = config.py dbquery.py messages.py $(phplib_DATA) *~ *.tmp *.pyc
+CLEANFILES = config.py dbquery.py messages.py *~ *.tmp *.pyc
 
 clean-local:
 	rm -rf build
@@ -104,9 +99,5 @@ dbquery.py: dbquery.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/confi
 	$(WML) -o $@ $<
 
 messages.py: messages.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-
-errorHandling.php: errorHandling.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
       $(top_srcdir)/config/cdswmllib.wml
 	$(WML) -o $@ $<
