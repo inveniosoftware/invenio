@@ -810,9 +810,9 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -o,  --output=output.html \t\t Path of the output file (default: same as input, without .wml extension)\n")
     sys.stderr.write("  -c,  --config=config.wml \t\t Config file\n")
     sys.stderr.write("\n")
-    sys.stderr.write(" Example: wml2html -i inputfile.wml -o outputfile.html\n")
-    sys.stderr.write(" Example: wml2html -i inputfile.wml -o outputfile.html -l en,fr,\n")
-    sys.stderr.write(" Example: wml2html.py -i ../../miscutil/lib/config.py.wml -c ../../../config/config.wml -c ../../../config/configbis.wml  -o /tmp/config.py -l en ")
+    sys.stderr.write(" Example: webdoc -i inputfile.wml -o outputfile.html\n")
+    sys.stderr.write(" Example: webdoc -i inputfile.wml -o outputfile.html -l en,fr,\n")
+    sys.stderr.write(" Example: webdoc -i ../../miscutil/lib/config.py.wml -c ../../../config/config.wml -c ../../../config/configbis.wml  -o /tmp/config.py -l en ")
     sys.stderr.write("\n")
 
     sys.exit(exitcode)
