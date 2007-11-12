@@ -243,9 +243,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../youraccount/edit",
                                                text=_("This functionality is forbidden to guest users."),
                                                navmenuid='youraccount')
+        body = ''
+        if args['verbose']==9:
+            user_info = webuser.collect_user_info(req)
+            for key, value in user_info.items():
+                body += "<b>%s</b>:%s<br>" % (key, value)
 
         return page(title= _("Your Settings"),
-                    body=webaccount.perform_set(webuser.get_email(uid),
+                    body=body+webaccount.perform_set(webuser.get_email(uid),
                                                 args['ln'], verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % cdsnameintl.get(args['ln'], cdsname),
