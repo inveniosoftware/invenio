@@ -23,26 +23,18 @@
 <!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: tips -->
 
-<p><lang><en>Find out all about searching</en>
-   <fr>Trouvez tout sur la recherche de</fr>
-   <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
-   <es>Find out all about searching</es>
-   <ca>Trobeu tota l'ajuda sobre la cerca</ca>
-   <pl>Find out all about searching</pl>
-   <pt>Descubra tudo sobre buscas no</pt>
-   <it>Tutto quanto vi serve per poter ricercare in</it>
-   <ru>Find out all about searching</ru>
-   <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
-   <cs>Zde naleznete vše co se týče vyhledávání na serveru</cs>
-   <no>Finn ut alt om søking i</no>
-   <sv>Finn ut allt om sökning av</sv>
-   <el>Find out all about searching</el>
-   <uk>Find out all about searching</uk>
-   <ja>Find out all about searching</ja>
-   <bg>Find out all about searching</bg>
-   <hr>Find out all about searching</hr>
-   <zh_CN>Find out all about searching</zh_CN>
-   <zh_TW>Find out all about searching</zh_TW></lang>
+<p><lang>
+     <en>Find out all about searching</en>
+     <fr>Trouvez tout sur la recherche de</fr>
+     <de>Lernen Sie alles über den Suchemöglichkeiten beim</de>
+     <ca>Trobeu tota l'ajuda sobre la cerca</ca>
+     <pt>Descubra tudo sobre buscas no</pt>
+     <it>Tutto quanto vi serve per poter ricercare in</it>
+     <sk>Tu nájdete všetko čo sa týka hľadania na serveri</sk>
+     <cs>Zde naleznete vše co se týče vyhledávání na serveru</cs>
+     <no>Finn ut alt om søking i</no>
+     <sv>Finn ut allt om sökning av</sv>
+   </lang>
    <CDSNAMEINTL>
 </p>
 <blockquote>
@@ -51,134 +43,62 @@
 <dt><a href="tips.<lang:current/>.html">_(Search Tips)_</a></dt>
 
 <dd><lang>
-    <en>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </en>
-    <fr>
-      Cette page vous présente des suggestions et des techniques qui puissent vous être utiles
-      afin d'utiliser au mieux <CDSNAMEINTL>.
-    </fr>
-    <de>
-      Diese Seite zeigt Ihnen alle nützliche Tipps und Techniken die
-      beim <CDSNAMEINTL> zur Verfügung stehen.
-    </de>
-    <es>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </es>
-    <ca>
-      Aquesta pàgina us presenta suggeriments i tècniques que us poden
-      resultar útils per usar <CDSNAMEINTL> en totes les seves possibilitats.
-    </ca>
-    <pl>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </pl>
-    <pt>
-      Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do
-      <CDSNAMEINTL> em toda sua potencialidade.
-    </pt>
-    <it>
-      Questa pagina vi fornisce utili consigli per servirvi al meglio
-      <CDSNAMEINTL>.
-    </it>
-    <ru>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </ru>
-    <sk>
-      Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
-      plne využívať možností <CDSNAMEINTL>.
-    </sk>
-    <cs>
-      Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
-      plně využívat možností <CDSNAMEINTL>.
-    </cs>
-    <no>
-      Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
-      fullt utbytte av <CDSNAMEINTL> sine sider.
-    </no>
-    <sv>
-      Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
-      till fullo använda denna webbplats som <CDSNAMEINTL> erbjuder dig.
-    </sv>
-    <el>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </el>
-    <uk>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </uk>
-    <ja>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </ja>
-    <bg>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </bg>
-    <hr>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </hr>
-    <zh_CN>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </zh_CN>
-    <zh_TW>
-      This page presents you with useful tips and techniques in order to
-      help you use the <CDSNAMEINTL> site to the full.
-    </zh_TW>
+      <en>
+        This page presents you with useful tips and techniques in order to
+        help you use the <CDSNAMEINTL> site to the full.
+      </en>
+      <fr>
+        Cette page vous présente des suggestions et des techniques qui puissent vous être utiles
+        afin d'utiliser au mieux <CDSNAMEINTL>.
+      </fr>
+      <de>
+        Diese Seite zeigt Ihnen alle nützliche Tipps und Techniken die
+        beim <CDSNAMEINTL> zur Verfügung stehen.
+      </de>
+      <ca>
+        Aquesta pàgina us presenta suggeriments i tècniques que us poden
+        resultar útils per usar <CDSNAMEINTL> en totes les seves possibilitats.
+      </ca>
+      <pt>
+        Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do
+        <CDSNAMEINTL> em toda sua potencialidade.
+      </pt>
+      <it>
+        Questa pagina vi fornisce utili consigli per servirvi al meglio
+        <CDSNAMEINTL>.
+      </it>
+      <sk>
+        Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
+        plne využívať možností <CDSNAMEINTL>.
+      </sk>
+      <cs>
+        Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
+        plně využívat možností <CDSNAMEINTL>.
+      </cs>
+      <no>
+        Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
+        fullt utbytte av <CDSNAMEINTL> sine sider.
+      </no>
+      <sv>
+        Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
+        till fullo använda denna webbplats som <CDSNAMEINTL> erbjuder dig.
+      </sv>
     </lang>
 </dd>
 <dt><a href="guide.<lang:current/>.html">
      <lang>
-     <en>Search Guide</en>
-     <fr>Guide de Recherche</fr>
-     <de>Search Guide</de>
-     <es>Search Guide</es>
-     <ca>Guia de Cerca</ca>
-     <pl>Search Guide</pl>
-     <pt>Guia de buscas</pt>
-     <it>Search Guide</it>
-     <ru>Search Guide</ru>
-     <sk>Search Guide</sk>
-     <cs>Search Guide</cs>
-     <no>Search Guide</no>
-     <sv>Search Guide</sv>
-     <el>Search Guide</el>
-     <uk>Search Guide</uk>
-     <ja>Search Guide</ja>
-     <bg>Search Guide</bg>
-     <hr>Search Guide</hr>
-     <zh_CN>Search Guide</zh_CN>
-     <zh_TW>Search Guide</zh_TW>
+       <en>Search Guide</en>
+       <fr>Guide de Recherche</fr>
+       <ca>Guia de Cerca</ca>
+       <pt>Guia de buscas</pt>
      </lang>
     </a>
 </dt>
 <dd><lang>
-    <en>Full guide on how to search</en>
-    <fr>Le guide complet sur comment rechercher sur</fr>
-    <de>Full guide on how to search</de>
-    <es>Full guide on how to search</es>
-    <ca>Guia completa de com cercar a l'</ca>
-    <pl>Full guide on how to search</pl>
-    <pt>Guia completo de como realizar buscas no</pt>
-    <it>Full guide on how to search</it>
-    <ru>Full guide on how to search</ru>
-    <sk>Full guide on how to search</sk>
-    <cs>Full guide on how to search</cs>
-    <no>Full guide on how to search</no>
-    <sv>Full guide on how to search</sv>
-    <el>Full guide on how to search</el>
-    <uk>Full guide on how to search</uk>
-    <ja>Full guide on how to search</ja>
-    <bg>Full guide on how to search</bg>
-    <hr>Full guide on how to search</hr>
-    <zh_CN>Full guide on how to search</zh_CN>
-    <zh_TW>Full guide on how to search</zh_TW>
+      <en>Full guide on how to search</en>
+      <fr>Le guide complet sur comment rechercher sur</fr>
+      <ca>Guia completa de com cercar a l'</ca>
+      <pt>Guia completo de como realizar buscas no</pt>
     </lang>
     <CDSNAMEINTL>.
 </dd>
