@@ -32,7 +32,6 @@ __revision__ = "$Id$"
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
-import string
 import re
 try:
     import psyco
@@ -975,8 +974,8 @@ def get_string_value_RXP(node):
 
 def encode_for_xml(s):
     "Encode special chars in string so that it would be XML-compliant."
-    s = string.replace(s, '&', '&amp;')
-    s = string.replace(s, '<', '&lt;')
+    s = s.replace('&', '&amp;')
+    s = s.replace('<', '&lt;')
     return s
 
 def print_errors(alist):
