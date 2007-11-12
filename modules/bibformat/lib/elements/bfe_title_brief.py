@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 def format(bfo, highlight="no"):
     """
     Prints a short title, suitable for brief format.
-    
+
     @param highlight highlights the words corresponding to search query if set to 'yes'
     """
 
@@ -35,9 +35,9 @@ def format(bfo, highlight="no"):
 
     out = title
     if len(title_remainder) > 0:
-        out += title_remainder + " : "
+        out += " : " + title_remainder
     if len(edition_statement) > 0:
-        out += edition_statement + " ; "
+        out += " ; " + edition_statement
 
     #Try to display 'Conference' title if other titles were not found
     if out == '':
@@ -48,6 +48,6 @@ def format(bfo, highlight="no"):
         out = bibformat_utils.highlight(out, bfo.search_pattern,
                                         prefix_tag="<span style='font-weight: bolder'>",
                                         suffix_tag='</style>')
-   
+
     return out
 
