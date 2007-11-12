@@ -349,7 +349,7 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         
     ret = [ (key,value) for key, value in recweightdic.iteritems() ] #sort according to values
 
-    ret.reverse()
+    ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second memeber of the tuples
     
     if verbose > 0:
         voutput = voutput+"\n"+"find_citations retlist "+str(ret)    
