@@ -17,24 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdir=$(localstatedir)/www/admin/bibformat
-
-FILESWML=$(wildcard $(srcdir)/*.wml)
-web_DATA=$(FILESWML:$(srcdir)/%.wml=%)
-
 webappdir = $(localstatedir)/www/admin/bibformat
+
 webapp_DATA = bibformat_migration_kit_assistant.py bibformatadmin.py js_quicktags.js
 
-EXTRA_DIST =  bibformat_migration_kit_assistant.py bibformatadmin.py js_quicktags.js $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST =  $(webapp_DATA)
 
-CLEANFILES = $(wildcard *.php) *~ *.tmp
-
-LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
-MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)
-
-%.php: %.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-       $(top_srcdir)/config/cdspage.wml $(top_srcdir)/config/cdsnavbar.wml $(MO)
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	for lang in en; do \
-		$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py $${lang} "$*.php" ; \
-	done
+CLEANFILES = *~ *.tmp
