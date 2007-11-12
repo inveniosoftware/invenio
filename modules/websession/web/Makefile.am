@@ -16,15 +16,3 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-webappdir = $(localstatedir)/www
-
-webapp_DATA = sessinit.inc.php 
-
-EXTRA_DIST = sessinit.inc.php.wml
-
-CLEANFILES = sessinit.inc.php *~ *.tmp
-
-sessinit.inc.php: sessinit.inc.php.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
