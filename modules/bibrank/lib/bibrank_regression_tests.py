@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibRank web pages whether they are up or not."""
 
     def test_rank_by_word_similarity_pages_availability(self):
-        """bibrank - availability of ranking search results pages""" 
+        """bibrank - availability of ranking search results pages"""
 
         baseurl = weburl + '/search'
 
         _exports = ['?p=ellis&r=wrd']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -47,12 +47,12 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_similar_records_pages_availability(self):
-        """bibrank - availability of similar records results pages""" 
+        """bibrank - availability of similar records results pages"""
 
         baseurl = weburl + '/search'
 
         _exports = ['?p=recid%3A18&rm=wrd']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -60,18 +60,23 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_citations(self):
-        """bibrank - citations"""
-        baseurl = weburl + '/search'
-        error_messages = []
-        _exports = ['?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&rof=hb&verbose=2']
-        for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
-        if error_messages:
-            self.fail(merge_error_messages(error_messages))
-        return
-        
-test_suite = make_test_suite(BibRankWebPagesAvailabilityTest)
+class BibRankCitationRankingTest(unittest.TestCase):
+    """Check BibRank citation ranking tools."""
+
+    def test_search_results_ranked_by_citations(self):
+        """bibrank - search results ranked by number of citations"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&rg=1',
+                                               expected_text="hep-th/0212138"))
+
+    def test_search_results_ranked_by_citations_verbose(self):
+        """bibrank - search results ranked by number of citations, verbose output"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
+                                               expected_text="find_citations retlist [(84, 3), (77, 2), (85, 0)]"))
+
+test_suite = make_test_suite(BibRankWebPagesAvailabilityTest,
+                             BibRankCitationRankingTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
