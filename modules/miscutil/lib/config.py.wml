@@ -48,6 +48,9 @@ etcdir = "<ETCDIR>"
 version = "<VERSION>"
 localedir = "<LOCALEDIR>"
 
+## Languages available on this server:
+cdslangs = ['de', 'en', 'es', 'ca', 'pt', 'fr', 'hr', 'it', 'ru', 'sk', 'cs', 'no', 'sv', 'el', 'uk', 'ja', 'pl', 'bg', 'zh_CN', 'zh_TW']
+
 ## intl versions of CDSNAME of this installation:
 cdsnameintl = {}
 <de>cdsnameintl['de'] = "<CDSNAMEINTL>"</de>
