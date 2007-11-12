@@ -402,15 +402,15 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             activated = 0 # Administrator confirmation required
 
 
-    if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
-        address_activation_key = mail_cookie_create_mail_activation(email)
-        ip_address = req.connection.remote_host or req.connection.remote_ip
+        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+            address_activation_key = mail_cookie_create_mail_activation(email)
+            ip_address = req.connection.remote_host or req.connection.remote_ip
 
-        if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
-            tmpl.tmpl_account_address_activation_email_body(
-                email, address_activation_key, ip_address, ln),
-            header='', footer=''):
-            return 1
+            if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
+                tmpl.tmpl_account_address_activation_email_body(
+                    email, address_activation_key, ip_address, ln),
+                header='', footer=''):
+                return 1
 
     # okay, go on and register the user:
     user_preference = get_default_user_preferences()
