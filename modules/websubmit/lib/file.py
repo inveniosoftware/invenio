@@ -424,7 +424,7 @@ class BibDoc:
             return None
 
     def addIcon(self, file, basename=''):
-        """link an icon with the bibdoc object"""
+        """link an icon with the bibdoc object. Return the icon bibdoc"""
         #first check if an icon already exists
         existingIcon = self.getIcon()
         if existingIcon is not None:
@@ -447,6 +447,7 @@ class BibDoc:
             os.umask(old_umask)
         self.touch()
         self.BuildRelatedFileList()
+        return newicon
 
     def deleteIcon(self):
         existingIcon = self.getIcon()
@@ -499,9 +500,9 @@ class BibDoc:
     def changeName(self, newname):
         """Rename the bibdoc name. New name must not be already used by the linked
         bibrecs."""
-        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, self.docname))
+        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
         if res:
-            raise StandardError, "A bibdoc called %s already exists for recid %s" % (self.docname, self.recid)
+            raise StandardError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
         run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
         for f in os.listdir(self.basedir):
             if f.startswith(self.docname):
