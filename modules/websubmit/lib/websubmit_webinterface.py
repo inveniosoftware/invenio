@@ -465,6 +465,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
                     description=_("Internal Error"),
                     keywords="%s, Internal Error" % c,
+                    uid = getUid(req),
                     language=ln,
                     req=req,
                     navmenuid='submit')
@@ -475,6 +476,7 @@ def warningMsg(title,req,c=cdsname,ln=cdslang):
                     body = title,
                     description=_("Internal Error"),
                     keywords="%s, Internal Error" % c,
+                    uid = getUid(req),
                     language=ln,
                     req=req,
                     navmenuid='submit')
