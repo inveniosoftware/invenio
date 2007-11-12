@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20070904, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20070904)
+AC_INIT(cds-invenio, 0.93.50.20071112, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071112)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -485,8 +485,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibformat/etc/format_templates/Makefile \
 	  modules/bibformat/lib/Makefile \
 	  modules/bibformat/lib/elements/Makefile \
-	  modules/bibformat/lib/core/Makefile \
-	  modules/bibformat/lib/common/Makefile \
 	  modules/bibformat/web/Makefile \
 	  modules/bibformat/web/admin/Makefile \
 	  modules/bibharvest/Makefile \
