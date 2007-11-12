@@ -3636,7 +3636,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 if sf: # do we have to sort?
                     recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of)
                 elif rm: # do we have to rank?
-                    results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_colls,
+                    results_final_for_all_colls_rank_records_output = rank_records(rm, 0, results_final_for_all_selected_colls,
                                                                                    string.split(p) + string.split(p1) +
                                                                                    string.split(p2) + string.split(p3), verbose)
                     if results_final_for_all_colls_rank_records_output[0]:
