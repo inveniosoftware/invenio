@@ -45,8 +45,8 @@ from invenio.external_authentication import InvenioWebAccessExternalAuthError
 import invenio.template
 websession_templates = invenio.template.load('websession')
 
-# perform_info(): display the main features of CDS personalize
 def perform_info(req, ln):
+    """Display the main features of CDS personalize"""
     out = ""
     uid = getUid(req)
 
@@ -101,8 +101,8 @@ def perform_youradminactivities(user_info, ln):
              weburl = weburl,
            )
 
-# perform_display_account(): display a dynamic page that shows the user's account
 def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
+    """Display a dynamic page that shows the user's account."""
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -142,16 +142,16 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
              administrative = perform_youradminactivities(user_info, ln)
            )
 
-# template_account() : it is a template for print each of the options from the user's account
 def template_account(title, body, ln):
+    """It is a template for print each of the options from the user's account."""
     return websession_templates.tmpl_account_template(
              ln = ln,
              title = title,
              body = body
            )
 
-# warning_guest_user(): It returns an alert message,showing that the user is a guest user and should log into the system
 def warning_guest_user(type, ln=cdslang):
+    """It returns an alert message,showing that the user is a guest user and should log into the system."""
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -161,8 +161,9 @@ def warning_guest_user(type, ln=cdslang):
              type = type,
            )
 
-## perform_delete():delete  the account of the user, not implement yet
+
 def perform_delete(ln):
+    """Delete  the account of the user, not implement yet."""
     # TODO
     return websession_templates.tmpl_account_delete(ln = ln)
 
@@ -244,9 +245,8 @@ def perform_set(email, ln, verbose=0):
     out += perform_display_external_user_settings(prefs, ln)
     return out
 
-##  create_register_page_box(): register a new account
 def create_register_page_box(referer='', ln=cdslang):
-
+    """Register a new account."""
     return websession_templates.tmpl_register_page(
              referer = referer,
              ln = ln,
