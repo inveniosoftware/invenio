@@ -715,16 +715,21 @@ def elaborate_fft_tags(record, rec_id, mode):
         tags8564s = record_get_field_instances(record, '856', '4', ' ')
         filtered_tags8564s = []
 
+        old_comments = {}
+        old_descriptions = {}
+
         # Let's discover all the previous internal urls, in order to rebuild them!
         for field in tags8564s:
             to_be_removed = False
             for value in field_get_subfield_values(field, 'u'):
                 if value.startswith('%s/record/%s/files/' % (weburl, rec_id)):
                     to_be_removed = True
-                    if descriptions.get(value, 'KEEP-OLD-VALUE') == 'KEEP-OLD-VALUE':
-                        descriptions[value] = field_get_subfield_values(field, 'y')
-                    if comments.get(value, 'KEEP-OLD-VALUE') == 'KEEP-OLD-VALUE':
-                        comments[value] = field_get_subfield_values(field, 'z')
+                    description = field_get_subfield_values(field, 'y')
+                    if description:
+                        old_descriptions[value] = description[0]
+                    comment = field_get_subfield_values(field, 'z')
+                    if comment:
+                        old_comments[value] = comment[0]
             if not to_be_removed:
                 filtered_tags8564s.append(field)
 
@@ -739,10 +744,14 @@ def elaborate_fft_tags(record, rec_id, mode):
         for file in latest_files:
             new_url = '%s/record/%s/files/%s' % (weburl, rec_id, file.getFullName())
             new_subfield = [('u', new_url)]
-            description = descriptions.get(new_url, descriptions.get(changed.get(new_url, ''), ''))
+            description = descriptions.get(new_url, '')
+            if description == 'KEEP-OLD-VALUE':
+                description = old_descriptions.get(changed.get(new_url, new_url), '')
             if description:
                 new_subfield.append(('y', description))
-            comment = comments.get(new_url, comments.get(changed.get(new_url, ''), ''))
+            comment = comments.get(new_url, '')
+            if comment == 'KEEP-OLD-VALUE':
+                comment = old_comments.get(changed.get(new_url, new_url), '')
             if comment:
                 new_subfield.append(('z', comment))
             record_add_field(record, '856', '4', ' ', '', new_subfield)
@@ -800,9 +809,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                 format = filename[len(file_strip_ext(filename)):].lower()
                 tmpurl = download_url(url, format)
                 try:
-                    bibdoc.addIcon(tmpurl, 'icon-%s' % bibdoc.getDocName())
+                    icondoc = bibdoc.addIcon(tmpurl, 'icon-%s' % bibdoc.getDocName())
                     if restriction and restriction != 'KEEP-OLD-VALUE':
-                        bibdoc.setStatus(restriction)
+                        icondoc.setStatus(restriction)
                 except StandardError, e:
                     write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
                 os.remove(tmpurl)
@@ -814,7 +823,7 @@ def elaborate_fft_tags(record, rec_id, mode):
 
     tuple_list = extract_tag_from_record(record, 'FFT')
     if tuple_list: # FFT Tags analysis
-        write_message("insert_fft_tags, all FFTs: "+str(tuple_list), verbose=9)
+        write_message("FFTs: "+str(tuple_list), verbose=9)
         docs = {} # docnames and their data
         comments = {} # files and their comments
         descriptions = {} # docnames and their descriptions
@@ -938,6 +947,15 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if icon and not icon == 'KEEP-OLD-VALUE':
                     _add_new_icon(bibdoc, icon, restriction)
             elif mode == 'replace_or_insert': # more like correct_or_insert
+                for bibdoc in bibrecdocs.listBibDocs():
+                    if bibdoc.getDocName() == docname:
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
+                            if newname != docname:
+                                try:
+                                    bibdoc.changeName(newname)
+                                except StandardError, e:
+                                    write_message(e, stream=sys.stderr)
+                                    break
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.listBibDocs():
                     if bibdoc.getDocName() == docname:
@@ -949,12 +967,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
                         else:
-                            if newname != docname:
-                                try:
-                                    bibdoc.changeName(newname)
-                                except StandardError, e:
-                                    write_message(e, stream=sys.stderr)
-                                    break
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.setStatus(restriction)
                             # Since the docname already existed we have to first
@@ -975,9 +987,17 @@ def elaborate_fft_tags(record, rec_id, mode):
                     if icon and not icon == 'KEEP-OLD-VALUE':
                         _add_new_icon(bibdoc, icon, restriction)
             elif mode == 'correct':
-                found_bibdoc = False
                 for bibdoc in bibrecdocs.listBibDocs():
                     if bibdoc.getDocName() == docname:
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
+                            if newname != docname:
+                                try:
+                                    bibdoc.changeName(newname)
+                                except StandardError, e:
+                                    write_message(e, stream=sys.stderr)
+                                    break
+                for bibdoc in bibrecdocs.listBibDocs():
+                    if bibdoc.getDocName() == newname:
                         found_bibdoc = True
                         if doctype == 'PURGE':
                             bibdoc.purge()
@@ -986,12 +1006,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
                         else:
-                            if newname != docname:
-                                try:
-                                    bibdoc.changeName(newname)
-                                except StandardError, e:
-                                    write_message(e, stream=sys.stderr)
-                                    break
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.setStatus(restriction)
                             (first_url, first_format) = urls[0]
@@ -1308,6 +1322,10 @@ def wipe_out_record_from_all_tables(recid):
     the database (bibrec, bibrec_bibxxx, bibxxx, bibfmt).  Useful for
     the time being for test cases.
     """
+    # delete all the linked bibdocs
+    bibrecdocs = BibRecDocs(recid)
+    for bibdoc in BibRecDocs(recid).listBibDocs():
+        bibdoc.expunge()
     # delete from bibrec:
     run_sql("DELETE FROM bibrec WHERE id=%s", (recid,))
     # delete from bibrec_bibxxx:
