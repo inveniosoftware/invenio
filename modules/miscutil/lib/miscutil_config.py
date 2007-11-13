@@ -39,5 +39,8 @@ CFG_MISCUTIL_ERROR_MESSAGES = \
     'ERR_MISCUTIL_NO_MESSAGE_IN_DICT': '_("An undefined error has occured. %s not defined in %s")',
     'ERR_MISCUTIL_UNDEFINED_ERROR': '_("An undefined error has occured (%s)")',
     'ERR_MISCUTIL_BAD_ARGUMENT_TYPE': '_("Unable to display error: Arguments do not match for error %s")',
-    'ERR_MISCUTIL_DEBUG': 'Error nb %i'
+    'ERR_MISCUTIL_DEBUG': 'Error nb %i',
+    'ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL' : '_("The system is not attempting to send an email from %s, to %s, with body %s")',
+    'ERR_MISCUTIL_CONNECTION_SMTP': '_("Error in connecting to the SMPT server waiting %s seconds. Exception is %s, while sending email from %s to %s with body %s.")',
+    'ERR_MISCUTIL_SENDING_EMAIL' : '_("Error in sending email from %s to %s with body %s")'
 }
