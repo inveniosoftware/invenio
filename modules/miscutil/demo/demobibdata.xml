@@ -38,7 +38,7 @@
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/cern/others/PHO/photo-ex/0106015_01.jpg</subfield>
             <subfield code="x">http://preprints.cern.ch/photo/photo-ex/0106015_01.gif</subfield>
-            <subfield code="r">RestrictedDoc</subfield>
+            <subfield code="r">restrdoc</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="o">0003717PHOPHO</subfield>
