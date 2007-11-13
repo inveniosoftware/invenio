@@ -999,6 +999,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        task_set_option('verbose', 0)
         err1, recid1 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid1, 'xm')
         inserted_hm = print_record(recid1, 'hm')
@@ -1013,6 +1014,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        task_set_option('verbose', 0)
         err2, recid2 = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid2, 'xm')
         inserted_hm = print_record(recid2, 'hm')
@@ -1025,6 +1027,7 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
                                            self.hm_testrec2))
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        task_set_option('verbose', 0)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
         self.assertEqual(-1, recid1_updated)
         # delete test records
@@ -1832,8 +1835,14 @@ class BibUploadFFTModeTest(unittest.TestCase):
     """
     Testing treatment of fulltext file transfer import mode.
     """
-    def test_simple_fft_insert_via_http(self):
-        """bibupload - simple FFT insert via HTTP"""
+
+    def _test_bibdoc_status(self, recid, docname, status):
+        res = run_sql('SELECT bd.status FROM bibrec_bibdoc as bb JOIN bibdoc as bd ON bb.id_bibdoc = bd.id WHERE bb.id_bibrec = %s AND bd.docname = %s', (recid, docname))
+        self.failUnless(res)
+        self.assertEqual(status, res[0][0])
+
+    def test_simple_fft_insert(self):
+        """bibupload - simple FFT insert"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -1889,8 +1898,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless(try_url_download(testrec_expected_url))
         bibupload.wipe_out_record_from_all_tables(recid)
 
-    def test_detailed_fft_insert_via_http(self):
-        """bibupload - detailed FFT insert via HTTP"""
+    def test_detailed_fft_insert(self):
+        """bibupload - detailed FFT insert"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -1971,8 +1980,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         #bibupload.wipe_out_record_from_all_tables(recid)
 
 
-    def test_simple_fft_insert_via_http_with_restriction(self):
-        """bibupload - simple FFT insert via HTTP with restriction"""
+    def test_simple_fft_insert_with_restriction(self):
+        """bibupload - simple FFT insert with restriction"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -2045,8 +2054,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless(open_icon.read() == restricted_icon.read())
         bibupload.wipe_out_record_from_all_tables(recid)
 
-    def test_simple_fft_insert_via_http_with_icon(self):
-        """bibupload - simple FFT insert via HTTP with icon"""
+    def test_simple_fft_insert_with_icon(self):
+        """bibupload - simple FFT insert with icon"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -2116,8 +2125,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
 
 
-    def test_multiple_fft_insert_via_http(self):
-        """bibupload - multiple FFT insert via HTTP and FILE"""
+    def test_multiple_fft_insert(self):
+        """bibupload - multiple FFT insert"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -2198,18 +2207,22 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # Using only html marc output is fine because a value is represented
         # by a single row, so a row to row comparison can be employed.
 
-        #self.failUnless(compare_xmbuffers(inserted_xm,
-                                          #testrec_expected_xm))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
         for url in testrec_expected_urls:
             self.failUnless(try_url_download(url))
-        # FIXME: compare also var/data/files/.../ content
-        # clean up after ourselves:
+
+        self._test_bibdoc_status(recid, 'head', '')
+        self._test_bibdoc_status(recid, '0101001', '')
+        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'demobibdata', '')
+
         bibupload.wipe_out_record_from_all_tables(recid)
 
-    def test_simple_fft_correct_via_http(self):
-        """bibupload - simple FFT correct via HTTP"""
+    def test_simple_fft_correct(self):
+        """bibupload - simple FFT correct"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -2280,6 +2293,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
 
+        self._test_bibdoc_status(recid, 'cds', '')
+
         #print "\nRecid: " + str(recid) + "\n"
         #print testrec_expected_hm + "\n"
         #print print_record(recid, 'hm') + "\n"
@@ -2287,8 +2302,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid)
 
 
-    def test_detailed_fft_correct_via_http(self):
-        """bibupload - detailed FFT correct via HTTP"""
+    def test_detailed_fft_correct(self):
+        """bibupload - detailed FFT correct"""
         # define the test case:
         test_to_upload = """
         <record>
@@ -2370,6 +2385,302 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                           testrec_expected_xm))
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
+
+        self._test_bibdoc_status(recid, 'patata', '')
+
+        #print "\nRecid: " + str(recid) + "\n"
+        #print testrec_expected_hm + "\n"
+        #print print_record(recid, 'hm') + "\n"
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_no_url_fft_correct(self):
+        """bibupload - no_url FFT correct"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="d">Try</subfield>
+          <subfield code="z">Comment</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="n">cds</subfield>
+          <subfield code="m">patata</subfield>
+          <subfield code="f">.gif</subfield>
+          <subfield code="d">KEEP-OLD-VALUE</subfield>
+          <subfield code="z">Next Comment</subfield>
+         </datafield>
+        </record>
+        """
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="y">Try</subfield>
+          <subfield code="z">Next Comment</subfield>
+         </datafield>
+        </record>
+        """ % { 'weburl': weburl}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(weburl)s/record/123456789/files/patata.gif$$yTry$$zNext Comment
+        """ % { 'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
+            % {'weburl': weburl}
+
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm))
+
+        self._test_bibdoc_status(recid, 'patata', '')
+
+        #print "\nRecid: " + str(recid) + "\n"
+        #print testrec_expected_hm + "\n"
+        #print print_record(recid, 'hm') + "\n"
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_multiple_fft_correct(self):
+        """bibupload - multiple FFT correct"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="d">Try</subfield>
+          <subfield code="z">Comment</subfield>
+          <subfield code="r">Restricted</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="f">.jpeg</subfield>
+          <subfield code="d">Try jpeg</subfield>
+          <subfield code="z">Comment jpeg</subfield>
+          <subfield code="r">Restricted</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="m">patata</subfield>
+          <subfield code="f">.gif</subfield>
+          <subfield code="r">New restricted</subfield>
+         </datafield>
+        </record>
+        """
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/patata.gif</subfield>
+         </datafield>
+        </record>
+        """ % { 'weburl': weburl}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(weburl)s/record/123456789/files/patata.gif
+        """ % { 'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
+            % {'weburl': weburl}
+
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm))
+
+        self._test_bibdoc_status(recid, 'patata', 'New restricted')
+
+        #print "\nRecid: " + str(recid) + "\n"
+        #print testrec_expected_hm + "\n"
+        #print print_record(recid, 'hm') + "\n"
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_purge_fft_correct(self):
+        """bibupload - purge FFT correct"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cdsweb.cern.ch/img/head.gif</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_purge = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+          <subfield code="t">PURGE</subfield>
+         </datafield>
+        </record>
+        """
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+         </datafield>
+        </record>
+        """ % { 'weburl': weburl}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
+        8564_ $$u%(weburl)s/record/123456789/files/head.gif
+        """ % { 'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" % { 'weburl': weburl}
+
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        test_to_purge = test_to_purge.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+        # purge test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_purge)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm))
+
+        self._test_bibdoc_status(recid, 'cds', '')
+        self._test_bibdoc_status(recid, 'head', '')
 
         #print "\nRecid: " + str(recid) + "\n"
         #print testrec_expected_hm + "\n"
